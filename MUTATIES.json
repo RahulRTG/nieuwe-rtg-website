@@ -3020,6 +3020,14 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "magnaatlab.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/magnaatlab.js",
+      "operator": "return-weg#1",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
     "magnaatwereld.test.js": {
       "soort": "puur",
       "staat": "gezakt",

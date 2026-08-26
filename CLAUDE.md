@@ -205,6 +205,33 @@ opzet, en het betekent er niet hetzelfde (daar een genre-cap, hier een
 bedrijfsfunctie) — één van de twee hoort een andere naam te krijgen vóór er iets
 op wordt gebouwd.
 
+**`MAGNAATLAB.md` is Magnaat als testhal** — de rol bovenop het spel dat
+`GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
+hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
+simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
+113 requires, en raakt daarmee **1 van 409 kerndomeinen** aan — 0%. Als testhal
+bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
+van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
+afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
+tenant-isolatie, doelschending, canary met automatische terugrol, shadow
+execution op echt verkeer, de bewijsmatrix), maar ze draaien allemaal tegen de
+echte server met testdata en geen van hen in een wereld. De pijp tussen spel en
+platform bestaat trouwens wel en loopt de verkeerde kant op: `magnaat-capabilities.js`
+leest RTG's echte routes en maakt er gameplay van, mét risicoclassificatie — wat
+ontbreekt is de retourrichting. **De scherpste bevinding
+staat in par. 3:** `kern/pay/poort.js` kent geen enkele demo-, test- of spelstand,
+en dat is precies waarom Magnaat er niet bij kan — een spelbank moet geld uit
+niets maken. De uitweg is dus géén vlag in de poort maar een vierde provider naast
+de bestaande demo-provider in `server/betaal.js`; de regel die daaruit volgt is
+**een simulatie-adapter vervangt de rail, nooit de poort**. Twee dingen om niet
+te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis
+buiten Magnaat niet toestaat, staat een groene simulatie niet toe), en scores
+mogen op apps en capabilities maar niet op mensen. En er staan al **twee**
+synthetische werelden (Magnaat en `kern/hospitality-universe/`) die elkaar
+aanroepen — die vraag hoort beantwoord vóór er een derde bij komt.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

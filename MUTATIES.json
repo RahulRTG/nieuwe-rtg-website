@@ -859,6 +859,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "capabilities.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/capabilities.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "care.test.js": {
       "soort": "server",
       "staat": "gezakt",

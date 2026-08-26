@@ -181,6 +181,30 @@ zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**
 gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
 niet uit die meting komt.
 
+**`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet "RTG
+heeft veel operating layers" maar "RTG is één besturingssysteem van
+gestandaardiseerde capabilities". Lees die vóór je een capability, een woordenlijst
+met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
+is a Capability* — is er eerst **gemeten** in plaats van aangenomen
+(`scripts/capabilities.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
+geen capabilitylaag in deze code, er zijn er **twintig**, 91% van de leden woont in
+precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
+allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
+routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
+toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
+(`betalen`, `binnenkomen`, `SEPA_UIT` — allemaal "mag deze aanroep, en doet hij
+het?"), en nooit over het **domeinvermogen** (`rooms`, `rides`, `menu` — wat voor
+zaak is dit), want dat is dezelfde fout als `Asset`. Het contract van punt 7 bestaat al en staat in het kleinste hoekje van
+het huis: `kern/appstore/machtigingen.js` draagt als enige een doel én een grens.
+Wat er nog niet is, staat er met de meting erbij: de eventenvelop ontbreekt (de bus
+vervoert, er is geen taal) en van de 115 beproefde muterende routes zijn er 15
+retry-veilig. Zeven punten die een besluit van de eigenaar vragen staan in par. 4,
+waaronder het goedkoopste om nu te nemen en het duurste om uit te stellen: het woord
+"Capabilities" staat in het lagenmodel van `PLATFORM.md` par. 2 én in dat van de
+opzet, en het betekent er niet hetzelfde (daar een genre-cap, hier een
+bedrijfsfunctie) — één van de twee hoort een andere naam te krijgen vóór er iets
+op wordt gebouwd.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
@@ -216,7 +240,7 @@ centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
 
-**`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
+**`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 

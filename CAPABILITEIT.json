@@ -1,0 +1,331 @@
+{
+  "woordenlijsten": 20,
+  "leden": 241,
+  "ledenInEen": 220,
+  "ledenInMeer": 21,
+  "ledenInEenPct": 91,
+  "maxGelijkenis": 0.22,
+  "gelijkendeParen": 0,
+  "paren": [],
+  "gedeeldeLeden": [
+    {
+      "id": "tickets",
+      "lijsten": 4,
+      "waar": [
+        "server/kern/lidboard/catalogus.js :: CAPS",
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "bezorgen",
+      "lijsten": 3,
+      "waar": [
+        "server/kern/groothandel.js :: GH_FUNCTIES",
+        "server/kern/zaak.js :: CAPS",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "retail",
+      "lijsten": 3,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "rides",
+      "lijsten": 3,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "bestuur",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/onderneming/rechtsvorm-nl.js :: BV_CAPS",
+        "server/school/rollen.js :: RECHTUITLEG"
+      ]
+    },
+    {
+      "id": "boerderij",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "care",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/lidboard/catalogus.js :: CAPS",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "charter",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "gebouw",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "gps",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/beveiliging.js :: BEV_FUNCTIES",
+        "server/kern/lidboard/catalogus.js :: CAPS"
+      ]
+    },
+    {
+      "id": "journaal",
+      "lijsten": 2,
+      "waar": [
+        "server/bedrijf/rollen-register.js :: RECHTEN",
+        "server/school/rollen.js :: RECHTUITLEG"
+      ]
+    },
+    {
+      "id": "location",
+      "lijsten": 2,
+      "waar": [
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "luchthaven",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/mobiliteit/opdracht.js :: RITSOORT_MODULE",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "marina",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "orders",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/zaak.js :: CAPS",
+        "server/seed/genres-lijst-a.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "polis",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/pda/modules.js :: PER_CAP",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "pricing",
+      "lijsten": 2,
+      "waar": [
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    },
+    {
+      "id": "retour",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/groothandel.js :: GH_FUNCTIES",
+        "server/kern/mobiliteit/opdracht.js :: RITSOORT_MODULE"
+      ]
+    },
+    {
+      "id": "rooster",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/beveiliging.js :: BEV_FUNCTIES",
+        "server/school/rollen.js :: RECHTUITLEG"
+      ]
+    },
+    {
+      "id": "salon",
+      "lijsten": 2,
+      "waar": [
+        "server/kern/lidboard/catalogus.js :: CAPS",
+        "server/kern/zaak.js :: CAPS"
+      ]
+    },
+    {
+      "id": "services",
+      "lijsten": 2,
+      "waar": [
+        "server/seed/genres-lijst-a.js :: caps (genre-register)",
+        "server/seed/genres-lijst-b.js :: caps (genre-register)"
+      ]
+    }
+  ],
+  "contract": [
+    {
+      "lijst": "server/kern/appstore/machtigingen.js :: MACHTIGINGEN",
+      "leden": 3,
+      "draagt": [
+        "label",
+        "risico",
+        "doel",
+        "grens"
+      ]
+    },
+    {
+      "lijst": "server/kern/objectlaag/caps.js :: CAPS",
+      "leden": 15,
+      "draagt": [
+        "label",
+        "uitleg",
+        "bestemming"
+      ]
+    },
+    {
+      "lijst": "server/kern/lidboard/catalogus.js :: CAPS",
+      "leden": 33,
+      "draagt": [
+        "label",
+        "uitleg"
+      ]
+    },
+    {
+      "lijst": "server/kern/mobiliteit/modulecatalogus.js :: MODULES",
+      "leden": 25,
+      "draagt": [
+        "label",
+        "uitleg"
+      ]
+    },
+    {
+      "lijst": "server/kern/bevoegdheid/lijst.js :: VERMOGENS",
+      "leden": 16,
+      "draagt": [
+        "label",
+        "rang"
+      ]
+    },
+    {
+      "lijst": "server/kern/command/vermogens.js :: VERMOGENS",
+      "leden": 12,
+      "draagt": [
+        "label",
+        "bron"
+      ]
+    },
+    {
+      "lijst": "server/seed/genres-lijst-a.js :: caps (genre-register)",
+      "leden": 25,
+      "draagt": [
+        "label"
+      ]
+    },
+    {
+      "lijst": "server/seed/genres-lijst-b.js :: caps (genre-register)",
+      "leden": 20,
+      "draagt": [
+        "label"
+      ]
+    },
+    {
+      "lijst": "server/kern/beveiliging.js :: BEV_FUNCTIES",
+      "leden": 14,
+      "draagt": [
+        "label"
+      ]
+    },
+    {
+      "lijst": "server/kern/groothandel.js :: GH_FUNCTIES",
+      "leden": 11,
+      "draagt": [
+        "label"
+      ]
+    },
+    {
+      "lijst": "server/kern/zaak.js :: CAPS",
+      "leden": 6,
+      "draagt": [
+        "label"
+      ]
+    },
+    {
+      "lijst": "server/school/rollen.js :: RECHTUITLEG",
+      "leden": 18,
+      "draagt": []
+    },
+    {
+      "lijst": "server/bedrijf/rollen-register.js :: RECHTEN",
+      "leden": 17,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/mobiliteit/opdracht.js :: RITSOORT_MODULE",
+      "leden": 13,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/rtmail-recht.js :: RECHTEN",
+      "leden": 12,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/onderneming/rechtsvorm-nl.js :: BV_CAPS",
+      "leden": 9,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/pda/modules.js :: PER_CAP",
+      "leden": 8,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/magnaat-partnerstudio-bedrijf.js :: RECHTEN",
+      "leden": 4,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/overheid/index.js :: RECHTSVORMEN",
+      "leden": 3,
+      "draagt": []
+    },
+    {
+      "lijst": "server/kern/rtfos/basis.js :: RECHTEN",
+      "leden": 3,
+      "draagt": []
+    }
+  ],
+  "volledigsteContract": {
+    "lijst": "server/kern/appstore/machtigingen.js :: MACHTIGINGEN",
+    "leden": 3,
+    "draagt": [
+      "label",
+      "risico",
+      "doel",
+      "grens"
+    ]
+  },
+  "bestanden": 2355,
+  "bekeken": 2355,
+  "kandidaten": 835
+}

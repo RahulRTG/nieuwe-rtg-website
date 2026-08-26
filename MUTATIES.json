@@ -5338,6 +5338,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "semantiek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/semantiek.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "sentinel.test.js": {
       "soort": "puur",
       "staat": "gezakt",

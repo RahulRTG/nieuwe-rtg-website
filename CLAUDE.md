@@ -232,6 +232,29 @@ mogen op apps en capabilities maar niet op mensen. En er staan al **twee**
 synthetische werelden (Magnaat en `kern/hospitality-universe/`) die elkaar
 aanroepen — die vraag hoort beantwoord vóór er een derde bij komt.
 
+**`BEWIJSMACHINE.md` is de lat boven de testhal** — niet of Magnaat kan bewijzen
+dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
+mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
+of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
+van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
+`SEMANTIEK.json`) en het was **geen incident**: van de 94 namen die in meer dan
+één domein staan, dragen er **77 meer dan één betekenis** — samen 279
+betekenissen, met `SOORTEN` op **38**. Daarnaast 19 namen met juist één betekenis
+op twee plekken, en die twee vragen het tegenovergestelde: een botsing wordt
+**hernoemd**, een dubbeling wordt **samengevoegd**. De 77 zijn geen foutenlijst
+maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
+kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
+en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies
+wat LAT-regel 11 en `check.js` regel 48 verbieden (bewijsgroen is geen
+go-live-groen, en `scripts/zekerheid.js` bestaat juist omdat losse eerlijke
+getallen samen een gevaarlijk gevoel geven); één samengesteld entropiecijfer
+verbergt welke van de 31 geratelde meters bewoog; en een register dat naast de
+code leeft, wordt binnen een jaar zelf de 78ste botsing — het hoort te worden
+afgeleid, met bron én handhaver zoals `WETTEN.json`. Wat er nagemeten **niet** is:
+release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
+die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
+één keer met opzet, en dat is iets anders dan zoeken.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

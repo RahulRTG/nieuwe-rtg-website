@@ -1,0 +1,2284 @@
+{
+  "catalogi": 833,
+  "verschillendeNamen": 518,
+  "namenInMeerDomeinen": 94,
+  "woordenMetMeerBetekenissen": 77,
+  "betekenissenTotaal": 279,
+  "ergsteWoord": "SOORTEN",
+  "ergsteAantal": 38,
+  "dubbelingen": 19,
+  "top": [
+    {
+      "naam": "SOORTEN",
+      "domeinen": 39,
+      "betekenissen": 38,
+      "hoogsteOverlap": 0.2,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/bedrijf/contract.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "klant",
+            "leverancier",
+            "arbeid",
+            "huur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/appstore/tijdlijn.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "geinstalleerd",
+            "verleend",
+            "teruggenomen",
+            "verwijderd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/avond/plan.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "eten",
+            "vervoer",
+            "uitgaan",
+            "verblijf"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bank/index.js",
+            "server/kern/koppel.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "betaal",
+            "spaar",
+            "zakelijk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bureau/twin.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "klimaat",
+            "water",
+            "elektra",
+            "beveiliging"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/comm/index.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "personal",
+            "group",
+            "business",
+            "order"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/tijd.js"
+          ],
+          "leden": 13,
+          "voorbeeld": [
+            "naam",
+            "handelsnaam",
+            "rechtsvorm",
+            "zetel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/creator.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "reel",
+            "post",
+            "story",
+            "video"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/dyncode.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "kas",
+            "tafel",
+            "entree",
+            "zegel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/facturatie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "verkoop",
+            "dienst",
+            "huur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/flits.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "flitser",
+            "file",
+            "ongeval",
+            "object"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gast/verzoek.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "bediening",
+            "rekening",
+            "water",
+            "bestek"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/geldbeleid/regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "minimumbuffer",
+            "maanddrempel",
+            "reserveer-maandelijks",
+            "gift-bevestiging"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/genootschap/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "openbaar",
+            "besloten",
+            "geheim"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/herkomst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "zelf",
+            "apparaat",
+            "behandelaar",
+            "afgeleid"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/foliolaag.js"
+          ],
+          "leden": 13,
+          "voorbeeld": [
+            "kamer",
+            "toeristenbelasting",
+            "ontbijt",
+            "restaurant"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/kletspraat/namen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "horeca",
+            "hotel",
+            "winkel",
+            "plek"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/ledenbalie-zaken.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "reis",
+            "betaling",
+            "app",
+            "partner"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensband/index.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "ouder",
+            "kind",
+            "partner",
+            "familie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/lifestyle/dossier.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "vastgoed",
+            "voertuig",
+            "vaartuig",
+            "kunst"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/apparatuur.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "ruimte",
+            "werkbank",
+            "sensor",
+            "camera"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/magnaat-partnerstudio-basis.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "locatie",
+            "afdeling",
+            "rol",
+            "aanbod"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mall/collecties.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "collectie",
+            "bundel",
+            "evenement",
+            "seizoen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/cdt-tijden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "rijden",
+            "ander",
+            "beschikbaar",
+            "pauze"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/office/basis.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "tekst",
+            "blad",
+            "presentatie",
+            "formulier"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/opvang.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "azc",
+            "nood",
+            "gezin",
+            "amv"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/ov/index.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "bus",
+            "trein",
+            "metro",
+            "veerboot"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/contracten.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "vast",
+            "tijdelijk",
+            "oproep",
+            "nuluren"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/persoonseis-lijst.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "identiteit",
+            "vog",
+            "beveiligingspas",
+            "dienstlegitimatie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rechterhand/logboek.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "jacht",
+            "vliegtuig",
+            "helikopter",
+            "oldtimer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/projecten.js"
+          ],
+          "leden": 18,
+          "voorbeeld": [
+            "jongeren",
+            "huiswerk",
+            "sport",
+            "maaltijden"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/bewoner.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "licht",
+            "afval",
+            "water",
+            "geluid"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsraad.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "foundation",
+            "club",
+            "instelling"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/objectsoorten.js"
+          ],
+          "leden": 13,
+          "voorbeeld": [
+            "lantaarn",
+            "container",
+            "sensor",
+            "verkeerslicht"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/tijdlijn.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "zorg",
+            "verzorging",
+            "meting",
+            "doel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wallet.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "pas",
+            "ticket",
+            "sleutel",
+            "munt"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/routes/webbrowser.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "vraag",
+            "offerte",
+            "sollicitatie",
+            "reservering"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 14,
+          "voorbeeld": [
+            "microsoft365",
+            "google",
+            "teams",
+            "zoom"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "STATUS",
+      "domeinen": 13,
+      "betekenissen": 10,
+      "hoogsteOverlap": 1,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/architect/bank.js",
+            "server/kern/atelier/bank.js",
+            "server/kern/hardwarelab/bank.js",
+            "server/kern/studio/bank.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "schets",
+            "voorontwerp",
+            "ontwerp",
+            "maquette"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/betaalopdracht/index.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "GEBOEKT",
+            "INGEDIEND",
+            "AFGEWIKKELD",
+            "MISLUKT"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/ideeen.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "nieuw",
+            "in-uitwerking",
+            "uitgewerkt",
+            "geparkeerd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/livinglab/doorbraak.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "voorstel",
+            "ingediend",
+            "toegekend",
+            "afgewezen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/controles.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "open",
+            "verklaard",
+            "afgehandeld"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfclubs.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "verkend",
+            "gesprek",
+            "actief"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/projecten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "idee",
+            "aanvraag",
+            "beoordeling",
+            "goedgekeurd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/werkorders.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "open",
+            "toegewezen",
+            "bezig",
+            "klaar"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/werkplaats.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "idee",
+            "uitgewerkt",
+            "in-bouw",
+            "klaar"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/inschrijving.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "aanmelding",
+            "wachtlijst",
+            "ingeschreven",
+            "uitgeschreven"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "STANDEN",
+      "domeinen": 11,
+      "betekenissen": 10,
+      "hoogsteOverlap": 0.4,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/avond/voorkeuren.js",
+            "server/kern/werkvenster.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "nooit",
+            "gevraagd",
+            "altijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gast/verzoek.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "open",
+            "opgepakt",
+            "klaar",
+            "ingetrokken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/leeg.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "muziek",
+            "kijk",
+            "flow",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/regie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mens",
+            "na-termijn",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/overheid/btwtoezicht.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "sluit_aan",
+            "wijkt_af",
+            "niet_aangegeven",
+            "alleen_concept"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/run.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "concept",
+            "gecontroleerd",
+            "manager",
+            "administrateur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rahul/stemming.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "gewoon",
+            "blij",
+            "chagrijnig",
+            "moe"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/tenant/levensloop.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "actief",
+            "opzegging",
+            "bewaring",
+            "vernietigd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/rust.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "thuis",
+            "avond",
+            "slaap",
+            "werk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/aanwezigheid.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "aanwezig",
+            "telaat",
+            "afwezig",
+            "ziek"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "NIVEAUS",
+      "domeinen": 10,
+      "betekenissen": 9,
+      "hoogsteOverlap": 0.17,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/beveiliging.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "laag",
+            "verhoogd",
+            "hoog"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/command/bijstand-niveaus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "kijken",
+            "meedenken",
+            "herstellen",
+            "nood"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/scope.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "concern",
+            "entiteit",
+            "vestiging",
+            "afdeling"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/geldbeleid/regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "kijken",
+            "voorstellen",
+            "klaarzetten",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/paspoort.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "bevestiging",
+            "idkaart",
+            "paspoort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rampbeeld/index.js",
+            "server/kern/spellen/sudoku.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "normaal",
+            "incident",
+            "opgeschaald",
+            "ramp"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/geografie.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "stad",
+            "wijk",
+            "buurt",
+            "zone"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereldkern.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "verstoord",
+            "onbekend",
+            "aandacht",
+            "gezond"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/log.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "CATEGORIEEN",
+      "domeinen": 9,
+      "betekenissen": 9,
+      "hoogsteOverlap": 0.13,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/manifest.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "sociaal",
+            "reizen",
+            "eten",
+            "media"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/atelier/bank.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "kleding",
+            "tassen",
+            "horloges",
+            "schoenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/lidboard/catalogus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "app",
+            "leven",
+            "privacy",
+            "verbinding"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/lifestyle/index.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "reis",
+            "restaurant",
+            "evenement",
+            "cadeau"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/luchthaven/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "lijn",
+            "privejet",
+            "helikopter"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/markt/regels.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "kleding",
+            "kids",
+            "wonen",
+            "elektronica"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/voertuigcatalogus.js"
+          ],
+          "leden": 26,
+          "voorbeeld": [
+            "auto",
+            "taxi",
+            "taxibus",
+            "rolstoelbus"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rechterhand/garderobe.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "pak",
+            "colbert",
+            "overhemd",
+            "schoenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/risico.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "financieel",
+            "reputatie",
+            "veiligheid",
+            "continuiteit"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "ROLLEN",
+      "domeinen": 10,
+      "betekenissen": 8,
+      "hoogsteOverlap": 0.19,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/bedrijf/rollen-register.js",
+            "server/kern/rtfos/basis.js",
+            "server/school/rollen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "directie",
+            "bestuur",
+            "financieel",
+            "verkoop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/foundation/gezinshulp.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "beheerder",
+            "ouder",
+            "kind",
+            "gezinslid"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/muziek-samen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "productie",
+            "zang",
+            "tekst",
+            "instrument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/bestuur.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "bestuurder",
+            "voorzitter",
+            "penningmeester",
+            "secretaris"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/ov/operatie.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "hoofdgast",
+            "familie",
+            "assistent",
+            "manager"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/overheid/pda/index.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "receptie",
+            "security",
+            "schoonmaak",
+            "bode"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rechterhand/ai.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reisboek",
+            "cellier",
+            "table",
+            "maison"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtgone.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "executive",
+            "finance",
+            "legal",
+            "privacy"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "BRONNEN",
+      "domeinen": 8,
+      "betekenissen": 8,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/tijdlijn.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "journaal",
+            "schakelaar",
+            "noodstand"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/dagcoach.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "medicijnen",
+            "zorg",
+            "verzorging",
+            "gewoonten"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/voorraad.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "keuken",
+            "retail",
+            "boerderij",
+            "groothandel"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/componenten.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "klok",
+            "contract",
+            "rooster",
+            "handmatig"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtgonderzoeker.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "verkeer",
+            "partners",
+            "vracht",
+            "werkvloer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/uitgifte.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "zaak",
+            "office",
+            "rijk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "menu",
+            "diensten",
+            "kamers",
+            "agenda"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereld/feed.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "alles",
+            "lifestyle",
+            "business",
+            "genootschap"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "MODI",
+      "domeinen": 8,
+      "betekenissen": 8,
+      "hoogsteOverlap": 0.13,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bankregie/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "partner",
+            "hybride",
+            "eigen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/werklijst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "bediening",
+            "runner",
+            "host",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/incidentcontrole.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "normaal",
+            "waakzaam",
+            "beperkt",
+            "beschermd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/index.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "muziek",
+            "kijk",
+            "flow",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/navigatie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "auto",
+            "fiets",
+            "lopen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/ov/operatie.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "chauffeur",
+            "konvooi",
+            "trein",
+            "lijnvlucht"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereld/rechten.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "alles",
+            "lifestyle",
+            "business",
+            "genootschap"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/routes/supplier/kassa/modus.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "bakker",
+            "restaurant",
+            "discotheek",
+            "sportkantine"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "FASEN",
+      "domeinen": 7,
+      "betekenissen": 7,
+      "hoogsteOverlap": 0.08,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/bedrijf/klant.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "lead",
+            "gesprek",
+            "demo",
+            "offerte"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levenslijn/fasen.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "geboorte",
+            "opvang",
+            "basisschool",
+            "middelbaar"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/fase.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "idee",
+            "validatie",
+            "oprichting",
+            "eersteklant"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderwijs-ladder.js"
+          ],
+          "leden": 25,
+          "voorbeeld": [
+            "po-g1",
+            "po-g2",
+            "po-g3",
+            "po-g4"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "idee",
+            "onderzoek",
+            "prototype",
+            "proef"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/opvang.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "aangemeld",
+            "opvang",
+            "statushouder",
+            "gehuisvest"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/apparaat.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "geproduceerd",
+            "getest",
+            "geregistreerd",
+            "geinstalleerd"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "RANG",
+      "domeinen": 7,
+      "betekenissen": 7,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bankregie/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "partner",
+            "hybride",
+            "eigen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/bevoegdheid/lijst.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "betaalinstelling",
+            "elektronischgeldinstelling",
+            "bank"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/geldgraaf/uitzonderingen.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "klaarzetten",
+            "voorstellen",
+            "kijken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/herkomst.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "behandelaar",
+            "apparaat",
+            "zelf",
+            "afgeleid"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levenslijn/fasen.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "komt",
+            "geweest",
+            "nvt"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/regie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mens",
+            "na-termijn",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereldkern.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "incident",
+            "aandacht",
+            "actief",
+            "gezond"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "TYPES",
+      "domeinen": 8,
+      "betekenissen": 6,
+      "hoogsteOverlap": 1,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/atelierweb.js",
+            "server/kern/journalistiek.js",
+            "server/kern/webmaker-schoon.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hospitality-universe/human-reality.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "klacht",
+            "publiek",
+            "kwetsbaar",
+            "beschermd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/logies.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "hotel",
+            "apartment",
+            "villa"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rechterhand/hangar.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "jet",
+            "turboprop",
+            "helikopter",
+            "charter"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/thuis/index.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "villa",
+            "appartement",
+            "huis",
+            "kamer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/uitgaan.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "bar",
+            "club",
+            "beachclub"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "VELDEN",
+      "domeinen": 6,
+      "betekenissen": 6,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/db/tx/pgachter.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "soort",
+            "ref",
+            "klant",
+            "zaak"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "telefoon",
+            "adres",
+            "identiteit",
+            "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "hardware",
+            "software",
+            "dorp",
+            "meta"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "van",
+            "onderwerp",
+            "tekst",
+            "soort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform-taal.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "naam",
+            "klas",
+            "opleiding",
+            "vestiging"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "STANDAARD",
+      "domeinen": 5,
+      "betekenissen": 5,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/canary.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "deel",
+            "drempel",
+            "minimum"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/keukenlaag.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "koud",
+            "warm",
+            "grill",
+            "frituur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/pasprijs.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "gratis",
+            "rtg",
+            "lifestyle"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/terugval.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "verkeerslicht",
+            "gemaal",
+            "brug",
+            "transformator"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/toegankelijk.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "tekst",
+            "contrast",
+            "beweging",
+            "links"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "BANK",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/architect/bank.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "villa",
+            "penthouse",
+            "landgoed",
+            "chalet"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/atelier/bank.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "kleding",
+            "tassen",
+            "horloges",
+            "schoenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hardwarelab/bank.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "apparaat",
+            "wearable",
+            "scherm",
+            "sensor"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/studio/bank.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "automotive",
+            "jacht",
+            "vliegtuig",
+            "helikopter"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "FASES",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/functies/register/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "fundament",
+            "stad",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hospitality-universe/world-model.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "discovery",
+            "onboarding",
+            "planning",
+            "arrival"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/office/basis.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "concept",
+            "beoordeling",
+            "goedgekeurd",
+            "archief"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rahul-fases.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "kind",
+            "scholier",
+            "student",
+            "volwassen"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "KANALEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.1,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/concern/uitnodiging.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "chat",
+            "email",
+            "telefoon",
+            "code"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "tafel",
+            "bar",
+            "club",
+            "terras"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/berichten.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "app",
+            "email",
+            "sms",
+            "push"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/zaken.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "bewonersapp",
+            "gemeente",
+            "telefoon",
+            "ambtenaar"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "RECHTEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/bedrijf/rollen-register.js"
+          ],
+          "leden": 17,
+          "voorbeeld": [
+            "werkruimte",
+            "mens",
+            "mens.gevoelig",
+            "project"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/magnaat-partnerstudio-bedrijf.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "bekijken",
+            "bewerken",
+            "goedkeuren",
+            "oefenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/basis.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "stadsbestuur",
+            "projectleider",
+            "medewerker"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-recht.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "metadata",
+            "lezen",
+            "antwoorden",
+            "verzenden"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "VORMEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/mediaos/catalogus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "track",
+            "video",
+            "clip",
+            "live"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/office/basis.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "kader",
+            "ovaal",
+            "ruit",
+            "pijl"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/spellen/magnaat/bankvormen.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "rekeningcourant",
+            "werkkapitaal",
+            "investering",
+            "vastgoed"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/werkvormen.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "vervoer",
+            "zelfstandig",
+            "horeca",
+            "verblijf"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "KETEN",
+      "domeinen": 4,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0.18,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/keten.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "reizen",
+            "gelegenheden",
+            "huishouden",
+            "vervoer"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/keten.js",
+            "server/kern/modebezorg.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "aangevraagd",
+            "geprijsd",
+            "aangeboden",
+            "geaccepteerd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/projecten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "idee",
+            "aanvraag",
+            "beoordeling",
+            "goedgekeurd"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "CAPS",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0.03,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/lidboard/catalogus.js"
+          ],
+          "leden": 33,
+          "voorbeeld": [
+            "reizen",
+            "salon",
+            "spelen",
+            "bestellen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/objectlaag/caps.js"
+          ],
+          "leden": 15,
+          "voorbeeld": [
+            "berichten",
+            "wbw",
+            "samengroep",
+            "vonk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/zaak.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "orders",
+            "reserveren",
+            "bezorgen",
+            "modebezorg"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "DISCIPLINES",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/architect/bank.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "villa",
+            "penthouse",
+            "landgoed",
+            "chalet"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hardwarelab/bank.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "apparaat",
+            "wearable",
+            "scherm",
+            "sensor"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/studio/bank.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "automotive",
+            "jacht",
+            "vliegtuig",
+            "helikopter"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "DOELGROEPEN",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0.1,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/functies/register/doelgroepen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "rtg",
+            "lifestyle",
+            "business",
+            "gast"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/berichten.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "vrijwilligers",
+            "partners",
+            "projectgroep",
+            "deelnemers"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/peiling.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "ouders",
+            "leerlingen",
+            "personeel"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "DOMEINEN",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/delegatie.js"
+          ],
+          "leden": 14,
+          "voorbeeld": [
+            "huishouden",
+            "vervoer",
+            "kring",
+            "reizen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-adres.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "personeel",
+            "kantoor",
+            "rtf",
+            "rtg"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/domeinen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "verkeer",
+            "licht",
+            "lucht",
+            "geluid"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "HANDELINGEN",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/horeca/rahul-register.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "werklijst.samenvatten",
+            "gang.voorstellen",
+            "mise.adviseren",
+            "allergie.aanpassen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/persoonseis-lijst.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "voorschrijven",
+            "verwijzen",
+            "uitreiken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/ainiveau.js"
+          ],
+          "leden": 16,
+          "voorbeeld": [
+            "melding-samenvoegen",
+            "werkorder-uit-zaak",
+            "bericht-sturen",
+            "meting-vragen"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "LAGEN",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/consent.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "care-intake",
+            "care-vastlegging",
+            "rtgid-sessie",
+            "rtgid-machtiging"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/rahul-register.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mag",
+            "mensbevestigt",
+            "verboden"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/wereld/rechten.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "persoonlijk",
+            "professioneel",
+            "creator",
+            "ondernemer"
+          ]
+        }
+      ]
+    }
+  ],
+  "bestanden": 2355
+}

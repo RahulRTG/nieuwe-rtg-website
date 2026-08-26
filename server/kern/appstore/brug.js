@@ -25,6 +25,8 @@
    ========================================================================== */
 'use strict';
 
+const fout = require('../platformfout');
+
 const GRENS = {
   opslagSleutels: 32,
   opslagSleutelLengte: 64,
@@ -65,18 +67,18 @@ function maakBrug(kern) {
 
   const METHODES = {
     /* profiel.basis -- de codenaam en verder niets waarmee je iemand vindt. */
-    'profiel.wieBenIk': { machtiging: 'profiel.basis', doe: (ctx) => ({
+    'profiel.wieBenIk': { machtiging: 'profiel.basis', mutatie: 'idempotent', doe: (ctx) => ({
       codenaam: ctx.codenaam, taal: ctx.taal, pas: ctx.pas,
       let: 'Dit is alles wat een app van derden over jou te zien krijgt.' }) },
 
     /* opslag.eigen -- een kladblok per app per lid. */
-    'opslag.lees': { machtiging: 'opslag.eigen', doe: (ctx, args) => {
+    'opslag.lees': { machtiging: 'opslag.eigen', mutatie: 'idempotent', doe: (ctx, args) => {
       const k = String((args && args.sleutel) || '').slice(0, GRENS.opslagSleutelLengte);
       const b = bak('opslag', ctx.sleutel, ctx.key);
       return { sleutel: k, waarde: Object.prototype.hasOwnProperty.call(b, k) ? b[k] : null };
     } },
-    'opslag.lijst': { machtiging: 'opslag.eigen', doe: (ctx) => ({ sleutels: Object.keys(bak('opslag', ctx.sleutel, ctx.key)).sort() }) },
-    'opslag.zet': { machtiging: 'opslag.eigen', doe: (ctx, args) => {
+    'opslag.lijst': { machtiging: 'opslag.eigen', mutatie: 'idempotent', doe: (ctx) => ({ sleutels: Object.keys(bak('opslag', ctx.sleutel, ctx.key)).sort() }) },
+    'opslag.zet': { machtiging: 'opslag.eigen', mutatie: 'idempotent', doe: (ctx, args) => {
       const k = String((args && args.sleutel) || '').trim();
       if (!k || k.length > GRENS.opslagSleutelLengte) return { fout: 'Een sleutel is 1 tot ' + GRENS.opslagSleutelLengte + ' tekens.' };
       const w = args && args.waarde == null ? '' : String(args.waarde);
@@ -89,7 +91,7 @@ function maakBrug(kern) {
       b[k] = w; save();
       return { ok: true, sleutel: k };
     } },
-    'opslag.wis': { machtiging: 'opslag.eigen', doe: (ctx, args) => {
+    'opslag.wis': { machtiging: 'opslag.eigen', mutatie: 'idempotent', doe: (ctx, args) => {
       const b = bak('opslag', ctx.sleutel, ctx.key);
       const k = String((args && args.sleutel) || '');
       if (Object.prototype.hasOwnProperty.call(b, k)) { delete b[k]; save(); }
@@ -100,7 +102,7 @@ function maakBrug(kern) {
        bakje van deze app; het lid haalt het op in de App Store. Er gaat geen
        push, geen e-mail en geen sms achteraan, en dat is geen kwestie van
        instellingen: er is geen weg naartoe (zie machtigingen.NIET_GEBOUWD). */
-    'bericht.zet': { machtiging: 'bericht.klaarzetten', doe: (ctx, args) => {
+    'bericht.zet': { machtiging: 'bericht.klaarzetten', mutatie: 'nietHerhaalbaar', doe: (ctx, args) => {
       const t = String((args && args.tekst) || '').trim().slice(0, GRENS.berichtLengte);
       if (t.length < 2) return { fout: 'Een bericht is 2 tot ' + GRENS.berichtLengte + ' tekens.' };
       const b = bak('bakjes', ctx.key, ctx.sleutel);
@@ -115,6 +117,13 @@ function maakBrug(kern) {
     } }
   };
 
+  /* DE MUTATIEPOORT, en hij staat hier omdat dit de RAND van het platform is:
+     alles in METHODES is publiek aanroepbaar door code van een derde. Een
+     methode zonder mutatieklasse laat de server niet starten -- en dat is met
+     opzet strenger dan een foutmelding bij het eerste verzoek, want dan zou een
+     bouwfout pas opvallen als een lid hem tegenkomt (kern/mutatie.js). */
+  require('../mutatie').poort(METHODES, 'de brug van de App Store');
+
   const namen = Object.keys(METHODES);
 
   /* De aanroep zelf. `ctx` komt van de route en niet van de app: de app noemt
@@ -123,7 +132,7 @@ function maakBrug(kern) {
   function roep({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }) {
     const naam = String(methode || '');
     const m = Object.prototype.hasOwnProperty.call(METHODES, naam) ? METHODES[naam] : null;
-    if (!m) return { status: 400, error: 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.' };
+    if (!m) return fout.maak('RTG_METHODE_ONBEKEND', 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.', { methode: naam, methodes: namen });
     const heeft = Array.isArray(verleend) ? verleend : [];
     if (!heeft.includes(m.machtiging)) {
       /* EEN WEIGERING DIE UITLEGT, en dat is geen vriendelijkheid maar
@@ -136,25 +145,26 @@ function maakBrug(kern) {
          hij het kan veranderen. Dat laatste is het belangrijkste: het lid, niet
          de uitgever, en niet RTG. */
       const gevraagdMaarNietGegeven = Array.isArray(vraagt) && vraagt.includes(m.machtiging);
-      return { status: 403,
-        error: 'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". '
+      return fout.maak(gevraagdMaarNietGegeven ? 'RTG_MACHTIGING_NIET_VERLEEND' : 'RTG_MACHTIGING_NIET_GEVRAAGD',
+        'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". '
           + (gevraagdMaarNietGegeven
               ? 'Je app vraagt hem in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.'
               : 'Je app vraagt hem niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.'),
+        { methode: naam,
         machtiging: m.machtiging,
         verleend: heeft,
         gevraagd: Array.isArray(vraagt) ? vraagt : null,
         hoe: gevraagdMaarNietGegeven
           ? 'Alleen het lid kan dit aanzetten, in de App Store onder "wat mag deze app". Vraag het niet nog eens via de brug; werk zonder deze machtiging verder.'
-          : 'Zet hem in het manifest van een volgende versie, met een doel. Die versie gaat opnieuw langs de keuring, en het lid beslist opnieuw.' };
+          : 'Zet hem in het manifest van een volgende versie, met een doel. Die versie gaat opnieuw langs de keuring, en het lid beslist opnieuw.' });
     }
     if (rem('roep:' + sleutel + ':' + key, GRENS.roepenPerMinuut, 60000)) {
-      return { status: 429, error: 'Meer dan ' + GRENS.roepenPerMinuut + ' aanroepen per minuut houdt de brug tegen.' };
+      return fout.maak('RTG_TE_VEEL_AANROEPEN', 'Meer dan ' + GRENS.roepenPerMinuut + ' aanroepen per minuut houdt de brug tegen.', { methode: naam, perMinuut: GRENS.roepenPerMinuut });
     }
     let uit;
     try { uit = m.doe({ key, sleutel, codenaam, taal, pas }, args || {}); }
-    catch (e) { return { status: 500, error: 'De brug kon deze aanroep niet uitvoeren.' }; }
-    if (uit && uit.fout) return { status: 400, error: uit.fout };
+    catch (e) { return fout.maak('RTG_BRUG_FOUT', 'De brug kon deze aanroep niet uitvoeren.', { methode: naam }); }
+    if (uit && uit.fout) return fout.maak('RTG_ARGUMENT_ONGELDIG', uit.fout, { methode: naam });
     return { status: 200, ok: true, uit };
   }
 
@@ -163,7 +173,13 @@ function maakBrug(kern) {
      zien of het gelezen is -- anders is een bericht een baken. */
   const { bakje, bakjeGelezen, bakjes } = require('./bakjes')({ S, save, eigen, bak, GRENS });
 
-  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, GRENS, boek };
+  /* De classificatie zelf gaat mee naar buiten, en niet alleen de namen: de SDK,
+     de documentatie en een taakloper moeten kunnen LEZEN wat een tweede aanroep
+     doet. Stond dat alleen in de definitie hierboven, dan moest ieder van die
+     drie het opnieuw afleiden (LAT-regel 4). */
+  const mutaties = require('../mutatie').overzicht(METHODES);
+
+  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, mutaties, GRENS, boek };
 }
 
 module.exports = { maakBrug, GRENS };

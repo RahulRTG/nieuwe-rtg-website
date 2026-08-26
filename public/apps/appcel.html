@@ -130,7 +130,19 @@ function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = 
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
   body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+}).then(async r => { const d = await r.json().catch(() => ({}));
+  /* Het HELE antwoord blijft aan de fout hangen en niet alleen de zin. De brug
+     schrijft bij een weigering vier dingen op -- welke machtiging, wat het lid
+     wel gaf, wat het manifest vroeg, en hoe het op te lossen is -- plus een
+     stabiele code. Die reisden tot hier en werden hier weggegooid. */
+  if (!r.ok) { const e = new Error(d.error || 'Er ging iets mis.'); e.antwoord = d; throw e; }
+  return d; });
+
+/* Dezelfde lijst als in kern/appstore/brugklant.js. Hij staat hier als
+   tekenreeks omdat een celpagina geen require kent; test/appstore-cel.test.js
+   houdt de twee gelijk, zodat dit geen tweede waarheid wordt. */
+const FOUTVELDEN = ['code', 'error', 'herhaalbaar', 'methode', 'methodes',
+  'machtiging', 'verleend', 'gevraagd', 'hoe', 'perMinuut'];
 
 const SLEUTEL = (() => { try { return new URLSearchParams(location.search).get('app') || ''; } catch (e) { return ''; } })();
 let frame = null, STAND = null;
@@ -176,7 +188,16 @@ window.addEventListener('message', async (e) => {
   try {
     const r = await api('/api/appstore/brug', { sleutel: SLEUTEL, methode: d.methode, args: d.args, taal: document.documentElement.lang || 'nl' });
     stuur({ uit: r.uit });
-  } catch (err) { stuur({ error: err.message }); }
+  } catch (err) {
+    /* De weigering gaat als OBJECT de cel in, niet als zin. Alleen de velden uit
+       FOUTVELDEN (kern/appstore/brugklant.js): een antwoord van de server kan
+       meer dragen dan een derde hoort te zien, dus dit is een doorlaatlijst en
+       geen doorgeefluik. */
+    const a = err.antwoord || {};
+    const fout = { error: err.message };
+    for (const k of FOUTVELDEN) if (a[k] !== undefined) fout[k] = a[k];
+    stuur({ fout });
+  }
 }, false);
 
 /* ---------- wat mag deze app: zien, bijstellen, intrekken ---------- */

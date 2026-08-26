@@ -40,14 +40,28 @@ test('1. de cel krijgt precies EEN sandbox-vlag, en camera noch microfoon', () =
 });
 
 test('2. de cel-CSP zet alles dicht en doet er stuk voor stuk iets bij', () => {
-  const s = lees_('server/routes/appstore/cel.js');
+  /* De CSP is verhuisd naar kern/appstore/brugklant.js, en dat is geen
+     verzwakking maar de reden dat hij te vertrouwen blijft: `rtg dev` serveert
+     dezelfde cel op de machine van een ontwikkelaar en moet exact dezelfde CSP
+     zetten. Twee kopieen lopen een keer uiteen, en dan is de fout "werkt lokaal,
+     geblokkeerd in de cel". Deze toets kijkt dus op de nieuwe plek EN rekent na
+     dat de cel hem daar werkelijk vandaan haalt. */
+  const bron = lees_('server/kern/appstore/brugklant.js');
+  const { celCsp } = require('../server/kern/appstore/brugklant');
+  const csp = celCsp('https://rtg.example');
   for (const eis of ["default-src 'none'", "connect-src 'none'", "form-action 'none'",
     "base-uri 'none'", "object-src 'none'", 'sandbox allow-scripts']) {
-    assert.ok(s.includes(eis), 'de cel-CSP mist ' + eis);
+    assert.ok(csp.includes(eis), 'de cel-CSP mist ' + eis);
   }
-  assert.ok(!/script-src[^;]*unsafe-inline/.test(s), 'scripts krijgen nooit unsafe-inline in de cel');
-  assert.ok(/immutable/.test(s), 'de hash staat in het pad, dus de bundel is voorgoed te bewaren -- dat is de snelheidsbelofte');
-  assert.ok(/Cross-Origin-Resource-Policy', 'cross-origin'/.test(s),
+  assert.ok(!/script-src[^;]*unsafe-inline/.test(csp), 'scripts krijgen nooit unsafe-inline in de cel');
+  assert.ok(!/allow-same-origin/.test(bron), 'de vlag die de herkomst teruggeeft komt ook in de gedeelde bron niet voor');
+
+  const cel = lees_('server/routes/appstore/cel.js');
+  assert.match(cel, /require\('\.\.\/\.\.\/kern\/appstore\/brugklant'\)/,
+    'de cel hoort de gedeelde CSP en brugklant te gebruiken en geen eigen kopie te houden');
+  assert.ok(!/default-src 'none'/.test(cel), 'en dus geen tweede CSP naast de gedeelde');
+  assert.ok(/immutable/.test(cel), 'de hash staat in het pad, dus de bundel is voorgoed te bewaren -- dat is de snelheidsbelofte');
+  assert.ok(/Cross-Origin-Resource-Policy', 'cross-origin'/.test(cel),
     'de cel moet de CORP van opzet/koppen.js loslaten: een naamloze herkomst is voor de browser een andere herkomst, en same-origin blokkeert dan de eigen bundel van de app');
 });
 

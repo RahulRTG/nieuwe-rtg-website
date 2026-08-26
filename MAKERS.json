@@ -1,0 +1,776 @@
+{
+  "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
+  "vastgelegd": "2026-08-26",
+  "gemeten": {
+    "makers": 8,
+    "bestanden": 56,
+    "vormen": 17,
+    "paren": 28,
+    "metGedeeldeKern": 1,
+    "drempel": 0.6
+  },
+  "makers": [
+    {
+      "id": "websitemaker",
+      "naam": "Website-maker",
+      "bestanden": 19,
+      "vormen": 6,
+      "talen": 9,
+      "opslag": [
+        "ledenSites",
+        "reviewStats",
+        "siteTeam",
+        "supplierTypes",
+        "suppliers",
+        "vacatures",
+        "webMerken"
+      ],
+      "levensloop": [
+        "concept",
+        "herstel",
+        "live",
+        "offline",
+        "plan",
+        "spoor",
+        "versies"
+      ],
+      "poorten": [
+        "auth",
+        "officeAuth",
+        "supplierAuth",
+        "techAuth"
+      ]
+    },
+    {
+      "id": "websitestudio",
+      "naam": "Website-studio (Atelier)",
+      "bestanden": 1,
+      "vormen": 2,
+      "talen": 2,
+      "opslag": [
+        "atelierSites"
+      ],
+      "levensloop": [
+        "concept"
+      ],
+      "poorten": [
+        "auth",
+        "officeAuth"
+      ]
+    },
+    {
+      "id": "appstore",
+      "naam": "App Store",
+      "bestanden": 22,
+      "vormen": 5,
+      "talen": 5,
+      "opslag": [
+        "appstore:aankopen",
+        "appstore:afdracht",
+        "appstore:apps",
+        "appstore:bakjes",
+        "appstore:journaal",
+        "appstore:opslag",
+        "appstore:uitgevers",
+        "appstore:verleend",
+        "appstore:versies"
+      ],
+      "levensloop": [
+        "offline",
+        "spoor",
+        "versies"
+      ],
+      "poorten": [
+        "auth",
+        "gastAuth",
+        "officeAuth",
+        "supplierAuth",
+        "techAuth"
+      ]
+    },
+    {
+      "id": "lesmaker",
+      "naam": "Lesmaker",
+      "bestanden": 2,
+      "vormen": 0,
+      "talen": 1,
+      "opslag": [
+        "lessen"
+      ],
+      "levensloop": [],
+      "poorten": []
+    },
+    {
+      "id": "clips",
+      "naam": "Clips-studio",
+      "bestanden": 3,
+      "vormen": 1,
+      "talen": 2,
+      "opslag": [
+        "clips",
+        "clipsMeldingen",
+        "clipsReacties",
+        "clipsVolg"
+      ],
+      "levensloop": [],
+      "poorten": [
+        "auth",
+        "officeAuth"
+      ]
+    },
+    {
+      "id": "ondernemer",
+      "naam": "Bedrijfsontwerper / Mall-bouwer",
+      "bestanden": 1,
+      "vormen": 0,
+      "talen": 0,
+      "opslag": [],
+      "levensloop": [],
+      "poorten": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ]
+    },
+    {
+      "id": "partnerstudio",
+      "naam": "Magnaat Partnerstudio",
+      "bestanden": 7,
+      "vormen": 2,
+      "talen": 3,
+      "opslag": [
+        "magnaatPartnerstudio",
+        "suppliers"
+      ],
+      "levensloop": [
+        "live",
+        "offline"
+      ],
+      "poorten": [
+        "auth",
+        "supplierAuth"
+      ]
+    },
+    {
+      "id": "creator",
+      "naam": "Creator-laag",
+      "bestanden": 1,
+      "vormen": 1,
+      "talen": 3,
+      "opslag": [],
+      "levensloop": [],
+      "poorten": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ]
+    }
+  ],
+  "paren": [
+    {
+      "a": "websitemaker",
+      "b": "websitestudio",
+      "gedeeldeKern": true,
+      "via": "taal",
+      "vorm": 0.22,
+      "vormA": "server/kern/webmaker.js",
+      "vormB": "server/kern/atelierweb.js",
+      "vormGedeeld": [
+        "bij",
+        "blokken"
+      ],
+      "taal": 0.71,
+      "taalA": "server/kern/webmaker-schoon.js",
+      "taalB": "server/kern/atelierweb.js",
+      "taalGedeeld": [
+        "beeld",
+        "citaat",
+        "galerij",
+        "hero",
+        "knop",
+        "kolommen",
+        "kop",
+        "ruimte",
+        "tekst",
+        "voettekst"
+      ],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [
+        "concept"
+      ],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "zelfde gesloten woordenschat (0.71): beeld citaat galerij hero knop kolommen kop ruimte"
+    },
+    {
+      "a": "websitemaker",
+      "b": "clips",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0.07,
+      "vormA": "server/kern/webmaker.js",
+      "vormB": "server/kern/clips.js",
+      "vormGedeeld": [
+        "online"
+      ],
+      "taal": 0.09,
+      "taalA": "server/kern/webmaker-schoon.js",
+      "taalB": "server/kern/clips.js",
+      "taalGedeeld": [
+        "vraag"
+      ],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0.09 en vorm 0.07 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0.08,
+      "vormA": "server/kern/appstore/versies.js",
+      "vormB": "server/kern/magnaat-partnerstudio-bedrijf.js",
+      "vormGedeeld": [
+        "categorie"
+      ],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [
+        "offline"
+      ],
+      "poortGedeeld": [
+        "auth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0.08 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitemaker",
+      "b": "appstore",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [
+        "offline",
+        "spoor",
+        "versies"
+      ],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth",
+        "techAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitemaker",
+      "b": "lesmaker",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitemaker",
+      "b": "ondernemer",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitemaker",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [
+        "suppliers"
+      ],
+      "levensloopGedeeld": [
+        "live",
+        "offline"
+      ],
+      "poortGedeeld": [
+        "auth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitemaker",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "appstore",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "lesmaker",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "clips",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "ondernemer",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "websitestudio",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "lesmaker",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "clips",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "ondernemer",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "appstore",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "lesmaker",
+      "b": "clips",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "lesmaker",
+      "b": "ondernemer",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "lesmaker",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "lesmaker",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "clips",
+      "b": "ondernemer",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "clips",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "clips",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "ondernemer",
+      "b": "partnerstudio",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "ondernemer",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "officeAuth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    },
+    {
+      "a": "partnerstudio",
+      "b": "creator",
+      "gedeeldeKern": false,
+      "via": null,
+      "vorm": 0,
+      "vormA": null,
+      "vormB": null,
+      "vormGedeeld": [],
+      "taal": 0,
+      "taalA": null,
+      "taalB": null,
+      "taalGedeeld": [],
+      "opslagGedeeld": [],
+      "levensloopGedeeld": [],
+      "poortGedeeld": [
+        "auth",
+        "supplierAuth"
+      ],
+      "waarom": "taal 0 en vorm 0 halen de drempel 0.6 niet"
+    }
+  ]
+}

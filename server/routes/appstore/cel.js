@@ -31,20 +31,19 @@
    ========================================================================== */
 const zlib = require('zlib');
 
+const { BRUGKLANT, celCsp, metBrug } = require('../../kern/appstore/brugklant');
+
 module.exports = (kern) => {
   const { app, appstore, appstoreWinkel } = kern;
 
   const herkomst = (req) => (req.protocol || 'http') + '://' + (req.get('host') || 'localhost');
 
-  /* De CSP van de cel. Alles staat op 'none' en wat een app nodig heeft komt er
-     stuk voor stuk bij -- en niet andersom, want dan is elke nieuwe browserfunctie
-     stilzwijgend toegestaan. 'self' matcht niet in een naamloze herkomst; daarom
-     staat de eigen herkomst er expliciet bij. */
-  const CEL_CSP = (o) =>
-    "default-src 'none'; script-src " + o + "; style-src " + o + " 'unsafe-inline'; " +
-    "img-src " + o + " data:; font-src " + o + "; media-src " + o + " data:; " +
-    "connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; " +
-    "frame-ancestors " + o + "; sandbox allow-scripts";
+  /* De CSP en de brugklant komen uit kern/appstore/brugklant.js en staan niet
+     meer hier. Reden: `rtg dev` serveert dezelfde cel op de machine van een
+     ontwikkelaar en moet exact dezelfde twee gebruiken. Twee kopieen betekent
+     dat ze een keer uiteenlopen, en dan is de fout "werkt lokaal, geblokkeerd in
+     de cel" -- precies de ervaring die dit kanaal niet moet geven. */
+  const CEL_CSP = celCsp;
 
   /* DE ENE KOP DIE HIER OMGEZET MOET WORDEN, EN WAAROM DAT GEEN VERZWAKKING IS.
 
@@ -70,45 +69,11 @@ module.exports = (kern) => {
     res.set('Referrer-Policy', 'no-referrer');
   };
 
-  /* De brugklant: het ENIGE stuk code in de cel dat van RTG is. Hij wordt in elk
-     celdocument gezet (zie hieronder), zodat een app hem niet kan vergeten en
-     niet kan vervangen: een app die zelf naar `parent` reikt, is bij de keuring
-     al afgekeurd (kern/appstore/keuring.js, VERBODEN_JS). */
-  const BRUGKLANT = `(function(){'use strict';
-var nr=0,open={};
-function terug(e){ if(e.source!==window.parent) return; var d=e.data;
-  if(!d||d.rtgcel!==1||typeof d.nr!=='number') return; var w=open[d.nr]; if(!w) return; delete open[d.nr];
-  if(d.error) w.nee(new Error(d.error)); else w.ja(d.uit); }
-window.addEventListener('message',terug,false);
-function roep(methode,args){ return new Promise(function(ja,nee){
-  var n=++nr; open[n]={ja:ja,nee:nee};
-  setTimeout(function(){ if(open[n]){ delete open[n]; nee(new Error('De brug antwoordde niet op tijd.')); } },15000);
-  window.parent.postMessage({rtgcel:1,nr:n,methode:String(methode),args:args||{}},'*'); }); }
-window.RTG={ roep:roep, versie:1,
-  /* Wat een app NIET van de brug krijgt, staat hier zodat het in de console van
-     de bouwer zichtbaar is en niet in een document dat hij nooit opent. */
-  nietGebouwd:{ netwerk:'Een cel heeft geen netwerk. Alles loopt via RTG.roep().',
-    naam:'Een app van derden krijgt een codenaam, nooit een echte naam.',
-    push:'Er is geen kanaal dat een telefoon laat trillen.' } };
-})();`;
-
   /* GEMOUNT en niet als losse route. De eigen webmotor (server/web/routing.js)
      compileert alleen `:naam`-stukken tot params en zet bij een RegExp-pad
      bewust GEEN captures -- en een bundelpad is meerdere segmenten diep. Een
      mount is hier dus niet de omweg maar de rechte weg: hij strookt met wat de
      router kan, en het restpad lezen we zelf. */
-  /* Het brugscript in elk celdocument zetten. Eerst in de <head>, zodat de app
-     RTG.roep() al heeft voordat zijn eigen code draait. Geen <head>? Dan
-     vooraan; de browser hangt hem alsnog in de head die hij zelf maakt.
-
-     Injecteren en niet vragen om een <script src="/appcel/brug.js">: zo kan een
-     app hem niet vergeten en niet vervangen. Zelf naar `parent` reiken is bij de
-     keuring al afgekeurd (kern/appstore/keuring.js, VERBODEN_JS). */
-  function metBrug(html) {
-    const tag = '<script src="/appcel/brug.js"></script>';
-    return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + tag) : tag + html;
-  }
-
   app.use('/appcel', (req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') return next();
     const rest = String(req.url || '/').split('?')[0];

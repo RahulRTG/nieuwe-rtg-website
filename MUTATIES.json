@@ -7,6 +7,14 @@
       "operator": "true->false",
       "gezakt": 1
     },
+    "a11yoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/a11yoordeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "aanmeldbesluit.test.js": {
       "soort": "server",
       "staat": "gezakt",

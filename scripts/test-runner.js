@@ -10,7 +10,7 @@
    twee zwaarste hele-serverproeven daarna een voor een. Geen globbing, shell
    of npm-pakket nodig.
 
-   TWEE VLAGGEN VOOR DE CI:
+   DRIE VLAGGEN VOOR DE CI:
 
      --deel=2/4      draai alleen deel 2 van vier. De verdeling is om en om over
                      de gesorteerde lijst (bestand i hoort bij deel i % 4), zodat
@@ -22,8 +22,14 @@
                      rekent daarna over ALLE delen samen (scripts/dekkingsvloer.js);
                      de vlaggen --test-coverage-* konden dat niet, want die
                      rekenen per proces.
+     --zonder-ijkingen  laat de zes bronmuterende ijkingen weg (scripts/lib/
+                     ijkingen.js). De CI geeft die elk een eigen job: meterijk
+                     alleen duurde 18 van de 19 minuten van het langste deel, en
+                     achter een deel aansluiten is voor een ijking geen eis --
+                     apart draaien is dat wel.
 
-   Zonder die twee vlaggen gedraagt dit script zich precies als vroeger. */
+   Zonder die vlaggen gedraagt dit script zich precies als vroeger: dan draaien
+   de ijkingen gewoon mee, een voor een, na de rest. */
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -31,6 +37,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
 const { ontleedDeel, verdeel } = require('./lib/delen');
+const { IJKINGEN } = require('./lib/ijkingen');
 
 const WORTEL = path.join(__dirname, '..');
 const geefAfbouwSlotVrij = pak('volledige Node-tests');
@@ -50,14 +57,8 @@ const deel = (() => {
   }
   return d;
 })();
-const GEISOLEERD = new Set([
-  'boot-smoke.test.js',
-  'grens-sweep.test.js',
-  'klok.test.js',
-  'zaakdoos.test.js',
-  'keuring.test.js',
-  'meterijk.test.js'
-]);
+const GEISOLEERD = new Set(IJKINGEN);
+const zonderIjkingen = argv.includes('--zonder-ijkingen');
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
   ? Math.min(gevraagd, 32)
@@ -88,7 +89,12 @@ function draai(namen, parallel) {
        moet blijven staan: scripts/gezakte-toetsen.js leest hem, en zonder die
        regels weet wie een rode stap ziet alleen DAT er iets zakte. */
     fs.mkdirSync(dekkingMap, { recursive: true });
-    const naam = 'deel-' + (deel ? deel.nr : 1) + '-' + (++batch) + '.info';
+    /* De naam draagt wie hem schreef. De meters-job kiepert de lcov-bestanden
+       van alle delen en alle ijkingen in een map; heten ze dan allemaal
+       deel-1-1.info, dan is bij een gat niet te zien wie er niets afleverde. */
+    const merk = deel ? 'deel-' + deel.nr
+      : (selectie.length === 1 ? selectie[0].replace(/\.test\.js$/, '') : 'alles');
+    const naam = merk + '-' + (++batch) + '.info';
     args.push('--experimental-test-coverage',
       '--test-reporter=' + (reporter || 'tap'), '--test-reporter-destination=stdout',
       '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
@@ -111,8 +117,15 @@ function draai(namen, parallel) {
    ijkingen op de willekeur van hun plek in het alfabet in een of twee delen
    laten vallen; apart krijgt elk deel er hoogstens twee. */
 const gewoon = verdeel(bestanden.filter(n => !GEISOLEERD.has(n)), deel);
-const geïsoleerd = verdeel(bestanden.filter(n => GEISOLEERD.has(n)), deel);
+/* --zonder-ijkingen: de zes draaien in de CI in hun eigen job. Een expliciete
+   --bestanden=meterijk.test.js wint altijd -- dat IS die eigen job. */
+const geïsoleerd = zonderIjkingen && !selectie.length
+  ? [] : verdeel(bestanden.filter(n => GEISOLEERD.has(n)), deel);
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
+if (zonderIjkingen && !selectie.length) {
+  console.log('[tests] zonder de ' + IJKINGEN.length + ' ijkingen (' + IJKINGEN.join(', ') +
+    '); die draaien in de CI elk in een eigen job');
+}
 console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk');
 let code = draai(gewoon, concurrency);
 for (const naam of geïsoleerd) {

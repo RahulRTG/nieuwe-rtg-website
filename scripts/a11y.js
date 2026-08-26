@@ -38,13 +38,40 @@ const STRICT = process.env.A11Y_STRICT === '1';
    EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
    ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
 const { alleSchermen } = require('./schermen');
+const { ontleedDeel, verdeel } = require('./lib/delen');
+const oordeel = require('./lib/a11yoordeel');
 /* Wie iets vindt, meet nog een keer -- een plek, twee ronden. */
 const hermeet = require('./a11y-hermeet');
 /* alleSchermen() loopt public/apps af. Het 404-scherm staat in public/site en
    viel daarmee buiten de keuring -- terwijl het juist een scherm is dat een
    bezoeker onverwacht krijgt. Er is geen derde plek: dit zijn alle .html onder
    public. */
-const PAGINAS = alleSchermen().concat(['/site/404.html']);
+const ALLE_PAGINAS = alleSchermen().concat(['/site/404.html']);
+
+/* OPGEDEELD METEN, EEN KEER OORDELEN (27 augustus 2026).
+
+     --deel=2/4          meet alleen dit kwart van de schermen
+     --meting=<bestand>  schrijf de RUWE tellingen daarheen en vel geen oordeel
+
+   Waarom die twee bij elkaar horen: het oordeel van deze scan is een budget over
+   de HELE ronde (A11Y-INGELOGD.json). Een deel dat zijn eigen kwart tegen dat
+   budget legt, laat vier keer zoveel door. Dus meet een deel alleen, en telt
+   scripts/a11y-oordeel.js de delen op voordat er een oordeel valt. Zonder deze
+   vlaggen doet dit script precies wat het altijd deed: alles meten en zelf
+   oordelen -- dat is wat `npm run a11y` lokaal draait. */
+const deelVlag = (process.argv.find(a => a.startsWith('--deel=')) || '').slice(7);
+const deel = (() => {
+  if (!deelVlag) return null;
+  const d = ontleedDeel(deelVlag);
+  if (!d) { console.error('[a11y] --deel verwacht de vorm N/M met 1 <= N <= M, kreeg: ' + deelVlag); process.exit(2); }
+  return d;
+})();
+const metingUit = (process.argv.find(a => a.startsWith('--meting=')) || '').slice(9);
+const PAGINAS = verdeel(ALLE_PAGINAS, deel);
+if (!PAGINAS.length) {
+  console.error('[a11y] dit deel heeft geen schermen; dat is geen groene ronde maar een lege.');
+  process.exit(2);
+}
 
 /* DE BROWSERKEUZE KOMT UIT test/browser.js, en niet meer uit een eigen kopie.
 
@@ -323,39 +350,43 @@ function startEchteServer() {
      hieronder blijft staan zoals hij is: hij leest het getal uit het register,
      dus als iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven,
      met een reden, en niet hier in de code wegwerken. */
+  const meting = { perRonde, totaal, raakTotaal, paginas: PAGINAS.length,
+    deel: deel ? deel.nr + '/' + deel.totaal : 'heel' };
+
+  /* EEN DEEL OORDEELT NIET. Het schrijft wat het gezien heeft en zwijgt verder;
+     scripts/a11y-oordeel.js telt de delen op en velt daarna een keer het oordeel
+     tegen het budget van de hele ronde. Zie scripts/lib/a11yoordeel.js. */
+  if (metingUit) {
+    fs.mkdirSync(path.dirname(path.resolve(metingUit)), { recursive: true });
+    fs.writeFileSync(metingUit, JSON.stringify(meting, null, 2) + '\n');
+    console.log(`\n[a11y] deel ${meting.deel}: ${PAGINAS.length} schermen gemeten, ` +
+      `${totaal} structureel, ${contrastTotaal} contrast, ${raakTotaal} raakvlak -> ${metingUit}`);
+    console.log('[a11y] dit deel velt geen oordeel; dat doet scripts/a11y-oordeel.js over alle delen samen.');
+    return;
+  }
+
+  /* DE RATEL IS OP NUL AANGEKOMEN, EN DAT IS DE HELE BEDOELING GEWEEST.
+
+     De ingelogde ronde bracht 25 contrastfouten mee die nooit eerder gemeten
+     waren -- negen unieke plekken, vrijwel allemaal het accent als kleine tekst
+     op een donkere grond. Die op dag een hard afkeuren zou betekenen: de poort
+     staat rood tot iemand negen CSS-plekken heeft nagelopen, en dan wordt hij
+     uitgezet. Die op nul zetten zou liegen. Dus stond er een bovengrens die
+     alleen omlaag mocht.
+
+     Op 17 augustus 2026 zijn die negen plekken gerepareerd en meet de ingelogde
+     ronde nul. De grens in A11Y-INGELOGD.json staat daarmee op nul en de poort
+     is hard in BEIDE staten, op structuur en op contrast. De constructie
+     blijft staan zoals hij is: hij leest het getal uit het register, dus als
+     iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven, met een
+     reden, en niet hier in de code wegwerken. */
   const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
-  const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
-  const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };
-  const zaakronde = perRonde.find(r => r.naam === 'zaak') || { struct: 0, contr: 0 };
-  const fouten = [];
-  if (totaal > 0) fouten.push(`${totaal} structurele overtreding(en) -- die zijn in beide staten hard nul`);
-  if (uitgelogd.contr > grens.uitgelogd.contrast)
-    fouten.push(`${uitgelogd.contr} contrastfouten uitgelogd, de grens is ${grens.uitgelogd.contrast}`);
-  if (ingelogd.contr > grens.ingelogd.contrast)
-    fouten.push(`${ingelogd.contr} contrastfouten ingelogd, de grens is ${grens.ingelogd.contrast} -- er is er een BIJGEKOMEN`);
-  /* De zaakronde leest zijn eigen grens. Hij staat apart van `ingelogd` omdat
-     het andere schermen zijn: alles achter de zaak-inlog. Zou hij bij ingelogd
-     worden opgeteld, dan kan een reparatie aan de ene kant een verslechtering
-     aan de andere kant maskeren. */
-  if (zaakronde.contr > (grens.zaak || {}).contrast)
-    fouten.push(`${zaakronde.contr} contrastfouten in de zaakronde, de grens is ${(grens.zaak || {}).contrast} -- er is er een BIJGEKOMEN`);
-  /* Het raakvlak leest zijn grens uit hetzelfde register, en zijn oordeel staat
-     in raakvlakkeuring.veltRaakvlak -- puur, dus test/raakvlak.test.js kan het
-     zonder browser laten zakken. */
-  const raakOordeel = raakvlak.veltRaakvlak(raakTotaal, (grens.raakvlak || {}).onder24);
-  if (raakOordeel.faalt) fouten.push(raakOordeel.melding.trim().replace(/^\[a11y\] MISLUKT: /, ''));
-  if (fouten.length) {
+  const uit = oordeel.veld(meting, grens);
+  if (uit.fouten.length) {
     console.error('\n[a11y] MISLUKT:');
-    for (const f of fouten) console.error('  · ' + f);
+    for (const f of uit.fouten) console.error('  · ' + f);
     process.exit(1);
   }
-  if (raakOordeel.melding) console.log(raakOordeel.melding);
-  if (ingelogd.contr < grens.ingelogd.contrast)
-    console.log(`\n[a11y] De grens kan strakker: ingelogd ${ingelogd.contr} tegen ${grens.ingelogd.contrast} in A11Y-INGELOGD.json.`);
-  if (zaakronde.contr < ((grens.zaak || {}).contrast || 0))
-    console.log(`\n[a11y] De grens kan strakker: zaak ${zaakronde.contr} tegen ${(grens.zaak || {}).contrast} in A11Y-INGELOGD.json.`);
-  console.log(`\n[a11y] ${PAGINAS.length} schermen in DRIE staten: uitgelogd, als lid, en als zaak. ` +
-    `Structuur nul in alle drie; contrast uitgelogd nul, lid ${ingelogd.contr} (grens ${grens.ingelogd.contrast}), ` +
-    `zaak ${zaakronde.contr} (grens ${(grens.zaak || {}).contrast}). ` +
-    `Raakvlak op telefoonformaat, lid en zaak: ${raakTotaal} onder ${raakvlak.GRENS}x${raakvlak.GRENS}.`);
+  for (const m of uit.meldingen) console.log(m);
+  console.log(uit.samenvatting);
 })().catch((e) => { console.error('[a11y] fout:', e); process.exit(1); });

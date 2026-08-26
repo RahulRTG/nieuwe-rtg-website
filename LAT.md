@@ -341,6 +341,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
 | de dekkingsvloer, opgeteld over de vier delen van de suite | `scripts/dekkingsvloer.js` |
+| het a11y-oordeel over de hele ronde, niet per deel | `scripts/lib/a11yoordeel.js` + `test/a11yoordeel.test.js` |
+| elke bronmuterende ijking draait ergens, en niet nergens | `scripts/lib/ijkingen.js` + `test/delen.test.js` |
 | gedeeld zout blijft bij de demo-seed en komt nooit op een echt account | `scripts/check.js` + `test/zaaihash.test.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |

@@ -58,11 +58,17 @@ concurrency:
 #   - de schermdekking (welke app heeft een toets echt geopend) idem, met
 #     .schermjournaal.
 #
-# En een die BEWUST niet is opgedeeld: de a11y-scan. Zijn oordeel is een budget
-# over de hele ronde ("ingelogd ten hoogste N contrastfouten"). Vier delen die
-# elk hun kwart tegen het HELE budget leggen, laten samen vier keer zoveel door.
-# Die scan hoort dus eerst zijn meting van zijn oordeel te scheiden (BESTUUR.md);
-# tot dan blijft hij heel, en hij is met ~16 minuten de langste job.
+# En de a11y-scan, die eerst NIET opgedeeld kon worden en het nu wel is. Zijn
+# oordeel is een budget over de hele ronde ("ingelogd ten hoogste N
+# contrastfouten"), en vier delen die elk hun kwart tegen dat HELE budget leggen
+# laten samen vier keer zoveel door. Daarom is daar op 27 augustus 2026 eerst de
+# meting van het oordeel gescheiden (BESTUUR.md): vier delen meten, een job telt
+# op en velt het oordeel. Zelfde budget, vier keer minder wachten.
+#
+# Wat er van die dag NIET is opgedeeld en waarom: niets meer. De zes
+# bronmuterende ijkingen hebben elk een eigen job gekregen omdat ze traag zijn
+# en op niets hoeven te wachten -- meterijk alleen duurde 18 van de 19 minuten
+# van het langste toetsdeel.
 # ============================================================================
 
 jobs:
@@ -141,19 +147,23 @@ jobs:
       # naam ("not ok 5861 - ...") liet iedereen alsnog de suite lokaal naspelen.
       # Zie scripts/gezakte-toetsen.js.
       #
-      # DEZE STAP DRAAIT NU DEZELFDE RUNNER ALS `npm test` (scripts/test-runner.js)
-      # en niet meer een kaal `node --test test/*.test.js`. Dat is geen detail:
-      # die runner houdt de zes bronmuterende ijkingen (meterijk, keuring,
-      # boot-smoke, ...) APART, een voor een, na de rest. Kaal draaiden ze
-      # tussen de scanners door, en dan kon een scanner het kortlevende
-      # ijkbestand van meterijk zien en rood worden op iets wat niet stuk was.
-      # Lokaal was dat al opgelost; in de CI stond die flake er nog.
-      # Prijs: het deel dat meterijk krijgt is daardoor het langste deel.
+      # DEZE STAP DRAAIT DEZELFDE RUNNER ALS `npm test` (scripts/test-runner.js)
+      # en niet een kaal `node --test test/*.test.js`. Dat is geen detail: die
+      # runner houdt de zes bronmuterende ijkingen (meterijk, keuring,
+      # boot-smoke, ...) apart van de scanners. Kaal draaiden ze ertussendoor,
+      # en dan kon een scanner het kortlevende ijkbestand van meterijk zien en
+      # rood worden op iets wat niet stuk was.
+      #
+      # --zonder-ijkingen laat die zes hier WEG: ze hebben hieronder elk een
+      # eigen job. In de eerste groene ronde (27 augustus 2026) duurde het
+      # langste deel 19m08, waarvan meterijk alleen 18m38 -- een deel dat vier
+      # minuten toetst en daarna een kwartier op een ijking wacht. Apart is
+      # zowel sneller als eerlijker: nu zie je in de keten wat elke ijking kost.
       - name: Unit- en integratietoetsen (json-opslag)
         run: |
           set -o pipefail
           uitslag=0
-          npm run test:deel -- --deel=${{ matrix.deel }}/4 --dekking=dekking 2>&1 | tee /tmp/deel.log || uitslag=$?
+          npm run test:deel -- --deel=${{ matrix.deel }}/4 --zonder-ijkingen --dekking=dekking 2>&1 | tee /tmp/deel.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/deel.log; fi
           exit "$uitslag"
         env:
@@ -172,11 +182,21 @@ jobs:
           if-no-files-found: error
           retention-days: 5
 
-  meters:
-    name: Dekking over alle delen samen
+  ijkingen:
+    # ELKE IJKING ZIJN EIGEN RUNNER. Deze zes toetsen zetten met opzet een
+    # bekend-fout bestand in de boom om te zien of een meter er rood van wordt
+    # (scripts/lib/ijkingen.js legt uit waarom ze nooit tussen de rest door
+    # mogen). Ze zijn traag omdat ze per meter een volledige scan draaien --
+    # meterijk doet er alleen al ruim achttien minuten over -- en ze hoeven op
+    # niets te wachten. De lijst staat op EEN plek; test/delen.test.js legt deze
+    # matrix daarnaast, zodat een zevende ijking niet stilletjes nergens draait.
+    name: De ijking - ${{ matrix.ijking }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: toetsen
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        ijking: [boot-smoke, grens-sweep, keuring, klok, meterijk, zaakdoos]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -184,10 +204,45 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - name: De metingen van de vier delen ophalen
+      - name: De ijking draaien (een bestand, alleen op deze machine)
+        run: |
+          set -o pipefail
+          uitslag=0
+          npm run test:deel -- --bestanden=${{ matrix.ijking }}.test.js --zonder-ijkingen --dekking=dekking 2>&1 | tee /tmp/ijk.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/ijk.log; fi
+          exit "$uitslag"
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      - name: De meting van deze ijking bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: meting-ijk-${{ matrix.ijking }}
+          path: |
+            dekking/
+            routejournaal.log
+          if-no-files-found: error
+          retention-days: 5
+
+  meters:
+    name: Dekking over alle delen samen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # OOK OP DE IJKINGEN WACHTEN. Zij draaien echte servers en laden echte
+    # modules, dus hun lcov en hun routejournaal horen bij dezelfde ronde. Zonder
+    # deze `needs` zou de vloer over driekwart van de meting oordelen en dat
+    # netjes groen noemen.
+    needs: [toetsen, ijkingen]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: De metingen van de delen en de ijkingen ophalen
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
-          pattern: meting-deel-*
+          pattern: meting-*
           path: meting
       # DE VLOER IS EEN RATEL, GEEN RAPPORTCIJFER. Zakt de dekking onder de
       # vloer, dan faalt deze stap; de vloeren en de meting waar ze op staan
@@ -203,7 +258,7 @@ jobs:
       # en dat is nodig: dekking.js weigert een journaal dat ouder is dan de code.
       - name: Waargenomen endpoint-dekking (uit de samengevoegde routejournalen)
         run: |
-          cat meting/meting-deel-*/routejournaal.log > routejournaal.log
+          cat meting/meting-*/routejournaal.log > routejournaal.log
           wc -l routejournaal.log
           node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
 
@@ -352,9 +407,25 @@ jobs:
         run: node scripts/containerproef.js
 
   a11y:
-    name: Toegankelijkheid (eigen keuring)
+    # OPGEDEELD METEN, EEN KEER OORDELEN. Deze scan was met ruim een kwartier de
+    # op een na langste job, en hij kon lang NIET opgedeeld worden: zijn oordeel
+    # is een budget over de hele ronde (A11Y-INGELOGD.json, vandaag overal nul),
+    # en vier delen die elk hun kwart tegen dat hele budget leggen laten samen
+    # vier keer zoveel door -- alle vier groen.
+    #
+    # Sinds 27 augustus 2026 is de meting van het oordeel gescheiden
+    # (BESTUUR.md): elk deel meet zijn kwart en schrijft ruwe tellingen weg, en
+    # de job `a11y-oordeel` hieronder telt ze op en velt daarna EEN keer het
+    # oordeel -- tegen precies hetzelfde budget als toen alles in een job zat.
+    # test/a11yoordeel.test.js laat dat zakken zodra iemand het per deel gaat
+    # afrekenen; die toets heeft geen browser nodig.
+    name: Toegankelijkheid deel ${{ matrix.deel }} van 4
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        deel: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -366,21 +437,44 @@ jobs:
         run: |
           npm i --no-save playwright@^1.49.0
           npx playwright install --with-deps chromium
-      # De naam stond hier tot 17 augustus 2026 als "de vlaggenschip-schermen",
-      # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
-      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd -- en sinds
-      # de raakvlakronde over alle schermen nog een derde keer, op telefoonformaat.
-      #
-      # DEZE SCAN IS NIET OPGEDEELD, en dat is een besluit. Zijn oordeel is een
-      # budget over de hele ronde ("ingelogd ten hoogste N contrastfouten",
-      # A11Y-INGELOGD.json). Vier delen die elk hun kwart tegen datzelfde budget
-      # leggen, laten met z'n vieren vier keer zoveel door -- een meter die
-      # zwakker wordt van het opdelen is erger dan een trage meter. Opdelen kan
-      # pas als de meting van het oordeel gescheiden is (BESTUUR.md).
-      - name: Eigen a11y-scan, uitgelogd + ingelogd + raakvlak op telefoonformaat
-        run: node scripts/a11y.js
+      # De scan gaat over ALLE schermen, uitgelogd en ingelogd, en sinds de
+      # raakvlakronde nog een derde keer op telefoonformaat. Dit deel meet zijn
+      # kwart daarvan en oordeelt niet.
+      - name: Eigen a11y-scan (dit kwart), uitgelogd + ingelogd + raakvlak
+        run: node scripts/a11y.js --deel=${{ matrix.deel }}/4 --meting=a11ymeting/deel-${{ matrix.deel }}.json
         env:
           A11Y_STRICT: '1'
+      - name: De meting van dit deel bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: a11ymeting-deel-${{ matrix.deel }}
+          path: a11ymeting/
+          if-no-files-found: error
+          retention-days: 5
+
+  a11y-oordeel:
+    name: Toegankelijkheid - het oordeel over alle delen
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: a11y
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: De metingen van de vier delen ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: a11ymeting-deel-*
+          path: a11ymeting
+      # --delen=4 is de helft van de grendel: minder metingen dan beloofde delen
+      # zakt. De andere helft zit in het script zelf -- de delen samen moeten
+      # ELK scherm hebben gezien dat scripts/schermen.js kent, anders oordeelt
+      # hij over een gat en dat is geen oordeel.
+      - name: Het oordeel over de hele ronde
+        run: node scripts/a11y-oordeel.js a11ymeting --delen=4
 
   schermen:
     name: Schermtoetsen deel ${{ matrix.deel }} van 4

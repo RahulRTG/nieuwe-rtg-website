@@ -29,6 +29,7 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { ontleedDeel, verdeel } = require('../scripts/lib/delen');
+const { IJKINGEN, KORT } = require('../scripts/lib/ijkingen');
 const vloer = require('../scripts/dekkingsvloer');
 
 test('--deel neemt alleen N/M met 1 <= N <= M', () => {
@@ -104,4 +105,29 @@ test('geen lcov is geen honderd procent maar een fout', () => {
 
 test('de vloeren staan waar de meting ze zette', () => {
   assert.deepEqual(vloer.VLOER, { regels: 78, takken: 78, functies: 65 });
+});
+
+/* DE DERDE MANIER WAAROP DEZE KETEN STIL MINDER KAN TOETSEN, en de reden dat
+   deze toets bestaat. De zes bronmuterende ijkingen worden sinds 27 augustus
+   2026 UIT de delen gelaten (--zonder-ijkingen) en krijgen elk een eigen job in
+   ci.yml. Dat zijn twee plekken die hetzelfde moeten zeggen. Loopt de matrix
+   achter op de lijst, dan is de nieuwe ijking uit de delen gehaald zonder dat
+   er een job voor is -- hij draait dan NERGENS, en alle jobs zijn groen.
+
+   MUTATIE (LAT.md regel 2): een naam uit de matrix in ci.yml weggehaald
+   -> "elke ijking heeft een eigen job in de keten" ZAKT (RAAK). */
+test('elke ijking heeft een eigen job in de keten', () => {
+  const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const regel = /^\s*ijking:\s*\[([^\]]+)\]\s*$/m.exec(yml);
+  assert.ok(regel, 'ci.yml heeft geen matrix `ijking: [...]`; dan draait geen enkele ijking meer');
+  const inKeten = regel[1].split(',').map(x => x.trim()).filter(Boolean).sort();
+  assert.deepEqual(inKeten, [...KORT].sort(),
+    'de matrix in ci.yml en scripts/lib/ijkingen.js zeggen niet hetzelfde: ' +
+    inKeten.join(', ') + '  vs  ' + KORT.join(', '));
+  /* En de bestanden moeten ook echt bestaan -- een ijking die hernoemd is en in
+     beide lijsten netjes meeverhuisde, maar niet op schijf staat, geeft een
+     groene job over nul toetsen. */
+  for (const naam of IJKINGEN) {
+    assert.ok(fs.existsSync(path.join(__dirname, naam)), 'ijking ontbreekt op schijf: ' + naam);
+  }
 });

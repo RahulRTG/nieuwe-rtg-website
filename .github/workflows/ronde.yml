@@ -111,10 +111,33 @@ jobs:
       # De hele suite draait hier met het routejournaal aan. Wat daarin staat is
       # ECHT aangeroepen -- geen tekstzoektocht door de tests, die telt ook een
       # routenaam in een commentaarregel mee.
-      - name: De hele suite, met routejournaal
-        run: npm test
+      # --dekking laat de runner per batch een lcov-bestand schrijven. Dat kost
+      # niets extra (de suite draait hier toch al helemaal) en het vult het gat
+      # dat de census hieronder al sinds zijn bestaan meldt: zonder
+      # DEKKING-LCOV.info zegt `samenhang` netjes NIET GEMETEN over de
+      # servermodules -- eerlijk, maar het antwoord op een vraag die niemand
+      # stelde. Twintig minuten om apart te maken, nul minuten om hier mee te
+      # nemen.
+      - name: De hele suite, met routejournaal en dekking
+        run: npm test -- --dekking=dekkinglcov
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      # De census leest EEN lcov-bestand, dus de batches gaan hier bij elkaar.
+      # `if: always()`, want ook na een gezakte suite is het beter dat de census
+      # zegt wat hij ziet dan dat hij zwijgt -- en zijn eigen controle (minstens
+      # vijftig records en eindigend op end_of_record) houdt een halve meting
+      # tegen. Zonder bestanden gebeurt er niets en meldt hij NIET GEMETEN.
+      - name: De dekkingsdata voor de census samenstellen
+        if: always()
+        run: |
+          shopt -s nullglob
+          delen=(dekkinglcov/*.info)
+          if [ ${#delen[@]} -gt 0 ]; then
+            cat "${delen[@]}" > DEKKING-LCOV.info
+            echo "DEKKING-LCOV.info: $(grep -c '^SF:' DEKKING-LCOV.info) bronbestanden uit ${#delen[@]} batch(es)"
+          else
+            echo "geen lcov gevonden; de census meldt straks NIET GEMETEN, en dat is dan het eerlijke antwoord"
+          fi
       # Deze poort is wel hard: dekking is machine-onafhankelijk. De vloer staat
       # in NORM.json (dekkingWaargenomenPct, endpointsNooitAangeraakt).
       - name: Waargenomen endpoint-dekking (uit het journaal)

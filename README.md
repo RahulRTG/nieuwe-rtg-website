@@ -839,7 +839,8 @@ rood was nooit als bewijs meetelt.
 ### De keten die dit draait (GitHub Actions)
 
 `.github/workflows/ci.yml` draait bij elke pull request en bij elke push naar
-`main`. De unit-suite en de schermtoetsen staan er allebei **in vier delen**
+`main`. De unit-suite, de schermtoetsen en de a11y-scan staan er alle drie **in
+vier delen**
 (`npm run test:deel -- --deel=2/4`, `npm run e2e -- --deel=2/4`), en dat is de
 reden dat drie meters een eigen job hebben gekregen:
 
@@ -852,10 +853,23 @@ reden dat drie meters een eigen job hebben gekregen:
   samengevoegde versie, want per deel zou driekwart van de routes en schermen er
   als "nooit aangeroepen" uitzien.
 
-Wat bewust NIET is opgedeeld, is de a11y-scan: zijn oordeel is een budget over de
-hele ronde (`A11Y-INGELOGD.json`), en vier delen die elk hun kwart tegen dat hele
-budget leggen, laten samen vier keer zoveel door. Een meter die zwakker wordt van
-het opdelen is erger dan een trage meter.
+**De a11y-scan is ook opgedeeld, maar pas nadat zijn oordeel losgemaakt was van
+zijn meting.** Dat oordeel is een budget over de hele ronde
+(`A11Y-INGELOGD.json`), en vier delen die elk hun kwart tegen dat hele budget
+leggen, laten samen vier keer zoveel door -- alle vier groen. Elk deel meet nu
+zijn kwart en schrijft ruwe tellingen weg (`--meting=`); `scripts/a11y-oordeel.js`
+telt die op en velt daarna één keer het oordeel, tegen precies dezelfde grenzen.
+Het oordeel zelf staat in `scripts/lib/a11yoordeel.js` en is puur, zodat
+`test/a11yoordeel.test.js` het zonder browser kan laten zakken -- onder andere op
+de vraag of vier delen met elk één fout samen vier fouten zijn.
+
+**De zes bronmuterende ijkingen** (`meterijk`, `keuring`, `boot-smoke`, ...,
+`scripts/lib/ijkingen.js`) draaien niet meer mee in de delen maar hebben elk een
+eigen job. Ze zijn traag omdat ze per meter een volledige scan doen -- `meterijk`
+alleen al ruim achttien minuten -- en ze hoeven op niets te wachten. De lijst
+staat op één plek en `test/delen.test.js` legt de matrix in `ci.yml` ernaast: een
+ijking die uit de delen is gehaald zonder eigen job zou anders nergens meer
+draaien, met alle jobs groen.
 
 ## Datamap instelbaar (RTG_DATA_DIR)
 

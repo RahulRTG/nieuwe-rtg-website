@@ -41,7 +41,7 @@ function vulling(n) {
 function meet(journalen) {
   const args = [path.join(WORTEL, 'scripts', 'dekking.js'), '--json'];
   for (const j of journalen) { args.push('--lees'); args.push(j); }
-  const opties = { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+  const opties = { cwd: WORTEL, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     timeout: 600000, maxBuffer: 64 * 1024 * 1024 };
   /* spawnSync EN NIET execFileSync, want deze meter zakt hier met opzet (zie de
      opmerking bij vulling): dan GOOIT execFileSync, en in dat foutpad kapt Node
@@ -50,10 +50,29 @@ function meet(journalen) {
      de toets op "Unterminated string in JSON at position 65536": een meetfout
      die eruitziet als een kapotte meter. spawnSync gooit niet en houdt zich wel
      aan maxBuffer. */
-  const r = spawnSync(process.execPath, args, opties);
-  const uit = String(r.stdout || '');
-  assert.ok(uit.trim().startsWith('{'), 'de meter gaf geen JSON terug: ' + uit.slice(0, 200));
-  return JSON.parse(uit);
+  /* TWEE KEER PROBEREN, EN ALLEEN ALS DE METER NIET HEEFT GEMETEN.
+
+     Op 27 augustus 2026 zakte deze toets een keer in CI met een lege uitvoer na
+     tien seconden: geen JSON, geen cijfer, geen klacht. Een kindproces dat
+     halverwege omvalt (een runner die krap zit, zes toetsen tegelijk die elk
+     een meter starten) levert geen ANDERE uitslag op maar GEEN uitslag -- en
+     dat is een meetfout en geen oordeel over de dekking. Vandaar een tweede
+     poging, maar uitsluitend voor dat geval: komt er JSON, dan telt die JSON,
+     ook als het cijfer laag is. Zakt de meter twee keer, dan zakt de toets met
+     de volledige diagnose van allebei de pogingen erbij -- want de vorige
+     melding ("de meter gaf geen JSON terug: ") liet je met lege handen achter:
+     stderr ging naar /dev/null en de afloopcode werd niet genoemd. */
+  const pogingen = [];
+  for (let poging = 1; poging <= 2; poging++) {
+    const r = spawnSync(process.execPath, args, opties);
+    const uit = String(r.stdout || '');
+    if (uit.trim().startsWith('{')) return JSON.parse(uit);
+    pogingen.push('poging ' + poging + ': afloop=' + r.status + ' signaal=' + r.signal +
+      (r.error ? ' fout=' + r.error.message : '') +
+      ' stdout=' + JSON.stringify(uit.slice(0, 200)) +
+      ' stderr=' + JSON.stringify(String(r.stderr || '').slice(-400)));
+  }
+  assert.fail('de meter gaf geen JSON terug, twee keer niet -- ' + pogingen.join(' | '));
 }
 
 test('twee journalen tellen samen, en een endpoint uit het tweede is niet meer "nooit aangeraakt"', () => {

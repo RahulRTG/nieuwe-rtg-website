@@ -265,6 +265,7 @@ function hulp() {
     ${vet('rtg new')} [map]        een nieuwe app, klaar om te draaien
     ${vet('rtg check')} [map]      de echte poort over je bundel, op je eigen machine
     ${vet('rtg dev')} [map]        draai je app in een echte cel, met een synthetisch lid
+    ${vet('rtg a11y')} [map]       de toegankelijkheidskeuring van dit huis, op jouw app
     ${vet('rtg sdk')} [--uit map]  schrijf de typings en de documentatie uit de code
 
   ${grijs('Geen van deze opdrachten heeft een inlog nodig en geen ervan raakt de')}
@@ -279,6 +280,7 @@ const OPDRACHTEN = {
   new: opdrachtNew,
   check: opdrachtCheck,
   dev: (argv) => require('./rtg-dev')(argv, { leesBundel, kleur }),
+  a11y: (argv) => require('./rtg-a11y')(argv, { leesBundel, kleur }),
   sdk: (argv) => require('./rtg-sdk')(argv, { kleur })
 };
 
@@ -296,6 +298,11 @@ function hoofd(argv) {
 module.exports = { hoofd, leesBundel, opdrachtCheck, opdrachtNew, SJABLOON };
 
 if (require.main === module) {
-  const uit = hoofd(process.argv.slice(2));
-  if (typeof uit === 'number') process.exit(uit);
+  /* Een opdracht mag een belofte teruggeven (rtg a11y start een browser). Zonder
+     dit afsluit-pad zou de uitgangscode van zo'n opdracht altijd 0 zijn, en dan
+     is hij in een CI-keten waardeloos: dan meldt hij een fout die niemand ziet. */
+  Promise.resolve(hoofd(process.argv.slice(2))).then(
+    (uit) => { if (typeof uit === 'number' && uit !== 0) process.exit(uit); },
+    (e) => { console.error(e && e.stack || e); process.exit(2); }
+  );
 }

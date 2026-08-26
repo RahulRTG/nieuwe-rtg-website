@@ -134,7 +134,8 @@
     "makers:vast": "node scripts/makers.js --vastleggen"
   },
   "devDependencies": {
-    "playwright": "^1.62.1"
+    "playwright": "^1.62.1",
+    "zz-ijk-dev": "^1.0.0"
   },
   "bin": {
     "rtg": "scripts/rtg.js"

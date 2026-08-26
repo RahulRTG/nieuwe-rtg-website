@@ -152,9 +152,16 @@ module.exports = function dev(argv, hulp) {
       return stuur(200, 'text/html; charset=utf-8', metBrug(bufVan(b).toString('utf8')), koppen);
     }
 
-    // ---- de gastheer: de RTG-kant, zoals /apps/appcel.html ----
+    /* ---- de gastheer: de RTG-kant, zoals /apps/appcel.html ----
+       `?start=` wijst het kader naar een ANDERE pagina uit dezelfde bundel. Dat
+       is er voor `rtg a11y`, die elke HTML in de bundel wil meten en niet alleen
+       de startpagina -- een tweede scherm heeft dezelfde knoppen en velden, en
+       die zijn anders nooit gemeten. Alleen paden die echt in de bundel zitten:
+       anders is dit een open deur naar een willekeurig bestand. */
     if (pad === '/' || pad === '/index.html') {
-      return stuur(200, 'text/html; charset=utf-8', gastheer());
+      const gevraagd = u.searchParams.get('start');
+      const start = gevraagd && bestandVan(gevraagd) && gevraagd.endsWith('.html') ? gevraagd : manifest.start;
+      return stuur(200, 'text/html; charset=utf-8', gastheer(start));
     }
     stuur(404, 'text/plain; charset=utf-8', 'niets hier');
   });
@@ -163,7 +170,7 @@ module.exports = function dev(argv, hulp) {
      `sandbox="allow-scripts"` en niets erbij, en een brug die postMessage naar
      een aanroep vertaalt -- plus de twee dingen die alleen hier bestaan: de
      schakelaars en het venster waarin je ziet wat er over de brug ging. */
-  function gastheer() {
+  function gastheer(start) {
     const rijen = toonbaar(manifest.machtigingen, manifest.doelen).map(m => `
       <label class="m"><input type="checkbox" data-id="${esc(m.id)}" checked>
         <span><b>${esc(m.label)}</b>
@@ -197,7 +204,7 @@ module.exports = function dev(argv, hulp) {
 <div class="doek">
   <div class="kop"><b>${esc(manifest.naam)}</b><span>${esc(manifest.sleutel)} ${esc(manifest.versie)}</span>
     <span style="margin-left:auto">cel · geen netwerk · naamloze herkomst</span></div>
-  <iframe id="cel" sandbox="allow-scripts" allow="" src="/cel/${esc(manifest.start)}" title="${esc(manifest.naam)}"></iframe>
+  <iframe id="cel" sandbox="allow-scripts" allow="" src="/cel/${esc(start || manifest.start)}" title="${esc(manifest.naam)}"></iframe>
 </div>
 <aside>
   <div><h2>Synthetisch lid</h2><p class="lid">codenaam <b>${esc(LID.codenaam)}</b> · taal ${esc(LID.taal)} · pas ${esc(LID.pas)}</p>
@@ -231,6 +238,11 @@ document.querySelectorAll('input[data-id]').forEach(v => v.addEventListener('cha
   }
 
   server.listen(poort, () => {
+    /* `stil` is er voor rtg a11y, die deze server als motor gebruikt: die wil
+       zijn eigen uitslag tonen en niet de opstartregels van een ander gereedschap
+       ertussen. Onderdrukken door de aanroeper werkt hier niet -- dit blok draait
+       pas als listen() klaar is, dus nadat die zijn console weer heeft teruggezet. */
+    if (hulp && hulp.stil) return;
     const G = brug.GRENS;
     console.log('\n  \x1b[1m' + manifest.naam + '\x1b[0m  \x1b[90m' + manifest.sleutel + ' ' + manifest.versie + '\x1b[0m');
     console.log('  \x1b[90mdraait op\x1b[0m  http://localhost:' + poort + '\n');

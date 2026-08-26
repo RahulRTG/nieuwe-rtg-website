@@ -306,8 +306,10 @@ En sinds P0/P1 (zie par. 11):
   geclassificeerd; een zevende zonder klasse laat de brug niet opbouwen.
 - **Eén foutentaal.** Stabiele codes, en een weigering die heel aankomt tot in de
   cel — `kern/platformfout.js`, `kern/appstore/brugklant.js`.
-- **Het gereedschap.** `rtg new`, `rtg check`, `rtg dev`, `rtg sdk` —
+- **Het gereedschap.** `rtg new`, `rtg check`, `rtg dev`, `rtg a11y`, `rtg sdk` —
   `scripts/rtg*.js`, zonder inlog en zonder de server te raken.
+- **De toegankelijkheidsadapter.** De bestaande a11y-machinerie gericht op een
+  derdenbundel, gemeten in de cel — `scripts/rtg-a11y.js` (par. 9.2).
 
 ---
 
@@ -517,17 +519,39 @@ geen onafhankelijke pentest is) en `scripts/chaos.js` (een server omleggen en
 meten of de rest het overneemt). Daar hoort `rtg break` te beginnen — niet in
 Magnaat. Magnaat kan later scenario's aanleveren; het is niet dezelfde motor.
 
-### 9.2 De keuring kijkt niet naar toegankelijkheid
+### 9.2 De keuring keek niet naar toegankelijkheid — de adapter staat er nu
 
 `kern/appstore/keuring.js` controleert bestandssoort, budget, verboden vormen,
 externe verwijzingen en de virusscan. Meer niet. De a11y-machinerie
-(`scripts/a11y.js`, `test/a11ykeuring.test.js`) draait over onze eigen schermen
-en heeft nooit een derdenbundel gezien.
+(`scripts/a11ykeuring.js`, `scripts/raakvlakkeuring.js`) draaide over onze eigen
+schermen en had nooit een derdenbundel gezien — niet omdat hij dat niet kon, maar
+omdat niemand hem erop had gericht.
 
-**Bouw daar geen tweede stack voor.** Wat ontbreekt is een adapter: derdenbundel
-→ gerenderd testoppervlak → de bestaande machinerie → bewijs bij de app. Dan
-wordt een machine die er al staat breder inzetbaar, en past het naadloos in een
-poort die toch al per regel uitlegt hoe het wél kan.
+Dat is nu gedaan, en **zonder tweede stack**: `scripts/rtg-a11y.js` injecteert de
+bestaande `BRON` van beide keuringen en laat `velt()` het oordeel geven. Wat de
+adapter toevoegt is de weg ernaartoe — de bundel renderen **in de cel**, met
+dezelfde CSP en dezelfde sandbox, op telefoonformaat, zodat wat er wordt gemeten
+is wat een lid krijgt.
+
+*Wat er onderweg uitkwam.* De eerste versie las de verkeerde sleutel
+(`structureel` in plaats van `overtredingen`, en beide zijn lijsten). Gevolg: de
+contrastfout kwam er per ongeluk goed uit en de zes structurele controles
+meldden stilletjes niets — een app zonder alt, zonder labels, zonder `lang` en
+zonder `<title>` kreeg "in orde". Een keuring die zwijgt ziet er precies zo uit
+als een keuring die niets vindt, en dat is de gevaarlijkste soort stilte.
+`test/rtg-a11y.test.js` toets 1 zakt daar nu op.
+
+**Het is bewijs en geen poort**, met twee redenen. Blokkeren zou apps weigeren
+die vandaag zijn toegelaten — een verandering van de afspraak met bestaande
+uitgevers. En dit is de eerste keer dat dit huis toegankelijkheid op derdencode
+meet; we kennen de uitgangsstand niet, en een poort waarvan niemand weet wat hij
+tegenhoudt is geen poort maar een verrassing.
+
+**Wat er nog niet is: de uitslag als bewijs bij de app in de winkel.** Dat vraagt
+een browser op het moment van inzenden, en die heeft de server niet — `keur()` is
+synchroon en browserloos. Vandaar dat dit een eigen opdracht is en geen stap in
+de machinepoort. Wie het wel wil, bouwt een keurloper naast de server; dat is
+een besluit met een eigen bewijslast en geen regel erbij.
 
 ### 9.3 Er is geen kostenvlak
 
@@ -591,7 +615,7 @@ verpakking; de payload is domein.** Dat is dezelfde scheiding die
 |---|---|---|
 | **P0** ✅ | corrigeren | makersmeting (`scripts/makers.js` + `MAKERS.json`); de gebeurtenisenvelop (`kern/envelop.js`); mutatieclassificatie met `onbekend` verboden aan de rand (`kern/mutatie.js`) |
 | **P1** grotendeels | de ingang voor ontwikkelaars | ✅ brugklant + CSP los; ✅ het foutmodel heel; ✅ `rtg check`, `rtg dev`, `rtg new`, `rtg sdk` — **open:** de individuele ontwikkelaarsidentiteit (par. 7.1), want die vraagt een besluit en geen code |
-| **P2** | zichtbaarheid | console; documentatie inclusief *bewust niet beschikbaar*; machtigingenverkenner; logs en traces; toegankelijkheid in de derdenkeuring |
+| **P2** begonnen | zichtbaarheid | ✅ toegankelijkheid op de derdenbundel (`rtg a11y`); ✅ documentatie inclusief *bewust niet beschikbaar* (`rtg sdk`) — **open:** console, machtigingenverkenner, logs en traces |
 | **P3** | distributie | private apps via entitlements; previews en beta; de vergunningsdiff als uitgave-primitief; snellere review waar het risico dat toelaat |
 | **P4** | RTG Forge | `aanval.js` + `chaos.js` tot één beproevingshal; app-gerichte adversariële tests; replay; regressiebewijs |
 | **P5** | serverside platform | functies, jobs, cron, managed state, gecontroleerd netwerk — pas als P0's mutatieclassificatie het draagt |

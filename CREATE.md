@@ -75,8 +75,9 @@ hieronder.*
 
 **CREATE-03 — Een gedeeld model vraagt gemeten semantische overlap.**
 Niet een gedeelde naam, niet een gedeeld gevoel: een meting. *Handhaver:
-`scripts/objectmodel.js` en `OBJECTMODEL.json` hebben dit al een keer gedaan en
-`Asset` daarmee tegengehouden; `scripts/makers.js` moet het voor de makers doen.*
+`scripts/objectmodel.js` + `OBJECTMODEL.json` hielden `Asset` tegen;
+`scripts/makers.js` + `MAKERS.json` doen het voor de makers, met
+`test/makers.test.js` eronder.*
 
 **CREATE-04 — Eenvoudig maken toont alleen veilige standaarden.**
 Wie op niveau 1 begint, kan niets kiezen dat hem later in de problemen brengt.
@@ -192,25 +193,47 @@ een derde zou moeten verklaren tot welke klasse het hoort, en de derde klasse �
 een blok dat iets DOET — is precies waar machtigingen aan hangen. Een indeling in
 consument/zakelijk had die vraag nooit gesteld.
 
-### Wat er eerst gemeten moet worden
+### De meting is gedaan. Dit kwam eruit.
 
-Voordat er een familie wordt uitgeroepen, hoort dezelfde meting te draaien die
-`scripts/objectmodel.js` al een keer heeft gedaan — nu over de makers
-(`scripts/makers.js`). Per maker: objectmodel, opdrachten, opslagmodel,
-publicatiemodel, machtigingen, levensloop, gedeelde taal. Envelop eraf, dan pas
-vergelijken.
-
-Uitkomst in de vorm waarin je hem kunt gebruiken:
+`scripts/makers.js` meet acht makers over 56 bestanden langs vijf dimensies:
+vorm (bewaarde velden na aftrek van de envelop), **taal** (gesloten
+woordenschatten), opslag (`db.data`-sleutels), publicatie (welke stappen van de
+levensloop) en poort (achter welke inlog). De extractie komt uit
+`scripts/objectmodel.js` en de envelop wordt daar overgenomen — een tweede manier
+om een vorm te lezen is een tweede manier om hem verkeerd te lezen. De uitkomst
+staat in `MAKERS.json`.
 
 ```
-Website-maker  ↔ Website-studio    gedeelde kern: JA
-Lesmaker       ↔ Website-studio    gedeelde kern: NEE
-Clips          ↔ Lesmaker          gedeelde kern: NEE
+8 makers, 56 bestanden, 17 bewaarde vormen na aftrek van de envelop
+28 paren onderzocht; 1 met een gedeelde kern (drempel 0,60)
+
+JA   websitemaker <-> websitestudio    taal 0,71   vorm 0,22
+     beeld citaat galerij hero knop kolommen kop ruimte tekst voettekst
+NEE  websitemaker <-> clips            taal 0,09   vorm 0,07
+NEE  al het andere                     0,00
 ```
+
+**Precies één paar deelt een kern, en het is het paar dat je bij het lezen al
+zag.** Al het andere zit op nul. Dat is geen zwak resultaat maar het antwoord:
+RTG Create is een laag over zelfstandige makers, en er hoort geen gedeeld
+projectmodel te komen.
+
+*Waarom er een tweede dimensie bij moest.* De eerste versie mat alleen vorm en
+gaf Website-maker ↔ Atelier **0,22** — terwijl die twee aantoonbaar dezelfde
+bloktaal spreken. Die taal woont niet in een bewaarde vorm maar in
+`TYPES = ['hero','kop',...]`. Een meter die daarnaast kijkt, zegt "nee" op de
+goede vraag om de verkeerde reden, en dat is erger dan geen meter.
+
+*En waarom het bewijs ertoe doet.* Toen de taaldimensie er eenmaal was, haalde
+het paar de drempel — maar met als bewijs `['id','type','verberg','varianten']`,
+een uitsluitlijstje dat in beide bestanden woordelijk staat en dus 1,00 scoort.
+Het oordeel klopte en het bewijs was waardeloos. Nu wint onder de paren die de
+drempel halen die met de **meeste gedeelde woorden**. Beide vallen staan als
+toets in `test/makers.test.js`.
 
 **Wat vier makers delen, is een projectmodel. Wat er twee delen, is een
-toevalligheid met een mooie naam.** Pas na die meting mogen gedeelde abstracties
-ontstaan — dezelfde discipline waarmee `Asset` is voorkomen.
+toevalligheid met een mooie naam.** Er zijn er twee, en ze delen een formaat —
+geen projectmodel. Dezelfde discipline waarmee `Asset` is voorkomen.
 
 ---
 
@@ -274,62 +297,84 @@ Per punt het bestand dat het doet.
 - **Het inkoopdossier.** Per bewering een bron in de code, plus een blok "wat dit
   dossier NIET zegt".
 
+En sinds P0/P1 (zie par. 11):
+
+- **De makersmeting.** `scripts/makers.js`, `MAKERS.json`, `test/makers.test.js`.
+- **De gebeurtenisenvelop.** Dertien velden, geen domeinkennis — `kern/envelop.js`.
+- **De mutatiesemantiek.** Zes klassen, en een poort die `onbekend` weigert aan
+  de rand van het platform — `kern/mutatie.js`. De zes brugmethodes zijn
+  geclassificeerd; een zevende zonder klasse laat de brug niet opbouwen.
+- **Eén foutentaal.** Stabiele codes, en een weigering die heel aankomt tot in de
+  cel — `kern/platformfout.js`, `kern/appstore/brugklant.js`.
+- **Het gereedschap.** `rtg new`, `rtg check`, `rtg dev`, `rtg sdk` —
+  `scripts/rtg*.js`, zonder inlog en zonder de server te raken.
+
 ---
 
-## 6. Een stap weg
+## 6. De ontwikkelaarsingang — gebouwd
 
-De onderdelen staan; wat ontbreekt is de schil. Dit is fase 4 van
-DEVELOPERCLOUD.md, doorgerekend.
+Dit was fase 4 van DEVELOPERCLOUD.md. Zes punten, en ze staan er alle zes. Ze
+blijven hier staan met hun reden erbij, want wie ze verandert hoort te weten
+waarom ze zo zijn.
 
-1. **Eén brugklant, één CSP.** Ze staan nu als string-literal in
-   `routes/appstore/cel.js` (regel 43 en 77). Een CLI die ze kopieert, maakt een
-   tweede brug — LAT-regel 4. Verhuizen naar `kern/appstore/brugklant.js`.
-2. **Eén foutmodel — en het is nu kapot.** `brug.js` geeft bij een weigering vier
-   velden terug (`machtiging`, `verleend`, `gevraagd`, `hoe`). `appcel.html:133`
-   maakt er `new Error(d.error)` van, `:179` stuurt alleen `err.message` terug,
-   `cel.js:81` maakt er opnieuw een kale string van. **Dat antwoord bereikt
-   vandaag niemand.** Het doel is niet een code maar een taal:
+**1. Eén brugklant, één CSP** — `kern/appstore/brugklant.js`.
+Ze stonden als tekenreeks in `routes/appstore/cel.js`. Dat werkte zolang de cel
+de enige lezer was; `rtg dev` is de tweede. Een kopie ernaast loopt een keer
+uiteen, en dan is de fout die een uitgever ziet *"werkt lokaal, geblokkeerd in de
+cel"* — precies de ervaring die dit kanaal niet moet geven (LAT-regel 4). De
+bestaande CSP-bewaker in `test/appstore-cel.test.js` is meeverhuisd en rekent er
+nu ook na dát de cel hem daar vandaan haalt.
 
-   ```
-   RTG_PERMISSION_PURPOSE_MISMATCH
-   operation:         bericht.zet
-   allowed_purpose:   klaar-melden
-   requested_purpose: marketing
-   retryable:         false
-   ```
+**2. Eén foutentaal** — `kern/platformfout.js`.
+De brug schreef bij een weigering al vier dingen op: welke machtiging nodig was,
+wat het lid WEL gaf, wat het manifest vroeg, en hoe het op te lossen is. Dat
+bereikte niemand — `appcel.html` maakte er `new Error(d.error)` van en stuurde
+alleen `err.message` de cel in. Nu draagt elke weigering een stabiele code en
+komt alles heel aan als `RTGFout` met velden. `uitgezondenDoor` in de codetabel
+wijst het bestand aan en wordt nagerekend, dus een code die niets kan produceren
+valt om. Wat er géén code heeft, staat in `NOG_GEEN_CODE` mét de reden.
 
-   met de mensentekst ernaast: *deze machtiging bestaat, maar niet voor dit doel.*
-3. **`rtg check`.** `keur()` is al puur (`{bestanden, manifest, antivirus}`, geen
-   db, geen sessie), dus een CLI kan de echte poort requiren in plaats van hem na
-   te bouwen. Eén obstakel: zonder virusscanner geeft `keur()` `door: false`, wat
-   op de server juist is en in een CLI elke bundel afkeurt om een reden die de
-   bouwer niet kan oplossen. Oplossing in de taal van dit huis: **drie uitslagen
-   in plaats van twee** — vorm in orde of blokkeert, virusscan *niet uitgevoerd*
-   (BESTUUR.md: `niet vast te stellen` is een eersteklas uitslag). Een `eisScan`
-   die op de server default `true` blijft.
-4. **`rtg dev` draait de ECHTE brug.** `maakBrug()` heeft alleen
-   `{S, save, nu, boek, eigen}` nodig; een in-memory `S()` levert de echte brug
-   met de echte grenzen. Een emulator die de regels nábouwt, liegt vroeg of laat
-   over precies de grens waarop een app stukloopt.
+**3. `rtg check`** — de echte poort, op je eigen machine.
+`keur()` was al puur, dus de CLI require't hem in plaats van hem na te bouwen:
+dezelfde verbodenlijst, hetzelfde budget, dezelfde regelnummers. Eén obstakel
+moest worden opgelost: zonder virusscanner gaf `keur()` `door: false`, wat op de
+server juist is en in een CLI elke bundel afkeurt om een reden die de bouwer niet
+kan oplossen. Er zijn nu **drie uitslagen**: vorm in orde of blokkeert, virusscan
+*niet uitgevoerd*, keuring *niet vast te stellen* (BESTUUR.md — een eersteklas
+uitslag naast in orde en storing). Op de server blijft `eisScan` op `true` en
+verandert er niets.
 
-   **En hij doet nooit alsof een ontbrekende capability bestaat.** Lokaal
-   `rtg.notifications.send()` laten werken terwijl productie hem met opzet niet
-   kent, is de duurste vorm van behulpzaamheid die er is. De emulator antwoordt
-   woordelijk zoals productie antwoordt:
+**4. `rtg dev` draait de ECHTE brug** — `scripts/rtg-dev.js`.
+`maakBrug()` heeft alleen `{S, save, nu, boek, eigen}` nodig, dus een opslag in
+het geheugen levert de echte brug met de echte grenzen: 32 sleutels, 4 kB per
+waarde, 64 kB totaal, 5 berichten per dag, 120 aanroepen per minuut. Die getallen
+staan nergens in de CLI — ze komen uit `brug.GRENS`. Een emulator die ze nábouwt,
+liegt vroeg of laat over precies de grens waarop een app stukloopt.
 
-   ```
-   Capability niet beschikbaar
-   Reden:     Een derde mag een bericht KLAARZETTEN, maar het toestel
-              van een lid niet onderbreken.
-   Wel:       bericht.klaarzetten
-   ```
+En hij doet **nooit alsof een capability bestaat die er niet is**. Een aanroep
+die in productie weigert, weigert hier met dezelfde tekst, dezelfde code en
+hetzelfde alternatief. Een machtiging is met een vinkje in te trekken — juist die
+weg is de weg die niemand test.
 
-   Nee, plus waarom, plus de veilige route.
-5. **SDK en typings, gegenereerd** uit `METHODES` + `machtigingen.js`, met een
-   toets die zakt als er een methode bij komt zonder hergeneratie. De SDK is een
-   **getypeerde projectie van de bewezen architectuur** — dus `rtg.profile.basic`
-   en `rtg.messages.prepare`, en géén `rtg.assets` zolang dat begrip niet bestaat.
-6. **`rtg new`.** Vraagt wat je maakt, niet welk configbestand je wilt.
+**5. SDK en typings, gegenereerd** — `scripts/rtg-sdk.js`.
+Uit `METHODES`, `kern/mutatie.js`, `machtigingen.js`, `platformfout.js`,
+`GRENS` en `BUDGET`. Een handgeschreven `.d.ts` loopt uit de pas op de dag dat er
+een zevende methode bij komt; een toets zakt als de vormenlijst achterloopt. De
+mutatieklasse staat per methode in de typings én in de documentatie, want dat is
+wat een taakloper moet lezen.
+
+**6. `rtg new`** — een app die zijn eigen `rtg check` doorkomt.
+Dat laatste is een toets, en hij ving meteen iets: het eerste sjabloon noemde
+`fetch()` in een **commentaarregel**, en de poort leest regels zonder commentaar
+af te strijken. Dus blokkeerde `rtg new` gevolgd door `rtg check`. Dat is streng
+en het is de goede kant om streng te zijn — een lijst die je omzeilt door je
+aanroep in een string te zetten, is geen lijst.
+
+**Wat er met opzet niet in zit: inzenden.** `rtg check` en `rtg dev` vragen geen
+inlog en raken de server niet. Inzenden blijft op `/apps/appstore-uitgever.html`,
+want daar hangt een uitgeversplek aan een organisatie. Zo hoeft niemand een BV te
+hebben om te kunnen bouwen — en het identiteitsvraagstuk uit par. 7.1 hoefde niet
+eerst te worden opgelost om dit te kunnen leveren.
 
 ### `NIET_GEBOUWD` wordt documentatie
 
@@ -544,15 +589,22 @@ verpakking; de payload is domein.** Dat is dezelfde scheiding die
 
 | | fase | wat |
 |---|---|---|
-| **P0** | corrigeren | makersmeting (`scripts/makers.js`); capabilityterminologie vastzetten; de gebeurtenisenvelop; mutatieclassificatie met `UNKNOWN` verboden aan de rand |
-| **P1** | de ingang voor ontwikkelaars | individuele ontwikkelaarsidentiteit; brugklant + CSP los; het foutmodel heel; `rtg check`; `rtg dev`; SDK en typings; `rtg new` |
+| **P0** ✅ | corrigeren | makersmeting (`scripts/makers.js` + `MAKERS.json`); de gebeurtenisenvelop (`kern/envelop.js`); mutatieclassificatie met `onbekend` verboden aan de rand (`kern/mutatie.js`) |
+| **P1** grotendeels | de ingang voor ontwikkelaars | ✅ brugklant + CSP los; ✅ het foutmodel heel; ✅ `rtg check`, `rtg dev`, `rtg new`, `rtg sdk` — **open:** de individuele ontwikkelaarsidentiteit (par. 7.1), want die vraagt een besluit en geen code |
 | **P2** | zichtbaarheid | console; documentatie inclusief *bewust niet beschikbaar*; machtigingenverkenner; logs en traces; toegankelijkheid in de derdenkeuring |
 | **P3** | distributie | private apps via entitlements; previews en beta; de vergunningsdiff als uitgave-primitief; snellere review waar het risico dat toelaat |
 | **P4** | RTG Forge | `aanval.js` + `chaos.js` tot één beproevingshal; app-gerichte adversariële tests; replay; regressiebewijs |
 | **P5** | serverside platform | functies, jobs, cron, managed state, gecontroleerd netwerk — pas als P0's mutatieclassificatie het draagt |
 
-**P0 kost het minst en beslist het meest.** Elke stap daarna is omkeerbaar; het
+**P0 kostte het minst en besliste het meest.** De makersmeting gaf één paar met
+een gedeelde kern van de achtentwintig, en daarmee ligt de vorm van Create vast
+voordat er een regel schil op stond. Elke stap daarna is omkeerbaar; het
 projectmodel en de gebeurtenistaal zijn dat niet.
+
+Wat P1 nog open laat is met opzet geen code: **wie mag er publiceren zonder
+rechtspersoon** (par. 7.1). Bouwen en lokaal draaien vragen vandaag geen enkele
+identiteit, dus dat besluit hield het gereedschap niet tegen — het houdt alleen
+tegen dat wat je bouwt bij een lid terechtkomt.
 
 ---
 

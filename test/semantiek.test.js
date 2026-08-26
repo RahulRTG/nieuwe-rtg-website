@@ -116,6 +116,43 @@ test('6. en de andere kant op: totaal losse catalogi WORDEN gemeld', () => {
   assert.equal(r.top[0].waar.length, 2, 'en beide plekken staan erbij');
 });
 
+test('6b. de naamloze ronde vindt EEN waarheid onder TWEE namen', () => {
+  /* De ronde die het geval vond waar het om ging: kern/ledenbalie.js droeg
+     `PASSEN` en kern/ledenregister.js `PAS_VOLGORDE` met dezelfde vier leden en
+     een identieke afgeleide functie. De naam-ronde ziet dat paar per definitie
+     niet, want hij groepeert op naam. */
+  const leden = ['gratis', 'rtg', 'lifestyle', 'business'];
+  const r = S.analyse([
+    cat('server/kern/balie/x.js', 'PASSEN', leden.slice()),
+    cat('server/kern/register/x.js', 'PAS_VOLGORDE', leden.slice())
+  ]);
+  assert.equal(r.namenInMeerDomeinen, 0, 'op naam gegroepeerd is er niets te zien');
+  assert.equal(r.dubbelingenZonderNaam, 1, 'maar op inhoud wel');
+  assert.equal(r.dubbelingZonderNaamLijst[0].aNaam, 'PASSEN');
+  assert.equal(r.dubbelingZonderNaamLijst[0].bNaam, 'PAS_VOLGORDE');
+});
+
+test('6c. de naamloze ronde negeert kleine generieke schaaltjes', () => {
+  /* Met drie leden matcht [hoog midden laag] op elke andere drieledige schaal en
+     verzuipt de echte vondst. Vandaar de ondergrens; zonder hem is het getal
+     ruis. */
+  const r = S.analyse([
+    cat('server/kern/a/x.js', 'ERNST', ['hoog', 'midden', 'laag']),
+    cat('server/kern/b/x.js', 'ZWAARTE', ['hoog', 'midden', 'laag'])
+  ]);
+  assert.equal(r.dubbelingenZonderNaam, 0,
+    'drie leden is te weinig om van overtypen te spreken (ondergrens ' + S.NAAMLOOS_VANAF + ')');
+});
+
+test('6d. het GETAL en de LIJST van dubbelingen kunnen niet uiteenlopen', () => {
+  /* Hier stonden twee definities van "dubbeling" -- een teller in de clusterlus
+     en een lijst die op soort filterde -- en die gaven 19 en 14. Dezelfde
+     waarheid op twee plekken, in de meter die daar juist over gaat. */
+  const r = S.meet();
+  assert.equal(r.dubbelingen, r.dubbelingLijst.length,
+    'het getal is de lengte van de lijst, en niet een tweede telling');
+});
+
 test('7. de echte meting draait, en klopt met wat er is vastgelegd', () => {
   const r = S.meet();
   assert.ok(r.catalogi >= 200, 'er zijn catalogi gevonden (' + r.catalogi + ')');
@@ -125,7 +162,8 @@ test('7. de echte meting draait, en klopt met wat er is vastgelegd', () => {
   assert.ok(fs.existsSync(pad), 'SEMANTIEK.json bestaat -- draai: npm run semantiek:vast');
   const vast = JSON.parse(fs.readFileSync(pad, 'utf8'));
   for (const sleutel of ['catalogi', 'verschillendeNamen', 'namenInMeerDomeinen',
-    'woordenMetMeerBetekenissen', 'betekenissenTotaal', 'ergsteWoord', 'ergsteAantal', 'dubbelingen']) {
+    'woordenMetMeerBetekenissen', 'betekenissenTotaal', 'ergsteWoord', 'ergsteAantal',
+    'dubbelingen', 'dubbelingenZonderNaam']) {
     assert.deepEqual(r[sleutel], vast[sleutel],
       'SEMANTIEK.json loopt achter op "' + sleutel + '" (' + vast[sleutel] + ' vastgelegd, ' +
       r[sleutel] + ' gemeten) -- draai: npm run semantiek:vast');
@@ -145,4 +183,9 @@ test('8. de uitkomst die BEWIJSMACHINE.md par. 3 draagt, staat er ook echt', () 
   assert.ok(r.dubbelingen > 0,
     'par. 3 zegt dat de meter OOK de omgekeerde fout vindt (een betekenis, twee ' +
     'plekken); gemeten: ' + r.dubbelingen);
+  assert.ok(r.dubbelingLijst.length === r.dubbelingen && r.dubbelingLijst[0].waar.length >= 2,
+    'en dat hij die dubbelingen ook TOONT -- een getal zonder bewijs is niet na te lopen');
+  assert.ok(r.dubbelingenZonderNaam > 0,
+    'par. 3 zegt dat er ook waarheden onder twee namen staan; gemeten: ' +
+    r.dubbelingenZonderNaam);
 });

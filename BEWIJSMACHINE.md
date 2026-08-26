@@ -88,10 +88,11 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2355 bestanden, 833 catalogi, 518 verschillende namen
+2356 bestanden, 831 catalogi, 516 verschillende namen
   94 namen staan in meer dan een domein
   77 woorden dragen MEER DAN EEN betekenis   (samen 279 betekenissen)
-  19 namen dragen juist EEN betekenis op twee plekken   (LAT-regel 4)
+  28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
+ 101 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
 ```
 
 Van de 94 gedeelde namen dragen er **77 meer dan één betekenis**. Het was dus
@@ -114,12 +115,80 @@ Dit is waarom de meter twee uitslagen kent en niet één getal:
 
 - **Botsing** — één woord, meerdere dingen. De reparatie is **hernoemen**.
 - **Dubbeling** — één ding, meerdere plekken. De reparatie is **samenvoegen**,
-  en het is `LAT.md` regel 4. Er zijn er **19**, waaronder `ERNST` (`hoog /
-  midden / laag`) die identiek in `kern/command/alarm.js` en
-  `kern/payroll/controles.js` staat.
+  en het is `LAT.md` regel 4.
+
+De dubbelingen worden op twee manieren gezocht, en de tweede vond het geval waar
+het om ging:
+
+| ronde | wat hij vindt | aantal |
+|---|---|---|
+| **op naam** | dezelfde naam, dezelfde inhoud, twee domeinen | **28** |
+| **op inhoud** | dezelfde inhoud onder een **andere** naam | **101** |
+
+Die tweede ronde bestaat omdat de eerste hem miste. Dat is geen detail: de
+duurste dubbeling van allemaal draagt per definitie twee namen, want anders was
+hij al opgevallen.
 
 Een meter die die twee optelt, levert een getal waar niemand iets mee kan: de
 ene helft moet uit elkaar, de andere naar elkaar toe.
+
+### De convergentie: twee metingen wijzen naar dezelfde vier domeinen
+
+De grootste dubbelingen zijn niet generiek maar heel specifiek:
+
+```
+PALET    4 plekken, 16 leden   architect · atelier · hardwarelab · studio
+STATUS   4 plekken,  6 leden   architect · atelier · hardwarelab · studio
+BUREAUS  0,83                  kern/ideeen.js  ·  routes/werkplek-bureaus.js
+```
+
+Dat zijn **precies de vier domeinen** die `DEVELOPERCLOUD.md` par. 2 aanwees als
+de enige kandidaat die de drempel haalde: een **ontwerpopdracht**, gedeeld door
+`architect`, `atelier`, `hardwarelab` en `studio`.
+
+Die twee metingen hebben niets met elkaar te maken. `scripts/objectmodel.js`
+vergelijkt de VORMEN die een module wegschrijft, na aftrek van de envelop;
+`scripts/semantiek.js` vergelijkt de LEDEN van benoemde catalogi. Andere invoer,
+andere methode, andere drempels — en ze komen op hetzelfde viertal uit.
+
+> **Dat is het sterkste bewijs dat er in deze codebase te krijgen is voor een
+> gedeeld type.** Niet omdat een van beide metingen overtuigend is, maar omdat
+> twee onafhankelijke metingen elkaar niet hoorden te bevestigen en het toch doen.
+
+Wie het eerste gedeelde objecttype van de Developer Cloud gaat bouwen, begint
+hier — en niet bij een type dat iemand heeft bedacht.
+
+### Wat de meting al heeft opgeleverd: de paswaarheid stond op vier plekken
+
+Bij het nalopen van de dubbelingen kwam er een boven die het document niet
+alleen hoort te noemen maar ook op te lossen, want hij raakt een merkregel:
+**welke passen bestaan er.**
+
+```
+kern/ledenbalie.js      const PASSEN           = ['gratis','rtg','lifestyle','business']
+kern/ledenregister.js   const PAS_VOLGORDE     = ['gratis','rtg','lifestyle','business']
+kern/ledenregister.js   PAS_NAAM               de weergavenamen
+kern/assets.js          const BETALENDE_PASSEN = ['rtg','lifestyle','business']
+```
+
+De eerste twee droegen bovendien een **identieke** afgeleide functie (`pasVan`,
+die een tier op een pas afbeeldt) — twee kopieën van de regel die bepaalt welke
+pas een lid tóónt.
+
+Dit is nu één module: `server/kern/passen.js`, met `BETALEND` **afgeleid** in
+plaats van overgetypt, zodat wie een pas toevoegt dat op één plek doet. Zelfde
+patroon en zelfde reden als `kern/pasprijs.js`, dat een paar maanden eerder om
+exact dezelfde reden ontstond.
+
+**Drie mutaties, alle drie raak**: `pasVan` een gast als `rtg` laten tonen
+(2 toetsen), een gast laten kopen (3 toetsen), en `business` uit de lijst halen
+(3 toetsen). Een vierde mutatie bleek **inert** — `'gratis'` aan de betalende
+passen toevoegen verandert niets, want een gratis lid heeft tier `guest` en niet
+`gratis`. Dat is opgeschreven omdat het bijna als een dekkingsgat werd gerapporteerd
+terwijl het een fout in de mutatie was.
+
+En de reparatie is te zien in de meter zelf: de naamloze dubbelingen zakten van
+**111 naar 101**, want die ene lijst paarde met tien andere.
 
 ### Wat dit NIET zegt
 
@@ -319,15 +388,18 @@ met een eigen klok).
 | fase | wat | waarom nu |
 |---|---|---|
 | ~~**0. De semantiek meten**~~ ✅ | `scripts/semantiek.js` + `SEMANTIEK.json`; de uitkomst staat in par. 3 | zonder dit is een Semantic Registry een la of infrastructuur, en niemand die weet welke |
-| **1. De 19 dubbelingen** | één betekenis op twee plekken — `LAT.md` regel 4, en het is de helft die naar elkaar toe moet | klein, af te vinken, en het verkleint de 77 |
-| **2. Het register uit de code afleiden** | niet ernaast schrijven; het patroon van `WETTEN.json` (bron + handhaver + sabotage) | par. 4.2 — anders wordt het register zelf de 78ste botsing |
-| **3. De zoeker** | invoervolgordes genereren tegen de wetten die er al staan | par. 5.2 — de wetten staan, de zoeker niet |
-| **4. Tijd vooruit** | kan een account na jaren mutaties nog volledig weg | par. 5.3 — een belofte die nooit is beproefd |
-| **5. De scorecard doorklikbaar** | van elk vinkje naar het bewijs eronder, met `zekerheid.js` als bovenste regel | par. 4.1 — en zonder `READY` |
-| **6. Release-provenance** | eigen document, eigen bewijslast | par. 5.1 |
+| ~~**1. De eerste dubbeling**~~ ✅ | de paswaarheid stond op vier plekken; nu één module (`kern/passen.js`), met `BETALEND` afgeleid. Drie mutaties raak | par. 3 — en de meter bewoog mee: 111 → 101 naamloze dubbelingen |
+| **2. De rest van de 28 + 101** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
+| **3. De vier ontwerpdomeinen** | `architect`, `atelier`, `hardwarelab`, `studio` — het eerste echte gedeelde type | par. 3 — twee onafhankelijke metingen wijzen erheen |
+| **4. Het register uit de code afleiden** | niet ernaast schrijven; het patroon van `WETTEN.json` (bron + handhaver + sabotage) | par. 4.2 — anders wordt het register zelf de 78ste botsing |
+| **5. De zoeker** | invoervolgordes genereren tegen de wetten die er al staan | par. 5.2 — de wetten staan, de zoeker niet |
+| **6. Tijd vooruit** | kan een account na jaren mutaties nog volledig weg | par. 5.3 — een belofte die nooit is beproefd |
+| **7. De scorecard doorklikbaar** | van elk vinkje naar het bewijs eronder, met `zekerheid.js` als bovenste regel | par. 4.1 — en zonder `READY` |
+| **8. Release-provenance** | eigen document, eigen bewijslast | par. 5.1 |
 
-Fase 1 en 2 samen zijn de kern: eerst opruimen wat aantoonbaar dubbel is, dan
-pas een register — anders legt het register de rommel vast.
+Fase 1 t/m 4 zijn de kern: eerst opruimen wat aantoonbaar dubbel is, dan pas een
+register — anders legt het register de rommel vast. Fase 1 staat en heeft meteen
+laten zien dat het werkt: één samenvoeging haalde tien dubbelingen weg.
 
 ---
 

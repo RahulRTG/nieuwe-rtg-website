@@ -239,9 +239,19 @@ of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de 94 namen die in meer dan
 één domein staan, dragen er **77 meer dan één betekenis** — samen 279
-betekenissen, met `SOORTEN` op **38**. Daarnaast 19 namen met juist één betekenis
-op twee plekken, en die twee vragen het tegenovergestelde: een botsing wordt
-**hernoemd**, een dubbeling wordt **samengevoegd**. De 77 zijn geen foutenlijst
+betekenissen, met `SOORTEN` op **38**. Daarnaast **28** betekenissen die op meer
+dan één plek wonen én **101** paren die dezelfde waarheid onder een ándere naam
+dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
+dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
+tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
+metingen wijzen naar dezelfde vier domeinen** (`architect`, `atelier`,
+`hardwarelab`, `studio`): `OBJECTMODEL.json` via gedeelde vormen, `SEMANTIEK.json`
+via `PALET` en `STATUS` op vier plekken. Dat is het sterkste bewijs voor een
+gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
+"welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
+en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
+overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
+meter bewoog mee: 111 → 101. De 77 zijn geen foutenlijst
 maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
 kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
 en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies

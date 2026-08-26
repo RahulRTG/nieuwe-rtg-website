@@ -1,12 +1,746 @@
 {
-  "catalogi": 833,
-  "verschillendeNamen": 518,
+  "catalogi": 831,
+  "verschillendeNamen": 516,
   "namenInMeerDomeinen": 94,
   "woordenMetMeerBetekenissen": 77,
   "betekenissenTotaal": 279,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
-  "dubbelingen": 19,
+  "dubbelingen": 28,
+  "dubbelingLijst": [
+    {
+      "naam": "PALET",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/architect/bank.js",
+        "server/kern/atelier/bank.js",
+        "server/kern/hardwarelab/bank.js",
+        "server/kern/studio/bank.js"
+      ],
+      "leden": 16,
+      "voorbeeld": [
+        "travertijn",
+        "kalksteen",
+        "zichtbeton",
+        "leisteen"
+      ]
+    },
+    {
+      "naam": "MAANDEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/concern/voorstel.js",
+        "server/kern/fluister.js",
+        "server/kern/huis.js",
+        "server/kern/socialegraaf/lijn.js",
+        "server/kern/tijdlijn.js"
+      ],
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april"
+      ]
+    },
+    {
+      "naam": "ROLLEN",
+      "betekenissenVanDitWoord": 8,
+      "waar": [
+        "server/bedrijf/rollen-register.js",
+        "server/kern/rtfos/basis.js",
+        "server/school/rollen.js"
+      ],
+      "leden": 12,
+      "voorbeeld": [
+        "directie",
+        "bestuur",
+        "financieel",
+        "verkoop"
+      ]
+    },
+    {
+      "naam": "KETEN",
+      "betekenissenVanDitWoord": 3,
+      "waar": [
+        "server/kern/mobiliteit/keten.js",
+        "server/kern/modebezorg.js"
+      ],
+      "leden": 10,
+      "voorbeeld": [
+        "aangevraagd",
+        "geprijsd",
+        "aangeboden",
+        "geaccepteerd"
+      ]
+    },
+    {
+      "naam": "TYPES",
+      "betekenissenVanDitWoord": 6,
+      "waar": [
+        "server/kern/atelierweb.js",
+        "server/kern/journalistiek.js",
+        "server/kern/webmaker-schoon.js"
+      ],
+      "leden": 10,
+      "voorbeeld": [
+        "hero",
+        "kop",
+        "tekst",
+        "knop"
+      ]
+    },
+    {
+      "naam": "EISEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/aanmeldingen/bewijs.js",
+        "server/kern/persoonseis-lijst.js"
+      ],
+      "leden": 8,
+      "voorbeeld": [
+        "ziekenhuis",
+        "huisarts",
+        "specialist",
+        "apotheek"
+      ]
+    },
+    {
+      "naam": "BANDEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/bureau/relaties.js",
+        "server/kern/rechterhand/attenties.js"
+      ],
+      "leden": 7,
+      "voorbeeld": [
+        "partner",
+        "kind",
+        "ouder",
+        "compagnon"
+      ]
+    },
+    {
+      "naam": "DAGEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/agenda.js",
+        "server/kern/berichten/ai.js",
+        "server/kern/context.js",
+        "server/kern/voorspel/rekenen.js",
+        "server/kern/webplatform.js"
+      ],
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag"
+      ]
+    },
+    {
+      "naam": "GENRES",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/podium/index.js",
+        "server/kern/theater/index.js"
+      ],
+      "leden": 6,
+      "voorbeeld": [
+        "salon",
+        "muziek",
+        "koken",
+        "reizen"
+      ]
+    },
+    {
+      "naam": "SIGNALEN",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/clips.js",
+        "server/kern/podium/index.js"
+      ],
+      "leden": 6,
+      "voorbeeld": [
+        "vraag",
+        "offer",
+        "answer",
+        "ice"
+      ]
+    },
+    {
+      "naam": "STATUS",
+      "betekenissenVanDitWoord": 10,
+      "waar": [
+        "server/kern/architect/bank.js",
+        "server/kern/atelier/bank.js",
+        "server/kern/hardwarelab/bank.js",
+        "server/kern/studio/bank.js"
+      ],
+      "leden": 6,
+      "voorbeeld": [
+        "schets",
+        "voorontwerp",
+        "ontwerp",
+        "maquette"
+      ]
+    },
+    {
+      "naam": "BETEKENIS",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/geldwereld.js",
+        "server/kern/kantoorwereld.js",
+        "server/kern/socialewereld.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "verlopen",
+        "vandaag",
+        "open",
+        "gedeeld"
+      ]
+    },
+    {
+      "naam": "BUREAUS",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/ideeen.js",
+        "server/routes/werkplek-bureaus.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "atelier",
+        "studio",
+        "hardware",
+        "architect"
+      ]
+    },
+    {
+      "naam": "GROEPEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/foundation/gezinshulp.js",
+        "server/kern/schoolbieb.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong"
+      ]
+    },
+    {
+      "naam": "REGIOS",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/fiscaal/wereld.js",
+        "server/kern/reis.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "europa",
+        "amerika",
+        "azie",
+        "afrika"
+      ]
+    },
+    {
+      "naam": "TRIAGE",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/defensie/index.js",
+        "server/kern/zorgketen/index.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "rood",
+        "oranje",
+        "geel",
+        "groen"
+      ]
+    },
+    {
+      "naam": "ZICHT",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/geloofbieb.js",
+        "server/kern/rtfbieb.js",
+        "server/kern/schoolbieb.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong"
+      ]
+    },
+    {
+      "naam": "DOELGROEP_LABEL",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/geloofbieb.js",
+        "server/kern/rtfbieb.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "gezin"
+      ]
+    },
+    {
+      "naam": "KLAAR",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/autoverkoop.js",
+        "server/kern/modebezorg.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "gereden",
+        "afgeleverd",
+        "afgewezen",
+        "geannuleerd"
+      ]
+    },
+    {
+      "naam": "NIVEAUS",
+      "betekenissenVanDitWoord": 9,
+      "waar": [
+        "server/kern/rampbeeld/index.js",
+        "server/kern/spellen/sudoku.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "normaal",
+        "incident",
+        "opgeschaald",
+        "ramp"
+      ]
+    },
+    {
+      "naam": "PRIORITEITEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/bedrijf/project.js",
+        "server/kern/rtmail-dossier.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "laag",
+        "normaal",
+        "hoog",
+        "kritiek"
+      ]
+    },
+    {
+      "naam": "ERNST",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/command/alarm.js",
+        "server/kern/payroll/controles.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "hoog",
+        "midden",
+        "laag"
+      ]
+    },
+    {
+      "naam": "GRENS",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/medicatie-regels.js",
+        "server/kern/voeding.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "kop",
+        "tekst",
+        "wegen"
+      ]
+    },
+    {
+      "naam": "PASSEN",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/aanmeldingen.js",
+        "server/kern/passen.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "rtg",
+        "lifestyle",
+        "business"
+      ]
+    },
+    {
+      "naam": "RISICO",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/appstore/machtigingen.js",
+        "server/kern/rtfos/subsidies.js",
+        "server/kern/stadsweefsel/objectsoorten.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "laag",
+        "midden",
+        "hoog"
+      ]
+    },
+    {
+      "naam": "SOORTEN",
+      "betekenissenVanDitWoord": 38,
+      "waar": [
+        "server/kern/bank/index.js",
+        "server/kern/koppel.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "betaal",
+        "spaar",
+        "zakelijk"
+      ]
+    },
+    {
+      "naam": "STANDEN",
+      "betekenissenVanDitWoord": 10,
+      "waar": [
+        "server/kern/avond/voorkeuren.js",
+        "server/kern/werkvenster.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "nooit",
+        "gevraagd",
+        "altijd"
+      ]
+    },
+    {
+      "naam": "VERSIES",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/atelierweb.js",
+        "server/kern/journalistiek.js",
+        "server/kern/webmaker-schoon.js"
+      ],
+      "leden": 3,
+      "voorbeeld": [
+        "telefoon",
+        "tablet",
+        "desktop"
+      ]
+    }
+  ],
+  "dubbelingenZonderNaam": 101,
+  "dubbelingZonderNaamLijst": [
+    {
+      "overlap": 1,
+      "a": "server/kern/berichten/ai.js",
+      "aNaam": "UREN",
+      "b": "server/kern/eten/ontdekken.js",
+      "bNaam": "GETALLEN",
+      "leden": 12,
+      "voorbeeld": [
+        "een",
+        "twee",
+        "drie",
+        "vier",
+        "vijf"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/webmaker-schoon.js",
+      "aNaam": "ZAAKBRONNEN",
+      "b": "server/kern/webplatform.js",
+      "bNaam": "BRONNEN",
+      "leden": 12,
+      "voorbeeld": [
+        "menu",
+        "diensten",
+        "kamers",
+        "agenda",
+        "events"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/agenda.js",
+      "aNaam": "DAGEN",
+      "b": "server/kern/genootschap/inzicht.js",
+      "bNaam": "WEEKDAG",
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag",
+        "donderdag"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/berichten/ai.js",
+      "aNaam": "DAGEN",
+      "b": "server/kern/genootschap/inzicht.js",
+      "bNaam": "WEEKDAG",
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag",
+        "donderdag"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/context.js",
+      "aNaam": "DAGEN",
+      "b": "server/kern/genootschap/inzicht.js",
+      "bNaam": "WEEKDAG",
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag",
+        "donderdag"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/genootschap/inzicht.js",
+      "aNaam": "WEEKDAG",
+      "b": "server/kern/voorspel/rekenen.js",
+      "bNaam": "DAGEN",
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag",
+        "donderdag"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/genootschap/inzicht.js",
+      "aNaam": "WEEKDAG",
+      "b": "server/kern/webplatform.js",
+      "bNaam": "DAGEN",
+      "leden": 7,
+      "voorbeeld": [
+        "zondag",
+        "maandag",
+        "dinsdag",
+        "woensdag",
+        "donderdag"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/levensgraaf/bronnen.js",
+      "aNaam": "BEZIT_KAMER",
+      "b": "server/kern/lifestyle/dossier.js",
+      "bNaam": "SOORTEN",
+      "leden": 7,
+      "voorbeeld": [
+        "vastgoed",
+        "voertuig",
+        "vaartuig",
+        "kunst",
+        "horloge"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/clips.js",
+      "aNaam": "SIGNALEN",
+      "b": "server/kern/theater/index.js",
+      "bNaam": "THUIS_SIGNALEN",
+      "leden": 6,
+      "voorbeeld": [
+        "vraag",
+        "offer",
+        "answer",
+        "ice",
+        "klaar"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/huisdb.js",
+      "aNaam": "RTF_OMLEIDING",
+      "b": "server/routes/werkplek-bureaus.js",
+      "bNaam": "BUREAUS",
+      "leden": 6,
+      "voorbeeld": [
+        "atelier",
+        "studio",
+        "hardware",
+        "architect",
+        "redactie"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/webmaker-schoon.js",
+      "aNaam": "FORMSOORTEN",
+      "b": "server/routes/webbrowser.js",
+      "bNaam": "SOORTEN",
+      "leden": 6,
+      "voorbeeld": [
+        "vraag",
+        "offerte",
+        "sollicitatie",
+        "reservering",
+        "klacht"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/archief.js",
+      "aNaam": "KLAAR",
+      "b": "server/kern/leverancier/state.js",
+      "bNaam": "ORDER_KLAAR",
+      "leden": 5,
+      "voorbeeld": [
+        "geserveerd",
+        "geweigerd",
+        "terugbetaald",
+        "bezorgd",
+        "opgehaald"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/buddy/coachdata/index.js",
+      "aNaam": "LEEFTIJD",
+      "b": "server/kern/geloofbieb.js",
+      "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/buddy/coachdata/index.js",
+      "aNaam": "LEEFTIJD",
+      "b": "server/kern/leren/schrijven.js",
+      "bNaam": "OPDRACHTEN",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/buddy/coachdata/index.js",
+      "aNaam": "LEEFTIJD",
+      "b": "server/kern/rtfbieb.js",
+      "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/buddy/coachdata/index.js",
+      "aNaam": "LEEFTIJD",
+      "b": "server/kern/schoolbieb.js",
+      "bNaam": "GROEPEN",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/buddy/coachdata/index.js",
+      "aNaam": "LEEFTIJD",
+      "b": "server/kern/schoolbieb.js",
+      "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/gezinshulp.js",
+      "aNaam": "GROEPEN",
+      "b": "server/kern/geloofbieb.js",
+      "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/gezinshulp.js",
+      "aNaam": "GROEPEN",
+      "b": "server/kern/leren/schrijven.js",
+      "bNaam": "OPDRACHTEN",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/gezinshulp.js",
+      "aNaam": "GROEPEN",
+      "b": "server/kern/rtfbieb.js",
+      "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    }
+  ],
   "top": [
     {
       "naam": "SOORTEN",
@@ -2280,5 +3014,5 @@
       ]
     }
   ],
-  "bestanden": 2355
+  "bestanden": 2356
 }

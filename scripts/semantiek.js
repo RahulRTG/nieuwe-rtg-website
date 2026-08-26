@@ -81,6 +81,7 @@ const GEEN = [/\/initdata\//, /-data\.js$/, /\/zz-[^/]*\.js$/, /node_modules/];
 const MIN_LEDEN = 3;        // gelijk aan capabilities.js
 const BOTSING_ONDER = 0.15; // overlap hieronder: twee dingen, een woord
 const DUBBEL_BOVEN = 0.6;   // overlap hierboven: een ding, twee plekken
+const NAAMLOOS_VANAF = 4;   // ondergrens voor de naamloze ronde (zie analyse)
 
 /* Alleen commentaar eruit -- de tekenreeksen ZIJN hier de leden. Dezelfde val als
    in scripts/magnaatlab.js, waar de geleende wringer van objectmodel.js de
@@ -147,7 +148,8 @@ function lees() {
 }
 
 function analyse(catalogi, opties) {
-  const O = Object.assign({ botsingOnder: BOTSING_ONDER, dubbelBoven: DUBBEL_BOVEN }, opties || {});
+  const O = Object.assign({ botsingOnder: BOTSING_ONDER, dubbelBoven: DUBBEL_BOVEN,
+    naamloosVanaf: NAAMLOOS_VANAF }, opties || {});
 
   const opNaam = new Map();
   for (const c of catalogi) {
@@ -164,7 +166,7 @@ function analyse(catalogi, opties) {
      overlappen horen bij dezelfde betekenis. Het aantal clusters is het aantal
      betekenissen, en dat is precies wat een semantisch register moet weten. */
   const woorden = [];
-  let namenInMeerDomeinen = 0, dubbelingen = 0;
+  let namenInMeerDomeinen = 0;
 
   for (const [naam, lijst] of opNaam) {
     /* Per DOMEIN de rijkste catalogus, zodat een gesplitste module niet met
@@ -182,12 +184,12 @@ function analyse(catalogi, opties) {
        botsingsdrempel delen. Wat overblijft zijn losse betekenissen. */
     const cluster = domeinen.map((_, i) => i);
     const vind = (i) => (cluster[i] === i ? i : (cluster[i] = vind(cluster[i])));
-    let maxOverlap = 0, hoogsteBinnen = 0;
+    let maxOverlap = 0;
     for (let i = 0; i < domeinen.length; i++) {
       for (let j = i + 1; j < domeinen.length; j++) {
         const o = capabilities.jaccard(domeinen[i].leden, domeinen[j].leden);
         maxOverlap = Math.max(maxOverlap, o);
-        if (o > O.botsingOnder) { cluster[vind(i)] = vind(j); hoogsteBinnen = Math.max(hoogsteBinnen, o); }
+        if (o > O.botsingOnder) cluster[vind(i)] = vind(j);
       }
     }
     const groepen = new Map();
@@ -198,7 +200,6 @@ function analyse(catalogi, opties) {
     }
 
     const betekenissen = groepen.size;
-    if (hoogsteBinnen >= O.dubbelBoven) dubbelingen++;
 
     woorden.push({
       naam,
@@ -221,6 +222,67 @@ function analyse(catalogi, opties) {
     a.naam.localeCompare(b.naam));
 
   const botsende = woorden.filter(w => w.betekenissen > 1);
+
+  /* DE TWEEDE RONDE, EN DIE VOND HET GEVAL WAAR HET OM GING.
+
+     Alles hierboven groepeert op NAAM, en daarmee ziet het precies de dubbeling
+     niet die het duurst is: dezelfde waarheid onder twee VERSCHILLENDE namen.
+     Gevonden bij de hand toen de negentien werden nagelopen:
+
+       kern/ledenbalie.js     const PASSEN       = ['gratis','rtg','lifestyle','business']
+       kern/ledenregister.js  const PAS_VOLGORDE = ['gratis','rtg','lifestyle','business']
+
+     Zelfde lijst, zelfde afgeleide functie (`pasVan`), twee namen -- dus voor de
+     naam-ronde bestaan ze niet eens als paar. Dat is LAT-regel 4 in zijn zuiverste
+     vorm, en een meter die hem mist terwijl hij over dubbelingen rapporteert,
+     rapporteert een getal dat te laag is.
+
+     Dus: alle catalogi uit VERSCHILLENDE domeinen paarsgewijs, ongeacht naam.
+
+     WAAROM HIER EEN HOGERE ONDERGRENS STAAT. Met drie leden matcht `[hoog midden
+     laag]` op elke andere drieledige schaal in huis, en dan verzuipt de echte
+     vondst in tientallen generieke schaaltjes. Vanaf vier leden is een volledige
+     overlap iets dat iemand heeft OVERGETYPT in plaats van los bedacht. Dat is
+     grof en het is de goede kant om grof te zijn: deze ronde hoort aan te wijzen,
+     niet uitputtend te zijn. */
+  /* DE EENHEID VAN EEN DUBBELING IS HET CLUSTER, NIET HET WOORD.
+
+     Eerst filterde dit op woorden met precies EEN betekenis, en dat is te nauw:
+     `STATUS` draagt tien betekenissen, en als twee daarvan byte-voor-byte
+     hetzelfde zijn, is dat evengoed een waarheid op twee plekken. Die viel
+     buiten de telling omdat het woord ook nog negen andere dingen betekent.
+
+     Een cluster met twee of meer DOMEINEN erin is per definitie een betekenis
+     die op meer dan een plek woont. Dat is wat LAT-regel 4 bedoelt, ongeacht
+     hoeveel andere betekenissen hetzelfde woord verder nog draagt. */
+  const dubbelingLijst = [];
+  for (const w of woorden) {
+    for (const g of w.waar) {
+      if (g.bestanden.length < 2) continue;
+      dubbelingLijst.push({ naam: w.naam, betekenissenVanDitWoord: w.betekenissen,
+        waar: g.bestanden, leden: g.leden, voorbeeld: g.voorbeeld });
+    }
+  }
+  dubbelingLijst.sort((a, b) => b.leden - a.leden || a.naam.localeCompare(b.naam));
+
+  const naamloos = [];
+  const groot = catalogi.filter(c => c.leden.length >= O.naamloosVanaf);
+  for (let i = 0; i < groot.length; i++) {
+    for (let j = i + 1; j < groot.length; j++) {
+      if (groot[i].domein === groot[j].domein) continue;
+      if (groot[i].naam === groot[j].naam) continue;          // die staan al in de naam-ronde
+      const o = capabilities.jaccard(groot[i].leden, groot[j].leden);
+      if (o < O.dubbelBoven) continue;
+      naamloos.push({
+        overlap: Math.round(o * 100) / 100,
+        a: groot[i].bestand, aNaam: groot[i].naam,
+        b: groot[j].bestand, bNaam: groot[j].naam,
+        leden: groot[i].leden.length, voorbeeld: groot[i].leden.slice(0, 5)
+      });
+    }
+  }
+  naamloos.sort((x, y) => y.overlap - x.overlap || y.leden - x.leden);
+
   return {
     catalogi: catalogi.length,
     verschillendeNamen: opNaam.size,
@@ -229,7 +291,15 @@ function analyse(catalogi, opties) {
     betekenissenTotaal: botsende.reduce((n, w) => n + w.betekenissen, 0),
     ergsteWoord: botsende.length ? botsende[0].naam : null,
     ergsteAantal: botsende.length ? botsende[0].betekenissen : 0,
-    dubbelingen,
+    /* EEN definitie van "dubbeling", en niet twee. Hier stonden er twee: een
+       teller die meeliep in de clusterlus (op `hoogsteBinnen`) en een lijst die
+       op `soort` filterde. Ze gaven 19 en 14 -- dezelfde waarheid op twee
+       plekken, in de meter die daar juist over gaat. Nu is het getal de LENGTE
+       van de lijst, dus ze kunnen niet meer uiteenlopen. */
+    dubbelingen: dubbelingLijst.length,
+    dubbelingLijst,
+    dubbelingenZonderNaam: naamloos.length,
+    dubbelingZonderNaamLijst: naamloos.slice(0, 20),
     top: woorden.slice(0, 25)
   };
 }
@@ -253,7 +323,18 @@ function rapport(r) {
   L.push(`  ${r.woordenMetMeerBetekenissen} woorden dragen MEER DAN EEN betekenis ` +
     `(samen ${r.betekenissenTotaal} betekenissen)`);
   if (r.ergsteWoord) L.push(`  het ergste woord is ${r.ergsteWoord}, met ${r.ergsteAantal} betekenissen`);
-  L.push(`  ${r.dubbelingen} namen dragen juist EEN betekenis op twee plekken (LAT-regel 4)`);
+  L.push('');
+  L.push(`  ${r.dubbelingen} BETEKENISSEN WONEN OP MEER DAN EEN PLEK (LAT-regel 4) -- samenvoegen:`);
+  for (const d of r.dubbelingLijst.slice(0, 10)) {
+    L.push(`    ${d.naam.padEnd(18)}${d.waar.length} plekken, ${d.leden} leden  [${d.voorbeeld.join(' ')}]`);
+    for (const w of d.waar) L.push(`        ${w}`);
+  }
+  L.push('');
+  L.push(`  ${r.dubbelingenZonderNaam} paren dragen dezelfde waarheid onder een ANDERE naam;`);
+  L.push('  die ziet de naam-ronde per definitie niet. De eerste tien:');
+  for (const d of r.dubbelingZonderNaamLijst.slice(0, 10))
+    L.push(`    ${String(d.overlap).padStart(4)}  ${d.aNaam} / ${d.bNaam}  [${d.voorbeeld.join(' ')}]` +
+      `\n          ${d.a}\n          ${d.b}`);
   L.push('');
   for (const w of r.top.slice(0, 14)) {
     L.push(`    ${w.naam}  --  ${w.betekenissen} betekenis(sen) over ${w.domeinen} domeinen  [${w.soort}]`);
@@ -283,4 +364,5 @@ if (require.main === module) {
   }
 }
 
-module.exports = { lees, analyse, meet, rapport, domeinVan, MIN_LEDEN, BOTSING_ONDER, DUBBEL_BOVEN };
+module.exports = { lees, analyse, meet, rapport, domeinVan,
+  MIN_LEDEN, BOTSING_ONDER, DUBBEL_BOVEN, NAAMLOOS_VANAF };

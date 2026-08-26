@@ -57,9 +57,21 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
   const open = new Promise(k => { meldOpen = k; });
   const leesEven = (async () => {
     const dec = new TextDecoder(); let buf = '';
-    const tot = Date.now() + 5000;
+    /* DE TIJDGRENS GELDT VOOR HET GEHEEL EN NIET PER BROK, en dat is waarom deze
+       toets hier altijd groen was en in CI altijd rood. Er stond een race van
+       elke read() tegen 1200 ms, en won die klok, dan BRAK de lus af -- terwijl
+       het seintje nog onderweg was. Op deze machine komt het binnen een tel; op
+       een belaste runner zit er meer tussen `hello` en het event, en dan gaf de
+       toets op en meldde "B kreeg het seintje niet" over een server die het
+       keurig had gestuurd.
+       Nu racet de read tegen de RESTERENDE tijd: een trage brok kost geduld, en
+       alleen de totale grens beeindigt het wachten. */
+    const tot = Date.now() + 15000;
     while (Date.now() < tot) {
-      const { value, done } = await Promise.race([lezer.read(), new Promise(r => setTimeout(() => r({ done: true }), 1200))]);
+      const uit = await Promise.race([lezer.read(),
+        new Promise(r => setTimeout(() => r({ tijdOp: true }), Math.max(50, tot - Date.now())))]);
+      if (uit.tijdOp) break;
+      const { value, done } = uit;
       if (done || !value) break;
       buf += dec.decode(value);
       if (buf.includes('hello')) meldOpen();

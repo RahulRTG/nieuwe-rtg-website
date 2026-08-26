@@ -4,6 +4,9 @@
 'use strict';
 const net = require('net');
 const tls = require('tls');
+/* SNI alleen bij een NAAM -- zie de kop van ./lib/sni.js. Een IP als
+   servername weigert Node hard, en dat liet deze client in CI omvallen. */
+const { sniVan } = require('./lib/sni');
 const os = require('os');
 const crypto = require('crypto');
 const ssrf = require('./kern/ssrf');
@@ -159,7 +162,7 @@ function verstuur(cfg, bericht) {
     };
 
     const sock = cfg.secure
-      ? tls.connect({ host: cfg.host, port: cfg.port, servername: cfg.host }, () => start(sock, true))
+      ? tls.connect(Object.assign({ host: cfg.host, port: cfg.port }, sniVan(cfg.host)), () => start(sock, true))
       : net.connect({ host: cfg.host, port: cfg.port }, () => start(sock, false));
     sock.on('error', klaarMislukt);
   });
@@ -172,7 +175,7 @@ function verstuur(cfg, bericht) {
     if (!versleuteld && /STARTTLS/.test(caps)) {
       await commando(socket, lezer, 'STARTTLS', [220], 'STARTTLS');
       socket = await new Promise((res, rej) => {
-        const t = tls.connect({ socket, servername: cfg.host }, () => res(t));
+        const t = tls.connect(Object.assign({ socket }, sniVan(cfg.host)), () => res(t));
         t.on('error', rej);
       });
       socket.setTimeout(cfg.timeout, () => { throw new Error('SMTP: tijd verstreken'); });

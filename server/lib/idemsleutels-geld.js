@@ -39,7 +39,6 @@ const SLEUTELS = {
   /* ---- zet een stand: tweemaal hetzelfde is eenmaal die stand ---- */
   'POST /api/geld/grens/zet': { zelfdeVerzoek: true },              // de grens zelf
   'POST /api/geld/grens/weg': { velden: ['id'] },                   // welke grens weg moet
-  'POST /api/office/bank/terugstorting': { zelfdeVerzoek: true },   // open of gesloten
   'POST /api/supplier/pay/treasury/zet': { zelfdeVerzoek: true },   // de inrichting
 
   /* ---- laat los; de handeling is haar eigen id ---- */
@@ -74,6 +73,19 @@ const SLEUTELS = {
   /* En het zetten van een rekening: een herhaling ZET DE KLOK OPNIEUW, dus zij
      heeft een ander gevolg dan de eerste. Samenvouwen zou "terugzetten naar het
      oude IBAN" gratis maken -- de omweg waar de wachttijd juist voor is. */
+  /* En de terugstortstand van de bank, om nog een andere reden. Zij MAAKT niets
+     -- zij zet een schakelaar -- dus een dubbeltik is uit zichzelf al ongevaarlijk
+     en de poort wint er niets. Maar hij kan wel verliezen: gesloten, open, weer
+     gesloten binnen het venster is drie bewuste zetten, en de derde zou als
+     herhaling van de eerste worden weggevouwen. Dan blijft de stand op `open`
+     staan terwijl de boardroom `gesloten` las, en de auditregel die de route bij
+     `r.ok` schrijft komt er ook niet -- juist bij de knop die niet regelt wat RTG
+     doet maar wat RTG JURIDISCH IS. De andere zetters hierboven mogen wel
+     samenvouwen: die MAKEN iets bij een dubbeltik (grensZet zonder id legt een
+     tweede grens aan), en dat is de schade die de poort hoort te voorkomen. */
+  'POST /api/office/bank/terugstorting': { nietIdempotent: true,
+    waarom: 'een herhaalde zet is een bewuste zet: terugzetten binnen het venster zou stil verdwijnen, samen met de auditregel eronder' },
+
   'POST /api/pay/rekening': { nietIdempotent: true,
     waarom: 'een herhaalde rekeningwijziging start de wachttijd opnieuw; samenvouwen zou terugzetten naar een oud IBAN de wachttijd laten omzeilen' },
 };

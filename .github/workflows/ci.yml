@@ -117,6 +117,15 @@ jobs:
       # de standaardbibliotheek, ook voor de AEAD), dus er wordt niets van een
       # registry gehaald. `working-directory: motor` staat er omdat rustup de
       # toolchain uit de WERKMAP leest, en motor/rust-toolchain.toml pint 1.97.1.
+      # LIBXML2 HOORT HIER OOK, en stond alleen in de check-job hieronder.
+      # test/samlc14n.test.js legt onze canonicalisatie naast die van xmllint en
+      # slaat zichzelf bewust NIET over als die ontbreekt -- maar die toets valt
+      # in een SCHERF, niet in de check-job. De scheidsrechter stond dus in een
+      # andere machine dan de toets: drie beweringen zakten op ENOENT terwijl ze
+      # los groen zijn. Een aanname over de omgeving is geen omgeving, en die
+      # zin gold hier net zo goed.
+      - name: libxml2 (de scheidsrechter van de c14n-toets)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
       - name: De Rust-motor bouwen (de pariteitstoetsen hebben hem nodig)
         working-directory: motor
         run: cargo build --release --locked

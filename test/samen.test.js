@@ -44,7 +44,17 @@ test('1. een lid start een samen-sessie en een vriend doet mee met de code', asy
 test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SSE-seintje komt live binnen', async () => {
   // B luistert op de stroom; A stuurt de kamer naar de Mall
   const events = [];
+  let zagHello = false; let eerste = '';
   const es = await fetch(base + '/api/stream?token=' + encodeURIComponent(B));
+  /* DE VOORWAARDE EERST, en dat is met schade geleerd. /api/stream antwoordt
+     401 met een LEGE body, en de rem hieronder 429 met een korte. In beide
+     gevallen ziet de lezer meteen `done`, valt de lus eruit en zakte deze toets
+     op "B kreeg het kijk-seintje niet" -- over een server die dat seintje nooit
+     had hoeven sturen. In CI gebeurde dat binnen 30 ms terwijl de tijdgrens 15
+     seconden is; het getal wees de kant op, de melding niet. Een toets hoort te
+     zakken op zijn onderwerp, dus staan de voorwaarden er nu apart, met de
+     eerste bytes erbij zodat de reden er meteen staat. */
+  assert.equal(es.status, 200, 'de stroom van B ging niet open (status ' + es.status + ')');
   const lezer = es.body.getReader();
   /* WACHTEN TOT DE SERVER ONS KENT, en niet 300 ms gokken. /api/stream zet de
      luisteraar in sseClients en stuurt daarna meteen een `hello` (server.js).
@@ -74,7 +84,8 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
       const { value, done } = uit;
       if (done || !value) break;
       buf += dec.decode(value);
-      if (buf.includes('hello')) meldOpen();
+      if (!eerste) eerste = buf.slice(0, 120);
+      if (buf.includes('hello')) { zagHello = true; meldOpen(); }
       if (buf.includes('event: samen')) { events.push(buf); break; }
     }
     meldOpen();   // ook als de lijn dichtging: nooit blijven hangen
@@ -85,6 +96,7 @@ test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SS
   assert.equal(zet.body.kamer.pad, '/apps/mall.html');
   await leesEven;
   try { await lezer.cancel(); } catch (e) {}
+  assert.ok(zagHello, 'de stroom sloot voordat de server B als luisteraar kende; eerste bytes: ' + JSON.stringify(eerste));
   assert.ok(events.length && /"kind":"kijk"/.test(events[0]) && /mall\.html/.test(events[0]), 'B kreeg het kijk-seintje live');
   // en wie later binnenkomt ziet het in de staat
   const staat = await api(base, '/api/samen/staat', { code }, B);

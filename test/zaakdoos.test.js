@@ -189,8 +189,13 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
   const d = await r.json();
   assert.ok(d.ok && d.doorgegeven, 'de melding is doorgegeven aan de cloud');
   // en de vlootkaart in de Intern & IT-kamer toont hem, met via-stempel
+  /* Ruimere kap dan de 10 s van de wrapper: de eerste aanvraag betaalt ook de
+     warmte van het proces, en op een volgeladen runner (twee rondes op rij om
+     11,1 s gezakt, in de drukte na de GitHub-storing) is 10 s net te krap. Het
+     meegegeven signal wint, zie de kop van dit bestand. */
   const login = await fetch(cloudBase() + '/api/auth/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(30000),
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const kamer = await fetch(cloudBase() + '/api/office/kamer', {
@@ -203,8 +208,13 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
 
 test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug', async () => {
   // het kantoor drukt op Help bij testdoos (die staat op de kaart via zijn meldingen)
+  /* Ruimere kap dan de 10 s van de wrapper: de eerste aanvraag betaalt ook de
+     warmte van het proces, en op een volgeladen runner (twee rondes op rij om
+     11,1 s gezakt, in de drukte na de GitHub-storing) is 10 s net te krap. Het
+     meegegeven signal wint, zie de kop van dit bestand. */
   const login = await fetch(cloudBase() + '/api/auth/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(30000),
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const office = (pad, body) => fetch(cloudBase() + '/api/office/' + pad, {
@@ -212,10 +222,15 @@ test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug
     body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   // wachten tot testdoos op de wereldkaart staat (zijn eerste melding)
+  /* EEN TRAGE PEILING IS GEEN KAPOTTE DOOS. De lus heeft zelf dertig seconden
+     geduld, maar een antwoord dat de 10s-kap van de wrapper raakte gooide de
+     hele toets om -- de TimeoutError sloeg door de for-lus heen. Te laat telt
+     nu als "nog niet"; alleen de LUS bepaalt wanneer het genoeg is geweest, en
+     de bewering eronder blijft precies even streng. */
   let w;
   for (let i = 0; i < 60; i++) {
-    w = await office('wereld');
-    if ((w.body.items || []).some(x => x.id === 'doos:testdoos')) break;
+    try { w = await office('wereld'); } catch (e) { w = w || { body: {} }; }
+    if (((w.body || {}).items || []).some(x => x.id === 'doos:testdoos')) break;
     await new Promise(r => setTimeout(r, 500));
   }
   const bol = w.body.items.find(x => x.id === 'doos:testdoos');
@@ -227,7 +242,8 @@ test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug
   // zijn diagnoserapport; dat verschijnt in het nachtwerk-overzicht
   let gezien = false;
   for (let i = 0; i < 60 && !gezien; i++) {
-    const kamer = (await office('kamer', { id: 'intern' })).body;
+    let kamer = {};
+    try { kamer = (await office('kamer', { id: 'intern' })).body; } catch (e) { /* te laat telt als nog-niet */ }
     const nacht = ((kamer.lijsten || []).find(l => /nachtwerk/i.test(l.titel)) || {}).items || [];
     gezien = nacht.some(t => t.includes('testdoos'));
     if (!gezien) await new Promise(r => setTimeout(r, 500));

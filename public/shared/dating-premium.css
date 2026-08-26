@@ -10,7 +10,11 @@ body[data-rtg-dating]{
   --dating-gold-text:var(--gold-tekst,#c0a544);
   --dating-wine:var(--bordeaux-basis,#7f1634);
   --dating-line:rgba(64,55,39,.18);
-  --dating-muted:#706b61;
+  /* 4,65:1 in het ergste geval: nagerekend op de gemeten gate-grond EN op alle
+     zestien dagkleurwassen daaroverheen. De vorige (#706b61) haalde 4,34 -- op
+     papier zacht, op het scherm onder de norm. Zelfde les als de thematonen in
+     rtg-themas.css: ijken op het lichtste vlak is ijken op de verkeerde kant. */
+  --dating-muted:#59544A;
   background:var(--dating-paper)!important;
 }
 body[data-rtg-dating] .rtg-suitehero.rtg-intel-host{box-sizing:border-box;min-height:300px;padding-block:2.4rem;}
@@ -29,7 +33,7 @@ body[data-rtg-dating] .dating-tabs{
   box-sizing:border-box;position:sticky;z-index:28;top:var(--suite-stack,116px);display:flex;width:min(1180px,100%);margin:0 auto;
   padding:0 clamp(1rem,3vw,2.4rem);overflow-x:auto;background:rgba(244,240,233,.96);border-bottom:1px solid var(--dating-line);backdrop-filter:blur(14px);
 }
-body[data-rtg-dating] .dating-tabs button{position:relative;min-height:54px;padding:0 1rem;border:0;color:#706b61;background:transparent;font:700 .66rem/1 Inter,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
+body[data-rtg-dating] .dating-tabs button{position:relative;min-height:54px;padding:0 1rem;border:0;color:#59544A;background:transparent;font:700 .66rem/1 Inter,system-ui,sans-serif;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
 body[data-rtg-dating] .dating-tabs button::after{content:"";position:absolute;right:1rem;bottom:0;left:1rem;height:2px;background:transparent;}
 body[data-rtg-dating] .dating-tabs button[aria-selected="true"]{color:#211f1a;}
 body[data-rtg-dating] .dating-tabs button[aria-selected="true"]::after{background:var(--dating-gold);}
@@ -88,7 +92,13 @@ body[data-rtg-dating] .dating-input:focus{border-color:var(--dating-gold);outlin
 .dating-range>span{padding-bottom:.9rem;color:var(--dating-muted);font-size:.72rem;}
 .dating-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin-top:1.45rem;padding-top:1.25rem;border-top:1px solid var(--dating-line);}
 .dating-button{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.05rem;border:1px solid rgba(42,37,26,.25);border-radius:0;color:#26231d;background:transparent;font:650 .72rem/1 Inter,system-ui,sans-serif;letter-spacing:.075em;text-decoration:none;text-transform:uppercase;cursor:pointer;}
-.dating-button.primary{border-color:var(--dating-gold);color:var(--op-gold,#171308);background:var(--gold-glans,linear-gradient(145deg,#c0a544,#857007));}
+.dating-button.primary{border-color:var(--dating-gold);color:var(--op-gold,#171308);
+  /* GEEN VOLLE GOUD-GLANS ONDER DONKERE INKT. --gold-glans loopt door tot
+     --gold-diep (#5E4F05), en daar haalt --op-gold 2,29:1 -- de keuring oordeelt
+     op de ongunstigste stop, en vier poortknoppen zakten er in zes rondes op.
+     Dit verloop blijft geborsteld goud (MATERIAAL.md: mat, niet egaal) maar
+     houdt op bij de logotoon: nagerekend 8,99 / 7,68 / 5,85 op de drie stops. */
+  background:linear-gradient(145deg,#CDB35A 0%,var(--gold-tekst,#C0A544) 52%,#A98F1C 100%);}
 .dating-button.wine{border-color:var(--bordeaux-rand,rgba(158,28,64,.45));color:#fff;background:var(--bordeaux-glans,linear-gradient(155deg,#9e1c40,#7f1634));}
 .dating-button.quiet{border-color:transparent;color:#5f594e;}
 .dating-button.danger{border-color:rgba(127,22,52,.28);color:#7f1634;}

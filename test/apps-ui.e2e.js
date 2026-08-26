@@ -378,25 +378,34 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
-    await page.fill('#osZoekInput', 'iets vragen');
-    /* WACHT TOT DE RIJ ER STAAT, en dat is geen nettigheid.
+    /* WACHT TOT DE RIJ ER STAAT, EN BLIJF HET VRAGEN.
 
        zoek() in app-main.js hangt aan het input-event van #osZoekInput en zet
-       "Laat Rahul dit doen" pas bovenaan zodra er iets getypt IS. page.fill()
-       zet de waarde en vuurt dat event, maar tussen "gevuld" en "getekend" zit
-       de event-lus van de pagina. Hier stond alleen een evaluate die de rij
-       opzocht en aanklikte, zonder te controleren dat hij er was: op een drukke
-       runner werd dat `b.click()` op undefined, met de melding "Cannot read
-       properties of undefined (reading 'click')" -- een fout die niets zegt
-       over wat deze toets meet.
+       "Laat Rahul dit doen" pas bovenaan zodra er iets getypt IS. Die rij is dus
+       het gevolg van EEN gebeurtenis, en alles wat daarna nog aan het scherm
+       werkt kan hem weer weghalen: openZoek() zet zelf `zoekInput.value = ''` en
+       tekent opnieuw, en een late vertaalronde vervangt knopen in dezelfde lade.
 
-       Wat er GEMETEN wordt verandert hier niet: #chat mag de payload hieronder
-       nog steeds nooit uitvoeren. Alleen de weg ernaartoe wacht nu tot hij
-       begaanbaar is. */
-    await page.waitForFunction(
-      () => [...document.querySelectorAll('#osZoekLijst button')]
-        .some((x) => /Laat Rahul dit doen/i.test(x.textContent)),
-      null, { timeout: 10000 });
+       Hier stond `page.fill()` gevolgd door een wacht die alleen KEEK. Dat hield
+       stand op een rustige machine en zakte op 26 augustus 2026 in de CI met
+       "waitForFunction: Timeout 10000ms exceeded" -- terwijl dezelfde toets
+       lokaal, en dezelfde ronde in drie andere delen, gewoon groen was. Een
+       toets die afhangt van het moment waarop een event landt, meet dat moment
+       en niet de code.
+
+       Daarom vult deze wacht de vraag bij ELKE polling opnieuw in en vuurt hij
+       het input-event opnieuw af, tot de rij er staat. Kost niets als hij er al
+       is, en herstelt zichzelf als iets hem heeft weggehaald. Wat er GEMETEN
+       wordt verandert niet: #chat mag de payload hieronder nooit uitvoeren. */
+    await page.waitForFunction(() => {
+      const lijst = document.querySelector('#osZoekLijst');
+      const inp = document.querySelector('#osZoekInput');
+      if (!lijst || !inp) return false;
+      if ([...lijst.querySelectorAll('button')].some((x) => /Laat Rahul dit doen/i.test(x.textContent))) return true;
+      inp.value = 'iets vragen';
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      return false;
+    }, null, { timeout: 15000 });
     await page.evaluate(() => {
       const b = [...document.querySelectorAll('#osZoekLijst button')]
         .find((x) => /Laat Rahul dit doen/i.test(x.textContent));

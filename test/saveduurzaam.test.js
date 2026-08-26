@@ -73,6 +73,24 @@ test('op een opslag die niet kan tellen is duurzaam FALSE en niet stilzwijgend t
   assert.match(uit.reden, /kan duurzaamheid niet bevestigen/);
 });
 
+/* DE DERDE STAND: er viel niets te schrijven. Een weigering die eerst iets
+   vastzet en het daarna weer losliet, laat de opslag netto ongewijzigd achter.
+   De persistentiestand loopt dan niet op -- en die meting las dat als een
+   VERLOREN schrijfactie. De bundel gooide, en een nette 402 kwam als 500 bij de
+   klant terug (vier zakkers in test/payvooraf.test.js, uit deze ene oorzaak).
+   Geheugen en schijf waren juist gelijk, en dat IS duurzaam. Alleen de opslag
+   mag dit zeggen: afleiden uit een gelijk gebleven teller zou echt verlies
+   meedekken, en dat is precies wat de toets hierboven moet blijven vangen. */
+test('een bundel die netto niets wijzigt is duurzaam, niet verloren', () => {
+  const uit = JSON.parse(inProces({ RTG_DATA_DIR: verseMap() },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "db.db.data.proef={t:1};db.saveDuurzaam();" +
+    "db.db.data.proef.t=2;db.db.data.proef.t=1;" +
+    "console.log(JSON.stringify(db.saveDuurzaam()))})()"));
+  assert.equal(uit.duurzaam, true, 'niets te schrijven is niet hetzelfde als niet geschreven');
+  assert.equal(uit.reden, null);
+});
+
 /* ---------- de poort die hem schaars houdt ---------- */
 
 test('de huisregels kennen een regel die saveDuurzaam bewaakt', () => {

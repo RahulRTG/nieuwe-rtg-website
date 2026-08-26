@@ -19,46 +19,33 @@
    oplevert dan hij kost is geen inkomsten maar ergernis. */
 'use strict';
 
-const { BELEID, STANDEN, VAST, DREMPEL_CENTEN, pasVan } = require('./beleidkaart');
+const { BELEID, STANDEN, DREMPEL_CENTEN, pasVan } = require('./beleidkaart');
 
 module.exports = (ctx) => {
-  const { d, save, nu, meter, overzicht, boekDoorbelasting } = ctx;
+  const { d, save, nu, meter, overzicht, boekDoorbelasting, economie } = ctx;
 
-  function overschrijvingen() {
-    const k = d();
-    if (!k.beleid || typeof k.beleid !== 'object') k.beleid = {};
-    return k.beleid;
+  /* DE FIREWALL OP WERELDNIVEAU. Naast de vraag "wat zegt de pas van deze
+     gebruiker" staat sinds de economielaag een tweede: mag RTG deze wereld
+     überhaupt iets in rekening brengen? Dat is geen dubbeling maar een andere
+     vraag. De pas zegt wat er met de kosten van DIT soort gebruiker hoort te
+     gebeuren; de firewall zegt of er tussen twee rechtspersonen een grondslag
+     ligt om iets te leveren. Beide moeten ja zeggen.
+
+     Zonder economielaag gaat er niets door. Een firewall die wegvalt als hij
+     ontbreekt, is geen firewall (kern/economie/firewall.js). */
+  function wegOpen(drager) {
+    if (!economie) return { ok: false, code: 'geen-economielaag', uitleg: 'De economielaag is niet gemount; zonder firewall wordt er niets doorbelast.' };
+    const naar = economie.wereldVan(drager);
+    if (naar === economie.INFRA_WERELD) {
+      return { ok: false, code: 'eigen-wereld', uitleg: 'Dit is verbruik van RTG zelf; wij sturen onszelf geen rekening.' };
+    }
+    return economie.magBelasten({ van: economie.INFRA_WERELD, naar });
   }
-  const standVan = (pas) => {
-    const o = overschrijvingen()[pas];
-    return (o && o.stand) || (BELEID[pas] || BELEID.gratis).stand;
-  };
 
-  const beleid = () => Object.keys(BELEID).map(pas => {
-    const o = overschrijvingen()[pas];
-    return Object.assign({ pas }, BELEID[pas], {
-      stand: standVan(pas), bestaatNog: BELEID[pas].bestaatNog !== false,
-      vast: !!VAST[pas], waaromVast: VAST[pas] || null,
-      verzet: o ? { van: BELEID[pas].stand, naar: o.stand, reden: o.reden, op: o.op, door: o.door } : null });
-  });
-
-  /* Een stand verzetten. Met een reden, want dit verandert wat een lid op zijn
-     rekening krijgt; een verandering daarin zonder opgeschreven waarom is over
-     een half jaar niet meer te verdedigen tegenover het lid dat hem betaalt. */
-  function beleidZet(pas, stand, reden, wie) {
-    const p = String(pas || '');
-    if (!BELEID[p]) return { status: 400, error: 'Onbekende pas.' };
-    if (VAST[p]) return { status: 403, error: VAST[p] };
-    if (!STANDEN.includes(String(stand))) return { status: 400, error: 'Onbekende stand.' };
-    if (stand === 'rtfoundation' || stand === 'huis') return { status: 400, error: 'Die stand hoort bij een gezin of bij het huis, niet bij een pas.' };
-    const r = String(reden == null ? '' : reden).trim().slice(0, 300);
-    if (r.length < 8) return { status: 400, error: 'Noem de reden; een pas die opeens verbruik doorbelast verandert de rekening van elk lid erop.' };
-    const naam = String(wie || '').trim().slice(0, 80);
-    if (!naam) return { status: 400, error: 'Zonder wie gebeurt dit niet.' };
-    overschrijvingen()[p] = { stand: String(stand), reden: r, op: nu(), door: naam };
-    save();
-    return { status: 200, ok: true, beleid: beleid().find(b => b.pas === p) };
-  }
+  /* De beleidsstand woont in ./beleidstand.js: wat er per pas geldt en wie dat
+     verzet heeft. Zie de kop daar voor waarom dat een eigen bestand is. */
+  const stand = require('./beleidstand')(ctx);
+  const { beleid, beleidZet, standVan } = stand;
 
   function boek() {
     const k = d();
@@ -82,10 +69,20 @@ module.exports = (ctx) => {
     const b = BELEID[pas] || BELEID.gratis;
     const centen = o.totaal.centen;
     const teLaag = stand === 'doorbelasten' && centen < DREMPEL_CENTEN;
+    const fw = wegOpen(drager);
     return { drager, wie: o.wie, pas, stand, uitleg: b.uitleg, centen, graad: o.totaal.graad,
-      factureren: stand === 'doorbelasten' && !teLaag,
+      wereld: economie ? economie.wereldVan(drager) : null,
+      firewall: { ok: !!fw.ok, code: fw.code, uitleg: fw.uitleg, hoeWel: fw.hoeWel || null },
+      factureren: stand === 'doorbelasten' && !teLaag && !!fw.ok,
       waaromNiet: stand !== 'doorbelasten' ? b.uitleg
-        : teLaag ? ('Onder de drempel van ' + (DREMPEL_CENTEN / 100).toFixed(2) + ' euro; schuift door naar de volgende maand.') : null };
+        : !fw.ok ? fw.uitleg
+        : teLaag ? ('Onder de drempel van ' + (DREMPEL_CENTEN / 100).toFixed(2) + ' euro; schuift door naar de volgende maand.') : null,
+      /* Het PLAFOND van de relatie geldt per wereld en niet per gebruiker; het
+         wordt daarom in voorstel() getoetst, waar het weretotaal bekend is. Een
+         plafond dat per gebruiker afslaat, laat willekeurig de laatsten in de
+         lijst afvallen. */
+      voorbehoud: stand === 'doorbelasten' && fw.ok
+        ? 'De boardroom geeft per maand vrij; daar wordt ook het plafond van de relatie getoetst.' : null };
   }
 
   function voorstel(periode) {
@@ -94,10 +91,35 @@ module.exports = (ctx) => {
     /* De verdeling van deze maand EEN keer, en dan doorgegeven. Zie de kop van
        voorDrager in ./overzicht.js voor waarom dat hier uitmaakt. */
     const verdeeld = ctx.toerekening ? ctx.toerekening.verdeling(p).perDrager : {};
-    const rijen = meter.dragers(p).map(dr => standVoor(p, dr, verdeeld))
+    let rijen = meter.dragers(p).map(dr => standVoor(p, dr, verdeeld))
       .sort((a, b2) => b2.centen - a.centen);
+    /* HET PLAFOND VAN DE RELATIE, per wereld en niet per gebruiker. Wat RTG bij
+       een andere wereld mag neerleggen is met een maximum afgesproken; dat
+       maximum geldt voor het totaal. Ligt de wereld erboven, dan valt de HELE
+       wereld terug -- niet de laatste zoveel gebruikers uit een gesorteerde
+       lijst, want wie er dan afvalt hangt af van de sorteervolgorde en niet van
+       de afspraak. */
+    const plafondBlok = {};
+    if (economie) {
+      const perWereld = {};
+      for (const r of rijen) if (r.factureren) perWereld[r.wereld] = (perWereld[r.wereld] || 0) + r.centen;
+      for (const w of Object.keys(perWereld)) {
+        const uit = economie.magBelasten({ van: economie.INFRA_WERELD, naar: w, centen: perWereld[w] });
+        if (!uit.ok) plafondBlok[w] = uit;
+      }
+    }
+    if (Object.keys(plafondBlok).length) {
+      rijen = rijen.map(r => plafondBlok[r.wereld] && r.factureren
+        ? Object.assign({}, r, { factureren: false, waaromNiet: plafondBlok[r.wereld].uitleg,
+          firewall: Object.assign({ ok: false }, plafondBlok[r.wereld]) })
+        : r);
+    }
     const som = (f) => rijen.filter(f).reduce((a, r) => a + r.centen, 0);
-    return { periode: p, rijen,
+    return { periode: p, rijen, plafondBlok,
+      werelden: economie ? economie.WERELDEN.map(w => ({ wereld: w.id, naam: w.naam,
+        centen: rijen.filter(r => r.wereld === w.id).reduce((a, r) => a + r.centen, 0),
+        gebruikers: rijen.filter(r => r.wereld === w.id).length,
+        teFactureren: rijen.filter(r => r.wereld === w.id && r.factureren).reduce((a, r) => a + r.centen, 0) })) : [],
       totalen: { alles: som(() => true), teFactureren: som(r => r.factureren),
         inbegrepen: som(r => r.stand === 'inbegrepen'), rtfoundation: som(r => r.stand === 'rtfoundation'),
         huis: som(r => r.stand === 'huis') },
@@ -117,7 +139,7 @@ module.exports = (ctx) => {
     const v = voorstel(p);
     const regels = [];
     for (const r of v.rijen.filter(x => x.factureren)) {
-      const uit = boekDoorbelasting({ drager: r.drager, periode: p, centen: r.centen, graad: r.graad });
+      const uit = boekDoorbelasting({ drager: r.drager, periode: p, centen: r.centen, graad: r.graad, wereld: r.wereld });
       regels.push({ drager: r.drager, centen: r.centen, factuur: (uit && uit.id) || null,
         mislukt: uit && uit.error ? uit.error : null });
     }

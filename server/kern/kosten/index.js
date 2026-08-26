@@ -8,6 +8,9 @@
 
    ZEVEN DELEN, EN DE VOLGORDE IS EEN AFHANKELIJKHEID:
 
+     werelden       (kern/economie/) vier economieën die niet in elkaar
+                    overlopen, met een firewall ertussen. Deze laag rekent; die
+                    laag bepaalt wie mag betalen.
      soorten        welke kosten bestaan er, en wat is ervan te meten
      tarieven       wat kost één eenheid, en waar komt dat getal vandaan
      huisrekening   wat betaalde RTG in het echt, per maand
@@ -30,7 +33,15 @@
       Een kostenoverzicht is een gedragsbeeld; dat hoort niet naast een naam te
       liggen.
 
-   3. DE AI ZET KLAAR, EEN MENS GEEFT VRIJ. Er wordt niets gefactureerd zonder
+   3. KOSTEN VAN DE ENE WERELD KOMEN NOOIT BIJ EEN GEBRUIKER VAN DE ANDERE.
+      De nota van de infrastructuur wordt eerst over de vier economieën verdeeld
+      en pas daarna binnen elke economie over haar eigen gebruikers; tussen twee
+      werelden ligt een firewall die standaard weigert (kern/economie/). De
+      RTFoundation is een eigen rechtspersoon met een eigen vermogen en een eigen
+      begroting (kern/rtfos/geld.js) -- geen kostenpost van RTG die je over
+      gebruikers uitsmeert.
+
+   4. DE AI ZET KLAAR, EEN MENS GEEFT VRIJ. Er wordt niets gefactureerd zonder
       dat een mens uit het kantoor de maand vrijgeeft, met zijn naam eronder.
       GELD.md par. 3.
 
@@ -41,7 +52,7 @@
 const haak = require('./haak');
 const soorten = require('./soorten');
 
-function maakKosten({ db, save, accounts, geldPasprijzen, fonds, klok }) {
+function maakKosten({ db, save, accounts, geldPasprijzen, fonds, economie, klok }) {
   const nu = () => (typeof klok === 'function' ? klok() : new Date()).toISOString();
 
   function d() {
@@ -49,7 +60,7 @@ function maakKosten({ db, save, accounts, geldPasprijzen, fonds, klok }) {
     return db.data.kosten;
   }
 
-  const ctx = { db, save, nu, d, accounts, geldPasprijzen, fonds };
+  const ctx = { db, save, nu, d, accounts, geldPasprijzen, fonds, economie };
   const tarieven = require('./tarieven')(ctx);
   ctx.tarieven = tarieven;
   const meter = require('./meter')(ctx);
@@ -91,7 +102,7 @@ function maakKosten({ db, save, accounts, geldPasprijzen, fonds, klok }) {
     posten: huisrekening.posten, postZet: huisrekening.postZet, ontbrekendeNota: huisrekening.ontbrekend,
     voorDrager: overzicht.voorDrager, alleDragers: overzicht.alleDragers,
     nietGemeten: overzicht.nietGemeten, afstemming: overzicht.afstemming,
-    verdeling: toerekening.verdeling,
+    verdeling: toerekening.verdeling, verbruikPerWereld: toerekening.perWereld,
     dekkingVoor: dekking.dekkingVoor, dekkingHuis: dekking.huis,
     beleid: doorbelasting.beleid, beleidZet: doorbelasting.beleidZet, voorstel: doorbelasting.voorstel,
     standVoor: doorbelasting.standVoor,

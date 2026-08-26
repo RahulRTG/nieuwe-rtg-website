@@ -1297,6 +1297,13 @@
       "operator": "!==->===",
       "gezakt": 2
     },
+    "economie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "eenaccount-werkruimte.test.js": {
       "soort": "server",
       "staat": "gezakt",

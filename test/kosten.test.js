@@ -43,6 +43,19 @@ async function nu() {
   return r.body.periode;
 }
 
+/* DE ECONOMISCHE RELATIE die doorbelasten mogelijk maakt. Sinds de
+   economielaag is dit geen formaliteit: RTG en zijn leden zijn twee partijen, en
+   de firewall weigert standaard elke doorbelasting tussen twee werelden. Wie
+   deze regel weglaat, ziet de doorbelastingstoetsen zakken op "geen relatie" --
+   en dat is precies de bedoeling van die grens. */
+async function relatieNaarConsument(plafondCenten) {
+  return api('/api/office/economie/relatie/zet', {
+    van: 'rtg-intern', naar: 'consument',
+    grondslag: 'Toets: algemene voorwaarden, artikel verbruik boven de bundel',
+    plafondCenten: plafondCenten || 100000000
+  }, kantoor);
+}
+
 /* Een tarief zetten dat GROOT genoeg is om in hele centen zichtbaar te zijn.
    Duizend verzoeken kosten in het echt een fractie van een cent; met een echt
    tarief zou elke toets hieronder op 0 uitkomen en niets bewijzen. */
@@ -197,6 +210,8 @@ test('onder de drempel gaat er niets naar de rekening, erboven wel, en maar een 
   await api('/api/kosten/mij', {}, klein);
   await api('/api/office/kosten/beleid/zet',
     { pas: 'rtg', stand: 'doorbelasten', reden: 'Toets: RTG Pass rekent verbruik af' }, kantoor);
+  const rel = await relatieNaarConsument();
+  assert.equal(rel.status, 200, 'de relatie kwam er niet: ' + JSON.stringify(rel.body).slice(0, 160));
   const kleinBeeld = await api('/api/kosten/mij', {}, klein);
   assert.equal(kleinBeeld.body.wieBetaalt.stand, 'doorbelasten');
   assert.equal(kleinBeeld.body.wieBetaalt.opDeRekening, false, 'een paar cent hoort niet op een rekening');

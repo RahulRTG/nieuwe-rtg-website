@@ -35,7 +35,7 @@ function maandNaam(periode) {
 }
 
 module.exports = (ctx) => {
-  const { db, save, accounts } = ctx;
+  const { db, save, accounts, economie } = ctx;
 
   /* Waar woont de factuurlijst van deze drager? Een echt account heeft zijn
      eigen ledenstaat; een demo-sessie deelt de gedeelde demo -- dezelfde twee
@@ -58,9 +58,23 @@ module.exports = (ctx) => {
      maakt er geen tweede. Dat is dezelfde zekering als de idem-sleutel in
      kern/factuursaldo.js, en hier hard nodig: een dubbele doorbelasting is niet
      met een creditnota te repareren maar met vertrouwen. */
-  function boekDoorbelasting({ drager, periode, centen, graad }) {
+  function boekDoorbelasting({ drager, periode, centen, graad, wereld }) {
     const c = Math.round(Number(centen) || 0);
     if (!(c > 0)) return { error: 'Geen bedrag om door te belasten.' };
+    /* DE LAATSTE POORT VOOR DE FACTUUR, en met opzet niet dezelfde controle als
+       die in ./doorbelasting.js. Daar wordt gevraagd of RTG deze WERELD iets in
+       rekening mag brengen; hier of DEZE GEBRUIKER een rekening mag krijgen voor
+       kosten uit die wereld. Dat zijn twee vragen, en de tweede is strenger: een
+       open relatie naar de RTFoundation is geen open deur naar een gezin.
+
+       De wereld wordt hier ONAFHANKELIJK opnieuw bepaald en met de meegegeven
+       wereld vergeleken. Dat is met opzet een dubbele berekening: op deze plek
+       is dat geen dubbeling maar een controle, en het is de enige plek waar een
+       verwisseling van werelden nog kan worden gezien voordat er een bedrag op
+       iemands rekening staat. */
+    if (!economie) return { error: 'De economielaag is niet gemount; zonder firewall wordt er niets gefactureerd.' };
+    const poort = economie.magDragerBelasten({ drager, vanWereld: wereld || economie.wereldVan(drager) });
+    if (!poort.ok) return { error: poort.uitleg, code: poort.code };
     const doel = lijstVan(drager);
     if (doel.error) return doel;
     const md = doel.md;
@@ -78,7 +92,8 @@ module.exports = (ctx) => {
       desc: 'Eigen verbruik ' + maandNaam(periode) + (graad === 'vermoed' ? ' (deels toegerekend)' : ''),
       netto: 0, bijdrage: inclusief, status: 'open',
       date: 'Vervalt aan het eind van ' + maandNaam(periode),
-      verbruik: { periode, centenExBtw: c, btwPct: btw, graad: graad || 'onbekend' }
+      verbruik: { periode, centenExBtw: c, btwPct: btw, graad: graad || 'onbekend',
+        wereld: economie.wereldVan(drager) }
     });
     doel.bewaar();
     return { id: nummer, centenExBtw: c, bijdrage: inclusief, btwPct: btw };

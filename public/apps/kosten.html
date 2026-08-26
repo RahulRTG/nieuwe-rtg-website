@@ -201,6 +201,57 @@ function tekenVoorstel(v, beleid){
     '</div>';
 }
 
+/* DE VIER ECONOMIEEN EN DE GRENS ERTUSSEN.
+
+   Dit blok staat op het KOSTENSCHERM en niet op een eigen pagina, met opzet:
+   een firewall die je op een andere plek moet gaan zoeken dan waar je de
+   doorbelasting vrijgeeft, is een firewall die je pas opzoekt als er al iets
+   is misgegaan. Hier staat hij naast het bedrag dat hij tegenhoudt.
+
+   De weigering staat er ALTIJD met de reden en met hoe het wel kan. Een
+   doorbelasting die stilvalt zonder uitleg, laat iemand denken dat er niets te
+   factureren viel. */
+function tekenWerelden(w, posten){
+  const rel = w.relaties || [];
+  return '<div class="kaart"><h2>De vier economieen</h2>'+
+    '<p class="sub">Kosten van de ene economie komen nooit bij een gebruiker van de andere. De RTFoundation is een eigen rechtspersoon met een eigen vermogen; wat zij kost wordt uit haar eigen begroting betaald, niet uit die van RTG-gebruikers.</p>'+
+    '<div class="schuif"><table><thead><tr><th>Economie</th><th class="getal">Gebruikers</th><th>Factureert</th><th>Grond</th></tr></thead><tbody>'+
+    w.werelden.map(x => '<tr><td><b>'+esc(x.naam)+'</b><br><code>'+esc(x.id)+'</code></td>'+
+      '<td class="getal">'+x.gebruikers+'</td>'+
+      '<td>'+(x.factureerbaar ? 'ja' : '<span class="st">nee</span>')+'</td>'+
+      '<td class="sub">'+esc(x.grond)+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    (posten.length
+      ? '<h3 class="kop3">De nota\'s, verdeeld over de economieen</h3>'+
+        '<div class="schuif"><table><thead><tr><th>Soort</th><th>Economie</th><th class="getal">Deel</th><th>Wie betaalt dit</th></tr></thead><tbody>'+
+        posten.map(x => '<tr><td>'+esc(x.naam)+'</td><td><code>'+esc(x.wereld)+'</code></td>'+
+          '<td class="getal">'+eur(x.centen)+'</td>'+
+          '<td>'+(x.doorbelastbaar
+            ? esc(x.wereld)
+            : '<b>'+esc(x.betaaldDoor)+'</b><br><span class="sub">'+esc(x.firewall.uitleg)+
+              (x.firewall.hoeWel ? ' '+esc(x.firewall.hoeWel) : '')+'</span>')+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<p class="sub">Er zijn deze maand geen nota\'s om over de economieen te verdelen.</p>')+
+    '<h3 class="kop3">Economische relaties</h3>'+
+    (rel.length
+      ? '<div class="schuif"><table><thead><tr><th>Van</th><th>Naar</th><th class="getal">Plafond</th><th>Grondslag</th></tr></thead><tbody>'+
+        rel.map(x => '<tr><td><code>'+esc(x.van)+'</code></td><td><code>'+esc(x.naar)+'</code></td>'+
+          '<td class="getal">'+eur(x.plafondCenten)+'</td>'+
+          '<td class="sub">'+esc(x.grondslag)+' &middot; '+esc(x.door)+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<div class="bev">Er is geen enkele relatie vastgelegd. Zolang dat zo is, wordt er tussen twee economieen niets doorbelast. Dat is de grondstand en geen storing.</div>')+
+    '<div class="rij"><select class="veld" id="rVan" aria-label="Van welke economie">'+
+      w.werelden.map(x => '<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('')+
+    '</select><select class="veld" id="rNaar" aria-label="Naar welke economie">'+
+      w.werelden.map(x => '<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('')+
+    '</select>'+
+    '<input class="veld" id="rPlafond" type="number" min="1" step="1" placeholder="plafond in centen" aria-label="Plafond in centen">'+
+    '<input class="veld breed" id="rGrond" maxlength="300" placeholder="Welke overeenkomst of welk bestuursbesluit?" aria-label="Grondslag">'+
+    '<button class="knop" id="rZet" type="button">Relatie vastleggen</button></div>'+
+    '<p class="sub">Een relatie betekent dat de ene rechtspersoon de andere iets in rekening mag brengen. Dat is een bestuursbesluit; het plafond en de grondslag zijn daarom verplicht.</p>'+
+    '</div>';
+}
+
 function tekenGaten(nietGemeten){
   if (!nietGemeten.length) return '';
   return '<div class="kaart"><h2>Wat dit scherm niet weet</h2>'+
@@ -219,10 +270,12 @@ async function laden(){
       api('/api/office/kosten/nota', { periode: p }),
       api('/api/office/kosten/beleid')
     ]);
+    const w = await api('/api/office/economie/werelden', { periode: o.periode });
     const v = await api('/api/office/kosten/voorstel', { periode: o.periode });
     SOORTEN = t.soorten;
     if (!$('#maand').value) $('#maand').value = o.periode;
     $('#main').innerHTML = tekenDekking(o.dekking) + tekenVoorstel(v, b.beleid) +
+      tekenWerelden(w, w.wereldposten || []) +
       tekenGebruikers(o.gebruikers) + tekenTarieven(t.tarieven, o.ontbreekt.tarieven) +
       tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN) + tekenGaten(o.nietGemeten);
   } catch (e) {
@@ -242,6 +295,10 @@ document.addEventListener('click', async (ev) => {
       await api('/api/office/kosten/nota/zet', { periode: $('#maand').value, soort: $('#nSoort').value,
         centen: Number($('#nBedrag').value), bron: $('#nBron').value });
       meld('Nota vastgelegd.'); laden();
+    } else if (el.id === 'rZet') {
+      await api('/api/office/economie/relatie/zet', { van: $('#rVan').value, naar: $('#rNaar').value,
+        plafondCenten: Number($('#rPlafond').value), grondslag: $('#rGrond').value });
+      meld('Relatie vastgelegd.'); laden();
     } else if (el.id === 'vrij') {
       const r = await api('/api/office/kosten/vrijgeven', { periode: $('#maand').value });
       meld(r.geboekt + ' regels geboekt, samen ' + eur(r.totaalCenten) + '.'); laden();

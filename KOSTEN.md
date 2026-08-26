@@ -14,6 +14,12 @@ krijgt een eigenaar, of de eerlijke mededeling dat hij er geen heeft.*
 Code: `server/kern/kosten/`, routes in `server/routes/kosten.js`, toetsen in
 `test/kosten.test.js`.
 
+**Deze laag rekent; `ECONOMIE.md` bepaalt wie mag betalen.** De vier economische
+werelden en de firewall ertussen staan daar (`kern/economie/`). Wat hieronder over
+verdelen en doorbelasten staat, gaat langs die firewall: in de grondstand is er
+geen enkele relatie vastgelegd en wordt er tussen twee werelden dus **niets**
+doorbelast. Dat is geen storing maar de veilige stand.
+
 ---
 
 ## 1. De drie grenzen
@@ -81,6 +87,11 @@ geen energie.*
 
 Wat er wél is, is de **nota**. Die wordt verdeeld (`toerekening.js`).
 
+- **Eerst per wereld.** De nota gaat eerst over de vier economische werelden
+  (ECONOMIE.md par. 4) en pas daarna binnen elke wereld over haar eigen
+  gebruikers. Een gezin krijgt dus nooit een cent uit het deel van de zaken, en
+  andersom. Elk werelddeel gaat langs de firewall; zonder relatie blijft het
+  bedrag bij RTG, met de reden erbij.
 - **De sleutel:** het aandeel in de gemeten directe kosten van die maand. Wie een
   tiende van alle gemeten kosten veroorzaakte, krijgt een tiende van de stroom.
 - **De sleutel is niet volmaakt, en dat staat erbij.** Externe AI-tokens draaien
@@ -120,7 +131,7 @@ De standaardverdeling:
 | **RTG Lite** | **doorbelasten** | *bestaat nog niet* |
 | **Business Lite** | **doorbelasten** | *bestaat nog niet* |
 | zaak | inbegrepen | wat een zaak betaalt staat in zijn leverancierscontract |
-| gezin (RTF) | rtfoundation | de RTFoundation is gratis voor elk gezin |
+| gezin (RTF) | rtfoundation | de RTFoundation is gratis voor elk gezin; zij betaalt uit haar eigen begroting (`kern/rtfos/geld.js`) |
 | huis | huis | onze eigen rekening |
 
 **RTG Lite en Business Lite staan er al en bestaan nog niet.** Dat is met opzet

@@ -46,6 +46,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
      Naast de facturatie, want het eindigt op dezelfde factuur en niet op een
      tweede geldstroom. */
   require('../routes/kosten')(grens('kosten'));
+  /* De economielaag eronder (kern/economie/, ECONOMIE.md): de vier werelden en
+     de firewall ertussen. Na de kosten, want de werelden-route toont de
+     verdeling van de nota's die daar wordt gerekend. */
+  require('../routes/economie')(grens('economie'));
   require('../routes/rtmail')(grens('rtmail'));
   require('../routes/rtmail-vak')(grens('rtmail-vak'));
   require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));

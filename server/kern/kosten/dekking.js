@@ -30,7 +30,7 @@
 const { maandCentenUit } = require('../pasprijs');
 
 module.exports = (ctx) => {
-  const { meter, overzicht, doorbelasting, geldPasprijzen, fonds } = ctx;
+  const { meter, overzicht, doorbelasting, geldPasprijzen, fonds, economie, toerekening } = ctx;
 
   /* Wat betaalt deze drager per maand, exclusief btw? null betekent "hier is
      geen bedrag van bekend", en dat is een antwoord. */
@@ -84,14 +84,48 @@ module.exports = (ctx) => {
          zichtbaar te zijn in plaats van weggerekend. */
       zonderBekendeBijdrage: { aantal: onbekend.length, kostenCenten: onbekend.reduce((a, r) => a + r.kostenCenten, 0),
         waarom: 'Business Pass (op maat), zaken (leverancierscontract) en het huis zelf.' },
+      /* PER WERELD, en dat is sinds de economielaag de eerste indeling en niet
+         een extra kolom. Een totaal over vier economieën heen telt de kosten van
+         twee rechtspersonen bij elkaar op, en dat getal betekent niets. */
+      werelden: economie ? economie.WERELDEN.map(w => {
+        const inWereld = rijen.filter(r => economie.wereldVan(r.drager) === w.id);
+        return { wereld: w.id, naam: w.naam, factureerbaar: w.factureerbaar,
+          gebruikers: inWereld.length,
+          kostenCenten: inWereld.reduce((a, r) => a + r.kostenCenten, 0),
+          bijdragenCenten: inWereld.filter(r => r.bijdrageCenten != null).reduce((a, r) => a + r.bijdrageCenten, 0) };
+      }) : [],
       rtfoundation: {
         gezinnen: gezinnen.length, kostenCenten: gezinnen.reduce((a, r) => a + r.kostenCenten, 0),
-        wieBetaalt: 'De RTFoundation. Een gezin krijgt hiervoor nooit een rekening.',
+        wieBetaalt: 'De RTFoundation, uit haar eigen begroting (kern/rtfos/geld.js). Een gezin krijgt hiervoor nooit een rekening.',
+        /* WAT RTG DE STICHTING IN REKENING MAG BRENGEN, en of dat mag. De
+           stichting draait op de machines van RTG; dat is een levering tussen
+           twee rechtspersonen en geen boekhoudkundige verschuiving. Zonder
+           vastgelegde relatie blijft het bedrag bij RTG, en dat staat erbij in
+           plaats van dat het stil verdwijnt. */
+        infrastructuur: infraNaarFoundation(p),
         fonds: fonds ? fondsBeeld() : null
       },
       tekort: rijen.filter(r => r.uitkomst === 'dekt-niet' && r.pas !== 'gezin')
         .sort((a, b) => a.verschilCenten - b.verschilCenten).slice(0, 25)
     };
+  }
+
+  /* De werelddelen van de infrastructuurnota's die bij de RTFoundation horen,
+     met de uitslag van de firewall erbij. Leest de toerekening en rekent zelf
+     niets: twee plekken die dit bedrag uitrekenen zouden op een dag uiteenlopen,
+     en dan is de vraag welke van de twee de stichting moet betalen. */
+  function infraNaarFoundation(periode) {
+    if (!toerekening || !economie) return null;
+    const posten = (toerekening.verdeling(periode).wereldposten || [])
+      .filter(x => x.wereld === 'rtfoundation');
+    if (!posten.length) return null;
+    const totaal = posten.reduce((a, x) => a + x.centen, 0);
+    const geweigerd = posten.filter(x => !x.doorbelastbaar);
+    return { centen: totaal, posten: posten.map(x => ({ soort: x.soort, centen: x.centen, bron: x.bron })),
+      doorbelastbaar: geweigerd.length === 0,
+      waarom: geweigerd.length ? geweigerd[0].firewall.uitleg : null,
+      hoeWel: geweigerd.length ? geweigerd[0].firewall.hoeWel : null,
+      betaaldDoor: geweigerd.length ? economie.INFRA_WERELD : 'rtfoundation' };
   }
 
   /* Wat er in het fonds zit. Bewust NIET naast de maandkosten gelegd: dat

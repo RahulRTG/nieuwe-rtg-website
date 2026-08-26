@@ -265,6 +265,11 @@
     "drm": [
       "drm"
     ],
+    "economie": [
+      "boardroomAuth",
+      "economie",
+      "kosten"
+    ],
     "facturatie": [
       "facturatie"
     ],

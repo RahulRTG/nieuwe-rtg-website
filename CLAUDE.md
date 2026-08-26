@@ -55,6 +55,26 @@ de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
 paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
 oplaadmoment — en dát is het echte voordeel.
 
+**`ECONOMIE.md` is de laag erboven** -- RTG Economic Control Plane: de financiële
+intelligentielaag van het hele ecosysteem, als richtingsdocument met per onderdeel
+of het **staat**, **een stap weg** is, **een besluit vraagt** of **jaren weg** is
+(zoals PLATFORM.md en DEVELOPERCLOUD.md). Lees die vóór je aan doorbelasten,
+werelden of financiële voorspellingen werkt. De kern in één zin: **de RTFoundation
+is geen kostenpost van RTG die je over gebruikers uitsmeert, maar een eigen
+rechtspersoon met een eigen vermogen** -- en dat wordt afgedwongen en niet
+beloofd. Vier economische werelden (`consument`, `commercieel`, `rtg-intern`,
+`rtfoundation`) waarvan de wereld een eigenschap is van de IDENTITEIT en niet van
+de transactie, met een **firewall** ertussen die standaard weigert
+(`kern/economie/firewall.js`): een relatie tussen twee werelden bestaat alleen met
+een grondslag én een plafond, het register is standaard leeg, en een weigering
+zegt altijd hoe het wel kan. De nota's van de infrastructuur gaan daarom eerst
+over de vier werelden en pas daarna binnen elke wereld over haar eigen gebruikers.
+Er is een tweede poort die geen relatie kan openen: een rekening landt bij de
+ENTITEIT van een wereld, nooit bij een gebruiker ervan -- RTG mag de stichting
+factureren, nooit een gezin. Wat er nog niet is (economische graaf, provenance tot
+de providerfactuur, periode sluiten, forecast, cost routing) staat in ECONOMIE.md
+mét de reden en de stand, niet als lege functie.
+
 **`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker ons,
 en wie betaalt dat. WAARDE.md gaat over waarde die BINNEN RTG beweegt; dit gaat
 over het geld dat het huis er zelf aan uitgeeft. Lees die vóór je aan tarieven,

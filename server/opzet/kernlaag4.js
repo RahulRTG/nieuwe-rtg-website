@@ -27,6 +27,7 @@
      care
      geldregie
      ledenregister
+     economie
      kosten */
 'use strict';
 
@@ -131,15 +132,17 @@ Object.assign(kern, require('../kern/geldregie').maakGeldregie({ db, save }));
    en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
    het leunt op de pasprijzen daaruit. */
 Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
-/* RTG Kostprijs (kern/kosten/, KOSTEN.md): wat kost elke gebruiker, en wie
-   betaalt dat. NA de geldregie, want de dekkingskant legt de kosten naast de
-   pasprijs daaruit; het fonds gaat laat gebonden mee. Deze regel zet ook de
-   kostenhaak aan: tot hier meldden ai.js en de poorten aan een lege haak. */
-Object.assign(kern, require('../kern/kosten')({ db, save, accounts,
+/* RTG Kostprijs (KOSTEN.md) met de economielaag ervoor (ECONOMIE.md). Die
+   volgorde is een afhankelijkheid: de kostprijs verdeelt zijn nota's over de vier
+   werelden en vraagt de firewall of de ene wereld de andere iets mag neerleggen.
+   NA de geldregie om de pasprijs; het fonds gaat laat gebonden mee. Zet ook de
+   kostenhaak aan, die tot hier leeg was. */
+Object.assign(kern, require('../kern/economie')({ db, save }));
+Object.assign(kern, require('../kern/kosten')({ db, save, accounts, economie: kern.economie,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   fonds: () => kern.fonds }));
-/* En de RTFoundation-kant: zonder deze regel ziet een gezin nooit wat de
-   RTFoundation voor hem betaalt. Late binding, die router bestaat al. */
+// En de RTFoundation-kant: zonder dit ziet een gezin nooit wat de RTFoundation
+// voor hem betaalt. Late binding; die router bestaat al.
 if (kern.rtf && kern.rtf.setKostenHook) kern.rtf.setKostenHook(() => kern.kosten);
 /* De ledenbalie hangt in ./kernlaag7.js, met een eigen kern (kern/ledenbalie*.js)
    en een eigen zetel. Hier stond een TWEEDE bedrading uit een andere tak die

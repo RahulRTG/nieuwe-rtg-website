@@ -13,7 +13,8 @@
      2. het dekkingsblok staat er, met het voorbehoud eronder -- dat blok is de
         hele reden dat het percentage erboven mag staan;
      3. een tarief zetten VIA HET SCHERM komt echt aan en staat er daarna;
-     4. wat het scherm niet weet, staat er ook echt.
+     4. de vier economieen en de firewall staan op ditzelfde scherm;
+     5. wat het scherm niet weet, staat er ook echt.
 
    Draait alleen waar Playwright beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
@@ -49,6 +50,11 @@ test('het kostenbord: laadt, toont het voorbehoud, en zet een tarief',
        waarvan de noemer kosten bevat waarvan de teller de bijdrage mist. */
     assert.match(tekst, /Wat dit percentage niet zegt/);
     assert.match(tekst, /RTFoundation/);
+    /* De vier economieen en de grens ertussen staan op HETZELFDE scherm als de
+       doorbelasting, en dat is de bedoeling: een firewall die je elders moet
+       zoeken, zoek je pas op als er al iets is misgegaan. */
+    assert.match(tekst, /De vier economieen/);
+    assert.match(tekst, /geen enkele relatie vastgelegd|Economische relaties/);
 
     // een tarief zetten via het scherm, en het moet er daarna echt staan
     await page.selectOption('#tSoort', 'ai-uitvoer');

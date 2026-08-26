@@ -31,6 +31,11 @@ const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, dec
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 require('./foundation/gezin')(gctx);
 
+/* Wat dit gezin kost, en wie het betaalt (foundation/kosten.js). Een eigen
+   bestandje, want het antwoord draagt een belofte en geen bedrag: de
+   RTFoundation betaalt, en er komt nooit een rekening. */
+const { setKostenHook } = require('./foundation/kosten')({ router, gezinVan, beheerderVan });
+
 /* ---------- de gezinssessie: wie ben je, en mag je bij de privezaken ---------- */
 function sessieVan(req, res) {
   const g = gezinVan(req, res); if (!g) return null;
@@ -138,4 +143,4 @@ function leerlingPassen(sess) {
 
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { router, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };
+module.exports = { router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };

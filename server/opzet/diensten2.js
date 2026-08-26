@@ -14,6 +14,11 @@
    ========================================================================== */
 'use strict';
 
+/* De kostenhaak: wie draagt de kosten van dit verzoek. Buiten de fabriek, want
+   hij houdt geen staat die per opzet verschilt -- hij wijst alleen naar de
+   meter die kern/kosten later aanzet. */
+const kostenhaak = require('../kern/kosten/haak');
+
 module.exports = function maakDiensten2(deps) {
   const {
     DATA_DIR, PERSONAS, accounts, crypto, db, dirTouch, eigenaarAccount, findSupplier, 
@@ -136,7 +141,16 @@ function auth(req, res, next) {
     return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
   }
   dirTouch(sess);
-  next();
+  /* WIE DRAAGT DE KOSTEN VAN DIT VERZOEK. Eén keer neergezet, op het enige
+     keelgat waar elke leden-route langs moet: alles wat verderop gebeurt (een
+     AI-aanroep vijf lagen diep, een bericht) vindt de eigenaar in de
+     async-context in plaats van hem als parameter door honderden lagen te
+     krijgen. Het verzoek zelf telt mee, anders leest een gebruiker die nooit
+     met de AI praat als kosteloos. Zie kern/kosten/haak.js -- daar staat ook
+     waarom dit een verzoek nooit kan laten omvallen. */
+  const drager = kostenhaak.drager('lid', sess.key);
+  kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
+  kostenhaak.binnen(drager, next, sess.tier);
 }
 
 /* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >

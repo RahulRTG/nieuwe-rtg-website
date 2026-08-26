@@ -26,7 +26,8 @@
      berichten
      care
      geldregie
-     ledenregister */
+     ledenregister
+     kosten */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -130,6 +131,25 @@ Object.assign(kern, require('../kern/geldregie').maakGeldregie({ db, save }));
    en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
    het leunt op de pasprijzen daaruit. */
 Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
+/* RTG Kostprijs (kern/kosten/): wat kost elke gebruiker ons, en wie betaalt dat.
+   Hier gemount en niet eerder, want de dekkingskant legt de kosten naast de
+   PASPRIJS en die komt uit de geldregie een paar regels hierboven. Het fonds
+   gaat laat gebonden mee (het wordt in server.js gebouwd, na deze laag); een
+   kopie nu zou undefined bevriezen.
+
+   Deze regel zet ook de kostenhaak aan (kern/kosten/haak.js). Tot hier meldden
+   server/ai.js en de twee poorten hun verbruik aan een lege haak en gebeurde er
+   niets -- dat is met opzet: een AI-antwoord of een inlog die omvalt omdat de
+   boekhouding nog niet wakker is, is erger dan een teller die een seconde later
+   begint. */
+Object.assign(kern, require('../kern/kosten')({ db, save, accounts,
+  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
+  fonds: () => kern.fonds }));
+/* En de RTFoundation-kant aansluiten. Zonder deze regel bestaat /api/foundation/
+   kosten wel en antwoordt hij dat de laag niet wakker is -- een gezin zou dan
+   nooit te zien krijgen wat de RTFoundation voor hem betaalt. Late binding, want
+   de foundation-router wordt bij de poortwachters gebouwd, ver voor deze laag. */
+if (kern.rtf && kern.rtf.setKostenHook) kern.rtf.setKostenHook(() => kern.kosten);
 /* De ledenbalie hangt in ./kernlaag7.js, met een eigen kern (kern/ledenbalie*.js)
    en een eigen zetel. Hier stond een TWEEDE bedrading uit een andere tak die
    een maakLedenbalie() verwachtte die deze kern niet heeft -- de server startte

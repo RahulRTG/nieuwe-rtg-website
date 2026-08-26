@@ -55,6 +55,29 @@ de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
 paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
 oplaadmoment — en dát is het echte voordeel.
 
+**`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker ons,
+en wie betaalt dat. WAARDE.md gaat over waarde die BINNEN RTG beweegt; dit gaat
+over het geld dat het huis er zelf aan uitgeeft. Lees die vóór je aan tarieven,
+verbruik, doorbelasten of "wat kost een gratis account" werkt. De kern in één zin:
+**elke euro die dit huis uitgeeft krijgt een eigenaar, of de eerlijke mededeling
+dat hij er geen heeft.** Negen kostensoorten (`kern/kosten/soorten.js`) waarvan er
+zeven per gebruiker meetbaar zijn en twee niet; stroom en serverhuur worden
+verdeeld uit de echte nota met de sleutel erbij en dragen daarom altijd de graad
+`vermoed` -- het plafond volgt uit de meetweg en staat níét per regel, want die
+tweede plek werd door de toerekening genegeerd. De meter houdt tellers en geen
+journaal (een gedragslogboek per lid is voor een factuur niet nodig), de drager
+komt uit de async-context die de poort zet (`kern/kosten/haak.js`), en de AI-meter
+hangt op de enige plek waar élke modelaanroep langskomt (`server/ai.js`). Drie
+grenzen die niet mogen sneuvelen: er staat nooit een getal waar er geen is (geen
+tarief of nota = een REDEN, geen nul), deze laag kent geen namen (sessiesleutel,
+zaakcode, gezinscode -- nooit de kluis), en de machine zet klaar terwijl een mens
+uit de boardroom vrijgeeft. Wie wat betaalt staat in `kern/kosten/beleidkaart.js`:
+vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
+erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
+RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
+(`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
+belofte en niet met het bedrag).
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

@@ -37,6 +37,9 @@
    ========================================================================== */
 'use strict';
 
+/* De kostenhaak: wie draagt de kosten van dit verzoek. Zie kern/kosten/haak.js. */
+const kostenhaak = require('../kern/kosten/haak');
+
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
   grootSupplierSync, busGeef, kernGeef }) => {
   const bus = { publish: (a, b) => busGeef().publish(a, b) };
@@ -104,7 +107,13 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
        eigen VOG kan aftekenen, heeft geen VOG nodig. */
     const poort = persoonsPoort(req.supplier, req.actor);
     if (!poort.ok) return res.status(403).json({ error: poort.error, persoonseis: poort.missend || null });
-    next();
+    /* Dezelfde kostendrager-context als bij de leden-poort (opzet/diensten2.js).
+       De drager is de ZAAKCODE en niet de medewerker: de rekening gaat naar het
+       bedrijf, en een teller per medewerker zou een productiviteitscijfer per
+       mens zijn -- HORECA.md is daar niet vaag over. */
+    const drager = kostenhaak.drager('zaak', req.supplier.code);
+    kostenhaak.meld('verzoek', 1, { drager, pas: 'zaak' });
+    kostenhaak.binnen(drager, next, 'zaak');
   }
 
   /* Mag deze mens werken in een zaak van dit genre? Late binding: de kernlaag

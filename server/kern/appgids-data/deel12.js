@@ -63,5 +63,10 @@ module.exports = {
     ['Lees eerst wat de app nooit krijgt en waar uw gegevens blijven',
       'Kijk bij elke bewering naar de bron ernaast; die wijst een bestand aan dat na te lezen is',
       'Sluit af met "Wat dit dossier NIET zegt" -- daar begint uw eigen onderzoek'],
-    'Zonder app in het adres toont deze pagina het kanaaldossier: wat voor ELKE app van derden hier geldt, en welke machtigingen er met opzet niet bestaan. Die vraag hoeft u maar een keer te stellen.')
+    'Zonder app in het adres toont deze pagina het kanaaldossier: wat voor ELKE app van derden hier geldt, en welke machtigingen er met opzet niet bestaan. Die vraag hoeft u maar een keer te stellen.'),
+  '/apps/kosten.html': G('RTG Kostprijs: wat kost elke gebruiker ons, en wie betaalt dat.',
+    ['Vul eerst de tarieven en de nota\'s in; zonder bron rekent deze laag niets uit en is elk bedrag te laag',
+      'Lees het dekkingspercentage nooit los van het blok eronder -- van sommige gebruikers is geen bijdrage bekend',
+      'Vrijgeven zet de doorbelasting op de maandfactuur die er al is; dat kan een keer per maand'],
+    'Let op het label naast elk bedrag. "Gemeten" komt van een teller; "vermoed" is een verdeling van een nota, en dat is een schatting hoe precies het getal er ook uitziet. Een gezin van de RTFoundation krijgt hier nooit een rekening.')
 };

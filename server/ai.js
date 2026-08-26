@@ -15,6 +15,10 @@ const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
 const { kompasStatus } = require('./ai-kompas');
+/* De kostenhaak begint leeg: dit bestand bestaat lang voordat de kern wakker
+   is, en doet tot dan niets. Een AI-antwoord dat omvalt op een boekhouding is
+   erger dan een ontbroken teller. */
+const kostenhaak = require('./kern/kosten/haak');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -58,6 +62,19 @@ function maakAI(opts) {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
+            /* DE KOSTENMETER, op de enige plek waar elke modelaanroep van het
+               huis langskomt. Wie de kost draagt staat niet in params maar in de
+               async-context die de poort zette (kern/kosten/haak.js); anders zou
+               elke laag die het lid vergeet door te geven stil een kost zonder
+               eigenaar opleveren. Geen usage in het antwoord: dan melden we
+               niets -- een geschat tokenaantal is een factuur op een getal dat
+               niemand heeft geteld. */
+            const u = uit && uit.usage;
+            if (u) {
+              const invoer = (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0);
+              if (invoer > 0) kostenhaak.meld('ai-invoer', invoer, { bron: aanbieder.naam });
+              if (Number(u.output_tokens) > 0) kostenhaak.meld('ai-uitvoer', Number(u.output_tokens), { bron: aanbieder.naam });
+            }
             return uit;
           } catch (e) {
             laatste = e;

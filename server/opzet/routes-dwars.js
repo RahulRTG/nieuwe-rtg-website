@@ -42,6 +42,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/leerstof')(grens('leerstof'));
   require('../routes/bijles')(grens('bijles'));
   require('../routes/facturatie')(grens('facturatie'));
+  /* RTG Kostprijs (kern/kosten/): wat kost elke gebruiker, en wie betaalt dat.
+     Naast de facturatie, want het eindigt op dezelfde factuur en niet op een
+     tweede geldstroom. */
+  require('../routes/kosten')(grens('kosten'));
   require('../routes/rtmail')(grens('rtmail'));
   require('../routes/rtmail-vak')(grens('rtmail-vak'));
   require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));

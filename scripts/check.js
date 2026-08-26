@@ -3621,5 +3621,43 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
   }
 }
 
+/* DE ZAAI-HASH BLIJFT BIJ DE SEED.
+
+   kluis.zaaiHash rekent een demo-wachtwoord eenmalig uit en deelt dus het zout
+   tussen alle accounts met datzelfde wachtwoord. Voor een wachtwoord dat als
+   letterlijke tekst in deze repo staat kost dat niets; voor een echt wachtwoord
+   -- of voor de viercijferige PIN die langs createStaffSync loopt wanneer een
+   bedrijfsaanmelding wordt goedgekeurd -- zou het de tabel in groepjes verdelen.
+
+   De functie weigert daarom al buiten de demostand. Deze regel is de tweede
+   grendel: hij houdt de AANROEP bij de vijf plekken waar de seed staat, zodat
+   een route die morgen "even snel" een account aanmaakt er niet bij kan zonder
+   dat iemand het ziet. test/zaaihash.test.js bewaakt dat deze regel blijft. */
+{
+  const zaaiWoorden = /\b(zaaiHash|createUserZaai|createStaffZaai|setPasswordZaai)\b/;
+  const mag = new Set([
+    'server/accounts/kluis.js',        // waar hij woont
+    'server/accounts/users.js',        // de twee ledenvarianten
+    'server/accounts/staff.js',        // de personeelsvariant
+    'server/server.js',                // de eigenaar, het demopersoneel en Nora
+    'server/kern/staffseed-papieren.js' // de papieren van datzelfde personeel
+  ]);
+  const buiten = [];
+  for (const map of ['server', 'scripts']) {
+    loop(path.join(ROOT, map), /\.js$/, (f) => {
+      const rel = path.relative(ROOT, f).split(path.sep).join('/');
+      // de keuring zelf noemt de namen nu eenmaal; anders wijst hij naar zichzelf
+      if (mag.has(rel) || rel === 'scripts/check.js') return;
+      if (zaaiWoorden.test(zonderCommentaar(fs.readFileSync(f, 'utf8')))) buiten.push(rel);
+    });
+  }
+  if (buiten.length) {
+    fout('de zaai-hash wordt aangeroepen buiten de seed: ' + buiten.join(', ') +
+      ' -- gebruik hashPassword of hashPasswordSync, of zet de plek bewust in de lijst in scripts/check.js');
+  } else {
+    ok('de zaai-hash (gedeeld zout) blijft bij de ' + mag.size + ' seed-bestanden');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

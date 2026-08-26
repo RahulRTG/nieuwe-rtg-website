@@ -251,10 +251,10 @@ function zetEigenaarsAccount() {
     const bestaand = accounts.findByLogin('Rahul');
     if (bestaand) {
       u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
-      accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+      accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
       accounts.setVerification(u.id, 'verified');
     } else {
-      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+      u = accounts.createUserZaai({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
       accounts.saveMemberState(u.id, memberTemplate());
       accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
     }
@@ -266,7 +266,7 @@ function zetEigenaarsAccount() {
        Postgres kwam de rij ergens anders vandaan en was het wachtwoord
        onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
        Dit staat achter DEMO en draait dus nooit in productie. */
-    accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+    accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
     accounts.setVerification(u.id, 'verified');
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
@@ -328,7 +328,7 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      people.forEach(([name, role, func], i) => accounts.createStaffZaai({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
@@ -346,7 +346,7 @@ if (DEMO) {
   try {
     let nora = accounts.findByLogin('nora@rtg.example');
     if (!nora) {
-      nora = accounts.createUserSync({ username: 'nora', email: 'nora@rtg.example', password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: 'Nora Prins', phone: '+31600000002' });
+      nora = accounts.createUserZaai({ username: 'nora', email: 'nora@rtg.example', password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: 'Nora Prins', phone: '+31600000002' });
       accounts.setVerification(nora.id, 'verified');
     }
     for (const c of ['KIKUNOI', 'VORA']) {

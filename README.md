@@ -836,6 +836,27 @@ alleen omlaag; `test/meterijk.test.js` ijkt hem (keuringsregel 35), en
 `test/wetten.test.js` ijkt de motor zelf -- onder andere dat een wachter die al
 rood was nooit als bewijs meetelt.
 
+### De keten die dit draait (GitHub Actions)
+
+`.github/workflows/ci.yml` draait bij elke pull request en bij elke push naar
+`main`. De unit-suite en de schermtoetsen staan er allebei **in vier delen**
+(`npm run test:deel -- --deel=2/4`, `npm run e2e -- --deel=2/4`), en dat is de
+reden dat drie meters een eigen job hebben gekregen:
+
+- **de dekkingsvloer** stond in de vlaggen `--test-coverage-*` en die rekenen per
+  proces. Elk deel schrijft nu lcov; `scripts/dekkingsvloer.js` telt ze op en
+  oordeelt daarna. Een deel dat geen lcov aflevert is een fout en geen 100%.
+- **de waargenomen endpoint-dekking** (`scripts/dekking.js`) en **de
+  schermdekking** (`scripts/schermen.js`) lezen een journaal dat de servers zelf
+  schrijven. Elk deel schrijft zijn eigen journaal; de meters draaien op de
+  samengevoegde versie, want per deel zou driekwart van de routes en schermen er
+  als "nooit aangeroepen" uitzien.
+
+Wat bewust NIET is opgedeeld, is de a11y-scan: zijn oordeel is een budget over de
+hele ronde (`A11Y-INGELOGD.json`), en vier delen die elk hun kwart tegen dat hele
+budget leggen, laten samen vier keer zoveel door. Een meter die zwakker wordt van
+het opdelen is erger dan een trage meter.
+
 ## Datamap instelbaar (RTG_DATA_DIR)
 
 Standaard staan database, sleutels en uploads in `server/data`. Met

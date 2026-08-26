@@ -17,6 +17,12 @@ async function createUser(gegevens) {
 function createUserSync(gegevens) {
   return schrijfUser(gegevens, kluis.hashPasswordSync(gegevens.password));
 }
+/* Alleen voor de demo-seed: dezelfde weg, maar met de hash die kluis.zaaiHash
+   per wachtwoord eenmalig uitrekent. Waarom dat mag en waarom het buiten de
+   demostand weigert, staat bij zaaiHash zelf. */
+function createUserZaai(gegevens) {
+  return schrijfUser(gegevens, kluis.zaaiHash(gegevens.password));
+}
 function schrijfUser({ email, username, tier, realName, phone }, passwordHash) {
   // 'guest' is de gratis (bestel/betaal) laag: een echt account met paspoort,
   // maar zonder betaalde pas. rtg/lifestyle/business zijn de betaalde passen.
@@ -117,16 +123,27 @@ function zetActief(id, aan) {
 }
 const isActief = (u) => !!u && u.actief !== 0;
 
-/* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
-   setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
-function setPasswordSync(userId, password) {
+/* Het schrijven zelf, los van waar de hash vandaan komt: hashPasswordSync voor
+   de gewone weg, kluis.zaaiHash voor de demo-seed. Twee kopieen van deze UPDATE
+   zouden uiteenlopen zodra de sessiegrens verandert (LAT.md regel 4). */
+function zetWachtwoordHash(userId, hash) {
   // ook hier de sessiegrens, en om dezelfde reden als in tokens.js setPassword:
   // twee wegen naar hetzelfde wachtwoord horen niet twee verschillende dingen
   // met de lopende sessies te doen
   S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ? WHERE id = ?')
-    .run(kluis.hashPasswordSync(password), Date.now(), userId);
+    .run(hash, Date.now(), userId);
   mirror.markUser(userId);
   return getUserById(userId);
+}
+/* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
+   setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
+function setPasswordSync(userId, password) {
+  return zetWachtwoordHash(userId, kluis.hashPasswordSync(password));
+}
+/* Alleen voor de demo-seed (de eigenaar krijgt bij elke start zijn bekende
+   wachtwoord terug); zie kluis.zaaiHash. */
+function setPasswordZaai(userId, password) {
+  return zetWachtwoordHash(userId, kluis.zaaiHash(password));
 }
 
 /* Ontsleutelde naam/e-mail (alleen voor de eigenaar zelf of de backoffice). */
@@ -162,9 +179,9 @@ const { getMemberState, saveMemberState, setVerification, listByVerification,
   conversations, ledenRegisterRijen, deleteUser } = require('./dossier').maakDossier(getUserById);
 
 module.exports = {
-  createUser, createUserSync, getUserById, findByLogin, count, publicUser,
+  createUser, createUserSync, createUserZaai, getUserById, findByLogin, count, publicUser,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

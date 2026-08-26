@@ -14,6 +14,13 @@ async function createStaff(gegevens) {
 function createStaffSync(gegevens) {
   return schrijfStaff(gegevens, kluis.hashPasswordSync(String(gegevens.pin)));
 }
+/* Alleen voor de demo-seed. LET OP het verschil met createStaffSync hierboven:
+   die loopt OOK op een echte weg (de eigenaar-PIN bij een goedgekeurde
+   bedrijfsaanmelding, kern/aanmeldingen/bedrijf.js) en houdt dus zijn eigen
+   zout per rij. Zie kluis.zaaiHash. */
+function createStaffZaai(gegevens) {
+  return schrijfStaff(gegevens, kluis.zaaiHash(String(gegevens.pin)));
+}
 function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, pinHash) {
   const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString(),
     memberId != null ? Number(memberId) : null, memberTier ? String(memberTier).slice(0, 20) : null];
@@ -111,7 +118,7 @@ function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, fun
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
-  createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin,
+  createStaff, createStaffSync, createStaffZaai, getStaffById, listStaff, countStaff, verifyStaffPin,
   setStaffPin, deactivateStaff, deactivateStaffVanZaak, staffByMember, staffPositions,
   setStaffMember, claimStaffMember, releaseStaffMember, publicStaff, makePin
 };

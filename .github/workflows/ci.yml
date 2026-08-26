@@ -33,11 +33,184 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# ============================================================================
+# WAAROM DEZE KETEN ER ZO UITZIET (26 augustus 2026)
+#
+# Hij stond op 83 minuten, en dat kwam uit twee jobs die elk een uur duurden:
+# de unit-suite (76m44s) en de schermtoetsen plus de a11y-scan (66 min). Alles
+# daaromheen -- audit, container, registers -- was samen geen drie minuten.
+#
+# De oorzaak zat NIET in de keten maar in de code eronder: een serverstart kostte
+# 10,6 seconden, waarvan 7,3 aan 220 scrypt-hashes voor VIER demo-wachtwoorden.
+# De toetsen starten er per ronde bijna negenhonderd. Die reparatie staat in
+# server/accounts/kluis.js (zaaiHash) en scheelt op dezelfde bestanden een factor
+# 2,4. Dat is de eerste helft.
+#
+# De tweede helft staat hier: de twee lange jobs zijn opgedeeld. Wat daarbij
+# oppast is niet het opdelen zelf maar de METERS. Drie ervan rekenden over de
+# hele ronde, en die zouden per deel stilletjes minder streng worden:
+#
+#   - de dekkingsvloer stond in de vlaggen --test-coverage-* en rekent PER
+#     PROCES. Elk deel schrijft nu lcov; scripts/dekkingsvloer.js telt ze op en
+#     oordeelt daarna. Een deel zonder lcov is een fout, geen 100%.
+#   - de waargenomen endpoint-dekking leest het routejournaal. Elk deel schrijft
+#     zijn eigen journaal; de meter draait op de samengevoegde versie.
+#   - de schermdekking (welke app heeft een toets echt geopend) idem, met
+#     .schermjournaal.
+#
+# En een die BEWUST niet is opgedeeld: de a11y-scan. Zijn oordeel is een budget
+# over de hele ronde ("ingelogd ten hoogste N contrastfouten"). Vier delen die
+# elk hun kwart tegen het HELE budget leggen, laten samen vier keer zoveel door.
+# Die scan hoort dus eerst zijn meting van zijn oordeel te scheiden (BESTUUR.md);
+# tot dan blijft hij heel, en hij is met ~16 minuten de langste job.
+# ============================================================================
+
 jobs:
-  test:
-    name: Tests, checks en build
+  poorten:
+    name: Codeafspraken en registers
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Codeafspraken (check.js)
+        run: npm run check
+      - name: Eigen AST-scan (statische analyse, geen dependency)
+        run: npm run ast-scan
+      - name: CI-keten gebruikt alleen exact vastgezette Actions
+        run: npm run ci-keten
+      # Het wettenregister mag niet stil uit elkaar lopen met de code: elke wet
+      # wijst naar een letterlijke zin in zijn doctrine-document en naar de
+      # bestanden die hem tegenhouden. Deze stap is STATISCH en kost seconden --
+      # hij controleert of die bron en die handhavers er nog zijn, en of een
+      # eerdere sabotage-uitslag nog bij het huidige recept hoort. Het ECHT
+      # uitzetten van elke handhaver (npm run sabotage) duurt tientallen minuten
+      # en hoort in de wekelijkse ronde, niet in elke push.
+      - name: Het wettenregister klopt met de code (wetten.js --controle)
+        run: node scripts/wetten.js --controle
+
+  toetsen:
+    name: Toetsen deel ${{ matrix.deel }} van 4
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      # EEN GEZAKT DEEL MAG DE ANDERE DRIE NIET AFKAPPEN. Met fail-fast zie je
+      # bij een echte breuk een deel met een fout en drie met "cancelled", en
+      # dan weet je niet of het er een is of vierhonderd.
+      fail-fast: false
+      matrix:
+        deel: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      # LIBXML2 IS DE SCHEIDSRECHTER van test/samlc14n.test.js. Onze eigen
+      # canonicalisatie wordt daar naast die van een vreemde implementatie
+      # gelegd, en die toets slaat zichzelf bewust NIET over als xmllint
+      # ontbreekt: een veiligheidsmeting die niet heeft gedraaid mag er niet
+      # uitzien als een groen vinkje.
+      #
+      # In die toets stond dat xmllint "op elke ubuntu-runner" staat. Dat was
+      # niet waar -- de image van ubuntu-latest draagt hem niet, en de eerste
+      # volledige suite die hem bereikte zakte met drie keer ENOENT. Een
+      # aanname over de omgeving is geen omgeving; daarom staat hij hier. Hij
+      # staat in ELK deel, want welk deel hem krijgt hangt van de verdeling af.
+      - name: libxml2 (de scheidsrechter van de c14n-toets)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
+      # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
+      #
+      # RTG_ROUTELOG laat elke kindserver opschrijven welk ROUTEPATROON hij heeft
+      # afgehandeld. Dat kost niets extra's in deze stap en levert de job
+      # `meters` een waargenomen dekkingscijfer in plaats van een tekstzoektocht
+      # door de tests. Zie server/routelog.js en scripts/dekking.js.
+      #
+      # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
+      # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
+      # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
+      # daarna komt de dekkingstabel van ruim tweeduizend regels overheen, en de
+      # log-API levert alleen de STAART. Vandaar de herhaling onderaan, na de
+      # tabel, waar ze wel te vinden is -- met het hele TAP-blok, want alleen de
+      # naam ("not ok 5861 - ...") liet iedereen alsnog de suite lokaal naspelen.
+      # Zie scripts/gezakte-toetsen.js.
+      #
+      # DEZE STAP DRAAIT NU DEZELFDE RUNNER ALS `npm test` (scripts/test-runner.js)
+      # en niet meer een kaal `node --test test/*.test.js`. Dat is geen detail:
+      # die runner houdt de zes bronmuterende ijkingen (meterijk, keuring,
+      # boot-smoke, ...) APART, een voor een, na de rest. Kaal draaiden ze
+      # tussen de scanners door, en dan kon een scanner het kortlevende
+      # ijkbestand van meterijk zien en rood worden op iets wat niet stuk was.
+      # Lokaal was dat al opgelost; in de CI stond die flake er nog.
+      # Prijs: het deel dat meterijk krijgt is daardoor het langste deel.
+      - name: Unit- en integratietoetsen (json-opslag)
+        run: |
+          set -o pipefail
+          uitslag=0
+          npm run test:deel -- --deel=${{ matrix.deel }}/4 --dekking=dekking 2>&1 | tee /tmp/deel.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/deel.log; fi
+          exit "$uitslag"
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      # De meting van dit deel gaat naar de job `meters`. `if-no-files-found:
+      # error` is hier het halve punt: een deel dat zijn lcov of zijn journaal
+      # niet heeft geschreven moet HIER zakken. Zou het bestand stil ontbreken,
+      # dan rekent de vloer straks over drie kwart van de ronde en meldt groen.
+      - name: De meting van dit deel bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: meting-deel-${{ matrix.deel }}
+          path: |
+            dekking/
+            routejournaal.log
+          if-no-files-found: error
+          retention-days: 5
+
+  meters:
+    name: Dekking over alle delen samen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: toetsen
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: De metingen van de vier delen ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: meting-deel-*
+          path: meting
+      # DE VLOER IS EEN RATEL, GEEN RAPPORTCIJFER. Zakt de dekking onder de
+      # vloer, dan faalt deze stap; de vloeren en de meting waar ze op staan
+      # gaan mee in scripts/dekkingsvloer.js. Vier delen die samen te weinig
+      # dekken zakken hier, ook als elk deel afzonderlijk keurig was.
+      - name: De dekkingsvloer (alle delen opgeteld)
+        run: node scripts/dekkingsvloer.js meting
+      # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
+      # van de tests: te laag voor suites die een hulpje gebruiken, en op te
+      # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
+      # servers zelf schreven -- wat erin staat is echt aangeroepen. De vloer
+      # staat in NORM.json (dekkingWaargenomenPct). `cat` maakt een VERS bestand,
+      # en dat is nodig: dekking.js weigert een journaal dat ouder is dan de code.
+      - name: Waargenomen endpoint-dekking (uit de samengevoegde routejournalen)
+        run: |
+          cat meting/meting-deel-*/routejournaal.log > routejournaal.log
+          wc -l routejournaal.log
+          node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+
+  postgres:
+    name: PostgreSQL-integratietoetsen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     services:
       postgres:
         image: postgres:16-alpine
@@ -67,89 +240,38 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      # LIBXML2 IS DE SCHEIDSRECHTER van test/samlc14n.test.js. Onze eigen
-      # canonicalisatie wordt daar naast die van een vreemde implementatie
-      # gelegd, en die toets slaat zichzelf bewust NIET over als xmllint
-      # ontbreekt: een veiligheidsmeting die niet heeft gedraaid mag er niet
-      # uitzien als een groen vinkje.
-      #
-      # In die toets stond dat xmllint "op elke ubuntu-runner" staat. Dat was
-      # niet waar -- de image van ubuntu-latest draagt hem niet, en de eerste
-      # volledige suite die hem bereikte zakte met drie keer ENOENT. Een
-      # aanname over de omgeving is geen omgeving; daarom staat hij hier.
-      - name: libxml2 (de scheidsrechter van de c14n-toets)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
-      - name: Codeafspraken (check.js)
-        run: npm run check
-      - name: Eigen AST-scan (statische analyse, geen dependency)
-        run: npm run ast-scan
-      - name: CI-keten gebruikt alleen exact vastgezette Actions
-        run: npm run ci-keten
-      # Het wettenregister mag niet stil uit elkaar lopen met de code: elke wet
-      # wijst naar een letterlijke zin in zijn doctrine-document en naar de
-      # bestanden die hem tegenhouden. Deze stap is STATISCH en kost seconden --
-      # hij controleert of die bron en die handhavers er nog zijn, en of een
-      # eerdere sabotage-uitslag nog bij het huidige recept hoort. Het ECHT
-      # uitzetten van elke handhaver (npm run sabotage) duurt tientallen minuten
-      # en hoort in de wekelijkse ronde, niet in elke push.
-      - name: Het wettenregister klopt met de code (wetten.js --controle)
-        run: node scripts/wetten.js --controle
-      # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
-      # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
-      # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/
-      # functies): zakt de in-proces-dekking onder de vloer, dan faalt de stap.
-      # De vloeren staan bewust een paar punten onder de gemeten basislijn zodat
-      # normale ruis niet flaket, maar echte terugval hard opvalt.
-      #
-      # GEMETEN OP 17 AUGUSTUS 2026, volledige suite (6520 toetsen):
-      #   regels 80,63  takken 80,60  functies 67,73   -> vloer 78 / 78 / 65
-      #
-      # Daarvoor stonden de vloeren op 58/74/47 terwijl deze opmerking 63/80/51
-      # als basislijn noemde: twee getallen die geen van beide meer klopten, en
-      # ruim 22 punten lucht op regels en functies. Een vloer die zo diep onder
-      # de stand ligt bewaakt niets -- er kon een vijfde van de dekking wegvallen
-      # zonder dat de stap rood werd. Bij de volgende meting hoort de vloer weer
-      # mee op te schuiven; dat is dezelfde ratel als NORM.json.
-      # RTG_ROUTELOG laat elke kindserver opschrijven welk ROUTEPATROON hij heeft
-      # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
-      # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht
-      # door de tests. Zie server/routelog.js en scripts/dekking.js.
-      # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
-      # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
-      # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
-      # daarna komt de dekkingstabel van ruim tweeduizend regels overheen, en de
-      # log-API levert alleen de STAART. Het downloadadres van het volledige log
-      # ligt achter een andere host, die niet altijd bereikbaar is. Wie dan een
-      # rode stap ziet, weet alleen DAT er iets zakte. Vandaar de herhaling
-      # onderaan, na de tabel, waar ze wel te vinden is.
-      # Die herhaling gaf eerst alleen de NAAM terug ("not ok 5861 - ..."), en
-      # niet de reden. Daarmee begon iedereen alsnog bij het lokaal naspelen van
-      # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
-      # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
-      # de stapel. Zie scripts/gezakte-toetsen.js.
-      - name: Unit- en integratietests + dekkingsvloer (json-opslag)
-        run: |
-          set -o pipefail
-          uitslag=0
-          npm run test:gate 2>&1 | tee /tmp/gate.log || uitslag=$?
-          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/gate.log; fi
-          exit "$uitslag"
-        env:
-          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
-      # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
-      # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
-      # kv-tabel en zouden elkaar bij parallel draaien resetten.
-      # Elk bestand in een EIGEN database (scripts/pgtoetsen.js). Serieel draaien
-      # was niet genoeg: deze toetsen maken en droppen dezelfde tabellen, dus
-      # begon nummer vijf op wat nummer vier had achtergelaten. Daardoor stonden
-      # hier drie van de acht bestanden -- de andere vijf draaiden nooit.
-      - name: PostgreSQL-integratietests (elk in een eigen database)
+      # De Rust-motor stond hier vroeger al gebouwd omdat deze toetsen achter de
+      # unit-suite in dezelfde job hingen (`pretest`). Nu is dit een eigen job,
+      # en dan hoort de bouwstap er ook bij te staan: 13 seconden, en zonder hem
+      # zakken de toetsen die de motor aanroepen.
+      - name: De Rust-motor bouwen
+        run: npm run motor:build
+      # De PostgreSQL-opslag, -accounts en chaos-test met DATABASE_URL. Serieel
+      # (--test-concurrency=1): pg.test.js en chaos delen de kv-tabel en zouden
+      # elkaar bij parallel draaien resetten. Elk bestand in een EIGEN database
+      # (scripts/pgtoetsen.js). Serieel draaien was niet genoeg: deze toetsen
+      # maken en droppen dezelfde tabellen, dus begon nummer vijf op wat nummer
+      # vier had achtergelaten. Daardoor stonden hier drie van de acht bestanden
+      # -- de andere vijf draaiden nooit.
+      - name: PostgreSQL-integratietoetsen (elk in een eigen database)
         run: node scripts/pgtoetsen.js
         env:
           REDIS_URL: redis://localhost:6379
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+  norm:
+    name: De norm, de instroom en de build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
       # DE NORM: een ratel, geen rapportcijfer. NORM.json legt vast waar de code
       # staat; deze stap zakt zodra een van die meters SLECHTER wordt. Beter mag
       # altijd -- dan meldt hij dat de norm strakker gezet kan worden. Zonder
@@ -178,13 +300,6 @@ jobs:
       # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
       - name: Nieuwe routes komen met een toets
         run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD
-      # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
-      # van de tests: te laag voor suites die een hulpje gebruiken, en op te
-      # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
-      # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
-      # De vloer staat in NORM.json (dekkingWaargenomenPct).
-      - name: Waargenomen endpoint-dekking (uit het routejournaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
@@ -239,7 +354,7 @@ jobs:
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -255,37 +370,94 @@ jobs:
       # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
       # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd -- en sinds
       # de raakvlakronde over alle schermen nog een derde keer, op telefoonformaat.
+      #
+      # DEZE SCAN IS NIET OPGEDEELD, en dat is een besluit. Zijn oordeel is een
+      # budget over de hele ronde ("ingelogd ten hoogste N contrastfouten",
+      # A11Y-INGELOGD.json). Vier delen die elk hun kwart tegen datzelfde budget
+      # leggen, laten met z'n vieren vier keer zoveel door -- een meter die
+      # zwakker wordt van het opdelen is erger dan een trage meter. Opdelen kan
+      # pas als de meting van het oordeel gescheiden is (BESTUUR.md).
       - name: Eigen a11y-scan, uitgelogd + ingelogd + raakvlak op telefoonformaat
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'
+
+  schermen:
+    name: Schermtoetsen deel ${{ matrix.deel }} van 4
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        deel: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Playwright + Chromium
+        run: |
+          npm i --no-save playwright@^1.49.0
+          npx playwright install --with-deps chromium
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
       # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
       # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium
       # ontbreekt, en meldt de stap "0 fail" -- groen zonder iets gezien te
       # hebben. De stap hierboven installeert de browser; deze vlag controleert
       # dat dat ook echt gelukt is.
-      # Serieel is hier bewust: elk bestand start een echte server en vaak een
-      # Chromium. Met concurrency 2 wisselde onder runnerbelasting alleen WELK
-      # goed scherm zijn lokale 8/20s-grens miste (Boeken, daarna Mobiliteit).
-      # Een volledige seriele ronde blijft ruim binnen deze jobs 90 minuten.
-      # Dezelfde herhaling als bij de unit-toetsen, en om dezelfde reden: deze
-      # stap draait ruim veertig minuten en zet per schermtoets een server en een
-      # Chromium op. Zakt er een, dan staat zijn blok duizenden regels hoger.
+      #
+      # BINNEN EEN DEEL BLIJFT HET SERIEEL, en dat is bewust: elk bestand start
+      # een echte server en vaak een Chromium. Met concurrency 2 wisselde onder
+      # runnerbelasting alleen WELK goed scherm zijn lokale 8/20s-grens miste
+      # (Boeken, daarna Mobiliteit). De winst van het opdelen komt van vier
+      # MACHINES, niet van meer processen op dezelfde machine.
+      #
+      # Dezelfde herhaling van gezakte toetsen als bij de unit-toetsen, en om
+      # dezelfde reden: zakt er een, dan staat zijn blok duizenden regels hoger.
       - name: Scherm-tests (PDA in de browser)
         run: |
           set -o pipefail
           uitslag=0
-          npm run e2e 2>&1 | tee /tmp/e2e.log || uitslag=$?
+          npm run e2e -- --deel=${{ matrix.deel }}/4 2>&1 | tee /tmp/e2e.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/e2e.log; fi
           exit "$uitslag"
         env:
           RTG_E2E_STRICT: '1'
-      # "Af" is geen bewering meer. De stap hierboven schrijft .schermjournaal
-      # (RTG_ROUTELOG staat in het e2e-script), en de server noteert daarin elk
-      # scherm dat hij werkelijk heeft geserveerd. Deze stap telt de apps die
-      # geen enkele toets ooit heeft geopend en zakt als dat er meer worden.
-      # Bewust NA de e2e-stap en zonder `if: always()`: zonder journaal is er
-      # geen oordeel, en dan moet de e2e-fout de melding zijn en niet deze.
-      - name: Schermdekking (welke apps heeft een toets echt geopend)
-        run: node scripts/schermen.js
+          RTG_SCHERMJOURNAAL: ${{ github.workspace }}/schermjournaal.log
+      - name: Het schermjournaal van dit deel bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: schermjournaal-deel-${{ matrix.deel }}
+          path: schermjournaal.log
+          if-no-files-found: error
+          retention-days: 5
+
+  schermdekking:
+    name: Schermdekking (welke apps heeft een toets echt geopend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: schermen
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: De schermjournalen van de vier delen ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: schermjournaal-deel-*
+          path: journaal
+      # "Af" is geen bewering meer. De schermtoetsen schrijven per deel welk
+      # scherm de server werkelijk heeft geserveerd; deze stap telt over de VIER
+      # delen samen de apps die geen enkele toets ooit heeft geopend, en zakt als
+      # dat er meer worden. Per deel zou die telling onzin zijn: elk deel opent
+      # per definitie maar een kwart van de schermen.
+      - name: Schermdekking over de samengevoegde journalen
+        run: |
+          cat journaal/schermjournaal-deel-*/schermjournaal.log > schermjournaal.log
+          wc -l schermjournaal.log
+          node scripts/schermen.js --lees schermjournaal.log

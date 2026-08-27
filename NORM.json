@@ -21,7 +21,7 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4905,
     "browserpoortToetsen": 206,
-    "kernBreedte": 1423,
+    "kernBreedte": 1424,
     "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -34,6 +34,11 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-27",
+      "meter": "kernBreedte 1423 -> 1424 (het muzikale universum)",
+      "reden": "Het muzikale universum in het Klankwerk (UITVOEREND.md par. 3, punt 11): een uitgave die geen opname is maar een REGEL, waarbinnen elk toestel een eigen vertolking uitrekent. kernBreedte +1, en het is precies EEN naam: `muziekVertolking`.\n\nMinder kan niet zonder de functie weg te halen: het is een nieuwe handeling voor een lid (een vertolking opvragen) en die heeft een route nodig. De REGEL zelf kost geen kern-naam -- die reist mee op de uitgave, die er al was.\n\nDrie andere meters bewogen mee en zijn bij de OORZAAK hersteld in plaats van hier opgeschreven: keuringScheef en keuringTeGroot sloegen aan omdat server/kern/muziek-uitgave.js op 10149 van de 10240 byte stond -- eenennegentig byte speling, dus elke toevoeging duwde hem erover. Twee snedes gemaakt, en allebei wees de keuring de juiste naad aan: de VERTOLKING is verhuisd naar muziek-universum.js (dat bestand bezit de regel, dus het hoort te bepalen wat eruit klinkt), en de PUBLIEKSKANT (mooi vinden, reageren) naar muziek-uitgave-publiek.js. Het bestand staat nu op 10117 en heeft weer speling."
+    },
     {
       "datum": "2026-08-27",
       "meter": "kernBreedte 1422 -> 1423 (uitvoerende media)",

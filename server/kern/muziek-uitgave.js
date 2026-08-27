@@ -27,9 +27,9 @@
    of een volgorde op populariteit. Dezelfde ranglijst die Genootschap, De Salon
    en de RTMAIL-teams al weigerden. De zaal is chronologisch, eindig, en heeft
    een bodem. */
+const UNI = require('./muziek-universum');
 const ONDER = ['codenaam', 'rtg'];
 const ZAAL = 30;                 // wat je in één keer te horen krijgt
-const MAX_REACTIES = 200;
 
 module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify, nieuwWerk }) => {
   const nu = () => new Date().toISOString();
@@ -68,6 +68,11 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
       kanalen: JSON.parse(JSON.stringify(t.kanalen || [])),
       secties: JSON.parse(JSON.stringify(t.secties || [])),
       toelichting: schoon(v.toelichting, 300),
+      /* HET MUZIKALE UNIVERSUM (./muziek-universum.js): een uitgave die geen
+         opname is maar een REGEL. Optioneel. De `kanalen` hierboven blijven
+         staan, ook mét universum -- de opname van de maker wordt niet vervangen
+         maar staat ernaast. Waarom dat de kern van het ontwerp is, staat daar. */
+      universum: UNI.schoonUniversum(v.universum),
       makers,
       onder: onder === 'rtg' ? 'codenaam' : 'codenaam',   // tot een mens anders beslist
       rtgAanvraag: onder === 'rtg' ? 'gevraagd' : null,
@@ -159,28 +164,10 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
 
   /* "Mooi" is één keer per persoon en zonder ranglijst: het is een schouderklop
      aan de maker, geen score. Je kunt hem ook weer weghalen. */
-  function mooi(sess, id, aan) {
-    const u = uitgaveMet(id);
-    if (!u) return { status: 404, error: 'Deze uitgave bestaat niet.' };
-    if (!u.mooi || typeof u.mooi !== 'object') u.mooi = {};
-    if (aan === false) delete u.mooi[sess.key]; else u.mooi[sess.key] = true;
-    save();
-    return { status: 200, ok: true, mooi: Object.keys(u.mooi).length, ikVindHem: !!u.mooi[sess.key] };
-  }
+  /* Wat het publiek doet -- "mooi" vinden en reageren -- staat in
+     ./muziek-uitgave-publiek.js. */
+  const { mooi, reageer, reacties } = require('./muziek-uitgave-publiek')({ U, save, schoon, nu, uitgaveMet, codenaamVan });
 
-  function reageer(sess, id, tekst) {
-    const u = uitgaveMet(id);
-    if (!u) return { status: 404, error: 'Deze uitgave bestaat niet.' };
-    const t = schoon(tekst, 300);
-    if (!t) return { status: 400, error: 'Schrijf eerst iets.' };
-    const rij = U().reacties[u.id] = U().reacties[u.id] || [];
-    const r = { codenaam: codenaamVan(sess.key), tekst: t, at: nu() };
-    rij.push(r);
-    if (rij.length > MAX_REACTIES) U().reacties[u.id] = rij.slice(-MAX_REACTIES);
-    save();
-    return { status: 200, ok: true, reactie: r };
-  }
-  const reacties = (id) => ({ status: 200, reacties: (U().reacties[String(id || '')] || []).slice(-60) });
 
   /* Wat een uitgave naar buiten toont, en alles van één maker: dat staat in
      ./muziek-uitgave-beeld.js. Apart, omdat het een eigen onderwerp is (welke
@@ -188,7 +175,14 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
      de omvangregel van de keuring gaat. */
   const { publiek, vanMaker } = require('./muziek-uitgave-beeld')({ U, codenaamVan });
 
-  return { muziekGeefUit: geefUit, muziekTrekIn: trekIn, muziekVraagRtg: vraagRtg,
+  /* De vertolking van een universum staat in ./muziek-universum.js: dat bestand
+     bezit de regel, dus het hoort ook te bepalen wat eruit klinkt. Hier stond
+     hij eerst, en toen liep dit bestand over de 10 kB-keuringsgrens -- de naad
+     die de keuring aanwees, was ook de juiste. */
+  const { vertolking } = UNI.maakVertolking({ uitgaveMet, nu });
+
+  return { muziekVertolking: vertolking,
+    muziekGeefUit: geefUit, muziekTrekIn: trekIn, muziekVraagRtg: vraagRtg,
     muziekZaal: zaal, muziekLuister: luister, muziekMooi: mooi, muziekReageer: reageer,
     muziekReacties: reacties, muziekUitgavenVan: vanMaker,
     // "is dit stuk al uitgegeven?" -- de studio moet dat kunnen vragen zonder de

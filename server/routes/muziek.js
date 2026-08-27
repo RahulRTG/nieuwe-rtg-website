@@ -3,7 +3,7 @@
    de kern, zodat een geraden id niets oplevert. */
 module.exports = (kern) => {
   const { app, auth, muziekMaak, muziekMijn, muziekOpen, muziekBewaar, muziekWeg,
-    muziekRahul, anthropic } = kern;
+    muziekRahul, muziekVertolking, anthropic } = kern;
   if (!muziekMaak) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -12,6 +12,14 @@ module.exports = (kern) => {
   };
   const k = (req) => req.session.key;
 
+  /* EEN VERTOLKING van een muzikaal universum: wat er NU klinkt, binnen de
+     grenzen die de maker heeft vastgelegd (kern/muziek-universum.js). Zonder
+     zaad krijgt elke luisteraar zijn eigen vertolking van vandaag; met zaad is
+     hij tot op de noot terug te vinden. */
+  app.post('/api/muziek/vertolking', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, muziekVertolking(req.session, req.body || {}));
+  });
   app.post('/api/muziek/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, muziekMijn(k(req)));

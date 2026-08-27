@@ -3311,6 +3311,20 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### Het muzikale universum (een uitgave die geen opname is maar een regel)
+
+`server/kern/muziek-universum.js` + `POST /api/muziek/vertolking`. Elk platform geeft je een nummer: een vast bestand dat elke keer identiek klinkt. Dat kan hier ook en dat blijft. Maar dit huis kan iets wat de andere drie structureel niet kunnen: muziek wordt hier niet afgespeeld maar **uitgerekend** — een track is een handvol getallen, geen audio (`kern/muziek.js`). Zodra dat waar is, hoeft een uitgave niet één uitvoering te zijn.
+
+Een maker legt een **universum** vast: een stijl, een ladder, een tempobereik en een lengte. Binnen die grenzen rekent elk toestel een eigen **vertolking** uit. Twee mensen horen niet hetzelfde en toch onmiskenbaar hetzelfde werk — zoals twee uitvoeringen van dezelfde partituur.
+
+- **De opname van de maker blijft bestaan.** Een uitgave met een universum draagt nog steeds de `kanalen` die de maker zelf neerzette. Die zijn niet vervangen door een generator: ze staan er als "zoals de maker het speelde", náást de vertolking van vandaag. Een formaat dat de maker uit zijn eigen werk schrijft is precies wat het Klankwerk elders al weigert.
+- **Elke vertolking draagt haar zaad**, en is dus tot op de noot terug te vinden. Zonder dat zou "elke keer anders" geen formaat zijn maar ruis: een maker kan dan niet horen wat een luisteraar hoorde. Zonder opgegeven zaad krijgt elke luisteraar zijn eigen vertolking, en die blijft **de hele dag hetzelfde** — een stuk hoort niet te veranderen terwijl je ernaar luistert.
+- **Het universum gaat mee naar buiten.** Een luisteraar mag weten dat wat hij hoort binnen vastgelegde grenzen is uitgerekend, en welke grenzen dat zijn. Een stuk dat elke keer anders klinkt zonder dat te zeggen, is geen formaat maar een storing.
+- **Een onbekende stijl levert geen universum op.** Stil vervangen door house zou de maker iets anders laten uitgeven dan hij bedoelde — dezelfde regel als het onbekende instrument in `kern/muziek.js`: weg is eerlijker.
+- **Wat er niet komt:** een universum dat zichzelf bijstelt op wat mensen mooi vinden. Dat zou een hitlijst zijn met een omweg, en die weigeren het Klankwerk, de zaal en de Media OS alle drie al.
+
+`test/muziekuniversum.test.js` legt negen dingen vast, waaronder de drie die elkaar in de weg lijken te zitten: twee luisteraars horen iets anders, dezelfde luisteraar hoort de hele dag hetzelfde, en met een zaad is elke vertolking exact terug te vinden. Drie mutaties raak. Ook getoetst: het tempo klemt niet op één waarde — twee steekproeven landden bij het bouwen allebei op de bovengrens, en die schrik hoort in een toets en niet in een herinnering (over 200 zaden: zestien verschillende tempo's).
+
 ### Uitvoerende media (RTG speelt media niet af, RTG voert media uit)
 
 `server/kern/uitvoering/` + `/api/uitvoering/...`. Een maker publiceert geen bestand maar een **partituur**: fragmenten, welke daarvan onmisbaar zijn, wat RTG ermee mag doen en wie het mag zien. RTG bouwt daar op het moment van vragen één **uitvoering** van. De volledige redenering, inclusief wat er niet is en waarom, staat in `UITVOEREND.md`.

@@ -29,6 +29,11 @@ module.exports = ({ U, codenaamVan }) => {
        vast als een lid zijn eigen stuk onder een clip zet. De stuk-hub van de
        Media OS gebruikt hem om te tonen waar dit nummer nog meer onder ligt.
        Geheim is hij niet: de clips-feed toont hetzelfde id al bij de clip. */
+    /* Het universum gaat MEE naar buiten, en dat hoort: een luisteraar mag
+       weten dat wat hij hoort binnen vastgelegde grenzen is uitgerekend, en
+       welke grenzen dat zijn. Een stuk dat elke keer anders klinkt zonder dat
+       te zeggen, is geen formaat maar een storing. */
+    universum: u.universum || null,
     trackId: u.trackId || null,
     at: u.at
   });

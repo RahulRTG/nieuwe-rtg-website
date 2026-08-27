@@ -169,7 +169,7 @@ Bijgewerkt op 27 augustus 2026, nadat de motor er stond.
 | 7 | "leg me dit uit in 20 minuten" | Elastic | **een stap weg** | de motor is er; wat ontbreekt is de ingang, en die bestaat (`praat.js`) |
 | 13 | geen homepage, intentie als interface | — | **staat** | aansluiten op de bestaande balk, geen tweede ingang bouwen |
 | 8 | makers verkopen aanspraken | — | **staat** | aanbod → aankoop → aanspraak → uitvoering is rond, en idempotent van begin tot eind |
-| 11 | muzikaal universum (NIGHT DRIVE) | Elastic | **een stap weg** | een uitgave die de regel draagt i.p.v. de kanalen; de generator staat er al |
+| 11 | muzikaal universum (NIGHT DRIVE) | Elastic | **staat** | `kern/muziek-universum.js`: de uitgave draagt de regel, elke vertolking draagt haar zaad |
 | 4 | content die terugpraat | Responsive | **een stap weg** | keuzepunten als regels in de partituur |
 | 6 | "maak mijn ochtend" | Elastic + Responsive | **een besluit nodig** | zie 4.4: alleen op wat het lid zelf heeft aangewezen |
 | 5 | RTG Recall | Responsive | **een besluit nodig** | zie 4.4; het is `smaak.js` met een tijdas, niet een profiel |
@@ -356,8 +356,11 @@ Twee dingen die dat verzachten en die er al zijn:
    boeking de grond onder de aanspraak is. Wat er niet bij zit — btw-stukken,
    retour — staat op de bon zelf, met dezelfde reden als bij het Podium
    (`TAKEN.md` 4.16).
-4. **Het muzikaal universum** in het Klankwerk (#11): de goedkoopste nieuwe
-   standaard, en de enige die de grote drie structureel niet hebben.
+4. ~~**Het muzikaal universum** in het Klankwerk (#11).~~ **Gebouwd**
+   (`kern/muziek-universum.js`): een uitgave draagt een regel in plaats van
+   alleen een opname, en elke vertolking draagt haar zaad — dus elke keer anders
+   én tot op de noot terug te vinden. De opname van de maker blijft ernaast
+   staan.
 5. **De makersstudio** voor fragmenten en regels — het punt waarop dit staat of
    valt (par. 5).
 6. **Verklaarde objecten** (4.5), over dezelfde betaalpoort.

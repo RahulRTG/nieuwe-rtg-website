@@ -89,7 +89,7 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
      3 aanroepen van de ene synthetische wereld naar de andere
 
 2. DE DUBBELING
-    10 onderwerpen komen aan beide kanten voor (29 paren)
+    12 onderwerpen komen aan beide kanten voor (34 paren)
      0 daarvan delen ook werkelijk een VORM
 ```
 
@@ -112,9 +112,9 @@ lezer niet naar een bewegend percentage zoekt dat er niet komt.
 ### En de tweede helft zegt iets anders dan verwacht
 
 Punt 4 waarschuwt voor `MagnaatPaymentEngine` naast RTG Payment Engine. Die
-zorg is gemeten en **er is geen enkel geval van**. Tien onderwerpen komen aan
+zorg is gemeten en **er is geen enkel geval van**. Twaalf onderwerpen komen aan
 beide kanten voor — `bank`, `handel`, `kaart`, `acties`, `economie` — maar geen
-van de 29 paren deelt een vorm. `magnaat/bank.js` gaat over rente, termijn en
+van de 34 paren deelt een vorm. `magnaat/bank.js` gaat over rente, termijn en
 onderpand van een speler; `kern/bank/` gaat over IBAN, saldo en tenaamstelling.
 
 Dat is precies de uitslag die `PLATFORM.md` bij Cercle en Entourage ook kreeg,

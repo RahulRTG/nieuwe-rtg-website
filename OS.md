@@ -47,7 +47,7 @@ het.
 | uit de opzet | wat er staat | waar |
 |---|---|---|
 | **11** purpose-aware permissions | **volledig, en strenger dan gevraagd**: een gesloten lijst doelen, een machtiging kent haar toegestane doelen, en de vergunningsdiff ziet "zelfde machtiging, ánder doel" | `kern/appstore/machtigingen.js` (`DOELEN`, `doelMag`), `kern/appstore/besluit.js` |
-| **42** Platform Constitution | **staat, en harder dan de opzet vraagt**: 41 wetten in 9 soorten, elk met een bron én een handhaver, plus een motor die ze ECHT overtreedt om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
+| **42** Platform Constitution | **staat, en harder dan de opzet vraagt**: 46 wetten in 9 soorten, elk met een bron én een handhaver, plus een motor die ze ECHT overtreedt om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
 | **8/9** bindings i.p.v. API-sleutels | de brug leest wat het lid VERLEENDE, niet wat het manifest vroeg; de app krijgt nooit een sleutel | `kern/appstore/brug.js` |
 | **47** security sandbox | de **cel**: derdencode in een naamloze herkomst, eigen CSP, integriteit per lezing, `connect-src 'none'` | `routes/appstore/cel.js` |
 | **12** één policy engine | drie beleidslagen van hard naar zacht, en één poort waar elke betaling langs gaat | `kern/waarde/policy.js`, `kern/pay/poort.js` |
@@ -72,7 +72,7 @@ dingen springen eruit omdat ze in de opzet als toekomst staan en hier als code:
   van dienst te zijn" op, en dat is niet te vergelijken, niet te doorzoeken en
   niet te diffen bij een update.
 - **Punt 42 (grondwet) is af én strenger.** De opzet stelt twaalf regels voor.
-  `WETTEN.json` draagt er 41, elk met de plek waar hij gehandhaafd wordt — en
+  `WETTEN.json` draagt er 46, elk met de plek waar hij gehandhaafd wordt — en
   `scripts/sabotage.js` overtreedt ze stuk voor stuk in de echte bestanden om te
   zien of er werkelijk iets rood wordt. Een grondwet zonder die motor is een
   verlanglijst met genummerde regels.
@@ -127,7 +127,7 @@ vallen in twee soorten, en de meting laat het verschil zien:
 
 | | **platformvermogen** | **domeinvermogen** |
 |---|---|---|
-| Voorbeeld | `betalen`, `binnenkomen`, `bewaren`, `SEPA_UIT` | `rooms`, `rides`, `menu`, `tickets` |
+| Voorbeeld | `betalen`, `binnenkomen`, `bewaren`, `SEPA_UIT` | `bookings`, `rides`, `menu`, `tickets` |
 | Waar | `kern/command/vermogens.js`, `kern/bevoegdheid/lijst.js`, `kern/appstore/machtigingen.js` | het genre-register, `kern/zaak.js`, `kern/pda/modules.js` |
 | Vraag die het beantwoordt | mag deze aanroep, en doet hij het? | wat voor zaak is dit, en wat hoort daarbij? |
 | Delen ze iets met elkaar? | ja — het zijn allemaal "een aanroep die lukt of niet" | nee, en dat is gemeten |
@@ -146,7 +146,7 @@ omkering hoort er even hard bij te staan, want die staat er nu niet:
 > **En het platform bezit geen betekenis die aan een domein toebehoort.**
 
 Een hotelkamer heeft een schoonmaakstatus en een folio, een tafel heeft een
-couvert en een bediening. Dat zijn geen twee invullingen van `Asset`, en `rooms`
+couvert en een bediening. Dat zijn geen twee invullingen van `Asset`, en `bookings`
 en `rides` zijn geen twee invullingen van één capability-grammatica. Ze staan in
 het genre-register omdat ze een ZAAK typeren, niet omdat ze een aanroep zijn.
 
@@ -230,26 +230,53 @@ assen:
 
 | | waar | de as | de lagen |
 |---|---|---|---|
-| A | `PLATFORM.md` par. 2 | platformzorgen, van binnen naar buiten | Core, Enterprise engines, Industry engines, Capabilities, PDA, Business Network, Consumer Network |
+| A | `PLATFORM.md` par. 2 | platformzorgen, van binnen naar buiten | Core, Enterprise engines, Industry engines, Genre-caps, PDA, Business Network, Consumer Network |
 | B | `PLATFORM.md` par. 0b | hoe apps zich tot elkaar verhouden | specialistische apps, genre-superapps, RTG-hoofdlaag |
 | C | deze opzet | uitvoering, van boven naar beneden | Experiences, Journeys, Capabilities, Control Plane, Runtime |
 
 Twee assen naast elkaar is werkbaar; ze beantwoorden verschillende vragen. Drie is
 het niet, en het probleem is aanwijsbaar in plaats van principieel: **"Capabilities"
-staat in A én in C, en betekent er niet hetzelfde.** In A is het laag 4, de `caps`
-van een genre (`rooms`, `rides`) — domeinvermogen, precies het soort dat par. 2
+stond in A én in C, en betekende er niet hetzelfde.** In A was het laag 4, de `caps`
+van een genre (`bookings`, `rides`) — domeinvermogen, precies het soort dat par. 2
 hierboven buiten de grammatica houdt. In C is het de herbruikbare bedrijfsfunctie
 `Payment.Authorize` — platformvermogen. Wie die twee onder één woord in twee
 documenten laat staan, krijgt binnen een jaar twee antwoorden op "hoort dit in de
 capabilitylaag".
 
-De vijf lagen zijn niet slechter dan de zeven — **Journeys** is een echte
-toevoeging die in geen van beide bestaande modellen zit. Maar ze horen A te
-VERVANGEN of eraan te worden opgehangen, en het woord dat botst hoort in één van
-de twee een andere naam te krijgen.
+Daaruit volgt de regel die deze paragraaf achterlaat, en hij staat in `WETTEN.json`
+met een handhaver eronder:
 
-Dit is het goedkoopste besluit in dit hele document en het duurste om uit te
-stellen: één laagmodel kiezen kost een middag nu, en drie laagmodellen uit elkaar
+> **Twee lagenmodellen delen nooit een laagnaam.** Een woord dat twee lagen
+> benoemt, benoemt er geen.
+
+**Dat woord is hernoemd (27 augustus 2026).** Laag 4 van A heet nu **genre-cap**,
+in `PLATFORM.md`, `FUNCTIES.md` en `CONCERN.md`. Het veld in de code heet nog
+steeds `caps` — dat is de naam die 73 genres al dragen en die hoefde niet te
+bewegen. Alleen het woord in de tekst bewoog, want alleen daar botste het.
+
+Twee dingen die daarbij naar boven kwamen en die geen van beide zijn weggepoetst:
+
+- **Het waren er geen twee maar drie.** `PLATFORM.md` par. 0 gebruikt *capability*
+  in nóg een betekenis: een zelfstandig vak dat een eigen app verdient ("is dit
+  een zelfstandige professionele capability, of een tweede ingang naar dezelfde?").
+  Die is met opzet blijven staan. De super-app-regel werkt, wordt breed geciteerd
+  en heeft hier al een keer een fout voorkomen; die herschrijf je niet om een
+  woord op te ruimen. Het staat hier zodat de derde betekenis een besluit blijft
+  en geen slordigheid wordt.
+- **De hernoeming legde een ongedekte dubbeling bloot.** `FUNCTIES.md` noemde
+  "40 capabilities" en somde ze op — met de hand, naast het genre-register dat de
+  waarheid houdt. Geen enkele toets keek daarnaar. Dat is LAT-regel 4 en precies
+  de vorm die deze tak elders opruimde. Nu leidt `test/genrecap.test.js` de lijst
+  af uit `server/seed/genres-lijst.js` en zakt hij zodra de tekst en het register
+  uit elkaar lopen.
+
+Wat hiermee **niet** is opgelost: er liggen nog steeds twee lagenmodellen en deze
+opzet stelt een derde voor. De vijf lagen zijn niet slechter dan de zeven —
+**Journeys** is een echte toevoeging die in geen van beide bestaande modellen zit.
+Maar ze horen A te VERVANGEN of eraan te worden opgehangen. Dat besluit staat nog
+open; alleen de naambotsing is weg, en dat is het deel dat een handhaver kan
+dragen (`test/genrecap.test.js` zakt zodra twee lagenmodellen weer een naam
+delen). Eén laagmodel kiezen kost een middag nu, en drie laagmodellen uit elkaar
 trekken kost een maand over twee jaar.
 
 ### 4.3 Punten 25, 45 — de AI die capabilities uitvoert en apps schrijft
@@ -320,20 +347,46 @@ want `WETTEN.json` doet het al voor wetten.
 
 ## 5. Wat er ontbreekt, en wat het kost
 
-### 5.1 De eventtaal (punt 14) — de bus staat, de taal niet
+### 5.1 De eventtaal (punt 14) — ✅ *de envelop staat*
 
-`server/bus.js` bestaat en doet zijn werk: in-proces zonder Redis, pub/sub ermee,
-precies één aflevering per proces. Wat hij NIET draagt, nagekeken in de bron: geen
+`server/bus.js` deed zijn werk al: in-proces zonder Redis, pub/sub ermee, precies
+één aflevering per proces. Wat hij NIET droeg, nagekeken in de bron: geen
 `event_id`, geen `actor`, geen `correlation_id`, geen `causation_id`, geen
-`schema_version`, geen `classification`.
+`schema_version`, geen `classification`. **Vervoer was er. Taal niet.**
 
-Dat is dus geen half punt maar twee verschillende dingen waarvan er één af is.
-**Vervoer is er. Taal niet.** En de taal is het hele punt van punt 14: zonder
-envelop is `payment.authorized.v1` een string die iemand heeft afgesproken, en
-loopt de tweede consument binnen een maand op een veld dat er soms is.
+**Gebouwd op 27 augustus 2026** (`server/kern/envelop.js`, `test/envelop.test.js`).
+Acht velden en geen negende — `id`, `at`, `versie`, `kanaal`, `actor`,
+`correlatie`, `oorzaak`, `classificatie` — en de bus stempelt elk bericht dat
+erlangs komt. Vier keuzes daarin zijn geen implementatiedetail:
 
-Dit is de goedkoopste grote stap in het document: de envelop is een module en een
-toets, en hij kan naast het bestaande verkeer meelopen.
+- **Ernaast, niet eromheen.** Een abonnee leest `doel`, `event` en `data` zoals
+  altijd; er komt een sleutel bij. Een omhullend bericht had elke abonnee tegelijk
+  moeten veranderen, en een verandering die overal tegelijk moet, gebeurt half.
+- **De keten loopt vanzelf door.** Elke abonnee draait binnen de envelop van het
+  bericht dat hij afhandelt (AsyncLocalStorage, zoals `server/db/bijeen.js` dat al
+  voor de schrijfronde doet). Publiceert hij zelf iets, dan erft dat de correlatie
+  en krijgt het de binnenkomende gebeurtenis als oorzaak. Zonder die automatiek is
+  de keten binnen een maand op de helft van de plekken vergeten.
+- **De actor is een codenaam.** Een envelop gaat met `REDIS_URL` over een netwerk
+  en door een geheugendatabase; dat is precies waar een echte naam uit de
+  identiteitskluis lekt. De envelop weigert een actor die eruitziet als een
+  contactgegeven — een grove zeef tegen de fout die iemand per ongeluk maakt, geen
+  garantie tegen wie het expres wil. De bus levert dan gewoon af, zonder actor en
+  met een waarschuwing: de levering gaat voor, maar niets verdwijnt stil.
+- **`onbekend` is geen `openbaar`.** Wie de gevoeligheid niet noemt, krijgt
+  `onbekend`. Een gevolg-gebeurtenis erft de classificatie NIET — dat zou raden
+  zijn over andere inhoud.
+
+`scripts/envelop.js` telt wat de bus niet kan afleiden: van de zeven plekken die
+zelf een bericht samenstellen noemen er **zeven** een classificatie en **één** een
+actor. Dat laatste getal is geen tekortkoming die weggewerkt hoort te worden maar
+de eerlijke stand: er is vandaag precies één publicerende plek die de codenaam van
+het lid al op tafel heeft liggen. De rest zou hem moeten raden, en raden is hier
+erger dan `onbekend`.
+
+Wat de envelop NIET is: een schemaregister. `payment.authorized.v1` als
+afgesproken naam met een vorm erachter bestaat nog niet — de envelop zegt WIE,
+WANNEER, WAARDOOR en HOE GEVOELIG, en met opzet nooit WAT.
 
 ### 5.2 Idempotentie (punt 38) — gemeten, en het is niet best
 
@@ -390,7 +443,7 @@ maakt — en wat het goedkoopst terug te draaien is.
 |---|---|---|
 | ~~**0. De wet meten**~~ ✅ | `scripts/capabilities.js` + `CAPABILITEIT.json`; de uitkomst staat in par. 2 | zonder dit is "Everything is a Capability" een aanname, en aannames over gedeelde vorm zijn hier twee keer fout geweest |
 | **1. Eén lagenmodel kiezen** | de vijf van de opzet, de zeven van `PLATFORM.md`, of één samenvoeging | par. 4.2 — een middag nu, een maand over twee jaar |
-| **2. De eventenvelop** | `event_id`, actor, `correlation_id`, `causation_id`, versie, classificatie op `server/bus.js` | par. 5.1 — kan naast het bestaande verkeer meelopen, en elke volgende stap leunt erop |
+| ~~**2. De eventenvelop**~~ ✅ | `kern/envelop.js`: id, tijd, versie, kanaal, actor, correlatie, oorzaak, classificatie; de bus stempelt elk bericht | par. 5.1 — liep naast het bestaande verkeer mee, en elke volgende stap leunt erop |
 | **3. Het contract naar buiten** | het model van `MACHTIGINGEN` (doel + grens) op de lijsten die er het dichtst bij staan | par. 3 — het model bestaat al en is beproefd |
 | **4. Idempotentie van 13% omhoog** | de 100 onbeschermde routes eerst, daarna de 2959 ongemeten | par. 5.2 — de meting staat er al |
 | **5. Eén actormodel** | mens, app en agent onder één trustlaag | par. 4.4 — hoe langer dit wacht, hoe duurder |

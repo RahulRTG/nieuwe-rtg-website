@@ -40,7 +40,7 @@ door `test/semantiek.test.js`.
 
 | uit de opzet | wat er staat | waar |
 |---|---|---|
-| **1** executable specifications (half) | 41 systeemwetten met per stuk een bron én een handhaver — en een motor die ze **echt overtreedt** in de bestanden om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
+| **1** executable specifications (half) | 46 systeemwetten met per stuk een bron én een handhaver — en een motor die ze **echt overtreedt** in de bestanden om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
 | **3** counterfactual (kiem) | `wijzig()` op het wereldmodel schrijft een `counterfactual`-besluit weg | `kern/hospitality-universe/world-model.js` |
 | **4** performance budgets | p99, doorvoer, event-loop en hersteltijd met een lat die alleen omlaag mag, en die weigert te oordelen op een gezakte ronde | `BEPROEVING.json`, `scripts/norm.js` |
 | **7** incident → permanente wet | dit is letterlijk hoe `LAT.md` is ontstaan: elke regel komt uit een fout die hier écht is gemaakt, met de handhaver erbij | `LAT.md`, `NORM.json` |
@@ -104,9 +104,9 @@ De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:
 |---|---|---|
 | `SOORTEN` | **39** | contractsoorten, gebeurtenissen in een tijdlijn, avondplannen, rekeningsoorten |
 | `STATUS` | 10 | ontwerpfases bij de architect, betaalstanden, ideeënstanden, subsidiestanden |
-| `STANDEN` | 10 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
+| `STANDEN` | 11 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
 | `NIVEAUS` | 9 | dreigingsniveaus, bijstandsniveaus, concern-scopes, geldbeleidsniveaus |
-| `CATEGORIEEN` | 9 | app-categorieën, voertuigcategorieën, kledingcategorieën, risicocategorieën |
+| `CATEGORIEEN` | 9 → **8** | app-categorieën, voertuigcategorieën, kledingcategorieën, risicocategorieën (atelier is eruit, zie par. 3) |
 | `ROLLEN` | 8 | bedrijfsrollen, gezinsrollen, en zes andere |
 
 ### Twee bevindingen, en ze wijzen tegengesteld
@@ -122,8 +122,8 @@ het om ging:
 
 | ronde | wat hij vindt | aantal |
 |---|---|---|
-| **op naam** | dezelfde naam, dezelfde inhoud, twee domeinen | **28** |
-| **op inhoud** | dezelfde inhoud onder een **andere** naam | **101** |
+| **op naam** | dezelfde naam, dezelfde inhoud, twee domeinen | **29** |
+| **op inhoud** | dezelfde inhoud onder een **andere** naam | **106** |
 
 Die tweede ronde bestaat omdat de eerste hem miste. Dat is geen detail: de
 duurste dubbeling van allemaal draagt per definitie twee namen, want anders was
@@ -165,15 +165,26 @@ scherper dan "één type of niet":
 
 | | uitvoering | oordeel |
 |---|---|---|
-| `hash`, `kies`, `palet` | **één**, vier keer gekopieerd | echte dubbeling — samenvoegen |
+| `hash`, `kies`, `palet` | **één**, vier keer gekopieerd | echte dubbeling — ✅ *samengevoegd in `kern/ontwerpbank.js`* |
 | de opdrachtvorm `{ vakgebied, naam, brief }` | gedeeld, met `ontwerpen[]` en `collecties[]` | gedeeld type |
 | `maakConcept` | **vier verschillende** | het domeinwerk zelf — moet blijven |
 | `STATUS` | drie varianten | alle vier van `schets` naar `archief`, maar het midden is vakvocabulaire |
 | `PALET` | vier eigen paletten | van de 16 kleuren delen er **2** over alle vier |
 
-Drie van de vier noemen hun vakgebied `DISCIPLINES`, atelier `CATEGORIEEN` —
+Drie van de vier noemden hun vakgebied `DISCIPLINES`, atelier `CATEGORIEEN` —
 dezelfde rol, een andere naam. Dat is een botsing in het klein, binnen wat verder
 één familie is.
+
+**Opgelost (27 augustus 2026), en de meter bewoog mee.** Atelier noemt het nu ook
+`DISCIPLINES`, en dat haalt het uit een botsing en zet het in een familie:
+`CATEGORIEEN` droeg negen betekenissen en draagt er nu **acht**, terwijl
+`DISCIPLINES` er één draagt op vier plekken. Precies het onderscheid uit de tabel
+hierboven: hernoemen bij een botsing, samenvoegen bij een dubbeling.
+
+Wat NIET is meegegaan is een keuze: het veld op een ontwerp heet nog steeds
+`categorie` en het antwoord van de server `categorieLabel` en `categorieen`.
+Daar hangt een scherm aan en er ligt data mee opgeslagen. Een naam in de code is
+gratis te veranderen; een naam op de draad is dat niet.
 
 **En het handwerk vond een gebrek in de meter zelf.** `PALET` werd als één
 betekenis over vier plekken gemeld, door enkelvoudige koppeling: studio en
@@ -184,6 +195,28 @@ ze onderscheidt — de `Asset`-fout in het klein.
 
 Dat staat nu in de kop van `scripts/semantiek.js`: een cluster is een aanwijzing
 dat er iets te bekijken valt, nooit een bewijs dat het één ding is.
+
+**De samenvoeging is gedaan** (`server/kern/ontwerpbank.js`, 27 augustus 2026):
+`hash`, `kies` en `palet` waren byte voor byte gelijk in vier bestanden en wonen
+nu op één plek. Het gedrag is nagerekend en niet aangenomen — de vier oude
+bestanden uit `HEAD` naast de vier nieuwe, 500 opdrachten per domein, 34.000
+vergelijkingen, nul verschillen. `paletUit()` krijgt het palet MEE in plaats van
+het te kennen, zodat de vier paletten uit de tabel hierboven gescheiden blijven.
+
+**En de meter bewoog niet mee, wat hij ook niet hoort te doen.** Bij `passen.js`
+ging `dubbelingenZonderNaam` van 111 naar 101; hier bleef hij op 101 staan. Dat
+is geen falen maar de reikwijdte: `scripts/semantiek.js` leest *catalogi* —
+gesloten woordenlijsten — en `hash` is een functie. Wie verwacht dat elke
+opgeruimde dubbeling een meter laat zakken, verwacht dat één meter alles ziet.
+Deze dubbeling kwam van `OBJECTMODEL.json`, langs gedeelde vormen, en dat is
+precies waarom er twee metingen zijn.
+
+**Hij staat inmiddels op 106, en dat is geen terugval.** De meter telt de hele
+boom, en de kostprijslaag zette er negen kostensoorten, negen tarieven en een
+beleidkaart bij — nieuwe catalogi paren met bestaande. Een meter die alleen mag
+zakken meet niet de code maar de vlijt: wie hem stil wil houden, hoort geen
+lijsten meer te schrijven. Wat hier telt is dat elke beweging een aanwijsbare
+oorzaak heeft, omhoog zo goed als omlaag.
 
 ### Wat de meting al heeft opgeleverd: de paswaarheid stond op vier plekken
 
@@ -416,7 +449,7 @@ met een eigen klok).
 |---|---|---|
 | ~~**0. De semantiek meten**~~ ✅ | `scripts/semantiek.js` + `SEMANTIEK.json`; de uitkomst staat in par. 3 | zonder dit is een Semantic Registry een la of infrastructuur, en niemand die weet welke |
 | ~~**1. De eerste dubbeling**~~ ✅ | de paswaarheid stond op vier plekken; nu één module (`kern/passen.js`), met `BETALEND` afgeleid. Drie mutaties raak | par. 3 — en de meter bewoog mee: 111 → 101 naamloze dubbelingen |
-| **2. De rest van de 28 + 101** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
+| **2. De rest van de 29 + 106** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
 | ~~**3. De vier ontwerpdomeinen wegen**~~ ✅ | met de hand nagelopen: `hash`, `kies` en `palet` zijn één uitvoering in vier kopieën; `maakConcept`, `PALET` en `STATUS` zijn terecht verschillend | par. 3 — en het legde een ketenings­gebrek in de meter zelf bloot |
 | **4. Het register uit de code afleiden** | niet ernaast schrijven; het patroon van `WETTEN.json` (bron + handhaver + sabotage) | par. 4.2 — anders wordt het register zelf de 78ste botsing |
 | **5. De zoeker** | invoervolgordes genereren tegen de wetten die er al staan | par. 5.2 — de wetten staan, de zoeker niet |

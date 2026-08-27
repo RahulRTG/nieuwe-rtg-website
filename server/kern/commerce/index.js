@@ -11,6 +11,7 @@
      ./afrekening.js   rekent per VERKOPER, nooit een gezamenlijke bevestiging
      ./koopbaar.js     vertaalt een aanbod-rij naar werkwoorden, geen tweede vorm
      ./retour.js       de weg terug; zet een geldbesluit KLAAR en voert niets uit
+     ./verkoopweg.js   waarlangs een zaak verkoopt; weigert `publiek` met de reden
 
    ER WORDT HIER NIETS BETAALD EN NIETS BESTELD. De weg van bevestigen loopt
    langs de domeinen die er al over gaan (kern/lidacties voor een order bij een
@@ -37,6 +38,10 @@ function maakCommerce(state) {
      geen eigen. Een teruggave rekent met hetzelfde tarief als de verkoop, want
      het is dezelfde verkoop -- alleen andersom. */
   const retour = require('./retour')({ db, save, nu, btwUit: rekenaar.btwUit, zaakVan });
+  /* De verkoopweg telt zijn eigen aanbod niet: hij vraagt het aan de graaf. Een
+     eigen kopie zou binnen een week uiteenlopen met wat er werkelijk te koop
+     staat, en dan staat er een winkel met een verzonnen aantal artikelen. */
+  const wegen = require('./verkoopweg')({ db, save, nu, etalage: graaf.etalage });
 
   /* De mand van deze sleutel, doorgerekend. Dit is de enige plek waar de drie
      bij elkaar komen, en de volgorde is niet vrij: eerst de opzoeker (EEN
@@ -80,7 +85,13 @@ function maakCommerce(state) {
     retourVanKoper: (sleutel) => retour.vanKoper(sleutel),
     retourVanVerkoper: (code) => retour.vanVerkoper(code),
     retourBij: (id) => retour.bij(id),
-    RETOUR_NIET_GEBOUWD: retour.NIET_GEBOUWD
+    RETOUR_NIET_GEBOUWD: retour.NIET_GEBOUWD,
+    /* de verkoopwegen van EEN zaak; de zaakcode komt altijd van de deur */
+    wegLijst: (zaak) => wegen.lijst(zaak),
+    wegZet: (zaak, body) => wegen.zet(zaak, body),
+    wegPubliceer: (zaak, id, live) => wegen.publiceer(zaak, id, live),
+    wegWis: (zaak, id) => wegen.wis(zaak, id),
+    WEG_SOORTEN: wegen.WEGSOORTEN, WEG_TOEGANG: wegen.TOEGANG, WEG_NIET_GEBOUWD: wegen.NIET_GEBOUWD
   };
 
   return { commerce: api };

@@ -41,7 +41,7 @@
    ========================================================================== */
 'use strict';
 
-const { NA, GROND, STAND, EINDSTANDEN, NIET_GEBOUWD } = require('./retourlijst');
+const { NA, GROND, RETOURSTAND, EINDSTANDEN, NIET_GEBOUWD } = require('./retourlijst');
 
 const MAX = 50000;                       // de tabel blijft begrensd
 const VERVAL_DAGEN = 60;                 // een aanvraag die blijft liggen, vervalt
@@ -133,8 +133,8 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
       orderKenmerk: r.orderKenmerk || null,
       grond: r.grond, grondLabel: (GROND.get(r.grond) || {}).label || r.grond,
       toelichting: r.toelichting,
-      stand: r.stand, standLabel: (STAND.get(r.stand) || {}).label || r.stand,
-      volgende: (NA[r.stand] || []).map(id => ({ id, label: (STAND.get(id) || {}).label, door: (STAND.get(id) || {}).door })),
+      stand: r.stand, standLabel: (RETOURSTAND.get(r.stand) || {}).label || r.stand,
+      volgende: (NA[r.stand] || []).map(id => ({ id, label: (RETOURSTAND.get(id) || {}).label, door: (RETOURSTAND.get(id) || {}).door })),
       staat: r.staat, voorraadKan: r.voorraadKan == null ? null : !!r.voorraadKan,
       centen: r.centen, btw: r.btw, btwOnbekend: r.btwOnbekend,
       uitkomst: r.uitkomst, besluit: r.besluit,

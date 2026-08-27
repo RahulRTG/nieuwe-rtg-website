@@ -2185,6 +2185,9 @@
     ],
     "commerce": [
       "RETOUR_NIET_GEBOUWD",
+      "WEG_NIET_GEBOUWD",
+      "WEG_SOORTEN",
+      "WEG_TOEGANG",
       "aanbod",
       "commerce",
       "etalage",
@@ -2199,7 +2202,11 @@
       "retourVanVerkoper",
       "retourVraag",
       "retourZet",
-      "status"
+      "status",
+      "wegLijst",
+      "wegPubliceer",
+      "wegWis",
+      "wegZet"
     ]
   }
 }

@@ -1069,6 +1069,14 @@
       "gezakt": 13,
       "geprobeerd": 2
     },
+    "commerce-verkoopweg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commerce/verkoopweg.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 2
+    },
     "commerce.test.js": {
       "soort": "puur",
       "staat": "gezakt",

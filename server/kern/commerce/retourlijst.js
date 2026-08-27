@@ -10,7 +10,7 @@
    voorraadstand en btw-correctie bestonden nergens. Dit is dus geen tweede
    versie van iets; het is het ontbrekende stuk.
 
-   DE STROOM HEEFT VIJF STANDEN EN ZE ZIJN NIET INWISSELBAAR. Elke stand is een
+   DE STROOM HEEFT VIJF RETOURSTANDEN EN ZE ZIJN NIET INWISSELBAAR. Elke stand is een
    moment waarop iemand IETS BESLOOT, en wie dat was verschilt per stand. Dat is
    de hele reden dat het er vijf zijn en niet drie: een systeem dat "aanvaard" en
    "beoordeeld" samentrekt, kan niet meer zeggen of de verkoper het goed heeft
@@ -56,10 +56,10 @@ const GRONDEN = [
     'geleverd na het moment waarop het nog nut had', 'koper')
 ];
 
-/* DE STANDEN, in de enige volgorde waarin ze kunnen voorkomen. `door` zegt wie
+/* DE RETOURSTANDEN, in de enige volgorde waarin ze kunnen voorkomen. `door` zegt wie
    de stand zet -- en dat is het belangrijkste veld van deze tabel: RTG staat er
    nergens bij. */
-const STANDEN = [
+const RETOURSTANDEN = [
   { id: 'gevraagd', label: 'Aangevraagd', door: 'koper',
     wat: 'de koper vraagt om terug te sturen, met een grond' },
   { id: 'aanvaard', label: 'Aanvaard', door: 'verkoper',
@@ -128,8 +128,8 @@ const NIET_GEBOUWD = {
 };
 
 const opId = (lijst) => new Map(lijst.map(x => [x.id, x]));
-const GROND = opId(GRONDEN), STAND = opId(STANDEN), STAATOP = opId(STAAT), UITKOMST = opId(UITKOMSTEN);
-const EINDSTANDEN = STANDEN.filter(s => !NA[s.id].length).map(s => s.id);
+const GROND = opId(GRONDEN), RETOURSTAND = opId(RETOURSTANDEN), STAATOP = opId(STAAT), UITKOMST = opId(UITKOMSTEN);
+const EINDSTANDEN = RETOURSTANDEN.filter(s => !NA[s.id].length).map(s => s.id);
 
-module.exports = { GRONDEN, STANDEN, NA, STAAT, UITKOMSTEN, NIET_GEBOUWD,
-  GROND, STAND, STAATOP, UITKOMST, EINDSTANDEN };
+module.exports = { GRONDEN, RETOURSTANDEN, NA, STAAT, UITKOMSTEN, NIET_GEBOUWD,
+  GROND, RETOURSTAND, STAATOP, UITKOMST, EINDSTANDEN };

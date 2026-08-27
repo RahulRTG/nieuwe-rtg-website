@@ -167,17 +167,29 @@ met een `VERMOGENS` zonder één gedeeld lid waren daar de aanleiding. Een vijfd
 `KANALEN` erbij zetten — en dan uitgerekend als *het* kernbegrip van een nieuwe
 laag — is diezelfde fout, met opzet gemaakt.
 
-**Twee uitwegen, en de eerste is de goedkope.**
+**Er waren twee uitwegen, en de goedkope is genomen.**
 
-1. **Neem het woord over waar het al klopt.** `kern/horeca.js` gebruikt `KANALEN`
-   al in exact de betekenis die het voorstel bedoelt: waarlangs verkoop je. Maak
-   die de enige, en hernoem de andere drie naar wat ze werkelijk zijn
-   (`MELDWEGEN`, `UITNODIGINGSWEGEN`, `BERICHTWEGEN`). Drie hernoemingen, en het
-   woord is schoon. Vergelijk `server/kern/passen.js`: de vraag "welke passen
-   bestaan er" stond op vier plekken en woont nu op één — drie mutaties, en
-   `SEMANTIEK.json` bewoog mee van 111 naar 101.
-2. **Kies een ander woord voor de nieuwe laag** (`VERKOOPWEG`, `TOONBANK`). Dan
-   blijven de vier botsingen staan en is de nieuwe laag wél schoon.
+`kern/horeca.js` gebruikte `KANALEN` al in exact de betekenis die het voorstel
+bedoelt: waarlangs verkoop je. Die is de enige geworden; de andere drie heten nu
+naar wat ze werkelijk zijn — **`MELDWEGEN`** (`kern/stadsweefsel/zaken.js`),
+**`UITNODIGINGSWEGEN`** (`kern/concern/uitnodiging.js`) en **`BERICHTWEGEN`**
+(`kern/rtfos/berichten.js`). Alleen de namen veranderden, geen enkele waarde.
+
+Dat is precies de ingreep die `server/kern/passen.js` ook was: drie mutaties, en
+de meter bewoog mee. `KANALEN` staat **niet meer in de botsingstop** van
+`SEMANTIEK.json`, en het totaal aantal betekenissen ging van 282 naar 280.
+
+Het alternatief was een ander woord kiezen voor de nieuwe laag (`TOONBANK`). Dat
+zou de nieuwe laag schoon hebben gemaakt en de vier botsingen hebben laten staan
+— goedkoper vandaag, duurder elke dag daarna.
+
+> **En de laag hield zich er zelf ook aan — na één terugdraai.** De verkoopweg
+> heette eerst `SOORTEN` en de retourstanden `STANDEN`. Dat zijn precies de twee
+> ergste woorden van dit huis: `SOORTEN` stond op 38 betekenissen in 39 domeinen
+> en was daarmee `ergsteWoord` in `SEMANTIEK.json`. Ze zijn `WEGSOORTEN` en
+> `RETOURSTANDEN` geworden. Uitkomst: **`kern/commerce` doet aan geen enkele
+> naamsbotsing mee**, en het totaal aantal betekenissen in het huis staat op 281
+> — één lager dan voor deze laag bestond, ondanks twaalf nieuwe bestanden.
 
 > **Deze laag maakte die fout bijna zelf.** De werkwoorden heetten eerst
 > `VERMOGENS`, en dat woord staat al in `kern/bevoegdheid/lijst.js` (de
@@ -189,7 +201,7 @@ laag — is diezelfde fout, met opzet gemaakt.
 > heten nu `WERKWOORDEN` — het woord dat `scripts/commerce.js` en dit document al
 > gebruikten.
 
-Wat er niet mag gebeuren is de derde optie: het woord gebruiken en de botsing
+Wat er niet mocht gebeuren was de derde optie: het woord gebruiken en de botsing
 laten staan. Dan betekent `kanaal` in een routelog vijf dingen en is er geen
 manier meer om te zien welke.
 
@@ -199,7 +211,8 @@ manier meer om te zien welke.
 
 Zes, en er komt er geen zevende bij.
 
-**VERKOOPWEG** *(werktitel — zie par. 3)* — waarlangs iets te koop staat. Draagt
+**VERKOOPWEG** — waarlangs iets te koop staat. Het woord `kanaal` is
+vrijgemaakt (par. 3) en blijft van `kern/horeca.js`; dit is het object eromheen. Draagt
 identiteit, doelgroep, assortimentsbron, prijsbeleid, voorraadbron, afrekenbeleid,
 betaalbeleid, fulfilmentbeleid, retourbeleid, fiscale context, merk, toegang en
 publicatie. Een webshop, een POS, een QR-kaart, een B2B-portaal, een AI-agent en
@@ -321,6 +334,17 @@ autonome betaling die grens 2 verbiedt.
   legt. Wat er níét in zit staat er met de reden in `NIET_GEBOUWD`: ruilen tegen
   iets anders, een verzendlabel, automatisch terugboeken, en een
   retourpercentage (dat is een score op mensen).
+- **De verkoopweg** (`kern/commerce/verkoopweg.js`,
+  `routes/supplier/verkoopweg.js`): een genoemde, gepubliceerde selectie uit het
+  aanbod van een verkoper, met een toegangsniveau. Zes soorten (web, kassa, qr,
+  b2b, mall, agent), vijf toegangsniveaus — en `publiek` is er één die **wordt
+  geweigerd mét de reden** in plaats van te ontbreken, want dat is een besluit
+  van de boardroom (`kern/webdomein.js`, twee sloten). De telling van wat er te
+  koop staat komt uit de graaf en niet uit een eigen kopie; een kapotte
+  aanbodlaag geeft `null` en niet nul, want nul zou "deze winkel is leeg"
+  betekenen. De elf eigenschappen die par. 4 opsomt en die nergens bestaan
+  (prijsbeleid, betaalbeleid, fulfilment, eigen domein, merk) staan er niet als
+  leeg veld maar in `NIET_GEBOUWD` met de reden.
 - **Wat een aanbod NIET kan, met de reden erbij.** De unieke opbrengst van deze
   laag. Een ondernemer ziet per regel waarom er geen koopknop staat, en het
   verschil tussen *er is iets te doen* (zet een prijs) en *er is niets aan de
@@ -355,7 +379,8 @@ autonome betaling die grens 2 verbiedt.
 
 ### Vraagt een besluit van de eigenaar
 
-- **Het woord `Kanaal`** (par. 3): hernoemen of uitwijken. Goedkoop nu, duur later.
+- ~~Het woord `Kanaal`~~ — **genomen** (par. 3): hernoemd, `KANALEN` is uit de
+  botsingstop en het woord is van de verkoopweg.
 - **Publiek verkopen op een eigen domein.** `kern/webdomein.js` staat standaard
   uit met twee sloten, en de reden staat er: *binnen het huis leest alleen een
   ingelogd lid een site; op een eigen domein leest iedereen hem.* Een publieke

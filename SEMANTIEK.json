@@ -1,9 +1,9 @@
 {
-  "catalogi": 840,
-  "verschillendeNamen": 521,
+  "catalogi": 843,
+  "verschillendeNamen": 526,
   "namenInMeerDomeinen": 96,
   "woordenMetMeerBetekenissen": 79,
-  "betekenissenTotaal": 284,
+  "betekenissenTotaal": 281,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
   "dubbelingen": 28,
@@ -410,7 +410,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 11,
+      "betekenissenVanDitWoord": 10,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -1205,146 +1205,6 @@
       ]
     },
     {
-      "naam": "STANDEN",
-      "domeinen": 12,
-      "betekenissen": 11,
-      "hoogsteOverlap": 0.4,
-      "soort": "gemengd",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/avond/voorkeuren.js",
-            "server/kern/werkvenster.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "nooit",
-            "gevraagd",
-            "altijd"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/commerce/retourlijst.js"
-          ],
-          "leden": 7,
-          "voorbeeld": [
-            "gevraagd",
-            "aanvaard",
-            "onderweg",
-            "beoordeeld"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gast/verzoek.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "open",
-            "opgepakt",
-            "klaar",
-            "ingetrokken"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mediaos/leeg.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "muziek",
-            "kijk",
-            "flow",
-            "alles"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/regie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "mens",
-            "na-termijn",
-            "automatisch"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/overheid/btwtoezicht.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "sluit_aan",
-            "wijkt_af",
-            "niet_aangegeven",
-            "alleen_concept"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/payroll/run.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "concept",
-            "gecontroleerd",
-            "manager",
-            "administrateur"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rahul/stemming.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "gewoon",
-            "blij",
-            "chagrijnig",
-            "moe"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/tenant/levensloop.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "actief",
-            "opzegging",
-            "bewaring",
-            "vernietigd"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/veiligheid/rust.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "thuis",
-            "avond",
-            "slaap",
-            "werk"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/aanwezigheid.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "aanwezig",
-            "telaat",
-            "afwezig",
-            "ziek"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "STATUS",
       "domeinen": 13,
       "betekenissen": 10,
@@ -1470,6 +1330,134 @@
             "wachtlijst",
             "ingeschreven",
             "uitgeschreven"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "STANDEN",
+      "domeinen": 11,
+      "betekenissen": 10,
+      "hoogsteOverlap": 0.4,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/avond/voorkeuren.js",
+            "server/kern/werkvenster.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "nooit",
+            "gevraagd",
+            "altijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gast/verzoek.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "open",
+            "opgepakt",
+            "klaar",
+            "ingetrokken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/leeg.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "muziek",
+            "kijk",
+            "flow",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/regie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mens",
+            "na-termijn",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/overheid/btwtoezicht.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "sluit_aan",
+            "wijkt_af",
+            "niet_aangegeven",
+            "alleen_concept"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/run.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "concept",
+            "gecontroleerd",
+            "manager",
+            "administrateur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rahul/stemming.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "gewoon",
+            "blij",
+            "chagrijnig",
+            "moe"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/tenant/levensloop.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "actief",
+            "opzegging",
+            "bewaring",
+            "vernietigd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/rust.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "thuis",
+            "avond",
+            "slaap",
+            "werk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/aanwezigheid.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "aanwezig",
+            "telaat",
+            "afwezig",
+            "ziek"
           ]
         }
       ]
@@ -2543,63 +2531,6 @@
       ]
     },
     {
-      "naam": "KANALEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0.1,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/concern/uitnodiging.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "chat",
-            "email",
-            "telefoon",
-            "code"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/horeca.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "tafel",
-            "bar",
-            "club",
-            "terras"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/berichten.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "app",
-            "email",
-            "sms",
-            "push"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stadsweefsel/zaken.js"
-          ],
-          "leden": 10,
-          "voorbeeld": [
-            "bewonersapp",
-            "gemeente",
-            "telefoon",
-            "ambtenaar"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "RECHTEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3024,7 +2955,51 @@
           ]
         }
       ]
+    },
+    {
+      "naam": "NODIG",
+      "domeinen": 3,
+      "betekenissen": 3,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "bestelling",
+            "reservering",
+            "bezorging",
+            "identiteit"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/objectlaag/eventwereld.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "reservations",
+            "rides",
+            "bookings",
+            "tickets"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/intake.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "simulatie",
+            "kans",
+            "plan"
+          ]
+        }
+      ]
     }
   ],
-  "bestanden": 2370
+  "bestanden": 2372
 }

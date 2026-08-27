@@ -21,7 +21,15 @@
 /* De kanalen. Ze verschillen alleen in HOE de code bij iemand komt; de
    uitnodiging zelf is er niet anders van. Zou elk kanaal zijn eigen soort
    uitnodiging krijgen, dan had je zes stromen die uiteenlopen. */
-const KANALEN = ['chat', 'email', 'telefoon', 'qr', 'code', 'bulk', 'directory'];
+/* HERNOEMD VAN `KANALEN`. Vier domeinen droegen dat woord met vier
+   betekenissen en een onderlinge overlap van 0,10 -- SEMANTIEK.json had het in
+   de top staan als botsing. Het woord `kanaal` is nu van de VERKOOPWEG
+   (kern/horeca.js: tafel, bar, terras, afhaal, bezorging), omdat dat de enige
+   betekenis is waar een nieuwe laag hem voor nodig heeft; zie COMMERCE.md
+   par. 3. Dit is langs welke weg iemand wordt uitgenodigd (chat, e-mail, qr, code).
+
+   Er is niets aan de WAARDEN veranderd, alleen aan de naam ervan. */
+const UITNODIGINGSWEGEN = ['chat', 'email', 'telefoon', 'qr', 'code', 'bulk', 'directory'];
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, entiteitVind, entiteitBeeld, vestigingVind,
@@ -60,7 +68,7 @@ module.exports = (ctx) => {
       if (vest.gesloten) return { status: 409, error: 'Deze vestiging is gesloten.' };
     }
 
-    const kanaal = KANALEN.includes(b.kanaal) ? b.kanaal : 'code';
+    const kanaal = UITNODIGINGSWEGEN.includes(b.kanaal) ? b.kanaal : 'code';
     const van = b.van && /^\d{4}-\d{2}-\d{2}$/.test(b.van) ? b.van : tijdVandaag();
 
     const tot = new Date(tijdVandaag() + 'T00:00:00Z');
@@ -166,7 +174,7 @@ module.exports = (ctx) => {
   /* Wie is uitgenodigd en heeft nog niet gereageerd -- de readiness leest dit. */
   const openstaand = (entiteitId) => vanEntiteit(entiteitId).filter(u => u.stand === 'open');
 
-  return Object.assign({ UITNODIGING_KANALEN: KANALEN, uitnodigingVind: vind,
+  return Object.assign({ UITNODIGING_UITNODIGINGSWEGEN: UITNODIGINGSWEGEN, uitnodigingVind: vind,
     uitnodigingVindCode: vindCode, uitnodigingNieuw, uitnodigingAccepteer,
     uitnodigingIntrek, uitnodigingTekst: tekst, uitnodigingBeeld: beeld,
     uitnodigingVanEntiteit: vanEntiteit, uitnodigingOpenstaand: openstaand },

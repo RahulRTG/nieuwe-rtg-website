@@ -15,7 +15,7 @@
    ========================================================================== */
 'use strict';
 
-const { NA, STAND, STAATOP, UITKOMST } = require('./retourlijst');
+const { NA, RETOURSTAND, STAATOP, UITKOMST } = require('./retourlijst');
 
 module.exports = ({ save, klok, tekst, bij, ruim, publiek }) => {
   /* EEN STAND ZETTEN IS EEN HANDELING VAN EEN PARTIJ, en welke partij dat is
@@ -42,10 +42,10 @@ module.exports = ({ save, klok, tekst, bij, ruim, publiek }) => {
     if (sleutel != null && r.sleutel !== String(sleutel)) {
       return { status: 403, error: 'Deze retouraanvraag is niet van jou.' };
     }
-    const doel = STAND.get(tekst(naar, 30));
+    const doel = RETOURSTAND.get(tekst(naar, 30));
     if (!doel) return { status: 400, error: 'Die stand bestaat niet.' };
     if (!(NA[r.stand] || []).includes(doel.id)) {
-      return { status: 409, error: 'Van "' + (STAND.get(r.stand) || {}).label + '" kan het niet naar "' + doel.label + '".' };
+      return { status: 409, error: 'Van "' + (RETOURSTAND.get(r.stand) || {}).label + '" kan het niet naar "' + doel.label + '".' };
     }
     /* `termijn` zet zichzelf; niemand anders mag die stand kiezen. */
     if (doel.door === 'termijn') return { status: 403, error: 'Vervallen doet de termijn, niet een mens.' };

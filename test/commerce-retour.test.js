@@ -26,7 +26,7 @@ const K = require('../server/kern/commerce/koopbaar');
 const maakRetour = require('../server/kern/commerce/retour');
 const maakAfrekening = require('../server/kern/commerce/afrekening');
 const tarief = require('../server/kern/fiscaal/tarief');
-const { GRONDEN, STANDEN, UITKOMSTEN, NA } = require('../server/kern/commerce/retourlijst');
+const { GRONDEN, RETOURSTANDEN, UITKOMSTEN, NA } = require('../server/kern/commerce/retourlijst');
 
 const ZAAK = { code: 'MODE', type: 'retail', settings: { land: 'NL' } };
 const rekenaar = maakAfrekening({ tariefVan: tarief.tariefVan, basisCat: tarief.basisCat,
@@ -197,7 +197,7 @@ test('14. wat er met opzet niet is, staat er met de reden', () => {
 });
 
 test('15. elke stand noemt WIE hem zet, en elke uitkomst of er geld bij hoort', () => {
-  for (const s of STANDEN) assert.ok(s.door, s.id + ' hoort een partij te noemen');
+  for (const s of RETOURSTANDEN) assert.ok(s.door, s.id + ' hoort een partij te noemen');
   for (const u of UITKOMSTEN) assert.equal(typeof u.geldTerug, 'boolean', u.id);
   // en de tijdlijn groeit aan: elke stap blijft staan
   const R = motor();

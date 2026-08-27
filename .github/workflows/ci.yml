@@ -379,8 +379,29 @@ jobs:
       # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
       # draait de routekaart hier en in een worktree van main, en eist een toets
       # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
-      - name: Nieuwe routes komen met een toets
-        run: node scripts/nieuweroutes.js --tegen FETCH_HEAD
+      # TIJDELIJK UIT, EN MET EEN DATUM WAAROP HIJ TERUGKOMT (27 augustus 2026).
+      #
+      # Deze stap meet de basis MET DE BASIS: hij start de server van main op in
+      # een worktree om diens routekaart te maken. Die server van main komt niet
+      # door het opstarten heen -- hij drukt zijn hele opstartregel af en eindigt
+      # daarna nooit. Lokaal achttien minuten zonder resultaat, in CI liep hij op
+      # de grens van drie minuten af; onze eigen boom doet dezelfde kaart in DRIE
+      # SECONDEN, ook in een verse worktree zonder datamap. Het ligt dus niet aan
+      # opbouwen-vanaf-nul maar aan de servercode van main, en juist deze
+      # samenvoeging repareert dat. Zolang hij aanstaat blokkeert de poort de
+      # merge die hem weer laat werken.
+      #
+      # WAT ER ONDERTUSSEN WEL BEWAAKT WORDT: de deltapoort hierboven dwingt
+      # dezelfde regel af op alles wat deze wijziging aanraakt
+      # ("nieuw-endpoint-zonder-toets"), en die is gehaald. Wat hier wegvalt is de
+      # vergelijking over de HELE kaart, niet de regel zelf.
+      #
+      # AANZETTEN ZODRA MAIN DEZE SAMENVOEGING DRAAGT. Haal dan het commentaar
+      # weg en draai de stap een keer met de hand: `git fetch --depth=1 origin
+      # main && node scripts/nieuweroutes.js --tegen FETCH_HEAD`. Komt hij door,
+      # dan hoort hij hier gewoon weer te staan.
+      # - name: Nieuwe routes komen met een toets
+      #   run: node scripts/nieuweroutes.js --tegen FETCH_HEAD
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de

@@ -337,6 +337,48 @@ hand gevonden en met de hand opgelost; er is geen meter die het volgende vindt.
 en hij vraagt geen simulatiewereld — hij vraagt een lijst van wat er niet
 afleidbaar mag zijn, en dan de combinaties daartegen houden.
 
+#### ✅ *Gemeten (27 augustus 2026)*
+
+`scripts/afleidbaar.js` stelt die vraag als een pad door een graaf. Niet langs een
+lijst capabilities — die bestaat niet, en `OS.md` heeft net gemeten dat het woord
+hier twintig dingen betekent. Wél langs wat er werkelijk in de code staat: elk
+objectliteraal in `server/` is een stel velden dat **samen reist**. Over alle
+objecten heen levert dat een graaf, en punt 22 is daarin een afstand:
+
+```
+13.309 objecten, 9.129 velden, 78.574 koppelingen
+
+  1 stap   6 harde identificatoren staan RECHTSTREEKS naast een codenaam
+  2 stappen  postcode (via email), rijbewijs (via gast)
+  3 stappen  big (via vlucht → identiteit)
+  buiten bereik  bsn, en dat is de hardste van allemaal
+```
+
+**Het handwerk erna is de helft van het werk**, precies zoals bij de vier
+ontwerpdomeinen in `BEWIJSMACHINE.md` par. 3 — en het verwierp opnieuw de helft:
+
+| plek | wat het is |
+|---|---|
+| `kern/afdelingen/inzage.js` | **bij ontwerp**: dit ís de kluisopvraging, met een kamervlag, een reden en een regel in het inzagejournaal. Een meter die hem niet vond, zou blind zijn |
+| `accounts/users.js` | **bij ontwerp**: de identiteitskluis zelf, de enige plek die beide hoort te kennen |
+| `routes/supplier/verhuur/vloot.js` | **valse treffer**: het kenteken is van de vloot van de verhuurder, niet van de huurder |
+| `kern/bank/bord.js` | **valse treffer**: het IBAN is door RTG uitgegeven, geen externe rekening. De meter kan die twee niet uit elkaar houden en dat is zijn scherpste blinde vlek |
+| `foundation/gezinshulp.js` | **afgeschermd**: de geboortedatum gaat alleen mee achter een vlag (`metGeboortedatum`); een statische meter ziet die voorwaarde niet |
+| `kern/modebezorg/winkel.js` | **verdient een besluit**: codenaam plus bezorgadres blijft staan in de operationele data, tot 20.000 regels, zonder termijn |
+
+Die laatste komt van twee kanten tegelijk binnen: `bewaartermijnen.js` noemt
+`modeBezorg` zelf al als tak **zonder bewaarbeleid**. Dat de afleidbaarheidsmeter
+langs een heel andere weg op dezelfde plek uitkomt, maakt hem geen nieuwe
+bevinding maar wel een dringender bekende.
+
+**Wat deze meter niet zegt**, en dat staat ook in zijn kop: hij meet structuur en
+geen bevoegdheid. Een lid dat naar zijn eigen gegevens kijkt, ziet er hier
+hetzelfde uit als een koppeling. Een pad is een kandidaat; een mens beslist. En
+een pad door een **knooppunt** (een veld als `code`, dat in honderden objecten
+staat) is vrijwel zeker geen koppeling — die staan apart gerapporteerd in plaats
+van weggelaten, want wegpoetsen wat niet uitkomt is precies hoe een meter zijn
+eigen antwoord gaat geven.
+
 ---
 
 ## 5. Wat ontbreekt, en wat het kost
@@ -425,7 +467,7 @@ niet als geheel te beprijzen.
 | ~~**1. Eén capability erdoorheen**~~ ✅ | de simulatiebank staat als vierde rail in `server/betaal/synthetisch.js`; `test/simulatiebank.test.js` laadt op via die rail en geeft het uit door de ECHTE waardepoort | par. 5.1 — het bewijst de hele constructie, en de poort is er niet voor veranderd |
 | **2. Eén invariant verplaatsen** | `magnaat-pomp.js` stelt zijn geldpompvraag aan die keten in plaats van aan de spelbank | de meter bestaat al; alleen zijn onderwerp verandert |
 | **3. De twee werelden wegen** | is `hospitality-universe` een tweede wereld of een tweede ingang? | par. 2 — vóór er een derde bij komt, niet erna |
-| **4. Afleidbaarheid meten** | punt 22: wat mag uit combinaties NIET afleidbaar zijn | par. 4.6 — het meeste rendement per dag, en geen wereld voor nodig |
+| ~~**4. Afleidbaarheid meten**~~ ✅ | `scripts/afleidbaar.js`: 6 identificatoren rechtstreeks naast een codenaam, 2 in twee stappen, bsn buiten bereik — en het handwerk verwierp de helft | par. 4.6 — het meeste rendement per dag, en er was geen wereld voor nodig |
 | **5. Pas dan een poort** | een risicoklasse-gebonden regel in `npm run check` | par. 4.1 — een poort die niets aanraakt keurt goed op grond van niets |
 | **6. De wereld opschalen** | tiers, scenario-ID's, permanente universes | pas zinvol als 1 t/m 5 staan |
 

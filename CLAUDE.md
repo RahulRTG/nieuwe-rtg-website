@@ -261,6 +261,20 @@ mogen op apps en capabilities maar niet op mensen. En er staan al **twee**
 synthetische werelden (Magnaat en `kern/hospitality-universe/`) die elkaar
 aanroepen — die vraag hoort beantwoord vóór er een derde bij komt.
 
+**Punt 22 is ook gemeten** (par. 4.6): kunnen twee plekken die elk niets fout doen
+samen een codenaam terugvoeren naar een mens? `scripts/afleidbaar.js` leest elk
+objectliteraal in `server/` als een stel velden dat samen reist, en maakt daar een
+graaf van; de afstand van `codenaam` naar een harde identificator ís de bevinding.
+Zes staan er **rechtstreeks** naast een codenaam, twee op twee stappen, en het
+**bsn nergens**. Het handwerk erna verwierp de helft — twee treffers zijn de
+identiteitskluis zelf (waar de koppeling hóórt, met een auditregel), twee zijn
+verklaarbare valse treffers, één zit achter een vlag, en één verdient een besluit:
+codenaam plus bezorgadres blijft staan in de operationele data zonder
+bewaartermijn. De meter meet **structuur en geen bevoegdheid** — een lid dat naar
+zijn eigen gegevens kijkt ziet er hetzelfde uit, en een pad door een knooppunt als
+`code` is vrijwel zeker geen koppeling. Zulke paden worden apart gemeld en niet
+weggelaten.
+
 **`BEWIJSMACHINE.md` is de lat boven de testhal** — niet of Magnaat kan bewijzen
 dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt

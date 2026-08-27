@@ -37,7 +37,11 @@ const { INZENDINGEN_PER_UUR } = require('./versies');
    ./besluit.js (versie). */
 const STATUS_VERSIE = ['wacht-op-mens', 'gepubliceerd', 'geweigerd', 'ingetrokken'];
 
-function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
+function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus }) {
+  /* De gebeurtenissenstroom. Hij mag ontbreken -- de App Store werkt zonder bus
+     precies zoals hij altijd deed -- maar is hij er, dan gaat elke journaalregel
+     ook als envelop naar buiten (kern/gebeurtenis.js). */
+  const gebeurtenis = require('../gebeurtenis').maakGebeurtenis({ bus, log });
   const opslag = maakOpslag({ dir, log });
   const nu = () => datum().toISOString();
   const id = (p) => p + crypto.randomBytes(6).toString('hex');
@@ -60,6 +64,22 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
     const j = S().journaal;
     j.unshift(Object.assign({ at: nu(), wat, over: over || null, wie: wie || null }, extra || null));
     if (j.length > 5000) j.length = 5000;
+    /* En dezelfde regel gaat als GEBEURTENIS naar buiten. Het journaal blijft de
+       waarheid -- het groeit aan en wordt nooit herschreven; de uitzending is
+       vluchtig en belooft niets (envelop.NIET_GEBOUWD). Twee dingen met een
+       eigen taak dus, en geen tweede boekhouding.
+
+       De klasse is `intern` en niet `codenaam`: dit journaal noemt organisaties
+       en appsleutels, geen mensen. Zou hier ooit een codenaam in belanden, dan
+       hoort die klasse mee te veranderen -- daar zakt test/gebeurtenis.test.js
+       op. */
+    gebeurtenis.meld(require('../gebeurtenis').soortVan('appstore', wat), {
+      bron: 'kern/appstore',
+      klasse: 'intern',
+      onderwerp: over || '',
+      actor: wie || '',
+      lading: extra && typeof extra === 'object' && !Array.isArray(extra) ? extra : {}
+    });
     return j[0];
   }
   const journaal = (n) => S().journaal.slice(0, Math.max(1, Math.min(500, Number(n) || 100)));

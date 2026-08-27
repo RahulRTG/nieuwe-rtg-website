@@ -300,7 +300,10 @@ Per punt het bestand dat het doet.
 En sinds P0/P1 (zie par. 11):
 
 - **De makersmeting.** `scripts/makers.js`, `MAKERS.json`, `test/makers.test.js`.
-- **De gebeurtenisenvelop.** Dertien velden, geen domeinkennis — `kern/envelop.js`.
+- **De gebeurtenisenvelop, en hij wordt gevuld.** Dertien velden, geen
+  domeinkennis (`kern/envelop.js`), uitgezonden over een eigen buskanaal
+  (`kern/gebeurtenis.js`). Elke journaalregel van de App Store gaat mee; een
+  geweigerde envelop breekt de handeling niet maar verdwijnt ook niet stil.
 - **De mutatiesemantiek.** Zes klassen, en een poort die `onbekend` weigert aan
   de rand van het platform — `kern/mutatie.js`. De zes brugmethodes zijn
   geclassificeerd; een zevende zonder klasse laat de brug niet opbouwen.
@@ -480,7 +483,13 @@ marketplace-economie hierboven gaat ervan uit dat er iets te verdelen valt. Van
   derdencode uitsluitend in de browser van het lid. Zodra `onOrderCreated(event)`
   bij ons draait, verandert het dreigingsmodel volledig. Eigen document, eigen
   bewijslast (DEVELOPERCLOUD.md par. 3.4).
-- **Event-platform voor derden.** Eerst de envelop (par. 10), dan pas abonneren.
+- **Event-platform voor derden.** De envelop staat en wordt uitgezonden
+  (`kern/gebeurtenis.js`, kanaal `rtg:gebeurtenis:v1`, eerste producent is het
+  journaal van de App Store). Wat er níét is en een eigen besluit vraagt, staat
+  in `envelop.NIET_GEBOUWD`: levering, volgorde, opslag en abonneren door een
+  derde. Er is vandaag ook geen interne abonnee, en dat is op een bus een
+  complete toestand — de gebeurtenis is beschikbaar, wie hem nodig heeft haakt
+  aan met `luister()`.
 - **SDK's in vijf talen uit één contract.** Zinvol zodra het contract er is.
 - **Visuele app-bouwer en conversation-to-app.** Niveau 1 en 2 voor apps in
   plaats van sites. De Website-maker bewijst het patroon; de sprong zit in wat

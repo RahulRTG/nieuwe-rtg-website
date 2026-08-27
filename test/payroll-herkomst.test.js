@@ -45,16 +45,21 @@ const persoon = (staffId, naam, uren) => ({ staffId, naam,
 function opzet(opties) {
   const o = opties || {};
   const db = { data: {} };
+  /* Via de deur van het domein (server/kern/payroll/opslag.js) en niet met een
+     kale db-stub: sinds PR #128 krijgt geen payroll-laag de database nog mee,
+     alleen het contract. Voedde deze opstelling db, dan viel elke laag hier om
+     op `opslag.bak` -- en dat is precies wat er gebeurde. */
+  const opslag = require('../server/kern/payroll/opslag')({ db });
   const save = () => {};
   let teller = 0;
   const nu = () => '2026-04-01T10:0' + (teller++ % 10) + ':00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag, save, nu });
+  const componenten = maakComponenten({ opslag, save, nu });
   regelpakket.neemOp(pakket('nl-2026.1', o.pakketExtra), { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe', { ondanks: true, reden: 'toets' });
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
-  const aangifte = maakAangifte({ db, save, nu, crypto, run });
+  const run = maakRun({ opslag, save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag, save, nu, crypto });
+  const aangifte = maakAangifte({ opslag, save, nu, crypto, run });
   const dossier = maakDossier({ run, journaal, aangifte, regelpakket, contracten: null });
   const { payrollHerkomst } = maakPayrollHerkomst({ aangifte, run, regelpakket, dossier });
   return { db, run, aangifte, herkomst: payrollHerkomst };

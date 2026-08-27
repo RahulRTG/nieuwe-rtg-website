@@ -16,7 +16,8 @@ const MAX_LESSEN = 500;
 const MAX_KINDEREN = 40;
 
 module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
-  const L = () => { if (!db.data.lessen) db.data.lessen = {}; return db.data.lessen; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/lesmaker', bezit: { lessen: 'kaart' } });
+  const L = () => eigen.bak('lessen');
   const nu = () => Date.now();
   const code = (n) => { let s = ''; const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for (let i = 0; i < n; i++) s += A[crypto.randomInt(0, A.length)]; return s; };
 

@@ -25,6 +25,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakLandpakket } = require('../server/kern/command/landpakket');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 const fiscaal = require('../server/kern/fiscaal/landen');
 const valuta = require('../server/kern/payroll/valuta');
 
@@ -32,7 +33,7 @@ function maak(opties) {
   const o = opties || {};
   const db = { data: { talen: o.talen || { actief: ['nl', 'en'] }, techniek: { functies: {} } } };
   const regels = [];
-  const land = maakLandpakket({ db, save: () => {}, journaal: { noteer: r => regels.push(r) },
+  const land = maakLandpakket({ db, opslag: maakCmdOpslag({ db }), save: () => {}, journaal: { noteer: r => regels.push(r) },
     fiscaal, valuta, talen: () => db.data.talen,
     functies: { OP_ID: { 'supplier-pos': { id: 'supplier-pos' } } } });
   return { db, land, regels };

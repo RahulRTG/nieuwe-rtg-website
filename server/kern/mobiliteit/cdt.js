@@ -29,17 +29,17 @@ const { GRENZEN, SOORTEN, tel, signalen, rustSignaal } = require('./cdt-tijden')
 const DIENST_MAX = 4000;          // bewaargrens in de json-stand; de export gaat eerder
 
 module.exports = (ctx) => {
-  const { db, save, id, schoon, nu, findSupplier, opdrachtenVanVervoerder, logActivity } = ctx;
+  const { db, save, id, schoon, nu, findSupplier, opdrachtenVanVervoerder, logActivity, opslag } = ctx;
 
   function ensureCdt() {
-    if (!Array.isArray(db.data.mobDiensten)) db.data.mobDiensten = [];
-    if (!db.data.mobCdtRegime || typeof db.data.mobCdtRegime !== 'object') db.data.mobCdtRegime = {};
+    opslag.bak('mobDiensten');
+    opslag.bak('mobCdtRegime');
   }
-  const dienstenVan = code => { ensureCdt(); return db.data.mobDiensten.filter(d => d.vervoerder === code); };
+  const dienstenVan = code => { ensureCdt(); return opslag.bak('mobDiensten').filter(d => d.vervoerder === code); };
   const openDienst = (code, kaart) => dienstenVan(code).find(d => d.chauffeurskaart === kaart && !d.eind) || null;
 
   // de grenzen van deze onderneming: de standaard, tenzij hij zijn eigen regime zette
-  const regimeVan = code => Object.assign({}, GRENZEN, (db.data.mobCdtRegime || {})[code] || {});
+  const regimeVan = code => Object.assign({}, GRENZEN, (opslag.bak('mobCdtRegime') || {})[code] || {});
 
   function regimeZet(code, body = {}) {
     ensureCdt();
@@ -50,7 +50,7 @@ module.exports = (ctx) => {
       eigen[k] = Math.round(v);
     }
     if (!Object.keys(eigen).length) return { status: 400, error: 'Geef minstens een grens op.' };
-    db.data.mobCdtRegime[code] = Object.assign({}, db.data.mobCdtRegime[code] || {}, eigen);
+    opslag.bak('mobCdtRegime')[code] = Object.assign({}, opslag.bak('mobCdtRegime')[code] || {}, eigen);
     save();
     return { ok: true, grenzen: regimeVan(code), standaard: GRENZEN };
   }
@@ -76,8 +76,8 @@ module.exports = (ctx) => {
       voertuig: schoon(body.voertuig, 40) || null,
       start, eind: null, blokken: [{ soort: 'ander', van: start, tot: null }],
       startSignalen: rust ? [rust] : [], gemeldDoor: schoon(actor, 60) || 'chauffeur' };
-    db.data.mobDiensten.push(d);
-    if (db.data.mobDiensten.length > DIENST_MAX) db.data.mobDiensten = db.data.mobDiensten.slice(-DIENST_MAX);
+    opslag.bak('mobDiensten').push(d);
+    if (opslag.bak('mobDiensten').length > DIENST_MAX) opslag.zetBak('mobDiensten', opslag.bak('mobDiensten').slice(-DIENST_MAX));
     save();
     logActivity(supplier.code, actor, 'meldde zich aan op kaart ' + kaart);
     return { ok: true, dienst: dienstBeeld(d), signalen: rust ? [rust] : [] };

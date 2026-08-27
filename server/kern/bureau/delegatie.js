@@ -76,15 +76,13 @@ const GRENS_PLAFOND = 1000000000;
 
 module.exports = (ctx) => {
   const { db, save, nu } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   function D(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!l.delegatie || typeof l.delegatie !== 'object') l.delegatie = { per: {}, log: [] };
-    if (!l.delegatie.per || typeof l.delegatie.per !== 'object') l.delegatie.per = {};
-    if (!Array.isArray(l.delegatie.log)) l.delegatie.log = [];
-    return l.delegatie;
+    const d = levens.veld(key, 'delegatie', (x) => { x.per = {}; x.log = []; });
+    if (!d.per || typeof d.per !== 'object') d.per = {};
+    if (!Array.isArray(d.log)) d.log = [];
+    return d;
   }
 
   /* De geldende stand van een domein: opgeslagen waarde, teruggebracht tot het

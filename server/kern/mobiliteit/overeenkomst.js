@@ -29,10 +29,10 @@
 const PRODUCTEN = ['enkel', 'retour', 'dagkaart', 'zitplaats', 'abonnement'];
 
 module.exports = (ctx) => {
-  const { db, save, id, schoon, nu, findSupplier } = ctx;
+  const { db, save, id, schoon, nu, findSupplier, opslag } = ctx;
 
   function ensureOvereenkomsten() {
-    if (!Array.isArray(db.data.mobOvereenkomsten)) db.data.mobOvereenkomsten = [];
+    opslag.bak('mobOvereenkomsten');
   }
 
   const datum = v => {
@@ -57,7 +57,7 @@ module.exports = (ctx) => {
 
   const overeenkomstenVan = code => {
     ensureOvereenkomsten();
-    return db.data.mobOvereenkomsten.filter(o => o.vervoerder === code);
+    return opslag.bak('mobOvereenkomsten').filter(o => o.vervoerder === code);
   };
 
   /* De geldige overeenkomst voor een vervoerder op een dag. Meerdere kunnen er
@@ -98,7 +98,7 @@ module.exports = (ctx) => {
        niet INTREKKEN zonder er de vervoerder bij te typen die er al op staat --
        een opzegging die om een overbodig veld struikelt is een val, en juist
        opzeggen moet altijd lukken. */
-    const bestaand = body.id ? (db.data.mobOvereenkomsten.find(o => o.id === schoon(body.id, 40)) || null) : null;
+    const bestaand = body.id ? (opslag.bak('mobOvereenkomsten').find(o => o.id === schoon(body.id, 40)) || null) : null;
     if (body.id && !bestaand) return { status: 404, error: 'Overeenkomst niet gevonden.' };
     if (bestaand && body.intrekken) {
       bestaand.ingetrokken = { at: nu(), door: schoon(door, 60) || 'kantoor', reden: schoon(body.reden, 200) || null };
@@ -146,7 +146,7 @@ module.exports = (ctx) => {
       afdrachtDeel: Math.min(1, Math.max(0, Number(body.afdrachtDeel) || 1)),
       abonnementPrijs: abo || null, abonnementDagen: producten.includes('abonnement') ? dagen : null,
       ingetrokken: null, gewijzigd: nu() });
-    if (!bestaand) db.data.mobOvereenkomsten.push(o);
+    if (!bestaand) opslag.bak('mobOvereenkomsten').push(o);
     save();
     return { ok: true, overeenkomst: overeenkomstBeeld(o) };
   }
@@ -164,7 +164,7 @@ module.exports = (ctx) => {
   function overeenkomstLijst(body = {}) {
     ensureOvereenkomsten();
     const code = schoon(body.vervoerder, 20);
-    const lijst = code ? overeenkomstenVan(code) : db.data.mobOvereenkomsten;
+    const lijst = code ? overeenkomstenVan(code) : opslag.bak('mobOvereenkomsten');
     return { ok: true, overeenkomsten: lijst.map(overeenkomstBeeld), producten: PRODUCTEN };
   }
 

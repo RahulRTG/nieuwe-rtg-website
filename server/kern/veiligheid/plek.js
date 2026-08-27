@@ -14,15 +14,13 @@
    - geen delen zonder venster. Buiten een alarm of een lopende wacht ziet
      niemand iets, ook je kring niet. Toestemming heeft hier altijd een
      einddatum, en die staat in het venster zelf. */
-module.exports = ({ db, save }) => {
+module.exports = ({ opslag, save }) => {
   const nu = () => new Date().toISOString();
   const SPOOR_MAX = 12;
 
   function lijsten() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.plek) db.data.veilig.plek = {};
-    if (!db.data.veilig.vensters) db.data.veilig.vensters = {};
-    return db.data.veilig;
+    opslag.tak('plek'); opslag.tak('vensters');
+    return opslag.wortel();
   }
 
   const getal = (v) => { const n = Number(v); return Number.isFinite(n) ? n : null; };

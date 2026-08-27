@@ -25,6 +25,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 module.exports = ({ db, save, log, dataDir }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakdoos', bezit: { doosJournaal: 'lijst' } });
   // De doos praat met een of meer cloud-adressen (komma-lijst). Zijn het er
   // meer, dan zijn het replica's (trio/nood): valt de eerste weg, dan pakt de
   // doos de volgende voordat hij naar lokaal schakelt, en bij herstel keert hij
@@ -59,8 +60,7 @@ module.exports = ({ db, save, log, dataDir }) => {
   const teller = { pings: 0, rttSom: 0, uitval: 0, lokaalMs: 0, nagespeeld: 0, sinds: Date.now() };
 
   function journaal() {
-    if (!Array.isArray(db.data.doosJournaal)) db.data.doosJournaal = [];
-    return db.data.doosJournaal;
+    return eigen.bak('doosJournaal');
   }
 
   /* ---------- journaal-beveiliging ----------

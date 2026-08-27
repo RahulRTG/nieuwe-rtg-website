@@ -31,6 +31,7 @@ const WORTEL = path.join(__dirname, '..');
 // testrunner bezit de ouder dat slot al en geeft hij dit expliciet door.
 if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot').pak('meterijking');
 const norm = require('../scripts/norm.js');
+const deuren = require('../scripts/deuren');
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
 
@@ -141,6 +142,61 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  /* DE TWEE DEURMETERS, EN WAAROM ER MAAR EEN VAN ZE norm.meet() AANROEPT.
+
+     dbDeuren telt de bestanden buiten server/db/ die db.data rechtstreeks
+     aanraken; dbDeurenSchrijvend het deel daarvan dat er ook IN schrijft. Ze
+     staan los omdat lezen en schrijven verschillende dingen bepalen -- een
+     schrijver bepaalt of de invarianten van een domein kloppen, een lezer of je
+     de opslag kunt vervangen.
+
+     Twee losse meters zijn alleen strakker als de ZEEF ze ook echt uit elkaar
+     houdt. Zou hij elk db.data-bestand als schrijver tellen, dan bewegen beide
+     proeven netjes omhoog en ziet de ijking niets. Daarom kijkt elke proef ook
+     naar de ANDERE meter.
+
+     DE KOSTEN. norm.meet() doet de hele ronde en duurt minuten. Twee proeven die
+     hem allebei aanroepen kosten dat twee keer, bij elke draai van de suite, voor
+     altijd. Dat is niet gratis en het levert hier niets extra's op: beide meters
+     komen in scripts/norm.js uit EEN aanroep van deuren.meet(). Dus roept
+     dbDeurenSchrijvend hem aan -- en die controleert meteen dat norm.js BEIDE
+     velden uit die ene meting overneemt, wat een verwisseling zou vangen die twee
+     losse aanroepen juist niet vangen. dbDeuren meet daarna nog alleen de zeef.
+
+     Dat is een bewuste ruil en geen bezuiniging: wat er wordt bewezen is groter
+     geworden, en de rekening kleiner. */
+  dbDeuren: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-deur.js',
+      "'use strict';\n" +
+      '/* ijking: raakt db.data alleen LEZEND aan */\n' +
+      'module.exports = (db) => (db.data.leden || []).length;\n',
+      () => {
+        const na = deuren.meet();
+        assert.equal(na.schrijvendeDeuren - voor.dbDeurenSchrijvend, 0,
+          'een bestand dat db.data alleen LEEST mag de schrijvende meter niet bewegen; ' +
+          'doet hij dat wel, dan meten de twee meters hetzelfde en is de splitsing schijn');
+        return na.deuren - voor.dbDeuren;
+      })
+  },
+  dbDeurenSchrijvend: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-schrijf.js',
+      "'use strict';\n" +
+      '/* ijking: schrijft rechtstreeks IN db.data, langs de datalaag heen */\n' +
+      'module.exports = (db) => { db.data.zzIjkTeller = (db.data.zzIjkTeller || 0) + 1; };\n',
+      () => {
+        const na = norm.meet();
+        assert.equal(na.dbDeuren - voor.dbDeuren, 1,
+          'een schrijver is ook een deur en hoort in BEIDE meters te tellen');
+        /* De bedrading, voor allebei: norm.js hoort deze twee velden uit dezelfde
+           meting over te nemen. Een verwisseling (dbDeurenSchrijvend gevuld met
+           het deurental) overleeft de assert hierboven wel en deze niet. */
+        const rechtstreeks = deuren.meet();
+        assert.equal(na.dbDeuren, rechtstreeks.deuren, 'norm.js geeft dbDeuren door uit deuren.meet()');
+        assert.equal(na.dbDeurenSchrijvend, rechtstreeks.schrijvendeDeuren,
+          'norm.js geeft dbDeurenSchrijvend door uit deuren.meet(), en niet per ongeluk het deurental');
+        return na.dbDeurenSchrijvend - voor.dbDeurenSchrijvend;
+      })
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
@@ -879,6 +935,7 @@ test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
+    'server/kern/zz-ijk-tijdelijk-deur.js', 'server/kern/zz-ijk-tijdelijk-schrijf.js',
     'server/kern/zz-ijk-tijdelijk-c.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }

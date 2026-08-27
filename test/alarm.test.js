@@ -24,6 +24,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakAlarm } = require('../server/kern/command/alarm');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 function maak(opties) {
   const o = opties || {};
@@ -31,7 +32,7 @@ function maak(opties) {
   const regels = [];
   const seinen = [];
   const alarm = maakAlarm({
-    db, save: () => {},
+    db, opslag: maakCmdOpslag({ db }), save: () => {},
     journaal: {
       noteer: r => regels.push(r),
       controleer: () => (o.ketenStuk ? { heel: false, bij: 'r1', waarom: 'de regel is gewijzigd' } : { heel: true })
@@ -90,7 +91,7 @@ test('een opgelost alarm meldt zich af', () => {
   const regels = [], seinen = [];
   let stuk = true;
   const alarm = maakAlarm({
-    db, save: () => {},
+    db, opslag: maakCmdOpslag({ db }), save: () => {},
     journaal: { noteer: r => regels.push(r), controleer: () => (stuk ? { heel: false, bij: 'r1' } : { heel: true }) },
     slo: { stand: () => ({ doelen: [] }) },
     sonde: { buitenkort: () => ({ gemeten: true }), stand: () => ({ buiten: { pogingen: 1, mislukt: 0 } }) },
@@ -112,7 +113,7 @@ test('een opgelost alarm meldt zich af', () => {
 test('een controle die omvalt is een melding en geen stilte', () => {
   const { alarm } = maak(RUSTIG);
   const kapot = maakAlarm({
-    db: { data: {} }, save: () => {},
+    opslag: maakCmdOpslag({ db: { data: {} } }), save: () => {},
     journaal: { noteer: () => {}, controleer: () => { throw new Error('de keten is onleesbaar'); } },
     slo: { stand: () => ({ doelen: [] }) },
     sonde: { buitenkort: () => ({ gemeten: true }), stand: () => ({ buiten: { pogingen: 1, mislukt: 0 } }) },

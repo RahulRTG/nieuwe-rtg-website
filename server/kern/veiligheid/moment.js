@@ -13,16 +13,14 @@
    zomertijdgrens of een verlopen mandaat -- en dan is de tijdmachine precies
    zoveel waard als het aantal modules dat meedoet (scripts/klok.js). */
 const klok = require('../../lib/klok');
-module.exports = ({ db, save, crypto, schoon, sociaal, plek }) => {
+module.exports = ({ opslag, save, crypto, schoon, sociaal, plek }) => {
   const MAX_DUUR_MIN = 48 * 60;
   const STATUSSEN = new Set(['gepland', 'onderweg', 'vertraagd', 'bijna-aangekomen', 'aangekomen', 'geannuleerd']);
   const NIVEAUS = new Set(['plan', 'voortgang', 'locatie']);
   const nu = () => klok.datum().toISOString();
 
   function lijst() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.momenten) db.data.veilig.momenten = [];
-    return db.data.veilig.momenten;
+    return opslag.tak('momenten');
   }
   const actief = m => m.status !== 'gestopt' && m.tot > klok.nu();
   const codenaam = h => sociaal.codenaamVan(h) || h;

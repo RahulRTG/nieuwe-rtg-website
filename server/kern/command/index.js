@@ -35,15 +35,16 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      maakt om dezelfde motoren op een BEPERKT register te draaien (de zaak-kant,
      server/kern/zaak/). Wie een beperkt register geeft, krijgt gegarandeerd een
      beperkt antwoord -- er is geen pad omheen. */
+  const opslag = require('./opslag')({ db });   // de enige db-aanraking; zie ./opslag.js
   const register = require('./register').RTG;
-  const journaal = require('./journaal').maakJournaal({ db, save, crypto });
-  const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal });
+  const journaal = require('./journaal').maakJournaal({ db, save, crypto, opslag });
+  const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, opslag });
   const risico = require('./risico').maakRisico({ beleid });
-  const toegang = require('./toegang').maakToegang({ db, save, crypto, journaal });
-  const zaken = require('./zaken').maakZaken({ db, save, crypto, journaal, beleid });
-  const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid, register });
-  const toezicht = require('./toezicht').maakToezicht({ db, save, journaal, beleid });
-  const operator = require('./operator').maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register });
+  const toegang = require('./toegang').maakToegang({ db, save, crypto, journaal, opslag });
+  const zaken = require('./zaken').maakZaken({ db, save, crypto, journaal, beleid, opslag });
+  const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, opslag });
+  const toezicht = require('./toezicht').maakToezicht({ db, save, journaal, beleid, opslag });
+  const operator = require('./operator').maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, opslag });
   const puls = require('./puls').maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid, register });
   const simulatie = require('./simulatie').maakSimulatie({ db, runbooks, zaken, beleid, risico, register });
   const werkbesparing = require('./werkbesparing').maakWerkbesparing({ journaal, zaken, runbooks });
@@ -67,7 +68,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      canary. Ze zijn uit dit bestand gehaald toen het over de 10 kB-grens ging;
      de naad lag er al, want dit zijn allemaal dingen die de ruggengraat
      GEBRUIKEN en die de ruggengraat zelf niet nodig heeft. */
-  const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern });
+  const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern, opslag });
   const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
 
   /* DE MEETKANT VAN NIVEAU 5, sinds de gezondheidskaart een eigen bestand: de
@@ -76,14 +77,14 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      daar; wat ze delen is dat geen van vijven iets twee keer meet. */
   const { sonde, slo, alarm, gezondheid, incident, bijstand, vlootbeeld } =
     require('./meetlagen').maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice,
-      tenant: () => kern && kern.tenant });
+      tenant: () => kern && kern.tenant, opslag });
 
   /* HERSTEL ALS TRANSACTIE: het enige pad waarlangs de routes een recept
      draaien. Na de kaart: zijn voorcontrole leest die. */
   const transactie = require('./transactie').maakTransactie({ db, runbooks, register, journaal, gezondheid });
 
   /* DE CONFIGURATIETIJDLIJN: drie bestaande bronnen op één lijn, niets eigens. */
-  const tijdlijn = require('./tijdlijn').maakTijdlijn({ db, journaal });
+  const tijdlijn = require('./tijdlijn').maakTijdlijn({ db, journaal, opslag });
 
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');

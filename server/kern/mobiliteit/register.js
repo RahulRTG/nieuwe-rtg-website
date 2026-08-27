@@ -25,14 +25,14 @@
 const { MODULES, OP_ID, NIVEAUS } = require('./modulecatalogus');
 
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, nu } = ctx;
+  const { db, save, crypto, schoon, nu, opslag } = ctx;
 
   function ensureRegister() {
-    if (!db.data.mobModules || typeof db.data.mobModules !== 'object') db.data.mobModules = {};
+    opslag.bak('mobModules');
   }
   const stand = id => {
     ensureRegister();
-    return db.data.mobModules[id] || null;
+    return opslag.bak('mobModules')[id] || null;
   };
 
   /* Stabiel percentage: dezelfde gebruiker krijgt bij dezelfde module altijd
@@ -97,7 +97,7 @@ module.exports = (ctx) => {
         if (!r.aan) return { status: 409, error: m.naam + ' kan niet aan: ' + OP_ID[v].naam + ' staat uit (' + r.reden + ').', ontbreekt: v };
       }
     }
-    const s = db.data.mobModules[id] || (db.data.mobModules[id] = {});
+    const s = opslag.bak('mobModules')[id] || (opslag.bak('mobModules')[id] = {});
     if (!niveau) {
       s.wereld = aan;
     } else {
@@ -119,7 +119,7 @@ module.exports = (ctx) => {
   function modStoring(id, reden) {
     ensureRegister();
     if (!OP_ID[id]) return { status: 404, error: 'Onbekende vervoersmodule.' };
-    const s = db.data.mobModules[id] || (db.data.mobModules[id] = {});
+    const s = opslag.bak('mobModules')[id] || (opslag.bak('mobModules')[id] = {});
     s.storing = reden ? { sinds: nu(), reden: schoon(reden, 200) } : null;
     save();
     return { ok: true, id, storing: s.storing };

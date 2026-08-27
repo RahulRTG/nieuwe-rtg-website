@@ -35,7 +35,7 @@
 const UIT_FISCAAL = { minimumUurloon: 'uurloonMin', vakantiegeld: 'vakantiegeld', premies: 'lasten' };
 const NIET_UIT_FISCAAL = ['loonheffing', 'zvw'];
 
-function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
+function maakDekking({ opslag, save, nu, regelpakket, LANDEN, accounts }) {
   const tijd = nu || (() => new Date().toISOString());
   const norm = (l) => String(l || 'NL').toUpperCase();
 
@@ -45,7 +45,7 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
      het overzicht precies het land waar net een zaak is bijgekomen. */
   function landenMetWerk() {
     const per = new Map();
-    for (const s of (db.data.suppliers || [])) {
+    for (const s of opslag.vreemd.leveranciers()) {
       const land = norm((s.settings && s.settings.land) || 'NL');
       if (!per.has(land)) per.set(land, { land, zaken: 0, personeel: 0, codes: [] });
       const r = per.get(land);
@@ -59,7 +59,7 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
   /* Het BRONNENREGISTER (welk adres levert het regelpakket van welk land) staat
      in ./dekking-bronnen.js: een eigen onderwerp naast de vraag of een land kan
      draaien, en dit bestand ging over de 10 KB. */
-  const bronnen = require('./dekking-bronnen')({ db, save, tijd });
+  const bronnen = require('./dekking-bronnen')({ opslag, save, tijd });
   const { bronnenVan, alleBronnen, zetBron, haalBronWeg, noteerBron } = bronnen;
 
   /* ---------- de dekking ---------- */

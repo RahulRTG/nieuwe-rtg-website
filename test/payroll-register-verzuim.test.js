@@ -31,6 +31,7 @@ const { maakJournaal, TEGENREKENINGEN } = require('../server/kern/payroll/journa
 const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
 const { maakRun } = require('../server/kern/payroll/run');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 function klok() { let t = 0; return () => '2026-04-01T10:0' + (t++ % 10) + ':00.000Z'; }
 
@@ -38,7 +39,7 @@ function klok() { let t = 0; return () => '2026-04-01T10:0' + (t++ % 10) + ':00.
 
 test('een sector voegt zijn eigen component toe, zonder dat er code verandert', () => {
   const db = { data: {} };
-  const comp = maakComponenten({ db, save: () => {}, nu: klok() });
+  const comp = maakComponenten({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
   const voor = comp.alle().length;
 
   const r = comp.zet({ sleutel: 'wachttijd', naam: 'Wachttijd', soort: 'bruto', belast: true,
@@ -53,7 +54,7 @@ test('een sector voegt zijn eigen component toe, zonder dat er code verandert', 
 
 test('de keuring houdt een component tegen die de motor zou laten gokken', () => {
   const db = { data: {} };
-  const comp = maakComponenten({ db, save: () => {}, nu: klok() });
+  const comp = maakComponenten({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
 
   const geenGrondslag = comp.zet({ sleutel: 'bonus', naam: 'Bonus', soort: 'bruto', belast: true,
     grondslagen: [], invoerbron: 'handmatig', goedkeuring: 'manager' }, 'A. Bakker');
@@ -77,7 +78,7 @@ test('de keuring houdt een component tegen die de motor zou laten gokken', () =>
 
 test('een component die vervalt verdwijnt niet, maar telt niet meer mee', () => {
   const db = { data: {} };
-  const comp = maakComponenten({ db, save: () => {}, nu: klok() });
+  const comp = maakComponenten({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
   comp.zet({ sleutel: 'caotoeslag', naam: 'Cao-toeslag 2026', soort: 'bruto', belast: true,
     grondslagen: ['loonheffing'], invoerbron: 'handmatig', goedkeuring: 'manager',
     geldigVan: '2026-01-01', geldigTot: '2026-06-30' }, 'A. Bakker');
@@ -94,14 +95,14 @@ function runOpzet() {
   const db = { data: {} };
   const save = () => {};
   const nu = klok();
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp({ land: 'NL', versie: 'nl-2026.1', geldigVan: '2026-01-01', geldigTot: '2026-12-31',
     valuta: 'EUR', regels: { minimumUurloon: { '21+': 1499 }, loonheffing: { tarief: 0.37 },
       premies: { tarief: 0.20 }, zvw: 0.0657, vakantiegeld: 0.08 } }, { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
   const r = run.open({ code: 'MERIDIAAN', zaak: 'Meridiaan Toren', periode: '2026-03', land: 'NL',
     regels: [{ staffId: 7, naam: 'Timo Vos', contract: { uurloonCenten: 1800, soort: 'vast' },
       invoer: [{ component: 'gewerkte_uren', aantal: 160 }], leeftijdsgroep: '21+', gewerkteUren: 160 }],
@@ -200,7 +201,7 @@ test('sluitAan maakt geen tweede bestand als er al een is', () => {
 
 test('een leidinggevende ziet DAT iemand er niet is, niet WAT hij heeft', () => {
   const db = { data: {} };
-  const verzuim = maakVerzuim({ db, save: () => {}, nu: klok() });
+  const verzuim = maakVerzuim({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
   verzuim.meld('MERIDIAAN', 7, { soort: 'ziek', van: '2026-03-09', tot: '2026-03-13' }, 'Timo Vos');
   verzuim.meld('MERIDIAAN', 7, { soort: 'vakantie', van: '2026-03-23', tot: '2026-03-27' }, 'Timo Vos');
 
@@ -219,7 +220,7 @@ test('een leidinggevende ziet DAT iemand er niet is, niet WAT hij heeft', () => 
 
 test('wat iemand nog wel kan, kan worden bijgesteld -- en dat is wat de planning leest', () => {
   const db = { data: {} };
-  const verzuim = maakVerzuim({ db, save: () => {}, nu: klok() });
+  const verzuim = maakVerzuim({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
   verzuim.meld('MERIDIAAN', 7, { soort: 'ziek', van: '2026-03-09', tot: '2026-03-27' }, 'Timo Vos');
 
   assert.equal(verzuim.voorPlanning('MERIDIAAN', 7, '2026-03-01', '2026-03-31')[0].inzetbaarheid, 'niets',
@@ -239,7 +240,7 @@ test('wat iemand nog wel kan, kan worden bijgesteld -- en dat is wat de planning
 
 test('inzetbaarheid kent vier standen en geen vijfde, en geen veld voor waarom', () => {
   const db = { data: {} };
-  const verzuim = maakVerzuim({ db, save: () => {}, nu: klok() });
+  const verzuim = maakVerzuim({ opslag: maakOpslag({ db }), save: () => {}, nu: klok() });
   verzuim.meld('MERIDIAAN', 7, { soort: 'ziek', van: '2026-03-09', tot: '2026-03-27' }, 'Timo Vos');
   assert.equal(verzuim.zetInzetbaarheid('MERIDIAAN', 7, '2026-03-09', 'bijna beter', 'Timo Vos').status, 400);
   assert.equal(verzuim.zetInzetbaarheid('MERIDIAAN', 7, '2026-03-09', 'deels', '').status, 400,

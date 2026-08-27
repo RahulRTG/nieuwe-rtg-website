@@ -35,7 +35,7 @@ const klok = require('../../lib/klok');
 const niveaus = require('./bijstand-niveaus');
 const melden = require('./bijstand-melden');
 
-function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
+function maakBijstand({ opslag, save, crypto, journaal, tenant, diagnose }) {
   const nu = () => klok.datum().toISOString();
   /* De tenantlaag komt LUI binnen. Zij wordt in server/opzet/routes-dwars.js
      opgehangen en dat gebeurt vóór de aanbouw -- maar een laag die van die
@@ -44,8 +44,7 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
   const tenantNu = () => (typeof tenant === 'function' ? tenant() : tenant) || null;
 
   function rij() {
-    if (!Array.isArray(db.data.bijstand)) db.data.bijstand = [];
-    return db.data.bijstand;
+    return opslag.bak('bijstand');
   }
   const vind = (id) => rij().find(s => s.id === String(id)) || null;
 
@@ -67,7 +66,7 @@ function maakBijstand({ db, save, crypto, journaal, tenant, diagnose }) {
   /* HET BERICHT AAN DE KLANT. Het journaal hierboven is van RTG; dit schrijft in
      het journaal van de KLANT, dat hij zelf al leest. Zie ./bijstand-melden.js
      voor waarom dat kanaal en geen ander. */
-  const meld = (s, wat, reden) => melden.meld({ db, save }, s, wat, reden);
+  const meld = (s, wat, reden) => melden.meld({ opslag, save }, s, wat, reden);
 
   function kort(s) {
     return { id: s.id, org: s.org, orgNaam: s.orgNaam, onderwerp: s.onderwerp, niveau: s.niveau,

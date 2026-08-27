@@ -1,10 +1,11 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const maak=require('../server/kern/veiligheid/moment');
+const maakOpslag=require('../server/kern/veiligheid/opslag');
 
 function kern(){
   const db={data:{}},vrienden=new Set(['a:b','b:a']);
-  const m=maak({db,save(){},crypto:{randomBytes(){return Buffer.from('123456789012')}},schoon(v,n){return String(v||'').slice(0,n)},
+  const m=maak({opslag:maakOpslag({db}),save(){},crypto:{randomBytes(){return Buffer.from('123456789012')}},schoon(v,n){return String(v||'').slice(0,n)},
     sociaal:{codenaamVan(h){return h==='a'?'ALFA':'BRAVO'},zijnVrienden(a,b){return vrienden.has(a+':'+b)}},
     plek:{plekVoorContact(){return {lat:52.1,lon:4.3,live:true}}}});
   return {m,db};

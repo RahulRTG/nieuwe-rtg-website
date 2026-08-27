@@ -18,10 +18,9 @@ module.exports = (ctx) => {
      mutatie reist mee met de eerstvolgende save van iets anders -- en dan
      groeit de opslag met een rij per kijker. Dezelfde valkuil die
      kern/geldbeleid met zijn kijk/pak-paar al vermijdt. */
-  function mecenaatKijk(key) {
-    const l = (db.data.lifestyle || {})[key];
-    return Array.isArray(l && l.mecenaat) ? l.mecenaat : [];
-  }
+  /* KIJKEN EN NIET PAKKEN -- zie de kop hierboven. levensdossier.leesVeld()
+     maakt het veld niet aan, dus een kijker laat geen rij achter. */
+  const mecenaatKijk = (key) => ctx.levens.leesVeld(key, 'mecenaat');
 
   function mecGift(key, b) {
     const doel = schoon(b.doel, 100);

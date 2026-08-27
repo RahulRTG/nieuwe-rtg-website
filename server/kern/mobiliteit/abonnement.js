@@ -24,7 +24,7 @@ const PERIODE_MAX = 366;
 
 module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, pay, findSupplier,
-    modAan, overeenkomstVoor, magVerkopen, notify, ensureKaartjes, kaartenVan } = ctx;
+    modAan, overeenkomstVoor, magVerkopen, notify, ensureKaartjes, kaartenVan, opslag } = ctx;
 
   const dagenMs = d => d * 24 * 3600 * 1000;
 
@@ -90,7 +90,7 @@ module.exports = (ctx) => {
       geldigTot: new Date(start.getTime() + dagenMs(dagen)).toISOString(),
       overeenkomst: o.id, validaties: [], terugbetaald: null, gekocht: nu()
     };
-    db.data.mobKaartjes.push(a);
+    opslag.bak('mobKaartjes').push(a);
     save();
     notify(session.key, { icon: 'ticket', title: 'RTG OV',
       body: 'Uw abonnement bij ' + zaak.name + ' loopt tot ' + a.geldigTot.slice(0, 10) + '.', scope: 'ov' });

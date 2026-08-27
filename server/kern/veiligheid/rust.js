@@ -12,7 +12,7 @@
    Verder eindigt elke stand vanzelf. Geen enkele rustoptie blijft per ongeluk
    dagen aan staan, en een stand die aan een thuiskomst hangt gaat uit zodra
    je incheckt in de Thuiswacht. */
-module.exports = ({ db, save, schoon }) => {
+module.exports = ({ opslag, save, schoon }) => {
   const nu = () => new Date().toISOString();
 
   /* De standen. Bewust een korte lijst met een duidelijk verschil; niet
@@ -36,9 +36,7 @@ module.exports = ({ db, save, schoon }) => {
   };
 
   function lijsten() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.rust) db.data.veilig.rust = {};
-    return db.data.veilig.rust;
+    return opslag.tak('rust');
   }
 
   function rustStand(handle) {

@@ -123,19 +123,18 @@ function keur(c) {
   return bez;
 }
 
-function maakComponenten({ db, save, nu }) {
+function maakComponenten({ opslag, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
 
-  function bak() {
-    if (!db.data.payrollComponenten || typeof db.data.payrollComponenten !== 'object') {
-      db.data.payrollComponenten = {};
-      // de basisset komt er een keer in; daarna is hij gewoon te wijzigen
-      for (const c of BASIS) db.data.payrollComponenten[c.sleutel] =
-        Object.assign({}, c, { geldigVan: null, geldigTot: null, basis: true, at: tijd() });
-      save();
-    }
-    return db.data.payrollComponenten;
-  }
+  /* De basisset komt er EEN keer in, bij het aanmaken; daarna is hij gewoon te
+     wijzigen. Dat zaaien blijft HIER en verhuist niet naar het opslagcontract:
+     wat een looncomponent is, is domeinkennis, en een opslaglaag die dat weet
+     is precies de vermenging die het contract moet voorkomen. */
+  const bak = () => opslag.bak('payrollComponenten', (kaart) => {
+    for (const c of BASIS) kaart[c.sleutel] =
+      Object.assign({}, c, { geldigVan: null, geldigTot: null, basis: true, at: tijd() });
+    save();
+  });
 
   const alle = () => Object.values(bak());
   const een = (sleutel) => bak()[String(sleutel || '')] || null;

@@ -15,9 +15,9 @@
 
 const MAX_RIJEN = 5000;
 
-function maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s }) {
+function maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s, opslag }) {
   const rijen = (p) => {
-    const v = db.data ? db.data[p.collectie] : null;
+    const v = opslag.vak()[p.collectie] || null;
     return Array.isArray(v) ? v.slice(0, MAX_RIJEN) : [];
   };
 

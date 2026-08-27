@@ -42,9 +42,9 @@ const MAX_TOKENS = 8;
 const { maakUitdaging } = require('./sleutelwoorden-uitdaging');
 
 function maakSleutelwoorden({ db, save, crypto, accounts, slot }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/sleutelwoorden', bezit: { sleutelwoorden: 'kaart' } });
   const rij = () => {
-    if (!db.data.sleutelwoorden || typeof db.data.sleutelwoorden !== 'object') db.data.sleutelwoorden = {};
-    return db.data.sleutelwoorden;
+    return eigen.bak('sleutelwoorden');
   };
   /* Het slot is gedeeld (server/pinslot.js); hier stond een eigen kopie van
      dezelfde teller zonder opruimronde. Zie de kop van dat bestand. */

@@ -29,16 +29,11 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, findSupplier, tijdVandaag } = ctx;
+  const { db, save, crypto, schoon, findSupplier, tijdVandaag, opslag } = ctx;
 
   const nu = () => new Date().toISOString();
 
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!db.data.concern.vestigingen || typeof db.data.concern.vestigingen !== 'object')
-      db.data.concern.vestigingen = {};
-    return db.data.concern.vestigingen;
-  }
+  const bak = () => opslag.tak('vestigingen');
 
   const vind = (id) => bak()[String(id || '')] || null;
   const vanEntiteit = (entiteitId) => Object.values(bak()).filter(v => v.entiteit === entiteitId && !v.gesloten);

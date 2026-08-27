@@ -28,6 +28,7 @@ const assert = require('node:assert/strict');
 
 const { maakStadstart } = require('../server/kern/command/stadstart');
 const { maakLandpakket } = require('../server/kern/command/landpakket');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 const fiscaal = require('../server/kern/fiscaal/landen');
 const valuta = require('../server/kern/payroll/valuta');
 const { plaatsNorm } = require('../server/functies/toegang');
@@ -37,7 +38,7 @@ function maak() {
   const regels = [];
   const journaal = { noteer: r => regels.push(r) };
   const functies = { OP_ID: { 'supplier-pos': { id: 'supplier-pos' } } };
-  const landpakket = maakLandpakket({ db, save: () => {}, journaal, fiscaal, valuta,
+  const landpakket = maakLandpakket({ db, opslag: maakCmdOpslag({ db }), save: () => {}, journaal, fiscaal, valuta,
     talen: () => db.data.talen, functies });
   /* Een nagemaakt weefsel dat zich als het echte gedraagt: het kent zones per
      stad en alleen van steden die er zijn gezet. */
@@ -50,7 +51,7 @@ function maak() {
       return { stad: { id: 'G-x-stad', naam }, zones: bak[naam] };
     }
   };
-  const stad = maakStadstart({ db, save: () => {}, journaal, landpakket, functies, plaatsNorm, weefsel });
+  const stad = maakStadstart({ db, opslag: maakCmdOpslag({ db }), save: () => {}, journaal, landpakket, functies, plaatsNorm, weefsel });
   return { db, stad, landpakket, regels, bak };
 }
 

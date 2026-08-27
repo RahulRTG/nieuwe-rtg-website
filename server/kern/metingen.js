@@ -88,7 +88,8 @@ function beeldVan(rijen, onderwerp, nu = new Date()) {
 }
 
 module.exports = ({ db, save }) => {
-  const bak = () => { if (!db.data.dagmetingen) db.data.dagmetingen = {}; return db.data.dagmetingen; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/metingen', bezit: { dagmetingen: 'kaart' } });
+  const bak = () => eigen.bak('dagmetingen');
   const vanLid = key => { const b = bak(); if (!b[key]) b[key] = {}; return b[key]; };
   const rijenVan = (key, onderwerp) => { const l = vanLid(key); if (!l[onderwerp]) l[onderwerp] = []; return l[onderwerp]; };
 

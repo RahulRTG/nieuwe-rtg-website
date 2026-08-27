@@ -39,6 +39,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakTijdlijn } = require('../server/kern/command/tijdlijn');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const T = (min) => new Date(Date.parse('2026-08-24T12:00:00.000Z') - min * 60000).toISOString();
 const NU = '2026-08-24T12:00:00.000Z';
@@ -62,7 +63,7 @@ function opstelling() {
       niveau: 'auto', reden: 'ritten hervat' }
   ];
   const journaal = { recent: () => regels.slice().reverse() };
-  return { db, tijdlijn: maakTijdlijn({ db, journaal }) };
+  return { db, tijdlijn: maakTijdlijn({ db, opslag: maakCmdOpslag({ db }), journaal }) };
 }
 
 test('1. drie bronnen op één lijn, elk met zijn naam erbij', () => {

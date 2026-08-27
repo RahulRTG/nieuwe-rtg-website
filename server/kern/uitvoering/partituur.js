@@ -87,6 +87,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
 
   function zet(sess, opdracht) {
     const o = opdracht || {};
+    let verkoperLet = null;
     const p = vanMij(sess.key, o.id);
     if (!p) return { status: 404, error: 'Deze partituur bestaat niet, of is niet van u.' };
     if (o.weg === true) {
@@ -117,6 +118,13 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
       if (prijs > 0 && !(o.aanspraakNodig || p.aanspraakNodig))
         return { status: 400, error: 'Een prijs vraagt om een aanspraak: zonder die deur betaalt iemand voor iets dat toch al opengaat.' };
       p.prijsCenten = prijs;
+      /* WIE HIER DE VERKOPER IS. Staat op het moment dat iemand een prijs zet en
+         niet in voorwaarden die niemand leest; de redenering staat in de kop van
+         ./aanbod.js. */
+      if (prijs > 0) verkoperLet = 'U verkoopt dit zelf: het geld gaat rechtstreeks van de koper naar u, en RTG is ' +
+        'geen verkoper of tussenpersoon. Wat u daarover moet aangeven, bepaalt u zelf. ' +
+        'Onder "wat kwam er binnen" (RTG Pay) staat per jaar wat er via RTG bij u is binnengekomen, ' +
+        'met een uitdraai voor uw boekhouder.';
     }
     if (o.maxS != null) {
       const n = Math.round(Number(o.maxS));
@@ -132,7 +140,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
       p.klaar = !!o.klaar;
     }
     p.bijgewerkt = nu(); save();
-    return { status: 200, ok: true, partituur: beeld(p, true) };
+    return { status: 200, ok: true, partituur: beeld(p, true), let: verkoperLet };
   }
 
   /* Wat er IN een partituur zit -- erbij, eruit, verplaatsen, en de
@@ -143,25 +151,8 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
   const handeling = require('./handeling')({ catalogus, partituurMet: met, codenaamVan: null });
   const { onderdeel, eigenWerk } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN, handeling });
 
-  /* WAT ER OPENSTAAT VOOR IEDEREEN. De Media OS leest dit als vijfde vorm, zodat
-     een partituur in dezelfde wereld verschijnt als muziek, video, clips en live
-     -- geen tweede wereld en geen tweede volgknop (LAT.md regel 4).
-
-     Alleen KLAARGEZETTE partituren, en bewust zonder de onderdelen: wie er niet
-     in mag, hoort niet te zien waaruit het werk bestaat. Wat er WEL bij staat is
-     de duur en of er een aanspraak voor nodig is -- dat is wat iemand nodig
-     heeft om te kiezen of hij erop tikt. */
-  function openbaar(codenaamVan) {
-    return tabel().filter(p => p.klaar).map(p => ({
-      id: p.id, naam: p.naam, key: p.key,
-      codenaam: codenaamVan ? codenaamVan(p.key) : null,
-      kernS: (p.onderdelen || []).filter(o => o.rol === 'kern').reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
-      totaalS: (p.onderdelen || []).reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
-      onderdelen: (p.onderdelen || []).length,
-      aanspraakNodig: p.aanspraakNodig || null, prijsCenten: p.prijsCenten || 0,
-      toestemming: p.toestemming, at: p.at
-    }));
-  }
+  /* Wat de WERELD van een partituur ziet, staat in ./partituurbeeld.js. */
+  const { openbaar } = require('./partituurbeeld')({ tabel });
 
   const mijne = (sess) => ({ status: 200, partituren: tabel().filter(p => p.key === sess.key).map(p => beeld(p, true)), rollen: ROLLEN });
 

@@ -206,6 +206,38 @@ dit een zelfstandige capability, of een tweede ingang naar dezelfde?
 
 ---
 
+## 4.7 Wie de belasting betaalt, en wat dat NIET dekt
+
+**Besluit van de eigenaar (27 augustus 2026): bij een verkoop tussen leden is de
+particulier zelf verantwoordelijk voor zijn belasting; RTG geeft de tools.** Dat
+is het facilitator-model, en het is verdedigbaar: RTG is geen verkoper en geen
+tussenpersoon, het geld gaat rechtstreeks van koper naar verkoper.
+
+Dat besluit heeft een tweede helft die makkelijk blijft liggen: **"wij geven
+alleen de tools" is een belofte, en die moet in code staan** (LAT-regel 6). Tot
+27 augustus kon een lid dertig grootboekregels en zijn saldo zien — daar valt
+geen aangifte mee te doen. Sindsdien is er `kern/pay/inkomsten.js`: wat kwam er
+in een jaar binnen, per soort, met aantallen, en als uitdraai voor een
+boekhouder. Met een blok dat even groot is als het bedrag en zegt wat er **niet**
+in zit (geld buiten RTG Pay, eigen stortingen, en dat dit omzet is en geen
+winst). Een overzicht dat zich groter voordoet dan het is, laat iemand een
+verkeerde aangifte doen.
+
+**Wat dit besluit níét dekt, en dat blijft bij RTG liggen.** DAC7 (EU-richtlijn
+2021/514) legt een rapportageplicht bij de **platformexploitant**, niet bij de
+verkoper: vanaf 30 transacties óf 2.000 euro per jaar moet de exploitant
+verkopersgegevens verzamelen en aanleveren. Wie de belasting betaalt verandert
+daar niets aan. Zolang de verkoopvolumes klein zijn is dat theorie; het wordt
+praktijk op precies het moment dat de rest van dit document slaagt.
+
+Wat er nu al voor ligt: het inkomstenoverzicht telt per soort en per jaar,
+inclusief **aantallen** — dat is het getal waar de drempel op staat. Wat
+ontbreekt is de kant van RTG: welke verkopers over de drempel gaan, welke
+gegevens er dan verzameld moeten worden, en wie dat aanlevert. Dat is een
+besluit met een jurist, geen sprint.
+
+---
+
 ## 5. Waar het omvalt als het omvalt
 
 Niet op de techniek van het handelen — dat staat er grotendeels. Op de

@@ -2271,6 +2271,13 @@
       "gezakt": 2,
       "geprobeerd": 2
     },
+    "inkomsten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "inkoopketen.test.js": {
       "soort": "server",
       "staat": "gezakt",

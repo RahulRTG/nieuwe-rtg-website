@@ -3325,6 +3325,25 @@ Een maker legt een **universum** vast: een stijl, een ladder, een tempobereik en
 
 `test/muziekuniversum.test.js` legt negen dingen vast, waaronder de drie die elkaar in de weg lijken te zitten: twee luisteraars horen iets anders, dezelfde luisteraar hoort de hele dag hetzelfde, en met een zaad is elke vertolking exact terug te vinden. Drie mutaties raak. Ook getoetst: het tempo klemt niet op één waarde — twee steekproeven landden bij het bouwen allebei op de bovengrens, en die schrik hoort in een toets en niet in een herinnering (over 200 zaden: zestien verschillende tempo's).
 
+### Wat kwam er binnen (het gereedschap bij "u bent zelf verantwoordelijk")
+
+`server/kern/pay/inkomsten.js` + `POST /api/pay/inkomsten` en `/api/pay/inkomsten.csv`. Bij een verkoop tussen leden is de particulier zelf verantwoordelijk voor zijn belasting — RTG is geen verkoper en geen tussenpersoon. Dat is een besluit, en het heeft een tweede helft: **"wij geven alleen de tools" is een belofte, en die moet in code staan** (`LAT.md` regel 6). Tot dit bestand er was, kon een lid dertig grootboekregels en zijn saldo zien; daar valt geen aangifte mee te doen.
+
+Wat er nu is: alles wat er in een jaar via RTG Pay binnenkwam, **per soort en met aantallen**, plus een csv voor de boekhouder.
+
+**Vier dingen die het met opzet níét is, en ze staan alle vier in het antwoord zelf** — een overzicht dat zich groter voordoet dan het is, laat iemand een verkeerde aangifte doen:
+
+- het is **geen aangifte en geen advies**, het is wat RTG heeft geboekt;
+- het is **niet compleet**: contant geld, een bankoverschrijving en betalingen via de betaalprovider (zoals in de marktplaats) staan er niet in;
+- het is **geen winst**: wat het gekost heeft weet RTG niet;
+- **opladen is geen inkomen** — je eigen geld op je wallet zetten is geen ontvangst van een ander, en zonder die uitsluiting geeft iemand zijn eigen stortingen als omzet op.
+
+De csv gebruikt de ontsnapper van het huis (`kern/factuur.js`), die een cel die met `=`, `+`, `-` of `@` begint achter een apostrof zet — zodat een boekhouder geen **formule** opent uit een omschrijving die een vreemde heeft getypt. En hij draagt zijn grenzen in het bestand zelf: een csv belandt los van het scherm op een bureau en moet zichzelf kunnen uitleggen.
+
+De maker leest dezelfde positie op het moment dat het ertoe doet — wanneer hij een prijs zet — en de koper op de bon, zodat hij weet bij wie hij een factuur vraagt. Niet in voorwaarden die niemand leest.
+
+**Wat dit niet dekt:** DAC7 legt een rapportageplicht bij het *platform*, niet bij de verkoper. Die blijft bij RTG liggen; zie `EXCHANGE.md` par. 4.7.
+
 ### Uitvoerende media (RTG speelt media niet af, RTG voert media uit)
 
 `server/kern/uitvoering/` + `/api/uitvoering/...`. Een maker publiceert geen bestand maar een **partituur**: fragmenten, welke daarvan onmisbaar zijn, wat RTG ermee mag doen en wie het mag zien. RTG bouwt daar op het moment van vragen één **uitvoering** van. De volledige redenering, inclusief wat er niet is en waarom, staat in `UITVOEREND.md`.

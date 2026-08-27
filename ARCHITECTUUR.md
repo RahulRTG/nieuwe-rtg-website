@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4156 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4158 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4156 |
-| servermodules (`server/**/*.js`) | 2393 |
-| routebestanden (`server/routes/**`) | 485 |
-| kernmodules (`server/kern/**`) | 1474 |
+| API-endpoints | 4158 |
+| servermodules (`server/**/*.js`) | 2396 |
+| routebestanden (`server/routes/**`) | 486 |
+| kernmodules (`server/kern/**`) | 1476 |
 | schermen (`public/**/*.html`) | 269 |
 | gedeelde browsermodules (`public/shared/*.js`) | 229 |
-| toetsbestanden (`test/*.test.js`) | 980 |
+| toetsbestanden (`test/*.test.js`) | 981 |
 | schermtoetsen (`test/*.e2e.js`) | 140 |
 
 ## 2. De weg van een verzoek
@@ -118,7 +118,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 2372 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 2374 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -140,12 +140,12 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(176) auth(108) supplierAuth(56) officeAuth(39) db(36) status(27) liveCodename(27)
+app(177) auth(109) supplierAuth(56) officeAuth(39) db(36) liveCodename(28) status(27)
 accounts(23) schoon(21) managerOnly(16) codenaamVan(16) save(15) rtf(15)
-boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10)
+boardroomWie(11) geenGast(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10)
 rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)
-logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) mail(6) sseToSupplier(6)
-notifySupplier(6) boardroomAuth(6) pay(6) talen(6) appUrl(5) onboarding(5) tenant(5)
+logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) pay(7) mail(6) sseToSupplier(6)
+notifySupplier(6) boardroomAuth(6) talen(6) appUrl(5) onboarding(5) tenant(5)
 loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 ```
 

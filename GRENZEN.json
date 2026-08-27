@@ -1241,6 +1241,9 @@
       "onboarding",
       "pay"
     ],
+    "pay-inkomsten": [
+      "pay"
+    ],
     "pay-terug": [
       "pay"
     ],

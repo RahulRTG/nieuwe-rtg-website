@@ -49,6 +49,9 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     res.json(pay.overzicht(liveCodename(req.session)));
   });
+  // DE INKOMSTEN (./pay-inkomsten.js): apart, want die twee routes LEZEN alleen.
+  require('./pay-inkomsten')(kern, { geenGast });
+
   // opladen (Apple Pay/kaart via de betaal-naad)
   app.post('/api/pay/oplaad', auth, async (req, res) => {
     if (geenEchtAccount(req, res)) return;

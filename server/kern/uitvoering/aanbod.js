@@ -27,13 +27,27 @@
    aanspraak op -- niet twee van allebei, en ook niet een van het een en twee van
    het ander, wat de gevaarlijkste uitkomst zou zijn.
 
-   WAT DIT NIET DOET, en dat hoort er hardop bij te staan: RTG maakt hier GEEN
-   btw-stukken op. Dit is dezelfde rail en dus dezelfde grens als bij de
-   verkoopzone van het Podium, waar dat als open punt staat (TAKEN.md 4.16). Wie
-   van zijn werk een bedrijf maakt, hoort dat als zaak te doen -- en dan hoort de
-   verkoop over de partnerrekening te lopen zoals in de App Store, met de btw in
-   het land van de koper (kern/fiscaal/digitaal.js). Zolang dat er niet is, zegt
-   de bon dat met zoveel woorden in plaats van een tarief te verzinnen. */
+   WIE HIER DE VERKOPER IS -- besluit van de eigenaar, 27 augustus 2026. Bij een
+   verkoop tussen leden is de MAKER de verkoper. RTG is geen verkoper en geen
+   tussenpersoon: het geld gaat rechtstreeks van koper naar maker over dezelfde
+   rail als het Podium, en de particulier is zelf verantwoordelijk voor wat hij
+   aangeeft. RTG geeft daar het gereedschap voor (kern/pay/inkomsten.js: wat kwam
+   er binnen, per jaar, met een uitdraai) -- want "u bent zelf verantwoordelijk"
+   zonder gereedschap is een afschuiving en geen positie.
+
+   Dat staat op de bon van de KOPER (hij weet dan bij wie hij een factuur vraagt)
+   en bij de MAKER op het moment dat hij een prijs zet (kern/uitvoering/
+   partituur.js) -- niet in voorwaarden die niemand leest.
+
+   Wie van zijn werk een bedrijf maakt, hoort dat als zaak te doen; dan loopt de
+   verkoop over de partnerrekening zoals in de App Store, met de btw in het land
+   van de koper (kern/fiscaal/digitaal.js). Dat pad bestaat en is hier niet
+   aangesloten -- zie EXCHANGE.md.
+
+   WAT DEZE POSITIE NIET DEKT, en dat hoort erbij: DAC7 (EU 2021/514) legt een
+   rapportageplicht bij het PLATFORM, niet bij de verkoper -- vanaf 30
+   transacties of 2.000 euro per jaar. Die verplichting blijft bij RTG liggen,
+   ongeacht wie de belasting betaalt. Staat als open punt in EXCHANGE.md. */
 'use strict';
 
 const MIN_CENTEN = 100;        // een euro; daaronder kost de boeking meer dan hij opbrengt
@@ -58,8 +72,9 @@ module.exports = ({ partituur, aanspraak, pay, codenaamVan, onboarding }) => {
         'van de partituur -- de lengte hangt af van wat u vraagt en van wat de maker toestaat.',
       /* Wat RTG hier NIET doet. Een bon die alleen het mooie deel noemt, is een
          bon die de koper later verrast (LAT.md regel 6). */
-      nietGebouwd: 'RTG maakt van deze aankoop geen btw-factuur op en verzorgt geen retourregeling. ' +
-        'Het geld gaat rechtstreeks van u naar de maker, zoals bij het Podium; RTG is hier geen verkoper.',
+      nietGebouwd: 'De maker verkoopt dit zelf; RTG is geen verkoper en geen tussenpersoon. ' +
+        'Het geld gaat rechtstreeks van u naar hem, zoals bij het Podium. RTG maakt hier dus geen ' +
+        'btw-factuur op en verzorgt geen retourregeling -- wilt u een factuur, vraag die aan de maker.',
       let: 'U betaalt ' + (p.prijsCenten / 100).toFixed(2) + ' euro aan de maker. Bevestigen doet u zelf.'
     };
   }

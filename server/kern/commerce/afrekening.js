@@ -35,15 +35,12 @@
 'use strict';
 
 const { kan, waaromNiet } = require('./vermogens');
-
-const centenVan = (p) => {
-  if (!p) return null;
-  for (const v of [p.centen, p.bedrag, p.vanaf]) {
-    const n = Math.round(Number(v));
-    if (Number.isFinite(n)) return n;
-  }
-  return null;
-};
+/* HET BEDRAG WORDT HIER NIET OPNIEUW GELEZEN. `bedrag` staat in EURO'S en
+   `vanaf` is een vlag en geen bedrag -- twee dingen die deze laag allebei een
+   keer verkeerd om heeft gehad, en een tweede lezer zou ze een tweede keer
+   verkeerd om kunnen krijgen (LAT-regel 4). De uitleg staat bij de bron in
+   ./koopbaar.js. */
+const { vastBedragCenten: centenVan } = require('./koopbaar');
 
 module.exports = ({ tariefVan, basisCat, zaakVan, capsVan }) => {
 

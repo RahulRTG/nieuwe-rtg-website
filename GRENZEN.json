@@ -2181,6 +2181,18 @@
       "vakbewijsZet",
       "vakbewijzenVan",
       "vakbewijzenVerlopend"
+    ],
+    "commerce": [
+      "aanbod",
+      "commerce",
+      "etalage",
+      "mandBeeld",
+      "mandLeeg",
+      "mandLees",
+      "mandZet",
+      "opzoeker",
+      "reken",
+      "status"
     ]
   }
 }

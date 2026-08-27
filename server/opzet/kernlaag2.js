@@ -42,6 +42,25 @@ Object.assign(kern, require('../kern/mall').maakMall(Object.assign(
   { db, save, crypto, isRetail: kern.retailIsRetail, anthropic },
   // de vier late bindingen (Thuis, Reiswijzer, Supplier OS): ./malldraden.js
   require('./malldraden')(kern))));
+/* RTG Commerce (kern/commerce/): de verkooplaag boven de domeinen -- vermogens
+   per koopbaar, een mand over verkopers heen, en een afrekening PER verkoper.
+   Leest de Mall en schrijft daar niets terug; zie COMMERCE.md.
+
+   Meteen achter de Mall omdat hij haar aanbodlaag leest, en `aanbodAlles` gaat
+   als FUNCTIE mee: de mall-api is een regel hierboven samengesteld, en een
+   vastgehouden verwijzing zou die van dat moment zijn.
+
+   De fiscale functies komen rechtstreeks uit kern/fiscaal/tarief.js en niet uit
+   de fiscale laag (kernlaag4c): dat bestand is puur en draagt geen state, en het
+   is met opzet de ENIGE bron van een btw-tarief in dit huis. */
+Object.assign(kern, require('../kern/commerce').maakCommerce({
+  db, save, nu: require('../lib/klok').nu,
+  aanbodAlles: () => kern.mall.aanbodAlles(),
+  tariefVan: require('../kern/fiscaal/tarief').tariefVan,
+  basisCat: require('../kern/fiscaal/tarief').basisCat,
+  zaakVan: findSupplier,
+  capsVan: (s) => db.capsVan(s)
+}));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('../kern/appbieb').maakAppbieb({ db, save }));

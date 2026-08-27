@@ -36,53 +36,7 @@
 'use strict';
 
 const { verklaar, zonder } = require('./vermogens');
-const { TYPEN } = require('../mall/aanbodvorm');
-
-/* Wat het type belooft. Gelezen als: dit is wat de cta van aanbodvorm.js
-   aankondigt, niet wat een bepaalde zaak heeft ingericht.
-
-   Drie typen beloven met opzet WEINIG:
-     marktplaats  "Bekijken" -- kern/markt regelt de deal tussen twee mensen
-                  zelf, met een eigen chat en een eigen bewijs. Er komt hier geen
-                  tweede weg naar dezelfde handel.
-     offerte      "Offerte aanvragen" -- er is per definitie nog geen bedrag.
-     abonnement   "Aanmelden" -- een doorlopende afschrijving is een bevoegdheid
-                  en geen vermogen; zie NIET_GEBOUWD.abonnement in ./vermogens.js.
-                  Tot die er is, blijft het bij tonen en een prijs noemen. */
-const TYPE_VERMOGENS = {
-  product: ['prijs', 'beschikbaarheid', 'bevestig', 'lever', 'annuleer', 'retour'],
-  dienst: ['prijs', 'beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
-  boeking: ['beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
-  huur: ['prijs', 'beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
-  ticket: ['prijs', 'beschikbaarheid', 'bevestig', 'lever'],
-  reis: ['prijs', 'bevestig'],
-  verblijf: ['prijs', 'beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
-  eten: ['prijs', 'beschikbaarheid', 'bevestig', 'lever'],
-  vervoer: ['prijs', 'beschikbaarheid', 'bevestig', 'annuleer'],
-  marktplaats: [],
-  abonnement: ['prijs'],
-  offerte: []
-};
-
-/* Een prijs is er, of hij is er niet. kern/mall/aanbod.js zet `prijs` op null
-   wanneer een bron er geen kent, en dat is met opzet iets anders dan nul: nul is
-   gratis, null is onbekend. Een bedrag van nul houdt dus WEL het vermogen
-   `prijs` -- gratis is een prijs. */
-const heeftBedrag = (p) => !!(p && (Number.isFinite(Number(p.centen)) || Number.isFinite(Number(p.bedrag)) || Number.isFinite(Number(p.vanaf))));
-
-/* Waarom een belofte het niet haalt, in een zin die een ondernemer kan lezen en
-   waarop hij kan handelen. Geen "niet beschikbaar" -- dat zegt niets over wat
-   hij moet doen. */
-const REDEN = {
-  prijs: 'Deze rij draagt geen bedrag. Zet een prijs op het artikel; zonder bedrag valt er niets te kopen.',
-  bevestig: 'Dit type belooft "Kopen", en kopen zonder bedrag bestaat niet. Zet een prijs, dan komt de koopknop terug.',
-  beschikbaarheid: 'Er is niets gemeten: geen voorraad, geen tijdslot en geen open/dicht. Stilte is geen beschikbaarheid.',
-  lever: 'Deze aanbieder heeft geen bezorging of afhaal ingericht, en dit type wordt niet digitaal uitgegeven.'
-};
-
-/* De typen die zonder bezorgschakelaar toch geleverd worden, omdat de levering
-   digitaal of ter plekke is. Een ticket komt in de app, eten komt aan tafel. */
-const LEVERT_ZELF = new Set(['ticket', 'eten']);
+const { TYPE_VERMOGENS, REDEN, LEVERT_ZELF, vastBedragCenten, heeftBedrag, TYPEN } = require('./koopbaarlijst');
 
 /* De vertaling. `rij` is een genormaliseerd aanbod-object uit
    kern/mall/aanbod.js; `extra` laat een domein vermogens TOEVOEGEN die het
@@ -101,6 +55,7 @@ function vanAanbod(rij, extra) {
      leiden; de rest (reserveer, annuleer, retour) hangt aan wat de aanbieder
      heeft ingericht en komt via `extra` binnen of komt niet. */
   const weg = [];
+  const redenNu = {};
   /* GEEN BEDRAG BIJ EEN TYPE DAT ER EEN BELOOFT, HAALT OOK DE KOOPKNOP WEG -- en
      dat staat HIER en niet in de vermogensgraaf. Die graaf liet `bevestig` eerst
      aan `prijs` hangen, en COMMERCE.json sloeg dat eruit: 25 domeinen bevestigen
@@ -114,6 +69,8 @@ function vanAanbod(rij, extra) {
   const beloofdePrijs = belooft.includes('prijs');
   if (eerst.heeft.includes('prijs') && !heeftBedrag(rij.prijs)) {
     weg.push('prijs');
+    // welke van de twee het is, bepaalt wat de ondernemer moet doen
+    if (rij.prijs && rij.prijs.vanaf) redenNu.prijs = REDEN.prijsVanaf;
     if (beloofdePrijs && eerst.heeft.includes('bevestig')) weg.push('bevestig');
   }
   if (eerst.heeft.includes('beschikbaarheid') && rij.beschikbaar == null && rij.open == null) weg.push('beschikbaarheid');
@@ -126,10 +83,11 @@ function vanAanbod(rij, extra) {
      een scherm dat ze op een hoop gooit zegt "geen prijs" onder een knop die
      wegviel omdat er niet geleverd wordt. */
   const recht = new Set(weg);
+  /* Een reden die alleen voor DEZE rij geldt, wint van de algemene. */
   const ontbreekt = na.weg.map(w => ({
     vermogen: w.vermogen,
     door: recht.has(w.vermogen) ? 'rij' : w.door,
-    reden: recht.has(w.vermogen) ? (REDEN[w.vermogen] || 'Deze rij maakt dit vermogen niet waar.')
+    reden: recht.has(w.vermogen) ? (redenNu[w.vermogen] || REDEN[w.vermogen] || 'Deze rij maakt dit vermogen niet waar.')
       : 'Hangt aan ' + w.door + ', en dat vermogen viel weg.'
   }));
 
@@ -156,10 +114,40 @@ function vanAanbod(rij, extra) {
   };
 }
 
+/* WAAROM STAAT DIT NIET TE KOOP? Twee heel verschillende antwoorden, en een
+   ondernemer heeft aan het verkeerde niets.
+
+   1. HET TYPE BELOOFDE HET NOOIT. Een offerte-aanvraag of een marktplaats-
+      advertentie hoort geen koopknop te hebben; daar is niets aan kapot. Dan
+      noemt de reden het type en wat er dan WEL gebeurt (de cta uit
+      aanbodvorm.js), zodat er geen zoektocht ontstaat naar een instelling die
+      niet bestaat.
+   2. HET TYPE BELOOFDE HET WEL, maar de rij maakte het niet waar. Dan staat de
+      reden al in `ontbreekt` en is er iets te DOEN -- een prijs zetten, bezorging
+      inrichten.
+
+   De eerste stond er als "Dit type wordt hier niet verkocht", en dat is precies
+   de zin waar iemand een half uur mee kwijt is. */
+function waaromNietTeKoop(k) {
+  if (!k) return null;
+  if ((k.vermogens || []).includes('bevestig')) return null;
+  const gemist = (k.ontbreekt || []).find(o => o.vermogen === 'bevestig');
+  if (gemist) return gemist.reden;
+  const belooft = TYPE_VERMOGENS[k.type] || [];
+  if (!belooft.includes('bevestig')) {
+    /* Het label is een KOP en geen zelfstandig naamwoord ("Op aanvraag",
+       "Marktplaats"), dus het gaat tussen aanhalingstekens en niet achter een
+       lidwoord -- anders staat er "Dit is een op aanvraag". */
+    return 'Dit staat als "' + (TYPEN[k.type] ? TYPEN[k.type].label : k.type) +
+      '" in de Mall; daar wordt niet op afgerekend. De knop is "' + (k.cta || 'Bekijken') + '", en daar is niets aan mis.';
+  }
+  return 'Deze rij maakt de koopbelofte van dit type niet waar.';
+}
+
 /* Elk type uit aanbodvorm.js hoort hier een regel te hebben. Als functie en niet
    als losse controle, zodat de toets hem kan aanroepen zonder de hele Mall op te
    bouwen -- en zodat een nieuw type in aanbodvorm.js meteen zichtbaar wordt in
    plaats van stilletjes op `null` uit te komen. */
 const typenZonderRegel = () => Object.keys(TYPEN).filter(t => !TYPE_VERMOGENS[t]);
 
-module.exports = { vanAanbod, TYPE_VERMOGENS, typenZonderRegel };
+module.exports = { vanAanbod, TYPE_VERMOGENS, typenZonderRegel, vastBedragCenten, waaromNietTeKoop };

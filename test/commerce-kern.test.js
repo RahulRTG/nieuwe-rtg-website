@@ -41,10 +41,17 @@ const rekenaar = maakAfrekening({
   zaakVan: (c) => ZAKEN[c] || null, capsVan: () => []
 });
 
+/* DE PRIJSVORM IS DIE VAN kern/mall/aanbod.js REGEL 118 en niet een eigen
+   verzinsel: { bedrag (EURO'S), eenheid, valuta, vanaf (VLAG) }. Deze toets
+   gebruikte eerst `{ centen: 1000 }` -- een vorm die daar niet bestaat -- en
+   dekte daarmee precies de twee fouten af die de laag werkelijk had: euro's
+   gelezen als centen, en de vlag `vanaf` gelezen als bedrag. Een fixture die
+   afwijkt van de bron toetst de fixture. */
+const eur = (bedrag, vanaf) => ({ bedrag, eenheid: 'per stuk', valuta: 'EUR', vanaf: !!vanaf });
 const rij = (o) => Object.assign({
   id: 'x1', bron: 'proef', type: 'product', titel: 'Ding',
   aanbieder: { soort: 'zaak', code: 'MODE', naam: 'Atelier' },
-  prijs: { centen: 1000 }, beschikbaar: { voorraad: 5 }, bezorgt: true
+  prijs: eur(10), beschikbaar: { voorraad: 5 }, bezorgt: true
 }, o);
 const koopbaar = (o) => K.vanAanbod(rij(o));
 
@@ -117,7 +124,7 @@ test('7. geen bezorging is geen levering, en de reden staat erbij', () => {
 });
 
 test('8. de prijs komt nooit uit de browser, en dat wordt gemeld', () => {
-  const kat = { a: koopbaar({ id: 'a', prijs: { centen: 1000 } }) };
+  const kat = { a: koopbaar({ id: 'a', prijs: eur(10) }) };
   const r = rekenaar.reken([{ koopbaarId: 'a', aantal: 2, centen: 1 }], (id) => kat[id] || null);
   assert.equal(r.afrekeningen[0].totaalCenten, 2000, 'het bedrag van de server telt, niet dat van de client');
   assert.match(r.genegeerd, /niet gebruikt/,
@@ -125,13 +132,13 @@ test('8. de prijs komt nooit uit de browser, en dat wordt gemeld', () => {
 });
 
 test('9. de btw komt uit kern/fiscaal en verschilt per zaak en per land', () => {
-  const eur = (code, type) => {
-    const kat = { a: K.vanAanbod(rij({ id: 'a', type, aanbieder: { soort: 'zaak', code, naam: code }, prijs: { centen: 10000 } })) };
+  const bij = (code, type) => {
+    const kat = { a: K.vanAanbod(rij({ id: 'a', type, aanbieder: { soort: 'zaak', code, naam: code }, prijs: eur(100) })) };
     return rekenaar.reken([{ koopbaarId: 'a', aantal: 1 }], (id) => kat[id] || null).afrekeningen[0];
   };
-  const kleding = eur('MODE', 'product');
-  const etenNL = eur('REST', 'eten');
-  const etenES = eur('IBZ', 'eten');
+  const kleding = bij('MODE', 'product');
+  const etenNL = bij('REST', 'eten');
+  const etenES = bij('IBZ', 'eten');
   assert.equal(kleding.btw.tariefProcent, 21, 'een jas is geen eten');
   assert.equal(etenNL.btw.tariefProcent, 9);
   assert.notEqual(etenES.btw.tariefProcent, etenNL.btw.tariefProcent,
@@ -182,4 +189,49 @@ test('13. te weinig voorraad blokkeert de afrekening, maar stilte niet', () => {
   const s = rekenaar.reken([{ koopbaarId: 'stil', aantal: 3 }], (id) => kat[id] || null);
   assert.equal(s.afrekeningen[0].bevestigbaar, true,
     'een bron die niets meet, zegt niet "op" -- dat is de spiegelfout van stilte als beschikbaar lezen');
+});
+
+test('14. bedrag staat in EURO\'S en wordt niet als centen gelezen', () => {
+  /* De fout die pas bovenkwam op echte seed-data: een reis van 2200 euro werd
+     2200 centen, dus 22,00 op het scherm. Honderd keer te weinig, en niets aan
+     de uitkomst zag er kapot uit. kern/mall/aanbod.js regel 118 is de bron. */
+  assert.equal(K.vastBedragCenten({ bedrag: 2200, valuta: 'EUR', vanaf: false }), 220000);
+  assert.equal(K.vastBedragCenten({ bedrag: 0, valuta: 'EUR', vanaf: false }), 0, 'nul is gratis, niet onbekend');
+
+  const kat = { a: koopbaar({ id: 'a', prijs: eur(2200) }) };
+  const r = rekenaar.reken([{ koopbaarId: 'a', aantal: 1 }], (id) => kat[id] || null);
+  assert.equal(r.afrekeningen[0].totaalCenten, 220000, 'tweeduizendtweehonderd euro, niet tweeentwintig');
+});
+
+test('15. op een VANAF-prijs wordt niet afgerekend', () => {
+  /* `vanaf` is een vlag en geen bedrag -- hij stond in de kandidatenlijst, dus
+     Number(true) gaf 1 cent. En inhoudelijk: "vanaf 2200 per persoon" is een
+     indicatie voor een reis waarvan de prijs van de datum afhangt. Wie daarop
+     afrekent, incasseert een bedrag dat niemand heeft afgesproken. */
+  assert.equal(K.vastBedragCenten({ bedrag: 2200, valuta: 'EUR', vanaf: true }), null);
+
+  const k = koopbaar({ id: 'v', type: 'reis', prijs: eur(2200, true), bezorgt: false });
+  assert.ok(!k.vermogens.includes('prijs'), 'een indicatie is geen prijs-vermogen');
+  assert.ok(!k.vermogens.includes('bevestig'), 'en dus geen koopknop bij een type dat "Kopen" belooft');
+  assert.match(k.ontbreekt.find(o => o.vermogen === 'prijs').reden, /vanaf-prijs/,
+    'de ondernemer hoort te horen welke van de twee het is');
+  // maar hij mag wel getoond worden, met de indicatie erbij
+  assert.ok(k.vermogens.includes('toon'));
+  assert.equal(k.prijs.bedrag, 2200);
+});
+
+test('16. waarom iets niet te koop staat, kent twee heel verschillende antwoorden', () => {
+  /* Voor een ondernemer is dit het verschil tussen "er is iets te doen" en "er
+     is niets aan de hand". Beide als "niet te koop" tonen kost een half uur
+     zoeken naar een instelling die niet bestaat. */
+  const offerte = koopbaar({ type: 'offerte', prijs: null, bezorgt: false, beschikbaar: null, open: null });
+  assert.match(K.waaromNietTeKoop(offerte), /Offerte aanvragen/);
+  assert.match(K.waaromNietTeKoop(offerte), /niets aan mis/);
+  // en niet "een op aanvraag": het label is een kop, geen zelfstandig naamwoord
+  assert.ok(!/is een op aanvraag/i.test(K.waaromNietTeKoop(offerte)));
+
+  const stuk = koopbaar({ prijs: null });   // product dat "Kopen" belooft en geen bedrag heeft
+  assert.match(K.waaromNietTeKoop(stuk), /Zet een prijs/, 'hier is wel iets te doen');
+
+  assert.equal(K.waaromNietTeKoop(koopbaar({})), null, 'wat wel te koop staat, heeft geen reden');
 });

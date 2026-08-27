@@ -137,11 +137,27 @@ function tabel() {
     },
     {
       soort: 'schermen (public/**/*.html)',
-      bewaker: ['test/paginas.e2e.js', 'test/leven.e2e.js'],
-      wat: 'ze gaan allemaal open ZONDER fout (paginascan) en geven allemaal een teken van LEVEN (levenstoets)',
+      bewaker: ['test/paginas.e2e.js'],
+      wat: 'ze gaan allemaal open ZONDER fout en tonen een teken van LEVEN (de paginascan, die de map zelf opsomt)',
       dingen: () => loop(path.join(WORTEL, 'public'), n => n.endsWith('.html')),
-      // beide scans sommen de map zelf op: wat erin staat is per constructie gedekt
-      bewaakt: () => bestaat('test/paginas.e2e.js') && bestaat('test/leven.e2e.js')
+      /* ALLEEN DE PAGINASCAN SOMT DE MAP OP, en hier stond dat er twee dat deden.
+         test/leven.e2e.js stond ernaast met de tekst "beide scans sommen de map
+         zelf op" -- maar dat bestand opent EEN pagina (/apps/leven.html) en veegt
+         niets. Het is een gewone schermtoets zoals de 138 andere.
+
+         Wat er mis was, is NIET dat de census blind werd -- `bewaakt` eiste met
+         een EN dat allebei de bestanden er zijn, dus het weghalen van de veger
+         liet hem wel degelijk zakken. De fout zit er andersom in: de census hing
+         voor deze soort af van een bestand dat de dekking niet levert. Wie
+         leven.e2e.js ooit opruimt of hernoemt, krijgt 268 onbewaakte schermen
+         gemeld terwijl de paginascan alles gewoon dekt -- een vals alarm, en dat
+         is hoe een census binnen een week genegeerd wordt (zie de kop van dit
+         bestand over de 849 valse gevallen van de eerste versie).
+
+         De claim "alle 268 schermen" hangt aan de scan die de map opsomt, en aan
+         niets anders. Gevonden door te vragen of het ook WERKT in plaats van of
+         het groen is. */
+      bewaakt: () => bestaat('test/paginas.e2e.js')
     },
     {
       soort: 'app-delen (public/apps/*/**.js)',

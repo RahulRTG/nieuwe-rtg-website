@@ -98,13 +98,17 @@ function zetGelijktijdigheid(db) {
      al gedaan te hebben. Zie test/pragmavolgorde.test.js. */
   db.exec('PRAGMA busy_timeout=5000');
   const staatIn = () => String((db.prepare('PRAGMA journal_mode').get() || {}).journal_mode || '').toLowerCase();
-  const tot = Date.now() + 5000;
-  for (;;) {
+  /* TELLEN EN NIET KLOKKIJKEN. Een grens van "vijf seconden" zou hier een
+     `Date.now()` vragen, en dat is precies de klokschuld die scripts/klok.js
+     meet -- deze module hoort niet rechtstreeks aan het besturingssysteem te
+     vragen hoe laat het is. Tweehonderd pogingen van 25 ms is dezelfde grens,
+     uitgedrukt in wat we hier wel weten. */
+  for (let poging = 0; ; poging++) {
     if (staatIn() === 'wal') break;
     try { db.exec('PRAGMA journal_mode=WAL'); break; }
     catch (e) {
       const bezet = /lock|busy/i.test(String((e && e.message) || e));
-      if (!bezet || Date.now() >= tot) throw e;
+      if (!bezet || poging >= 200) throw e;
       // synchroon wachten: hier draait nog geen server, en de rest van deze
       // opstart mag niet doorlopen op een verbinding die nog niet staat.
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);

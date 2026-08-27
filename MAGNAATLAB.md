@@ -300,8 +300,13 @@ suggereren die er niet is.
 
 De opzet wil dat een PR faalt als `Identity → RTG Food` wordt geïmporteerd.
 Prachtig, en niet te bouwen zolang `OS.md` par. 4.2 openstaat: er liggen twee
-lagenmodellen in dit huis en de opzet stelt een derde voor, en het woord
-"Capabilities" betekent in twee ervan niet hetzelfde.
+lagenmodellen in dit huis en de opzet stelt een derde voor.
+
+De helft daarvan is inmiddels weg. Het woord dat in twee modellen niet hetzelfde
+betekende, is hernoemd — laag 4 van `PLATFORM.md` heet nu genre-cap, en
+`test/genrecap.test.js` zakt zodra twee lagenmodellen weer een naam delen. Maar
+dat was de naambotsing, niet de keuze: er liggen nog steeds twee modellen naast
+elkaar. Dependency fitness blijft dus wachten, alleen op een kleinere vraag.
 
 Een handhaver op een laagregel vraagt eerst één laagmodel. Wat er wél al is, is
 de meting eronder: `scripts/grenzen.js` meet hoe breed een domein in de gedeelde

@@ -193,17 +193,29 @@ allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
 toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
 (`betalen`, `binnenkomen`, `SEPA_UIT` — allemaal "mag deze aanroep, en doet hij
-het?"), en nooit over het **domeinvermogen** (`rooms`, `rides`, `menu` — wat voor
+het?"), en nooit over het **domeinvermogen** (`bookings`, `rides`, `menu` — wat voor
 zaak is dit), want dat is dezelfde fout als `Asset`. Het contract van punt 7 bestaat al en staat in het kleinste hoekje van
 het huis: `kern/appstore/machtigingen.js` draagt als enige een doel én een grens.
 Wat er nog niet is, staat er met de meting erbij: de eventenvelop ontbreekt (de bus
 vervoert, er is geen taal) en van de 115 beproefde muterende routes zijn er 15
-retry-veilig. Zeven punten die een besluit van de eigenaar vragen staan in par. 4,
-waaronder het goedkoopste om nu te nemen en het duurste om uit te stellen: het woord
-"Capabilities" staat in het lagenmodel van `PLATFORM.md` par. 2 én in dat van de
-opzet, en het betekent er niet hetzelfde (daar een genre-cap, hier een
-bedrijfsfunctie) — één van de twee hoort een andere naam te krijgen vóór er iets
-op wordt gebouwd.
+retry-veilig. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
+**Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
+lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
+par. 2 heet nu **genre-cap** (domeinvermogen), en *capability* blijft over voor de
+herbruikbare bedrijfsfunctie (platformvermogen). `scripts/lagen.js` leidt de
+lagenmodellen af uit de documenten zelf en `test/genrecap.test.js` zakt zodra twee
+modellen weer een naam delen of een citatie achterloopt op zijn bron. Wat níét
+opgelost is: er liggen nog steeds twee lagenmodellen en de opzet stelt een derde
+voor. Die keuze staat nog open; alleen de naambotsing is weg.
+
+Die hernoeming legde meteen bloot waarom hij nodig was: `PLATFORM.md` noemde
+`rooms` als voorbeeld-cap, en **die cap bestaat niet** — geen van de 73 genres
+draagt hem en `kern/werkvormen.js` maakt hem nergens aan. `kern/fiscaal/tarief.js`
+besliste er wel op of een verkoop 'logies' is, dus die tak was dood en een
+verblijfszaak rekende te veel btw (appartement NL 21% in plaats van 9%, hotel DE
+19% in plaats van 7%). De tak keek de hele tijd groen omdat een toets hem met
+verzonnen invoer voedde. Een cap die een document noemt, wordt sindsdien tegen de
+code gehouden.
 
 **`MAGNAATLAB.md` is Magnaat als testhal** — de rol bovenop het spel dat
 `GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat

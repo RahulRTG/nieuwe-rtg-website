@@ -127,7 +127,7 @@ vallen in twee soorten, en de meting laat het verschil zien:
 
 | | **platformvermogen** | **domeinvermogen** |
 |---|---|---|
-| Voorbeeld | `betalen`, `binnenkomen`, `bewaren`, `SEPA_UIT` | `rooms`, `rides`, `menu`, `tickets` |
+| Voorbeeld | `betalen`, `binnenkomen`, `bewaren`, `SEPA_UIT` | `bookings`, `rides`, `menu`, `tickets` |
 | Waar | `kern/command/vermogens.js`, `kern/bevoegdheid/lijst.js`, `kern/appstore/machtigingen.js` | het genre-register, `kern/zaak.js`, `kern/pda/modules.js` |
 | Vraag die het beantwoordt | mag deze aanroep, en doet hij het? | wat voor zaak is dit, en wat hoort daarbij? |
 | Delen ze iets met elkaar? | ja — het zijn allemaal "een aanroep die lukt of niet" | nee, en dat is gemeten |
@@ -146,7 +146,7 @@ omkering hoort er even hard bij te staan, want die staat er nu niet:
 > **En het platform bezit geen betekenis die aan een domein toebehoort.**
 
 Een hotelkamer heeft een schoonmaakstatus en een folio, een tafel heeft een
-couvert en een bediening. Dat zijn geen twee invullingen van `Asset`, en `rooms`
+couvert en een bediening. Dat zijn geen twee invullingen van `Asset`, en `bookings`
 en `rides` zijn geen twee invullingen van één capability-grammatica. Ze staan in
 het genre-register omdat ze een ZAAK typeren, niet omdat ze een aanroep zijn.
 
@@ -230,26 +230,47 @@ assen:
 
 | | waar | de as | de lagen |
 |---|---|---|---|
-| A | `PLATFORM.md` par. 2 | platformzorgen, van binnen naar buiten | Core, Enterprise engines, Industry engines, Capabilities, PDA, Business Network, Consumer Network |
+| A | `PLATFORM.md` par. 2 | platformzorgen, van binnen naar buiten | Core, Enterprise engines, Industry engines, Genre-caps, PDA, Business Network, Consumer Network |
 | B | `PLATFORM.md` par. 0b | hoe apps zich tot elkaar verhouden | specialistische apps, genre-superapps, RTG-hoofdlaag |
 | C | deze opzet | uitvoering, van boven naar beneden | Experiences, Journeys, Capabilities, Control Plane, Runtime |
 
 Twee assen naast elkaar is werkbaar; ze beantwoorden verschillende vragen. Drie is
 het niet, en het probleem is aanwijsbaar in plaats van principieel: **"Capabilities"
-staat in A én in C, en betekent er niet hetzelfde.** In A is het laag 4, de `caps`
-van een genre (`rooms`, `rides`) — domeinvermogen, precies het soort dat par. 2
+stond in A én in C, en betekende er niet hetzelfde.** In A was het laag 4, de `caps`
+van een genre (`bookings`, `rides`) — domeinvermogen, precies het soort dat par. 2
 hierboven buiten de grammatica houdt. In C is het de herbruikbare bedrijfsfunctie
 `Payment.Authorize` — platformvermogen. Wie die twee onder één woord in twee
 documenten laat staan, krijgt binnen een jaar twee antwoorden op "hoort dit in de
 capabilitylaag".
 
-De vijf lagen zijn niet slechter dan de zeven — **Journeys** is een echte
-toevoeging die in geen van beide bestaande modellen zit. Maar ze horen A te
-VERVANGEN of eraan te worden opgehangen, en het woord dat botst hoort in één van
-de twee een andere naam te krijgen.
+**Dat woord is hernoemd (27 augustus 2026).** Laag 4 van A heet nu **genre-cap**,
+in `PLATFORM.md`, `FUNCTIES.md` en `CONCERN.md`. Het veld in de code heet nog
+steeds `caps` — dat is de naam die 73 genres al dragen en die hoefde niet te
+bewegen. Alleen het woord in de tekst bewoog, want alleen daar botste het.
 
-Dit is het goedkoopste besluit in dit hele document en het duurste om uit te
-stellen: één laagmodel kiezen kost een middag nu, en drie laagmodellen uit elkaar
+Twee dingen die daarbij naar boven kwamen en die geen van beide zijn weggepoetst:
+
+- **Het waren er geen twee maar drie.** `PLATFORM.md` par. 0 gebruikt *capability*
+  in nóg een betekenis: een zelfstandig vak dat een eigen app verdient ("is dit
+  een zelfstandige professionele capability, of een tweede ingang naar dezelfde?").
+  Die is met opzet blijven staan. De super-app-regel werkt, wordt breed geciteerd
+  en heeft hier al een keer een fout voorkomen; die herschrijf je niet om een
+  woord op te ruimen. Het staat hier zodat de derde betekenis een besluit blijft
+  en geen slordigheid wordt.
+- **De hernoeming legde een ongedekte dubbeling bloot.** `FUNCTIES.md` noemde
+  "40 capabilities" en somde ze op — met de hand, naast het genre-register dat de
+  waarheid houdt. Geen enkele toets keek daarnaar. Dat is LAT-regel 4 en precies
+  de vorm die deze tak elders opruimde. Nu leidt `test/genrecap.test.js` de lijst
+  af uit `server/seed/genres-lijst.js` en zakt hij zodra de tekst en het register
+  uit elkaar lopen.
+
+Wat hiermee **niet** is opgelost: er liggen nog steeds twee lagenmodellen en deze
+opzet stelt een derde voor. De vijf lagen zijn niet slechter dan de zeven —
+**Journeys** is een echte toevoeging die in geen van beide bestaande modellen zit.
+Maar ze horen A te VERVANGEN of eraan te worden opgehangen. Dat besluit staat nog
+open; alleen de naambotsing is weg, en dat is het deel dat een handhaver kan
+dragen (`test/genrecap.test.js` zakt zodra twee lagenmodellen weer een naam
+delen). Eén laagmodel kiezen kost een middag nu, en drie laagmodellen uit elkaar
 trekken kost een maand over twee jaar.
 
 ### 4.3 Punten 25, 45 — de AI die capabilities uitvoert en apps schrijft

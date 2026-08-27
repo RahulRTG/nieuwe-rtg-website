@@ -1,9 +1,9 @@
 {
-  "catalogi": 831,
+  "catalogi": 833,
   "verschillendeNamen": 516,
-  "namenInMeerDomeinen": 94,
-  "woordenMetMeerBetekenissen": 77,
-  "betekenissenTotaal": 279,
+  "namenInMeerDomeinen": 95,
+  "woordenMetMeerBetekenissen": 78,
+  "betekenissenTotaal": 282,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
   "dubbelingen": 28,
@@ -2644,6 +2644,62 @@
       ]
     },
     {
+      "naam": "SCENARIOS",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/betaal/synthetisch.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "betaald",
+            "geweigerd",
+            "traag",
+            "terugboeking"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/magnaatwereld.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "planning",
+            "controle",
+            "gesprek",
+            "impact"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/simulatie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "slecht",
+            "basis",
+            "groei"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/klimaat.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "extreme-regen",
+            "hittegolf",
+            "droogte",
+            "hoogwater"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "VORMEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -2968,51 +3024,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "LAGEN",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/consent.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "care-intake",
-            "care-vastlegging",
-            "rtgid-sessie",
-            "rtgid-machtiging"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/horeca/rahul-register.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "mag",
-            "mensbevestigt",
-            "verboden"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereld/rechten.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "persoonlijk",
-            "professioneel",
-            "creator",
-            "ondernemer"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 2356
+  "bestanden": 2359
 }

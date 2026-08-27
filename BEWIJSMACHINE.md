@@ -88,14 +88,14 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2356 bestanden, 831 catalogi, 516 verschillende namen
-  94 namen staan in meer dan een domein
-  77 woorden dragen MEER DAN EEN betekenis   (samen 279 betekenissen)
+2359 bestanden, 833 catalogi, 516 verschillende namen
+  95 namen staan in meer dan een domein
+  78 woorden dragen MEER DAN EEN betekenis   (samen 282 betekenissen)
   28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
  101 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
 ```
 
-Van de 94 gedeelde namen dragen er **77 meer dan één betekenis**. Het was dus
+Van de 95 gedeelde namen dragen er **78 meer dan één betekenis**. Het was dus
 geen incident.
 
 De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:
@@ -165,7 +165,7 @@ scherper dan "één type of niet":
 
 | | uitvoering | oordeel |
 |---|---|---|
-| `hash`, `kies`, `palet` | **één**, vier keer gekopieerd | echte dubbeling — samenvoegen |
+| `hash`, `kies`, `palet` | **één**, vier keer gekopieerd | echte dubbeling — ✅ *samengevoegd in `kern/ontwerpbank.js`* |
 | de opdrachtvorm `{ vakgebied, naam, brief }` | gedeeld, met `ontwerpen[]` en `collecties[]` | gedeeld type |
 | `maakConcept` | **vier verschillende** | het domeinwerk zelf — moet blijven |
 | `STATUS` | drie varianten | alle vier van `schets` naar `archief`, maar het midden is vakvocabulaire |
@@ -184,6 +184,21 @@ ze onderscheidt — de `Asset`-fout in het klein.
 
 Dat staat nu in de kop van `scripts/semantiek.js`: een cluster is een aanwijzing
 dat er iets te bekijken valt, nooit een bewijs dat het één ding is.
+
+**De samenvoeging is gedaan** (`server/kern/ontwerpbank.js`, 27 augustus 2026):
+`hash`, `kies` en `palet` waren byte voor byte gelijk in vier bestanden en wonen
+nu op één plek. Het gedrag is nagerekend en niet aangenomen — de vier oude
+bestanden uit `HEAD` naast de vier nieuwe, 500 opdrachten per domein, 34.000
+vergelijkingen, nul verschillen. `paletUit()` krijgt het palet MEE in plaats van
+het te kennen, zodat de vier paletten uit de tabel hierboven gescheiden blijven.
+
+**En de meter bewoog niet mee, wat hij ook niet hoort te doen.** Bij `passen.js`
+ging `dubbelingenZonderNaam` van 111 naar 101; hier blijft hij op 101 staan. Dat
+is geen falen maar de reikwijdte: `scripts/semantiek.js` leest *catalogi* —
+gesloten woordenlijsten — en `hash` is een functie. Wie verwacht dat elke
+opgeruimde dubbeling een meter laat zakken, verwacht dat één meter alles ziet.
+Deze dubbeling kwam van `OBJECTMODEL.json`, langs gedeelde vormen, en dat is
+precies waarom er twee metingen zijn.
 
 ### Wat de meting al heeft opgeleverd: de paswaarheid stond op vier plekken
 

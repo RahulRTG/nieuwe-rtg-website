@@ -127,14 +127,32 @@ test('8 - de route hangt achter de uitgeverspoort', () => {
   assert.match(bron, /'\/api\/appstore\/naslag', supplierAuth/);
   assert.match(bron, /'\/api\/appstore\/uitgever\/journaal', supplierAuth, metOrg/,
     'het journaal hoort ook door metOrg, anders leest een zaak zonder organisatie mee');
+
+  /* De tweede deur draagt dezelfde routes, want het bureau erachter is er maar
+     een. Ontbreekt er een, dan valt dat scherm voor een persoon stil zonder dat
+     iemand het merkt -- de aanroep zit in een try/catch. */
+  const mens = fs.readFileSync(path.join(WORTEL, 'server/routes/appstore/persoon.js'), 'utf8');
+  for (const staart of ['naslag', 'journaal', 'cijfers', 'inzenden', 'proef', 'dossier', 'intrekken', 'aanvraag']) {
+    assert.match(mens, new RegExp("'/api/appstore/persoon/" + staart + "', auth"),
+      'de persoonsdeur mist /' + staart);
+  }
 });
 
 test('9 - het uitgeversbureau tekent alleen wat van de server komt', () => {
   /* De laatste manier waarop dit uiteen kan lopen: het scherm dat zijn eigen
      lijstje bijzet omdat dat sneller was. */
   const bron = fs.readFileSync(path.join(WORTEL, 'public/apps/appstore-uitgever.html'), 'utf8');
-  assert.match(bron, /api\('\/api\/appstore\/naslag'\)/);
-  assert.match(bron, /api\('\/api\/appstore\/uitgever\/journaal'\)/);
+  /* Sinds 27 augustus 2026 heeft dit bureau TWEE DEUREN: een zaak werkt onder
+     /api/appstore/uitgever/... en een geverifieerd mens onder
+     /api/appstore/persoon/... Het scherm kiest zijn voorvoegsel met P(), dus het
+     pad staat niet meer letterlijk in de bron. Wat deze toets vasthoudt is
+     onveranderd -- het HAALT ze bij de server en heeft geen eigen lijstje -- maar
+     de vorm van de vraag moest mee. */
+  assert.match(bron, /const P = \(staart\) => '\/api\/appstore\/' \+ DEUR/,
+    'het voorvoegsel hoort uit EEN plek te komen en niet per aanroep te worden gebouwd');
+  assert.match(bron, /api\(DEUR === 'persoon' \? P\('\/naslag'\) : '\/api\/appstore\/naslag'\)/,
+    'het naslagwerk komt van de server, langs de deur die bij deze inlog hoort');
+  assert.match(bron, /api\(P\('\/journaal'\)\)/);
   assert.match(bron, /function tekenNaslag\(n\)/);
   // geen eigen machtigingen- of foutcodelijst in het scherm
   assert.ok(!/profiel\.basis'\s*,\s*'opslag\.eigen/.test(bron), 'het scherm hoort geen eigen machtigingenlijst te hebben');

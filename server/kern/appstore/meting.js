@@ -38,13 +38,20 @@
    ========================================================================== */
 'use strict';
 
+/* DE TIJD KOMT VAN DE HUISKLOK EN NIET VAN HET OS. Een module die `Date.now()`
+   aanroept, trekt zich van RTG_KLOK niets aan en is dus niet te beproeven op een
+   schrikkeldag of een zomertijdsprong (scripts/klok.js). Dat geldt hier dubbel:
+   deze teller rekent in DAGEN, en een dagteller die de dag niet mee kan
+   verzetten, is niet te toetsen op de dag waarop hij de oudste laat vallen. */
+const { nu: klokNu, datum } = require('../../lib/klok');
+
 const DAGEN_MAX = 90;          // drie maanden terugkijken, daarna valt de oudste dag eraf
 const SCHRIJFRUST = 30000;     // hooguit eens per dertig seconden naar schijf
 
 function maakMeting({ S, save, nu }) {
   let laatsteSchrijf = 0;
 
-  const dag = () => String(nu ? nu() : new Date().toISOString()).slice(0, 10);
+  const dag = () => String(nu ? nu() : datum().toISOString()).slice(0, 10);
 
   function pot() {
     const s = S();
@@ -82,7 +89,7 @@ function maakMeting({ S, save, nu }) {
       t.codes[code] = (t.codes[code] || 0) + 1;
     }
     snoei(r);
-    const n = Date.now();
+    const n = klokNu();
     if (n - laatsteSchrijf > SCHRIJFRUST) { laatsteSchrijf = n; try { save(); } catch (e) {} }
   }
 

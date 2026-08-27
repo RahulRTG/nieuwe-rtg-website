@@ -42,6 +42,32 @@ test('een kale verwijzing naar een top-level naam van een zuster-slice wordt gev
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
+test('een methode in de KORTE vorm is een sleutel en geen verwijzing', () => {
+  /* `{ save() {}, boek() {} }` lijkt op twee aanroepen en is het niet: het zijn
+     property-namen. Zonder die uitzondering meldde de scan kern/appstore/
+     naslag.js -- dat de brug echt opbouwt met lege functies erin -- als een kale
+     verwijzing naar `save` en `boek` uit brug.js.
+
+     Wat NIET verdwijnt, staat er hieronder direct naast: een echte kale
+     verwijzing en een echte AANROEP van dezelfde naam worden nog steeds
+     gevangen. Een uitzondering die ook die twee wegneemt, zou de scan
+     uitschakelen in plaats van hem scherper maken. */
+  const bouw = (b) => maakGroep({ 'index.js': 'module.exports = () => {};\n',
+    'a.js': "const boek = 1;\nmodule.exports = () => boek;\n", 'b.js': b });
+
+  const sleutel = bouw("module.exports = () => { const x = { boek() {} }; return x; };\n");
+  try { assert.deepEqual(scan(sleutel), [], 'een methode-sleutel hoort geen melding te geven'); }
+  finally { fs.rmSync(sleutel, { recursive: true, force: true }); }
+
+  const kaal = bouw("module.exports = () => { return boek + 1; };\n");
+  try { assert.deepEqual(scan(kaal).map(b => b.naam), ['boek'], 'een kale verwijzing hoort nog steeds te knallen'); }
+  finally { fs.rmSync(kaal, { recursive: true, force: true }); }
+
+  const aanroep = bouw("module.exports = () => { boek('x', 1); };\n");
+  try { assert.deepEqual(scan(aanroep).map(b => b.naam), ['boek'], 'en een echte aanroep ook'); }
+  finally { fs.rmSync(aanroep, { recursive: true, force: true }); }
+});
+
 test('de parameters van een methode met een GEQUOTE sleutel gelden als binding', () => {
   /* Een actietabel met streepjes in de sleutels (`'veiling-start'(potje, h, z)`)
      is de gewone vorm in kern/spellen, en de scan zag die parameters NIET als

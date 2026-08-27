@@ -20,9 +20,9 @@
 'use strict';
 
 module.exports = ({ db, save, accounts, magBoardroom }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/ledenbalie-zetels', bezit: { balieZetels: 'lijst' } });
   function lijst() {
-    if (!Array.isArray(db.data.balieZetels)) db.data.balieZetels = [];
-    return db.data.balieZetels;
+    return eigen.bak('balieZetels');
   }
 
   /* Alleen codenamen en momenten naar buiten -- nooit een naam. De key is het
@@ -58,7 +58,7 @@ module.exports = ({ db, save, accounts, magBoardroom }) => {
     const k = String(key || '').trim();
     const l = lijst();
     const rest = l.filter(z => z.key !== k);
-    if (rest.length !== l.length) { db.data.balieZetels = rest; save(); }
+    if (rest.length !== l.length) { eigen.zetBak('balieZetels', rest); save(); }
     return { ok: true };
   }
 

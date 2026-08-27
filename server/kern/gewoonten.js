@@ -42,7 +42,8 @@ function reeksVan(dagen, nu = new Date()) {
 }
 
 module.exports = ({ db, save, schoon, crypto }) => {
-  const lijst = () => { if (!Array.isArray(db.data.gewoonten)) db.data.gewoonten = []; return db.data.gewoonten; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/gewoonten', bezit: { gewoonten: 'lijst' } });
+  const lijst = () => eigen.bak('gewoonten');
   const mijne = key => lijst().filter(g => g.key === key && g.status !== 'weg');
 
   function toon(g, nu) {

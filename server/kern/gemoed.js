@@ -44,7 +44,8 @@ const MAX_DAGEN = 400;
 const dagVan = d => new Date(d).toISOString().slice(0, 10);
 
 module.exports = ({ db, save, schoon }) => {
-  const bak = () => { if (!db.data.gemoed) db.data.gemoed = {}; return db.data.gemoed; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/gemoed', bezit: { gemoed: 'kaart' } });
+  const bak = () => eigen.bak('gemoed');
   const rijenVan = key => { const b = bak(); if (!b[key]) b[key] = []; return b[key]; };
 
   /* Nieuwste eerst; dat is de volgorde die aanhoudendZwaar verwacht en de

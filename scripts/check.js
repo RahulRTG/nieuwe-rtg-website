@@ -3928,5 +3928,110 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
   }
 }
 
+/* ============================================================================
+   54) EEN COLLECTIE HEEFT EEN EIGENAAR, EN DIE IS DE ENIGE DIE ERIN SCHRIJFT.
+
+   server/kern/eigencollectie.js is de lichte vorm van een opslagcontract: een
+   module zegt op zijn eigen plek welke collecties hij bezit en met welke vorm.
+   Die declaratie staat MET OPZET bij de eigenaar en niet in een middenregister
+   -- een centrale lijst van vierhonderd collecties is binnen een jaar de
+   volgende plek die uit de pas loopt met de code.
+
+   Precies daarom moet iets anders bewaken wat zo'n lijst gratis zou geven: dat
+   niemand hetzelfde opeist, en dat de eigenaar de enige schrijver is. Dat is
+   deze regel. Hij verzamelt alle declaraties in server/ en zakt op twee dingen:
+
+     - twee bestanden die dezelfde collectie bezitten. Dan is "eigenaar" een
+       woord zonder betekenis geworden.
+     - een SCHRIJVER buiten de eigenaar. De helper kan dat niet zien: hij weigert
+       wel een collectie die je niet declareerde, maar niet dat iemand anders
+       db.data.<jouw collectie> rechtstreeks aanraakt.
+
+   HIJ LEEST TOKENS EN GEEN TEKST, om dezelfde reden als regel 53: een naam in
+   een kop of een string is geen aanraking (TAKEN.md 6.17).
+   ========================================================================== */
+console.log('\n54) elke gedeclareerde collectie heeft een eigenaar, en die schrijft als enige');
+{
+  const { lex } = require('./ast/lexer');
+  const SERVER = path.join(ROOT, 'server');
+
+  /* Het `bezit`-blok van een aanroep uithalen: van `bezit:` tot de bijhorende
+     sluitaccolade, met accolades tellen. Een patroon zou stukgaan op de eerste
+     geneste vorm. */
+  function bezitVan(bron, vanaf) {
+    const k = bron.indexOf('bezit:', vanaf);
+    if (k < 0) return null;
+    const open = bron.indexOf('{', k);
+    if (open < 0) return null;
+    let d = 0;
+    for (let i = open; i < bron.length; i++) {
+      if (bron[i] === '{') d++;
+      else if (bron[i] === '}') { d--; if (!d) return bron.slice(open + 1, i); }
+    }
+    return null;
+  }
+
+  const eigenaarVan = new Map();   // collectie -> bestand
+  let declaraties = 0;
+  loop(SERVER, /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel === 'server/kern/eigencollectie.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (!bron.includes('eigencollectie')) return;
+    let i = 0;
+    while (true) {
+      const k = bron.indexOf('eigencollectie', i);
+      if (k < 0) break;
+      const blok = bezitVan(bron, k);
+      i = k + 14;
+      if (!blok) continue;
+      for (const m of blok.matchAll(/(?:^|[,{\s])([A-Za-z_$][\w$]*)\s*:\s*'(lijst|kaart)'/g)) {
+        declaraties++;
+        const naam = m[1];
+        if (eigenaarVan.has(naam) && eigenaarVan.get(naam) !== rel) {
+          fout('twee eigenaren voor "' + naam + '": ' + eigenaarVan.get(naam) + ' en ' + rel +
+            ' -- een collectie hoort er een te hebben');
+        } else eigenaarVan.set(naam, rel);
+      }
+      break;   // een bestand declareert een keer; de rest is hergebruik van de naam
+    }
+  });
+
+  /* En de andere helft: schrijft er iemand ANDERS in een gedeclareerde collectie? */
+  let indringers = 0;
+  if (eigenaarVan.size) {
+    loop(SERVER, /\.js$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.startsWith('server/db/')) return;
+      const bron = fs.readFileSync(f, 'utf8');
+      if (!bron.includes('db.data')) return;
+      let toks;
+      try { toks = lex(bron); } catch (e) { return; }
+      for (let i = 0; i + 4 < toks.length; i++) {
+        if (!(toks[i].type === 'naam' && toks[i].value === 'db' &&
+              toks[i + 1].value === '.' &&
+              toks[i + 2].type === 'naam' && toks[i + 2].value === 'data' &&
+              toks[i + 3].value === '.' && toks[i + 4].type === 'naam')) continue;
+        const naam = toks[i + 4].value;
+        const baas = eigenaarVan.get(naam);
+        if (!baas || baas === rel) continue;
+        /* Alleen SCHRIJVEN telt: lezen van andermans collectie is een bekende
+           en benoemde vorm (de `vreemd`-secties in de contracten). */
+        const na = toks[i + 5] && toks[i + 5].value;
+        const schrijft = na === '=' || na === '+=' || na === '-=' ||
+          (na === '.' && toks[i + 6] && /^(push|pop|shift|unshift|splice|sort|reverse|fill)$/.test(toks[i + 6].value));
+        if (!schrijft) continue;
+        indringers++;
+        fout('schrijft in andermans collectie: ' + rel + ':' + toks[i].lijn + ' raakt "' + naam +
+          '" aan, en die is van ' + baas);
+        break;
+      }
+    });
+  }
+
+  if (!declaraties) ok('nog geen enkele collectie gedeclareerd via kern/eigencollectie.js');
+  else if (!indringers) ok(eigenaarVan.size + ' collecties met een eigenaar, en niemand schrijft in die van een ander');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

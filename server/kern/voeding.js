@@ -48,9 +48,9 @@ const GRENS = {
 };
 
 module.exports = ({ db, save, schoon, crypto, zorgVan }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/voeding', bezit: { voeding: 'kaart' } });
   const bak = () => {
-    if (!db.data.voeding) db.data.voeding = {};
-    return db.data.voeding;
+    return eigen.bak('voeding');
   };
   const mijn = key => {
     const b = bak();

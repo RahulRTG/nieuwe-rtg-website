@@ -16,13 +16,14 @@ const JETSET_SOORTEN = {
 const MAX_LIJST = 200, MAX_JETSET = 100;
 
 module.exports = ({ db, save, crypto, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/gebouw', bezit: { gebouw: 'kaart' } });
   const nu = () => new Date().toISOString();
   const vandaag = () => nu().slice(0, 10);
   const id = p => p + crypto.randomBytes(3).toString('hex');
 
   const bouwDemoToren = require('./gebouw-demo'); // de voorbeeldtoren (data)
   const demoToren = () => bouwDemoToren(nu, vandaag);
-  const G = () => { if (!db.data.gebouw) db.data.gebouw = {}; return db.data.gebouw; };
+  const G = () => eigen.bak('gebouw');
   function torenVan(code) {
     const g = G();
     if (!g[code]) { g[code] = demoToren(); save(); }

@@ -16,6 +16,7 @@ const BRANDSTOF = ['diesel', 'benzine'];
 const MAX_LIJST = 200;
 
 module.exports = ({ db, save, crypto, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/marina', bezit: { marina: 'kaart' } });
   const nu = () => new Date().toISOString();
   const vandaag = () => nu().slice(0, 10);
   const id = p => p + crypto.randomBytes(3).toString('hex');
@@ -40,7 +41,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
       ]
     };
   }
-  const M = () => { if (!db.data.marina) db.data.marina = {}; return db.data.marina; };
+  const M = () => eigen.bak('marina');
   function havenVan(code) {
     const m = M();
     if (!m[code]) { m[code] = demoHaven(); save(); }

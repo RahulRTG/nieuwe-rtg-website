@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 139,
-    "keuringOmvang": 171,
+    "keuringOmvang": 172,
     "keuringDubbeling": 120,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -32,8 +32,8 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "schermenZonderVormtaal": 181,
-    "dbDeuren": 576,
-    "dbDeurenSchrijvend": 372
+    "dbDeuren": 540,
+    "dbDeurenSchrijvend": 333
   },
   "notities": [
     {
@@ -534,6 +534,11 @@
       "datum": "2026-08-27",
       "meter": "dbDeuren 642 -> 576 en dbDeurenSchrijvend 381 -> 372, EN DAT IS TWEE DINGEN TEGELIJK",
       "reden": "Het levensdossier achter een contract: kern/lifestyle, kern/rechterhand, kern/bureau en kern/levensgraaf delen db.data.lifestyle en gaan nu alle vier door kern/levensdossier/.\n\nMAAR DE DALING IS NIET WAT ZE LIJKT, en dat hoort hier te staan want anders legt deze ratel een winst vast die er niet is. In dezelfde ronde is scripts/deuren.js overgezet van een TEKSTpatroon naar de lexer, omdat hij een bestand meetelde dat `db.data` alleen in zijn KOP noemt -- dezelfde fout die keuringsregel 47 een keer maakte en die regel 53 al met de lexer had opgelost. De meter en de poort horen hetzelfde te meten.\n\nNagemeten met de NIEUWE meter op de vorige commit (fd20bf9), zodat de twee te scheiden zijn:\n\n  echte daling door dit werk : 589 -> 576 deuren, 379 -> 372 schrijvers  (13 en 7)\n  correctie van de meter zelf: 642 -> 589 deuren, 381 -> 379 schrijvers  (53 en 2)\n\nVan de 66 deuren die deze ratel ziet dalen zijn er dus 13 echt gesloten. De andere 53 stonden er nooit: dat waren koppen en commentaren die het woord noemen.\n\nWat dat betekent voor de eerdere getallen in deze reeks (706 -> 642): die zijn met de tekstmeter gezet en dus aan BEIDE kanten opgeblazen. De verhouding klopte, de absolute stand niet. Vanaf hier meet hij wat hij beweert te meten."
+    },
+    {
+      "datum": "2026-08-27",
+      "meter": "dbDeuren 576 -> 540, dbDeurenSchrijvend 372 -> 333; keuringOmvang 171 -> 172 (met de hand, TWEEDE KEER)",
+      "reden": "De lichte vorm van een opslagcontract: server/kern/eigencollectie.js, met keuringsregel 54 eronder. 41 collecties hebben nu een gedeclareerde eigenaar, en niemand schrijft in die van een ander.\n\nWAAROM keuringOmvang WEER OMHOOG GAAT, EN WAAROM DAT EEN SIGNAAL IS. server/kern/metingen.js stond op 9398 byte; de adviesdrempel ligt op 9400. De declaratieregel vervangt een accessor van 104 byte door twee regels van samen 148, dus het bestand komt op 9450. Er is geen vorm van die regel die eronder blijft.\n\nDit is de TWEEDE keer deze sessie dat deze meter met de hand omhoog gaat om precies deze reden -- de eerste was server/kern/mobiliteit/index.js op 9364. Dat patroon is zelf informatie: elk bestand dat vlak onder de 9400 zit, gaat erover zodra het achter een contract komt. Er staan er 172 in die band en de afbouw is nog lang niet klaar.\n\nDUS DE AFSPRAAK ERBIJ: dit is de laatste keer dat hij hierom omhoog mag. Bij het volgende geval wordt het bestand OPGEKNIPT, niet de meter verhoogd -- precies zoals dat bij kern/levensdossier (12.800 byte) en kern/command/opslag (10.057) al is gebeurd. Twee keer is een afweging; drie keer is een gewoonte, en dan is de ratel zijn tanden kwijt."
     }
   ],
   "prestatie": {

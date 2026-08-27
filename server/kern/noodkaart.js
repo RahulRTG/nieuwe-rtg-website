@@ -25,7 +25,8 @@
    keten eronder is theater. Zie docs/life.md. */
 
 module.exports = ({ db, save, schoon, zorgVan, medicijnenVan }) => {
-  const bak = () => { if (!db.data.noodkaarten) db.data.noodkaarten = {}; return db.data.noodkaarten; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/noodkaart', bezit: { noodkaarten: 'kaart' } });
+  const bak = () => eigen.bak('noodkaarten');
   const leeg = { contactNaam: '', contactTel: '', watNodig: '',
     zorgErbij: false, medicijnenErbij: false, aan: false };
 

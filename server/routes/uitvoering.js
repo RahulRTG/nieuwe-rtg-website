@@ -30,6 +30,12 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, uitvoering.partituurZet(sess(req), req.body || {}));
   });
+  /* Wat een maker kan aanwijzen, met de duur waar RTG die kent -- de studio
+     tekent daar zijn tijdlijn mee. */
+  app.post('/api/uitvoering/eigenwerk', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, uitvoering.eigenWerk(sess(req)));
+  });
   app.post('/api/uitvoering/partituur/onderdeel', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, uitvoering.onderdeel(sess(req), req.body || {}));

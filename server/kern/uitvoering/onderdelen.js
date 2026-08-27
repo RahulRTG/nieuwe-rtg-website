@@ -66,5 +66,33 @@ module.exports = ({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDE
     return { status: 200, ok: true, partituur: beeld(p, true) };
   }
 
-  return { onderdeel };
+  /* WAT EEN MAKER KAN AANWIJZEN. De studio heeft dit nodig om een tijdlijn te
+     kunnen tekenen: welk eigen werk is er, en hoe lang duurt het.
+
+     LIVE VALT ERBUITEN, en niet omdat het lastig is: een uitzending heeft geen
+     lengte om een bereik in te kiezen. Een tijdlijn over iets wat nog bezig is,
+     zou een bereik beloven dat niet bestaat.
+
+     EN WAAR DE LENGTE ONBEKEND IS, STAAT DAT ERBIJ. RTG kent de duur van een
+     uitgegeven stuk (gerekend uit tempo en maten) en van een clip en een video
+     (opgegeven bij het maken). Ontbreekt hij toch, dan komt het stuk WEL in de
+     lijst met de reden erbij -- een maker die zijn werk mist, gaat zoeken; een
+     maker die leest waarom het er niet bij kan, weet wat hij eraan kan doen. */
+  function eigenWerk(sess) {
+    const wereld = catalogus.alles(sess);
+    const stukken = wereld.rijen
+      .filter(r => r.mijn && r.vorm !== 'live')
+      .map(r => ({
+        stukId: r.id, vorm: r.vorm, vormNaam: r.vormNaam, titel: r.titel,
+        duurS: r.duurS > 0 ? Math.round(r.duurS) : null,
+        reden: r.duurS > 0 ? null
+          : 'Van dit stuk kent RTG de lengte niet, dus er valt geen tijdlijn overheen te leggen.'
+      }));
+    return { status: 200, stukken,
+      uitleg: stukken.length
+        ? 'Uw eigen werk. Kies een stuk, sleep het begin en het eind, en wijs aan of het onmisbaar is.'
+        : 'U heeft nog geen werk om uit te kiezen. Maak eerst iets in het Klankwerk, het Theater of Clips.' };
+  }
+
+  return { onderdeel, eigenWerk };
 };

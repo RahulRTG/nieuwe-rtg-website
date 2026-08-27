@@ -49,102 +49,11 @@ function maakCatalogus({ bronnen }) {
     return { rijen: r, reden: null };
   }
 
-  /* ---- de vier vertalers: van een domeinbeeld naar één stuk ---- */
+  /* De vier vertalers (van een domeinbeeld naar EEN stuk) staan in
+     ./catalogus-vormen.js: daar staat hoe een stuk ERUITZIET, hier hoe de
+     wereld wordt SAMENGESTELD. */
+  const { vanTrack, vanVideo, vanClip, vanLive } = require('./catalogus-vormen')({ VORMEN, stukId });
 
-  // Muziek: een UITGAVE uit het Klankwerk. Het geluid reist niet als bestand;
-  // de motor op het toestel rekent het uit, precies zoals de maker het hoorde.
-  function vanTrack(u, key) {
-    const maker = (u.makers || [])[0] || {};
-    return {
-      id: stukId('track', u.id), vorm: 'track', vormNaam: VORMEN.track,
-      titel: u.naam,
-      maker: { codenaam: maker.codenaam || u.naamOnder, onder: u.onder, naamOnder: u.naamOnder },
-      at: u.at, duurS: null, onderwerp: 'muziek',
-      meta: u.bpm + ' slagen · ' + u.maten + ' maten' + (u.onder === 'rtg' ? ' · onder de RTG-naam' : ''),
-      spelen: { soort: 'motor', bron: u.id },
-      cijfers: { mooi: u.mooi || 0, reacties: u.reacties || 0 },
-      makers: u.makers || [], toelichting: u.toelichting || '',
-      mijn: !!u.vanMij, trackId: u.trackId || null
-    };
-  }
-
-  // Video: een stuk uit het Theater. Ligt hij THUIS (P2P), dan speelt hij niet
-  // hier maar in het Theater zelf -- dat staat er ook bij, want een knop die
-  // niets doet is erger dan een knop die zegt waar hij heen gaat.
-  function vanVideo(v, key, abonnee, mijn) {
-    const thuis = v.bewaring === 'thuis';
-    return {
-      id: stukId('video', v.id), vorm: 'video', vormNaam: VORMEN.video,
-      titel: v.titel,
-      maker: { codenaam: v.codenaam, kanaal: v.kanaal, kanaalId: v.kanaalId },
-      at: v.at, duurS: v.duurS || null, onderwerp: v.genre || null,
-      meta: (v.duurS ? Math.round(v.duurS / 60) + ' min · ' : '') + v.mb + ' MB · ' + v.kanaal,
-      spelen: thuis
-        ? { soort: 'elders', bron: '/apps/theater.html', reden: 'Deze video staat thuis bij de maker; het Theater haalt hem rechtstreeks op.' }
-        : { soort: 'stream', bron: '/api/theater/kijk/' + v.id },
-      cijfers: { reacties: v.reacties || 0 },
-      omschrijving: v.omschrijving || '',
-      /* De ondertitels reizen mee, net als bij een clip hieronder: het is tekst,
-         dus klein, en de speler moet ze hebben voordat het beeld begint. Zonder
-         dit veld speelt de Media OS dezelfde video als het Theater maar zonder
-         band -- twee schermen, een bestand, twee ervaringen. */
-      ondertitels: Array.isArray(v.ondertitels) ? v.ondertitels : [],
-      ondertiteld: !!v.ondertiteld,
-      mijn: !!mijn, volgIk: !!abonnee
-    };
-  }
-
-  // Korte video: een clip. Het beeld staat ALLEEN op het toestel van de maker
-  // en reist rechtstreeks; RTG heeft de bytes niet en krijgt ze ook niet. Dus
-  // speelt hij in Clips, waar dat doorgeefluik staat, en niet hier.
-  function vanClip(c, key) {
-    return {
-      id: stukId('clip', c.id), vorm: 'clip', vormNaam: VORMEN.clip,
-      titel: c.titel,
-      maker: { codenaam: c.codenaam },
-      at: c.at, duurS: c.speelduurS || c.duurS, onderwerp: null,
-      meta: (c.speelduurS || c.duurS) + 's · ' + (c.online ? 'maker online' : 'maker offline') +
-        (c.ondertiteld ? ' · ondertiteld' : ''),
-      /* 'p2p': dit speelt WEL hier, maar niet langs RTG. De bytes staan op het
-         toestel van de maker en reizen rechtstreeks; shared/clipdeler.js doet
-         dat, en dezelfde laag speelt hem in Clips. `bron` is waar een scherm
-         zonder die laag hem alsnog kan kijken -- geen dode knop. */
-      spelen: { soort: 'p2p', bron: '/apps/clips.html',
-        reden: 'Het beeld staat op het toestel van de maker en reist rechtstreeks; RTG heeft die bytes niet.' },
-      cijfers: { reacties: c.reacties || 0 },
-      poster: c.poster || null, geluid: c.geluid || 'eigen', muziek: c.muziek || null,
-      /* Wat de speler nodig heeft om de clip te tonen ZOALS de maker hem
-         bedoelde: is hij nu bereikbaar, waar begint en eindigt de knip, en de
-         ondertitels (die komen wel van RTG, want tekst is klein). */
-      online: !!c.online, knip: c.knip || null, ondertitels: c.ondertitels || [],
-      mijn: !!c.mijn, volgIk: !!c.volgIk
-    };
-  }
-
-  // Live: een kanaal van het Podium. Staat er nu niets aan, dan is het kanaal
-  // zelf het stuk -- je volgt een maker, niet een uitzending.
-  function vanLive(k, key) {
-    return {
-      id: stukId('live', k.id), vorm: 'live', vormNaam: VORMEN.live,
-      titel: k.live ? k.live.titel : k.naam,
-      maker: { codenaam: k.codenaam, kanaal: k.naam },
-      at: k.live ? k.live.sinds : null, duurS: null, onderwerp: k.genre || null,
-      meta: k.live ? ('nu live · ' + k.kijkers + ' kijkers') : 'niet live',
-      spelen: { soort: 'elders', bron: '/apps/podium.html', reden: 'Live gaat rechtstreeks van kijker naar kijker; dat staat in het Podium.' },
-      cijfers: { kijkers: k.kijkers || 0 },
-      live: !!k.live, abbCenten: k.abbCenten || 0, ikAbonnee: !!k.ikAbonnee,
-      /* De sleutel van de maker komt WEL binnen (het Podium zet hem in zijn
-         eigen beeld) maar gaat hier NIET verder: hij wordt alleen vergeleken
-         om te weten of dit uw eigen kanaal is. Wat naar buiten reist, draagt
-         codenamen (server/accounts). */
-      mijn: !!(key && k.makerKey === key), bio: k.bio || ''
-    };
-  }
-
-  /* ---- alles ophalen en normaliseren ----
-     `sess` gaat mee omdat het Klankwerk zijn zaal op een sessie opvraagt en de
-     rest op een sleutel; dat verschil wordt hier opgevangen en gaat niet verder
-     de Media OS in. */
   function alles(sess) {
     const key = sess.key;
     const buiten = [];

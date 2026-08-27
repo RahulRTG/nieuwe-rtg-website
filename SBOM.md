@@ -98,6 +98,17 @@ aangezien is erger dan geen bewijs.
   elk image dat het op een tag staat.
 - **Geen kwetsbaarheidsscan.** Deze lijst zegt WAT erin zit, niet dat het veilig
   is. Dat is minder dan een keurmerk en precies wat een SBOM hoort te zijn.
-- **Geen verificatie bij het uitrollen.** Niets controleert vandaag dat de
-  bronafdruk van de draaiende server overeenkomt met die van de release die
-  bedoeld was. De gegevens zijn er nu wel; de controle is de volgende stap.
+~~- **Geen verificatie bij het uitrollen.**~~ **Die staat er sinds 27 augustus
+2026:** `node scripts/uitrolproef.js <adres>` vraagt een draaiende server welke
+build hij is en legt die naast de materiaallijst. Drie uitslagen met drie
+afsluitcodes, zodat een pijplijn ze uit elkaar houdt zonder tekst te lezen:
+**gelijk** (0), **anders** (1) en **niet vast te stellen** (2). Dat derde is
+geen verlegenheid maar de regel van `BESTUUR.md`: onbekend is een eersteklas
+uitslag naast in orde en storing, en een ontwikkelserver zonder bouwstempel is
+niet verdacht.
+
+  Een gelijke afdruk bewijst dat de **bronboom** byte voor byte die van de
+  release is, pad inbegrepen. Hij bewijst **niet** dat het image verder
+  ongewijzigd is: de basis-images staan op een tag, er draait een Rust-binary die
+  niet in de som zit, en niets is ondertekend. Dat staat in de uitslag zelf, want
+  een provenance-werktuig dat niet zegt wat het níét bewijst, wordt overschat.

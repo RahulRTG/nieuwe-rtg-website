@@ -190,9 +190,19 @@ al: wat ontbreekt is de aankoop die hem verleent, en die hoort over
 **Het scherm staat er inmiddels** (`/apps/uitvoering.html`): de kijker kiest een
 partituur en een tijdsbudget, de maker stelt er een samen. Twee dingen zijn daar
 met opzet anders dan in een speler -- het bewijs staat even groot als de montage,
-en een weigering rendert als antwoord in plaats van als foutmelding. Wat er
-daarna nog niet is: fragmenten AANWIJZEN op een tijdlijn. Dat is de makersstudio
-uit par. 5, en dat is het punt waarop dit staat of valt.
+en een weigering rendert als antwoord in plaats van als foutmelding. **En de makersstudio staat er ook** (stand "Studio"): een maker kiest een stuk
+uit zijn eigen werk, sleept begin en eind over een tijdlijn, en het fragment-id
+ontstaat vanzelf -- er wordt geen letter meer getypt. De getallen zijn daar de
+waarheid en de balk de affordance, niet andersom: wie niet kan slepen, monteert
+met de velden of met de pijltjestoetsen. Dat is geen extraatje maar de reden dat
+het werkt, want een tijdlijn die alleen met een muis te bedienen is, sluit een
+deel van de makers uit.
+
+Daarvoor moest één ding eerst kloppen: een uitgegeven stuk had geen DUUR. Die
+wordt nu gerekend uit tempo en maten, met de constanten van de klankmotor zelf
+(`kern/muziek-uitgave-beeld.js`) -- zonder lengte valt er geen tijdlijn overheen
+te leggen. Waar RTG de lengte niet kent, staat het stuk er wél met de reden
+erbij, en is de knop uit in plaats van stil kapot.
 
 ## 4. Waar de opzet en het huis botsen
 

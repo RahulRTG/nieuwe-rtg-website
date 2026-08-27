@@ -64,7 +64,11 @@ test.before(async () => {
 
   // het eigen werk van de maker: een uitgegeven stuk en drie korte video's
   const trackId = (await api('/api/muziek/maak', {}, maker)).body.track.id;
-  await api('/api/muziek/bewaar', { id: trackId, naam: 'Middernacht', klaar: true }, maker);
+  /* Tempo en maten expliciet: sinds een uitgave een GEREKENDE duur draagt
+     (maten x 16 stappen x 60/bpm/4) valt een fragment buiten die duur er
+     terecht uit. 32 maten op 60 slagen is 128 seconden, dus de kern van 60
+     hieronder past. Dat de toets hierop eerst zakte, is de controle die werkt. */
+  await api('/api/muziek/bewaar', { id: trackId, naam: 'Middernacht', klaar: true, bpm: 60, maten: 32 }, maker);
   const uitgaveId = (await api('/api/muziek/uitgeven', { id: trackId, toelichting: 'x' }, maker)).body.uitgave.id;
   clipA = await clip('Aanloop', 20, maker);
   clipB = await clip('Uitloop', 20, maker);
@@ -328,6 +332,26 @@ test('een verdwenen KERN weigert: een kortere versie zou een ander werk zijn', a
   assert.equal(r.status, 409, 'zonder kern geen uitvoering');
   assert.equal(r.body.geweigerd, true);
   assert.match(r.body.reden, /onmisbare|ander werk/i);
+});
+
+test('een maker ziet zijn eigen werk met de duur erbij, en live valt erbuiten', async () => {
+  const r = await api('/api/uitvoering/eigenwerk', {}, maker);
+  assert.equal(r.status, 200);
+  const eigen = r.body.stukken || [];
+  assert.ok(eigen.length, 'de maker heeft werk om uit te kiezen');
+  assert.ok(eigen.every(s => s.vorm !== 'live'),
+    'een uitzending heeft geen lengte om een bereik in te kiezen');
+  const track = eigen.find(s => s.vorm === 'track');
+  assert.ok(track, 'het uitgegeven stuk staat erbij');
+  assert.equal(track.duurS, 128, '32 maten op 60 slagen is 128 seconden, gerekend en niet geraden');
+  /* Wat GEEN duur heeft, valt niet weg maar draagt de reden -- een maker die
+     zijn werk mist gaat zoeken, een maker die leest waarom weet wat hij kan doen. */
+  assert.ok(eigen.every(s => s.duurS || s.reden), 'zonder duur staat er een reden');
+  // en het werk van een ander komt er niet in
+  const vanKijker = await api('/api/uitvoering/eigenwerk', {}, kijker);
+  const mijnIds = new Set(eigen.map(s => s.stukId));
+  assert.ok((vanKijker.body.stukken || []).every(s => !mijnIds.has(s.stukId)),
+    'de kijker ziet het werk van de maker hier niet');
 });
 
 test('een gast komt er niet in', async () => {

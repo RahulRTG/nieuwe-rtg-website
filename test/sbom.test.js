@@ -129,3 +129,49 @@ test('het stempel wordt NIET door het proces zelf uitgerekend', () => {
   assert.ok(!/require\(.*sbom|createHash|readFileSync/.test(bron),
     'bouwstempel.js hoort niets te lezen of te hashen; hij geeft door wat de bouwer zei');
 });
+
+/* ---- de uitrolproef: draait wat er is gebouwd? ---- */
+
+const uitrol = require('../scripts/uitrolproef');
+const AFDRUK = 'sha256:' + 'a'.repeat(64);
+const ANDERS = 'sha256:' + 'b'.repeat(64);
+
+test('een gelijke bronafdruk is GELIJK, en zegt erbij wat het niet bewijst', () => {
+  const u = uitrol.oordeel({ vastgelegd: true, bronAfdruk: AFDRUK }, AFDRUK);
+  assert.equal(u.stand, 'gelijk');
+  assert.equal(u.code, 0);
+  assert.match(u.let, /basis-images|handtekening/i,
+    'een provenance-werktuig dat niet zegt wat het NIET bewijst, wordt overschat');
+});
+
+test('een andere bronafdruk is een alarm, met beide waarden erbij', () => {
+  const u = uitrol.oordeel({ vastgelegd: true, bronAfdruk: ANDERS }, AFDRUK);
+  assert.equal(u.stand, 'anders');
+  assert.equal(u.code, 1);
+  assert.equal(u.draait, ANDERS);
+  assert.equal(u.verwacht, AFDRUK, 'wie dit leest moet kunnen zien WAT er afwijkt');
+});
+
+test('geen stempel is NIET VAST TE STELLEN, en niet stiekem goed of fout', () => {
+  /* BESTUUR.md: onbekend is een eersteklas uitslag naast in orde en storing.
+     Een server zonder stempel als "gelijk" tellen zou de proef waardeloos maken;
+     als "anders" zou elke ontwikkelserver een alarm geven. */
+  const geen = uitrol.oordeel({ vastgelegd: false, reden: 'geen release-image' }, AFDRUK);
+  assert.equal(geen.stand, 'niet vast te stellen');
+  assert.equal(geen.code, 2);
+  assert.match(geen.waarom, /release-image/, 'met de reden van de server zelf');
+
+  const zonderVerwachting = uitrol.oordeel({ vastgelegd: true, bronAfdruk: AFDRUK }, null);
+  assert.equal(zonderVerwachting.stand, 'niet vast te stellen',
+    'ook zonder verwachte afdruk valt er niets vast te stellen');
+});
+
+test('de drie uitslagen hebben drie verschillende afsluitcodes', () => {
+  const codes = [
+    uitrol.oordeel({ vastgelegd: true, bronAfdruk: AFDRUK }, AFDRUK).code,
+    uitrol.oordeel({ vastgelegd: true, bronAfdruk: ANDERS }, AFDRUK).code,
+    uitrol.oordeel(null, AFDRUK).code
+  ];
+  assert.deepEqual(codes, [0, 1, 2],
+    'een uitrolpijplijn moet de drie uit elkaar kunnen houden zonder tekst te lezen');
+});

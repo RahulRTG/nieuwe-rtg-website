@@ -83,6 +83,7 @@ function maakUitvoering({ db, save, schoon, crypto, catalogus, keyVanCodenaam, p
       partituurMaak: (sess, o) => partituur.maak(sess, o),
       partituurZet: (sess, o) => partituur.zet(sess, o),
       onderdeel: (sess, o) => partituur.onderdeel(sess, o),
+      eigenWerk: (sess) => partituur.eigenWerk(sess),
       voerUit: bouwUitvoering,
       bon: (sess, o) => aanbod ? aanbod.bon(sess, (o || {}).partituurId)
         : { status: 503, error: 'De betaallaag draait niet mee; betaalde partituren zijn nu niet te kopen.' },

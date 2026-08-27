@@ -38,7 +38,8 @@ test('een lid vraagt om een uitvoering, en leest waaruit hij bestaat',
 
     // eigen werk: een uitgegeven stuk (de kern) en een korte video (verdieping)
     const trackId = (await api('/api/muziek/maak', {}, lid.token)).track.id;
-    await api('/api/muziek/bewaar', { id: trackId, naam: 'De lange weg', klaar: true }, lid.token);
+    // 32 maten op 60 slagen = 128 seconden, dus het kernfragment van 60 past
+    await api('/api/muziek/bewaar', { id: trackId, naam: 'De lange weg', klaar: true, bpm: 60, maten: 32 }, lid.token);
     const uitgave = (await api('/api/muziek/uitgeven', { id: trackId }, lid.token)).uitgave;
     const clip = (await api('/api/clips/maak', { titel: 'Aanloop', duurS: 20, mbGeschat: 2 }, lid.token)).id;
 
@@ -88,6 +89,80 @@ test('een lid vraagt om een uitvoering, en leest waaruit hij bestaat',
     assert.match(weiger, /waarom/i, 'het scherm legt uit in plaats van te klagen');
     assert.match(weiger, /60/, 'en noemt hoe lang het onmisbare deel werkelijk duurt');
     assert.ok(!/undefined|NaN/.test(weiger), 'geen lege plekken in de uitleg');
+
+    assert.deepEqual(fouten, [], 'geen fouten in de console: ' + JSON.stringify(fouten));
+  } finally {
+    if (browser) await browser.close();
+    await stop({ child });
+  }
+});
+
+test('een maker wijst een fragment aan op een tijdlijn, zonder ooit een id te typen',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-studio-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const api = (pad, lijf, token) => fetch(base + pad, { method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+      body: JSON.stringify(lijf || {}) }).then(r => r.json());
+
+    const u = Date.now().toString().slice(-8);
+    const lid = await api('/api/auth/register', { name: 'Studiolid', email: 'us' + u + '@x.nl',
+      phone: '06' + u, password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' });
+    const trackId = (await api('/api/muziek/maak', {}, lid.token)).track.id;
+    // 32 maten op 60 slagen = 128 seconden: lang genoeg om een bereik in te kiezen
+    await api('/api/muziek/bewaar', { id: trackId, naam: 'Het lange stuk', klaar: true, bpm: 60, maten: 32 }, lid.token);
+    await api('/api/muziek/uitgeven', { id: trackId }, lid.token);
+    const p = (await api('/api/uitvoering/partituur/maak', { naam: 'Op de tijdlijn' }, lid.token)).partituur;
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
+    await ctx.addInitScript((t) => {
+      try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+    }, lid.token);
+    const page = await ctx.newPage();
+    const fouten = letOpFouten(page, []);
+    await page.goto(base + '/apps/uitvoering.html', { waitUntil: 'load' });
+
+    await page.locator('[data-stand="studio"]').click();
+    await page.waitForSelector('#werkLijst .werkknop', { timeout: 20000 });
+
+    /* Het stuk staat er MET zijn duur. Die is gerekend uit tempo en maten
+       (kern/muziek-uitgave-beeld.js); stond hij op null, dan viel er geen
+       tijdlijn overheen te leggen en zou de knop uitstaan. */
+    const knop = await page.$eval('#werkLijst .werkknop', e => e.textContent);
+    assert.match(knop, /Het lange stuk/);
+    assert.match(knop, /128s/, 'de duur is gerekend en staat erbij: ' + knop);
+
+    await page.locator('#werkLijst .werkknop').first().click();
+    await page.waitForSelector('#knipVlak:not([hidden])', { timeout: 10000 });
+
+    /* Met het TOETSENBORD een bereik kiezen. Dat is de weg die moet werken voor
+       wie niet kan slepen; als alleen slepen werkte, kon een deel van de makers
+       niet monteren. */
+    await page.locator('#balk').focus();
+    await page.keyboard.press('Shift+ArrowRight');   // begin +10
+    await page.keyboard.press('ArrowUp');            // eind +1
+    const bereik = await page.$eval('#balkTekst', e => e.textContent);
+    assert.match(bereik, /10s tot 31s/, 'de pijltjes verschuiven het bereik: ' + bereik);
+
+    await page.fill('#fragNaam', 'De opbouw');
+    await page.selectOption('#fragRol', 'kern');
+    await page.click('#zetFragment');
+    await page.waitForFunction(() => /Toegevoegd/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 10000 });
+
+    /* En het staat er ook echt in, met precies het gekozen bereik. Het id is
+       door het scherm samengesteld; de maker heeft geen letter ervan getypt. */
+    const na = await api('/api/uitvoering/partituren', {}, lid.token);
+    const mijn = (na.partituren || []).find(x => x.id === p.id);
+    assert.equal(mijn.onderdelen.length, 1, 'er staat een onderdeel in');
+    const o = mijn.onderdelen[0];
+    assert.equal(o.naam, 'De opbouw');
+    assert.equal(o.rol, 'kern');
+    assert.equal(o.duurS, 21, 'van 10 tot 31 is 21 seconden');
+    assert.match(o.fragmentId, /^fragment:track:.+@10-31$/, 'het id is samengesteld: ' + o.fragmentId);
 
     assert.deepEqual(fouten, [], 'geen fouten in de console: ' + JSON.stringify(fouten));
   } finally {

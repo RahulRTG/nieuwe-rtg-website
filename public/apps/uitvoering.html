@@ -58,6 +58,16 @@
     background:var(--card);border:1px solid var(--line);padding:0.6rem 0.9rem;font-size:0.82rem;
     transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;}
   .melding.zien{opacity:1;transform:translateX(-50%);}
+  .werkrij{display:grid;gap:0.4rem;margin-top:0.8rem;}
+  .werkknop{text-align:left;}
+  .werkknop:disabled{opacity:0.6;cursor:default;}
+  /* De tijdlijn. Hoge balk, want een raakvlak van 24 pixels is voor een hand
+     met tremor geen raakvlak (WCAG 2.5.8, en TAKEN.md 4.33 in dit huis). */
+  .balk{position:relative;height:48px;background:var(--card2);border:1px solid var(--line);
+    margin-top:0.8rem;cursor:ew-resize;touch-action:none;}
+  .balk:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .balkvlak{position:absolute;top:0;bottom:0;background:rgba(201,162,75,0.32);
+    border-left:2px solid var(--gold);border-right:2px solid var(--gold);}
   [hidden]{display:none !important;}
 </style>
 </head>
@@ -70,6 +80,7 @@
   <nav class="standen" aria-label="Standen">
     <button type="button" data-stand="luister" aria-current="true">Uitvoeren</button>
     <button type="button" data-stand="maak" aria-current="false">Mijn partituren</button>
+    <button type="button" data-stand="studio" aria-current="false">Studio</button>
   </nav>
 
   <main>
@@ -111,10 +122,58 @@
       </div>
       <div class="kaart" id="mijnLijst"><p class="stil">Laden…</p></div>
     </section>
+    <!-- ---- de studio: aanwijzen op een tijdlijn ---- -->
+    <section id="vlakStudio" hidden>
+      <div class="kaart">
+        <h2>Een fragment aanwijzen</h2>
+        <p class="stil">Kies een stuk uit uw eigen werk, sleep het begin en het eind, en zeg of dit
+          onmisbaar is. Het fragment-id maakt dit scherm; u hoeft niets te typen.</p>
+        <div class="rij" style="margin-top:0.8rem">
+          <label for="studioP" class="stil">In partituur</label>
+          <select id="studioP"><option value="">- laden -</option></select>
+        </div>
+        <div id="werkLijst" class="werkrij"><p class="stil">Laden...</p></div>
+      </div>
+
+      <div class="kaart" id="knipVlak" hidden>
+        <h2 id="knipTitel"></h2>
+        <!-- DE BALK IS DE AFFORDANCE, DE GETALLEN ZIJN DE WAARHEID. Wie niet
+             sleept, monteert met de velden eronder of met de pijltjestoetsen. -->
+        <div id="balk" class="balk" role="slider" tabindex="0"
+             aria-label="Begin en eind van het fragment"
+             aria-valuemin="0" aria-valuemax="0" aria-valuetext="nog niets gekozen">
+          <div id="balkVlak" class="balkvlak"></div>
+        </div>
+        <p class="stil" id="balkTekst" style="margin-top:0.4rem"></p>
+        <div class="rij" style="margin-top:0.7rem">
+          <label for="fragVan" class="stil">Begin (s)</label>
+          <input id="fragVan" type="number" min="0" step="1" value="0">
+          <label for="fragTot" class="stil">Eind (s)</label>
+          <input id="fragTot" type="number" min="1" step="1" value="30">
+        </div>
+        <div class="rij" style="margin-top:0.7rem">
+          <label for="fragNaam" class="stil">Naam</label>
+          <input id="fragNaam" type="text" maxlength="80" placeholder="Waar gaat dit stuk over?">
+          <label for="fragRol" class="stil">Rol</label>
+          <select id="fragRol">
+            <option value="verdieping">verdieping (mag weg als de tijd op is)</option>
+            <option value="kern">kern (hoort er altijd in)</option>
+          </select>
+          <label for="fragDiepte" class="stil">Diepte</label>
+          <select id="fragDiepte">
+            <option value="1">1 - voor iedereen</option>
+            <option value="2">2 - wie meer wil</option>
+            <option value="3">3 - wie het onderwerp kent</option>
+          </select>
+          <button class="knop vol" id="zetFragment" type="button">Zet in de partituur</button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <p class="melding" id="melding" role="status" aria-live="polite"></p>
   <script src="/apps/uitvoering.js" defer></script>
+  <script src="/apps/uitvoering-studio.js" defer></script>
   <!-- De gedeelde schil van dit huis, in dezelfde volgorde als de andere
        ledenschermen: de metgezel (Rahul, het palet), de basislaag, de bediening
        met zijn randen, en de cookie- en iOS-lagen. randen.js hoort BIJ

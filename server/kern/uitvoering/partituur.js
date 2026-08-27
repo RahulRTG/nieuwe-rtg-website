@@ -138,9 +138,9 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
   /* Wat er IN een partituur zit -- erbij, eruit, verplaatsen, en de
      eigendomscontrole -- staat in ./onderdelen.js. Gesplitst toen dit bestand
      tegen de 10 kB-grens liep; de naad loopt waar hij hoort. */
-  const { onderdeel } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN });
+  const { onderdeel, eigenWerk } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN });
 
   const mijne = (sess) => ({ status: 200, partituren: tabel().filter(p => p.key === sess.key).map(p => beeld(p, true)), rollen: ROLLEN });
 
-  return { maak, zet, onderdeel, mijne, met, beeld, ROLLEN };
+  return { maak, zet, onderdeel, eigenWerk, mijne, met, beeld, ROLLEN };
 };

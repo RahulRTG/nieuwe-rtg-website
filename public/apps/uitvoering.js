@@ -44,7 +44,9 @@
       });
       $('#vlakLuister').hidden = b.dataset.stand !== 'luister';
       $('#vlakMaak').hidden = b.dataset.stand !== 'maak';
+      $('#vlakStudio').hidden = b.dataset.stand !== 'studio';
       if (b.dataset.stand === 'maak') laadMijn();
+      if (b.dataset.stand === 'studio' && window.RTGStudioLaad) window.RTGStudioLaad();
     };
   });
 
@@ -199,6 +201,11 @@
       laadMijn(); laadKeuze();
     });
   };
+
+  /* De studio roept dit aan nadat hij een fragment heeft toegevoegd, zodat de
+     lijst en de keuze meteen kloppen. Een haak en geen tweede laadfunctie: twee
+     plekken die dezelfde lijst ophalen, lopen uiteen. */
+  window.RTGUitvoeringHerlaad = function () { laadMijn(); laadKeuze(); };
 
   laadKeuze();
 })();

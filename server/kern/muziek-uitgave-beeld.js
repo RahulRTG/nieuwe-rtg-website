@@ -11,9 +11,28 @@
    (kern/mediaos/) vraagt het hier op en houdt zelf geen tweede lijst bij. */
 'use strict';
 
+const I = require('./muziek-instrumenten');
+
+/* DE DUUR VAN EEN UITGAVE, gerekend en niet geraden. Een stuk is hier geen
+   bestand met een lengte maar een raster, dus de duur volgt uit het tempo en
+   het aantal maten. De rekensom komt uit de motor zelf (public/apps/klankwerk/
+   motor.js: een stap duurt 60/bpm/4 seconde) en de stappen per maat uit
+   ./muziek-instrumenten.js -- zodat hij meebeweegt als die constanten ooit
+   veranderen in plaats van hier als 240 te blijven staan.
+
+   Waarom dit hier staat en niet in de catalogus van de Media OS: die weet niet
+   hoe een raster klinkt, en hoort dat ook niet te weten. Zonder dit veld toonde
+   de mediawereld `duurS: null` voor elk uitgegeven stuk, en kon een tijdlijn er
+   niet omheen gebouwd worden. */
+const duurVanUitgave = (u) => {
+  const bpm = Number(u.bpm), maten = Number(u.maten);
+  if (!(bpm > 0) || !(maten > 0)) return null;
+  return Math.round(maten * I.STAPPEN_PER_MAAT * (60 / bpm / 4));
+};
+
 module.exports = ({ U, codenaamVan }) => {
   const publiek = (u, key) => ({
-    id: u.id, naam: u.naam, bpm: u.bpm, maten: u.maten,
+    id: u.id, naam: u.naam, bpm: u.bpm, maten: u.maten, duurS: duurVanUitgave(u),
     onder: u.onder,
     naamOnder: u.onder === 'rtg' ? 'Rahul Travel Group' : (u.makers[0] || {}).codenaam || codenaamVan(u.key),
     makers: u.makers,
@@ -42,5 +61,5 @@ module.exports = ({ U, codenaamVan }) => {
     .filter(u => u.key === makerKey)
     .map(u => publiek(u, kijkerKey));
 
-  return { publiek, vanMaker };
+  return { publiek, vanMaker, duurVanUitgave };
 };

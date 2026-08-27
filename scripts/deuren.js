@@ -28,7 +28,14 @@
    - public/ en test/. De browser praat niet met db.data, en een toets die de
      staat opzet is geen productiepad.
 
-   WAT DEZE METER NIET WEET. Hij leest brontekst, geen gedrag. Een bestand dat
+   HIJ LEEST CODE EN GEEN PROZA. Dit stond eerst als een patroon over de rauwe
+   tekst, en dat telde een bestand mee dat `db.data` alleen in zijn KOP noemt --
+   twee contracten die net waren opgeknipt dragen de uitleg in hun
+   register-helft en raken de opslag niet aan. Dezelfde fout die keuringsregel
+   47 een keer maakte (TAKEN.md 6.17) en die regel 53 met de lexer oploste. De
+   meter en de poort horen hetzelfde te meten, dus doet hij het nu ook.
+
+   WAT DEZE METER NIET WEET. Hij leest de ontleding, geen gedrag. Een bestand dat
    `db.data` via een doorgegeven verwijzing aanraakt (`const d = db.data;` in de
    ene module, gebruikt in de andere) telt hier niet mee. Dat is een bewuste
    onderschatting van dezelfde soort als keuringsregel 50: een vals alarm in een
@@ -41,6 +48,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { lex } = require('./ast/lexer');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -84,8 +92,23 @@ function meet(opties) {
     let bron;
     try { bron = fs.readFileSync(path.join(wortel, rel), 'utf8'); } catch (e) { continue; }
     if (!bron.includes('db.data')) continue;
+
+    /* De tokenreeks  db . data  -- een naam, een punt, een naam. Een string of
+       een commentaar met diezelfde tekst is geen aanraking. */
+    let toks;
+    try { toks = lex(bron); } catch (e) { continue; }
+    let echt = 0;
+    for (let i = 0; i + 2 < toks.length; i++) {
+      if (toks[i].type === 'naam' && toks[i].value === 'db' &&
+          toks[i + 1].value === '.' &&
+          toks[i + 2].type === 'naam' && toks[i + 2].value === 'data') echt++;
+    }
+    if (!echt) continue;
+
     raken.push(rel);
-    aanrakingen += (bron.match(/db\.data\b/g) || []).length;
+    aanrakingen += echt;
+    /* Voor de collectienamen en de schrijfvormen volstaat de tekst: die worden
+       alleen geteld in bestanden die de poort hierboven al zijn gepasseerd. */
     for (const m of bron.matchAll(/db\.data\.([A-Za-z_$][\w$]*)/g)) collecties.add(m[1]);
     if (SCHRIJF.some(r => r.test(bron))) schrijven.push(rel);
   }

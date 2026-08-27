@@ -32,8 +32,8 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "schermenZonderVormtaal": 181,
-    "dbDeuren": 642,
-    "dbDeurenSchrijvend": 381
+    "dbDeuren": 576,
+    "dbDeurenSchrijvend": 372
   },
   "notities": [
     {
@@ -529,6 +529,11 @@
       "datum": "2026-08-27",
       "meter": "keuringOmvang 170 -> 171 (met de hand); dbDeuren 693 -> 661 en dbDeurenSchrijvend 418 -> 392",
       "reden": "Vier domeinen achter een opslagcontract: payroll, concern, veiligheid en mobiliteit. Twee meters gaan flink omlaag en een gaat met de hand omhoog, en dat laatste hoort uitgelegd.\n\nserver/kern/mobiliteit/index.js stond op 9364 byte; de adviesdrempel van keuringOmvang ligt op 9400. De regel die het contract bedraadt -- ctx.opslag = require('./opslag')({ db }) -- kost 50 byte, en daarmee komt het bestand op 9414. Er is dus GEEN vorm van die regel die eronder blijft, ook niet zonder commentaar en zonder lege regel (nagemeten: 9406).\n\nDe alternatieven waren commentaar wegschaven elders in het bestand, of index.js opknippen. Het eerste is precies het spel dat TAKEN.md 6.16 beschrijft: de uitzonderingslijst groeide daar jaren omdat niemand de meter wilde zien bewegen. Het tweede is een echte snede, maar index.js is een bedradingsbestand van vijfentwintig Object.assign-regels; er valt geen natuurlijke naad in te leggen die iets oplost.\n\nDus staat hij hier als besluit in plaats van als gescheefde meting. Het bestand is 9461 byte en de HARDE grens (keuringsregel 13) ligt op 10240, dus er is ruimte; wie hem ooit toch opknipt, zet deze meter weer op 170."
+    },
+    {
+      "datum": "2026-08-27",
+      "meter": "dbDeuren 642 -> 576 en dbDeurenSchrijvend 381 -> 372, EN DAT IS TWEE DINGEN TEGELIJK",
+      "reden": "Het levensdossier achter een contract: kern/lifestyle, kern/rechterhand, kern/bureau en kern/levensgraaf delen db.data.lifestyle en gaan nu alle vier door kern/levensdossier/.\n\nMAAR DE DALING IS NIET WAT ZE LIJKT, en dat hoort hier te staan want anders legt deze ratel een winst vast die er niet is. In dezelfde ronde is scripts/deuren.js overgezet van een TEKSTpatroon naar de lexer, omdat hij een bestand meetelde dat `db.data` alleen in zijn KOP noemt -- dezelfde fout die keuringsregel 47 een keer maakte en die regel 53 al met de lexer had opgelost. De meter en de poort horen hetzelfde te meten.\n\nNagemeten met de NIEUWE meter op de vorige commit (fd20bf9), zodat de twee te scheiden zijn:\n\n  echte daling door dit werk : 589 -> 576 deuren, 379 -> 372 schrijvers  (13 en 7)\n  correctie van de meter zelf: 642 -> 589 deuren, 381 -> 379 schrijvers  (53 en 2)\n\nVan de 66 deuren die deze ratel ziet dalen zijn er dus 13 echt gesloten. De andere 53 stonden er nooit: dat waren koppen en commentaren die het woord noemen.\n\nWat dat betekent voor de eerdere getallen in deze reeks (706 -> 642): die zijn met de tekstmeter gezet en dus aan BEIDE kanten opgeblazen. De verhouding klopte, de absolute stand niet. Vanaf hier meet hij wat hij beweert te meten."
     }
   ],
   "prestatie": {

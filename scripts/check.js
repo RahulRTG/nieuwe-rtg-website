@@ -3840,6 +3840,36 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
            afweging. Zolang hij hier staat, kan er geen tweede bij komen zonder
            dat deze regel rood wordt. */
         'register.js': 'zuivere module; zijn lees(db)-contract wordt gedeeld met zaakcommand en werkcommand'
+      } },
+    /* DE VIER DIE EEN DEUR DELEN. db.data.lifestyle is EEN dossier per lid met
+       vijfentwintig velden, en de meting wees uit dat er geen enkel veld door
+       twee domeinen wordt geschreven. Het is dus geen betwiste zak maar een
+       samengesteld dossier; kern/levensdossier.js draagt de veldenlijst met per
+       veld zijn eigenaar, en weigert een schrijver die niet de eigenaar is. */
+    { map: 'server/kern/lifestyle', deur: '../levensdossier/index.js',
+      waarom: 'bezit vijf velden van het levensdossier (verzoeken, bezittingen, afspraken, dossier, voorkeuren)' },
+    { map: 'server/kern/rechterhand', deur: '../levensdossier/index.js',
+      waarom: 'bezit twaalf velden; de afspraak stond hier als commentaar en is nu een poort' },
+    { map: 'server/kern/bureau', deur: '../levensdossier/index.js',
+      waarom: 'bezit acht velden en LEEST er vier van anderen; die vier staan nu met naam in de code' },
+    { map: 'server/kern/levensgraaf', deur: '../levensdossier/index.js',
+      waarom: 'schrijft niets en leest alles: een projectie, en die mag het dossier niet laten groeien',
+      ook: {
+        /* DE BRONNEN ZIJN ZUIVERE BESCHRIJVINGEN. Elke bron is een object met
+           functies die hun gegevensbron als ARGUMENT krijgen (net als
+           kern/command/register.js), en ze lezen zes collecties van andere
+           domeinen: agendas, boekingen, cvs, leren, lifestyle en rtgid. Alleen
+           lezen -- deze laag schrijft nergens.
+
+           Ze contracteren betekent het bronnen-contract wijzigen, en dat dragen
+           ook bronnen-basis, bronnen2, bronnen3 en de zaak-graaf in
+           kern/zaak/. Dat is een ontwerpvraag over domeinen heen en geen
+           migratie; zolang ze hier staan, kan er geen vijfde bij komen zonder
+           dat deze regel rood wordt. */
+        'bronnen-leven.js': 'zuivere bronbeschrijving; leest leren en cvs met db als argument',
+        'bronnen-leven-bijdrage.js': 'zuivere bronbeschrijving; leest rtgid met db als argument',
+        'bronnen-platform.js': 'zuivere bronbeschrijving; leest boekingen en agendas met db als argument',
+        'bronnen-zaak.js': 'zuivere bronbeschrijving; leest boekingen en agendas met db als argument'
       } }
   ];
 
@@ -3853,12 +3883,18 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
     if (!fs.existsSync(wortel)) { fout(dom.map + ' bestaat niet, maar staat wel als gecontracteerd'); continue; }
     const deurPad = path.join(wortel, dom.deur);
     if (!fs.existsSync(deurPad)) { fout(dom.map + ' mist zijn deur (' + dom.deur + ')'); continue; }
+    /* De deur mag BUITEN de eigen map staan. Vier domeinen delen er een:
+       kern/levensdossier.js draagt het dossier per lid waarvan lifestyle,
+       rechterhand, bureau en levensgraaf elk hun eigen velden schrijven.
+       Eist deze regel dat een deur binnen het domein staat, dan zou zo'n
+       gedeeld contract in vier kopieen moeten -- precies wat het oplost. */
+    const deurRel = path.relative(ROOT, deurPad).replace(/\\/g, '/');
 
     let langs = 0, gekeken = 0;
     loop(wortel, /\.js$/, f => {
       const rel = path.relative(ROOT, f).replace(/\\/g, '/');
       gekeken++;
-      if (rel === path.posix.join(dom.map, dom.deur)) return;      // de deur zelf
+      if (rel === deurRel) return;                                 // de deur zelf
       if (ook.has(path.posix.basename(rel))) return;               // benoemd, met reden
       /* CODE LEZEN EN GEEN PROZA, VIA DE LEXER. Keuringsregel 47 heeft deze
          fout een keer gemaakt (TAKEN.md 6.17): hij las de RAUWE bron en meldde

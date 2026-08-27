@@ -34,19 +34,15 @@ const TENEUR = ['positief', 'neutraal', 'negatief'];
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   function R(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!l.reputatie || typeof l.reputatie !== 'object') l.reputatie = {};
-    const r = l.reputatie;
+    const r = levens.veld(key, 'reputatie');
     for (const v of ['optredens', 'lijnen', 'woordvoerders', 'vermeldingen']) if (!Array.isArray(r[v])) r[v] = [];
     return r;
   }
   function lees(key) {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    const r = l.reputatie || {};
+    const r = levens.leesVeld(key, 'reputatie');
     return { optredens: r.optredens || [], lijnen: r.lijnen || [],
       woordvoerders: r.woordvoerders || [], vermeldingen: r.vermeldingen || [] };
   }

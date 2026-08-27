@@ -45,22 +45,23 @@ module.exports = ({ db, save, crypto, liveCodename, anthropic, DATA_DIR }) => {
     } catch (e) { return ''; }
   }
 
-  // hetzelfde dossier als De Rechterhand; wij zorgen alleen dat onze lijsten bestaan
+  /* HETZELFDE DOSSIER ALS BUREAU EN LIFESTYLE; wij zorgen alleen dat ONZE
+     lijsten bestaan. Die zin stond hier al als commentaar en was de enige
+     plek waar de afspraak leefde; server/kern/levensdossier.js maakt er een
+     poort van -- veld() weigert een veld dat van een ander domein is. */
+  const levens = require('../levensdossier')({ db }).voor('rechterhand');
   function L(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!Array.isArray(l.reizen)) l.reizen = [];
-    if (!Array.isArray(l.cellier)) l.cellier = [];
-    if (!Array.isArray(l.tables)) l.tables = [];
-    if (!l.maison || typeof l.maison !== 'object') l.maison = { staf: [], taken: [], logboek: [] };
-    if (!l.hangar || typeof l.hangar !== 'object') l.hangar = { toestellen: [], vluchten: [] };
-    if (!Array.isArray(l.entourage)) l.entourage = [];
-    if (!l.attenties || typeof l.attenties !== 'object') l.attenties = { relaties: [], giften: [] };
-    return l;
+    levens.veld(key, 'reizen');
+    levens.veld(key, 'cellier');
+    levens.veld(key, 'tables');
+    levens.veld(key, 'entourage');
+    levens.veld(key, 'maison', (m) => { m.staf = []; m.taken = []; m.logboek = []; });
+    levens.veld(key, 'hangar', (h) => { h.toestellen = []; h.vluchten = []; });
+    levens.veld(key, 'attenties', (a) => { a.relaties = []; a.giften = []; });
+    return levens.lees(key);
   }
 
-  const ctx = { db, save, rid, nu, schoon, isDatum, getal, L, liveCodename, enc, dec };
+  const ctx = { db, save, rid, nu, schoon, isDatum, getal, L, levens, liveCodename, enc, dec };
   const api = Object.assign({},
     require('./reisboek')(ctx),
     require('./cellier')(ctx),

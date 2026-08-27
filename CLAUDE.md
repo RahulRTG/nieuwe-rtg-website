@@ -322,6 +322,33 @@ bij: geen handtekening (de provenance komt van onze eigen builder), geen
 digest-pinning van de basis-images, geen kwetsbaarheidsscan, en geen verificatie
 bij het uitrollen.
 
+**`EXCHANGE.md` is de richting van de handelskant** — niet "een betere
+Marktplaats" maar een ander werkwoord: **een marktplaats zet iets online en
+wacht, een exchange draagt iets veilig over.** Lees die vóór je aan de markt, de
+Mall of een handelsfunctie werkt. De belangrijkste vaststelling is dat dit géén
+leeg veld is: `kern/markt.js` draagt al een verkopersbadge, oplichtingsdetectie,
+een verbodslijst, melden en blokkeren, AI-hulp die schrijft en prijst — en een
+maatregel die de meeste marktplaatsen niet hebben: **betalen kan pas als koper en
+verkoper fysiek bij elkaar zijn**.
+
+**Par. 2 is de vondst die de volgorde bepaalt en hoort eerst gelezen:** in de hele
+marktboom staat **geen enkele geldbeweging naar de verkoper**. De koper wordt
+afgeschreven via de provider, de advertentie gaat op verkocht, en de verkoper
+krijgt een melding. Dat is geen escrow zonder naam — escrow heeft een vrijgave,
+en die bestaat hier niet. Of dat een demo-stand is of een geldstroom die niet
+aankomt, is een vraag die beantwoord hoort te worden vóór er iets bovenop komt.
+
+Verder par. 4, de botsingen, met als scherpste: **escrow is geen functie maar een
+vergunningsvraag.** Geld van een ander aanhouden en later vrijgeven breekt alle
+drie de voorwaarden waarop `WALLET_SALDO` ooit een besluit mocht heten (alleen
+binnen RTG, niet uitbetaald, met plafonds) — wie dat bouwt zonder de
+bevoegdheidsvraag mee te bewegen, bouwt het pad om de vergunningplicht heen. En
+verder: de Deal Room mag klaarzetten maar nooit afspreken, een productpas draagt
+per vakje een bewijsgraad (een pas met alleen vinkjes is een pas die liegt), een
+fraudegraaf over apparaten en adressen botst frontaal met het codenaam-ontwerp,
+en "Universal Product Identity" is dezelfde belofte als `Asset` — die moet worden
+GEVONDEN in een meting en niet eroverheen verklaard (`OBJECTMODEL.json`).
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

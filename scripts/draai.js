@@ -82,8 +82,13 @@ function tePakken() {
      een poort staan: dat zou snelheid uit overgeslagen zekerheid halen. */
   const iA = ARG.indexOf('--alleen');
   if (iA >= 0) {
-    const p = new RegExp(ARG[iA + 1]);
-    return alleToetsen().filter((t) => p.test(t));
+    /* Een deeltekst en geen regex: het argument werd in een new RegExp()
+       gestopt, en een patroon uit invoer bouwen is de klasse fout die CodeQL
+       hier terecht aanwees (js/regex-injection) -- ook al is de invoer hier je
+       eigen commandoregel. Niemand gaf ooit iets anders op dan een stuk van de
+       bestandsnaam, en dat is precies wat includes() doet. */
+    const deel = ARG[iA + 1] || '';
+    return alleToetsen().filter((t) => t.includes(deel));
   }
   if (!heeft('--plan')) return alleToetsen();
   const uit = require('child_process').execFileSync(process.execPath,

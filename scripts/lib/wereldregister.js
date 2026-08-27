@@ -60,7 +60,16 @@ function draai(code) {
 function waarde(n) {
   if (!n) return undefined;
   if (n.type === 'Literal') {
-    if (n.kind === 'string') return JSON.parse(n.raw.replace(/^'([\s\S]*)'$/, (m, x) => '"' + x.replace(/"/g, '\\"') + '"'));
+    if (n.kind === 'string') {
+      /* Een JS-stringliteraal wordt hier ZELF ontcijferd, teken voor teken, in
+         plaats van via JSON.parse. De oude weg bouwde een JSON-string door de
+         aanhalingstekens om te schrijven en alleen " te ontsnappen -- maar \\
+         en \' bleven staan, en JSON kent \' niet (js/incomplete-sanitization).
+         Op 'pad\\naar' of 'zo\'n geval' klapte de meting dus stil om. */
+      const kaal = n.raw.slice(1, -1);
+      const TAFEL = { n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', v: '\v', '0': '\0' };
+      return kaal.replace(/\\([\s\S])/g, (m, c) => TAFEL[c] !== undefined ? TAFEL[c] : c);
+    }
     if (n.kind === 'getal') return Number(n.raw);
     if (n.kind === 'bool') return n.raw === 'true';
     return null;

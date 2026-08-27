@@ -132,7 +132,10 @@ test('7. de BTW-POT gaat mee omlaag -- met de echte fiscale laag', () => {
   const fiscaal = require('../server/kern/fiscaal').maakFiscaal({
     /* De ECHTE helpers uit kern/afgeleid.js en geen nabootsing: een fixture die
        afwijkt van de bron toetst de fixture. */
-    db, centen: (n) => Math.round(n * 100) / 100,
+    /* De ECHTE helpers uit de kern en geen nabootsing: een fixture die afwijkt
+       van de bron toetst de fixture. `rondEuro` heette tot voor kort `centen` en
+       rondde euro's af -- zie kern/geld/eenheid.js. */
+    db, rondEuro: require('../server/kern/util').rondEuro,
     btwSplit: require('../server/kern/afgeleid').btwSplit
   });
   /* De VORM komt uit kern/fiscaal/index.js: financeVoor geeft `btw`, een rij

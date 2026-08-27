@@ -31,7 +31,7 @@
 const STATUS = ['concept', 'live', 'gesloten'];
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, stadVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, stadVan, save } = ctx;
   const { bronUitCampagne } = eigen;
 
   const C = () => S().campagnes;
@@ -128,7 +128,7 @@ module.exports = (ctx, eigen) => {
     if (!w.landelijk) return { status: 403, error: 'Campagnegeld verdeelt het landelijke bestuur.' };
     if (c.status !== 'live') return { status: 400, error: 'Deze campagne staat op "' + c.status + '".' };
     if (sleutelSom(c) !== 1000) return { status: 400, error: 'De verdeelsleutel sluit niet.' };
-    const bedrag = centen(b.bedrag);
+    const bedrag = naarCenten(b.bedrag);
     if (bedrag === null || bedrag === 0) return { status: 400, error: 'Welk bedrag is er binnengekomen?' };
 
     const ruw = c.sleutel.map(s => ({ s, exact: (bedrag * s.promille) / 1000 }));

@@ -3,7 +3,7 @@
    maakFiscaal in kern/fiscaal.js. */
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 module.exports = (ctx) => {
-  const { db, centen, btwSplit, financeVoor } = ctx;
+  const { db, rondEuro, btwSplit, financeVoor } = ctx;
   const ordersVoor = typeof ctx.ordersVanZaak === 'function'
     ? ctx.ordersVanZaak
     : code => (db.data.orders || []).filter(o => o.supplierCode === code);
@@ -27,14 +27,14 @@ module.exports = (ctx) => {
       let t = 0;
       for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name), b); }
       omzet += t;
-      betaalwijzen.app = centen((betaalwijzen.app || 0) + t);
+      betaalwijzen.app = rondEuro((betaalwijzen.app || 0) + t);
     }
     for (const v of db.data.posSales[s.code] || []) {
       if (!opDag(v.at)) continue;
       bonnen++;
       omzet += v.total || 0;
       const m = v.method || 'contant';
-      betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
+      betaalwijzen[m] = rondEuro((betaalwijzen[m] || 0) + (v.total || 0));
       if (m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening: de btw loopt via de hoofdboeking
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
@@ -43,7 +43,7 @@ module.exports = (ctx) => {
       const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
       return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, t) };
     }).sort((a, b) => b.omzet - a.omzet);
-    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw };
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: rondEuro(omzet), fooien: rondEuro(fooien), betaalwijzen, btw };
   }
 
   /* De shift-samenvatting: het avondbriefing-moment in een kaart. De cijfers
@@ -78,7 +78,7 @@ module.exports = (ctx) => {
     }
     // wie stond er op de kassa
     const team = {};
-    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = centen((team[v.actor] || 0) + (v.total || 0));
+    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = rondEuro((team[v.actor] || 0) + (v.total || 0));
     // de hotelkant: bezetting, aankomsten en vertrekken van vandaag, en de
     // gemiddelde kamerprijs van wie er nu slaapt (ADR)
     let verblijf = null;
@@ -95,13 +95,13 @@ module.exports = (ctx) => {
         bezet: s.rooms.filter(r => r.hk && r.hk.status === 'bezet').length,
         totaal: s.rooms.length,
         aankomsten, vertrekken, noShows,
-        adr: inHuis ? centen(kamerOmzet / inHuis) : 0
+        adr: inHuis ? rondEuro(kamerOmzet / inHuis) : 0
       };
     }
     return {
       ok: true, datum: z.datum,
       omzet: z.omzet, bonnen: z.bonnen, fooien: z.fooien, betaalwijzen: z.betaalwijzen,
-      gasten, toppers, derving: centen(derving), verblijf,
+      gasten, toppers, derving: rondEuro(derving), verblijf,
       team: Object.entries(team).sort((a, b) => b[1] - a[1]).map(([naam, omzet]) => ({ naam, omzet }))
     };
   }

@@ -15,7 +15,7 @@ const { zzpBerekening } = require('./zzp');
 // de factuur van de klant vraagt het aan dezelfde routine; zie ./tarief.js
 const tarief = require('./tarief');
 
-function maakFiscaal({ db, centen, btwSplit }) {
+function maakFiscaal({ db, rondEuro, btwSplit }) {
   function financeVoor(s) {
     const landCode = tarief.landVan(s);
     const L = LANDEN[landCode];
@@ -59,7 +59,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
     let gcIngewisseld = 0;
     for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
     if (gcIngewisseld) tel(basisCat, gcIngewisseld);
-    const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
+    const gcOpen = rondEuro(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.entries(potten).map(([cat, omzet]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, tarief.tariefVan(s, cat)) }))
       .sort((a, b) => b.omzet - a.omzet);
@@ -67,21 +67,21 @@ function maakFiscaal({ db, centen, btwSplit }) {
     const uurloon = (s.settings && Number(s.settings.uurloon)) || 16;
     const duurUur = e => ((e.out ? new Date(e.out) : new Date()) - new Date(e.in)) / 3600000;
     const uren = (db.data.klok[s.code] || []).filter(e => String(e.in).slice(0, 7) === maand).reduce((x, e) => x + duurUur(e), 0);
-    const bruto = centen(uren * uurloon);
+    const bruto = rondEuro(uren * uurloon);
     return {
       land: landCode, landNaam: L.naam,
       landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })).sort((a, b) => a.naam.localeCompare(b.naam)),
       peiljaar: FISCAAL_PEILJAAR,
       maand,
-      btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),
+      btw, btwTotaal: rondEuro(btw.reduce((x, r2) => x + r2.btw, 0)),
       personeel: {
         uren: Math.round(uren * 10) / 10, uurloon, bruto,
-        lasten: centen(bruto * L.lasten), lastenPct: Math.round(L.lasten * 100),
-        vakantiegeld: centen(bruto * L.vakantiegeld), vakantiegeldPct: Math.round(L.vakantiegeld * 1000) / 10,
-        totaal: centen(bruto * (1 + L.lasten + L.vakantiegeld)),
+        lasten: rondEuro(bruto * L.lasten), lastenPct: Math.round(L.lasten * 100),
+        vakantiegeld: rondEuro(bruto * L.vakantiegeld), vakantiegeldPct: Math.round(L.vakantiegeld * 1000) / 10,
+        totaal: rondEuro(bruto * (1 + L.lasten + L.vakantiegeld)),
         uurloonMin: L.uurloonMin
       },
-      giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), open: gcOpen, aantal: kaarten.length },
+      giftcards: { verkocht: rondEuro(gcVerkocht), ingewisseld: rondEuro(gcIngewisseld), open: gcOpen, aantal: kaarten.length },
       regels: [
         L.aangifte,
         L.extra,
@@ -96,7 +96,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
   function cannedBoekhouder(vraag, fin, L) {
     const v = vraag.toLowerCase();
     if (/btw|vat|tarief|belasting|afdra/.test(v))
-      return 'In ' + L.naam + ' gelden voor u deze tarieven: ' + fin.btw.map(r => r.label + ' ' + r.tarief + '%').join(', ') + '. Deze maand is de af te dragen btw € ' + fin.btwTotaal + ' over € ' + centen(fin.btw.reduce((x, r) => x + r.grondslag, 0)) + ' grondslag. ' + L.aangifte;
+      return 'In ' + L.naam + ' gelden voor u deze tarieven: ' + fin.btw.map(r => r.label + ' ' + r.tarief + '%').join(', ') + '. Deze maand is de af te dragen btw € ' + fin.btwTotaal + ' over € ' + rondEuro(fin.btw.reduce((x, r) => x + r.grondslag, 0)) + ' grondslag. ' + L.aangifte;
     if (/personeel|loon|salaris|lasten|vakantiegeld|kost/.test(v))
       return 'Deze maand: ' + fin.personeel.uren + ' geklokte uren tegen € ' + fin.personeel.uurloon + ' = € ' + fin.personeel.bruto + ' bruto. Daar komt ~' + fin.personeel.lastenPct + '% werkgeverslasten (€ ' + fin.personeel.lasten + ')' + (fin.personeel.vakantiegeld ? ' en ' + fin.personeel.vakantiegeldPct + '% vakantiegeldreserve (€ ' + fin.personeel.vakantiegeld + ')' : '') + ' bij: totaal € ' + fin.personeel.totaal + '. Indicatie minimumuurloon in ' + L.naam + ': € ' + fin.personeel.uurloonMin + '.';
     if (/cadeau|bon|kaart|voucher|gift/.test(v))
@@ -108,7 +108,7 @@ function maakFiscaal({ db, centen, btwSplit }) {
 
   /* Het Z-rapport (dagafsluiting) en de shift-samenvatting draaien als
      submodule op de gedeelde context (een keer bij het opstarten opgebouwd). */
-  const { dagrapport, shiftSamenvatting } = require('./rapporten')({ db, centen, btwSplit, financeVoor });
+  const { dagrapport, shiftSamenvatting } = require('./rapporten')({ db, rondEuro, btwSplit, financeVoor });
 
   return { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting };
 }

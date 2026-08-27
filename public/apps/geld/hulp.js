@@ -58,7 +58,7 @@
      het, en dubbelzinnig is het niet: 1.500 is duizendvijfhonderd, 1.50 is
      anderhalve euro. Onleesbaar levert null op, en null is geen nul: de
      aanroeper hoort erom te vragen in plaats van stil met nul te rekenen. */
-  function centen(v) {
+  function naarCenten(v) {
     const s = String(v == null ? '' : v).trim().replace(/^€\s*/, '');
     if (!/^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$|^\d+(?:[.,]\d{1,2})?$/.test(s)) return null;
     const punten = (s.match(/\.\d{3}(?!\d)/g) || []).length > 0;
@@ -93,5 +93,5 @@
     meldT = setTimeout(() => { el.style.display = 'none'; }, 2600);
   }
 
-  w.Geld = { token, api, esc, euro, centen, datum, melding };
+  w.Geld = { token, api, esc, euro, naarCenten, datum, melding };
 })(window, document);

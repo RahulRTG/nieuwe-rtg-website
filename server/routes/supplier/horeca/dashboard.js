@@ -22,7 +22,7 @@
       en die belofte doen we hier niet. */
 module.exports = (kern) => {
   const { app, schoon, supplierAuth, horeca } = kern;
-  const { H, nu, centen, totaal, openstaand } = horeca;
+  const { H, nu, heleCenten, totaal, openstaand } = horeca;
   const dienstmeting = require('../../../kern/horeca/dienstmeting')({ horeca });
 
   /* ---------- DE DIENSTMETING ----------
@@ -66,7 +66,7 @@ module.exports = (kern) => {
 
     const perWijze = {};
     for (const r of betaald) for (const b of (r.betalingen || []))
-      perWijze[b.wijze] = (perWijze[b.wijze] || 0) + centen(b.centen);
+      perWijze[b.wijze] = (perWijze[b.wijze] || 0) + heleCenten(b.centen);
 
     const omzet = betaald.reduce((t, r) => t + totaal(r).netto, 0);
     const fooi = betaald.reduce((t, r) => t + totaal(r).fooi, 0);
@@ -78,7 +78,7 @@ module.exports = (kern) => {
       gemiddeldePerBon: betaald.length ? Math.round(omzet / betaald.length) : null,
       gemiddeldePerGast: gasten ? Math.round(omzet / gasten) : null,
       fooiCenten: fooi, kortingCenten: korting,
-      oninbaar: { bonnen: oninbaar.length, centen: oninbaar.reduce((t, r) => t + centen((r.oninbaar || {}).centen || 0), 0),
+      oninbaar: { bonnen: oninbaar.length, centen: oninbaar.reduce((t, r) => t + heleCenten((r.oninbaar || {}).centen || 0), 0),
         redenen: oninbaar.map(r => (r.oninbaar || {}).reden).filter(Boolean).slice(0, 20) },
       perKanaal: Object.values(perKanaal).sort((a, b) => b.omzetCenten - a.omzetCenten),
       perBetaalwijze: perWijze,

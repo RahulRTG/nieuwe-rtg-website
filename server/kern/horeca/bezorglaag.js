@@ -19,7 +19,7 @@
 'use strict';
 
 module.exports = ({ save, horeca, haversine }) => {
-  const { H, nu, id, centen } = horeca;
+  const { H, nu, id, heleCenten } = horeca;
 
   const B = (code) => {
     const h = H(code);
@@ -50,7 +50,7 @@ module.exports = ({ save, horeca, haversine }) => {
     const uit = zoekZone(b, { postcode, lat, lng }, zaak);
     if (!uit.zone) return { ok: true, bezorgbaar: false, reden: uit.reden, code: 'buiten-zone', km: uit.km || null };
     const z = uit.zone;
-    const bedrag = centen(bedragCenten);
+    const bedrag = heleCenten(bedragCenten);
     const gratis = !!(z.gratisVanafCenten && bedrag >= z.gratisVanafCenten);
     return {
       ok: true, bezorgbaar: b.open, gesloten: !b.open,

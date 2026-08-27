@@ -515,47 +515,101 @@ autonome betaling die grens 2 verbiedt.
   één keer heeft laten ontsporen. Ze zijn niet in één ronde samen te brengen, en
   een poging daartoe die halverwege stopt, laat het huis met nóg één meer achter.
 
-  Er stonden er 90 toen dit stuk werd geschreven; twee ervan zijn **deze laag
-  zelf** (`afrekening.js` en `overdracht.js`). De meter kent geen uitzondering
+  Er stonden er 90 toen dit stuk werd geschreven en 92 nu; twee ervan zijn **deze
+  laag zelf** (`afrekening.js` en `overdracht.js`). De meter kent geen uitzondering
   voor de bouwer, en dat hoort zo. Wat de meting níét kan zien is dat die twee
   dezelfde som gebruiken.
 
   **Maar bij het natellen bleek het risico ergens anders te zitten, en scherper.**
   Ze rekenen niet in dezelfde eenheid, en erger: het WOORD voor die eenheid
-  betekende drie dingen.
+  betekende drie dingen. Niet op vier plekken, zoals hier eerst stond, maar op
+  **zeven** in `server/` en een **achtste** in `public/` — dat verschil is zelf
+  het bewijs dat tellen boven onthouden gaat.
 
   | | | |
   |---|---|---|
   | `kern/util.js` | `centen(n) = round(n*100)/100` | euro's blijven euro's |
   | `school/financien.js` | `centen(v) = round(v*100)` | euro's worden centen |
   | `kern/labfonds.js` | `centen(euro) = round(euro*100)` | euro's worden centen |
-  | `bedrijf/klant.js`, `bedrijf/project.js` | idem | euro's worden centen |
+  | `bedrijf/klant.js` | idem, met een eigen plafond | euro's worden centen |
+  | `bedrijf/project.js` | idem, met een ánder plafond | euro's worden centen |
+  | `kern/rtfos/basis.js` | idem, met een dérde plafond | euro's worden centen |
   | `kern/horeca.js` | `centen(v) = round(v)` | ongewijzigd |
+  | `public/apps/geld/hulp.js` | `Geld.centen(v)`, leest "1.000" goed | euro's worden centen |
 
   `centen(x)` **leest** als "maak er centen van" en doet dat in `kern/util.js`
-  juist niet. Er was niets kapot — nagelopen, alle vijf de aanroepers geven het
-  goede mee — maar dat was geluk en geen ontwerp: dezelfde familie fout kostte
-  deze laag al een keer een factor honderd (`bedrag` in euro's dat als centen
-  werd gelezen). Dit is een `SEMANTIEK.json`-botsing in de duurste laag die er is.
+  juist niet. Vóór de hernoeming was er niets kapot — nagelopen, alle aanroepers
+  gaven het goede mee — maar dat was geluk en geen ontwerp: dezelfde familie fout
+  kostte deze laag al een keer een factor honderd (`bedrag` in euro's dat als
+  centen werd gelezen). Dit is een `SEMANTIEK.json`-botsing in de duurste laag
+  die er is. Wat de hernoeming zélf brak en hoe dat is gevonden, staat hieronder
+  — ongepoetst, want dat is de helft van wat dit stuk waard maakt.
 
   Wat er nu staat: **één plek die zegt wat een bedrag is**
   (`kern/geld/eenheid.js`), met namen die niet te verwarren zijn — `naarCenten`,
-  `naarEuro`, `rondEuro`, `regelCenten`, `somCenten`, en géén `centen`. De vier
-  omzetters die zo heetten zijn hernoemd en wijzen er nu heen.
-  `test/geldeenheid.test.js` toets 7 houdt het aantal functies dat `centen` heet
-  én van eenheid verandert op **nul**, en toets 8 laat die meter zelf uitslaan op
-  een bekend-foute invoer.
+  `naarEuro`, `rondEuro`, `regelCenten`, `somCenten`, en géén `centen`. Alle acht
+  zijn hernoemd naar wat ze DOEN en wijzen er nu heen: `rondEuro` in
+  `kern/util.js`, `heleCenten` in `kern/horeca.js`, `naarCenten` op de zes die
+  echt omzetten (`Geld.naarCenten` in de browser hoort daarbij: een huisregel die
+  bij de servergrens stopt, is een halve huisregel). Twee van de drie plafonds
+  blijven staan waar ze stonden — dat is beleid van die laag en geen eenheid. Het
+  derde is verschoven en dat staat in `kern/rtfos/basis.js` uitgeschreven: de
+  bovengrens van EENHEID (tien miljoen euro) bindt daar nu, en het eigen plafond
+  van een miljard was dode code geworden.
 
-  Wat er **niet** staat: `kern/util.js` heet nog steeds `centen` terwijl hij
-  `rondEuro` is. Dat zijn **104 aanroepen in 40 bestanden**, en hij reist via de
-  `hulp`-bundel naar elke kernlaag. Dat is een mechanische maar brede omzetting
-  en die is hier met opzet niet half gedaan — met de omvang erbij, zodat het een
-  besluit is en geen vergeetpost.
+  **Gemeten, niet geschat.** De omzetting raakte **149 verwijzingen**: het woord
+  `centen` als identifier ging van 431 in 110 bestanden naar 282 in 70. Wat
+  overblijft zijn velden en variabelen die een bedrag in centen VASTHOUDEN — die
+  heten naar wat ze zijn, niet naar wat ze doen, en die mogen zo heten. Hier
+  stond eerder "104 aanroepen in 40 bestanden" voor alleen al `kern/util.js`;
+  nagemeten waren dat er **37 in 7**. Een getal uit het hoofd is in dit document
+  net zo goed een schermleugen als op een scherm.
+
+  **Drie wachten houden het tegen, en ze zijn er niet in één keer gekomen.**
+  `test/geldeenheid.test.js` toets 7 houdt het aantal functies dat `centen` heet
+  én van eenheid verandert op **nul**; toets 7b is strenger en laat helemaal geen
+  FUNCTIE meer toe die zo heet; toets 7c verbiedt elke AANROEP `.centen(`. Toets
+  8 laat de meters zelf uitslaan op een bekend-foute invoer, want een toets die
+  je niet hebt zien zakken is geen toets (`LAT.md` regel 10). Alle drie lezen
+  `server/` én `public/`.
+
+  Toets 7c bestaat omdat een hernoemer namen ná een punt MOET overslaan — anders
+  sneuvelt elk veld dat `centen` heet, en dat zijn er honderden. Precies daardoor
+  bleven twee aanroepen staan: `ctx.centen(...)` in `kern/rtfos/steden.js` en
+  `horeca.centen(...)` in `kern/gast/beleid.js`. Allebei stil kapot, allebei op
+  een route die geld aanneemt. Die wacht kan alleen bestaan omdát 7b de andere
+  kant dichtzet: als er geen functie `centen` meer bestaat, is iedere `.centen(`
+  per definitie een aanroep van `undefined`. Twee regels die elkaar dragen zijn
+  sterker dan twee die naast elkaar staan.
+
+  **En 7b verdiende zichzelf meteen terug.** Hij vond de zevende omzetter
+  (`kern/rtfos/basis.js`) nadat de modules die hem gebruiken al hernoemd waren.
+  Die stonden dus te destructureren op een naam die de context niet gaf — in
+  JavaScript geen fout maar `undefined`, dat pas klapt als die regel draait. Op
+  het geldpad bleven de rtfos-toetsen groen; die takken zijn niet gedekt. Daarom
+  staat er nu
+  `test/rtfos-context.test.js`: die BOUWT de gedeelde context en leest van elke
+  module wat hij eruit haalt — 47 modules, 412 namen. Op zijn eerste ronde vond
+  hij meteen een tweede stille fout in dezelfde laag: een ontbrekende `require`.
+  Die had keuringsregel 50 óók gezien; de winst is dat een toets van seconden hem
+  eerder vindt dan een keuring van minuten. Wat regel 50 níét ziet is het eerste
+  geval: daar wás de naam gebonden, door de destructurering zelf, en ontbrak
+  alleen de waarde aan de andere kant.
+
+  **En de toets moest zelf worden verbreed, wat het punt nog eens maakt.** Hij
+  las alleen `const { … } = ctx`, dus `ctx.centen(bedrag)` glipte erlangs. Twee
+  vormen om iets uit een context te halen betekent twee lezingen, en de tweede
+  is er pas gekomen nadat een bestaande toets (`rtfos.test.js`, de rolgrens) een
+  500 liet zien op `/api/rtfos/stad/limiet`. Die had de fout dus wél te pakken —
+  wat er eerder over die veertig toetsen stond, geldt voor het geldpad en niet
+  voor de hele laag.
 
   En de eenheidssplitsing zelf staat er als eerste grove snede, mét wat hij niet
-  ziet: **40 in centen, 5 in euro's, 3 gemengd, 44 niet vast te stellen**. Die
-  laatste helft is te groot om er een conclusie op te bouwen, en dat staat er
-  liever dan een getal dat zekerder klinkt dan het is.
+  ziet: **41 in centen, 5 in euro's, 0 gemengd, 46 niet vast te stellen**. Dat
+  nulletje is nieuw: de drie sommen die eerder twee eenheden door elkaar
+  gebruikten zijn er niet meer. Die laatste helft is te groot om er een conclusie
+  op te bouwen, en dat staat er liever dan een getal dat zekerder klinkt dan het
+  is.
 ---
 
 ## 7. Wat dit document níét zegt

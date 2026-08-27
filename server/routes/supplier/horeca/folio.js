@@ -26,7 +26,7 @@
       er geld vaststaat, is precies het soort belofte dat later niet waar is. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, nu, id, centen, uitEuro } = horeca;
+  const { H, nu, id, heleCenten, uitEuro } = horeca;
 
   /* De leeskant EN het boeken staan in kern/horeca/foliolaag.js. Niet uit
      netheid: de gastkant heeft dezelfde vraag en dezelfde boeking nodig voor
@@ -46,8 +46,8 @@ module.exports = (kern) => {
     const f = { id: id(5), kamer, gastnaam: schoon(req.body.gastnaam, 60) || null,
       gasten: Math.max(1, Math.min(20, parseInt(req.body.gasten, 10) || 1)),
       van: schoon(req.body.van, 10) || nu().slice(0, 10), tot: schoon(req.body.tot, 10) || null,
-      nachtprijsCenten: req.body.nachtprijs != null ? uitEuro(req.body.nachtprijs) : centen(req.body.nachtprijsCenten),
-      toeristenbelastingCenten: req.body.toeristenbelasting != null ? uitEuro(req.body.toeristenbelasting) : centen(req.body.toeristenbelastingCenten),
+      nachtprijsCenten: req.body.nachtprijs != null ? uitEuro(req.body.nachtprijs) : heleCenten(req.body.nachtprijsCenten),
+      toeristenbelastingCenten: req.body.toeristenbelasting != null ? uitEuro(req.body.toeristenbelasting) : heleCenten(req.body.toeristenbelastingCenten),
       status: 'open', regels: [], betalingen: [], nachten: [], borg: null,
       at: nu(), door: req.actor.name };
     F(req.supplier.code)[f.id] = f;
@@ -59,7 +59,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/folio/boek', supplierAuth, (req, res) => {
     const uit = boek(req.supplier.code, schoon(req.body.kamer, 20), {
       soort: req.body.soort, omschrijving: req.body.omschrijving,
-      centen: req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen),
+      centen: req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen),
       door: req.actor.name, bron: schoon(req.body.bron, 40) || null });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     res.json(Object.assign({ ok: true }, uit, { soorten: SOORTEN }));
@@ -108,7 +108,7 @@ module.exports = (kern) => {
       save();
       return res.json({ ok: true, borg: f.borg, folio: publiek(f) });
     }
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     if (!bedrag) return res.status(400).json({ error: 'Welk borgbedrag is afgesproken?' });
     f.borg = { centen: bedrag, at: nu(), door: req.actor.name, geblokkeerdBijBank: false };
     save();
@@ -122,7 +122,7 @@ module.exports = (kern) => {
     if (!f) return res.status(404).json({ error: 'Er staat geen open gastrekening op die kamer.' });
     const open = openVan(f);
     if (open > 0) {
-      const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : (req.body.centen != null ? centen(req.body.centen) : open);
+      const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : (req.body.centen != null ? heleCenten(req.body.centen) : open);
       if (bedrag > open) return res.status(400).json({ error: 'Dat is meer dan er openstaat (' + (open / 100).toFixed(2) + ').' });
       f.betalingen.push({ id: id(3), wijze: schoon(req.body.wijze, 20) || 'pin', centen: bedrag, at: nu(), door: req.actor.name });
     }

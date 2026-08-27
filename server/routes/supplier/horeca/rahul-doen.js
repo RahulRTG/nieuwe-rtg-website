@@ -25,7 +25,7 @@
 
 module.exports = (kern) => {
   const { schoon, horeca, keuken } = kern;
-  const { nu, id, centen } = horeca;
+  const { nu, id, heleCenten } = horeca;
   const cadans = require('../../../kern/horeca/cadans');
   // dezelfde klok als de cadans hierboven; niet de OS-tijd
   const klok = require('../../../lib/klok');
@@ -42,7 +42,7 @@ module.exports = (kern) => {
       if (rek.status !== 'open') return { error: 'Deze rekening is al ' + rek.status + '.' };
       const reden = schoon((g || {}).reden, 80);
       if (!reden) return { error: 'Een korting draagt altijd een reden.' };
-      const bedrag = centen((g || {}).centen);
+      const bedrag = heleCenten((g || {}).centen);
       if (!bedrag) return { error: 'Geef een bedrag in centen.' };
       rek.kortingen.push({ id: id(3), reden: reden + ' (via Rahul, bevestigd door ' + wie + ')',
         procent: null, centen: bedrag, at: nu(), door: wie });

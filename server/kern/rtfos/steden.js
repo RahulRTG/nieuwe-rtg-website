@@ -127,7 +127,7 @@ module.exports = (ctx) => {
     if (!w.landelijk) return { status: 403, error: 'Goedkeuringslimieten stelt het landelijke bestuur vast.' };
     const r = String(rol || '');
     if (!Object.prototype.hasOwnProperty.call(LIMIET, r)) return { status: 400, error: 'Voor deze rol bestaat geen limiet.' };
-    const c = ctx.centen(bedrag);
+    const c = ctx.naarCenten(bedrag);
     if (c === null) return { status: 400, error: 'Wat is het bedrag?' };
     if (c > LIMIET[r]) {
       return { status: 400, error: 'De landelijke bovengrens voor ' + r + ' is ' + euro(LIMIET[r]) +

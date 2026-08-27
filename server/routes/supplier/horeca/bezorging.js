@@ -19,7 +19,7 @@
    De gecombineerde route en het afleverbewijs staan in horeca/bezorgrit.js. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, haversine, horeca } = kern;
-  const { nu, id, centen, uitEuro } = horeca;
+  const { nu, id, heleCenten, uitEuro } = horeca;
   /* De rekensom (zones, kosten, sloten) staat in kern/horeca/bezorglaag.js,
      want de gastkant stelt dezelfde vragen. Een zone die de zaak anders
      uitrekent dan de gast levert een bestelling op die wordt aangenomen en niet
@@ -35,8 +35,8 @@ module.exports = (kern) => {
         id: schoon(z && z.id, 20) || id(3), naam: schoon(z && z.naam, 40) || 'Zone',
         postcodes: Array.isArray(z && z.postcodes) ? z.postcodes.slice(0, 200).map(pc).filter(Boolean) : [],
         straalKm: z && z.straalKm != null ? Math.max(0, Math.min(100, Number(z.straalKm) || 0)) : null,
-        kostenCenten: z && z.kosten != null ? uitEuro(z.kosten) : centen(z && z.kostenCenten),
-        minimumCenten: z && z.minimum != null ? uitEuro(z.minimum) : centen(z && z.minimumCenten),
+        kostenCenten: z && z.kosten != null ? uitEuro(z.kosten) : heleCenten(z && z.kostenCenten),
+        minimumCenten: z && z.minimum != null ? uitEuro(z.minimum) : heleCenten(z && z.minimumCenten),
         gratisVanafCenten: z && z.gratisVanaf != null ? uitEuro(z.gratisVanaf) : null,
         minuten: Math.max(5, Math.min(180, parseInt(z && z.minuten, 10) || 30)) }));
     }
@@ -52,7 +52,7 @@ module.exports = (kern) => {
     const uit = zoekZone(b, req.body || {}, req.supplier);
     if (!uit.zone) return res.json({ ok: true, bezorgbaar: false, reden: uit.reden, km: uit.km || null });
     const z = uit.zone;
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     const gratis = z.gratisVanafCenten && bedrag >= z.gratisVanafCenten;
     res.json({ ok: true, bezorgbaar: b.open, gesloten: !b.open, redenDicht: b.open ? null : (b.redenDicht || 'De bezorging is tijdelijk gesloten.'),
       zone: { id: z.id, naam: z.naam, minuten: z.minuten }, hoe: uit.hoe, km: uit.km || null,

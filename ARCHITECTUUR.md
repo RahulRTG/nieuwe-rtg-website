@@ -24,7 +24,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | kernmodules (`server/kern/**`) | 1481 |
 | schermen (`public/**/*.html`) | 270 |
 | gedeelde browsermodules (`public/shared/*.js`) | 230 |
-| toetsbestanden (`test/*.test.js`) | 987 |
+| toetsbestanden (`test/*.test.js`) | 988 |
 | schermtoetsen (`test/*.e2e.js`) | 139 |
 
 ## 2. De weg van een verzoek
@@ -104,7 +104,7 @@ zie §5 -- er zijn nog 195 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
-| `member` | 645 | 58 | 12 | 399 |
+| `member` | 645 | 58 | 12 | 398 |
 | `supplier` | 608 | 113 | 10 | 301 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |

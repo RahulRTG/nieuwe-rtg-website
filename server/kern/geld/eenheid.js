@@ -2,23 +2,28 @@
    DE EENHEID VAN GELD -- een plek die zegt wat een bedrag IS.
 
    DIT BESTAND KOMT UIT EEN METING, en niet uit netheid. COMMERCE.md hield "de
-   91 optellingen" overeind als de duurste post: 91 plekken die van regels een
+   optellingen" overeind als de duurste post: 92 plekken die van regels een
    bedrag maken, elk een eigen kans om anders af te ronden. Bij het natellen
    bleek het risico ergens anders te zitten, en scherper:
 
      kern/util.js         centen(n) = Math.round(n * 100) / 100      -> EURO'S
      school/financien.js  centen(v) = Math.round(v * 100)            -> CENTEN
      kern/labfonds.js     centen(euro) = Math.round(euro * 100)      -> CENTEN
+     bedrijf/klant.js     centen(x) = ... * 100                      -> CENTEN
+     bedrijf/project.js   centen(x) = ... * 100                      -> CENTEN
+     kern/rtfos/basis.js  centen(v) = ... * 100                      -> CENTEN
      kern/horeca.js       centen(v) = Math.round(v)                  -> ONGEWIJZIGD
 
-   Vier functies, een naam, drie uitkomsten. En daarnaast dragen tientallen
-   velden `.centen` een geheel getal in centen. `centen(x)` LEEST als "maak er
-   centen van" en doet dat in kern/util.js juist niet -- die rondt euro's af en
-   laat ze euro's. Er is vandaag niets kapot (nagelopen: de school en het
-   labfonds krijgen euro's, de horeca krijgt centen), maar dat is geluk en geen
-   ontwerp. Dezelfde familie fout kostte deze laag al een keer een factor
-   honderd: `bedrag` in kern/mall/aanbod.js staat in EURO'S en werd als centen
-   gelezen (zie kern/commerce/koopbaarlijst.js).
+   ZEVEN functies, een naam, drie uitkomsten -- en er stonden er vier in dit
+   overzicht toen het werd geschreven. Dat verschil is zelf het bewijs dat tellen
+   boven onthouden gaat. Daarnaast dragen tientallen velden `.centen` een geheel
+   getal in centen. `centen(x)` LEEST als "maak er centen van" en doet dat in
+   kern/util.js juist niet -- die rondt euro's af en laat ze euro's. Er was
+   niets kapot (nagelopen: de school en het labfonds krijgen euro's, de horeca
+   krijgt centen), maar dat is geluk en geen ontwerp. Dezelfde familie fout
+   kostte deze laag al een keer een factor honderd: `bedrag` in
+   kern/mall/aanbod.js staat in EURO'S en werd als centen gelezen (zie
+   kern/commerce/koopbaarlijst.js).
 
    DUS: EEN PLEK, EN NAMEN DIE NIET TE VERWARREN ZIJN. `naarCenten` gaat van
    euro naar cent, `naarEuro` terug, `rondEuro` rondt af zonder van eenheid te
@@ -77,8 +82,8 @@ function rondEuro(euro) {
   return n == null ? null : Math.round(n * 100) / 100;
 }
 
-/* EEN REGELBEDRAG: stuk maal aantal, in centen. Dit is de som die volgens de
-   meting op 92 plekken staat. Hij staat hier niet om die 92 te vervangen -- dat
+/* EEN REGELBEDRAG: stuk maal aantal, in centen. Dit is de som die volgens
+   COMMERCE.json op 92 plekken staat. Hij staat hier niet om die 92 te vervangen -- dat
    is het werk van jaren dat COMMERCE.md beschrijft -- maar zodat wat er NIEUW
    bijkomt een plek heeft waar de eenheid vastligt. */
 function regelCenten(stukCenten, aantal) {

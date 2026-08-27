@@ -22,7 +22,7 @@
       nacalculatie zonder kosten is geen nacalculatie. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, nu, id, centen, uitEuro } = horeca;
+  const { H, nu, id, heleCenten, uitEuro } = horeca;
 
   const E = (code) => { const h = H(code); if (!h.events) h.events = {}; return h.events; };
   const postSom = (posten) => posten.reduce((t, p) => t + p.centen * p.aantal, 0);
@@ -34,7 +34,7 @@ module.exports = (kern) => {
   const leesPosten = (lijst) => (Array.isArray(lijst) ? lijst : []).slice(0, 100).map(p => ({
     id: id(3), omschrijving: schoon(p && p.omschrijving, 100) || 'Post',
     aantal: Math.max(1, Math.min(5000, parseInt(p && p.aantal, 10) || 1)),
-    centen: p && p.prijs != null ? uitEuro(p.prijs) : centen(p && p.centen),
+    centen: p && p.prijs != null ? uitEuro(p.prijs) : heleCenten(p && p.centen),
     soort: schoon(p && p.soort, 30) || 'algemeen' })).filter(p => p.centen || p.omschrijving);
 
   /* ---------- de offerte ---------- */
@@ -96,7 +96,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/horeca/event/aanbetaling', supplierAuth, (req, res) => {
     const e = eventVan(req, res); if (!e) return;
     if (e.status === 'offerte') return res.status(409).json({ error: 'Er is nog geen akkoord; een aanbetaling op een offerte zonder opdracht hoort niet.' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     if (!bedrag) return res.status(400).json({ error: 'Welk bedrag is er aanbetaald?' });
     const totaal = postSom(e.posten);
     const al = (e.aanbetalingen || []).reduce((t, a) => t + a.centen, 0);
@@ -112,7 +112,7 @@ module.exports = (kern) => {
     const soort = String(req.body.soort || 'inkoop');
     if (!['inkoop', 'uren', 'materiaal', 'derden', 'overig'].includes(soort))
       return res.status(400).json({ error: 'Kies inkoop, uren, materiaal, derden of overig.' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     const uren = soort === 'uren' ? Math.max(0, Math.min(10000, Number(req.body.uren) || 0)) : null;
     if (!bedrag) return res.status(400).json({ error: 'Welk bedrag?' });
     e.kosten.push({ id: id(3), soort, omschrijving: schoon(req.body.omschrijving, 100) || soort,

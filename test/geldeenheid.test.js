@@ -1,14 +1,28 @@
 /* DE EENHEID VAN GELD -- en de naam die drie dingen betekende.
 
-   DEZE TOETS KOMT UIT EEN METING. COMMERCE.md hield "de 91 optellingen"
-   overeind als de duurste post. Bij het natellen bleek het risico ergens anders
-   te zitten: er stonden VIER functies met de naam `centen` en ze deden drie
+   DEZE TOETS KOMT UIT EEN METING. COMMERCE.md hield "de optellingen" overeind
+   als de duurste post. Bij het natellen bleek het risico ergens anders te
+   zitten: er stonden ZEVEN functies met de naam `centen` en ze deden drie
    verschillende dingen met een bedrag.
 
      kern/util.js         centen(n) = round(n * 100) / 100      -> euro's blijven euro's
      school/financien.js  centen(v) = round(v * 100)            -> euro's worden centen
      kern/labfonds.js     centen(euro) = round(euro * 100)      -> euro's worden centen
+     bedrijf/klant.js     centen(x) = ... * 100                 -> euro's worden centen
+     bedrijf/project.js   centen(x) = ... * 100                 -> euro's worden centen
+     kern/rtfos/basis.js  centen(v) = ... * 100                 -> euro's worden centen
      kern/horeca.js       centen(v) = round(v)                  -> ongewijzigd
+
+   Er stonden er VIER in dit lijstje toen het werd geschreven. De laatste drie
+   zijn erbij gekomen door te tellen in plaats van te kijken, en de zevende werd
+   pas door toets 7b hieronder gevonden -- nadat zijn aanroepers al hernoemd
+   waren. Dat is precies waar deze toets voor is.
+
+   EN ER WAS EEN ACHTSTE, aan de andere kant van de lijn: `Geld.centen` in
+   public/apps/geld/hulp.js zette euro's om naar centen. De wachten hieronder
+   lezen daarom server/ EN public/ -- een huisregel die bij de servergrens stopt,
+   is een halve huisregel. Wat public/ met opzet WEL mag houden is een losse
+   `var centen = ...` die een bedrag vasthoudt; die zegt wat hij is.
 
    `centen(x)` LEEST als "maak er centen van" en doet dat in kern/util.js juist
    niet. Er was niets kapot -- nagelopen -- maar dat was geluk: dezelfde familie
@@ -103,6 +117,7 @@ function omzettersMetDeNaamCenten() {
     }
   };
   loop(path.join(WORTEL, 'server'));
+  loop(path.join(WORTEL, 'public'));
   return uit;
 }
 
@@ -112,6 +127,79 @@ test('7. er is geen functie meer die `centen` heet en van eenheid verandert', ()
     'Deze functies heten `centen` en maken er centen van. Dat leest hetzelfde als\n' +
     'kern/util.js `centen`, die euro\'s afrondt en euro\'s LAAT. Gebruik naarCenten\n' +
     'uit kern/geld/eenheid.js:\n  ' + gevonden.join('\n  '));
+});
+
+/* En de tweede helft van dezelfde afspraak: er hoort helemaal geen FUNCTIE meer
+   te zijn die `centen` heet. Een losse variabele die een bedrag vasthoudt mag
+   zo heten -- dat is wat het is. Een functie niet: die zegt met zijn naam wat
+   hij DOET, en `centen` heeft drie keer iets anders gedaan. */
+function functiesMetDeNaamCenten() {
+  const uit = [];
+  const loop = (map) => {
+    for (const n of fs.readdirSync(map)) {
+      const p = path.join(map, n);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) { if (n !== 'node_modules' && n !== 'data') loop(p); continue; }
+      if (!n.endsWith('.js')) continue;
+      const bron = fs.readFileSync(p, 'utf8');
+      /* Een functie: `function centen(`, of een pijl/functie-toewijzing. Een
+         gewone variabele (`const centen = Math.round(x)`) valt er buiten. */
+      for (const m of bron.matchAll(/(?:function\s+centen\s*\(|(?:const|let)\s+centen\s*=\s*(?:\([^)]*\)|\w+)\s*=>|(?:const|let)\s+centen\s*=\s*function)/g)) {
+        uit.push(path.relative(WORTEL, p) + ': ' + m[0].trim());
+      }
+    }
+  };
+  loop(path.join(WORTEL, 'server'));
+  loop(path.join(WORTEL, 'public'));
+  return uit;
+}
+
+test('7b. er is helemaal geen FUNCTIE meer die `centen` heet', () => {
+  const gevonden = functiesMetDeNaamCenten();
+  assert.deepEqual(gevonden, [],
+    'Een functie zegt met zijn naam wat hij doet, en `centen` deed drie dingen.\n' +
+    'kern/util.js heet nu rondEuro, kern/horeca.js heleCenten, en de omzetters\n' +
+    'naarCenten uit kern/geld/eenheid.js. Nog over:\n  ' + gevonden.join('\n  '));
+});
+
+/* En de derde vorm, die de eerste twee allebei missen: `iets.centen(bedrag)`.
+   Een hernoemer moet namen na een punt overslaan -- anders sneuvelt elk VELD dat
+   `centen` heet, en dat zijn er tientallen. Precies daardoor bleven bij de
+   hernoeming twee AANROEPEN staan: kern/rtfos/steden.js deed `ctx.centen(...)`
+   en kern/gast/beleid.js `horeca.centen(...)`. Allebei stil kapot -- undefined
+   aanroepen geeft pas een TypeError als die regel draait -- en allebei op een
+   route die geld aanneemt.
+
+   Deze wacht kan bestaan omdat toets 7b hierboven de andere kant dichtzet: er is
+   geen functie meer die `centen` heet, dus IEDERE aanroep `.centen(` is per
+   definitie een aanroep van undefined. Een veld uitlezen (`b.centen`, zonder
+   haakje) blijft gewoon goed en staat er honderden keren. */
+function aanroepenViaEenPunt() {
+  const uit = [];
+  const loop = (map) => {
+    for (const n of fs.readdirSync(map)) {
+      const p = path.join(map, n);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) { if (n !== 'node_modules' && n !== 'data') loop(p); continue; }
+      if (!n.endsWith('.js')) continue;
+      const bron = fs.readFileSync(p, 'utf8');
+      for (const m of bron.matchAll(/([A-Za-z_$][A-Za-z0-9_$]*)\.centen\s*\(/g)) {
+        uit.push(path.relative(WORTEL, p) + ': ' + m[0]);
+      }
+    }
+  };
+  loop(path.join(WORTEL, 'server'));
+  loop(path.join(WORTEL, 'public'));
+  return uit;
+}
+
+test('7c. niets roept `.centen(` nog aan -- dat is een aanroep van undefined', () => {
+  const gevonden = aanroepenViaEenPunt();
+  assert.deepEqual(gevonden, [],
+    'Er bestaat geen functie `centen` meer (toets 7b), dus dit roept undefined aan\n' +
+    'en geeft een TypeError zodra de regel draait. Gebruik naarCenten, heleCenten\n' +
+    'of rondEuro -- welke, zegt de kop van kern/geld/eenheid.js. Gevonden:\n  ' +
+    gevonden.join('\n  '));
 });
 
 test('8. de meter zelf slaat uit op een bekend-foute invoer', () => {

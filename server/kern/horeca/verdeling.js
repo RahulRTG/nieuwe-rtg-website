@@ -30,7 +30,7 @@
 const WIJZEN = ['gelijk', 'product', 'persoon', 'percentage', 'een'];
 
 module.exports = ({ horeca }) => {
-  const { centen, totaal } = horeca;
+  const { heleCenten, totaal } = horeca;
 
   /* Verdeel een bedrag over n delen zonder een cent te verliezen: de rest gaat
      naar de eerste delen. Dezelfde som als in schuif.js. */
@@ -66,7 +66,7 @@ module.exports = ({ horeca }) => {
       const eigen = Object.fromEntries(mensen.map((n) => [n, 0]));
       let gedeeld = 0;
       for (const r of (rek.regels || [])) {
-        const som = centen(r.centen * r.aantal);
+        const som = heleCenten(r.centen * r.aantal);
         if (r.gastNr && eigen[r.gastNr] != null) eigen[r.gastNr] += som; else gedeeld += som;
       }
       /* De korting en de fooi hangen aan de hele rekening, dus die gaan
@@ -92,7 +92,7 @@ module.exports = ({ horeca }) => {
         for (let i = 0; rest > 0; i = (i + 1) % ruw.length, rest--) ruw[i] += 1;
         uit = opgave.map((d, i) => ({ nr: parseInt(d.nr, 10), centen: ruw[i] }));
       } else {
-        uit = opgave.map((d) => ({ nr: parseInt(d.nr, 10), centen: centen(d.centen) }));
+        uit = opgave.map((d) => ({ nr: parseInt(d.nr, 10), centen: heleCenten(d.centen) }));
       }
     }
 

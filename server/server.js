@@ -242,32 +242,56 @@ const DEMO = process.env.RTG_DEMO === '1';
    'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
 function zetEigenaarsAccount() {
   const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
+  /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
+     daarmee was de demo-stand een garantie die alleen gold op een verse
+     database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
+     Postgres kwam de rij ergens anders vandaan en was het wachtwoord
+     onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
+     Dit staat achter DEMO en draait dus nooit in productie. */
+  const bijwerken = (rij) => {
+    let x = rij;
+    if (accounts.realNameOf(x) !== 'Rahul Imran Ismail') x = accounts.renameUser(x.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+    accounts.setPasswordSync(x.id, DEMO_WACHTWOORD);
+    accounts.setVerification(x.id, 'verified');
+    return x;
+  };
   let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
   if (!u) {
     /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
        een; op een database die al demoleden bevat draagt de seed-persona de
        naam Rahul al, en verhuizen we die naar het eigenaarsadres. Anders zou
        de inlognaam botsen en bleef de eigenaar buiten de boardroom staan. */
-    const bestaand = accounts.findByLogin('Rahul');
-    if (bestaand) {
-      u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
-      accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
-      accounts.setVerification(u.id, 'verified');
-    } else {
-      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-      accounts.saveMemberState(u.id, memberTemplate());
-      accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+    /* DIT IS KIJKEN-DAN-DOEN, EN ER KIJKEN ER MEER TEGELIJK. In de vloot komen
+       vier servers op tegen dezelfde database en doen ze hier alle vier
+       hetzelfde. Wie de tweede is, botst op UNIQUE(users.username) -- buiten
+       elke route, dus fataal, dus die groep viel om. De vloot herstartte hem en
+       de tweede keer bestond het account wel, waardoor het jarenlang alleen als
+       een trage opstart voelde; op een bouwmachine met dekkingsmeting haalde
+       het kantoor de opkomsttijd er niet mee (test/vloot.test.js, 27 augustus
+       2026). Een botsing hier betekent niet "fout" maar "iemand anders was
+       eerder": dan valt er niets meer aan te maken en werken we bij wat er nu
+       staat. Zie test/eigenaar-wedloop.test.js. */
+    try {
+      const bestaand = accounts.findByLogin('Rahul');
+      if (bestaand) {
+        u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
+        accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+        accounts.setVerification(u.id, 'verified');
+      } else {
+        u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+        accounts.saveMemberState(u.id, memberTemplate());
+        accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
+      }
+    } catch (e) {
+      /* Alleen de botsing zelf wordt opgevangen. Elke andere fout hoort hard te
+         blijven: een database die stuk is, is geen wedloop. */
+      if (!/UNIQUE constraint/i.test(String((e && e.message) || e))) throw e;
+      const gewonnen = accounts.findByLogin(eigenaar.OWNER_EMAIL) || accounts.findByLogin('Rahul');
+      if (!gewonnen) throw e; // botsing zonder winnaar: dan klopte de aanname niet
+      u = bijwerken(gewonnen);
     }
   } else {
-    if (accounts.realNameOf(u) !== 'Rahul Imran Ismail') u = accounts.renameUser(u.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
-    /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
-       daarmee was de demo-stand een garantie die alleen gold op een verse
-       database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
-       Postgres kwam de rij ergens anders vandaan en was het wachtwoord
-       onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
-       Dit staat achter DEMO en draait dus nooit in productie. */
-    accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
-    accounts.setVerification(u.id, 'verified');
+    u = bijwerken(u);
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
      account. De kantoor- en zaak-rol staan er standaard aan gekoppeld, dus

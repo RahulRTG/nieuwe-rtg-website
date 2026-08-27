@@ -1341,6 +1341,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "eigenaar-wedloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/migraties/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "eigenaar.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4494,6 +4502,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 13,
       "scherp": "gezakt"
+    },
+    "pragmavolgorde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "productie-installatie.test.js": {
       "soort": "puur",

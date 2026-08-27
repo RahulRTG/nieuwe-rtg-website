@@ -74,18 +74,50 @@ function loadRing(file, vault) {
   return uit;
 }
 
-function init() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const db = new DatabaseSync(DB_FILE);
-  S.db = db;
+/* De gelijktijdigheidsstand van een verbinding. Staat apart zodat de VOLGORDE
+   beproefbaar is (test/pragmavolgorde.test.js) in plaats van alleen bedoeld. */
+function zetGelijktijdigheid(db) {
   /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
      herstart die de oude instance een tel overlapt, parallelle testservers)
      wacht de tweede even in plaats van hard te crashen op "database is
-     locked". Dit was de bron van de sporadische testflake. */
-  db.exec('PRAGMA journal_mode=WAL');
-  db.exec('PRAGMA synchronous=NORMAL');
+     locked". Dit was de bron van de sporadische testflake.
+
+     EN DAT GOLD NIET VOOR DE OMSCHAKELING ZELF. `journal_mode=WAL` vraagt even
+     een exclusief slot op het bestand, en dat statement luistert als een van de
+     weinige NIET naar `busy_timeout`: het weigert meteen. Dus juist de regel die
+     de crash hoorde te voorkomen, was de regel waarop een tweede proces omviel
+     ("database is locked", buiten elke route, dus fataal). De wachttijd
+     vooropzetten repareert dat niet -- dat is beproefd en het hielp niet.
+
+     Wat wel werkt is dat de stand PERSISTENT is: staat het bestand eenmaal in
+     WAL, dan hoeft niemand meer om te schakelen. Alleen de allereerste opkomst
+     op een verse database botst dus, en die botsing duurt zo lang als de ander
+     erover doet. Daarom eerst kijken en pas dan schakelen, en bij een bezet
+     bestand kort wachten en opnieuw kijken -- meestal blijkt de ander het dan
+     al gedaan te hebben. Zie test/pragmavolgorde.test.js. */
   db.exec('PRAGMA busy_timeout=5000');
+  const staatIn = () => String((db.prepare('PRAGMA journal_mode').get() || {}).journal_mode || '').toLowerCase();
+  const tot = Date.now() + 5000;
+  for (;;) {
+    if (staatIn() === 'wal') break;
+    try { db.exec('PRAGMA journal_mode=WAL'); break; }
+    catch (e) {
+      const bezet = /lock|busy/i.test(String((e && e.message) || e));
+      if (!bezet || Date.now() >= tot) throw e;
+      // synchroon wachten: hier draait nog geen server, en de rest van deze
+      // opstart mag niet doorlopen op een verbinding die nog niet staat.
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
+    }
+  }
+  db.exec('PRAGMA synchronous=NORMAL');
+}
+
+function init() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  const db = new DatabaseSync(DB_FILE);
+  S.db = db;
+  zetGelijktijdigheid(db);
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een
      keer draaien, met een grootboek erbij en een weigering om te starten op een
@@ -130,7 +162,7 @@ function schrijfKluisRing(ring) {
 }
 
 module.exports = {
-  init, checkpoint, schrijfKluisRing, RING_FILE,
+  init, zetGelijktijdigheid, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   ...users,

@@ -111,10 +111,28 @@ module.exports = ({ db, save, crypto, schoon }) => {
       tot = d.toISOString();
     }
     const rij = rijVan(key);
+
+    /* DEZELFDE BRON VERLEENT MAAR EEN KEER, en dat is de belangrijkste regel in
+       deze functie. `bron` is de gebeurtenis zelf -- een betaal-id, een
+       kaartnummer, een besluit -- en die gebeurtenis is er maar een. Een
+       herhaalde oproep is dus bijna altijd een NETWERKHERHALING en niet een
+       tweede aankoop, en die mag geen tweede aanspraak opleveren.
+
+       Dat onderscheid was er eerst niet, en de redenering die dat goedpraatte
+       ("iemand kan hetzelfde opnieuw kopen") haalde twee dingen door elkaar:
+       een tweede AANKOOP draagt een andere bron, een tweede VERZOEK draagt
+       dezelfde. Zodra deze route aan RTG Pay hangt (UITVOEREND.md par. 6, stap
+       3) is het verschil geld waard -- dan is dit de plek waar een dubbele
+       verwerking wel of niet ontstaat.
+
+       De sleutel is (code, bron): een cadeau en een aankoop met hetzelfde
+       betaal-id bestaan niet. Een ingetrokken aanspraak telt NIET mee, want dan
+       is het intrekken een besluit dat een herhaling stil zou terugdraaien. */
+    const zelfde = rij.find(a => a.code === code && a.bron === bron && !a.ingetrokken);
+    if (zelfde) return { status: 200, ok: true, aanspraak: beeld(zelfde), herhaald: true,
+      uitleg: 'Deze bron had al een aanspraak verleend; er is er geen tweede bij gekomen.' };
+
     if (rij.length >= MAX_PER_LID) return { status: 409, error: 'Dit lid heeft de bovengrens van ' + MAX_PER_LID + ' aanspraken bereikt.' };
-    /* Twee keer dezelfde code is geen fout: iemand kan hetzelfde opnieuw kopen
-       of er een cadeau bij krijgen. De LANGSTE geldige telt, en de andere blijft
-       gewoon staan -- de geschiedenis van waar iets vandaan kwam, wissen we niet. */
     const a = { id: id(), code, herkomst: o.herkomst, bron, at: nu(), tot, ingetrokken: null };
     rij.unshift(a); save();
     return { status: 200, ok: true, aanspraak: beeld(a) };

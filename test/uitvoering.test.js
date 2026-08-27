@@ -15,6 +15,8 @@
      -> "een partituur gaat over eigen werk" ZAKT (RAAK)
    - de ontbrekende-kern-weigering uit uitvoer.js gehaald
      -> "een verdwenen kern weigert" ZAKT (RAAK)
+   - de (code, bron)-controle uit aanspraak.js gehaald
+     -> "dezelfde bron verleent maar EEN aanspraak" ZAKT (RAAK)
 
    Draai los: node --experimental-sqlite --test test/uitvoering.test.js */
 const test = require('node:test');
@@ -192,6 +194,26 @@ test('met een verleende aanspraak speelt het werk, en na intrekken niet meer', a
   const na = await api('/api/uitvoering/voer', { partituurId: p1 }, kijker);
   assert.equal(na.status, 403, 'ingetrokken is meteen dicht');
   assert.match(na.body.reden, /ingetrokken/i, 'met een andere reden dan "u had er nooit een"');
+  await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: '' }, maker);
+});
+
+test('dezelfde bron verleent maar EEN aanspraak: een herhaald verzoek is geen tweede aankoop', async () => {
+  await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: 'les-idem' }, maker);
+  const opdracht = { codenaam: kijkerNaam, code: 'les-idem', herkomst: 'aankoop', bron: 'betaling-99' };
+  const een = await api('/api/uitvoering/aanspraak/verleen', opdracht, maker);
+  const twee = await api('/api/uitvoering/aanspraak/verleen', opdracht, maker);
+  assert.equal(een.status, 200);
+  assert.equal(twee.status, 200, 'een herhaling is geen fout');
+  assert.equal(twee.body.herhaald, true, 'maar hij wordt wel als herhaling herkend');
+  assert.equal(twee.body.aanspraak.id, een.body.aanspraak.id, 'en levert dezelfde aanspraak op');
+  const alle = (await api('/api/uitvoering/aanspraken', {}, kijker)).body.aanspraken;
+  assert.equal(alle.filter(a => a.bron === 'betaling-99').length, 1, 'er staat er precies EEN in de lijst');
+
+  // een ECHTE tweede aankoop draagt een andere bron, en die telt wel
+  const derde = await api('/api/uitvoering/aanspraak/verleen',
+    { codenaam: kijkerNaam, code: 'les-idem', herkomst: 'aankoop', bron: 'betaling-100' }, maker);
+  assert.equal(derde.body.herhaald, undefined, 'een andere bron is een andere gebeurtenis');
+  assert.notEqual(derde.body.aanspraak.id, een.body.aanspraak.id);
   await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: '' }, maker);
 });
 

@@ -69,7 +69,7 @@ Geen inschatting: per bouwsteen staat het bestand erbij dat het doet.
 | **Eén poort voor elke handeling met geld** | geen tweede betaalweg, geen tweede saldo | `kern/pay/poort.js` |
 | **Intentie als interface** | de balk "Kies een wereld" wordt met een tik een vraagveld | `WERELD.md`, `public/shared/command/praat.js` |
 | **Een tijdgebonden tekstspoor** | `van`/`tot`/`tekst`, op één plek gevalideerd voor twee vormen | `kern/ondertitels.js` |
-| **De partituur, de aanspraak en de uitvoering** | gebouwd op 27 augustus 2026: zeven routes, vijftien toetsen, vier mutaties raak | `kern/uitvoering/`, `routes/uitvoering.js` |
+| **De partituur, de aanspraak en de uitvoering** | gebouwd op 27 augustus 2026: zeven routes, zestien toetsen, vijf mutaties raak | `kern/uitvoering/`, `routes/uitvoering.js` |
 | **Benoemde stukken op een tijdlijn** | `secties`: intro, couplet, refrein als namen op stukken van het raster, bewaard op de track | `kern/muziek.js`, `kern/muziek-lied.js` |
 
 **En wat er niet staat, ook gemeten — met een correctie die de zaak sterker
@@ -351,7 +351,10 @@ Twee dingen die dat verzachten en die er al zijn:
    `kern/uitvoering/`, zeven routes, vijftien toetsen, vier mutaties raak. Geen
    transcodering, geen nieuw beeld — de bestaande spelers voeren het uit.
 3. **De aankoop die een aanspraak verleent**, over `kern/pay/poort.js`. Vandaag
-   verleent alleen de maker er een; dat is de helft van de keten.
+   verleent alleen de maker er een; dat is de helft van de keten. Het verlenen
+   is inmiddels wel **retry-veilig gemaakt op (code, bron)** — dezelfde
+   gebeurtenis verleent maar één keer — juist omdat dit de route is waar straks
+   geld aan hangt.
 4. **Het muzikaal universum** in het Klankwerk (#11): de goedkoopste nieuwe
    standaard, en de enige die de grote drie structureel niet hebben.
 5. **De makersstudio** voor fragmenten en regels — het punt waarop dit staat of

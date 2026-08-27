@@ -123,6 +123,27 @@ test('7 - de echte meting draait, en vindt precies de twee webmakers', () => {
     'en het bewijs is de bloktaal, niet de huishouding');
 });
 
+test('8b - MAKERS.json is een AFDRUK van de meting en geen los verhaal', () => {
+  /* Deze toets stond er eerst NIET, en dat was een gat dat dit huis al eens had
+     gedicht: test/objectmodel.test.js toets 7 doet precies dit voor
+     OBJECTMODEL.json, met de reden erbij -- twee plaatsen met dezelfde waarheid
+     lopen uit elkaar.
+
+     Hij is gekomen doordat het echt gebeurde: kern/appstore/brugklant.js kwam er
+     later bij, viel onder de prefix van de App Store-maker, en MAKERS.json bleef
+     op 56 bestanden staan terwijl de meting er 57 telde. Niets zag dat. Een
+     afdruk die stilletjes veroudert is erger dan geen afdruk, want hij wordt
+     geciteerd (CREATE.md par. 3). */
+  const vast = JSON.parse(require('fs').readFileSync(
+    require('path').join(__dirname, '..', 'MAKERS.json'), 'utf8'));
+  const vers = M.meet();
+  assert.deepEqual(vast.gemeten, vers.gemeten,
+    'MAKERS.json loopt achter op de code -- draai: npm run makers:vast');
+  assert.deepEqual(vast.paren.map(p => [p.a, p.b, p.gedeeldeKern]),
+    vers.paren.map(p => [p.a, p.b, p.gedeeldeKern]),
+    'en het oordeel per paar hoort ook gelijk te zijn');
+});
+
 test('8 - elke maker uit de lijst heeft bestanden gevonden', () => {
   /* Een prefix die nergens op slaat, geeft een maker zonder bestanden -- en dan
      meet dit script stilzwijgend niets over hem. Dat hoort op te vallen. */

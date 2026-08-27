@@ -1,9 +1,9 @@
 {
   "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
-  "vastgelegd": "2026-08-26",
+  "vastgelegd": "2026-08-27",
   "gemeten": {
     "makers": 8,
-    "bestanden": 56,
+    "bestanden": 57,
     "vormen": 17,
     "paren": 28,
     "metGedeeldeKern": 1,
@@ -61,9 +61,9 @@
     {
       "id": "appstore",
       "naam": "App Store",
-      "bestanden": 22,
+      "bestanden": 23,
       "vormen": 5,
-      "talen": 5,
+      "talen": 6,
       "opslag": [
         "appstore:aankopen",
         "appstore:afdracht",

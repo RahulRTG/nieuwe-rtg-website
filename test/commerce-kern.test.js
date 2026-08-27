@@ -1,9 +1,9 @@
-/* DE COMMERCE-KERN -- vermogens, koopbaar, afrekening.
+/* DE COMMERCE-KERN -- werkwoorden, koopbaar, afrekening.
 
    WAT HIER WORDT VASTGEHOUDEN. Deze laag bestaat omdat COMMERCE.json een
    voorstel weersprak: een Koopbaar-protocol met acht verplichte werkwoorden
    bestaat niet in deze code (0 van 100 domeinen voert ze alle acht uit). De
-   vervanging is een VERKLARING van vermogens. Die vervanging is alleen iets
+   vervanging is een VERKLARING van werkwoorden. Die vervanging is alleen iets
    waard zolang drie dingen blijven kloppen, en dat zijn de drie zwaarste toetsen
    hieronder:
 

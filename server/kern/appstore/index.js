@@ -94,6 +94,10 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
      een mens van RTG over zijn app nam. En een regel van iemand anders komt er
      nooit uit: de app moet van deze org zijn (APPSTORE.md -- een uitgever ziet
      aantallen en bedragen, nooit een ander). */
+  /* Welke apps van een organisatie zijn. Staat hier omdat de motor de apps
+     kent; de meter kent ze met opzet niet (die weet alleen sleutels). */
+  const uitgeverApps = (org) => Object.values(S().apps).filter(a => a.org === norm(org)).map(a => a.sleutel);
+
   function journaalVan(org, n) {
     const o = norm(org);
     const eigenApps = new Set(Object.values(S().apps).filter(a => a.org === o).map(a => a.sleutel));
@@ -126,7 +130,7 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
   const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
-  const motor = { S, journaal, journaalVan, boek, opslag, nu, save,
+  const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
     publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER: U.STATUS_UITGEVER, geld,

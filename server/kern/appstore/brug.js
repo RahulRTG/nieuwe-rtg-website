@@ -41,6 +41,10 @@ const GRENS = {
 function maakBrug(kern) {
   const { S, eigen, nu, boek } = kern;
   const save = kern.save;
+  /* De meter. Hij telt aanroepen en weigeringen per app per dag en weet met
+     opzet NIET welk lid er aanroept -- deze functie geeft hem alleen de
+     appsleutel en de foutcode mee (kern/appstore/meting.js). */
+  const meting = require('./meting').maakMeting({ S, save, nu });
 
   /* De rem staat in het geheugen en niet in de database: een teller die per
      aanroep wordt weggeschreven, maakt van een rem een schrijfstorm. Hij gaat bij
@@ -129,7 +133,20 @@ function maakBrug(kern) {
   /* De aanroep zelf. `ctx` komt van de route en niet van de app: de app noemt
      alleen een methode en argumenten. Wie hij is, welke app dit is en wat er is
      verleend, wordt hier bepaald uit de sessie. */
-  function roep({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }) {
+  /* Alle uitgangen van roep() lopen langs deze functie, zodat er precies EEN
+     plek is waar wordt geteld. Zou er per tak worden geteld, dan is de eerste
+     tak die iemand later toevoegt de tak die niet meetelt (LAT-regel 5). */
+  function uitkomst(sleutel, r) {
+    try { meting.tel(sleutel, r && r.code ? r.code : null); } catch (e) {}
+    return r;
+  }
+
+  function roep(opdracht) {
+    const { key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt } = opdracht;
+    return uitkomst(sleutel, roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }));
+  }
+
+  function roepKaal({ key, sleutel, methode, args, codenaam, taal, pas, verleend, vraagt }) {
     const naam = String(methode || '');
     const m = Object.prototype.hasOwnProperty.call(METHODES, naam) ? METHODES[naam] : null;
     if (!m) return fout.maak('RTG_METHODE_ONBEKEND', 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.', { methode: naam, methodes: namen });
@@ -179,7 +196,7 @@ function maakBrug(kern) {
      drie het opnieuw afleiden (LAT-regel 4). */
   const mutaties = require('../mutatie').overzicht(METHODES);
 
-  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, mutaties, GRENS, boek };
+  return { roep, bakje, bakjeGelezen, bakjes, METHODES: namen, mutaties, GRENS, boek, meting };
 }
 
 module.exports = { maakBrug, GRENS };

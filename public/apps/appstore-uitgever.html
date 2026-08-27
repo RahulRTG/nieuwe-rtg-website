@@ -302,6 +302,29 @@ function tekenNaslag(n){
     '</table></div>';
 }
 
+/* De cijfers. Tellingen van aanroepen, nooit van mensen -- en die zin staat er
+   letterlijk bij, want zonder hem leest iemand "412 aanroepen" als "412
+   gebruikers". Hij komt van de server mee (kern/appstore/meting.js). */
+function tekenCijfers(apps){
+  if (!apps || !apps.length) return '';
+  const metIets = apps.filter(a => a.totaal.aanroepen);
+  if (!metIets.length) return '<div class="kaart"><h2>Cijfers</h2>'+
+    '<p class="sub">Nog geen aanroepen. Zodra een lid je app opent en die de brug gebruikt, staat hier hoe vaak — en hoe vaak dat werd geweigerd.</p></div>';
+  return '<div class="kaart"><h2>Cijfers</h2>'+
+    '<p class="sub">'+esc(metIets[0].let)+'</p>'+
+    metIets.map(a => '<div class="scheiding-s"><b>'+esc(a.sleutel)+'</b>'+
+      '<p class="sub">'+a.totaal.aanroepen+' aanroepen · '+a.totaal.weigeringen+' geweigerd</p>'+
+      (Object.keys(a.totaal.codes).length
+        ? '<table><tr><th>weigering</th><th>hoe vaak</th></tr>'+
+          Object.entries(a.totaal.codes).sort((x,y)=>y[1]-x[1])
+            .map(([c,n]) => '<tr><td><code>'+esc(c)+'</code></td><td>'+n+'</td></tr>').join('')+
+          '</table>'
+        : '')+
+      '<table><tr><th>dag</th><th>aanroepen</th><th>geweigerd</th></tr>'+
+      a.dagen.slice(0,14).map(d => '<tr><td>'+esc(d.dag)+'</td><td>'+d.aanroepen+'</td><td>'+d.weigeringen+'</td></tr>').join('')+
+      '</table></div>').join('')+'</div>';
+}
+
 function tekenJournaal(lijst){
   if (!lijst) return '';
   if (!lijst.length) return '<div class="kaart"><h2>Wat er met je inzendingen gebeurde</h2>'+
@@ -330,11 +353,12 @@ async function laad(){
      geen foutmelding over iets wat er niet is. */
   try { STAND.naslag = await api('/api/appstore/naslag'); } catch (e) {}
   if (toegelaten) { try { STAND.journaal = (await api('/api/appstore/uitgever/journaal')).lijst; } catch (e) {} }
+  if (toegelaten) { try { STAND.cijfers = (await api('/api/appstore/uitgever/cijfers')).apps; } catch (e) {} }
   $('#main').innerHTML =
     '<div class="kaart"><h2>'+esc(d.organisatie || d.org)+'</h2>'+
       '<p class="sub">Organisatie <code>'+esc(d.org)+'</code> · '+(d.uitgever ? 'uitgeversplek: '+esc(d.uitgever.status) : 'nog geen uitgeversplek')+'</p></div>'+
     (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps() + tekenOmzet()
-    + tekenJournaal(STAND.journaal) + tekenNaslag(STAND.naslag);
+    + tekenCijfers(STAND.cijfers) + tekenJournaal(STAND.journaal) + tekenNaslag(STAND.naslag);
 
   const vraag = $('#uVraag');
   if (vraag) vraag.addEventListener('click', async () => {

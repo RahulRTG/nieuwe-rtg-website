@@ -414,7 +414,7 @@ maand een mening.
 | vraag | besluit | wat dat betekent |
 |---|---|---|
 | Wie mag publiceren zonder rechtspersoon? | **Een geverifieerd natuurlijk persoon mag GRATIS publiceren** | betaald distribueren blijft aan een rechtspersoon; er komt een verificatiestap en een tweede uitgeverssoort. Par. 7.1 hieronder is daarmee beantwoord. |
-| Wat mag er per app gemeten worden? | **Privacyarme tellingen per dag** | aanroepen en weigeringen per foutcode, per app, per dag. Geen bezoeker, geen tijdstip — hetzelfde ontwerp als `kern/webmaker-meting.js`. Daarmee kan de console echte getallen tonen (par. 9.3). |
+| Wat mag er per app gemeten worden? | **Privacyarme tellingen per dag** ✅ gebouwd | aanroepen en weigeringen per foutcode, per app, per dag. Geen lid, geen tijdstip — hetzelfde ontwerp als `kern/webmaker-meting.js`. De console toont ze (par. 9.3). |
 | Wanneer blokkeert de toegankelijkheidskeuring? | **Vanaf nu alles** | ook een update van een bestaande app. Sterkste belofte aan leden met een handicap; de prijs is dat een vandaag toegelaten app zonder aanpassing geen update meer kan inzenden. |
 | Wat eerst? | **De mutatieclassificatie uitbreiden** | de voorwaarde voor P5. Gebouwd; zie hieronder wat dat wel en niet oplevert. |
 
@@ -611,15 +611,29 @@ is: `scripts/duurzaamheidskosten.js` (één meting), `kern/servicekosten.js` en
 spel-economie). Kostenvoorspelling per uitrol is een nieuw meetvlak — een goed
 idee, maar geen stap weg.
 
-**Dat is ook waar de ontwikkelaarsconsole ophoudt.** Wat een console uit
-bestaande bronnen kan tonen, staat er inmiddels: het naslagwerk, de
-machtigingenverkenner en het eigen journaal van een uitgever. Wat er niet staat
-zijn meters en traces per app — hoeveel aanroepen, hoeveel weigeringen, hoe
-lang. Die getallen bestaan nergens: `kern/appstore/brug.js` telt per lid en per
-app alleen voor de REM, in het geheugen, en gooit dat bij een herstart weg. Een
-console die ze toch toont, toont verzonnen getallen. Eerst meten, dan tonen —
-dezelfde volgorde als overal in dit huis (BESTUUR.md: wat niet gemeten is, wordt
-niet als getal getoond).
+**De console is inmiddels af, met één grens erin.** Wat er staat: het
+naslagwerk, de machtigingenverkenner, het eigen journaal, en sinds het besluit
+van 27 augustus 2026 ook **de cijfers** — aanroepen en weigeringen per app per
+dag, uitgesplitst naar foutcode, want dat is wat een uitgever kan repareren
+(`kern/appstore/meting.js`).
+
+Die meter volgt `kern/webmaker-meting.js` tot in de afweging: geen leden, geen
+tijdstippen, geen duur. De brug wéét welk lid er aanroept — hij moet immers weten
+wat dat lid heeft verleend — maar die wetenschap komt de meter niet binnen: er is
+geen parameter voor, en `test/appstore-meting.test.js` toets 1 zakt als iemand er
+een toevoegt. Dat is met opzet strenger dan een afspraak: de waarde ligt voor het
+grijpen, en "unieke gebruikers" is anders één regel code weg.
+
+**Wat er niet komt zonder een eigen besluit is een trace per aanroep** — methode,
+duur, volgorde. Dat is geen meter meer maar een verslag van wat een mens met een
+app deed, en het botst met `envelop.NIET_GEBOUWD` (terugkijken). Wie het wil,
+neemt dat besluit apart.
+
+Wat wél is uitgesproken en niet verstopt: de teller schrijft hooguit eens per
+dertig seconden naar schijf, want `save()` schrijft de hele database weg en de
+brug staat 120 aanroepen per minuut toe. Bij een herstart gaan de tellingen van
+hooguit dertig seconden verloren. Voor een dagteller is dat ruis; voor het
+journaal zou het onaanvaardbaar zijn, en daarom staat dat ergens anders.
 
 ---
 
@@ -703,7 +717,7 @@ verpakking; de payload is domein.** Dat is dezelfde scheiding die
 |---|---|---|
 | **P0** ✅ | corrigeren | makersmeting (`scripts/makers.js` + `MAKERS.json`); de gebeurtenisenvelop (`kern/envelop.js`); mutatieclassificatie met `onbekend` verboden aan de rand (`kern/mutatie.js`) |
 | **P1** grotendeels | de ingang voor ontwikkelaars | ✅ brugklant + CSP los; ✅ het foutmodel heel; ✅ `rtg check`, `rtg dev`, `rtg new`, `rtg sdk` — **open:** de individuele ontwikkelaarsidentiteit (par. 7.1), want die vraagt een besluit en geen code |
-| **P2** grotendeels | zichtbaarheid | ✅ toegankelijkheid op de derdenbundel (`rtg a11y`); ✅ documentatie inclusief *bewust niet beschikbaar*, zowel als bestand (`rtg sdk`) als op het uitgeversbureau; ✅ de machtigingenverkenner; ✅ het eigen journaal van een uitgever — **open:** meters en traces, en dat is geen schil maar een meetvlak dat niet bestaat (par. 9.3) |
+| **P2** ✅ | zichtbaarheid | toegankelijkheid op de derdenbundel (`rtg a11y`); documentatie inclusief *bewust niet beschikbaar*, als bestand én op het uitgeversbureau; de machtigingenverkenner; het eigen journaal van een uitgever; **de cijfers per app** (`kern/appstore/meting.js`). Wat er niet komt is een trace per aanroep — zie par. 9.3 |
 | **P3** | distributie | private apps via entitlements; previews en beta; de vergunningsdiff als uitgave-primitief; snellere review waar het risico dat toelaat |
 | **P4** | RTG Forge | `aanval.js` + `chaos.js` tot één beproevingshal; app-gerichte adversariële tests; replay; regressiebewijs |
 | **P5** | serverside platform | functies, jobs, cron, managed state, gecontroleerd netwerk — pas als P0's mutatieclassificatie het draagt |

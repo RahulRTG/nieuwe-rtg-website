@@ -11,7 +11,7 @@
    niet onder een organisatie, dan is dat een weigering met de weg erbij en geen
    stilzwijgende toelating. */
 module.exports = (kern) => {
-  const { app, supplierAuth, appstore, appstoreWinkel, tenant } = kern;
+  const { app, supplierAuth, appstore, appstoreWinkel, appstoreBrug, tenant } = kern;
 
   /* De organisatie achter deze zaak, of de reden waarom er geen is. Een
      ontbrekende tenantlaag is hier GEEN "ja": dan gaat de deur dicht (dezelfde
@@ -62,6 +62,15 @@ module.exports = (kern) => {
   app.post('/api/appstore/uitgever/journaal', supplierAuth, metOrg((req, o) => ({
     status: 200, lijst: appstore.journaalVan(o.org, req.body && req.body.n)
   })));
+
+  /* De cijfers over de eigen apps. Tellingen van aanroepen, uitgesplitst naar
+     foutcode -- want dat is wat een uitgever kan repareren. Nooit een lid: de
+     meter heeft er niet eens een parameter voor (kern/appstore/meting.js). */
+  /* mutatie: idempotent -- lezen */
+  app.post('/api/appstore/uitgever/cijfers', supplierAuth, metOrg((req, o) => {
+    const mijn = appstore.uitgeverApps ? appstore.uitgeverApps(o.org) : [];
+    return { status: 200, apps: appstoreBrug.meting.cijfersVan(mijn, req.body && req.body.dagen) };
+  }));
 
   /* Het naslagwerk: de methodes, de machtigingen, de grenzen, de foutcodes en
      wat er BEWUST niet is. Dezelfde bron als `rtg sdk` gebruikt

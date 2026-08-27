@@ -4,7 +4,23 @@
    (deterministische keuze, palet en het atelier-sjabloon voor een concept).
    Puur data + functies; de runtime woont in index.js en aiwerk.js. */
 
-const CATEGORIEEN = {
+/* DIT HEETTE HIER `CATEGORIEEN`, EN DAT WAS EEN BOTSING IN HET KLEIN.
+
+   De andere drie ontwerpdomeinen (architect, hardwarelab, studio) noemen hun
+   vakgebied `DISCIPLINES`; dit noemde precies hetzelfde `CATEGORIEEN`. Dezelfde
+   rol, een andere naam -- gevonden bij het handwerk aan de vier domeinen
+   (BEWIJSMACHINE.md par. 3). En het was geen smaakkwestie: `CATEGORIEEN` droeg
+   in dit huis negen betekenissen (app-, voertuig-, kleding-, risicocategorieen
+   en vijf andere), terwijl `DISCIPLINES` er precies een draagt op vier plekken.
+   De hernoeming haalt dit dus uit een botsing en zet het in een familie.
+
+   WAT NIET IS MEEGEGAAN, en dat is een keuze en geen vergeetachtigheid: het
+   VELD op een ontwerp heet nog steeds `categorie`, en het antwoord van de
+   server nog steeds `categorieLabel` en `categorieen`. Daar hangt een scherm
+   aan (public/apps/kantoren-collectieboek.js leest `o.categorieLabel ||
+   o.categorie`) en er ligt data mee opgeslagen. Een naam in de code is gratis
+   te veranderen; een naam op de draad is dat niet. */
+const DISCIPLINES = {
   kleding:      { label: 'Couture & tailoring', icon: 'mode' },
   tassen:       { label: 'Maroquinerie', icon: 'tas' },
   horloges:     { label: 'Haute horlogerie', icon: 'juweel' },
@@ -87,16 +103,11 @@ const ONDERDELEN = {
   lederwaren: ['Body', 'Voering', 'Vakindeling', 'Sluiting', 'Preeg']
 };
 
-function hash(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function kies(arr, seed, n) {
-  const out = []; const used = new Set(); const s = (seed >>> 0);
-  for (let i = 0; out.length < Math.min(n, arr.length); i++) {
-    const idx = (s + i * 2654435761) % arr.length; // s en de stap zijn positief, dus idx is dat ook
-    if (!used.has(idx)) { used.add(idx); out.push(arr[idx]); }
-  }
-  return out;
-}
-function palet(seed, n) { return kies(PALET_NAMEN, seed, n).map(nm => ({ naam: nm, hex: PALET[nm] })); }
+/* hash, kies en palet stonden hier byte voor byte gelijk aan die in de drie
+   andere ontwerpbanken; ze wonen nu in kern/ontwerpbank.js. Het PALET blijft
+   hier, want dat is wat dit domein onderscheidt. Zie de kop daar. */
+const { hash, kies, paletUit } = require('../ontwerpbank');
+const palet = (seed, n) => paletUit(PALET, seed, n);
 
 // het atelier-sjabloon: een deterministisch concept uit de bank (val-terug voor de AI)
 function maakConcept(categorie, brief, naam, scho) {
@@ -114,4 +125,4 @@ function maakConcept(categorie, brief, naam, scho) {
   return { silhouet, materialen, kleuren, details, afwerking, verhaal };
 }
 
-module.exports = { CATEGORIEEN, STATUS, PALET, PALET_NAMEN, BANK, ONDERDELEN, hash, kies, palet, maakConcept };
+module.exports = { DISCIPLINES, STATUS, PALET, PALET_NAMEN, BANK, ONDERDELEN, hash, kies, palet, maakConcept };

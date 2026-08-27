@@ -864,6 +864,116 @@
           "test:test/wetten.test.js"
         ]
       }
+    },
+    {
+      "id": "geld-poort-kent-geen-spelstand",
+      "soort": "geld",
+      "wet": "De waardepoort kent geen demo-, test- of spelstand. Een simulatie-adapter vervangt de rail, nooit de poort -- wat beslist of iets mag, draait in de simulatie ongewijzigd mee.",
+      "bron": {
+        "bestand": "MAGNAATLAB.md",
+        "anker": "Een simulatie-adapter vervangt de **rail**, nooit de **poort**"
+      },
+      "handhaver": [
+        "server/kern/pay/poort.js",
+        "test/simulatiebank.test.js"
+      ],
+      "sabotage": {
+        "wat": "smokkelt een demostand de waardepoort binnen, met een naam die aan een woordgrens ontsnapt",
+        "bestand": "server/kern/pay/poort.js",
+        "zoek": "  function waardePoort({ van, naar, centen, soort, genre, dagBesteed }) {",
+        "zet": "  const demoStand = process.env.RTG_DEMO === '1';\n  function waardePoort({ van, naar, centen, soort, genre, dagBesteed }) {",
+        "wachters": [
+          "test:test/simulatiebank.test.js"
+        ]
+      }
+    },
+    {
+      "id": "geld-simulatiebank-nooit-in-productie",
+      "soort": "geld",
+      "wet": "De simulatiebank maakt geld uit niets en draait daarom nooit in productie, ook niet met de vlag aan, en nooit naast een echte betaalprovider.",
+      "bron": {
+        "bestand": "MAGNAATLAB.md",
+        "anker": "weigert altijd in productie"
+      },
+      "handhaver": [
+        "server/betaal/synthetisch.js",
+        "test/simulatiebank.test.js"
+      ],
+      "sabotage": {
+        "wat": "haalt de productiegrendel van de simulatiebank weg",
+        "bestand": "server/betaal/synthetisch.js",
+        "zoek": "  if (e.NODE_ENV === 'production')",
+        "zet": "  if (false)",
+        "wachters": [
+          "test:test/simulatiebank.test.js"
+        ]
+      }
+    },
+    {
+      "id": "toegang-actor-op-de-bus-is-een-codenaam",
+      "soort": "toegang",
+      "wet": "Wat de bus vervoert draagt een codenaam als actor en nooit een contactgegeven; met REDIS_URL gaat een envelop over een netwerk, en daar hoort geen echte naam op.",
+      "bron": {
+        "bestand": "OS.md",
+        "anker": "De actor is een codenaam."
+      },
+      "handhaver": [
+        "server/kern/envelop.js",
+        "test/envelop.test.js"
+      ],
+      "sabotage": {
+        "wat": "zet de zeef uit die een e-mailadres als actor tegenhoudt",
+        "bestand": "server/kern/envelop.js",
+        "zoek": "  if (CONTACTGEGEVEN.test(a)) throw new Error(",
+        "zet": "  if (false) throw new Error(",
+        "wachters": [
+          "test:test/envelop.test.js"
+        ]
+      }
+    },
+    {
+      "id": "techniek-geen-gedeelde-laagnaam",
+      "soort": "techniek",
+      "wet": "Twee lagenmodellen delen nooit een laagnaam; een woord dat twee lagen benoemt, benoemt er geen.",
+      "bron": {
+        "bestand": "OS.md",
+        "anker": "Twee lagenmodellen delen nooit een laagnaam."
+      },
+      "handhaver": [
+        "scripts/lagen.js",
+        "test/genrecap.test.js"
+      ],
+      "sabotage": {
+        "wat": "zet het woord terug dat in twee lagenmodellen niet hetzelfde betekende",
+        "bestand": "PLATFORM.md",
+        "zoek": "| 4 — Genre-caps |",
+        "zet": "| 4 — Capabilities |",
+        "wachters": [
+          "test:test/genrecap.test.js"
+        ]
+      }
+    },
+    {
+      "id": "techniek-een-genoemde-cap-bestaat",
+      "soort": "techniek",
+      "wet": "Een cap die een document noemt, bestaat in de code. Een voorbeeld in een tekst is een bewering en geen illustratie: een cap die nergens wordt aangemaakt, stuurt een lezer met vertrouwen de verkeerde kant op.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "Een cap die een document noemt, wordt sindsdien tegen de"
+      },
+      "handhaver": [
+        "test/genrecap.test.js",
+        "server/seed/genres-lijst.js"
+      ],
+      "sabotage": {
+        "wat": "zet de niet-bestaande cap terug die de btw op een overnachting fout liet rekenen",
+        "bestand": "PLATFORM.md",
+        "zoek": "(`caps`): `bookings`, `rides`",
+        "zet": "(`caps`): `rooms`, `rides`",
+        "wachters": [
+          "test:test/genrecap.test.js"
+        ]
+      }
     }
   ]
 }

@@ -124,9 +124,9 @@ test('9 - wat er niet is, staat er met een reden', () => {
 });
 
 test('10 - de dertien velden liggen vast', () => {
-  assert.equal(E.VELDEN.length, 13);
+  assert.equal(E.ENVELOPVELDEN.length, 13);
   for (const v of ['id', 'soort', 'versie', 'actor', 'onderwerp', 'organisatie',
     'doel', 'op', 'keten', 'oorzaak', 'klasse', 'bron', 'lading']) {
-    assert.ok(E.VELDEN.includes(v), v + ' hoort in de envelop te zitten');
+    assert.ok(E.ENVELOPVELDEN.includes(v), v + ' hoort in de envelop te zitten');
   }
 });

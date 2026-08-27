@@ -42,7 +42,13 @@ const { datum } = require('../lib/klok');
 /* De dertien velden. Meer worden het er niet zonder dat iemand dit blok
    verandert, en dat is de bedoeling: een envelop die per domein een veldje
    erbij krijgt, is na een jaar geen gedeelde vorm meer. */
-const VELDEN = ['id', 'soort', 'versie', 'actor', 'onderwerp', 'organisatie',
+/* ENVELOPVELDEN en niet VELDEN. Die naam was al bezet: kern/rtmail-regels.js
+   noemt zijn vier matchvelden ook VELDEN, en omdat ze allebei `onderwerp` en
+   `soort` bevatten, las scripts/semantiek.js de twee als EEN catalogus die zou
+   moeten worden samengevoegd. Dat zou fout zijn -- het zijn twee verschillende
+   dingen -- maar een meter die je naar de verkeerde reparatie stuurt, is erger
+   dan geen meter. Hernoemen is hier het goedkope antwoord (LAT-regel 4). */
+const ENVELOPVELDEN = ['id', 'soort', 'versie', 'actor', 'onderwerp', 'organisatie',
   'doel', 'op', 'keten', 'oorzaak', 'klasse', 'bron', 'lading'];
 const VERPLICHT = ['soort', 'bron', 'klasse'];
 
@@ -92,7 +98,7 @@ function maak(ruw, opties) {
   }
 
   for (const k of Object.keys(ruw)) {
-    if (!VELDEN.includes(k)) fout(k, 'Onbekend veld "' + k + '". Een envelop kent er ' + VELDEN.length + ': ' + VELDEN.join(', ') + '. Wat van jouw domein is, hoort in de lading.');
+    if (!ENVELOPVELDEN.includes(k)) fout(k, 'Onbekend veld "' + k + '". Een envelop kent er ' + ENVELOPVELDEN.length + ': ' + ENVELOPVELDEN.join(', ') + '. Wat van jouw domein is, hoort in de lading.');
   }
 
   const soort = tekst(ruw.soort);
@@ -189,4 +195,4 @@ function lees(ruw) {
   return maak(ruw);
 }
 
-module.exports = { maak, lees, volgOp, VELDEN, VERPLICHT, KLASSEN, NIET_GEBOUWD, LADING_MAX };
+module.exports = { maak, lees, volgOp, ENVELOPVELDEN, VERPLICHT, KLASSEN, NIET_GEBOUWD, LADING_MAX };

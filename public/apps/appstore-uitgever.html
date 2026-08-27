@@ -104,7 +104,20 @@
    onzichtbaar maken. */
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
+/* TWEE DEUREN, EEN BUREAU (besluit 27 augustus 2026). Een ZAAK logt in als
+   leverancier en werkt onder /api/appstore/uitgever/...; een geverifieerd MENS
+   logt in als lid en werkt onder /api/appstore/persoon/... De routes staan met
+   opzet gelijk (server/routes/appstore/persoon.js), zodat dit scherm alleen zijn
+   VOORVOEGSEL hoeft te kiezen en niet twee keer bestaat.
+
+   De zaakinlog gaat voor: wie allebei heeft, is hier aan het werk als zaak --
+   dan hoort zijn app bij het bedrijf en niet bij hem persoonlijk. */
+let TOKEN = null, DEUR = 'uitgever';
+try {
+  TOKEN = localStorage.getItem('rtg_sup_token');
+  if (!TOKEN) { TOKEN = localStorage.getItem('rtg_member_token'); if (TOKEN) DEUR = 'persoon'; }
+} catch (e) {}
+const P = (staart) => '/api/appstore/' + DEUR + (staart || '');
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3200); }
 const api = (pad, body) => fetch(pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -165,12 +178,12 @@ function toonFouten(d){
 
 async function proef(){
   $('#uitslag').innerHTML = '<p class="sub">De poort leest je bundel…</p>';
-  try { toonFouten(await api('/api/appstore/uitgever/proef', { manifest: manifestUit(), bestanden: BUNDEL })); }
+  try { toonFouten(await api(P('/proef'), { manifest: manifestUit(), bestanden: BUNDEL })); }
   catch (e) { toonFouten(e.d || { error: e.message }); }
 }
 async function inzenden(){
   try {
-    const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifestUit(), bestanden: BUNDEL });
+    const r = await api(P('/inzenden'), { manifest: manifestUit(), bestanden: BUNDEL });
     toonFouten(r); meld('Ingezonden. Een mens van RTG kijkt ernaar.'); laad();
   } catch (e) { toonFouten(e.d || { error: e.message }); meld(e.message); }
 }
@@ -214,9 +227,18 @@ function tekenInzenden(){
       '<div><label class="vlak" for="mCategorie">Categorie</label><select class="veld" id="mCategorie" class="vol">'+
         ['sociaal','reizen','eten','media','geld','spelen','leven','veiligheid'].map(c => '<option>'+c+'</option>').join('')+'</select></div>'+
       '<div><label class="vlak" for="mStart">Startbestand</label><input class="veld" id="mStart" class="vol" maxlength="80" placeholder="index.html"></div>'+
-      '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label><input class="veld" id="mPrijs" class="vol" inputmode="decimal" placeholder="0,00"></div>'+
+      /* EEN PERSOON PUBLICEERT GRATIS (besluit 27 augustus 2026). Het veld staat
+         er dan wel, maar op nul en dicht -- en met de reden ernaast. Zou het
+         gewoon openstaan, dan typt iemand een prijs, bouwt een bundel en hoort
+         pas bij het inzenden dat het nooit kon. De server blijft de poort
+         (kern/appstore/uitgevers.js: magPrijsVragen); dit is het venster erop. */
+      '<div><label class="vlak" for="mPrijs">Prijs in euro (0 = gratis)</label>'+
+        '<input class="veld" id="mPrijs" class="vol" inputmode="decimal" placeholder="0,00" value="'+(DEUR==='persoon'?'0':'')+'"'+
+        (DEUR==='persoon'?' readonly':'')+'></div>'+
     '</div>'+
-    '<p class="sub mt-s">Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.</p>'+
+    '<p class="sub mt-s">'+(DEUR === 'persoon'
+      ? 'Als geverifieerd persoon publiceer je gratis. Een betaalde app vraagt een rechtspersoon: daar hangen de btw, de afdracht en een aanspreekbare partij aan. Wil je geld vragen, vraag dan een uitgeversplek aan vanuit een zaak.'
+      : 'Een betaalde app wordt in de winkel gekocht, nooit in de app zelf. RTG int bij het lid, draagt de btw af in het land van dat lid, houdt de afdracht in en schrijft de rest bij op de RTG Pay-rekening van je zaak. Wat een lid betaalt, ziet hij als bon voordat hij drukt.')+'</p>'+
     '<div class="mt-m"><label class="vlak" for="mUitleg">Uitleg (20-260 tekens, dit leest een lid vóór hij iets geeft)</label>'+
       '<textarea class="veld" id="mUitleg" class="vol-tekst" maxlength="260"></textarea></div>'+
     '<div class="mt-l"><span class="vlak">Wat je vraagt</span>'+m+'</div>'+
@@ -340,20 +362,20 @@ function tekenJournaal(lijst){
 async function laad(){
   if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><h2>Log eerst in</h2><p class="sub">Deze pagina hoort bij je RTG-werkplek. <a href="/apps/leverancier.html">Naar de werkplek →</a></p></div>'; return; }
   let d;
-  try { d = await api('/api/appstore/uitgever'); }
+  try { d = await api(P()); }
   catch (e) { $('#main').innerHTML = '<div class="kaart"><h2>Nog geen uitgever</h2><p class="sub">'+esc(e.message)+'</p></div>'; return; }
   STAND = d;
   const toegelaten = d.uitgever && d.uitgever.status === 'toegelaten';
   /* De omzet komt apart binnen en mag ontbreken: draait dit proces zonder
      RTG Pay, dan is er geen betaalde kant en zegt de pagina dat door het blok
      gewoon weg te laten in plaats van een nul te tonen die niets betekent. */
-  if (toegelaten) { try { const o = await api('/api/appstore/uitgever/omzet'); if (o.aantal != null) STAND.omzet = o; } catch (e) {} }
+  if (toegelaten) { try { const o = await api(P('/omzet')); if (o.aantal != null) STAND.omzet = o; } catch (e) {} }
   /* Het naslagwerk en het eigen journaal mogen ontbreken zonder dat de pagina
      omvalt: een proces zonder die routes hoort een werkend bureau te tonen en
      geen foutmelding over iets wat er niet is. */
-  try { STAND.naslag = await api('/api/appstore/naslag'); } catch (e) {}
-  if (toegelaten) { try { STAND.journaal = (await api('/api/appstore/uitgever/journaal')).lijst; } catch (e) {} }
-  if (toegelaten) { try { STAND.cijfers = (await api('/api/appstore/uitgever/cijfers')).apps; } catch (e) {} }
+  try { STAND.naslag = await api(DEUR === 'persoon' ? P('/naslag') : '/api/appstore/naslag'); } catch (e) {}
+  if (toegelaten) { try { STAND.journaal = (await api(P('/journaal'))).lijst; } catch (e) {} }
+  if (toegelaten) { try { STAND.cijfers = (await api(P('/cijfers'))).apps; } catch (e) {} }
   $('#main').innerHTML =
     '<div class="kaart"><h2>'+esc(d.organisatie || d.org)+'</h2>'+
       '<p class="sub">Organisatie <code>'+esc(d.org)+'</code> · '+(d.uitgever ? 'uitgeversplek: '+esc(d.uitgever.status) : 'nog geen uitgeversplek')+'</p></div>'+
@@ -362,7 +384,7 @@ async function laad(){
 
   const vraag = $('#uVraag');
   if (vraag) vraag.addEventListener('click', async () => {
-    try { await api('/api/appstore/uitgever/aanvraag', { naam: $('#uNaam').value, contact: $('#uContact').value }); meld('Aangevraagd. Een mens van RTG kijkt ernaar.'); laad(); }
+    try { await api(P('/aanvraag'), { naam: $('#uNaam').value, contact: $('#uContact').value }); meld('Aangevraagd. Een mens van RTG kijkt ernaar.'); laad(); }
     catch (e) { meld(e.message); }
   });
   const map = $('#mMap');
@@ -382,7 +404,7 @@ async function laad(){
     vak.hidden = false; b.setAttribute('aria-expanded','true');
     vak.innerHTML = '<p class="sub">Bezig…</p>';
     try {
-      const d = await api('/api/appstore/uitgever/dossier', { sleutel: b.dataset.s });
+      const d = await api(P('/dossier'), { sleutel: b.dataset.s });
       vak.innerHTML = '<p class="sub">'+esc(d.let)+'</p>'+
         '<p class="sub mt-xs"><b>Waar de gegevens blijven:</b> '+esc(d.waarDeGegevensBlijven.antwoord)+'</p>'+
         '<p class="sub"><b>Wat de poort vond:</b> '+d.watDePoortVond.blokkerend+' blokkerend, '+d.watDePoortVond.letOp+
@@ -393,7 +415,7 @@ async function laad(){
     } catch (e) { vak.innerHTML = '<p class="sub">'+esc(e.message)+'</p>'; }
   }));
   document.querySelectorAll('.aTrek').forEach(b => b.addEventListener('click', async () => {
-    try { await api('/api/appstore/uitgever/intrekken', { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken - ook bij de leden die hem al hadden.'); laad(); }
+    try { await api(P('/intrekken'), { sleutel: b.dataset.s, reden: 'ingetrokken door de uitgever' }); meld('Ingetrokken - ook bij de leden die hem al hadden.'); laad(); }
     catch (e) { meld(e.message); }
   }));
 }

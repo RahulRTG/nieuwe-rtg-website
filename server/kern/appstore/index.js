@@ -110,12 +110,13 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
      een naad en geen opdeling om de omvang: het gaat over een PARTIJ, terwijl de
      rest van dit bestand over BYTES gaat. */
   const U = require('./uitgevers')({ S, save, nu, boek, eigen, norm });
-  const { uitgever, magInzenden, uitgeverAanvragen, uitgeverBesluit, publiekU, uitgevers } = U;
+  const { uitgever, magInzenden, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit, publiekU, uitgevers,
+    magPrijsVragen, uitgeverVanPersoon } = U;
 
   /* De versiekant (inzenden, keuren, aftekenen, intrekken) staat in ./versies.js.
      Hij krijgt de motor-delen mee die hij leest -- de opslag, het journaal, de
      uitgeverslijst -- en niet de kern eromheen. */
-  const V = require('./versies')({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, antivirus });
+  const V = require('./versies')({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, magPrijsVragen, antivirus });
   const { app, versie, inzenden, proef, publiekV } = V;
   /* De toegankelijkheidspoort. Hij wordt VOOR ./besluit.js opgebouwd omdat die
      hem meekrijgt: publiceren kan niet zonder een geslaagde keuring op deze
@@ -136,7 +137,8 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
   const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
-    uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
+    uitgever, uitgevers, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit,
+    magInzenden, magPrijsVragen, uitgeverVanPersoon,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
     publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER: U.STATUS_UITGEVER, geld,
     tijdlijn, noteer, hercontrole, TIJDLIJN_SOORTEN };

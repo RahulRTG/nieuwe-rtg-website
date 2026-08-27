@@ -413,9 +413,9 @@ maand een mening.
 
 | vraag | besluit | wat dat betekent |
 |---|---|---|
-| Wie mag publiceren zonder rechtspersoon? | **Een geverifieerd natuurlijk persoon mag GRATIS publiceren** | betaald distribueren blijft aan een rechtspersoon; er komt een verificatiestap en een tweede uitgeverssoort. Par. 7.1 hieronder is daarmee beantwoord. |
+| Wie mag publiceren zonder rechtspersoon? | **Een geverifieerd natuurlijk persoon mag GRATIS publiceren** ✅ gebouwd | betaald distribueren blijft aan een rechtspersoon. Twee uitgeverssoorten, een tweede deur op de ledeninlog, en de prijsgrens op één plek. Par. 7.1 hieronder is daarmee beantwoord. |
 | Wat mag er per app gemeten worden? | **Privacyarme tellingen per dag** ✅ gebouwd | aanroepen en weigeringen per foutcode, per app, per dag. Geen lid, geen tijdstip — hetzelfde ontwerp als `kern/webmaker-meting.js`. De console toont ze (par. 9.3). |
-| Wanneer blokkeert de toegankelijkheidskeuring? | **Vanaf nu alles** | ook een update van een bestaande app. Sterkste belofte aan leden met een handicap; de prijs is dat een vandaag toegelaten app zonder aanpassing geen update meer kan inzenden. |
+| Wanneer blokkeert de toegankelijkheidskeuring? | **Vanaf nu alles** ✅ gebouwd | ook een update van een bestaande app. Sterkste belofte aan leden met een handicap; de prijs is dat een vandaag toegelaten app zonder aanpassing geen update meer kan inzenden. |
 | Wat eerst? | **De mutatieclassificatie uitbreiden** | de voorwaarde voor P5. Gebouwd; zie hieronder wat dat wel en niet oplevert. |
 
 **Bij het derde besluit hoort een ontwerpgevolg dat niet vrij te kiezen is.**
@@ -425,7 +425,13 @@ te staan bij het **besluit**, niet bij het inzenden: inzenden mag altijd, maar
 een versie kan niet worden goedgekeurd zolang de keuring niet is gedraaid en
 geslaagd. Dat past bovendien bij twee bestaande grenzen — de machine keurt nooit
 goed (APPSTORE.md grens 2), en een ingediend stuk is geen bewijs, dus RTG draait
-hem en niet de uitgever. **Dit is nog niet gebouwd.**
+hem en niet de uitgever. **Gebouwd** — `kern/appstore/toegankelijk.js` (drie
+standen, en *niet vast te stellen* is geen ja), de poort in
+`kern/appstore/besluit.js` en alleen in de publiceer-tak, twee kantoorroutes, de
+keurloper `scripts/appstore-a11y.js` die de bundel rendert, en de uitslag op het
+keuringsscherm zodat de mens die aftekent ziet waarom iets niet kan. De uitslag
+hangt aan de **bundelhash** en niet aan de app: zou hij aan de app hangen, dan
+keurt de eerste versie de volgende goed.
 
 ### 7.1 Ontwikkelen zonder eerst bedrijf te zijn
 
@@ -451,6 +457,39 @@ persoon mag gratis publiceren; betaald distribueren blijft aan een rechtspersoon
 draaien vragen geen enkele identiteit — dat kan morgen, want `rtg check` en
 `rtg dev` raken de server niet. Maar zodra code van een natuurlijk persoon voor
 een LID draait, staat er geen aanspreekbare partij meer achter.
+
+**Gebouwd** (`server/routes/appstore/persoon.js`, `kern/appstore/uitgevers.js`).
+Vier dingen die daarbij niet vrij te kiezen waren:
+
+- **Twee deuren, één motor.** Een zaak komt binnen op `supplierAuth` en werkt
+  onder `/api/appstore/uitgever/…`; een mens komt binnen op de ledeninlog en
+  werkt onder `/api/appstore/persoon/…`. Dat is geen vijfde identiteitsbegrip:
+  `org` IS in beide gevallen de klant (TENANT.md), alleen de manier waarop
+  iemand aantoont dat hij die org is verschilt. Het uitgeversbureau kiest zijn
+  voorvoegsel en bestaat niet twee keer.
+- **De prijsgrens staat op één plek** (`magPrijsVragen`) en knelt bij het
+  *inzenden* — het vroegste moment waarop de prijs binnenkomt. Wie het pas bij
+  het aftekenen zou horen, heeft een bundel gebouwd die nooit kon.
+- **De organisatiecode van een mens is willekeurig.** `publiekU.org` staat in de
+  catalogus bij elke app; een code die uit het account of de codenaam is
+  gebouwd, maakt dat account publiek — en dat is het codenaamontwerp omzeilen.
+  De sessiesleutel staat ernaast in de opslag en komt nooit in `publiekU`.
+- **De soort is een bevoegdheid en geen vlag.** Hij wordt bij het aanmaken gezet
+  en verandert nooit meer, ook niet door een tweede aanvraag; en `magPrijsVragen`
+  geeft een *reden* terug, niet een ja of nee — dezelfde redenering als
+  WAARDE.md voor uitbetaalbaar.
+
+Twee poorten voor de mens zelf staan als **pure functie** in de kern
+(`mensMagUitgeven`): een door RTG geverifieerde identiteit, en achttien jaar. Een
+toegangsregel die in een route woont, kan alleen worden getoetst door een server
+op te starten — en wordt daarom bijna nooit getoetst. Een leeftijd die niet vast
+te stellen is, is ook hier geen ja. De derde poort is ongewijzigd: een **mens van
+RTG** laat toe, en kijkt daarbij of de naam waaronder iemand wil publiceren bij
+de geverifieerde identiteit past.
+
+Wat een persoon met een reden **niet** krijgt: een omzetscherm. Hij publiceert
+gratis, dus er valt geen omzet te tonen — en een lege pagina zou suggereren dat
+er ooit iets in komt te staan. Het antwoord zegt daarom waarom het er niet is.
 
 ### 7.2 De capabilities die vandaag met een reden NIET bestaan
 

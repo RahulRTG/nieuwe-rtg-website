@@ -250,3 +250,15 @@ test('17. de afrekening zegt WAAR er bevestigd wordt, want zij doet het zelf nie
     'twee deuren bij een verkoper zijn twee deuren; er komt geen enkele link overheen');
   assert.equal(a.regels.find(x => x.titel === 'Tafel').pagina, '/apps/foodcourt.html');
 });
+
+test('18. een vanaf-prijs krijgt een ANDERE reden dan geen prijs', () => {
+  /* "Zet een prijs" is misleidend als er er een staat -- dan gaat een
+     ondernemer zoeken naar een leeg veld dat niet bestaat. De oorzaak is dat
+     het een indicatie is, en dat hoort er te staan. */
+  const vanaf = koopbaar({ type: 'eten', prijs: eur(12, true), bezorgt: false });
+  const geen = koopbaar({ type: 'eten', prijs: null, bezorgt: false });
+  assert.match(K.waaromNietTeKoop(vanaf), /vanaf-prijs/);
+  assert.ok(!/Zet een prijs,/.test(K.waaromNietTeKoop(vanaf)), 'er STAAT een prijs');
+  assert.match(K.waaromNietTeKoop(geen), /Zet een prijs/);
+  assert.notEqual(K.waaromNietTeKoop(vanaf), K.waaromNietTeKoop(geen));
+});

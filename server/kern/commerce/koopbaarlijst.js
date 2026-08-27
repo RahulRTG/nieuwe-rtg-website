@@ -81,6 +81,10 @@ const REDEN = {
   prijs: 'Deze rij draagt geen bedrag. Zet een prijs op het artikel; zonder bedrag valt er niets te kopen.',
   prijsVanaf: 'Dit is een vanaf-prijs en geen afrekenbedrag. Wie hierop afrekent, incasseert iets wat niemand heeft afgesproken; het echte bedrag hoort uit het domein zelf te komen.',
   bevestig: 'Dit type belooft "Kopen", en kopen zonder bedrag bestaat niet. Zet een prijs, dan komt de koopknop terug.',
+  /* Als de oorzaak een VANAF-prijs is, is "zet een prijs" misleidend -- er
+     staat er een. Dan hoort er te staan wat er werkelijk aan de hand is,
+     anders zoekt de ondernemer naar een leeg veld dat niet bestaat. */
+  bevestigVanaf: 'Er staat wel een bedrag, maar als vanaf-prijs. Daar kan niet op worden afgerekend: het echte bedrag hangt af van de datum of de keuze. Zet een vast bedrag, dan komt de koopknop terug.',
   beschikbaarheid: 'Er is niets gemeten: geen voorraad, geen tijdslot en geen open/dicht. Stilte is geen beschikbaarheid.',
   lever: 'Deze aanbieder heeft geen bezorging of afhaal ingericht, en dit type wordt niet digitaal uitgegeven.'
 };

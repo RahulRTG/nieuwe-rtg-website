@@ -70,7 +70,7 @@ function vanAanbod(rij, extra) {
   if (eerst.heeft.includes('prijs') && !heeftBedrag(rij.prijs)) {
     weg.push('prijs');
     // welke van de twee het is, bepaalt wat de ondernemer moet doen
-    if (rij.prijs && rij.prijs.vanaf) redenNu.prijs = REDEN.prijsVanaf;
+    if (rij.prijs && rij.prijs.vanaf) { redenNu.prijs = REDEN.prijsVanaf; redenNu.bevestig = REDEN.bevestigVanaf; }
     if (beloofdePrijs && eerst.heeft.includes('bevestig')) weg.push('bevestig');
   }
   if (eerst.heeft.includes('beschikbaarheid') && rij.beschikbaar == null && rij.open == null) weg.push('beschikbaarheid');

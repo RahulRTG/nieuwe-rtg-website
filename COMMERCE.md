@@ -342,7 +342,10 @@ autonome betaling die grens 2 verbiedt.
   van de boardroom (`kern/webdomein.js`, twee sloten). De telling van wat er te
   koop staat komt uit de graaf en niet uit een eigen kopie; een kapotte
   aanbodlaag geeft `null` en niet nul, want nul zou "deze winkel is leeg"
-  betekenen. De elf eigenschappen die par. 4 opsomt en die nergens bestaan
+  betekenen. Scherm voor de ondernemer: `/apps/leverancier-commerce.html` — daar
+  staat `publiek` in de keuzelijst als een optie die *uitgeschakeld* is met de
+  reden eronder, want een optie die ontbreekt laat iemand zoeken naar een
+  instelling die niet bestaat. De elf eigenschappen die par. 4 opsomt en die nergens bestaan
   (prijsbeleid, betaalbeleid, fulfilment, eigen domein, merk) staan er niet als
   leeg veld maar in `NIET_GEBOUWD` met de reden.
 - **De winkel op een partnersite.** Er is géén productblok bijgekomen, en dat is

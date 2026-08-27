@@ -59,7 +59,7 @@ const TOEGANG = [
 ];
 
 const NIET_GEBOUWD = {
-  prijsbeleid: 'Een eigen prijs per verkoopweg (kassaprijs anders dan webprijs) vraagt een tweede prijsbron naast het domein. Zolang die er niet is, geldt de prijs van het aanbod -- een verkoopweg met een eigen prijslijst zou meteen de vraag oproepen welke van de twee klopt.',
+  prijsbeleid: 'Een eigen prijs per verkoopweg (kassaprijs anders dan webprijs) vraagt een tweede prijsbron naast het domein. Zolang die er niet is, geldt de prijs van het aanbod; een verkoopweg met een eigen prijslijst zou meteen de vraag oproepen welke van de twee klopt.',
   betaalbeleid: 'Welke betaalwijzen een verkoopweg toestaat, hoort bij kern/pay en niet hier. Er komt geen tweede plek die bepaalt of iets betaald mag worden.',
   fulfilmentbeleid: 'Bezorgen en afhalen staan per zaak in kern/leverancier/bezorgregel.js. Een verkoopweg die dat overschrijft, laat een zaak per weg iets anders beloven dan haar bezorgschakelaar zegt.',
   eigenDomein: 'Een eigen adres is kern/webdomein.js en staat standaard uit, met twee sloten. Die staan daar met reden; een verkoopweg legt er geen derde naast.',

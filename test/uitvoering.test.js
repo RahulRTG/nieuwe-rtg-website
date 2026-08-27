@@ -418,6 +418,43 @@ test('een onzinnige handeling levert GEEN handeling op, geen halve', async () =>
   await api('/api/uitvoering/partituur/onderdeel', { id: p1, fragmentId: frag, aan: false }, maker);
 });
 
+/* ---- ontdekken: een partituur is een vorm in de MEDIAWERELD ---- */
+
+test('een klaargezette partituur verschijnt in de mediawereld, met een eigen stand', async () => {
+  const w = await api('/api/mediaos/wereld', { modus: 'uitvoering' }, kijker);
+  assert.equal(w.status, 200);
+  assert.equal(w.body.modusNaam, 'Uitvoeringen');
+  const mijne = (w.body.stukken || []).find(x => x.id === 'partituur:' + p1);
+  assert.ok(mijne, 'de partituur van de maker staat er voor een ander lid in');
+  assert.equal(mijne.vormNaam, 'Uitvoering');
+  assert.equal(mijne.maker.codenaam, makerNaam, 'op codenaam, zoals alles hier');
+
+  /* Hij SPEELT niet hier: een uitvoering begint met de vraag hoeveel tijd u
+     heeft, en een speelknop zonder die vraag is een gok. */
+  assert.equal(mijne.spelen.soort, 'elders');
+  assert.match(mijne.spelen.reden, /uitgevoerd|tijd/i);
+  assert.ok(mijne.meta.indexOf('kern') >= 0, 'de kaart zegt hoe kort het kan: ' + mijne.meta);
+});
+
+test('een partituur die NIET klaarstaat, staat niet in de wereld', async () => {
+  const dicht = (await api('/api/uitvoering/partituur/maak', { naam: 'Nog niet af' }, maker)).body.partituur.id;
+  await api('/api/uitvoering/partituur/onderdeel',
+    { id: dicht, fragmentId: 'fragment:clip:' + clipB + '@0-5', rol: 'kern' }, maker);
+  const w = await api('/api/mediaos/wereld', { modus: 'uitvoering' }, kijker);
+  assert.ok(!(w.body.stukken || []).some(x => x.id === 'partituur:' + dicht),
+    'werk in wording hoort niet in de etalage');
+});
+
+test('de wereld verraadt niet WAARUIT een partituur bestaat', async () => {
+  /* Wie er niet in mag, hoort niet te zien welke fragmenten erin zitten -- dat
+     zou een inhoudsopgave zijn van werk dat achter een deur staat. Wat er wel
+     bij staat is de duur en de prijs: dat heeft iemand nodig om te kiezen. */
+  const w = await api('/api/mediaos/wereld', { modus: 'uitvoering' }, kijker);
+  const kaart = (w.body.stukken || []).find(x => x.id === 'partituur:' + p1);
+  assert.equal(kaart.onderdelen, undefined, 'geen inhoudsopgave in de etalage');
+  assert.ok(typeof kaart.kernS === 'number', 'wel hoe kort het kan');
+});
+
 test('een gast komt er niet in', async () => {
   const r = await fetch(base + '/api/uitvoering/partituren', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.ok(r.status === 401 || r.status === 403, 'zonder token geen toegang (' + r.status + ')');

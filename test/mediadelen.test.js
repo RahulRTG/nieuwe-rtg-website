@@ -67,6 +67,38 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
+test('0. een PARTITUUR is ook een stuk, dus delen werkt er vanzelf voor', async () => {
+  /* Sinds een klaargezette partituur als vijfde vorm in de catalogus staat
+     (kern/uitvoering/), reist hij door dezelfde deur als muziek, video, clips en
+     live. Dat is precies de winst van EEN catalogus: er hoefde voor het delen
+     niets bij gebouwd te worden, en er kan dus ook niets uiteenlopen.
+
+     Deze toets staat hier en niet bij de uitvoerende laag, omdat hij bewijst dat
+     de bestaande DEELWEG hem aankan -- niet dat de nieuwe laag iets kan. */
+  const p = (await api('/api/uitvoering/partituur/maak', { naam: 'Om te delen' }, maker.token)).body.partituur;
+  /* De DUUR opvragen in plaats van aannemen. Een uitgave heeft een gerekende
+     lengte (maten en tempo), en een fragment daarbuiten wordt terecht geweigerd
+     -- dat is precies waar deze toets eerder op zakte. */
+  const werk = (await api('/api/uitvoering/eigenwerk', {}, maker.token)).body.stukken || [];
+  const stuk = werk.find(x => x.stukId === 'track:' + uitgaveId);
+  assert.ok(stuk && stuk.duurS > 1, 'het uitgegeven stuk heeft een bekende duur: ' + JSON.stringify(stuk));
+  const o = await api('/api/uitvoering/partituur/onderdeel',
+    { id: p.id, fragmentId: 'fragment:track:' + uitgaveId + '@0-' + Math.min(10, stuk.duurS), rol: 'kern' }, maker.token);
+  assert.equal(o.status, 200, 'het fragment gaat erin: ' + JSON.stringify(o.body).slice(0, 160));
+  const kl = await api('/api/uitvoering/partituur/zet', { id: p.id, klaar: true }, maker.token);
+  assert.equal(kl.status, 200, 'en hij staat klaar: ' + JSON.stringify(kl.body).slice(0, 160));
+
+  const r = await api('/api/member/dm/send', { toKey: vriendKey, stukId: 'partituur:' + p.id }, maker.token);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+  assert.equal(r.body.message.stuk.vorm, 'partituur', 'het gesprek weet welke vorm het is');
+
+  /* En de ONTVANGER lost hem op met zijn eigen sessie -- dezelfde regel als bij
+     elk ander gedeeld stuk. Delen is geen doorgeefluik langs een dichte deur. */
+  const bij = await api('/api/mediaos/stuk', { id: 'partituur:' + p.id }, vriend.token);
+  assert.equal(bij.status, 200);
+  assert.equal(bij.body.stuk.titel, 'Om te delen');
+});
+
 test('1. een stuk delen: alleen het id gaat mee, geen kopie', async () => {
   const r = await api('/api/member/dm/send', { toKey: vriendKey, stukId: 'track:' + uitgaveId }, maker.token);
   assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));

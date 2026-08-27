@@ -21,7 +21,7 @@
    laag erboven die het alsnog invoert zou die keuze stil terugdraaien. */
 'use strict';
 
-const VORMEN = { track: 'Muziek', video: 'Video', clip: 'Korte video', live: 'Live' };
+const VORMEN = { track: 'Muziek', video: 'Video', clip: 'Korte video', live: 'Live', partituur: 'Uitvoering' };
 
 /* Het id is één string zodat hij door een URL, een bibliotheekrij en een
    chatbericht kan reizen. Splitsen doen we op de EERSTE dubbele punt: een
@@ -52,7 +52,7 @@ function maakCatalogus({ bronnen }) {
   /* De vier vertalers (van een domeinbeeld naar EEN stuk) staan in
      ./catalogus-vormen.js: daar staat hoe een stuk ERUITZIET, hier hoe de
      wereld wordt SAMENGESTELD. */
-  const { vanTrack, vanVideo, vanClip, vanLive } = require('./catalogus-vormen')({ VORMEN, stukId });
+  const { vanTrack, vanVideo, vanClip, vanLive, vanPartituur } = require('./catalogus-vormen')({ VORMEN, stukId });
 
   function alles(sess) {
     const key = sess.key;
@@ -90,6 +90,16 @@ function maakCatalogus({ bronnen }) {
     const p = haal(() => bronnen.live(key));
     if (p.reden) buiten.push({ vorm: 'live', vormNaam: VORMEN.live, reden: p.reden });
     else for (const k of (p.rijen.kanalen || [])) uit.push(vanLive(k, key));
+
+    /* De vijfde vorm: uitvoeringen (kern/uitvoering/). LAAT GEBONDEN en
+       optioneel, en dat moet ook wel -- die laag leest DEZE catalogus, dus hij
+       bestaat pas nadat de Media OS er is. Draait hij niet mee, dan is er geen
+       bron en blijft de wereld precies wat hij was. */
+    if (bronnen.partituren) {
+      const q = haal(() => bronnen.partituren(sess));
+      if (q.reden) buiten.push({ vorm: 'partituur', vormNaam: VORMEN.partituur, reden: q.reden });
+      else for (const x of (q.rijen || [])) uit.push(vanPartituur(x, key));
+    }
 
     // dubbelen eruit: een eigen video staat zowel in "nieuw" als in "mijn"
     const gezien = new Set();

@@ -84,6 +84,10 @@ function maakUitvoering({ db, save, schoon, crypto, catalogus, keyVanCodenaam, p
       partituurZet: (sess, o) => partituur.zet(sess, o),
       onderdeel: (sess, o) => partituur.onderdeel(sess, o),
       eigenWerk: (sess) => partituur.eigenWerk(sess),
+      /* De lijst die de Media OS leest. Geen route: dit is een LEZER voor de
+         wereldlaag, en een tweede ingang naar dezelfde lijst zou een tweede
+         antwoord kunnen geven. */
+      openbaar: () => partituur.openbaar(codenaamVan),
       voerUit: bouwUitvoering,
       bon: (sess, o) => aanbod ? aanbod.bon(sess, (o || {}).partituurId)
         : { status: 503, error: 'De betaallaag draait niet mee; betaalde partituren zijn nu niet te kopen.' },

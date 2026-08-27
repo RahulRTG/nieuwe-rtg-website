@@ -143,7 +143,27 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
   const handeling = require('./handeling')({ catalogus, partituurMet: met, codenaamVan: null });
   const { onderdeel, eigenWerk } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN, handeling });
 
+  /* WAT ER OPENSTAAT VOOR IEDEREEN. De Media OS leest dit als vijfde vorm, zodat
+     een partituur in dezelfde wereld verschijnt als muziek, video, clips en live
+     -- geen tweede wereld en geen tweede volgknop (LAT.md regel 4).
+
+     Alleen KLAARGEZETTE partituren, en bewust zonder de onderdelen: wie er niet
+     in mag, hoort niet te zien waaruit het werk bestaat. Wat er WEL bij staat is
+     de duur en of er een aanspraak voor nodig is -- dat is wat iemand nodig
+     heeft om te kiezen of hij erop tikt. */
+  function openbaar(codenaamVan) {
+    return tabel().filter(p => p.klaar).map(p => ({
+      id: p.id, naam: p.naam, key: p.key,
+      codenaam: codenaamVan ? codenaamVan(p.key) : null,
+      kernS: (p.onderdelen || []).filter(o => o.rol === 'kern').reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
+      totaalS: (p.onderdelen || []).reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
+      onderdelen: (p.onderdelen || []).length,
+      aanspraakNodig: p.aanspraakNodig || null, prijsCenten: p.prijsCenten || 0,
+      toestemming: p.toestemming, at: p.at
+    }));
+  }
+
   const mijne = (sess) => ({ status: 200, partituren: tabel().filter(p => p.key === sess.key).map(p => beeld(p, true)), rollen: ROLLEN });
 
-  return { maak, zet, onderdeel, eigenWerk, mijne, met, beeld, handeling, ROLLEN };
+  return { maak, zet, onderdeel, eigenWerk, mijne, openbaar, met, beeld, handeling, ROLLEN };
 };

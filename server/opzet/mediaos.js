@@ -37,6 +37,11 @@ module.exports = (kern, hulp) => {
       clips: (key) => kern.clipsFeed(key, {}),
       // alleen de zones die in de gedeelde index horen; 18+ en besloten niet
       live: (key) => kern.podiumGedeeld(key),
+      /* De vijfde vorm: uitvoeringen. LAAT GEBONDEN -- kern.uitvoering wordt NA
+         deze module gezet (./uitvoering.js leest de catalogus die hier ontstaat),
+         dus dit moet een functie zijn die pas bij het OPVRAGEN kijkt. Staat die
+         laag uit, dan is er geen bron en blijft de wereld wat hij was. */
+      partituren: () => (kern.uitvoering ? kern.uitvoering.openbaar() : []),
       /* Media for Business: de twee bronnen die AL intern zijn. Ze geven per
          lid alleen wat bij een zaak van dat lid hoort -- de Media OS filtert
          hier niets openbaars "intern". */

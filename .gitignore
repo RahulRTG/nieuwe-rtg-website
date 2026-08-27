@@ -77,3 +77,13 @@ zz-ijk-tijdelijk*
 # de bron -- committen zou een digest van gisteren aan de release van vandaag
 # hangen.
 BASISIMAGES.json
+
+# De PRIVEsleutel van het releasezegel hoort nooit in de repository; de
+# publieke helft (RELEASE.pub) juist wel. Deze regel is een vangnet voor de
+# vorm die iemand met de hand zou neerzetten.
+RELEASE.key
+RELEASE.sig
+RELEASE.json
+
+TRIVY.json
+TRIVY.log

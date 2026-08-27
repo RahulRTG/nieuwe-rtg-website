@@ -105,3 +105,76 @@ jobs:
             --tag "$RTG_RELEASE_IMAGE" .
           echo "Gepubliceerd: $RTG_RELEASE_IMAGE"
           echo "Herkomst opvraagbaar met: docker buildx imagetools inspect $RTG_RELEASE_IMAGE --format '{{ json .Provenance }}'"
+          echo "RTG_IMAGE_DIGEST=$(docker buildx imagetools inspect "$RTG_RELEASE_IMAGE" --format '{{ .Manifest.Digest }}')" >> "$GITHUB_ENV"
+
+      # HET RELEASEZEGEL. Ondertekend met een EIGEN sleutel (besluit van de
+      # eigenaar): dat bewijst dat RTG achter deze combinatie image-digest +
+      # bronafdruk + commit staat. Het bewijst NIET dat GitHub het heeft gebouwd
+      # -- de vertrouwensbron blijft RTG. Zie SBOM.md.
+      #
+      # Met openssl en niet met een ondertekengereedschap van een derde: bij een
+      # supply-chain-functie is een extra binary in de keten precies de verkeerde
+      # toevoeging. Verifieren kan iedereen met RELEASE.pub uit de repository:
+      #   node scripts/releasezegel.js --verifieer RELEASE.json RELEASE.sig
+      - name: Het releasezegel zetten
+        shell: bash
+        env:
+          RTG_RELEASE_SLEUTEL: ${{ secrets.RTG_RELEASE_SLEUTEL }}
+        run: |
+          node scripts/releasezegel.js --maak --image "$RTG_RELEASE_IMAGE" --digest "$RTG_IMAGE_DIGEST"
+          if [ -z "$RTG_RELEASE_SLEUTEL" ]; then
+            echo "LET OP: er is geen RTG_RELEASE_SLEUTEL ingesteld; deze release wordt NIET ondertekend."
+            echo "        Maak er een met: node scripts/releasesleutel.js"
+            exit 0
+          fi
+          printf '%s' "$RTG_RELEASE_SLEUTEL" > /tmp/release.key
+          openssl pkeyutl -sign -inkey /tmp/release.key -rawin -in RELEASE.json -out /tmp/release.sig
+          base64 -w0 /tmp/release.sig > RELEASE.sig
+          shred -u /tmp/release.key
+          node scripts/releasezegel.js --verifieer RELEASE.json RELEASE.sig
+
+      # DE KWETSBAARHEIDSSCAN. Niet-blokkerend, en dat is met opzet: een vals
+      # alarm hoort geen release tegen te houden, en blokkerend maken is later
+      # een schakelaar. Trivy draait als CONTAINER en niet als GitHub-actie --
+      # zelfde vertrouwensmodel als de basis-images die hier al draaien, en hij
+      # LEEST alleen; hij bepaalt niet wat er wordt gepubliceerd.
+      #
+      # De uitslag komt als artefact bij de run. Faalt de scanner zelf, dan staat
+      # dat er hardop: een scan die stil overslaat, ziet eruit als een schone scan.
+      - name: Kwetsbaarheden scannen (leest alleen, blokkeert niet)
+        shell: bash
+        run: |
+          set +e
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasecurity/trivy:latest image --scanners vuln --format json \
+            --output /dev/stdout "$RTG_RELEASE_IMAGE" > TRIVY.json 2> TRIVY.log
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "LET OP: de scanner is zelf niet goed gedraaid (code $code). Dit is GEEN schone uitslag."
+            tail -20 TRIVY.log || true
+          else
+            node -e 'const r=require("./TRIVY.json");const t={};
+              for (const x of (r.Results||[])) for (const v of (x.Vulnerabilities||[])) t[v.Severity]=(t[v.Severity]||0)+1;
+              console.log("Gevonden: "+(Object.keys(t).length?JSON.stringify(t):"niets"));' || true
+          fi
+
+      - name: De uitslag van de scan bewaren bij de run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: kwetsbaarheden
+          path: |
+            TRIVY.json
+            TRIVY.log
+          if-no-files-found: warn
+
+      - name: Het zegel bewaren bij de run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: releasezegel
+          path: |
+            RELEASE.json
+            RELEASE.sig
+          if-no-files-found: warn

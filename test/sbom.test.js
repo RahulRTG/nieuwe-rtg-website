@@ -206,3 +206,85 @@ test('een opgeschreven digest komt in de lijst, en zonder staat dat er ook', () 
     else if (fs.existsSync(pad)) fs.unlinkSync(pad);
   }
 });
+
+/* ---- het releasezegel: staat RTG hier achter? ---- */
+
+const zegel = require('../scripts/releasezegel');
+const crypto = require('crypto');
+
+function sleutelpaar() {
+  const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
+  return { pub: publicKey.export({ type: 'spki', format: 'pem' }), priv: privateKey };
+}
+const teken = (bytes, priv) => crypto.sign(null, bytes, priv);
+
+test('een geldig zegel is GELDIG, en zegt erbij wat het niet bewijst', () => {
+  const k = sleutelpaar();
+  const bytes = Buffer.from(JSON.stringify(zegel.maak({ image: 'ghcr.io/x:v1' })));
+  const u = zegel.verifieer(bytes, teken(bytes, k.priv), k.pub);
+  assert.equal(u.stand, 'geldig');
+  assert.equal(u.code, 0);
+  assert.match(u.let, /GitHub|vertrouwensbron/i,
+    'een eigen handtekening bewijst niet wie er heeft gebouwd, en dat hoort in de uitslag');
+});
+
+test('een verklaring die is AANGERAAKT breekt het zegel', () => {
+  const k = sleutelpaar();
+  const bytes = Buffer.from('{"image":"ghcr.io/x:v1"}');
+  const sig = teken(bytes, k.priv);
+  const geknoeid = Buffer.from('{"image":"ghcr.io/kwaad:v1"}');
+  const u = zegel.verifieer(geknoeid, sig, k.pub);
+  assert.equal(u.stand, 'gebroken');
+  assert.equal(u.code, 1);
+  assert.match(u.waarom, /veranderd|niet door RTG/i);
+});
+
+test('een handtekening van een ANDERE sleutel is gebroken, niet geldig', () => {
+  const echt = sleutelpaar(), vals = sleutelpaar();
+  const bytes = Buffer.from('{"image":"ghcr.io/x:v1"}');
+  const u = zegel.verifieer(bytes, teken(bytes, vals.priv), echt.pub);
+  assert.equal(u.stand, 'gebroken', 'wie de sleutel niet heeft, kan niet namens RTG spreken');
+});
+
+test('zonder publieke sleutel is het NIET VAST TE STELLEN, en niet stiekem goed', () => {
+  const k = sleutelpaar();
+  const bytes = Buffer.from('{"a":1}');
+  const u = zegel.verifieer(bytes, teken(bytes, k.priv), null);
+  assert.equal(u.stand, 'niet vast te stellen');
+  assert.equal(u.code, 2);
+  /* Op de REDEN en niet alleen op de stand. Zonder de wachter valt dit geval
+     ook in de catch eronder, en dan klopt de uitslag toevallig maar zegt hij
+     "de sleutel is niet te lezen" in plaats van "er is geen sleutel". Een
+     mutatie die de wachter weghaalde, zakte hier eerst NIET op -- gevonden
+     doordat ze bleef staan. */
+  assert.match(u.waarom, /geen publieke releasesleutel/i,
+    'de reden hoort te zeggen dat er GEEN sleutel is, niet dat hij onleesbaar is: ' + u.waarom);
+  const zonderSig = zegel.verifieer(bytes, null, k.pub);
+  assert.equal(zonderSig.stand, 'niet vast te stellen', 'en zonder handtekening ook niet');
+});
+
+test('de verklaring bedenkt niets: alles komt uit de materiaallijst', () => {
+  const v = zegel.maak({ image: 'ghcr.io/rtg:v9', imageDigest: 'sha256:' + 'd'.repeat(64) });
+  const s = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SBOM.json'), 'utf8'));
+  assert.equal(v.bronAfdruk, s.eigenCode.afdruk, 'de bronafdruk komt uit SBOM.json');
+  assert.equal(v.commit, s.product.commit);
+  assert.equal(v.image, 'ghcr.io/rtg:v9');
+  assert.equal(v.npmInRelease, 0, 'en de nuldependency-stand reist mee in het zegel');
+  /* Wat onbekend is, is null en geen lege string: een lege string ziet eruit
+     als een antwoord. */
+  const leeg = zegel.maak({});
+  assert.equal(leeg.image, null);
+  assert.equal(leeg.imageDigest, null);
+});
+
+test('de PRIVEsleutel staat nergens in de repository', () => {
+  /* Een script dat een privesleutel wegschrijft, zet hem vroeg of laat in een
+     commit. releasesleutel.js drukt hem af en schrijft alleen de publieke helft. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'releasesleutel.js'), 'utf8');
+  assert.ok(!/writeFileSync\([^)]*priv/i.test(bron), 'de privesleutel wordt niet weggeschreven');
+  assert.match(bron, /RELEASE\.pub/, 'de publieke helft wel');
+  const ignore = fs.readFileSync(path.join(WORTEL, '.gitignore'), 'utf8');
+  for (const naam of ['RELEASE.key', 'RELEASE.sig', 'RELEASE.json']) {
+    assert.ok(ignore.includes(naam), naam + ' hoort in .gitignore');
+  }
+});

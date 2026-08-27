@@ -3,13 +3,13 @@
   "vastgelegd": "2026-08-27",
   "gemeten": {
     "bestanden": 1539,
-    "vormen": 1172,
-    "velden": 1706,
-    "modules": 604,
+    "vormen": 1173,
+    "velden": 1710,
+    "modules": 605,
     "domeinen": 219,
     "envelopDrempel": 14,
     "envelop": 31,
-    "veldenDomeineigen": 1210,
+    "veldenDomeineigen": 1214,
     "veldenGedeeldVanafVier": 162,
     "gelijkendeVormparen": 17
   },
@@ -216,6 +216,18 @@
       ]
     },
     {
+      "veld": "prijsCenten",
+      "domeinen": 10,
+      "waar": [
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/eten",
+        "kern/geloofbieb",
+        "kern/reisbieb",
+        "kern/rtfbieb"
+      ]
+    },
+    {
       "veld": "waarde",
       "domeinen": 10,
       "waar": [
@@ -357,18 +369,6 @@
         "kern/fiscaal",
         "kern/mobiliteit",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "prijsCenten",
-      "domeinen": 9,
-      "waar": [
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/eten",
-        "kern/geloofbieb",
-        "kern/reisbieb",
-        "kern/rtfbieb"
       ]
     },
     {

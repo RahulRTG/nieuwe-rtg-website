@@ -116,5 +116,30 @@ module.exports = ({ VORMEN, stukId }) => {
      rest op een sleutel; dat verschil wordt hier opgevangen en gaat niet verder
      de Media OS in. */
 
-  return { vanTrack, vanVideo, vanClip, vanLive };
+  /* Een PARTITUUR (kern/uitvoering/): geen opname maar een werk dat op het
+     moment van vragen wordt uitgevoerd. Hij speelt daarom niet HIER: `elders`
+     met de reden erbij, precies zoals een thuis-video en een clip dat al doen.
+     Een speelknop die een uitvoering zou starten zonder de vraag "hoeveel tijd
+     heeft u" is geen speelknop maar een gok. */
+  function vanPartituur(p, key) {
+    return {
+      id: stukId('partituur', p.id), vorm: 'partituur', vormNaam: VORMEN.partituur,
+      titel: p.naam,
+      maker: { codenaam: p.codenaam },
+      at: p.at, duurS: p.totaalS || null, onderwerp: null,
+      meta: p.onderdelen + ' onderdelen - kern ' + Math.round(p.kernS) + 's van ' + Math.round(p.totaalS) + 's' +
+        (p.toestemming && p.toestemming.inkorten ? ' - past zich aan uw tijd aan' : ' - alleen in zijn geheel') +
+        (p.prijsCenten ? ' - ' + (p.prijsCenten / 100).toFixed(2) + ' euro' : ''),
+      spelen: { soort: 'elders', bron: '/apps/uitvoering.html',
+        reden: 'Een partituur wordt uitgevoerd en niet afgespeeld: u zegt eerst hoeveel tijd u heeft.' },
+      cijfers: {},
+      /* Wat een kijker moet weten VOORDAT hij erop tikt: kost het iets, en hoe
+         kort kan het. Niet wat erin zit -- wie er niet in mag, hoort niet te
+         zien waaruit het bestaat. */
+      kernS: p.kernS, aanspraakNodig: p.aanspraakNodig || null, prijsCenten: p.prijsCenten || 0,
+      mijn: p.key === key
+    };
+  }
+
+  return { vanTrack, vanVideo, vanClip, vanLive, vanPartituur };
 };

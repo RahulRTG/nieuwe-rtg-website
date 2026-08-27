@@ -87,11 +87,37 @@ De `SBOM.json` van de commit wordt daarnaast als artefact bij de run bewaard.
 Dit hoort er even groot bij te staan, want half bewijs dat voor heel wordt
 aangezien is erger dan geen bewijs.
 
-- **Geen handtekening.** De provenance komt van BuildKit in onze eigen workflow.
-  Er is geen door sigstore ondertekende attestatie op naam van GitHub, en dus
-  geen manier voor een buitenstaander om te verifiëren zonder ons te vertrouwen.
-  Dat vraagt een extra actie plus `id-token: write` — een besluit, geen
-  vergetelheid.
+~~- **Geen handtekening.**~~ **Besluit van de eigenaar (27 augustus 2026): er
+wordt ondertekend met een EIGEN sleutel.** De pijplijn schrijft een verklaring
+(`RELEASE.json`: commit, bronafdruk, image + digest, de getrokken basis-images)
+en ondertekent die met ed25519. Verifiëren kan iedereen met `RELEASE.pub` uit de
+repository:
+
+  ```
+  node scripts/releasezegel.js --verifieer RELEASE.json RELEASE.sig
+  ```
+
+  **Geen nieuw gereedschap in de keten:** ondertekenen gaat met `openssl` (dat er
+  al is), verifiëren met de ingebouwde crypto van Node. Bij een
+  supply-chain-functie is een extra binary precies de verkeerde toevoeging.
+
+  **Wat het waard is, en wat niet.** Een handtekening met onze eigen sleutel
+  bewijst dat deze verklaring is afgegeven door de houder van die sleutel en
+  sindsdien niet is veranderd. Hij bewijst **niet** dat GitHub dit heeft gebouwd:
+  de vertrouwensbron blijft RTG. Dat staat in de uitslag zelf, niet alleen hier.
+  Wie meer wil — keyless op naam van de bouwer, controleerbaar zonder ons — heeft
+  sigstore nodig, en dat is een andere keuze met een derde partij erin.
+
+  **De sleutel.** `node scripts/releasesleutel.js` maakt hem aan, schrijft alleen
+  de publieke helft weg en drukt de privésleutel één keer af. Die hoort als
+  geheim `RTG_RELEASE_SLEUTEL` in de pijplijn en nergens in deze map: een script
+  dat een privésleutel in de werkmap zet, zet hem vroeg of laat in een commit.
+  Lekt hij, dan kan iemand anders verklaringen namens RTG afgeven — dan hoort er
+  een nieuwe sleutel te komen en moet `RELEASE.pub` mee. Dat is de prijs van zelf
+  ondertekenen.
+
+  Is er geen sleutel ingesteld, dan zegt de pijplijn dat hardop en publiceert hij
+  **zonder** zegel, in plaats van te doen alsof.
 - **Nog geen digest-pinning, maar wel digest-REGISTRATIE.** `node:22-slim` van
   vandaag is niet die van vorige maand. Vastzetten op een digest maakt de release
   reproduceerbaar en kost onderhoud: elke patch van een basis-image wordt dan een
@@ -106,16 +132,19 @@ aangezien is erger dan geen bewijs.
   plaats van een gok. Dat bestand hoort bij het **artefact** en niet bij de bron
   en staat daarom in `.gitignore`: het committen zou een digest van gisteren aan
   de release van vandaag hangen.
-- **Geen kwetsbaarheidsscan, en dat is een besluit dat open staat.** Deze lijst
-  zegt WAT erin zit, niet dat het veilig is. Een scan vraagt een
-  kwetsbaarheidsdatabase, en die hebben wij niet: elke praktische route (Trivy,
-  Grype, Docker Scout, de GitHub-scanner) betekent een derde partij toelaten in
-  de releasepijplijn en vertrouwen op háár oordeel. Dat is precies het soort
-  keuze dat `APPSTORE.md` en dit document elders niet stilzwijgend maken. Er is
-  daarom bewust niets bijgezet dat half werkt: de vraag *welke scanner, en op
-  wiens gezag* hoort door de eigenaar beantwoord te worden. Wat de keuze
-  goedkoper maakt dan hij lijkt, is dat er nu een materiaallijst ligt om hem op
-  los te laten.
+~~- **Geen kwetsbaarheidsscan.**~~ **Besluit van de eigenaar: Trivy, en
+niet-blokkerend.** Hij draait als **container** en niet als GitHub-actie —
+hetzelfde vertrouwensmodel als de basis-images die hier al draaien — en hij
+**leest alleen**: hij bepaalt niet wat er wordt gepubliceerd. De uitslag komt als
+artefact bij de run.
+
+  Niet-blokkerend is met opzet: een vals alarm hoort geen release tegen te
+  houden, en blokkerend maken is later een schakelaar. Faalt de scanner zélf, dan
+  staat dat hardop in het log — *een scan die stil overslaat, ziet eruit als een
+  schone scan*, en dat is de gevaarlijkste uitslag van alle drie.
+
+  Deze lijst zegt nog steeds WAT erin zit en niet dat het veilig is. De scan is
+  een tweede meting ernaast, geen keurmerk erover.
 ~~- **Geen verificatie bij het uitrollen.**~~ **Die staat er sinds 27 augustus
 2026:** `node scripts/uitrolproef.js <adres>` vraagt een draaiende server welke
 build hij is en legt die naast de materiaallijst. Drie uitslagen met drie

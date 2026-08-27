@@ -41,7 +41,11 @@ const MODI = {
   muziek: { naam: 'Muziek', vormen: ['track'] },
   kijk: { naam: 'Kijk', vormen: ['video', 'live'] },
   flow: { naam: 'Flow', vormen: ['clip'] },
-  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live'] },
+  /* UITVOERINGEN: partituren (kern/uitvoering/). Een eigen stand en niet
+     bijgemengd in Muziek of Kijk, want een partituur is geen van beide -- hij
+     kan muziek, video en korte video door elkaar dragen. */
+  uitvoering: { naam: 'Uitvoeringen', vormen: ['partituur'] },
+  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live', 'partituur'] },
   /* MEDIA FOR BUSINESS. Een eigen stand, geen filter over de gewone wereld:
      wat hier staat is INTERN gepubliceerd (kern/theater/zaak.js, kern/podium
      zone 'zaak') en staat in geen enkele openbare lijst. Een filter over

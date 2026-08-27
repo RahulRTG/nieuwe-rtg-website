@@ -34,6 +34,13 @@ module.exports = (ctx) => {
   function dagrapport(s, datum) {
     const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
+    /* DE DERDE KOPIE VAN DEZELFDE BESLISSING, en hij was de laatste die nog
+       naar de niet-bestaande cap `rooms` keek. ./tarief.js is er juist gekomen
+       omdat de boekhouding en de factuur uiteenliepen (zie de kop daar); dit
+       Z-rapport stond er met de hand naast en liep dus mee de mist in. Twee
+       sessies repareerden dit dezelfde dag: de een liet ook het LAND door
+       tarief.js bepalen (landVan), de ander de categorie. Allebei gehouden --
+       er staat hier geen eigen kopie van een fiscale beslissing meer. */
     const landCode = tarief.landVan(s);
     // de categorie uit DEZELFDE routine als de boekhouding en de factuur
     const basisCat = tarief.basisCat(s, db.capsVan(s));

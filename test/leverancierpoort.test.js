@@ -68,7 +68,11 @@ test('de bus wordt pas bij het SEINEN opgehaald, niet bij het bouwen', () => {
   poort.sseToSupplier('ABC', 'sync', { scope: 'team' });
   poort.sseToOffice('nieuw', { wat: 'iets' });
   assert.equal(geseind.length, 2);
-  assert.deepEqual(geseind[0], { kanaal: 'sse', doel: 'sup', match: 'ABC', event: 'sync', data: { scope: 'team' } });
+  /* De `envelop` hierin is een OPGAVE en nog geen envelop: deze poort zegt hoe
+     gevoelig de inhoud is, en server/bus.js vult daar id, tijd en keten bij.
+     Hier staat een stub-bus, dus je ziet precies wat de poort zelf meegeeft. */
+  assert.deepEqual(geseind[0], { kanaal: 'sse', doel: 'sup', match: 'ABC', event: 'sync',
+    data: { scope: 'team' }, envelop: { classificatie: 'intern' } });
   assert.equal(geseind[1].doel, 'office');
 });
 

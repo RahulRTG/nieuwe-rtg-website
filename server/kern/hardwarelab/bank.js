@@ -80,16 +80,11 @@ const BANK = {
   }
 };
 
-function hash(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
-function kies(arr, seed, n) {
-  const out = []; const used = new Set(); const s = (seed >>> 0);
-  for (let i = 0; out.length < Math.min(n, arr.length); i++) {
-    const idx = (s + i * 2654435761) % arr.length;
-    if (!used.has(idx)) { used.add(idx); out.push(arr[idx]); }
-  }
-  return out;
-}
-function palet(seed, n) { return kies(PALET_NAMEN, seed, n).map(nm => ({ naam: nm, hex: PALET[nm] })); }
+/* hash, kies en palet stonden hier byte voor byte gelijk aan die in de drie
+   andere ontwerpbanken; ze wonen nu in kern/ontwerpbank.js. Het PALET blijft
+   hier, want dat is wat dit domein onderscheidt. Zie de kop daar. */
+const { hash, kies, paletUit } = require('../ontwerpbank');
+const palet = (seed, n) => paletUit(PALET, seed, n);
 
 // het lab-sjabloon: een deterministisch concept uit de bank (val-terug voor de AI)
 function maakConcept(discipline, brief, naam, scho) {

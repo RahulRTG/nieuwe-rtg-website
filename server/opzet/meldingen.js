@@ -27,7 +27,9 @@ function initRealtime() {
 
 // stuur een sync-signaal naar één of meer tiers (open schermen herladen data)
 function broadcastSync(tiers, scope) {
-  bus.publish('sse', { doel: 'tier', match: [...tiers], event: 'sync', data: { scope } });
+  // alleen de naam van een scherm: geen inhoud, dus intern en geen persoonsgegeven
+  bus.publish('sse', { doel: 'tier', match: [...tiers], event: 'sync', data: { scope },
+    envelop: { classificatie: 'intern' } });
 }
 
 // notificeer één tier: opslaan, naar open schermen sturen én web-push
@@ -41,7 +43,9 @@ function notify(tier, note) {
   db.data.notifications[tier].unshift(n);
   db.data.notifications[tier] = db.data.notifications[tier].slice(0, 40);
   save();
-  bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n });
+  // een melding gaat over een lid en draagt zijn tekst mee
+  bus.publish('sse', { doel: 'tier', match: [tier], event: 'notify', data: n,
+    envelop: { classificatie: 'persoonsgegeven' } });
   sendPush(tier, n);
   return n;
 }

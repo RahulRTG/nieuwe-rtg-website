@@ -437,7 +437,39 @@ function keur() {
   return { rijen, klachten };
 }
 
-if (require.main === module) {
+/* DEZELFDE VRAAG, AAN RTG. `MAGNAATLAB.md` par. 5.1 vraagt fase 2: laat deze
+   meter zijn geldpompvraag stellen aan de RTG-keten in plaats van aan de
+   spelbank. Die keten woont in de Magnaat-wereld zelf
+   (server/kern/spellen/magnaat/rtg-keten.js) -- zie de kop daar voor waarom
+   juist daar -- en draait op de simulatiebank achter de betaalnaad.
+
+   Hij staat als APARTE STAND en niet ernaast in dezelfde ronde, om twee redenen.
+   Hij heeft RTG_SIMULATIEBANK=1 nodig en zou anders elke gewone ronde laten
+   omvallen; en hij meet iets anders. De spelvraag heeft een ruismarge omdat een
+   contract echte capaciteit verlegt; de RTG-vraag heeft die niet -- daar is een
+   overdracht een overdracht en is elke cent verschil een bevinding. */
+async function rtgRonde() {
+  const betaal = require('../server/betaal');
+  const keten = require('../server/kern/spellen/magnaat/rtg-keten')({ betaal, crypto: require('crypto') });
+  console.log('Magnaat vraagt het aan RTG Pay: kan een speler waarde maken uit niets?\n');
+  console.log('  rail: ' + betaal.AANBIEDER + (betaal.SIMULATIE_AAN ? '' : '   (' + betaal.simulatieBelet() + ')') + '\n');
+  const { rijen, klachten } = await keten.keur();
+  console.log('scenario              | in rust  | met de pomp | verschil | sluit | bank weigerde');
+  for (const r of rijen)
+    console.log(r.sleutel.padEnd(21) + ' | ' + String(r.rust).padStart(8) + ' | ' +
+      String(r.pomp).padStart(11) + ' | ' + String(r.verschil).padStart(8) + ' | ' +
+      String(r.sluit.klopt).padStart(5) + ' | ' + String(r.geweigerd).padStart(3) + 'x');
+  console.log('\n' + (klachten.length
+    ? 'AFGEKEURD -- hier komt waarde uit het niets:\n  ' + klachten.join('\n  ')
+    : 'geen enkel scenario maakt waarde uit het niets\n' +
+      '  exact nul verschil, en de sluitcontrole klopt in elk scenario'));
+  return klachten.length ? 1 : 0;
+}
+
+if (require.main === module && process.argv.includes('--rtg')) {
+  rtgRonde().then(code => { process.exitCode = code; })
+    .catch(e => { console.error('De RTG-ronde liep vast: ' + e.message); process.exitCode = 1; });
+} else if (require.main === module) {
   console.log('Magnaat-geldpomp: kan een speler waarde maken uit niets?\n');
   const { rijen, klachten } = keur();
   console.log('scenario              | soort    | totaal in rust | met de pomp |   verschil |  %');
@@ -453,4 +485,4 @@ if (require.main === module) {
   if (klachten.length) process.exitCode = 1;
 }
 
-module.exports = { SCENARIOS, meet, keur, wereld, totaal, RUIS, EXACT };
+module.exports = { SCENARIOS, meet, keur, wereld, totaal, RUIS, EXACT, rtgRonde };

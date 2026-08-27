@@ -64,18 +64,52 @@ function landVan(s) {
 function basisCat(s, caps) {
   const c = Array.isArray(caps) ? caps : [];
   if (c.includes('rides')) return (s && s.type) === 'jet' ? 'jet' : 'vervoer';
-  if (c.includes('rooms')) return 'logies';
+  /* DE CAP VOOR KAMERS HEET `bookings` EN HEEFT NOOIT `rooms` GEHETEN.
+     Hier stond `c.includes('rooms')`, en die cap bestaat niet: geen van de 73
+     genres draagt hem en kern/werkvormen.js maakt hem nergens aan. De tak was
+     dus dood, en 'logies' onbereikbaar -- terwijl de kop van dit bestand
+     "kamers -> 'logies'" belooft.
+
+     Wat er in plaats daarvan gebeurde: een hotel viel door naar 'eten' (het
+     staat in ETEN_GENRES) en een appartement, villa of wintersportresort naar
+     'standaard'. Gemeten op 27 augustus 2026, met de echte genrelijst en de
+     echte landentabel:
+
+       appartement NL   21% gerekend, 9% verschuldigd
+       villa NL         21% gerekend, 9% verschuldigd
+       hotel DE         19% gerekend, 7% verschuldigd
+       hotel BE         12% gerekend, 6% verschuldigd
+
+     Een verblijfszaak rekende dus te veel btw over een overnachting, in het
+     grootste geval meer dan het dubbele. `s.rooms` bestaat wel -- dat is het
+     VELD met de kamers, en daaruit leidt werkvormen.js juist `bookings` af.
+     Een veldnaam die als capnaam werd gelezen; gevonden doordat PLATFORM.md
+     `rooms` als voorbeeld-cap noemde en test/genrecap.test.js elke genoemde cap
+     sindsdien tegen het register houdt. */
+  if (c.includes('bookings')) return 'logies';
   if ((s && s.menu && s.menu.length) || ETEN_GENRES.includes(s && s.type)) return 'eten';
   return 'standaard';
 }
 
-/* De categorie van EEN artikel. Alleen de bar wijkt af van de basis: een glas
-   wijn in een restaurant is geen eten. Buiten de horeca (basis is niet 'eten')
-   verandert een artikel de categorie nooit. */
+/* De categorie van EEN artikel. Alleen de kaart wijkt af van de basis: een glas
+   wijn in een restaurant is geen eten, en een biertje in een hotelbar is geen
+   overnachting.
+
+   DIE TWEEDE TAK IS NIEUW, en hij hoort bij de reparatie hierboven. Zolang
+   'logies' onbereikbaar was, kwam een hotel met een kaart altijd op basis
+   'eten' uit en deed deze functie haar werk. Zodra een hotel wél 'logies'
+   krijgt, zou zonder deze tak ELK artikel op de rekening het logiestarief
+   krijgen -- in Nederland een pils van 21% naar 9%. Een reparatie die een
+   andere fout maakt is geen reparatie.
+
+   Buiten 'eten' en 'logies' verandert een artikel de categorie nooit: wat aan
+   boord van een privejet wordt geschonken volgt het tarief van de vlucht, en
+   dat is een fiscale keuze die hier niet stilletjes omgegooid wordt. */
 function catVanItem(s, naam, basis) {
-  if (basis !== 'eten') return basis;
+  if (basis !== 'eten' && basis !== 'logies') return basis;
   const m = ((s && s.menu) || []).find(x => x.name === naam);
-  return m && m.station === 'bar' ? 'drank' : 'eten';
+  if (!m) return basis;
+  return m.station === 'bar' ? 'drank' : 'eten';
 }
 
 /* HET PERCENTAGE UIT EEN TARIEVENTABEL: de categorie, anders het

@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-08-26T21:32:30.455Z",
-    "commit": "2f33c1c7",
-    "boomVuil": false,
+    "op": "2026-08-27T14:23:27.470Z",
+    "commit": "c1c3223e",
+    "boomVuil": true,
     "node": "v24.18.0"
   },
   "uitleg": "Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.",
@@ -13,21 +13,21 @@
       "afdruk": "e47d10c9fe01f877",
       "reden": "Pearl is warm: nooit meer blauw dan rood",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 148
+      "duurMs": 182
     },
     "vorm-status-niet-op-kleur": {
       "stand": "raak",
       "afdruk": "223d8101e527d636",
       "reden": "status leunt nooit op kleur alleen",
       "wachter": "test:test/ontwerp.test.js",
-      "duurMs": 197
+      "duurMs": 218
     },
     "techniek-sabotage-meet-zichzelf": {
       "stand": "raak",
       "afdruk": "10d7a3a44bc61253",
       "reden": "1. een wachter die AL rood was, telt nooit als bewijs",
       "wachter": "test:test/wetten.test.js",
-      "duurMs": 343
+      "duurMs": 448
     },
     "merk-kleurspelling": {
       "stand": "raak",
@@ -41,14 +41,14 @@
       "afdruk": "d1229adf5443e82e",
       "reden": "er zijn precies twee letterrollen, en alles loopt daardoorheen",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 148
+      "duurMs": 191
     },
     "merk-goud-is-mat": {
       "stand": "raak",
       "afdruk": "dbc3deca2baf008b",
       "reden": "Gold is mat champagne, geen internet-goud",
       "wachter": "test:test/materiaal.test.js",
-      "duurMs": 149
+      "duurMs": 197
     },
     "merk-geen-emoji": {
       "stand": "raak",
@@ -69,7 +69,7 @@
       "afdruk": "970552b3c4d76e60",
       "reden": "elke modus zet ALLE dichtheidsmaten, niet een deel",
       "wachter": "test:test/ontwerp.test.js",
-      "duurMs": 190
+      "duurMs": 195
     },
     "vorm-geen-inline-handlers": {
       "stand": "raak",
@@ -90,14 +90,14 @@
       "afdruk": "4f2ae0376690c7e2",
       "reden": "de prompt draagt Rahul nooit op te zeggen dat iets al geregeld is",
       "wachter": "test:test/rahul-eerlijk.test.js",
-      "duurMs": 171
+      "duurMs": 205
     },
     "toegang-codenaam-boven-naam": {
       "stand": "raak",
       "afdruk": "9714846f5b5e32dc",
       "reden": "de leden-prompt noemt de codenaam, niet de volledige naam",
       "wachter": "test:test/rahul-eerlijk.test.js",
-      "duurMs": 173
+      "duurMs": 212
     },
     "toegang-geen-kluisgegevens-van-een-ander": {
       "stand": "raak",
@@ -118,7 +118,7 @@
       "afdruk": "224357a4951a37cd",
       "reden": "de progressiegrens hangt aan de echte leeftijdspoort in grens.js",
       "wachter": "test:test/spelbeleid.test.js",
-      "duurMs": 251
+      "duurMs": 314
     },
     "toegang-elke-route-heeft-een-poort": {
       "stand": "raak",
@@ -137,9 +137,9 @@
     "geld-conservatie": {
       "stand": "raak",
       "afdruk": "df25b4e8b5b6e069",
-      "reden": "\u001b[33m2026-08-26T21:32:25.507Z WARN \u001b[0m [config] RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).",
+      "reden": "gelijktijdige echte tikken bewaren geld op de cent en zakken nooit onder nul",
       "wachter": "test:test/geld-conservatie-last.test.js",
-      "duurMs": 5008
+      "duurMs": 15727
     },
     "geld-geen-autonome-betalingen": {
       "stand": "mensenwerk",
@@ -151,14 +151,14 @@
       "afdruk": "083f689cce42468e",
       "reden": "bijdrage: alleen wat u gaf, met een datum, en zonder som",
       "wachter": "test:test/levensgraafleven.test.js",
-      "duurMs": 155
+      "duurMs": 185
     },
     "leven-talent-blijft-bij-het-lid": {
       "stand": "raak",
       "afdruk": "9e6b4b936c01a182",
       "reden": "talenten: het eigen project en de eigen cv-vaardigheden, vertrouwelijk en alleen het lid",
       "wachter": "test:test/levensgraafleven.test.js",
-      "duurMs": 156
+      "duurMs": 187
     },
     "leven-kind-is-geen-profiel": {
       "stand": "mensenwerk",
@@ -175,21 +175,21 @@
       "afdruk": "382b9db0038fb713",
       "reden": "er wordt niets geschreven en er is geen route die toegang verleent",
       "wachter": "test:test/onderneming-toegang.test.js",
-      "duurMs": 205
+      "duurMs": 244
     },
     "concern-geen-score-zonder-afwijking": {
       "stand": "raak",
       "afdruk": "d679535723f47778",
       "reden": "de meter geeft altijd dezelfde vorm terug, ook zonder cijfer",
       "wachter": "test:test/onderneming-dagbeeld.test.js",
-      "duurMs": 212
+      "duurMs": 234
     },
     "concern-juridisch-gegeven-heeft-een-bron": {
       "stand": "raak",
       "afdruk": "080b150fd18731ea",
-      "reden": "een juridisch gegeven zonder bron bestaat niet",
+      "reden": "✖ een juridisch gegeven zonder bron bestaat niet (15.675167ms)",
       "wachter": "test:test/concern.test.js",
-      "duurMs": 226
+      "duurMs": 104
     },
     "concern-werknemer-koopt-geen-pas": {
       "stand": "raak",
@@ -213,25 +213,24 @@
       "duurMs": 113612
     },
     "wereld-geen-twee-beginschermen": {
-      "stand": "raak",
+      "stand": "blind",
       "afdruk": "132d10527e2099dd",
-      "reden": "\u001b[33m2026-08-20T23:11:24.582Z WARN \u001b[0m [config] RTG_ENC_KEY niet gezet: versleuteling-at-rest is uit (prima voor lokaal, niet voor productie).",
-      "wachter": "e2e:test/appmenu.e2e.js",
-      "duurMs": 142541
+      "reden": "deze wachter was al rood voordat er iets gesaboteerd was (Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur); zijn rood bewijst hier niets",
+      "wachter": "e2e:test/appmenu.e2e.js"
     },
     "techniek-geen-productie-zonder-grootboek": {
       "stand": "raak",
       "afdruk": "22ed44b294cb29c4",
       "reden": "zonder grootboek gaat de start NIET door: json en geheugen worden geblokkeerd",
       "wachter": "test:test/opslagblokkade.test.js",
-      "duurMs": 166
+      "duurMs": 191
     },
     "techniek-domeingrens-houdt-tegen": {
       "stand": "raak",
       "afdruk": "bc62adc8153c9155",
       "reden": "een naam van een ANDER domein gooit, en de fout noemt domein en naam",
       "wachter": "test:test/domeingrens.test.js",
-      "duurMs": 169
+      "duurMs": 189
     },
     "techniek-elke-meter-is-geijkt": {
       "stand": "raak",
@@ -280,14 +279,49 @@
       "afdruk": "60274c89a500a887",
       "reden": "detectie: crashes en 5xx tellen mee, client-fouten en ruis niet",
       "wachter": "test:test/strenge-poort.test.js",
-      "duurMs": 339
+      "duurMs": 434
     },
     "techniek-wetten-hebben-een-bron": {
       "stand": "raak",
       "afdruk": "01dd60c9b89073d8",
       "reden": "Het wetboek klopt niet:",
       "wachter": "script:node scripts/wetten.js --controle",
-      "duurMs": 64
+      "duurMs": 76
+    },
+    "geld-poort-kent-geen-spelstand": {
+      "stand": "raak",
+      "afdruk": "1418f327a06403cd",
+      "reden": "5. de waardepoort kent geen simulatiestand, en dat blijft zo",
+      "wachter": "test:test/simulatiebank.test.js",
+      "duurMs": 13297
+    },
+    "geld-simulatiebank-nooit-in-productie": {
+      "stand": "raak",
+      "afdruk": "21586d83286fcb96",
+      "reden": "1. de drie grendels zitten dicht, en elke zegt WELKE",
+      "wachter": "test:test/simulatiebank.test.js",
+      "duurMs": 13656
+    },
+    "toegang-actor-op-de-bus-is-een-codenaam": {
+      "stand": "raak",
+      "afdruk": "484c09bc34ccb13a",
+      "reden": "3. de actor is een codenaam, geen contactgegeven",
+      "wachter": "test:test/envelop.test.js",
+      "duurMs": 395
+    },
+    "techniek-geen-gedeelde-laagnaam": {
+      "stand": "raak",
+      "afdruk": "687d72b741896d79",
+      "reden": "1. de meter vindt de lagenmodellen die er werkelijk staan",
+      "wachter": "test:test/genrecap.test.js",
+      "duurMs": 185
+    },
+    "techniek-een-genoemde-cap-bestaat": {
+      "stand": "raak",
+      "afdruk": "035045b56a193383",
+      "reden": "8. elke cap die PLATFORM.md als voorbeeld noemt, bestaat echt",
+      "wachter": "test:test/genrecap.test.js",
+      "duurMs": 171
     }
   }
 }

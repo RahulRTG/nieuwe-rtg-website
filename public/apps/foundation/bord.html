@@ -65,6 +65,17 @@
   .pageview .tekst{white-space:pre-wrap;font-size:.92rem;line-height:1.45;}
   .pageview canvas,.pageview img{width:100%;border-radius:0;background:var(--bord);display:block;}
   @media(max-width:820px){.app{grid-template-columns:1fr;}.zij{position:fixed;inset:auto 0 0 0;max-height:44vh;background:var(--bg);z-index:5;padding:.7rem;border-top:1px solid var(--lijn);}}
+  /* OP EEN TELEFOON BREEKT OOK DE LESCODE ZELF AF, en niet alleen de rij
+     eromheen. De rij hierboven wrapt al, maar dit blok bleef als geheel 384px
+     breed -- label, code met brede letterafstand, kopieerknop en de
+     online-teller naast elkaar. Op 390px kwam de rechterrand daarmee op 395 en
+     liep de pagina buiten beeld; de keuring meet dat en telt het als gebrek.
+     margin-left:auto hoort er ook af: dat duwt het blok naar rechts terwijl er
+     op een smal scherm niets is om naartoe te duwen. */
+  @media(max-width:430px){
+    .code{flex-wrap:wrap;max-width:100%;margin-left:0;}
+    .code b{letter-spacing:.2em;}
+  }
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}.merkvlak b{color:#F4E9C8;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">

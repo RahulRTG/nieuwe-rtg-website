@@ -116,6 +116,31 @@ zelf af, en wat niet gemeten is wordt niet als getal getoond. Daar staat ook wat
 er al staat en dus NIET opnieuw gebouwd moet worden — de rekening is al één
 waarheid over alle kanalen, en het ontbrekende scharnier is de **stoel**.
 
+**`UITVOEREND.md` is de richting van de mediakant** — niet "media-apps, maar
+slimmer" maar een ander werkwoord: **RTG speelt media niet af, RTG voert media
+uit.** Lees die vóór je aan een mediaformaat, een montage of een makersstudio
+werkt. Een publicatie wordt een **programma** (onderdelen, regels, toestemming,
+handelingen) en RTG bouwt daar op het moment van vragen een **uitvoering** van.
+De dragende bewering is niet ambitieus maar gemeten: dit huis kán geen montage
+renderen — de clipbytes staan in OPFS op het toestel van de maker, het Theater
+hercomprimeert principieel niet, en een uitgave uit het Klankwerk is een rij
+getallen die het toestel uitrekent. Dus moet het uitvoeren, en het doet dat één
+stuk groot al: de knip in `kern/clips-studio.js` is "een begin en een eind, geen
+nieuwe video". Er komt daarom één begrip bij en geen laag: het **deel**
+(`deel:<vorm>:<domein-id>@<van>-<tot>`), dat net als een afspeellijst alleen
+verwijst en met de sessie van de KIJKER wordt opgelost — een uitvoering is dus
+nooit een weg naar wat de wereld weigert. De regel die niet mag sneuvelen staat
+in par. 2.3: **RTG monteert alleen uit wat de maker heeft aangewezen en verzint
+er nooit iets bij** — past het gevraagde niet binnen de regels, dan wordt het
+geweigerd mét de reden en niet opgevuld, overbrugd of gladgestreken. Lees verder
+vooral par. 4, de botsingen: het woord "capability" is hier al twee keer bezet
+(`OS.md`) en een derde betekenis is het goedkoopste besluit om nu te nemen, een
+maker die een *wereld* publiceert moet het wereldpatroon van `PLATFORM.md` halen
+en niet een tabbladenbundel zijn, en een aanwezigheid gebouwd uit het materiaal
+van een maker draagt vijf voorwaarden of vervalt. Par. 5 zegt waar het omvalt als
+het omvalt: niet op de runtime maar op het auteurschap — dit leeft of sterft bij
+de studio voor de MAKER, niet bij de speler voor de kijker.
+
 **`BESTUUR.md` is het besturingsvlak** — de achterkant van RTG niet als
 backoffice maar als één laag waarin een mens ziet wat er draait, of het gezond
 is, en **hoe hard dat bewijs is**. Lees die vóór je aan een bestuursscherm, een

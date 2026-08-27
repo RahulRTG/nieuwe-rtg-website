@@ -6,11 +6,11 @@
     "keuringStuk": 0,
     "keuringScheef": 5,
     "dependencies": 0,
-    "testbestanden": 976,
+    "testbestanden": 982,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 139,
-    "keuringOmvang": 172,
+    "keuringOmvang": 171,
     "keuringDubbeling": 120,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -539,6 +539,11 @@
       "datum": "2026-08-27",
       "meter": "dbDeuren 576 -> 540, dbDeurenSchrijvend 372 -> 333; keuringOmvang 171 -> 172 (met de hand, TWEEDE KEER)",
       "reden": "De lichte vorm van een opslagcontract: server/kern/eigencollectie.js, met keuringsregel 54 eronder. 41 collecties hebben nu een gedeclareerde eigenaar, en niemand schrijft in die van een ander.\n\nWAAROM keuringOmvang WEER OMHOOG GAAT, EN WAAROM DAT EEN SIGNAAL IS. server/kern/metingen.js stond op 9398 byte; de adviesdrempel ligt op 9400. De declaratieregel vervangt een accessor van 104 byte door twee regels van samen 148, dus het bestand komt op 9450. Er is geen vorm van die regel die eronder blijft.\n\nDit is de TWEEDE keer deze sessie dat deze meter met de hand omhoog gaat om precies deze reden -- de eerste was server/kern/mobiliteit/index.js op 9364. Dat patroon is zelf informatie: elk bestand dat vlak onder de 9400 zit, gaat erover zodra het achter een contract komt. Er staan er 172 in die band en de afbouw is nog lang niet klaar.\n\nDUS DE AFSPRAAK ERBIJ: dit is de laatste keer dat hij hierom omhoog mag. Bij het volgende geval wordt het bestand OPGEKNIPT, niet de meter verhoogd -- precies zoals dat bij kern/levensdossier (12.800 byte) en kern/command/opslag (10.057) al is gebeurd. Twee keer is een afweging; drie keer is een gewoonte, en dan is de ratel zijn tanden kwijt."
+    },
+    {
+      "datum": "2026-08-27",
+      "meter": "keuringOmvang 172 -> 171, testbestanden 976 -> 982; beide na het samengaan met main (545f876a)",
+      "reden": "Main liep door met PR #127 en die tak knipte bestanden op (\"de keuring nagelopen: brede streepjes eruit en twee bestanden opgeknipt\", \"opgeknipt en een schijnbotsing weg\") en bracht zes toetsbestanden mee. Op de samengevoegde boom meet de ratel dus BETER dan de norm die uit de tekstsamenvoeging van twee NORM.json-en kwam: keuringOmvang 171 tegen norm 172, testbestanden 982 tegen 976.\n\nDIE SLACK HOORT ERUIT, want een norm die losser staat dan de boom bewaakt niets -- een terugval naar 172 zou stil doorkomen. Beide staan daarom met de hand op de gemeten stand.\n\nWAT DIT NIET IS: winst van deze tak. Allebei komen ze van main en niet van de contractlaag. Ze staan hier op naam van het SAMENGAAN, en er is bewust geen --vastleggen gedraaid: dat zou elke meter die main verbeterde als ratel van deze tak wegschrijven.\n\nEN HET LOST EEN SCHULD IN DIE HIER TWEE NOTITIES HOGER STAAT. keuringOmvang is in deze reeks twee keer met de hand opgehoogd (mobiliteit/index.js 9364, metingen.js 9398), met de afspraak erbij dat een derde keer NIET mag en dat er dan geknipt wordt. Main heeft dat knipwerk gedaan; de meter staat weer op 171 en de afspraak is niet aangesproken."
     }
   ],
   "prestatie": {

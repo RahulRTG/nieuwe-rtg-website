@@ -1,12 +1,12 @@
 {
-  "simulatiemodules": 64,
-  "kernmodules": 1407,
-  "kernDomeinen": 412,
+  "simulatiemodules": 66,
+  "kernmodules": 1409,
+  "kernDomeinen": 414,
   "perWereld": {
     "magnaat": {
-      "modules": 61,
+      "modules": 63,
       "regels": 0,
-      "raaktKern": 1
+      "raaktKern": 2
     },
     "hospitality": {
       "modules": 3,
@@ -14,9 +14,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 113,
-  "geraakteKernmodules": 1,
-  "geraakteKernDomeinen": 1,
+  "requiresTotaal": 116,
+  "geraakteKernmodules": 2,
+  "geraakteKernDomeinen": 2,
   "bereikPct": 0,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -44,10 +44,17 @@
         "server/kern/magnaat-dekkingsmatrix.js"
       ],
       "aantal": 1
+    },
+    {
+      "doel": "server/kern/pay",
+      "door": [
+        "server/kern/spellen/magnaat/rtg-keten.js"
+      ],
+      "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 10,
-  "kandidaatparen": 29,
+  "gedeeldeOnderwerpen": 11,
+  "kandidaatparen": 32,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {

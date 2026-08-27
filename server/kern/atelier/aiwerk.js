@@ -3,7 +3,7 @@
    scherpe blik van de creatief directeur geeft. Val altijd terug op het
    atelier-sjabloon uit ./bank zodat het ook zonder API-sleutel werkt. Krijgt de
    gedeelde ctx van kern/atelier/index.js. */
-const { CATEGORIEEN, ONDERDELEN, maakConcept } = require('./bank');
+const { DISCIPLINES, ONDERDELEN, maakConcept } = require('./bank');
 
 module.exports = (ctx) => {
   const { anthropic, save, scho, nu, vind, publiek } = ctx;
@@ -16,7 +16,7 @@ module.exports = (ctx) => {
     if (anthropic) {
       try {
         const sys = require('../rahul').RAHUL_LEAD + 'je bent de creatief directeur van RTG Atelier, het meest exclusieve ontwerpbureau ter wereld voor ' +
-          ((CATEGORIEEN[o.categorie] || {}).label || o.categorie) + '. Ontwerp een stuk op basis van de brief. Antwoord ALLEEN met JSON: ' +
+          ((DISCIPLINES[o.categorie] || {}).label || o.categorie) + '. Ontwerp een stuk op basis van de brief. Antwoord ALLEEN met JSON: ' +
           '{"silhouet":"...","materialen":[".."],"kleuren":[{"naam":"..","hex":"#RRGGBB"}],"details":[".."],"afwerking":"..","verhaal":".."}. ' +
           'Gebruik een gedempt, "quiet luxury"-palet (geen felle kleuren). Kort en concreet, in het Nederlands.';
         const r = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 700, system: sys, messages: [{ role: 'user', content: 'Merk/huis: ' + (o.huis || 'RTG Atelier') + '. Naam: ' + o.naam + '. Brief: ' + (o.brief || o.naam) }] });
@@ -50,7 +50,7 @@ module.exports = (ctx) => {
     }));
     o.techpack = {
       onderdelen,
-      constructie: (CATEGORIEEN[o.categorie] || {}).label + ', met de hand opgebouwd; ' + c.afwerking,
+      constructie: (DISCIPLINES[o.categorie] || {}).label + ', met de hand opgebouwd; ' + c.afwerking,
       maten: o.categorie === 'horloges' ? 'kastdiameter 38-40 mm, dikte < 9 mm' : (o.categorie === 'kleding' ? 'volledige maatstaat 34-46 (EU)' : 'atelier-standaardmaat, op maat mogelijk'),
       kleurwegen: c.kleuren.map(k => k.naam),
       controle: ['materiaalkeuring bij ontvangst', 'tussentijdse pasvorm/monsterkeur', 'eindcontrole met de hand'],
@@ -74,7 +74,7 @@ module.exports = (ctx) => {
     if (anthropic) {
       try {
         const sys = require('../rahul').RAHUL_LEAD + 'je bent de creatief directeur van RTG Atelier. Geef een korte, scherpe maar respectvolle kritiek op het ontwerp: signatuur, materiaal, commerciële haak en afwerking. In het Nederlands. Situatie: ' +
-          o.naam + ' (' + ((CATEGORIEEN[o.categorie] || {}).label) + '), ' + c.silhouet + ', ' + c.materialen.join('/') + ', tinten ' + c.kleuren.map(k => k.naam).join('/') + '.';
+          o.naam + ' (' + ((DISCIPLINES[o.categorie] || {}).label) + '), ' + c.silhouet + ', ' + c.materialen.join('/') + ', tinten ' + c.kleuren.map(k => k.naam).join('/') + '.';
         const r = await anthropic.messages.create({ model: 'claude-sonnet-5', max_tokens: 450, system: sys, messages: [{ role: 'user', content: v || 'Geef je kritiek en één concreet verbeterpunt.' }] });
         const t = (r && r.content && r.content[0] && r.content[0].text || '').trim();
         if (t) { o.kritiek = t; o.updatedAt = nu(); save(); return { ok: true, kritiek: t, ontwerp: publiek(o) }; }

@@ -116,7 +116,7 @@ bouwen**. Vanaf het moment dat er een geldige bedrijfsentiteit is, komen alle
 routes samen in dezelfde kern:
 
 ```
-Juridische structuur → Bedrijfsmodel → Capabilities → Organisatie →
+Juridische structuur → Bedrijfsmodel → Genre-caps → Organisatie →
 Mensen → Rechten → Processen → Software → Controle → Live
 ```
 
@@ -333,7 +333,7 @@ veranderen, in plaats van door een tweede lijst bij te werken.
 Bewaakt door `test/genretoegang.test.js` (5 toetsen, 5 mutaties gedaan en zien
 zakken) en `test/genreregister.test.js`.
 
-### Capability Composer
+### Genre-cap Composer
 
 Na herkenning stelt Rahul de inrichting voor, in drie lagen — **essentieel**,
 **aanbevolen**, **optioneel** — met één knop: *gebruik voorstel*. Voor een
@@ -355,7 +355,7 @@ overtreden en wet 3 tegelijk.
   → maintenance → vervangend voertuig → ticket. De klant start met echte
   processen in plaats van een leeg systeem.
 - **Multi-location cloning.** *"Kopieer de structuur van Amsterdam?"* — rollen,
-  beleid, workflows, capabilities, templates, apparaatconfiguratie en
+  beleid, workflows, genre-caps, templates, apparaatconfiguratie en
   rapportages mee; alleen de lokale afwijkingen bijstellen.
 - **Holding policy inheritance.** Een holding legt beleid centraal op ("alle
   betalingen boven €100k twee goedkeuringen"); dochters erven dat en kunnen
@@ -378,7 +378,7 @@ Vanaf?                        [ 1 september     ]
 ```
 
 Wat RTG onder water doet: employment-record, bedrijf, juridische entiteit,
-vestiging, afdeling, rol, capabilities, geldigheid, toegangsrechten, de juiste
+vestiging, afdeling, rol, genre-caps, geldigheid, toegangsrechten, de juiste
 app en de audit-regel. **Dat is precies de complexiteit die de gebruiker niet
 hoort te zien** — wet 3 en wet 5 in één scherm.
 
@@ -433,7 +433,7 @@ entiteit, vestiging of afdeling.
 
 Een chauffeur zonder geldig rijbewijs voor een voertuigcategorie krijgt dat werk
 niet. Een medewerker zonder de vereiste training krijgt de bijbehorende
-veiligheidscapability niet. Dit is geen extra rechtenmodel maar een filter over
+veiligheids-cap niet. Dit is geen extra rechtenmodel maar een filter over
 het bestaande — dezelfde vorm als het werkvenster in `magWerken()`, dat een
 geldige inlog al kan tegenhouden zonder dat er een rol verandert.
 
@@ -479,10 +479,10 @@ Niet alles hoeft live te blokkeren:
 |---|---|
 | **Info** | kan live |
 | **Aandacht** | kan live, met het risico zichtbaar |
-| **Blokkerend** | deze capability gaat niet aan |
+| **Blokkerend** | deze genre-cap gaat niet aan |
 
 Een restaurant zonder menu kan zijn account gebruiken, maar niet online
-bestellen aanzetten. De blokkade zit dus op de **capability** en niet op het
+bestellen aanzetten. De blokkade zit dus op de **genre-cap** en niet op het
 bedrijf — dat is waarom de caps-laag hier het aangrijpingspunt is.
 
 ### Sandbox
@@ -525,7 +525,7 @@ Geen chatbot. Zes taken, en elk ervan is traceerbaar:
 |---|---|
 | **ontdekken** | "Ik herken drie vestigingen." |
 | **structureren** | "Deze twee lijken onder dezelfde BV te vallen." |
-| **voorstellen** | "Uw hotel heeft waarschijnlijk deze twaalf capabilities nodig." |
+| **voorstellen** | "Uw hotel heeft waarschijnlijk deze twaalf genre-caps nodig." |
 | **controleren** | "Eén bestuurder staat zonder einddatum actief, maar de volmacht verloopt over 18 dagen." |
 | **automatiseren** | "Ik heb 42 rollen klaargezet." |
 | **uitleggen** | "Waarom heeft deze medewerker geen toegang tot Finance?" |
@@ -562,7 +562,7 @@ importeert ze, en leest:
 
 > **Uw concern is opgebouwd.**
 > 3 juridische entiteiten · 2 locaties · 14 afdelingen · 27 rollen ·
-> 180 medewerkers · 11 workflows · 18 bedrijfscapabilities
+> 180 medewerkers · 11 workflows · 18 genre-caps
 > Er zijn nog 4 punten die uw aandacht vragen.
 
 En nooit: *"stap 43 van 78"*.
@@ -581,7 +581,7 @@ En nooit: *"stap 43 van 78"*.
   invullen, is fout gebouwd — de vorm hoort zich naar de onderneming te voegen,
   zoals `kern/onderneming/fase.js` dat al doet (een idee krijgt geen
   debiteurenbeheer).
-- **Geen 40 losse apps.** Dit is één capability-laag onder de bestaande
+- **Geen 40 losse apps.** Dit is één laag genre-caps onder de bestaande
   leverancier-app en PDA, geen nieuwe reeks schermen. `PLATFORM.md` §0 geldt
   onverkort.
 

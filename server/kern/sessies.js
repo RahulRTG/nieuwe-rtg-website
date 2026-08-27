@@ -39,7 +39,10 @@ function maakSessies({ db, save, crypto }) {
 
   function zend(actie, hash, sess) {
     if (!bus) return;
-    bus.publish(KANAAL, Object.assign({ versie: 1, bron, actie, hash }, sess ? { sess } : {}));
+    /* Met een sessie erbij gaat er iets over een MENS de bus over; zonder
+       alleen een hash die verdwijnt. Dat verschil hoort in de envelop. */
+    bus.publish(KANAAL, Object.assign({ versie: 1, bron, actie, hash,
+      envelop: { classificatie: sess ? 'persoonsgegeven' : 'intern' } }, sess ? { sess } : {}));
   }
 
   // Verwijder een hash uit beide opslagplaatsen (Map + snapshot).

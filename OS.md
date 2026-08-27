@@ -243,6 +243,12 @@ hierboven buiten de grammatica houdt. In C is het de herbruikbare bedrijfsfuncti
 documenten laat staan, krijgt binnen een jaar twee antwoorden op "hoort dit in de
 capabilitylaag".
 
+Daaruit volgt de regel die deze paragraaf achterlaat, en hij staat in `WETTEN.json`
+met een handhaver eronder:
+
+> **Twee lagenmodellen delen nooit een laagnaam.** Een woord dat twee lagen
+> benoemt, benoemt er geen.
+
 **Dat woord is hernoemd (27 augustus 2026).** Laag 4 van A heet nu **genre-cap**,
 in `PLATFORM.md`, `FUNCTIES.md` en `CONCERN.md`. Het veld in de code heet nog
 steeds `caps` — dat is de naam die 73 genres al dragen en die hoefde niet te

@@ -106,7 +106,7 @@ De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:
 | `STATUS` | 10 | ontwerpfases bij de architect, betaalstanden, ideeënstanden, subsidiestanden |
 | `STANDEN` | 10 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
 | `NIVEAUS` | 9 | dreigingsniveaus, bijstandsniveaus, concern-scopes, geldbeleidsniveaus |
-| `CATEGORIEEN` | 9 | app-categorieën, voertuigcategorieën, kledingcategorieën, risicocategorieën |
+| `CATEGORIEEN` | 9 → **8** | app-categorieën, voertuigcategorieën, kledingcategorieën, risicocategorieën (atelier is eruit, zie par. 3) |
 | `ROLLEN` | 8 | bedrijfsrollen, gezinsrollen, en zes andere |
 
 ### Twee bevindingen, en ze wijzen tegengesteld
@@ -171,9 +171,20 @@ scherper dan "één type of niet":
 | `STATUS` | drie varianten | alle vier van `schets` naar `archief`, maar het midden is vakvocabulaire |
 | `PALET` | vier eigen paletten | van de 16 kleuren delen er **2** over alle vier |
 
-Drie van de vier noemen hun vakgebied `DISCIPLINES`, atelier `CATEGORIEEN` —
+Drie van de vier noemden hun vakgebied `DISCIPLINES`, atelier `CATEGORIEEN` —
 dezelfde rol, een andere naam. Dat is een botsing in het klein, binnen wat verder
 één familie is.
+
+**Opgelost (27 augustus 2026), en de meter bewoog mee.** Atelier noemt het nu ook
+`DISCIPLINES`, en dat haalt het uit een botsing en zet het in een familie:
+`CATEGORIEEN` droeg negen betekenissen en draagt er nu **acht**, terwijl
+`DISCIPLINES` er één draagt op vier plekken. Precies het onderscheid uit de tabel
+hierboven: hernoemen bij een botsing, samenvoegen bij een dubbeling.
+
+Wat NIET is meegegaan is een keuze: het veld op een ontwerp heet nog steeds
+`categorie` en het antwoord van de server `categorieLabel` en `categorieen`.
+Daar hangt een scherm aan en er ligt data mee opgeslagen. Een naam in de code is
+gratis te veranderen; een naam op de draad is dat niet.
 
 **En het handwerk vond een gebrek in de meter zelf.** `PALET` werd als één
 betekenis over vier plekken gemeld, door enkelvoudige koppeling: studio en

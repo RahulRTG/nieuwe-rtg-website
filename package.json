@@ -97,6 +97,7 @@
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",
     "grenslijst": "node scripts/grenslijst.js",
+    "sbom": "node scripts/sbom.js",
     "wetten": "node scripts/wetten.js",
     "sabotage": "node --experimental-sqlite scripts/sabotage.js",
     "zekerheid": "node scripts/zekerheid.js",

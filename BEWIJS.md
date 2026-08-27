@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1115 bestanden en 7486 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1118 bestanden en 7520 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1115 |
-| losse beweringen (`test(...)`) | 7486 |
+| toetsbestanden | 1118 |
+| losse beweringen (`test(...)`) | 7520 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 940 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 943 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 18 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-976 bestanden, 7251 beweringen.
+979 bestanden, 7285 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -266,6 +266,7 @@ toets omvalt.
 | `geldbeleid.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Geldbeleid, fase 1 van GELD.md: regels met vier niveaus, potten (oormerken binnen het eigen tegoed) en het append-only actielog, getoetst over het routecontract heen -- de UI bouwt blind op deze routes, dus de... |
 | `geldgraaf.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Geldgraaf, fase 1 van GELD.md: de cockpit staat voor een vers lid, de patroonherkenning vindt terugkerende posten en meldt een prijsstijging als 'post-duurder', een minimumbuffer-regel geeft een uitzondering met... |
 | `geldgrens.test.js` | 8 | gezakt op `liegpoort /api/` | DE EIGEN GELDGRENS -- een regel die het lid over zichzelf stelt en die echt weigert. WAAROM DEZE TOETS ER IS kern/geldbeleid/regels.js kent vier regelsoorten en ze WAARSCHUWEN allemaal. |
+| `geldidempotentie.test.js` | 3 | gezakt op `liegpoort /api/` | DE GELDROUTES, TWEE KEER AANGEROEPEN -- beweegt het geld dan een keer? WAAROM DEZE TOETS ER IS, en waarom hij niet in IDEMPROEF.json past. |
 | `geldregie.test.js` | 3 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
 | `geldveilig.test.js` | 5 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |
 | `geldwereld.test.js` | 8 | gezakt op `!==->===#0` | RTG Geld, de samenhanglaag. Zelfde beloftes als de andere werelden -- bezit niets, verzint niets, meldt stille bronnen -- plus de regel die alleen hier geldt: DEZE LAAG TELT NIETS ZELF OP. |
@@ -744,6 +745,7 @@ toets omvalt.
 | `samlxsw.test.js` | 12 | gezakt op `===->!==#0` | DE AANVALSTOETS OP DE SAML-DEUR. De faalvorm van een SAML-controle is geen foutmelding maar een STILLE AUTHENTICATIE-BYPASS: een document dat er perfect uitziet, met een handtekening die werkelijk klopt, waarna wij... |
 | `satelliet.test.js` | 4 | gezakt op `liegpoort /api/` | De satellietlaag: alles wat de app bruikbaar houdt op een trage verbinding met hoge vertraging (satelliet, buitengebied, traag mobiel). We toetsen: 1. |
 | `saveduurzaam.test.js` | 11 | geen module gevonden | saveDuurzaam() -- de zware primitive, en de poort die hem schaars houdt. WAT HIER OP HET SPEL STAAT, en het is niet de techniek. |
+| `sbom.test.js` | 9 | gezakt op `===->!==#0` | DE MATERIAALLIJST -- klopt hij nog met wat er werkelijk in de release zit? WAT DEZE TOETS WEL EN NIET VASTLEGT, en dat verschil is de hele opzet. |
 | `scanner.test.js` | 4 | gezakt op `>=->>#0` | RTG Scanner (public/shared/scanner.js): de camera-bediening. De camera zelf (getUserMedia, BarcodeDetector) bestaat niet in Node, dus we toetsen de pure, camera-onafhankelijke kern: de grijswaarde-omzetting die elk... |
 | `scannerpdf.test.js` | 3 | gezakt op `<=-><#0` | RTG Scanner: de eigen PDF-bouwer (public/apps/scanner/pdfje.js) is puur en draait ook in Node -- dus toetsen we hem zonder browser: een geldige PDF-structuur, een beeld per pagina, en een kloppende xref-verwijzing. |
 | `schakelkast-dekking.test.js` | 6 | gezakt op `liegpoort /api/` | STAAT ELKE FUNCTIE VAN HET PLATFORM IN DE BOARDROOM? De schakelkast is niet zo compleet als haar knoppen, maar zo compleet als haar CATALOGUS. |
@@ -899,6 +901,7 @@ toets omvalt.
 | `uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | De documentenuitgifte (kern/uitgifte.js): met een druk op de knop de officiele documentatie naar oude apparatuur of een harde schijf, altijd achter het 4- of 6-ogenprincipe. Getest voor de drie huizen: de zaak... |
 | `uitloggen.test.js` | 4 | gezakt op `liegpoort /api/` | UITLOGGEN MOET ECHT UITLOGGEN. Gevonden in aanvalsronde 2 (scripts/aanval.js, punt 14), en het is het soort gat dat je alleen vindt door het te DOEN in plaats van te lezen: POST /api/logout -> { ok: true } POST... |
 | `uitrol.test.js` | 5 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `uitvoering.test.js` | 22 | gezakt op `liegpoort /api/` | UITVOERENDE MEDIA: een maker publiceert een partituur, en RTG maakt daar op het moment van vragen één uitvoering van (UITVOEREND.md). Wat hier bewezen moet worden is vooral wat de laag NIET doet. |
 | `uitvoerproef.test.js` | 10 | gezakt op `true->false#0` | DE UITVOER-SCHAKEL: LEKT HET ANTWOORD VAN EEN DOORLAAT? WAT ER MIS WAS. |
 | `upload-poort.test.js` | 4 | gezakt op `liegpoort /api/` | DEZELFDE INHOUD, TWEE WEGEN NAAR BINNEN -- EN MAAR EEN POORT. De Ontsmetter hangt als scan-net over elke verzoek-body: alles wat eruitziet als een complete data-URL ("data:<mime>;base64,<...>") wordt gescand, waar in... |
 | `uploadquarantaine.test.js` | 5 | gezakt op `===->!==#0` | De uploadgrens in het klein: bytes staan tijdens de keuring in een aparte map, bereiken de route alleen na de eigen én externe scan, en blijven bij geen enkel oordeel als terugvindbaar virusbestand liggen. |

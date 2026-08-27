@@ -5158,6 +5158,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "sbom.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/bouwstempel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "scanner.test.js": {
       "soort": "puur",
       "staat": "gezakt",

@@ -369,6 +369,28 @@ Wat de stap goedkoper maakt dan hij lijkt: de bestanddelen bestaan al los
 Wat ontbreekt is dat ze aan een **artefact** hangen in plaats van aan een
 werkkopie.
 
+**Bijgewerkt 27 augustus 2026 — de eerste helft staat, en heeft een eigen
+document: `SBOM.md`.** Wat er sindsdien is: een materiaallijst (`npm run sbom` →
+`SBOM.json`) met de basis-images, de crates en een reproduceerbare afdruk over de
+eigen code; een **bouwstempel** dat `GET /api/health` laat zeggen wélke build er
+draait (commit + bronafdruk, en `vastgelegd: false` mét de reden als het geen
+release-image is); en een releasepijplijn die met `--provenance=mode=max
+--sbom=true` bouwt, zodat BuildKit een SLSA-provenance-attestatie naast het image
+publiceert. `test/sbom.test.js` handhaaft de eigenschappen die waar moeten
+blijven — negen toetsen, drie mutaties raak.
+
+Eén meting daaruit is het opschrijven waard, want ze maakt de opzet hierboven
+scherper: **er zit nul npm in de release.** De derdenlaag van dit huis zijn niet
+de pakketten maar de basis-images. Een SBOM die alleen npm telt, zou hier een
+verkeerd beeld geven.
+
+Wat er in par. 5.1 nog steeds NIET staat, en dat is met opzet geen voetnoot: geen
+**handtekening** (de provenance komt van onze eigen builder, dus een
+buitenstaander moet ons nog steeds vertrouwen), geen **digest-pinning** van de
+basis-images, geen kwetsbaarheidsscan, en geen **verificatie bij het uitrollen**
+— de gegevens zijn er nu wel, de controle nog niet. Zie de slotparagraaf van
+`SBOM.md`.
+
 ### 5.2 De gegenereerde tegenvoorbeeldzoektocht
 
 `scripts/sabotage.js` overtreedt elke wet **één keer, met opzet**. Dat is sterk

@@ -49,6 +49,29 @@ COPY --from=motor-builder /tmp/rtg-sentinel /app/rtg-sentinel
 # snoeien.
 RUN npm run build
 
+# HET BOUWSTEMPEL -- de runtimekant van de release-provenance.
+#
+# Deze drie waarden komen van de BOUWER en worden hier alleen doorgegeven. Een
+# proces dat zijn eigen afdruk uitrekent, rekent hem uit over de bestanden die
+# het op dat moment heeft -- en dat beantwoordt de vraag "is dit wat er gebouwd
+# is" juist niet. /api/health toont ze (server/bouwstempel.js); zonder stempel
+# zegt dat veld dat het geen release is, in plaats van een leeg veld te tonen.
+#
+# Ze staan NA `npm run build`, zodat een nieuwe commit de dure lagen hierboven
+# niet ongeldig maakt. En als ARG zonder default: wie het image met de hand
+# bouwt, krijgt geen verzonnen stempel maar geen stempel.
+ARG RTG_BOUW_COMMIT
+ARG RTG_BRON_AFDRUK
+ARG RTG_BOUW_AT
+ENV RTG_BOUW_COMMIT=$RTG_BOUW_COMMIT \
+    RTG_BRON_AFDRUK=$RTG_BRON_AFDRUK \
+    RTG_BOUW_AT=$RTG_BOUW_AT
+# Dezelfde drie als OCI-labels, zodat `docker inspect` ze ook zonder draaiende
+# container laat zien -- een inkoper hoeft de app dan niet te starten.
+LABEL org.opencontainers.image.revision=$RTG_BOUW_COMMIT \
+      org.opencontainers.image.created=$RTG_BOUW_AT \
+      nl.rtg.bron-afdruk=$RTG_BRON_AFDRUK
+
 # Inhoudsbewijs in het image: na uitrol kan exact worden gecontroleerd welke
 # Node-bron, frontend-build en Rust-binary deze container draagt.
 RUN node scripts/release-bewijs.js --uit /app/release-bewijs.json

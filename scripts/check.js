@@ -819,6 +819,17 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
        Gaat RTG de bezorging wel doen (staat in TAKEN.md), dan hoort deze route
        alsnog langs de poort en verdwijnt deze regel. */
     ['/api/podium/koop', 'kopen bij een medelid in de uitzending; RTG bezorgt niet en vraagt geen adres'],
+    /* Uitvoerende media: een partituur van een medelid kopen (UITVOEREND.md).
+       Zelfde geval als /api/podium/koop hierboven, en om dezelfde reden op deze
+       lijst en niet achter de poort. Wat er wordt gekocht is een AANSPRAAK -- een
+       recht om het werk te openen -- en niet iets dat bezorgd moet worden. Er
+       gaat geen adres, geen contactgegeven en geen bestelregel naar de maker;
+       hij ziet een betaling op codenaam, precies zoals bij elke andere
+       lid-aan-lid-betaling in dit huis. Een gegevenspoort zou hier om gegevens
+       vragen die deze stroom nooit gebruikt, en dat is een valse vraag: een lid
+       dat geleerd wordt om zulke schermen weg te klikken, klikt ook het scherm
+       weg dat er wel toe doet. */
+    ['/api/uitvoering/koop', 'een partituur van een medelid kopen; het gekochte is een aanspraak, er wordt niets bezorgd en er gaat geen adres mee'],
     ['/api/mob/aanbod', 'welk vervoer hier bestaat opvragen; er gebeurt nog niets'],
     ['/api/mob/plekken', 'de bestemmingenlijst opvragen; er gebeurt nog niets'],
     ['/api/mob/favoriet', 'je eigen bewaarde plekken; er staat geen derde tegenover'],

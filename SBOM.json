@@ -1,0 +1,92 @@
+{
+  "uitleg": "Waar een RTG-release uit bestaat. Gegenereerd met node scripts/sbom.js; bewerk dit bestand niet met de hand. Dit zegt WAT erin zit, niet dat het veilig is -- daar is een scanner voor, en die draait hier niet.",
+  "formaat": "rtg-sbom/1",
+  "product": {
+    "naam": "rtg-website",
+    "bron": "git",
+    "commit": "c359a2cc3173e2932360f3a39c317cc92797ec0c",
+    "werkboomSchoon": false
+  },
+  "eigenCode": {
+    "afdruk": "sha256:0e627638fe91279755cf091babe957838fb84f22f542fdee78c1ea8dc4d14ede",
+    "bestanden": 5027,
+    "bytes": 69608421
+  },
+  "telling": {
+    "onderdelen": 7,
+    "inRelease": 4,
+    "alleenBouw": 3,
+    "npmInRelease": 0
+  },
+  "onderdelen": [
+    {
+      "soort": "container",
+      "ecosysteem": "oci",
+      "naam": "rust",
+      "versie": "1.97-slim",
+      "licentie": null,
+      "integriteit": null,
+      "fase": "motor-builder",
+      "inRelease": true,
+      "let": "Vastgezet op een tag, niet op een digest."
+    },
+    {
+      "soort": "container",
+      "ecosysteem": "oci",
+      "naam": "postgres",
+      "versie": "18-alpine",
+      "licentie": null,
+      "integriteit": null,
+      "fase": "backup-runtime",
+      "inRelease": true,
+      "let": "Vastgezet op een tag, niet op een digest."
+    },
+    {
+      "soort": "container",
+      "ecosysteem": "oci",
+      "naam": "node",
+      "versie": "22-slim",
+      "licentie": null,
+      "integriteit": null,
+      "fase": "runtime",
+      "inRelease": true,
+      "let": "Vastgezet op een tag, niet op een digest."
+    },
+    {
+      "soort": "library",
+      "ecosysteem": "npm",
+      "naam": "fsevents",
+      "versie": "2.3.2",
+      "licentie": "MIT",
+      "integriteit": "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==",
+      "inRelease": false
+    },
+    {
+      "soort": "library",
+      "ecosysteem": "npm",
+      "naam": "playwright",
+      "versie": "1.62.1",
+      "licentie": "Apache-2.0",
+      "integriteit": "sha512-0M+L3LAD8/nm554LOla9Ayx0j0tmFZ0FBcoQ7F1VuVHpM/XpiC8RcDzBQB8W5+hA8L22THxELzeF+2WcUzvcLg==",
+      "inRelease": false
+    },
+    {
+      "soort": "library",
+      "ecosysteem": "npm",
+      "naam": "playwright-core",
+      "versie": "1.62.1",
+      "licentie": "Apache-2.0",
+      "integriteit": "sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==",
+      "inRelease": false
+    },
+    {
+      "soort": "library",
+      "ecosysteem": "cargo",
+      "naam": "rtg-motor",
+      "versie": "0.1.0",
+      "licentie": null,
+      "integriteit": null,
+      "inRelease": true
+    }
+  ]
+}

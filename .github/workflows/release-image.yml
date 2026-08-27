@@ -43,12 +43,45 @@ jobs:
           repo="${GITHUB_REPOSITORY,,}"
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then tag="${GITHUB_REF_NAME}"; else tag="sha-${GITHUB_SHA::12}"; fi
           echo "RTG_RELEASE_IMAGE=ghcr.io/$repo:$tag" >> "$GITHUB_ENV"
+      # De materiaallijst hoort bij DEZE commit en wordt daarom hier gemaakt en
+      # niet uit de repository gelezen: een SBOM die iemand vergat bij te werken,
+      # beschrijft een andere release dan er wordt gepubliceerd.
+      - name: Materiaallijst (SBOM) en bronafdruk
+        shell: bash
+        run: |
+          npm run sbom
+          afdruk="$(node -e 'process.stdout.write(require("./SBOM.json").eigenCode.afdruk)')"
+          echo "RTG_BRON_AFDRUK=$afdruk" >> "$GITHUB_ENV"
+          echo "RTG_BOUW_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          echo "Bronafdruk: $afdruk"
+      - name: De materiaallijst bewaren bij de run
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: sbom
+          path: SBOM.json
       - name: Login op GitHub Container Registry
         run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Bouw en publiceer exact één app/motor-image
+      - name: Buildx (nodig voor attestaties)
+        run: docker buildx create --use --driver docker-container
+      # BOUWEN MET HERKOMST. `--provenance=mode=max` laat BuildKit een
+      # SLSA-provenance-attestatie meepubliceren (welke bron, welke bouwstappen,
+      # welke builder), `--sbom=true` een materiaallijst van het image zelf.
+      # Allebei komen ze naast het image in het register te staan en zijn ze op
+      # te vragen met `docker buildx imagetools inspect`.
+      #
+      # WAT DIT WEL EN NIET IS, en dat hoort erbij: dit is provenance van de
+      # BOUWER (BuildKit in deze workflow). Het is geen door sigstore
+      # ondertekende attestatie op naam van GitHub -- dat is een volgende stap en
+      # vraagt een extra actie plus `id-token: write`. Zie SBOM.md.
+      - name: Bouw en publiceer exact één app/motor-image, met herkomst
         run: |
-          docker build --pull --tag "$RTG_RELEASE_IMAGE" .
-          docker push "$RTG_RELEASE_IMAGE"
+          docker buildx build --pull --push \
+            --provenance=mode=max --sbom=true \
+            --build-arg "RTG_BOUW_COMMIT=$GITHUB_SHA" \
+            --build-arg "RTG_BRON_AFDRUK=$RTG_BRON_AFDRUK" \
+            --build-arg "RTG_BOUW_AT=$RTG_BOUW_AT" \
+            --tag "$RTG_RELEASE_IMAGE" .
           echo "Gepubliceerd: $RTG_RELEASE_IMAGE"
+          echo "Herkomst opvraagbaar met: docker buildx imagetools inspect $RTG_RELEASE_IMAGE --format '{{ json .Provenance }}'"

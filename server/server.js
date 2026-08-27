@@ -674,6 +674,12 @@ app.get('/api/health', (req, res) => {
        Zonder die modus zijn ze altijd gelijk. */
     server: Number(process.env.RTG_SERVER || 1), active: db.writable, leider: !!db.leider,
     domeinen: process.env.RTG_DOMAINS || 'alle',
+    /* WELKE BUILD DRAAIT HIER (server/bouwstempel.js). Zonder dit blok is de
+       materiaallijst in SBOM.json niet aan een draaiend proces te koppelen, en
+       blijft "is wat er draait ook wat er is gebouwd" een kwestie van
+       vertrouwen. Staat er geen stempel, dan zegt het veld dat met de reden --
+       geen leeg veld en geen gok. */
+    bouw: require('./bouwstempel').bouwstempel(),
     pid: process.pid, up: Math.round(process.uptime())
   });
 });

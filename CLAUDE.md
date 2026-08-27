@@ -306,6 +306,22 @@ release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
 die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
 één keer met opzet, en dat is iets anders dan zoeken.
 
+**`SBOM.md` is de release-provenance** — waar een RTG-release uit bestaat, en of
+je kunt nagaan dat wat er draait ook is wat er is gebouwd. Lees die vóór je aan
+de Dockerfile, de releasepijplijn of een bouwstempel werkt. `npm run sbom`
+schrijft `SBOM.json`; de opvallendste meting daarin is dat er **nul npm in de
+release** zit — de derdenlaag van dit huis zijn niet de pakketten maar de
+**basis-images** (`node`, `rust`, `postgres`), en een SBOM die alleen npm telt
+zou hier dus een verkeerd beeld geven. De afdruk over de eigen code loopt over
+**pad én inhoud**: een bestand verplaatsen is een andere release. `GET
+/api/health` draagt een blok `bouw` met commit en bronafdruk, en die komen van de
+BOUWER — `server/bouwstempel.js` rekent niets zelf uit, want een proces dat zijn
+eigen afdruk berekent, beantwoordt precies de vraag niet. Is er geen stempel, dan
+staat er `vastgelegd: false` mét de reden. Wat er nog NIET is staat er even groot
+bij: geen handtekening (de provenance komt van onze eigen builder), geen
+digest-pinning van de basis-images, geen kwetsbaarheidsscan, en geen verificatie
+bij het uitrollen.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

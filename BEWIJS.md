@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1135 bestanden en 7598 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1135 bestanden en 7600 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1135 |
-| losse beweringen (`test(...)`) | 7598 |
+| losse beweringen (`test(...)`) | 7600 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 960 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-993 bestanden, 7358 beweringen.
+993 bestanden, 7360 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -394,7 +394,7 @@ toets omvalt.
 | `kluis-binding.test.js` | 8 | gezakt op `return-weg#0` | De identiteitskluis met CONTEXT-BINDING (server/accounts/gebonden.js). De kluis versleutelde de inhoud van naam/e-mail/telefoon al, maar zei niets over waar die inhoud thuishoorde. |
 | `kluis-rotatie.test.js` | 7 | gezakt op `return-weg#0` | Sleutelrotatie van de identiteitskluis (server/accounts/onderhoud.js). Een gecompromitteerde kluissleutel moet te vervangen zijn zonder de gegevens te verliezen en zonder downtime. |
 | `koppels.test.js` | 4 | gezakt op `liegpoort /api/` | Gekoppelde schakelaars (tegenhangers): twee functies die samen een dienst vormen volgen elkaar automatisch als de boardroom er een omzet, zodat er nooit een halve dienst overblijft (vacatures zonder sollicitanten,... |
-| `kosten.test.js` | 11 | gezakt op `liegpoort /api/` | RTG KOSTPRIJS: wat kost elke gebruiker, en wie betaalt dat. Getoetst over het routecontract heen -- de schermen bouwen blind op deze routes, dus deze toetsen praten er net zo blind tegen: alleen fetch met een... |
+| `kosten.test.js` | 13 | gezakt op `liegpoort /api/` | RTG KOSTPRIJS: wat kost elke gebruiker, en wie betaalt dat. Getoetst over het routecontract heen -- de schermen bouwen blind op deze routes, dus deze toetsen praten er net zo blind tegen: alleen fetch met een... |
 | `kostengrens.test.js` | 5 | gezakt op `liegpoort /api/` | EEN VERBRUIKSGRENS DIE ECHT WEIGERT. Een waarschuwing die nergens bijt, is een getal op een scherm. |
 | `kostenherkomst.test.js` | 4 | gezakt op `liegpoort /api/` | "WAAROM BETAAL IK DIT?" -- de keten van een bedrag terug naar de factuur van onze eigen leverancier. Elke kostenregel droeg al een bron: een zin die iemand in de boardroom had ingetikt. |
 | `kostenketen.test.js` | 1 | gezakt op `liegpoort /api/` | DE HELE KETEN IN EEN KEER -- en de bewering die eronder ligt: er raakt geen euro zoek en er komt er geen bij. De andere kostentoetsen kijken elk naar een schakel: de meters, de herkomst, de maandafsluiting, de... |

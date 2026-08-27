@@ -339,3 +339,58 @@ test('een kind in het gezin komt niet bij het kostenoverzicht', async () => {
   const ouder = await api('/api/foundation/kosten', { code }, gemaakt.body.token);
   assert.equal(ouder.status, 200);
 });
+
+/* DE NOTA'S LEZEN, EN NIET ALLEEN ZETTEN.
+
+   Er zijn twee routes rond de huisrekening en de toetsen raakten er maar een:
+   `/api/office/kosten/nota/zet` staat acht keer in deze suite,
+   `/api/office/kosten/nota` geen enkele keer. Dat viel niet op door de tekst --
+   het langere pad bevat het kortere -- maar wel door het routejournaal, dat
+   telt wat er ECHT langskomt (scripts/dekking.js). Precies waar die meter voor
+   bestaat.
+
+   Wat hij hoort te bewijzen is niet dat de route antwoordt maar dat de twee
+   helften van zijn antwoord over dezelfde maand gaan: wat in `posten` staat,
+   hoort niet in `ontbreekt` te staan, en andersom. Een bord dat een maand
+   compleet noemt terwijl er een nota mist, stuurt een mens de
+   maandafsluiting in met een gat.
+
+   EEN EIGEN, OUDE MAAND. De andere toetsen in dit bestand boeken stroom in de
+   huidige maand; deze zou dan meeliften op wat een buur al had gezet en zijn
+   eigen beginstand niet kennen.
+
+   MUTATIE: in huisrekening.js `ontbrekend()` de filter weghalen
+   (`.filter(s => !r[s.id])`), zodat een geboekte soort toch als ontbrekend
+   blijft gelden -- dan zakt deze toets op de laatste assertie. */
+test('het notaoverzicht en de ontbrekende nota zeggen hetzelfde over dezelfde maand', async () => {
+  const maand = '2019-07';
+
+  const leeg = await api('/api/office/kosten/nota', { periode: maand }, kantoor);
+  assert.equal(leeg.status, 200);
+  assert.equal(leeg.body.periode, maand, 'de route antwoordt over een andere maand dan gevraagd');
+  assert.deepEqual(leeg.body.posten, [], 'een maand waarin niets is geboekt heeft geen posten');
+  assert.deepEqual((leeg.body.ontbreekt || []).slice().sort(), ['hosting', 'stroom'],
+    'zonder nota horen beide toegerekende soorten als ontbrekend te gelden');
+
+  const gezet = await api('/api/office/kosten/nota/zet',
+    { periode: maand, soort: 'stroom', centen: 45678, bron: 'Nota energieleverancier, juli 2019' }, kantoor);
+  assert.equal(gezet.status, 200, JSON.stringify(gezet.body).slice(0, 200));
+
+  const na = await api('/api/office/kosten/nota', { periode: maand }, kantoor);
+  const stroom = (na.body.posten || []).find(x => x.soort === 'stroom');
+  assert.ok(stroom, 'de geboekte nota staat niet in het overzicht');
+  assert.equal(stroom.centen, 45678);
+  assert.match(stroom.bron, /energieleverancier/, 'een bedrag zonder bron is een getal zonder herkomst');
+  assert.deepEqual(na.body.ontbreekt, ['hosting'],
+    'wat geboekt is hoort uit de ontbrekendenlijst te verdwijnen, en wat niet geboekt is erin te blijven');
+});
+
+/* En de deur zit dicht: dit is de huisrekening van RTG en geen openbaar bord.
+   MUTATIE: `boardroomAuth` van deze route vervangen door de ledenpoort -- dan
+   antwoordt hij een lid met 200 en zakt deze toets. */
+test('het notaoverzicht is niet te lezen zonder de boardroom', async () => {
+  const zonder = await api('/api/office/kosten/nota', { periode: '2019-07' });
+  assert.notEqual(zonder.status, 200, 'de huisrekening kwam eruit zonder enige sleutel');
+  const lid = await api('/api/office/kosten/nota', { periode: '2019-07' }, await versLid());
+  assert.notEqual(lid.status, 200, 'een gewoon lid kon de huisrekening van RTG lezen');
+});

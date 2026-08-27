@@ -42,7 +42,23 @@ const GEN = {
   },
   buur(g) {
     const stap = g.stap || 1;
-    const n = stap * (1 + r(Math.floor((g.max - stap) / stap)));
+    /* HET GETAL BEGINT BIJ DRIE STAPPEN, EN DAT IS GEEN SMAAK.
+
+       Bij een stap groter dan 1 staat "(in stappen van 100)" in de vraag zelf,
+       dus in ELKE vraag van dit leerdoel. Begon het getal bij een stap, dan kon
+       het antwoord precies die stap worden: bij 200 en "welk getal komt voor"
+       is het antwoord 100 -- en dat staat al in de vraag. Dan verklapt de vaste
+       tekst de oplossing, precies het lek dat test/leerfabric.test.js beschrijft
+       ("geen vaste tekst in een vraag is ooit het antwoord"). Het gebeurde
+       zelden genoeg om lang onopgemerkt te blijven: van de tienduizend mogelijke
+       getallen is er een die het doet, dus de toets viel er pas op 27 augustus
+       2026 over. Zeldzaam is niet hetzelfde als onmogelijk.
+
+       Vanaf drie stappen kan geen van beide buren nog gelijk zijn aan de stap.
+       Bij stap 1 staat de haakjestekst er niet en verandert er niets. */
+    const laagste = stap > 1 ? 3 : 1;
+    const hoogste = Math.floor((g.max - stap) / stap);
+    const n = stap * (hoogste <= laagste ? laagste : laagste + r(hoogste - laagste + 1));
     const na = r(2) === 0;
     return { v: 'Welk getal komt ' + (na ? 'na' : 'voor') + ' ' + n + (stap > 1 ? ' (in stappen van ' + stap + ')' : '') + '?', a: String(na ? n + stap : n - stap) };
   },

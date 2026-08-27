@@ -31,6 +31,20 @@ const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'cod
 const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func',
   'member_id', 'member_tier'];
 
+/* KOLOMMEN DIE GEEN NULL VERDRAGEN, met de waarde die de tabel zelf zou hebben
+   ingevuld. Een rij die zo'n kolom niet noemt, komt hier binnen als undefined,
+   en undefined werd hieronder een EXPLICIETE null -- dat is iets anders dan de
+   kolom weglaten: de default slaat niet meer aan en Postgres weigert de rij.
+   Op de JSON- en sqlite-opslag valt dat niemand op, want die kennen de eis niet;
+   in Postgres viel de hele spiegel om ("null value in column actief violates
+   not-null constraint") en daarmee alle tien de pg-toetsen tegelijk.
+   Deze waarden staan woordelijk in de DDL hieronder. Komt er een kolom bij met
+   NOT NULL DEFAULT, dan hoort hij hier ook. */
+const NIET_NULL = { actief: 1, sessies_vanaf: 0 };
+const waarde = (row, c) => (row[c] === undefined || row[c] === null
+  ? (c in NIET_NULL ? NIET_NULL[c] : null)
+  : row[c]);
+
 function maakPgAccounts({ url, log }) {
   const { Pool } = require('./pgwire');
   const pool = new Pool({ connectionString: url, max: Number(process.env.PG_POOL_MAX || 10) });
@@ -113,7 +127,7 @@ function maakPgAccounts({ url, log }) {
   const BRON = require('crypto').randomBytes(6).toString('hex');
 
   async function upsertUser(row) {
-    await pool.query(upUserSQL(), USER_COLS.map(c => row[c] === undefined ? null : row[c]));
+    await pool.query(upUserSQL(), USER_COLS.map(c => waarde(row, c)));
     await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + row.id + ':' + BRON]);
   }
   async function upsertStaff(row) {

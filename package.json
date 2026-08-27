@@ -89,6 +89,7 @@
     "semantiek": "node scripts/semantiek.js",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "lagen": "node scripts/lagen.js",
+    "envelop": "node scripts/envelop.js",
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",

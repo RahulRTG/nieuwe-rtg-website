@@ -341,20 +341,46 @@ want `WETTEN.json` doet het al voor wetten.
 
 ## 5. Wat er ontbreekt, en wat het kost
 
-### 5.1 De eventtaal (punt 14) — de bus staat, de taal niet
+### 5.1 De eventtaal (punt 14) — ✅ *de envelop staat*
 
-`server/bus.js` bestaat en doet zijn werk: in-proces zonder Redis, pub/sub ermee,
-precies één aflevering per proces. Wat hij NIET draagt, nagekeken in de bron: geen
+`server/bus.js` deed zijn werk al: in-proces zonder Redis, pub/sub ermee, precies
+één aflevering per proces. Wat hij NIET droeg, nagekeken in de bron: geen
 `event_id`, geen `actor`, geen `correlation_id`, geen `causation_id`, geen
-`schema_version`, geen `classification`.
+`schema_version`, geen `classification`. **Vervoer was er. Taal niet.**
 
-Dat is dus geen half punt maar twee verschillende dingen waarvan er één af is.
-**Vervoer is er. Taal niet.** En de taal is het hele punt van punt 14: zonder
-envelop is `payment.authorized.v1` een string die iemand heeft afgesproken, en
-loopt de tweede consument binnen een maand op een veld dat er soms is.
+**Gebouwd op 27 augustus 2026** (`server/kern/envelop.js`, `test/envelop.test.js`).
+Acht velden en geen negende — `id`, `at`, `versie`, `kanaal`, `actor`,
+`correlatie`, `oorzaak`, `classificatie` — en de bus stempelt elk bericht dat
+erlangs komt. Vier keuzes daarin zijn geen implementatiedetail:
 
-Dit is de goedkoopste grote stap in het document: de envelop is een module en een
-toets, en hij kan naast het bestaande verkeer meelopen.
+- **Ernaast, niet eromheen.** Een abonnee leest `doel`, `event` en `data` zoals
+  altijd; er komt een sleutel bij. Een omhullend bericht had elke abonnee tegelijk
+  moeten veranderen, en een verandering die overal tegelijk moet, gebeurt half.
+- **De keten loopt vanzelf door.** Elke abonnee draait binnen de envelop van het
+  bericht dat hij afhandelt (AsyncLocalStorage, zoals `server/db/bijeen.js` dat al
+  voor de schrijfronde doet). Publiceert hij zelf iets, dan erft dat de correlatie
+  en krijgt het de binnenkomende gebeurtenis als oorzaak. Zonder die automatiek is
+  de keten binnen een maand op de helft van de plekken vergeten.
+- **De actor is een codenaam.** Een envelop gaat met `REDIS_URL` over een netwerk
+  en door een geheugendatabase; dat is precies waar een echte naam uit de
+  identiteitskluis lekt. De envelop weigert een actor die eruitziet als een
+  contactgegeven — een grove zeef tegen de fout die iemand per ongeluk maakt, geen
+  garantie tegen wie het expres wil. De bus levert dan gewoon af, zonder actor en
+  met een waarschuwing: de levering gaat voor, maar niets verdwijnt stil.
+- **`onbekend` is geen `openbaar`.** Wie de gevoeligheid niet noemt, krijgt
+  `onbekend`. Een gevolg-gebeurtenis erft de classificatie NIET — dat zou raden
+  zijn over andere inhoud.
+
+`scripts/envelop.js` telt wat de bus niet kan afleiden: van de zeven plekken die
+zelf een bericht samenstellen noemen er **zeven** een classificatie en **één** een
+actor. Dat laatste getal is geen tekortkoming die weggewerkt hoort te worden maar
+de eerlijke stand: er is vandaag precies één publicerende plek die de codenaam van
+het lid al op tafel heeft liggen. De rest zou hem moeten raden, en raden is hier
+erger dan `onbekend`.
+
+Wat de envelop NIET is: een schemaregister. `payment.authorized.v1` als
+afgesproken naam met een vorm erachter bestaat nog niet — de envelop zegt WIE,
+WANNEER, WAARDOOR en HOE GEVOELIG, en met opzet nooit WAT.
 
 ### 5.2 Idempotentie (punt 38) — gemeten, en het is niet best
 
@@ -411,7 +437,7 @@ maakt — en wat het goedkoopst terug te draaien is.
 |---|---|---|
 | ~~**0. De wet meten**~~ ✅ | `scripts/capabilities.js` + `CAPABILITEIT.json`; de uitkomst staat in par. 2 | zonder dit is "Everything is a Capability" een aanname, en aannames over gedeelde vorm zijn hier twee keer fout geweest |
 | **1. Eén lagenmodel kiezen** | de vijf van de opzet, de zeven van `PLATFORM.md`, of één samenvoeging | par. 4.2 — een middag nu, een maand over twee jaar |
-| **2. De eventenvelop** | `event_id`, actor, `correlation_id`, `causation_id`, versie, classificatie op `server/bus.js` | par. 5.1 — kan naast het bestaande verkeer meelopen, en elke volgende stap leunt erop |
+| ~~**2. De eventenvelop**~~ ✅ | `kern/envelop.js`: id, tijd, versie, kanaal, actor, correlatie, oorzaak, classificatie; de bus stempelt elk bericht | par. 5.1 — liep naast het bestaande verkeer mee, en elke volgende stap leunt erop |
 | **3. Het contract naar buiten** | het model van `MACHTIGINGEN` (doel + grens) op de lijsten die er het dichtst bij staan | par. 3 — het model bestaat al en is beproefd |
 | **4. Idempotentie van 13% omhoog** | de 100 onbeschermde routes eerst, daarna de 2959 ongemeten | par. 5.2 — de meting staat er al |
 | **5. Eén actormodel** | mens, app en agent onder één trustlaag | par. 4.4 — hoe langer dit wacht, hoe duurder |

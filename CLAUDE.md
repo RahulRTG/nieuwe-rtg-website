@@ -196,9 +196,17 @@ toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
 het?"), en nooit over het **domeinvermogen** (`bookings`, `rides`, `menu` — wat voor
 zaak is dit), want dat is dezelfde fout als `Asset`. Het contract van punt 7 bestaat al en staat in het kleinste hoekje van
 het huis: `kern/appstore/machtigingen.js` draagt als enige een doel én een grens.
-Wat er nog niet is, staat er met de meting erbij: de eventenvelop ontbreekt (de bus
-vervoert, er is geen taal) en van de 115 beproefde muterende routes zijn er 15
-retry-veilig. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
+**De eventenvelop staat** (27 augustus 2026): `kern/envelop.js` geeft elk bericht
+op de bus acht velden — id, tijd, versie, kanaal, actor, correlatie, oorzaak,
+classificatie — en de keten loopt vanzelf door, zodat een gevolg-gebeurtenis weet
+waardoor zij ontstond. Drie grenzen daar: **de actor is een codenaam** (de envelop
+weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
+netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
+niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
+houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
+staat er met de meting erbij: van de 115 beproefde muterende routes zijn er 15
+retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
 par. 2 heet nu **genre-cap** (domeinvermogen), en *capability* blijft over voor de

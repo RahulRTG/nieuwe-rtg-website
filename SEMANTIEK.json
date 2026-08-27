@@ -1,9 +1,9 @@
 {
-  "catalogi": 831,
+  "catalogi": 833,
   "verschillendeNamen": 516,
-  "namenInMeerDomeinen": 94,
-  "woordenMetMeerBetekenissen": 77,
-  "betekenissenTotaal": 279,
+  "namenInMeerDomeinen": 95,
+  "woordenMetMeerBetekenissen": 78,
+  "betekenissenTotaal": 282,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
   "dubbelingen": 28,
@@ -1579,122 +1579,6 @@
       ]
     },
     {
-      "naam": "CATEGORIEEN",
-      "domeinen": 9,
-      "betekenissen": 9,
-      "hoogsteOverlap": 0.13,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/appstore/manifest.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "sociaal",
-            "reizen",
-            "eten",
-            "media"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/atelier/bank.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "kleding",
-            "tassen",
-            "horloges",
-            "schoenen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/lidboard/catalogus.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "app",
-            "leven",
-            "privacy",
-            "verbinding"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/lifestyle/index.js"
-          ],
-          "leden": 7,
-          "voorbeeld": [
-            "reis",
-            "restaurant",
-            "evenement",
-            "cadeau"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/luchthaven/index.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "lijn",
-            "privejet",
-            "helikopter"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/markt/regels.js"
-          ],
-          "leden": 10,
-          "voorbeeld": [
-            "kleding",
-            "kids",
-            "wonen",
-            "elektronica"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mobiliteit/voertuigcatalogus.js"
-          ],
-          "leden": 26,
-          "voorbeeld": [
-            "auto",
-            "taxi",
-            "taxibus",
-            "rolstoelbus"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rechterhand/garderobe.js"
-          ],
-          "leden": 10,
-          "voorbeeld": [
-            "pak",
-            "colbert",
-            "overhemd",
-            "schoenen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/risico.js"
-          ],
-          "leden": 7,
-          "voorbeeld": [
-            "financieel",
-            "reputatie",
-            "veiligheid",
-            "continuiteit"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "ROLLEN",
       "domeinen": 10,
       "betekenissen": 8,
@@ -1900,6 +1784,110 @@
             "lifestyle",
             "business",
             "genootschap"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "CATEGORIEEN",
+      "domeinen": 8,
+      "betekenissen": 8,
+      "hoogsteOverlap": 0.13,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/appstore/manifest.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "sociaal",
+            "reizen",
+            "eten",
+            "media"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/lidboard/catalogus.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "app",
+            "leven",
+            "privacy",
+            "verbinding"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/lifestyle/index.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "reis",
+            "restaurant",
+            "evenement",
+            "cadeau"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/luchthaven/index.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "lijn",
+            "privejet",
+            "helikopter"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/markt/regels.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "kleding",
+            "kids",
+            "wonen",
+            "elektronica"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mobiliteit/voertuigcatalogus.js"
+          ],
+          "leden": 26,
+          "voorbeeld": [
+            "auto",
+            "taxi",
+            "taxibus",
+            "rolstoelbus"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rechterhand/garderobe.js"
+          ],
+          "leden": 10,
+          "voorbeeld": [
+            "pak",
+            "colbert",
+            "overhemd",
+            "schoenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtfos/risico.js"
+          ],
+          "leden": 7,
+          "voorbeeld": [
+            "financieel",
+            "reputatie",
+            "veiligheid",
+            "continuiteit"
           ]
         }
       ]
@@ -2475,6 +2463,63 @@
       ]
     },
     {
+      "naam": "DISCIPLINES",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/architect/bank.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "villa",
+            "penthouse",
+            "landgoed",
+            "chalet"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/atelier/bank.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "kleding",
+            "tassen",
+            "horloges",
+            "schoenen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/hardwarelab/bank.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "apparaat",
+            "wearable",
+            "scherm",
+            "sensor"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/studio/bank.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "automotive",
+            "jacht",
+            "vliegtuig",
+            "helikopter"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "FASES",
       "domeinen": 4,
       "betekenissen": 4,
@@ -2644,6 +2689,62 @@
       ]
     },
     {
+      "naam": "SCENARIOS",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/betaal/synthetisch.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "betaald",
+            "geweigerd",
+            "traag",
+            "terugboeking"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/magnaatwereld.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "planning",
+            "controle",
+            "gesprek",
+            "impact"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/simulatie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "slecht",
+            "basis",
+            "groei"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stadsweefsel/klimaat.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "extreme-regen",
+            "hittegolf",
+            "droogte",
+            "hoogwater"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "VORMEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -2792,51 +2893,6 @@
       ]
     },
     {
-      "naam": "DISCIPLINES",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/architect/bank.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "villa",
-            "penthouse",
-            "landgoed",
-            "chalet"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/hardwarelab/bank.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "apparaat",
-            "wearable",
-            "scherm",
-            "sensor"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/studio/bank.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "automotive",
-            "jacht",
-            "vliegtuig",
-            "helikopter"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "DOELGROEPEN",
       "domeinen": 3,
       "betekenissen": 3,
@@ -2968,51 +3024,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "LAGEN",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/consent.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "care-intake",
-            "care-vastlegging",
-            "rtgid-sessie",
-            "rtgid-machtiging"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/horeca/rahul-register.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "mag",
-            "mensbevestigt",
-            "verboden"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/wereld/rechten.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "persoonlijk",
-            "professioneel",
-            "creator",
-            "ondernemer"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 2356
+  "bestanden": 2363
 }

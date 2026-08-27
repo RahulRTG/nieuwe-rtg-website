@@ -60,8 +60,12 @@ app.post('/api/fluister', auth, async (req, res) => {
       // streamende voortgang voor een zware taak: elke stap wordt live
       // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
       opStap: (v) => {
+        /* De enige publicerende plek in dit huis die de actor met zekerheid
+           weet: hier ligt de codenaam van het lid al op tafel. Nooit de echte
+           naam -- die woont in de identiteitskluis en hoort niet op een bus. */
         try { bus && bus.publish('sse', { doel: 'tier', match: [req.session.tier],
-          event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar } }); } catch (e) {}
+          event: 'rahul-voortgang', data: { stap: v.stap, totaal: v.totaal, bericht: v.bericht, klaar: !!v.klaar },
+          envelop: { actor: liveCodename(req.session), classificatie: 'persoonsgegeven' } }); } catch (e) {}
       },
       // Leden- en Foundationpaden wel; werkwerelden blijven buiten bereik.
       filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w)),

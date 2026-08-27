@@ -30,7 +30,8 @@ function maak(opts) {
     { methode: 'POST', route: '/api/x', status: '5xx', aantal: fouten }
   ] }) };
   const schakelFase = (id, door) => { gezet.push(id); return { ok: true, aan: 1, uit: 1 }; };
-  const regie = maakUitrolregie({ db, save: () => {}, meting, functies, schakelFase, nu: () => t });
+  const opslag = require('../server/kern/command/opslag')({ db });
+  const regie = maakUitrolregie({ opslag, save: () => {}, meting, functies, schakelFase, nu: () => t });
   return {
     regie, db, gezet,
     verkeer(n, f) { antwoorden += n; fouten += (f || 0); },

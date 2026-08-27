@@ -68,7 +68,7 @@ function maakLagen({ db, save, crypto, journaal, register, kern, opslag }) {
      kanaal tussen twee leden. Waarom dat geen instelling is, staat in de kop
      van ./uitrolregie.js. */
   const uitrolregie = require('./uitrolregie').maakUitrolregie({
-    db, save, meting: require('../../meting'), functies: require('../../functies/register'),
+    opslag, save, meting: require('../../meting'), functies: require('../../functies/register'),
     schakelFase: (id, door) => {
       const a = kern && kern.afdelingen;
       if (!a || typeof a.schakelFase !== 'function') {

@@ -77,20 +77,18 @@ const STANDAARD = {
   geschiedenisMax: 200
 };
 
-function maakUitrolregie({ db, save, meting, functies, schakelFase, nu }) {
+function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
   const tijd = nu || klok.nu;
   const iso = () => new Date(tijd()).toISOString();
   const TREDEN = () => (functies && functies.FASES) || [];
   const index = id => TREDEN().findIndex(t => t.id === id);
 
   function staat() {
-    db.data.techniek = db.data.techniek || {};
-    const t = db.data.techniek;
-    if (!t.uitrol || typeof t.uitrol !== 'object') {
-      t.uitrol = { trede: null, sinds: null, stand: 'stil', reden: null, basis: null, geschiedenis: [] };
-    }
-    if (!Array.isArray(t.uitrol.geschiedenis)) t.uitrol.geschiedenis = [];
-    return t.uitrol;
+    /* Door de deur van het domein (./opslag.js, gedeeld.uitrol) en niet
+       rechtstreeks in db.data -- keuringsregel 62 houdt dat sindsdien bij.
+       Het vak maakt beide lagen zelf aan; zie de kop van dat vak voor waarom
+       gedeeld.techniek() hier niet volstond. */
+    return opslag.gedeeld.uitrol();
   }
 
   /* Alle antwoorden en alle serverfouten van dit moment. Zie keuze 3 in de kop:

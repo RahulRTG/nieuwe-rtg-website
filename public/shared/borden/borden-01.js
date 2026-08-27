@@ -15,7 +15,7 @@
    Roep .refresh() aan bij een SSE-sync; het open bord blijft open. */
 (function (w) {
   'use strict';
-  function esc(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   var VUILNIS = '<svg class="bd-vuil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>';
 
   function stijl(){

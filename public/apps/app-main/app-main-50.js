@@ -23,7 +23,7 @@
     return el;
   }
 
-  const escHtml = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const escHtml = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   // een voorstel van Rahul ("even checken...") krijgt echte knoppen
   function voorstelChips(aan){

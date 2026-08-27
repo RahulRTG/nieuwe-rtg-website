@@ -3637,5 +3637,160 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
   }
 }
 
+/* ============================================================================
+   52) EEN ONTSNAPPINGSFUNCTIE DEKT HET AANHALINGSTEKEN.
+
+   WAAR DEZE REGEL VANDAAN KOMT. Dit huis droeg 28 eigen escape-helpers, en vijf
+   daarvan vervingen alleen `&` en `<`. Dat is genoeg zolang de uitkomst in TEKST
+   landt. Twee ervan landden in een ATTRIBUUT:
+
+     borden:      '<span class="bd-av" title="' + esc(n) + '">'
+     collegachat: '<input id="ccInput" placeholder="... ' + esc(naam) + '">'
+
+   Een naam met een aanhalingsteken breekt daar uit het attribuut, en de rest van
+   die naam wordt markup. In een werk-OS zet een ANDER mens die naam, dus dat is
+   geen theorie.
+
+   WAAROM DE REGEL STRENGER IS DAN DE VONDST. Je zou kunnen uitrekenen welke esc()
+   in attribuutcontext landt en alleen die eisen. Dat is te doen -- en het is de
+   verkeerde reparatie. Dan blijft de kennis "waar landt deze string?" bij de
+   AANROEPER liggen, en die verplaatst een regel zonder aan zijn escape te denken.
+   LAT.md regel 1: repareer de oorzaak, niet het symptoom. De oorzaak is dat een
+   escape zijn veiligheid van zijn omgeving laat afhangen. Dus dekt elke helper
+   `&`, `<` en `"`, en hoeft de aanroeper niets te weten.
+
+   WAAROM DIT DE PARSER GEBRUIKT EN GEEN PATROON. De eerste versie hiervan zocht
+   met een reguliere expressie naar het lijf van de functie. Die kapte een
+   meerregelig lijf af bij de eerste nieuwe regel en las een tekenklasse niet, en
+   meldde daardoor de TWEE STERKSTE helpers van het huis als zwak -- `util.js` en
+   `geld/hulp.js` dekken alle vijf de tekens. Een keuring met valse meldingen is
+   erger dan geen keuring: hij leert je wegkijken. Daarom loopt hij nu over de
+   ontleedboom van scripts/ast en leest hij het lijf exact.
+
+   WAT DEZE REGEL NIET DEKT, en dat staat er met opzet bij. Een ENKEL aangehaald
+   attribuut (title='...') blijft open: dan is `'` het gevaarlijke teken, en dat
+   eist deze regel niet -- dit huis schrijft zijn attributen dubbel aangehaald en
+   de 23 bestaande sterke helpers dekken `'` niet allemaal. Hij keurt ook geen
+   URL- of scriptcontext: href="javascript:..." is een andere fout met een andere
+   reparatie. Dit is een ondergrens, geen uitvoergrens. Die laatste (tekst /
+   attribuut / url / html als aparte contracten) hoort bij de Interface Runtime
+   en is groter werk dan een keuringsregel. */
+console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
+{
+  const { lex } = require('./ast/lexer');
+
+  /* WAAROM DE LEXER EN NIET DE PARSER. De vorige versie hiervan gebruikte
+     ast/parser.js, en die zakte op 43 bestanden -- alle 43 een BUNDELDEEL. Een
+     deel is geen geldig programma: het begint midden in een IIFE die pas in een
+     ander deel sluit. Daar woonden vier van de vijf zwakke ontsnappingen, dus de
+     regel keurde precies de plek niet waar de fout zat.
+     Een lexer heeft geen grammatica nodig en leest een fragment gewoon. Hij
+     kent bovendien de twee plekken waar handwerk hier stukloopt: strings en het
+     verschil tussen een deling en een reguliere expressie. Het lijf van een
+     functie is altijd haakjes-gebalanceerd, ook in een fragment, dus tellen over
+     tokens is exact. */
+  let BUNDELUIT = new Set();
+  try { BUNDELUIT = new Set(Object.keys(require('./bundel').bundels).map(x => 'public/' + x)); }
+  catch (e) { fout('de bundellijst kon niet worden gelezen (' + e.message + '); dan stelt deze regel minder vast'); }
+
+  const HEET_ESC = n => /^esc/i.test(n) || /escape/i.test(n);
+  const isLees = (t, v) => !!t && t.type === 'lees' && t.value === v;
+
+  function haakEind(toks, k) {
+    const open = toks[k].value, dicht = { '(': ')', '[': ']', '{': '}' }[open];
+    let d = 0;
+    for (let i = k; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.type !== 'lees') continue;
+      if (t.value === open) d++;
+      else if (t.value === dicht && !--d) return i;
+    }
+    return -1;
+  }
+
+  /* Van het eerste token van een functie-uitdrukking naar het laatste. Dekt
+     `function f(){}`, `(a) => {}`, `a => expr` en `(a) => expr`. */
+  function eindeVanFunctie(toks, k) {
+    let i = k;
+    if (toks[i] && toks[i].type === 'naam' && toks[i].value === 'function') {
+      i++;
+      if (toks[i] && toks[i].type === 'naam') i++;
+      if (!isLees(toks[i], '(')) return -1;
+      i = haakEind(toks, i); if (i < 0) return -1;
+      i++;
+      return isLees(toks[i], '{') ? haakEind(toks, i) : -1;
+    }
+    if (isLees(toks[i], '(')) { i = haakEind(toks, i); if (i < 0) return -1; i++; }
+    else if (toks[i] && toks[i].type === 'naam') i++;
+    else return -1;
+    if (!isLees(toks[i], '=>')) return -1;
+    i++;
+    if (isLees(toks[i], '{')) return haakEind(toks, i);
+    let d = 0;                                    // pijlfunctie met een uitdrukking als lijf
+    for (let j = i; j < toks.length; j++) {
+      const t = toks[j];
+      if (t.type !== 'lees') continue;
+      if ('(['.includes(t.value) || t.value === '{') d++;
+      else if (')]'.includes(t.value) || t.value === '}') { if (!d) return j - 1; d--; }
+      else if ((t.value === ';' || t.value === ',') && !d) return j - 1;
+    }
+    return toks.length - 1;
+  }
+
+  /* De patronen die aan .replace( worden meegegeven, als brontekst. Een negatieve
+     klasse telt niet: die zegt juist dat het teken NIET wordt geraakt. */
+  function replacePatronen(lijf) {
+    const uit = [];
+    for (const m of lijf.matchAll(/\.replace\s*\(\s*\/((?:[^/\\\n[]|\\.|\[(?:[^\]\\]|\\.)*\])+)\//g)) {
+      if (!m[1].startsWith('^')) uit.push(m[1]);
+    }
+    return uit;
+  }
+  const ENTITEIT = { '&': /&amp;/, '<': /&lt;/, '"': /&quot;|&#0*34\b/ };
+  function dekt(lijf, teken) {
+    if (ENTITEIT[teken].test(lijf)) return true;
+    return replacePatronen(lijf).some(pat => {
+      const klassen = [...pat.matchAll(/\[(\^?)((?:[^\]\\]|\\.)*)\]/g)];
+      if (klassen.some(k => !k[1] && k[2].includes(teken))) return true;
+      return pat.replace(/\[(?:[^\]\\]|\\.)*\]/g, '') === teken;
+    });
+  }
+  /* Alleen HTML-ontsnappers: een escapeRegex() vervangt ook van alles, maar draagt
+     geen entiteit en geen `<` in zijn patroon, en hoort hier niet te zakken. */
+  const isHtmlEsc = lijf => /&amp;|&lt;|&gt;|&quot;|&#0*3[49]\b/.test(lijf) ||
+    replacePatronen(lijf).some(pat => pat.includes('<'));
+
+  let gekeurd = 0, zwak = 0, stuk = 0;
+  loop(path.join(ROOT, 'public'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel.startsWith('public/dist/') || BUNDELUIT.has(rel)) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (!/\besc\w*\s*[=(:]/i.test(bron) || !bron.includes('.replace(')) return;
+    let toks;
+    try { toks = lex(bron); } catch (e) { stuk++; fout('kon ' + rel + ' niet lezen (' + e.message + ')'); return; }
+
+    for (let i = 0; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.type !== 'naam' || !HEET_ESC(t.value)) continue;
+      const vorig = toks[i - 1], volg = toks[i + 1];
+      let k = -1;
+      if (vorig && vorig.type === 'naam' && vorig.value === 'function') k = i - 1;
+      else if (isLees(volg, '=') || isLees(volg, ':')) k = i + 2;
+      if (k < 0 || !toks[k]) continue;
+      const e = eindeVanFunctie(toks, k);
+      if (e < 0) continue;
+      const lijf = bron.slice(toks[k].start, toks[e].end);
+      if (!/\.replace\s*\(/.test(lijf) || !isHtmlEsc(lijf)) continue;
+      gekeurd++;
+      const mist = ['&', '<', '"'].filter(c => !dekt(lijf, c));
+      if (!mist.length) continue;
+      zwak++;
+      fout('zwakke ontsnapping: ' + rel + ':' + t.lijn + ' -- ' + t.value + '() dekt ' +
+        mist.map(c => c === '"' ? 'het aanhalingsteken' : c).join(' en ') + ' niet');
+    }
+  });
+  if (!zwak && !stuk) ok(gekeurd + ' HTML-ontsnappingsfuncties dekken & < en het aanhalingsteken');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

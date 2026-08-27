@@ -40,7 +40,7 @@ door `test/semantiek.test.js`.
 
 | uit de opzet | wat er staat | waar |
 |---|---|---|
-| **1** executable specifications (half) | 41 systeemwetten met per stuk een bron én een handhaver — en een motor die ze **echt overtreedt** in de bestanden om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
+| **1** executable specifications (half) | 46 systeemwetten met per stuk een bron én een handhaver — en een motor die ze **echt overtreedt** in de bestanden om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
 | **3** counterfactual (kiem) | `wijzig()` op het wereldmodel schrijft een `counterfactual`-besluit weg | `kern/hospitality-universe/world-model.js` |
 | **4** performance budgets | p99, doorvoer, event-loop en hersteltijd met een lat die alleen omlaag mag, en die weigert te oordelen op een gezakte ronde | `BEPROEVING.json`, `scripts/norm.js` |
 | **7** incident → permanente wet | dit is letterlijk hoe `LAT.md` is ontstaan: elke regel komt uit een fout die hier écht is gemaakt, met de handhaver erbij | `LAT.md`, `NORM.json` |
@@ -88,7 +88,7 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2361 bestanden, 833 catalogi, 516 verschillende namen
+2363 bestanden, 833 catalogi, 516 verschillende namen
   95 namen staan in meer dan een domein
   78 woorden dragen MEER DAN EEN betekenis   (samen 282 betekenissen)
   28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)

@@ -47,7 +47,7 @@ het.
 | uit de opzet | wat er staat | waar |
 |---|---|---|
 | **11** purpose-aware permissions | **volledig, en strenger dan gevraagd**: een gesloten lijst doelen, een machtiging kent haar toegestane doelen, en de vergunningsdiff ziet "zelfde machtiging, ánder doel" | `kern/appstore/machtigingen.js` (`DOELEN`, `doelMag`), `kern/appstore/besluit.js` |
-| **42** Platform Constitution | **staat, en harder dan de opzet vraagt**: 41 wetten in 9 soorten, elk met een bron én een handhaver, plus een motor die ze ECHT overtreedt om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
+| **42** Platform Constitution | **staat, en harder dan de opzet vraagt**: 46 wetten in 9 soorten, elk met een bron én een handhaver, plus een motor die ze ECHT overtreedt om te zien of er iets rood wordt | `WETTEN.json`, `scripts/sabotage.js`, `SABOTAGE.json` |
 | **8/9** bindings i.p.v. API-sleutels | de brug leest wat het lid VERLEENDE, niet wat het manifest vroeg; de app krijgt nooit een sleutel | `kern/appstore/brug.js` |
 | **47** security sandbox | de **cel**: derdencode in een naamloze herkomst, eigen CSP, integriteit per lezing, `connect-src 'none'` | `routes/appstore/cel.js` |
 | **12** één policy engine | drie beleidslagen van hard naar zacht, en één poort waar elke betaling langs gaat | `kern/waarde/policy.js`, `kern/pay/poort.js` |
@@ -72,7 +72,7 @@ dingen springen eruit omdat ze in de opzet als toekomst staan en hier als code:
   van dienst te zijn" op, en dat is niet te vergelijken, niet te doorzoeken en
   niet te diffen bij een update.
 - **Punt 42 (grondwet) is af én strenger.** De opzet stelt twaalf regels voor.
-  `WETTEN.json` draagt er 41, elk met de plek waar hij gehandhaafd wordt — en
+  `WETTEN.json` draagt er 46, elk met de plek waar hij gehandhaafd wordt — en
   `scripts/sabotage.js` overtreedt ze stuk voor stuk in de echte bestanden om te
   zien of er werkelijk iets rood wordt. Een grondwet zonder die motor is een
   verlanglijst met genummerde regels.
@@ -93,7 +93,7 @@ over mogen-en-kunnen gaat, en kijkt of de leden elkaar kennen.
 ### De uitkomst
 
 ```
-2361 bestanden, 835 woordenlijsten gevonden, 20 gaan over mogen-en-kunnen
+2363 bestanden, 835 woordenlijsten gevonden, 20 gaan over mogen-en-kunnen
  241 verschillende leden in die 20 lijsten
  220 van 241 leden (91%) staan in PRECIES EEN lijst
    0 lijstparen lijken op elkaar   (hoogste gelijkenis tussen twee lijsten: 0,22)

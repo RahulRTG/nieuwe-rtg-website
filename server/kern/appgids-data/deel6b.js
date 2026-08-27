@@ -2,7 +2,13 @@
    Zie ../appgids.js voor de uitleg. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
-module.exports = {  '/apps/oog.html': G('RTG Eye: camera-visie op je toestel, voor voertuigschouw en werkvloerlog.',
+module.exports = {
+  '/apps/uitvoering.html': G('Uitvoerende media: een werk dat zich naar uw tijd voegt, binnen de grenzen van de maker.',
+    ['Kies een partituur en zeg hoeveel tijd u heeft',
+      'Lees onder "waaruit dit bestaat" wat er niet in zit, en waarom',
+      'Stel zelf een partituur samen uit uw eigen werk'],
+    'RTG monteert alleen uit wat de maker heeft aangewezen. Past het niet, dan krijgt u de reden en geen half werk.'),
+  '/apps/oog.html': G('RTG Eye: camera-visie op je toestel, voor voertuigschouw en werkvloerlog.',
     ['Scan een voertuig voor of na gebruik', 'Log hands-free wat je ziet', 'Deel het rapport met de zaak'],
     'Een schouw van één minuut vooraf voorkomt discussies achteraf; de foto\'s zijn je bewijs.'),
   '/apps/ov.html': G('RTG Vervoer: een rit boeken, het OV en de bedrijfspendel in één app met live GPS.',

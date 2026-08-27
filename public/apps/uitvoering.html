@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Uitvoerende media</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<script src="/shared/schermrust.js" defer></script>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);
+    --txt:var(--rtg-txt);--soft:var(--rtg-soft);--gold:#C9A24B;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.4rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;letter-spacing:0.02em;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;min-width:44px;min-height:44px;
+    display:inline-flex;align-items:center;justify-content:center;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);color:var(--txt);
+    font-size:0.8rem;padding:0.55rem 0.8rem;min-height:44px;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .stil{color:var(--soft);font-size:0.8rem;line-height:1.55;}
+  .standen{display:flex;gap:0.15rem;padding:0 1.1rem;border-bottom:1px solid var(--line);}
+  .standen button{background:none;border:0;padding:0.7rem 0.85rem;margin-bottom:-1px;color:var(--soft);
+    font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+    border-bottom:2px solid transparent;min-height:44px;}
+  .standen button[aria-current="true"]{color:var(--txt);border-bottom-color:var(--gold);}
+  main{padding:1.1rem;display:grid;gap:1.1rem;max-width:56rem;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);padding:1rem;}
+  .kaart h2{font-family:'Bodoni Moda',serif;font-size:1.05rem;font-weight:600;margin-bottom:0.5rem;}
+  .rij{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
+  input,select{background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    font:inherit;font-size:0.85rem;padding:0.5rem 0.6rem;min-height:44px;}
+  input[type=number]{width:7rem;}
+  ol{list-style:none;display:grid;gap:0.55rem;margin-top:0.7rem;}
+  .regel{border-left:2px solid var(--gold);padding:0.5rem 0 0.5rem 0.7rem;}
+  .regel b{font-size:0.9rem;}
+  .regel .waarom{color:var(--soft);font-size:0.75rem;margin-top:0.15rem;}
+  .kern{color:var(--gold);font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;}
+  /* HET BEWIJS staat er even groot bij als de montage zelf, en niet in de
+     kleine lettertjes: een uitvoering is een bewering van RTG over andermans
+     werk (UITVOEREND.md par. 2.4). */
+  .bewijs{background:var(--card2);border:1px solid var(--line);padding:0.9rem;margin-top:0.9rem;}
+  .bewijs h3{font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin-bottom:0.5rem;}
+  .bewijs dl{display:grid;grid-template-columns:auto 1fr;gap:0.25rem 0.8rem;font-size:0.8rem;}
+  .bewijs dt{color:var(--soft);}
+  .weg{margin-top:0.6rem;font-size:0.78rem;color:var(--soft);line-height:1.5;}
+  .weiger{border-left:2px solid var(--rood);padding-left:0.7rem;}
+  .weiger b{color:var(--rood);}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%) translateY(1rem);opacity:0;
+    background:var(--card);border:1px solid var(--line);padding:0.6rem 0.9rem;font-size:0.82rem;
+    transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;}
+  .melding.zien{opacity:1;transform:translateX(-50%);}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+  <header class="kop">
+    <a href="/apps/app.html" aria-label="Terug naar het beginscherm">&#8592;</a>
+    <h1>Uitvoerende media</h1>
+    <span class="rek"></span>
+  </header>
+  <nav class="standen" aria-label="Standen">
+    <button type="button" data-stand="luister" aria-current="true">Uitvoeren</button>
+    <button type="button" data-stand="maak" aria-current="false">Mijn partituren</button>
+  </nav>
+
+  <main>
+    <!-- ---- de kant van de kijker ---- -->
+    <section id="vlakLuister">
+      <div class="kaart">
+        <h2>Wat wil je horen of zien, en hoeveel tijd heb je?</h2>
+        <p class="stil">RTG speelt een partituur niet af maar voert hem uit: hij stelt op dit moment
+          een versie samen binnen de grenzen die de maker heeft vastgelegd. Past het gevraagde daar
+          niet in, dan krijg je de reden en geen half werk.</p>
+        <div class="rij" style="margin-top:0.8rem">
+          <label for="kiesP" class="stil">Partituur</label>
+          <select id="kiesP"><option value=""> -- laden -- </option></select>
+          <label for="budget" class="stil">Ik heb</label>
+          <input id="budget" type="number" min="0" step="10" placeholder="seconden">
+          <label for="diepte" class="stil">Diepte</label>
+          <select id="diepte">
+            <option value="3">alles</option>
+            <option value="2">wat verdieping</option>
+            <option value="1">alleen de kern</option>
+          </select>
+          <button class="knop vol" id="voerKnop" type="button">Voer uit</button>
+        </div>
+      </div>
+      <div class="kaart" id="uitslag" hidden></div>
+    </section>
+
+    <!-- ---- de kant van de maker ---- -->
+    <section id="vlakMaak" hidden>
+      <div class="kaart">
+        <h2>Een partituur maken</h2>
+        <p class="stil">Een partituur is geen montage maar de ruimte waarbinnen montages mogen
+          ontstaan. U wijst fragmenten aan uit uw <b>eigen</b> werk, zegt welke onmisbaar zijn, en
+          bepaalt zelf of RTG mag inkorten.</p>
+        <div class="rij" style="margin-top:0.8rem">
+          <input id="nieuwNaam" type="text" placeholder="Naam van de partituur" maxlength="80">
+          <button class="knop vol" id="maakKnop" type="button">Aanmaken</button>
+        </div>
+      </div>
+      <div class="kaart" id="mijnLijst"><p class="stil">Laden…</p></div>
+    </section>
+  </main>
+
+  <p class="melding" id="melding" role="status" aria-live="polite"></p>
+  <script src="/apps/uitvoering.js" defer></script>
+  <!-- De gedeelde schil van dit huis, in dezelfde volgorde als de andere
+       ledenschermen: de metgezel (Rahul, het palet), de basislaag, de bediening
+       met zijn randen, en de cookie- en iOS-lagen. randen.js hoort BIJ
+       bediening.js -- zonder de randen is het paneel niet te openen
+       (test/randen.test.js). -->
+  <script src="/shared/deelmenu.js" defer></script>
+  <script src="/shared/sneltoets.js" defer></script>
+  <script src="/shared/metgezel.js" defer></script>
+  <script src="/shared/basis.js" defer></script>
+  <script src="/shared/bediening.js" defer></script>
+  <script src="/shared/randen.js" defer></script>
+  <script src="/shared/cookie.js" defer></script>
+  <script src="/shared/ios.js" defer></script>
+</body>
+</html>

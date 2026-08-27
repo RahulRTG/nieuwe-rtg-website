@@ -6346,6 +6346,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "uitvoering.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "uitvoering.test.js": {
       "soort": "server",
       "staat": "gezakt",

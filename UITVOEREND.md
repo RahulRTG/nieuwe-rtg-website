@@ -187,7 +187,12 @@ afspraak raakt, en er staat er ook geen die doet alsof. De aanspraak is er wel
 al: wat ontbreekt is de aankoop die hem verleent, en die hoort over
 `kern/pay/poort.js` te lopen en nergens anders.
 
-Ook niet gebouwd: een scherm. Deze ronde is de laag en niet de app.
+**Het scherm staat er inmiddels** (`/apps/uitvoering.html`): de kijker kiest een
+partituur en een tijdsbudget, de maker stelt er een samen. Twee dingen zijn daar
+met opzet anders dan in een speler -- het bewijs staat even groot als de montage,
+en een weigering rendert als antwoord in plaats van als foutmelding. Wat er
+daarna nog niet is: fragmenten AANWIJZEN op een tijdlijn. Dat is de makersstudio
+uit par. 5, en dat is het punt waarop dit staat of valt.
 
 ## 4. Waar de opzet en het huis botsen
 

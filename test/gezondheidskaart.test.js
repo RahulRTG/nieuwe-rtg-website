@@ -62,6 +62,7 @@ const assert = require('node:assert/strict');
 
 const { maakGezondheid } = require('../server/kern/command/gezondheid');
 const { VERMOGENS, ketenVan } = require('../server/kern/command/vermogens');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 const { CATEGORIEEN } = require('../server/functies/register');
 
 const UUR = 3600000;
@@ -75,7 +76,7 @@ function kaart(o) {
   return {
     db, journaalRegels,
     g: maakGezondheid({
-      db, save() {},
+      db, opslag: maakCmdOpslag({ db }), save() {},
       meting: { reeksen: () => ({ gestart: Date.now() - UUR, verzoeken: opt.verkeer || [] }) },
       slo: { stand: () => opt.slo || ({ doelen: [], tel: {} }) },
       sonde: opt.sonde || { stand: () => ({ binnen: { pogingen: 0 }, buiten: { pogingen: 0 } }) },

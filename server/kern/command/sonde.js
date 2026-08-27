@@ -30,8 +30,8 @@ const STANDAARD_UREN = 24;
 
 const binnenlands = (basis) => /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:|\/|$)/i.test(String(basis));
 
-function maakSonde({ db, save, vak, reizen }) {
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+function maakSonde({ db, save, vak, reizen, opslag }) {
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
 
   function lijst() {
     const v = V();

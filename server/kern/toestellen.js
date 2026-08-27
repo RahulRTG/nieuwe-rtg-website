@@ -27,7 +27,8 @@
 const MAX_TOESTELLEN = 8;
 
 module.exports = ({ db, save, crypto, schoon, metingVanToestel }) => {
-  const lijst = () => { if (!Array.isArray(db.data.toestellen)) db.data.toestellen = []; return db.data.toestellen; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/toestellen', bezit: { toestellen: 'lijst' } });
+  const lijst = () => eigen.bak('toestellen');
   const afdruk = t => crypto.createHash('sha256').update(String(t || ''), 'utf8').digest('hex');
   const mijne = key => lijst().filter(t => t.key === key && t.status === 'actief');
 

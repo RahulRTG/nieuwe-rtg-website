@@ -26,17 +26,14 @@ const DOCUMENTEN = ['dierenpaspoort', 'vaccinatie', 'stamboom', 'chipregistratie
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
+
 
   function D(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!Array.isArray(l.dieren)) l.dieren = [];
-    return l.dieren;
+    return levens.veld(key, 'dieren');
   }
   const lees = key => {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return Array.isArray(l.dieren) ? l.dieren : [];
+    return levens.leesVeld(key, 'dieren');
   };
   const vind = (key, id) => lees(key).find(d => d.id === id);
 
@@ -62,8 +59,7 @@ module.exports = (ctx) => {
     return { status: 200, ok: true };
   }
   function drDierWeg(key, id) {
-    const l = db.data.lifestyle[key]; if (!l) return { status: 200, ok: true };
-    l.dieren = D(key).filter(x => x.id !== id); save();
+    levens.zetVeld(key, 'dieren', D(key).filter(x => x.id !== id)); save();
     return { status: 200, ok: true };
   }
 

@@ -33,6 +33,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
+const { MERK: IJKMERK } = require('../scripts/lib/schonebron');
 const START = '/apps/app.html';
 
 function alleSchermen() {
@@ -40,6 +41,7 @@ function alleSchermen() {
   (function loop(d, pre) {
     for (const f of fs.readdirSync(d)) {
       const v = path.join(d, f);
+      if (f.includes(IJKMERK)) continue;              // een ijkrestant is geen scherm; zie scripts/lib/schonebron.js
       if (fs.statSync(v).isDirectory()) loop(v, pre + f + '/');
       else if (f.endsWith('.html')) uit.push(pre + f);
     }

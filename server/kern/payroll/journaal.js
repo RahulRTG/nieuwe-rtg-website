@@ -38,7 +38,7 @@ const TEGENREKENINGEN = {
   werkgeverslasten: '1630'  // premies en Zvw: schuld aan de Belastingdienst
 };
 
-function maakJournaal({ db, save, nu, crypto }) {
+function maakJournaal({ opslag, save, nu, crypto }) {
   const tijd = nu || (() => new Date().toISOString());
 
   /* ---------- de boeking ---------- */
@@ -101,12 +101,12 @@ function maakJournaal({ db, save, nu, crypto }) {
      10 KB. Het krijgt de boeking mee, want het moet ertegen kloppen voordat er
      iets wordt bewaard. */
   const { betaalbestand, sluitAan } = require('./journaal-betalen')({
-    db, save, tijd, crypto, boeking, bestandenVan: (id) => bestandenVan(id),
+    opslag, save, tijd, crypto, boeking, bestandenVan: (id) => bestandenVan(id),
     tegenrekeningNetto: TEGENREKENINGEN.nettoloon });
 
   /* Welke betaalbestanden zijn er voor deze run gemaakt? Lezen, niet maken --
      het openen van een dossier hoort geen geld in beweging te zetten. */
-  const bestandenVan = (runId) => (db.data.payrollBetaalbestanden || [])
+  const bestandenVan = (runId) => opslag.bak('payrollBetaalbestanden')
     .filter(b => b.runId === runId);
 
   return { boeking, betaalbestand, sluitAan, bestandenVan, TEGENREKENINGEN };

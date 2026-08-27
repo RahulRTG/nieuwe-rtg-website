@@ -26,6 +26,7 @@
    van allemaal: een zoekopdracht die niets vindt ziet er hetzelfde uit als een
    zoekopdracht zonder treffers. */
 module.exports = ({ db, save, bijeen, inBundel, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm, commWerk }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/berichten', bezit: { berichtVlaggen: 'kaart' } });
   const DM = () => (typeof commDm === 'function' ? commDm() : null);
   // zelfde late binding als DM: de kern bestaat nog niet op het moment van mounten
   const WERK = () => (typeof commWerk === 'function' ? commWerk() : null);
@@ -38,8 +39,7 @@ module.exports = ({ db, save, bijeen, inBundel, socialConnecties, dmSleutel, cod
   const SNIPPET = 140;
 
   function V() {
-    if (!db.data.berichtVlaggen || typeof db.data.berichtVlaggen !== 'object') db.data.berichtVlaggen = {};
-    return db.data.berichtVlaggen;
+    return eigen.bak('berichtVlaggen');
   }
   const vlaggenVan = mij => (V()[mij] || {});
   /* Een vlag omzetten. Drie standen, elk met een reden om te bestaan:

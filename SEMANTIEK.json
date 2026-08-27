@@ -1,12 +1,12 @@
 {
-  "catalogi": 833,
-  "verschillendeNamen": 516,
-  "namenInMeerDomeinen": 95,
-  "woordenMetMeerBetekenissen": 78,
-  "betekenissenTotaal": 282,
+  "catalogi": 845,
+  "verschillendeNamen": 517,
+  "namenInMeerDomeinen": 98,
+  "woordenMetMeerBetekenissen": 81,
+  "betekenissenTotaal": 291,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
-  "dubbelingen": 28,
+  "dubbelingen": 29,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -229,6 +229,25 @@
         "kind",
         "tiener",
         "jong"
+      ]
+    },
+    {
+      "naam": "NIET_GEBOUWD",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/command/opslag-register.js",
+        "server/kern/concern/opslag.js",
+        "server/kern/levensdossier/velden.js",
+        "server/kern/mobiliteit/opslag.js",
+        "server/kern/payroll/opslag.js",
+        "server/kern/veiligheid/opslag.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "schema",
+        "validatie",
+        "bevoegdheid",
+        "gebeurtenissen"
       ]
     },
     {
@@ -2177,6 +2196,99 @@
       ]
     },
     {
+      "naam": "VELDEN",
+      "domeinen": 7,
+      "betekenissen": 7,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/db/tx/pgachter.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "soort",
+            "ref",
+            "klant",
+            "zaak"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gegevenspoort.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "telefoon",
+            "adres",
+            "identiteit",
+            "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 24,
+          "voorbeeld": [
+            "verzoeken",
+            "bezittingen",
+            "afspraken",
+            "dossier"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderzoekslab.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "hardware",
+            "software",
+            "dorp",
+            "meta"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-regels.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "van",
+            "onderwerp",
+            "tekst",
+            "soort"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/webplatform-taal.js"
+          ],
+          "leden": 11,
+          "voorbeeld": [
+            "hero",
+            "kop",
+            "tekst",
+            "knop"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/koppelingen.js"
+          ],
+          "leden": 12,
+          "voorbeeld": [
+            "naam",
+            "klas",
+            "opleiding",
+            "vestiging"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "TYPES",
       "domeinen": 8,
       "betekenissen": 6,
@@ -2253,87 +2365,6 @@
             "bar",
             "club",
             "beachclub"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "VELDEN",
-      "domeinen": 6,
-      "betekenissen": 6,
-      "hoogsteOverlap": 0.09,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/db/tx/pgachter.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "soort",
-            "ref",
-            "klant",
-            "zaak"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gegevenspoort.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "telefoon",
-            "adres",
-            "identiteit",
-            "reisdocument"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderzoekslab.js"
-          ],
-          "leden": 9,
-          "voorbeeld": [
-            "hardware",
-            "software",
-            "dorp",
-            "meta"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-regels.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "van",
-            "onderwerp",
-            "tekst",
-            "soort"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/webplatform-taal.js"
-          ],
-          "leden": 11,
-          "voorbeeld": [
-            "hero",
-            "kop",
-            "tekst",
-            "knop"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/koppelingen.js"
-          ],
-          "leden": 12,
-          "voorbeeld": [
-            "naam",
-            "klas",
-            "opleiding",
-            "vestiging"
           ]
         }
       ]
@@ -2515,6 +2546,63 @@
             "jacht",
             "vliegtuig",
             "helikopter"
+          ]
+        }
+      ]
+    },
+    {
+      "naam": "DOMEINEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/delegatie.js"
+          ],
+          "leden": 14,
+          "voorbeeld": [
+            "huishouden",
+            "vervoer",
+            "kring",
+            "reizen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "lifestyle",
+            "rechterhand",
+            "bureau",
+            "levensgraaf"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-adres.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "personeel",
+            "kantoor",
+            "rtf",
+            "rtg"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/domeinen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "verkeer",
+            "licht",
+            "lucht",
+            "geluid"
           ]
         }
       ]
@@ -2937,51 +3025,6 @@
       ]
     },
     {
-      "naam": "DOMEINEN",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/bureau/delegatie.js"
-          ],
-          "leden": 14,
-          "voorbeeld": [
-            "huishouden",
-            "vervoer",
-            "kring",
-            "reizen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-adres.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "personeel",
-            "kantoor",
-            "rtf",
-            "rtg"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stad/domeinen.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "verkeer",
-            "licht",
-            "lucht",
-            "geluid"
-          ]
-        }
-      ]
-    },
-    {
       "naam": "HANDELINGEN",
       "domeinen": 3,
       "betekenissen": 3,
@@ -3026,5 +3069,5 @@
       ]
     }
   ],
-  "bestanden": 2363
+  "bestanden": 2372
 }

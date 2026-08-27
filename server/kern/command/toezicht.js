@@ -22,14 +22,12 @@
    en grenzen. Dat is een bewuste beperking en geen gebrek. */
 'use strict';
 
-function maakToezicht({ db, save, journaal, beleid }) {
+function maakToezicht({ opslag, save, journaal, beleid }) {
   function reg() {
-    if (!db.data.commandAgents) db.data.commandAgents = {};
-    return db.data.commandAgents;
+    return opslag.bak('commandAgents');
   }
   function claims() {
-    if (!db.data.commandClaims) db.data.commandClaims = {};
-    return db.data.commandClaims;
+    return opslag.bak('commandClaims');
   }
   const nu = () => Date.now();
   const uur = 3600 * 1000;

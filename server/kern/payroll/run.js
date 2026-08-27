@@ -30,14 +30,11 @@
 
 const STANDEN = ['concept', 'gecontroleerd', 'manager', 'administrateur', 'definitief'];
 
-function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
+function maakRun({ opslag, save, nu, crypto, motor, regelpakket, componenten }) {
   const tijd = nu || (() => new Date().toISOString());
   const id = () => 'run_' + crypto.randomBytes(5).toString('hex');
 
-  function bak() {
-    if (!Array.isArray(db.data.payrollRunsV2)) db.data.payrollRunsV2 = [];
-    return db.data.payrollRunsV2;
-  }
+  const bak = () => opslag.bak('payrollRunsV2');
   const vind = (runId) => bak().find(r => r.id === runId) || null;
 
   function stempel(run, wat, door, extra) {
@@ -161,7 +158,7 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
 
   /* De correctierun staat apart (./correctie.js): een eigen onderwerp, en run.js
      ging over de 10 KB. Hij krijgt de binnenkant mee die hij nodig heeft. */
-  const { corrigeer } = require('./correctie').maakCorrectie({ db, save, nu, crypto, motor, regelpakket,
+  const { corrigeer } = require('./correctie').maakCorrectie({ save, nu, crypto, motor, regelpakket,
     componenten, vind, bak, kort, stempel });
 
   return { open, keurGoed, maakDefinitief, corrigeer, lijst, haal: haalRun, strokenVan, STANDEN };

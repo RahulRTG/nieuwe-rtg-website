@@ -33,6 +33,7 @@ const { STATUSSEN, EINDSTATUS, KANTOOR_STATUSSEN, SOORTEN, SPECIALIST, BESLOTEN_
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, liveCodename, notify, beoordeel, deelopdrachten } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   /* C() maakt de lijst aan en is dus alleen voor SCHRIJVERS. lees() raakt niets
      aan en is voor lezers.
@@ -44,16 +45,10 @@ module.exports = (ctx) => {
      ("de graaf schrijft niets terug"); hij zakte, en dit is de oorzaak en niet
      het symptoom. */
   function C(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!Array.isArray(l.cases)) l.cases = [];
-    return l.cases;
+    return levens.veld(key, 'cases');
   }
   function lees(key) {
-    const alle = db.data && db.data.lifestyle;
-    const l = (alle && alle[key]) || {};
-    return Array.isArray(l.cases) ? l.cases : [];
+    return levens.leesVeld(key, 'cases');
   }
 
   const openCase = c => !EINDSTATUS.has(c.status);

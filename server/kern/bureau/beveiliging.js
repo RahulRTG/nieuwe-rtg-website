@@ -35,20 +35,17 @@ const DIGITAAL = ['wachtwoordronde', 'certificaat', 'apparaat', 'back-up', 'over
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum, caseOpen } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
+
 
   function B(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    const l = db.data.lifestyle[key];
-    if (!l.beveiliging || typeof l.beveiliging !== 'object') l.beveiliging = {};
-    const b = l.beveiliging;
+    const b = levens.veld(key, 'beveiliging');
     for (const v of ['posten', 'reisrisico', 'digitaal', 'incidenten']) if (!Array.isArray(b[v])) b[v] = [];
     return b;
   }
   // lezen maakt niets aan; zie de uitleg in cases.js
   function lees(key) {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    const b = l.beveiliging || {};
+    const b = levens.leesVeld(key, 'beveiliging');
     return { posten: b.posten || [], reisrisico: b.reisrisico || [],
       digitaal: b.digitaal || [], incidenten: b.incidenten || [] };
   }

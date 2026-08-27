@@ -36,11 +36,8 @@ const tenantJournaal = require('../tenant/journaal');
    het bericht. Staat die er niet (meer), dan gebeurt er niets: een bericht in
    het journaal van een andere werkruimte zou bij mensen aankomen die er niets
    mee te maken hebben. */
-function ruimteVan(db, s) {
-  const code = s && s.werkruimte;
-  if (!code || !db.data || !db.data.werkruimtes) return null;
-  return Object.prototype.hasOwnProperty.call(db.data.werkruimtes, code)
-    ? db.data.werkruimtes[code] : null;
+function ruimteVan(opslag, s) {
+  return opslag.vreemd.werkruimte(s && s.werkruimte);
 }
 
 /* `wie` is met opzet 'RTG Bijstand' en geen medewerkersnaam. Aan de RTG-kant
@@ -48,8 +45,8 @@ function ruimteVan(db, s) {
    een klant zetten geeft hem een handvat dat hem niets zegt en ons een naam die
    hij niet hoort te hebben. Wat hij WEL moet kunnen: dit terugvinden. Daarom
    staat het sessie-id in `waarover`. */
-function meld({ db, save }, s, wat, reden) {
-  const w = ruimteVan(db, s);
+function meld({ opslag, save }, s, wat, reden) {
+  const w = ruimteVan(opslag, s);
   if (!w) return false;
   tenantJournaal.schrijf(w, 'RTG Bijstand', wat, 'bijstand ' + s.id, reden || null);
   save();

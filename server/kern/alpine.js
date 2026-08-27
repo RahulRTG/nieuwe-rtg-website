@@ -12,6 +12,7 @@ const TIJD = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
 module.exports = ({ db, save, crypto, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/alpine', bezit: { alpine: 'kaart' } });
   const nu = () => new Date().toISOString();
   const vandaag = () => nu().slice(0, 10);
   const id = p => p + crypto.randomBytes(3).toString('hex');
@@ -19,7 +20,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const plusDagen = (datum, dagen) => new Date(new Date(datum + 'T12:00:00Z').getTime() + dagen * 86400000).toISOString().slice(0, 10);
 
   const demoResort = require('./alpine-demo'); // het voorbeeldresort (pure data)
-  const R = () => { if (!db.data.alpine) db.data.alpine = {}; return db.data.alpine; };
+  const R = () => eigen.bak('alpine');
   function resortVan(code) {
     const r = R();
     if (!r[code]) { r[code] = demoResort(); save(); }

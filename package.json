@@ -99,6 +99,7 @@
     "chaos": "node scripts/chaos.js",
     "spreiding": "node scripts/spreidingsproef.js",
     "grenzen": "node scripts/grenzen.js",
+    "deuren": "node scripts/deuren.js",
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",
     "grenslijst": "node scripts/grenslijst.js",

@@ -41,7 +41,7 @@ const CO2_ELEKTRISCH_DEEL = 0.25;
 const STORING_VENSTER_DAGEN = 30;
 
 module.exports = (ctx) => {
-  const { db } = ctx;
+  const { db, opslag } = ctx;
 
   /* De uitstoot van een etappe. Geeft altijd terug HOE het getal tot stand
      kwam, zodat een reiziger die het napluist niet op een blote 312 stuit. */
@@ -58,7 +58,7 @@ module.exports = (ctx) => {
   /* Betrouwbaarheid van een lijn: het aantal storingen dat de vervoerder zelf
      heeft gemeld in het venster. Geen gegevens is "niet bekend". */
   function betrouwbaarheidVan(vervoerder, lijnId) {
-    const storingen = db.data.mobStoringen || [];
+    const storingen = opslag.bak('mobStoringen') || [];
     if (!storingen.length)
       return { bekend: false, storingen: 0, uitleg: 'Nog geen storingsgegevens over deze lijn.' };
     const vanaf = Date.now() - STORING_VENSTER_DAGEN * 24 * 3600 * 1000;
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
      Welke van de twee het is, staat erbij -- "over 4 minuten" uit een
      dienstregeling is iets anders dan "over 4 minuten" uit GPS. */
   function wachttijdVan(vervoerder, lijn, halte) {
-    const vers = (db.data.ovVoertuigen || []).filter(v => v.code === vervoerder && v.lijnId === lijn.id &&
+    const vers = (opslag.vreemd.ovVoertuigen() || []).filter(v => v.code === vervoerder && v.lijnId === lijn.id &&
       Date.now() - new Date(v.at).getTime() < 120 * 1000);
     if (vers.length && halte) {
       /* Zelfde nul-is-vals-val als in ./reisplan: een voertuig dat precies op

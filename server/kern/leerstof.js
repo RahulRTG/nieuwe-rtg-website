@@ -51,11 +51,11 @@ for (const blok of VO.concat(VO2, VO3, VERVOLG)) {
 }
 
 function maakLeerstof({ db, save, onderwijs }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/leerstof', bezit: { leerstofSessies: 'kaart' } });
   const nu = () => new Date().toISOString();
 
   function sessies() {
-    if (!db.data.leerstofSessies || typeof db.data.leerstofSessies !== 'object') db.data.leerstofSessies = {};
-    return db.data.leerstofSessies;
+    return eigen.bak('leerstofSessies');
   }
   const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 

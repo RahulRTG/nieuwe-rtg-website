@@ -30,10 +30,9 @@ const { s } = require('./register');
 
 const MAX_RIJEN = 5000;
 
-function maakOvername({ db, save, crypto, journaal, register }) {
+function maakOvername({ db, save, crypto, journaal, register, opslag }) {
   function alle() {
-    if (!db.data.overnames || typeof db.data.overnames !== 'object') db.data.overnames = {};
-    return db.data.overnames;
+    return opslag.bak('overnames');
   }
   const nu = () => new Date().toISOString();
 

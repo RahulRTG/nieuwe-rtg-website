@@ -25,13 +25,17 @@
 module.exports = (state) => {
   const { db, save, crypto, schoon, sociaal, kluis, meldAan, mail, appUrl } = state;
 
-  const kring = require('./kring')({ db, save, schoon, sociaal });
-  const plek = require('./plek')({ db, save });
-  const alarm = require('./alarm')({ db, save, crypto, kring, plek, meldAan, mail, appUrl });
-  const wacht = require('./wacht')({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal });
-  const codewoord = require('./codewoord')({ db, save, crypto, kluis, alarm, plek, sociaal });
-  const rust = require('./rust')({ db, save, schoon });
-  const moment = require('./moment')({ db, save, crypto, schoon, sociaal, plek });
+  /* DE ENIGE PLEK WAAR VEILIGHEID db AANRAAKT; alles eronder krijgt het
+     contract mee in plaats van de database -- zie ./opslag.js. */
+  const opslag = require('./opslag')({ db });
+
+  const kring = require('./kring')({ opslag, save, schoon, sociaal });
+  const plek = require('./plek')({ opslag, save });
+  const alarm = require('./alarm')({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl });
+  const wacht = require('./wacht')({ opslag, save, crypto, schoon, alarm, plek, meldAan, sociaal });
+  const codewoord = require('./codewoord')({ opslag, save, crypto, kluis, alarm, plek, sociaal });
+  const rust = require('./rust')({ opslag, save, schoon });
+  const moment = require('./moment')({ opslag, save, crypto, schoon, sociaal, plek });
 
   /* Het volledige beeld voor een lid: wat loopt er, wie is mijn kring, hoe
      staat het codewoord, welke rust. Een aanroep, want de vier apps tonen

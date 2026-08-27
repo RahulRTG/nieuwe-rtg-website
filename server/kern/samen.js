@@ -8,10 +8,10 @@
    vanzelf opgeruimd. */
 
 module.exports = ({ db, save, crypto, sseToCustomer, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/samen', bezit: { samenKamers: 'kaart' } });
   const UUR = 3600000;
   const K = () => {
-    if (!db.data.samenKamers || typeof db.data.samenKamers !== 'object') db.data.samenKamers = {};
-    return db.data.samenKamers;
+    return eigen.bak('samenKamers');
   };
   const pub = (k) => ({ code: k.code, gastheer: k.gastheer, leden: k.leden.map(l => l.codenaam),
     pad: k.pad, titel: k.titel, chat: k.chat.slice(-30), at: k.at,

@@ -36,18 +36,16 @@ const { impactVan, aanleidingen } = require('./incident-impact');
 
 const OPEN = 'open', BEZIG = 'in behandeling', HERSTELD = 'hersteld', DICHT = 'gesloten';
 
-function maakIncidenten({ db, save, journaal, gezondheid }) {
+function maakIncidenten({ opslag, save, journaal, gezondheid }) {
   const nu = () => klok.datum().toISOString();
 
   function rij() {
-    if (!Array.isArray(db.data.commandIncidenten)) db.data.commandIncidenten = [];
-    return db.data.commandIncidenten;
+    return opslag.bak('commandIncidenten');
   }
   /* Een oplopend nummer en geen willekeurige sleutel: hier wordt naar verwezen
      in een gesprek, in een ticket en in een verslag. */
   function nummer() {
-    db.data.commandIncidentTeller = Number(db.data.commandIncidentTeller || 0) + 1;
-    return 'RTG-' + String(db.data.commandIncidentTeller).padStart(4, '0');
+    return 'RTG-' + String(opslag.teller('commandIncidentTeller', 1)).padStart(4, '0');
   }
   const vind = (id) => rij().find(i => i.id === String(id)) || null;
   const levend = (i) => i.status !== DICHT;

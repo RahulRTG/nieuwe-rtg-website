@@ -26,6 +26,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakMdm, naamNorm } = require('../server/kern/command/mdm');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 const { plaatsNorm } = require('../server/functies/toegang');
 
 const PARTIJEN = [
@@ -45,7 +46,7 @@ function maak(extra) {
     partners: [{ code: 'P1', name: 'Nova van Dijk', city: 'Amsterdam' }]
   }, extra || {}) };
   const regels = [];
-  const mdm = maakMdm({ db, save: () => {}, journaal: { noteer: r => regels.push(r) },
+  const mdm = maakMdm({ db, opslag: maakCmdOpslag({ db }), save: () => {}, journaal: { noteer: r => regels.push(r) },
     partijen: PARTIJEN, plaatsNorm });
   return { db, mdm, regels };
 }

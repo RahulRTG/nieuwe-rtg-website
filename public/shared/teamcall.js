@@ -25,7 +25,7 @@
   let binnenkomend = null;           // { van, vanNaam } zolang het rinkelt
   let ice = null, timer = null, t0 = 0;
 
-  function esc(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'); }
   const zend = (kind, extra) => API.call('/staff/call', Object.assign({ kind, video: true }, extra || {})).catch(() => {});
   async function haalIce(){
     try { ice = (await (await fetch('/api/ice')).json()).iceServers; }

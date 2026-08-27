@@ -33,13 +33,13 @@
 const { STAPPEN, EENHEDEN, magStap, publiek, overzicht } = require('./handelsketen/regels');
 
 function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon, facturatie }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/handelsketen', bezit: { handel: 'lijst' } });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const getal = (v, max) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : 0; };
 
   function store() {
-    if (!Array.isArray(db.data.handel)) db.data.handel = [];
-    return db.data.handel;
+    return eigen.bak('handel');
   }
   function vind(id) { return store().find(h => h.id === String(id || '')); }
   function zaakInfo(s) { return { code: s.code, naam: s.name }; }

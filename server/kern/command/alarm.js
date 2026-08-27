@@ -29,7 +29,7 @@
 
 const ERNST = { hoog: 3, midden: 2, laag: 1 };
 
-function maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit, norm, sein }) {
+function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm, sein }) {
   const D = () => {
     const n = (typeof norm === 'function' ? norm() : norm) || {};
     return Object.assign({ budgetRestDeel: 0.25, defectenDrempel: 25, buitenStilUren: 24, stilteMaxUren: 72 },
@@ -37,8 +37,7 @@ function maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit, norm, se
   };
 
   function vak() {
-    if (!db.data.commandAlarmen || typeof db.data.commandAlarmen !== 'object') db.data.commandAlarmen = {};
-    return db.data.commandAlarmen;
+    return opslag.bak('commandAlarmen');
   }
 
   /* De controles. Elk geeft null (niets aan de hand) of een bevinding. Ze

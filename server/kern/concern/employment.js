@@ -42,16 +42,11 @@ const SOORTEN = {
 const DATUM = /^\d{4}-\d{2}-\d{2}$/;
 
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, entiteitVind, vestigingVind, tijdVandaag } = ctx;
+  const { db, save, crypto, schoon, entiteitVind, vestigingVind, tijdVandaag, opslag } = ctx;
 
   const nu = () => new Date().toISOString();
 
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!db.data.concern.employments || typeof db.data.concern.employments !== 'object')
-      db.data.concern.employments = {};
-    return db.data.concern.employments;
-  }
+  const bak = () => opslag.tak('employments');
 
   const vind = (id) => bak()[String(id || '')] || null;
 

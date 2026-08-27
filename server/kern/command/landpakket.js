@@ -44,14 +44,10 @@ function laad() {
   }
 }
 
-function maakLandpakket({ db, save, journaal, fiscaal, valuta, talen, functies }) {
-  function staat() {
-    db.data.techniek = db.data.techniek || {};
-    return (db.data.techniek.functies = db.data.techniek.functies || {});
-  }
+function maakLandpakket({ opslag, save, journaal, fiscaal, valuta, talen, functies }) {
+  const staat = () => opslag.gedeeld.schakelkast();
   function actieve() {
-    db.data.landen = db.data.landen || {};
-    return db.data.landen;
+    return opslag.bak('landen');
   }
 
   const pakketVan = (land) => laad().pakketten.find(p => p.land === String(land || '').toUpperCase()) || null;

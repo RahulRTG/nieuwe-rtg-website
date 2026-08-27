@@ -31,14 +31,12 @@ const ZWAAR = {
 
 const NOOD_MINUTEN = 60;
 
-function maakToegang({ db, save, crypto, journaal }) {
+function maakToegang({ opslag, save, crypto, journaal }) {
   function rij() {
-    if (!Array.isArray(db.data.commandRechten)) db.data.commandRechten = [];
-    return db.data.commandRechten;
+    return opslag.bak('commandRechten');
   }
   function mandaten() {
-    if (!Array.isArray(db.data.commandMandaten)) db.data.commandMandaten = [];
-    return db.data.commandMandaten;
+    return opslag.bak('commandMandaten');
   }
   const nu = () => new Date().toISOString();
   const straks = (min) => new Date(Date.now() + min * 60000).toISOString();

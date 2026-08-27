@@ -12,13 +12,14 @@ const PROGRAMMA_IDEEEN = ['Gezonde kantine', 'Huiswerkklas na training', 'Sportm
   'Contributiefonds', 'Trainersopleiding', 'Buurttoernooi', 'Ontbijt voor vroege teams'];
 
 module.exports = ({ db, save, crypto }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtfclubs', bezit: { rtfClubs: 'lijst' } });
   const nu = () => new Date().toISOString();
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const rid = () => crypto.randomBytes(4).toString('hex');
   const TEKENS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const codeMaak = () => 'CLUB-' + Array.from(crypto.randomBytes(6)).map(b => TEKENS[b % TEKENS.length]).join('');
 
-  const C = () => { if (!Array.isArray(db.data.rtfClubs)) db.data.rtfClubs = []; return db.data.rtfClubs; };
+  const C = () => eigen.bak('rtfClubs');
   const vind = id => C().find(c => c.id === String(id || ''));
   const vindCode = code => C().find(c => c.code === String(code || '').trim().toUpperCase());
 

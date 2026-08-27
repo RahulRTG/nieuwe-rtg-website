@@ -48,13 +48,13 @@ const BERICHTEN = 40;
 const NEGEER_MAX = 500;
 
 module.exports = ({ db, save, rtmail, agenda, vandaag }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/postdatum', bezit: { postdatums: 'kaart' } });
   const dag = typeof vandaag === 'function' ? vandaag : () => new Date().toISOString().slice(0, 10);
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const bronVan = (berichtId) => 'post:' + berichtId;
 
   function store() {
-    if (!db.data.postdatums || typeof db.data.postdatums !== 'object') db.data.postdatums = {};
-    return db.data.postdatums;
+    return eigen.bak('postdatums');
   }
   function weggelegd(eigenaar, maken) {
     const s = store();

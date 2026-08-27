@@ -44,9 +44,9 @@ const MAX_PER_REKENING = 20;   // meer dan twintig potjes op een rekening is rui
 const MAX_NAAM = 60;
 
 function maakOormerk({ db, save, crypto, nu = klokNu }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/waarde/oormerk', bezit: { waardeOormerken: 'kaart' } });
   function bak() {
-    if (!db.data.waardeOormerken || typeof db.data.waardeOormerken !== 'object') db.data.waardeOormerken = {};
-    return db.data.waardeOormerken;
+    return eigen.bak('waardeOormerken');
   }
   function lijst(rek) {
     const b = bak();

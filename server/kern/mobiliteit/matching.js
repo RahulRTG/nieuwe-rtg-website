@@ -37,12 +37,18 @@ const MAX_AANRIJ_MIN = 25;       // verder dan dit is geen toewijzing maar een b
 const MIN_ENERGIE_PCT = 15;
 
 module.exports = (ctx) => {
-  const { db, save, schoon, haversine, etaMinutes, assetGeschikt, assetInzetbaar, assetBeeld } = ctx;
+  const { db, save, schoon, haversine, etaMinutes, assetGeschikt, assetInzetbaar, assetBeeld, opslag } = ctx;
 
-  function ensureMatching() {
-    if (!db.data.mobMatching || typeof db.data.mobMatching !== 'object')
-      db.data.mobMatching = { standaard: Object.assign({}, STANDAARD_GEWICHTEN), steden: {}, vervoerders: {} };
-  }
+  /* De standaardgewichten komen er EEN keer in, bij het aanmaken; daarna zijn
+     ze gewoon te wijzigen. Dit stond eerder als "bestaat de collectie al?", en
+     dat is precies de vraag die het opslagcontract nu zelf beantwoordt -- dus
+     hangt het zaaien eraan in plaats van aan een voorwaarde die altijd onwaar
+     zou zijn geworden. */
+  const ensureMatching = () => opslag.bak('mobMatching', (kaart) => {
+    kaart.standaard = Object.assign({}, STANDAARD_GEWICHTEN);
+    kaart.steden = {};
+    kaart.vervoerders = {};
+  });
 
   /* De gewichten voor deze plek. Fijnste wint, net als bij het
      moduleregister: vervoerder boven stad boven de standaard. Een gewicht dat
@@ -50,7 +56,7 @@ module.exports = (ctx) => {
      enkele knop kunt bijstellen zonder de hele tabel over te schrijven. */
   function matchGewichten(waar = {}) {
     ensureMatching();
-    const m = db.data.mobMatching;
+    const m = opslag.bak('mobMatching');
     return Object.assign({}, STANDAARD_GEWICHTEN, m.standaard || {},
       (waar.stad && m.steden[waar.stad]) || {},
       (waar.vervoerder && m.vervoerders[waar.vervoerder]) || {});
@@ -58,7 +64,7 @@ module.exports = (ctx) => {
 
   function matchGewichtenZet(body = {}) {
     ensureMatching();
-    const m = db.data.mobMatching;
+    const m = opslag.bak('mobMatching');
     const gew = {};
     for (const [k, v] of Object.entries(body.gewichten || {})) {
       if (!Object.prototype.hasOwnProperty.call(STANDAARD_GEWICHTEN, k)) return { status: 400, error: 'Onbekende factor: ' + k };
@@ -78,7 +84,7 @@ module.exports = (ctx) => {
   function ritenVandaag(vervoerder) {
     const vanaf = new Date(); vanaf.setHours(0, 0, 0, 0);
     const telling = new Map();
-    for (const o of db.data.mobOpdrachten || []) {
+    for (const o of opslag.bak('mobOpdrachten') || []) {
       if (o.vervoerder !== vervoerder || !o.chauffeur) continue;
       if (new Date(o.gemaakt).getTime() < vanaf.getTime()) continue;
       telling.set(o.chauffeur, (telling.get(o.chauffeur) || 0) + 1);

@@ -19,6 +19,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakUren, nachtUren } = require('../server/kern/payroll/uren');
 const { maakControles } = require('../server/kern/payroll/controles');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 /* Een klok met vaste tijden. Let op: de tijden zijn lokaal, want dat is ook hoe
    er geklokt wordt -- een dienst van 22:00 is 22:00 op de vloer. */
@@ -41,7 +42,7 @@ test('nachturen kloppen over middernacht heen', () => {
 test('een ontbrekende uitklok wordt niet geschat maar gemeld', () => {
   const db = klok([dienst(1, '2026-06-03T09:00:00', '2026-06-03T17:00:00'),
     dienst(1, '2026-06-04T09:00:00', null)]);
-  const uren = maakUren({ db });
+  const uren = maakUren({ opslag: maakOpslag({ db })});
   const m = uren.meet('ESVEDRA', '2026-06');
   assert.equal(m.feiten[0].uren, 8, 'alleen de volledige dienst telt');
   const b = m.bevindingen.find(x => x.soort === 'ontbrekende_uitklok');
@@ -54,7 +55,7 @@ test('een ontbrekende uitklok wordt niet geschat maar gemeld', () => {
 test('overlappende diensten verdubbelen de uren niet', () => {
   const db = klok([dienst(1, '2026-06-03T09:00:00', '2026-06-03T17:00:00'),
     dienst(1, '2026-06-03T15:00:00', '2026-06-03T20:00:00')]);
-  const m = maakUren({ db }).meet('ESVEDRA', '2026-06');
+  const m = maakUren({ opslag: maakOpslag({ db })}).meet('ESVEDRA', '2026-06');
   assert.equal(m.feiten[0].uren, 8, 'de tweede telt niet mee: iemand klokt niet op twee plekken');
   assert.ok(m.bevindingen.some(b => b.soort === 'overlappende_dienst'));
 });
@@ -62,7 +63,7 @@ test('overlappende diensten verdubbelen de uren niet', () => {
 test('uren na de laatste werkdag tellen niet mee', () => {
   const db = klok([dienst(1, '2026-06-03T09:00:00', '2026-06-03T17:00:00'),
     dienst(1, '2026-06-20T09:00:00', '2026-06-20T17:00:00')]);
-  const m = maakUren({ db }).meet('ESVEDRA', '2026-06', { uitDienstOp: { 1: '2026-06-10' } });
+  const m = maakUren({ opslag: maakOpslag({ db })}).meet('ESVEDRA', '2026-06', { uitDienstOp: { 1: '2026-06-10' } });
   assert.equal(m.feiten[0].uren, 8);
   const b = m.bevindingen.find(x => x.soort === 'uren_na_uitdienst');
   assert.ok(b && b.eigenaar === 'administrateur', JSON.stringify(m.bevindingen));
@@ -70,7 +71,7 @@ test('uren na de laatste werkdag tellen niet mee', () => {
 
 test('meten en wegen zijn gescheiden: de cao zit niet in de meting', () => {
   const db = klok([dienst(1, '2026-06-01T22:00:00', '2026-06-02T06:00:00')]);
-  const uren = maakUren({ db });
+  const uren = maakUren({ opslag: maakOpslag({ db })});
   const m = uren.meet('ESVEDRA', '2026-06');
   const feit = m.feiten[0];
   assert.equal(feit.uren, 8);
@@ -89,7 +90,7 @@ test('meten en wegen zijn gescheiden: de cao zit niet in de meting', () => {
 
 test('overuren gaan over het contract heen, niet over een vast getal', () => {
   const db = klok([]);
-  const uren = maakUren({ db });
+  const uren = maakUren({ opslag: maakOpslag({ db })});
   const feit = { staffId: 1, uren: 200, nachturen: 0, zondaguren: 0 };
   const klein = uren.weeg(feit, { uurloonCenten: 1800, urenPerWeek: 24 });
   const groot = uren.weeg(feit, { uurloonCenten: 1800, urenPerWeek: 40 });
@@ -104,7 +105,7 @@ function nepRun(over) {
       { component: 'gewerkte_uren', aantal: 100, centen: 180000 }] } }
   ] }, over || {});
 }
-const opzetC = () => { const db = { data: {} }; return maakControles({ db, save: () => {}, nu: () => '2026-07-01T12:00:00.000Z' }); };
+const opzetC = () => { const db = { data: {} }; return maakControles({ opslag: maakOpslag({ db }), save: () => {}, nu: () => '2026-07-01T12:00:00.000Z' }); };
 
 test('een sterke afwijking van de vorige periode wordt gezien, niet gerepareerd', () => {
   const c = opzetC();

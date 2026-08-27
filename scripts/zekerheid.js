@@ -4,7 +4,7 @@
 
    WAAROM DIT ER IS, EN WAAROM HET NIET NOG EEN RAPPORT IS
 
-   Dit huis meet veel. `npm run check` doet 52 codeafspraken, `npm run norm`
+   Dit huis meet veel. `npm run check` doet 53 codeafspraken, `npm run norm`
    ratelt de meters, `npm run dekking` telt waargenomen endpoints, `npm run
    mutatie` probeert 646 toetsbestanden om te krijgen, `npm run samenhang`
    vraagt wie er kijkt, `npm run wetten` toont de systeemwetten en `npm run

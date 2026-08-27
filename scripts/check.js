@@ -3792,5 +3792,58 @@ console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
   if (!zwak && !stuk) ok(gekeurd + ' HTML-ontsnappingsfuncties dekken & < en het aanhalingsteken');
 }
 
+/* ============================================================================
+   53) EEN GECONTRACTEERD DOMEIN HEEFT EEN DEUR, EN NIET ZEVENTIEN.
+
+   WAAROM DEZE REGEL NAAST DE RATEL STAAT. scripts/norm.js telt de deuren naar
+   db.data over het hele huis (dbDeuren, dbDeurenSchrijvend) en laat ze alleen
+   omlaag. Dat houdt het TOTAAL in de hand, maar niet een enkel domein: wie een
+   deur sluit in payroll en er een opent in mobiliteit, beweegt de meter niet.
+   Voor een domein dat NET achter een contract staat is dat precies het gat --
+   daar is de winst nieuw en dus het makkelijkst weer kwijt.
+
+   Dus: zodra een domein hieronder staat, is zijn aantal rechtstreekse
+   aanrakingen NUL en niet "lager dan gisteren". De ratel blijft ernaast voor
+   alles wat nog niet gecontracteerd is.
+
+   HOE JE EEN DOMEIN TOEVOEGT. Een regel in GECONTRACTEERD, met de map en de
+   naam van de deur. Dat is met opzet het enige wat het kost: als het volgende
+   domein een nieuwe keuringsregel zou vragen, gebeurt het niet.
+
+   WAT DEZE REGEL NIET DOET. Hij leest brontekst en kijkt naar `db.data`. Een
+   module die db langs een andere naam krijgt doorgegeven ziet hij niet -- zelfde
+   bewuste onderschatting als bij scripts/deuren.js en keuringsregel 50. Bij
+   payroll is dat vandaag geen gat: na de migratie krijgt geen enkele laag daar
+   nog een database mee, alleen het contract, en dat is sterker dan een regel.
+   Deze poort vangt de terugval. */
+console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eigen deur');
+{
+  const GECONTRACTEERD = [
+    { map: 'server/kern/payroll', deur: 'opslag.js',
+      waarom: 'eerste contractlaag; elf schrijvers over veertien bestanden, dertien collecties' }
+  ];
+
+  for (const dom of GECONTRACTEERD) {
+    const wortel = path.join(ROOT, dom.map);
+    if (!fs.existsSync(wortel)) { fout(dom.map + ' bestaat niet, maar staat wel als gecontracteerd'); continue; }
+    const deurPad = path.join(wortel, dom.deur);
+    if (!fs.existsSync(deurPad)) { fout(dom.map + ' mist zijn deur (' + dom.deur + ')'); continue; }
+
+    let langs = 0, gekeken = 0;
+    loop(wortel, /\.js$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      gekeken++;
+      if (rel === path.posix.join(dom.map, dom.deur)) return;      // de deur zelf
+      const bron = fs.readFileSync(f, 'utf8');
+      if (!/\bdb\.data\b/.test(bron)) return;
+      langs++;
+      const regelNr = bron.split('\n').findIndex(r => /\bdb\.data\b/.test(r)) + 1;
+      fout('langs de deur: ' + rel + ':' + regelNr + ' raakt db.data rechtstreeks aan -- ' +
+        'dit domein gaat door ' + dom.map + '/' + dom.deur);
+    });
+    if (!langs) ok(dom.map + ': ' + (gekeken - 1) + ' bestanden, geen enkele raakt db.data buiten ' + dom.deur);
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

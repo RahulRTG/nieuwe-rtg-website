@@ -35,8 +35,9 @@ const OVERUREN_VEEL = 60; // per periode; daarboven is het geen uitschieter meer
 
 const euro = (c) => (c / 100).toFixed(2);
 
-function maakControles({ db, save, nu }) {
+function maakControles({ opslag, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
+  const bak = () => opslag.bak('payrollBevindingen');
 
   function bevinding(soort, ernst, eigenaar, uitleg, extra) {
     return Object.assign({ soort, ernst, eigenaar, uitleg, status: 'open', at: tijd() }, extra || {});
@@ -129,15 +130,15 @@ function maakControles({ db, save, nu }) {
     }
 
     /* Bewaren, zodat een verklaring blijft staan tussen twee keer kijken. */
-    const bak = (db.data.payrollBevindingen = db.data.payrollBevindingen || {});
-    const oud = bak[run.id] || [];
+    const bevindingen = bak();
+    const oud = bevindingen[run.id] || [];
     const samen = uit.map(b => {
       const eerder = oud.find(x => x.soort === b.soort && x.staffId === b.staffId);
       return eerder && eerder.status !== 'open'
         ? Object.assign({}, b, { status: eerder.status, verklaring: eerder.verklaring, door: eerder.door })
         : b;
     });
-    bak[run.id] = samen;
+    bevindingen[run.id] = samen;
     save();
 
     return { runId: run.id, bevindingen: samen,
@@ -151,7 +152,7 @@ function maakControles({ db, save, nu }) {
     if (String(verklaring || '').trim().length < 10)
       return { status: 400, error: 'Noteer waarom deze bevinding in orde is.' };
     if (!door) return { status: 400, error: 'Noteer wie dit verklaart.' };
-    const rij = (db.data.payrollBevindingen || {})[runId] || [];
+    const rij = bak()[runId] || [];
     const b = rij.find(x => x.soort === soort && (staffId == null || x.staffId === staffId));
     if (!b) return { status: 404, error: 'Deze bevinding kennen we niet.' };
     b.status = 'verklaard'; b.verklaring = String(verklaring).trim().slice(0, 400);
@@ -163,14 +164,14 @@ function maakControles({ db, save, nu }) {
   /* Mag deze run definitief worden? Een openstaande hoge bevinding houdt hem
      tegen. Dat is de rem; verklaren kan altijd, negeren niet. */
   function magDefinitief(runId) {
-    const rij = (db.data.payrollBevindingen || {})[runId] || [];
+    const rij = bak()[runId] || [];
     const blok = rij.filter(b => b.ernst === 'hoog' && b.status === 'open');
     if (!blok.length) return { ok: true };
     return { status: 409, error: 'Er staan ' + blok.length + ' bevinding(en) met ernst hoog open. Handel ze af of verklaar ze.',
       bevindingen: blok };
   }
 
-  const van = (runId) => (db.data.payrollBevindingen || {})[runId] || [];
+  const van = (runId) => bak()[runId] || [];
 
   return { loop, verklaar, magDefinitief, van, ERNST, STATUS, AFWIJKING };
 }

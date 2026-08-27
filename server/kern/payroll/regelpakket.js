@@ -40,13 +40,10 @@ const { keur, VEREIST, AANNEMELIJK } = require('./regelpakket-keuring');
 
 const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
-function maakRegelpakket({ db, save, nu }) {
+function maakRegelpakket({ opslag, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
 
-  function bak() {
-    if (!db.data.payrollRegels || typeof db.data.payrollRegels !== 'object') db.data.payrollRegels = {};
-    return db.data.payrollRegels;
-  }
+  const bak = () => opslag.bak('payrollRegels');
   const lijstVan = (land) => {
     const b = bak();
     const l = String(land || 'NL').toUpperCase();

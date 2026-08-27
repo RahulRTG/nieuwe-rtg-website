@@ -46,7 +46,7 @@ const NIVEAUS = ['gegevens', 'kopie'];
    vullen is geen verplicht veld. */
 const REDEN_MIN = 10;
 
-function maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity }) {
+function maakIdentiteit({ accounts, opslag, save, nu, inzagelog, notify, logActivity }) {
   const tijd = nu || (() => new Date().toISOString());
 
   /* De stand: het enige dat een werkgever standaard ziet. */
@@ -123,7 +123,7 @@ function maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity
       });
     } catch (e) { /* het journaal mag de inzage niet blokkeren, wel altijd geprobeerd */ }
 
-    const rij = (db.data.identiteitVerzoeken = db.data.identiteitVerzoeken || []);
+    const rij = opslag.bak('identiteitVerzoeken');
     rij.unshift({ id: verzoekId, code: supplierCode, staffId: staff.id, accountId: Number(memberId),
       niveau, reden: String(reden).trim().slice(0, 300), door, doorRol: doorRol || null, at: tijd() });
     if (rij.length > 2000) rij.length = 2000;
@@ -157,7 +157,7 @@ function maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity
 
   /* Wat een medewerker zelf ziet: wie heeft wat opgevraagd, en waarom. Dit is
      de kant van het spoor die de betrokkene toekomt. */
-  const mijnVerzoeken = (memberId) => (db.data.identiteitVerzoeken || [])
+  const mijnVerzoeken = (memberId) => opslag.bak('identiteitVerzoeken')
     .filter(v => v.accountId === Number(memberId))
     .map(v => ({ id: v.id, bedrijf: v.code, niveau: v.niveau, reden: v.reden, door: v.door, at: v.at }));
 

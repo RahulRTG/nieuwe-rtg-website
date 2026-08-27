@@ -58,27 +58,25 @@ function brugStand() {
   const staat = { opslag: {}, bakjes: {} };
   const brug = maakBrug({ S: () => staat, save() {}, boek() {},
     nu: () => new Date().toISOString(), eigen: (o, k) => o[k] });
-  return { methodes: brug.mutaties, GRENS: brug.GRENS };
+  return { methodes: brug.mutaties, GRENS: brug.GRENS, machtigingen: brug.machtigingen };
 }
 
 /* Welke machtiging bij welke methode hoort. `overzicht()` uit kern/mutatie.js
    neemt hem niet mee, en een tweede lijst aanleggen zou precies de dubbeling
-   zijn die dit bestand moet voorkomen -- dus wordt hij uit de bron van de brug
-   gelezen, één keer. */
-let MACHT = null;
-function machtigingVan(naam) {
-  if (!MACHT) {
-    MACHT = {};
-    const bron = require('fs').readFileSync(require('path').join(__dirname, 'brug.js'), 'utf8');
-    for (const m of bron.matchAll(/'([a-z]+\.[a-zA-Z]+)':\s*\{\s*machtiging:\s*'([^']+)'/g)) MACHT[m[1]] = m[2];
-  }
-  return MACHT[naam] || null;
-}
+   zijn die dit bestand moet voorkomen -- dus komt hij uit de DRAAIENDE brug.
+
+   Hier stond eerst een regex over de bron van brug.js. Die werkte, tot de
+   methodetabel naar een eigen bestand verhuisde: toen leverde hij stil een lege
+   lijst en stond er bij elke methode geen machtiging meer. Een naslagwerk dat
+   stukgaat op een bestandsverhuizing, leest geen code maar tekst. */
+let STAND = null;
+const stand = () => (STAND || (STAND = brugStand()));
+function machtigingVan(naam) { return stand().machtigingen[naam] || null; }
 
 /* Het hele naslagwerk in één vorm. Zowel de CLI als het uitgeversbureau leest
    dit; wie er iets aan toevoegt, voegt het op beide plekken tegelijk toe. */
 function naslag() {
-  const { methodes, GRENS } = brugStand();
+  const { methodes, GRENS } = stand();
   return {
     methodes: methodes.map(m => Object.assign({
       machtiging: machtigingVan(m.naam),

@@ -3,7 +3,7 @@
   "vastgelegd": "2026-08-27",
   "gemeten": {
     "makers": 8,
-    "bestanden": 60,
+    "bestanden": 63,
     "vormen": 18,
     "paren": 28,
     "metGedeeldeKern": 1,
@@ -61,7 +61,7 @@
     {
       "id": "appstore",
       "naam": "App Store",
-      "bestanden": 26,
+      "bestanden": 29,
       "vormen": 6,
       "talen": 6,
       "opslag": [

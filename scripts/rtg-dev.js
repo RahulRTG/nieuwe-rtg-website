@@ -208,7 +208,7 @@ module.exports = function dev(argv, hulp) {
 </div>
 <aside>
   <div><h2>Synthetisch lid</h2><p class="lid">codenaam <b>${esc(LID.codenaam)}</b> · taal ${esc(LID.taal)} · pas ${esc(LID.pas)}</p>
-  <p class="let">Dit is alles wat een app van derden over een mens te zien krijgt. Geen naam, geen e-mail, geen adres — ook niet hier.</p></div>
+  <p class="let">Dit is alles wat een app van derden over een mens te zien krijgt. Geen naam, geen e-mail, geen adres; ook niet hier.</p></div>
   <div><h2>Wat het lid verleent</h2>${rijen || '<p class="lid">Je app vraagt niets.</p>'}
   <p class="let">Zet er een uit en kijk wat je app doet. Dat is de weg die niemand test.</p></div>
   <div><h2>Wat er bewust niet is</h2><ul>${nietRijen}</ul></div>

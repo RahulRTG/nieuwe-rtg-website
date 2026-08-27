@@ -331,7 +331,7 @@ function tekenCijfers(apps){
   if (!apps || !apps.length) return '';
   const metIets = apps.filter(a => a.totaal.aanroepen);
   if (!metIets.length) return '<div class="kaart"><h2>Cijfers</h2>'+
-    '<p class="sub">Nog geen aanroepen. Zodra een lid je app opent en die de brug gebruikt, staat hier hoe vaak — en hoe vaak dat werd geweigerd.</p></div>';
+    '<p class="sub">Nog geen aanroepen. Zodra een lid je app opent en die de brug gebruikt, staat hier hoe vaak, en hoe vaak dat werd geweigerd.</p></div>';
   return '<div class="kaart"><h2>Cijfers</h2>'+
     '<p class="sub">'+esc(metIets[0].let)+'</p>'+
     metIets.map(a => '<div class="scheiding-s"><b>'+esc(a.sleutel)+'</b>'+

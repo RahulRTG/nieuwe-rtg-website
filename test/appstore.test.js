@@ -330,9 +330,17 @@ test('12. elke machtiging in de catalogus wordt door de brug uitgevoerd', () => 
   /* LAT-regel 6: een belofte in tekst is een belofte in code. Een machtiging die
      wel te vragen is en nergens iets doet, is precies zo'n belofte -- en een
      lid dat hem verleent, verleent iets wat niet bestaat. */
-  const brug = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'appstore', 'brug.js'), 'utf8');
+  /* Uit de DRAAIENDE brug en niet uit zijn broncode. De eerste versie las
+     brug.js als tekst; toen de methodetabel naar een eigen bestand verhuisde,
+     zakte deze toets op een verhuizing in plaats van op een gebroken belofte --
+     en dat is niet wat hij hoort te bewaken. */
+  const { maakBrug } = require('../server/kern/appstore/brug');
+  const staat = { opslag: {}, bakjes: {} };
+  const brug = maakBrug({ S: () => staat, save() {}, boek() {},
+    nu: () => new Date().toISOString(), eigen: (o, k) => o[k] });
+  const gebruikt = new Set(Object.values(brug.machtigingen));
   for (const m of MACHTIGINGEN) {
-    assert.ok(brug.includes("machtiging: '" + m.id + "'"),
+    assert.ok(gebruikt.has(m.id),
       'machtiging ' + m.id + ' staat in de catalogus maar wordt door geen enkele methode van de brug gebruikt');
   }
 });

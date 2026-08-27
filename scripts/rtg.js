@@ -249,9 +249,15 @@ function opdrachtNew(argv) {
   }
   console.log('\n  ' + vet(sleutel) + ' staat klaar in ' + grijs(map) + '\n');
   console.log('    ' + Object.keys(SJABLOON).join('  '));
+  /* Een relatief pad is alleen prettiger als het ook korter is. Ligt de map
+     buiten de huidige map, dan levert path.relative iets als
+     ../../../tmp/... op -- dan is het volledige pad leesbaarder. */
+  const rel = path.relative(process.cwd(), map);
+  const toon = (!rel || rel.startsWith('..') || rel.length > map.length) ? map : rel;
   console.log('\n  Verder:');
-  console.log('    rtg dev ' + path.relative(process.cwd(), map) + grijs('     draai hem, met een synthetisch lid'));
-  console.log('    rtg check ' + path.relative(process.cwd(), map) + grijs('   haal de poort erover'));
+  console.log('    rtg dev ' + toon + grijs('     draai hem, met een synthetisch lid'));
+  console.log('    rtg check ' + toon + grijs('   haal de poort erover'));
+  console.log('    rtg a11y ' + toon + grijs('    de toegankelijkheidskeuring erover'));
   console.log('');
   return 0;
 }

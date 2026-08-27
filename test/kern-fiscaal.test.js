@@ -84,11 +84,26 @@ test('cannedBoekhouder: antwoordt gericht op btw, personeel en cadeaukaarten', (
    Voor een Nederlandse zaak viel dat samen, daarbuiten niet.
    ------------------------------------------------------------------------ */
 const tarief = require('../server/kern/fiscaal/tarief');
+/* De ECHTE genrelijst en de ECHTE capsVan, voor de toetsen onderaan: die gaan
+   juist over de vraag of een cap in productie kan bestaan, en dan is een stub
+   met verzonnen caps precies het verkeerde gereedschap. */
+const genres = require('../server/seed/genres-lijst');
+const werkvormen = require('../server/kern/werkvormen');
 
 test('tarief: de categorie volgt de werkvorm van de zaak, niet het genre alleen', () => {
   const eet = { type: 'restaurant', menu: [{ name: 'Sushi', station: 'keuken' }] };
   assert.equal(tarief.basisCat(eet, ['menu']), 'eten');
-  assert.equal(tarief.basisCat({ type: 'hotel' }, ['rooms', 'menu']), 'logies', 'kamers gaan voor de kaart');
+  /* HIER STOND `['rooms', 'menu']`, EN DAT IS PRECIES WAAROM DE FOUT BLEEF.
+     `rooms` is geen cap: geen van de 73 genres draagt hem en kern/werkvormen.js
+     maakt hem nergens aan. Deze toets voerde dus een invoer op die in productie
+     niet kan bestaan, zag de tak groen worden, en dekte een dode tak af -- de
+     btw op een overnachting werd al die tijd als 'eten' of 'standaard' gerekend
+     (appartement NL 21% in plaats van 9%). Een toets met verzonnen invoer is
+     erger dan geen toets, want hij geeft dekking zonder dekking te leveren.
+     test/genrecap.test.js houdt sindsdien elke genoemde cap tegen de code aan. */
+  assert.equal(tarief.basisCat({ type: 'hotel' }, ['bookings', 'menu']), 'logies', 'kamers gaan voor de kaart');
+  assert.equal(tarief.basisCat({ type: 'hotel' }, ['rooms', 'menu']), 'eten',
+    '`rooms` bestaat niet en mag hier dus ook niets doen');
   assert.equal(tarief.basisCat({ type: 'taxi' }, ['rides']), 'vervoer');
   assert.equal(tarief.basisCat({ type: 'jet' }, ['rides']), 'jet', 'internationaal personenvervoer apart');
   /* En de reparatie: een zaak zonder kaart, kamers of ritten is GEEN eten.
@@ -102,7 +117,10 @@ test('tarief: binnen de horeca telt de bar apart, daarbuiten verandert een artik
   assert.equal(tarief.catVanItem(zaak, 'Sushi', 'eten'), 'eten');
   assert.equal(tarief.catVanItem(zaak, 'Sake', 'eten'), 'drank', 'alcohol is geen eten');
   assert.equal(tarief.catVanItem(zaak, 'Onbekend gerecht', 'eten'), 'eten', 'niet op de kaart: de basis');
-  assert.equal(tarief.catVanItem({ type: 'hotel' }, 'Sake', 'logies'), 'logies', 'buiten de horeca-basis: nooit');
+  assert.equal(tarief.catVanItem({ type: 'hotel' }, 'Sake', 'logies'), 'logies',
+    'een hotel zonder kaart heeft geen kaartartikelen; alles volgt de basis');
+  assert.equal(tarief.catVanItem({ type: 'jet', menu: [{ name: 'Sake', station: 'bar' }] }, 'Sake', 'jet'), 'jet',
+    'en buiten eten en logies verandert een artikel de categorie nooit');
 });
 
 test('tarief: het percentage komt uit de landentabel, en dus per land anders', () => {
@@ -138,4 +156,74 @@ test('tarief: de factuurmotor en de maandboekhouding rekenen met hetzelfde perce
   const viaMotor = tarief.tariefVan(zaak,
     tarief.catVanItem(zaak, 'Gazpacho', tarief.basisCat(zaak, db.capsVan(zaak))));
   assert.equal(viaMotor, eten.tarief, 'de bon van de gast draagt hetzelfde tarief');
+});
+
+test('tarief: een overnachting valt onder logies, niet onder eten of standaard', () => {
+  /* De fout die `rooms` veroorzaakte, in cijfers. Zet in tarief.js `bookings`
+     terug op `rooms` en deze toets zakt vier keer. */
+  const db = werkvormen.haakAan({ data: { supplierTypes: genres, thuisHuizen: {} } });
+  for (const type of ['hotel', 'apartment', 'villa', 'wintersport']) {
+    const zaak = { code: 'V', type, rooms: [{ nr: 1 }], settings: { land: 'NL' } };
+    const basis = tarief.basisCat(zaak, db.capsVan(zaak));
+    assert.equal(basis, 'logies', type + ' verkoopt logies');
+    assert.equal(tarief.tariefVan(zaak, basis), 9, type + ' rekent het Nederlandse logiestarief');
+  }
+  const duits = { code: 'V', type: 'hotel', rooms: [{ nr: 1 }], settings: { land: 'DE' } };
+  assert.equal(tarief.tariefVan(duits, tarief.basisCat(duits, db.capsVan(duits))), 7,
+    'en in Duitsland 7% en niet 19%');
+});
+
+test('tarief: op de rekening van een verblijfszaak volgt een kaartartikel de kaart', () => {
+  /* De tweede helft van de reparatie: zonder deze tak zou een pils in een
+     hotelbar het logiestarief krijgen. Een reparatie die een andere fout maakt
+     is geen reparatie. */
+  const db = werkvormen.haakAan({ data: { supplierTypes: genres, thuisHuizen: {} } });
+  const hotel = { code: 'H', type: 'hotel', rooms: [{ nr: 1 }], settings: { land: 'NL' },
+    menu: [{ name: 'Pils', station: 'bar' }, { name: 'Soep', station: 'keuken' }] };
+  const basis = tarief.basisCat(hotel, db.capsVan(hotel));
+  assert.equal(basis, 'logies');
+  assert.equal(tarief.catVanItem(hotel, 'Pils', basis), 'drank');
+  assert.equal(tarief.tariefVan(hotel, 'drank'), 21, 'een pils blijft 21%');
+  assert.equal(tarief.catVanItem(hotel, 'Soep', basis), 'eten');
+  assert.equal(tarief.catVanItem(hotel, 'Overnachting', basis), 'logies',
+    'wat niet op de kaart staat, is de basis van de zaak');
+
+  /* En buiten eten en logies verandert er niets: een privejet blijft 0%. */
+  const jet = { code: 'J', type: 'jet', fleet: [{}], settings: { land: 'NL' },
+    menu: [{ name: 'Champagne', station: 'bar' }] };
+  const jetBasis = tarief.basisCat(jet, db.capsVan(jet));
+  assert.equal(jetBasis, 'jet');
+  assert.equal(tarief.catVanItem(jet, 'Champagne', jetBasis), 'jet', 'aan boord volgt de vlucht');
+});
+
+test('tarief: het Z-rapport rekent met dezelfde categorie als de maandboekhouding', () => {
+  /* DE DERDE KOPIE. kern/fiscaal/rapporten.js besliste de categorie met de hand
+     -- en keek daarbij naar `rooms`, dus liep hij mee de mist in EN kon hij van
+     de andere twee afwijken. Zonder deze toets is die reparatie ongedekt: geen
+     enkel bestand in test/ raakte de btw-categorie van het dagrapport aan
+     (nagegaan met een mutatie die de basiscategorie op 'standaard' zette --
+     alles bleef groen).
+
+     Deze toets kijkt daarom naar de UITKOMST van beide kanten tegelijk: het
+     dagrapport van vandaag en de maandboekhouding van dezelfde zaak. Lopen ze
+     uiteen, dan is er weer een tweede beslissing bij gekomen. */
+  const nu = new Date();
+  const dag = nu.toISOString().slice(0, 10);
+  const hotel = { code: 'ALPEN', type: 'hotel', settings: { land: 'DE', uurloon: 20 },
+    menu: [{ name: 'Pils', station: 'bar' }] };
+  const db = stubDb({
+    supplierTypes: genres,
+    orders: [{ supplierCode: 'ALPEN', paid: true, at: nu.toISOString(), paidAt: nu.toISOString(),
+      items: [{ name: 'Overnachting', price: 214, qty: 1 }, { name: 'Pils', price: 119, qty: 1 }] }]
+  });
+  const { dagrapport, financeVoor } = maakFiscaal({ db, centen, btwSplit });
+
+  const z = dagrapport(hotel, dag);
+  const catsZ = Object.fromEntries(z.btw.map(r => [r.cat, r.tarief]));
+  assert.equal(catsZ.logies, LANDEN.DE.tarieven.logies, 'de overnachting staat op logies (7%)');
+  assert.equal(catsZ.drank, LANDEN.DE.tarieven.drank, 'de pils op drank');
+
+  const maand = financeVoor(hotel);
+  const catsM = Object.fromEntries(maand.btw.map(r => [r.cat, r.tarief]));
+  assert.deepEqual(catsZ, catsM, 'Z-rapport en maandboekhouding noemen dezelfde categorieen');
 });

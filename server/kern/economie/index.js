@@ -22,10 +22,19 @@
    Opslag: db.data.economie. */
 'use strict';
 
+const { datum: klokDatum } = require('../../lib/klok');
+
 const werelden = require('./werelden');
 
 function maakEconomie({ db, save, klok }) {
-  const nu = () => (typeof klok === 'function' ? klok() : new Date()).toISOString();
+  /* De terugval is de HUISKLOK en niet het besturingssysteem. `new Date()` stond
+     hier, en dat is precies de aanroep waar server/lib/klok.js voor bestaat: wie
+     de tijd rechtstreeks aan het OS vraagt, doet niet mee aan RTG_KLOK en is dus
+     niet te beproeven op een schrikkeldag, een zomertijdsprong of een maand die
+     omslaat. In een boekhouding is die laatste geen theorie -- de periodesleutel
+     JJJJ-MM hangt eraan. De injecteerbare `klok` blijft voorgaan, want een toets
+     die een maandwissel naspeelt geeft er een mee. */
+  const nu = () => (typeof klok === 'function' ? klok() : klokDatum()).toISOString();
   function d() {
     if (!db.data.economie || typeof db.data.economie !== 'object') db.data.economie = {};
     return db.data.economie;

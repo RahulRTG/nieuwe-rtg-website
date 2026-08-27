@@ -77,7 +77,7 @@ const REGELS = [
   [/appstore|appcel/, 'techniek', 'Techniek & De Wacht'],
 
   /* Geld, handel en groei. */
-  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen/, 'financien', 'Financiën'],
+  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen|(?:api|apps|office|supplier|foundation)\/kosten\b|zaakkosten/, 'financien', 'Financiën'],
   [/marketing|campagne|analytics|\/merk/, 'marketing', 'Marketing'],
   [/\/pr\/|communicatie|persbericht/, 'pr', 'PR & communicatie'],
   [/\/sales|acquisitie|lead/, 'sales', 'Sales'],

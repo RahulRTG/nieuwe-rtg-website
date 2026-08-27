@@ -423,6 +423,16 @@ betekenen, en dat is een andere bewering dan "niet bekend". Er staat een
 schermtoets op die precies dat vastlegt, voor het lid én voor de zaak
 (`test/kostenklant.e2e.js`).
 
+**Wie deze laag bezit, staat in het Controleregister: Financiën.** Elk codepunt
+in dit huis (een route, een scherm, een functie) hoort bewust bij een RTG-kamer;
+wat nergens is belegd valt terug op *Onderzoek & data* en telt daar als een gat,
+want onbekend werk hoort niet stilletjes ergens te belanden
+(`kern/magnaat-kantoorregels.js`). De hele kostprijslaag ligt daarom bij
+Financiën -- de vraag "wat kost dit en wie betaalt het" is een financiële vraag,
+ongeacht wie hem stelt. De regel is met opzet nauw: `supplier/kosten` valt
+eronder, `supplier/horeca/event/kosten` niet, want dat is de nacalculatie van een
+zaak en hoort bij haar eigen domein.
+
 **Wat een zaak niet heeft is een eigen verbruiksgrens.** Die hoort bij een
 persoon die zijn eigen uitgaven in de hand houdt; op een zaak zou hij een
 medewerker het werk uit handen slaan zonder dat die weet wie hem heeft gezet.

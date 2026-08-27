@@ -2,18 +2,18 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-27",
   "gemeten": {
-    "bestanden": 1535,
+    "bestanden": 1538,
     "domeinenTotaal": 430,
-    "koopbareVormen": 436,
+    "koopbareVormen": 437,
     "koopbareDomeinen": 100,
     "envelopDrempel": 6,
     "envelop": 42,
-    "veldenDomeineigen": 657,
-    "veldenNietEnvelop": 845,
+    "veldenDomeineigen": 660,
+    "veldenNietEnvelop": 849,
     "gelijkendeVormparen": 7,
     "werkwoordenVolledig": 0,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 42,
+    "werkwoordCombinaties": 43,
     "wagenVormen": 24,
     "wagenVormenUniek": 22,
     "wagenDomeinen": 17,
@@ -72,7 +72,7 @@
     "bevestig": 45,
     "lever": 15,
     "annuleer": 21,
-    "retour": 6
+    "retour": 7
   },
   "overalAanwezig": [],
   "matrix": [
@@ -805,6 +805,25 @@
       "telt": 3
     },
     {
+      "domein": "kern/commerce",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": true
+      },
+      "bewijs": {
+        "toon": "etalage",
+        "bevestig": "waaromNietTeKoop",
+        "retour": "retourBij"
+      },
+      "telt": 3
+    },
+    {
       "domein": "kern/eten",
       "heeft": {
         "toon": true,
@@ -1119,24 +1138,6 @@
       "bewijs": {
         "toon": "fitOverzicht",
         "bevestig": "fitBaanBoek"
-      },
-      "telt": 2
-    },
-    {
-      "domein": "kern/commerce",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "etalage",
-        "bevestig": "waaromNietTeKoop"
       },
       "telt": 2
     },

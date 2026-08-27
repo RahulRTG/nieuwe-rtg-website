@@ -1061,6 +1061,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "commerce-retour.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commerce/koopbaar.js",
+      "operator": "&&->||#0",
+      "gezakt": 13,
+      "geprobeerd": 2
+    },
     "commerce.test.js": {
       "soort": "puur",
       "staat": "gezakt",

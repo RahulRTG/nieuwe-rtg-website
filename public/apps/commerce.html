@@ -78,6 +78,11 @@
   .afrek .btwr{font-size:.76rem;color:var(--soft);margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
   .blok{color:var(--burgundy);font-size:.82rem;margin-top:.4rem;}
   .deur{font-size:.8rem;color:var(--soft);margin-top:.55rem;}
+  .stap{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
+  .stap span{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:99px;padding:.15rem .5rem;}
+  .stap span.nu{border-color:var(--gold);color:var(--gold);}
+  .klaar{border:1px dashed var(--gold);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.84rem;color:var(--muted);}
+  .klaar b{color:var(--txt);}
   .deur a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--line);}
   .samen{border:1px dashed var(--line);border-radius:14px;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
   .samen b{color:var(--txt);font-weight:600;}
@@ -105,6 +110,11 @@
     <div class="kop"><h2>Etalage van een verkoper</h2><span class="n">te koop, en wat er niet bij staat</span></div>
     <div style="margin-bottom:1rem;"><select id="kies"><option>Laden…</option></select></div>
     <div id="etalage"></div>
+  </section>
+
+  <section id="retour-sec">
+    <div class="kop"><h2>Terugsturen</h2><span class="n">de weg terug</span></div>
+    <div id="retour"></div>
   </section>
 
   <section id="mand-sec">
@@ -161,6 +171,7 @@ async function start(){
     tekenMeting(r);
     vulKiezer();
     await tekenMand();
+    await tekenRetouren();
   } catch (e) { $('#main').insertAdjacentHTML('afterbegin', '<div class="stuk">'+esc(e.message)+'</div>'); }
 }
 
@@ -282,6 +293,53 @@ function toonMand(m){
   if (m.genegeerd) h += '<div class="stuk" style="margin-top:.8rem;">'+esc(m.genegeerd)+'</div>';
   if ((m.geweigerd||[]).length) h += geweigerdBlok(m.geweigerd);
   el.innerHTML = h;
+}
+
+/* DE WEG TERUG. Het lid ziet zijn aanvragen en kan er precies EEN stand zetten:
+   "verstuurd". Aanvaarden, beoordelen en afhandelen zijn handelingen van de
+   verkoper; die knoppen staan hier niet, ook niet grijs -- een knop die nooit
+   van jou is, hoort niet op jouw scherm.
+
+   `besluit.uitgevoerd` wordt UITDRUKKELIJK getoond. Een klaargezet bedrag dat
+   eruitziet als een betaald bedrag is precies de stilte die deze laag hoort te
+   vermijden (GELD.md par. 3: geld verlaat het huis nooit vanzelf). */
+const STAPPEN = ['gevraagd','aanvaard','onderweg','beoordeeld','afgehandeld'];
+async function tekenRetouren(){
+  const el = $('#retour'); if (!el) return;
+  try {
+    const r = await api('/api/commerce/retour/mijn', {});
+    const lijst = r.retouren || [];
+    if (!lijst.length) {
+      el.innerHTML = '<p class="leeg">Je hebt niets teruggestuurd. Wat terug kan, herken je aan de chip RETOUR hierboven; ' +
+        'de aanvraag vraagt om het bestelkenmerk dat je van de verkoper kreeg.</p>';
+      return;
+    }
+    el.innerHTML = lijst.map(x => {
+      const eind = ['afgewezen','vervallen'].includes(x.stand);
+      const stappen = eind
+        ? '<div class="stap"><span class="nu">' + esc(x.standLabel) + '</span></div>'
+        : '<div class="stap">' + STAPPEN.map(id =>
+            '<span class="' + (id === x.stand ? 'nu' : '') + '">' + esc(id) + '</span>').join('') + '</div>';
+      const b = x.besluit;
+      const besluit = !b ? '' :
+        '<div class="klaar">' + (b.geldTerug
+          ? '<b>' + euroC(b.centen) + '</b> staat klaar om terug te gaan' +
+            (b.btwCenten ? ' (waarvan ' + euroC(b.btwCenten) + ' btw tegen ' + b.tariefProcent + '%)' : '') +
+            '. ' + (b.uitgevoerd ? 'Uitgevoerd.' : 'Nog niet uitgevoerd: een mens bij de verkoper doet dat, RTG stuurt geen geld uit zichzelf.')
+          : esc(b.reden || b.soort)) + '</div>';
+      const knop = x.stand === 'aanvaard'
+        ? '<div class="acties"><button class="knop" data-verstuurd="' + esc(x.id) + '">Ik heb het verstuurd</button></div>' : '';
+      return '<div class="rij"><h3>' + esc(x.titel) + '</h3>' +
+        '<div class="meta">' + esc(x.verkoperNaam || '') + ' &middot; ' + esc(x.grondLabel) +
+        ' &middot; bestelling ' + esc(x.orderRef) +
+        (x.orderGecontroleerd ? '' : ' (nog niet door de verkoper nagekeken)') + '</div>' +
+        stappen + besluit + knop + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-verstuurd]').forEach(btn => btn.onclick = async () => {
+      try { await api('/api/commerce/retour/verstuurd', { id: btn.getAttribute('data-verstuurd') });
+        meld('Genoteerd.'); tekenRetouren(); } catch (e) { meld(e.message); }
+    });
+  } catch (e) { el.innerHTML = '<div class="stuk">' + esc(e.message) + '</div>'; }
 }
 
 function geweigerdBlok(g){

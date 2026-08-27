@@ -173,6 +173,10 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/vervoer')(kern);
   require('./supplier/kassa')(kern);
   require('./supplier/horeca')(kern); // RTG Horeca OS: rekeningen, keuken, bezorging, club, hotel-folio
+  /* De retourstroom, verkoperkant (kern/commerce/retour.js, COMMERCE.md par. 6).
+     De ledenkant staat in routes/commerce.js; de standen die de VERKOPER zet,
+     komen alleen langs deze deur. */
+  require('./supplier/retour')(kern);
   require('./supplier/werving')(kern);
   /* "Vooruit": dezelfde Control Tower als de ledenkant, op de code van de zaak.
      Zie de kop van ./supplier/vooruit.js. */

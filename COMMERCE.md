@@ -32,9 +32,9 @@ behandeld. De meting is **met opzet royaal**: een werkwoord telt mee bij de
 vaagste naamverwantschap, een koopbare vorm bij het minste prijsveld. Dat maakt
 `Koopbaar` rijker dan hij is — en dus weegt een negatieve uitslag zwaar.
 
-**436 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
-42 envelop-velden blijven er 845 velden over, waarvan **657 (78%) in precies één
-domein** voorkomen. Van de 436 koopbare vormen halen **7 paren** uit verschillende
+**437 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
+42 envelop-velden blijven er 849 velden over, waarvan **660 (78%) in precies één
+domein** voorkomen. Van de 437 koopbare vormen halen **7 paren** uit verschillende
 domeinen de 60%-drempel.
 
 De acht werkwoorden, over die 100 domeinen:
@@ -48,15 +48,15 @@ De acht werkwoorden, over die 100 domeinen:
 | `reserveer` | 22 van 100 (22%) | ████ |
 | `annuleer` | 21 van 100 (21%) | ████ |
 | `lever` | 15 van 100 (15%) | ███ |
-| `retour` | **6 van 100 (6%)** | █ |
+| `retour` | **7 van 100 (7%)** | █ |
 
 En de drie getallen waar het besluit op rust:
 
 - **0 domeinen voeren alle acht werkwoorden uit.**
 - **0 werkwoorden staan in álle koopbare domeinen** — zelfs `toon` niet.
-- **42 verschillende combinaties** van werkwoorden over 100 domeinen.
+- **43 verschillende combinaties** van werkwoorden over 100 domeinen.
 
-Eén protocol met 42 verschillende invullingen is geen protocol. Wie `Koopbaar`
+Eén protocol met 43 verschillende invullingen is geen protocol. Wie `Koopbaar`
 alsnog als interface van acht methodes neerzet, dwingt 100 domeinen tot methodes
 die ze niet hebben. Voor `lever` staat er dan in 85 van de 100 domeinen een
 `nietGebouwd`, voor `retour` in 94 — of erger: een lege implementatie die *doet*
@@ -90,7 +90,7 @@ derde die er dwars overheen ligt.
 
 ### De prijskaart
 
-De 78% domeineigen velden en de 42 combinaties zeggen samen: elk domein verkoopt
+De 78% domeineigen velden en de 43 combinaties zeggen samen: elk domein verkoopt
 op zijn eigen manier. Wat het per domein kóst om het onder één laag te brengen,
 staat hieronder — niet als foutenlijst maar als prijskaart. Volledige matrix in
 `COMMERCE.json`.
@@ -132,12 +132,16 @@ wijst als hij "webshop" zegt. Het heeft varianten, SKU's en voorraad op de
 variant — en geen prijsfunctie, geen levering, geen annulering, geen retour. De
 webshop bouwen betekent dus niet "retail ontsluiten" maar *retail afmaken*.
 
-**`retour` staat op 6 van 100, en die zes zijn geen retouren.** Het zijn
+**`retour` stond bij de eerste meting op 6 van 100, en die zes waren geen
+retouren.** Het zijn
 `terugboeken` (`kern/betaalopdracht`), `terugGave` (`kern/pay`), `maakTeruggave`
 (`kern/appstore`) en de koeriersretour van `kern/modebezorg`: geldomkeringen en
-één pakket dat terugrijdt. Een goederenretour met grondslag, inspectie,
-voorraadstand en btw-correctie bestaat nergens. **Reverse Commerce is geen
-uitbreiding maar nieuwbouw** — en het is de grootste van de vier gaten.
+één pakket dat terugrijdt. (Het staat nu op 7: de zevende is `kern/commerce`
+zelf, de laag die hieronder is gebouwd om dat gat te vullen.) Een goederenretour met grondslag, inspectie,
+voorraadstand en btw-correctie bestond nergens. **Reverse Commerce was dus geen
+uitbreiding maar nieuwbouw** — en het was de grootste van de vier gaten. Hij
+staat er inmiddels (par. 6), en dat de meting hem als afwezig aanwees is precies
+waarom hij als eerste is gebouwd.
 
 ---
 
@@ -305,6 +309,18 @@ autonome betaling die grens 2 verbiedt.
   sessiesleutel, en de afrekening per verkoper met btw uit `kern/fiscaal/tarief.js`.
   Draait op de seed: 100 koopbaren uit 8 typen. Scherm: `/apps/commerce.html`,
   routes: `/api/commerce/*`.
+- **Reverse Commerce** (`kern/commerce/retour*.js`, `routes/supplier/retour.js`).
+  De weg terug met dezelfde bewijslaag als de weg heen: zes gronden als gesloten
+  lijst, vijf standen die elk zeggen wélke partij ze zet, de staat waarin iets
+  terugkomt (en dus of het terug in de voorraad *kan* — boeken doet het domein),
+  zes uitkomsten, en een **bevroren** bedrag en btw-tarief op het moment van
+  aanvragen. Drie grenzen erin: RTG zet nooit een stand namens de verkoper, het
+  geldbesluit wordt **klaargezet en nooit uitgevoerd** (`uitgevoerd: false`), en
+  de order blijft van het domein — een retour verwijst ernaar en draagt
+  `orderGecontroleerd: false` tot de verkoper hem tegen zijn eigen administratie
+  legt. Wat er níét in zit staat er met de reden in `NIET_GEBOUWD`: ruilen tegen
+  iets anders, een verzendlabel, automatisch terugboeken, en een
+  retourpercentage (dat is een score op mensen).
 - **Wat een aanbod NIET kan, met de reden erbij.** De unieke opbrengst van deze
   laag. Een ondernemer ziet per regel waarom er geen koopknop staat, en het
   verschil tussen *er is iets te doen* (zet een prijs) en *er is niets aan de
@@ -323,6 +339,11 @@ autonome betaling die grens 2 verbiedt.
   of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
   vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
   bedrag hoort uit het domein zelf te komen.
+- **Het geld van een retour werkelijk terugstorten.** Het besluit staat klaar met
+  bedrag, btw-deel en tarief; een mens voert het uit langs `kern/pay` met de
+  bevoegdheid die daarvoor bestaat. Die knop komt er niet als bijproduct van een
+  statusknop bij — maar de weg van dat klaargezette besluit naar de uitbetaling
+  is nog met de hand.
 - **Bevestigen vanuit de mand.** De afrekening rekent door, stopt bij de deur en
   **wijst hem aan**: elke afrekening draagt `bevestigBij` met de plek(ken) waar
   die verkoper werkelijk bevestigt, en het scherm zet er een link heen. Meerdere
@@ -352,11 +373,6 @@ autonome betaling die grens 2 verbiedt.
 
 ### Jaren weg
 
-- **Reverse Commerce.** Zes van de 100 domeinen kennen iets dat op retour lijkt, en
-  geen ervan is een goederenretour. Grondslag, bewijs, keuze (geld terug /
-  ruilen / tegoed / reparatie / garantie), logistiek, inspectie, voorraadstand,
-  grootboekomkering, btw-correctie — dat is een domein op zich, met dezelfde
-  bewijslaag als de verkoop.
 - **De 90 optellingen.** 90 plekken in 49 domeinen rekenen regelbedragen uit of
   tellen ze op. Dat is de prijs van geen gedeelde afrekening, en het is precies
   het patroon dat `fiscaal/tarief.js` al één keer heeft laten ontsporen. Ze zijn

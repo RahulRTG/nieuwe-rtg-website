@@ -1662,6 +1662,7 @@
       "coachRules",
       "comm",
       "commGast",
+      "commerce",
       "controleerSom",
       "creator",
       "dagrapport",
@@ -2183,6 +2184,7 @@
       "vakbewijzenVerlopend"
     ],
     "commerce": [
+      "RETOUR_NIET_GEBOUWD",
       "aanbod",
       "commerce",
       "etalage",
@@ -2192,6 +2194,11 @@
       "mandZet",
       "opzoeker",
       "reken",
+      "retourBij",
+      "retourVanKoper",
+      "retourVanVerkoper",
+      "retourVraag",
+      "retourZet",
       "status"
     ]
   }

@@ -65,6 +65,36 @@ module.exports = (kern) => {
     stuur(res, commerce.mandBeeld(wie(req)));
   });
 
+  /* ---------- de weg terug (COMMERCE.md par. 6, kern/commerce/retour.js) ----------
+
+     WIE WAT MAG, ZIT IN DE KERN EN NIET HIER. `door` zegt namens welke partij
+     een stand wordt gezet, en de standentabel bepaalt of dat mag. Deze routes
+     leiden dat alleen door -- met EEN uitzondering die hier thuishoort: een lid
+     is per definitie de koper, dus het lid kan zichzelf hier nooit tot verkoper
+     benoemen. De verkoperkant hoort achter supplierAuth en staat in
+     routes/supplier/; tot die er is, komen die standen niet langs deze deur. */
+  app.post('/api/commerce/retour/vraag', auth, (req, res) => {
+    const b = req.body || {};
+    stuur(res, commerce.retourVraag({
+      sleutel: wie(req), koopbaarId: tekst(b.koopbaarId, 80),
+      orderRef: tekst(b.orderRef, 80), grond: tekst(b.grond, 40),
+      toelichting: tekst(b.toelichting, 500), centen: b.centen
+    }));
+  });
+
+  /* Wat het LID zelf kan zetten: onderweg (hij heeft het verstuurd). Meer niet.
+     Aanvaarden, beoordelen en afhandelen zijn handelingen van de verkoper, en
+     die krijgen hier geen ingang -- ook niet met `door: 'verkoper'` in de body. */
+  app.post('/api/commerce/retour/verstuurd', auth, (req, res) => {
+    stuur(res, commerce.retourZet({ id: tekst((req.body || {}).id, 60), naar: 'onderweg', door: 'koper', sleutel: wie(req) }));
+  });
+
+  app.post('/api/commerce/retour/mijn', auth, (req, res) =>
+    res.json({ ok: true, retouren: commerce.retourVanKoper(wie(req)),
+      /* Wat er met opzet niet bestaat, gaat mee zodat een scherm het kan tonen
+         in plaats van een knop te bouwen die nooit werkt. */
+      nietGebouwd: commerce.RETOUR_NIET_GEBOUWD }));
+
   /* Doorrekenen zonder mand: voor een scherm dat een samenstelling wil laten
      zien voordat iemand iets bewaart. Dezelfde rekenaar, dus dezelfde grenzen --
      inclusief het melden van meegestuurde bedragen. */

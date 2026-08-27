@@ -10,6 +10,7 @@
      ./mand.js         bewaart wat en hoeveel, nooit wat het kost
      ./afrekening.js   rekent per VERKOPER, nooit een gezamenlijke bevestiging
      ./koopbaar.js     vertaalt een aanbod-rij naar werkwoorden, geen tweede vorm
+     ./retour.js       de weg terug; zet een geldbesluit KLAAR en voert niets uit
 
    ER WORDT HIER NIETS BETAALD EN NIETS BESTELD. De weg van bevestigen loopt
    langs de domeinen die er al over gaan (kern/lidacties voor een order bij een
@@ -32,6 +33,10 @@ function maakCommerce(state) {
   const graaf = require('./graaf')({ aanbodAlles });
   const mand = require('./mand')({ db, save, nu });
   const rekenaar = require('./afrekening')({ tariefVan, basisCat, zaakVan, capsVan });
+  /* De retourstroom krijgt de btw-splitser van de afrekening MEE en heeft er
+     geen eigen. Een teruggave rekent met hetzelfde tarief als de verkoop, want
+     het is dezelfde verkoop -- alleen andersom. */
+  const retour = require('./retour')({ db, save, nu, btwUit: rekenaar.btwUit, zaakVan });
 
   /* De mand van deze sleutel, doorgerekend. Dit is de enige plek waar de drie
      bij elkaar komen, en de volgorde is niet vrij: eerst de opzoeker (EEN
@@ -67,7 +72,15 @@ function maakCommerce(state) {
     mandLeeg: (sleutel) => mand.leeg(sleutel),
     mandBeeld,
     /* rekenen zonder mand: een directe afrekening van meegegeven regels */
-    reken: (regels) => rekenaar.reken(regels, graaf.opzoeker().bij)
+    reken: (regels) => rekenaar.reken(regels, graaf.opzoeker().bij),
+    /* de weg terug. `retourVraag` zoekt het koopbaar zelf op: een aanroeper die
+       er zelf een meegeeft, kan er een verzinnen waar `retour` op staat. */
+    retourVraag: (o) => retour.vraag(Object.assign({}, o, { koopbaar: graaf.opzoeker().bij(o && o.koopbaarId) })),
+    retourZet: (o) => retour.zet(o),
+    retourVanKoper: (sleutel) => retour.vanKoper(sleutel),
+    retourVanVerkoper: (code) => retour.vanVerkoper(code),
+    retourBij: (id) => retour.bij(id),
+    RETOUR_NIET_GEBOUWD: retour.NIET_GEBOUWD
   };
 
   return { commerce: api };

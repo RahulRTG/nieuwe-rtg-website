@@ -51,7 +51,7 @@
        klopt het tegenvoorbeeld dus, per KOOPBAAR niet -- en dit is een
        eigenschap van een koopbaar. Je stuurt niets terug wat nooit is gekocht.
 
-   Meer dwang dan deze vier zou de 42 gemeten combinaties terugbrengen tot de ene
+   Meer dwang dan deze vier zou de 43 gemeten combinaties terugbrengen tot de ene
    combinatie die niemand heeft, en dan is dit alsnog een interface.
 
    WAT HIER DUS NIET STAAT: dat een PRODUCT zonder prijs niet te kopen is. Dat is

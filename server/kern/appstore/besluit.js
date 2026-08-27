@@ -17,7 +17,7 @@
 const { MACHTIGINGEN, DOELEN, NIET_GEBOUWD } = require('./machtigingen');
 const { BUDGET } = require('./keuring');
 
-module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV }) {
+module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV, toegankelijk}) {
   /* -------------------------------------------------------------- het aftekenen */
 
   /* Wat deze inzending MEER vraagt dan de versie die nu live staat. Zonder dit
@@ -60,6 +60,16 @@ module.exports = function maakBesluit({ S, save, nu, boek, eigen, norm, uitgever
     if (keuze === 'geweigerd' && String(reden || '').trim().length < 10) return { status: 400, error: 'Een weigering draagt een reden van ten minste tien tekens; die leest de uitgever.' };
     const u = uitgever(v.org);
     if (keuze === 'gepubliceerd' && (!u || u.status !== 'toegelaten')) return { status: 409, error: 'De uitgever is inmiddels ' + (u ? u.status : 'verdwenen') + '; deze versie gaat niet live.' };
+    /* DE TOEGANKELIJKHEIDSPOORT (besluit 27 augustus 2026). Hij staat hier en
+       niet bij het inzenden, want keur() is synchroon en heeft geen browser
+       terwijl deze keuring de app RENDERT. Inzenden mag dus altijd; publiceren
+       pas nadat de keuring is gedraaid en geslaagd. Weigeren mag ook zonder
+       keuring -- een mens die een app afkeurt hoeft niet eerst te meten.
+       Zie kern/appstore/toegankelijk.js. */
+    if (keuze === 'gepubliceerd' && toegankelijk) {
+      const belet = toegankelijk.belet(v);
+      if (belet) return belet;
+    }
 
     v.status = keuze;
     v.besluit = { door: wie, at: nu(), reden: String(reden || '').trim().slice(0, 600) || null };

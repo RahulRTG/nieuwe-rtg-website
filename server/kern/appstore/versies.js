@@ -107,7 +107,14 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
       uitleg: v.manifest.uitleg, categorie: v.manifest.categorie, taal: v.manifest.taal,
       prijsCenten: Number(v.manifest.prijsCenten || 0),
       vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen), hash: v.hash, maten: v.maten,
-      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null };
+      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null,
+      /* DE TOEGANKELIJKHEIDSUITSLAG REIST MEE, en alleen als hij bij DEZE bytes
+         hoort. Een uitslag van een vorige bundel is geen uitslag (zie
+         ./toegankelijk.js), dus hij hoort hier ook niet te verschijnen -- anders
+         leest een mens op het keuringsscherm een groen vinkje dat over iets
+         anders gaat. Dit is TONEN en geen beslissen: de poort blijft
+         toegankelijk.belet() in ./besluit.js (LAT-regel 4). */
+      toegankelijk: v.toegankelijk && v.toegankelijk.hash === v.hash ? v.toegankelijk : null };
   }
 
   return { app, versie, inzenden, proef, publiekV, remGehaald, INZENDINGEN_PER_UUR };

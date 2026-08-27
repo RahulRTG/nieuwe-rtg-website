@@ -3,9 +3,9 @@
   "vastgelegd": "2026-08-27",
   "gemeten": {
     "routesMetRol": 3074,
-    "routesGevonden": 3837,
-    "verklaard": 21,
-    "onverklaard": 3816,
+    "routesGevonden": 3839,
+    "verklaard": 24,
+    "onverklaard": 3815,
     "beproefd": 115,
     "onbereikbaarVoorDeProef": 2959,
     "verklaardEnBeproefd": 0,
@@ -48,6 +48,39 @@
   "tegenspraken": [],
   "onbekendeKlassen": [],
   "verklaard": [
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/toegankelijk",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 33,
+      "klasse": "idempotent",
+      "waarom": "dezelfde uitslag twee keer noteren laat dezelfde stand */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/toegankelijk/wachtrij",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 44,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/besluit",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 48,
+      "klasse": "nietHerhaalbaar",
+      "waarom": "een besluit is een handeling van een mens en telt op in het journaal */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
     {
       "methode": "POST",
       "pad": "/api/appstore/catalogus",

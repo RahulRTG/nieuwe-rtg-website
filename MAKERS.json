@@ -3,8 +3,8 @@
   "vastgelegd": "2026-08-27",
   "gemeten": {
     "makers": 8,
-    "bestanden": 57,
-    "vormen": 17,
+    "bestanden": 60,
+    "vormen": 18,
     "paren": 28,
     "metGedeeldeKern": 1,
     "drempel": 0.6
@@ -61,8 +61,8 @@
     {
       "id": "appstore",
       "naam": "App Store",
-      "bestanden": 23,
-      "vormen": 5,
+      "bestanden": 26,
+      "vormen": 6,
       "talen": 6,
       "opslag": [
         "appstore:aankopen",
@@ -234,7 +234,7 @@
       "b": "partnerstudio",
       "gedeeldeKern": false,
       "via": null,
-      "vorm": 0.08,
+      "vorm": 0.07,
       "vormA": "server/kern/appstore/versies.js",
       "vormB": "server/kern/magnaat-partnerstudio-bedrijf.js",
       "vormGedeeld": [
@@ -252,7 +252,7 @@
         "auth",
         "supplierAuth"
       ],
-      "waarom": "taal 0 en vorm 0.08 halen de drempel 0.6 niet"
+      "waarom": "taal 0 en vorm 0.07 halen de drempel 0.6 niet"
     },
     {
       "a": "websitemaker",

@@ -117,11 +117,16 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
      uitgeverslijst -- en niet de kern eromheen. */
   const V = require('./versies')({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, antivirus });
   const { app, versie, inzenden, proef, publiekV } = V;
+  /* De toegankelijkheidspoort. Hij wordt VOOR ./besluit.js opgebouwd omdat die
+     hem meekrijgt: publiceren kan niet zonder een geslaagde keuring op deze
+     bundelhash (besluit 27 augustus 2026, kern/appstore/toegankelijk.js). */
+  const toegankelijk = require('./toegankelijk').maakToegankelijk({ S, save, nu, versie, boek });
+
   /* En het aftekenen apart daarvan (./besluit.js): dat is de ENIGE plek waar een
      versie live gaat, en die scheiding is de reden dat grens 2 na te lezen is
      zonder de hele motor door te moeten. */
   const { wachtrij, besluit, intrekkenKaal, mijnUitgeverij } =
-    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV });
+    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV, toegankelijk });
 
   /* De naad met het geld (./naad.js): daar wordt de betaalde kant opgebouwd en
      wordt intrekken uitgebreid met de teruggaverechten. Apart bestand omdat het
@@ -130,7 +135,7 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
   const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
-  const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save,
+  const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
     publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER: U.STATUS_UITGEVER, geld,

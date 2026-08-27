@@ -1649,6 +1649,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "geldidempotentie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "geldregie.test.js": {
       "soort": "server",
       "staat": "gezakt",

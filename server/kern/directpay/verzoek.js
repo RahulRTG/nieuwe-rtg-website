@@ -11,17 +11,49 @@ module.exports = (ctx) => {
 
   /* De leverancier stuurt een betaalverzoek op codenaam (of open aan wie het
      bekijkt). Het lid rekent het met Face ID af. */
-  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving }) {
+  /* Hoe lang twee identieke verzoeken hetzelfde verzoek zijn. Een dubbeltik en
+     een haperend netwerk vallen ruim binnen een minuut; twee rondjes op
+     hetzelfde bedrag voor dezelfde gast vallen er ruim buiten. */
+  const DUBBEL_MS = 60 * 1000;
+
+  /* Een betaalverzoek maken. WAAROM HIER EEN HERHALINGSCONTROLE STAAT: dit was
+     een van de acht geldroutes die IDEMPROEF.json als "onbeschermd" telde, en
+     bij deze route is dat geen telling maar een gevolg dat de GAST ziet -- twee
+     verzoeken voor hetzelfde bedrag in zijn app, en de kans dat hij twee keer
+     betaalt.
+
+     Twee vangnetten, en het tweede bestaat omdat het eerste van de client komt:
+       - `idem` van het scherm: hetzelfde verzoek, hetzelfde antwoord;
+       - en zonder idem: een OPEN verzoek met dezelfde ontvanger, hetzelfde
+         bedrag en dezelfde omschrijving van minder dan een minuut oud is een
+         dubbeltik en geen tweede verzoek.
+     In beide gevallen komt het BESTAANDE verzoek terug en geen fout: de
+     leverancier deed niets verkeerds, en een 409 zou hem laten denken dat het
+     eerste verzoek niet is aangekomen. */
+  function verzoekMaak({ supplierCode, actorName, naarCodename, bedragCenten, omschrijving, idem }) {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     const cent = centenVan(bedragCenten);
     if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
     if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
+
+    const naar = naarCodename ? schoon(naarCodename, 40) : null;
+    const oms = schoon(omschrijving, 120) || 'Betaalverzoek';
+    const sleutel = schoon(idem, 80) || null;
+    const eerder = betaalVerzoekenVanZaak(s.code) || [];
+    const zelfde = eerder.find(v => sleutel
+      ? v.idem === sleutel
+      : (v.status === 'open' && v.naarCodename === naar && v.bedrag === cent && v.omschrijving === oms &&
+         Date.now() - new Date(v.at || 0).getTime() < DUBBEL_MS));
+    if (zelfde) return { status: 200, ok: true, verzoek: verzoekPubliek(zelfde), herhaald: true,
+      let: 'Dit verzoek stond er al; er is er geen tweede bij gekomen.' };
+
     const v = {
+      idem: sleutel,
       ref: id('BV'), supplierCode: s.code, supplierName: s.name,
-      naarCodename: naarCodename ? schoon(naarCodename, 40) : null,
-      bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Betaalverzoek',
+      naarCodename: naar,
+      bedrag: cent, omschrijving: oms,
       status: 'open', door: schoon(actorName, 60) || 'Beheer', betaaldDoor: null, betaaldRef: null, at: nu()
     };
     /* Ging met unshift + slice(0, 100000): een kopie van de hele array bij elk

@@ -56,6 +56,13 @@ function maakWallet({ db, save, crypto, schoon }) {
     const titel = schoon(b.titel, 80), code = schoon(b.code, 40);
     if (!titel) return { status: 400, error: 'Geef het een naam (bijv. de winkel of het event).' };
     if (!code) return { status: 400, error: 'Wat is de kaart- of ticketcode?' };
+    /* Dezelfde kaart hoort er maar een keer in. Een tweede oproep met dezelfde
+       soort en dezelfde code is een dubbeltik of een netwerkherhaling -- niemand
+       voegt zijn klantenkaart twee keer toe. Het bestaande item komt terug en
+       geen fout: er is niets misgegaan. (Een van de honderd onbeschermde routes
+       uit IDEMPROEF.json; hier goedkoop te repareren op een natuurlijke sleutel.) */
+    const zelfde = bak(key).find(x => x.soort === soort && x.code === code && x.bron === 'zelf');
+    if (zelfde) return { status: 200, ok: true, item: zelfde, herhaald: true };
     if (bak(key).length >= MAX_ITEMS) return { status: 409, error: 'De wallet zit vol; ruim eerst iets op.' };
     const d = voeg(key, { soort, titel, code, bron: 'zelf' });
     return { status: 200, ok: true, item: d };

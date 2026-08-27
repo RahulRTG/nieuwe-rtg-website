@@ -12,7 +12,9 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
   // valt dit terug op de equivalente scan over de meegegeven db.
   const vanKlant = ordersVanKlant || (key => (db.data.orders || []).filter(o => (o.customerKey || o.customerTier) === key));
   function sseToCustomer(key, event, data) {
-    bus.publish('sse', { doel: 'key', match: key, event, data, id: nextSseId() });
+    // de live-laag stuurt waar een lid is en wat het besteld heeft
+    bus.publish('sse', { doel: 'key', match: key, event, data, id: nextSseId(),
+      envelop: { classificatie: 'persoonsgegeven' } });
   }
 
   function liveCodename(session) {

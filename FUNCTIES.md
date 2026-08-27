@@ -19,7 +19,7 @@ het?**
 | Functieschakelaars (aan/uit per functie) | **145** in 16 categorieën |
 | Apps in de leden-catalogus | **83** in 8 categorieën |
 | Bedrijfsgenres | **73** in 26 sectoren |
-| Capabilities (waar de apps op sturen) | **40** |
+| Genre-caps (waar de apps op sturen) | **40** |
 | API-endpoints | ~2.950 |
 | Kernmodules (`server/kern/**`) | ~905 |
 | App-pagina's (`public/apps/**.html`) | 212 |
@@ -513,7 +513,7 @@ ze werken; dit is wat hij ziet.
 # 3. De 73 genres in 26 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
-krijgt volgt niet uit zijn genre maar uit zijn *capabilities*: een hotel en een
+krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
 appartement delen `bookings`, een restaurant en een beachclub delen `menu`. Dat
 is de reden dat er geen 130 losse apps zijn.
 
@@ -544,7 +544,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **veterinary** (2) — Dierenartspraktijk (`dierenarts`), Petcare & pension (`petcare`)
 - **wholesale** (1) — Groothandel & markt (`groothandel`)
 
-De 40 capabilities waar de apps naar kijken (nooit naar het genre zelf):
+De 40 genre-caps waar de apps naar kijken (nooit naar het genre zelf):
 
 `advies`, `alpine`, `beauty`, `beveiliging`, `bezorgen`, `boerderij`, `bookings`, `care`, `charter`, `creator`, `doors`, `fitclub`, `fleet`, `gebouw`, `gemeente`, `golf`, `groothandel`, `huur`, `location`, `luchthaven`, `marechaussee`, `marina`, `menu`, `opvang`, `orders`, `ov`, `petcare`, `polis`, `pricing`, `redactie`, `reservations`, `retail`, `rides`, `rijk`, `services`, `sportclub`, `tickets`, `vastgoed`, `vracht`, `weddings`
 ---

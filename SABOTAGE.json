@@ -278,6 +278,41 @@
       "reden": "Het wetboek klopt niet:",
       "wachter": "script:node scripts/wetten.js --controle",
       "duurMs": 76
+    },
+    "geld-poort-kent-geen-spelstand": {
+      "stand": "raak",
+      "afdruk": "1418f327a06403cd",
+      "reden": "5. de waardepoort kent geen simulatiestand, en dat blijft zo",
+      "wachter": "test:test/simulatiebank.test.js",
+      "duurMs": 13297
+    },
+    "geld-simulatiebank-nooit-in-productie": {
+      "stand": "raak",
+      "afdruk": "21586d83286fcb96",
+      "reden": "1. de drie grendels zitten dicht, en elke zegt WELKE",
+      "wachter": "test:test/simulatiebank.test.js",
+      "duurMs": 13656
+    },
+    "toegang-actor-op-de-bus-is-een-codenaam": {
+      "stand": "raak",
+      "afdruk": "484c09bc34ccb13a",
+      "reden": "3. de actor is een codenaam, geen contactgegeven",
+      "wachter": "test:test/envelop.test.js",
+      "duurMs": 395
+    },
+    "techniek-geen-gedeelde-laagnaam": {
+      "stand": "raak",
+      "afdruk": "687d72b741896d79",
+      "reden": "1. de meter vindt de lagenmodellen die er werkelijk staan",
+      "wachter": "test:test/genrecap.test.js",
+      "duurMs": 185
+    },
+    "techniek-een-genoemde-cap-bestaat": {
+      "stand": "raak",
+      "afdruk": "035045b56a193383",
+      "reden": "8. elke cap die PLATFORM.md als voorbeeld noemt, bestaat echt",
+      "wachter": "test:test/genrecap.test.js",
+      "duurMs": 171
     }
   }
 }

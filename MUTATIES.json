@@ -86,6 +86,14 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "afleidbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afleidbaar.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "agenda-pro.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1361,6 +1369,14 @@
       "gezakt": 1,
       "scherp": "overleefd"
     },
+    "envelop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/envelop.js",
+      "operator": "!==->===#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "ervaring.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1706,6 +1722,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 14,
       "scherp": "gezakt"
+    },
+    "genrecap.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/werkvormen.js",
+      "operator": "return-weg#1",
+      "gezakt": 2,
+      "geprobeerd": 8
     },
     "genredekking.test.js": {
       "soort": "puur",
@@ -3065,6 +3089,14 @@
       "gezakt": 6,
       "geprobeerd": 2
     },
+    "magnaat-rtgketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "magnaat-rust-integratie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4004,6 +4036,14 @@
     "ontwerp.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "ontwerpbank.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ontwerpbank.js",
+      "operator": "+->-#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "oog.test.js": {
       "soort": "server",
@@ -5466,6 +5506,13 @@
       "operator": "return-weg#2",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "simulatiebank.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "skipwacht.test.js": {
       "soort": "puur",

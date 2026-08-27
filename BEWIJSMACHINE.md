@@ -88,14 +88,14 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2388 bestanden, 839 catalogi, 520 verschillende namen
-  95 namen staan in meer dan een domein
-  77 woorden dragen MEER DAN EEN betekenis   (samen 281 betekenissen)
+2395 bestanden, 841 catalogi, 520 verschillende namen
+  96 namen staan in meer dan een domein
+  78 woorden dragen MEER DAN EEN betekenis   (samen 284 betekenissen)
   29 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
  106 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
 ```
 
-Van de 95 gedeelde namen dragen er **77 meer dan één betekenis**. Het was dus
+Van de 96 gedeelde namen dragen er **78 meer dan één betekenis**. Het was dus
 geen incident.
 
 De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:

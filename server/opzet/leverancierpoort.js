@@ -46,10 +46,10 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
 
   // SSE-routering naar een specifieke leverancier of naar de backoffice
   function sseToSupplier(code, event, data) {
-    bus.publish('sse', { doel: 'sup', match: code, event, data });
+    bus.publish('sse', { doel: 'sup', match: code, event, data, envelop: { classificatie: 'intern' } });
   }
   function sseToOffice(event, data) {
-    bus.publish('sse', { doel: 'office', event, data });
+    bus.publish('sse', { doel: 'office', event, data, envelop: { classificatie: 'intern' } });
   }
 
   function notifySupplier(code, note) {

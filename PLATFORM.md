@@ -326,11 +326,27 @@ Eén leverancier-app voor 73 genres, en één PDA die zich naar functie en zaak
 voegt. Dat is precies het model dat 130 losse apps voorkomt — het staat er al,
 het heet alleen nog niet zo, en het houdt bij de huidige opzet niet vol tot 130.
 
-De genres dragen **capabilities** (`caps`): `rooms`, `rides`, `menu`, `tickets`,
+De genres dragen **genre-caps** (`caps`): `bookings`, `rides`, `menu`, `tickets`,
 `retail`, `charter`, `marina`, `gebouw`, `boerderij`, `polis`, `beveiliging`,
 `vastgoed`, `groothandel`, `ov`, `luchthaven`, `gemeente`. De app en de PDA
 kijken naar die caps en niet naar het genre. Dat is laag 4 uit het plan, en die
 laag werkt.
+
+> **Waarom "genre-cap" en niet "capability".** Dit heette hier tot 27 augustus
+> 2026 gewoon *capability*, en `OS.md` par. 4.2 legde uit waarom dat niet kon
+> blijven: het woord stond in dít lagenmodel (laag 4) én in dat van RTG Universal
+> OS, en het betekende er niet hetzelfde. Hier is het **domeinvermogen** — wat
+> voor zaak is dit, welke schermen krijgt zij. Daar is het **platformvermogen** —
+> een herbruikbare bedrijfsfunctie als `Payment.Authorize`, die je aanroept en die
+> ja of nee zegt. Wie die twee onder één woord laat staan, krijgt binnen een jaar
+> twee antwoorden op "hoort dit in de capabilitylaag". Het veld in de code heet
+> nog steeds `caps`; het woord in de tekst heet nu genre-cap.
+>
+> Let op: in par. 0 hierboven staat *capability* in nóg een derde betekenis — een
+> zelfstandig vak dat een eigen app verdient. Die is met opzet niet meegenomen:
+> de toetsvraag van de super-app-regel werkt en wordt breed geciteerd, en een
+> werkende regel herschrijf je niet om een woord. Dat is een besluit dat open
+> staat, geen slordigheid; `OS.md` par. 4.2 houdt het vast.
 
 ---
 
@@ -341,7 +357,7 @@ laag werkt.
 | 1 — Core | identiteit, organisaties, locaties, personen, rechten, documenten, geld, communicatie, workflow, audit | grotendeels: kluis met codenamen, SSO/SCIM, passkeys, betalen, grootboek, bestanden, auditlog | een expliciete organisatie-entiteit; een zaak is nu een rij in `suppliers` |
 | 2 — Enterprise engines | CRM, ERP, HR, finance, procurement, inventory, assets, projecten, planning, service, BI, AI | veel, verspreid: payroll, roosters, voorraad, agenda, facturatie, boardroom, AI | ze staan naast elkaar, niet als aanroepbare motoren onder de genres |
 | 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **het aanknopingspunt**: elk genre draagt een `industry`, 73 genres in 26 sectoren; de sector doet zijn eerste echte werk in de handelsketen (de keuzelijst groepeert erop) | de motoren zelf — er hangt nog geen gedeelde sectorlogica aan |
-| 4 — Capabilities | `rooms`, `rides`, `menu`, `tickets` … | **ja, en dit werkt** | meer caps naarmate sectoren erbij komen |
+| 4 — Genre-caps | `bookings`, `rides`, `menu`, `tickets` … | **ja, en dit werkt** | meer caps naarmate sectoren erbij komen |
 | 5 — PDA | één adaptieve Work PDA | **ja**, en de server bepaalt sinds kort welke modules een zaak krijgt (`server/kern/pda/modules.js`) | de PDA-delen zijn nog geen echte modules (één gesloten scope) |
 | 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | **de keten staat** (`server/kern/handelsketen.js`) en draait op één paar: beachclub → wasserij | de veertien oude collecties migreren; koppeling naar het grootboek |
 | 7 — Consumer Network | de ledenkant | **ja**, het verst ontwikkeld | — |
@@ -363,7 +379,7 @@ alle drie nagemeten, niet aangenomen.
 Een genre droeg een `label`, een `icon` en `caps`. Meer niet. Er was geen veld
 dat zei dat `hotel`, `apartment`, `villa` en `wintersport` dezelfde
 hospitality-motor delen. Gedeelde sectorlogica kon daardoor nergens wonen: aan
-`rooms` gehangen lekte housekeeping naar `wellness`, aan `hotel` gehangen moest
+`bookings` gehangen lekte housekeeping naar `wellness`, aan `hotel` gehangen moest
 het bij `villa` opnieuw.
 
 **Wat er nu staat.** Het genre-register (`server/seed/genres.js` +

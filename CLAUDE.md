@@ -273,8 +273,8 @@ op wordt gebouwd.
 `GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
-(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
-113 requires, en raakt daarmee **1 van 413 kerndomeinen** aan — 0%. Als testhal
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
+116 requires, en raakt daarmee **2 van 415 kerndomeinen** aan — 0%. Als testhal
 bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
 van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
@@ -301,8 +301,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 95 namen die in meer dan
-één domein staan, dragen er **77 meer dan één betekenis** — samen 281
+`SEMANTIEK.json`) en het was **geen incident**: van de 96 namen die in meer dan
+één domein staan, dragen er **78 meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

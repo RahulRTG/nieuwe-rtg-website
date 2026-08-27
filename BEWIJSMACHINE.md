@@ -88,7 +88,7 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2359 bestanden, 833 catalogi, 516 verschillende namen
+2361 bestanden, 833 catalogi, 516 verschillende namen
   95 namen staan in meer dan een domein
   78 woorden dragen MEER DAN EEN betekenis   (samen 282 betekenissen)
   28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)

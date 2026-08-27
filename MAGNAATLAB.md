@@ -78,13 +78,13 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
 ### De uitkomst
 
 ```
-64 simulatiemodules tegenover 1398 kernmodules in 410 domeinen
-   magnaat        61 modules
+66 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
+   magnaat        63 modules
    hospitality     3 modules
 
 1. HET BEREIK
-   113 requires in de simulatielaag
-     1 kernmodule geraakt, in 1 van 410 domeinen        (0%)
+   116 requires in de simulatielaag
+     2 kernmodules geraakt, in 2 van 412 domeinen       (0%)
      0 modules doen een netwerkaanroep                  (de ontsnapping wordt niet gebruikt)
      3 aanroepen van de ene synthetische wereld naar de andere
 
@@ -93,12 +93,21 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
      0 daarvan delen ook werkelijk een VORM
 ```
 
-De enige kernmodule die de simulatielaag aanraakt is `kern/bestuursroutes`.
-Niet `kern/pay`, niet `kern/waarde`, niet `kern/bevoegdheid`, niet
-`kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
+De simulatielaag raakt twee kernmodules aan: `kern/bestuursroutes` en — sinds
+27 augustus 2026 — **`kern/pay`**. Niet `kern/waarde`, niet `kern/bevoegdheid`,
+niet `kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
 
-> **Als testhal bewijst Magnaat vandaag niets over RTG, en de reden is niet
-> subtiel: hij roept RTG niet aan.**
+> **Als testhal bewees Magnaat niets over RTG, en de reden was niet subtiel: hij
+> riep RTG niet aan.** Voor precies één capability geldt dat niet meer.
+
+**En het percentage bewoog niet, wat eerlijker is dan het klinkt.** Dit document
+schreef bij fase 2 op: *"Slaagt dat, dan is de meting hierboven niet meer 0%."*
+Dat klopte niet. Twee van 412 domeinen rondt af op 0%, en één capability is nu
+eenmaal geen percentage. Wat er wél veranderde is de **lijst**: `kern/pay` staat
+erin, bij naam, en dat is de bewering die iemand kan natrekken. Een
+verhoudingsgetal over 412 domeinen is te grof om één verbinding te registreren —
+dat is een eigenschap van de meter en geen tegenvaller, en het staat hier zodat de volgende
+lezer niet naar een bewegend percentage zoekt dat er niet komt.
 
 ### En de tweede helft zegt iets anders dan verwacht
 
@@ -300,8 +309,13 @@ suggereren die er niet is.
 
 De opzet wil dat een PR faalt als `Identity → RTG Food` wordt geïmporteerd.
 Prachtig, en niet te bouwen zolang `OS.md` par. 4.2 openstaat: er liggen twee
-lagenmodellen in dit huis en de opzet stelt een derde voor, en het woord
-"Capabilities" betekent in twee ervan niet hetzelfde.
+lagenmodellen in dit huis en de opzet stelt een derde voor.
+
+De helft daarvan is inmiddels weg. Het woord dat in twee modellen niet hetzelfde
+betekende, is hernoemd — laag 4 van `PLATFORM.md` heet nu genre-cap, en
+`test/genrecap.test.js` zakt zodra twee lagenmodellen weer een naam delen. Maar
+dat was de naambotsing, niet de keuze: er liggen nog steeds twee modellen naast
+elkaar. Dependency fitness blijft dus wachten, alleen op een kleinere vraag.
 
 Een handhaver op een laagregel vraagt eerst één laagmodel. Wat er wél al is, is
 de meting eronder: `scripts/grenzen.js` meet hoe breed een domein in de gedeelde
@@ -332,21 +346,119 @@ hand gevonden en met de hand opgelost; er is geen meter die het volgende vindt.
 en hij vraagt geen simulatiewereld — hij vraagt een lijst van wat er niet
 afleidbaar mag zijn, en dan de combinaties daartegen houden.
 
+#### ✅ *Gemeten (27 augustus 2026)*
+
+`scripts/afleidbaar.js` stelt die vraag als een pad door een graaf. Niet langs een
+lijst capabilities — die bestaat niet, en `OS.md` heeft net gemeten dat het woord
+hier twintig dingen betekent. Wél langs wat er werkelijk in de code staat: elk
+objectliteraal in `server/` is een stel velden dat **samen reist**. Over alle
+objecten heen levert dat een graaf, en punt 22 is daarin een afstand:
+
+```
+13.309 objecten, 9.129 velden, 78.574 koppelingen
+
+  1 stap   6 harde identificatoren staan RECHTSTREEKS naast een codenaam
+  2 stappen  postcode (via email), rijbewijs (via gast)
+  3 stappen  big (via vlucht → identiteit)
+  buiten bereik  bsn, en dat is de hardste van allemaal
+```
+
+**Het handwerk erna is de helft van het werk**, precies zoals bij de vier
+ontwerpdomeinen in `BEWIJSMACHINE.md` par. 3 — en het verwierp opnieuw de helft:
+
+| plek | wat het is |
+|---|---|
+| `kern/afdelingen/inzage.js` | **bij ontwerp**: dit ís de kluisopvraging, met een kamervlag, een reden en een regel in het inzagejournaal. Een meter die hem niet vond, zou blind zijn |
+| `accounts/users.js` | **bij ontwerp**: de identiteitskluis zelf, de enige plek die beide hoort te kennen |
+| `routes/supplier/verhuur/vloot.js` | **valse treffer**: het kenteken is van de vloot van de verhuurder, niet van de huurder |
+| `kern/bank/bord.js` | **valse treffer**: het IBAN is door RTG uitgegeven, geen externe rekening. De meter kan die twee niet uit elkaar houden en dat is zijn scherpste blinde vlek |
+| `foundation/gezinshulp.js` | **afgeschermd**: de geboortedatum gaat alleen mee achter een vlag (`metGeboortedatum`); een statische meter ziet die voorwaarde niet |
+| `kern/modebezorg/winkel.js` | **verdient een besluit**: codenaam plus bezorgadres blijft staan in de operationele data, tot 20.000 regels, zonder termijn |
+
+Die laatste komt van twee kanten tegelijk binnen: `bewaartermijnen.js` noemt
+`modeBezorg` zelf al als tak **zonder bewaarbeleid**. Dat de afleidbaarheidsmeter
+langs een heel andere weg op dezelfde plek uitkomt, maakt hem geen nieuwe
+bevinding maar wel een dringender bekende.
+
+**Wat deze meter niet zegt**, en dat staat ook in zijn kop: hij meet structuur en
+geen bevoegdheid. Een lid dat naar zijn eigen gegevens kijkt, ziet er hier
+hetzelfde uit als een koppeling. Een pad is een kandidaat; een mens beslist. En
+een pad door een **knooppunt** (een veld als `code`, dat in honderden objecten
+staat) is vrijwel zeker geen koppeling — die staan apart gerapporteerd in plaats
+van weggelaten, want wegpoetsen wat niet uitkomt is precies hoe een meter zijn
+eigen antwoord gaat geven.
+
 ---
 
 ## 5. Wat ontbreekt, en wat het kost
 
-### 5.1 De verbinding (par. 2) — 0%, en dat is de hele opgave
+### 5.1 De verbinding (par. 2) — de rail staat, de wereld nog niet
 
-Alles hierboven hangt hieraan. De goedkoopste eerste stap is niet een
-Simulation Cloud maar **één capability, één invariant, één keer bewezen**: laat
-Magnaat een boeking door `kern/pay/poort.js` doen via een `SyntheticBank` in
-`server/betaal.js`, en laat `scripts/magnaat-pomp.js` zijn geldpompvraag stellen
-aan díé keten in plaats van aan de spelbank.
+Alles hierboven hangt hieraan. De goedkoopste eerste stap was niet een
+Simulation Cloud maar **één capability, één invariant, één keer bewezen**.
 
-Slaagt dat, dan is de meting hierboven niet meer 0% en is er iets bewezen dat
-vandaag niet bewezen is. Slaagt het niet, dan is dát de bevinding, en die is meer
-waard dan een architectuurplaat.
+**De rail staat** (27 augustus 2026): `server/betaal/synthetisch.js` is de vierde
+provider achter de betaalnaad, naast Stripe, Mollie/Adyen en de demo. En
+`kern/pay/poort.js` is er niet voor veranderd — geen letter — want dat was de
+hele inzet.
+
+Wat hij toevoegt boven de demo-provider is precies wat een testhal nodig heeft:
+**hij kan stuk.** De demo bevestigt altijd en bewijst daarmee dat de zonnige dag
+werkt; deze bank kent vier afloopen — `betaald`, `geweigerd`, `traag`,
+`terugboeking` — en kiest er reproduceerbaar een uit de idempotentiesleutel, zodat
+dezelfde boeking in elke run dezelfde afloop geeft. De verdeling (85/7/5/3) is
+een **keuze en geen meting**: ze is gekozen zodat elk pad in een run van redelijke
+omvang voorkomt, niet omdat echt betaalverkeer er zo uitziet.
+
+Drie grendels, alle drie fail-closed, want deze bank maakt geld uit niets: hij
+draait alleen met `RTG_SIMULATIEBANK=1`, weigert zodra er een échte provider
+geconfigureerd is (een simulatie die een werkende rail overschaduwt is erger dan
+geen simulatie), en weigert altijd in productie — ook mét de vlag. Elke weigering
+noemt wélke grendel dichtzit.
+
+En er is met opzet **geen knop in de productieweg**: geen enkele HTTP-route geeft
+een scenario door, want wie een scenario over HTTP kan kiezen, kan een betaling
+laten slagen die niet geslaagd is. `test/simulatiebank.test.js` bewaakt dat, en
+bewaakt ook de poort zelf: die toets zakt zodra `kern/pay/poort.js` een demo-,
+spel- of testvorm gaat kennen. Drie mutaties liepen daar eerst dwars doorheen
+(`demoStand`, `RTG_SPELMODUS`, `isTest`) — de toets is daarop drie keer
+aangescherpt, en dát is waarom hij nu iets betekent.
+
+Het bewijs zelf staat er ook: een lid laadt op via de simulatiebank, een
+geweigerde simulatie levert geen cent op, en het geld dat er wél is gaat door de
+échte waardepoort — dezelfde code als in productie, er is geen tweede pad.
+
+**En Magnaat rijdt er inmiddels op** (fase 2, dezelfde dag).
+`server/kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay in
+plaats van aan de spelbank: `npm run magnaat:pomp:rtg`. Hij staat in de
+Magnaat-WERELD en niet in `scripts/`, want het is Magnaats vraag — en omdat de
+meting van par. 2 kijkt naar wat de modules in die wereld aanroepen.
+
+De keten is van begin tot eind de echte: simulatiebank → `server/betaal.js` →
+`pay.laadOp` → `kern/pay/poort.js` → het grootboek. Vijf met opzet perverse
+volgordes — heen en weer, in een kring, naar jezelf, opgeknipt en weer
+samengevoegd, en twee keer dezelfde tik — en de uitkomst is in alle vijf **exact
+nul verschil** met de sluitcontrole op nul. `dubbelTikken` is de scherpste:
+twintig aangeboden tikken leveren **veertig** grootboekregels op en geen zestig,
+want de tweede aanbieding van dezelfde sleutel boekt niet opnieuw. Dat is
+idempotentie, gemeten in plaats van aangenomen.
+
+**Deze proef ging eerst zelf de mist in, en dat is de vermelding waard**, want het
+is precies de fout waar hij naar zoekt. De eerste versie riep `pay.stuur` aan met
+het verkeerde veld en keek niet naar het antwoord. Elke tik kwam terug met een
+404, en de meter meldde opgewekt dat geen enkel scenario waarde uit het niets
+maakte — over overdrachten die nooit hadden plaatsgevonden. Gevonden door een
+mutatie: het weghalen van de retourtik liet álles groen. Dat kon maar twee dingen
+betekenen, en het was de ergste van de twee.
+
+De reparatie is een tweede meting náást de invariant: het aantal grootboekregels
+per scenario staat als **getal** vast. Want een overdracht tussen spelers laat de
+som per definitie gelijk — de invariant alleen kan een scenario dat werkt niet
+onderscheiden van een dat niets doet.
+
+**Wat dit NIET is:** een koppeling. Geen enkele speelbeurt komt langs RTG Pay;
+`test/magnaat-rtgketen.test.js` toets 7 leest alle spelmodules en zakt zodra er
+één `kern/pay` laadt. Dit is een proefstuk, en het hoort er een te blijven.
 
 ### 5.2 Impact-based testing (punt 12) — de graaf ontbreekt
 
@@ -388,10 +500,10 @@ niet als geheel te beprijzen.
 | fase | wat | waarom nu |
 |---|---|---|
 | ~~**0. De testhal meten**~~ ✅ | `scripts/magnaatlab.js` + `MAGNAATLAB.json`; de uitkomst staat in par. 2 | zonder dit is "Magnaat is onze testhal" een intentie, en de meting zegt 0% |
-| **1. Eén capability erdoorheen** | Magnaat boekt via `kern/pay/poort.js` met een `SyntheticBank` in `server/betaal.js` | par. 5.1 — het bewijst de hele constructie of het weerlegt hem, en het raakt de poort niet aan |
-| **2. Eén invariant verplaatsen** | `magnaat-pomp.js` stelt zijn geldpompvraag aan die keten in plaats van aan de spelbank | de meter bestaat al; alleen zijn onderwerp verandert |
+| ~~**1. Eén capability erdoorheen**~~ ✅ | de simulatiebank staat als vierde rail in `server/betaal/synthetisch.js`; `test/simulatiebank.test.js` laadt op via die rail en geeft het uit door de ECHTE waardepoort | par. 5.1 — het bewijst de hele constructie, en de poort is er niet voor veranderd |
+| ~~**2. Eén invariant verplaatsen**~~ ✅ | `npm run magnaat:pomp:rtg` stelt de geldpompvraag aan RTG Pay via de simulatiebank; vijf perverse volgordes, exact nul verschil, en de idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels) | de meter bestond al; alleen zijn onderwerp veranderde |
 | **3. De twee werelden wegen** | is `hospitality-universe` een tweede wereld of een tweede ingang? | par. 2 — vóór er een derde bij komt, niet erna |
-| **4. Afleidbaarheid meten** | punt 22: wat mag uit combinaties NIET afleidbaar zijn | par. 4.6 — het meeste rendement per dag, en geen wereld voor nodig |
+| ~~**4. Afleidbaarheid meten**~~ ✅ | `scripts/afleidbaar.js`: 6 identificatoren rechtstreeks naast een codenaam, 2 in twee stappen, bsn buiten bereik — en het handwerk verwierp de helft | par. 4.6 — het meeste rendement per dag, en er was geen wereld voor nodig |
 | **5. Pas dan een poort** | een risicoklasse-gebonden regel in `npm run check` | par. 4.1 — een poort die niets aanraakt keurt goed op grond van niets |
 | **6. De wereld opschalen** | tiers, scenario-ID's, permanente universes | pas zinvol als 1 t/m 5 staan |
 
@@ -421,5 +533,5 @@ toevoeging is hij vandaag niet waar:
 > Nothing critical reaches RTG production without first surviving RTG itself —
 > **en wat Magnaat niet aanroept, heeft Magnaat niet overleefd.**
 
-Vandaag is dat 0% van 410 domeinen. Dat getal is de opgave, en het is ook de
+Vandaag is dat 0% van 412 domeinen. Dat getal is de opgave, en het is ook de
 enige eerlijke maat voor de voortgang.

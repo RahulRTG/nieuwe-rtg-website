@@ -61,12 +61,27 @@ if (ADYEN_KEY && !BETALEN_UIT) {
   try { adyen = require('./adyen')(ADYEN_KEY); }
   catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
 }
+/* DE VIERDE RAIL: de simulatiebank van de testhal (./betaal/synthetisch.js).
+
+   MAGNAATLAB.md par. 3: een simulatie-adapter vervangt de RAIL, nooit de POORT.
+   kern/pay/poort.js kent geen enkele demo-, test- of spelstand en dat blijft zo;
+   de naad waar een vierde provider in past, is deze. Hij weigert zichzelf zodra
+   er een echte provider staat, en altijd in productie -- zie de drie grendels
+   daar. */
+const echteRail = stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen' : null;
+const simulatie = require('./betaal/synthetisch')({ crypto, env: process.env, echteRail });
+const SIMULATIE_AAN = simulatie.aan() && !BETALEN_UIT;
+
 const voorkeur = String(process.env.PAYMENT_PROVIDER || '').toLowerCase();
 const AANBIEDER = BETALEN_UIT ? 'uit'
   : voorkeur === 'mollie' && mollie ? 'mollie'
   : voorkeur === 'adyen' && adyen ? 'adyen'
   : voorkeur === 'stripe' && stripe ? 'stripe'
   : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen'
+  /* De simulatiebank gaat VOOR de demo als hij bewust aan staat. Een testhal die
+     stilzwijgend de altijd-slaagt-demo krijgt, bewijst dat de zonnige dag werkt
+     en verder niets -- en dat is precies de dag waarop niemand een fout maakt. */
+  : SIMULATIE_AAN ? 'simulatie'
   : DEMO_BETALEN ? 'demo' : 'uit';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
@@ -82,7 +97,7 @@ function koppelStore(store) {
 
 const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v),
-  env: process.env, uit: BETALEN_UIT });
+  env: process.env, uit: BETALEN_UIT, simulatie: BETALEN_UIT ? null : simulatie });
 const {
   maakBetaling: maakProviderBetaling,
   haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
@@ -139,47 +154,13 @@ async function maakUitbetaling(opdracht) {
   return res;
 }
 
-/* Verifieer een inkomende provider-webhook en geef de gebeurtenis terug.
-   - Stripe met secret: officiële handtekeningcontrole (gooit bij twijfel).
-   - Demo met secret: HMAC-SHA256 over de ruwe body, constant-tijd vergeleken.
-   - Zonder secret (lokaal): body wordt alleen geparsed; NB: zet in productie
-     altijd een secret, anders is de webhook niet te vertrouwen. */
-function verifieerWebhook(ruweBody, handtekening) {
-  if (BETALEN_UIT)
-    throw new Error('Betaalwebhook geweigerd: betalen staat bewust uitgeschakeld.');
-  const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
-  if (stripe && WEBHOOK_SECRET) {
-    return stripe.webhooks.constructEvent(buf, handtekening, WEBHOOK_SECRET);
-  }
-  /* ZONDER SECRET IN PRODUCTIE: WEIGEREN.
-
-     Hier stond alleen een waarschuwing in het commentaar hierboven ("zet in
-     productie altijd een secret"). Dat is precies het soort belofte waar niets
-     van afhangt: zonder secret viel de code door naar JSON.parse en gaf de
-     webhook een onondertekend bericht terug als geverifieerde waarheid. Wie het
-     adres kent, kan dan zelf "betaald" roepen.
-
-     De poortwacht-ronde vond dit doordat /api/betaal/webhook anoniem 200 gaf.
-     Buiten productie blijft de doorval bestaan -- daar draait alles op
-     demo-geld en zou een verplicht secret elke lokale start blokkeren. */
-  if (!WEBHOOK_SECRET && process.env.NODE_ENV === 'production')
-    throw new Error('Webhook geweigerd: er is geen webhook-secret ingesteld, dus dit bericht is niet te vertrouwen.');
-  if (WEBHOOK_SECRET) {
-    const verwacht = crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
-    const gegeven = Buffer.from(String(handtekening || ''), 'utf8');
-    const goed = gegeven.length === verwacht.length &&
-      crypto.timingSafeEqual(Buffer.from(verwacht, 'utf8'), gegeven);
-    if (!goed) throw new Error('Ongeldige webhook-handtekening.');
-  }
-  return JSON.parse(buf.toString('utf8'));
-}
-
-// Hulp om zelf een geldige demo-handtekening te maken (tests, en de eigen
-// interne webhook-doorgifte in demo-stand).
-function tekenDemo(ruweBody) {
-  const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
-  return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
-}
+/* De webhook van buiten woont in ./betaal/webhook.js -- dat is de kant die
+   BINNENKOMT, en die snede houdt dit bestand onder de grens van keuringsregel 13.
+   De regel die daar geldt is de belangrijkste van de hele betaalkant en staat er
+   uitgeschreven: de client mag een betaling starten, nooit zichzelf betaald
+   noemen. */
+const { verifieerWebhook, tekenDemo } = require('./betaal/webhook')({
+  crypto, stripe, BETALEN_UIT, WEBHOOK_SECRET, env: process.env });
 
 module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   maakBetaling, haalBetaling, maakTerugbetaling, maakUitbetaling,
@@ -187,6 +168,7 @@ module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
   zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,
   WEBHOOK_SECRET, MOLLIE_AAN: !!mollie, ADYEN_AAN: !!adyen,
+  SIMULATIE_AAN, simulatieBelet: () => simulatie.belet(),
   adyenMerchantAccount: adyen && adyen.merchantAccount,
   adyenHandmatigeCapture: !!(adyen && adyen.handmatigeCapture),
   verifieerAdyenMelding: (item) => !!(adyen && adyen.verifieerMelding(item)) };

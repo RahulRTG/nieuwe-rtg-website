@@ -54,11 +54,21 @@ const norm = (s) => String(s || '')
   .replace(/\*\*/g, '').replace(/`/g, '')
   .replace(/\s+/g, ' ').trim().toLowerCase();
 
-/* EEN LAAGTABEL herken je aan haar rijen: "| 4 — Genre-caps | ..." of, met
-   nadruk, "| **1 — Specialistische apps** | ...". Het streepje is een kastlijn
-   (—) en niet het koppelteken in "genre-caps" zelf; daarom staat er spatie
-   omheen in het patroon. */
-const RIJ = /^\|\s*\*{0,2}\s*(\d+)\s*—\s*([^|]+?)\s*\*{0,2}\s*\|/;
+/* EEN LAAGTABEL herken je aan haar rijen: een nummer, een kastlijn en een naam.
+   Met nadruk mag ook: "| **1 (kastlijn) Specialistische apps** | ...".
+
+   HET SCHEIDINGSTEKEN STAAT HIER ALS CODEPUNT, en dat is geen omslachtigheid.
+   Keuringsregel 3 verbiedt brede streepjes in de bron van dit huis (huisstijl),
+   maar de MARKDOWN-tabellen die deze meter leest gebruiken er wel een. Een meter
+   die het teken moet herkennen dat hij zelf niet mag dragen, bouwt het op --
+   precies zoals scripts/check.js dat voor diezelfde regel doet. Een blinde
+   zoek-en-vervang zette hier een keer twee koppeltekens neer, en toen vond deze
+   meter geen enkel lagenmodel meer en meldde opgewekt "geen botsing".
+
+   Het koppelteken in "genre-caps" is een ander teken; daarom hoeft er geen
+   spatie omheen te staan in het patroon. */
+const KASTLIJN = String.fromCharCode(0x2014);
+const RIJ = new RegExp('^\\|\\s*\\*{0,2}\\s*(\\d+)\\s*' + KASTLIJN + '\\s*([^|]+?)\\s*\\*{0,2}\\s*\\|');
 
 function lagenUitTabel(tekst) {
   const uit = [];
@@ -131,7 +141,7 @@ function analyse({ modellen, citaten }) {
     /* Een rij die geen bestaand model citeert, INTRODUCEERT er een. Zo komt het
        voorstel uit OS.md ("deze opzet") in de vergelijking terecht zonder dat
        het ergens anders als tabel hoeft te staan. */
-    const naam = c.waar + ' — ' + c.bron;
+    const naam = c.waar + ' -- ' + c.bron;
     alle[naam] = c.lagen;
     zonderBron.push({ naam, merk: c.merk });
   }

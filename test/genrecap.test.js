@@ -129,10 +129,20 @@ test('5. tegenproef: een citatie die afwijkt van zijn bron, wordt gemeld', () =>
 
 test('6. de meter leest beide schrijfwijzen van een laagrij', () => {
   /* PLATFORM.md par. 0b zet zijn laagnamen vet, par. 2 niet. Een meter die er
-     maar een kent, mist een heel model en meldt daarna vrolijk "geen botsing". */
-  assert.deepEqual(L.lagenUitTabel('| 4 — Genre-caps | x | y |'), [{ nummer: 4, naam: 'genre-caps' }]);
-  assert.deepEqual(L.lagenUitTabel('| **1 — Specialistische apps** | x | y |'),
+     maar een kent, mist een heel model en meldt daarna vrolijk "geen botsing".
+
+     De kastlijn staat hier als codepunt en niet als teken: keuringsregel 3
+     verbiedt hem in de bron van dit huis, terwijl de markdown die de meter leest
+     hem wel gebruikt. Met twee koppeltekens zou deze toets groen blijven op een
+     meter die in de echte documenten niets meer vindt -- en dat is precies de
+     toets die niets bewijst. */
+  const K = String.fromCharCode(0x2014);
+  assert.deepEqual(L.lagenUitTabel('| 4 ' + K + ' Genre-caps | x | y |'),
+    [{ nummer: 4, naam: 'genre-caps' }]);
+  assert.deepEqual(L.lagenUitTabel('| **1 ' + K + ' Specialistische apps** | x | y |'),
     [{ nummer: 1, naam: 'specialistische apps' }]);
+  assert.deepEqual(L.lagenUitTabel('| 4 -- Genre-caps | x | y |'), [],
+    'twee koppeltekens zijn geen kastlijn');
   assert.deepEqual(L.lagenUitTabel('| geen laagrij | x |'), []);
 });
 

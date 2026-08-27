@@ -262,7 +262,7 @@ if (require.main === module) {
       console.log('\n' + kop);
       for (const g of lijst) {
         console.log('  ' + g.veld + '  (' + g.stappen + ' stap' + (g.stappen === 1 ? '' : 'pen') +
-          (g.viaKnooppunt ? ', via een knooppunt met graad ' + g.hoogsteGraad : '') + ')  — ' + g.waarom);
+          (g.viaKnooppunt ? ', via een knooppunt met graad ' + g.hoogsteGraad : '') + ')  -- ' + g.waarom);
         console.log('      pad: ' + g.pad.join(' → '));
         g.bestanden.forEach((b, i) => console.log('        ' + g.pad[i] + '+' + g.pad[i + 1] + ': ' + b.join(', ')));
       }

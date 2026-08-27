@@ -78,12 +78,12 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
 ### De uitkomst
 
 ```
-65 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
-   magnaat        62 modules
+66 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
+   magnaat        63 modules
    hospitality     3 modules
 
 1. HET BEREIK
-   115 requires in de simulatielaag
+   116 requires in de simulatielaag
      2 kernmodules geraakt, in 2 van 412 domeinen       (0%)
      0 modules doen een netwerkaanroep                  (de ontsnapping wordt niet gebruikt)
      3 aanroepen van de ene synthetische wereld naar de andere
@@ -104,8 +104,9 @@ niet `kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
 schreef bij fase 2 op: *"Slaagt dat, dan is de meting hierboven niet meer 0%."*
 Dat klopte niet. Twee van 412 domeinen rondt af op 0%, en één capability is nu
 eenmaal geen percentage. Wat er wél veranderde is de **lijst**: `kern/pay` staat
-erin, bij naam, en dat is de bewering die iemand kan natrekken. Een verhoudingsgetal over 412 domeinen is te grof om één verbinding te registreren — dat is een
-eigenschap van de meter en geen tegenvaller, en het staat hier zodat de volgende
+erin, bij naam, en dat is de bewering die iemand kan natrekken. Een
+verhoudingsgetal over 412 domeinen is te grof om één verbinding te registreren —
+dat is een eigenschap van de meter en geen tegenvaller, en het staat hier zodat de volgende
 lezer niet naar een bewegend percentage zoekt dat er niet komt.
 
 ### En de tweede helft zegt iets anders dan verwacht

@@ -1,10 +1,10 @@
 {
-  "simulatiemodules": 65,
+  "simulatiemodules": 66,
   "kernmodules": 1400,
   "kernDomeinen": 412,
   "perWereld": {
     "magnaat": {
-      "modules": 62,
+      "modules": 63,
       "regels": 0,
       "raaktKern": 2
     },
@@ -14,7 +14,7 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 115,
+  "requiresTotaal": 116,
   "geraakteKernmodules": 2,
   "geraakteKernDomeinen": 2,
   "bereikPct": 0,

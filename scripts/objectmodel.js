@@ -231,7 +231,12 @@ function analyse(vormen, bestandenTel, opties) {
 
 function meet() { const g = lees(); return analyse(g.vormen, g.bestanden); }
 
-module.exports = { meet, lees, analyse, vormenVan, wring, domeinVan };
+/* `bestanden` en `GEEN` staan hier ook in de uitvoer omdat scripts/commerce.js
+   dezelfde boom afloopt met dezelfde uitsluitingen. Die lijst is duur betaald --
+   seedbestanden gaven 2227 valse vormparen, en zz-proefbestanden lieten de meter
+   per ronde een ander getal geven. Een tweede meter met een eigen kopie van die
+   lijst loopt er per definitie op achter (LAT-regel 4). */
+module.exports = { meet, lees, analyse, vormenVan, wring, domeinVan, bestanden, GEEN, BRONNEN };
 
 if (require.main === module) {
   const r = meet();

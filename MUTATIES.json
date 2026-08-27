@@ -1053,6 +1053,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "commerce.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/commerce.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "concern-voorstel.test.js": {
       "soort": "puur",
       "staat": "gezakt",

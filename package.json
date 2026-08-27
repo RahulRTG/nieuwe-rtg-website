@@ -86,6 +86,8 @@
     "capabilities:vast": "node scripts/capabilities.js --vastleggen",
     "magnaatlab": "node scripts/magnaatlab.js",
     "magnaatlab:vast": "node scripts/magnaatlab.js --vastleggen",
+    "commerce": "node scripts/commerce.js",
+    "commerce:vast": "node scripts/commerce.js --vastleggen",
     "semantiek": "node scripts/semantiek.js",
     "semantiek:vast": "node scripts/semantiek.js --vastleggen",
     "belofte": "node scripts/belofte.js",

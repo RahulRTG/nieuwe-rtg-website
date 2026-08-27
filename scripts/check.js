@@ -3596,20 +3596,26 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
      De melding NOEMT WAT ER VERSCHILT en niet alleen dat er iets verschilt. Een
      keuring die "loopt achter" zegt over een afdruk met tien blokken, stuurt je
      zelf op zoek; dat is precies het half uur dat deze regel hoort te schelen. */
-  try {
-    const doel = path.join(ROOT, 'OBJECTMODEL.json');
-    const model = require('./objectmodel');
-    const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
-    const vers = model.meet();
-    /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
-       ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
-       sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
-       meting is net zo goed achterstand. */
-    const blokken = [...new Set([...Object.keys(opSchijf || {}), ...Object.keys(vers)])]
-      .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
-    const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
-    if (opSchijf === null) fout('OBJECTMODEL.json bestaat niet -- draai: npm run objectmodel:vast');
-    else {
+  /* TWEE AFDRUKKEN, EEN VERGELIJKING. COMMERCE.json (scripts/commerce.js) draagt
+     precies dezelfde vorm als OBJECTMODEL.json -- een `uitleg`, een `vastgelegd`
+     en daaronder blokken waarvan er een `gemeten` heet -- en hoort dus langs
+     dezelfde controle. Die controle twee keer uitschrijven is de fout waar
+     LAT-regel 4 over gaat, en hier met een scherp randje: de vereniging van
+     beide sleutelverzamelingen hieronder is zelf een reparatie van een eerdere
+     ronde, en een kopie zou die reparatie precies EEN keer dragen. */
+  const afdrukGelijk = ({ bestand, meter, vast, zeg }) => {
+    try {
+      const doel = path.join(ROOT, bestand);
+      const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
+      const vers = meter();
+      if (opSchijf === null) { fout(bestand + ' bestaat niet -- draai: ' + vast); return; }
+      /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
+         ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
+         sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
+         meting is net zo goed achterstand. */
+      const blokken = [...new Set([...Object.keys(opSchijf), ...Object.keys(vers)])]
+        .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
+      const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
       const verschil = [];
       for (const k of blokken) {
         if (!anders(opSchijf[k], vers[k])) continue;
@@ -3620,21 +3626,29 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
            hieronder geen enkel verschil opleveren -- en dan meldt de regel
            doodleuk dat alles in orde is. */
         const was = opSchijf.gemeten || {};
-        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten)])) {
-          if (was[m] !== vers.gemeten[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + vers.gemeten[m]);
+        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten || {})])) {
+          if (was[m] !== (vers.gemeten || {})[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + (vers.gemeten || {})[m]);
         }
       }
-      if (verschil.length) {
-        fout('OBJECTMODEL.json loopt achter op de meting (' + verschil.join('; ') +
-          ') -- draai: npm run objectmodel:vast');
-      } else {
-        ok(vers.gemeten.vormen + ' bewaarde vormen in ' + vers.gemeten.bestanden +
-          ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan');
-      }
+      if (verschil.length) fout(bestand + ' loopt achter op de meting (' + verschil.join('; ') + ') -- draai: ' + vast);
+      else ok(zeg(vers));
+    } catch (e) {
+      fout(bestand + ' kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
     }
-  } catch (e) {
-    fout('het objectmodel kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
-  }
+  };
+
+  afdrukGelijk({
+    bestand: 'OBJECTMODEL.json', meter: () => require('./objectmodel').meet(),
+    vast: 'npm run objectmodel:vast',
+    zeg: (v) => v.gemeten.vormen + ' bewaarde vormen in ' + v.gemeten.bestanden +
+      ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan'
+  });
+  afdrukGelijk({
+    bestand: 'COMMERCE.json', meter: () => require('./commerce').meet(),
+    vast: 'npm run commerce:vast',
+    zeg: (v) => v.gemeten.koopbareVormen + ' koopbare vormen in ' + v.gemeten.koopbareDomeinen +
+      ' domeinen, ' + v.gemeten.werkwoordenVolledig + ' domeinen met alle acht werkwoorden, en COMMERCE.json is daar in elk blok gelijk aan'
+  });
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

@@ -185,6 +185,9 @@ if (require.main === module) {
       : 'BEWIJS.md loopt achter op de toetsen. Draai: node scripts/bewijs.js');
     process.exit(1);
   }
+  /* Niet schrijven terwijl er toetsen draaien: dan legt deze afdruk hun
+     tijdelijke bestanden vast. Zie scripts/lib/schonebron.js. */
+  require('./lib/schonebron').eisSchoneBron('BEWIJS.md');
   fs.writeFileSync(DOEL, tekst);
   console.log('BEWIJS.md geschreven (' + tekst.split('\n').length + ' regels).');
 }

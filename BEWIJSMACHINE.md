@@ -158,6 +158,33 @@ andere methode, andere drempels — en ze komen op hetzelfde viertal uit.
 Wie het eerste gedeelde objecttype van de Developer Cloud gaat bouwen, begint
 hier — en niet bij een type dat iemand heeft bedacht.
 
+### Het handwerk aan die vier domeinen, en wat het opleverde
+
+De meting wijst aan; een mens beslist. Dat handwerk is gedaan, en het antwoord is
+scherper dan "één type of niet":
+
+| | uitvoering | oordeel |
+|---|---|---|
+| `hash`, `kies`, `palet` | **één**, vier keer gekopieerd | echte dubbeling — samenvoegen |
+| de opdrachtvorm `{ vakgebied, naam, brief }` | gedeeld, met `ontwerpen[]` en `collecties[]` | gedeeld type |
+| `maakConcept` | **vier verschillende** | het domeinwerk zelf — moet blijven |
+| `STATUS` | drie varianten | alle vier van `schets` naar `archief`, maar het midden is vakvocabulaire |
+| `PALET` | vier eigen paletten | van de 16 kleuren delen er **2** over alle vier |
+
+Drie van de vier noemen hun vakgebied `DISCIPLINES`, atelier `CATEGORIEEN` —
+dezelfde rol, een andere naam. Dat is een botsing in het klein, binnen wat verder
+één familie is.
+
+**En het handwerk vond een gebrek in de meter zelf.** `PALET` werd als één
+betekenis over vier plekken gemeld, door enkelvoudige koppeling: studio en
+hardwarelab overlappen 0,60 en trekken architect en atelier het cluster in,
+terwijl die onderling maar **0,14** delen. Een architect werkt met travertijn en
+zichtbeton, een atelier met inkt-navy en kameel; die samenvoegen zou weghalen wat
+ze onderscheidt — de `Asset`-fout in het klein.
+
+Dat staat nu in de kop van `scripts/semantiek.js`: een cluster is een aanwijzing
+dat er iets te bekijken valt, nooit een bewijs dat het één ding is.
+
 ### Wat de meting al heeft opgeleverd: de paswaarheid stond op vier plekken
 
 Bij het nalopen van de dubbelingen kwam er een boven die het document niet
@@ -390,7 +417,7 @@ met een eigen klok).
 | ~~**0. De semantiek meten**~~ ✅ | `scripts/semantiek.js` + `SEMANTIEK.json`; de uitkomst staat in par. 3 | zonder dit is een Semantic Registry een la of infrastructuur, en niemand die weet welke |
 | ~~**1. De eerste dubbeling**~~ ✅ | de paswaarheid stond op vier plekken; nu één module (`kern/passen.js`), met `BETALEND` afgeleid. Drie mutaties raak | par. 3 — en de meter bewoog mee: 111 → 101 naamloze dubbelingen |
 | **2. De rest van de 28 + 101** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
-| **3. De vier ontwerpdomeinen** | `architect`, `atelier`, `hardwarelab`, `studio` — het eerste echte gedeelde type | par. 3 — twee onafhankelijke metingen wijzen erheen |
+| ~~**3. De vier ontwerpdomeinen wegen**~~ ✅ | met de hand nagelopen: `hash`, `kies` en `palet` zijn één uitvoering in vier kopieën; `maakConcept`, `PALET` en `STATUS` zijn terecht verschillend | par. 3 — en het legde een ketenings­gebrek in de meter zelf bloot |
 | **4. Het register uit de code afleiden** | niet ernaast schrijven; het patroon van `WETTEN.json` (bron + handhaver + sabotage) | par. 4.2 — anders wordt het register zelf de 78ste botsing |
 | **5. De zoeker** | invoervolgordes genereren tegen de wetten die er al staan | par. 5.2 — de wetten staan, de zoeker niet |
 | **6. Tijd vooruit** | kan een account na jaren mutaties nog volledig weg | par. 5.3 — een belofte die nooit is beproefd |

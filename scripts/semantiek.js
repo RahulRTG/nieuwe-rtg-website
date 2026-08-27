@@ -62,6 +62,23 @@
      "uit elkaar gelopen" leest deze meter niet; dat leest een mens in de twee
      bestanden. Daarom staat bij elke botsing waar hij vandaan komt.
 
+   - HET CLUSTEREN KETENT, en dat is de zwakste plek van de uitkomst. De
+     groepering hieronder gebruikt ENKELVOUDIGE KOPPELING: A en B horen bij
+     elkaar zodra ze meer dan de drempel delen. Daardoor kan C via B bij A
+     belanden terwijl A en C elkaar nauwelijks raken.
+
+     Dat is geen theorie. Bij het handmatig nalopen van `PALET` bleek precies
+     dit: studio en hardwarelab overlappen 0,60, en trokken architect en atelier
+     mee in een cluster terwijl die onderling maar 0,14 delen. De meter meldde
+     "een betekenis op vier plekken"; in werkelijkheid heeft elk van de vier zijn
+     eigen palet van zestien kleuren, waarvan er TWEE door alle vier gedeeld
+     worden. Een architect werkt met travertijn en zichtbeton, een atelier met
+     inkt-navy en kameel -- die samenvoegen zou weghalen wat ze onderscheidt.
+
+     Een cluster is dus een AANWIJZING dat er iets te bekijken valt, en nooit een
+     bewijs dat het een ding is. Wie een cluster wil samenvoegen, legt eerst de
+     leden van de uiterste twee naast elkaar.
+
    Draai: node scripts/semantiek.js            (leesbaar)
           node scripts/semantiek.js --json     (voor de ratel)
           npm run semantiek:vast               (schrijft SEMANTIEK.json)

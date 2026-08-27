@@ -29,6 +29,7 @@ const crypto = require('node:crypto');
 
 const { maakRegister } = require('../server/kern/command/register');
 const { maakOvername } = require('../server/kern/command/overname');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const REGISTER = maakRegister([
   { type: 'zaak', label: 'Zaak', meervoud: 'zaken', domein: 'handel',
@@ -38,7 +39,7 @@ const REGISTER = maakRegister([
 function maak() {
   const db = { data: { suppliers: [{ code: 'ONS-1', name: 'Van onszelf' }] } };
   const regels = [];
-  const overname = maakOvername({ db, save: () => {}, crypto,
+  const overname = maakOvername({ db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto,
     journaal: { noteer: r => regels.push(r) }, register: REGISTER });
   return { db, overname, regels };
 }

@@ -55,12 +55,12 @@ function afstand(a, b) {
   return Math.round(2 * R * Math.asin(Math.sqrt(q)));
 }
 
-function maakMdm({ db, save, journaal, partijen, plaatsNorm }) {
+function maakMdm({ db, save, journaal, partijen, plaatsNorm, opslag }) {
   const PARTIJEN = Array.isArray(partijen) ? partijen : [];
   const plaats = typeof plaatsNorm === 'function' ? plaatsNorm : (v => String(v || '').toLowerCase().trim());
 
   const rijen = (p) => {
-    const v = db.data ? db.data[p.collectie] : null;
+    const v = opslag.vak()[p.collectie] || null;
     return Array.isArray(v) ? v.slice(0, MAX_RIJEN) : [];
   };
 
@@ -162,7 +162,7 @@ function maakMdm({ db, save, journaal, partijen, plaatsNorm }) {
      GEMETEN wie op elkaar lijkt, daar wordt er iets mee gedaan. Die twee horen
      uit elkaar omdat de meting altijd mag draaien en het samenvoegen nooit
      vanzelf. */
-  const samen = require('./mdmsamen').maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s });
+  const samen = require('./mdmsamen').maakSamen({ db, save, journaal, PARTIJEN, bedrijven, partijen0, s, opslag });
 
   function meet() {
     const b = bedrijven();

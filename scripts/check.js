@@ -3818,6 +3818,7 @@ console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
    Deze poort vangt de terugval. */
 console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eigen deur');
 {
+  const { lex } = require('./ast/lexer');
   const GECONTRACTEERD = [
     { map: 'server/kern/payroll', deur: 'opslag.js',
       waarom: 'eerste contractlaag; elf schrijvers over veertien bestanden, dertien collecties' },
@@ -3826,10 +3827,28 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
     { map: 'server/kern/veiligheid', deur: 'opslag.js',
       waarom: 'zeven schrijvers; wortel met takken, plus twee plekken die een tak VERVANGEN' },
     { map: 'server/kern/mobiliteit', deur: 'opslag.js',
-      waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' }
+      waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' },
+    { map: 'server/kern/command', deur: 'opslag.js',
+      waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
+      ook: {
+        /* register.js is een ZUIVERE module: hij krijgt zijn gegevensbron als
+           argument mee (rijen(db, soort)) en heeft geen fabriek waar een
+           contract in past. Hem omzetten betekent het lees(db)-contract
+           wijzigen, en dat contract dragen OOK kern/zaakcommand/register.js en
+           kern/werkcommand/register.js. Dat is een ontwerpvraag over drie
+           domeinen en geen migratie; zie ./opslag.js voor de volledige
+           afweging. Zolang hij hier staat, kan er geen tweede bij komen zonder
+           dat deze regel rood wordt. */
+        'register.js': 'zuivere module; zijn lees(db)-contract wordt gedeeld met zaakcommand en werkcommand'
+      } }
   ];
 
   for (const dom of GECONTRACTEERD) {
+    /* Een BENOEMDE uitzondering, met reden -- dezelfde vorm als MAG_ZONDER in
+       regel 16 en TOEGESTAAN in regel 47. Een bestand dat hier staat mag
+       db.data aanraken; een bestand dat hier NIET staat niet, en dat is het
+       verschil met geen poort. Wie er een bij zet, schrijft op waarom. */
+    const ook = new Set(Object.keys(dom.ook || {}));
     const wortel = path.join(ROOT, dom.map);
     if (!fs.existsSync(wortel)) { fout(dom.map + ' bestaat niet, maar staat wel als gecontracteerd'); continue; }
     const deurPad = path.join(wortel, dom.deur);
@@ -3840,14 +3859,36 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
       const rel = path.relative(ROOT, f).replace(/\\/g, '/');
       gekeken++;
       if (rel === path.posix.join(dom.map, dom.deur)) return;      // de deur zelf
-      const bron = fs.readFileSync(f, 'utf8');
-      if (!/\bdb\.data\b/.test(bron)) return;
+      if (ook.has(path.posix.basename(rel))) return;               // benoemd, met reden
+      /* CODE LEZEN EN GEEN PROZA, VIA DE LEXER. Keuringsregel 47 heeft deze
+         fout een keer gemaakt (TAKEN.md 6.17): hij las de RAUWE bron en meldde
+         een bestand als overtreder omdat de naam in een KOP stond die uitlegt
+         waarom het daar juist NIET gebeurt.
+
+         Commentaar wegstrippen is hier niet genoeg. kern/command/landpakket.js
+         draagt `bron: 'db.data.talen'` als STRINGWAARDE -- een gegeven dat
+         vertelt waar een feit vandaan komt, en geen aanraking. De lexer kent
+         het verschil tussen een naam en een string, dus zoeken we de tokenreeks
+         db . data en niet een patroon in tekst. */
+      const ruw = fs.readFileSync(f, 'utf8');
+      let toks;
+      try { toks = lex(ruw); }
+      catch (e) { fout('kon ' + rel + ' niet lezen (' + e.message + '); daar stelt deze regel niets vast'); return; }
+      let regelNr = 0;
+      for (let i = 0; i + 2 < toks.length; i++) {
+        if (toks[i].type === 'naam' && toks[i].value === 'db' &&
+            toks[i + 1].type === 'lees' && toks[i + 1].value === '.' &&
+            toks[i + 2].type === 'naam' && toks[i + 2].value === 'data') { regelNr = toks[i].lijn; break; }
+      }
+      if (!regelNr) return;
       langs++;
-      const regelNr = bron.split('\n').findIndex(r => /\bdb\.data\b/.test(r)) + 1;
       fout('langs de deur: ' + rel + ':' + regelNr + ' raakt db.data rechtstreeks aan -- ' +
         'dit domein gaat door ' + dom.map + '/' + dom.deur);
     });
-    if (!langs) ok(dom.map + ': ' + (gekeken - 1) + ' bestanden, geen enkele raakt db.data buiten ' + dom.deur);
+    if (!langs) {
+      const erbij = ook.size ? ' (plus ' + ook.size + ' benoemde uitzondering(en))' : '';
+      ok(dom.map + ': ' + (gekeken - 1 - ook.size) + ' bestanden, geen enkele raakt db.data buiten ' + dom.deur + erbij);
+    }
   }
 }
 

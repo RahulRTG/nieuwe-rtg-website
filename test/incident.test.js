@@ -43,6 +43,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakIncidenten } = require('../server/kern/command/incident');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 /* Een gezondheidskaart die je zelf zet. De motor leest er alleen uit; alles wat
    hij over een storing zegt, moet uit deze bevindingen komen. */
@@ -70,7 +71,7 @@ function opstelling(oordelen, extra) {
   const regels = [];
   const journaal = { noteer: (r) => regels.push(r), overObject: (t, i) => regels.filter(r => r.objectId === i) };
   let kaart = kaartMet(oordelen || {}, extra);
-  const inc = maakIncidenten({ db, save() {}, journaal, gezondheid: { stand: () => kaart.stand() } });
+  const inc = maakIncidenten({ db, opslag: maakCmdOpslag({ db }), save() {}, journaal, gezondheid: { stand: () => kaart.stand() } });
   return { db, regels, inc, zet: (o, e) => { kaart = kaartMet(o, e); } };
 }
 

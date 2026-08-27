@@ -29,7 +29,7 @@
    dan gelooft niemand meer welk van de twee. */
 'use strict';
 
-function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice, tenant }) {
+function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOffice, tenant, opslag }) {
   /* De sonde levert de metingen van BUITENAF en de SLO-meter houdt het
      foutbudget bij; ze staan in deze volgorde omdat de meter de sonde erbij zet
      en niet andersom. De reizen komen uit dezelfde SLO.json als de doelen, via
@@ -37,7 +37,7 @@ function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOff
      reizen dat langzaam iets anders gaat toetsen. */
   const slolaag = require('./slo');
   const sonde = require('./sonde').maakSonde({ db, save,
-    reizen: () => slolaag.laadNorm().reizen || [] });
+    reizen: () => slolaag.laadNorm().reizen || [], opslag });
   const slo = slolaag.maakSlo({ meting: require('../../meting'), sonde });
 
   /* HET ALARM. Hij meet niets zelf: elke controle leest een laag die er al is.
@@ -46,18 +46,18 @@ function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOff
      de module -- een regeltaal in een configuratiebestand is een tweede
      implementatie die je niet kunt toetsen. */
   const alarm = require('./alarm').maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit,
-    norm: () => slolaag.laadNorm(), sein: sseToOffice });
+    norm: () => slolaag.laadNorm(), sein: sseToOffice, opslag });
   alarm.tikker();
 
   /* DE GEZONDHEIDSKAART. Niet "wat staat er in de gegevens" (dat is ./puls.js)
      maar "doen de vermogens het, en hoe hard is dat bewijs". Hij hangt hier
      onderaan omdat hij de drie hierboven leest en zelf niets meet. */
-  const gezondheid = require('./gezondheid').maakGezondheid({ db, save, slo, sonde, alarm, kwaliteit, journaal });
+  const gezondheid = require('./gezondheid').maakGezondheid({ opslag, save, slo, sonde, alarm, kwaliteit, journaal });
 
   /* HET INCIDENT. Hij leest de gezondheidskaart en niets anders; hij meet dus
      ook niets zelf. De machine OPENT hier en een mens SLUIT: een incident dat
      zichzelf sluit, laat een storing achter zonder conclusie. */
-  const incident = require('./incident').maakIncidenten({ db, save, journaal, gezondheid });
+  const incident = require('./incident').maakIncidenten({ db, save, journaal, gezondheid, opslag });
 
   /* BIJSTAND EN HET VLOOTBEELD. Ze staan hier omdat ze allebei op de
      gezondheidskaart en het incident leunen, en niet omgekeerd. De tenantlaag
@@ -69,7 +69,7 @@ function maakMeetlagen({ db, save, crypto, journaal, kwaliteit, canary, sseToOff
      bijstand.js zelf mogen lezen, dan zou elke nieuwe knop daar zijn eigen
      leespad kunnen maken. */
   const diagnose = require('./bijstand-diagnose').maakDiagnose({ tenant, gezondheid, incident });
-  const bijstand = require('./bijstand').maakBijstand({ db, save, crypto, journaal, tenant, diagnose });
+  const bijstand = require('./bijstand').maakBijstand({ db, save, crypto, journaal, tenant, diagnose, opslag });
   const vlootbeeld = require('./vlootbeeld').maakVlootbeeld({ tenant, incident, bijstand, gezondheid });
 
   return { sonde, slo, alarm, gezondheid, incident, bijstand, vlootbeeld, diagnose, slolaag };

@@ -13,12 +13,13 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const maakBeleid = require('../server/kern/socialebeleid');
 const maakVoorstellen = require('../server/kern/socialecommand/voorstellen');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const dag = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
 
 function opzet() {
   const db = { data: {} };
-  const k = maakBeleid({ db, save: () => {}, soorten: ['antwoord'] });
+  const k = maakBeleid({ db, opslag: maakCmdOpslag({ db }), save: () => {}, soorten: ['antwoord'] });
   return { b: k.socialebeleid, db };
 }
 

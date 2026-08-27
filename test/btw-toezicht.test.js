@@ -14,6 +14,7 @@ const crypto = require('crypto');
 const { maakBtwAangifte } = require('../server/kern/fiscaal/btwaangifte');
 const { maakBtwTelling } = require('../server/kern/fiscaal/btwtelling');
 const maakToezicht = require('../server/kern/overheid/btwtoezicht');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 /* Een factuur zoals kern/facturatie/motor.js hem boekt. Zelfde helper als in
    test/btw-aangifte.test.js; hij staat hier opnieuw omdat een toets die zijn
@@ -34,7 +35,7 @@ function opzet(facturen, nuIso) {
   const klok = { nu: nuIso || '2026-08-09T12:00:00.000Z' };
   const nu = () => klok.nu;
   const { telPerZaak } = maakBtwTelling({ db });
-  const toezicht = maakToezicht({ db, nu, seed: () => {}, telPerZaak });
+  const toezicht = maakToezicht({ db, opslag: maakCmdOpslag({ db }), nu, seed: () => {}, telPerZaak });
   const aangifte = maakBtwAangifte({ db, save: () => {}, crypto, nu }).btwAangifte;
   return { db, klok, toezicht, aangifte };
 }

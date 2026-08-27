@@ -42,6 +42,7 @@ const crypto = require('crypto');
 
 const { maakRunbooks } = require('../server/kern/command/runbooks');
 const { maakTransactie } = require('../server/kern/command/transactie');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const SOORT = { type: 'rit', sleutel: 'id', label: 'Rit', meervoud: 'ritten', domein: 'mobiliteit' };
 
@@ -75,7 +76,7 @@ function opstelling(o) {
 
   const journaalRegels = [];
   const runbooks = maakRunbooks({
-    db, save() {}, crypto,
+    db, opslag: maakCmdOpslag({ db }), save() {}, crypto,
     journaal: { noteer: (r) => journaalRegels.push(r) },
     risico: { beoordeel: () => ({ niveau: 'auto', score: 5, waarom: ['toets'], vierOgen: false }) },
     beleid: { getal: (k, d) => d, waarde: (k, d) => d },

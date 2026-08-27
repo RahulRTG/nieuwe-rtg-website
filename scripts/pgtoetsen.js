@@ -156,15 +156,31 @@ async function beheer(sql) {
        worden nagespeeld. Nu komt bij elk bestand dat zakt OF nul toetsen draait
        de afloop mee, plus de laatste betekenisvolle regels van zijn uitvoer. */
     if (!geslaagd || tel === 0) {
-      /* De GEZAKTE toetsen eerst, en pas daarna de staart. Zonder die voorrang
-         bestond de laatste acht regels uit de samenvatting ("# fail 2") en
-         stond er nog steeds niet WELKE toets viel. */
+      /* DE GEZAKTE TOETS MET ZIJN BLOK, en pas daarna de staart.
+
+         Twee keer bijgesteld, en allebei de keren stond er iets anders dan de
+         reden. Eerst waren het de laatste acht regels, en dat bleek precies de
+         samenvatting ("# fail 2"): wel dat er twee vielen, niet welke. Daarna
+         de regels die op "not ok" of op "error:" leken -- maar in tap staat de
+         reden in een INGESPRONGEN blok onder de not-ok-regel, en dat blok viel
+         door dat filter heen; er bleef "error: |-" over met niets erachter.
+         Nu wordt vanaf elke not-ok-regel het hele blok meegenomen tot het
+         afsluitende "...", en dat is waar de melding zelf staat. */
       const alles = uit.split('\n').map(l => l.trimEnd());
-      const gevallen = alles.filter(l => /^not ok |^\s+(error|expected|actual|code):/.test(l));
+      const gevallen = [];
+      for (let i = 0; i < alles.length; i++) {
+        if (!/^\s*not ok /.test(alles[i])) continue;
+        gevallen.push(alles[i].trim());
+        for (let j = i + 1; j < alles.length && j < i + 20; j++) {
+          if (/^\s*(not ok |ok |# )/.test(alles[j])) break;
+          if (/^\s*\.\.\.\s*$/.test(alles[j])) break;
+          if (alles[j].trim() && !/^\s*(---|\*)/.test(alles[j])) gevallen.push('  ' + alles[j].trim());
+        }
+      }
       const gezien = gevallen.length ? gevallen : alles
         .filter(l => l.trim() && !/^(ok |# Subtest|# {2}|TAP version)/.test(l.trim()));
       console.log('        ' + K.grijs + 'afloop=' + r.status + ' signaal=' + r.signal + K.reset);
-      for (const regel of gezien.slice(-8)) console.log('        ' + K.rood + regel.slice(0, 160) + K.reset);
+      for (const regel of gezien.slice(0, 24)) console.log('        ' + K.rood + regel.slice(0, 160) + K.reset);
       if (!gezien.length) console.log('        ' + K.grijs + '(het kind drukte niets af)' + K.reset);
     }
     uitslag.push({ bestand, code: r.status, geslaagd: tel, over });

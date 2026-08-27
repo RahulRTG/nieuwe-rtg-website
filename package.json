@@ -75,6 +75,8 @@
     "test:coverage": "node --experimental-test-coverage --test test/*.test.js",
     "pretest:gate": "npm run motor:build",
     "test:gate": "node --experimental-test-coverage --test-coverage-lines=78 --test-coverage-branches=78 --test-coverage-functions=65 --test --test-concurrency=${RTG_GATE_CONCURRENCY:-6} test/*.test.js",
+    "_dekking:scherven": "De vloer van de OPGETELDE scherfmeting. Andere getallen dan test:gate, en met opzet: de tabel van het enkele proces telt de TOETSBESTANDEN mee (973 rijen op main, elk bijna 100%), de lcov-optelling telt alleen bronbestanden. Twee universa, dus twee vloeren. Gemeten 27 augustus 2026 over vier scherven: regels 72,52 takken 69,90 functies 50,38.",
+    "dekking:scherven": "--test-coverage-lines=70 --test-coverage-branches=67 --test-coverage-functions=47",
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "schermen": "node scripts/schermen.js",

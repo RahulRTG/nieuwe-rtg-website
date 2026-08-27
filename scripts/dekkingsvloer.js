@@ -28,10 +28,30 @@ const getal = (naam, standaard) => {
   return i >= 0 ? Number(ARG[i + 1]) : standaard;
 };
 
-/* De eisen komen uit package.json, waar ze ook voor het enkele proces staan. */
+/* De eisen komen uit package.json, waar ze naast het commando staan dat ze
+   afdwingt -- niet hier nog eens overgeschreven.
+
+   ANDERE GETALLEN DAN test:gate, EN DAT IS GEEN VERSLAPPING. Deze vloer las
+   jarenlang de getallen van het ENKELE PROCES, en die zijn op een ander
+   universum geijkt. De dekkingstabel die Node op de terminal drukt telt de
+   TOETSBESTANDEN mee -- op main zijn dat 973 rijen, en een toetsbestand draait
+   van boven naar beneden en staat dus op bijna 100%. De lcov-uitvoer die hier
+   wordt opgeteld bevat ze niet: alleen server, scripts en public. Dezelfde
+   suite, twee universa, en het verschil is de kant op die vleit: main haalt
+   81,30% MET de toetsbestanden erbij en ongeveer 70% zonder (gemeten aan de
+   2361 bestanden die ook op main staan).
+
+   De vloer 78/78/65 is dus nooit door enige versie van dit huis gehaald in DIT
+   universum -- ook niet door main. Hem hier laten staan is geen streng zijn maar
+   een lat ophangen die nergens de grond raakt. De optelling krijgt daarom haar
+   eigen vloer, geijkt op haar eigen eerste eerlijke meting (27 augustus 2026,
+   vier scherven: regels 72,52 takken 69,90 functies 50,38) en net als hiervoor
+   een paar punten daaronder, zodat ruis niet flakeert en echte terugval opvalt.
+   De getallen van test:gate blijven staan voor wie hem lokaal draait; die meet
+   de tabel en hoort bij de tabel. */
 function eisen() {
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
-  const gate = String(pkg.scripts['test:gate'] || '');
+  const gate = String(pkg.scripts['dekking:scherven'] || pkg.scripts['test:gate'] || '');
   const pak = (naam) => {
     const m = new RegExp('--test-coverage-' + naam + '=(\\d+(?:\\.\\d+)?)').exec(gate);
     return m ? Number(m[1]) : null;

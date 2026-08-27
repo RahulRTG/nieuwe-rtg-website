@@ -38,10 +38,18 @@ const { INZENDINGEN_PER_UUR } = require('./versies');
 const STATUS_VERSIE = ['wacht-op-mens', 'gepubliceerd', 'geweigerd', 'ingetrokken'];
 
 function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus }) {
-  /* De gebeurtenissenstroom. Hij mag ontbreken -- de App Store werkt zonder bus
-     precies zoals hij altijd deed -- maar is hij er, dan gaat elke journaalregel
-     ook als envelop naar buiten (kern/gebeurtenis.js). */
-  const gebeurtenis = require('../gebeurtenis').maakGebeurtenis({ bus, log });
+  /* De gebeurtenissenstroom loopt over de BUS, en de bus doet de envelop.
+
+     Hier stond eerst een eigen laag (kern/gebeurtenis.js) die zelf een envelop
+     maakte en hem op de bus zette. Die is weg, en niet omdat hij stuk was:
+     server/bus.js doet sinds OS.md precies hetzelfde voor ELKE publicerende
+     plek, inclusief de keten die vanzelf doorloopt. Twee lagen die allebei een
+     envelop maken is een tweede berichtformaat binnen een jaar -- wat de kop van
+     kern/envelop.js zelf als de fout benoemt (LAT-regel 4).
+
+     Wat een publicist nog wel zelf zegt, zegt hij in `envelop`: WIE het deed en
+     hoe gevoelig het is. De rest -- id, tijd, keten, oorzaak -- vult de bus in. */
+  const KANAAL = 'rtg:appstore:v1';
   const opslag = maakOpslag({ dir, log });
   const nu = () => datum().toISOString();
   const id = (p) => p + crypto.randomBytes(6).toString('hex');
@@ -69,17 +77,26 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
        vluchtig en belooft niets (envelop.NIET_GEBOUWD). Twee dingen met een
        eigen taak dus, en geen tweede boekhouding.
 
-       De klasse is `intern` en niet `codenaam`: dit journaal noemt organisaties
-       en appsleutels, geen mensen. Zou hier ooit een codenaam in belanden, dan
-       hoort die klasse mee te veranderen -- daar zakt test/gebeurtenis.test.js
-       op. */
-    gebeurtenis.meld(require('../gebeurtenis').soortVan('appstore', wat), {
-      bron: 'kern/appstore',
-      klasse: 'intern',
-      onderwerp: over || '',
-      actor: wie || '',
-      lading: extra && typeof extra === 'object' && !Array.isArray(extra) ? extra : {}
-    });
+       De classificatie is `intern` en niet `persoonsgegeven`: dit journaal noemt
+       organisaties en appsleutels, geen mensen. Zou hier ooit een codenaam in
+       belanden, dan hoort die classificatie mee te veranderen -- een codenaam
+       telt in kern/envelop.js uitdrukkelijk als persoonsgegeven. */
+    if (bus && typeof bus.publish === 'function') {
+      try {
+        bus.publish(KANAAL, {
+          /* De OPGAVE aan de bus: alleen wat deze plek weet. Geen id en geen
+             tijd -- die verzint een publicist niet zelf. */
+          envelop: { actor: wie || undefined, classificatie: 'intern' },
+          soort: 'appstore.' + wat, onderwerp: over || null,
+          inhoud: extra && typeof extra === 'object' && !Array.isArray(extra) ? extra : {}
+        });
+      } catch (e) {
+        /* Een bus die stukgaat is geen reden om de handeling te laten mislukken,
+           maar wel om het te zeggen (LAT-regel 5). Het journaal hierboven is de
+           waarheid; de uitzending is vluchtig en belooft niets. */
+        try { (log || console.warn)('[appstore] de bus weigerde ' + wat + ': ' + (e && e.message)); } catch (e2) {}
+      }
+    }
     return j[0];
   }
   const journaal = (n) => S().journaal.slice(0, Math.max(1, Math.min(500, Number(n) || 100)));

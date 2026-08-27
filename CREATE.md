@@ -300,10 +300,19 @@ Per punt het bestand dat het doet.
 En sinds P0/P1 (zie par. 11):
 
 - **De makersmeting.** `scripts/makers.js`, `MAKERS.json`, `test/makers.test.js`.
-- **De gebeurtenisenvelop, en hij wordt gevuld.** Dertien velden, geen
-  domeinkennis (`kern/envelop.js`), uitgezonden over een eigen buskanaal
-  (`kern/gebeurtenis.js`). Elke journaalregel van de App Store gaat mee; een
-  geweigerde envelop breekt de handeling niet maar verdwijnt ook niet stil.
+- **De gebeurtenisenvelop, en hij wordt gevuld.** Elke journaalregel van de App
+  Store gaat als gebeurtenis de bus over, op kanaal `rtg:appstore:v1`. De
+  envelop zelf komt van `server/bus.js` en `kern/envelop.js` — acht velden, geen
+  domeinkennis, en een keten die vanzelf doorloopt.
+
+  *Hier stond eerst een eigen laag.* `kern/gebeurtenis.js` maakte zijn eigen
+  envelop van dertien velden en zette hem op de bus. Die is weg: `main` bracht
+  met OS.md een envelop mee die de bus voor **elke** publicerende plek aanbrengt,
+  en twee lagen die allebei een envelop maken zijn een tweede berichtformaat
+  binnen een jaar — precies wat de kop van `kern/envelop.js` zelf als de fout
+  benoemt. Wat een publicist nog zelf zegt is WIE het deed en hoe gevoelig het
+  is; id, tijd en keten vult de bus in. Een bus die stukgaat breekt de handeling
+  niet, maar verdwijnt ook niet stil.
 - **De mutatiesemantiek.** Zes klassen, en een poort die `onbekend` weigert aan
   de rand van het platform — `kern/mutatie.js`. De zes brugmethodes zijn
   geclassificeerd; een zevende zonder klasse laat de brug niet opbouwen.
@@ -556,12 +565,12 @@ marketplace-economie hierboven gaat ervan uit dat er iets te verdelen valt. Van
   bij ons draait, verandert het dreigingsmodel volledig. Eigen document, eigen
   bewijslast (DEVELOPERCLOUD.md par. 3.4).
 - **Event-platform voor derden.** De envelop staat en wordt uitgezonden
-  (`kern/gebeurtenis.js`, kanaal `rtg:gebeurtenis:v1`, eerste producent is het
-  journaal van de App Store). Wat er níét is en een eigen besluit vraagt, staat
-  in `envelop.NIET_GEBOUWD`: levering, volgorde, opslag en abonneren door een
-  derde. Er is vandaag ook geen interne abonnee, en dat is op een bus een
-  complete toestand — de gebeurtenis is beschikbaar, wie hem nodig heeft haakt
-  aan met `luister()`.
+  (`server/bus.js` + `kern/envelop.js`, kanaal `rtg:appstore:v1`, eerste
+  producent is het journaal van de App Store). Wat er níét is: er is geen
+  leveringsgarantie, geen volgorde, geen opslag en geen manier waarop een DERDE
+  zich abonneert — die vier zijn elk een eigen besluit met een eigen bewijslast.
+  Er is vandaag ook geen interne abonnee, en dat is op een bus een complete
+  toestand: de gebeurtenis is beschikbaar, wie hem nodig heeft abonneert zich.
 - **SDK's in vijf talen uit één contract.** Zinvol zodra het contract er is.
 - **Visuele app-bouwer en conversation-to-app.** Niveau 1 en 2 voor apps in
   plaats van sites. De Website-maker bewijst het patroon; de sprong zit in wat

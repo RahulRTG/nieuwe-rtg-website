@@ -1,132 +1,189 @@
-/* DE GEBEURTENISENVELOP -- deelt hij werkelijk alleen vorm?
+/* DE EVENTENVELOP: de taal op de bus.
 
-   kern/envelop.js heeft precies een regel: de envelop deelt VORM, nooit
-   BETEKENIS. Die regel is makkelijk op te schrijven en makkelijk te slopen --
-   een lijstje geldige soorten, een schoonmaak van de lading, een veldje voor een
-   domein dat het toevallig nodig heeft, en de gedeelde vorm is een gedeeld model
-   geworden dat niemand meer kan wijzigen.
+   OS.md par. 3 mat het gat: *de bus vervoert, er is geen taal.* Van de
+   publicerende plekken droeg er een een `versie`, een een `id`, en geen enkele
+   iets waarmee je twee gebeurtenissen aan elkaar knoopt.
 
-   Deze toets houdt die regel vast op de vier plekken waar hij sneuvelt:
+   Dit bestand bewaakt vier dingen, en drie ervan zijn grenzen en geen functies:
 
-     1. de envelop kent geen domeinen (geen lijst van geldige soorten);
-     2. de envelop kijkt niet in de lading;
-     3. de envelop kent GEEN domeinmodule -- te zien aan zijn requires;
-     4. een binnenkomende envelop wordt niet stilzwijgend aangevuld.
-
-   En daarnaast: dat de vorm zelf werkelijk streng is, want een envelop die
-   alles doorlaat is geen afspraak.
+     1. DE ACTOR IS EEN CODENAAM. Een envelop gaat met REDIS_URL over een
+        netwerk en door een geheugendatabase. Dat is precies de plek waar een
+        echte naam of een e-mailadres ongemerkt uit de identiteitskluis lekt.
+        Toets 3 en 8.
+     2. ONBEKEND IS GEEN OPENBAAR. Wie de gevoeligheid niet noemt, krijgt
+        `onbekend` -- nooit de geruststellende waarde. Toets 2, en toets 5 zegt
+        dat een gevolg-gebeurtenis de classificatie NIET erft: dat zou raden
+        zijn, en raden over gevoeligheid is de duurste soort raden.
+     3. DE LEVERING GAAT VOOR. Een fout in de envelop mag nooit een melding
+        tegenhouden, en mag ook nooit stil verdwijnen. Toets 8.
+     4. DE BROWSER ZIET DE ENVELOP NOOIT. De SSE-laag stuurt `data` en verder
+        niets; de actor en de classificatie blijven binnen. Toets 9.
 
    Draai los: node --test test/envelop.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('fs');
-const path = require('path');
 const E = require('../server/kern/envelop');
+const { maakBus } = require('../server/bus');
+const { maakSse } = require('../server/kern/sse');
+const meter = require('../scripts/envelop');
 
-const goed = (extra) => Object.assign({
-  soort: 'website.gepubliceerd', bron: 'kern/webmaker', klasse: 'codenaam'
-}, extra || {});
-
-test('1 - de envelop kent geen domeinen', () => {
-  /* Een verzonnen domein hoort door te komen. Zou de envelop een lijst geldige
-     soorten hebben, dan wist hij welke domeinen bestaan -- en dan deelt hij
-     betekenis. */
-  const r = E.maak(goed({ soort: 'kapperszaak.geknipt' }));
-  assert.equal(r.ok, true, r.fouten && JSON.stringify(r.fouten));
-  assert.equal(r.envelop.soort, 'kapperszaak.geknipt');
-
-  // de VORM van een soort wordt wel bewaakt: dat is vorm, geen betekenis
-  assert.equal(E.maak(goed({ soort: 'zomaarwat' })).ok, false);
-  assert.equal(E.maak(goed({ soort: 'Website.Gepubliceerd' })).ok, false);
+test('1. een envelop draagt acht velden en geen negende', () => {
+  /* De opsomming staat er voluit omdat de envelop GESLOTEN is: zodra er een
+     veld bij mag, staat er binnen een jaar inhoud in en is het een tweede
+     berichtformaat. Deze toets zakt zowel bij een veld erbij als bij een veld
+     eraf. */
+  const e = E.maak({ kanaal: 'sse' });
+  assert.deepEqual(Object.keys(e).sort(),
+    ['actor', 'at', 'classificatie', 'correlatie', 'id', 'kanaal', 'oorzaak', 'versie']);
+  assert.equal(e.versie, E.VERSIE);
+  assert.ok(/^\d{4}-\d{2}-\d{2}T/.test(e.at), 'de tijd staat in ISO');
+  assert.notEqual(E.maak({ kanaal: 'x' }).id, E.maak({ kanaal: 'x' }).id, 'elke gebeurtenis een eigen id');
+  assert.ok(Object.isFrozen(e), 'een envelop ligt vast zodra hij bestaat');
+  e.actor = 'anders';
+  assert.equal(e.actor, null, 'en laat zich niet omschrijven');
 });
 
-test('2 - de lading wordt niet gelezen, alleen begrensd', () => {
-  const raar = { '<script>': 'x', 'veld met spaties': { diep: [1, 2, { nog: 'dieper' }] }, leeg: null };
-  const r = E.maak(goed({ lading: raar }));
-  assert.equal(r.ok, true);
-  assert.deepEqual(r.envelop.lading, raar, 'de lading hoort er onaangeroerd uit te komen');
-
-  // alleen de omvang is een grens
-  const groot = { veel: 'x'.repeat(E.LADING_MAX + 100) };
-  const g = E.maak(goed({ lading: groot }));
-  assert.equal(g.ok, false);
-  assert.match(g.fouten[0].wat, /kB/);
+test('2. wie de gevoeligheid niet noemt, krijgt onbekend en niet openbaar', () => {
+  assert.equal(E.maak({ kanaal: 'sse' }).classificatie, 'onbekend');
+  assert.equal(E.maak({ kanaal: 'sse', classificatie: 'verzonnen' }).classificatie, 'onbekend',
+    'een classificatie buiten de lijst bestaat niet');
+  assert.equal(E.maak({ kanaal: 'sse', classificatie: 'bijzonder' }).classificatie, 'bijzonder');
+  for (const soort of ['openbaar', 'intern', 'persoonsgegeven', 'bijzonder', 'onbekend'])
+    assert.ok(E.CLASSIFICATIES[soort], soort + ' staat op de lijst met een uitleg');
 });
 
-test('3 - de envelop hangt aan geen enkel domein', () => {
-  /* Dit is de toets die de regel het hardst vasthoudt, en hij kijkt naar de
-     BRON: wie een domein wil kennen, moet er een require voor schrijven, en dat
-     is een regel die opvalt in een diff (zelfde truc als kern/appstore/brug.js
-     met de identiteitskluis). */
-  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'envelop.js'), 'utf8');
-  const requires = [...bron.matchAll(/require\(\s*'([^']+)'\s*\)/g)].map(m => m[1]);
-  const vreemd = requires.filter(r => r !== '../lib/klok' && r !== 'crypto');
-  assert.deepEqual(vreemd, [], 'de envelop hoort niets te kennen behalve de klok en crypto');
+test('3. de actor is een codenaam, geen contactgegeven', () => {
+  assert.equal(E.maak({ kanaal: 'sse', actor: 'Reiziger Zeven' }).actor, 'Reiziger Zeven',
+    'een codenaam met een spatie mag');
+  assert.equal(E.maak({ kanaal: 'sse' }).actor, null, 'geen actor is geen probleem');
+  assert.throws(() => E.maak({ kanaal: 'sse', actor: 'jan@voorbeeld.nl' }), /contactgegeven/,
+    'een e-mailadres hoort niet op de bus');
+  assert.throws(() => E.maak({ kanaal: 'sse', actor: '+31 6 12345678' }), /contactgegeven/,
+    'een telefoonnummer evenmin');
+  assert.throws(() => E.maak({ kanaal: 'sse', actor: { codename: 'x' } }), /codenaam/,
+    'een object is geen codenaam');
+  assert.throws(() => E.maak({ kanaal: 'sse', actor: 'x'.repeat(65) }), /te lang/);
 });
 
-test('4 - een binnenkomende envelop wordt niet aangevuld', () => {
-  // maken mag aanvullen: dan ben JIJ de afzender
-  const vers = E.maak(goed());
-  assert.equal(vers.ok, true);
-  assert.ok(vers.envelop.id, 'een verse envelop krijgt een id');
-  assert.ok(vers.envelop.op, 'en een tijdstip');
-
-  // lezen niet: een envelop zonder id komt ergens vandaan waar de vorm niet geldt
-  const binnen = E.lees(goed());
-  assert.equal(binnen.ok, false);
-  assert.deepEqual(binnen.fouten.map(f => f.veld).sort(), ['id', 'op']);
-  assert.match(binnen.fouten[0].wat, /niet aangevuld/);
+test('4. de eerste gebeurtenis van een keten is zijn eigen correlatie', () => {
+  const e = E.alsStart(E.maak({ kanaal: 'sse' }));
+  assert.equal(e.correlatie, e.id);
+  const later = E.alsStart(E.maak({ kanaal: 'sse', correlatie: 'bestaande-keten' }));
+  assert.equal(later.correlatie, 'bestaande-keten', 'een lopende keten wordt niet overschreven');
 });
 
-test('5 - onbekende velden worden geweigerd, niet genegeerd', () => {
-  const r = E.maak(goed({ hotelkamer: 'A12' }));
-  assert.equal(r.ok, false);
-  assert.equal(r.fouten[0].veld, 'hotelkamer');
-  assert.match(r.fouten[0].wat, /lading/, 'en de fout wijst de weg: dat hoort in de lading');
+test('5. binnen een keten erven correlatie en actor, en de classificatie juist niet', () => {
+  const eerste = E.alsStart(E.maak({ kanaal: 'sse', actor: 'Reiziger Zeven', classificatie: 'bijzonder' }));
+  E.inKeten(eerste, () => {
+    assert.equal(E.huidige().id, eerste.id, 'binnen de keten weet je welke gebeurtenis je afhandelt');
+    const gevolg = E.maak({ kanaal: 'sse' });
+    assert.equal(gevolg.correlatie, eerste.correlatie, 'dezelfde keten');
+    assert.equal(gevolg.oorzaak, eerste.id, 'en de directe oorzaak wijst terug');
+    assert.equal(gevolg.actor, 'Reiziger Zeven', 'de actor blijft dezelfde mens');
+    assert.equal(gevolg.classificatie, 'onbekend',
+      'de gevoeligheid erft NIET: dat zou raden zijn over andere inhoud');
+  });
+  assert.equal(E.huidige(), null, 'buiten de keten is er geen huidige gebeurtenis');
 });
 
-test('6 - de klasse is een gesloten lijst, met codenaam apart van gevoelig', () => {
-  assert.equal(E.maak(goed({ klasse: 'codenaam' })).ok, true);
-  assert.equal(E.maak(goed({ klasse: 'persoonsgegevens' })).ok, false);
-  assert.ok(Object.keys(E.KLASSEN).includes('codenaam'));
-  assert.match(E.KLASSEN.codenaam, /zonder naam/, 'het onderscheid waar dit huis op draait hoort uitgeschreven te staan');
+test('6. de bus stempelt elk bericht, en stempelt nooit twee keer', () => {
+  const bus = maakBus();
+  const gezien = [];
+  bus.subscribe('proef', m => gezien.push(m));
+  bus.publish('proef', { doel: 'key', match: 'k1', event: 'ping', data: { x: 1 } });
+  assert.equal(gezien.length, 1);
+  const m = gezien[0];
+  assert.equal(m.doel, 'key', 'de bestaande sleutels blijven staan');
+  assert.deepEqual(m.data, { x: 1 });
+  assert.ok(m.envelop && m.envelop.id, 'en er komt een envelop bij');
+  assert.equal(m.envelop.kanaal, 'proef');
+  assert.equal(m.envelop.correlatie, m.envelop.id, 'de eerste is zijn eigen keten');
+
+  /* Een bericht dat al een envelop MET id draagt, is al eerder gebeurd -- bij
+     Redis komt het bij het publicerende proces terug. Dat mag geen tweede
+     identiteit krijgen, anders telt elk incident dubbel. */
+  bus.publish('proef', m);
+  assert.equal(gezien[1].envelop.id, m.envelop.id, 'dezelfde gebeurtenis, hetzelfde id');
 });
 
-test('7 - keten en oorzaak binden een handeling, de klok niet', () => {
-  const eerste = E.maak(goed({ soort: 'website.bewaard' })).envelop;
-  assert.equal(eerste.keten, eerste.id, 'een envelop zonder keten begint er een');
-  assert.equal(eerste.oorzaak, null);
-
-  const tweede = E.volgOp(eerste, goed({ soort: 'website.gepubliceerd' }));
-  assert.equal(tweede.ok, true);
-  assert.equal(tweede.envelop.keten, eerste.keten, 'dezelfde handeling, dezelfde keten');
-  assert.equal(tweede.envelop.oorzaak, eerste.id);
-
-  const derde = E.volgOp(tweede.envelop, goed({ soort: 'zaak.gemeld' }));
-  assert.equal(derde.envelop.keten, eerste.keten, 'de keten overleeft meerdere stappen');
-  assert.equal(derde.envelop.oorzaak, tweede.envelop.id);
+test('7. wie binnen een afhandeling publiceert, blijft in dezelfde keten', () => {
+  const bus = maakBus();
+  const gezien = [];
+  bus.subscribe('keten', m => {
+    gezien.push(m);
+    if (m.event === 'eerste') bus.publish('keten', { event: 'tweede', data: {} });
+  });
+  bus.publish('keten', { event: 'eerste', data: {}, envelop: { actor: 'Reiziger Zeven', classificatie: 'persoonsgegeven' } });
+  assert.equal(gezien.length, 2);
+  assert.equal(gezien[0].envelop.actor, 'Reiziger Zeven');
+  assert.equal(gezien[1].envelop.correlatie, gezien[0].envelop.correlatie, 'een keten');
+  assert.equal(gezien[1].envelop.oorzaak, gezien[0].envelop.id, 'en het gevolg wijst naar zijn oorzaak');
+  assert.notEqual(gezien[1].envelop.id, gezien[0].envelop.id, 'maar het zijn twee gebeurtenissen');
 });
 
-test('8 - een envelop kan niet zijn eigen oorzaak zijn', () => {
-  const r = E.maak(goed({ id: 'abcdefgh12345678', oorzaak: 'abcdefgh12345678' }));
-  assert.equal(r.ok, false);
-  assert.ok(r.fouten.some(f => f.veld === 'oorzaak'));
+test('8. een geweigerde actor houdt het bericht niet tegen, en verdwijnt niet stil', () => {
+  const bus = maakBus();
+  const gezien = [];
+  const gewaarschuwd = [];
+  const oud = console.warn;
+  console.warn = (...a) => gewaarschuwd.push(a.join(' '));
+  try {
+    bus.subscribe('proef', m => gezien.push(m));
+    bus.publish('proef', { event: 'ping', data: { x: 1 }, envelop: { actor: 'jan@voorbeeld.nl', classificatie: 'intern' } });
+  } finally { console.warn = oud; }
+  assert.equal(gezien.length, 1, 'het bericht is gewoon afgeleverd');
+  assert.equal(gezien[0].envelop.actor, null, 'maar zonder de actor die niet mocht');
+  assert.equal(gezien[0].envelop.classificatie, 'intern', 'de rest van de opgave blijft staan');
+  assert.equal(gewaarschuwd.length, 1, 'en er staat een waarschuwing in het log');
+  assert.match(gewaarschuwd[0], /envelop geweigerd/);
 });
 
-test('9 - wat er niet is, staat er met een reden', () => {
-  /* Zelfde afspraak als machtigingen.NIET_GEBOUWD: een ontbrekende belofte hoort
-     te lezen als een besluit en niet als een lege plek. */
-  for (const [wat, reden] of Object.entries(E.NIET_GEBOUWD)) {
-    assert.ok(reden.length > 40, wat + ' hoort een echte reden te dragen');
-  }
-  assert.ok(E.NIET_GEBOUWD.levering, 'dat een envelop geen leveringsbelofte is, hoort er te staan');
-  assert.match(E.NIET_GEBOUWD.volgorde, /keten|oorzaak/, 'en de volgorde-val hoort de uitweg te noemen');
+test('9. de envelop bereikt de browser nooit', () => {
+  /* De actor en de classificatie zijn intern. Zouden ze meeliften op de
+     SSE-regel, dan lekt de codenaam van het ene lid naar het scherm van het
+     andere. De afleverlaag stuurt alleen `data`; deze toets legt dat vast op de
+     BYTES die de verbinding in gaan en niet op de bedoeling. */
+  const bus = maakBus();
+  const sse = maakSse({ bus });
+  const geschreven = [];
+  sse.sseClients.push({ tier: 'rtg', key: 'k1', res: { write: (s) => geschreven.push(s) } });
+  bus.publish('sse', { doel: 'key', match: 'k1', event: 'ping', data: { x: 1 },
+    envelop: { actor: 'Reiziger Zeven', classificatie: 'persoonsgegeven' } });
+  const uit = geschreven.join('');
+  assert.match(uit, /event: ping/, 'het event komt aan');
+  assert.match(uit, /"x":1/, 'met zijn data');
+  assert.ok(!uit.includes('Reiziger Zeven'), 'en zonder de actor');
+  assert.ok(!uit.includes('persoonsgegeven'), 'en zonder de classificatie');
+  assert.ok(!uit.includes('envelop'), 'de envelop gaat de deur niet uit');
 });
 
-test('10 - de dertien velden liggen vast', () => {
-  assert.equal(E.ENVELOPVELDEN.length, 13);
-  for (const v of ['id', 'soort', 'versie', 'actor', 'onderwerp', 'organisatie',
-    'doel', 'op', 'keten', 'oorzaak', 'klasse', 'bron', 'lading']) {
-    assert.ok(E.ENVELOPVELDEN.includes(v), v + ' hoort in de envelop te zitten');
-  }
+test('10. elke plek die zelf een bericht samenstelt, zegt hoe gevoelig het is', () => {
+  const uit = meter.meet();
+  assert.ok(uit.stelenZelfSamen >= 6, 'de meter vindt de publicerende plekken, nu: ' + uit.stelenZelfSamen);
+  assert.deepEqual(uit.zonderClassificatie, [],
+    'zonder classificatie: ' + uit.zonderClassificatie.join(', '));
+});
+
+test('11. tegenproef: de meter ziet het verschil tussen samenstellen en doorgeven', () => {
+  /* Zonder dit onderscheid meldt de meter voor altijd een gat dat niemand kan
+     dichten -- een doorgeefluik heeft geen eigen classificatie. En zonder de
+     tegenproef zou hij ook groen blijven als hij ALLES doorgeefluik noemde. */
+  const uit = meter.analyse([
+    { bestand: 'a.js', kanaal: 'sse', doorgeef: false, classificatie: true, actor: true },
+    { bestand: 'b.js', kanaal: 'sse', doorgeef: false, classificatie: false, actor: false },
+    { bestand: 'c.js', kanaal: 'x', doorgeef: true, classificatie: false, actor: false }
+  ]);
+  assert.equal(uit.plekken, 3);
+  assert.equal(uit.doorgeefluiken, 1);
+  assert.equal(uit.stelenZelfSamen, 2);
+  assert.equal(uit.metClassificatie, 1);
+  assert.equal(uit.metActor, 1);
+  assert.deepEqual(uit.zonderClassificatie, ['b.js (sse)'], 'het gat wordt bij naam genoemd');
+});
+
+test('12. het tweede argument bepaalt of iets samenstelt of doorgeeft', () => {
+  assert.equal(meter.argumentNa('publish(k, b)', 'publish(k, '.length), 'b');
+  assert.equal(meter.argumentNa('publish(k, { a: 1 })', 'publish(k, '.length), '{ a: 1 }');
+  assert.equal(meter.argumentNa('publish(k, Object.assign({ a: 1 }, x))', 'publish(k, '.length),
+    'Object.assign({ a: 1 }, x)');
 });

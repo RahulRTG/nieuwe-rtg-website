@@ -118,7 +118,8 @@ module.exports = function bouwKernAanDrie(kern, grens) {
     db, save, dir: DATA_DIR, antivirus: kern.antivirus, pay: kern.pay, findSupplier: kern.findSupplier,
     /* De bus komt van de kern en wordt hier alleen doorgegeven: elke
        journaalregel gaat daarmee ook als gebeurtenis naar de andere processen
-       in de vloot (kern/gebeurtenis.js). Ontbreekt hij, dan werkt de App Store
+       in de vloot -- van een envelop voorzien door de bus zelf (server/bus.js,
+       kern/envelop.js). Ontbreekt hij, dan werkt de App Store
        precies zoals hij altijd deed. */
     bus: kern.bus,
     log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));

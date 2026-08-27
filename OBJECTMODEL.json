@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-27",
   "gemeten": {
-    "bestanden": 1535,
+    "bestanden": 1531,
     "vormen": 1171,
-    "velden": 1704,
+    "velden": 1705,
     "modules": 604,
-    "domeinen": 218,
+    "domeinen": 219,
     "envelopDrempel": 14,
     "envelop": 31,
-    "veldenDomeineigen": 1207,
+    "veldenDomeineigen": 1209,
     "veldenGedeeldVanafVier": 161,
     "gelijkendeVormparen": 17
   },
@@ -360,6 +360,18 @@
       ]
     },
     {
+      "veld": "versie",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/appstore",
+        "kern/beroepenbieb",
+        "kern/command",
+        "kern/envelop",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "prijsCenten",
       "domeinen": 9,
       "waar": [
@@ -405,18 +417,6 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 8,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/livinglab",
-        "kern/rijksbieb"
       ]
     },
     {
@@ -492,6 +492,18 @@
       ]
     },
     {
+      "veld": "actor",
+      "domeinen": 8,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/envelop",
+        "kern/magnaat-controle",
+        "kern/magnaatwereld",
+        "kern/retail"
+      ]
+    },
+    {
       "veld": "rol",
       "domeinen": 8,
       "waar": [
@@ -513,18 +525,6 @@
         "kern/overheid",
         "kern/regering",
         "kern/stadsweefsel"
-      ]
-    },
-    {
-      "veld": "geldigTot",
-      "domeinen": 7,
-      "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/mobiliteit",
-        "kern/rtfos",
-        "kern/wallet"
       ]
     }
   ],

@@ -82,6 +82,13 @@ function maakCommerce(state) {
        er zelf een meegeeft, kan er een verzinnen waar `retour` op staat. */
     retourVraag: (o) => retour.vraag(Object.assign({}, o, { koopbaar: graaf.opzoeker().bij(o && o.koopbaarId) })),
     retourZet: (o) => retour.zet(o),
+    /* Uitvoeren is een aparte handeling dan afhandelen: afhandelen ZET KLAAR,
+       dit BETAALT. Een mens drukt, en de weg loopt langs kern/pay. */
+    retourVoerUit: (o) => retour.voerUit(o),
+    /* kern/pay komt in kernlaag3, na deze laag -- vandaar late binding, zoals
+       koppelGrens in kern/pay/poort.js zelf. Niet gekoppeld betekent dat een
+       uitvoering weigert met de reden, en niet dat er stilletjes niets gebeurt. */
+    koppelPay: (fn) => retour.koppelPay(fn),
     retourVanKoper: (sleutel) => retour.vanKoper(sleutel),
     retourVanVerkoper: (code) => retour.vanVerkoper(code),
     retourBij: (id) => retour.bij(id),

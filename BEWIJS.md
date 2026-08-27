@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1119 bestanden en 7539 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1119 bestanden en 7545 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1119 |
-| losse beweringen (`test(...)`) | 7539 |
+| losse beweringen (`test(...)`) | 7545 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 944 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-980 bestanden, 7304 beweringen.
+980 bestanden, 7310 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -184,7 +184,7 @@ toets omvalt.
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
 | `commandlagen.test.js` | 11 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `commerce-kern.test.js` | 18 | gezakt op `&&->||#0` | DE COMMERCE-KERN -- werkwoorden, koopbaar, afrekening. WAT HIER WORDT VASTGEHOUDEN. |
-| `commerce-retour.test.js` | 15 | gezakt op `&&->||#0` | REVERSE COMMERCE -- de weg terug. WAAROM DEZE LAAG NIEUWBOUW IS: COMMERCE.json telt het werkwoord `retour` in 6 van de 100 koopbare domeinen, en geen van die zes is een goederenretour -- drie geldomkeringen en een... |
+| `commerce-retour.test.js` | 21 | gezakt op `&&->||#0` | REVERSE COMMERCE -- de weg terug. WAAROM DEZE LAAG NIEUWBOUW IS: COMMERCE.json telt het werkwoord `retour` in 6 van de 100 koopbare domeinen, en geen van die zes is een goederenretour -- drie geldomkeringen en een... |
 | `commerce-verkoopweg.test.js` | 11 | gezakt op `!==->===#0` | DE VERKOOPWEG -- waarlangs een zaak verkoopt. DE ZWAARSTE TOETS IS 4. |
 | `commerce.test.js` | 9 | gezakt op `&&->||#0` | DE COMMERCE-METING -- en of hij werkelijk iets onderscheidt. scripts/commerce.js beantwoordt de vraag uit COMMERCE.md par. |
 | `concern-voorstel.test.js` | 5 | gezakt op `===->!==#0` | STAP 9: WAT UIT EEN DOCUMENT KOMT IS EEN VOORSTEL, NOOIT EEN FEIT. WAAROM DIT BESTAAT Document Intelligence is het deel dat het meest indrukwekkend oogt en het makkelijkst fout gaat: een patroonherkenner die zijn... |

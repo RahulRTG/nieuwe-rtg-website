@@ -21,10 +21,11 @@
      (een offerte-aanvraag hoort geen koopknop te hebben). Dat verschil is de
      unieke opbrengst van deze laag.
 
-     EN WAT HET NIET DOET: geld terugstorten. Een retour die is afgehandeld
-     ZET een bedrag klaar; uitvoeren gebeurt langs RTG Pay met de bevoegdheid
-     die daarvoor bestaat. Het scherm zegt dat met zoveel woorden in plaats van
-     een knop te tonen die het niet waarmaakt (GELD.md par. 3). -->
+     OVER HET GELD. Afhandelen ZET een bedrag klaar; uitbetalen is een aparte
+     handeling met een eigen knop, en die loopt langs RTG Pay (terugGave) --
+     dezelfde weg die kern/appstore gebruikt. Er gebeurt niets vanzelf: een mens
+     drukt (GELD.md par. 3). Lukt het niet, dan blijft er "nog niet uitgevoerd"
+     staan; er komt nooit "betaald" bij een teruggave die niet is gedaan. -->
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -190,9 +191,17 @@ function kaartVan(x){
   const b = x.besluit;
   /* Een klaargezet bedrag dat eruitziet als een betaald bedrag is precies de
      stilte die deze laag hoort te vermijden. */
+  /* HET GELDBESLUIT, EN DE KNOP DIE HET UITVOERT. Uitvoeren staat apart van
+     afhandelen: afhandelen ZET klaar, dit BETAALT -- langs RTG Pay, met een
+     mens die drukt. Er gebeurt niets vanzelf (GELD.md par. 3). Is er geen
+     codenaam vastgelegd, dan komt er geen knop maar de reden. */
   const besluit = !b ? '' : '<div class="klaar">' + (b.geldTerug
     ? '<b>'+euroC(b.centen)+'</b> staat klaar om terug te gaan'+(b.btwCenten?' (waarvan '+euroC(b.btwCenten)+' btw tegen '+b.tariefProcent+'%)':'')+
-      '. '+(b.uitgevoerd?'Uitgevoerd.':'<b>Nog niet uitgevoerd</b> &mdash; dat doet u in RTG Pay; dit scherm verplaatst geen geld.')
+      '. '+(b.uitgevoerd
+        ? '<b>Uitgevoerd</b>' + (b.ledgerRef ? ' (boeking '+esc(b.ledgerRef)+')' : '') + '.'
+        : (x.uitbetaalbaar === false
+            ? 'Bij deze aanvraag is niet vastgelegd naar wie het geld terug zou gaan; dat is niet vanaf dit scherm te herstellen.'
+            : '<b>Nog niet uitgevoerd.</b><div class="rij"><button class="knop doe" data-uit="'+esc(x.id)+'">Nu uitbetalen</button></div>'))
     : esc(b.reden || b.soort)) + '</div>';
 
   let acties = '';
@@ -227,6 +236,15 @@ function kaartVan(x){
 }
 
 function bindRetour(){
+  document.querySelectorAll('[data-uit]').forEach(b => b.onclick = async () => {
+    /* De knop gaat meteen op slot: een tweede druk is bij de server hetzelfde
+       verzoek (de retour is de idem-sleutel), maar een knop die blijft reageren
+       laat iemand twijfelen of het is gelukt. */
+    b.disabled = true; b.textContent = 'Bezig...';
+    try { await api('/api/supplier/retour/uitvoeren', { id: b.getAttribute('data-uit') });
+      meld('Uitbetaald.'); tekenRetouren(); }
+    catch (e) { meld(e.message); b.disabled = false; b.textContent = 'Nu uitbetalen'; }
+  });
   document.querySelectorAll('[data-zet]').forEach(b => b.onclick = async () => {
     const id = b.getAttribute('data-zet'), naar = b.getAttribute('data-naar');
     const veld = (naam) => { const e = document.querySelector('['+naam+'="'+id+'"]'); return e ? e.value : ''; };

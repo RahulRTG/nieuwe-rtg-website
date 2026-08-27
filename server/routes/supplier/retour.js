@@ -60,4 +60,17 @@ module.exports = (kern) => {
       orderKenmerk: schoon(b.orderKenmerk, 80)
     }));
   });
+
+  /* UITVOEREN IS EEN ANDERE HANDELING DAN AFHANDELEN, en heeft daarom een eigen
+     deur. Afhandelen ZET een bedrag klaar; dit BETAALT het uit, langs
+     kern/pay/verkoop.js terugGave. Een mens drukt -- er gebeurt niets vanzelf,
+     niet op een timer en niet als bijproduct van de statusknop (GELD.md par. 3).
+
+     Twee keer drukken is geen tweede teruggave: de retour-id is de idem-sleutel
+     in de geldlaag, en dit is precies de knop waarop twee keer wordt gedrukt. */
+  app.post('/api/supplier/retour/uitvoeren', supplierAuth, async (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    antwoord(res, await commerce.retourVoerUit({
+      id: schoon((req.body || {}).id, 60), verkoper: req.supplier.code, wie: door }));
+  });
 };

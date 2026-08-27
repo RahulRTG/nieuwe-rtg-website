@@ -80,7 +80,7 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
      gekocht" -- dat weet deze laag niet -- maar "dit ding KAN terug": het
      werkwoord `retour` staat erop. Zonder dat werkwoord is een retourstroom een
      belofte die de verkoper nooit heeft gedaan. */
-  function vraag({ sleutel, koopbaar, orderRef, grond, toelichting, centen }) {
+  function vraag({ sleutel, codenaam, koopbaar, orderRef, grond, toelichting, centen }) {
     const s = tekst(sleutel, 120);
     if (!s) return { status: 400, error: 'Geen retour zonder sleutel.' };
     if (!koopbaar) return { status: 404, error: 'Dit aanbod bestaat niet (meer).' };
@@ -101,6 +101,14 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
     const r = {
       id: 'rt' + Math.random().toString(36).slice(2, 10) + klok().toString(36).slice(-4),
       sleutel: s,
+      /* DE CODENAAM STAAT ERBIJ, EN DAT IS GEEN DUBBELING VAN DE SLEUTEL. De
+         sleutel is van de SESSIE (waarmee "mijn retouren" wordt opgehaald); de
+         codenaam is waar RTG Pay op boekt. Zonder hem is een teruggave niet uit
+         te voeren zonder alsnog een naam op te zoeken -- en de codenaam is juist
+         de vorm die dit huis daarvoor heeft (CLAUDE.md, privacy by design).
+         Ontbreekt hij, dan kan er later geen geld terug; dat wordt gezegd en
+         niet stil opgelost. */
+      codenaam: codenaam ? tekst(codenaam, 80) : null,
       koopbaarId: koopbaar.id, titel: koopbaar.titel, bron: koopbaar.bron,
       verkoper: (koopbaar.aanbieder && koopbaar.aanbieder.code) || null,
       verkoperNaam: (koopbaar.aanbieder && koopbaar.aanbieder.naam) || null,
@@ -130,6 +138,10 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
     return {
       id: r.id, titel: r.titel, verkoper: r.verkoper, verkoperNaam: r.verkoperNaam,
       bron: r.bron, orderRef: r.orderRef, orderGecontroleerd: !!r.orderGecontroleerd,
+      /* Niet de codenaam zelf naar buiten -- alleen of een teruggave uitvoerbaar
+         is. Een codenaam op een verkopersscherm is een gegeven dat daar niets
+         toevoegt. */
+      uitbetaalbaar: !!r.codenaam,
       orderKenmerk: r.orderKenmerk || null,
       grond: r.grond, grondLabel: (GROND.get(r.grond) || {}).label || r.grond,
       toelichting: r.toelichting,
@@ -146,11 +158,11 @@ module.exports = ({ db, save, nu, btwUit, zaakVan }) => {
      hij nodig heeft: opslaan, de klok, de schoonmaak van tekst, de opzoeker en
      de publieke vorm.
      Hij kent de tabel zelf. */
-  const { zet } = require('./retourstand')({ save, klok, tekst, bij, ruim, publiek });
+  const { zet, voerUit, koppelPay } = require('./retourstand')({ save, klok, tekst, bij, ruim, publiek });
 
   const vanKoper = (sleutel) => { ruim(); return pot().filter(r => r.sleutel === String(sleutel || '')).slice(0, 200).map(publiek); };
   const vanVerkoper = (code) => { ruim(); return pot().filter(r => r.verkoper === String(code || '')).slice(0, 200).map(publiek); };
 
-  return { vraag, zet, vanKoper, vanVerkoper, bij: (id) => { const r = bij(id); return r ? publiek(r) : null; },
+  return { vraag, zet, voerUit, koppelPay, vanKoper, vanVerkoper, bij: (id) => { const r = bij(id); return r ? publiek(r) : null; },
     ruim, NIET_GEBOUWD, VERVAL_DAGEN };
 };

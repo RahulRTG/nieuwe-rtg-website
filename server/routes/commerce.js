@@ -17,7 +17,10 @@
    "alleen een ingelogd lid leest dit" en "iedereen leest dit". Zolang dat besluit
    niet is genomen, komt er hier geen deur omheen. */
 module.exports = (kern) => {
-  const { app, auth, commerce } = kern;
+  /* `liveCodename` zet de sessie om in de codenaam waarop RTG Pay boekt. Hij
+     staat hier en niet in de kern: welke codenaam bij een sessie hoort, is een
+     vraag van de deur en niet van de commerce-laag. */
+  const { app, auth, commerce, liveCodename } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const wie = (req) => req.session.key;
   const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 80) || null;
@@ -76,7 +79,11 @@ module.exports = (kern) => {
   app.post('/api/commerce/retour/vraag', auth, (req, res) => {
     const b = req.body || {};
     stuur(res, commerce.retourVraag({
-      sleutel: wie(req), koopbaarId: tekst(b.koopbaarId, 80),
+      sleutel: wie(req),
+      /* Zonder codenaam kan er later geen geld terug. Hij wordt HIER vastgelegd
+         en niet bij het afhandelen: op dat moment is de sessie er niet meer. */
+      codenaam: liveCodename ? liveCodename(req.session) : null,
+      koopbaarId: tekst(b.koopbaarId, 80),
       orderRef: tekst(b.orderRef, 80), grond: tekst(b.grond, 40),
       toelichting: tekst(b.toelichting, 500), centen: b.centen
     }));

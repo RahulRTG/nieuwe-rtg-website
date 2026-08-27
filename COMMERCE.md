@@ -334,6 +334,13 @@ autonome betaling die grens 2 verbiedt.
   legt. Wat er níét in zit staat er met de reden in `NIET_GEBOUWD`: ruilen tegen
   iets anders, een verzendlabel, automatisch terugboeken, en een
   retourpercentage (dat is een score op mensen).
+  **De uitvoering staat er ook**: een manager van de verkoper drukt, en het
+  bedrag gaat langs `kern/pay/verkoop.js` `terugGave` — dezelfde functie die
+  `kern/appstore` gebruikt, met haar idempotentie en haar alles-of-niets. Uit-
+  voeren is een aparte handeling dan afhandelen (die zet klaar, dit betaalt), en
+  de retour-id is de idem-sleutel: twee keer drukken is één verzoek. Zonder
+  geldlaag, zonder codenaam of bij een weigering blijft `uitgevoerd: false` staan
+  — er komt nooit "betaald" bij een teruggave die niet is gedaan.
 - **De verkoopweg** (`kern/commerce/verkoopweg.js`,
   `routes/supplier/verkoopweg.js`): een genoemde, gepubliceerde selectie uit het
   aanbod van een verkoper, met een toegangsniveau. Zes soorten (web, kassa, qr,
@@ -372,11 +379,6 @@ autonome betaling die grens 2 verbiedt.
   of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
   vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
   bedrag hoort uit het domein zelf te komen.
-- **Het geld van een retour werkelijk terugstorten.** Het besluit staat klaar met
-  bedrag, btw-deel en tarief; een mens voert het uit langs `kern/pay` met de
-  bevoegdheid die daarvoor bestaat. Die knop komt er niet als bijproduct van een
-  statusknop bij — maar de weg van dat klaargezette besluit naar de uitbetaling
-  is nog met de hand.
 - **Bevestigen vanuit de mand.** De afrekening rekent door, stopt bij de deur en
   **wijst hem aan**: elke afrekening draagt `bevestigBij` met de plek(ken) waar
   die verkoper werkelijk bevestigt, en het scherm zet er een link heen. Meerdere

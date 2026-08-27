@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4159 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4160 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,7 +18,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4159 |
+| API-endpoints | 4160 |
 | servermodules (`server/**/*.js`) | 2394 |
 | routebestanden (`server/routes/**`) | 487 |
 | kernmodules (`server/kern/**`) | 1474 |
@@ -105,7 +105,7 @@ zie §5 -- er zijn nog 195 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 645 | 58 | 12 | 399 |
-| `supplier` | 605 | 113 | 10 | 298 |
+| `supplier` | 606 | 113 | 10 | 298 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 71 | 9 | 39 | 60 |
@@ -140,7 +140,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(176) auth(108) supplierAuth(56) officeAuth(39) db(36) status(28) liveCodename(27)
+app(176) auth(108) supplierAuth(56) officeAuth(39) db(36) status(28) liveCodename(28)
 accounts(23) schoon(21) managerOnly(16) codenaamVan(16) save(15) rtf(15)
 boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10)
 rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)

@@ -18,6 +18,58 @@
 const { NA, RETOURSTAND, STAATOP, UITKOMST } = require('./retourlijst');
 
 module.exports = ({ save, klok, tekst, bij, ruim, publiek }) => {
+
+  /* DE UITVOERING VAN EEN KLAARGEZET GELDBESLUIT.
+
+     Tot hier zet deze laag alleen klaar: `uitgevoerd: false`, en de weg naar de
+     uitbetaling was met de hand. Dit is die weg -- en hij verandert niets aan de
+     grens, hij maakt hem af. Een MENS van de verkoper drukt; er gebeurt niets
+     vanzelf, niet op een timer en niet als bijproduct van de statusknop
+     (GELD.md par. 3).
+
+     ER KOMT GEEN TWEEDE GELDWEG BIJ. Dit roept kern/pay/verkoop.js `terugGave`
+     aan, dezelfde functie die kern/appstore gebruikt -- met haar idempotentie,
+     haar alles-of-niets (een halve teruggave is een tweede probleem bovenop het
+     eerste) en haar weigering wanneer de partner zijn deel al heeft laten
+     uitbetalen. Deze laag boekt zelf niets en telt geen saldi (LAT-regel 4).
+
+     DE IDEM-SLEUTEL IS DE RETOUR ZELF. Twee keer drukken is dan hetzelfde
+     verzoek en geen tweede teruggave -- en dat is precies de knop waarop twee
+     keer wordt gedrukt. */
+  let terugGave = null;
+  const koppelPay = (fn) => { terugGave = typeof fn === 'function' ? fn : null; };
+
+  async function voerUit({ id, verkoper, wie }) {
+    ruim();
+    const r = bij(id);
+    if (!r) return { status: 404, error: 'Deze retouraanvraag bestaat niet.' };
+    if (verkoper != null && r.verkoper !== String(verkoper)) {
+      return { status: 403, error: 'Deze retouraanvraag hoort niet bij deze zaak.' };
+    }
+    const b = r.besluit;
+    if (r.stand !== 'afgehandeld' || !b) return { status: 409, error: 'Er staat nog geen besluit klaar om uit te voeren.' };
+    if (!b.geldTerug || !(b.centen > 0)) return { status: 409, error: 'Bij deze uitkomst gaat er geen geld terug.' };
+    if (b.uitgevoerd) return { ok: true, retour: publiek(r), alGedaan: true };
+    if (!r.codenaam) {
+      return { status: 409, error: 'Bij deze aanvraag is niet vastgelegd naar wie het geld terug zou gaan; dat is met de hand te herstellen, maar niet hier.' };
+    }
+    if (!terugGave) return { status: 503, error: 'De geldlaag is niet gekoppeld; er wordt niets uitgevoerd.' };
+
+    const uit = await terugGave({
+      codenaam: r.codenaam, vanPartner: r.verkoper, partnerCenten: b.centen,
+      oms: 'Retour: ' + (r.titel || 'aankoop'), ref: r.id, idem: r.id
+    });
+    if (uit && uit.error) return uit;
+
+    b.uitgevoerd = true; b.uitgevoerdOp = klok();
+    b.ledgerRef = (uit && (uit.ref || uit.ledgerRef)) || r.id;
+    r.bij = klok();
+    r.stappen.push({ stand: 'afgehandeld', door: 'verkoper', at: klok(),
+      wie: tekst(wie, 80) || null, uitbetaald: b.centen });
+    save();
+    return { ok: true, retour: publiek(r) };
+  }
+
   /* EEN STAND ZETTEN IS EEN HANDELING VAN EEN PARTIJ, en welke partij dat is
      staat in ./retourlijst.js. Deze functie controleert drie dingen en verzint
      er geen vierde bij: mag deze stand na de huidige, is de aanroeper de partij
@@ -113,5 +165,5 @@ module.exports = ({ save, klok, tekst, bij, ruim, publiek }) => {
     return { ok: true, retour: publiek(r) };
   }
 
-  return { zet };
+  return { zet, voerUit, koppelPay };
 };

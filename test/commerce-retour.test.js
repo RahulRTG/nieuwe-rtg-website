@@ -206,3 +206,101 @@ test('15. elke stand noemt WIE hem zet, en elke uitkomst of er geld bij hoort', 
   R.zet({ id, naar: 'onderweg', door: 'koper' });
   assert.deepEqual(R.bij(id).stappen.map(s => s.stand), ['gevraagd', 'aanvaard', 'onderweg']);
 });
+
+/* ---------- de uitvoering: van KLAARGEZET naar BETAALD ---------- */
+
+/* Een motor met een stuurbare geldlaag. De echte weg loopt langs
+   kern/pay/verkoop.js terugGave; hier wordt hij nagebootst zodat te toetsen is
+   wat deze laag doet met een geslaagde, een geweigerde en een ontbrekende
+   geldlaag -- drie gevallen waarvan de tweede en derde het meest voorkomen en
+   het minst worden getoetst. */
+function motorMetPay(pay) {
+  const db = { data: {} };
+  const R = maakRetour({ db, save: () => {}, nu: () => 1700000000000,
+    btwUit: rekenaar.btwUit, zaakVan: () => ZAAK });
+  if (pay !== undefined) R.koppelPay(pay);
+  return R;
+}
+async function totAfgehandeld(R, o) {
+  const r = R.vraag(Object.assign({ sleutel: 'lid1', codenaam: 'CN-1', koopbaar: jas(),
+    orderRef: 'ORD-1', grond: 'defect', centen: 24900 }, o || {}));
+  const id = r.retour.id;
+  R.zet({ id, naar: 'aanvaard', door: 'verkoper' });
+  R.zet({ id, naar: 'onderweg', door: 'koper' });
+  R.zet({ id, naar: 'beoordeeld', door: 'verkoper', staat: 'ongebruikt' });
+  R.zet({ id, naar: 'afgehandeld', door: 'verkoper', uitkomst: 'geld-terug' });
+  return id;
+}
+
+test('16. uitvoeren betaalt uit langs de bestaande geldlaag, niet langs een eigen', async () => {
+  const gezien = [];
+  const R = motorMetPay(async (o) => { gezien.push(o); return { ok: true, ref: 'LG-9' }; });
+  const id = await totAfgehandeld(R);
+  const uit = await R.voerUit({ id, verkoper: 'MODE', wie: 'Sanne' });
+  assert.ok(uit.ok);
+  assert.equal(uit.retour.besluit.uitgevoerd, true);
+  assert.equal(uit.retour.besluit.ledgerRef, 'LG-9');
+  // wat er naar de geldlaag ging: de codenaam, de partner, het bevroren bedrag
+  assert.equal(gezien.length, 1);
+  assert.equal(gezien[0].codenaam, 'CN-1');
+  assert.equal(gezien[0].vanPartner, 'MODE');
+  assert.equal(gezien[0].partnerCenten, 24900);
+  assert.equal(gezien[0].idem, id, 'de retour is de idem-sleutel: twee keer drukken is een verzoek');
+});
+
+test('17. twee keer drukken betaalt niet twee keer uit', async () => {
+  let n = 0;
+  const R = motorMetPay(async () => { n++; return { ok: true, ref: 'LG-1' }; });
+  const id = await totAfgehandeld(R);
+  await R.voerUit({ id, verkoper: 'MODE' });
+  const tweede = await R.voerUit({ id, verkoper: 'MODE' });
+  assert.equal(tweede.alGedaan, true);
+  assert.equal(n, 1, 'de tweede druk raakt de geldlaag niet eens');
+});
+
+test('18. een weigering van de geldlaag laat de retour ONuitgevoerd', async () => {
+  const R = motorMetPay(async () => ({ status: 409, error: 'Op partner:MODE staat niet genoeg.' }));
+  const id = await totAfgehandeld(R);
+  const uit = await R.voerUit({ id, verkoper: 'MODE' });
+  assert.equal(uit.status, 409);
+  assert.equal(R.bij(id).besluit.uitgevoerd, false,
+    'anders staat er "betaald" bij een teruggave die niet is gedaan');
+});
+
+test('19. zonder geldlaag gebeurt er niets, en dat wordt gezegd', async () => {
+  const R = motorMetPay();          // niet gekoppeld
+  const id = await totAfgehandeld(R);
+  const uit = await R.voerUit({ id, verkoper: 'MODE' });
+  assert.equal(uit.status, 503);
+  assert.match(uit.error, /niet gekoppeld/);
+  assert.equal(R.bij(id).besluit.uitgevoerd, false);
+});
+
+test('20. uitvoeren kan alleen wat is afgehandeld, met geld, door de eigen zaak', async () => {
+  const R = motorMetPay(async () => ({ ok: true }));
+  // nog niet afgehandeld
+  const vroeg = R.vraag({ sleutel: 'lid1', codenaam: 'CN-1', koopbaar: jas(), orderRef: 'O', grond: 'defect', centen: 100 }).retour.id;
+  assert.equal((await R.voerUit({ id: vroeg, verkoper: 'MODE' })).status, 409);
+  // een uitkomst zonder geld
+  const zonderGeld = R.vraag({ sleutel: 'lid1', codenaam: 'CN-1', koopbaar: jas(), orderRef: 'O2', grond: 'defect', centen: 100 }).retour.id;
+  R.zet({ id: zonderGeld, naar: 'aanvaard', door: 'verkoper' });
+  R.zet({ id: zonderGeld, naar: 'onderweg', door: 'koper' });
+  R.zet({ id: zonderGeld, naar: 'beoordeeld', door: 'verkoper', staat: 'gebruikt' });
+  R.zet({ id: zonderGeld, naar: 'afgehandeld', door: 'verkoper', uitkomst: 'vervanging' });
+  assert.match((await R.voerUit({ id: zonderGeld, verkoper: 'MODE' })).error, /geen geld terug/);
+  // en een vreemde zaak
+  const mijn = await totAfgehandeld(R, { orderRef: 'O3' });
+  assert.equal((await R.voerUit({ id: mijn, verkoper: 'ANDERE' })).status, 403);
+});
+
+test('21. zonder codenaam kan er niet worden uitbetaald, en dat staat er', async () => {
+  /* De codenaam wordt bij de AANVRAAG vastgelegd, want bij het afhandelen is de
+     sessie er niet meer. Ontbreekt hij, dan weigert de uitvoering met de reden
+     in plaats van een naam op te zoeken. */
+  const R = motorMetPay(async () => ({ ok: true }));
+  const id = await totAfgehandeld(R, { codenaam: null });
+  assert.equal(R.bij(id).uitbetaalbaar, false);
+  const uit = await R.voerUit({ id, verkoper: 'MODE' });
+  assert.equal(uit.status, 409);
+  assert.match(uit.error, /naar wie het geld terug zou gaan/);
+});

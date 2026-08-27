@@ -156,7 +156,12 @@ async function beheer(sql) {
        worden nagespeeld. Nu komt bij elk bestand dat zakt OF nul toetsen draait
        de afloop mee, plus de laatste betekenisvolle regels van zijn uitvoer. */
     if (!geslaagd || tel === 0) {
-      const gezien = uit.split('\n').map(l => l.trimEnd())
+      /* De GEZAKTE toetsen eerst, en pas daarna de staart. Zonder die voorrang
+         bestond de laatste acht regels uit de samenvatting ("# fail 2") en
+         stond er nog steeds niet WELKE toets viel. */
+      const alles = uit.split('\n').map(l => l.trimEnd());
+      const gevallen = alles.filter(l => /^not ok |^\s+(error|expected|actual|code):/.test(l));
+      const gezien = gevallen.length ? gevallen : alles
         .filter(l => l.trim() && !/^(ok |# Subtest|# {2}|TAP version)/.test(l.trim()));
       console.log('        ' + K.grijs + 'afloop=' + r.status + ' signaal=' + r.signal + K.reset);
       for (const regel of gezien.slice(-8)) console.log('        ' + K.rood + regel.slice(0, 160) + K.reset);

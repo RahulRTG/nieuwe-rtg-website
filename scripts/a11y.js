@@ -63,6 +63,31 @@ const PAGINAS = alleSchermen().concat(['/site/404.html']);
    browser" die scripts/lib/scherm.js eerder ving: een require die slaagt
    terwijl de Chromium erachter ontbreekt. herkomst() blijft uit lib/scherm
    komen -- test/browser.js heeft die functie niet. */
+/* EEN SCHERM DAT ZICHZELF WEGSTUURT, LAAT DE HELE KEURING NIET VALLEN.
+
+   Een pagina die na het laden zelf naar een ander adres springt (een poort, een
+   apparaatgrens) onderbreekt de VOLGENDE goto: Playwright gooit dan
+   "Navigation to ... is interrupted by another navigation". Die worp stond
+   buiten elke vangst, dus na 273 schermen maal drie thema's viel de hele ronde
+   om op een enkel scherm -- op 27 augustus 2026 was dat kantoorpda.html onder
+   royal, terwijl champagne en bordeaux er net op tijd langs waren. Dat is een
+   race en geen oordeel.
+
+   Twee keer proberen dus, met een adempauze ertussen zodat de sprong van het
+   vorige scherm klaar is. Lukt het dan nog niet, dan is het WEL een bevinding:
+   een scherm dat niet te keuren is, telt hier als gebrek en wordt niet
+   stilzwijgend overgeslagen. */
+async function ga(pg, url) {
+  try { await pg.goto(url, { waitUntil: 'load' }); return null; }
+  catch (e) {
+    try {
+      await pg.waitForTimeout(700);
+      await pg.goto(url, { waitUntil: 'load' });
+      return null;
+    } catch (e2) { return e2.message.split('\n')[0]; }
+  }
+}
+
 function laadPlaywright() {
   try { return require('../test/browser').laadBrowser(); }
   catch (e) { try { return require('./lib/scherm').laadScherm(); } catch (e2) { return null; } }
@@ -344,7 +369,11 @@ function startEchteServer() {
     console.log(`\n[a11y] ===== ronde ${ronde.naam.toUpperCase()} (${PAGINAS.length} schermen) =====`);
 
     for (const pad of PAGINAS) {
-      await page.goto(basis + pad, { waitUntil: 'load' });
+      const misging = await ga(page, basis + pad);
+      if (misging) {
+        console.error(`[a11y] ${pad} (${ronde.naam}): niet te openen -- ${misging}`);
+        struct += 1; continue;
+      }
       await page.waitForTimeout(600); // laat intro-animaties (opacity) uitlopen
       let res;
       try { res = await hermeet(page, KEUR, (r) => r.overtredingen.length || r.contrast.length); }
@@ -446,7 +475,8 @@ function startEchteServer() {
        dus daarmee zou het leerlingprofiel de rest van de ronde meelopen. Zetten
        en terugzetten in localStorage blijft bij dit ene scherm. */
     const eigen = EIGEN_SESSIE[pad];
-    await tel.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
+    const telMis = await ga(tel, basis + (EIGEN_PAD[pad] || pad));
+    if (telMis) { console.error(`[a11y] ${pad} (telefoon): niet te openen -- ${telMis}`); continue; }
     if (eigen) {
       try {
         await tel.evaluate((z) => { try { localStorage.setItem('rtf_sessie', JSON.stringify(z)); } catch (e) {} }, eigen);
@@ -550,7 +580,8 @@ function startEchteServer() {
   console.log(`\n[a11y] ===== ronde TABLET (${PAGINAS.length} schermen, 834x1112, ingelogd) =====`);
   const tabu = { breed: [], klein: [], gemeten: 0 };
   for (const pad of PAGINAS) {
-    await tab.goto(basis + (EIGEN_PAD[pad] || pad), { waitUntil: 'load' });
+    const tabMis = await ga(tab, basis + (EIGEN_PAD[pad] || pad));
+    if (tabMis) { console.error(`[a11y] ${pad} (tablet): niet te openen -- ${tabMis}`); continue; }
     await tab.waitForTimeout(600);
     try {
       const m = await tab.evaluate(MOB('rechts'));
@@ -628,7 +659,11 @@ function startEchteServer() {
     const pg = await ctx.newPage();
     let struct = 0, contr = 0;
     for (const pad of PAGINAS) {
-      await pg.goto(basis + pad, { waitUntil: 'load' });
+      const misging = await ga(pg, basis + pad);
+      if (misging) {
+        console.error(`[a11y] ${pad} (${thema}): niet te openen -- ${misging}`);
+        struct += 1; continue;
+      }
       await pg.waitForTimeout(600);
       let res;
       try { res = await hermeet(pg, KEUR, (r) => r.overtredingen.length || r.contrast.length); }

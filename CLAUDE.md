@@ -245,7 +245,16 @@ staat in par. 3:** `kern/pay/poort.js` kent geen enkele demo-, test- of spelstan
 en dat is precies waarom Magnaat er niet bij kan — een spelbank moet geld uit
 niets maken. De uitweg is dus géén vlag in de poort maar een vierde provider naast
 de bestaande demo-provider in `server/betaal.js`; de regel die daaruit volgt is
-**een simulatie-adapter vervangt de rail, nooit de poort**. Twee dingen om niet
+**een simulatie-adapter vervangt de rail, nooit de poort**. **Die rail staat**
+(27 augustus 2026): `server/betaal/synthetisch.js`, en de poort is er geen letter
+voor veranderd. Wat hij toevoegt boven de demo is dat hij **stuk kan** — vier
+afloopen (`betaald`, `geweigerd`, `traag`, `terugboeking`), reproduceerbaar
+gekozen uit de idempotentiesleutel. Drie grendels, alle drie fail-closed en elk
+met de reden erbij: alleen met `RTG_SIMULATIEBANK=1`, nooit naast een échte
+provider, nooit in productie. En geen knop in de productieweg: geen enkele
+HTTP-route geeft een scenario door, want dan kan iemand een betaling laten slagen
+die niet geslaagd is. De meting van `MAGNAATLAB.json` staat nog steeds op 0% en
+dat klopt — de rail loopt, Magnaat draait er nog niet op. Twee dingen om niet
 te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis
 buiten Magnaat niet toestaat, staat een groene simulatie niet toe), en scores
 mogen op apps en capabilities maar niet op mensen. En er staan al **twee**

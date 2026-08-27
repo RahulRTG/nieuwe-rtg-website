@@ -341,17 +341,46 @@ afleidbaar mag zijn, en dan de combinaties daartegen houden.
 
 ## 5. Wat ontbreekt, en wat het kost
 
-### 5.1 De verbinding (par. 2) — 0%, en dat is de hele opgave
+### 5.1 De verbinding (par. 2) — de rail staat, de wereld nog niet
 
-Alles hierboven hangt hieraan. De goedkoopste eerste stap is niet een
-Simulation Cloud maar **één capability, één invariant, één keer bewezen**: laat
-Magnaat een boeking door `kern/pay/poort.js` doen via een `SyntheticBank` in
-`server/betaal.js`, en laat `scripts/magnaat-pomp.js` zijn geldpompvraag stellen
-aan díé keten in plaats van aan de spelbank.
+Alles hierboven hangt hieraan. De goedkoopste eerste stap was niet een
+Simulation Cloud maar **één capability, één invariant, één keer bewezen**.
 
-Slaagt dat, dan is de meting hierboven niet meer 0% en is er iets bewezen dat
-vandaag niet bewezen is. Slaagt het niet, dan is dát de bevinding, en die is meer
-waard dan een architectuurplaat.
+**De rail staat** (27 augustus 2026): `server/betaal/synthetisch.js` is de vierde
+provider achter de betaalnaad, naast Stripe, Mollie/Adyen en de demo. En
+`kern/pay/poort.js` is er niet voor veranderd — geen letter — want dat was de
+hele inzet.
+
+Wat hij toevoegt boven de demo-provider is precies wat een testhal nodig heeft:
+**hij kan stuk.** De demo bevestigt altijd en bewijst daarmee dat de zonnige dag
+werkt; deze bank kent vier afloopen — `betaald`, `geweigerd`, `traag`,
+`terugboeking` — en kiest er reproduceerbaar een uit de idempotentiesleutel, zodat
+dezelfde boeking in elke run dezelfde afloop geeft. De verdeling (85/7/5/3) is
+een **keuze en geen meting**: ze is gekozen zodat elk pad in een run van redelijke
+omvang voorkomt, niet omdat echt betaalverkeer er zo uitziet.
+
+Drie grendels, alle drie fail-closed, want deze bank maakt geld uit niets: hij
+draait alleen met `RTG_SIMULATIEBANK=1`, weigert zodra er een échte provider
+geconfigureerd is (een simulatie die een werkende rail overschaduwt is erger dan
+geen simulatie), en weigert altijd in productie — ook mét de vlag. Elke weigering
+noemt wélke grendel dichtzit.
+
+En er is met opzet **geen knop in de productieweg**: geen enkele HTTP-route geeft
+een scenario door, want wie een scenario over HTTP kan kiezen, kan een betaling
+laten slagen die niet geslaagd is. `test/simulatiebank.test.js` bewaakt dat, en
+bewaakt ook de poort zelf: die toets zakt zodra `kern/pay/poort.js` een demo-,
+spel- of testvorm gaat kennen. Drie mutaties liepen daar eerst dwars doorheen
+(`demoStand`, `RTG_SPELMODUS`, `isTest`) — de toets is daarop drie keer
+aangescherpt, en dát is waarom hij nu iets betekent.
+
+Het bewijs zelf staat er ook: een lid laadt op via de simulatiebank, een
+geweigerde simulatie levert geen cent op, en het geld dat er wél is gaat door de
+échte waardepoort — dezelfde code als in productie, er is geen tweede pad.
+
+**Wat dit NIET is.** De meting van par. 2 staat nog steeds op 0%, en terecht: er
+loopt nu een rail, maar Magnaat draait er nog niet op. `scripts/magnaat-pomp.js`
+stelt zijn geldpompvraag nog aan de spelbank en niet aan deze keten. Dat is fase
+2, en pas dán beweegt het getal.
 
 ### 5.2 Impact-based testing (punt 12) — de graaf ontbreekt
 
@@ -393,7 +422,7 @@ niet als geheel te beprijzen.
 | fase | wat | waarom nu |
 |---|---|---|
 | ~~**0. De testhal meten**~~ ✅ | `scripts/magnaatlab.js` + `MAGNAATLAB.json`; de uitkomst staat in par. 2 | zonder dit is "Magnaat is onze testhal" een intentie, en de meting zegt 0% |
-| **1. Eén capability erdoorheen** | Magnaat boekt via `kern/pay/poort.js` met een `SyntheticBank` in `server/betaal.js` | par. 5.1 — het bewijst de hele constructie of het weerlegt hem, en het raakt de poort niet aan |
+| ~~**1. Eén capability erdoorheen**~~ ✅ | de simulatiebank staat als vierde rail in `server/betaal/synthetisch.js`; `test/simulatiebank.test.js` laadt op via die rail en geeft het uit door de ECHTE waardepoort | par. 5.1 — het bewijst de hele constructie, en de poort is er niet voor veranderd |
 | **2. Eén invariant verplaatsen** | `magnaat-pomp.js` stelt zijn geldpompvraag aan die keten in plaats van aan de spelbank | de meter bestaat al; alleen zijn onderwerp verandert |
 | **3. De twee werelden wegen** | is `hospitality-universe` een tweede wereld of een tweede ingang? | par. 2 — vóór er een derde bij komt, niet erna |
 | **4. Afleidbaarheid meten** | punt 22: wat mag uit combinaties NIET afleidbaar zijn | par. 4.6 — het meeste rendement per dag, en geen wereld voor nodig |

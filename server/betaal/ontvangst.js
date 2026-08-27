@@ -3,8 +3,12 @@
    kern/betaalwaarheid. */
 'use strict';
 
-module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env, uit }) {
+module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, get, set, env, uit, simulatie }) {
   const stripeGehost = stripe && require('./stripe-gehost')(stripe);
+  /* De simulatiebank (./synthetisch.js) is de vierde rail en gedraagt zich als
+     de andere drie: hij is er of hij is er niet, en als hij er niet is zegt hij
+     waarom. Zie de kop daar voor de drie grendels. */
+  const simAan = !!(simulatie && simulatie.aan());
   const weigerUit = () => {
     if (uit) throw new Error('Betalen staat bewust uitgeschakeld. Er is niets afgeschreven.');
   };
@@ -15,6 +19,10 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     if (stripe) rails.push({ id: 'stripe', label: 'Stripe · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
     if (mollie) rails.push({ id: 'mollie', label: 'Mollie · iDEAL of bankbetaling', soort: 'doorsturen', echt: true });
     if (adyen) rails.push({ id: 'adyen', label: 'Adyen · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
+    /* De simulatiebank staat VOOR de demo in de lijst, en dat is met opzet: een
+       testhal die stilzwijgend de altijd-slaagt-demo krijgt, bewijst niets. */
+    if (!rails.length && simAan)
+      rails.push({ id: 'simulatie', label: 'Simulatiebank · testhal, geen echt geld', soort: 'simulatie', echt: false });
     if (!rails.length && standaard === 'demo')
       rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
     if (!rails.length) return { standaard: 'uit', rails: [], uit: true,
@@ -30,6 +38,14 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       if (gevraagd === 'mollie' && mollie) return 'mollie';
       if (gevraagd === 'adyen' && adyen) return 'adyen';
       if (gevraagd === 'demo' && standaard === 'demo' && !stripe && !mollie && !adyen) return 'demo';
+      /* Wie de simulatiebank vraagt terwijl die dichtzit, hoort te horen WELKE
+         grendel dichtzit -- niet "niet beschikbaar", want dan zoekt iemand een
+         kwartier naar een sleutel die er niet toe doet. */
+      if (gevraagd === 'simulatie') {
+        if (simAan) return 'simulatie';
+        throw new Error(simulatie ? simulatie.belet()
+          : 'De simulatiebank is niet gekoppeld. Er is niets afgeschreven.');
+      }
       throw new Error('Betaalprovider "' + gevraagd + '" is niet beschikbaar. Er is niets afgeschreven.');
     }
     if (String(opdracht && opdracht.methode || '').toLowerCase() === 'ideal' && mollie) return 'mollie';
@@ -88,6 +104,9 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       const p = await adyen.paymentLinks.create(parameters, { idempotencyKey: sleutel });
       res = { id: p.id, status: p.status, checkoutUrl: p.url, aanbieder: 'adyen',
         betaalId: p.pspReference || null, bedrag: Math.round(bedrag), valuta, referentie };
+    } else if (rail === 'simulatie') {
+      res = simulatie.maak({ bedrag, valuta, referentie, idempotentieSleutel: sleutel,
+        simulatie: opdracht && opdracht.simulatie });
     } else if (rail === 'demo') {
       res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
         aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };

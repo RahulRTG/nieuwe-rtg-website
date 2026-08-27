@@ -61,12 +61,27 @@ if (ADYEN_KEY && !BETALEN_UIT) {
   try { adyen = require('./adyen')(ADYEN_KEY); }
   catch (e) { /* configuratiecontrole maakt een echte productiefout zichtbaar */ }
 }
+/* DE VIERDE RAIL: de simulatiebank van de testhal (./betaal/synthetisch.js).
+
+   MAGNAATLAB.md par. 3: een simulatie-adapter vervangt de RAIL, nooit de POORT.
+   kern/pay/poort.js kent geen enkele demo-, test- of spelstand en dat blijft zo;
+   de naad waar een vierde provider in past, is deze. Hij weigert zichzelf zodra
+   er een echte provider staat, en altijd in productie -- zie de drie grendels
+   daar. */
+const echteRail = stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen' : null;
+const simulatie = require('./betaal/synthetisch')({ crypto, env: process.env, echteRail });
+const SIMULATIE_AAN = simulatie.aan() && !BETALEN_UIT;
+
 const voorkeur = String(process.env.PAYMENT_PROVIDER || '').toLowerCase();
 const AANBIEDER = BETALEN_UIT ? 'uit'
   : voorkeur === 'mollie' && mollie ? 'mollie'
   : voorkeur === 'adyen' && adyen ? 'adyen'
   : voorkeur === 'stripe' && stripe ? 'stripe'
   : stripe ? 'stripe' : mollie ? 'mollie' : adyen ? 'adyen'
+  /* De simulatiebank gaat VOOR de demo als hij bewust aan staat. Een testhal die
+     stilzwijgend de altijd-slaagt-demo krijgt, bewijst dat de zonnige dag werkt
+     en verder niets -- en dat is precies de dag waarop niemand een fout maakt. */
+  : SIMULATIE_AAN ? 'simulatie'
   : DEMO_BETALEN ? 'demo' : 'uit';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
@@ -82,7 +97,7 @@ function koppelStore(store) {
 
 const ontvangst = require('./betaal/ontvangst')({ crypto, stripe, mollie, adyen,
   standaard: AANBIEDER, get: (k) => haalOp(k), set: (k, v) => bewaar(k, v),
-  env: process.env, uit: BETALEN_UIT });
+  env: process.env, uit: BETALEN_UIT, simulatie: BETALEN_UIT ? null : simulatie });
 const {
   maakBetaling: maakProviderBetaling,
   haalBetaling, maakTerugbetaling, mogelijkheden, kiesAanbieder
@@ -187,6 +202,7 @@ module.exports = { AANBIEDER, BETALEN_AAN: !BETALEN_UIT && AANBIEDER !== 'uit',
   CONNECT_SANDBOX: sandbox.CONNECT, SEPA_SANDBOX: sandbox.SEPA,
   zetSandbox: (kanaal, aan) => regie.zet(kanaal, aan), sandboxStand: regie.stand,
   WEBHOOK_SECRET, MOLLIE_AAN: !!mollie, ADYEN_AAN: !!adyen,
+  SIMULATIE_AAN, simulatieBelet: () => simulatie.belet(),
   adyenMerchantAccount: adyen && adyen.merchantAccount,
   adyenHandmatigeCapture: !!(adyen && adyen.handmatigeCapture),
   verifieerAdyenMelding: (item) => !!(adyen && adyen.verifieerMelding(item)) };

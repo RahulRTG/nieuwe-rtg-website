@@ -29,7 +29,18 @@ const GEISOLEERD = new Set([
   'klok.test.js',
   'zaakdoos.test.js',
   'keuring.test.js',
-  'meterijk.test.js'
+  'meterijk.test.js',
+  /* vloot.test.js start VIER volledige RTG-servers tegelijk (de poortwachter en
+     drie groepen). Naast drie andere bestanden op een machine met vier kernen
+     vechten die om dezelfde CPU's, en dan haalt de opkomst het budget niet: op
+     27 augustus 2026 zakte hij met kantoor en rtf op 502 -- de gateway stond,
+     de groepen niet -- met een SQLite-lock ernaast. Los gedraaid is hij groen.
+
+     Hij hoort hier dus thuis om dezelfde reden als de twee zware serverproeven
+     hierboven, en het budget wordt NIET nog een keer opgerekt: dat is een keer
+     gebeurd (30s -> 120s, zie de kop van die toets) en een tweede keer zou het
+     symptoom behandelen in plaats van de oorzaak. */
+  'vloot.test.js'
 ]);
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0

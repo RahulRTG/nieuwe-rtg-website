@@ -138,6 +138,9 @@ module.exports = function bouwKernAan(kern, grens) {
   /* De Media OS leest de vier media-domeinen; hij hangt daarom NA clips,
      theater en podium, en heeft aan de kern verder niets eigens. */
   require('../routes/mediaos')(grens('mediaos'));
+  /* Uitvoerende media leest dezelfde catalogus als de Media OS en hangt daar
+     dus achter (UITVOEREND.md). */
+  require('../routes/uitvoering')(grens('uitvoering'));
   require('../routes/kantoorpakket')(grens('kantoorpakket'));
   require('../routes/mobiliteit')(grens('mobiliteit'));
   /* Het Foundation OS: steden, partnerstichtingen, projecten, vrijwilligers,

@@ -3311,6 +3311,32 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### Uitvoerende media (RTG speelt media niet af, RTG voert media uit)
+
+`server/kern/uitvoering/` + `/api/uitvoering/...`. Een maker publiceert geen bestand maar een **partituur**: fragmenten, welke daarvan onmisbaar zijn, wat RTG ermee mag doen en wie het mag zien. RTG bouwt daar op het moment van vragen één **uitvoering** van. De volledige redenering, inclusief wat er niet is en waarom, staat in `UITVOEREND.md`.
+
+Het dragende argument is niet ambitie maar meting: **dit huis kán geen montage renderen.** De clipbytes staan in OPFS op het toestel van de maker, het Theater hercomprimeert principieel niet, en een uitgave uit het Klankwerk is een rij getallen die het toestel uitrekent. Uitvoeren is dus het enige wat deze architectuur kan — en één stuk groot deed ze het al: de knip in `kern/clips-studio.js` is "een begin en een eind, geen nieuwe video".
+
+- **Vier begrippen, en ze zijn alle vier eerst GETELD.** In dit huis is een keer gebleken dat een naam stil twee dingen kan gaan betekenen (`SEMANTIEK.json`: 77 namen, 279 betekenissen), dus vóór er iets heette is elk woord gemeten. `aanspraak` en `partituur` waren vrij (nul treffers). Twee woorden uit de eerste opzet vielen af: **`deel` botste met `deelId()` en `delen`** in precies de module die het id moet parsen, en **`programma`** betekent hier al een lijst gebeurtenissen op een dag (reisboek, sportclub, clubs). Ze heten daarom `fragment` en `partituur`.
+- **Het fragment bezit niets.** `fragment:<vorm>:<domein-id>@<van>-<tot>` draagt een verwijzing en twee getallen, net als een afspeellijst — en wordt opgelost met de sessie van de **kijker**. Een uitvoering is dus geen doorgeefluik langs een dichte deur, ook niet als de maker het fragment er zelf in zette. Haalt de maker het stuk weg, dan staat het er als onbeschikbaar in plaats van te verdampen.
+- **De drie gezagsvormen.** Een uitvoering ontstaat alleen waar de **toestemming van de maker**, de **aanspraak van de kijker** en de **regels van de partituur** samen kloppen. Ontbreekt er een, dan komt er een **weigering met de reden** — die draagt hetzelfde bewijsblok als een geslaagde uitvoering, want juist wie niet krijgt wat hij vroeg hoort te kunnen zien waarom.
+- **RTG verzint er nooit iets bij.** Elke regel van een uitvoering is terug te voeren op een onderdeel dat de maker heeft aangewezen; er wordt niet overbrugd, niet gladgestreken en niet opgevuld. En **de kern is alles of niets**: mist een onmisbaar onderdeel, dan is het geen kortere versie maar een ander werk, en dus een weigering.
+- **Een aanspraak hangt aan een grond en nooit aan een boolean** — een **herkomst** (aankoop, cadeau, werkgever, kaartje, abonnement, promotie, organisator, maker) plus een **bron** (de gebeurtenis zelf). Zonder allebei ontstaat er geen aanspraak. Verlenen doet de maker, en alleen voor een code die een van zijn eigen partituren werkelijk vraagt; aan uzelf verlenen kan niet. Het is een **huiswoord, geen schermwoord**: een lid ziet "jouw aankopen", nooit "mijn aanspraken".
+- **Reproduceerbaar.** Er zit geen toeval in de motor: dezelfde vraag geeft dezelfde uitvoering. Zonder dat kan een maker niet nagaan wat een kijker werkelijk kreeg, en is "de officiële korte versie" een bewering die niemand kan controleren (`BESTUUR.md`).
+
+| route | wat het doet |
+| --- | --- |
+| `POST /api/uitvoering/partituren` | uw eigen partituren, met kern- en totaalduur |
+| `POST /api/uitvoering/partituur/maak` · `/zet` | aanmaken; naam, toestemming, benodigde aanspraak, klaarzetten |
+| `POST /api/uitvoering/partituur/onderdeel` | een fragment erbij, eruit of verplaatsen — alleen van **eigen** werk |
+| `POST /api/uitvoering/voer` `{partituurId, secondenBudget, diepte}` | de uitvoering, met per regel een `waarom` en een `bewijs`-blok |
+| `POST /api/uitvoering/aanspraken` | wat u heeft, met de grond eronder |
+| `POST /api/uitvoering/aanspraak/verleen` · `/intrek` | door de maker, voor een code die zijn eigen partituur vraagt |
+
+**Wat er níét is, en dat staat er met de reden bij.** De vierde kolom van een partituur — de **handelingen** (kopen, boeken, vragen vanuit een uitvoering) — is niet gebouwd, dus er staat geen knop die doet alsof. De aanspraak bestaat wel al; wat ontbreekt is de **aankoop** die er een verleent, en die hoort over `kern/pay/poort.js` te lopen en nergens anders. Er is deze ronde ook nog geen scherm: dit is de laag, niet de app. Zet de boardroom de schakelaar `uitvoering` uit, dan blijft de mediawereld eronder gewoon werken.
+
+`test/uitvoering.test.js` legt vijftien dingen vast, waaronder de vier die het makkelijkst stilletjes zouden verdwijnen: een budget onder de kern **weigert** (en levert geen korter werk), een partituur gaat alleen over **eigen** werk, zonder aanspraak komt er geen uitvoering én geen inhoudsopgave, en een verdwenen kern weigert. Alle vier zijn met een mutatie **zien zakken** (LAT.md regel 2); de mutatiemotor zet het bestand op *scherp: gezakt* — het zakt op de inhoud en niet alleen op de inlog.
+
 ### RTG Tenant Control Plane (de klant als ding, en het Werk OS onder zijn eigen naam)
 
 `server/kern/tenant/` + `/api/tenant/...` + `/api/techniek/tenant`. Het

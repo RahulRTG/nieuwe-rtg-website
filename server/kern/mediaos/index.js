@@ -136,6 +136,12 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
   }
 
   return Object.assign({}, lijsten, samen, {
+    /* De catalogus gaat naar buiten omdat de uitvoerende laag (kern/uitvoering/)
+       fragmenten met de sessie van de KIJKER moet oplossen, langs precies deze
+       weg. Hem daar opnieuw opbouwen uit dezelfde bronnen zou een tweede
+       antwoord geven op "wat mag dit lid zien" -- en dat is er een te veel
+       (LAT.md regel 4). Lezen alleen: er staat geen schrijvende functie op. */
+    mediaCatalogus: catalogus,
     mediaWereld: wereld, mediaVolg: volg,
     mediaBieb: bieb, mediaBewaar: bewaar,
     mediaMeldZet: meldZet, mediaMeldVan: meldVan,

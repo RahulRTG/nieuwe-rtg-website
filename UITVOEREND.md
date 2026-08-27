@@ -69,6 +69,7 @@ Geen inschatting: per bouwsteen staat het bestand erbij dat het doet.
 | **Eén poort voor elke handeling met geld** | geen tweede betaalweg, geen tweede saldo | `kern/pay/poort.js` |
 | **Intentie als interface** | de balk "Kies een wereld" wordt met een tik een vraagveld | `WERELD.md`, `public/shared/command/praat.js` |
 | **Een tijdgebonden tekstspoor** | `van`/`tot`/`tekst`, op één plek gevalideerd voor twee vormen | `kern/ondertitels.js` |
+| **De partituur, de aanspraak en de uitvoering** | gebouwd op 27 augustus 2026: zeven routes, vijftien toetsen, vier mutaties raak | `kern/uitvoering/`, `routes/uitvoering.js` |
 | **Benoemde stukken op een tijdlijn** | `secties`: intro, couplet, refrein als namen op stukken van het raster, bewaard op de track | `kern/muziek.js`, `kern/muziek-lied.js` |
 
 **En wat er niet staat, ook gemeten — met een correctie die de zaak sterker
@@ -93,28 +94,35 @@ publicatie krijgt vier delen, en alles hieronder is een gevolg daarvan.
 
 | deel | wat de maker vastlegt |
 |---|---|
-| **Onderdelen** | wat er ís — bestaande id's, plus één nieuwe vorm: `deel:` |
+| **Onderdelen** | wat er ís — bestaande id's, plus één nieuwe vorm: `fragment:` |
 | **Regels** | wat eruit mag ontstaan — verplichte kern, optionele verdieping, volgorde-eisen, minimum- en maximumduur, dieptes, talen |
 | **Toestemming** | wat RTG ermee mag — inkorten, hermonteren, als bron dienen, in een samengestelde uitzending |
-| **Handelingen** | wat het stuk kan dóén — kopen, boeken, vragen; altijd over de bestaande rails |
+| **Handelingen** | wat het stuk kan dóén — kopen, boeken, vragen; altijd over de bestaande rails *(nog niet gebouwd, zie par. 3)* |
 
-### 2.1 Het deel: de vijfde id-vorm
+### 2.1 Het fragment: de vijfde id-vorm
 
 `kern/mediaos/catalogus.js` kent vier vormen. Er komt er één bij, en maar één:
 
 ```
-deel:<vorm>:<domein-id>@<van>-<tot>
+fragment:<vorm>:<domein-id>@<van>-<tot>        fragment:track:u91c0@0-30
 ```
 
-Een deel bezit niets. Het is een bereik in een stuk dat een domein al bezit —
-exact het patroon van de bibliotheek en de afspeellijst (LAT-regel 4). Daaruit
-volgen drie eigenschappen die niet apart gebouwd hoeven te worden:
+**Het heette in de eerste opzet `deel`, en die naam is afgevallen op een
+meting.** `deel` is in precies deze laag al bezet: `deelId()` in
+`kern/mediaos/catalogus.js` SPLITST een stuk-id, en `delen` in
+`kern/mediaos/lijstdelen.js` betekent iets met iemand DELEN. Een derde
+betekenis erbij, uitgerekend in de module die het id moet parsen, is de stille
+botsing die `SEMANTIEK.json` telt. `fragment` kwam uit dezelfde meting als vrij.
 
-- **Haalt de maker het stuk weg, dan is het deel weg** — en het verdwijnt niet
-  stil, maar staat als weggehaald in de uitvoering.
-- **De deur blijft van het domein.** Een deel wordt opgelost met de sessie van
-  de kijker. Een uitvoering is dus nooit een weg om binnen te halen wat de wereld
-  weigert.
+Een fragment bezit niets. Het draagt een verwijzing en twee getallen — exact het
+patroon van de bibliotheek en de afspeellijst (LAT-regel 4). Daaruit volgen drie
+eigenschappen die niet apart gebouwd hoeven te worden:
+
+- **Haalt de maker het stuk weg, dan is het fragment weg** — en het verdwijnt
+  niet stil, maar staat als onbeschikbaar in de uitvoering.
+- **De deur blijft van het domein.** Een fragment wordt opgelost met de sessie
+  van de kijker. Een uitvoering is dus nooit een weg om binnen te halen wat de
+  wereld weigert.
 - **Er wordt niets gekopieerd**, dus er ontstaat geen tweede administratie naast
   het origineel.
 
@@ -153,38 +161,83 @@ in deze 24 minuten" hoort een antwoord te krijgen.
 
 ## 3. De vijf standaarden, per stuk in een bak
 
+Bijgewerkt op 27 augustus 2026, nadat de motor er stond.
+
 | # | idee | standaard | bak | wat het nog vraagt |
 |---|---|---|---|---|
-| 11 | muzikaal universum (NIGHT DRIVE) | Elastic | **een stap weg** | een uitgave die de regel draagt i.p.v. de kanalen; de generator staat er al |
-| 1 | film die zich aan jou vormt | Elastic | **een stap weg** (runtime) / **jaren** (auteurschap) | het programma-begrip; de studio voor de maker is het echte werk |
-| 7 | "leg me dit uit in 20 minuten" | Elastic | **een stap weg** | idem, plus een ingang; die ingang bestaat (`praat.js`) |
+| 1 | film die zich aan jou vormt | Elastic | **staat** (runtime) / **jaren** (auteurschap) | de motor draait; de studio voor de maker is het echte werk |
+| 7 | "leg me dit uit in 20 minuten" | Elastic | **een stap weg** | de motor is er; wat ontbreekt is de ingang, en die bestaat (`praat.js`) |
 | 13 | geen homepage, intentie als interface | — | **staat** | aansluiten op de bestaande balk, geen tweede ingang bouwen |
-| 4 | content die terugpraat | Responsive | **een stap weg** | keuzepunten als regels in het programma |
+| 8 | makers verkopen aanspraken | — | **staat** (het begrip) / **een stap weg** (de aankoop) | de aanspraak werkt; de koppeling aan RTG Pay is de volgende stap |
+| 11 | muzikaal universum (NIGHT DRIVE) | Elastic | **een stap weg** | een uitgave die de regel draagt i.p.v. de kanalen; de generator staat er al |
+| 4 | content die terugpraat | Responsive | **een stap weg** | keuzepunten als regels in de partituur |
 | 6 | "maak mijn ochtend" | Elastic + Responsive | **een besluit nodig** | zie 4.4: alleen op wat het lid zelf heeft aangewezen |
 | 5 | RTG Recall | Responsive | **een besluit nodig** | zie 4.4; het is `smaak.js` met een tijdas, niet een profiel |
 | 9 | objecten in media | Executable | **een besluit nodig** | zie 4.5: verklaard door de maker, nooit gedetecteerd |
 | 2 | aanwezigheid i.p.v. livestream | World | **een besluit nodig** | het Podium heeft de motor; de ruimte is een wereld en moet de lat halen |
 | 3 | een maker publiceert een wereld | World | **een besluit nodig** | zie 4.2: het wereldpatroon is de lat, niet een tabbladenbundel |
-| 8 | makers verkopen capabilities | — | **een besluit nodig** | zie 4.1: de naam is twee keer bezet |
 | 10 | media beweegt tussen apparaten | Fluid | **jaren weg** | tussen tabbladen staat het (`shared/speler.js`); tussen apparaten is een ander ding |
 | 12 | Creator Presence | World | **jaren weg** | zie 4.3 |
 
----
+**Wat er van de motor NIET staat, en dat hoort er hardop bij.** Een partituur
+draagt vandaag onderdelen, regels en toestemming; de vierde kolom uit par. 2 --
+de **handelingen** (kopen, boeken, vragen vanuit een uitvoering) -- is niet
+gebouwd. Er is dus nog geen enkele knop in een uitvoering die geld of een
+afspraak raakt, en er staat er ook geen die doet alsof. De aanspraak is er wel
+al: wat ontbreekt is de aankoop die hem verleent, en die hoort over
+`kern/pay/poort.js` te lopen en nergens anders.
+
+Ook niet gebouwd: een scherm. Deze ronde is de laag en niet de app.
 
 ## 4. Waar de opzet en het huis botsen
 
-### 4.1 "Capability" is hier al twee keer bezet
+### 4.1 "Capability" heette hier al twee dingen — het besluit is genomen
 
-`OS.md` heeft dit gemeten en het is geen muggenziften: het woord staat in het
+`OS.md` had dit gemeten en het was geen muggenziften: het woord staat in het
 lagenmodel van `PLATFORM.md` én in dat van de OS-opzet, en het betekent er niet
-hetzelfde (daar een genre-cap, hier een bedrijfsfunctie). `SEMANTIEK.json` telt
-77 namen die meer dan één betekenis dragen; dit zou de 78ste worden, en wel
-meteen in een verkoopbelofte aan makers.
+hetzelfde. `SEMANTIEK.json` telt 77 namen die meer dan één betekenis dragen; dit
+zou de 78ste zijn geworden, en meteen in een verkoopbelofte aan makers.
 
-**Dit is het goedkoopste besluit om nu te nemen en het duurste om uit te
-stellen.** Een derde betekenis erbij is niet te repareren zodra er drie schermen,
-een prijskaartje en een uitgeversovereenkomst aan hangen. Wat een maker verkoopt
-verdient een eigen woord.
+**Besluit van de eigenaar (27 augustus 2026): het heet `aanspraak`.** Niet
+capability, niet skill, niet access, niet membership. De meting bevestigde dat
+de naam vrij was: nul treffers in `server/` en `public/`, op één stuk lopende
+tekst in de juridische voorwaarden na — waar het precies dit betekent.
+
+Het is ook het enige woord dat de RELATIE beschrijft in plaats van een kant
+ervan:
+
+| woord | wat het beschrijft |
+|---|---|
+| capability | wat een systeem KAN |
+| toestemming | wat iemand MAG |
+| toegang | of een deur opengaat |
+| abonnement | een betaalvorm |
+| product | wat er verkocht wordt |
+| **aanspraak** | **wat deze mens van deze maker mag verlangen, en waarom** |
+
+Daaruit volgt de keten: **aanbod → aankoop → aanspraak → uitvoering**. Een
+maker verkoopt een product; dat product VERLEENT aanspraken; de uitvoering
+controleert de aanspraak. Een betaald fotografieprogramma is dus niet zelf een
+rechtenset — dat onderscheid is precies wat de oude naam kwijtraakte.
+
+En de herkomst verschilt terwijl de uitvoering dat niet hoeft te weten: een
+aanspraak uit een aankoop, een cadeau, een werkgeversbudget, een kaartje, een
+actie of van de maker zelf zijn voor de motor hetzelfde ding. Het gratis pad en
+het betaalde pad delen dus één deur — er is er maar één die dicht kan zitten.
+
+**Twee grenzen bij dit woord.** Een aanspraak hangt aan een HERKOMST plus een
+BRON en nooit aan een boolean (dezelfde regel die `WAARDE.md` aan uitbetalen
+stelt): zonder allebei ontstaat er geen aanspraak, en is er dus ook nooit een
+die per ongeluk aanstaat. En het is een **huiswoord, geen schermwoord** — een
+lid ziet "jouw aankopen", "jouw cursussen", "jouw kaartjes", nooit "mijn
+aanspraken", net zomin als hij hoort te weten dat een montage intern een lijst
+fragmenten is.
+
+*Ook `programma` viel af op dezelfde meting: het betekent hier al een lijst
+gebeurtenissen op een dag (`kern/rechterhand/reisboek.js`,
+`kern/sportclub/cockpit.js`, `kern/rtfclubs.js`). Wat de maker vastlegt heet
+daarom `partituur` — vrij, en de metafoor klopt tot in de details: een partituur
+wordt niet afgespeeld maar uitgevoerd.*
 
 ### 4.2 "Wereld" heeft hier al een lat
 
@@ -291,19 +344,21 @@ Twee dingen die dat verzachten en die er al zijn:
 
 ## 6. De volgorde
 
-1. **Het woord voor wat een maker verkoopt** (4.1). Een besluit, geen bouwwerk,
-   en alles erna gebruikt het.
-2. **Het deel en de uitvoering** op wat er al staat: een programma over bestaande
-   stukken, "ik heb 24 minuten", uitgevoerd door de spelers die er zijn. Geen
-   transcodering, geen nieuw beeld. Dit is het kleinste bewijs van de these.
-3. **Het muzikaal universum** in het Klankwerk (#11): de goedkoopste nieuwe
+1. ~~**Het woord voor wat een maker verkoopt.**~~ **Genomen op 27 augustus 2026:
+   `aanspraak`** (par. 4.1). Twee andere namen vielen op dezelfde meting af:
+   `deel` werd `fragment`, `programma` werd `partituur`.
+2. ~~**Het fragment en de uitvoering** op wat er al staat.~~ **Gebouwd**:
+   `kern/uitvoering/`, zeven routes, vijftien toetsen, vier mutaties raak. Geen
+   transcodering, geen nieuw beeld — de bestaande spelers voeren het uit.
+3. **De aankoop die een aanspraak verleent**, over `kern/pay/poort.js`. Vandaag
+   verleent alleen de maker er een; dat is de helft van de keten.
+4. **Het muzikaal universum** in het Klankwerk (#11): de goedkoopste nieuwe
    standaard, en de enige die de grote drie structureel niet hebben.
-4. **De makersstudio** voor delen en regels — het punt waarop dit staat of valt.
-5. **Verklaarde objecten** (4.5), over de bestaande betaalpoort.
-6. Pas daarna de wereld (4.2) en, als hij zijn vijf voorwaarden kan dragen, de
+5. **De makersstudio** voor fragmenten en regels — het punt waarop dit staat of
+   valt (par. 5).
+6. **Verklaarde objecten** (4.5), over dezelfde betaalpoort.
+7. Pas daarna de wereld (4.2) en, als hij zijn vijf voorwaarden kan dragen, de
    aanwezigheid (4.3).
-
----
 
 ## 7. Wat dit document niet is
 

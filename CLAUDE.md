@@ -126,18 +126,34 @@ renderen — de clipbytes staan in OPFS op het toestel van de maker, het Theater
 hercomprimeert principieel niet, en een uitgave uit het Klankwerk is een rij
 getallen die het toestel uitrekent. Dus moet het uitvoeren, en het doet dat één
 stuk groot al: de knip in `kern/clips-studio.js` is "een begin en een eind, geen
-nieuwe video". Er komt daarom één begrip bij en geen laag: het **deel**
-(`deel:<vorm>:<domein-id>@<van>-<tot>`), dat net als een afspeellijst alleen
-verwijst en met de sessie van de KIJKER wordt opgelost — een uitvoering is dus
-nooit een weg naar wat de wereld weigert. De regel die niet mag sneuvelen staat
-in par. 2.3: **RTG monteert alleen uit wat de maker heeft aangewezen en verzint
-er nooit iets bij** — past het gevraagde niet binnen de regels, dan wordt het
-geweigerd mét de reden en niet opgevuld, overbrugd of gladgestreken. Lees verder
-vooral par. 4, de botsingen: het woord "capability" is hier al twee keer bezet
-(`OS.md`) en een derde betekenis is het goedkoopste besluit om nu te nemen, een
-maker die een *wereld* publiceert moet het wereldpatroon van `PLATFORM.md` halen
-en niet een tabbladenbundel zijn, en een aanwezigheid gebouwd uit het materiaal
-van een maker draagt vijf voorwaarden of vervalt. Par. 5 zegt waar het omvalt als
+nieuwe video".
+
+**De laag staat sinds 27 augustus 2026** in `server/kern/uitvoering/`, met vier
+begrippen die alle vier eerst zijn GETELD voor ze een naam kregen — omdat een
+naam hier stil twee dingen kan gaan betekenen (`SEMANTIEK.json`): een
+**partituur** (wat de maker vastlegt), een **fragment**
+(`fragment:<vorm>:<domein-id>@<van>-<tot>`, een bereik in een stuk), een
+**aanspraak** (wat een kijker mag verlangen, en op welke grond) en de
+**uitvoering** zelf. Twee woorden uit de eerste opzet vielen op die meting af,
+en dat is het patroon om vast te houden: `deel` botste met `deelId()` en
+`delen` in precies de module die het id moet parsen, en `programma` betekent
+hier al een lijst gebeurtenissen op een dag. Een fragment verwijst alleen en
+wordt opgelost met de sessie van de KIJKER — een uitvoering is dus nooit een weg
+naar wat de wereld weigert.
+
+Drie regels die niet mogen sneuvelen. **RTG monteert alleen uit wat de maker
+heeft aangewezen en verzint er nooit iets bij**: past het gevraagde niet binnen
+de regels, dan wordt het geweigerd mét de reden en niet opgevuld, overbrugd of
+gladgestreken (een weigering is daar een volwaardige uitslag, met hetzelfde
+bewijsblok als een geslaagde uitvoering). **De kern is alles of niets**: een
+uitvoering die een onmisbaar onderdeel mist is niet een kortere versie maar een
+ander werk. En **een aanspraak hangt aan een herkomst plus een bron en nooit aan
+een boolean** — dezelfde regel die `WAARDE.md` aan uitbetalen stelt.
+
+Lees verder vooral par. 4, de botsingen: een maker die een *wereld* publiceert
+moet het wereldpatroon van `PLATFORM.md` halen en niet een tabbladenbundel zijn,
+en een aanwezigheid gebouwd uit het materiaal van een maker draagt vijf
+voorwaarden of vervalt. Par. 5 zegt waar het omvalt als
 het omvalt: niet op de runtime maar op het auteurschap — dit leeft of sterft bij
 de studio voor de MAKER, niet bij de speler voor de kijker.
 

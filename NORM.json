@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-08-24",
+  "vastgelegd": "2026-08-27",
   "meters": {
     "endpointsZonderTest": 1173,
     "dekkingPct": 72,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 5,
     "inlineStijlAttributen": 4905,
     "browserpoortToetsen": 206,
-    "kernBreedte": 1422,
+    "kernBreedte": 1423,
     "kernGedeeld": 194,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -34,6 +34,11 @@
     "schermenZonderVormtaal": 184
   },
   "notities": [
+    {
+      "datum": "2026-08-27",
+      "meter": "kernBreedte 1422 -> 1423 (uitvoerende media)",
+      "reden": "Uitvoerende media (UITVOEREND.md): de partituur, de aanspraak en de uitvoering. kernBreedte +1, en het is precies EEN naam: `uitvoering`. Dat is met opzet zo laag.\n\nDe laag heeft acht handelingen (partituren lezen, een partituur maken, zetten, een onderdeel erbij, uitvoeren, aanspraken lezen, verlenen, intrekken). Acht losse kern-namen zou de meter acht omhoog duwen; ze staan daarom op EEN genest object, zoals kern.werkplekken dat al doet. De route raakt dus een naam aan en de andere zeven wonen daarbinnen.\n\nDe tweede naam die deze tak toevoegt, `mediaCatalogus`, telt hier NIET mee: die wordt alleen door server/opzet/uitvoering.js gelezen en door geen enkele route aangeraakt. Hij bestaat omdat een fragment met de sessie van de KIJKER moet worden opgelost langs precies dezelfde weg als de Media OS -- hem daar opnieuw opbouwen zou een tweede antwoord geven op \"wat mag dit lid zien\" (LAT.md regel 4), en dat is duurder dan een naam.\n\nVier andere meters bewogen eerst mee en zijn ALLEMAAL bij de oorzaak hersteld in plaats van hier opgeschreven: keuringScheef en keuringTeGroot (vier regels commentaar duwden opzet/kernlaag7.js over de 10 kB; teruggebracht tot een regel, de uitleg staat in opzet/uitvoering.js waar hij hoort), keuringDubbeling (`voerUit` en `intrek` stonden al in twee kernmodules; hier heten ze bouwUitvoering en trekAanspraakIn), routesNietSchakelbaar (de zeven routes hangen nu aan de boardroom-schakelaar `uitvoering`) en keuringOmvang (de verantwoording is uit uitvoer.js gehaald naar bewijs.js -- ook inhoudelijk juist: de laag die kiest, verantwoordt niet)."
+    },
     {
       "datum": "2026-08-25",
       "meter": "keuringOmvang 169 -> 171; kernBreedte 1421 -> 1422 (de waardelaag, OPNIEUW GEMETEN na het vijfde samengaan met main)",

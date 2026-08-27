@@ -6324,6 +6324,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "uitvoering.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
+      "scherp": "gezakt"
+    },
     "uitvoerproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",

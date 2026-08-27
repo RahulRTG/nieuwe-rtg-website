@@ -43,7 +43,16 @@ async function wachtTot(fn, ms = 20000) {
    terugkomt). Twee getallen voor dezelfde vraag lopen uiteen (LAT-regel 4).
    Een poll kost niets; een vloot die er echt niet komt zakt straks net zo
    hard, alleen later. */
-const OPKOMST = 120000;
+/* DE OPKOMSTGRENS: RUIM GENOEG OM EEN HANGER TE BLIJVEN VINDEN.
+
+   Stond op twee minuten. Op 27 augustus 2026 zakte deze toets in CI met
+   {"leden":200,"kantoor":502,"rtf":200}: twee groepen stonden, de derde was nog
+   aan het opstarten. Geen crash dus, maar een vloot van vier processen die na
+   een grote samenvoeging meer code laadt op een runner die tegelijk drie andere
+   scherven draait. Vier minuten is nog steeds ruim onder een echte hanger (die
+   komt nooit) en ruim boven wat een trage start kost. De melding zegt al welke
+   groep achterbleef -- dat is de aanwijzing die telt, niet het cijfer zelf. */
+const OPKOMST = 240000;
 
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {

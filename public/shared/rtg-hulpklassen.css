@@ -42,6 +42,12 @@
 .h-flex1 { flex: 1 !important; }
 .h-flex2 { flex: 2 !important; }
 .h-wrap  { flex-wrap: wrap !important; }
+/* een veld dat meegroeit maar met een LEESBARE basis begint. .h-flex1 is
+   `flex:1`, en dat is basis 0: in een rij met een label en een knop wordt zo'n
+   veld op telefoonformaat tot een paar pixels platgedrukt -- op
+   /apps/horeca-bezorg.html mat de raakvlakronde 23x44. Met een basis van 12rem
+   samen met .h-wrap slaat de rij om in plaats van te knijpen. */
+.h-groei12 { flex: 1 1 12rem !important; }
 
 /* een cel die de hele rasterbreedte pakt */
 .h-volbreed { grid-column: 1 / -1 !important; }

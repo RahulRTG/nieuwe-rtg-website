@@ -487,21 +487,6 @@
     },
     {
       "overlap": 1,
-      "a": "server/kern/webmaker-schoon.js",
-      "aNaam": "ZAAKBRONNEN",
-      "b": "server/kern/webplatform.js",
-      "bNaam": "BRONNEN",
-      "leden": 12,
-      "voorbeeld": [
-        "menu",
-        "diensten",
-        "kamers",
-        "agenda",
-        "events"
-      ]
-    },
-    {
-      "overlap": 1,
       "a": "server/kern/agenda.js",
       "aNaam": "DAGEN",
       "b": "server/kern/genootschap/inzicht.js",
@@ -731,6 +716,21 @@
       "aNaam": "GROEPEN",
       "b": "server/kern/geloofbieb.js",
       "bNaam": "ZICHT",
+      "leden": 5,
+      "voorbeeld": [
+        "mini",
+        "kind",
+        "tiener",
+        "jong",
+        "volw"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/foundation/gezinshulp.js",
+      "aNaam": "GROEPEN",
+      "b": "server/kern/leren/schrijven.js",
+      "bNaam": "OPDRACHTEN",
       "leden": 5,
       "voorbeeld": [
         "mini",
@@ -1882,7 +1882,7 @@
           "bestanden": [
             "server/kern/webplatform.js"
           ],
-          "leden": 12,
+          "leden": 13,
           "voorbeeld": [
             "menu",
             "diensten",

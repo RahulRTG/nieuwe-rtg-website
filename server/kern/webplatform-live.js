@@ -6,6 +6,14 @@
    stond al buiten: de publieke zaakgegevens, gepubliceerde events, openstaande
    vacatures en het reviewgemiddelde. */
 module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team, salonBeeld }) => {
+  /* DE WINKELBRON WORDT LAAT GEKOPPELD. kern/commerce komt na dit bestand
+     (kernlaag2b tegenover server.js), dus de verwijzing wordt hier vastgehouden
+     en niet meegegeven -- zelfde patroon als koppelGrens in kern/pay/poort.js.
+     Niet gekoppeld betekent: de bron lost op naar niets, en dat is precies wat
+     een bron zonder inhoud hoort te doen. */
+  let winkelVan = null;
+  const koppelWinkel = (fn) => { winkelVan = typeof fn === 'function' ? fn : null; };
+  const winkel = (code) => (winkelVan ? winkelVan(code) : null);
   function los(blok, s) {
     const uit = [];
     const kop = t => uit.push({ id: blok.id + '-k', type: 'kop', tekst: t });
@@ -13,7 +21,30 @@ module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team, salonBeeld }) =>
     const regel = x => [x.name, x.desc].filter(Boolean).join(' -- ') + (x.price != null || x.prijs != null ? '  ·  ' + geld(x.price != null ? x.price : x.prijs) : '');
     const bron = blok.bron;
 
-    if (bron === 'menu' && (s.menu || []).length) {
+    /* DE WINKEL. Leest kern/commerce (de graaf) en bezit niets: wat hier komt te
+       staan is wat daar te koop staat, op het moment van openen. Alleen wat
+       BEVESTIGD kan worden komt erin -- een aanbod zonder koopknop op een
+       winkelpagina is een aanbod waar een bezoeker op klikt en niets vindt.
+
+       Er staat geen mand en geen afrekenknop bij, en dat is geen omissie: kopen
+       gebeurt waar het al gebeurt (COMMERCE.md grens 5, en de afrekening zegt
+       zelf waar dat is). Deze bron toont; hij verkoopt niet. */
+    if (bron === 'winkel') {
+      let e = null;
+      try { e = winkel ? winkel(s.code) : null; } catch (err) { e = null; }
+      const teKoop = (e && e.teKoop) || [];
+      if (teKoop.length) {
+        kop('Te koop');
+        teKoop.slice(0, 40).forEach((k, i) =>
+          item('w' + i, [k.titel, k.prijs && k.prijs.bedrag != null
+            ? geld(k.prijs.bedrag) + (k.prijs.vanaf ? ' (vanaf)' : '') + (k.prijs.eenheid ? '  ·  ' + k.prijs.eenheid : '')
+            : null].filter(Boolean).join('  ·  ')));
+        /* Een onvolledige leeslaag wordt GEZEGD en niet stil ingekort: een
+           etalage die een leverancier weglaat is erger dan een die zegt dat ze
+           hem niet kon ophalen (LAT-regel 5). */
+        if (e && e.volledig === false) item('wstuk', 'Niet alles kon worden opgehaald; deze lijst is mogelijk niet compleet.');
+      }
+    } else if (bron === 'menu' && (s.menu || []).length) {
       kop('Menu');
       s.menu.slice(0, 30).forEach((x, i) => item('m' + i, regel(x)));
     } else if (bron === 'diensten' && (s.services || []).length) {
@@ -92,5 +123,6 @@ module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team, salonBeeld }) =>
     return uit;
   }
 
+  los.koppelWinkel = koppelWinkel;
   return los;
 };

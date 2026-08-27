@@ -35,4 +35,12 @@ Object.assign(kern, require('../kern/commerce').maakCommerce({
   zaakVan: findSupplier,
   capsVan: (s) => db.capsVan(s)
 }));
+/* DE WINKELBRON VAN HET WEB PLATFORM. kern/webplatform.js wordt in server.js
+   gebouwd, ver voor deze laag, dus hij krijgt de winkel hier laat aangereikt --
+   zelfde patroon als koppelGrens in kern/pay/poort.js. Zonder deze regel lost
+   een `winkel`-blok op naar niets, en dat is precies wat een bron zonder
+   inhoud hoort te doen; mét deze regel toont hij wat er te koop staat. */
+if (kern.webplatform && kern.webplatform.koppelWinkel) {
+  kern.webplatform.koppelWinkel((code) => kern.commerce.etalage(code));
+}
 };

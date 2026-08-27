@@ -345,6 +345,15 @@ autonome betaling die grens 2 verbiedt.
   betekenen. De elf eigenschappen die par. 4 opsomt en die nergens bestaan
   (prijsbeleid, betaalbeleid, fulfilment, eigen domein, merk) staan er niet als
   leeg veld maar in `NIET_GEBOUWD` met de reden.
+- **De winkel op een partnersite.** Er is géén productblok bijgekomen, en dat is
+  de pointe: `winkel` is een dertiende **bron** van het bestaande
+  `zaakdata`-blok geworden (`webplatform.js`), naast `menu`, `kamers` en
+  `agenda`. Een zaakdata-blok draagt een verwijzing en lost bij het openen op uit
+  de laag die er werkelijk over gaat — dus wijzigt het aanbod, dan staat het op
+  de site zonder dat iemand de site aanraakt (het Business Master Record). Zo
+  blijft grens 5 staan zonder dat er iets voor moest wijken: Webmaker heeft nog
+  steeds 14 bloktypes en nul commerce-logica. Wat de bron toont is wat er te
+  koop staat; kopen gebeurt waar het al gebeurde.
 - **Wat een aanbod NIET kan, met de reden erbij.** De unieke opbrengst van deze
   laag. Een ondernemer ziet per regel waarom er geen koopknop staat, en het
   verschil tussen *er is iets te doen* (zet een prijs) en *er is niets aan de
@@ -352,9 +361,6 @@ autonome betaling die grens 2 verbiedt.
 
 ### Een stap weg
 
-- **De winkelblokken in Webmaker.** 14 bloktypes nu (`webmaker-schoon.js:10`),
-  geen product-, mand- of afrekenblok. De leeslaag staat er nu, dus dit zijn
-  weergaven zonder logica — precies zoals grens 5 eist.
 - **`kern/retail` afmaken tot 6/8.** Prijsfunctie, levering, annulering — de drie
   die het domein mist en die `kern/mall` en `kern/horeca` al hebben.
 - **Een exacte prijs waar nu een vanaf-prijs staat.** Op de seed dragen 12 van de

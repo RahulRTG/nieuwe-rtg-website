@@ -22,7 +22,7 @@ const RV = require('../onderneming/rechtsvorm');
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, tijdZet, tijdOpDatum, tijdOpDatumVan,
-    tijdGeschiedenis, tijdVerwijderEntiteit, tijdVandaag } = ctx;
+    tijdGeschiedenis, tijdVerwijderEntiteit, tijdVandaag, opslag } = ctx;
 
   const nu = () => new Date().toISOString();
 
@@ -32,12 +32,7 @@ module.exports = (ctx) => {
      allebei een entiteit "samenstellen" lopen uiteen (LAT-regel 4). */
   const { entiteitBeeld } = require('./entiteit-beeld')(ctx);
 
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!db.data.concern.entiteiten || typeof db.data.concern.entiteiten !== 'object')
-      db.data.concern.entiteiten = {};
-    return db.data.concern.entiteiten;
-  }
+  const bak = () => opslag.tak('entiteiten');
 
   const vind = (id) => bak()[String(id || '')] || null;
   const vanEigenaar = (key) => Object.values(bak()).filter(e => e.eigenaar === key);

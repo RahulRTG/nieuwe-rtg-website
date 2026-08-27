@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 139,
-    "keuringOmvang": 170,
+    "keuringOmvang": 171,
     "keuringDubbeling": 120,
     "keuringDekkingAdvies": 56,
     "endpointsNooitAangeraakt": 0,
@@ -32,8 +32,8 @@
     "bronBlindeBestanden": 0,
     "delenZonderOnderwerp": 0,
     "schermenZonderVormtaal": 181,
-    "dbDeuren": 693,
-    "dbDeurenSchrijvend": 418
+    "dbDeuren": 661,
+    "dbDeurenSchrijvend": 392
   },
   "notities": [
     {
@@ -524,6 +524,11 @@
       "datum": "2026-08-24",
       "meter": "endpointsZonderTest 1179 -> 1173, inlineStijlAttributen 4936 -> 4905 (allebei STRAKKER)",
       "reden": "Twee reparaties, geen nieuw werk, en allebei gevonden doordat de norm rood ging.\n\nendpointsZonderTest: twintig toetsbestanden op deze tak plakten hun routes aan elkaar (`api('/api/supplier/horeca' + pad)`), waardoor 372 aanroepen naar endpoints die WEL getoetst worden als ongedekt telden -- scripts/lib/routedekking.js zoekt de route als TEKST. Precies dezelfde fout als in werkgevolg.test.js op 23 augustus, en dezelfde oplossing: de route staat nu voluit in elke aanroep. Netto zes endpoints onder de oude norm, ondanks dertien nieuwe endpoints erbij.\n\ninlineStijlAttributen: 55 style-attributen weg uit horeca.html, horeca-beheer.html, horeca-pda.html en horeca/bar.js. Ze zijn klassen geworden in shared/zaakscherm.css, in de lijn die daar al lag (.z-mt40 en zijn buren, met dezelfde reden erbij: style-src-attr in de CSP kan pas dicht als ze weg zijn). En schermenZonderVormtaal ging van 187 terug naar 184 doordat de drie nieuwe horecaschermen de tokenlaag van ONTWERP.md nu insluiten."
+    },
+    {
+      "datum": "2026-08-27",
+      "meter": "keuringOmvang 170 -> 171 (met de hand); dbDeuren 693 -> 661 en dbDeurenSchrijvend 418 -> 392",
+      "reden": "Vier domeinen achter een opslagcontract: payroll, concern, veiligheid en mobiliteit. Twee meters gaan flink omlaag en een gaat met de hand omhoog, en dat laatste hoort uitgelegd.\n\nserver/kern/mobiliteit/index.js stond op 9364 byte; de adviesdrempel van keuringOmvang ligt op 9400. De regel die het contract bedraadt -- ctx.opslag = require('./opslag')({ db }) -- kost 50 byte, en daarmee komt het bestand op 9414. Er is dus GEEN vorm van die regel die eronder blijft, ook niet zonder commentaar en zonder lege regel (nagemeten: 9406).\n\nDe alternatieven waren commentaar wegschaven elders in het bestand, of index.js opknippen. Het eerste is precies het spel dat TAKEN.md 6.16 beschrijft: de uitzonderingslijst groeide daar jaren omdat niemand de meter wilde zien bewegen. Het tweede is een echte snede, maar index.js is een bedradingsbestand van vijfentwintig Object.assign-regels; er valt geen natuurlijke naad in te leggen die iets oplost.\n\nDus staat hij hier als besluit in plaats van als gescheefde meting. Het bestand is 9461 byte en de HARDE grens (keuringsregel 13) ligt op 10240, dus er is ruimte; wie hem ooit toch opknipt, zet deze meter weer op 170."
     }
   ],
   "prestatie": {

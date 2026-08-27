@@ -16,13 +16,11 @@
         niemand het alarm nog. Vals alarm sloopt een veiligheidssysteem.
      2. daarna pas de kring.
    Het codewoord slaat trede 1 over: daar is de vertraging juist het gevaar. */
-module.exports = ({ db, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
+module.exports = ({ opslag, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
   const nu = () => new Date().toISOString();
 
   function lijsten() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.alarmen) db.data.veilig.alarmen = [];
-    return db.data.veilig.alarmen;
+    return opslag.tak('alarmen');
   }
 
   const TEKST = {
@@ -92,7 +90,7 @@ module.exports = ({ db, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
       naar: gegaan, mails: ont.mails.length, proef: !!proef, stil: !!stil,
       afgesloten: false, plek: plek.laatstePlek(handle) || null
     });
-    db.data.veilig.alarmen = alarmen.slice(0, 200);
+    opslag.zetTak('alarmen', alarmen.slice(0, 200));
     save();
 
     if (!stil) meldAan(handle, {

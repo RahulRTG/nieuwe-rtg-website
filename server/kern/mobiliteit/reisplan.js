@@ -29,7 +29,7 @@ const OPTIES_MAX = 4;
 module.exports = (ctx) => {
   const { db, schoon, modAan, plekBepaal,
     // de etappe-bouwers komen uit ./reisplan-etappe, dat hiervoor wordt gemount
-    LOOP_MAX_M, afst, rond, loopEtappe, taxiEtappe, aanloop, ovEtappe, optieVan } = ctx;
+    LOOP_MAX_M, afst, rond, loopEtappe, taxiEtappe, aanloop, ovEtappe, optieVan, opslag } = ctx;
 
   /* De planner. `waar` gaat naar het moduleregister: welke vervoersvormen hier
      bestaan bepaalt welke opties er uberhaupt gemaakt worden. */
@@ -59,7 +59,7 @@ module.exports = (ctx) => {
     // 3. multimodaal: per lijn de beste instap- en uitstaphalte
     if (!magOv.aan) afgevallen.push({ naam: 'Openbaar vervoer', reden: magOv.reden });
     else {
-      for (const zaak of db.data.suppliers || []) {
+      for (const zaak of opslag.vreemd.leveranciers() || []) {
         if (zaak.type !== 'ov') continue;
         for (const lijn of zaak.lijnen || []) {
           const haltes = (lijn.haltes || []).filter(h => Number.isFinite(h.lat));

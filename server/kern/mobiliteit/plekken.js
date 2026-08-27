@@ -28,14 +28,14 @@
    lid kan hem weggooien zonder dat er iets aan zijn paspoort verandert. */
 
 module.exports = (ctx) => {
-  const { db, schoon, haversine } = ctx;
+  const { db, schoon, haversine, opslag } = ctx;
 
-  const zaakMet = code => (db.data.suppliers || []).find(s => s.code === code) || null;
+  const zaakMet = code => (opslag.vreemd.leveranciers() || []).find(s => s.code === code) || null;
 
   // alle haltes van alle OV-zaken, met hun lijn erbij
   function haltes() {
     const uit = [];
-    for (const s of db.data.suppliers || []) {
+    for (const s of opslag.vreemd.leveranciers() || []) {
       for (const l of s.lijnen || []) {
         for (const h of l.haltes || []) {
           if (Number.isFinite(h.lat) && Number.isFinite(h.lng))
@@ -47,8 +47,8 @@ module.exports = (ctx) => {
   }
 
   const favsVan = key => {
-    if (!db.data.mobFavorieten || typeof db.data.mobFavorieten !== 'object') db.data.mobFavorieten = {};
-    return db.data.mobFavorieten[key] || [];
+    opslag.bak('mobFavorieten');
+    return opslag.bak('mobFavorieten')[key] || [];
   };
 
   /* Los een plek op. `session` mag ontbreken (een dispatcher die een
@@ -79,7 +79,7 @@ module.exports = (ctx) => {
 
     if (spec.hier) {
       if (!session) return { error: 'Een live locatie hoort bij een ingelogde reiziger.' };
-      const L = (db.data.live || {})[session.key];
+      const L = (opslag.vreemd.live() || {})[session.key];
       if (!L || !Number.isFinite(L.lat)) return { error: 'Uw locatie is niet bekend; zet GPS aan of kies een plek.' };
       return { lat: L.lat, lng: L.lng, label: 'Huidige locatie', bron: 'live' };
     }
@@ -109,7 +109,7 @@ module.exports = (ctx) => {
     const genre = schoon(opties.genre, 30).toLowerCase();
     const limiet = Math.min(200, Math.max(10, Math.round(Number(opties.limiet) || 60)));
 
-    const zaken = (db.data.suppliers || [])
+    const zaken = (opslag.vreemd.leveranciers() || [])
       .filter(s => s.loc && Number.isFinite(s.loc.lat))
       .map(s => ({ soort: 'zaak', code: s.code, naam: s.name, genre: s.type, stad: s.city || null,
         lat: s.loc.lat, lng: s.loc.lng, afstandM: afst(s.loc) }));
@@ -134,14 +134,14 @@ module.exports = (ctx) => {
      opgeslagen punten is een bewegingsprofiel, en dat willen we hier niet
      aanleggen. Weghalen wist echt, want dit is het enige exemplaar. */
   function favZet(session, body = {}) {
-    if (!db.data.mobFavorieten || typeof db.data.mobFavorieten !== 'object') db.data.mobFavorieten = {};
-    const lijst = db.data.mobFavorieten[session.key] || (db.data.mobFavorieten[session.key] = []);
+    opslag.bak('mobFavorieten');
+    const lijst = opslag.bak('mobFavorieten')[session.key] || (opslag.bak('mobFavorieten')[session.key] = []);
     const favId = schoon(body.id, 40);
     if (body.weg) {
       const voor = lijst.length;
-      db.data.mobFavorieten[session.key] = lijst.filter(f => f.id !== favId);
+      opslag.bak('mobFavorieten')[session.key] = lijst.filter(f => f.id !== favId);
       ctx.save();
-      return voor === db.data.mobFavorieten[session.key].length
+      return voor === opslag.bak('mobFavorieten')[session.key].length
         ? { status: 404, error: 'Onbekende favoriete plek.' } : { ok: true, weg: favId };
     }
     const plek = plekBepaal(body.plek, session);

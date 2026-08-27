@@ -21,9 +21,9 @@
 
 module.exports = (ctx) => {
   const { db, save, schoon, nu, notify, findSupplier, opdrachtMet, opdrachtBeeld,
-    opdrachtAnnuleer, co2Van, sseToOffice, beleidToets, werktBij } = ctx;
+    opdrachtAnnuleer, co2Van, sseToOffice, beleidToets, werktBij, opslag } = ctx;
 
-  const zakelijkeOpdrachten = org => (db.data.mobOpdrachten || [])
+  const zakelijkeOpdrachten = org => (opslag.bak('mobOpdrachten') || [])
     .filter(o => o.organisatie === schoon(org, 20).toUpperCase());
 
   /* DE POORT WAAR ELKE ZAKELIJKE RIT DOORHEEN MOET. Hij hangt in de

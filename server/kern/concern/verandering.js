@@ -30,15 +30,11 @@ module.exports = (ctx) => {
   const { db, save, crypto, schoon, entiteitVind, entiteitBeeld, entiteitAlle,
     vestigingAlleVanEntiteit, employmentVanEntiteit, employmentVanPersoon,
     employmentVind, employmentBeeindig, uitnodigingOpenstaand,
-    tijdGeschiedenis, tijdZet, tijdVandaag, concernUbo } = ctx;
+    tijdGeschiedenis, tijdZet, tijdVandaag, concernUbo, opslag } = ctx;
 
   const nu = () => new Date().toISOString();
 
-  function opnamebak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!Array.isArray(db.data.concern.opnames)) db.data.concern.opnames = [];
-    return db.data.concern.opnames;
-  }
+  const opnamebak = () => opslag.tak('opnames');
 
   /* ---- IMPACT ----
 
@@ -81,11 +77,11 @@ module.exports = (ctx) => {
          fout die zetRegister() met kopie() vermijdt. */
       entiteiten: JSON.parse(JSON.stringify(ents)),
       vestigingen: JSON.parse(JSON.stringify(
-        Object.values((db.data.concern.vestigingen) || {}).filter(v => ids.has(v.entiteit)))),
+        Object.values(opslag.tak('vestigingen')).filter(v => ids.has(v.entiteit)))),
       employments: JSON.parse(JSON.stringify(
-        Object.values((db.data.concern.employments) || {}).filter(x => ids.has(x.entiteit)))),
+        Object.values(opslag.tak('employments')).filter(x => ids.has(x.entiteit)))),
       feiten: JSON.parse(JSON.stringify(
-        (db.data.concern.feiten || []).filter(f => ids.has(f.entiteit))))
+        opslag.tak('feiten').filter(f => ids.has(f.entiteit))))
     };
     const bak = opnamebak();
     bak.push(o);
@@ -109,7 +105,7 @@ module.exports = (ctx) => {
     /* Alles van deze eigenaar dat NU bestaat weghalen en de opname terugzetten.
        Alleen van deze eigenaar: een herstel mag nooit aan andermans entiteiten
        komen, ook niet als er ondertussen iets is bijgekomen. */
-    const c = db.data.concern;
+    const c = opslag.wortel();
     for (const e of ctx.entiteitVanEigenaar(eigenaar)) { delete c.entiteiten[e.id]; ids.add(e.id); }
     for (const [k2, v] of Object.entries(c.vestigingen || {})) if (ids.has(v.entiteit)) delete c.vestigingen[k2];
     for (const [k2, v] of Object.entries(c.employments || {})) if (ids.has(v.entiteit)) delete c.employments[k2];

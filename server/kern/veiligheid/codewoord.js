@@ -25,15 +25,13 @@
    mag midden in een normale mededeling staan. Dat kan met een afdruk door
    over de woorden te schuiven in vensters van precies zoveel woorden als de
    zin lang is. */
-module.exports = ({ db, save, crypto, kluis, alarm, plek, sociaal }) => {
+module.exports = ({ opslag, save, crypto, kluis, alarm, plek, sociaal }) => {
   const nu = () => new Date().toISOString();
   const MIN_WOORDEN = 3;
   const MAX_WOORDEN_BERICHT = 120;   // langere berichten kappen we af; geen rekenwerk verspillen
 
   function lijsten() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.codewoord) db.data.veilig.codewoord = {};
-    return db.data.veilig.codewoord;
+    return opslag.tak('codewoord');
   }
 
   /* Normaliseren: hoofdletters, leestekens en dubbele spaties mogen niet

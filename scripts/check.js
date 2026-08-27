@@ -3820,7 +3820,13 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
 {
   const GECONTRACTEERD = [
     { map: 'server/kern/payroll', deur: 'opslag.js',
-      waarom: 'eerste contractlaag; elf schrijvers over veertien bestanden, dertien collecties' }
+      waarom: 'eerste contractlaag; elf schrijvers over veertien bestanden, dertien collecties' },
+    { map: 'server/kern/concern', deur: 'opslag.js',
+      waarom: 'acht schrijvers; EEN wortel met acht takken, en dus een andere vorm dan payroll' },
+    { map: 'server/kern/veiligheid', deur: 'opslag.js',
+      waarom: 'zeven schrijvers; wortel met takken, plus twee plekken die een tak VERVANGEN' },
+    { map: 'server/kern/mobiliteit', deur: 'opslag.js',
+      waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' }
   ];
 
   for (const dom of GECONTRACTEERD) {

@@ -38,7 +38,7 @@ const LENZEN = Object.freeze([
   { id: 'events', naam: 'Events', url: '/apps/avond.html', eist: null }
 ]);
 
-function normaliseer(tier) {
+function normaliseerLidmaatschap(tier) {
   const waarde = String(tier || '').trim().toLowerCase().replace(/[ -]+/g, '_');
   return waarde === 'businesslite' ? 'business_lite' : waarde;
 }
@@ -50,7 +50,7 @@ function identiteit(stand) {
 }
 
 function voor({ tier, verified } = {}) {
-  const pas = PASSEN[normaliseer(tier)];
+  const pas = PASSEN[normaliseerLidmaatschap(tier)];
   if (!pas) return null;
   return {
     member: { id: 'member', naam: 'Member' },
@@ -77,4 +77,8 @@ function lenzenVoor(tier) {
   }));
 }
 
-module.exports = { PASSEN, STATUSSEN, LENZEN, normaliseer, voor, voorSessie, lenzenVoor };
+module.exports = {
+  PASSEN, STATUSSEN, LENZEN,
+  normaliseer: normaliseerLidmaatschap,
+  voor, voorSessie, lenzenVoor
+};

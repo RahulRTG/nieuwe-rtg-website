@@ -146,7 +146,17 @@ test('de vijf vormen staan echt in deze bron (anders toetst dit een verzonnen ge
   bestaat('public/apps/app.html', 'accept="image/*"');
   bestaat('server/opzet/kaartwebhooks.js', "type: '*/*'");
   bestaat('scripts/samenhang.js', 'server/**/*.js');
-  bestaat('scripts/check.js', "startsWith('/*')");
+  /* Stond eerst op scripts/check.js. Die droeg de vorm in regel 7, waar
+     commentaar met een regel-heuristiek werd overgeslagen (`t.startsWith('/*')`).
+     Die heuristiek is vervangen door lib/bron.js zelf -- ze klopte niet voor
+     blokcommentaar zonder asterisk, en verklaarde elke uitleg die een pad noemt
+     tot kapotte require.
+
+     De VORM is daarmee niet uit het huis verdwenen, alleen uit dat bestand:
+     scripts/keuring.js scant zijn bron nog steeds regel voor regel en draagt hem
+     onveranderd. Daar wijst deze bewering nu heen, want het gaat erom dat
+     bron.js een geval aankan dat ECHT bestaat -- niet om welk bestand het draagt. */
+  bestaat('scripts/keuring.js', "startsWith('/*')");
   bestaat('server/kern/antivirus/analyse.js', 'image/*');
 });
 

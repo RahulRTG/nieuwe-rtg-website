@@ -14,8 +14,7 @@
    Schaalvast: de rijen komen begrensd uit de accountlaag (een venster, geen
    miljoenen); bij een echt grootboek zou dit aggregatie-per-facet worden. */
 
-const PAS_VOLGORDE = ['gratis', 'rtg', 'lifestyle', 'business'];
-const PAS_NAAM = { gratis: 'Gratis app', rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+const { PASSEN: PAS_VOLGORDE, PAS_NAAM, pasVan } = require('./passen');   // een plek, zie ./passen.js
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
 const { maandCentenVoor } = require('./pasprijs');
@@ -23,8 +22,6 @@ const { maandCentenVoor } = require('./pasprijs');
 module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal }) => {
   const eur = c => Math.round(c) / 100;
 
-  // de pas van een lid: een gast/gratis lid heeft tier 'guest'; wij tonen 'gratis'.
-  const pasVan = tier => (tier === 'guest' ? 'gratis' : (PAS_VOLGORDE.includes(tier) ? tier : 'rtg'));
   // de stad komt uit het onboardingprofiel (woonplaats), op sleutel.
   function stadVan(key, profielen) {
     const p = profielen[key];

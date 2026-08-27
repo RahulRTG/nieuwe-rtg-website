@@ -88,21 +88,21 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2356 bestanden, 831 catalogi, 516 verschillende namen
-  94 namen staan in meer dan een domein
-  77 woorden dragen MEER DAN EEN betekenis   (samen 279 betekenissen)
-  28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
- 101 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
+2388 bestanden, 839 catalogi, 520 verschillende namen
+  95 namen staan in meer dan een domein
+  77 woorden dragen MEER DAN EEN betekenis   (samen 281 betekenissen)
+  29 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
+ 106 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
 ```
 
-Van de 94 gedeelde namen dragen er **77 meer dan één betekenis**. Het was dus
+Van de 95 gedeelde namen dragen er **77 meer dan één betekenis**. Het was dus
 geen incident.
 
 De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:
 
 | woord | betekenissen | een greep uit wat het kan zijn |
 |---|---|---|
-| `SOORTEN` | **38** | contractsoorten, gebeurtenissen in een tijdlijn, avondplannen, rekeningsoorten |
+| `SOORTEN` | **39** | contractsoorten, gebeurtenissen in een tijdlijn, avondplannen, rekeningsoorten |
 | `STATUS` | 10 | ontwerpfases bij de architect, betaalstanden, ideeënstanden, subsidiestanden |
 | `STANDEN` | 10 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
 | `NIVEAUS` | 9 | dreigingsniveaus, bijstandsniveaus, concern-scopes, geldbeleidsniveaus |

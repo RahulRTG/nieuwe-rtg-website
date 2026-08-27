@@ -274,7 +274,7 @@ op wordt gebouwd.
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
 (`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
-113 requires, en raakt daarmee **1 van 410 kerndomeinen** aan — 0%. Als testhal
+113 requires, en raakt daarmee **1 van 413 kerndomeinen** aan — 0%. Als testhal
 bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
 van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
@@ -301,10 +301,10 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 94 namen die in meer dan
-één domein staan, dragen er **77 meer dan één betekenis** — samen 279
-betekenissen, met `SOORTEN` op **38**. Daarnaast **28** betekenissen die op meer
-dan één plek wonen én **101** paren die dezelfde waarheid onder een ándere naam
+`SEMANTIEK.json`) en het was **geen incident**: van de 95 namen die in meer dan
+één domein staan, dragen er **77 meer dan één betekenis** — samen 281
+betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
+dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
 dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
 tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
@@ -315,7 +315,8 @@ gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
 "welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
 en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
 overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
-meter bewoog mee: 111 → 101. De 77 zijn geen foutenlijst
+meter bewoog mee: 111 → 101 (en staat nu op 106: deze tak zette er zelf
+code bij, en de meter telt de hele boom). De 77 zijn geen foutenlijst
 maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
 kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
 en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies

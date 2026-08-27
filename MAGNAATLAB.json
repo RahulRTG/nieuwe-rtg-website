@@ -1,7 +1,7 @@
 {
   "simulatiemodules": 64,
-  "kernmodules": 1398,
-  "kernDomeinen": 410,
+  "kernmodules": 1424,
+  "kernDomeinen": 413,
   "perWereld": {
     "magnaat": {
       "modules": 61,
@@ -46,8 +46,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 10,
-  "kandidaatparen": 29,
+  "gedeeldeOnderwerpen": 11,
+  "kandidaatparen": 31,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -170,23 +170,23 @@
       "meetbaar": false
     },
     {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/magnaat-economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
       "onderwerp": "handel",
       "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
       "rtg": "server/kern/markt/handel.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel.js",
-      "rtg": "server/kern/markt/handel.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel.js",
-      "rtg": "server/kern/podium/handel.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

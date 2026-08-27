@@ -1,12 +1,12 @@
 {
-  "catalogi": 831,
-  "verschillendeNamen": 516,
-  "namenInMeerDomeinen": 94,
+  "catalogi": 839,
+  "verschillendeNamen": 520,
+  "namenInMeerDomeinen": 95,
   "woordenMetMeerBetekenissen": 77,
-  "betekenissenTotaal": 279,
+  "betekenissenTotaal": 281,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 38,
-  "dubbelingen": 28,
+  "ergsteAantal": 39,
+  "dubbelingen": 29,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -293,6 +293,21 @@
       ]
     },
     {
+      "naam": "GRAAD",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/command/gezondheid.js",
+        "server/kern/kosten/soorten.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "onbekend",
+        "vermoed",
+        "gemeten",
+        "bewezen"
+      ]
+    },
+    {
       "naam": "KLAAR",
       "betekenissenVanDitWoord": 2,
       "waar": [
@@ -396,7 +411,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 38,
+      "betekenissenVanDitWoord": 39,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -410,7 +425,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 10,
+      "betekenissenVanDitWoord": 11,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -438,7 +453,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 101,
+  "dubbelingenZonderNaam": 106,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -453,6 +468,66 @@
         "drie",
         "vier",
         "vijf"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/concern/voorstel.js",
+      "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/huis.js",
+      "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
+      "b": "server/kern/socialegraaf/lijn.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
+      "b": "server/kern/tijdlijn.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
       ]
     },
     {
@@ -679,73 +754,13 @@
         "jong",
         "volw"
       ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/buddy/coachdata/index.js",
-      "aNaam": "LEEFTIJD",
-      "b": "server/kern/schoolbieb.js",
-      "bNaam": "ZICHT",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/gezinshulp.js",
-      "aNaam": "GROEPEN",
-      "b": "server/kern/geloofbieb.js",
-      "bNaam": "ZICHT",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/gezinshulp.js",
-      "aNaam": "GROEPEN",
-      "b": "server/kern/leren/schrijven.js",
-      "bNaam": "OPDRACHTEN",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/gezinshulp.js",
-      "aNaam": "GROEPEN",
-      "b": "server/kern/rtfbieb.js",
-      "bNaam": "ZICHT",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
     }
   ],
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 39,
-      "betekenissen": 38,
+      "domeinen": 40,
+      "betekenissen": 39,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -949,6 +964,18 @@
             "hotel",
             "winkel",
             "plek"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/kosten/soorten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "ai-invoer",
+            "ai-uitvoer",
+            "verzoek",
+            "opslag"
           ]
         },
         {
@@ -1205,6 +1232,146 @@
       ]
     },
     {
+      "naam": "STANDEN",
+      "domeinen": 12,
+      "betekenissen": 11,
+      "hoogsteOverlap": 0.4,
+      "soort": "gemengd",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/avond/voorkeuren.js",
+            "server/kern/werkvenster.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "nooit",
+            "gevraagd",
+            "altijd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/gast/verzoek.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "open",
+            "opgepakt",
+            "klaar",
+            "ingetrokken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/kosten/beleidkaart.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "inbegrepen",
+            "doorbelasten",
+            "rtfoundation",
+            "huis"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/leeg.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "muziek",
+            "kijk",
+            "flow",
+            "alles"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/onderneming/regie.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "mens",
+            "na-termijn",
+            "automatisch"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/overheid/btwtoezicht.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "sluit_aan",
+            "wijkt_af",
+            "niet_aangegeven",
+            "alleen_concept"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/payroll/run.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "concept",
+            "gecontroleerd",
+            "manager",
+            "administrateur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rahul/stemming.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "gewoon",
+            "blij",
+            "chagrijnig",
+            "moe"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/tenant/levensloop.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "actief",
+            "opzegging",
+            "bewaring",
+            "vernietigd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/rust.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "thuis",
+            "avond",
+            "slaap",
+            "werk"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/school/aanwezigheid.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "aanwezig",
+            "telaat",
+            "afwezig",
+            "ziek"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "STATUS",
       "domeinen": 13,
       "betekenissen": 10,
@@ -1330,134 +1497,6 @@
             "wachtlijst",
             "ingeschreven",
             "uitgeschreven"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "STANDEN",
-      "domeinen": 11,
-      "betekenissen": 10,
-      "hoogsteOverlap": 0.4,
-      "soort": "gemengd",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/avond/voorkeuren.js",
-            "server/kern/werkvenster.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "nooit",
-            "gevraagd",
-            "altijd"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/gast/verzoek.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "open",
-            "opgepakt",
-            "klaar",
-            "ingetrokken"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mediaos/leeg.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "muziek",
-            "kijk",
-            "flow",
-            "alles"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/onderneming/regie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "mens",
-            "na-termijn",
-            "automatisch"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/overheid/btwtoezicht.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "sluit_aan",
-            "wijkt_af",
-            "niet_aangegeven",
-            "alleen_concept"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/payroll/run.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "concept",
-            "gecontroleerd",
-            "manager",
-            "administrateur"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rahul/stemming.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "gewoon",
-            "blij",
-            "chagrijnig",
-            "moe"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/tenant/levensloop.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "actief",
-            "opzegging",
-            "bewaring",
-            "vernietigd"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/veiligheid/rust.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "thuis",
-            "avond",
-            "slaap",
-            "werk"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/aanwezigheid.js"
-          ],
-          "leden": 5,
-          "voorbeeld": [
-            "aanwezig",
-            "telaat",
-            "afwezig",
-            "ziek"
           ]
         }
       ]
@@ -3014,5 +3053,5 @@
       ]
     }
   ],
-  "bestanden": 2356
+  "bestanden": 2388
 }

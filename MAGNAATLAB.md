@@ -78,13 +78,13 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
 ### De uitkomst
 
 ```
-64 simulatiemodules tegenover 1398 kernmodules in 410 domeinen
+64 simulatiemodules tegenover 1424 kernmodules in 413 domeinen
    magnaat        61 modules
    hospitality     3 modules
 
 1. HET BEREIK
    113 requires in de simulatielaag
-     1 kernmodule geraakt, in 1 van 410 domeinen        (0%)
+     1 kernmodule geraakt, in 1 van 413 domeinen        (0%)
      0 modules doen een netwerkaanroep                  (de ontsnapping wordt niet gebruikt)
      3 aanroepen van de ene synthetische wereld naar de andere
 
@@ -421,5 +421,5 @@ toevoeging is hij vandaag niet waar:
 > Nothing critical reaches RTG production without first surviving RTG itself —
 > **en wat Magnaat niet aanroept, heeft Magnaat niet overleefd.**
 
-Vandaag is dat 0% van 410 domeinen. Dat getal is de opgave, en het is ook de
+Vandaag is dat 0% van 413 domeinen. Dat getal is de opgave, en het is ook de
 enige eerlijke maat voor de voortgang.

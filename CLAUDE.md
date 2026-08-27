@@ -243,7 +243,7 @@ op wordt gebouwd.
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
 (`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
-113 requires, en raakt daarmee **1 van 410 kerndomeinen** aan — 0%. Als testhal
+113 requires, en raakt daarmee **1 van 411 kerndomeinen** aan — 0%. Als testhal
 bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
 van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden

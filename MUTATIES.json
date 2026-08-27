@@ -859,6 +859,14 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "capabilities.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/capabilities.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "care.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3088,6 +3096,14 @@
       "operator": ">=->>#0",
       "gezakt": 1,
       "geprobeerd": 3
+    },
+    "magnaatlab.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/magnaatlab.js",
+      "operator": "return-weg#1",
+      "gezakt": 2,
+      "geprobeerd": 4
     },
     "magnaatwereld.test.js": {
       "soort": "puur",
@@ -5403,6 +5419,14 @@
       "staat": "gezakt",
       "module": "scripts/docker/start.js",
       "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "semantiek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/semantiek.js",
+      "operator": "getal+1#0",
       "gezakt": 1,
       "geprobeerd": 1
     },

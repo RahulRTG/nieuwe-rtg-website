@@ -26,7 +26,7 @@
 const TICKETS_PER_OBJECT = 300;
 const UREN_PER_TICKET = 24;   // per jaar
 const JAREN_GELDIG = 10;
-const BETALENDE_PASSEN = ['rtg', 'lifestyle', 'business'];
+const { BETALEND: BETALENDE_PASSEN } = require('./passen');   // afgeleid, zie ./passen.js
 const BEDENKTIJD_DAGEN = 14;        // herroeping met volledige terugbetaling
 const TERUGKOOP_VENSTER_DAGEN = 30; // RTG betaalt een terugkoop uiterlijk dan uit
 const SERVICE_FEE_PCT = 0.02;       // per ticket per jaar, dekt beheer en bemanning

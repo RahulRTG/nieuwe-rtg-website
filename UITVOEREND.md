@@ -97,7 +97,7 @@ publicatie krijgt vier delen, en alles hieronder is een gevolg daarvan.
 | **Onderdelen** | wat er ís — bestaande id's, plus één nieuwe vorm: `fragment:` |
 | **Regels** | wat eruit mag ontstaan — verplichte kern, optionele verdieping, volgorde-eisen, minimum- en maximumduur, dieptes, talen |
 | **Toestemming** | wat RTG ermee mag — inkorten, hermonteren, als bron dienen, in een samengestelde uitzending |
-| **Handelingen** | wat het stuk kan dóén — kopen, boeken, vragen; altijd over de bestaande rails *(nog niet gebouwd, zie par. 3)* |
+| **Handelingen** | wat het stuk kan dóén — kopen, boeken, vragen; altijd over de bestaande rails *(de aankoop staat; handelingen vanuit een lopende uitvoering nog niet, zie par. 3)* |
 
 ### 2.1 Het fragment: de vijfde id-vorm
 
@@ -168,7 +168,7 @@ Bijgewerkt op 27 augustus 2026, nadat de motor er stond.
 | 1 | film die zich aan jou vormt | Elastic | **staat** (runtime) / **jaren** (auteurschap) | de motor draait; de studio voor de maker is het echte werk |
 | 7 | "leg me dit uit in 20 minuten" | Elastic | **een stap weg** | de motor is er; wat ontbreekt is de ingang, en die bestaat (`praat.js`) |
 | 13 | geen homepage, intentie als interface | — | **staat** | aansluiten op de bestaande balk, geen tweede ingang bouwen |
-| 8 | makers verkopen aanspraken | — | **staat** (het begrip) / **een stap weg** (de aankoop) | de aanspraak werkt; de koppeling aan RTG Pay is de volgende stap |
+| 8 | makers verkopen aanspraken | — | **staat** | aanbod → aankoop → aanspraak → uitvoering is rond, en idempotent van begin tot eind |
 | 11 | muzikaal universum (NIGHT DRIVE) | Elastic | **een stap weg** | een uitgave die de regel draagt i.p.v. de kanalen; de generator staat er al |
 | 4 | content die terugpraat | Responsive | **een stap weg** | keuzepunten als regels in de partituur |
 | 6 | "maak mijn ochtend" | Elastic + Responsive | **een besluit nodig** | zie 4.4: alleen op wat het lid zelf heeft aangewezen |
@@ -350,11 +350,12 @@ Twee dingen die dat verzachten en die er al zijn:
 2. ~~**Het fragment en de uitvoering** op wat er al staat.~~ **Gebouwd**:
    `kern/uitvoering/`, zeven routes, vijftien toetsen, vier mutaties raak. Geen
    transcodering, geen nieuw beeld — de bestaande spelers voeren het uit.
-3. **De aankoop die een aanspraak verleent**, over `kern/pay/poort.js`. Vandaag
-   verleent alleen de maker er een; dat is de helft van de keten. Het verlenen
-   is inmiddels wel **retry-veilig gemaakt op (code, bron)** — dezelfde
-   gebeurtenis verleent maar één keer — juist omdat dit de route is waar straks
-   geld aan hangt.
+3. ~~**De aankoop die een aanspraak verleent.**~~ **Gebouwd**
+   (`kern/uitvoering/aanbod.js`): bon en koop, over dezelfde rail als de
+   verkoopzone van het Podium, en **idempotent van begin tot eind** doordat de
+   boeking de grond onder de aanspraak is. Wat er niet bij zit — btw-stukken,
+   retour — staat op de bon zelf, met dezelfde reden als bij het Podium
+   (`TAKEN.md` 4.16).
 4. **Het muzikaal universum** in het Klankwerk (#11): de goedkoopste nieuwe
    standaard, en de enige die de grote drie structureel niet hebben.
 5. **De makersstudio** voor fragmenten en regels — het punt waarop dit staat of

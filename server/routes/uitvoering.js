@@ -48,6 +48,23 @@ module.exports = (kern) => {
     stuur(res, r);
   });
 
+  /* ---- het aanbod: de aankoop die een aanspraak laat ontstaan ----
+     Twee stappen en met opzet geen een: eerst de BON (wat betaal ik, aan wie,
+     en wat krijg ik), dan de KOOP. GELD.md par. 3: alles wat een ander raakt is
+     maximaal klaarzetten, en bevestigen doet de mens.
+
+     `idem` hoort van de CLIENT te komen en per koopintentie hetzelfde te zijn.
+     Daarmee is de hele keten idempotent: dezelfde idem geeft dezelfde boeking,
+     en dezelfde boeking geeft dezelfde aanspraak (kern/uitvoering/aanbod.js). */
+  app.post('/api/uitvoering/bon', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, uitvoering.bon(sess(req), req.body || {}));
+  });
+  app.post('/api/uitvoering/koop', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await uitvoering.koop(sess(req), req.body || {}));
+  });
+
   /* ---- de aanspraak ----
      Lezen doet het lid zelf; verlenen en intrekken doet de MAKER, en alleen
      voor een code die een van zijn eigen partituren werkelijk vraagt (de

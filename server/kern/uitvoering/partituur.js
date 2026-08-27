@@ -66,7 +66,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
       stukId: (F.lees(o.fragmentId) || {}).stukId || null
     })),
     regels: p.regels, toestemming: p.toestemming,
-    aanspraakNodig: p.aanspraakNodig || null,
+    aanspraakNodig: p.aanspraakNodig || null, prijsCenten: p.prijsCenten || 0,
     kernS: (p.onderdelen || []).filter(o => o.rol === 'kern').reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
     totaalS: (p.onderdelen || []).reduce((n, o) => n + F.duurVan(o.fragmentId), 0),
     rollen: voorMaker ? ROLLEN : undefined
@@ -80,7 +80,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
       return { status: 409, error: 'U heeft de bovengrens van ' + MAX_PARTITUREN + ' partituren bereikt.' };
     const p = { id: id(), key: sess.key, naam, onderdelen: [],
       regels: { maxS: 0 }, toestemming: schoneToestemming(null),
-      aanspraakNodig: null, klaar: false, at: nu(), bijgewerkt: nu() };
+      aanspraakNodig: null, prijsCenten: 0, klaar: false, at: nu(), bijgewerkt: nu() };
     tabel().push(p); save();
     return { status: 200, ok: true, partituur: beeld(p, true) };
   }
@@ -101,7 +101,22 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
     if (o.toestemming != null) p.toestemming = schoneToestemming(o.toestemming);
     if (o.aanspraakNodig !== undefined) {
       const c = String(o.aanspraakNodig || '').toLowerCase();
+      if (!c && p.prijsCenten > 0 && o.prijsCenten == null)
+        return { status: 400, error: 'Haal eerst de prijs weg: een betaald werk zonder aanspraak zou voor iedereen opengaan.' };
       p.aanspraakNodig = c ? c : null;
+    }
+    /* DE PRIJS. Hij woont hier omdat hij bij de partituur hoort, maar wat er
+       met geld GEBEURT staat in ./aanbod.js -- die naad loopt waar hij hoort:
+       hier staat wat iets kost, daar staat wat er gebeurt als iemand het koopt.
+
+       Een prijs zonder benodigde aanspraak bestaat niet, en dat is geen
+       formaliteit: dan zou een lid betalen voor iets dat toch al opengaat. */
+    if (o.prijsCenten != null) {
+      const n = Math.round(Number(o.prijsCenten));
+      const prijs = Number.isFinite(n) && n > 0 ? n : 0;
+      if (prijs > 0 && !(o.aanspraakNodig || p.aanspraakNodig))
+        return { status: 400, error: 'Een prijs vraagt om een aanspraak: zonder die deur betaalt iemand voor iets dat toch al opengaat.' };
+      p.prijsCenten = prijs;
     }
     if (o.maxS != null) {
       const n = Math.round(Number(o.maxS));
@@ -120,55 +135,10 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
     return { status: 200, ok: true, partituur: beeld(p, true) };
   }
 
-  /* ---- de onderdelen ----
-     Eén ingang voor erbij, eruit en wijzigen, om dezelfde reden als bij een
-     afspeellijst: de drie raken precies dezelfde rij, en er is geen stand
-     waarin "toevoegen" iets anders van de partituur weet dan "verplaatsen". */
-  function onderdeel(sess, opdracht) {
-    const o = opdracht || {};
-    const p = vanMij(sess.key, o.id);
-    if (!p) return { status: 404, error: 'Deze partituur bestaat niet, of is niet van u.' };
-    const fid = String(o.fragmentId || '');
-    const f = F.lees(fid);
-    if (!f) return { status: 400, error: 'Dit is geen geldig fragment-id (fragment:<vorm>:<id>@<van>-<tot>).' };
-
-    const staat = (p.onderdelen || []).findIndex(x => x.fragmentId === fid);
-    if (o.aan === false) {
-      if (staat < 0) return { status: 404, error: 'Dit fragment staat niet in deze partituur.' };
-      p.onderdelen.splice(staat, 1); p.bijgewerkt = nu(); save();
-      return { status: 200, ok: true, partituur: beeld(p, true) };
-    }
-    if (o.naar != null) {
-      if (staat < 0) return { status: 404, error: 'Dit fragment staat niet in deze partituur.' };
-      const naar = Math.min(Math.max(Math.round(Number(o.naar)) || 0, 0), p.onderdelen.length - 1);
-      const [x] = p.onderdelen.splice(staat, 1);
-      p.onderdelen.splice(naar, 0, x); p.bijgewerkt = nu(); save();
-      return { status: 200, ok: true, partituur: beeld(p, true) };
-    }
-
-    /* HET EIGENDOM. De catalogus wordt gelezen met de sessie van de MAKER, en
-       die zegt zelf al of een stuk van hem is. Zo staat de vraag "is dit van
-       mij" op één plek en niet op twee (LAT.md regel 4). */
-    const wereld = catalogus.alles(sess);
-    const rij = wereld.rijen.find(r => r.id === f.stukId);
-    if (!rij) return { status: 404, error: 'Dit stuk bestaat niet, of staat niet voor u open.' };
-    if (!rij.mijn) return { status: 403, error: 'Een partituur gaat over uw eigen werk. Dit stuk is van iemand anders.' };
-    /* Waar de lengte BEKEND is, moet het fragment erbinnen vallen -- zelfde
-       regel als een ondertitelcue (kern/ondertitels.js). Voor een track en een
-       clip kent RTG de lengte niet, en daar wordt dus niet op tijd gecontroleerd
-       in plaats van een grens te verzinnen. */
-    if (rij.duurS && f.tot > rij.duurS)
-      return { status: 400, error: 'Dit fragment loopt tot ' + f.tot + 's, maar het stuk duurt ' + rij.duurS + 's.' };
-    if (staat >= 0) return { status: 409, error: 'Dit fragment staat al in deze partituur.' };
-    if ((p.onderdelen || []).length >= MAX_ONDERDELEN)
-      return { status: 409, error: 'Een partituur draagt hoogstens ' + MAX_ONDERDELEN + ' onderdelen.' };
-
-    const rol = ROLLEN[o.rol] ? o.rol : 'verdieping';
-    const diepte = Math.min(Math.max(Math.round(Number(o.diepte)) || 1, 1), 3);
-    p.onderdelen.push({ fragmentId: fid, naam: schoon(o.naam, 80) || rij.titel, rol, diepte, at: nu() });
-    p.bijgewerkt = nu(); save();
-    return { status: 200, ok: true, partituur: beeld(p, true) };
-  }
+  /* Wat er IN een partituur zit -- erbij, eruit, verplaatsen, en de
+     eigendomscontrole -- staat in ./onderdelen.js. Gesplitst toen dit bestand
+     tegen de 10 kB-grens liep; de naad loopt waar hij hoort. */
+  const { onderdeel } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN });
 
   const mijne = (sess) => ({ status: 200, partituren: tabel().filter(p => p.key === sess.key).map(p => beeld(p, true)), rollen: ROLLEN });
 

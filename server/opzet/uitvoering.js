@@ -27,6 +27,11 @@ module.exports = (kern, hulp) => {
     catalogus: mediaCatalogus,
     /* De gids die een codenaam aan een sleutel koppelt -- nodig om een
        aanspraak aan iemand te verlenen. Async, zoals overal in dit huis. */
-    keyVanCodenaam
+    keyVanCodenaam,
+    /* De aankoopketen (kern/uitvoering/aanbod.js) loopt over dezelfde rail als
+       de verkoopzone van het Podium: pay.stuur, lid aan maker. Er komt geen
+       tweede geldstroom bij. Draait pay niet mee, dan bestaat het aanbod niet
+       en zegt de route dat. */
+    pay: kern.pay, codenaamVan: kern.codenaamVan, onboarding: kern.onboarding
   }));
 };

@@ -17,6 +17,12 @@
      -> "een verdwenen kern weigert" ZAKT (RAAK)
    - de (code, bron)-controle uit aanspraak.js gehaald
      -> "dezelfde bron verleent maar EEN aanspraak" ZAKT (RAAK)
+   - het boeking-id NIET als bron maar een verzonnen sleutel (aanbod.js)
+     -> "kopen laat de aanspraak ontstaan" ZAKT (RAAK)
+   - de al-gekocht-controle uit aanbod.js gehaald
+     -> "de HELE keten is idempotent" ZAKT (RAAK)
+   - een prijs zonder aanspraak toestaan (partituur.js)
+     -> "een prijs zonder aanspraak bestaat niet" ZAKT (RAAK)
 
    Draai los: node --experimental-sqlite --test test/uitvoering.test.js */
 const test = require('node:test');
@@ -26,7 +32,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 
-let srv, base, maker, kijker, makerNaam, kijkerNaam;
+let srv, base, maker, kijker, koper, makerNaam, kijkerNaam;
 let kernFrag, fragA, fragB, clipA, clipB, clipC, p1;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-uitv-'));
 
@@ -50,6 +56,11 @@ test.before(async () => {
   base = srv.base;
   maker = await lid('Maker'); kijker = await lid('Kijker');
   makerNaam = await codenaamVan(maker); kijkerNaam = await codenaamVan(kijker);
+  /* De KOPER is het eigenaarsaccount: dat is geverifieerd, en RTG Pay vraagt
+     van een gewoon vers account eerst het paspoort (onboarding payGate). Een
+     toets die dat omzeilt, toetst een deur die in productie dicht zit. */
+  koper = (await api('/api/auth/login', { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
+  assert.ok(koper, 'het eigenaarsaccount is ingelogd als koper');
 
   // het eigen werk van de maker: een uitgegeven stuk en drie korte video's
   const trackId = (await api('/api/muziek/maak', {}, maker)).body.track.id;
@@ -215,6 +226,85 @@ test('dezelfde bron verleent maar EEN aanspraak: een herhaald verzoek is geen tw
   assert.equal(derde.body.herhaald, undefined, 'een andere bron is een andere gebeurtenis');
   assert.notEqual(derde.body.aanspraak.id, een.body.aanspraak.id);
   await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: '' }, maker);
+});
+
+/* ---- de keten: aanbod -> aankoop -> aanspraak -> uitvoering ---- */
+
+test('een prijs zonder aanspraak bestaat niet: dan betaalt iemand voor een open deur', async () => {
+  const los = (await api('/api/uitvoering/partituur/maak', { naam: 'Gratis maar duur' }, maker)).body.partituur.id;
+  const r = await api('/api/uitvoering/partituur/zet', { id: los, prijsCenten: 500 }, maker);
+  assert.equal(r.status, 400);
+  assert.match(r.body.error, /aanspraak/i);
+});
+
+test('de bon zegt wat je betaalt, aan wie, en wat RTG NIET doet', async () => {
+  await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: 'masterclass-koop', prijsCenten: 250 }, maker);
+  const r = await api('/api/uitvoering/bon', { partituurId: p1 }, koper);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.centen, 250);
+  assert.equal(r.body.maker, makerNaam, 'het geld gaat naar de maker en niet naar RTG');
+  assert.equal(r.body.alGekocht, false);
+  assert.match(r.body.nietGebouwd, /btw|retour/i, 'de bon noemt wat er niet bij zit');
+  // en de maker koopt zijn eigen werk niet
+  const eigen = await api('/api/uitvoering/bon', { partituurId: p1 }, maker);
+  assert.equal(eigen.status, 400);
+  assert.match(eigen.body.error, /eigen werk/i);
+});
+
+test('kopen laat de aanspraak ontstaan, en daarmee gaat het werk open', async () => {
+  const dicht = await api('/api/uitvoering/voer', { partituurId: p1 }, koper);
+  assert.equal(dicht.status, 403, 'voor de aankoop staat het dicht');
+
+  const k = await api('/api/uitvoering/koop', { partituurId: p1, idem: 'koop-a' }, koper);
+  assert.equal(k.status, 200, JSON.stringify(k.body).slice(0, 200));
+  assert.ok(k.body.boeking, 'er is echt een boeking gemaakt');
+  assert.equal(k.body.aanspraak.herkomst, 'aankoop');
+  assert.equal(k.body.aanspraak.bron, String(k.body.boeking), 'de BOEKING is de grond onder de aanspraak');
+
+  const open = await api('/api/uitvoering/voer', { partituurId: p1 }, koper);
+  assert.equal(open.status, 200, 'na de aankoop speelt het werk');
+  assert.equal(open.body.bewijs.aanspraak.herkomst, 'aankoop');
+});
+
+test('de HELE keten is idempotent: dezelfde idem geeft een betaling en een aanspraak', async () => {
+  const eerste = await api('/api/uitvoering/koop', { partituurId: p1, idem: 'koop-b' }, koper);
+  const tweede = await api('/api/uitvoering/koop', { partituurId: p1, idem: 'koop-b' }, koper);
+  assert.equal(tweede.status, 200);
+  /* De tweede oproep komt niet eens bij de betaling: hij ziet dat de koper de
+     aanspraak al heeft. Dat is de bovenste van twee vangnetten -- het onderste
+     (dezelfde idem geeft dezelfde boeking, en dezelfde boeking dezelfde
+     aanspraak) staat in de toets hieronder. */
+  assert.equal(tweede.body.al, true, 'de tweede oproep schrijft niets af');
+
+  const mijn = (await api('/api/uitvoering/aanspraken', {}, koper)).body.aanspraken;
+  assert.equal(mijn.filter(a => a.code === 'masterclass-koop').length, 1,
+    'er staat precies EEN aanspraak, hoe vaak er ook op de knop is getikt');
+});
+
+test('en het onderste vangnet ook: dezelfde boeking verleent maar EEN keer', async () => {
+  /* Zonder het bovenste vangnet (de al-gekocht-controle) moet de idempotentie
+     van pay.stuur plus die van verleen het werk doen. Dat is precies wat er
+     gebeurt als twee verzoeken elkaar kruisen voordat de eerste klaar is. */
+  const asp = (await api('/api/uitvoering/aanspraken', {}, koper)).body.aanspraken
+    .find(a => a.code === 'masterclass-koop');
+  assert.ok(asp, 'de aanspraak van de aankoop staat er');
+  assert.match(asp.bron, /^[a-z0-9]/i, 'en zijn bron is het boeking-id, geen verzonnen sleutel');
+  assert.equal(asp.herkomstNaam, 'gekocht', 'het lid leest een woord, geen code');
+
+  /* p1 weer vrijgeven voor de toetsen hieronder. Prijs en aanspraak moeten in
+     EEN opdracht weg: de aanspraak losweken terwijl er een prijs op staat wordt
+     geweigerd, en dat is precies de bedoeling van die grens. */
+  const vrij = await api('/api/uitvoering/partituur/zet', { id: p1, prijsCenten: 0, aanspraakNodig: '' }, maker);
+  assert.equal(vrij.status, 200, 'prijs en aanspraak gaan er samen af');
+  assert.equal(vrij.body.partituur.prijsCenten, 0);
+});
+
+test('de aanspraak losweken terwijl er een prijs op staat, wordt geweigerd', async () => {
+  await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: 'tijdelijk', prijsCenten: 300 }, maker);
+  const r = await api('/api/uitvoering/partituur/zet', { id: p1, aanspraakNodig: '' }, maker);
+  assert.equal(r.status, 400, 'een betaald werk zonder deur zou voor iedereen opengaan');
+  assert.match(r.body.error, /prijs/i);
+  await api('/api/uitvoering/partituur/zet', { id: p1, prijsCenten: 0, aanspraakNodig: '' }, maker);
 });
 
 test('een verdwenen verdieping valt niet stil weg maar staat er als onbeschikbaar', async () => {

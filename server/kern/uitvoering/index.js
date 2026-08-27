@@ -31,10 +31,14 @@
    en is los te toetsen. */
 'use strict';
 
-function maakUitvoering({ db, save, schoon, crypto, catalogus, keyVanCodenaam }) {
+function maakUitvoering({ db, save, schoon, crypto, catalogus, keyVanCodenaam, pay, codenaamVan, onboarding }) {
   const aanspraak = require('./aanspraak')({ db, save, crypto, schoon });
   const partituur = require('./partituur')({ db, save, schoon, crypto, catalogus });
   const { bouwUitvoering } = require('./uitvoer')({ catalogus, partituur, aanspraak });
+  /* De aankoop die een aanspraak laat ontstaan (./aanbod.js). Optioneel: draait
+     RTG Pay niet mee, dan is er geen aanbod en zegt de route dat, in plaats van
+     een knop te tonen die niets doet. */
+  const aanbod = pay ? require('./aanbod')({ partituur, aanspraak, pay, codenaamVan, onboarding }) : null;
 
   /* WIE MAG EEN AANSPRAAK VERLENEN. Alleen een maker, en alleen voor een code
      die een van zijn EIGEN partituren werkelijk vraagt. Zonder die band zou
@@ -80,6 +84,10 @@ function maakUitvoering({ db, save, schoon, crypto, catalogus, keyVanCodenaam })
       partituurZet: (sess, o) => partituur.zet(sess, o),
       onderdeel: (sess, o) => partituur.onderdeel(sess, o),
       voerUit: bouwUitvoering,
+      bon: (sess, o) => aanbod ? aanbod.bon(sess, (o || {}).partituurId)
+        : { status: 503, error: 'De betaallaag draait niet mee; betaalde partituren zijn nu niet te kopen.' },
+      koop: (sess, o) => aanbod ? aanbod.koop(sess, o)
+        : { status: 503, error: 'De betaallaag draait niet mee; betaalde partituren zijn nu niet te kopen.' },
       aanspraken: (sess) => aanspraak.mijne(sess.key),
       verleen, intrek,
       HERKOMSTEN: aanspraak.HERKOMSTEN, ROLLEN: partituur.ROLLEN

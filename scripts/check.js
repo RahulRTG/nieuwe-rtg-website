@@ -183,14 +183,30 @@ let reqFout = 0;
 for (const map of ['server', 'scripts']) {
   loop(path.join(ROOT, map), /\.js$/, f => {
     const maker = require('module').createRequire(f);
-    for (const regel of fs.readFileSync(f, 'utf8').split('\n')) {
-      const t = regel.trim();
-      if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) continue; // commentaar overslaan
-      const re = /require\((["'])(\.[^"']*)\1\)/g; let m;
-      while ((m = re.exec(regel))) {
-        try { maker.resolve(m[2]); }
-        catch (e) { reqFout++; fout("kapotte require('" + m[2] + "') in " + path.relative(ROOT, f)); }
-      }
+    /* COMMENTAAR ERUIT MET DE GEDEELDE WRINGER, en niet met een eigen zeef.
+
+       Hier stond een regel-heuristiek: sla een regel over als hij getrimd
+       begint met `//`, `*` of `/*`. Die klopt voor blokcommentaar dat elke
+       vervolgregel met een asterisk begint -- en dit huis schrijft zijn
+       blokcommentaar juist ZONDER die asterisk (zie de kop van dit bestand, en
+       elke meter in scripts/). Een vervolgregel begint dus gewoon met een woord,
+       en de scan las hem als code.
+
+       Gevolg: elke uitleg die een pad NOEMT werd een kapotte require. Gevonden
+       toen scripts/magnaatlab.js in zijn kop uitlegde waarom de wringer van
+       objectmodel.js daar niet deugt -- die uitleg citeert een require, en rule
+       7 verklaarde het bestand stuk terwijl er niets stuk was.
+
+       Dat is precies wat lib/bron.js bestaat om te voorkomen (LAT.md regel 4:
+       twee plekken die dezelfde waarheid vasthouden). check.js gebruikt hem al
+       op dertien andere plekken; deze regel was de uitzondering. De regelnummers
+       gaan bij het wringen verloren en dat kost hier niets: deze melding noemt
+       het bestand en het pad, geen regel. */
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    const re = /require\((["'])(\.[^"']*)\1\)/g; let m;
+    while ((m = re.exec(bron))) {
+      try { maker.resolve(m[2]); }
+      catch (e) { reqFout++; fout("kapotte require('" + m[2] + "') in " + path.relative(ROOT, f)); }
     }
   });
 }

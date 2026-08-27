@@ -199,3 +199,48 @@ test('6b. en een belofte van voor middernacht telt niet als bijna een dag te vro
   assert.equal(uit.soort, 'gemeten');
   assert.ok(uit.waarde >= 19 && uit.waarde <= 21, 'twintig minuten uitgelopen: ' + uit.waarde);
 });
+
+/* ----------------------------------------------------------------------------
+   EN DEZELFDE VONDST VAN DE ANDERE KANT.
+
+   Deze toets komt van main: een tweede sessie liep dezelfde nacht tegen
+   dezelfde middernachtfout aan en schreef er zijn eigen proef bij, met een
+   gang die om 23:55 klaarstaat op een belofte van 00:20. Hij blijft staan, en
+   met opzet: hij geeft GEEN vrijAt mee, dus hij houdt vast dat de meting ook
+   klopt als het moment van vrijgeven ontbreekt en er op het klaar-moment moet
+   worden geankerd. Hernummerd naar 7 omdat 6 hierboven al bezet was. */
+/* DE BELOFTE OVER MIDDERNACHT HEEN.
+
+   Toets 4 hierboven bouwt zijn serveertijd als "nu + 30 minuten" in HH:MM, en
+   liep daardoor op 26 augustus om 23:50 vast: +30 minuten werd "00:20", en de
+   meting rekende dat als 00:20 diezelfde ochtend -- 1411 minuten te vroeg.
+
+   De toets had gelijk. Het was de MEETFUNCTIE die de belofte altijd op de dag
+   van uitvoering zette, dus elke zaak die na middernacht doorserveert kreeg een
+   kwaliteitscijfer dat er een dag naast zat.
+
+   Deze toets voedt de rekenkant rechtstreeks met vaste tijdstempels, zodat hij
+   niet afhangt van het moment waarop de suite draait -- dat is immers precies
+   wat toets 4 de das omdeed. */
+test('7. een gang die om 23:55 klaarstaat met belofte 00:20 is 25 minuten TE VROEG, geen dag', () => {
+  const { REGELS } = require('../server/kern/horeca/dienstmeting')(
+    { horeca: { nu: () => new Date().toISOString() } });
+  assert.ok(REGELS.length >= 12, 'de meetlat staat er nog');
+
+  const tijden = require('../server/kern/horeca/dienstmeting-tijden');
+  const naam = 'beloofde versus werkelijke';
+  const dag = '2026-08-26T';
+  const rek = (klaar, om) => ([{ regels: [{ gang: 2, serveerOm: om, klaarAt: klaar }] }]);
+
+  /* Over middernacht: klaar om 23:55, belofte 00:20 (de volgende dag). */
+  const over = tijden.belofte(rek(dag + '23:55:00', '00:20'), naam);
+  assert.equal(over.soort, 'gemeten', 'er was een serveertijd afgesproken');
+  assert.ok(over.waarde <= 30,
+    'de belofte hoort op de VOLGENDE dag te vallen, niet 23 uur eerder: ' + over.waarde);
+
+  /* En de tegenproef, want een reparatie die ALLES dichtbij maakt meet niets:
+     een gewone avond hoort onveranderd te blijven. */
+  const gewoon = tijden.belofte(rek(dag + '20:25:00', '20:00'), naam);
+  assert.equal(gewoon.soort, 'gemeten');
+  assert.equal(gewoon.waarde, 25, 'een gewone avond blijft 25 minuten te laat: ' + gewoon.waarde);
+});

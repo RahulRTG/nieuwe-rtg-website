@@ -22,10 +22,23 @@
 /* De volgorde en de namen komen uit de ladder (kern/pasladder.js) en staan hier
    niet nog eens: een trede erbij hoort in EEN lijst te landen, niet in twee.
    Alleen beschikbare treden -- een pas die nog niet bestaat, heeft geen leden en
-   zou hier als lege regel met nul euro staan. */
+   zou hier als lege regel met nul euro staan.
+
+   EN pasVan KOMT UIT ./passen.js, want dat is een andere vraag. De ladder zegt
+   WELKE treden er zijn; passen.js zegt welke pas een lid TOONT (een gast heet
+   'gratis', iets onbekends valt terug op 'rtg'). Die regel stond ooit in twee
+   kopieen en hoort er maar een te zijn. Twee sessies raakten deze regel dezelfde
+   nacht aan -- de een verving de harde lijst door de ladder, de ander bracht
+   alles onder passen.js -- en dit is de helft van allebei die klopt.
+
+   Wat hier NIET is opgelost: passen.js draagt zijn eigen harde lijst
+   ['gratis','rtg','lifestyle','business'] en leest de ladder niet. Zolang die
+   twee gelijk lopen valt dat niemand op; een trede erbij in de ladder alleen wel.
+   Dat is ouder dan deze samenvoeging en hoort in een eigen ronde. */
 const ladder = require('./pasladder');
 const PAS_VOLGORDE = ladder.treden().filter(t => t.beschikbaar).map(t => t.id);
 const PAS_NAAM = Object.fromEntries(ladder.treden().map(t => [t.id, t.naam]));
+const { pasVan } = require('./passen');
 const GESLACHT_NAAM = { v: 'Vrouw', m: 'Man', x: 'X' };
 
 const { maandCentenVoor, contractueel } = require('./pasprijs');
@@ -38,8 +51,6 @@ module.exports = ({ accounts, onboarding, geldPasprijzen, ledenAantal, db }) => 
   const { omzetstaat } = maakOmzet({ db, geldPasprijzen, PAS_VOLGORDE, PAS_NAAM,
     contractueel, maandCentenVoor, eur });
 
-  // de pas van een lid: een gast/gratis lid heeft tier 'guest'; wij tonen 'gratis'.
-  const pasVan = tier => (tier === 'guest' ? 'gratis' : (PAS_VOLGORDE.includes(tier) ? tier : 'rtg'));
   // de stad komt uit het onboardingprofiel (woonplaats), op sleutel.
   function stadVan(key, profielen) {
     const p = profielen[key];

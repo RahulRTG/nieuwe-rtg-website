@@ -38,7 +38,7 @@ const { maandCentenVoor, contractueel } = require('./pasprijs');  // een antwoor
    LETTERS en cijfers geteld en niet op tekens, anders is "........." zo tien
    tekens lang. Zelfde lijn als kern/payroll/identiteit.js. */
 const REDEN_MIN = 10;
-const PASSEN = ['gratis', 'rtg', 'lifestyle', 'business'];
+const { PASSEN, pasVan } = require('./passen');   // een plek, zie ./passen.js
 
 module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom, herstelStart }) => {
   const nu = () => new Date().toISOString();
@@ -46,7 +46,6 @@ module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom
   const kort = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const inhoud = s => String(s).replace(/[^\p{L}\p{N}]/gu, '').length;
   const wie = d => kort((d && d.naam) || (typeof d === 'string' ? d : '') || 'balie', 60);
-  const pasVan = t => (t === 'guest' ? 'gratis' : (PASSEN.includes(t) ? t : 'rtg'));
   const redenOf = reden => { const r = kort(reden, 300); return inhoud(r) >= REDEN_MIN ? r : null; };
   const geenReden = { status: 400, error: 'Noteer waarvoor u dit doet. Het lid kan die reden later opvragen.' };
   const geenLid = { status: 404, error: 'Dit lid kennen we niet.' };

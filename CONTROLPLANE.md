@@ -186,7 +186,7 @@ billing en UI. Zie §7.
 
 ### 5.1 De caller-meting (was §6.1, nu gebouwd)
 
-`scripts/capabilities.js` telt per capability of er een caller is buiten de eigen
+`scripts/capabilityroepers.js` telt per capability of er een caller is buiten de eigen
 module. Bij de eerste run: **vijf van de acht stil** — kassa, Werk OS, personeel,
 governance en de vaste contactpersoon werden nergens gevraagd. Ze waren
 beschreven in het productprofiel, nagepraat door drie toetsen, en in vier
@@ -480,7 +480,7 @@ Twee dingen die het bord bruikbaar houden in plaats van alarmerend:
   `can_use_dedicated_support` in `routes/supplier/abonnement.js`. Wie die
   "onbewaakt" noemt, laat vier keer per bord een vals alarm afgaan, en dan leert
   iedereen de kolom te negeren. Het register van wie waar wordt gevraagd is
-  `scripts/capabilities.js` (§5.1), niet dit bord.
+  `scripts/capabilityroepers.js` (§5.1), niet dit bord.
 - **Zonder schaduwlaag zegt het bord "onbekend", niet "afgedwongen".** Doen alsof
   een regel bijt terwijl je het niet kunt nakijken, is precies de soort zekerheid
   die dit document nergens wil.
@@ -648,7 +648,7 @@ hoort, dus niemand heeft hem gekocht en niemand kán hem krijgen. Dat is geen do
 code die je opruimt als je toevallig langsloopt; het is een deur die dicht zit
 zonder dat iemand er een sleutel voor heeft laten maken.
 
-`scripts/capabilities.js` meet het nu in dezelfde run. Vandaag zijn er nul — en
+`scripts/capabilityroepers.js` meet het nu in dezelfde run. Vandaag zijn er nul — en
 juist daarom hoort de meting te bestaan, want de dag dat er één komt, komt hij
 stil.
 
@@ -697,7 +697,7 @@ Uit de aantekeningen hierboven, op volgorde van waarde:
 
 Zolang die vier niet allemaal machinaal gemeten worden, is dit een ambitie. Drie
 zijn dat nu — belofte (`claims.poort`), oorsprong (`bevoegdheid.herkomst`) en
-caller (`scripts/capabilities.js`) — en één deels: bewijs. Sinds §5.10 is dat
+caller (`scripts/capabilityroepers.js`) — en één deels: bewijs. Sinds §5.10 is dat
 laatste voor één van de vijf soorten onomkeerbare handelingen wél hard: een
 waardestap uit een voornemen komt er zonder besluit niet doorheen. Dat verschil
 eerlijk houden is de hele reden dat dit document een tabel bevat en geen

@@ -227,6 +227,43 @@ function isOptelling(bron) {
   return HEEFT_BEDRAG.test(s) && OPTELLING.some(r => r.test(s));
 }
 
+/* ============================================================================
+   IN WELKE EENHEID WORDT ER GEREKEND -- en waarom die vraag zwaarder weegt dan
+   het aantal optellingen zelf.
+
+   COMMERCE.md zette de 91 optellingen op "jaren weg" met als reden dat ze niet
+   in een ronde zijn samen te brengen. Dat klopt, maar het verbergt iets scherpers:
+   ze rekenen niet in dezelfde EENHEID. Naast elkaar gelegd:
+
+     kern/pay/kassa.js         sum van r.centen                      -- centen
+     kern/gast/order.js        sum van r.centen * r.aantal           -- centen
+     kern/horeca/verdeling.js  centen(r.centen * r.aantal)           -- centen
+     kern/onderneming/...      rond(sum van Number(f.totaal))        -- EURO'S
+
+   Een som in centen is exact. Een som in euro's is drijvende komma, en die
+   verliest een cent zodra er genoeg regels bij elkaar komen -- zwijgend. Dat is
+   dezelfde familie fouten als `bedrag` in euro's dat als centen werd gelezen
+   (kern/commerce/koopbaarlijst.js), en die kostte hier een factor honderd.
+
+   Deze meter zegt daarom niet alleen HOEVEEL plekken er rekenen, maar ook in
+   welke eenheid. Zo wordt "91" van een klacht een samenstelling waar iets aan te
+   doen is: de centen-kant is in orde, de euro-kant is de schuld.
+
+   ONBEKEND IS EEN EIGEN UITSLAG. Een bestand dat allebei doet, of geen van
+   beide herkenbaar, telt niet stilletjes bij de goede kant op. */
+const EENHEID_CENTEN = /\b(centen|centsBedrag|totaalCenten|stukCenten|brutoCenten|nettoCenten|btwCenten)\b/;
+const EENHEID_EURO = /\b(rond|centen)\s*\(\s*[^)]*\b(prijs|price|bedrag|totaal|omzet)\b/i;
+
+function optelEenheid(bron) {
+  const s = wring(bron);
+  const c = EENHEID_CENTEN.test(s);
+  const e = EENHEID_EURO.test(s);
+  if (c && !e) return 'centen';
+  if (e && !c) return 'euro';
+  if (c && e) return 'gemengd';
+  return 'onbekend';
+}
+
 function lees() {
   const paden = BRONNEN.reduce((a, m) => bestanden(m, a), []);
   const vormen = [];        // { module, velden[] }
@@ -245,7 +282,7 @@ function lees() {
       vormen.push({ module: p, velden });
     }
     functies.push({ module: p, namen: functiesVan(bron) });
-    if (isOptelling(bron)) optellingen.push({ module: p });
+    if (isOptelling(bron)) optellingen.push({ module: p, eenheid: optelEenheid(bron) });
   }
   return { vormen, functies, optellingen, bestanden: paden.length };
 }
@@ -333,12 +370,17 @@ function analyse({ vormen, functies, optellingen }, bestandenTel, opties) {
   const wagenDomeinen = new Set(wagens.map(w => w.domein));
   const wagenVormen = new Set(wagens.map(w => w.kern.join(',')));
 
-  /* D. De optellingen, per domein. */
+  /* D. De optellingen, per domein EN per eenheid. Die tweede telling is de
+     bruikbare: 91 plekken die allemaal in centen rekenen is iets anders dan 91
+     plekken waarvan een deel in euro's als kommagetal rekent, en alleen dat
+     tweede kan zwijgend een cent verliezen. Zie optelEenheid() hierboven. */
   const optelDomeinen = new Map();
+  const perEenheid = { centen: 0, euro: 0, gemengd: 0, onbekend: 0 };
   for (const o of optellingen) {
     const d = domeinVan(o.module);
     if (!optelDomeinen.has(d)) optelDomeinen.set(d, []);
     optelDomeinen.get(d).push(o.module);
+    perEenheid[o.eenheid || 'onbekend'] = (perEenheid[o.eenheid || 'onbekend'] || 0) + 1;
   }
 
   return {
@@ -359,7 +401,11 @@ function analyse({ vormen, functies, optellingen }, bestandenTel, opties) {
       wagenVormenUniek: wagenVormen.size,
       wagenDomeinen: wagenDomeinen.size,
       optellingen: optellingen.length,
-      optelDomeinen: optelDomeinen.size
+      optelDomeinen: optelDomeinen.size,
+      optelCenten: perEenheid.centen,
+      optelEuro: perEenheid.euro,
+      optelGemengd: perEenheid.gemengd,
+      optelOnbekend: perEenheid.onbekend
     },
     envelop,
     perWerkwoord,

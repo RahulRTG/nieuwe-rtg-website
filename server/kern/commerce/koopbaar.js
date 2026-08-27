@@ -37,6 +37,7 @@
 
 const { verklaar, zonder } = require('./werkwoorden');
 const { TYPE_WERKWOORDEN, REDEN, LEVERT_ZELF, vastBedragCenten, heeftBedrag, TYPEN } = require('./koopbaarlijst');
+const { geldig: vraagGeldig, publiek: vraagPubliek } = require('./prijsvraag');
 
 /* De vertaling. `rij` is een genormaliseerd aanbod-object uit
    kern/mall/aanbod.js; `extra` laat een domein werkwoorden TOEVOEGEN die het
@@ -67,10 +68,20 @@ function vanAanbod(rij, extra) {
      `bevestig` alleen weg bij een type dat `prijs` in zijn belofte had staan.
      Een boeking zonder bedrag houdt zijn bevestiging gewoon. */
   const beloofdePrijs = belooft.includes('prijs');
-  if (eerst.heeft.includes('prijs') && !heeftBedrag(rij.prijs)) {
+  /* EEN PRIJSVRAAG IS EEN PRIJS, alleen nog niet beantwoord. Een huis met
+     kamers die elk hun eigen exacte bedrag hebben, of een reis tegen een vaste
+     nettoprijs per persoon: het bedrag BESTAAT en hangt van een keuze af. Zo'n
+     rij houdt dus `prijs` en `bevestig` -- het antwoord komt uit de mand
+     (kern/commerce/prijsvraag.js), niet uit deze projectie.
+
+     Zonder dit onderscheid viel elk verblijf en elke reis uit de etalage met
+     "zet een prijs", terwijl er drie kamerprijzen naast staan. */
+  const vraag = vraagGeldig(rij.prijsvraag) ? rij.prijsvraag : null;
+  if (eerst.heeft.includes('prijs') && !heeftBedrag(rij.prijs) && !vraag) {
     weg.push('prijs');
-    // welke van de twee het is, bepaalt wat de ondernemer moet doen
-    if (rij.prijs && rij.prijs.vanaf) { redenNu.prijs = REDEN.prijsVanaf; redenNu.bevestig = REDEN.bevestigVanaf; }
+    // welke van de drie het is, bepaalt wat de ondernemer moet doen
+    if (rij.prijsAard === 'niveau') { redenNu.prijs = REDEN.prijsNiveau; redenNu.bevestig = REDEN.bevestigNiveau; }
+    else if (rij.prijs && rij.prijs.vanaf) { redenNu.prijs = REDEN.prijsVanaf; redenNu.bevestig = REDEN.bevestigVanaf; }
     if (beloofdePrijs && eerst.heeft.includes('bevestig')) weg.push('bevestig');
   }
   if (eerst.heeft.includes('beschikbaarheid') && rij.beschikbaar == null && rij.open == null) weg.push('beschikbaarheid');
@@ -101,6 +112,10 @@ function vanAanbod(rij, extra) {
     aanbieder: rij.aanbieder,
     plek: rij.plek || null,
     prijs: rij.prijs || null,
+    prijsAard: rij.prijsAard || null,
+    /* De vraag die beantwoord moet worden voor er een bedrag is. `null` als er
+       gewoon een vast bedrag staat -- dan valt er niets te vragen. */
+    prijsvraag: vraag ? vraagPubliek(vraag) : null,
     /* De stand van NU, los van het werkwoord. Een gesloten zaak kan nog steeds
        bevestigen (bestellen voor morgen); een zaak zonder koopknop niet. Die
        twee door elkaar halen is de fout waar kern/mall/stand.js over gaat. */

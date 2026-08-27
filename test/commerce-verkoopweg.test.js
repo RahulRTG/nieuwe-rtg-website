@@ -41,7 +41,11 @@ test('2. soort en toegang komen uit een gesloten lijst', () => {
   assert.equal(W.zet('MODE', Object.assign({}, basis, { soort: 'telepathie' })).status, 400);
   assert.equal(W.zet('MODE', Object.assign({}, basis, { toegang: 'iedereen-behalve-jan' })).status, 400);
   assert.ok(W.WEGSOORTEN.every(s => s.id && s.label && s.wat));
-  assert.ok(W.TOEGANG.every(t => t.id && t.label && typeof t.kan === 'boolean'));
+  /* `kan` kent DRIE waarden en geen twee: true, false, en null voor
+     afhankelijk. Zie toets 4 -- `publiek` hangt van twee sloten af, en dat is
+     iets anders dan verboden. */
+  assert.ok(W.TOEGANG.every(t => t.id && t.label && (t.kan === true || t.kan === false || t.kan === null)));
+  assert.equal(W.TOEGANG.filter(t => t.kan === null).length, 1, 'precies een afhankelijke');
 });
 
 test('3. de zaak komt van de aanroeper en niet uit het lijf', () => {
@@ -52,19 +56,20 @@ test('3. de zaak komt van de aanroeper en niet uit het lijf', () => {
   assert.equal(W.lijst('MODE')[0].zaak, 'MODE');
 });
 
-test('4. PUBLIEK verkopen wordt geweigerd, met de reden en de beslisser', () => {
-  const W = motor();
+test('4. PUBLIEK verkopen wordt geweigerd zolang een slot dicht zit', () => {
+  const W = motor();                       // geen lezers gekoppeld: allebei onbekend
   const r = W.zet('MODE', Object.assign({}, basis, { toegang: 'publiek' }));
   assert.equal(r.status, 403);
-  assert.match(r.error, /wie de lezers zijn/);
   assert.equal(r.besluitVan, 'boardroom');
+  assert.match(r.error, /niet vast te stellen/, 'onbekend is geen dicht, en het staat er ook zo');
+  assert.deepEqual(r.dicht, ['boardroom', 'eigenAdres']);
   assert.equal(W.lijst('MODE').length, 0, 'en er blijft niets half aangemaakt staan');
 
-  /* De optie STAAT in de lijst, met kan:false en een waarom. Een lijst waar hij
-     niet in staat laat de vraag onbeantwoord; deze geeft het antwoord. */
+  /* De optie STAAT in de lijst, met kan:null en de voorwaarden erbij. Een lijst
+     waar hij niet in staat laat de vraag onbeantwoord; deze geeft het antwoord. */
   const p = W.TOEGANG.find(t => t.id === 'publiek');
-  assert.equal(p.kan, false);
-  assert.ok(p.waarom && p.waarom.length > 40);
+  assert.equal(p.kan, null, 'afhankelijk, niet verboden');
+  assert.ok(p.afhankelijk && p.afhankelijk.length > 40);
 });
 
 test('5. live zetten is een aparte handeling dan bewerken', () => {

@@ -21,58 +21,34 @@
    NIET_GEBOUWD met de reden -- dezelfde vorm als in ./werkwoordlijst.js en
    TENANT.md.
 
-   ================== EN WAT HIJ MET OPZET NIET KAN ==================
+   ================== EN WANNEER HIJ PUBLIEK MAG ==================
 
-   PUBLIEK VERKOPEN KAN HIER NIET, en dat is geen ontbrekende regel maar een
-   geweigerde. kern/webdomein.js legt uit waarom: binnen het huis leest alleen
-   een ingelogd lid mee, op een openbaar adres leest iedereen mee -- "dat is geen
-   instelling maar een verandering van wie de lezers zijn". Daar zitten twee
-   sloten op, en het eerste is een besluit van de boardroom. Een verkoopweg die
-   zichzelf publiek kan zetten, is een derde slot dat de andere twee omzeilt.
+   PUBLIEK VERKOPEN IS AFHANKELIJK, en dat is sinds kort iets anders dan
+   onmogelijk. Hier stond een onvoorwaardelijke weigering met de zin erbij:
+   "Zodra de eigenaar het besluit neemt, is dat hier een regel minder en geen
+   nieuwe laag." Dat is nu gebeurd, en het is inderdaad een regel MINDER
+   geworden: ./publiekslot.js LEEST de twee sloten van kern/webdomein.js in
+   plaats van er een derde naast te leggen.
 
-   Dus weigert `zet` de toegang `publiek` MET de reden, zoals TENANT.md de modus
-   `sovereign` weigert in plaats van hem als knop te laten bestaan. Zodra de
-   eigenaar het besluit neemt, is dat hier een regel minder en geen nieuwe laag.
+   Slot een is de boardroom (`dom-eigendomein`, standaard uit), slot twee is de
+   zaak die zelf een adres koppelt en online zet. Staan die allebei open, dan is
+   deze verkoopweg geen nieuwe deur maar een etalage op een deur die al open
+   staat. Staat er een dicht, dan weigert `zet` nog steeds -- maar nu MET de
+   naam van het slot dat dicht zit, in plaats van met een blanket nee.
+
+   Deze laag kan geen van beide sloten openen. Hij heeft geen schrijfweg naar de
+   functie en geen schrijfweg naar het domein; hij kan alleen lezen.
    ========================================================================== */
 'use strict';
 
-const WEGSOORTEN = [
-  { id: 'web', label: 'Website', wat: 'een site van de verkoper zelf' },
-  { id: 'pos', label: 'Kassa', wat: 'aan de balie, op het scherm van de zaak' },
-  { id: 'qr', label: 'QR ter plekke', wat: 'aan tafel, op de kamer, bij het schap' },
-  { id: 'b2b', label: 'Zakelijk portaal', wat: 'voor bedrijven met een relatie' },
-  { id: 'mall', label: 'RTG Mall', wat: 'binnen de leden-app' },
-  { id: 'agent', label: 'AI-agent', wat: 'een gesprek in plaats van een scherm' }
-];
+const { WEGSOORTEN, TOEGANG, NIET_GEBOUWD, WEGSOORT, TOEG, MAX_PER_ZAAK } = require('./verkoopweglijst');
 
-/* DE TOEGANG. `publiek` staat er WEL in en is met opzet niet te kiezen: een
-   lijst waar hij niet in staat, laat de vraag onbeantwoord; een lijst waar hij
-   in staat met een weigering, geeft het antwoord. Zie de kop. */
-const TOEGANG = [
-  { id: 'personeel', label: 'Alleen personeel', kan: true, wie: 'medewerkers van de zaak' },
-  { id: 'leden', label: 'RTG-leden', kan: true, wie: 'iedereen die is ingelogd' },
-  { id: 'klanten', label: 'Eigen klanten', kan: true, wie: 'leden die de verkoper heeft uitgenodigd' },
-  { id: 'bedrijven', label: 'Zakelijke relaties', kan: true, wie: 'organisaties met een relatie' },
-  { id: 'publiek', label: 'Iedereen op internet', kan: false,
-    wie: 'ook wie geen account heeft',
-    waarom: 'Publiek verkopen verandert wie de lezers zijn, en dat is een besluit van de boardroom en niet van een verkoper. kern/webdomein.js heeft daar twee sloten voor; een verkoopweg die zichzelf publiek zet, zou daar een derde naast leggen die de andere twee omzeilt.' }
-];
-
-const NIET_GEBOUWD = {
-  prijsbeleid: 'Een eigen prijs per verkoopweg (kassaprijs anders dan webprijs) vraagt een tweede prijsbron naast het domein. Zolang die er niet is, geldt de prijs van het aanbod; een verkoopweg met een eigen prijslijst zou meteen de vraag oproepen welke van de twee klopt.',
-  betaalbeleid: 'Welke betaalwijzen een verkoopweg toestaat, hoort bij kern/pay en niet hier. Er komt geen tweede plek die bepaalt of iets betaald mag worden.',
-  fulfilmentbeleid: 'Bezorgen en afhalen staan per zaak in kern/leverancier/bezorgregel.js. Een verkoopweg die dat overschrijft, laat een zaak per weg iets anders beloven dan haar bezorgschakelaar zegt.',
-  eigenDomein: 'Een eigen adres is kern/webdomein.js en staat standaard uit, met twee sloten. Die staan daar met reden; een verkoopweg legt er geen derde naast.',
-  merk: 'Het merk van een verkoper woont in kern/webmerk.js en geldt per vestiging. Een verkoopweg met een eigen huisstijl zou een vierde plek zijn waar een logo vandaan komt.'
-};
-
-const OP_ID = (l) => new Map(l.map(x => [x.id, x]));
-const WEGSOORT = OP_ID(WEGSOORTEN), TOEG = OP_ID(TOEGANG);
-
-const MAX_PER_ZAAK = 20;
-
-module.exports = ({ db, save, nu, etalage }) => {
+module.exports = ({ db, save, nu, etalage, publiekSlot }) => {
   const klok = () => (typeof nu === 'function' ? nu() : require('../../lib/klok').nu());
+  /* De twee sloten van kern/webdomein.js, gelezen door ./publiekslot.js. Niet
+     gekoppeld betekent dat `publiek` dicht blijft mét de reden -- en niet dat
+     hij stilletjes open gaat. */
+  const slot = publiekSlot || require('./publiekslot')();
   const tekst = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 80);
 
   function pot() {
@@ -101,9 +77,21 @@ module.exports = ({ db, save, nu, etalage }) => {
     if (!soort) return { status: 400, error: 'Kies een soort: ' + WEGSOORTEN.map(s => s.id).join(', ') + '.' };
 
     const toegang = TOEG.get(tekst(b.toegang, 20));
-    if (!toegang) return { status: 400, error: 'Kies wie erbij mag: ' + TOEGANG.filter(t => t.kan).map(t => t.id).join(', ') + '.' };
-    /* DE WEIGERING MET DE REDEN. Zie de kop: dit is geen ontbrekende regel. */
-    if (!toegang.kan) return { status: 403, error: toegang.waarom, toegang: toegang.id, besluitVan: 'boardroom' };
+    if (!toegang) return { status: 400, error: 'Kies wie erbij mag: ' + TOEGANG.filter(t => t.kan !== false).map(t => t.id).join(', ') + '.' };
+    /* AFHANKELIJK IS NIET HETZELFDE ALS VERBODEN. `kan: null` betekent: het
+       hangt van de twee sloten af. Staan die open, dan mag het; staat er een
+       dicht, dan weigert dit MET de naam van dat slot -- zie de kop. */
+    let publiekOp = null;
+    if (toegang.kan === null) {
+      const st = slot.stand(code);
+      if (!st.mag) {
+        return { status: 403, error: st.waarom, toegang: toegang.id,
+          besluitVan: 'boardroom', sloten: st.sloten, dicht: st.dicht };
+      }
+      publiekOp = st.adres;
+    } else if (toegang.kan === false) {
+      return { status: 403, error: toegang.afhankelijk || 'Deze toegang kan niet.', toegang: toegang.id };
+    }
 
     const lijst = vanZaak(code);
     const bestaand = b.id ? lijst.find(w => w.id === tekst(b.id, 40)) : null;
@@ -116,6 +104,11 @@ module.exports = ({ db, save, nu, etalage }) => {
        te koop heeft; een lijst = precies die. Nooit een filter dat de zaak zelf
        niet kan zien -- daarom een opsomming en geen zoekopdracht. */
     w.alleen = Array.isArray(b.alleen) ? [...new Set(b.alleen.map(x => tekst(x, 80)).filter(Boolean))].slice(0, 500) : (w.alleen || []);
+    /* Het adres waarop hij publiek stond TOEN hij werd gemaakt. Puur ter
+       informatie: of hij het NU nog mag, wordt elke keer opnieuw gelezen (zie
+       beeld en publiceer). Een verkoopweg die zijn eigen vergunning bewaart,
+       blijft publiek nadat de boardroom de schakelaar heeft omgezet. */
+    if (publiekOp) w.publiekOp = publiekOp; else delete w.publiekOp;
     if (!bestaand) lijst.unshift(w);
     save();
     return { ok: true, verkoopweg: beeld(w) };
@@ -127,6 +120,15 @@ module.exports = ({ db, save, nu, etalage }) => {
   function publiceer(zaakCode, id, live) {
     const w = vanZaak(zaakCode).find(x => x.id === tekst(id, 40));
     if (!w) return { status: 404, error: 'Deze verkoopweg bestaat niet.' };
+    /* DE SLOTEN WORDEN HIER OPNIEUW GELEZEN. Live gaan is het moment waarop er
+       iets naar buiten verandert, en tussen aanmaken en publiceren kan de
+       boardroom de functie hebben uitgezet of de zaak zijn adres hebben
+       losgekoppeld. Een verkoopweg die zijn vergunning van gisteren gebruikt,
+       staat publiek terwijl het slot dicht zit. */
+    if (live && w.toegang === 'publiek') {
+      const st = slot.stand(w.zaak);
+      if (!st.mag) return { status: 403, error: st.waarom, sloten: st.sloten, dicht: st.dicht };
+    }
     const uit = telling(w);
     if (live && !uit.aantal) {
       return { status: 409, error: 'Deze verkoopweg heeft niets te koop. Een lege winkel online zetten helpt niemand.' };
@@ -158,6 +160,18 @@ module.exports = ({ db, save, nu, etalage }) => {
     }
   }
 
+  /* De stand van de twee sloten voor deze zaak, plus wat dat voor DEZE weg
+     betekent. `staatStil` is het geval dat een ondernemer moet zien: hij is
+     live gezet en een slot is daarna dichtgegaan. */
+  function publiekBeeld(w) {
+    const st = slot.stand(w.zaak);
+    return {
+      mag: st.mag, adres: st.adres, sloten: st.sloten, waarom: st.waarom,
+      staatStil: !!w.live && !st.mag,
+      gemaaktOp: w.publiekOp || null
+    };
+  }
+
   function beeld(w) {
     const t = telling(w);
     return {
@@ -169,6 +183,12 @@ module.exports = ({ db, save, nu, etalage }) => {
       live: !!w.live,
       teKoop: t.aantal, teKoopVolledig: t.volledig !== false, buitenDeEtalage: t.buiten == null ? null : t.buiten,
       tellingOnbekend: t.reden || null,
+      /* Voor een PUBLIEKE weg: de stand van de twee sloten NU, en niet die van
+         gisteren. Zo ziet een ondernemer meteen dat zijn winkel stilstaat omdat
+         de boardroom de functie uitzette, in plaats van zich af te vragen
+         waarom er niemand komt. Bij de andere vier soorten hoort dit blok er
+         niet: die hangen nergens van af. */
+      publiek: w.toegang === 'publiek' ? publiekBeeld(w) : null,
       at: w.at, bij: w.bij
     };
   }

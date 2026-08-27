@@ -28,7 +28,13 @@ function maakFiscaal({ db, centen, btwSplit }) {
     const basisCat = tarief.basisCat(s, db.capsVan(s));
     // omzet per belastingcategorie: bar-items zijn drank, keuken-items eten
     const potten = {};
-    const tel = (cat, bedrag) => { if (bedrag > 0) potten[cat] = (potten[cat] || 0) + bedrag; };
+    /* OOK NEGATIEF, en dat is sinds de tegenboekingen geen detail. Hier stond
+       `bedrag > 0`, als hygiene tegen nul en rommel. Een teruggedraaide
+       kassabon is een NEGATIEVE regel (kern/retail/annulering.js), en die zou
+       daarmee stil zijn weggevallen: de verkoop bleef in de btw-pot staan en de
+       annulering verdween. Dat is een aangifte die te hoog uitvalt. Nul slaan
+       we nog steeds over -- dat voegt niets toe. */
+    const tel = (cat, bedrag) => { if (bedrag) potten[cat] = (potten[cat] || 0) + bedrag; };
     const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     for (const o of db.data.orders) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;

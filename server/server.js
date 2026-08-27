@@ -1381,7 +1381,8 @@ const {
   isRetail: retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, verkoop: retailVerkoop,
-  verkoopTerug: retailVerkoopTerug,
+  verkoopTerug: retailVerkoopTerug, prijsVan: retailPrijsVan,
+  annuleerVerkoop: retailAnnuleer, bonBeeld: retailBon, ANNULEERGRONDEN,
   voorraadZoek, retailStats, retailState, catalogus: retailCatalogus
 } = maakRetail({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
@@ -1942,7 +1943,7 @@ const kern = {
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
-  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, voorraadZoek,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, retailPrijsVan, retailAnnuleer, retailBon, ANNULEERGRONDEN, voorraadZoek,
   retailStats, retailState, retailCatalogus,
   /* DE GROOTHANDEL ALS EEN NAAM. Vier van deze zestien werden door zowel member
      als supplier aangeraakt (ghMarkt, ghPlaatsBestelling, ghAnnuleer,
@@ -2036,6 +2037,25 @@ require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
+
+/* DE TWEE SLOTEN OP PUBLIEK VERKOPEN, aan de commerce-laag gegeven als LEZERS.
+
+   Precies dezelfde twee reads als eigenWeb.serveer hierboven doet: de
+   boardroom-functie 'dom-eigendomein' en de site die op een eigen adres staat.
+   Ze staan hier omdat webmaker en functies in dit bestand wonen en kern/commerce
+   in kernlaag2b wordt gebouwd; een tweede lezer in de kern zou een tweede
+   antwoord op dezelfde vraag zijn (LAT-regel 4).
+
+   ER GAAT ALLEEN LEESWERK IN. kern/commerce krijgt geen manier om de functie
+   aan te zetten of een domein te koppelen -- het kan alleen zien of dat al is
+   gebeurd. Zonder deze regels blijft `publiek` dicht met de reden "niet vast te
+   stellen", en dat is de goede kant op. */
+if (kern.commerce && kern.commerce.koppelPubliek) {
+  kern.commerce.koppelPubliek({
+    functieAan: (id) => functies.functieAan(id, db.data && db.data.techniek && db.data.techniek.functies),
+    siteVan: (zaakCode) => webmaker.siteVanZaak(zaakCode)
+  });
+}
 
 /* ---------- de afsluiters en de start staan in ./opzet/start.js ----------
 

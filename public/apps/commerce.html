@@ -90,6 +90,11 @@
   .ga:focus-visible{outline:2px solid var(--txt);outline-offset:2px;}
   .ga:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line);color:var(--soft);}
   .gaf{display:block;font-size:.74rem;color:var(--soft);margin-top:.1rem;}
+  .vraag{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.6rem;padding-top:.55rem;border-top:1px solid var(--line);}
+  .vraag label{display:flex;flex-direction:column;gap:.2rem;font-size:.74rem;color:var(--soft);}
+  .vraag select,.vraag input{font:inherit;font-size:.84rem;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:.3rem .5rem;}
+  .vraag input{width:5.5rem;}
+  .vraag select:focus-visible,.vraag input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
   .samen{border:1px dashed var(--line);border-radius:14px;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
   .samen b{color:var(--txt);font-weight:600;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
@@ -236,8 +241,21 @@ async function tekenEtalage(code){
     h += '<h3 style="font-size:.95rem;margin:.4rem 0 .7rem;">Te koop <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+teKoop.length+'</span></h3>';
     h += teKoop.length ? teKoop.map(k =>
       '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
-      '<div class="meta">'+esc(k.typeLabel||k.type)+(k.prijs&&k.prijs.bedrag!=null ? ' · '+esc(new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(k.prijs.bedrag))+(k.prijs.eenheid?' '+esc(k.prijs.eenheid):'') : '')+'</div>'+
+      /* "VANAF" HOORT ERBIJ TE STAAN. Zonder dat woord leest 520,00 als de prijs,
+         terwijl het de laagste van een reeks is -- en de kamer eronder kost 780.
+         Een prijsNIVEAU (een restaurant) krijgt zijn eigen woord: dat is geen
+         prijs maar een indicatie, en "vanaf" zou suggereren dat je het kunt
+         kopen. Zie prijsAard in kern/mall/aanbod.js. */
+      '<div class="meta">'+esc(k.typeLabel||k.type)+(k.prijs&&k.prijs.bedrag!=null
+        ? ' · '+(k.prijsAard==='niveau' ? 'gerechten vanaf ' : (k.prijs.vanaf ? 'vanaf ' : ''))+
+          esc(new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(k.prijs.bedrag))+
+          (k.prijs.eenheid?' '+esc(k.prijs.eenheid):'') : '')+'</div>'+
       chips(k)+
+      /* DE PRIJSVRAAG. Een verblijf of een reis draagt geen vast bedrag maar een
+         keuze met exacte bedragen erachter (welke kamer, hoeveel nachten). Die
+         staat hier als twee velden; het BEDRAG komt uit de server zodra ze zijn
+         ingevuld. Wij tonen wat de opties kosten, wij rekenen niets uit. */
+      vraagBlok(k)+
       '<div class="acties"><button class="knop" data-in="'+esc(k.id)+'">In de mand</button>'+
       /* Terugsturen kan alleen wat de verkoper heeft ingericht. Geen grijze knop
          bij de rest: een knop die nooit van jou is, hoort er niet te staan. */
@@ -257,14 +275,46 @@ async function tekenEtalage(code){
         '<div class="waarom'+(prima?' prima':'')+'">'+esc(k.waarom||'')+'</div></div>';
     }).join('') : '<p class="leeg">Alles van deze verkoper staat te koop.</p>';
     el.innerHTML = h;
-    el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in')));
+    el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in'), b));
     el.querySelectorAll('[data-retour]').forEach(b => b.onclick = () => retourVorm(b, b.getAttribute('data-retour')));
   } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
 }
 
-async function inMand(id){
-  try { const r = await api('/api/commerce/mand/zet', { koopbaarId: id, aantal: 1 }); toonMand(r); meld('In de mand.'); }
-  catch (e) { meld(e.message); }
+/* Het blok waarin een koper de prijsvraag beantwoordt. Bij een vast bedrag
+   staat er niets -- dan valt er niets te vragen. De bedragen bij de opties
+   komen in CENTEN van de server; wij delen door honderd om ze te TONEN en
+   rekenen verder niets uit. */
+function vraagBlok(k){
+  const v = k.prijsvraag; if (!v) return '';
+  return '<div class="vraag" data-vraag="'+esc(k.id)+'">'+
+    '<label>'+esc(v.basis.vraag || v.basis.label)+
+      '<select data-veld="'+esc(v.basis.id)+'">'+
+        v.basis.opties.map(o => '<option value="'+esc(o.id)+'">'+esc(o.label)+' &middot; '+euroC(o.centen)+(v.eenheid?' '+esc(v.eenheid):'')+'</option>').join('')+
+      '</select></label>'+
+    '<label>'+esc(v.maal.vraag || v.maal.label)+
+      '<input type="number" data-veld="'+esc(v.maal.id)+'" min="'+v.maal.min+'" max="'+v.maal.max+'" value="'+v.maal.min+'"></label>'+
+    '</div>';
+}
+
+/* De antwoorden van EEN rij, of null als die rij geen vraag heeft. Ze worden
+   uit het blok van de knop zelf gelezen (closest) en niet via een id: een
+   koopbaar-id bevat dubbele punten, en die breken een querySelector. Dezelfde
+   les als bij het retourformulier. */
+function antwoordenVan(knop){
+  const rij = knop.closest('.rij'); if (!rij) return null;
+  const blok = rij.querySelector('[data-vraag]'); if (!blok) return null;
+  const uit = {};
+  blok.querySelectorAll('[data-veld]').forEach(v => { uit[v.getAttribute('data-veld')] = v.value; });
+  return uit;
+}
+
+async function inMand(id, knop){
+  try {
+    const antwoorden = knop ? antwoordenVan(knop) : null;
+    const r = await api('/api/commerce/mand/zet',
+      { koopbaarId: id, aantal: 1, antwoorden: antwoorden || undefined });
+    toonMand(r); meld('In de mand.');
+  } catch (e) { meld(e.message); }
 }
 
 async function tekenMand(){
@@ -283,6 +333,9 @@ function toonMand(m){
   h += (m.afrekeningen||[]).map(a =>
     '<div class="afrek"><div class="top"><h3>'+esc(a.aanbiederNaam)+'</h3><span class="bedrag">'+euroC(a.totaalCenten)+'</span></div>'+
     (a.regels||[]).map(r => '<div class="regel"><span class="l">'+r.aantal+'× '+esc(r.titel)+
+      /* Hoe dit bedrag is opgebouwd, als het uit een keuze kwam. Een koper die
+         "Sea-view suite x 3 nachten" leest, hoeft niet te rekenen. */
+      (r.keuze && r.keuze.uitleg ? '<span class="gaf">'+esc(r.keuze.uitleg)+'</span>' : '')+
       /* HET MERKJE: aan wie is deze regel doorgegeven, en wanneer. Er staat met
          opzet niet "besteld" -- RTG hoort niet van het domein of de koper heeft
          doorgezet, en dat zou een bewering zijn zonder meting. Weghalen doet de

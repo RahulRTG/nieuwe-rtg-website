@@ -44,10 +44,14 @@ const AFGEDWONGEN = {
     waar: 'bij het sluiten van de stemronde: zolang een vereiste goedkeuring ontbreekt, kan het besluit niet worden gesloten' }
 };
 
+const EENHEID = require('../kern/geld/eenheid');
+
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, werkPoort, log, eigenVeld } = sctx;
   const R = (w) => { if (!w.regels) w.regels = {}; return w.regels; };
-  const centenVan = (v) => Math.round(Math.max(0, Number(v) || 0) * 100);
+  /* Een van de vier eigen omzetters die dit huis had. De naam loog niet, maar
+     de rekenkunde stond hier los; nu komt hij uit kern/geld/eenheid.js. */
+  const centenVan = (v) => EENHEID.naarCenten(Math.max(0, Number(v) || 0)) || 0;
 
   /* Welke regels raken DIT object? Per soort één voorwaarde, en de vraag wordt
      hier één keer beantwoord -- de handhaving (./regelpoort.js) stelt hem, maar

@@ -1,3 +1,4 @@
+const EENHEID = require('./geld/eenheid');
 /* Het Lab-fonds (kern/labfonds): leden zamelen samen geld in voor het RTF
    Onderzoekslab. Het opgehaalde geld wordt PER LOCATIE verdeeld, zodat elke plek
    zelf in zijn eigen omgeving kan investeren. Wat er per locatie met de pot
@@ -15,7 +16,10 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
-  const centen = (euro) => Math.max(0, Math.round(Number(euro) * 100) || 0);
+  /* HEET NIET MEER `centen`. Die naam betekende in dit huis drie dingen -- zie
+     de kop van ./geld/eenheid.js. Hier ging hij van euro naar cent, en dat is
+     wat de naam nu zegt. */
+  const naarCenten = (euro) => Math.max(0, EENHEID.naarCenten(euro) || 0);
   const eur = (c) => Math.round(c) / 100;
   // richtingen die geen omgeving dienen maar privaat gewin: de scheidsrechter raadt af
   const PRIVAAT = ['mezelf', 'mijzelf', 'eigen zak', 'prive', 'privé', 'vakantie voor mij', 'cadeau voor mij', 'zakgeld', 'mijn rekening'];
@@ -87,7 +91,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   function doneer(lidKey, lidNaam, locId, euro) {
     if (!lidKey) return { status: 403, error: 'Log in met je RTG-account om mee in te zamelen.' };
     const l = loc(locId); if (!l) return { status: 404, error: 'Deze locatie bestaat niet.' };
-    const c = centen(euro);
+    const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Zamel minimaal EUR 1 in.' };
     if (c > 5000000) return { status: 400, error: 'Dat is te veel voor een keer; verdeel het over meerdere keren.' };
     l.pot += c; l.opgehaald += c;
@@ -116,7 +120,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   /* De voorstellen, de stemming, de AI-scheidsrechter en de beslissing draaien
      als submodule op dezelfde context; zie labfonds/voorstellen.js. */
   const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
-    F, loc, vindV, locBeeld, voorstelBeeld, schoon, centen, eur, nu, rid, save, PRIVAAT });
+    F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT });
 
   return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom } };
 };

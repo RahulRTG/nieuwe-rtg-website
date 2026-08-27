@@ -55,6 +55,15 @@
   .vlag{font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:.15rem .5rem;color:var(--soft);}
   .vlag.live{border-color:var(--green);color:var(--green);}
   .waarom{border-left:2px solid var(--burgundy);padding-left:.8rem;margin-top:.5rem;color:var(--muted);font-size:.83rem;line-height:1.55;}
+  .waarom b{color:var(--txt);display:block;margin-bottom:.4rem;}
+  .slot{margin:.45rem 0;}
+  .slot i{font-style:normal;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:.1rem .5rem;margin-right:.4rem;}
+  .slot i.ja{color:var(--gold);border-color:var(--gold);}
+  .slot i.nee{color:var(--burgundy);border-color:var(--burgundy);}
+  .slot i.onb{color:var(--soft);}
+  .slot .sub{display:block;color:var(--soft);font-size:.76rem;margin:.1rem 0 0 .2rem;}
+  .stil{border:1px solid var(--burgundy);border-radius:10px;padding:.5rem .7rem;margin:.5rem 0;color:var(--burgundy);font-size:.82rem;line-height:1.5;}
+  .stil b{color:var(--txt);}
   .waarom.prima{border-left-color:var(--soft);}
   .klaar{border:1px dashed var(--gold);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.83rem;color:var(--muted);}
   .klaar b{color:var(--txt);}
@@ -102,7 +111,7 @@ if (!TOKEN) {
   $('#main').innerHTML = '<p class="leeg">Log eerst in op uw zaak via <a href="/apps/leverancier.html" style="color:var(--gold);">de leverancier-app</a>.</p>';
 } else { start(); }
 
-let SOORTEN = [], TOEGANG = [];
+let SOORTEN = [], TOEGANG = [], PUBLIEK = null;
 
 async function start(){
   await tekenWegen();
@@ -115,13 +124,19 @@ async function tekenWegen(){
   const el = $('#wegen');
   try {
     const r = await api('/api/supplier/verkoopweg/lijst', {});
-    SOORTEN = r.soorten || []; TOEGANG = r.toegang || [];
+    SOORTEN = r.soorten || []; TOEGANG = r.toegang || []; PUBLIEK = r.publiek || null;
     const wegen = r.wegen || [];
     el.innerHTML = wegen.length ? wegen.map(w =>
       '<div class="kaart"><h3>'+esc(w.naam)+' <span class="vlag'+(w.live?' live':'')+'">'+(w.live?'live':'concept')+'</span></h3>'+
       '<div class="meta">'+esc(w.soortLabel)+' &middot; '+esc(w.toegangLabel)+' ('+esc(w.wie||'')+') &middot; '+esc(w.selectie)+'</div>'+
       /* De telling komt uit de leeslaag. `null` is niet nul: nul zou "deze
          winkel is leeg" betekenen, en dat weten we juist niet. */
+      /* EEN PUBLIEKE WEG DIE STILSTAAT. Live gezet toen de sloten open stonden,
+         en daarna ging er een dicht. Zonder deze regel staat er "live" bij een
+         winkel waar niemand kan komen. */
+      (w.publiek && w.publiek.staatStil
+        ? '<div class="stil"><b>Staat stil.</b> '+esc(w.publiek.waarom)+'</div>'
+        : (w.publiek && w.publiek.mag ? '<div class="meta">Publiek op '+esc(w.publiek.adres||'')+'</div>' : ''))+
       '<div class="meta">'+(w.teKoop == null
         ? esc(w.tellingOnbekend || 'Het aanbod kon niet worden geteld.')
         : w.teKoop + ' te koop' + (w.buitenDeEtalage ? ', ' + w.buitenDeEtalage + ' erbuiten' : '') +
@@ -143,21 +158,42 @@ async function tekenWegen(){
   } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
 }
 
-/* Het formulier. `publiek` staat WEL in de keuzelijst en is uitgeschakeld met de
-   reden eronder -- een optie die ontbreekt laat iemand zoeken naar een
+/* DE TWEE SLOTEN, uitgeschreven. `publiek` is AFHANKELIJK en niet verboden: hij
+   kan zodra de boardroom de functie aanzet en deze zaak zelf een adres online
+   heeft staan. Een blanket "kan niet" laat een ondernemer zoeken naar een
+   instelling; twee sloten met hun stand vertellen hem precies wat er te doen is
+   en door wie. `null` is met opzet geen `dicht`: niet vast te stellen is een
+   eigen uitslag (BESTUUR.md). */
+function slotenBlok(pub){
+  if (!PUBLIEK || !Array.isArray(PUBLIEK.sloten)) return '<div class="waarom">'+esc(pub.afhankelijk||'')+'</div>';
+  const merk = (o) => o === true ? '<i class="ja">open</i>'
+    : (o === false ? '<i class="nee">dicht</i>' : '<i class="onb">niet vast te stellen</i>');
+  return '<div class="waarom"><b>Publiek verkopen: twee sloten</b>' +
+    PUBLIEK.sloten.map(x => '<div class="slot">'+merk(x.open)+' '+esc(x.naam)+
+      '<span class="sub">'+esc(x.wat)+' &middot; '+esc(x.waar)+'</span>'+
+      (x.adres ? '<span class="sub">Adres: '+esc(x.adres)+'</span>' : '')+'</div>').join('') +
+    (PUBLIEK.mag ? '<div class="slot"><i class="ja">Beide open.</i> Een publieke verkoopweg staat op ' + esc(PUBLIEK.adres||'') + '.</div>' : '') +
+    '</div>';
+}
+
+/* Het formulier. `publiek` staat WEL in de keuzelijst, en is te kiezen zodra de
+   twee sloten open staan -- een optie die ontbreekt laat iemand zoeken naar een
    instelling die niet bestaat; een optie met een antwoord erop niet. */
 function tekenNieuw(nietGebouwd){
-  const pub = TOEGANG.find(t => !t.kan);
+  const pub = TOEGANG.find(t => t.kan === null);
+  const magPubliek = !!(PUBLIEK && PUBLIEK.mag);
   $('#nieuw').innerHTML =
     '<h3>Nieuwe verkoopweg</h3>' +
     '<div class="rij">' +
       '<input id="n-naam" placeholder="Naam, bijvoorbeeld Onze webshop" style="min-width:15rem;">' +
       '<select id="n-soort">' + SOORTEN.map(s => '<option value="'+esc(s.id)+'">'+esc(s.label)+'</option>').join('') + '</select>' +
-      '<select id="n-toegang">' + TOEGANG.map(t =>
-        '<option value="'+esc(t.id)+'"'+(t.kan?'':' disabled')+'>'+esc(t.label)+(t.kan?'':' (kan niet)')+'</option>').join('') + '</select>' +
+      '<select id="n-toegang">' + TOEGANG.map(t => {
+        const kan = t.kan === null ? magPubliek : t.kan !== false;
+        return '<option value="'+esc(t.id)+'"'+(kan?'':' disabled')+'>'+esc(t.label)+(kan?'':' (nog niet)')+'</option>';
+      }).join('') + '</select>' +
       '<button class="knop doe" id="n-maak">Aanmaken</button>' +
     '</div>' +
-    (pub ? '<div class="waarom">'+esc(pub.waarom)+'</div>' : '') +
+    (pub ? slotenBlok(pub) : '') +
     '<div class="nietkan"><b>Wat een verkoopweg niet regelt</b><br>' +
       Object.entries(nietGebouwd).map(([k,v]) => '<i>'+esc(k)+'</i> &mdash; '+esc(v)).join('<br>') + '</div>';
   $('#n-maak').onclick = async () => {

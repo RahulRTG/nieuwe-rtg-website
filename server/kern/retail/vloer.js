@@ -48,17 +48,12 @@ module.exports = (ctx) => {
     return { ok: true, sale };
   }
 
-  /* Ketst de RTG Pay-betaling na de verkoop alsnog af, dan draait de route de
-     verkoop hiermee terug: voorraad erbij, bon eruit. De klanthistorie laten
-     we staan; die is informatief en heeft geen geldwaarde. */
-  function verkoopTerug(s, sale) {
-    for (const it of sale.items || []) {
-      const hit = variantVan(s, it.vsku);
-      if (hit) hit.variant.voorraad += it.qty;
-    }
-    db.data.posSales[s.code] = (db.data.posSales[s.code] || []).filter(x => x.id !== sale.id);
-    save();
-  }
+  /* Terugdraaien woont in ./annulering.js en niet meer hier. Hier stond een
+     functie die de voorraad terughaalde en de BON UIT posSales gooide; dat is
+     geen annulering maar een uitgeveegde regel, en de Z-lijst van gisteren
+     klopte er niet meer mee. Nu is elke ongedaanmaking een tegenboeking met een
+     grond -- zie de kop daar. De klanthistorie laten we staan; die is
+     informatief en heeft geen geldwaarde. */
 
   /* ---- voorraad opzoeken (winkelvloer): naam, sku, kleur of maat ---- */
   function voorraadZoek(s, q, drempel) {
@@ -80,7 +75,12 @@ module.exports = (ctx) => {
     const today = vandaag();
     const sales = (db.data.posSales[s.code] || []);
     const dag = sales.filter(x => String(x.at).slice(0, 10) === today);
+    /* De OMZET telt de tegenboekingen gewoon mee: die zijn negatief, dus een
+       teruggedraaide verkoop valt vanzelf weg. Het AANTAL BONNEN mag dat niet
+       doen -- anders staat er bij een vergissing die meteen wordt hersteld
+       "2 bonnen" terwijl er nul klanten zijn geweest. Zie ./annulering.js. */
     const omzetVandaag = rond(dag.reduce((n, x) => n + (x.total || 0), 0));
+    const tegen = dag.filter(x => x.soort === 'annulering');
     // verkocht per artikel (naam) uit de posSales-historie
     const perArtikel = {};
     for (const x of sales) for (const it of (x.items || [])) {
@@ -107,7 +107,9 @@ module.exports = (ctx) => {
     for (const a of s.artikelen || []) for (const v of a.varianten || [])
       if (v.voorraad <= ((s.settings && s.settings.retailDrempel) || 3)) laag.push({ artikel: a.naam, kleur: v.kleur, maat: v.maat, voorraad: v.voorraad, vsku: v.vsku });
     return {
-      omzetVandaag, bonnenVandaag: dag.length,
+      omzetVandaag,
+      bonnenVandaag: dag.length - tegen.length * 2,
+      teruggedraaidVandaag: tegen.length,
       artikelen: (s.artikelen || []).length,
       voorraadTotaal: (s.artikelen || []).reduce((n, a) => n + totaleVoorraad(a), 0),
       bestsellers, sellThrough, laag: laag.slice(0, 30),
@@ -161,5 +163,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus };
+  return { verkoop, voorraadZoek, retailStats, retailState, catalogus };
 };

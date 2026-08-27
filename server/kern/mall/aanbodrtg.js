@@ -11,7 +11,7 @@
 module.exports = (ctx, hulp) => {
   const { db, plek } = ctx;
   const { plekVan, MARKT_BEREIK } = plek;
-  const { aanbod, prijs, status, zaakPlek } = hulp;
+  const { aanbod, prijs, status, zaakPlek, getal } = hulp;
 
   /* ---------------------------------------------------------------------
      De RTG-brede bronnen: aanbod dat niet aan een enkele zaak hangt.
@@ -35,6 +35,20 @@ module.exports = (ctx, hulp) => {
       plek: plekVan({ stad: r.bestemming }),
       bereik: { soort: 'adres', km: 0, label: 'Op bestemming', aangenomen: false },
       prijs: prijs(r.prijs, 'per persoon', true),
+      /* DE VANAF-PRIJS IS HIER GEEN ONTBREKENDE PRIJS. De nettoprijs per
+         persoon staat vast ("leden reizen tegen de nettoprijs, zonder opslag");
+         wat er ontbreekt is met hoeveel personen. Dat is een vraag met een
+         exact antwoord, dus staat hij er als prijsvraag bij -- zie
+         kern/commerce/prijsvraag.js. De DATUM bevestigt het reisbureau, en dat
+         verandert de prijs per persoon niet. */
+      prijsAard: 'keuze',
+      prijsvraag: getal(r.prijs) ? {
+        eenheid: 'per persoon',
+        basis: { id: 'reis', label: 'De reis', vraag: 'Deze reis',
+          opties: [{ id: r.id, label: r.titel, centen: Math.round(getal(r.prijs) * 100) }] },
+        maal: { id: 'personen', label: 'Aantal personen', vraag: 'Met hoeveel personen reist u',
+          min: 1, max: 12, eenheid: 'persoon', eenheidMeervoud: 'personen' }
+      } : null,
       beschikbaar: r.dates ? { tekst: r.dates, hard: false } : null,
       pagina: '/apps/reisbureau.html', verdieping: 'reizen',
       kenmerken: (r.inbegrepen || []).slice(0, 4)
@@ -53,6 +67,18 @@ module.exports = (ctx, hulp) => {
         aanbieder: { soort: 'zaak', code: h.code, naam: h.naam, status: status(s) },
         plek: s ? zaakPlek(s) : plekVan({ stad: h.stad }), bereik: { soort: 'adres', km: 0 },
         prijs: h.vanaf != null ? prijs(h.vanaf, 'per nacht', true) : null,
+        /* Elke vrije kamer heeft zijn EIGEN exacte prijs per nacht (zie
+           kern/logies.js); de vanaf-prijs is alleen de laagste daarvan. Welke
+           kamer en hoeveel nachten -- twee vragen met een exact antwoord. */
+        prijsAard: h.kamers.length ? 'keuze' : null,
+        prijsvraag: h.kamers.length ? {
+          eenheid: 'per nacht',
+          basis: { id: 'kamer', label: 'Kamer', vraag: 'Welke kamer wilt u',
+            opties: h.kamers.map(k => ({ id: String(k.id), label: k.naam,
+              centen: Math.round((Number(k.prijs) || 0) * 100), uitleg: k.omschrijving || null })) },
+          maal: { id: 'nachten', label: 'Aantal nachten', vraag: 'Hoeveel nachten blijft u',
+            min: 1, max: 30, eenheid: 'nacht', eenheidMeervoud: 'nachten' }
+        } : null,
         beschikbaar: h.kamers.length ? { tekst: h.kamers.length + (h.kamers.length === 1 ? ' kamer vrij' : ' kamers vrij'), hard: true } : null,
         pagina: '/apps/hotels.html', genre: h.soort, genreLabel: h.soortLabel, verdieping: 'reizen',
         kenmerken: h.kamers.slice(0, 3).map(k => k.naam)

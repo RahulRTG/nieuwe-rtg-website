@@ -57,7 +57,11 @@ module.exports = (kern) => {
      kan het tussendoor een oud totaal tonen. */
   app.post('/api/commerce/mand/zet', auth, (req, res) => {
     const b = req.body || {};
-    const r = commerce.mandZet(wie(req), b.koopbaarId, b.aantal, !!b.vervang);
+    /* `antwoorden` is de keuze achter een prijsvraag (welke kamer, hoeveel
+       nachten). Geen bedrag: het bedrag komt uit de server. Zie
+       kern/commerce/prijsvraag.js. */
+    const r = commerce.mandZet(wie(req), b.koopbaarId, b.aantal, !!b.vervang,
+      (b.antwoorden && typeof b.antwoorden === 'object') ? b.antwoorden : null);
     if (r.error) return stuur(res, r);
     stuur(res, commerce.mandBeeld(wie(req)));
   });

@@ -88,6 +88,22 @@ module.exports = (ctx) => {
       },
       plek: o.plek, bereik: o.bereik,
       prijs: o.prijs || null,
+      /* WAT VOOR SOORT PRIJS DIT IS, en dat is iets anders dan het bedrag zelf.
+         `bedrag` staat er, `vanaf` zegt of het een indicatie is -- maar niet
+         WAAROM. Gemeten op de seed zijn er twee heel verschillende redenen voor
+         een vanaf-prijs, en ze vragen het tegenovergestelde:
+
+           'niveau'  een restaurant met "vanaf 12 euro per gerecht". Je koopt
+                     geen restaurant; hier valt niets exact te maken en dat
+                     hoort ook niet.
+           'keuze'   een huis met kamers, of een reis per persoon. Het exacte
+                     bedrag BESTAAT en hangt van een keuze af; `prijsvraag`
+                     zegt welke.
+
+         Zonder dit onderscheid ziet zo'n rij eruit als een ontbrekende prijs,
+         en dan gaat iemand er een invullen die er niet hoort. */
+      prijsAard: o.prijsAard || null,
+      prijsvraag: o.prijsvraag || null,
       // de zakelijke prijs reist mee; zoek.js kiest welke er getoond wordt
       zakelijkePrijs: o.zakelijkePrijs || null,
       /* `open` is de stand uit de Supplier OS: true, false of null. Null is met

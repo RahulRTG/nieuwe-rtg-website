@@ -42,7 +42,12 @@ function maakCommerce(state) {
   /* De verkoopweg telt zijn eigen aanbod niet: hij vraagt het aan de graaf. Een
      eigen kopie zou binnen een week uiteenlopen met wat er werkelijk te koop
      staat, en dan staat er een winkel met een verzonnen aantal artikelen. */
-  const wegen = require('./verkoopweg')({ db, save, nu, etalage: graaf.etalage });
+  /* De twee sloten op publiek verkopen. Ze worden LAAT gekoppeld (server.js,
+     na de kernlagen): de functiestand en de webmaker bestaan buiten deze laag,
+     en ze worden gelezen en nooit gezet. Niet gekoppeld betekent dat `publiek`
+     dicht blijft mét de reden -- zie ./publiekslot.js. */
+  const publiekSlot = require('./publiekslot')();
+  const wegen = require('./verkoopweg')({ db, save, nu, etalage: graaf.etalage, publiekSlot });
   /* De overdracht rekent zelf niets uit: hij krijgt het doorgerekende mandbeeld
      als parameter mee. Zo staat er geen tweede som naast die van ./afrekening.js. */
   const overdracht = require('./overdracht')({ db, save, nu });
@@ -85,7 +90,7 @@ function maakCommerce(state) {
     opzoeker: (filter) => graaf.opzoeker(filter),
     /* de mand */
     mandLees: (sleutel) => mand.lees(sleutel),
-    mandZet: (sleutel, koopbaarId, aantal, vervang) => mand.zet(sleutel, koopbaarId, aantal, vervang),
+    mandZet: (sleutel, koopbaarId, aantal, vervang, antwoorden) => mand.zet(sleutel, koopbaarId, aantal, vervang, antwoorden),
     mandLeeg: (sleutel) => mand.leeg(sleutel),
     mandBeeld,
     /* DE OVERDRACHT: de keuze afleveren bij de deur die wel bevestigt. De regels
@@ -121,7 +126,11 @@ function maakCommerce(state) {
     wegZet: (zaak, body) => wegen.zet(zaak, body),
     wegPubliceer: (zaak, id, live) => wegen.publiceer(zaak, id, live),
     wegWis: (zaak, id) => wegen.wis(zaak, id),
-    WEG_SOORTEN: wegen.WEGSOORTEN, WEG_TOEGANG: wegen.TOEGANG, WEG_NIET_GEBOUWD: wegen.NIET_GEBOUWD
+    WEG_SOORTEN: wegen.WEGSOORTEN, WEG_TOEGANG: wegen.TOEGANG, WEG_NIET_GEBOUWD: wegen.NIET_GEBOUWD,
+    /* De twee lezers erin. Alleen lezers: deze laag krijgt geen manier om een
+       slot te openen, en dat is de hele grens (./publiekslot.js). */
+    koppelPubliek: (o) => publiekSlot.koppel(o),
+    publiekStand: (zaakCode) => publiekSlot.stand(zaakCode)
   };
 
   return { commerce: api };

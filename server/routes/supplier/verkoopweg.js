@@ -34,6 +34,11 @@ module.exports = (kern) => {
     const door = managerOf(req, res); if (!door) return;
     res.json({ ok: true, wegen: commerce.wegLijst(req.supplier.code),
       soorten: commerce.WEG_SOORTEN, toegang: commerce.WEG_TOEGANG,
+      /* De stand van de twee sloten VOORAF, zodat het scherm kan zeggen wat er
+         dicht zit in plaats van de ondernemer eerst een 403 te laten oplopen.
+         Dezelfde lezer als `zet` gebruikt, dus er kan geen scherm ontstaan dat
+         iets anders belooft dan de server toestaat. */
+      publiek: commerce.publiekStand ? commerce.publiekStand(req.supplier.code) : null,
       nietGebouwd: commerce.WEG_NIET_GEBOUWD });
   });
 

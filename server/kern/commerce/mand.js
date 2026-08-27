@@ -72,7 +72,7 @@ module.exports = ({ db, save, nu }) => {
   /* Een regel erbij, of het aantal van een bestaande regel ophogen. `aantal: 0`
      haalt hem weg -- zo hoeft een scherm geen tweede endpoint te kennen voor
      "eentje minder tot hij op is". */
-  function zet(sleutel, koopbaarId, aantal, vervang) {
+  function zet(sleutel, koopbaarId, aantal, vervang, antwoorden) {
     const s = sleutelVan(sleutel);
     if (!s) return { status: 400, error: 'Geen mand zonder sleutel.' };
     const id = String(koopbaarId == null ? '' : koopbaarId).slice(0, 80);
@@ -96,6 +96,25 @@ module.exports = ({ db, save, nu }) => {
     } else {
       if (m.regels.length >= MAX_REGELS) return { status: 409, error: 'Deze mand zit vol (' + MAX_REGELS + " regels). Reken eerst af wat erin zit." };
       m.regels.push({ koopbaarId: id, aantal: n, at: klok() });
+    }
+    /* DE ANTWOORDEN OP DE PRIJSVRAAG. Dit is GEEN bedrag en dus geen breuk met
+       de kop hierboven: het is een KEUZE, net als het aantal -- welke kamer,
+       hoeveel nachten. Het bedrag dat eruit volgt wordt uitgerekend op het
+       moment dat het nodig is, door ./afrekening.js, uit de server. Zou de mand
+       het bedrag bewaren, dan staat er morgen een prijs van gisteren in.
+
+       Een gewijzigd antwoord is een andere keuze, dus het merkje van de
+       overdracht vervalt -- om dezelfde reden als bij een gewijzigd aantal. */
+    if (antwoorden && typeof antwoorden === 'object') {
+      const r = m.regels.find(x => x.koopbaarId === id);
+      if (r) {
+        const schoon = {};
+        for (const k of Object.keys(antwoorden).slice(0, 8)) {
+          schoon[String(k).slice(0, 40)] = String(antwoorden[k] == null ? '' : antwoorden[k]).slice(0, 80);
+        }
+        r.antwoorden = schoon;
+        delete r.overdracht;
+      }
     }
     m.bij = klok();
     if (!m.regels.length) delete p[s];

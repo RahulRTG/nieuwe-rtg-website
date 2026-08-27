@@ -1,9 +1,11 @@
 # RTG Commerce — de laag boven de domeinen
 
-*Gemeten op 27 augustus 2026 met `scripts/commerce.js`, opnieuw vastgelegd nadat
-`kern/commerce/` er zelf bij kwam en nadat `kern/retail` een prijsfunctie kreeg;
-de uitslag staat in `COMMERCE.json` en wordt bewaakt door
-`test/commerce.test.js`.*
+*Gemeten op 27 augustus 2026 met `scripts/commerce.js`, opnieuw vastgelegd na
+elke ronde die de code raakte; de uitslag staat in `COMMERCE.json` en wordt
+bewaakt door `test/commerce.test.js`. De vier posten die dit document als
+openstaand had — de publieke verkoopweg, `annuleer` in retail, de vanaf-prijzen
+en de optellingen — zijn alle vier afgemaakt; par. 6 zegt per post wat er is
+gebouwd en wat er met opzet níét is gedaan.*
 
 Dit is een richtingsdocument zoals `PLATFORM.md`, `DEVELOPERCLOUD.md` en `OS.md`:
 per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
@@ -161,7 +163,7 @@ betekent dus niet "retail ontsluiten" maar *retail afmaken*.
 > zakt op de oude volgorde.
 >
 > Wat het **niet** heeft gedaan is een optelling wegnemen. Die is verhuisd van
-> `vloer.js` naar `assortiment.js`, en 91 blijft dus 91. Het verschil dat de
+> `vloer.js` naar `assortiment.js`, en het totaal bleef dus staan. Het verschil dat de
 > meter niet kan zien is dat er nu één plek is die zegt wat iets kost, in plaats
 > van een som in de buik van een handeling die tegelijk voorraad afboekt.
 
@@ -426,44 +428,76 @@ autonome betaling die grens 2 verbiedt.
 
 ### Een stap weg
 
-- ~~`kern/retail` afmaken tot 6/8~~ — het staat op **5/8** (par. 2, met de
-  prijsfunctie en de fout die eronder zat). Wat er nog ontbreekt is geen
-  opruimklus meer maar twee besluiten.
-  `lever` hoort **niet** hier: bezorgen staat per zaak in
-  `kern/leverancier/bezorgregel.js`, en een tweede plek zou een zaak per weg iets
-  anders laten beloven dan haar bezorgschakelaar zegt. En `annuleer` is er wel
-  half — `verkoopTerug` zet de voorraad terug én **wist de bon**. Dat is geen
-  annulering maar een uitgeveegde kassaregel, en het rechtzetten daarvan raakt
-  het Z-rapport, de fooien en de boekhouding. Dat is een besluit van de eigenaar
-  en geen reparatie.
-- **Een exacte prijs waar nu een vanaf-prijs staat.** Op de seed dragen 12 van de
-  92 koopbaren met een bedrag een *indicatie* (`vanaf`) in plaats van een
-  afrekenbedrag: reizen, verblijven en menukaarten waarvan de prijs van de datum
-  of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
-  vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken.
+- ~~`kern/retail` afmaken~~ — het staat op **5/8** (par. 2), en `annuleer` is nu
+  ook echt gebouwd. Hier stond een functie die de voorraad terughaalde én **de
+  kassabon uit `posSales` gooide**: geen annulering maar een uitgeveegde regel,
+  waarna de Z-lijst van gisteren er niet meer mee klopte.
 
-  Hier is **geen regel code aan deze laag** te schrijven die dat oplost, en dat
-  is de reden dat het hier staat en niet bij *staat*. Voor een deel is het
-  data — een ondernemer die een vast bedrag invult, en het scherm zegt hem dat
-  ook met zoveel woorden (`REDEN.bevestigVanaf`: *"Zet een vast bedrag, dan komt
-  de koopknop terug"*). Maar voor een reis en een verblijf zal het dat nooit
-  worden: daar hángt de prijs van de datum af. Wat die domeinen nodig hebben is
-  het werkwoord `prijs` in zijn echte vorm — een functie die bij een datum en
-  een keuze een bedrag geeft, zoals `kern/retail` er nu een heeft. Dat is werk
-  in `kern/reis` en `kern/verblijf` en niet hier; deze laag kan hem alleen
-  aanroepen zodra hij er is.
+  Het is een **tegenboeking** geworden en geen vlag (`kern/retail/annulering.js`).
+  De bon blijft staan met een merkje; ernaast komt zijn spiegelbeeld met een min
+  ervoor. Dat is niet alleen netter maar ook goedkoper: **42 plekken** in dit huis
+  lezen `posSales`, en de plekken die geld optellen komen door een tegenboeking
+  vanzelf op nul uit — zonder dat er ergens een `if (!bon.geannuleerd)` bij hoeft.
+  Een vlag zou al die plekken moeten bereiken, en de plek die hem vergeet telt
+  omzet die niet bestaat.
+
+  Twee tellingen moesten wél mee. Het **aantal bonnen** telt de tegenboeking niet
+  mee (een hersteld foutje is geen twee klanten), en de **btw-pot** in
+  `kern/fiscaal/index.js` liet negatieve bedragen vallen (`if (bedrag > 0)`) —
+  daardoor bleef de verkoop in de aangifte staan en verdween de annulering: een
+  aangifte die te hoog uitvalt. Nagerekend tegen een draaiende server: de btw
+  gaat 754,96 → 1258,26 → **exact terug naar 754,96**.
+
+  Er is nog steeds **één** weg om een verkoop ongedaan te maken en geen twee: een
+  mislukte betaling gaat langs dezelfde tegenboeking, met de grond
+  `betaling-mislukt`. Twee mechanismen zijn twee waarheden over de vraag of die
+  omzet echt is. `lever` hoort nog steeds **niet** hier: bezorgen staat per zaak
+  in `kern/leverancier/bezorgregel.js`.
+- ~~Een exacte prijs waar nu een vanaf-prijs staat~~ — **gebouwd**, en de twaalf
+  bleken drie verschillende dingen te zijn. Nagemeten op de seed:
+
+  | | wat het is | wat eraan te doen was |
+  |---|---|---|
+  | 6× `eten` | een restaurant, "vanaf €12 per gerecht" | **niets** — dat is een prijs*niveau*, geen prijs |
+  | 3× `verblijf` | een huis met kamers die elk hun eigen exacte prijs hebben | welke kamer, hoeveel nachten |
+  | 3× `reis` | de nettoprijs per persoon staat vast | met hoeveel personen |
+
+  De laatste twee hebben dezelfde vorm — **kies een grondslag, maal een aantal** —
+  en dat is precies de som die `afrekening.js` al deed. Er is dus geen prijsfunctie
+  per domein aangeroepen en geen registertje van domeinen die er een hebben: het
+  domein publiceert de keuzes mét hun exacte bedrag (die kent het al), en de
+  commerce-laag doet de vermenigvuldiging die ze overal al doet
+  (`kern/commerce/prijsvraag.js`). Een aanroep terug het domein in zou een tweede
+  weg zijn waarlangs een bedrag ontstaat.
+
+  Drie grenzen: het bedrag komt uit de **optie van de server** en nooit uit het
+  antwoord van de browser; een onvolledig antwoord geeft **nooit** een getal maar
+  de vraag terug; en `prijsAard: 'niveau'` markeert de zes restaurants als wat ze
+  zijn, zodat "zet een prijs" een ondernemer niet aan het werk zet aan iets wat
+  niet bestaat. Zonder dat onderscheid vielen drie verblijven en drie reizen uit
+  de etalage met een reden die niet klopte.
 - ~~Bevestigen vanuit de mand~~ — **gebouwd**, zie *De overdracht* hieronder.
 
 ### Vraagt een besluit van de eigenaar
 
 - ~~Het woord `Kanaal`~~ — **genomen** (par. 3): hernoemd, `KANALEN` is uit de
   botsingstop en het woord is van de verkoopweg.
-- **Publiek verkopen op een eigen domein.** `kern/webdomein.js` staat standaard
-  uit met twee sloten, en de reden staat er: *binnen het huis leest alleen een
-  ingelogd lid een site; op een eigen domein leest iedereen hem.* Een publieke
-  winkel is die grens, één stap verder. Dat is een besluit, geen ontbrekende code
-  — en het raakt `CLAUDE.md` ("geen marketingsite terugbouwen"), al is de winkel
-  van een partner iets anders dan de etalage van RTG.
+- ~~Publiek verkopen op een eigen domein~~ — **gebouwd**, en het werd inderdaad
+  een regel MINDER en geen nieuwe laag. `kern/commerce/publiekslot.js` LEEST de
+  twee sloten van `kern/webdomein.js` in plaats van er een derde naast te
+  leggen: slot een is de boardroomfunctie `dom-eigendomein` (standaard uit),
+  slot twee is de zaak die zelf een adres koppelt en online zet. Staan ze
+  allebei open, dan is een publieke verkoopweg geen nieuwe deur maar een etalage
+  op een deur die al open staat.
+
+  Vier dingen die het scherp houden. De weigering noemt **welk slot** dicht zit
+  in plaats van een blanket nee. `niet vast te stellen` is een eigen uitslag
+  naast open en dicht, en houdt ook tegen — er gaat niets naar buiten op een
+  vermoeden. De stand wordt bij élke lezing opnieuw opgehaald, dus een
+  verkoopweg die live staat als de boardroom de schakelaar omzet, meldt
+  **staat stil** in plaats van door te gaan op de vergunning van gisteren. En
+  deze laag kan geen van beide sloten openen: hij krijgt twee lezers en verder
+  niets.
 - **Betaalroutering en zelfherstel.** Technisch een uitbreiding van
   `server/betaal-regie.js`. Maar "RTG kiest de goedkoopste rail" is een belofte
   over andermans geld, en die hoort langs dezelfde vraag als elke andere
@@ -475,27 +509,53 @@ autonome betaling die grens 2 verbiedt.
 
 ### Jaren weg
 
-- **De 91 optellingen.** 91 plekken in 49 domeinen rekenen regelbedragen uit of
-  tellen ze op. Dat is de prijs van geen gedeelde afrekening, en het is precies
-  het patroon dat `fiscaal/tarief.js` al één keer heeft laten ontsporen. Ze zijn
-  niet in één ronde samen te brengen, en een poging daartoe die halverwege stopt,
-  laat het huis met nóg één meer achter.
+- **De 92 optellingen — en wat het natellen opleverde.** 92 plekken in 49
+  domeinen rekenen regelbedragen uit of tellen ze op. Dat is de prijs van geen
+  gedeelde afrekening, en het is precies het patroon dat `fiscaal/tarief.js` al
+  één keer heeft laten ontsporen. Ze zijn niet in één ronde samen te brengen, en
+  een poging daartoe die halverwege stopt, laat het huis met nóg één meer achter.
 
-  Er stonden er 90 toen dit stuk werd geschreven; de 91ste is **deze laag zelf**.
-  De meter kent geen uitzondering voor de bouwer, en dat hoort zo — `kern/commerce`
-  staat er nu bij met twee plekken (`afrekening.js` en `overdracht.js`) en als
-  achttiende manddomein. Wat de meting níét kan zien is dat die twee dezelfde som
-  gebruiken: de overdracht rekent niet, hij krijgt het doorgerekende mandbeeld als
-  parameter. Een getal dat zijn eigen maker meetelt is eerlijker dan een getal dat
-  dat niet doet, ook als het daardoor iets erger lijkt dan het is.
+  Er stonden er 90 toen dit stuk werd geschreven; twee ervan zijn **deze laag
+  zelf** (`afrekening.js` en `overdracht.js`). De meter kent geen uitzondering
+  voor de bouwer, en dat hoort zo. Wat de meting níét kan zien is dat die twee
+  dezelfde som gebruiken.
 
-  En het blijft 91 ná de prijsfunctie van `kern/retail`: die is niet weggenomen
-  maar **verhuisd**, van `vloer.js` naar `assortiment.js`. Dat is precies de reden
-  dat deze post op *jaren weg* staat en niet op *een stap weg*. Een som netter
-  neerzetten is een middag werk; hem wegnemen vraagt een gedeelde afrekening waar
-  alle 49 domeinen doorheen gaan, en zolang die er niet is, verplaatst elke ronde
-  hem alleen maar.
+  **Maar bij het natellen bleek het risico ergens anders te zitten, en scherper.**
+  Ze rekenen niet in dezelfde eenheid, en erger: het WOORD voor die eenheid
+  betekende drie dingen.
 
+  | | | |
+  |---|---|---|
+  | `kern/util.js` | `centen(n) = round(n*100)/100` | euro's blijven euro's |
+  | `school/financien.js` | `centen(v) = round(v*100)` | euro's worden centen |
+  | `kern/labfonds.js` | `centen(euro) = round(euro*100)` | euro's worden centen |
+  | `bedrijf/klant.js`, `bedrijf/project.js` | idem | euro's worden centen |
+  | `kern/horeca.js` | `centen(v) = round(v)` | ongewijzigd |
+
+  `centen(x)` **leest** als "maak er centen van" en doet dat in `kern/util.js`
+  juist niet. Er was niets kapot — nagelopen, alle vijf de aanroepers geven het
+  goede mee — maar dat was geluk en geen ontwerp: dezelfde familie fout kostte
+  deze laag al een keer een factor honderd (`bedrag` in euro's dat als centen
+  werd gelezen). Dit is een `SEMANTIEK.json`-botsing in de duurste laag die er is.
+
+  Wat er nu staat: **één plek die zegt wat een bedrag is**
+  (`kern/geld/eenheid.js`), met namen die niet te verwarren zijn — `naarCenten`,
+  `naarEuro`, `rondEuro`, `regelCenten`, `somCenten`, en géén `centen`. De vier
+  omzetters die zo heetten zijn hernoemd en wijzen er nu heen.
+  `test/geldeenheid.test.js` toets 7 houdt het aantal functies dat `centen` heet
+  én van eenheid verandert op **nul**, en toets 8 laat die meter zelf uitslaan op
+  een bekend-foute invoer.
+
+  Wat er **niet** staat: `kern/util.js` heet nog steeds `centen` terwijl hij
+  `rondEuro` is. Dat zijn **104 aanroepen in 40 bestanden**, en hij reist via de
+  `hulp`-bundel naar elke kernlaag. Dat is een mechanische maar brede omzetting
+  en die is hier met opzet niet half gedaan — met de omvang erbij, zodat het een
+  besluit is en geen vergeetpost.
+
+  En de eenheidssplitsing zelf staat er als eerste grove snede, mét wat hij niet
+  ziet: **40 in centen, 5 in euro's, 3 gemengd, 44 niet vast te stellen**. Die
+  laatste helft is te groot om er een conclusie op te bouwen, en dat staat er
+  liever dan een getal dat zekerder klinkt dan het is.
 ---
 
 ## 7. Wat dit document níét zegt

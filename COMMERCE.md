@@ -323,10 +323,14 @@ autonome betaling die grens 2 verbiedt.
   of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
   vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
   bedrag hoort uit het domein zelf te komen.
-- **Bevestigen vanuit de mand.** De afrekening rekent door en stopt bij de deur;
-  de knop wijst naar het domein dat de bestelling werkelijk beheert. Dat is met
-  opzet zo gebouwd (er komt geen tweede orderwaarheid), maar de doorverwijzing
-  per type is er nog niet.
+- **Bevestigen vanuit de mand.** De afrekening rekent door, stopt bij de deur en
+  **wijst hem aan**: elke afrekening draagt `bevestigBij` met de plek(ken) waar
+  die verkoper werkelijk bevestigt, en het scherm zet er een link heen. Meerdere
+  deuren bij één verkoper worden ook als meerdere getoond — een tafel en een
+  artikel worden niet op dezelfde plek bevestigd, en dat samentrekken zou een
+  belofte maken die de kern juist weigert. Wat er nog niet is: de bestelling
+  meegeven aan dat domein, zodat de koper daar niet opnieuw begint. Dat is een
+  overdracht en geen tweede orderwaarheid, maar hij is nog niet gebouwd.
 
 ### Vraagt een besluit van de eigenaar
 

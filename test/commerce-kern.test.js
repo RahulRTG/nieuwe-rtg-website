@@ -235,3 +235,18 @@ test('16. waarom iets niet te koop staat, kent twee heel verschillende antwoorde
 
   assert.equal(K.waaromNietTeKoop(koopbaar({})), null, 'wat wel te koop staat, heeft geen reden');
 });
+
+test('17. de afrekening zegt WAAR er bevestigd wordt, want zij doet het zelf niet', () => {
+  /* Deze laag bevestigt met opzet niets namens een verkoper. Dan is de
+     verwijzing geen extraatje maar het sluitstuk: zonder haar is "wij stoppen
+     bij de deur" een doodlopend eind. */
+  const kat = {
+    a: K.vanAanbod(rij({ id: 'a', titel: 'Jas', pagina: '/apps/mall.html' })),
+    b: K.vanAanbod(rij({ id: 'b', titel: 'Tafel', type: 'eten', bezorgt: false, pagina: '/apps/foodcourt.html' }))
+  };
+  const r = rekenaar.reken([{ koopbaarId: 'a', aantal: 1 }, { koopbaarId: 'b', aantal: 1 }], (id) => kat[id] || null);
+  const a = r.afrekeningen[0];
+  assert.deepEqual(a.bevestigBij.sort(), ['/apps/foodcourt.html', '/apps/mall.html'],
+    'twee deuren bij een verkoper zijn twee deuren; er komt geen enkele link overheen');
+  assert.equal(a.regels.find(x => x.titel === 'Tafel').pagina, '/apps/foodcourt.html');
+});

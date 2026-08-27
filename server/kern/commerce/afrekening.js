@@ -103,6 +103,11 @@ module.exports = ({ tariefVan, basisCat, zaakVan, capsVan }) => {
            "0,00" -- dat leest als een fout in de prijs. */
         gratis: !kan(k, 'prijs'),
         levert: kan(k, 'lever'), annuleerbaar: kan(k, 'annuleer'), retourneerbaar: kan(k, 'retour'),
+        /* WAAR DIT WERKELIJK WORDT BEVESTIGD. Deze laag bevestigt met opzet
+           niets zelf, en dan is dit geen extraatje maar het sluitstuk: zonder
+           deze verwijzing is "wij stoppen bij de deur" een doodlopend eind.
+           kern/mall/aanbod.js zet hem al per rij; hier reist hij mee. */
+        pagina: k.pagina || null,
         blokkade
       },
       aanbieder: k.aanbieder || null
@@ -146,6 +151,11 @@ module.exports = ({ tariefVan, basisCat, zaakVan, capsVan }) => {
         btwOnbekend: btw ? null : 'Voor deze verkoper is geen btw-tarief vast te stellen; het bedrag staat bruto.',
         totaalCenten: bruto,
         bevestigbaar: blokkades.length === 0,
+        /* Gebundeld per pagina en niet als een enkele link: de regels van EEN
+           verkoper kunnen op twee plekken worden bevestigd (een tafel in de
+           foodcourt, een artikel in de Mall). Dat zijn dan twee deuren, en die
+           verzwijgen zou hier een derde soort belofte maken. */
+        bevestigBij: [...new Set(a.regels.map(r => r.pagina).filter(Boolean))],
         blokkades
       });
     });

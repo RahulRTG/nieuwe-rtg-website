@@ -77,6 +77,8 @@
   .afrek .regel .l{color:var(--muted);}
   .afrek .btwr{font-size:.76rem;color:var(--soft);margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
   .blok{color:var(--burgundy);font-size:.82rem;margin-top:.4rem;}
+  .deur{font-size:.8rem;color:var(--soft);margin-top:.55rem;}
+  .deur a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--line);}
   .samen{border:1px dashed var(--line);border-radius:14px;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
   .samen b{color:var(--txt);font-weight:600;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
@@ -261,6 +263,15 @@ function toonMand(m){
       ? 'Inclusief '+a.btw.tariefProcent+'% btw ('+euroC(a.btw.btwCenten)+') over '+euroC(a.btw.nettoCenten)+' netto.'
       : esc(a.btwOnbekend||''))+'</div>'+
     ((a.blokkades||[]).length ? '<div class="blok">'+a.blokkades.map(b=>esc(b.titel)+': '+esc(b.reden)).join('<br>')+'</div>' : '')+
+    /* WAAR JE HET BEVESTIGT. Deze laag doet dat met opzet niet zelf, dus zonder
+       deze regel eindigt het scherm in het niets. Meerdere deuren bij een
+       verkoper worden ook als meerdere getoond -- een tafel en een artikel
+       worden op verschillende plekken bevestigd, en dat samentrekken zou hier
+       een belofte maken die de kern juist weigert. */
+    ((a.bevestigBij||[]).length
+      ? '<div class="deur">Bevestigen doe je bij de verkoper zelf: ' +
+        a.bevestigBij.map(p => '<a href="'+esc(p)+'">'+esc((p.replace('/apps/','').replace('.html','')||'').replace(/^./, c => c.toUpperCase()))+'</a>').join(' &middot; ') + '</div>'
+      : '<div class="deur">Voor deze verkoper is geen plek bekend waar dit wordt bevestigd.</div>')+
     '</div>').join('');
 
   /* De belangrijkste zin van dit scherm. Er is geen knop "betaal alles", en dat

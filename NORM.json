@@ -25,7 +25,7 @@
     "kernGedeeld": 209,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 385,
+    "toetsenNietGemeten": 386,
     "toetsenOngevoeligPct": 1.8,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -942,6 +942,15 @@
       "van": 20,
       "vervalt": "2026-10-31",
       "reden": "Main erbij gehaald op de samenvoegingstak (PR #122 van een parallelle sessie). Main bracht meetbestanden in de wortel mee (CAPABILITEIT.json en zijn buren) die aan geen ratel in NORM.json hangen; hun eigen toets bewaakt ze wel. Zelfde soort schuld als die van vanochtend, alleen verder opgelopen door die twaalf commits; hoort terug naar 20."
+    },
+    {
+      "datum": "2026-08-27",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 385,
+      "vervalt": "2026-09-30",
+      "meter": "toetsenNietGemeten 385 -> 386",
+      "reden": "De samenvoegronde bracht nieuwe toetsen mee (de scherventeller in test/lcov.test.js en de partnertypes), en de mutatiemotor is daar nog niet langs geweest. Een toets telt pas als gemeten wanneer de motor hem een keer heeft geprobeerd te breken; tot dat moment staat hij hier als schuld en niet als winst. De motor draait over de hele suite en dat past niet binnen deze ronde, dus de schuld staat op de eerstvolgende mutatieronde."
     }
   ],
   "prestatie": {

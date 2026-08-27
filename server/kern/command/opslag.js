@@ -133,7 +133,16 @@ module.exports = function maakOpslag({ db }) {
      bezit hem. Zie de kop voor waarom dat een eigen woord verdient.
      ------------------------------------------------------------------------- */
   const gedeeld = {
-    schakelkast() {
+    /* MET EEN DUBBELE PUNT EN NIET ALS METHODE-KORTSCHRIFT, en dat is geen
+       smaak. scripts/kruisscan.js (keuringsregel 9) zoekt met een tekstpatroon
+       naar een naam die in een ZUSTERBESTAND op het hoogste niveau staat --
+       hier `schakelkast` in ./gezondheid.js -- en slaat een sleutel met een
+       dubbele punt over. Het kortschrift `schakelkast() {` glipt daar
+       tussendoor en werd als kruis-slice-verwijzing gemeld terwijl het een
+       SLEUTEL is en geen verwijzing. Die scanner is met opzet grof (zie zijn
+       kop); hem het verschil leren vraagt een ontleder. Deze vorm kost niets
+       en neemt de valse melding weg. */
+    schakelkast: () => {
       const t = (db.data.techniek && typeof db.data.techniek === 'object')
         ? db.data.techniek : (db.data.techniek = {});
       const f = t.functies;

@@ -253,8 +253,15 @@ gekozen uit de idempotentiesleutel. Drie grendels, alle drie fail-closed en elk
 met de reden erbij: alleen met `RTG_SIMULATIEBANK=1`, nooit naast een échte
 provider, nooit in productie. En geen knop in de productieweg: geen enkele
 HTTP-route geeft een scenario door, want dan kan iemand een betaling laten slagen
-die niet geslaagd is. De meting van `MAGNAATLAB.json` staat nog steeds op 0% en
-dat klopt — de rail loopt, Magnaat draait er nog niet op. Twee dingen om niet
+die niet geslaagd is. **En Magnaat rijdt er inmiddels op**:
+`kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay
+(`npm run magnaat:pomp:rtg`) — vijf perverse volgordes, exact nul verschil, en de
+idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels). Het
+bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules; het
+percentage bleef 0% en dat is geen tegenvaller maar te grof gemeten — één
+capability is geen percentage. Het is een **proefstuk en geen koppeling**: geen
+speelbeurt komt langs RTG Pay, en `test/magnaat-rtgketen.test.js` zakt zodra een
+spelmodule `kern/pay` laadt. Twee dingen om niet
 te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis
 buiten Magnaat niet toestaat, staat een groene simulatie niet toe), en scores
 mogen op apps en capabilities maar niet op mensen. En er staan al **twee**

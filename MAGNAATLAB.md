@@ -78,13 +78,13 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
 ### De uitkomst
 
 ```
-64 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
-   magnaat        61 modules
+65 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
+   magnaat        62 modules
    hospitality     3 modules
 
 1. HET BEREIK
-   113 requires in de simulatielaag
-     1 kernmodule geraakt, in 1 van 412 domeinen        (0%)
+   115 requires in de simulatielaag
+     2 kernmodules geraakt, in 2 van 412 domeinen       (0%)
      0 modules doen een netwerkaanroep                  (de ontsnapping wordt niet gebruikt)
      3 aanroepen van de ene synthetische wereld naar de andere
 
@@ -93,12 +93,20 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
      0 daarvan delen ook werkelijk een VORM
 ```
 
-De enige kernmodule die de simulatielaag aanraakt is `kern/bestuursroutes`.
-Niet `kern/pay`, niet `kern/waarde`, niet `kern/bevoegdheid`, niet
-`kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
+De simulatielaag raakt twee kernmodules aan: `kern/bestuursroutes` en — sinds
+27 augustus 2026 — **`kern/pay`**. Niet `kern/waarde`, niet `kern/bevoegdheid`,
+niet `kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
 
-> **Als testhal bewijst Magnaat vandaag niets over RTG, en de reden is niet
-> subtiel: hij roept RTG niet aan.**
+> **Als testhal bewees Magnaat niets over RTG, en de reden was niet subtiel: hij
+> riep RTG niet aan.** Voor precies één capability geldt dat niet meer.
+
+**En het percentage bewoog niet, wat eerlijker is dan het klinkt.** Dit document
+schreef bij fase 2 op: *"Slaagt dat, dan is de meting hierboven niet meer 0%."*
+Dat klopte niet. Twee van 412 domeinen rondt af op 0%, en één capability is nu
+eenmaal geen percentage. Wat er wél veranderde is de **lijst**: `kern/pay` staat
+erin, bij naam, en dat is de bewering die iemand kan natrekken. Een verhoudingsgetal over 412 domeinen is te grof om één verbinding te registreren — dat is een
+eigenschap van de meter en geen tegenvaller, en het staat hier zodat de volgende
+lezer niet naar een bewegend percentage zoekt dat er niet komt.
 
 ### En de tweede helft zegt iets anders dan verwacht
 
@@ -419,10 +427,37 @@ Het bewijs zelf staat er ook: een lid laadt op via de simulatiebank, een
 geweigerde simulatie levert geen cent op, en het geld dat er wél is gaat door de
 échte waardepoort — dezelfde code als in productie, er is geen tweede pad.
 
-**Wat dit NIET is.** De meting van par. 2 staat nog steeds op 0%, en terecht: er
-loopt nu een rail, maar Magnaat draait er nog niet op. `scripts/magnaat-pomp.js`
-stelt zijn geldpompvraag nog aan de spelbank en niet aan deze keten. Dat is fase
-2, en pas dán beweegt het getal.
+**En Magnaat rijdt er inmiddels op** (fase 2, dezelfde dag).
+`server/kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay in
+plaats van aan de spelbank: `npm run magnaat:pomp:rtg`. Hij staat in de
+Magnaat-WERELD en niet in `scripts/`, want het is Magnaats vraag — en omdat de
+meting van par. 2 kijkt naar wat de modules in die wereld aanroepen.
+
+De keten is van begin tot eind de echte: simulatiebank → `server/betaal.js` →
+`pay.laadOp` → `kern/pay/poort.js` → het grootboek. Vijf met opzet perverse
+volgordes — heen en weer, in een kring, naar jezelf, opgeknipt en weer
+samengevoegd, en twee keer dezelfde tik — en de uitkomst is in alle vijf **exact
+nul verschil** met de sluitcontrole op nul. `dubbelTikken` is de scherpste:
+twintig aangeboden tikken leveren **veertig** grootboekregels op en geen zestig,
+want de tweede aanbieding van dezelfde sleutel boekt niet opnieuw. Dat is
+idempotentie, gemeten in plaats van aangenomen.
+
+**Deze proef ging eerst zelf de mist in, en dat is de vermelding waard**, want het
+is precies de fout waar hij naar zoekt. De eerste versie riep `pay.stuur` aan met
+het verkeerde veld en keek niet naar het antwoord. Elke tik kwam terug met een
+404, en de meter meldde opgewekt dat geen enkel scenario waarde uit het niets
+maakte — over overdrachten die nooit hadden plaatsgevonden. Gevonden door een
+mutatie: het weghalen van de retourtik liet álles groen. Dat kon maar twee dingen
+betekenen, en het was de ergste van de twee.
+
+De reparatie is een tweede meting náást de invariant: het aantal grootboekregels
+per scenario staat als **getal** vast. Want een overdracht tussen spelers laat de
+som per definitie gelijk — de invariant alleen kan een scenario dat werkt niet
+onderscheiden van een dat niets doet.
+
+**Wat dit NIET is:** een koppeling. Geen enkele speelbeurt komt langs RTG Pay;
+`test/magnaat-rtgketen.test.js` toets 7 leest alle spelmodules en zakt zodra er
+één `kern/pay` laadt. Dit is een proefstuk, en het hoort er een te blijven.
 
 ### 5.2 Impact-based testing (punt 12) — de graaf ontbreekt
 
@@ -465,7 +500,7 @@ niet als geheel te beprijzen.
 |---|---|---|
 | ~~**0. De testhal meten**~~ ✅ | `scripts/magnaatlab.js` + `MAGNAATLAB.json`; de uitkomst staat in par. 2 | zonder dit is "Magnaat is onze testhal" een intentie, en de meting zegt 0% |
 | ~~**1. Eén capability erdoorheen**~~ ✅ | de simulatiebank staat als vierde rail in `server/betaal/synthetisch.js`; `test/simulatiebank.test.js` laadt op via die rail en geeft het uit door de ECHTE waardepoort | par. 5.1 — het bewijst de hele constructie, en de poort is er niet voor veranderd |
-| **2. Eén invariant verplaatsen** | `magnaat-pomp.js` stelt zijn geldpompvraag aan die keten in plaats van aan de spelbank | de meter bestaat al; alleen zijn onderwerp verandert |
+| ~~**2. Eén invariant verplaatsen**~~ ✅ | `npm run magnaat:pomp:rtg` stelt de geldpompvraag aan RTG Pay via de simulatiebank; vijf perverse volgordes, exact nul verschil, en de idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels) | de meter bestond al; alleen zijn onderwerp veranderde |
 | **3. De twee werelden wegen** | is `hospitality-universe` een tweede wereld of een tweede ingang? | par. 2 — vóór er een derde bij komt, niet erna |
 | ~~**4. Afleidbaarheid meten**~~ ✅ | `scripts/afleidbaar.js`: 6 identificatoren rechtstreeks naast een codenaam, 2 in twee stappen, bsn buiten bereik — en het handwerk verwierp de helft | par. 4.6 — het meeste rendement per dag, en er was geen wereld voor nodig |
 | **5. Pas dan een poort** | een risicoklasse-gebonden regel in `npm run check` | par. 4.1 — een poort die niets aanraakt keurt goed op grond van niets |

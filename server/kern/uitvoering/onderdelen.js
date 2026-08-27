@@ -19,7 +19,7 @@
 
 const F = require('./fragment');
 
-module.exports = ({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN }) => {
+module.exports = ({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN, handeling }) => {
   function onderdeel(sess, opdracht) {
     const o = opdracht || {};
     const p = vanMij(sess.key, o.id);
@@ -61,7 +61,11 @@ module.exports = ({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDE
 
     const rol = ROLLEN[o.rol] ? o.rol : 'verdieping';
     const diepte = Math.min(Math.max(Math.round(Number(o.diepte)) || 1, 1), 3);
-    p.onderdelen.push({ fragmentId: fid, naam: schoon(o.naam, 80) || rij.titel, rol, diepte, at: nu() });
+    /* De HANDELING (./handeling.js): wat een kijker hier kan doen. Verklaard
+       door de maker en nooit gedetecteerd; wat niet klopt levert GEEN handeling
+       op in plaats van een halve. */
+    p.onderdelen.push({ fragmentId: fid, naam: schoon(o.naam, 80) || rij.titel, rol, diepte,
+      handeling: handeling ? handeling.schoneHandeling(o.handeling, schoon) : null, at: nu() });
     p.bijgewerkt = nu(); save();
     return { status: 200, ok: true, partituur: beeld(p, true) };
   }

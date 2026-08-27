@@ -175,3 +175,34 @@ test('de drie uitslagen hebben drie verschillende afsluitcodes', () => {
   assert.deepEqual(codes, [0, 1, 2],
     'een uitrolpijplijn moet de drie uit elkaar kunnen houden zonder tekst te lezen');
 });
+
+test('een opgeschreven digest komt in de lijst, en zonder staat dat er ook', () => {
+  /* De pijplijn schrijft BASISIMAGES.json met wat hij werkelijk trok. Dat
+     bestand hoort bij het ARTEFACT en niet bij de bron, dus het staat in
+     .gitignore -- hier wordt allebei de standen beproefd. */
+  const pad = path.join(WORTEL, 'BASISIMAGES.json');
+  const bestond = fs.existsSync(pad);
+  const bewaard = bestond ? fs.readFileSync(pad) : null;
+  try {
+    const ref = (lijst.onderdelen.find(o => o.ecosysteem === 'oci') || {});
+    assert.ok(ref.naam, 'er is minstens een basis-image');
+    const volleRef = ref.naam + ':' + ref.versie;
+    const digest = 'sha256:' + 'c'.repeat(64);
+    fs.writeFileSync(pad, JSON.stringify({ images: { [volleRef]: digest } }));
+    const met = sbom.bouw();
+    const gevonden = met.onderdelen.find(o => o.naam === ref.naam && o.versie === ref.versie);
+    assert.equal(gevonden.integriteit, digest, 'de getrokken digest staat erbij');
+    assert.match(gevonden.let, /werkelijk trok/, 'met wat die digest betekent');
+    assert.ok(met.telling.imagesMetDigest >= 1, 'en hij wordt geteld');
+
+    fs.unlinkSync(pad);
+    const zonder = sbom.bouw();
+    const kaal = zonder.onderdelen.find(o => o.naam === ref.naam && o.versie === ref.versie);
+    assert.equal(kaal.integriteit, null);
+    assert.match(kaal.let, /geen digest opgeschreven/,
+      'zonder digest staat dat er als de eerlijke stand, niet als fout');
+  } finally {
+    if (bestond) fs.writeFileSync(pad, bewaard);
+    else if (fs.existsSync(pad)) fs.unlinkSync(pad);
+  }
+});

@@ -68,6 +68,8 @@
   .balk:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .balkvlak{position:absolute;top:0;bottom:0;background:rgba(201,162,75,0.32);
     border-left:2px solid var(--gold);border-right:2px solid var(--gold);}
+  .handeling{margin-top:0.5rem;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
+  .handeling .knop{text-decoration:none;display:inline-flex;align-items:center;}
   [hidden]{display:none !important;}
 </style>
 </head>
@@ -94,6 +96,12 @@
         <div class="rij" style="margin-top:0.8rem">
           <label for="kiesP" class="stil">Partituur</label>
           <select id="kiesP"><option value=""> -- laden -- </option></select>
+          <!-- Het scherm toont uw EIGEN partituren. Die van een ander opent u
+               met zijn id; dat is wat een gedeelde verwijzing draagt. Zoeken en
+               ontdekken bestaat hier nog niet, en dat staat er zo bij in plaats
+               van dat het scherm doet alsof. -->
+          <label for="vreemdP" class="stil">of van iemand anders</label>
+          <input id="vreemdP" type="text" maxlength="40" placeholder="id van de partituur">
           <label for="budget" class="stil">Ik heb</label>
           <input id="budget" type="number" min="0" step="10" placeholder="seconden">
           <label for="diepte" class="stil">Diepte</label>
@@ -165,6 +173,14 @@
             <option value="2">2 - wie meer wil</option>
             <option value="3">3 - wie het onderwerp kent</option>
           </select>
+        </div>
+        <div class="rij" style="margin-top:0.7rem">
+          <label for="fragHandeling" class="stil">Hier kan de kijker</label>
+          <select id="fragHandeling">
+            <option value="">niets (alleen kijken of luisteren)</option>
+            <option value="aanbod">iets van mij bekijken dat te koop is</option>
+          </select>
+          <select id="fragDoel" hidden><option value="">- kies -</option></select>
           <button class="knop vol" id="zetFragment" type="button">Zet in de partituur</button>
         </div>
       </div>
@@ -173,6 +189,7 @@
 
   <p class="melding" id="melding" role="status" aria-live="polite"></p>
   <script src="/apps/uitvoering.js" defer></script>
+  <script src="/apps/uitvoering-toon.js" defer></script>
   <script src="/apps/uitvoering-studio.js" defer></script>
   <!-- De gedeelde schil van dit huis, in dezelfde volgorde als de andere
        ledenschermen: de metgezel (Rahul, het palet), de basislaag, de bediening

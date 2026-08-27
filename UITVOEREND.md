@@ -97,7 +97,7 @@ publicatie krijgt vier delen, en alles hieronder is een gevolg daarvan.
 | **Onderdelen** | wat er ís — bestaande id's, plus één nieuwe vorm: `fragment:` |
 | **Regels** | wat eruit mag ontstaan — verplichte kern, optionele verdieping, volgorde-eisen, minimum- en maximumduur, dieptes, talen |
 | **Toestemming** | wat RTG ermee mag — inkorten, hermonteren, als bron dienen, in een samengestelde uitzending |
-| **Handelingen** | wat het stuk kan dóén — kopen, boeken, vragen; altijd over de bestaande rails *(de aankoop staat; handelingen vanuit een lopende uitvoering nog niet, zie par. 3)* |
+| **Handelingen** | wat het stuk kan dóén — altijd **verklaard** door de maker, altijd over de bestaande rails, en altijd klaarzetten |
 
 ### 2.1 Het fragment: de vijfde id-vorm
 

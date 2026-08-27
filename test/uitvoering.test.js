@@ -354,6 +354,70 @@ test('een maker ziet zijn eigen werk met de duur erbij, en live valt erbuiten', 
     'de kijker ziet het werk van de maker hier niet');
 });
 
+/* ---- de vierde kolom: wat een stuk kan DOEN ---- */
+
+test('een handeling wordt KLAARGEZET en nooit uitgevoerd', async () => {
+  // een tweede partituur van dezelfde maker, met een prijs erop
+  const t2 = (await api('/api/muziek/maak', {}, maker)).body.track.id;
+  await api('/api/muziek/bewaar', { id: t2, naam: 'De masterclass', klaar: true, bpm: 60, maten: 32 }, maker);
+  const u2 = (await api('/api/muziek/uitgeven', { id: t2 }, maker)).body.uitgave;
+  const les = (await api('/api/uitvoering/partituur/maak', { naam: 'De masterclass' }, maker)).body.partituur.id;
+  await api('/api/uitvoering/partituur/onderdeel',
+    { id: les, fragmentId: 'fragment:track:' + u2.id + '@0-40', rol: 'kern' }, maker);
+  await api('/api/uitvoering/partituur/zet',
+    { id: les, aanspraakNodig: 'masterclass-h', prijsCenten: 900, klaar: true }, maker);
+
+  // en een fragment in p1 dat daarnaar verwijst
+  const nieuwFrag = 'fragment:clip:' + clipB + '@0-15';
+  const r = await api('/api/uitvoering/partituur/onderdeel',
+    { id: p1, fragmentId: nieuwFrag, rol: 'verdieping', naam: 'Meer hierover',
+      handeling: { soort: 'aanbod', doel: les, label: 'De hele masterclass' } }, maker);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
+
+  const uit = await api('/api/uitvoering/voer', { partituurId: p1 }, kijker);
+  assert.equal(uit.status, 200);
+  const regel = uit.body.uitvoering.find(x => x.fragmentId === nieuwFrag);
+  assert.ok(regel, 'het fragment speelt mee');
+  assert.ok(regel.handeling, 'en draagt de handeling');
+  assert.equal(regel.handeling.open, true);
+  assert.equal(regel.handeling.wat, 'klaarzetten', 'het werkwoord staat in de kaart, niet op het scherm');
+  assert.equal(regel.handeling.centen, 900, 'met wat het kost, voordat er iets gebeurt');
+  assert.match(regel.handeling.let, /bon|zelf/i, 'en de belofte dat de mens bevestigt');
+
+  /* HET SCHERPSTE: er is niets afgeschreven. Een uitvoering die geld beweegt,
+     zou GELD.md par. 3 breken -- alles wat een ander raakt is klaarzetten. */
+  const aanspraken = (await api('/api/uitvoering/aanspraken', {}, kijker)).body.aanspraken;
+  assert.ok(!aanspraken.some(a => a.code === 'masterclass-h'),
+    'het uitvoeren van een werk verleent geen aanspraak op wat erin wordt aangeboden');
+  await api('/api/uitvoering/partituur/onderdeel', { id: p1, fragmentId: nieuwFrag, aan: false }, maker);
+});
+
+test('een handeling naar iets wat de kijker niet mag zien, is geen dode knop', async () => {
+  // een clip van de KIJKER: voor de maker bestaat die niet als eigen werk
+  const vreemdeClip = (await api('/api/clips/maak', { titel: 'Van de kijker', duurS: 12, mbGeschat: 1 }, kijker)).body.id;
+  const frag = 'fragment:clip:' + clipB + '@0-12';
+  await api('/api/uitvoering/partituur/onderdeel',
+    { id: p1, fragmentId: frag, rol: 'verdieping', naam: 'Verwijzing',
+      handeling: { soort: 'stuk', doel: 'clip:bestaatniet' } }, maker);
+  const uit = await api('/api/uitvoering/voer', { partituurId: p1 }, kijker);
+  const regel = uit.body.uitvoering.find(x => x.fragmentId === frag);
+  assert.ok(regel.handeling, 'de kaart komt er wel');
+  assert.equal(regel.handeling.open, false);
+  assert.match(regel.handeling.reden, /weggehaald|dicht/i, 'met de reden erbij');
+  assert.equal(vreemdeClip && true, true);
+  await api('/api/uitvoering/partituur/onderdeel', { id: p1, fragmentId: frag, aan: false }, maker);
+});
+
+test('een onzinnige handeling levert GEEN handeling op, geen halve', async () => {
+  const frag = 'fragment:clip:' + clipB + '@0-8';
+  await api('/api/uitvoering/partituur/onderdeel',
+    { id: p1, fragmentId: frag, rol: 'verdieping', handeling: { soort: 'raket', doel: 'x' } }, maker);
+  const mijn = (await api('/api/uitvoering/partituren', {}, maker)).body.partituren.find(x => x.id === p1);
+  const o = mijn.onderdelen.find(x => x.fragmentId === frag);
+  assert.equal(o.handeling, null, 'een knop waarvan de helft ontbreekt is erger dan geen knop');
+  await api('/api/uitvoering/partituur/onderdeel', { id: p1, fragmentId: frag, aan: false }, maker);
+});
+
 test('een gast komt er niet in', async () => {
   const r = await fetch(base + '/api/uitvoering/partituren', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.ok(r.status === 401 || r.status === 403, 'zonder token geen toegang (' + r.status + ')');

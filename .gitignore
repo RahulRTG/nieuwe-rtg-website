@@ -71,3 +71,9 @@ server/routes/zz-ijk-tijdelijk*.js
 # is. Dat is hier gebeurd. Achterblijvers worden niet door git bewaakt maar
 # door de toets zelf ("de ijking ruimt zichzelf op").
 zz-ijk-tijdelijk*
+
+# Per build gegenereerd door de releasepijplijn (release-image.yml): welke
+# basis-images er werkelijk zijn getrokken. Hoort bij het ARTEFACT en niet bij
+# de bron -- committen zou een digest van gisteren aan de release van vandaag
+# hangen.
+BASISIMAGES.json

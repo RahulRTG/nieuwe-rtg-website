@@ -142,9 +142,11 @@
        Dat is het hele punt van dit scherm. De server leest hem opnieuw en
        weigert wat niet klopt -- dit is gemak, geen vertrouwen. */
     var fid = 'fragment:' + gekozenStuk.stukId + '@' + van + '-' + tot;
+    var soort = $('#fragHandeling').value, doel = $('#fragDoel').value;
     api('/api/uitvoering/partituur/onderdeel', { id: pid, fragmentId: fid,
       rol: $('#fragRol').value, diepte: Number($('#fragDiepte').value),
-      naam: $('#fragNaam').value.trim() || gekozenStuk.titel })
+      naam: $('#fragNaam').value.trim() || gekozenStuk.titel,
+      handeling: soort && doel ? { soort: soort, doel: doel } : undefined })
       .then(function (r) {
         if (r.body && r.body.error) { zeg(r.body.error); return; }
         zeg('Toegevoegd: ' + sec(van) + ' tot ' + sec(tot) + '.');

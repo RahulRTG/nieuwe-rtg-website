@@ -62,7 +62,7 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
     id: p.id, naam: p.naam, klaar: !!p.klaar, at: p.at, bijgewerkt: p.bijgewerkt || p.at,
     onderdelen: (p.onderdelen || []).map(o => ({
       fragmentId: o.fragmentId, naam: o.naam, rol: o.rol, rolUitleg: ROLLEN[o.rol],
-      diepte: o.diepte, duurS: F.duurVan(o.fragmentId),
+      diepte: o.diepte, duurS: F.duurVan(o.fragmentId), handeling: o.handeling || null,
       stukId: (F.lees(o.fragmentId) || {}).stukId || null
     })),
     regels: p.regels, toestemming: p.toestemming,
@@ -138,9 +138,12 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
   /* Wat er IN een partituur zit -- erbij, eruit, verplaatsen, en de
      eigendomscontrole -- staat in ./onderdelen.js. Gesplitst toen dit bestand
      tegen de 10 kB-grens liep; de naad loopt waar hij hoort. */
-  const { onderdeel, eigenWerk } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN });
+  /* Wat een stuk kan DOEN staat in ./handeling.js -- eigen bestand, want het is
+     een eigen onderwerp met een eigen grens (klaarzetten, nooit doen). */
+  const handeling = require('./handeling')({ catalogus, partituurMet: met, codenaamVan: null });
+  const { onderdeel, eigenWerk } = require('./onderdelen')({ save, schoon, nu, catalogus, vanMij, beeld, ROLLEN, MAX_ONDERDELEN, handeling });
 
   const mijne = (sess) => ({ status: 200, partituren: tabel().filter(p => p.key === sess.key).map(p => beeld(p, true)), rollen: ROLLEN });
 
-  return { maak, zet, onderdeel, eigenWerk, mijne, met, beeld, ROLLEN };
+  return { maak, zet, onderdeel, eigenWerk, mijne, met, beeld, handeling, ROLLEN };
 };

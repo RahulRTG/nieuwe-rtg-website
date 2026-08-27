@@ -92,12 +92,30 @@ aangezien is erger dan geen bewijs.
   geen manier voor een buitenstaander om te verifiëren zonder ons te vertrouwen.
   Dat vraagt een extra actie plus `id-token: write` — een besluit, geen
   vergetelheid.
-- **Geen digest-pinning van de basis-images.** `node:22-slim` van vandaag is niet
-  die van vorige maand. Vastzetten op een digest maakt de release
-  reproduceerbaar en kost onderhoud (elke patch is een commit). De lijst zegt bij
-  elk image dat het op een tag staat.
-- **Geen kwetsbaarheidsscan.** Deze lijst zegt WAT erin zit, niet dat het veilig
-  is. Dat is minder dan een keurmerk en precies wat een SBOM hoort te zijn.
+- **Nog geen digest-pinning, maar wel digest-REGISTRATIE.** `node:22-slim` van
+  vandaag is niet die van vorige maand. Vastzetten op een digest maakt de release
+  reproduceerbaar en kost onderhoud: elke patch van een basis-image wordt dan een
+  commit. Dat is een besluit van de eigenaar en het hoort niet in een script te
+  sluipen.
+
+  Wat er sinds 27 augustus 2026 wél gebeurt is het goedkope deel dat dat besluit
+  mogelijk maakt: de pijplijn vraagt bij het register op welke digests hij op dat
+  moment trekt, schrijft ze in `BASISIMAGES.json` en de materiaallijst neemt ze
+  over. Van elke release is dus na te gaan uit welke images hij is gebouwd, ook
+  zonder te pinnen — en pinnen wordt dan een besluit met gegevens eronder in
+  plaats van een gok. Dat bestand hoort bij het **artefact** en niet bij de bron
+  en staat daarom in `.gitignore`: het committen zou een digest van gisteren aan
+  de release van vandaag hangen.
+- **Geen kwetsbaarheidsscan, en dat is een besluit dat open staat.** Deze lijst
+  zegt WAT erin zit, niet dat het veilig is. Een scan vraagt een
+  kwetsbaarheidsdatabase, en die hebben wij niet: elke praktische route (Trivy,
+  Grype, Docker Scout, de GitHub-scanner) betekent een derde partij toelaten in
+  de releasepijplijn en vertrouwen op háár oordeel. Dat is precies het soort
+  keuze dat `APPSTORE.md` en dit document elders niet stilzwijgend maken. Er is
+  daarom bewust niets bijgezet dat half werkt: de vraag *welke scanner, en op
+  wiens gezag* hoort door de eigenaar beantwoord te worden. Wat de keuze
+  goedkoper maakt dan hij lijkt, is dat er nu een materiaallijst ligt om hem op
+  los te laten.
 ~~- **Geen verificatie bij het uitrollen.**~~ **Die staat er sinds 27 augustus
 2026:** `node scripts/uitrolproef.js <adres>` vraagt een draaiende server welke
 build hij is en legt die naast de materiaallijst. Drie uitslagen met drie

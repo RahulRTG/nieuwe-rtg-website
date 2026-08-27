@@ -68,79 +68,27 @@
     });
   }
 
-  function toonWeigering(b) {
-    var v = $('#uitslag'); v.hidden = false; v.innerHTML = '';
-    v.appendChild(el('h2', null, 'Dat kan niet, en dit is waarom'));
-    var w = el('div', 'weiger');
-    w.appendChild(el('b', null, b.reden || 'Deze uitvoering kon niet worden samengesteld.'));
-    v.appendChild(w);
-    var g = b.bewijs || {};
-    if (g.kernS != null) {
-      var d = el('p', 'stil');
-      d.textContent = 'Het onmisbare deel duurt ' + sec(g.kernS) + '; het hele werk ' + sec(g.totaalS) + '.';
-      v.appendChild(d);
-    }
-    if (g.toestemming && !g.toestemming.inkorten) {
-      v.appendChild(el('p', 'stil', 'De maker staat inkorten niet toe: dit werk bestaat alleen in zijn geheel.'));
-    }
-  }
-
-  function toonUitvoering(b) {
-    var v = $('#uitslag'); v.hidden = false; v.innerHTML = '';
-    v.appendChild(el('h2', null, (b.partituur && b.partituur.naam) || 'Uitvoering'));
-    v.appendChild(el('p', 'stil', b.uitleg || ''));
-
-    var ol = el('ol');
-    (b.uitvoering || []).forEach(function (r) {
-      var li = el('li', 'regel');
-      if (r.rol === 'kern') li.appendChild(el('div', 'kern', 'kern'));
-      li.appendChild(el('b', null, r.titel || r.stukId));
-      li.appendChild(el('div', 'stil', r.vormNaam + ' · ' + sec(r.van) + '-' + sec(r.tot) + ' (' + sec(r.duurS) + ')'));
-      li.appendChild(el('div', 'waarom', r.waarom || ''));
-      ol.appendChild(li);
-    });
-    v.appendChild(ol);
-
-    /* HET BEWIJS. Alles hieronder komt uit het antwoord van de server; er wordt
-       op dit scherm niets bij elkaar geteld. Zou dat wel gebeuren, dan zeggen
-       twee lagen op een dag iets anders over dezelfde montage (BESTUUR.md). */
-    var g = b.bewijs || {};
-    var bw = el('div', 'bewijs');
-    bw.appendChild(el('h3', null, 'Waaruit dit bestaat'));
-    var dl = el('dl');
-    var voegToe = function (naam, waarde) {
-      dl.appendChild(el('dt', null, naam)); dl.appendChild(el('dd', null, waarde));
-    };
-    voegToe('U vroeg', (g.gevraagd && g.gevraagd.secondenBudget ? sec(g.gevraagd.secondenBudget) : 'het hele werk')
-      + ' · diepte ' + ((g.gevraagd && g.gevraagd.diepte) || 3));
-    voegToe('U krijgt', sec(g.gekozenS) + ' van ' + sec(g.totaalS));
-    voegToe('Onmisbaar', sec(g.kernS));
-    if (g.aanspraak) voegToe('Uw recht', g.aanspraak.herkomstNaam || g.aanspraak.herkomst);
-    voegToe('De maker staat toe', [g.toestemming && g.toestemming.inkorten ? 'inkorten' : null,
-      g.toestemming && g.toestemming.hermonteren ? 'hermonteren' : null]
-      .filter(Boolean).join(' en ') || 'niets; alleen het hele werk');
-    bw.appendChild(dl);
-
-    (g.weggelaten || []).forEach(function (w) {
-      bw.appendChild(el('p', 'weg', '· ' + (w.naam || w.fragmentId) + ' -- ' + w.reden));
-    });
-    (g.nietBeschikbaar || []).forEach(function (w) {
-      bw.appendChild(el('p', 'weg', '· ' + (w.naam || w.fragmentId) + ' -- ' + w.reden));
-    });
-    if (g.herleidbaar) bw.appendChild(el('p', 'weg', g.herleidbaar));
-    v.appendChild(bw);
-  }
+  /* Hoe een uitslag ERUITZIET staat in ./uitvoering-toon.js. Die laag krijgt de
+     kleine helpers hieronder mee via het venster; twee exemplaren van `el` en
+     `api` zouden twee plekken zijn waar hetzelfde misgaat. */
+  window.RTGUitvoeringEl = el;
+  window.RTGUitvoeringSec = sec;
+  window.RTGUitvoeringApi = api;
+  window.RTGUitvoeringZeg = zeg;
 
   $('#voerKnop').onclick = function () {
-    var id = $('#kiesP').value;
-    if (!id) { zeg('Kies eerst een partituur.'); return; }
+    /* Een ingevuld vreemd id gaat VOOR: wie dat typt, bedoelt dat. De server
+       kent het verschil tussen eigen en andermans werk toch al -- dit scherm
+       hoeft er geen tweede oordeel over te vellen. */
+    var id = $('#vreemdP').value.trim() || $('#kiesP').value;
+    if (!id) { zeg('Kies een partituur, of vul het id van iemand anders in.'); return; }
     var b = Number($('#budget').value);
     api('/api/uitvoering/voer', { partituurId: id,
       secondenBudget: b > 0 ? b : undefined, diepte: Number($('#diepte').value) })
       .then(function (r) {
-        if (r.body && r.body.geweigerd) { toonWeigering(r.body); return; }
+        if (r.body && r.body.geweigerd) { window.RTGUitvoeringToon.weigering(r.body); return; }
         if (r.body && r.body.error) { zeg(r.body.error); return; }
-        toonUitvoering(r.body);
+        window.RTGUitvoeringToon.uitvoering(r.body);
       });
   };
 

@@ -39,6 +39,7 @@ const F = require('./fragment');
 const B = require('./bewijs');
 
 module.exports = ({ catalogus, partituur, aanspraak }) => {
+  const H = partituur.handeling;
 
   function bouwUitvoering(sess, opdracht) {
     const o = opdracht || {};
@@ -151,6 +152,10 @@ module.exports = ({ catalogus, partituur, aanspraak }) => {
         fragmentId: x.od.fragmentId, stukId: x.f.stukId, van: x.f.van, tot: x.f.tot, duurS: x.duurS,
         titel: x.od.naam, vorm: x.rij.vorm, vormNaam: x.rij.vormNaam, rol: x.od.rol,
         spelen: x.rij.spelen,
+        /* De handeling wordt HIER opgelost, met de sessie van de kijker en niet
+           met die van de maker: wijst een maker naar iets wat deze kijker niet
+           mag zien, dan staat dat er met de reden en niet als dode knop. */
+        handeling: x.od.handeling && H ? H.los(sess, x.od.handeling, p.key) : null,
         waarom: x.od.rol === 'kern'
           ? 'De maker heeft dit als onmisbaar aangewezen.'
           : 'Verdieping op niveau ' + x.od.diepte + '; hier was ruimte voor.'

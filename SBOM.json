@@ -4,19 +4,20 @@
   "product": {
     "naam": "rtg-website",
     "bron": "git",
-    "commit": "c359a2cc3173e2932360f3a39c317cc92797ec0c",
+    "commit": "d0f4b8e058f0cd736bf22c0ccb91b11f1d4f52e9",
     "werkboomSchoon": false
   },
   "eigenCode": {
-    "afdruk": "sha256:0e627638fe91279755cf091babe957838fb84f22f542fdee78c1ea8dc4d14ede",
-    "bestanden": 5027,
-    "bytes": 69608421
+    "afdruk": "sha256:0468130f3bf5e9f0e9d8f8f157f2e019b3edca7cdbee6d3c26fb0c47090bfdc5",
+    "bestanden": 5041,
+    "bytes": 69725614
   },
   "telling": {
     "onderdelen": 7,
     "inRelease": 4,
     "alleenBouw": 3,
-    "npmInRelease": 0
+    "npmInRelease": 0,
+    "imagesMetDigest": 0
   },
   "onderdelen": [
     {
@@ -28,7 +29,7 @@
       "integriteit": null,
       "fase": "motor-builder",
       "inRelease": true,
-      "let": "Vastgezet op een tag, niet op een digest."
+      "let": "Vastgezet op een tag, niet op een digest, en er is geen digest opgeschreven."
     },
     {
       "soort": "container",
@@ -39,7 +40,7 @@
       "integriteit": null,
       "fase": "backup-runtime",
       "inRelease": true,
-      "let": "Vastgezet op een tag, niet op een digest."
+      "let": "Vastgezet op een tag, niet op een digest, en er is geen digest opgeschreven."
     },
     {
       "soort": "container",
@@ -50,7 +51,7 @@
       "integriteit": null,
       "fase": "runtime",
       "inRelease": true,
-      "let": "Vastgezet op een tag, niet op een digest."
+      "let": "Vastgezet op een tag, niet op een digest, en er is geen digest opgeschreven."
     },
     {
       "soort": "library",

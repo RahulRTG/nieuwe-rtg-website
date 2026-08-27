@@ -170,3 +170,84 @@ test('een maker wijst een fragment aan op een tijdlijn, zonder ooit een id te ty
     await stop({ child });
   }
 });
+
+test('een handeling in een uitvoering ZET KLAAR en koopt niet',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-handeling-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const api = (pad, lijf, token) => fetch(base + pad, { method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
+      body: JSON.stringify(lijf || {}) }).then(r => r.json());
+
+    const u = Date.now().toString().slice(-8);
+    const maker = await api('/api/auth/register', { name: 'Aanbieder', email: 'uh' + u + '@x.nl',
+      phone: '06' + u, password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' });
+    const kijker = await api('/api/auth/register', { name: 'Kijker', email: 'uk' + u + '@x.nl',
+      phone: '07' + u, password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' });
+
+    const mk = async (naam) => {
+      const t = (await api('/api/muziek/maak', {}, maker.token)).track.id;
+      await api('/api/muziek/bewaar', { id: t, naam, klaar: true, bpm: 60, maten: 32 }, maker.token);
+      return (await api('/api/muziek/uitgeven', { id: t }, maker.token)).uitgave;
+    };
+    const hoofd = await mk('Het werk'), les = await mk('De masterclass');
+
+    // het betaalde aanbod
+    const lesP = (await api('/api/uitvoering/partituur/maak', { naam: 'De masterclass' }, maker.token)).partituur;
+    await api('/api/uitvoering/partituur/onderdeel',
+      { id: lesP.id, fragmentId: 'fragment:track:' + les.id + '@0-40', rol: 'kern' }, maker.token);
+    await api('/api/uitvoering/partituur/zet',
+      { id: lesP.id, aanspraakNodig: 'les-e2e', prijsCenten: 900, klaar: true }, maker.token);
+
+    // het werk waarin ernaar wordt verwezen
+    const p = (await api('/api/uitvoering/partituur/maak', { naam: 'Het werk' }, maker.token)).partituur;
+    await api('/api/uitvoering/partituur/onderdeel',
+      { id: p.id, fragmentId: 'fragment:track:' + hoofd.id + '@0-40', rol: 'kern', naam: 'Het werk zelf',
+        handeling: { soort: 'aanbod', doel: lesP.id, label: 'De hele masterclass' } }, maker.token);
+    await api('/api/uitvoering/partituur/zet', { id: p.id, toestemming: { inkorten: true }, klaar: true }, maker.token);
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
+    await ctx.addInitScript((t) => {
+      try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+    /* De KIJKER zit in de browser en niet de maker: een maker die zijn eigen
+       aanbod aanklikt krijgt terecht "dit is uw eigen werk", en dan zou deze
+       toets de bon nooit zien. Hij opent het werk met het id, want het scherm
+       toont alleen je eigen partituren -- zoeken bestaat hier nog niet. */
+    }, kijker.token);
+    const page = await ctx.newPage();
+    const fouten = letOpFouten(page, []);
+    await page.goto(base + '/apps/uitvoering.html', { waitUntil: 'load' });
+    await page.waitForSelector('#vreemdP', { timeout: 20000 });
+
+    await page.fill('#vreemdP', p.id);
+    await page.click('#voerKnop');
+    await page.waitForSelector('#uitslag .handeling', { timeout: 15000 });
+
+    /* De knop noemt de PRIJS voordat er iets gebeurt, en het werkwoord komt van
+       de server. Zou het scherm zelf mogen kiezen, dan koos het op een dag
+       "koop" -- en dat is precies wat GELD.md par. 3 verbiedt. */
+    const knop = await page.$eval('#uitslag .handeling .knop', e => e.textContent);
+    assert.match(knop, /De hele masterclass/);
+    assert.match(knop, /9\.00 euro/, 'de prijs staat erop: ' + knop);
+    assert.ok(!/^koop|kopen/i.test(knop.trim()), 'dit is geen koopknop: ' + knop);
+
+    await page.click('#uitslag .handeling .knop');
+    await page.waitForFunction(() => /Wat dit kost/.test(document.querySelector('#uitslag').textContent),
+      null, { timeout: 10000 });
+    const bon = await page.$eval('#uitslag .handeling .bewijs', e => e.textContent);
+    assert.match(bon, /btw|retour/i, 'de bon zegt ook wat RTG NIET doet: ' + bon.slice(0, 120));
+
+    /* EN ER IS NIETS AFGESCHREVEN. Dit is de assertie waar het om gaat: een
+       uitvoering zet klaar en rekent nooit af. */
+    const aanspraken = (await api('/api/uitvoering/aanspraken', {}, kijker.token)).aanspraken || [];
+    assert.ok(!aanspraken.some(a => a.code === 'les-e2e'), 'er is niets gekocht door te kijken');
+
+    assert.deepEqual(fouten, [], 'geen fouten in de console: ' + JSON.stringify(fouten));
+  } finally {
+    if (browser) await browser.close();
+    await stop({ child });
+  }
+});

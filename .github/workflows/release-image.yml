@@ -46,6 +46,26 @@ jobs:
       # De materiaallijst hoort bij DEZE commit en wordt daarom hier gemaakt en
       # niet uit de repository gelezen: een SBOM die iemand vergat bij te werken,
       # beschrijft een andere release dan er wordt gepubliceerd.
+      # WELKE BASIS-IMAGES ZIJN ER WERKELIJK GETROKKEN. Een tag is geen afdruk;
+      # pinnen op een digest is een besluit met onderhoud eraan (SBOM.md). Wat
+      # hier gebeurt is het goedkope deel dat dat besluit mogelijk maakt: van
+      # elke release vastleggen UIT WELKE images hij is gebouwd. Zonder pullen,
+      # rechtstreeks bij het register opgevraagd.
+      - name: Digests van de basis-images vastleggen
+        shell: bash
+        run: |
+          docker buildx create --use --driver docker-container
+          echo '{"uitleg":"De digests die de pijplijn werkelijk trok. Gegenereerd in release-image.yml.","images":{}}' > BASISIMAGES.json
+          for ref in $(grep -oPi '^FROM\s+\K\S+' Dockerfile | grep ':' | sort -u); do
+            d=$(docker buildx imagetools inspect "$ref" --format '{{ .Manifest.Digest }}' 2>/dev/null || true)
+            if [ -n "$d" ]; then
+              node -e 'const f="BASISIMAGES.json",j=require("./"+f);j.images[process.argv[1]]=process.argv[2];
+                require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")' "$ref" "$d"
+              echo "$ref -> $d"
+            else
+              echo "LET OP: geen digest gevonden voor $ref; hij komt zonder in de lijst."
+            fi
+          done
       - name: Materiaallijst (SBOM) en bronafdruk
         shell: bash
         run: |
@@ -58,13 +78,13 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: sbom
-          path: SBOM.json
+          path: |
+            SBOM.json
+            BASISIMAGES.json
       - name: Login op GitHub Container Registry
         run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Buildx (nodig voor attestaties)
-        run: docker buildx create --use --driver docker-container
       # BOUWEN MET HERKOMST. `--provenance=mode=max` laat BuildKit een
       # SLSA-provenance-attestatie meepubliceren (welke bron, welke bouwstappen,
       # welke builder), `--sbom=true` een materiaallijst van het image zelf.

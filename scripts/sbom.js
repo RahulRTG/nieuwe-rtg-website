@@ -99,9 +99,26 @@ function cargoOnderdelen() {
   return uit;
 }
 
+/* WAT ER WERKELIJK IS GETROKKEN. Een tag is geen afdruk: `node:22-slim` van
+   vandaag is niet die van vorige maand. Pinnen op een digest is een besluit met
+   onderhoud eraan (elke patch wordt een commit), en dat besluit hoort niet in
+   een script te sluipen.
+
+   Wat hier WEL gebeurt: de pijplijn schrijft de digests die hij op dat moment
+   heeft opgehaald in BASISIMAGES.json, en die worden hier meegenomen. Daarmee is
+   van elke release na te gaan uit welke basis-images hij is gebouwd -- ook
+   zonder te pinnen. Pinnen wordt dan een besluit met gegevens eronder in plaats
+   van een gok. Ontbreekt het bestand, dan staat er bij elk image dat het op een
+   tag staat; dat is de eerlijke stand en geen fout. */
+function getrokkenDigests() {
+  try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'BASISIMAGES.json'), 'utf8')).images || {}; }
+  catch (e) { return {}; }
+}
+
 /* De basis-images: de werkelijke derdenlaag van deze release. Uit de Dockerfile
    zelf gelezen, zodat de lijst niet los van de bouw kan gaan lopen. */
 function basisImages() {
+  const digests = getrokkenDigests();
   let df = '';
   try { df = fs.readFileSync(path.join(WORTEL, 'Dockerfile'), 'utf8'); } catch (e) { return []; }
   const uit = [];
@@ -109,13 +126,12 @@ function basisImages() {
     const ref = m[1];
     if (/^scratch$/i.test(ref) || !ref.includes(':')) continue;
     const i = ref.lastIndexOf(':');
+    const digest = digests[ref] || null;
     uit.push({ soort: 'container', ecosysteem: 'oci', naam: ref.slice(0, i), versie: ref.slice(i + 1),
-      licentie: null, integriteit: null, fase: m[2] || 'runtime', inRelease: true,
-      /* Een tag is geen afdruk: `node:22-slim` van vandaag is niet die van
-         vorige maand. Dat staat erbij in plaats van te doen alsof dit vastligt;
-         vastleggen vraagt een digest in de Dockerfile, en dat is een besluit
-         met onderhoud eraan (zie SBOM.md). */
-      let: 'Vastgezet op een tag, niet op een digest.' });
+      licentie: null, integriteit: digest, fase: m[2] || 'runtime', inRelease: true,
+      let: digest
+        ? 'Op een tag gebouwd; dit is de digest die de pijplijn toen werkelijk trok.'
+        : 'Vastgezet op een tag, niet op een digest, en er is geen digest opgeschreven.' });
   }
   return uit;
 }
@@ -137,7 +153,8 @@ function bouw() {
       onderdelen: onderdelen.length,
       inRelease: onderdelen.filter(o => o.inRelease).length,
       alleenBouw: onderdelen.filter(o => !o.inRelease).length,
-      npmInRelease: onderdelen.filter(o => o.ecosysteem === 'npm' && o.inRelease).length
+      npmInRelease: onderdelen.filter(o => o.ecosysteem === 'npm' && o.inRelease).length,
+      imagesMetDigest: onderdelen.filter(o => o.ecosysteem === 'oci' && o.integriteit).length
     },
     onderdelen
   };

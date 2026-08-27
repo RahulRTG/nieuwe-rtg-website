@@ -267,6 +267,53 @@ function tekenApps(){
       '</table></div>').join('')+'</div>';
 }
 
+/* HET NASLAGWERK EN HET EIGEN JOURNAAL.
+
+   Allebei komen ze van de server en worden ze hier alleen getekend: de inhoud
+   komt uit kern/appstore/naslag.js -- dezelfde bron die `rtg sdk` uitschrijft --
+   zodat dit scherm en de gegenereerde typings niet uiteen kunnen lopen. Wie hier
+   een lijstje bijzet dat niet van de server komt, maakt een tweede waarheid. */
+function tekenNaslag(n){
+  if (!n) return '';
+  const kB = b => Math.round(b / 1024) + ' kB';
+  return '<div class="kaart"><h2>Wat je app kan vragen</h2>'+
+    '<p class="sub">'+esc(n.let)+'</p>'+
+    '<table><tr><th>methode</th><th>machtiging</th><th>tweede aanroep</th></tr>'+
+    n.methodes.map(m => '<tr><td><code>'+esc(m.naam)+'</code></td><td><code>'+esc(m.machtiging || '-')+'</code></td>'+
+      '<td>'+(m.herhaalbaar ? 'laat dezelfde stand achter' : 'is een tweede gebeurtenis')+'</td></tr>').join('')+
+    '</table>'+
+    '<h3>Machtigingen</h3>'+
+    n.machtigingen.map(m => '<div class="scheiding-s"><b>'+esc(m.label)+'</b> <code>'+esc(m.id)+'</code>'+
+      '<p class="sub">geeft: '+esc(m.geeft)+'</p>'+
+      '<p class="sub"><b class="goud">Nooit:</b> '+esc(m.nooit)+'</p>'+
+      '<p class="sub">doelen: '+m.doelen.map(d => '<code>'+esc(d.id)+'</code> ('+esc(d.uitleg)+')').join(', ')+'</p></div>').join('')+
+    '<h3>Bewust niet beschikbaar</h3>'+
+    '<p class="sub">Dit ontbreekt niet, het is besloten. Een regel verdwijnt hier pas als de brug hem uitvoert.</p>'+
+    n.nietBeschikbaar.map(x => '<div class="scheiding-s"><b>'+esc(x.wat)+'</b><p class="sub">'+esc(x.waarom)+'</p></div>').join('')+
+    '<h3>Grenzen</h3>'+
+    '<p class="sub">'+n.grenzen.opslagSleutels+' sleutels per lid · '+n.grenzen.opslagWaarde+' tekens per waarde · '+
+      kB(n.grenzen.opslagTotaal)+' opslag · '+n.grenzen.berichtenPerDag+' berichten per dag · '+
+      n.grenzen.roepenPerMinuut+' aanroepen per minuut</p>'+
+    '<p class="sub">bundel: '+n.budget.bestanden+' bestanden · '+kB(n.budget.totaal)+' totaal · '+
+      kB(n.budget.script)+' script · '+kB(n.budget.stijl)+' stijl</p>'+
+    '<h3>Als de brug weigert</h3>'+
+    '<table><tr><th>code</th><th>herhaalbaar</th><th>wat het betekent</th></tr>'+
+    n.fouten.map(f => '<tr><td><code>'+esc(f.code)+'</code></td><td>'+(f.herhaalbaar ? 'ja' : 'nee')+'</td><td>'+esc(f.uitleg)+'</td></tr>').join('')+
+    '</table></div>';
+}
+
+function tekenJournaal(lijst){
+  if (!lijst) return '';
+  if (!lijst.length) return '<div class="kaart"><h2>Wat er met je inzendingen gebeurde</h2>'+
+    '<p class="sub">Nog niets. Zodra je inzendt, staat hier wat de poort vond en wanneer een mens van RTG ernaar keek.</p></div>';
+  return '<div class="kaart"><h2>Wat er met je inzendingen gebeurde</h2>'+
+    '<p class="sub">Je eigen regels uit het journaal van de App Store. Het groeit aan en wordt nooit herschreven.</p>'+
+    '<table><tr><th>wanneer</th><th>wat</th><th>welke app</th></tr>'+
+    lijst.map(r => '<tr><td>'+esc(String(r.at).slice(0,16).replace('T',' '))+'</td>'+
+      '<td>'+esc(String(r.wat).replace(/-/g, ' '))+'</td><td>'+esc(r.over || '-')+'</td></tr>').join('')+
+    '</table></div>';
+}
+
 async function laad(){
   if (!TOKEN) { $('#main').innerHTML = '<div class="kaart"><h2>Log eerst in</h2><p class="sub">Deze pagina hoort bij je RTG-werkplek. <a href="/apps/leverancier.html">Naar de werkplek →</a></p></div>'; return; }
   let d;
@@ -278,10 +325,16 @@ async function laad(){
      RTG Pay, dan is er geen betaalde kant en zegt de pagina dat door het blok
      gewoon weg te laten in plaats van een nul te tonen die niets betekent. */
   if (toegelaten) { try { const o = await api('/api/appstore/uitgever/omzet'); if (o.aantal != null) STAND.omzet = o; } catch (e) {} }
+  /* Het naslagwerk en het eigen journaal mogen ontbreken zonder dat de pagina
+     omvalt: een proces zonder die routes hoort een werkend bureau te tonen en
+     geen foutmelding over iets wat er niet is. */
+  try { STAND.naslag = await api('/api/appstore/naslag'); } catch (e) {}
+  if (toegelaten) { try { STAND.journaal = (await api('/api/appstore/uitgever/journaal')).lijst; } catch (e) {} }
   $('#main').innerHTML =
     '<div class="kaart"><h2>'+esc(d.organisatie || d.org)+'</h2>'+
       '<p class="sub">Organisatie <code>'+esc(d.org)+'</code> · '+(d.uitgever ? 'uitgeversplek: '+esc(d.uitgever.status) : 'nog geen uitgeversplek')+'</p></div>'+
-    (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps() + tekenOmzet();
+    (toegelaten ? '' : tekenAanvraag()) + (toegelaten ? tekenInzenden() : '') + tekenApps() + tekenOmzet()
+    + tekenJournaal(STAND.journaal) + tekenNaslag(STAND.naslag);
 
   const vraag = $('#uVraag');
   if (vraag) vraag.addEventListener('click', async () => {

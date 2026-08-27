@@ -50,6 +50,21 @@ module.exports = (kern) => {
   app.post('/api/appstore/uitgever/intrekken', supplierAuth, metOrg((req, o) => appstore.intrekken({
     sleutel: req.body.sleutel, reden: req.body.reden, door: (req.actor && req.actor.name) || 'de uitgever', doorOrg: o.org })));
 
+  /* Het eigen journaal: wat er met MIJN inzendingen is gebeurd. Een uitgever zag
+     tot nu toe alleen de stand van een versie en niet wat er onderweg gebeurde --
+     wie er wanneer naar keek, waarop de machine aansloeg, wanneer een mens
+     aftekende. Dat is zijn eigen informatie en die hoort hij te kunnen lezen. */
+  app.post('/api/appstore/uitgever/journaal', supplierAuth, metOrg((req, o) => ({
+    status: 200, lijst: appstore.journaalVan(o.org, req.body && req.body.n)
+  })));
+
+  /* Het naslagwerk: de methodes, de machtigingen, de grenzen, de foutcodes en
+     wat er BEWUST niet is. Dezelfde bron als `rtg sdk` gebruikt
+     (kern/appstore/naslag.js), zodat het scherm en de gegenereerde typings niet
+     uiteen kunnen lopen. */
+  app.post('/api/appstore/naslag', supplierAuth, (req, res) =>
+    res.json(require('../../kern/appstore/naslag').naslag()));
+
   /* De proefkeuring: dezelfde machinepoort, zonder dat er iets wordt bewaard.
      Hij bestaat omdat de rem op inzenden (twaalf per uur) anders het leren
      tegenhoudt -- en een uitgever die niet kan leren, zendt slechte bundels in. */

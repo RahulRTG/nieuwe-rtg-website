@@ -313,6 +313,14 @@ En sinds P0/P1 (zie par. 11):
   `scripts/rtg*.js`, zonder inlog en zonder de server te raken.
 - **De toegankelijkheidsadapter.** De bestaande a11y-machinerie gericht op een
   derdenbundel, gemeten in de cel — `scripts/rtg-a11y.js` (par. 9.2).
+- **Het naslagwerk, uit één bron.** De methodes met hun mutatieklasse, de
+  machtigingen met hun doelen, de grenzen, het budget, de foutcodes en wat er
+  BEWUST niet is — `kern/appstore/naslag.js`. Zowel `rtg sdk` als het
+  uitgeversbureau leest het, zodat de gegenereerde typings en het scherm niet
+  uiteen kunnen lopen.
+- **Het eigen journaal van een uitgever.** Wat er met zijn inzendingen gebeurde,
+  inclusief de besluiten die een mens van RTG erover nam — en nooit een regel
+  van een ander (`journaalVan`).
 
 ---
 
@@ -562,13 +570,23 @@ synchroon en browserloos. Vandaar dat dit een eigen opdracht is en geen stap in
 de machinepoort. Wie het wel wil, bouwt een keurloper naast de server; dat is
 een besluit met een eigen bewijslast en geen regel erbij.
 
-### 9.3 Er is geen kostenvlak
+### 9.3 Er is geen kosten- of metervlak, en dat begrenst de console
 
 Er is geen laag die kosten per app, per gebruiker of per functie bijhoudt. Wat er
 is: `scripts/duurzaamheidskosten.js` (één meting), `kern/servicekosten.js` en
 `kern/pasprijs.js` (prijzen aan leden), en `kern/magnaat-economie.js` (de
 spel-economie). Kostenvoorspelling per uitrol is een nieuw meetvlak — een goed
 idee, maar geen stap weg.
+
+**Dat is ook waar de ontwikkelaarsconsole ophoudt.** Wat een console uit
+bestaande bronnen kan tonen, staat er inmiddels: het naslagwerk, de
+machtigingenverkenner en het eigen journaal van een uitgever. Wat er niet staat
+zijn meters en traces per app — hoeveel aanroepen, hoeveel weigeringen, hoe
+lang. Die getallen bestaan nergens: `kern/appstore/brug.js` telt per lid en per
+app alleen voor de REM, in het geheugen, en gooit dat bij een herstart weg. Een
+console die ze toch toont, toont verzonnen getallen. Eerst meten, dan tonen —
+dezelfde volgorde als overal in dit huis (BESTUUR.md: wat niet gemeten is, wordt
+niet als getal getoond).
 
 ---
 
@@ -624,7 +642,7 @@ verpakking; de payload is domein.** Dat is dezelfde scheiding die
 |---|---|---|
 | **P0** ✅ | corrigeren | makersmeting (`scripts/makers.js` + `MAKERS.json`); de gebeurtenisenvelop (`kern/envelop.js`); mutatieclassificatie met `onbekend` verboden aan de rand (`kern/mutatie.js`) |
 | **P1** grotendeels | de ingang voor ontwikkelaars | ✅ brugklant + CSP los; ✅ het foutmodel heel; ✅ `rtg check`, `rtg dev`, `rtg new`, `rtg sdk` — **open:** de individuele ontwikkelaarsidentiteit (par. 7.1), want die vraagt een besluit en geen code |
-| **P2** begonnen | zichtbaarheid | ✅ toegankelijkheid op de derdenbundel (`rtg a11y`); ✅ documentatie inclusief *bewust niet beschikbaar* (`rtg sdk`) — **open:** console, machtigingenverkenner, logs en traces |
+| **P2** grotendeels | zichtbaarheid | ✅ toegankelijkheid op de derdenbundel (`rtg a11y`); ✅ documentatie inclusief *bewust niet beschikbaar*, zowel als bestand (`rtg sdk`) als op het uitgeversbureau; ✅ de machtigingenverkenner; ✅ het eigen journaal van een uitgever — **open:** meters en traces, en dat is geen schil maar een meetvlak dat niet bestaat (par. 9.3) |
 | **P3** | distributie | private apps via entitlements; previews en beta; de vergunningsdiff als uitgave-primitief; snellere review waar het risico dat toelaat |
 | **P4** | RTG Forge | `aanval.js` + `chaos.js` tot één beproevingshal; app-gerichte adversariële tests; replay; regressiebewijs |
 | **P5** | serverside platform | functies, jobs, cron, managed state, gecontroleerd netwerk — pas als P0's mutatieclassificatie het draagt |

@@ -44,18 +44,11 @@ function bron() {
   return { brug, methodes: brug.mutaties, GRENS: brug.GRENS };
 }
 
-/* Welke argumenten en welk antwoord een methode heeft, is het enige stuk dat
-   niet uit de code te lezen valt: de brug neemt `args` als een zak aan. Het
-   staat daarom hier, als de ene plek, mét een toets die zakt zodra er een
-   methode bij komt die hier niet staat (test/rtg-sdk.test.js). */
-const VORMEN = {
-  'profiel.wieBenIk': { args: null, uit: '{ codenaam: string; taal: string; pas: string; let: string }' },
-  'opslag.lees': { args: '{ sleutel: string }', uit: '{ sleutel: string; waarde: string | null }' },
-  'opslag.lijst': { args: null, uit: '{ sleutels: string[] }' },
-  'opslag.zet': { args: '{ sleutel: string; waarde: string }', uit: '{ ok: true; sleutel: string }' },
-  'opslag.wis': { args: '{ sleutel: string }', uit: '{ ok: true }' },
-  'bericht.zet': { args: '{ tekst: string }', uit: '{ ok: true; klaargezet: string }' }
-};
+/* De vormen en de machtiging-per-methode komen uit kern/appstore/naslag.js.
+   Ze stonden hier, en dat werkte zolang de CLI de enige lezer was -- maar het
+   uitgeversbureau toont nu hetzelfde, en twee lijstjes lopen een keer uiteen
+   (LAT-regel 4). */
+const { VORMEN, machtigingVan } = require(path.join(WORTEL, 'server/kern/appstore/naslag'));
 
 function typings({ methodes, GRENS }) {
   const overloads = methodes.map(m => {
@@ -193,19 +186,6 @@ function documentatie({ methodes, GRENS }) {
   }
   R('');
   return r.join('\n');
-}
-
-/* Welke machtiging bij een methode hoort, staat in de brug zelf. We lezen hem
-   uit de bron omdat `overzicht()` hem niet meeneemt -- en een tweede lijst hier
-   aanleggen zou precies de dubbeling zijn die deze generator moet voorkomen. */
-let MACHT_CACHE = null;
-function machtigingVan(naam) {
-  if (!MACHT_CACHE) {
-    MACHT_CACHE = {};
-    const s = fs.readFileSync(path.join(WORTEL, 'server/kern/appstore/brug.js'), 'utf8');
-    for (const m of s.matchAll(/'([a-z]+\.[a-zA-Z]+)':\s*\{\s*machtiging:\s*'([^']+)'/g)) MACHT_CACHE[m[1]] = m[2];
-  }
-  return MACHT_CACHE[naam] || null;
 }
 
 module.exports = function sdk(argv, hulp) {

@@ -84,6 +84,24 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
   }
   const journaal = (n) => S().journaal.slice(0, Math.max(1, Math.min(500, Number(n) || 100)));
 
+  /* Het journaal van EEN uitgever: wat er met zijn eigen inzendingen is gebeurd.
+     Tot nu toe zag een uitgever alleen de STAND van een versie -- wachtend,
+     live, geweigerd -- en niet wat er onderweg gebeurde. Dat is precies de
+     informatie waar hij iets aan heeft, en het is zijn eigen.
+
+     Twee regels. Een regel telt mee als hij OVER zijn app gaat of DOOR zijn
+     organisatie is gedaan; wie alleen op `wie` filtert, mist de besluiten die
+     een mens van RTG over zijn app nam. En een regel van iemand anders komt er
+     nooit uit: de app moet van deze org zijn (APPSTORE.md -- een uitgever ziet
+     aantallen en bedragen, nooit een ander). */
+  function journaalVan(org, n) {
+    const o = norm(org);
+    const eigenApps = new Set(Object.values(S().apps).filter(a => a.org === o).map(a => a.sleutel));
+    return S().journaal
+      .filter(r => (r.over && eigenApps.has(r.over)) || r.wie === o)
+      .slice(0, Math.max(1, Math.min(200, Number(n) || 50)));
+  }
+
   /* Wie hier mag publiceren en wie dat besloot, staat in ./uitgevers.js. Dat is
      een naad en geen opdeling om de omvang: het gaat over een PARTIJ, terwijl de
      rest van dit bestand over BYTES gaat. */
@@ -108,7 +126,7 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
   const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
-  const motor = { S, journaal, boek, opslag, nu, save,
+  const motor = { S, journaal, journaalVan, boek, opslag, nu, save,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
     publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER: U.STATUS_UITGEVER, geld,

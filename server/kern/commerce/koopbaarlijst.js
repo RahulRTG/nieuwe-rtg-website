@@ -3,8 +3,8 @@
    gelezen, en welke redenen een ondernemer te zien krijgt.
 
    Pure data en twee pure functies. De vertaling die ze gebruikt staat in
-   ./koopbaar.js; dezelfde tweedeling als ./vermogenlijst.js naast
-   ./vermogens.js, en om dezelfde reden: een tabel die je zonder de motor kunt
+   ./koopbaar.js; dezelfde tweedeling als ./werkwoordlijst.js naast
+   ./werkwoorden.js, en om dezelfde reden: een tabel die je zonder de motor kunt
    lezen, is een tabel die een toets kan voeren met wat hij zelf verzint.
    ========================================================================== */
 'use strict';
@@ -20,9 +20,9 @@ const { TYPEN } = require('../mall/aanbodvorm');
                   tweede weg naar dezelfde handel.
      offerte      "Offerte aanvragen" -- er is per definitie nog geen bedrag.
      abonnement   "Aanmelden" -- een doorlopende afschrijving is een bevoegdheid
-                  en geen vermogen; zie NIET_GEBOUWD.abonnement in ./vermogens.js.
+                  en geen vermogen; zie NIET_GEBOUWD.abonnement in ./werkwoorden.js.
                   Tot die er is, blijft het bij tonen en een prijs noemen. */
-const TYPE_VERMOGENS = {
+const TYPE_WERKWOORDEN = {
   product: ['prijs', 'beschikbaarheid', 'bevestig', 'lever', 'annuleer', 'retour'],
   dienst: ['prijs', 'beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
   boeking: ['beschikbaarheid', 'reserveer', 'bevestig', 'annuleer'],
@@ -61,7 +61,7 @@ const TYPE_VERMOGENS = {
    afhangt; wie daarop afrekent, incasseert een bedrag dat niemand heeft
    afgesproken. Van de 92 koopbaren met een prijs in de seed dragen er 12 zo'n
    indicatie (reis, verblijf, eten). Die mogen wel getoond worden -- de koper wil
-   weten waar het ongeveer begint -- maar ze leveren geen `prijs`-vermogen op, en
+   weten waar het ongeveer begint -- maar ze leveren geen `prijs`-werkwoord op, en
    dus bij een type dat "Kopen" belooft ook geen koopknop. Het echte bedrag hoort
    uit het domein zelf te komen (een menugerecht, een artikel, een datum), en dat
    is precies wat COMMERCE.md par. 6 "een stap weg" noemt. */
@@ -71,7 +71,7 @@ const vastBedragCenten = (p) => {
   return Number.isFinite(euro) ? Math.round(euro * 100) : null;
 };
 /* Nul is gratis, null is onbekend -- dat onderscheid blijft. Een bedrag van nul
-   houdt dus WEL het vermogen `prijs`. */
+   houdt dus WEL het werkwoord `prijs`. */
 const heeftBedrag = (p) => vastBedragCenten(p) != null;
 
 /* Waarom een belofte het niet haalt, in een zin die een ondernemer kan lezen en
@@ -90,4 +90,4 @@ const REDEN = {
 const LEVERT_ZELF = new Set(['ticket', 'eten']);
 
 
-module.exports = { TYPE_VERMOGENS, REDEN, LEVERT_ZELF, vastBedragCenten, heeftBedrag, TYPEN };
+module.exports = { TYPE_WERKWOORDEN, REDEN, LEVERT_ZELF, vastBedragCenten, heeftBedrag, TYPEN };

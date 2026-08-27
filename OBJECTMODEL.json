@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-26",
+  "vastgelegd": "2026-08-27",
   "gemeten": {
-    "bestanden": 1527,
-    "vormen": 1170,
-    "velden": 1704,
-    "modules": 603,
-    "domeinen": 218,
+    "bestanden": 1535,
+    "vormen": 1172,
+    "velden": 1706,
+    "modules": 605,
+    "domeinen": 219,
     "envelopDrempel": 14,
-    "envelop": 31,
-    "veldenDomeineigen": 1208,
-    "veldenGedeeldVanafVier": 161,
+    "envelop": 32,
+    "veldenDomeineigen": 1209,
+    "veldenGedeeldVanafVier": 162,
     "gelijkendeVormparen": 17
   },
   "envelop": [
@@ -41,24 +41,13 @@
     "tijd",
     "titel",
     "tot",
+    "type",
     "uitleg",
     "van",
     "wat",
     "wie"
   ],
   "gedeeld": [
-    {
-      "veld": "type",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/antivirus",
-        "kern/command",
-        "kern/instant-reality",
-        "kern/magnaat-werkroutefabriek",
-        "kern/magnaatwereld"
-      ]
-    },
     {
       "veld": "categorie",
       "domeinen": 13,
@@ -168,6 +157,30 @@
       ]
     },
     {
+      "veld": "waarom",
+      "domeinen": 11,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/commerce",
+        "kern/concern",
+        "kern/gewoonten",
+        "kern/horeca"
+      ]
+    },
+    {
+      "veld": "open",
+      "domeinen": 11,
+      "waar": [
+        "kern/commerce",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/livinglab",
+        "kern/luchthaven",
+        "kern/mall"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 10,
       "waar": [
@@ -240,18 +253,6 @@
       ]
     },
     {
-      "veld": "waarom",
-      "domeinen": 10,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/concern",
-        "kern/gewoonten",
-        "kern/horeca",
-        "kern/livinglab"
-      ]
-    },
-    {
       "veld": "onderwerp",
       "domeinen": 10,
       "waar": [
@@ -285,18 +286,6 @@
         "kern/ledenbalie",
         "kern/livinglab",
         "kern/magnaatwereld"
-      ]
-    },
-    {
-      "veld": "open",
-      "domeinen": 10,
-      "waar": [
-        "kern/concern",
-        "kern/labfonds",
-        "kern/livinglab",
-        "kern/luchthaven",
-        "kern/mall",
-        "kern/samenwerking"
       ]
     },
     {
@@ -405,6 +394,18 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "plek",
+      "domeinen": 8,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/commerce",
+        "kern/hulpdienst",
+        "kern/mall",
+        "kern/rtfos"
       ]
     },
     {
@@ -542,7 +543,6 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
       ]
     },
@@ -570,7 +570,6 @@
         "max",
         "min",
         "placeholder",
-        "type",
         "verplicht"
       ]
     },
@@ -584,12 +583,11 @@
         "lk",
         "lt",
         "rk",
-        "rt",
-        "type"
+        "rt"
       ]
     },
     {
-      "gelijkenis": 0.89,
+      "gelijkenis": 0.88,
       "a": "server/kern/command/runbookcatalogus.js",
       "b": "server/kern/zaakcommand/runbooks.js",
       "domeinA": "kern/command",
@@ -601,22 +599,7 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
-      ]
-    },
-    {
-      "gelijkenis": 0.83,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
-      "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
       ]
     },
     {
@@ -648,6 +631,19 @@
         "publiekePrijs",
         "sku",
         "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
       ]
     },
     {

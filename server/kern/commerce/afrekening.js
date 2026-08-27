@@ -34,7 +34,7 @@
    ========================================================================== */
 'use strict';
 
-const { kan, waaromNiet } = require('./vermogens');
+const { kan, waaromNiet } = require('./werkwoorden');
 /* HET BEDRAG WORDT HIER NIET OPNIEUW GELEZEN. `bedrag` staat in EURO'S en
    `vanaf` is een vlag en geen bedrag -- twee dingen die deze laag allebei een
    keer verkeerd om heeft gehad, en een tweede lezer zou ze een tweede keer
@@ -67,14 +67,14 @@ module.exports = ({ tariefVan, basisCat, zaakVan, capsVan }) => {
     const k = id ? koopbaarVan(id) : null;
     if (!k) return { fout: { koopbaarId: id, reden: 'Dit aanbod bestaat niet (meer).' } };
     if (!kan(k, 'bevestig')) {
-      const uitleg = (k.ontbreekt || []).find(o => o.vermogen === 'bevestig');
+      const uitleg = (k.ontbreekt || []).find(o => o.werkwoord === 'bevestig');
       return { fout: { koopbaarId: id, titel: k.titel, reden: uitleg ? uitleg.reden : waaromNiet(k, 'bevestig') } };
     }
     /* GEEN PRIJS IS NIET HETZELFDE ALS GEEN AFREKENING. Een koopbaar dat wel
        `bevestig` heeft maar geen `prijs`, is een gratis bevestiging -- een tafel,
        een bezichtiging, een afspraak. Dat is geen randgeval maar wat de meting
-       afdwong: 25 domeinen bevestigen zonder prijs (COMMERCE.json), en daarom
-       hangt `bevestig` in ./vermogenlijst.js niet meer aan `prijs`.
+       afdwong: 26 van de 100 domeinen bevestigen zonder prijs (COMMERCE.json), en daarom
+       hangt `bevestig` in ./werkwoordlijst.js niet meer aan `prijs`.
 
        Deze regel weigeren zou die correctie meteen weer ongedaan maken: dan valt
        een tafel alsnog uit de mand, nu een laag lager. Hij wordt dus een regel
@@ -86,7 +86,7 @@ module.exports = ({ tariefVan, basisCat, zaakVan, capsVan }) => {
     const stuk = kan(k, 'prijs') ? centenVan(k.prijs) : 0;
     if (stuk == null) return { fout: { koopbaarId: id, titel: k.titel, reden: 'Dit aanbod verklaart een prijs maar draagt geen bedrag; de server rekent niets uit dat er niet staat.' } };
 
-    /* Beschikbaarheid weegt alleen mee als het koopbaar dat vermogen HEEFT. Een
+    /* Beschikbaarheid weegt alleen mee als het koopbaar dat werkwoord HEEFT. Een
        ding zonder gemeten voorraad tegenhouden zou stilte als "op" uitleggen, en
        dat is de spiegelbeeldige fout van stilte als "beschikbaar" uitleggen. */
     let blokkade = null;

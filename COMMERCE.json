@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-27",
   "gemeten": {
-    "bestanden": 1527,
-    "domeinenTotaal": 429,
-    "koopbareVormen": 433,
-    "koopbareDomeinen": 99,
+    "bestanden": 1535,
+    "domeinenTotaal": 430,
+    "koopbareVormen": 436,
+    "koopbareDomeinen": 100,
     "envelopDrempel": 6,
     "envelop": 42,
-    "veldenDomeineigen": 647,
-    "veldenNietEnvelop": 833,
+    "veldenDomeineigen": 657,
+    "veldenNietEnvelop": 845,
     "gelijkendeVormparen": 7,
     "werkwoordenVolledig": 0,
     "werkwoordenOveral": 0,
@@ -17,8 +17,8 @@
     "wagenVormen": 24,
     "wagenVormenUniek": 22,
     "wagenDomeinen": 17,
-    "optellingen": 89,
-    "optelDomeinen": 48
+    "optellingen": 90,
+    "optelDomeinen": 49
   },
   "envelop": [
     "aantal",
@@ -65,11 +65,11 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 79,
+    "toon": 80,
     "prijs": 30,
     "beschikbaarheid": 43,
     "reserveer": 22,
-    "bevestig": 44,
+    "bevestig": 45,
     "lever": 15,
     "annuleer": 21,
     "retour": 6
@@ -1119,6 +1119,24 @@
       "bewijs": {
         "toon": "fitOverzicht",
         "bevestig": "fitBaanBoek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/commerce",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "etalage",
+        "bevestig": "waaromNietTeKoop"
       },
       "telt": 2
     },
@@ -2237,10 +2255,10 @@
       ]
     },
     {
-      "domein": "kern/creator",
+      "domein": "kern/commerce",
       "plekken": 1,
       "waar": [
-        "server/kern/creator.js"
+        "server/kern/commerce/afrekening.js"
       ]
     }
   ]

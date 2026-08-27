@@ -9,7 +9,7 @@
      ./graaf.js        leest de domeinen via kern/mall/aanbod.js en schrijft niets
      ./mand.js         bewaart wat en hoeveel, nooit wat het kost
      ./afrekening.js   rekent per VERKOPER, nooit een gezamenlijke bevestiging
-     ./koopbaar.js     vertaalt een aanbod-rij naar vermogens, geen tweede vorm
+     ./koopbaar.js     vertaalt een aanbod-rij naar werkwoorden, geen tweede vorm
 
    ER WORDT HIER NIETS BETAALD EN NIETS BESTELD. De weg van bevestigen loopt
    langs de domeinen die er al over gaan (kern/lidacties voor een order bij een

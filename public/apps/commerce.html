@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Commerce</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<!-- RTG Commerce: de verkooplaag boven de domeinen (COMMERCE.md).
+
+     WAT DIT SCHERM LAAT ZIEN EN WAAROM DAT ANDERS IS DAN EEN WINKEL. Een
+     etalage toont wat er te koop staat. Dit toont daarnaast wat er NIET te koop
+     staat en waarom -- en dat tweede is het hele punt van deze laag. Een
+     ondernemer met tachtig artikelen weet niet welke er stilletjes buiten
+     vallen; hier staat het met de reden erbij, en met wat hij eraan kan doen.
+
+     ER WORDT HIER NIETS BESTELD. De mand rekent door en stopt bij de deur:
+     bevestigen gebeurt in het domein dat er al over gaat. De regel "RTG
+     bevestigt niets namens een verkoper" staat met zoveel woorden op het scherm,
+     want een knop die er niet is, hoort te worden uitgelegd. -->
+<style>
+  :root{
+    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:1000px;margin:0 auto;}
+  section{margin-top:2rem;}
+  .kop{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .kop h2{font-size:1.15rem;}
+  .kop .n{font-size:.72rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;}
+  .uitleg{color:var(--muted);font-size:.86rem;line-height:1.6;margin-bottom:1rem;max-width:62ch;}
+
+  /* de werkwoordbalk: de meting, live */
+  .meters{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.55rem;}
+  .meter{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.6rem .7rem;}
+  .meter .v{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .meter .n{font-family:'Bodoni Moda',serif;font-size:1.3rem;margin-top:.1rem;}
+  .meter .bar{height:3px;background:var(--line);border-radius:2px;margin-top:.45rem;overflow:hidden;}
+  .meter .bar i{display:block;height:100%;background:var(--gold);}
+
+  select,button{font:inherit;}
+  select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem;max-width:100%;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.45rem .8rem;cursor:pointer;font-size:.84rem;}
+  .knop:hover{border-color:var(--gold);}
+  .knop.stil{opacity:.45;cursor:not-allowed;}
+
+  .rij{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;}
+  .rij h3{font-size:1rem;}
+  .rij .meta{font-size:.76rem;color:var(--soft);margin-top:.2rem;}
+  .rij .acties{margin-top:.6rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;}
+  .chip{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--line);border-radius:99px;color:var(--muted);}
+  .chip.aan{border-color:var(--gold);color:var(--gold);}
+  .chip.uit{opacity:.4;text-decoration:line-through;}
+
+  .waarom{border-left:2px solid var(--burgundy);padding-left:.8rem;margin-top:.5rem;color:var(--muted);font-size:.84rem;line-height:1.55;}
+  .prima{border-left-color:var(--soft);}
+
+  .afrek{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:.8rem;}
+  .afrek .top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin-bottom:.6rem;}
+  .afrek .top h3{font-size:1.05rem;}
+  .afrek .bedrag{font-family:'Bodoni Moda',serif;font-size:1.3rem;}
+  .afrek .regel{display:flex;justify-content:space-between;gap:1rem;font-size:.88rem;padding:.25rem 0;}
+  .afrek .regel .l{color:var(--muted);}
+  .afrek .btwr{font-size:.76rem;color:var(--soft);margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .blok{color:var(--burgundy);font-size:.82rem;margin-top:.4rem;}
+  .samen{border:1px dashed var(--line);border-radius:14px;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
+  .samen b{color:var(--txt);font-weight:600;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
+  .stuk{border:1px solid var(--burgundy);border-radius:12px;padding:.7rem .9rem;color:var(--burgundy);font-size:.84rem;margin-bottom:1rem;}
+  #melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;}
+</style>
+</head>
+<body>
+<header>
+  <button class="terug" id="terug" type="button">Terug</button>
+  <div><div class="ey">RTG Commerce</div><h1>Wat er te koop staat</h1></div>
+</header>
+<main id="main">
+  <p class="uitleg">Deze laag legt de domeinen naast elkaar en zegt per ding wat je ermee kunt:
+  tonen, prijzen, reserveren, bevestigen, leveren, annuleren, terugsturen. Wat een aanbieder
+  niet heeft ingericht, staat er niet als lege knop maar met de reden erbij.</p>
+
+  <section id="meting">
+    <div class="kop"><h2>De werkwoorden, nu gemeten</h2><span class="n" id="meting-n"></span></div>
+    <div class="meters" id="meters"></div>
+  </section>
+
+  <section id="etalage-sec">
+    <div class="kop"><h2>Etalage van een verkoper</h2><span class="n">te koop, en wat er niet bij staat</span></div>
+    <div style="margin-bottom:1rem;"><select id="kies"><option>Laden…</option></select></div>
+    <div id="etalage"></div>
+  </section>
+
+  <section id="mand-sec">
+    <div class="kop"><h2>De mand</h2><span class="n">een afrekening per verkoper</span>
+      <button class="knop" id="leeg" type="button" style="margin-left:auto;">Leegmaken</button></div>
+    <div id="mand"></div>
+  </section>
+</main>
+<div id="melding"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* Centen, en met de centen erbij -- een bon waarop btw en netto moeten optellen
+   tot precies het bedrag dat je betaalt, verdraagt geen afronding op hele
+   euro's. Zelfde reden als euroC() in mall.html. */
+const euroC = c => (c==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c)/100);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity='1'; clearTimeout(m._t); m._t = setTimeout(()=>m.style.opacity='0',2400); }
+const api = (pad, body) => fetch(pad, {
+  method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
+  body: JSON.stringify(body||{})
+}).then(async r => { const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+$('#terug').onclick = () => history.length > 1 ? history.back() : location.assign('/apps/app.html');
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<p class="leeg">Log eerst in om je aanbod en je mand te zien.</p>';
+} else { start(); }
+
+/* De acht werkwoorden in de volgorde van een koop -- dezelfde volgorde als
+   kern/commerce/werkwoordlijst.js, zodat het scherm en de kern hetzelfde verhaal
+   vertellen. */
+const VERM = ['toon','prijs','beschikbaarheid','reserveer','bevestig','lever','annuleer','retour'];
+const VERM_LABEL = { toon:'te zien', prijs:'kost iets', beschikbaarheid:'is er', reserveer:'reserveren',
+  bevestig:'kopen', lever:'leveren', annuleer:'annuleren', retour:'retour' };
+
+let ALLES = [];
+
+async function start(){
+  /* DE KNOP WORDT HIER GEBONDEN EN NIET ONDERAAN HET SCRIPT. Zonder token wordt
+     #main vervangen door een inlogzin, en dan bestaat #leeg niet meer -- een
+     binding onderaan gooide daar "Cannot set properties of null". De pagina zag
+     er goed uit en het script stond stil: precies het stille soort fout. */
+  const leeg = $('#leeg');
+  if (leeg) leeg.onclick = async () => {
+    try { toonMand(await api('/api/commerce/mand/leeg', {})); meld('Mand leeg.'); }
+    catch (e) { meld(e.message); }
+  };
+  try {
+    const r = await api('/api/commerce/aanbod', {});
+    ALLES = r.koopbaren || [];
+    tekenMeting(r);
+    vulKiezer();
+    await tekenMand();
+  } catch (e) { $('#main').insertAdjacentHTML('afterbegin', '<div class="stuk">'+esc(e.message)+'</div>'); }
+}
+
+/* De meting op het scherm is dezelfde als die van scripts/commerce.js, alleen
+   dan over de LEVENDE data in plaats van over de broncode. Dat is met opzet: een
+   scherm dat "alles kan alles" suggereert, is precies wat COMMERCE.md
+   tegenspreekt. */
+function tekenMeting(r){
+  const n = ALLES.length;
+  $('#meting-n').textContent = n + ' koopbaren' + (r.volledig ? '' : ', niet alle bronnen bereikbaar');
+  if (!r.volledig && (r.stuk||[]).length) {
+    $('#meters').insertAdjacentHTML('beforebegin',
+      '<div class="stuk">Deze bronnen konden niet worden opgehaald: ' +
+      esc(r.stuk.map(s=>s.bron).join(', ')) + '. De lijst hieronder is dus niet compleet.</div>');
+  }
+  const tel = {}; for (const v of VERM) tel[v] = 0;
+  for (const k of ALLES) for (const v of (k.werkwoorden||[])) if (tel[v] != null) tel[v]++;
+  $('#meters').innerHTML = VERM.map(v => {
+    const pct = n ? Math.round(tel[v]/n*100) : 0;
+    return '<div class="meter"><div class="v">'+esc(VERM_LABEL[v])+'</div>'+
+      '<div class="n">'+tel[v]+' <span style="font-size:.8rem;color:var(--soft);">van '+n+'</span></div>'+
+      '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+  }).join('');
+}
+
+function vulKiezer(){
+  const per = new Map();
+  for (const k of ALLES) {
+    const c = k.aanbieder && k.aanbieder.code; if (!c) continue;
+    if (!per.has(c)) per.set(c, { naam: k.aanbieder.naam || c, n: 0, niet: 0 });
+    const p = per.get(c); p.n++; if (!(k.werkwoorden||[]).includes('bevestig')) p.niet++;
+  }
+  const lijst = [...per.entries()].sort((a,b)=> b[1].niet - a[1].niet || b[1].n - a[1].n);
+  $('#kies').innerHTML = lijst.map(([c,p]) =>
+    '<option value="'+esc(c)+'">'+esc(p.naam)+': '+p.n+' regels'+(p.niet?', '+p.niet+' niet te koop':'')+'</option>').join('')
+    || '<option value="">Geen verkopers gevonden</option>';
+  $('#kies').onchange = () => tekenEtalage($('#kies').value);
+  if (lijst.length) tekenEtalage(lijst[0][0]);
+}
+
+function chips(k){
+  return '<div class="chips">' + VERM.map(v => {
+    const aan = (k.werkwoorden||[]).includes(v);
+    return '<span class="chip '+(aan?'aan':'uit')+'">'+esc(VERM_LABEL[v])+'</span>';
+  }).join('') + '</div>';
+}
+
+async function tekenEtalage(code){
+  if (!code) return;
+  const el = $('#etalage'); el.innerHTML = '<p class="leeg">Laden…</p>';
+  try {
+    const r = await api('/api/commerce/etalage', { verkoper: code });
+    const teKoop = r.teKoop || [], niet = r.nietTeKoop || [];
+    let h = '';
+    h += '<h3 style="font-size:.95rem;margin:.4rem 0 .7rem;">Te koop <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+teKoop.length+'</span></h3>';
+    h += teKoop.length ? teKoop.map(k =>
+      '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
+      '<div class="meta">'+esc(k.typeLabel||k.type)+(k.prijs&&k.prijs.bedrag!=null ? ' · '+esc(new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(k.prijs.bedrag))+(k.prijs.eenheid?' '+esc(k.prijs.eenheid):'') : '')+'</div>'+
+      chips(k)+
+      '<div class="acties"><button class="knop" data-in="'+esc(k.id)+'">In de mand</button></div></div>').join('')
+      : '<p class="leeg">Bij deze verkoper staat nu niets te koop.</p>';
+
+    h += '<h3 style="font-size:.95rem;margin:1.6rem 0 .7rem;">Staat er niet bij <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+niet.length+'</span></h3>';
+    h += niet.length ? niet.map(k => {
+      /* Twee heel verschillende gevallen, en ze krijgen een andere kleur: iets
+         waar de ondernemer iets aan kan doen (bordeaux) tegenover iets dat
+         gewoon zo hoort (grijs). Zie waaromNietTeKoop() in de kern. */
+      const prima = /niets aan mis/.test(k.waarom || '');
+      return '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
+        '<div class="meta">'+esc(k.type)+'</div>'+
+        '<div class="waarom'+(prima?' prima':'')+'">'+esc(k.waarom||'')+'</div></div>';
+    }).join('') : '<p class="leeg">Alles van deze verkoper staat te koop.</p>';
+    el.innerHTML = h;
+    el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in')));
+  } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+}
+
+async function inMand(id){
+  try { const r = await api('/api/commerce/mand/zet', { koopbaarId: id, aantal: 1 }); toonMand(r); meld('In de mand.'); }
+  catch (e) { meld(e.message); }
+}
+
+async function tekenMand(){
+  try { toonMand(await api('/api/commerce/mand', {})); } catch (e) { $('#mand').innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+}
+
+function toonMand(m){
+  const el = $('#mand');
+  if (m.leeg || !(m.afrekeningen||[]).length) {
+    el.innerHTML = '<p class="leeg">Je mand is leeg.</p>' +
+      ((m.geweigerd||[]).length ? geweigerdBlok(m.geweigerd) : '');
+    return;
+  }
+  let h = '';
+  if (m.volledig === false) h += '<div class="stuk">Niet alle bronnen waren bereikbaar toen dit bedrag werd uitgerekend. Er kan een regel ontbreken.</div>';
+  h += (m.afrekeningen||[]).map(a =>
+    '<div class="afrek"><div class="top"><h3>'+esc(a.aanbiederNaam)+'</h3><span class="bedrag">'+euroC(a.totaalCenten)+'</span></div>'+
+    (a.regels||[]).map(r => '<div class="regel"><span class="l">'+r.aantal+'× '+esc(r.titel)+'</span><span>'+(r.gratis?'gratis':euroC(r.totaalCenten))+'</span></div>').join('')+
+    '<div class="btwr">'+(a.btw
+      ? 'Inclusief '+a.btw.tariefProcent+'% btw ('+euroC(a.btw.btwCenten)+') over '+euroC(a.btw.nettoCenten)+' netto.'
+      : esc(a.btwOnbekend||''))+'</div>'+
+    ((a.blokkades||[]).length ? '<div class="blok">'+a.blokkades.map(b=>esc(b.titel)+': '+esc(b.reden)).join('<br>')+'</div>' : '')+
+    '</div>').join('');
+
+  /* De belangrijkste zin van dit scherm. Er is geen knop "betaal alles", en dat
+     is geen ontbrekende functie maar een grens: achter deze regels zitten
+     verschillende partijen met verschillende bevestigingen. */
+  h += '<div class="samen"><b>'+euroC(m.toonTotaalCenten)+'</b> in totaal, maar dat is een optelsom om te tonen, geen bedrag dat je in één keer bevestigt.' +
+    (m.samenReden ? ' ' + esc(m.samenReden) : '') + '</div>';
+  if (m.genegeerd) h += '<div class="stuk" style="margin-top:.8rem;">'+esc(m.genegeerd)+'</div>';
+  if ((m.geweigerd||[]).length) h += geweigerdBlok(m.geweigerd);
+  el.innerHTML = h;
+}
+
+function geweigerdBlok(g){
+  return '<div class="samen" style="margin-top:.8rem;"><b>Niet meegerekend</b><br>' +
+    g.map(x => esc(x.titel || x.koopbaarId) + ': ' + esc(x.reden)).join('<br>') + '</div>';
+}
+</script>
+</body>
+</html>

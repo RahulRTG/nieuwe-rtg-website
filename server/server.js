@@ -2025,6 +2025,7 @@ const hulp = {
    aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
 require('./opzet/kernlaag3b')(kern, hulp);

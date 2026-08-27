@@ -2,13 +2,13 @@
 
    WAT HIER WORDT VASTGEHOUDEN. Deze laag bestaat omdat COMMERCE.json een
    voorstel weersprak: een Koopbaar-protocol met acht verplichte werkwoorden
-   bestaat niet in deze code (0 van 99 domeinen voert ze alle acht uit). De
+   bestaat niet in deze code (0 van 100 domeinen voert ze alle acht uit). De
    vervanging is een VERKLARING van vermogens. Die vervanging is alleen iets
    waard zolang drie dingen blijven kloppen, en dat zijn de drie zwaarste toetsen
    hieronder:
 
      4. `bevestig` hangt NIET aan `prijs`. Dat deed hij in de eerste opzet, en
-        de meting sloeg het eruit: 25 domeinen bevestigen zonder prijs. Een tafel
+        de meting sloeg het eruit: 26 domeinen bevestigen zonder prijs. Een tafel
         en een bezichtiging kosten niets. Zet iemand die afhankelijkheid terug,
         dan verdwijnt de tafel uit de mand en niemand ziet waarom.
      8. de prijs komt NOOIT uit de browser, en een meegestuurd bedrag wordt
@@ -21,7 +21,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const V = require('../server/kern/commerce/vermogens');
+const V = require('../server/kern/commerce/werkwoorden');
 const K = require('../server/kern/commerce/koopbaar');
 const maakAfrekening = require('../server/kern/commerce/afrekening');
 const tarief = require('../server/kern/fiscaal/tarief');
@@ -69,7 +69,7 @@ test('2. zonder haalt weg wat op een weggevallen vermogen leunde', () => {
     assert.ok(!na.heeft.includes(id), id + ' hangt aan bevestig en hoort mee te vallen');
   }
   assert.ok(na.heeft.includes('prijs'), 'prijs hangt nergens aan en blijft staan');
-  assert.ok(na.weg.some(w => w.vermogen === 'lever' && w.door === 'bevestig'), 'met de aanleiding erbij');
+  assert.ok(na.weg.some(w => w.werkwoord === 'lever' && w.door === 'bevestig'), 'met de aanleiding erbij');
 });
 
 test('3. een onbekend vermogen verdwijnt niet stil maar met een reden', () => {
@@ -82,10 +82,10 @@ test('3. een onbekend vermogen verdwijnt niet stil maar met een reden', () => {
   assert.match(ruil.geweigerd[0].reden, /retour en een nieuwe koop/);
 });
 
-test('4. bevestig hangt NIET aan prijs -- 25 domeinen bevestigen zonder bedrag', () => {
+test('4. bevestig hangt NIET aan prijs -- 26 domeinen bevestigen zonder bedrag', () => {
   const r = V.verklaar(['bevestig']);
   assert.ok(!r.heeft.includes('prijs'),
-    'COMMERCE.json: 25 domeinen bevestigen zonder prijs; een tafel kost niets');
+    'COMMERCE.json: 26 domeinen bevestigen zonder prijs; een tafel kost niets');
   // en de vier die WEL overbleven, staan er nog
   assert.ok(V.verklaar(['reserveer']).heeft.includes('beschikbaarheid'));
   for (const v of ['lever', 'annuleer', 'retour']) {
@@ -96,31 +96,31 @@ test('4. bevestig hangt NIET aan prijs -- 25 domeinen bevestigen zonder bedrag',
 test('5. elk aanbodtype uit aanbodvorm.js heeft hier een regel', () => {
   assert.deepEqual(K.typenZonderRegel(), [],
     'een nieuw type in aanbodvorm.js hoort een vermogensregel te krijgen');
-  assert.equal(Object.keys(K.TYPE_VERMOGENS).length, Object.keys(TYPEN).length);
+  assert.equal(Object.keys(K.TYPE_WERKWOORDEN).length, Object.keys(TYPEN).length);
 });
 
 test('6. het type belooft, de rij maakt waar', () => {
   const heel = koopbaar({});
-  assert.ok(heel.vermogens.includes('bevestig') && heel.vermogens.includes('retour'));
+  assert.ok(heel.werkwoorden.includes('bevestig') && heel.werkwoorden.includes('retour'));
 
   // een PRODUCT belooft "Kopen": zonder bedrag valt de koopknop weg
   const zonderPrijs = koopbaar({ prijs: null });
-  assert.ok(!zonderPrijs.vermogens.includes('bevestig'));
-  assert.match(zonderPrijs.ontbreekt.find(o => o.vermogen === 'bevestig').reden, /Kopen/);
+  assert.ok(!zonderPrijs.werkwoorden.includes('bevestig'));
+  assert.match(zonderPrijs.ontbreekt.find(o => o.werkwoord === 'bevestig').reden, /Kopen/);
 
   // een BOEKING belooft "Reserveren": zonder bedrag blijft de bevestiging staan
   const tafel = koopbaar({ type: 'boeking', prijs: null, bezorgt: false });
-  assert.ok(tafel.vermogens.includes('bevestig'), 'een tafel bevestig je zonder te betalen');
-  assert.ok(tafel.vermogens.includes('reserveer'));
+  assert.ok(tafel.werkwoorden.includes('bevestig'), 'een tafel bevestig je zonder te betalen');
+  assert.ok(tafel.werkwoorden.includes('reserveer'));
 });
 
 test('7. geen bezorging is geen levering, en de reden staat erbij', () => {
   const k = koopbaar({ bezorgt: false });
-  assert.ok(!k.vermogens.includes('lever'));
-  assert.ok(k.vermogens.includes('bevestig'), 'niet kunnen bezorgen is geen reden om niet te kunnen kopen');
-  assert.match(k.ontbreekt.find(o => o.vermogen === 'lever').reden, /bezorging of afhaal/);
+  assert.ok(!k.werkwoorden.includes('lever'));
+  assert.ok(k.werkwoorden.includes('bevestig'), 'niet kunnen bezorgen is geen reden om niet te kunnen kopen');
+  assert.match(k.ontbreekt.find(o => o.werkwoord === 'lever').reden, /bezorging of afhaal/);
   // een ticket levert zichzelf
-  assert.ok(koopbaar({ type: 'ticket', bezorgt: false }).vermogens.includes('lever'));
+  assert.ok(koopbaar({ type: 'ticket', bezorgt: false }).werkwoorden.includes('lever'));
 });
 
 test('8. de prijs komt nooit uit de browser, en dat wordt gemeld', () => {
@@ -211,12 +211,12 @@ test('15. op een VANAF-prijs wordt niet afgerekend', () => {
   assert.equal(K.vastBedragCenten({ bedrag: 2200, valuta: 'EUR', vanaf: true }), null);
 
   const k = koopbaar({ id: 'v', type: 'reis', prijs: eur(2200, true), bezorgt: false });
-  assert.ok(!k.vermogens.includes('prijs'), 'een indicatie is geen prijs-vermogen');
-  assert.ok(!k.vermogens.includes('bevestig'), 'en dus geen koopknop bij een type dat "Kopen" belooft');
-  assert.match(k.ontbreekt.find(o => o.vermogen === 'prijs').reden, /vanaf-prijs/,
+  assert.ok(!k.werkwoorden.includes('prijs'), 'een indicatie is geen prijs-vermogen');
+  assert.ok(!k.werkwoorden.includes('bevestig'), 'en dus geen koopknop bij een type dat "Kopen" belooft');
+  assert.match(k.ontbreekt.find(o => o.werkwoord === 'prijs').reden, /vanaf-prijs/,
     'de ondernemer hoort te horen welke van de twee het is');
   // maar hij mag wel getoond worden, met de indicatie erbij
-  assert.ok(k.vermogens.includes('toon'));
+  assert.ok(k.werkwoorden.includes('toon'));
   assert.equal(k.prijs.bedrag, 2200);
 });
 

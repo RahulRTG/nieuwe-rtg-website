@@ -171,11 +171,11 @@ winkel, een mand, een afrekening of een retour werkt. De dragende bewering van h
 voorstel — één `Koopbaar`-protocol met acht werkwoorden over dertien soorten
 verkoopbare dingen — is er eerst **gemeten** (`scripts/commerce.js`,
 `COMMERCE.json`) in plaats van aangenomen, want dat is exact de vorm waarin `Asset`
-al een keer sneuvelde. De uitslag is streng: 433 koopbare vormen in 99 domeinen,
+al een keer sneuvelde. De uitslag is streng: 436 koopbare vormen in 100 domeinen,
 **0 domeinen die alle acht werkwoorden uitvoeren**, **0 werkwoorden die in álle
 koopbare domeinen staan**, en 42 verschillende combinaties. Eén protocol met 42
 invullingen is geen protocol; `Koopbaar` wordt daarom een **verklaring van
-vermogens** en geen interface van verplichte methodes — het model daarvoor is
+werkwoorden** en geen interface van verplichte methodes — het model daarvoor is
 `kern/appstore/machtigingen.js`, het enige bestand met een doel én een grens. Wat
 er wél gevonden is zijn twee echte gedeelde vormen, allebei tussen precies twee
 domeinen: het artikel met varianten (mall ↔ retail) en de bestelregel (gast ↔
@@ -186,7 +186,13 @@ dat is een grens en geen gat), er komt geen tweede betaalweg langs
 vóór je begint: het woord **`Kanaal` is al bezet** — `SEMANTIEK.json` heeft
 `KANALEN` in de top als botsing (4 domeinen, 4 betekenissen, overlap 0,10), dus
 het nieuwe kernbegrip hernoemt eerst of wijkt uit. Het duurste gat is `retour`: 6
-van de 99 domeinen kennen iets dat erop lijkt, en geen ervan is een goederenretour.
+van de 100 domeinen kennen iets dat erop lijkt, en geen ervan is een goederenretour.
+**De laag staat inmiddels** (`server/kern/commerce/`, acht bestanden, gemonteerd in
+`opzet/kernlaag2b.js`, scherm `/apps/commerce.html`): werkwoorden, koopbaar, graaf,
+mand en een afrekening per verkoper, draaiend op 100 koopbaren uit de seed. Twee
+dingen die echte data blootlegde en die je nergens anders moet herhalen: `bedrag`
+in `kern/mall/aanbod.js` staat in EURO'S en niet in centen, en `vanaf` is een VLAG
+en geen bedrag -- op een vanaf-prijs wordt niet afgerekend.
 
 **`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
 een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,

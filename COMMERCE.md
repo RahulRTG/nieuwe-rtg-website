@@ -1,6 +1,7 @@
 # RTG Commerce — de laag boven de domeinen
 
-*Gemeten op 27 augustus 2026 met `scripts/commerce.js`; de uitslag staat in
+*Gemeten op 27 augustus 2026 met `scripts/commerce.js`, opnieuw vastgelegd nadat
+`kern/commerce/` er zelf bij kwam; de uitslag staat in
 `COMMERCE.json` en wordt bewaakt door `test/commerce.test.js`.*
 
 Dit is een richtingsdocument zoals `PLATFORM.md`, `DEVELOPERCLOUD.md` en `OS.md`:
@@ -31,34 +32,34 @@ behandeld. De meting is **met opzet royaal**: een werkwoord telt mee bij de
 vaagste naamverwantschap, een koopbare vorm bij het minste prijsveld. Dat maakt
 `Koopbaar` rijker dan hij is — en dus weegt een negatieve uitslag zwaar.
 
-**433 vormen met een prijsveld, in 99 van 429 domeinen.** Na aftrek van de
-42 envelop-velden blijven er 833 velden over, waarvan **647 (78%) in precies één
-domein** voorkomen. Van de 433 koopbare vormen halen **7 paren** uit verschillende
+**436 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
+42 envelop-velden blijven er 845 velden over, waarvan **657 (78%) in precies één
+domein** voorkomen. Van de 436 koopbare vormen halen **7 paren** uit verschillende
 domeinen de 60%-drempel.
 
-De acht werkwoorden, over die 99 domeinen:
+De acht werkwoorden, over die 100 domeinen:
 
 | werkwoord | domeinen | |
 |---|---|---|
-| `toon` | 79 van 99 (80%) | ████████████████ |
-| `bevestig` | 44 van 99 (44%) | █████████ |
-| `beschikbaarheid` | 43 van 99 (43%) | █████████ |
-| `prijs` | 30 van 99 (30%) | ██████ |
-| `reserveer` | 22 van 99 (22%) | ████ |
-| `annuleer` | 21 van 99 (21%) | ████ |
-| `lever` | 15 van 99 (15%) | ███ |
-| `retour` | **6 van 99 (6%)** | █ |
+| `toon` | 80 van 100 (80%) | ████████████████ |
+| `bevestig` | 45 van 100 (45%) | █████████ |
+| `beschikbaarheid` | 43 van 100 (43%) | █████████ |
+| `prijs` | 30 van 100 (30%) | ██████ |
+| `reserveer` | 22 van 100 (22%) | ████ |
+| `annuleer` | 21 van 100 (21%) | ████ |
+| `lever` | 15 van 100 (15%) | ███ |
+| `retour` | **6 van 100 (6%)** | █ |
 
 En de drie getallen waar het besluit op rust:
 
 - **0 domeinen voeren alle acht werkwoorden uit.**
 - **0 werkwoorden staan in álle koopbare domeinen** — zelfs `toon` niet.
-- **42 verschillende combinaties** van werkwoorden over 99 domeinen.
+- **42 verschillende combinaties** van werkwoorden over 100 domeinen.
 
 Eén protocol met 42 verschillende invullingen is geen protocol. Wie `Koopbaar`
-alsnog als interface van acht methodes neerzet, dwingt 99 domeinen tot methodes
-die ze niet hebben. Voor `lever` staat er dan in 84 van de 99 domeinen een
-`nietGebouwd`, voor `retour` in 93 — of erger: een lege implementatie die *doet*
+alsnog als interface van acht methodes neerzet, dwingt 100 domeinen tot methodes
+die ze niet hebben. Voor `lever` staat er dan in 85 van de 100 domeinen een
+`nietGebouwd`, voor `retour` in 94 — of erger: een lege implementatie die *doet*
 alsof.
 
 > **Twee dingen die de meter eerst verkeerd zei, en waarom dat hier staat.**
@@ -131,7 +132,7 @@ wijst als hij "webshop" zegt. Het heeft varianten, SKU's en voorraad op de
 variant — en geen prijsfunctie, geen levering, geen annulering, geen retour. De
 webshop bouwen betekent dus niet "retail ontsluiten" maar *retail afmaken*.
 
-**`retour` staat op 6 van 99, en die zes zijn geen retouren.** Het zijn
+**`retour` staat op 6 van 100, en die zes zijn geen retouren.** Het zijn
 `terugboeken` (`kern/betaalopdracht`), `terugGave` (`kern/pay`), `maakTeruggave`
 (`kern/appstore`) en de koeriersretour van `kern/modebezorg`: geldomkeringen en
 één pakket dat terugrijdt. Een goederenretour met grondslag, inspectie,
@@ -174,6 +175,16 @@ laag — is diezelfde fout, met opzet gemaakt.
 2. **Kies een ander woord voor de nieuwe laag** (`VERKOOPWEG`, `TOONBANK`). Dan
    blijven de vier botsingen staan en is de nieuwe laag wél schoon.
 
+> **Deze laag maakte die fout bijna zelf.** De werkwoorden heetten eerst
+> `VERMOGENS`, en dat woord staat al in `kern/bevoegdheid/lijst.js` (de
+> juridische bevoegdheden: `WALLET_SALDO`, `LID_UITBETALING`), in
+> `kern/command/vermogens.js` en in `kern/wereld/rechten.js` — drie betekenissen,
+> en `OS.md` gebruikt het bovendien voor het onderscheid platformvermogen /
+> domeinvermogen. Een vierde erbij zetten, in het document dat over precies die
+> fout gaat, is het soort vergissing dat je alleen ziet als je ernaar kijkt. Ze
+> heten nu `WERKWOORDEN` — het woord dat `scripts/commerce.js` en dit document al
+> gebruikten.
+
 Wat er niet mag gebeuren is de derde optie: het woord gebruiken en de botsing
 laten staan. Dan betekent `kanaal` in een routelog vijf dingen en is er geen
 manier meer om te zien welke.
@@ -193,12 +204,13 @@ en dat mag**: het is geen bewering over bestaande domeinen, dus hij hoeft niet
 gevonden te worden — hij moet alleen niet botsen.
 
 **KOOPBAAR** — iets dat langs een verkoopweg kan gaan. **Geen interface van acht
-methodes, maar een verklaring van vermogens.** Een koopbaar zegt wélke van de acht
+methodes, maar een verklaring van werkwoorden.** Een koopbaar zegt wélke van de acht
 werkwoorden hij kent, en de afrekening past zich aan. Dat is niet een compromis:
-het is wat de meting vond. Een gerecht kent geen retour, een hotelkamer kent geen
+het is wat de meting vond: 26 van de 100 domeinen bevestigen zonder prijs. Een
+gerecht kent geen retour, een hotelkamer kent geen
 levering, een digitale dienst kent geen voorraad — en een protocol dat doet alsof
-van wel, staat 84 keer leeg op `lever` en 93 keer op `retour`.
-`kern/appstore/machtigingen.js` is het model: elk vermogen draagt een doel én een
+van wel, staat 85 keer leeg op `lever` en 94 keer op `retour`.
+`kern/appstore/machtigingen.js` is het model: elk werkwoord draagt een doel én een
 grens.
 
 **MAND** — wat een koper bij elkaar heeft staan, over verkoopwegen en verkopers
@@ -286,23 +298,35 @@ autonome betaling die grens 2 verbiedt.
 - **Een sitebouwer met versies, publiceren, plannen en spoor** (`kern/webmaker*`),
   met live blokken die uit het zaakprofiel oplossen (`kern/webplatform.js`) en één
   sjabloon voor alle vestigingen van een merk (`kern/webmerk.js`).
+- **De commerce-laag zelf** (`kern/commerce/`, acht bestanden, gemonteerd in
+  `opzet/kernlaag2b.js`): de werkwoorden als gesloten lijst met per werkwoord wat
+  het geeft en wat het nooit doet, de vertaling van een aanbod-rij naar een koopbaar,
+  de leeslaag over `kern/mall/aanbod.js` (nul `save()`), de mand op de
+  sessiesleutel, en de afrekening per verkoper met btw uit `kern/fiscaal/tarief.js`.
+  Draait op de seed: 100 koopbaren uit 8 typen. Scherm: `/apps/commerce.html`,
+  routes: `/api/commerce/*`.
+- **Wat een aanbod NIET kan, met de reden erbij.** De unieke opbrengst van deze
+  laag. Een ondernemer ziet per regel waarom er geen koopknop staat, en het
+  verschil tussen *er is iets te doen* (zet een prijs) en *er is niets aan de
+  hand* (een offerte-aanvraag hoort geen koopknop te hebben).
 
 ### Een stap weg
 
-- **De leeslaag ("Commerce Graph").** De bouwstenen liggen er: `kern/mall/aanbod.js`
-  is al precies dit — een leeslaag die een reeks domeinen op één vorm projecteert,
-  níéts schrijft (nul `save()`), en een kapotte bron als `stuk` teruggeeft in
-  plaats van als een korter lijstje. (Hoevéél domeinen dat er zijn, zeggen
-  `aanbod.js` en `bestellingen.js` verschillend — acht bronnen tegenover tien
-  domeinen. Dat is een los draadje van vóór dit document, geen getal om hier op
-  te bouwen.) Wat ontbreekt is de koopkant erbij (prijs, voorraad, btw,
-  beschikbaarheid) en een tweede lezer naast de Mall. **De domeinen blijven
-  eigenaar; de graaf schrijft nooit.**
 - **De winkelblokken in Webmaker.** 14 bloktypes nu (`webmaker-schoon.js:10`),
-  geen product-, mand- of afrekenblok. Zodra de leeslaag er is, zijn dit
-  weergaven zonder logica.
+  geen product-, mand- of afrekenblok. De leeslaag staat er nu, dus dit zijn
+  weergaven zonder logica — precies zoals grens 5 eist.
 - **`kern/retail` afmaken tot 6/8.** Prijsfunctie, levering, annulering — de drie
   die het domein mist en die `kern/mall` en `kern/horeca` al hebben.
+- **Een exacte prijs waar nu een vanaf-prijs staat.** Op de seed dragen 12 van de
+  92 koopbaren met een bedrag een *indicatie* (`vanaf`) in plaats van een
+  afrekenbedrag: reizen, verblijven en menukaarten waarvan de prijs van de datum
+  of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
+  vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
+  bedrag hoort uit het domein zelf te komen.
+- **Bevestigen vanuit de mand.** De afrekening rekent door en stopt bij de deur;
+  de knop wijst naar het domein dat de bestelling werkelijk beheert. Dat is met
+  opzet zo gebouwd (er komt geen tweede orderwaarheid), maar de doorverwijzing
+  per type is er nog niet.
 
 ### Vraagt een besluit van de eigenaar
 
@@ -324,16 +348,16 @@ autonome betaling die grens 2 verbiedt.
 
 ### Jaren weg
 
-- **Reverse Commerce.** Zes van de 99 domeinen kennen iets dat op retour lijkt, en
+- **Reverse Commerce.** Zes van de 100 domeinen kennen iets dat op retour lijkt, en
   geen ervan is een goederenretour. Grondslag, bewijs, keuze (geld terug /
   ruilen / tegoed / reparatie / garantie), logistiek, inspectie, voorraadstand,
   grootboekomkering, btw-correctie — dat is een domein op zich, met dezelfde
   bewijslaag als de verkoop.
-- **De 89 optellingen.** 89 plekken in 48 domeinen rekenen regelbedragen uit of
+- **De 90 optellingen.** 90 plekken in 49 domeinen rekenen regelbedragen uit of
   tellen ze op. Dat is de prijs van geen gedeelde afrekening, en het is precies
   het patroon dat `fiscaal/tarief.js` al één keer heeft laten ontsporen. Ze zijn
   niet in één ronde samen te brengen, en een poging daartoe die halverwege stopt,
-  laat het huis met 90 achter.
+  laat het huis met 91 achter.
 
 ---
 
@@ -341,17 +365,27 @@ autonome betaling die grens 2 verbiedt.
 
 Het zegt niet dat de meting `Koopbaar` heeft *weerlegd* als idee. Het zegt dat
 `Koopbaar` als **interface van acht verplichte methodes** niet in deze code te
-vinden is, en dat hij als **verklaring van vermogens** wél kan. Dat is een andere
+vinden is, en dat hij als **verklaring van werkwoorden** wél kan. Dat is een andere
 vorm, geen kleinere ambitie.
 
 Het zegt ook niets over of de domeinen *zouden moeten* kunnen wat ze niet kunnen.
 "`kern/retail` kent geen retour" betekent: er staat vandaag niets. Niet dat het
 daar niet hoort. De meting is een prijskaart, geen foutenlijst.
 
+**De laag meet zichzelf mee, en dat levert meteen een illustratie op.** Sinds
+`kern/commerce/` bestaat, telt de meting hem als het honderdste koopbare domein.
+Hij scoort 2 van 8 — `toon` en `bevestig` — en die tweede is *onterecht*: de
+werkwoordfamilie `bevestig` bevat het patroon `koop`, en `koopbaar.js` heet
+`koopbaar`. Precies de vergissing waar de kop van `scripts/commerce.js` voor
+waarschuwt, nu in het bestand dat de waarschuwing schreef. Het is één domein van
+de honderd en het verandert geen enkele conclusie, maar het staat hier omdat een
+meting die haar eigen ruis verzwijgt, precies zo betrouwbaar oogt als een die dat
+niet doet.
+
 En het meet namen, geen betekenissen. Een `bevestig` in `kern/reservering`
 bevestigt een tafel; een `bevestig` in `kern/appstore` bevestigt een aanschaf.
 Waar twee werkwoorden hetzelfde werkwoord zijn, beslist een mens die beide
-modules opent — daarom staat in `COMMERCE.json` bij elk vermogen wáár het vandaan
+modules opent — daarom staat in `COMMERCE.json` bij elk werkwoord wáár het vandaan
 komt.
 
 ---

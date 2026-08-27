@@ -1,9 +1,9 @@
 {
-  "catalogi": 831,
-  "verschillendeNamen": 516,
-  "namenInMeerDomeinen": 94,
-  "woordenMetMeerBetekenissen": 77,
-  "betekenissenTotaal": 279,
+  "catalogi": 835,
+  "verschillendeNamen": 519,
+  "namenInMeerDomeinen": 95,
+  "woordenMetMeerBetekenissen": 78,
+  "betekenissenTotaal": 281,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 38,
   "dubbelingen": 28,
@@ -438,7 +438,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 101,
+  "dubbelingenZonderNaam": 103,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -453,6 +453,36 @@
         "drie",
         "vier",
         "vijf"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/commerce/koopbaarlijst.js",
+      "aNaam": "TYPE_WERKWOORDEN",
+      "b": "server/kern/mall/aanbodvorm.js",
+      "bNaam": "TYPEN",
+      "leden": 12,
+      "voorbeeld": [
+        "product",
+        "dienst",
+        "boeking",
+        "huur",
+        "ticket"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/commerce/koopbaarlijst.js",
+      "aNaam": "TYPE_WERKWOORDEN",
+      "b": "server/kern/mall/aanbodvorm.js",
+      "bNaam": "TYPE_VERDIEPING",
+      "leden": 12,
+      "voorbeeld": [
+        "product",
+        "dienst",
+        "boeking",
+        "huur",
+        "ticket"
       ]
     },
     {
@@ -700,36 +730,6 @@
       "a": "server/foundation/gezinshulp.js",
       "aNaam": "GROEPEN",
       "b": "server/kern/geloofbieb.js",
-      "bNaam": "ZICHT",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/gezinshulp.js",
-      "aNaam": "GROEPEN",
-      "b": "server/kern/leren/schrijven.js",
-      "bNaam": "OPDRACHTEN",
-      "leden": 5,
-      "voorbeeld": [
-        "mini",
-        "kind",
-        "tiener",
-        "jong",
-        "volw"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/foundation/gezinshulp.js",
-      "aNaam": "GROEPEN",
-      "b": "server/kern/rtfbieb.js",
       "bNaam": "ZICHT",
       "leden": 5,
       "voorbeeld": [
@@ -3014,5 +3014,5 @@
       ]
     }
   ],
-  "bestanden": 2356
+  "bestanden": 2366
 }

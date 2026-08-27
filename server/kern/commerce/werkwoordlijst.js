@@ -1,18 +1,18 @@
 /* ============================================================================
-   DE LIJST VAN VERMOGENS -- de acht, en wat er met opzet niet bestaat.
+   DE LIJST VAN WERKWOORDEN -- de acht, en wat er met opzet niet bestaat.
 
    Pure data. De logica die hem gebruikt (verklaren, aftrekken, uitleggen) staat
-   in ./vermogens.js; dezelfde tweedeling als kern/persoonseis.js met zijn
+   in ./werkwoorden.js; dezelfde tweedeling als kern/persoonseis.js met zijn
    -lijst.js, en om dezelfde reden: een tabel die je zonder de motor kunt lezen,
    is een tabel die een toets kan voeren met wat hij zelf verzint.
 
    DIT IS GEEN INTERFACE. Het voorstel voor deze laag zette acht werkwoorden
    achter een Koopbaar-protocol dat elk verkoopbaar ding zou implementeren.
    scripts/commerce.js heeft gemeten of dat protocol in deze code bestaat, en
-   het antwoord staat in COMMERCE.json: van de 99 domeinen met een koopbare
+   het antwoord staat in COMMERCE.json: van de 100 domeinen met een koopbare
    vorm voert er GEEN ENKELE alle acht werkwoorden uit, GEEN ENKEL werkwoord
    staat in alle domeinen, en er zijn 42 verschillende combinaties. Een
-   interface van acht verplichte methodes zou 84 lege `lever` en 93 lege
+   interface van acht verplichte methodes zou 85 lege `lever` en 94 lege
    `retour` opleveren -- of erger, implementaties die doen alsof.
 
    Dus draait het om: een koopbaar VERKLAART welke vermogens hij heeft, en de
@@ -25,13 +25,13 @@
    WAT `nooit` HIER DOET. Het is geen slag om de arm maar de grens die de
    afrekening afdwingt. Staat er bij `prijs` dat hij nooit uit de browser komt,
    dan is dat precies wat kern/commerce/afrekening.js controleert. Een regel hier
-   die nergens wordt afgedwongen, laat test/commerce-vermogens.test.js zakken.
+   die nergens wordt afgedwongen, laat test/commerce-kern.test.js zakken.
 
    `vereist` IS DE ENIGE AFHANKELIJKHEID DIE ER IS, en hij is TEGEN DE METING
    GEHOUDEN in plaats van bedacht. Dat was nodig ook: de eerste opzet liet
    `bevestig` afhangen van `prijs` -- "je bevestigt geen bedrag dat niemand heeft
    berekend" -- en dat klonk sluitend. COMMERCE.json zegt iets anders: er zijn
-   25 domeinen die bevestigen ZONDER prijs. Dat is geen uitzondering maar een
+   26 domeinen die bevestigen ZONDER prijs. Dat is geen uitzondering maar een
    kwart van alles wat hier verkoopt, en het is ook gewoon waar: een tafel, een
    bezichtiging en een afspraak worden bevestigd zonder dat er geld aan te pas
    komt. Die afhankelijkheid is eruit.
@@ -65,7 +65,7 @@ const V = (id, label, wat, nooit, vereist) => ({ id, label, wat, nooit, vereist:
 
 /* De acht. De volgorde is die van een koop en niet die van het alfabet: zo
    leest een vermogenlijst als een verhaal en zie je meteen waar hij ophoudt. */
-const VERMOGENS = [
+const WERKWOORDEN = [
   V('toon',
     'Te zien',
     'dit ding heeft een titel, een aanbieder en een plek waar je het bekijkt',
@@ -116,4 +116,4 @@ const NIET_GEBOUWD = {
   levering_derden: 'Een externe vervoerder melden als geleverd zou een bewering van buiten als gemeten stand opvoeren. Zie kern/mall/extern.js: een melding is vers of hij telt niet.'
 };
 
-module.exports = { VERMOGENS, NIET_GEBOUWD };
+module.exports = { WERKWOORDEN, NIET_GEBOUWD };

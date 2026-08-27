@@ -10,7 +10,7 @@
 
    HIJ BOUWT DE PROJECTIE NIET ZELF. kern/mall/aanbod.js doet dat al -- tien
    bronnen op een gedeelde vorm, met een kapotte bron als `stuk` in plaats van
-   als een korter lijstje. Deze laag roept die aan en doet er de vermogens bij
+   als een korter lijstje. Deze laag roept die aan en doet er de werkwoorden bij
    (./koopbaar.js). Een tweede projectie ernaast zou binnen een maand een ander
    idee hebben van wat een aanbieder is (LAT-regel 4).
 
@@ -57,8 +57,8 @@ module.exports = ({ aanbodAlles }) => {
       if (f.bron && rij.bron !== f.bron) continue;
       if (f.type && rij.type !== f.type) continue;
       const k = vanAanbod(rij);
-      if (!k) { geweigerd.push({ bron: rij.bron || '?', reden: 'geen vermogensregel voor type ' + rij.type }); continue; }
-      if (f.alleenKoopbaar && !k.vermogens.includes('bevestig')) continue;
+      if (!k) { geweigerd.push({ bron: rij.bron || '?', reden: 'geen werkwoordregel voor type ' + rij.type }); continue; }
+      if (f.alleenKoopbaar && !k.werkwoorden.includes('bevestig')) continue;
       koopbaren.push(k);
     }
     return { ok: true, volledig: stuk.length === 0, koopbaren, stuk, geweigerd: geweigerd.slice(0, 50) };
@@ -90,8 +90,8 @@ module.exports = ({ aanbodAlles }) => {
      stilte. */
   function etalage(verkoperCode) {
     const uit = alles({ verkoper: verkoperCode });
-    const teKoop = uit.koopbaren.filter(k => k.vermogens.includes('bevestig'));
-    const nietTeKoop = uit.koopbaren.filter(k => !k.vermogens.includes('bevestig'))
+    const teKoop = uit.koopbaren.filter(k => k.werkwoorden.includes('bevestig'));
+    const nietTeKoop = uit.koopbaren.filter(k => !k.werkwoorden.includes('bevestig'))
       .map(k => ({
         id: k.id, titel: k.titel, type: k.type,
         waarom: waaromNietTeKoop(k)

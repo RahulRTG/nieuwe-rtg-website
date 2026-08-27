@@ -5,22 +5,28 @@ module.exports = (ctx) => {
     ledenPrijs, gidsHaal, meldWachtlijst, MATEN, SEIZOENEN,
     id, nu, vandaag, rond, schoon, isRetail, artikelVan, variantVan, totaleVoorraad } = ctx;
   const { klantRec, klantProfiel, wishlistToggle } = ctx;
+  /* prijsVan komt uit ./assortiment.js, dat vóór deze laag in de context wordt
+     gelegd (zie kern/retail.js). Zo staat de prijs op één plek en rekent de
+     kassa hem niet zelf nog eens uit. */
+  const { prijsVan } = ctx;
+  /* EERST REKENEN, DAN PAS MUTEREN. Dit liep vroeger door elkaar: de voorraad
+     ging eraf terwijl de regels werden langsgelopen, en bij de eerste regel
+     zonder voorraad keerde de functie terug met een 409 -- met de voorraad van
+     de regels ervoor al afgeboekt, zonder bon. Die volgorde is nu onmogelijk:
+     prijsVan (./assortiment.js) raakt niets aan, en er wordt hieronder geen
+     voorraad aangeraakt zolang er een tekort is. */
   function verkoop(s, body, actor) {
-    const regels = Array.isArray(body.regels) ? body.regels : [];
-    const items = [];
-    let totaal = 0;
-    for (const r of regels.slice(0, 50)) {
-      const hit = variantVan(s, r.vsku);
-      if (!hit) continue;
-      const aantal = Math.max(1, Math.min(50, parseInt(r.aantal, 10) || 1));
-      if (hit.variant.voorraad < aantal) return { status: 409, error: 'Onvoldoende voorraad voor ' + hit.artikel.naam + ' (' + hit.variant.maat + '): nog ' + hit.variant.voorraad + '.' };
-      hit.variant.voorraad -= aantal;
-      const stuk = hit.artikel.price;
-      items.push({ vsku: r.vsku, name: hit.artikel.naam + ' (' + hit.variant.kleur + ', ' + hit.variant.maat + ')', qty: aantal, price: stuk });
-      totaal += stuk * aantal;
+    const berekend = prijsVan(s, body.regels);
+    if (berekend.error) return berekend;
+    if (berekend.tekort.length) {
+      const t = berekend.tekort[0];
+      return { status: 409, error: 'Onvoldoende voorraad voor ' + t.naam + ': nog ' + t.vrij + '.', tekort: berekend.tekort };
     }
-    if (!items.length) return { status: 400, error: 'Geen geldige artikelen.' };
-    totaal = rond(totaal);
+    if (!berekend.regels.length) return { status: 400, error: 'Geen geldige artikelen.' };
+
+    const items = berekend.regels.map(r => ({ vsku: r.vsku, name: r.naam, qty: r.aantal, price: r.stuk }));
+    for (const r of berekend.regels) variantVan(s, r.vsku).variant.voorraad -= r.aantal;
+    const totaal = berekend.totaal;
     const method = ['contant', 'rtgpay'].includes(body.method) ? body.method : 'contant';
     // als posSale, zodat het Z-rapport, de fooien en de boekhouding meelopen
     const sale = { id: id(), method, total: totaal, items, actor: (actor && actor.name) || 'Team', at: nu(), room: null, retail: true };
@@ -29,7 +35,10 @@ module.exports = (ctx) => {
     // een variant apart voor deze klant afronden (opgehaald) als die erbij hoort
     if (body.klantKey) {
       const rec = klantRec(s, body.klantKey);
-      for (const it of items) rec.historie.push({ sku: it.vsku, naam: it.name, bedrag: rond(it.price * it.qty), at: nu() });
+      /* Het regelbedrag komt uit dezelfde berekening als de bon en wordt hier
+         niet voor de tweede keer uitgerekend -- anders staat er in de historie
+         van een klant een som die uit een andere bron komt dan zijn kassabon. */
+      for (const r of berekend.regels) rec.historie.push({ sku: r.vsku, naam: r.naam, bedrag: r.totaal, at: nu() });
       rec.historie = rec.historie.slice(-200);
       for (const it of items) { const ap = (db.data.retailApart || []).find(x => x.key === body.klantKey && x.vsku === it.vsku && x.status === 'apart'); if (ap) ap.status = 'opgehaald'; }
     }

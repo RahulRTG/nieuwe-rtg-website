@@ -4,12 +4,12 @@
   "gemeten": {
     "bestanden": 1540,
     "domeinenTotaal": 430,
-    "koopbareVormen": 438,
+    "koopbareVormen": 440,
     "koopbareDomeinen": 100,
     "envelopDrempel": 6,
     "envelop": 42,
     "veldenDomeineigen": 661,
-    "veldenNietEnvelop": 850,
+    "veldenNietEnvelop": 851,
     "gelijkendeVormparen": 7,
     "werkwoordenVolledig": 0,
     "werkwoordenOveral": 0,
@@ -66,9 +66,9 @@
   ],
   "perWerkwoord": {
     "toon": 80,
-    "prijs": 30,
+    "prijs": 31,
     "beschikbaarheid": 43,
-    "reserveer": 22,
+    "reserveer": 23,
     "bevestig": 45,
     "lever": 15,
     "annuleer": 21,
@@ -466,6 +466,27 @@
         "beschikbaarheid": "open",
         "bevestig": "boeking",
         "lever": "laadMeegeleverd"
+      },
+      "telt": 5
+    },
+    {
+      "domein": "kern/retail",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "voorraadZoek",
+        "prijs": "prijsVan",
+        "beschikbaarheid": "pasVoorraad",
+        "reserveer": "legApart",
+        "bevestig": "verkoop"
       },
       "telt": 5
     },
@@ -976,25 +997,6 @@
       "telt": 3
     },
     {
-      "domein": "kern/retail",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "voorraadZoek",
-        "beschikbaarheid": "pasVoorraad",
-        "bevestig": "verkoop"
-      },
-      "telt": 3
-    },
-    {
       "domein": "kern/waarde",
       "heeft": {
         "toon": true,
@@ -1009,7 +1011,7 @@
       "bewijs": {
         "toon": "lijst",
         "beschikbaarheid": "beschikbaar",
-        "reserveer": "reserveer"
+        "reserveer": "apart"
       },
       "telt": 3
     },
@@ -2185,8 +2187,8 @@
       "domein": "kern/retail",
       "plekken": 2,
       "waar": [
-        "server/kern/retail/klant.js",
-        "server/kern/retail/vloer.js"
+        "server/kern/retail/assortiment.js",
+        "server/kern/retail/klant.js"
       ]
     },
     {

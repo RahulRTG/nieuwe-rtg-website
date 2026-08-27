@@ -1,8 +1,9 @@
 # RTG Commerce — de laag boven de domeinen
 
 *Gemeten op 27 augustus 2026 met `scripts/commerce.js`, opnieuw vastgelegd nadat
-`kern/commerce/` er zelf bij kwam; de uitslag staat in
-`COMMERCE.json` en wordt bewaakt door `test/commerce.test.js`.*
+`kern/commerce/` er zelf bij kwam en nadat `kern/retail` een prijsfunctie kreeg;
+de uitslag staat in `COMMERCE.json` en wordt bewaakt door
+`test/commerce.test.js`.*
 
 Dit is een richtingsdocument zoals `PLATFORM.md`, `DEVELOPERCLOUD.md` en `OS.md`:
 per onderdeel staat er of het **staat**, **een stap weg** is, **een besluit
@@ -32,9 +33,9 @@ behandeld. De meting is **met opzet royaal**: een werkwoord telt mee bij de
 vaagste naamverwantschap, een koopbare vorm bij het minste prijsveld. Dat maakt
 `Koopbaar` rijker dan hij is — en dus weegt een negatieve uitslag zwaar.
 
-**438 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
-42 envelop-velden blijven er 849 velden over, waarvan **660 (78%) in precies één
-domein** voorkomen. Van de 438 koopbare vormen halen **7 paren** uit verschillende
+**440 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
+42 envelop-velden blijven er 851 velden over, waarvan **661 (78%) in precies één
+domein** voorkomen. Van de 440 koopbare vormen halen **7 paren** uit verschillende
 domeinen de 60%-drempel.
 
 De acht werkwoorden, over die 100 domeinen:
@@ -44,8 +45,8 @@ De acht werkwoorden, over die 100 domeinen:
 | `toon` | 80 van 100 (80%) | ████████████████ |
 | `bevestig` | 45 van 100 (45%) | █████████ |
 | `beschikbaarheid` | 43 van 100 (43%) | █████████ |
-| `prijs` | 30 van 100 (30%) | ██████ |
-| `reserveer` | 22 van 100 (22%) | ████ |
+| `prijs` | 31 van 100 (31%) | ██████ |
+| `reserveer` | 23 van 100 (23%) | ████ |
 | `annuleer` | 21 van 100 (21%) | ████ |
 | `lever` | 15 van 100 (15%) | ███ |
 | `retour` | **7 van 100 (7%)** | █ |
@@ -111,7 +112,7 @@ staat hieronder — niet als foutenlijst maar als prijskaart. Volledige matrix i
 | `kern/verblijf` | • | | • | | • | | • | | 4/8 |
 | `kern/ov` | • | • | | | • | | • | | 4/8 |
 | `kern/onderneming` | • | • | • | • | | | | | 4/8 |
-| **`kern/retail`** | • | | • | | • | | | | **3/8** |
+| **`kern/retail`** | • | • | • | • | • | | | | **5/8** |
 | `kern/eten` | • | • | • | | | | | | 3/8 |
 | `kern/waarde` | • | | • | • | | | | | 3/8 |
 | `kern/modebezorg` | • | | | | | • | | • | 3/8 |
@@ -127,10 +128,42 @@ andere kant: `kern/appstore/machtigingen.js` is het enige bestand in dit huis da
 een **doel én een grens** draagt. Wie de commerce-laag ontwerpt, leest dat domein
 eerst.
 
-**`kern/retail` haalt 3 van 8**, terwijl dat het domein is waar iedereen naar
+**`kern/retail` haalt 5 van 8**, terwijl dat het domein is waar iedereen naar
 wijst als hij "webshop" zegt. Het heeft varianten, SKU's en voorraad op de
-variant — en geen prijsfunctie, geen levering, geen annulering, geen retour. De
-webshop bouwen betekent dus niet "retail ontsluiten" maar *retail afmaken*.
+variant — en geen levering, geen annulering, geen retour. De webshop bouwen
+betekent dus niet "retail ontsluiten" maar *retail afmaken*.
+
+> Het stond hier eerst op **3 van 8**. De vierde is geen nieuwbouw maar een
+> **meterfout van dezelfde soort als `serveer` en `maakTeruggave`**. `legApart`
+> in `kern/retail/klant.js` haalt een variant uit de vrije verkoop, houdt hem
+> vast op de sleutel van een klant en laat hem na drie dagen vervallen — de
+> regel erboven zegt zelf *"gereserveerd = uit de vrije verkoop"*. Dat is
+> `reserveer`, en het patroon zag het woord niet. Gevonden bij het zoeken naar
+> wat er in retail nog gebouwd moest worden; het antwoord was dus deels: niets.
+> Dat de correctie precies het domein raakt dat er het slechtst uit kwam, is
+> een reden om hem na te rekenen en niet om hem te laten — over 1540 bestanden
+> kantelt er exact één domein (22 → 23) en komt er nergens een valse treffer
+> bij. `test/commerce.test.js` toets 3b noemt de functie bij naam, zodat een
+> hernoeming de regel laat zakken in plaats van hem lucht te laten meten.
+>
+> De **vijfde is wel gebouwd**, en hij kwam uit dezelfde zoektocht. De prijs
+> bestond in retail wel maar stond MIDDENIN een andere handeling: `verkoop` in
+> `retail/vloer.js` rekende zijn totaal ter plekke uit. Dat is nu `prijsVan` in
+> `retail/assortiment.js` — een functie die niets aanraakt, alle tekorten
+> tegelijk teruggeeft en een onbekende variant benoemt in plaats van hem stil te
+> laten vallen.
+>
+> **En het repareerde een echte fout.** `verkoop` haalde de voorraad eraf
+> *terwijl* hij de regels langsliep, en keerde bij de eerste regel zonder
+> voorraad terug met een 409 — met de voorraad van de regels ervoor al
+> afgeboekt, zonder bon en zonder dat iemand het zag. Eerst rekenen en dan pas
+> muteren maakt die volgorde onmogelijk; `test/retail-prijs.test.js` toets 4
+> zakt op de oude volgorde.
+>
+> Wat het **niet** heeft gedaan is een optelling wegnemen. Die is verhuisd van
+> `vloer.js` naar `assortiment.js`, en 91 blijft dus 91. Het verschil dat de
+> meter niet kan zien is dat er nu één plek is die zegt wat iets kost, in plaats
+> van een som in de buik van een handeling die tegelijk voorraad afboekt.
 
 **`retour` stond bij de eerste meting op 6 van 100, en die zes waren geen
 retouren.** Het zijn
@@ -232,10 +265,11 @@ grens.
 
 **MAND** — wat een koper bij elkaar heeft staan, over verkoopwegen en verkopers
 heen. Eén mand, veel afrekeningen (zie de grens hieronder). Dit is het enige
-begrip waar samenvoegen echt iets oplevert: er staan nu **24 vormen die regels
-dragen** (een aantal naast een bedrag) in **17 domeinen**, en daarvan zijn er
-**22 verschillend**. Ze delen dus vrijwel niets — anders dan bij `Koopbaar` is
-hier geen bestaand type dat kapotgemaakt wordt.
+begrip waar samenvoegen echt iets oplevert: er staan nu **25 vormen die regels
+dragen** (een aantal naast een bedrag) in **18 domeinen**, en daarvan zijn er
+**23 verschillend**. Ze delen dus vrijwel niets — anders dan bij `Koopbaar` is
+hier geen bestaand type dat kapotgemaakt wordt. (De vijfentwintigste en het
+achttiende domein zijn deze laag zelf; zie par. 6, *jaren weg*.)
 
 **AFREKENING** — de bevestigde, server-berekende waarheid over één verkoper: de
 regels, de prijs, de btw, de korting, de verzendkosten, het bewijs. Nooit uit de
@@ -392,8 +426,16 @@ autonome betaling die grens 2 verbiedt.
 
 ### Een stap weg
 
-- **`kern/retail` afmaken tot 6/8.** Prijsfunctie, levering, annulering — de drie
-  die het domein mist en die `kern/mall` en `kern/horeca` al hebben.
+- ~~`kern/retail` afmaken tot 6/8~~ — het staat op **5/8** (par. 2, met de
+  prijsfunctie en de fout die eronder zat). Wat er nog ontbreekt is geen
+  opruimklus meer maar twee besluiten.
+  `lever` hoort **niet** hier: bezorgen staat per zaak in
+  `kern/leverancier/bezorgregel.js`, en een tweede plek zou een zaak per weg iets
+  anders laten beloven dan haar bezorgschakelaar zegt. En `annuleer` is er wel
+  half — `verkoopTerug` zet de voorraad terug én **wist de bon**. Dat is geen
+  annulering maar een uitgeveegde kassaregel, en het rechtzetten daarvan raakt
+  het Z-rapport, de fooien en de boekhouding. Dat is een besluit van de eigenaar
+  en geen reparatie.
 - **Een exacte prijs waar nu een vanaf-prijs staat.** Op de seed dragen 12 van de
   92 koopbaren met een bedrag een *indicatie* (`vanaf`) in plaats van een
   afrekenbedrag: reizen, verblijven en menukaarten waarvan de prijs van de datum
@@ -436,6 +478,13 @@ autonome betaling die grens 2 verbiedt.
   gebruiken: de overdracht rekent niet, hij krijgt het doorgerekende mandbeeld als
   parameter. Een getal dat zijn eigen maker meetelt is eerlijker dan een getal dat
   dat niet doet, ook als het daardoor iets erger lijkt dan het is.
+
+  En het blijft 91 ná de prijsfunctie van `kern/retail`: die is niet weggenomen
+  maar **verhuisd**, van `vloer.js` naar `assortiment.js`. Dat is precies de reden
+  dat deze post op *jaren weg* staat en niet op *een stap weg*. Een som netter
+  neerzetten is een middag werk; hem wegnemen vraagt een gedeelde afrekening waar
+  alle 49 domeinen doorheen gaan, en zolang die er niet is, verplaatst elke ronde
+  hem alleen maar.
 
 ---
 

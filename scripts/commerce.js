@@ -122,12 +122,27 @@ const AANTALVELD = /^(aantal|qty|hoeveelheid|stuks|n|count)$/i;
    werkwoord retour terwijl dat bestand juist HET teruggaverecht uit APPSTORE.md
    uitvoert. Dit huis schrijft `maakX`, `zetX`, `doeX` en `isX`, dus een anker
    vooraan meet de schrijfgewoonte en niet het werk -- en het maakte de meting
-   STRENGER dan de kop belooft, precies de verkeerde kant op. */
+   STRENGER dan de kop belooft, precies de verkeerde kant op.
+
+   DE DERDE VAN DAT SOORT: `apart` in de reserveer-familie. `legApart` in
+   kern/retail/klant.js haalt een variant uit de vrije verkoop, houdt hem vast
+   op de sleutel van een klant en laat hem na drie dagen vervallen -- de regel
+   erboven zegt zelf `// gereserveerd = uit de vrije verkoop`. Dat is een
+   reservering, en de meter zag hem niet.
+
+   Hij is gevonden bij het zoeken naar wat er in kern/retail nog gebouwd moest
+   worden, en het antwoord was dus deels: niets, het domein reserveert al. Dat
+   het woord precies het domein raakt dat er slecht uit kwam, is een reden om
+   het NA te rekenen en niet om het te laten: over 1540 bestanden kantelt er
+   exact een domein (22 -> 23) en komt er nergens een valse treffer bij. De
+   conclusies bewegen niet -- 0 domeinen halen alle acht, en kern/retail blijft
+   de laagste van de matrix. Toets 3b in test/commerce.test.js noemt de functie
+   bij naam. */
 const WERKWOORDEN = {
   toon: /(toon|beeld|weergave|publiek|etalage|kaart|lijst|overzicht|zoek)/i,
   prijs: /(prijs|prijzen|tarief|kosten|bereken|som|totaal|offerte|quote)/i,
   beschikbaarheid: /(beschikbaar|vrij|voorraad|slot|sloten|capaciteit|open|agenda|rooster|bezetting)/i,
-  reserveer: /(reserveer|reserveren|reservering|houd|blokkeer|claim|vastleg|vastzet)/i,
+  reserveer: /(reserveer|reserveren|reservering|houd|blokkeer|claim|vastleg|vastzet|apart)/i,
   bevestig: /(bevestig|plaats|boek|accepteer|akkoord|bestel|koop|aanschaf)/i,
   /* `serveer` staat er met een lookbehind, en dat is geen finesse maar een
      reparatie van een uitslag die anders had gelogen: RESERVEER bevat SERVEER.

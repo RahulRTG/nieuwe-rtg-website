@@ -74,6 +74,32 @@ test('3. reserveren is niet leveren -- RESERVEER bevat SERVEER', () => {
   assert.equal(r.perWerkwoord.lever, 0, 'een domein dat alleen reserveert, levert niet');
 });
 
+/* De derde meterfout van dezelfde soort. `legApart` in kern/retail/klant.js
+   haalt een variant uit de vrije verkoop, houdt hem vast op de sleutel van een
+   klant en laat hem na drie dagen vervallen; de regel erboven zegt zelf
+   "gereserveerd = uit de vrije verkoop". De meter zag dat niet, en zette
+   kern/retail daardoor op 3 van 8 terwijl het domein wel degelijk reserveert.
+
+   DE TOETS NOEMT DE ECHTE FUNCTIE. Een toets op het woord `apart` zou blijven
+   staan als iemand `legApart` hernoemt, en dan meet de regel niets meer. */
+test('3b. apart leggen IS reserveren (legApart in kern/retail)', () => {
+  assert.equal(C.WERKWOORDEN.reserveer.test('legApart'), true);
+  assert.equal(C.WERKWOORDEN.reserveer.test('mijnApart'), true);
+
+  const bron = require('fs').readFileSync(
+    require('path').join(__dirname, '..', 'server/kern/retail/klant.js'), 'utf8');
+  assert.match(bron, /function legApart\b/,
+    'de functie waarop deze regel rust, hoort te bestaan -- anders meet het patroon lucht');
+  assert.match(bron, /gereserveerd = uit de vrije verkoop/,
+    'en hij hoort nog steeds voorraad uit de vrije verkoop te halen');
+
+  /* En hij verbreedt niets anders: `apart` hoort geen tweede werkwoord te raken. */
+  for (const [naam, re] of Object.entries(C.WERKWOORDEN)) {
+    if (naam === 'reserveer') continue;
+    assert.equal(re.test('legApart'), false, naam + ' hoort apart leggen niet te claimen');
+  }
+});
+
 test('4. een werkwoord telt ook met een voorvoegsel ervoor (maakTeruggave)', () => {
   const r = doe(
     [V('server/kern/appstore/x.js', ['id', 'prijs', 'bruto', 'afdracht'])],

@@ -51,12 +51,12 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
   const deelKlant = require('./retail/klant')(ctx);
   Object.assign(ctx, deelKlant);
   const deelVloer = require('./retail/vloer')(ctx);
-  const { zetCollectie, zetArtikel, pasVoorraad, releaseDrop } = deelAssortiment;
+  const { zetCollectie, zetArtikel, pasVoorraad, releaseDrop, prijsVan } = deelAssortiment;
   const { klantRec, klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart, vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling } = deelKlant;
   const { verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus } = deelVloer;
 
   return {
-    isRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
+    isRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop, prijsVan,
     klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle,
     legApart, mijnApart, vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling,
     verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus

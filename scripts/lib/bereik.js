@@ -38,9 +38,18 @@ function zonderCommentaar(txt, isHtml) {
   return t.replace(/^[ \t]*\/\/.*$/gm, ' ');
 }
 
+const { MERK: IJKMERK } = require('./schonebron');
+
 function bestanden(dir, uit) {
   for (const f of fs.readdirSync(dir)) {
     if (f === 'dist') continue;
+    /* EEN IJKRESTANT IS GEEN SCHERM. De meterijking zet tijdelijke bestanden
+       neer om te zien of een meter beweegt; blijft er een staan (een gedode
+       suite, een finally die niet aan de beurt kwam), dan telde die hier mee
+       als onbereikbaar scherm en zakte deze meting op iets dat niemand heeft
+       gebouwd. Stond in test/bereikbaar.test.js voordat de meting hierheen
+       verhuisde; die overslag hoorde mee te verhuizen. */
+    if (f.includes(IJKMERK)) continue;
     const p = path.join(dir, f);
     if (fs.statSync(p).isDirectory()) bestanden(p, uit);
     else if (/\.(html|js)$/.test(f)) uit.push(p);

@@ -84,6 +84,19 @@ const REGELS = [
   [/supplier\/(?:inkoop|groothandel|keten|vracht)|\/inkoop|\/groothandel|\/vracht/, 'inkoop', 'Inkoop'],
   [/supplier\/(?:verkoop|retail|order|menu|reserver)|\/verkoop|\/mall|\/retail|\/bestellen|\/kassa|\/handel/, 'verkoop', 'Verkoop'],
   [/\/foodcourt|\/spar\b|\/pakket|\/order|\/reserveer|\/reservering|\/verhuur/, 'verkoop', 'Verkoop'],
+  /* RTG Commerce (COMMERCE.md): de verkooplaag boven de domeinen -- het aanbod,
+     de mand, de afrekening, de overdracht naar de deur die bevestigt, de
+     verkoopwegen van een zaak en de weg terug. Dat is verkoop en geen onderzoek,
+     en zonder deze regel viel de hele laag (schermen, api en werkprocessen) op
+     de terugval. `supplier/retour` staat er apart bij: de regel hierboven noemt
+     `retail` en dat is een ander woord.
+
+     HET KOPPELTEKEN STAAT ER MET REDEN. Het zaakscherm heet
+     `/apps/leverancier-commerce.html`, en met alleen `\/commerce` bleef precies
+     dat ene scherm op de terugval staan -- de twee schermen van dezelfde laag
+     zouden dan bij twee kantoren horen. Er zijn er twee in dit huis en allebei
+     zijn ze verkoop. */
+  [/[/-]commerce|supplier\/retour/, 'verkoop', 'Verkoop'],
 
   /* Mensen, recht en de eigen organisatie. */
   [/staff|personeel|vacature|sollicit|\/werving|\/cv\b|\/werkvloer|\/training|\/werk\.html/, 'hr', 'HR'],

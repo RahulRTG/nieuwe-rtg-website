@@ -70,6 +70,10 @@
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
     ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    /* RTG Commerce (COMMERCE.md): wat er te koop staat over alle domeinen heen,
+       met je mand en de weg terug. Hij hoort in deze wereld en niet bij Werk:
+       dit is de KOPERSkant. De verkoperskant staat in de zaak-app. */
+    commerce:    { naam: 'Te koop',       url: '/apps/commerce.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

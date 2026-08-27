@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**51 bundels, 408 delen, 0 zonder onderwerp.**
+**51 bundels, 409 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 84 delen, 8886 regels in de delen
+`public/apps/app-main/` -- 84 delen, 8890 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -190,7 +190,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 111 delen, 9191 regels in de delen
+`public/apps/leverancier/` -- 112 delen, 9199 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -271,7 +271,8 @@ omlaag.
 | `leverancier-55c.js` | "Vooruit": wat er op de zaak afkomt |
 | `leverancier-55d.js` | De post-voorstellen van de zaak: datums die zichzelf aandienen |
 | `leverancier-56.js` | een cel op het zaakbord, en de samenvatting van schakelaars |
-| `leverancier-57.js` | de incidenten op het beveiligingsbord |
+| `leverancier-56a.js` | Vervolg van leverancier-56 (op de 10 kB-leesgrens geknipt toen het Meer-scherm er een knop bij kreeg -- RTG Commerce) |
+| `leverancier-57.js` | Vervolg van leverancier-56a |
 | `leverancier-58.js` | alles opnieuw tekenen, en het actieve tabblad zichtbaar maken |
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
@@ -553,7 +554,7 @@ omlaag.
 
 ## `shared/glyf.js`
 
-`public/shared/glyf/` -- 3 delen, 206 regels in de delen
+`public/shared/glyf/` -- 3 delen, 208 regels in de delen
 
 | deel | onderwerp |
 |---|---|

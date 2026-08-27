@@ -44,6 +44,14 @@ module.exports = [
     uitleg: 'Digitale contracten die een lid in de app ondertekent.', paden: ['/api/contract', '/api/contracten'] },
   { id: 'groothandel', categorie: 'Genres & diensten', naam: 'Groothandel & markt', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier'],
     uitleg: 'De brede B2B/B2C-marktplaats: horeca koopt in, leden bestellen boodschappen, met AI-bijbestellen. Elke groothandel zet zijn eigen functies aan/uit.', paden: ['/api/groothandel', '/api/supplier/groothandel', '/api/supplier/inkoop'] },
+  /* RTG Commerce (COMMERCE.md): de kopersKANT. Uit zetten haalt de mand, de
+     afrekening, de overdracht en het retourverzoek weg; de domeinen zelf
+     verkopen daarna gewoon door zoals ze dat altijd al deden -- deze laag
+     bevestigt niets en is dus ook nergens de enige weg naar. De zaakkant staat
+     bij Zaakregie. */
+  { id: 'commerce', categorie: 'Genres & diensten', naam: 'RTG Commerce (mand & retour)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.',
+    paden: ['/api/commerce'] },
 
   // ---- Sociaal (De Salon) ----
   { id: 'salon', categorie: 'Sociaal (De Salon)', naam: 'De Salon (feed, volgen, deals)', standaard: true, doelgroepen: LEDEN_GAST,

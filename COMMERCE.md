@@ -440,8 +440,18 @@ autonome betaling die grens 2 verbiedt.
   92 koopbaren met een bedrag een *indicatie* (`vanaf`) in plaats van een
   afrekenbedrag: reizen, verblijven en menukaarten waarvan de prijs van de datum
   of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
-  vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
-  bedrag hoort uit het domein zelf te komen.
+  vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken.
+
+  Hier is **geen regel code aan deze laag** te schrijven die dat oplost, en dat
+  is de reden dat het hier staat en niet bij *staat*. Voor een deel is het
+  data — een ondernemer die een vast bedrag invult, en het scherm zegt hem dat
+  ook met zoveel woorden (`REDEN.bevestigVanaf`: *"Zet een vast bedrag, dan komt
+  de koopknop terug"*). Maar voor een reis en een verblijf zal het dat nooit
+  worden: daar hángt de prijs van de datum af. Wat die domeinen nodig hebben is
+  het werkwoord `prijs` in zijn echte vorm — een functie die bij een datum en
+  een keuze een bedrag geeft, zoals `kern/retail` er nu een heeft. Dat is werk
+  in `kern/reis` en `kern/verblijf` en niet hier; deze laag kan hem alleen
+  aanroepen zodra hij er is.
 - ~~Bevestigen vanuit de mand~~ — **gebouwd**, zie *De overdracht* hieronder.
 
 ### Vraagt een besluit van de eigenaar

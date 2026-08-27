@@ -38,7 +38,7 @@
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 

@@ -3713,6 +3713,10 @@ var RTG_BOUW = '4416650d';
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
     ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    /* RTG Commerce (COMMERCE.md): wat er te koop staat over alle domeinen heen,
+       met je mand en de weg terug. Hij hoort in deze wereld en niet bij Werk:
+       dit is de KOPERSkant. De verkoperskant staat in de zaak-app. */
+    commerce:    { naam: 'Te koop',       url: '/apps/commerce.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
@@ -3908,7 +3912,7 @@ var RTG_BOUW = '4416650d';
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 

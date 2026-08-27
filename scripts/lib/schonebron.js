@@ -26,6 +26,31 @@
    EEN PLEK EN NIET TWEE. Beide generatoren lezen dezelfde regel, want twee
    kopieen lopen binnen een week uiteen (LAT.md regel 4). Komt er een derde
    afdruk bij, dan hangt hij hier ook aan.
+
+   DE LEZERSKANT, ERBIJ OP 27 AUGUSTUS 2026. Hierboven staat de schrijverskant:
+   een generator schrijft niet zolang er een restant staat. Er is een tweede
+   kant, en die is in CI stukgegaan voor hij was opgeschreven.
+
+   Node draait toetsbestanden NAAST elkaar. Terwijl meterijk zijn tijdelijke
+   pagina in public/apps/ heeft staan, lopen andere toetsen diezelfde boom af en
+   beweren iets over ELKE app-pagina -- dat de gids hem dekt, dat hij de i18n-laag
+   haalt, dat hij vanaf het beginscherm te bereiken is. In dat raampje beweren ze
+   dat over een bestand dat geen product is, en dan zakken ze op een fout die er
+   niet is.
+
+   GEMETEN, NIET GEGOKT: van de veertien toetsen die public/apps/ van schijf
+   aflopen, breken er DRIE op zo'n restant (negenplus, i18n-auto, bereikbaar) en
+   elf niet. Die drie slaan het over via MERK hieronder. De andere elf krijgen
+   niets: een filter dat nergens iets tegenhoudt is een filter dat straks iets
+   verkeerds tegenhoudt.
+
+   WAAROM DIT GEEN UITZONDERINGSLIJST IS. scripts/schermen.js weigert er met
+   zoveel woorden een ("wie een scherm niet wil laten toetsen moet dat kunnen
+   uitleggen"), en dat blijft precies zo -- alleSchermen() filtert niets, want de
+   METER moet het restant juist zien, anders bewijst de ijking niets. Wat hier
+   wordt overgeslagen is geen scherm dat zich verstopt maar steigerwerk van een
+   toets. En blijft er ooit een restant achter, dan houdt de wacht hierboven de
+   afdrukken tegen; het wordt dus niet stilletjes de nieuwe normaal.
    ========================================================================== */
 'use strict';
 const fs = require('fs');

@@ -10,9 +10,10 @@ const os = require('os');
 const path = require('path');
 const { startServer, elevateTier } = require('./helper');
 
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 let BASE;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rendezvous-'));
-let child;
+let child, office;
 
 const raw = (pad, body, token) => fetch(BASE + '/api' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
@@ -23,6 +24,7 @@ const rv = (pad, body, token) => raw('/member/rendezvous/' + pad, body, token);
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  office = (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
@@ -30,14 +32,24 @@ test.after(() => {
 });
 
 let teller = 0;
-const officeTok = async () => (await json(await raw('/office/login', { code: 'RTG-OFFICE' }))).token;
-async function lidMet(tier) {
+async function lidMet(tier, opties = {}) {
   const t = Date.now() + '' + (teller++);
   // zelf-registreren geeft altijd RTG; Lifestyle/Business komt na een menselijk
   // akkoord, dus registreren als RTG en optillen langs de office-flow.
   const regTier = (tier === 'lifestyle' || tier === 'business') ? 'rtg' : tier;
-  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'r' + t + '@v.test', phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1985-05-05', tier: regTier }));
-  if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, await officeTok());
+  const r = await json(await raw('/auth/register', { name: 'Lid ' + t, email: 'r' + t + '@v.test', phone: '06' + String(t).slice(-8),
+    password: 'geheim123', geboortedatum: opties.geboortedatum || '1985-05-05', tier: regTier }));
+  if (tier === 'lifestyle' || tier === 'business') await elevateTier(BASE, r.token, tier, office);
+  if (opties.verifieer !== false) {
+    const staat = await json(await raw('/state', {}, r.token));
+    const codenaam = staat.state.user.codename;
+    await raw('/verify/upload', { image: PNG }, r.token);
+    await raw('/verify/selfie', { image: PNG }, r.token);
+    const wachtrij = await json(await raw('/office/verifications', {}, office));
+    const aanvraag = (wachtrij.pending || []).find(p => p.codename === codenaam);
+    assert.ok(aanvraag, 'identiteitsverificatie staat bij kantoor klaar');
+    await raw('/office/verify', { userId: aanvraag.id, decision: 'approve', faceMatch: true, geslacht: 'x' }, office);
+  }
   return r.token;
 }
 
@@ -112,4 +124,39 @@ test('Rendez-vous is gated op de Lifestyle Pass (RTG niet, Business wel)', async
   assert.equal((await rv('profiel', {}, rtg)).status, 403);
   const biz = await lidMet('business');
   assert.equal((await rv('profiel', {}, biz)).status, 200);
+});
+
+test('Rendez-vous eist naast de pas ook een geverifieerde identiteit en 18+', async () => {
+  const ongeverifieerd = await lidMet('lifestyle', { verifieer: false });
+  let r = await rv('profiel', {}, ongeverifieerd);
+  assert.equal(r.status, 403);
+  assert.equal((await json(r)).code, 'IDENTITY_REQUIRED');
+
+  const minderjarig = await lidMet('lifestyle', { geboortedatum: '2010-05-05' });
+  r = await rv('profiel', {}, minderjarig);
+  assert.equal(r.status, 403);
+  assert.equal((await json(r)).code, 'AGE_REQUIRED');
+});
+
+test('blokkeren verwijdert de connectie direct; melden gaat op codenaam naar kantoor', async () => {
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  await rv('profiel/zet', { aan: true, over: 'A', locaties: 'Ibiza' }, a);
+  await rv('profiel/zet', { aan: true, over: 'B', locaties: 'Ibiza' }, b);
+  const kandidaat = (await json(await rv('kandidaten', {}, a))).kandidaten.find(k => k.over === 'B');
+  assert.ok(kandidaat);
+  await rv('like', { id: kandidaat.id }, a);
+  const andersom = (await json(await rv('kandidaten', {}, b))).kandidaten.find(k => k.over === 'A');
+  await rv('like', { id: andersom.id }, b);
+  assert.equal((await json(await rv('matches', {}, a))).matches.length, 1);
+
+  const blok = await json(await raw('/member/rendezvous/blokkeer', { id: kandidaat.id, meld: 'Ongepast bericht' }, a));
+  assert.equal(blok.gemeld, true);
+  assert.equal((await json(await rv('matches', {}, a))).matches.length, 0, 'de match is direct weg voor A');
+  assert.equal((await json(await rv('matches', {}, b))).matches.length, 0, 'de match is direct weg voor B');
+  assert.ok(!(await json(await rv('kandidaten', {}, b))).kandidaten.some(k => k.id === andersom.id), 'beiden zien elkaar niet meer');
+
+  const meldingen = await json(await raw('/office/rendezvous/meldingen', {}, office));
+  assert.ok(meldingen.meldingen.some(m => m.reden === 'Ongepast bericht'), 'kantoor ontvangt de melding');
+  assert.ok(meldingen.meldingen.every(m => m.van && m.over), 'de melding gebruikt codenamen');
 });

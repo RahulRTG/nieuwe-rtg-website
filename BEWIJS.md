@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1112 bestanden en 7461 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1112 bestanden en 7463 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1112 |
-| losse beweringen (`test(...)`) | 7461 |
+| losse beweringen (`test(...)`) | 7463 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 48 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 937 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-973 bestanden, 7226 beweringen.
+973 bestanden, 7228 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -675,7 +675,7 @@ toets omvalt.
 | `rekenschuif.test.js` | 4 | gezakt op `===->!==#0` | De verwijzing-schuiver van het rekenblad (shared/rekenschuif.js): het stuk dat kopiëren, plakken en doorvoeren EERLIJK maakt. Wie =B2*C2 een rij lager plakt bedoelt =B3*C3; een dollarteken zet vast; en wat van het... |
 | `release-bewijs.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rem.test.js` | 6 | gezakt op `&&->||#0` | Test voor de eigen rate-limiter (server/rem.js): binnen het venster mag een sleutel tot `limit` verzoeken, daarboven springt de rem aan; sleutels tellen los; `skip` slaat over; een verlopen venster telt weer vanaf... |
-| `rendezvous.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |
+| `rendezvous.test.js` | 7 | gezakt op `liegpoort /api/` | Integratietests voor Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass. Twee leden zetten een profiel op, liken elkaar (wederzijds = match), en Rahul stelt een jetset-date voor op een gedeelde locatie. |
 | `reservering-beleid.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `residentie.test.js` | 5 | gezakt op `liegpoort /api/` | De Residence: het virtuele grandhotel. Toegang (leden wel, gasten niet), bewegen door de zaal (grid, meubels blokkeren, zitmeubels laten zitten), praten en emotes, de eigen suite met het RTG Maison-atelier... |
 | `residentie2.test.js` | 5 | gezakt op `liegpoort /api/` | De Residence, samen spelen: uitdagen en accepteren in de juiste zaal, om de beurt spelen met een timing-nauwkeurigheid, een eerlijke uitslag zonder ranglijsten, de vragen van het huis aan het diner, en de... |

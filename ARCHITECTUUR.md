@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4143 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4145 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4143 |
-| servermodules (`server/**/*.js`) | 2385 |
+| API-endpoints | 4145 |
+| servermodules (`server/**/*.js`) | 2386 |
 | routebestanden (`server/routes/**`) | 484 |
-| kernmodules (`server/kern/**`) | 1468 |
+| kernmodules (`server/kern/**`) | 1469 |
 | schermen (`public/**/*.html`) | 268 |
 | gedeelde browsermodules (`public/shared/*.js`) | 229 |
 | toetsbestanden (`test/*.test.js`) | 973 |
@@ -103,7 +103,7 @@ zie §5 -- er zijn nog 194 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 41 |
-| `member` | 643 | 58 | 12 | 398 |
+| `member` | 645 | 58 | 12 | 399 |
 | `supplier` | 599 | 111 | 10 | 297 |
 | `office` | 40 | 7 | 5 | 64 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -139,7 +139,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(175) auth(107) supplierAuth(56) officeAuth(38) db(36) status(27) liveCodename(27)
+app(175) auth(107) supplierAuth(56) officeAuth(39) db(36) status(27) liveCodename(27)
 accounts(23) schoon(21) managerOnly(16) codenaamVan(16) save(15) rtf(15) crypto(12)
 boardroomWie(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10) rtmail(10)
 express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8) logActivity(8)

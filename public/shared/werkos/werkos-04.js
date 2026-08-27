@@ -1,3 +1,10 @@
+/* DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin.
+
+   Hier staat hoe dat vlak opent en sluit, wat de focus doet zolang het open
+   is, en hoe het rooster van apps erin wordt gezet. Onderdeel van de bundel
+   shared/werkos.js; de delen worden achter elkaar geplakt
+   (scripts/bundel.js), dus dit bestand begint midden in de omringende
+   functie. */
   function bouwBordSchil(opts, scrim, grid, sluit) {
     const apps = (opts.apps || []).filter(a => a.el);
     let vergrendeldTot = 0;

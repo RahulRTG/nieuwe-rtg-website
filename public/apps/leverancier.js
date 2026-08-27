@@ -6861,7 +6861,6 @@
   const mNaam = x => MENU_VERTAAL.map[x.id] || x.name;
   function luchtPct(){ const st = state.settings || {}; return st.luchtzijde ? (Number.isFinite(Number(st.luchtToeslagPct)) ? Math.round(Number(st.luchtToeslagPct)) : 15) : 0; }
   function luchtPrijs(p){ const pct = luchtPct(); return pct ? Math.round(p * (1 + pct / 100) * 100) / 100 : p; }
-  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
 /* HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw.
 
    Dit is de tweede helft van ./leverancier-61.js. Dat bestand ging over de
@@ -6880,6 +6879,8 @@
    `vraagPayCode` HAALT de code op (tap to pay, scannen, typen) en
    `payCodeMetKaart` laat er eerst het bedoelingsscherm overheen gaan. De vier
    kassa-ingangen roepen de tweede aan; de eerste is alleen voor de tweede. */
+
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
      niet of tikt er niemand, dan komt het typvenster vanzelf.
@@ -9435,6 +9436,14 @@
     bindEtenWerkblad(el);
   }
 
+/* HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf.
+
+   Tweede helft van ./leverancier-84.js: daar staat wat het werkblad TOONT,
+   hier wat er gebeurt als iemand erop drukt -- de rollen, de filters, het
+   zoekveld en het laden. De knip loopt waar het onderwerp wisselt en
+   verplaatst niets: dit bestand begint gewoon midden in de app-functie,
+   want de delen van een bundel worden achter elkaar geplakt
+   (scripts/bundel.js). */
   function bindEtenWerkblad(el){
     el.querySelectorAll('[data-eten-rol]').forEach(b => b.addEventListener('click', () => { etenRol=b.dataset.etenRol; try{localStorage.setItem('rtg_eten_rol',etenRol);}catch(e){} laadEtenWerkblad(true); }));
     el.querySelectorAll('[data-eten-filter]').forEach(b => b.addEventListener('click', () => { const f=b.dataset.etenFilter; etenFilters=etenFilters.includes(f)?etenFilters.filter(x=>x!==f):etenFilters.concat(f); laadEtenWerkblad(true); }));

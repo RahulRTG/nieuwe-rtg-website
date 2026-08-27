@@ -1,4 +1,3 @@
-  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
 /* HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw.
 
    Dit is de tweede helft van ./leverancier-61.js. Dat bestand ging over de
@@ -17,6 +16,8 @@
    `vraagPayCode` HAALT de code op (tap to pay, scannen, typen) en
    `payCodeMetKaart` laat er eerst het bedoelingsscherm overheen gaan. De vier
    kassa-ingangen roepen de tweede aan; de eerste is alleen voor de tweede. */
+
+  function methodLabel(m){ return m==='rtgpay'?'RTG Pay':m==='pin'?T('pos.pin','PIN'):m==='contant'?T('pos.cash','Contant'):m==='rtg'?T('pos.rtg','RTG-code'):m==='kamer'?T('pos.room','Op de kamer'):m==='tafel'?T('pos.table','Op de tafel'):m==='app'?T('pos.app','In de app'):m; }
   /* RTG Pay aan de kassa: tap to pay als het kan (de gast houdt zijn toestel
      hiertegen), met altijd de uitweg om de code te typen; werkt de NFC-chip
      niet of tikt er niemand, dan komt het typvenster vanzelf.

@@ -1,3 +1,11 @@
+/* HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf.
+
+   Tweede helft van ./leverancier-84.js: daar staat wat het werkblad TOONT,
+   hier wat er gebeurt als iemand erop drukt -- de rollen, de filters, het
+   zoekveld en het laden. De knip loopt waar het onderwerp wisselt en
+   verplaatst niets: dit bestand begint gewoon midden in de app-functie,
+   want de delen van een bundel worden achter elkaar geplakt
+   (scripts/bundel.js). */
   function bindEtenWerkblad(el){
     el.querySelectorAll('[data-eten-rol]').forEach(b => b.addEventListener('click', () => { etenRol=b.dataset.etenRol; try{localStorage.setItem('rtg_eten_rol',etenRol);}catch(e){} laadEtenWerkblad(true); }));
     el.querySelectorAll('[data-eten-filter]').forEach(b => b.addEventListener('click', () => { const f=b.dataset.etenFilter; etenFilters=etenFilters.includes(f)?etenFilters.filter(x=>x!==f):etenFilters.concat(f); laadEtenWerkblad(true); }));

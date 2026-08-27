@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 448 delen, 3 zonder onderwerp.**
+**58 bundels, 448 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -202,7 +202,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 111 delen, 9542 regels in de delen, waarvan 2 zonder onderwerp
+`public/apps/leverancier/` -- 111 delen, 9551 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -290,7 +290,7 @@ omlaag.
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
 | `leverancier-61.js` | Een gerecht met ingrediënten, dieetlabels en keuzes aan de menukaart toevoegen |
-| `leverancier-61a.js` | -- |
+| `leverancier-61a.js` | HOE EEN BETAALCODE VAN EEN GAST BINNENKOMT, en daarna de kassa-opbouw |
 | `leverancier-62.js` | de shift-samenvatting: het avondbriefingmoment |
 | `leverancier-63.js` | afrekenen, of op de kamer laten schrijven |
 | `leverancier-64.js` | de bon van de kassa naar een bestelling |
@@ -316,7 +316,7 @@ omlaag.
 | `leverancier-82.js` | het alarmvenster |
 | `leverancier-83.js` | de recepten en hun marges |
 | `leverancier-84.js` | de meldingenlijst van de zaak |
-| `leverancier-84a.js` | -- |
+| `leverancier-84a.js` | HET ETEN-WERKBLAD AAN ZIJN KNOPPEN, en de rest van het werkblad zelf |
 
 ## `apps/meldkamer.js`
 
@@ -842,7 +842,7 @@ omlaag.
 
 ## `shared/werkos.js`
 
-`public/shared/werkos/` -- 7 delen, 676 regels in de delen, waarvan 1 zonder onderwerp
+`public/shared/werkos/` -- 7 delen, 683 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -852,7 +852,7 @@ omlaag.
 | `werkos-01c.js` | Beweging bevestigt alleen een wissel van werkvlak |
 | `werkos-02.js` | Command Center |
 | `werkos-03.js` | bouwen en spiegelen |
-| `werkos-04.js` | -- |
+| `werkos-04.js` | DE BORDSCHIL: het vlak dat over de app komt met de werkvlakken erin |
 
 ## `shared/zaakcommand.js`
 

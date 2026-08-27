@@ -61,6 +61,7 @@
   .rij h3{font-size:1rem;}
   .rij .meta{font-size:.76rem;color:var(--soft);margin-top:.2rem;}
   .rij .acties{margin-top:.6rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .retourvorm input,.retourvorm select{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:.38rem .6rem;font:inherit;font-size:.8rem;}
   .chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;}
   .chip{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--line);border-radius:99px;color:var(--muted);}
   .chip.aan{border-color:var(--gold);color:var(--gold);}
@@ -231,7 +232,12 @@ async function tekenEtalage(code){
       '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
       '<div class="meta">'+esc(k.typeLabel||k.type)+(k.prijs&&k.prijs.bedrag!=null ? ' · '+esc(new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(k.prijs.bedrag))+(k.prijs.eenheid?' '+esc(k.prijs.eenheid):'') : '')+'</div>'+
       chips(k)+
-      '<div class="acties"><button class="knop" data-in="'+esc(k.id)+'">In de mand</button></div></div>').join('')
+      '<div class="acties"><button class="knop" data-in="'+esc(k.id)+'">In de mand</button>'+
+      /* Terugsturen kan alleen wat de verkoper heeft ingericht. Geen grijze knop
+         bij de rest: een knop die nooit van jou is, hoort er niet te staan. */
+      ((k.werkwoorden||[]).includes('retour')
+        ? '<button class="knop" data-retour="'+esc(k.id)+'">Terugsturen</button>' : '')+
+      '</div><div class="retourvorm" hidden></div></div>').join('')
       : '<p class="leeg">Bij deze verkoper staat nu niets te koop.</p>';
 
     h += '<h3 style="font-size:.95rem;margin:1.6rem 0 .7rem;">Staat er niet bij <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+niet.length+'</span></h3>';
@@ -246,6 +252,7 @@ async function tekenEtalage(code){
     }).join('') : '<p class="leeg">Alles van deze verkoper staat te koop.</p>';
     el.innerHTML = h;
     el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in')));
+    el.querySelectorAll('[data-retour]').forEach(b => b.onclick = () => retourVorm(b, b.getAttribute('data-retour')));
   } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
 }
 
@@ -295,6 +302,57 @@ function toonMand(m){
   el.innerHTML = h;
 }
 
+/* HET AANVRAAGFORMULIER. Drie dingen worden gevraagd en geen vierde: welke
+   bestelling (het kenmerk dat de verkoper gaf -- RTG kan dat niet nakijken en
+   doet niet alsof), waarom (een keuze uit de lijst, geen vrij tekstveld), en wat
+   het kostte. Een toelichting mag erbij en is niet verplicht.
+
+   DE GRONDEN KOMEN VAN DE SERVER en staan niet hier: een tweede lijst in het
+   scherm loopt binnen een maand uiteen met kern/commerce/retourlijst.js. */
+const GRONDEN = [
+  ['bedenktijd', 'Op andere gedachten'],
+  ['niet-zoals-beschreven', 'Niet zoals beschreven'],
+  ['defect', 'Kapot of werkt niet'],
+  ['beschadigd-aangekomen', 'Beschadigd aangekomen'],
+  ['verkeerd-geleverd', 'Verkeerd geleverd'],
+  ['te-laat', 'Te laat gekomen']
+];
+/* ER ZIT GEEN KOOPBAAR-ID IN EEN SELECTOR, en dat is geen stijl maar een bug
+   die hier zat. Een koopbaar-id komt uit een domein en ziet eruit als
+   `artikel:MAISON:d4af0347`. Als DOM-id mag dat, maar elke querySelector erop
+   klapt eruit -- `#rq-ref-artikel:MAISON:...` is geen geldige selector, en
+   CSS.escape helpt niet in een quoted attribuutselector (die voegt backslashes
+   toe die juist niet matchen).
+
+   Daarom wordt er niets opgezocht op id: de knop geeft zijn eigen blok mee, en
+   de velden worden BINNEN dat blok gevonden op een data-attribuut. Dan maakt het
+   niet uit wat een domein in zijn id's zet. */
+function retourVorm(knop, id){
+  const rij = knop.closest('.rij');
+  const el = rij && rij.querySelector('.retourvorm');
+  if (!el) return;
+  if (!el.hidden) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML =
+    '<div class="acties"><input placeholder="Bestelkenmerk van de verkoper" data-veld="ref" style="min-width:13rem;">' +
+    '<select data-veld="grond">' + GRONDEN.map(g => '<option value="'+g[0]+'">'+esc(g[1])+'</option>').join('') + '</select>' +
+    '<input placeholder="Bedrag in euro" data-veld="bedrag" style="width:8rem;">' +
+    '<button class="knop" data-veld="doe">Aanvragen</button></div>' +
+    '<input placeholder="Toelichting (mag leeg)" data-veld="tel" style="width:100%;margin-top:.4rem;">';
+  el.querySelector('[data-veld="doe"]').onclick = async () => {
+    const v = (w) => { const e = el.querySelector('[data-veld="'+w+'"]'); return e ? e.value : ''; };
+    const euro = v('bedrag');
+    try {
+      await api('/api/commerce/retour/vraag', { koopbaarId: id, orderRef: v('ref'), grond: v('grond'),
+        toelichting: v('tel'),
+        /* Euro's op het scherm, centen naar de server. */
+        centen: euro ? Math.round(Number(String(euro).replace(',', '.')) * 100) : 0 });
+      el.hidden = true; el.innerHTML = '';
+      meld('Aangevraagd.'); tekenRetouren();
+    } catch (e) { meld(e.message); }
+  };
+}
+
 /* DE WEG TERUG. Het lid ziet zijn aanvragen en kan er precies EEN stand zetten:
    "verstuurd". Aanvaarden, beoordelen en afhandelen zijn handelingen van de
    verkoper; die knoppen staan hier niet, ook niet grijs -- een knop die nooit
@@ -310,8 +368,8 @@ async function tekenRetouren(){
     const r = await api('/api/commerce/retour/mijn', {});
     const lijst = r.retouren || [];
     if (!lijst.length) {
-      el.innerHTML = '<p class="leeg">Je hebt niets teruggestuurd. Wat terug kan, herken je aan de chip RETOUR hierboven; ' +
-        'de aanvraag vraagt om het bestelkenmerk dat je van de verkoper kreeg.</p>';
+      el.innerHTML = '<p class="leeg">Je hebt niets teruggestuurd. Bij een aanbod dat terug kan, staat hierboven de knop Terugsturen; ' +
+        'die vraagt om het bestelkenmerk dat je van de verkoper kreeg.</p>';
       return;
     }
     el.innerHTML = lijst.map(x => {

@@ -33,7 +33,10 @@ module.exports = (ctx) => {
   /* Eén gedeelde context die per laag wordt aangevuld. Zo leest elke deellaag
      wat de vorige heeft neergezet, zonder dat er een tweede kopie van een
      leesfunctie ontstaat. */
-  const k = { db, save, crypto, schoon, findSupplier, vandaag: ctx.vandaag };
+  /* DE ENIGE PLEK WAAR CONCERN db AANRAAKT. Vanaf hier krijgt elke deellaag
+     het contract mee in plaats van de database -- zie ./opslag.js. */
+  const opslag = require('./opslag')({ db });
+  const k = { db, save, crypto, schoon, findSupplier, vandaag: ctx.vandaag, opslag };
 
   Object.assign(k, require('./tijd')(k));
   Object.assign(k, require('./entiteit')(k));

@@ -28,6 +28,7 @@
 const I = require('./muziek-instrumenten');
 
 module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/muziek', bezit: { muziek: 'lijst' } });
   const nu = () => new Date().toISOString();
   const rid = () => 'm' + crypto.randomBytes(5).toString('hex');
   const getal = (v, min, max, terug) => {
@@ -36,8 +37,7 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
   };
 
   function T() {
-    if (!Array.isArray(db.data.muziek)) db.data.muziek = [];
-    return db.data.muziek;
+    return eigen.bak('muziek');
   }
   const trackMet = (id) => T().find(t => t.id === String(id || '')) || null;
 
@@ -166,7 +166,7 @@ module.exports = ({ db, save, crypto, schoon, magBij, stempel }) => {
   function weg(key, id) {
     const t = trackMet(id);
     if (!t || t.key !== key) return { status: 404, error: 'Dit stuk bestaat niet.' };
-    db.data.muziek = T().filter(x => x.id !== t.id);
+    eigen.zetBak('muziek', T().filter(x => x.id !== t.id));
     save();
     return { status: 200, ok: true };
   }

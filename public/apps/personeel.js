@@ -69,7 +69,7 @@
   let toastTimer;
   function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3000); }
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min'); const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur'); return Math.round(h/24)+T('t.days',' dg'); }
-  function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function esc(x){ return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   /* Welke eigen tabs deze zaak aanzet, bepaalt de server: kern/pda/modules.js.
      Stond hier als caps.includes(..) per tab; dan weten twee plekken hetzelfde. */

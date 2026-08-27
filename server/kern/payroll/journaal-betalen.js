@@ -25,7 +25,7 @@ const valuta = require('./valuta');
 
 const IBAN_VORM = /^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/;
 
-module.exports = ({ db, save, tijd, crypto, boeking, bestandenVan, tegenrekeningNetto }) => {
+module.exports = ({ opslag, save, tijd, crypto, boeking, bestandenVan, tegenrekeningNetto }) => {
 
   /* ---------- het betaalbestand ---------- */
 /* Een SEPA-overboeking per medewerker. Geen XML hier: dat is een vorm, en de
@@ -118,7 +118,7 @@ function betaalbestand(run, rekeningen) {
     terugtevorderenCenten: terug ? Math.abs(terug) : 0,
     terugtevorderen: run.stroken.filter(x => x.strook.nettoCenten < 0)
       .map(x => ({ staffId: x.staffId, naam: x.naam, centen: Math.abs(x.strook.nettoCenten) })) };
-  const rij = (db.data.payrollBetaalbestanden = db.data.payrollBetaalbestanden || []);
+  const rij = opslag.bak('payrollBetaalbestanden');
   rij.unshift(best);
   if (rij.length > 500) rij.length = 500;
   save();

@@ -90,10 +90,8 @@ module.exports = (ctx) => {
      nu toevallig niets op, maar "levert toevallig niets op" is geen grens. De
      zaken-graaf geeft daarom zijn eigen lezer mee, en dan KAN hij niet in een
      ledendossier kijken -- ook niet als een code ooit op een sleutel lijkt. */
-  const dossierVan = typeof ctx.dossier === 'function' ? ctx.dossier : (key) => {
-    const alle = db.data && db.data.lifestyle;
-    return (alle && alle[key]) || {};
-  };
+  const levens = require('../levensdossier')({ db }).voor('levensgraaf');   // lees() maakt niets aan
+  const dossierVan = typeof ctx.dossier === 'function' ? ctx.dossier : (key) => levens.lees(key);
 
   /* De hele graaf van een lid: elke bron levert zijn knopen, wij plakken ze aan
      elkaar en leiden de kanten af uit `ouder`. Kanten zijn dus geen apart

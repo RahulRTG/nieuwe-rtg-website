@@ -23,13 +23,13 @@
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, codenaamVan, notify,
     reisPlan, opdrachtMaak, opdrachtMet, opdrachtAnnuleer, opdrachtBeeld,
-    kaartKoop, kaartMet, kaartBeeld } = ctx;
+    kaartKoop, kaartMet, kaartBeeld, opslag } = ctx;
 
   function ensureReizen() {
-    if (!Array.isArray(db.data.mobReizen)) db.data.mobReizen = [];
+    opslag.bak('mobReizen');
   }
-  const reisMet = rid => { ensureReizen(); return db.data.mobReizen.find(r => r.id === rid) || null; };
-  const reizenVan = key => { ensureReizen(); return db.data.mobReizen.filter(r => r.key === key); };
+  const reisMet = rid => { ensureReizen(); return opslag.bak('mobReizen').find(r => r.id === rid) || null; };
+  const reizenVan = key => { ensureReizen(); return opslag.bak('mobReizen').filter(r => r.key === key); };
 
   /* Een reis boeken. `body` draagt dezelfde velden als de planner plus de id
      van de gekozen optie. */
@@ -100,7 +100,7 @@ module.exports = (ctx) => {
     r.etappes.sort((a, b) => keuze.etappes.findIndex(x => x.wijze === a.wijze && (x.lijnId || '') === (a.lijnId || '')) -
       keuze.etappes.findIndex(x => x.wijze === b.wijze && (x.lijnId || '') === (b.lijnId || '')));
 
-    db.data.mobReizen.unshift(r);
+    opslag.bak('mobReizen').unshift(r);
     save();
     notify(session.key, { icon: 'ov', title: 'RTG Vervoer',
       body: 'Uw reis naar ' + (plan.naar.label || 'de bestemming') + ' staat klaar.', scope: 'mobiliteit' });

@@ -31,14 +31,11 @@
    niets nieuws is (zie `ongewijzigd` in regelpakket.neemOp). */
 const RONDE_MS = 24 * 60 * 60 * 1000;
 
-function maakBijwerken({ regelpakket, db, save, nu, log, dekking, fetchImpl }) {
+function maakBijwerken({ regelpakket, opslag, save, nu, log, dekking, fetchImpl }) {
   const tijd = nu || (() => new Date().toISOString());
   const meld = log || (() => {});
 
-  function journaal() {
-    if (!Array.isArray(db.data.payrollRegelJournaal)) db.data.payrollRegelJournaal = [];
-    return db.data.payrollRegelJournaal;
-  }
+  const journaal = () => opslag.bak('payrollRegelJournaal');
   /* Elke ronde komt in het journaal, ook een die niets vond. "Er is al drie
      maanden niets binnengekomen" is namelijk zelf een bevinding: het betekent
      of dat er niets veranderde, of dat de bron stuk is, en zonder journaal zie

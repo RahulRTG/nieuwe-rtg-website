@@ -30,8 +30,8 @@ const MAX = 5000;
    Dit is geen tweede journaal: het is dezelfde module, één keer per eigenaar.
    De waarheid "wat is er in zaak X gebeurd" staat daarmee op precies één
    plek -- wat LAT.md regel 4 vraagt. */
-function maakJournaal({ db, save, crypto, vak }) {
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+function maakJournaal({ db, save, crypto, vak, opslag }) {
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   function lijst() {
     const v = V();
     if (!Array.isArray(v.commandJournaal)) v.commandJournaal = [];

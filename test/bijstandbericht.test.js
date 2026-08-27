@@ -39,6 +39,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 function opstelling() {
   const db = { data: {
@@ -55,7 +56,7 @@ function opstelling() {
   const tenant = { register: { haal: () => ({ org: 'O-HOSHI', naam: 'Hoshi', werkruimtes: ['WMIJN'] }),
     lijst: () => [{ org: 'O-HOSHI', naam: 'Hoshi', werkruimtes: ['WMIJN'] }] } };
   const b = require('../server/kern/command/bijstand').maakBijstand({
-    db, save: () => {}, crypto, journaal, tenant: () => tenant,
+    db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto, journaal, tenant: () => tenant,
     diagnose: { voor: () => ({ stand: {}, nooit: [], watIkKeek: 'de stand' }) } });
   return { db, journaal, b };
 }

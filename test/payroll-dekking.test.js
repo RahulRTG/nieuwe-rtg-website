@@ -25,6 +25,7 @@ const assert = require('node:assert/strict');
 const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
 const { maakDekking } = require('../server/kern/payroll/dekking');
 const { maakBijwerken } = require('../server/kern/payroll/bijwerken');
+const maakOpslag = require('../server/kern/payroll/opslag');
 const { LANDEN } = require('../server/kern/fiscaal/landen');
 
 const pakket = (land, versie, over) => Object.assign({
@@ -41,9 +42,9 @@ function opzet(zaken) {
   ] } };
   const save = () => {};
   const nu = () => '2026-03-01T00:00:00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
   const accounts = { countStaff: (code) => ({ MERIDIAAN: 5, KIKUNOI: 12, PONTO: 3 })[code] || 0 };
-  const dekking = maakDekking({ db, save, nu, regelpakket, LANDEN, accounts });
+  const dekking = maakDekking({ opslag: maakOpslag({ db }), save, nu, regelpakket, LANDEN, accounts });
   return { db, regelpakket, dekking, nu, save };
 }
 
@@ -146,7 +147,7 @@ test('de bijwerkronde pakt een bron op die via het scherm is toegevoegd', async 
     gevraagd = url;
     return { ok: true, json: async () => pakket('ES', 'es-2026.1') };
   };
-  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, db: k.db, save: k.save,
+  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, opslag: maakOpslag({ db: k.db }), save: k.save,
     nu: k.nu, dekking: k.dekking, fetchImpl: nep });
 
   const uitslag = await bijwerken.ronde();
@@ -171,7 +172,7 @@ test('een bron die stukgaat zet de andere niet stil, en zijn fout blijft staan',
     if (url.includes('stuk')) throw new Error('bron gaf status 503');
     return { ok: true, json: async () => pakket('NL', 'nl-2026.1') };
   };
-  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, db: k.db, save: k.save,
+  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, opslag: maakOpslag({ db: k.db }), save: k.save,
     nu: k.nu, dekking: k.dekking, fetchImpl: nep });
 
   const uitslag = await bijwerken.ronde();
@@ -196,10 +197,10 @@ test('de ronde kijkt vooruit naar wat afloopt', async () => {
      bestaat -- de ronde kijkt bewust met de klok van de dekking vooruit en niet
      met een datum die hij zelf meestuurt. */
   const nov = () => '2026-11-15T00:00:00.000Z';
-  const dekkingNov = maakDekking({ db: k.db, save: k.save, nu: nov,
+  const dekkingNov = maakDekking({ opslag: maakOpslag({ db: k.db }), save: k.save, nu: nov,
     regelpakket: k.regelpakket, LANDEN, accounts: { countStaff: () => 5 } });
   const gemeld = [];
-  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, db: k.db, save: k.save,
+  const bijwerken = maakBijwerken({ regelpakket: k.regelpakket, opslag: maakOpslag({ db: k.db }), save: k.save,
     nu: nov, dekking: dekkingNov, log: (t) => gemeld.push(t) });
   const uitslag = await bijwerken.ronde();
   assert.equal(uitslag.verloopt.length, 1, 'de ronde die tarieven haalt, kijkt meteen vooruit');

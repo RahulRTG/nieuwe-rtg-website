@@ -55,6 +55,7 @@ const crypto = require('crypto');
 const { maakBijstand } = require('../server/kern/command/bijstand');
 const { maakRtgkant } = require('../server/kern/command/bijstand-rtg');
 const { maakDiagnose } = require('../server/kern/command/bijstand-diagnose');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const ORG = 'HOSHI';
 const TENANT = {
@@ -79,7 +80,7 @@ function opstelling() {
   const db = { data: {} };
   const regels = [];
   const diagnose = maakDiagnose({ tenant: TENANT, gezondheid: GEZOND, incident: INCIDENT });
-  const b = maakBijstand({ db, save() {}, crypto,
+  const b = maakBijstand({ db, opslag: maakCmdOpslag({ db }), save() {}, crypto,
     journaal: { noteer: (r) => regels.push(r) }, tenant: TENANT, diagnose });
   return { db, regels, b, diagnose };
 }

@@ -26,9 +26,9 @@ const { niveauVan } = require('./zorgniveau');
 const { GRENS, dag, momentenVan, voorraadVan, waarschuwing } = require('./medicatie-regels');
 
 module.exports = ({ db, save, schoon, crypto }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/medicatie', bezit: { medicatie: 'kaart' } });
   const bak = () => {
-    if (!db.data.medicatie) db.data.medicatie = {};
-    return db.data.medicatie;
+    return eigen.bak('medicatie');
   };
   const mijn = key => {
     const b = bak();

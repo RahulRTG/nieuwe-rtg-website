@@ -33,27 +33,26 @@ const STATEN = ['uitstekend', 'goed', 'redelijk', 'restauratie nodig'];
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum, getal } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   function stukken(key) {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return (l.bezittingen || []).filter(b => SOORTEN.has(b.soort));
+    /* VREEMDE SECTIE: `bezittingen` is van kern/lifestyle. */
+    return levens.leesVeld(key, 'bezittingen').filter(b => SOORTEN.has(b.soort));
   }
   function C(key, bezitId, maak) {
     if (!stukken(key).some(b => b.id === bezitId)) return null;
-    const l = db.data.lifestyle[key];
-    if (!l.collectie || typeof l.collectie !== 'object') l.collectie = {};
-    if (!l.collectie[bezitId]) {
+    const co = levens.veld(key, 'collectie');
+    if (!co[bezitId]) {
       if (!maak) return { herkomst: [], taxaties: [], bruikleen: [], conditie: {}, standplaats: {} };
-      l.collectie[bezitId] = { herkomst: [], taxaties: [], bruikleen: [], conditie: {}, standplaats: {} };
+      co[bezitId] = { herkomst: [], taxaties: [], bruikleen: [], conditie: {}, standplaats: {} };
     }
-    const d = l.collectie[bezitId];
+    const d = co[bezitId];
     for (const v of ['herkomst', 'taxaties', 'bruikleen']) if (!Array.isArray(d[v])) d[v] = [];
     for (const v of ['conditie', 'standplaats']) if (!d[v] || typeof d[v] !== 'object') d[v] = {};
     return d;
   }
   const dossierVan = (key, id) => {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return (l.collectie || {})[id] || { herkomst: [], taxaties: [], bruikleen: [], conditie: {}, standplaats: {} };
+    return levens.leesVeld(key, 'collectie')[id] || { herkomst: [], taxaties: [], bruikleen: [], conditie: {}, standplaats: {} };
   };
   const geenStuk = { status: 404, error: 'Dit stuk staat niet als kunst, horloge of sieraad in uw register.' };
 

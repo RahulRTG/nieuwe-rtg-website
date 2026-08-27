@@ -39,9 +39,9 @@ const STANDAARD_MS = 60 * 60 * 1000;   // een uur
 const MAX_MS = 24 * 60 * 60 * 1000;    // niets houdt geld langer dan een dag vast
 
 function maakReserve({ db, save, crypto, nu = klokNu }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/waarde/reserve', bezit: { waardeReserves: 'lijst' } });
   function bak() {
-    if (!Array.isArray(db.data.waardeReserves)) db.data.waardeReserves = [];
-    return db.data.waardeReserves;
+    return eigen.bak('waardeReserves');
   }
   const geldig = r => r.status === 'open' && r.tot > nu();
 

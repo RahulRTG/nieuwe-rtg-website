@@ -25,20 +25,21 @@ const { maakRun } = require('../server/kern/payroll/run');
 const { maakJournaal } = require('../server/kern/payroll/journaal');
 const { maakVerzuim } = require('../server/kern/payroll/verzuim');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 function opzet() {
   const db = { data: {} };
   const save = () => {};
   const nu = () => '2026-08-06T12:00:00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp({ land: 'NL', versie: 'nl-2026.1', geldigVan: '2026-01-01', geldigTot: '2026-12-31',
     regels: { minimumUurloon: { '21+': 1499 }, loonheffing: { tarief: 0.37 },
       premies: { tarief: 0.20 }, zvw: 0.0657, vakantiegeld: 0.08 } }, { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
-  const verzuim = maakVerzuim({ db, save, nu });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
+  const verzuim = maakVerzuim({ opslag: maakOpslag({ db }), save, nu });
   return { db, regelpakket, componenten, run, journaal, verzuim };
 }
 

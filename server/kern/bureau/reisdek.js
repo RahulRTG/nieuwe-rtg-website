@@ -36,10 +36,11 @@ const VERGETEN = ['gezocht', 'gevonden', 'onderweg', 'terug', 'opgegeven'];
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum, getal } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   const reizenVan = key => {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return Array.isArray(l.reizen) ? l.reizen : [];
+    /* VREEMDE SECTIE: `reizen` is van kern/rechterhand. */
+    return levens.leesVeld(key, 'reizen');
   };
   function reis(key, reisId, maak) {
     const r = reizenVan(key).find(x => x.id === reisId);

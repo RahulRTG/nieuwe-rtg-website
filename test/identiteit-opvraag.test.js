@@ -19,6 +19,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakIdentiteit } = require('../server/kern/payroll/identiteit');
+const maakOpslag = require('../server/kern/payroll/opslag');
 /* HET ECHTE INZAGEJOURNAAL en niet een dubbel. Hier stond `{ noteer: (r) =>
    journaal.push(r) }`, en dat slikte elk object -- ook een met sleutels die het
    echte inzagelog niet leest. Dat is precies wat er gebeurde: de aanroep zette
@@ -40,7 +41,7 @@ function opzet(over) {
   };
   inzagelog.zet(db, () => {});
   const ident = maakIdentiteit(Object.assign({
-    accounts, db, save: () => {}, nu: () => '2026-08-06T12:00:00.000Z',
+    accounts, opslag: maakOpslag({ db }), save: () => {}, nu: () => '2026-08-06T12:00:00.000Z',
     inzagelog,
     notify: (key, m) => berichten.push({ key, m }),
     logActivity: () => {}

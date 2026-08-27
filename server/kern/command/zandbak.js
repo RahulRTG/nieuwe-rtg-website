@@ -29,10 +29,9 @@ const MAX_ZANDBAKKEN = 10;
 const STANDAARD_DAGEN = 7;
 const DAG = 86400000;
 
-function maakZandbak({ db, save, crypto, zaai, register, catalogus }) {
+function maakZandbak({ db, opslag, save, crypto, zaai, register, catalogus }) {
   function alle() {
-    if (!db.data.zandbakken || typeof db.data.zandbakken !== 'object') db.data.zandbakken = {};
-    return db.data.zandbakken;
+    return opslag.bak('zandbakken');
   }
 
   const schoon = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').slice(0, 40);
@@ -129,11 +128,11 @@ function maakZandbak({ db, save, crypto, zaai, register, catalogus }) {
     const venster = { data: z.data };
     const vak = () => { z.eigen = z.eigen || {}; return z.eigen; };
 
-    const journaal = require('./journaal').maakJournaal({ db, save, crypto, vak });
-    const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, vak });
+    const journaal = require('./journaal').maakJournaal({ db, save, crypto, vak, opslag });
+    const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal, vak, opslag });
     const risico = require('./risico').maakRisico({ beleid });
     const runbooks = require('./runbooks').maakRunbooks({
-      db: venster, save, crypto, journaal, risico, beleid, register, catalogus, vak });
+      db: venster, save, crypto, journaal, risico, beleid, register, catalogus, vak, opslag });
     const kwaliteit = require('./kwaliteit').maakKwaliteit({ db: venster, register });
     const zoeklaag = require('./zoek');
     const objectlaag = require('./object');

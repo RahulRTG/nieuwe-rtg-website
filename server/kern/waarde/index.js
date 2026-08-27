@@ -65,6 +65,7 @@ function klasseVan(rek) {
    pay.koppelPlafond dat doet. Zonder koppeling blijft het getal uit de tabel
    staan, dus een losse waardelaag gedraagt zich exact als voorheen. */
 function maakWaarde({ db, save, crypto, nu = klokNu }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/waarde', bezit: { waardePosities: 'kaart' } });
   let walletPlafondBron = null;
   const koppelWalletPlafond = (fn) => { walletPlafondBron = typeof fn === 'function' ? fn : null; };
   const reserve = maakReserve({ db, save, crypto, nu });
@@ -75,8 +76,7 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
   const oormerk = require('./oormerk').maakOormerk({ db, save, crypto, nu });
 
   function posities() {
-    if (!db.data.waardePosities || typeof db.data.waardePosities !== 'object') db.data.waardePosities = {};
-    return db.data.waardePosities;
+    return eigen.bak('waardePosities');
   }
 
   /* De positie van een rekening. Staat er niets geregistreerd, dan volgt de

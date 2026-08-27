@@ -47,14 +47,11 @@ function keur(v) {
   return bez;
 }
 
-function maakContracten({ db, save, nu }) {
+function maakContracten({ opslag, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
   const sleutel = (code, staffId, nr) => String(code).toUpperCase() + ':' + staffId + ':' + (nr || 1);
 
-  function bak() {
-    if (!db.data.payrollContracten || typeof db.data.payrollContracten !== 'object') db.data.payrollContracten = {};
-    return db.data.payrollContracten;
-  }
+  const bak = () => opslag.bak('payrollContracten');
   const versiesVan = (code, staffId, nr) => {
     const b = bak(); const k = sleutel(code, staffId, nr);
     if (!Array.isArray(b[k])) b[k] = [];

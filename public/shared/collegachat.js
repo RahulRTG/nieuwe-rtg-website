@@ -11,7 +11,7 @@
   let API = null, T = (k, nl) => nl, toast = () => {}, mij = () => null;
   let openMet = null; // { staffId, naam } zolang het paneel open staat
 
-  function esc(x){ return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   function stijl(){
     if (document.getElementById('ccStijl')) return;
     const s = document.createElement('style');

@@ -35,12 +35,11 @@ const KOPPELING_UIT = {
 
 module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, findSupplier, logActivity,
-    dienstenVan, dienstBeeld, rittenVan, opdrachtMet } = ctx;
+    dienstenVan, dienstBeeld, rittenVan, opdrachtMet, opslag } = ctx;
 
   function ensureExport() {
-    if (!Array.isArray(db.data.mobCdtExports)) db.data.mobCdtExports = [];
-    if (!db.data.mobCdtDienstverlener || typeof db.data.mobCdtDienstverlener !== 'object')
-      db.data.mobCdtDienstverlener = {};
+    opslag.bak('mobCdtExports');
+    opslag.bak('mobCdtDienstverlener');
   }
 
   /* De ICT-dienstverlener die deze onderneming gebruikt. Wij controleren zijn
@@ -51,21 +50,21 @@ module.exports = (ctx) => {
     ensureExport();
     const naam = schoon(body.naam, 80);
     if (body.weg) {
-      delete db.data.mobCdtDienstverlener[supplier.code];
+      delete opslag.bak('mobCdtDienstverlener')[supplier.code];
       save();
       return { ok: true, dienstverlener: null };
     }
     if (!naam) return { status: 400, error: 'Noteer de naam van de ICT-dienstverlener.' };
     const d = { naam, registratie: schoon(body.registratie, 60) || null,
       vastgelegdDoor: schoon(actor, 60) || 'onderneming', vastgelegd: nu() };
-    db.data.mobCdtDienstverlener[supplier.code] = d;
+    opslag.bak('mobCdtDienstverlener')[supplier.code] = d;
     save();
     return { ok: true, dienstverlener: d, let: 'RTG controleert deze registratie niet; u blijft zelf verantwoordelijk voor de aanlevering.' };
   }
 
   const dienstverlenerVan = code => {
     ensureExport();
-    return db.data.mobCdtDienstverlener[code] || null;
+    return opslag.bak('mobCdtDienstverlener')[code] || null;
   };
 
   /* Een vaste ordening voor de vingerafdruk: sleutels gesorteerd, zodat
@@ -118,7 +117,7 @@ module.exports = (ctx) => {
 
     const e = { id: id('ex'), vervoerder: supplier.code, van, tot, gemaakt: nu(),
       hash: vingerafdruk(inhoud), aantallen: inhoud.aantallen, overdrachten: [] };
-    db.data.mobCdtExports.push(e);
+    opslag.bak('mobCdtExports').push(e);
     save();
     return { ok: true, export: exportBeeld(e), inhoud, koppeling: koppelingStand(supplier.code) };
   }
@@ -134,7 +133,7 @@ module.exports = (ctx) => {
      er met zoveel woorden bij. */
   function cdtOverdracht(supplier, actor, body = {}) {
     ensureExport();
-    const e = db.data.mobCdtExports.find(x => x.id === schoon(body.id, 40) && x.vervoerder === supplier.code);
+    const e = opslag.bak('mobCdtExports').find(x => x.id === schoon(body.id, 40) && x.vervoerder === supplier.code);
     if (!e) return { status: 404, error: 'Export niet gevonden.' };
     const dv = dienstverlenerVan(supplier.code);
     const naam = schoon(body.dienstverlener, 80) || (dv && dv.naam);
@@ -151,7 +150,7 @@ module.exports = (ctx) => {
 
   const cdtExportLijst = supplier => {
     ensureExport();
-    return { ok: true, exports: db.data.mobCdtExports.filter(e => e.vervoerder === supplier.code)
+    return { ok: true, exports: opslag.bak('mobCdtExports').filter(e => e.vervoerder === supplier.code)
       .slice(-30).reverse().map(exportBeeld), koppeling: koppelingStand(supplier.code) };
   };
 

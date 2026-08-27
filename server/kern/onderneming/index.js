@@ -33,6 +33,7 @@ const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
 module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi, codenaamVan, tierVan, keyVanCodenaam, lidstandVan }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/onderneming', bezit: { ondernemingen: 'lijst' } });
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -44,8 +45,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort, staffLijst, anthropic, magAi });
 
   const bak = () => {
-    if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
-    return db.data.ondernemingen;
+    return eigen.bak('ondernemingen');
   };
   const nu = () => new Date().toISOString();
   const scho = (v, n) => schoon(v, n);

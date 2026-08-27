@@ -22,7 +22,7 @@
    kunt. */
 'use strict';
 
-function maakCorrectie({ db, save, nu, crypto, motor, regelpakket, componenten, vind, bak, kort, stempel }) {
+function maakCorrectie({ save, nu, crypto, motor, regelpakket, componenten, vind, bak, kort, stempel }) {
   const tijd = nu || (() => new Date().toISOString());
   const id = () => 'run_' + crypto.randomBytes(5).toString('hex');
 

@@ -30,13 +30,13 @@ const AANWEZIG_MS = 2 * 60 * 1000;     // wie zich twee minuten niet meldt, is w
 const MAX_KAMERS = 200;
 
 module.exports = ({ db, save, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden, sseToCustomer }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mediaos/samen', bezit: { mediaKamers: 'kaart' } });
   const nuMs = () => Date.now();
   const nu = () => new Date().toISOString();
   const id = () => 'mk' + crypto.randomBytes(4).toString('hex');
 
   function tabel() {
-    if (!db.data.mediaKamers || typeof db.data.mediaKamers !== 'object') db.data.mediaKamers = {};
-    return db.data.mediaKamers;
+    return eigen.bak('mediaKamers');
   }
   /* Oude kamers opruimen bij elke aanraking. Een kamer die blijft staan nadat
      iedereen weg is, is een uitnodiging die eeuwig geldig blijft. */

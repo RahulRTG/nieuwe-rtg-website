@@ -13,19 +13,20 @@
                  van Rahul in de u-vorm
    Gedeelde context (db, save, anthropic, liveCodename) vanuit server.js. */
 module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
+  /* Het levensdossier is GEDEELD met rechterhand, bureau en levensgraaf, en
+     elk domein schrijft alleen zijn eigen velden. Zie server/kern/levensdossier.js. */
+  const mijn = require('../levensdossier')({ db }).voor('lifestyle');
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
+  /* De vijf velden van DIT domein. De andere twintig horen bij rechterhand en
+     bureau; die maakt deze functie met opzet niet aan. */
   function L(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = { verzoeken: [], bezittingen: [], afspraken: [], dossier: [], voorkeuren: {} };
-    const l = db.data.lifestyle[key];
-    for (const veld of ['verzoeken', 'bezittingen', 'afspraken', 'dossier']) if (!Array.isArray(l[veld])) l[veld] = [];
-    if (!l.voorkeuren || typeof l.voorkeuren !== 'object') l.voorkeuren = {};
-    return l;
+    for (const veld of ['verzoeken', 'bezittingen', 'afspraken', 'dossier', 'voorkeuren']) mijn.veld(key, veld);
+    return mijn.lees(key);
   }
 
   /* ================= Concierge-bureau ================= */
@@ -72,7 +73,7 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
   };
   function conciergeDesk() {
     const uit = [];
-    for (const [key, l] of Object.entries(db.data.lifestyle || {})) {
+    for (const [key, l] of Object.entries(mijn.alleLezend())) {
       for (const v of (l.verzoeken || [])) if (OPEN(v.status))
         uit.push({ key, codenaam: liveCodename ? liveCodename(key) : '', id: v.id, titel: v.titel, details: v.details,
           categorie: v.categorie, status: v.status, at: v.at, laatste: (v.updates[v.updates.length - 1] || {}).notitie || '',
@@ -82,7 +83,7 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
     return { status: 200, verzoeken: uit, statussen: CONCIERGE_STATUS };
   }
   function conciergeVoortgang(key, id, status, notitie) {
-    const l = db.data.lifestyle && db.data.lifestyle[key];
+    const l = mijn.lees(key);
     const v = l && (l.verzoeken || []).find(x => x.id === id);
     if (!v) return { status: 404, error: 'Dit verzoek is er niet meer.' };
     if (!CONCIERGE_STATUS.includes(status)) return { status: 400, error: 'Onbekende status.' };

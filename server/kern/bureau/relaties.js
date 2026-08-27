@@ -32,27 +32,26 @@ const BANDEN = ['partner', 'kind', 'ouder', 'broer of zus', 'compagnon', 'colleg
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   const relatiesVan = key => {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return ((l.attenties || {}).relaties) || [];
+    /* VREEMDE SECTIE: `attenties` is van kern/rechterhand. Lezen mag, schrijven niet. */
+    return (levens.leesVeld(key, 'attenties').relaties) || [];
   };
   function R(key, relatieId, maak) {
     if (!relatiesVan(key).some(r => r.id === relatieId)) return null;
-    const l = db.data.lifestyle[key];
-    if (!l.relatieContext || typeof l.relatieContext !== 'object') l.relatieContext = {};
-    if (!l.relatieContext[relatieId]) {
+    const rc = levens.veld(key, 'relatieContext');
+    if (!rc[relatieId]) {
       if (!maak) return { banden: [], ontmoetingen: [], context: {} };
-      l.relatieContext[relatieId] = { banden: [], ontmoetingen: [], context: {} };
+      rc[relatieId] = { banden: [], ontmoetingen: [], context: {} };
     }
-    const d = l.relatieContext[relatieId];
+    const d = rc[relatieId];
     for (const v of ['banden', 'ontmoetingen']) if (!Array.isArray(d[v])) d[v] = [];
     if (!d.context || typeof d.context !== 'object') d.context = {};
     return d;
   }
   const dossierVan = (key, id) => {
-    const l = (db.data && db.data.lifestyle && db.data.lifestyle[key]) || {};
-    return (l.relatieContext || {})[id] || { banden: [], ontmoetingen: [], context: {} };
+    return levens.leesVeld(key, 'relatieContext')[id] || { banden: [], ontmoetingen: [], context: {} };
   };
   const geenRelatie = { status: 404, error: 'Deze relatie staat niet in uw Attenties.' };
 

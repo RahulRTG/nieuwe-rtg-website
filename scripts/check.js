@@ -3944,457 +3944,404 @@ console.log('\n53) elk scherm is vanaf de bank te bereiken');
 }
 
 
+/* =====================================================================
+/* De drie regels hieronder kwamen uit PR #128 binnen als 52-54, terwijl deze
+   tak 53-60 al droeg; ze zijn hernummerd naar 61-63 boven het maximum, zodat
+   geen twee regels een nummer delen (zelfde greep als bij TAKEN.md par. 4). */
 /* ============================================================================
-   54) DE RELEASE-WORKFLOW PUBLICEERT NIETS ZONDER STUKLIJST EN HERKOMST
+   61) EEN ONTSNAPPINGSFUNCTIE DEKT HET AANHALINGSTEKEN.
 
-   WAT HIER ACHTER ZIT. Het releasebewijs (scripts/release-bewijs.js) hasht elke
-   bron in dit huis, en dat bewijs zit ook in het image. Maar een image is meer
-   dan deze repository: uit node:22-slim komen ruim honderd deb-pakketten mee die
-   wij niet schrijven en niet kiezen. Op de vraag "zit die kwetsbaarheid in wat
-   jullie draaien?" gaf een bronhash geen antwoord, en die vraag komt bij elke
-   doorlichting langs. scripts/imageherkomst.js maakt daarom een stuklijst UIT het
-   gepubliceerde image en bindt die met een handtekening aan het image-digest.
+   WAAR DEZE REGEL VANDAAN KOMT. Dit huis droeg 28 eigen escape-helpers, en vijf
+   daarvan vervingen alleen `&` en `<`. Dat is genoeg zolang de uitkomst in TEKST
+   landt. Twee ervan landden in een ATTRIBUUT:
 
-   WAAROM DAT HIER EEN POORT NODIG HEEFT. Die stappen staan in een
-   workflow-bestand, en workflow-bestanden zijn de makkelijkste plek om iets uit
-   te zetten: een stap uitcommentarieren is een regel, en de publicatie gaat
-   daarna gewoon door. Groen, sneller, en niemand die het ziet -- tot een
-   inkoper om de stuklijst vraagt. Deze regel maakt van dat weglaten een rood
-   vinkje.
+     borden:      '<span class="bd-av" title="' + esc(n) + '">'
+     collegachat: '<input id="ccInput" placeholder="... ' + esc(naam) + '">'
 
-   DE VOLGORDE DOET ERTOE, en dat is geen vormkwestie. Een stuklijst die VOOR de
-   publicatie wordt gemaakt beschrijft een image dat misschien niet is wat er
-   uiteindelijk gepusht is. Daarom eist deze regel dat --sbom NA de push staat.
+   Een naam met een aanhalingsteken breekt daar uit het attribuut, en de rest van
+   die naam wordt markup. In een werk-OS zet een ANDER mens die naam, dus dat is
+   geen theorie.
 
-   WAT HIJ NIET KAN. Of de handtekening ooit gezet is, weet dit bestand niet:
-   dat hangt aan een secret in GitHub. Wel kan hij eisen dat de publieke sleutel,
-   als hij er staat, een echte Ed25519-sleutel is -- een verminkte plak tekst in
-   deploy/release-sleutel.pub zou anders pas opvallen op het moment dat iemand
-   een release probeert te verifieren. */
-console.log('\n54) de release-workflow publiceert niets zonder stuklijst en herkomst');
+   WAAROM DE REGEL STRENGER IS DAN DE VONDST. Je zou kunnen uitrekenen welke esc()
+   in attribuutcontext landt en alleen die eisen. Dat is te doen -- en het is de
+   verkeerde reparatie. Dan blijft de kennis "waar landt deze string?" bij de
+   AANROEPER liggen, en die verplaatst een regel zonder aan zijn escape te denken.
+   LAT.md regel 1: repareer de oorzaak, niet het symptoom. De oorzaak is dat een
+   escape zijn veiligheid van zijn omgeving laat afhangen. Dus dekt elke helper
+   `&`, `<` en `"`, en hoeft de aanroeper niets te weten.
+
+   WAAROM DIT DE PARSER GEBRUIKT EN GEEN PATROON. De eerste versie hiervan zocht
+   met een reguliere expressie naar het lijf van de functie. Die kapte een
+   meerregelig lijf af bij de eerste nieuwe regel en las een tekenklasse niet, en
+   meldde daardoor de TWEE STERKSTE helpers van het huis als zwak -- `util.js` en
+   `geld/hulp.js` dekken alle vijf de tekens. Een keuring met valse meldingen is
+   erger dan geen keuring: hij leert je wegkijken. Daarom loopt hij nu over de
+   ontleedboom van scripts/ast en leest hij het lijf exact.
+
+   WAT DEZE REGEL NIET DEKT, en dat staat er met opzet bij. Een ENKEL aangehaald
+   attribuut (title='...') blijft open: dan is `'` het gevaarlijke teken, en dat
+   eist deze regel niet -- dit huis schrijft zijn attributen dubbel aangehaald en
+   de 23 bestaande sterke helpers dekken `'` niet allemaal. Hij keurt ook geen
+   URL- of scriptcontext: href="javascript:..." is een andere fout met een andere
+   reparatie. Dit is een ondergrens, geen uitvoergrens. Die laatste (tekst /
+   attribuut / url / html als aparte contracten) hoort bij de Interface Runtime
+   en is groter werk dan een keuringsregel. */
+console.log('\n61) elke ontsnappingsfunctie dekt & < en "');
 {
-  const wfPad = path.join(ROOT, '.github/workflows/release-image.yml');
-  if (!fs.existsSync(wfPad)) fout('.github/workflows/release-image.yml bestaat niet meer');
-  else if (!fs.existsSync(path.join(ROOT, 'scripts/imageherkomst.js'))) fout('scripts/imageherkomst.js is weg, terwijl de workflow hem aanroept');
-  else {
-    const wf = fs.readFileSync(wfPad, 'utf8');
-    const na = (naald) => wf.indexOf(naald);
-    const push = na('docker push');
-    const sbom = na('imageherkomst.js --sbom');
-    const binden = na('imageherkomst.js --binden');
-    const controle = na('imageherkomst.js --controle');
-    const klachten = [];
-    if (push < 0) klachten.push('de workflow pusht geen image meer -- dan klopt deze regel niet meer bij wat hij bewaakt');
-    if (sbom < 0) klachten.push('er wordt geen stuklijst meer gemaakt (imageherkomst.js --sbom ontbreekt)');
-    else if (push >= 0 && sbom < push) klachten.push('de stuklijst wordt VOOR de push gemaakt; dan beschrijft hij niet wat er gepubliceerd is');
-    if (binden < 0) klachten.push('het image-digest wordt nergens aan de stuklijst gebonden (imageherkomst.js --binden ontbreekt)');
-    else if (sbom >= 0 && binden < sbom) klachten.push('er wordt gebonden voordat de stuklijst bestaat');
-    if (controle < 0) klachten.push('de workflow controleert zijn eigen publicatie niet (imageherkomst.js --controle ontbreekt)');
-    if (!/upload-artifact/.test(wf) || !/sbom\.json/.test(wf)) klachten.push('de stuklijst wordt niet bewaard: zonder upload blijft er na de run niets van over');
-    /* Een sleutel die er WEL staat maar geen sleutel is, is erger dan geen
-       sleutel: hij ziet eruit als een vertrouwensanker. */
-    const pubPad = path.join(ROOT, 'deploy/release-sleutel.pub');
-    if (fs.existsSync(pubPad)) {
-      try {
-        const sleutel = require('crypto').createPublicKey(fs.readFileSync(pubPad, 'utf8'));
-        if (sleutel.asymmetricKeyType !== 'ed25519') klachten.push('deploy/release-sleutel.pub is geen Ed25519-sleutel maar ' + sleutel.asymmetricKeyType);
-      } catch (e) { klachten.push('deploy/release-sleutel.pub is geen leesbare publieke sleutel: ' + e.message); }
+  const { lex } = require('./ast/lexer');
+
+  /* WAAROM DE LEXER EN NIET DE PARSER. De vorige versie hiervan gebruikte
+     ast/parser.js, en die zakte op 43 bestanden -- alle 43 een BUNDELDEEL. Een
+     deel is geen geldig programma: het begint midden in een IIFE die pas in een
+     ander deel sluit. Daar woonden vier van de vijf zwakke ontsnappingen, dus de
+     regel keurde precies de plek niet waar de fout zat.
+     Een lexer heeft geen grammatica nodig en leest een fragment gewoon. Hij
+     kent bovendien de twee plekken waar handwerk hier stukloopt: strings en het
+     verschil tussen een deling en een reguliere expressie. Het lijf van een
+     functie is altijd haakjes-gebalanceerd, ook in een fragment, dus tellen over
+     tokens is exact. */
+  let BUNDELUIT = new Set();
+  try { BUNDELUIT = new Set(Object.keys(require('./bundel').bundels).map(x => 'public/' + x)); }
+  catch (e) { fout('de bundellijst kon niet worden gelezen (' + e.message + '); dan stelt deze regel minder vast'); }
+
+  const HEET_ESC = n => /^esc/i.test(n) || /escape/i.test(n);
+  const isLees = (t, v) => !!t && t.type === 'lees' && t.value === v;
+
+  function haakEind(toks, k) {
+    const open = toks[k].value, dicht = { '(': ')', '[': ']', '{': '}' }[open];
+    let d = 0;
+    for (let i = k; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.type !== 'lees') continue;
+      if (t.value === open) d++;
+      else if (t.value === dicht && !--d) return i;
     }
-    if (klachten.length) klachten.forEach(fout);
-    else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
-      (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
+    return -1;
   }
-}
 
+  /* Van het eerste token van een functie-uitdrukking naar het laatste. Dekt
+     `function f(){}`, `(a) => {}`, `a => expr` en `(a) => expr`. */
+  function eindeVanFunctie(toks, k) {
+    let i = k;
+    if (toks[i] && toks[i].type === 'naam' && toks[i].value === 'function') {
+      i++;
+      if (toks[i] && toks[i].type === 'naam') i++;
+      if (!isLees(toks[i], '(')) return -1;
+      i = haakEind(toks, i); if (i < 0) return -1;
+      i++;
+      return isLees(toks[i], '{') ? haakEind(toks, i) : -1;
+    }
+    if (isLees(toks[i], '(')) { i = haakEind(toks, i); if (i < 0) return -1; i++; }
+    else if (toks[i] && toks[i].type === 'naam') i++;
+    else return -1;
+    if (!isLees(toks[i], '=>')) return -1;
+    i++;
+    if (isLees(toks[i], '{')) return haakEind(toks, i);
+    let d = 0;                                    // pijlfunctie met een uitdrukking als lijf
+    for (let j = i; j < toks.length; j++) {
+      const t = toks[j];
+      if (t.type !== 'lees') continue;
+      if ('(['.includes(t.value) || t.value === '{') d++;
+      else if (')]'.includes(t.value) || t.value === '}') { if (!d) return j - 1; d--; }
+      else if ((t.value === ';' || t.value === ',') && !d) return j - 1;
+    }
+    return toks.length - 1;
+  }
 
-/* ============================================================================
-   55) DE DUBBELTIK STAAT NA ELKE ANDERE RES.JSON-WIKKEL
+  /* De patronen die aan .replace( worden meegegeven, als brontekst. Een negatieve
+     klasse telt niet: die zegt juist dat het teken NIET wordt geraakt. */
+  function replacePatronen(lijf) {
+    const uit = [];
+    for (const m of lijf.matchAll(/\.replace\s*\(\s*\/((?:[^/\\\n[]|\\.|\[(?:[^\]\\]|\\.)*\])+)\//g)) {
+      if (!m[1].startsWith('^')) uit.push(m[1]);
+    }
+    return uit;
+  }
+  const ENTITEIT = { '&': /&amp;/, '<': /&lt;/, '"': /&quot;|&#0*34\b/ };
+  function dekt(lijf, teken) {
+    if (ENTITEIT[teken].test(lijf)) return true;
+    return replacePatronen(lijf).some(pat => {
+      const klassen = [...pat.matchAll(/\[(\^?)((?:[^\]\\]|\\.)*)\]/g)];
+      if (klassen.some(k => !k[1] && k[2].includes(teken))) return true;
+      return pat.replace(/\[(?:[^\]\\]|\\.)*\]/g, '') === teken;
+    });
+  }
+  /* Alleen HTML-ontsnappers: een escapeRegex() vervangt ook van alles, maar draagt
+     geen entiteit en geen `<` in zijn patroon, en hoort hier niet te zakken. */
+  const isHtmlEsc = lijf => /&amp;|&lt;|&gt;|&quot;|&#0*3[49]\b/.test(lijf) ||
+    replacePatronen(lijf).some(pat => pat.includes('<'));
 
-   DEZE REGEL KOMT UIT EEN FOUT DIE DERTIEN GROENE TOETSEN NIET ZAGEN. De
-   dubbeltik (server/lib/dubbeltik.js) hing res.json om zich een antwoord te
-   herinneren. jsonGzip() doet dat OOK, en stuurt een antwoord boven de kilobyte
-   via res.send in plaats van via res.json. Stond de dubbeltik daarvoor, dan zag
-   hij grote antwoorden nooit -- en liet hij de herhaling het werk gewoon opnieuw
-   doen. Negentien routes in de idemproef, allemaal met een groot antwoord, en
-   nergens een foutmelding: kleine antwoorden gingen goed, en curl vraagt
-   standaard geen compressie.
-
-   Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
-   dubbeltik hoort dus de BUITENSTE wikkel te zijn. test/dubbeltikgzip.test.js
-   bewijst dat die samenstelling werkt; deze regel bewaakt dat de PRODUCTIECODE
-   die volgorde ook echt aanhoudt -- een toets die zijn eigen volgorde opschrijft
-   zegt niets over wat er in server/ gebeurt. */
-console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
-{
-  const wikkelaars = [];
-  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+  let gekeurd = 0, zwak = 0, stuk = 0;
+  loop(path.join(ROOT, 'public'), /\.js$/, f => {
     const rel = path.relative(ROOT, f).replace(/\\/g, '/');
-    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
-    /* Elke plek die res.json vervangt is een wikkel. De dubbeltik zelf hoort
-       er ook bij: die moet als laatste komen. */
-    if (/\bres\.json\s*=/.test(bron)) wikkelaars.push(rel);
+    if (rel.startsWith('public/dist/') || BUNDELUIT.has(rel)) return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (!/\besc\w*\s*[=(:]/i.test(bron) || !bron.includes('.replace(')) return;
+    let toks;
+    try { toks = lex(bron); } catch (e) { stuk++; fout('kon ' + rel + ' niet lezen (' + e.message + ')'); return; }
+
+    for (let i = 0; i < toks.length; i++) {
+      const t = toks[i];
+      if (t.type !== 'naam' || !HEET_ESC(t.value)) continue;
+      const vorig = toks[i - 1], volg = toks[i + 1];
+      let k = -1;
+      if (vorig && vorig.type === 'naam' && vorig.value === 'function') k = i - 1;
+      else if (isLees(volg, '=') || isLees(volg, ':')) k = i + 2;
+      if (k < 0 || !toks[k]) continue;
+      const e = eindeVanFunctie(toks, k);
+      if (e < 0) continue;
+      const lijf = bron.slice(toks[k].start, toks[e].end);
+      if (!/\.replace\s*\(/.test(lijf) || !isHtmlEsc(lijf)) continue;
+      gekeurd++;
+      const mist = ['&', '<', '"'].filter(c => !dekt(lijf, c));
+      if (!mist.length) continue;
+      zwak++;
+      fout('zwakke ontsnapping: ' + rel + ':' + t.lijn + ' -- ' + t.value + '() dekt ' +
+        mist.map(c => c === '"' ? 'het aanhalingsteken' : c).join(' en ') + ' niet');
+    }
   });
-  const poortwachters = path.join(ROOT, 'server/opzet/poortwachters.js');
-  const bron = fs.existsSync(poortwachters) ? zonderCommentaar(fs.readFileSync(poortwachters, 'utf8')) : '';
-  const gzip = bron.indexOf('app.use(jsonGzip())');
-  const dub = bron.indexOf('app.use(dubbeltik.middleware())');
-  const klachten = [];
-  if (dub < 0) klachten.push('de dubbeltik wordt in poortwachters.js niet meer gemount; dan is geen enkele route tegen een herhaling beschermd');
-  else if (gzip < 0) klachten.push('jsonGzip() staat niet meer in poortwachters.js -- controleer of de dubbeltik nog de buitenste wikkel is');
-  else if (dub < gzip) klachten.push('de dubbeltik staat VOOR jsonGzip(); grote antwoorden gaan dan buiten hem om (zie test/dubbeltikgzip.test.js)');
-  /* En een NIEUWE wikkel is geen fout, maar wel iets waar iemand naar hoort te
-     kijken: hij kan de dubbeltik opnieuw onzichtbaar maken. De lijst staat hier
-     bij naam, dus hij groeit niet stil. */
-  const BEKEND = {
-    'server/middleware/compressie.js': 'jsonGzip -- staat VOOR de dubbeltik, precies daarom bestaat deze regel',
-    'server/opzet/lijfpoort.js': 'het zaakdoos-journaal; staat voor de dubbeltik en verandert het antwoord niet',
-    'server/opzet/liegpoort.js': 'meetgereedschap, draait alleen met RTG_LIEG en nooit in een echte rit',
-    'server/lib/dubbeltik.js': 'de dubbeltik zelf',
-    'server/lib/cache.js': 'antwoordcache; alleen op leesroutes (GET), en een cachetreffer doet per definitie geen werk',
-    'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
-    'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
-    'server/middleware/idempotentie.js': "de opt-in idempotentielaag. NAGEKEKEN op 20 augustus 2026: gemount in opzet/poortwachters.js r.114, dus NA de dubbeltik (r.96) -- hij is de buitenste wikkel. Dat is hier juist: hij grijpt alleen in als de client ZELF een idem-sleutel meestuurde, en dan is de herhaling een bewuste retry en geen dubbeltik. Elk ander antwoord gaat ongewijzigd door naar de dubbeltik.",
-  };
-  const nieuw = wikkelaars.filter(w => !BEKEND[w]);
-  if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +
-    ' -- staat de dubbeltik daar nog achter? Zet hem op de lijst in check.js regel 51 zodra dat is nagekeken');
-  if (klachten.length) klachten.forEach(fout);
-  else ok(wikkelaars.length + ' plekken vervangen res.json, en de dubbeltik komt na jsonGzip()');
+  if (!zwak && !stuk) ok(gekeurd + ' HTML-ontsnappingsfuncties dekken & < en het aanhalingsteken');
 }
 
 /* ============================================================================
-   56) GEEN NIEUWE PRIVE-ROUTELIJST
+   62) EEN GECONTRACTEERD DOMEIN HEEFT EEN DEUR, EN NIET ZEVENTIEN.
 
-   WAAROM DEZE REGEL BESTAAT. "Welke routes heeft deze server" werd op ACHT
-   plekken los uitgezocht, en elke plek kwam op een ander getal:
+   WAAROM DEZE REGEL NAAST DE RATEL STAAT. scripts/norm.js telt de deuren naar
+   db.data over het hele huis (dbDeuren, dbDeurenSchrijvend) en laat ze alleen
+   omlaag. Dat houdt het TOTAAL in de hand, maar niet een enkel domein: wie een
+   deur sluit in payroll en er een opent in mobiliteit, beweegt de meter niet.
+   Voor een domein dat NET achter een contract staat is dat precies het gat --
+   daar is de winst nieuw en dus het makkelijkst weer kwijt.
 
-     scripts/lib/routes.js            2934   (regex over de bron)
-     magnaat-capabilities-bronnen.js  3679   (regex over de bron)
-     POORTWACHT-ronde                 3987
-     scripts/routekaart.js            4191   (de levende router)
-     plus prive-scanners in beproeving.js, tot-crash.js en schakelbaar.js
+   Dus: zodra een domein hieronder staat, is zijn aantal rechtstreekse
+   aanrakingen NUL en niet "lager dan gisteren". De ratel blijft ernaast voor
+   alles wat nog niet gecontracteerd is.
 
-   Geen van die verschillen was ergens te zien. De vier bewijsproeven leunden op
-   de eerste en misten daardoor alle vier dezelfde 1257 routes -- waaronder de
-   hele RTFoundation. Dat is niet "een scanner die iets mist": dat is een huis
-   waarvan niemand weet hoe groot het is.
+   HOE JE EEN DOMEIN TOEVOEGT. Een regel in GECONTRACTEERD, met de map en de
+   naam van de deur. Dat is met opzet het enige wat het kost: als het volgende
+   domein een nieuwe keuringsregel zou vragen, gebeurt het niet.
 
-   Er is nu EEN antwoord: scripts/routekaart.js vraagt het aan de router
-   (app._routes(), server/web/routing.js), en scripts/lib/routes.js verdeelt dat
-   onder de afnemers. Deze regel houdt dat zo. Wie een nieuwe eigen scanner
-   schrijft, ziet hem hier zakken -- met de reden erbij, want de verleiding is
-   begrijpelijk: een regex is in vijf regels klaar en een routekaart kost een
-   kindproces.
-
-   WAT HIJ MEET. Een bestand in scripts/ dat zelf een `app.post('/pad'`-achtige
-   uitdrukking over de BRON legt, terwijl het de routekaart of lib/routes niet
-   gebruikt. De drie bekende gevallen staan met naam op de lijst en mogen blijven
-   staan tot ze zijn omgezet; ze mogen alleen niet met een vierde vermeerderen.
-
-   WAT HIJ NIET MEET. Of de routekaart zelf klopt -- dat doet
-   test/routedekking.test.js, en de achterstand van de bronscanner van de
-   Capability Graph staat als ratel in test/magnaat-capabilities.test.js. */
-console.log('\n56) geen nieuwe prive-routelijst: EEN plek bepaalt welke routes er zijn');
+   WAT DEZE REGEL NIET DOET. Hij leest brontekst en kijkt naar `db.data`. Een
+   module die db langs een andere naam krijgt doorgegeven ziet hij niet -- zelfde
+   bewuste onderschatting als bij scripts/deuren.js en keuringsregel 50. Bij
+   payroll is dat vandaag geen gat: na de migratie krijgt geen enkele laag daar
+   nog een database mee, alleen het contract, en dat is sterker dan een regel.
+   Deze poort vangt de terugval. */
+console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eigen deur');
 {
-  /* De drie die er al zijn, met wat er nodig is om ze op te ruimen. Deze lijst
-     MAG ALLEEN KRIMPEN -- zelfde afspraak als BEKEND hierboven en als de
-     schuldlijst in BEREIK.json. */
-  const BEKENDE_SCANNERS = new Map([
-    ['scripts/beproeving.js', 'eigen alleRoutes(); draait zelf een server en kan de routekaart lenen'],
-    ['scripts/tot-crash.js', 'eigen alleRoutes(); zelfde omzetting als beproeving.js'],
-    ['scripts/schakelbaar.js', 'leest paden voluit om ze te kunnen tellen (keuringsregel 45); een eigen soort']
-  ]);
-  /* HET KENMERK VAN EEN EIGEN SCANNER, en dat is niet te verzinnen: een
-     reguliere uitdrukking met `\.(` gevolgd door een HTTP-methode-alternatie.
-     Alle vier de bestaande scanners hebben precies die vorm --
+  const { lex } = require('./ast/lexer');
+  const GECONTRACTEERD = [
+    { map: 'server/kern/payroll', deur: 'opslag.js',
+      waarom: 'eerste contractlaag; elf schrijvers over veertien bestanden, dertien collecties' },
+    { map: 'server/kern/concern', deur: 'opslag.js',
+      waarom: 'acht schrijvers; EEN wortel met acht takken, en dus een andere vorm dan payroll' },
+    { map: 'server/kern/veiligheid', deur: 'opslag.js',
+      waarom: 'zeven schrijvers; wortel met takken, plus twee plekken die een tak VERVANGEN' },
+    { map: 'server/kern/mobiliteit', deur: 'opslag.js',
+      waarom: 'veertien schrijvers en 109 aanrakingen: het rommeligste domein, en daarom het meest gebaat' },
+    { map: 'server/kern/command', deur: 'opslag.js',
+      waarom: 'twaalf schrijvers; het eerste domein met vier soorten omgang (bezit, teller, gedeeld, vreemd)',
+      ook: {
+        /* register.js is een ZUIVERE module: hij krijgt zijn gegevensbron als
+           argument mee (rijen(db, soort)) en heeft geen fabriek waar een
+           contract in past. Hem omzetten betekent het lees(db)-contract
+           wijzigen, en dat contract dragen OOK kern/zaakcommand/register.js en
+           kern/werkcommand/register.js. Dat is een ontwerpvraag over drie
+           domeinen en geen migratie; zie ./opslag.js voor de volledige
+           afweging. Zolang hij hier staat, kan er geen tweede bij komen zonder
+           dat deze regel rood wordt. */
+        'register.js': 'zuivere module; zijn lees(db)-contract wordt gedeeld met zaakcommand en werkcommand'
+      } },
+    /* DE VIER DIE EEN DEUR DELEN. db.data.lifestyle is EEN dossier per lid met
+       vijfentwintig velden, en de meting wees uit dat er geen enkel veld door
+       twee domeinen wordt geschreven. Het is dus geen betwiste zak maar een
+       samengesteld dossier; kern/levensdossier.js draagt de veldenlijst met per
+       veld zijn eigenaar, en weigert een schrijver die niet de eigenaar is. */
+    { map: 'server/kern/lifestyle', deur: '../levensdossier/index.js',
+      waarom: 'bezit vijf velden van het levensdossier (verzoeken, bezittingen, afspraken, dossier, voorkeuren)' },
+    { map: 'server/kern/rechterhand', deur: '../levensdossier/index.js',
+      waarom: 'bezit twaalf velden; de afspraak stond hier als commentaar en is nu een poort' },
+    { map: 'server/kern/bureau', deur: '../levensdossier/index.js',
+      waarom: 'bezit acht velden en LEEST er vier van anderen; die vier staan nu met naam in de code' },
+    { map: 'server/kern/levensgraaf', deur: '../levensdossier/index.js',
+      waarom: 'schrijft niets en leest alles: een projectie, en die mag het dossier niet laten groeien',
+      ook: {
+        /* DE BRONNEN ZIJN ZUIVERE BESCHRIJVINGEN. Elke bron is een object met
+           functies die hun gegevensbron als ARGUMENT krijgen (net als
+           kern/command/register.js), en ze lezen zes collecties van andere
+           domeinen: agendas, boekingen, cvs, leren, lifestyle en rtgid. Alleen
+           lezen -- deze laag schrijft nergens.
 
-       /\b(app|router)\.(post|get|put|delete|patch)\(     lib/routes.js
-       /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(  capabilities-bronnen
-       /app\.(get|post|put|delete)\(\s*'(\/api\/...        beproeving, tot-crash
-       /app\.(get|post|put|delete|patch|all)\(             schakelbaar
+           Ze contracteren betekent het bronnen-contract wijzigen, en dat dragen
+           ook bronnen-basis, bronnen2, bronnen3 en de zaak-graaf in
+           kern/zaak/. Dat is een ontwerpvraag over domeinen heen en geen
+           migratie; zolang ze hier staan, kan er geen vijfde bij komen zonder
+           dat deze regel rood wordt. */
+        'bronnen-leven.js': 'zuivere bronbeschrijving; leest leren en cvs met db als argument',
+        'bronnen-leven-bijdrage.js': 'zuivere bronbeschrijving; leest rtgid met db als argument',
+        'bronnen-platform.js': 'zuivere bronbeschrijving; leest boekingen en agendas met db als argument',
+        'bronnen-zaak.js': 'zuivere bronbeschrijving; leest boekingen en agendas met db als argument'
+      } }
+  ];
 
-     Plus de eis dat het bestand ook echt de servermap afloopt; anders vlagt
-     deze regel elke toevallige `/x\.(get|set)/` in een script dat met routes
-     niets te maken heeft. Twee kenmerken samen, want een van de twee is te
-     grof -- en een keuring die roept bij dingen die kloppen, leert je hem te
-     negeren (zie de kop van test/blindevlek.test.js). */
-  const METHODE_ALTERNATIE = /\\\.\s*\(\??:?\s*(?:get|post|put|delete|patch|all)\s*\|/i;
-  const LOOPT_SERVER_AF = /(?:readdirSync|readFileSync)[\s\S]{0,400}?['"]server['"]|['"]server['"][\s\S]{0,400}?(?:readdirSync|readFileSync)/;
-  const eigenScanner = (bron) => METHODE_ALTERNATIE.test(bron) && LOOPT_SERVER_AF.test(bron);
+  for (const dom of GECONTRACTEERD) {
+    /* Een BENOEMDE uitzondering, met reden -- dezelfde vorm als MAG_ZONDER in
+       regel 16 en TOEGESTAAN in regel 47. Een bestand dat hier staat mag
+       db.data aanraken; een bestand dat hier NIET staat niet, en dat is het
+       verschil met geen poort. Wie er een bij zet, schrijft op waarom. */
+    const ook = new Set(Object.keys(dom.ook || {}));
+    const wortel = path.join(ROOT, dom.map);
+    if (!fs.existsSync(wortel)) { fout(dom.map + ' bestaat niet, maar staat wel als gecontracteerd'); continue; }
+    const deurPad = path.join(wortel, dom.deur);
+    if (!fs.existsSync(deurPad)) { fout(dom.map + ' mist zijn deur (' + dom.deur + ')'); continue; }
+    /* De deur mag BUITEN de eigen map staan. Vier domeinen delen er een:
+       kern/levensdossier.js draagt het dossier per lid waarvan lifestyle,
+       rechterhand, bureau en levensgraaf elk hun eigen velden schrijven.
+       Eist deze regel dat een deur binnen het domein staat, dan zou zo'n
+       gedeeld contract in vier kopieen moeten -- precies wat het oplost. */
+    const deurRel = path.relative(ROOT, deurPad).replace(/\\/g, '/');
 
-  const nieuw = [];
-  let bekeken = 0;
-  const scanMap = (d) => {
-    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
-      const p = path.join(d, f.name);
-      if (f.isDirectory()) { scanMap(p); continue; }
-      if (!f.name.endsWith('.js')) continue;
-      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
-      /* Drie bestanden horen hier niet in: de twee die de ENE routelijst maken,
-         en deze keuring zelf -- die draagt het patroon in zijn eigen detectie en
-         zou zichzelf aanwijzen. Dat is precies wat er gebeurde bij het schrijven. */
-      if (rel === 'scripts/lib/routes.js' || rel === 'scripts/routekaart.js' ||
-          rel === 'scripts/check.js') continue;
-      bekeken++;
-      const bron = fs.readFileSync(p, 'utf8');
-      const bouwtRegex = eigenScanner(bron);
-      /* DE OVERTREDING IS DE EIGEN UITDRUKKING, niet het ontbreken van een
-         require. Hier stond eerst "gebruikt hij lib/routes? dan is het goed", en
-         dat gaf meteen een valse vrijspraak: scripts/beproeving.js importeert
-         `isSchakel` uit lib/routes EN heeft daarnaast zijn eigen alleRoutes().
-         Een module lenen voor iets anders is geen bewijs dat je haar routelijst
-         gebruikt. Wie zijn eigen scanner niet meer heeft, is klaar -- dat is de
-         enige toets die niet te omzeilen is met een import erbij. */
-      if (!bouwtRegex) continue;
-      if (BEKENDE_SCANNERS.has(rel)) continue;
-      nieuw.push(rel);
+    let langs = 0, gekeken = 0;
+    loop(wortel, /\.js$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      gekeken++;
+      if (rel === deurRel) return;                                 // de deur zelf
+      if (ook.has(path.posix.basename(rel))) return;               // benoemd, met reden
+      /* CODE LEZEN EN GEEN PROZA, VIA DE LEXER. Keuringsregel 47 heeft deze
+         fout een keer gemaakt (TAKEN.md 6.17): hij las de RAUWE bron en meldde
+         een bestand als overtreder omdat de naam in een KOP stond die uitlegt
+         waarom het daar juist NIET gebeurt.
+
+         Commentaar wegstrippen is hier niet genoeg. kern/command/landpakket.js
+         draagt `bron: 'db.data.talen'` als STRINGWAARDE -- een gegeven dat
+         vertelt waar een feit vandaan komt, en geen aanraking. De lexer kent
+         het verschil tussen een naam en een string, dus zoeken we de tokenreeks
+         db . data en niet een patroon in tekst. */
+      const ruw = fs.readFileSync(f, 'utf8');
+      let toks;
+      try { toks = lex(ruw); }
+      catch (e) { fout('kon ' + rel + ' niet lezen (' + e.message + '); daar stelt deze regel niets vast'); return; }
+      let regelNr = 0;
+      for (let i = 0; i + 2 < toks.length; i++) {
+        if (toks[i].type === 'naam' && toks[i].value === 'db' &&
+            toks[i + 1].type === 'lees' && toks[i + 1].value === '.' &&
+            toks[i + 2].type === 'naam' && toks[i + 2].value === 'data') { regelNr = toks[i].lijn; break; }
+      }
+      if (!regelNr) return;
+      langs++;
+      fout('langs de deur: ' + rel + ':' + regelNr + ' raakt db.data rechtstreeks aan -- ' +
+        'dit domein gaat door ' + dom.map + '/' + dom.deur);
+    });
+    if (!langs) {
+      const erbij = ook.size ? ' (plus ' + ook.size + ' benoemde uitzondering(en))' : '';
+      ok(dom.map + ': ' + (gekeken - 1 - ook.size) + ' bestanden, geen enkele raakt db.data buiten ' + dom.deur + erbij);
     }
-  };
-  scanMap(path.join(ROOT, 'scripts'));
+  }
+}
 
-  /* De lijst mag alleen krimpen: een naam die zijn eigen scanner kwijt is, hoort
-     eraf. Anders slijt hij tot namen die niets meer zeggen. */
-  const opgelost = [...BEKENDE_SCANNERS.keys()].filter(rel => {
-    const p = path.join(ROOT, rel);
-    if (!fs.existsSync(p)) return true;
-    return !eigenScanner(fs.readFileSync(p, 'utf8'));
+/* ============================================================================
+   63) EEN COLLECTIE HEEFT EEN EIGENAAR, EN DIE IS DE ENIGE DIE ERIN SCHRIJFT.
+
+   server/kern/eigencollectie.js is de lichte vorm van een opslagcontract: een
+   module zegt op zijn eigen plek welke collecties hij bezit en met welke vorm.
+   Die declaratie staat MET OPZET bij de eigenaar en niet in een middenregister
+   -- een centrale lijst van vierhonderd collecties is binnen een jaar de
+   volgende plek die uit de pas loopt met de code.
+
+   Precies daarom moet iets anders bewaken wat zo'n lijst gratis zou geven: dat
+   niemand hetzelfde opeist, en dat de eigenaar de enige schrijver is. Dat is
+   deze regel. Hij verzamelt alle declaraties in server/ en zakt op twee dingen:
+
+     - twee bestanden die dezelfde collectie bezitten. Dan is "eigenaar" een
+       woord zonder betekenis geworden.
+     - een SCHRIJVER buiten de eigenaar. De helper kan dat niet zien: hij weigert
+       wel een collectie die je niet declareerde, maar niet dat iemand anders
+       db.data.<jouw collectie> rechtstreeks aanraakt.
+
+   HIJ LEEST TOKENS EN GEEN TEKST, om dezelfde reden als regel 53: een naam in
+   een kop of een string is geen aanraking (TAKEN.md 6.17).
+   ========================================================================== */
+console.log('\n63) elke gedeclareerde collectie heeft een eigenaar, en die schrijft als enige');
+{
+  const { lex } = require('./ast/lexer');
+  const SERVER = path.join(ROOT, 'server');
+
+  /* Het `bezit`-blok van een aanroep uithalen: van `bezit:` tot de bijhorende
+     sluitaccolade, met accolades tellen. Een patroon zou stukgaan op de eerste
+     geneste vorm. */
+  function bezitVan(bron, vanaf) {
+    const k = bron.indexOf('bezit:', vanaf);
+    if (k < 0) return null;
+    const open = bron.indexOf('{', k);
+    if (open < 0) return null;
+    let d = 0;
+    for (let i = open; i < bron.length; i++) {
+      if (bron[i] === '{') d++;
+      else if (bron[i] === '}') { d--; if (!d) return bron.slice(open + 1, i); }
+    }
+    return null;
+  }
+
+  const eigenaarVan = new Map();   // collectie -> bestand
+  let declaraties = 0;
+  loop(SERVER, /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (rel === 'server/kern/eigencollectie.js') return;
+    const bron = fs.readFileSync(f, 'utf8');
+    if (!bron.includes('eigencollectie')) return;
+    let i = 0;
+    while (true) {
+      const k = bron.indexOf('eigencollectie', i);
+      if (k < 0) break;
+      const blok = bezitVan(bron, k);
+      i = k + 14;
+      if (!blok) continue;
+      for (const m of blok.matchAll(/(?:^|[,{\s])([A-Za-z_$][\w$]*)\s*:\s*'(lijst|kaart)'/g)) {
+        declaraties++;
+        const naam = m[1];
+        if (eigenaarVan.has(naam) && eigenaarVan.get(naam) !== rel) {
+          fout('twee eigenaren voor "' + naam + '": ' + eigenaarVan.get(naam) + ' en ' + rel +
+            ' -- een collectie hoort er een te hebben');
+        } else eigenaarVan.set(naam, rel);
+      }
+      break;   // een bestand declareert een keer; de rest is hergebruik van de naam
+    }
   });
 
-  if (nieuw.length) {
-    for (const rel of nieuw) {
-      fout(rel + ' leidt zijn eigen routelijst uit de brontekst af. Gebruik ' +
-        'scripts/lib/routes.js (die vraagt het aan de router) -- een tweede lijst ' +
-        'komt op een ander getal en niemand ziet het verschil.');
-    }
-  } else if (opgelost.length) {
-    for (const rel of opgelost) {
-      fout(rel + ' gebruikt de gedeelde routelijst nu wel; haal hem van BEKENDE_SCANNERS ' +
-        'in keuringsregel 49 (die lijst mag alleen krimpen).');
-    }
-  } else {
-    ok(bekeken + ' scripts bekeken; geen nieuwe eigen routelijst, ' + BEKENDE_SCANNERS.size +
-      ' erkend op de lijst (die alleen mag krimpen)');
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   57) EEN BROWSER START OP EEN PLEK
-
-   WAT ER GEBEURDE. Deze suite laadde playwright op 123 plekken met dezelfde
-   zesregelige functie onder twee namen (laadBrowser en laadPlaywright), startte
-   hem op 164 plekken met dezelfde letterlijke opties, en sloeg zich over met
-   vijf verschillende zinnen. Op de dag dat de omgeving een andere chromium had
-   dan playwright vroeg, vielen alle 122 browsertoetsen om -- en er was geen plek
-   waar dat te repareren viel. Een waarheid in bijna driehonderd kopieen is geen
-   waarheid maar een gerucht (LAT.md regel 4).
-
-   Erger dan de storing was wat de storing NALIET: het schermjournaal van die
-   ronde zag er identiek uit aan dat van een geslaagde ronde waarin geen enkel
-   scherm werd geopend. Zie test/schermronde.test.js.
-
-   WAT HIJ MEET. Een toetsbestand dat zelf playwright opzoekt of zelf
-   launch-opties samenstelt, in plaats van het aan test/helper.js te vragen.
-
-   WAT HIJ NIET MEET. Of de browser het DOET -- dat merk je vanzelf. Deze regel
-   gaat alleen over waar het antwoord op "hoe start hier een browser" staat. */
-console.log('\n57) een browser start op EEN plek: test/helper.js');
-{
-  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
-  const EIGEN_LADER = /function\s+laad(?:Browser|Playwright)\s*\(/;
-  const EIGEN_OPTIES = /\.launch\(\s*\{/;
-  const EIGEN_REDEN = /skip:\s*\w+\s*\?\s*false\s*:/;
-  const overtreders = [];
-  let bekeken = 0;
-  for (const f of fs.readdirSync(path.join(ROOT, 'test'))) {
-    if (!f.endsWith('.js') || f === 'helper.js') continue;
-    /* ZONDER COMMENTAAR. De eerste versie las de hele bron en wees
-       test/skipwacht.test.js aan, die de oude schrijfwijze in zijn KOPTEKST
-       aanhaalt om uit te leggen wat er mis mee was. Een keuring die een
-       toelichting voor een overtreding aanziet, leert je hem te negeren. */
-    const bron = zonderCommentaar(fs.readFileSync(path.join(ROOT, 'test', f), 'utf8'));
-    if (!/chromium/.test(bron)) continue;
-    bekeken++;
-    const wat = [];
-    if (EIGEN_LADER.test(bron)) wat.push('zoekt zelf playwright op');
-    if (EIGEN_OPTIES.test(bron)) wat.push('stelt zelf launch-opties samen');
-    if (EIGEN_REDEN.test(bron)) wat.push('verzint zijn eigen overslaan-reden');
-    if (wat.length) overtreders.push('test/' + f + ': ' + wat.join(', '));
-  }
-  if (overtreders.length) {
-    for (const r of overtreders) fout(r);
-    fout('Vraag het aan test/helper.js: laadPlaywright(), browserOpties(pw) en geenBrowser(pw).');
-  } else {
-    ok(bekeken + ' browsertoetsen halen hun browser bij test/helper.js');
-  }
-}
-
-console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte cirkel');
-{
-  const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
-  const mag = (v) => {
-    const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
-    return k === '0' || k === '0!important' || k === '50%' || k === '50%!important';
-  };
-  const kapot = [];
-  let gekeken = 0, cirkels = 0;
-  loop(path.join(ROOT, 'public'), /\.(css|html|js)$/, f => {
-    const rel = path.relative(ROOT, f);
-    if (rel.endsWith('.min.js')) return;
-    let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
-    if (!bron.includes('border-radius')) return;
-    gekeken++;
-    let m;
-    RE.lastIndex = 0;
-    while ((m = RE.exec(bron))) {
-      const v = m[1].trim();
-      if (mag(v)) { if (v.toLowerCase().startsWith('50%')) cirkels++; continue; }
-      kapot.push(rel + ' regel ' + bron.slice(0, m.index).split('\n').length + ': ' + v.slice(0, 40));
-    }
-  });
-  if (kapot.length) {
-    for (const k of kapot.slice(0, 12)) {
-      fout('ronde hoek: ' + k + ' -- zet hem op 0 (CLAUDE.md ontwerpprincipe 3);' +
-        ' een echte cirkel mag, en die schrijf je als border-radius:50%');
-    }
-    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');
-  } else {
-    ok(gekeken + ' bestanden met een radius: allemaal 0, plus ' + cirkels + ' echte cirkels');
-  }
-}
-
-
-/* ==========================================================================
-   59) ELKE MODULE DIE ROUTES REGISTREERT, WORDT OOK ECHT INGELADEN.
-
-   Bij de samenvoeging van 24 takken (21 augustus 2026) viel de mountregel van
-   server/routes/office/rendezvous.js weg. Het bestand stond er, de kern eronder
-   ook, en alle drie zijn adressen gaven 404 -- "Onbekend eindpunt". Vier toetsen
-   zakten daarop, na twee uur suite.
-
-   EN GEEN ENKELE METER ZAG HET AANKOMEN, want dat kan ook niet: een module die
-   niemand inlaadt staat in geen enkele teller, dus hij kan er ook nergens uit
-   verdwijnen. De dekking daalt niet, de routekaart wordt korter, en alles ziet
-   er kleiner maar gezond uit. Dat is de stilste vorm van kapot die dit huis
-   kent.
-
-   Deze regel stelt een kleine vraag -- is er een pad van een ingang naar dit
-   bestand? -- en beantwoordt hem in milliseconden. Zie scripts/lib/bedrading.js
-   voor hoe requires worden opgelost en waarom samengestelde requires RUIM
-   worden benaderd (liever een gemist geval dan een vals alarm, want een poort
-   die onterecht rood staat leert niemand meer iets).
-
-   MUTATIE (RAAK): haal de mountregel van office/rendezvous uit routes/office.js
-   -> deze regel meldt dat bestand bij naam.
-   ========================================================================== */
-/* DE REALITY INDEX -- EEN wandeling, EEN leesronde, EEN antwoord op de
-   commentaarvraag. Regel 59 en 60 stellen verschillende vragen over dezelfde
-   feiten; ze horen die feiten niet elk apart op te halen. Zie
-   PROOF-INCREMENTAL.md stap 1: drie scanners met elk een eigen boomwandeling was
-   niet alleen traag, het was de bron van drie van de vier meetfouten die bij het
-   bouwen van deze twee poorten zijn gemaakt -- want elke kopie had zijn eigen
-   antwoord op de vraag wat commentaar is. */
-const WERKELIJKHEID = require('./lib/werkelijkheid').index(['server', 'public']);
-
-console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen');
-{
-  const { meet } = require('./lib/bedrading');
-  const r = meet(['server'], WERKELIJKHEID);
-  if (r.wezen.length) {
-    for (const w of r.wezen.slice(0, 12)) {
-      fout('registreert routes maar wordt nergens ingeladen: ' + w +
-        ' -- mount hem, of haal hem weg');
-    }
-    if (r.wezen.length > 12) fout('... en nog ' + (r.wezen.length - 12) + ' module(s)');
-  } else {
-    /* DE DRIE GETALLEN STAAN ERBIJ, en dat is de hele bedoeling: een graaf die
-       zegt "nul wezen" moet kunnen laten zien hoeveel hij zeker wist. Zie
-       PROOF-INCREMENTAL.md par. 3.2 -- known / potentially relevant /
-       unresolved als GEMETEN grootheden, niet als gevoel. */
-    ok(r.gekeken + ' bestanden, ' + r.kanten.opgelost + ' kanten opgelost, ' +
-      r.kanten.benaderd.length + ' benaderd, ' + r.kanten.onbekend.length + ' onbekend' +
-      ' -- geen enkele routemodule zonder pad vanaf een ingang');
-    for (const o of r.kanten.onbekend) {
-      console.log('  \x1b[2m  onbekend: ' + o.bestand + ':' + o.lijn + '  [' + o.vorm + ']\x1b[0m');
-    }
-    for (const [g, b] of Object.entries(r.vertrouwen).sort()) {
-      console.log('  \x1b[2m  ' + g.padEnd(9) + String(b.pct).padStart(6) + '% exact' +
-        (b.onbekend ? '  (' + b.onbekend + ' onbekend)' : '') + '\x1b[0m');
-    }
-  }
-
-  /* DE RATEL, EN DE HARDE NUL VOOR DRIE GEBIEDEN.
-
-     Onbekende kanten zijn geen gewone technische schuld. Het zijn de GRENZEN
-     van wat dit systeem op dit moment veilig kan bewijzen, en daar hangt straks
-     een beslissing aan: over een onbekende kant mag geen bewijs worden geerfd,
-     dus dan moet de impactzone conservatief worden opgerekt
-     (PROOF-INCREMENTAL.md par. 3.2 en 7.3). Een onbekende die er stilletjes
-     bijkomt, maakt die zone dus stilletjes groter of -- erger -- wordt vergeten.
-
-     Voor identity, money en security is de eis NUL en geen ratel. Daar mag een
-     impactzone nooit te klein uitvallen omdat de graaf een kant niet kon
-     bepalen; liever een gebied dat weigert te groeien dan een gebied waar we
-     het niet zeker weten. */
-  {
-    const REG = path.join(ROOT, 'BEDRADING.json');
-    let oud = null;
-    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
-    if (!oud) {
-      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
-    } else {
-      if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
-        fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
-          r.kanten.onbekend.length + '. Los de nieuwe op, of leg de groei met een reden vast in BEDRADING.json');
-        for (const o of r.kanten.onbekend) fout('  ' + o.bestand + ':' + o.lijn + '  ' + o.reden);
+  /* En de andere helft: schrijft er iemand ANDERS in een gedeclareerde collectie? */
+  let indringers = 0;
+  if (eigenaarVan.size) {
+    loop(SERVER, /\.js$/, f => {
+      const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+      if (rel.startsWith('server/db/')) return;
+      const bron = fs.readFileSync(f, 'utf8');
+      if (!bron.includes('db.data')) return;
+      let toks;
+      try { toks = lex(bron); } catch (e) { return; }
+      for (let i = 0; i + 4 < toks.length; i++) {
+        if (!(toks[i].type === 'naam' && toks[i].value === 'db' &&
+              toks[i + 1].value === '.' &&
+              toks[i + 2].type === 'naam' && toks[i + 2].value === 'data' &&
+              toks[i + 3].value === '.' && toks[i + 4].type === 'naam')) continue;
+        const naam = toks[i + 4].value;
+        const baas = eigenaarVan.get(naam);
+        if (!baas || baas === rel) continue;
+        /* Alleen SCHRIJVEN telt: lezen van andermans collectie is een bekende
+           en benoemde vorm (de `vreemd`-secties in de contracten). */
+        const na = toks[i + 5] && toks[i + 5].value;
+        const schrijft = na === '=' || na === '+=' || na === '-=' ||
+          (na === '.' && toks[i + 6] && /^(push|pop|shift|unshift|splice|sort|reverse|fill)$/.test(toks[i + 6].value));
+        if (!schrijft) continue;
+        indringers++;
+        fout('schrijft in andermans collectie: ' + rel + ':' + toks[i].lijn + ' raakt "' + naam +
+          '" aan, en die is van ' + baas);
+        break;
       }
-      for (const g of ['identity', 'money', 'security']) {
-        const b = r.vertrouwen[g];
-        if (b && b.onbekend) {
-          fout(g + ' heeft ' + b.onbekend + ' onbekende kant(en); daar is de eis nul --' +
-            ' een impactzone mag hier nooit te klein uitvallen');
-        }
-      }
-    }
+    });
   }
-}
 
-/* ==========================================================================
-   60) DE VERBODEN GRAAF: paden die er niet eens mogen ZIJN.
-
-   Dit huis beweert zulke dingen al -- de gluurronde (mag A bij de spullen van
-   B), de rolronde (welke rol komt waar binnen), het gesloten circuit van RTG
-   Pay -- maar dynamisch, achteraf, en alleen op de paden waar iemand een toets
-   voor maakte. Een verboden kant die STATISCH staat, geldt overal en altijd,
-   ook waar niemand aan gedacht heeft.
-
-   FAIL-CLOSED: elke regel in scripts/lib/verboden.js noemt wie het WEL mag, met
-   een reden. Al het andere is verboden. Een lijst van wie het NIET mag vergeet
-   zichzelf zodra er een map bijkomt.
-
-   MUTATIE (RAAK): roep accounts.realNameOf() aan in een bestand onder
-   server/routes/member/ -> deze regel meldt het, met de reden dat de ledenkant
-   op codenamen draait.
-
-   Zie PROOF-INCREMENTAL.md par. 4.
-   ========================================================================== */
-console.log('\n60) de verboden graaf: geen enkel pad dat er niet mag zijn');
-{
-  const { meet } = require('./lib/verboden');
-  const r = meet(['server', 'public'], WERKELIJKHEID);
-  if (r.overtredingen.length) {
-    for (const o of r.overtredingen.slice(0, 12)) {
-      fout(o.werkwoord + ' geschonden (' + o.regel + '): ' + o.bestand + ':' + o.lijn +
-        ' raakt ' + o.wat + ' -- ' + o.reden);
-    }
-    if (r.overtredingen.length > 12) fout('... en nog ' + (r.overtredingen.length - 12) + ' plek(ken)');
-  } else {
-    const raakt = Object.values(r.gedekt).reduce((a, g) => a + g.geraakt, 0);
-    ok(r.regels + ' verboden kanten over ' + r.gekeken + ' bestanden; ' + raakt +
-      ' plek(ken) raken ze en dragen allemaal een reden');
-    for (const [id, g] of Object.entries(r.gedekt)) {
-      console.log('  \x1b[2m  ' + id.padEnd(18) + g.geraakt + ' plek(ken), allemaal toegestaan\x1b[0m');
-    }
-  }
+  if (!declaraties) ok('nog geen enkele collectie gedeclareerd via kern/eigencollectie.js');
+  else if (!indringers) ok(eigenaarVan.size + ' collecties met een eigenaar, en niemand schrijft in die van een ander');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

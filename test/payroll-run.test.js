@@ -26,6 +26,7 @@ const { maakComponenten } = require('../server/kern/payroll/componenten');
 const { maakContracten } = require('../server/kern/payroll/contracten');
 const { maakRun } = require('../server/kern/payroll/run');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 function pakket(versie, over) {
   return Object.assign({
@@ -39,12 +40,12 @@ function opzet(merkAan) {
   const db = { data: {} };
   const save = () => {};
   const nu = () => new Date().toISOString();
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
-  const contracten = maakContracten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
+  const contracten = maakContracten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp(pakket('nl-2026.1'), { soort: 'test' });
   if (merkAan !== false) regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
   return { db, regelpakket, componenten, contracten, run };
 }
 

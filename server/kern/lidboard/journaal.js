@@ -39,9 +39,9 @@ const MAX = 200;
 const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('../../lib/keten');
 
 function maakJournaal({ db, save }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/lidboard/journaal', bezit: { ledenBoardLog: 'kaart' } });
   function store() {
-    if (!db.data.ledenBoardLog || typeof db.data.ledenBoardLog !== 'object') db.data.ledenBoardLog = {};
-    return db.data.ledenBoardLog;
+    return eigen.bak('ledenBoardLog');
   }
   const kort = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 

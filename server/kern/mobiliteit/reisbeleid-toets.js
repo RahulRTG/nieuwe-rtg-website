@@ -11,7 +11,7 @@
 const DAGNAMEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 
 module.exports = (ctx) => {
-  const { db, schoon, nu, beleidVan, werktBij, beleidBeeld } = ctx;
+  const { db, schoon, nu, beleidVan, werktBij, beleidBeeld, opslag } = ctx;
   // eigen kopie: een tijd als 'uu:mm' in minuten. Vier regels overzetten is
   // hier eerlijker dan er een ctx-naam voor optuigen die niemand anders leest.
   const minuten = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -19,7 +19,7 @@ module.exports = (ctx) => {
   // wat deze medewerker deze maand al op rekening van het bedrijf zette
   function besteedDezeMaand(org, key) {
     const maand = nu().slice(0, 7);
-    return (db.data.mobOpdrachten || [])
+    return (opslag.bak('mobOpdrachten') || [])
       .filter(o => o.organisatie === org && o.reiziger === key &&
         String(o.gemaakt).slice(0, 7) === maand &&
         o.status !== 'geannuleerd' &&

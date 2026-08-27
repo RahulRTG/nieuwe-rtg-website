@@ -41,13 +41,13 @@ const RITSOORTEN = Object.keys(RITSOORT_MODULE).concat('charter');
 
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, haversine, etaMinutes, modAan, plekBepaal,
-    findSupplier, codenaamVan } = ctx;
+    findSupplier, codenaamVan, opslag } = ctx;
   const { tariefVan, prijsUit, STANDAARD_TARIEF } = require('./opdracht-prijs')({ findSupplier });
 
   function ensureOpdrachten() {
-    if (!Array.isArray(db.data.mobOpdrachten)) db.data.mobOpdrachten = [];
+    opslag.bak('mobOpdrachten');
   }
-  const opdrachtMet = ref => { ensureOpdrachten(); return db.data.mobOpdrachten.find(o => o.ref === ref) || null; };
+  const opdrachtMet = ref => { ensureOpdrachten(); return opslag.bak('mobOpdrachten').find(o => o.ref === ref) || null; };
 
   /* Welke module hoort bij deze aanvraag? Voor een charter komt het antwoord
      uit het voertuig, voor de rest uit de ritsoort. */
@@ -144,7 +144,7 @@ module.exports = (ctx) => {
       gebeurtenissen: [{ soort: 'ride.requested', at: nu(), door: actor.soort || 'lid' }],
       stad: waar.stad
     };
-    db.data.mobOpdrachten.unshift(o);
+    opslag.bak('mobOpdrachten').unshift(o);
     save();
     return { ok: true, opdracht: opdrachtBeeld(o) };
   }
@@ -167,12 +167,12 @@ module.exports = (ctx) => {
     return b;
   }
 
-  const opdrachtenVan = key => { ensureOpdrachten(); return db.data.mobOpdrachten.filter(o => o.reiziger === key); };
-  const opdrachtenVanVervoerder = code => { ensureOpdrachten(); return db.data.mobOpdrachten.filter(o => o.vervoerder === code); };
+  const opdrachtenVan = key => { ensureOpdrachten(); return opslag.bak('mobOpdrachten').filter(o => o.reiziger === key); };
+  const opdrachtenVanVervoerder = code => { ensureOpdrachten(); return opslag.bak('mobOpdrachten').filter(o => o.vervoerder === code); };
   // een rit die op akkoord van de werkgever wacht, hoort op geen enkel planbord
   const wachtOpAkkoord = o => !!(o.goedkeuring && o.goedkeuring.status === 'wacht');
   const opdrachtenOpen = () => { ensureOpdrachten();
-    return db.data.mobOpdrachten.filter(o => !['afgerekend', 'geannuleerd'].includes(o.status) && !wachtOpAkkoord(o)); };
+    return opslag.bak('mobOpdrachten').filter(o => !['afgerekend', 'geannuleerd'].includes(o.status) && !wachtOpAkkoord(o)); };
 
   return { RITSOORTEN, RITSOORT_MODULE, STANDAARD_TARIEF, ensureOpdrachten, opdrachtMet, opdrachtMaak,
     opdrachtBeeld, opdrachtenVan, opdrachtenVanVervoerder, opdrachtenOpen, wachtOpAkkoord,

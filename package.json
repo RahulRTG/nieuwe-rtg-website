@@ -119,6 +119,7 @@
     "chaos": "node scripts/chaos.js",
     "spreiding": "node scripts/spreidingsproef.js",
     "grenzen": "node scripts/grenzen.js",
+    "deuren": "node scripts/deuren.js",
     "leugens": "node scripts/leugendetector.js",
     "mutatie": "node scripts/mutatie.js",
     "grenslijst": "node scripts/grenslijst.js",

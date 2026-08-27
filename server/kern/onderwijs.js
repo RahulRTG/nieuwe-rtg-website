@@ -12,14 +12,14 @@ const { maakBewijs, beheersingVan, BEWIJSSOORTEN } = require('./onderwijs-bewijs
 const { maakGeheugen } = require('./onderwijs-geheugen');
 
 function maakOnderwijs({ db, save, schoon }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/onderwijs', bezit: { onderwijs: 'kaart' } });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const nu = () => new Date().toISOString();
   const faseVan = id => FASEN.find(f => f.id === id) || null;
   const faseIx = id => FASEN.findIndex(f => f.id === id);
 
   function borden() {
-    if (!db.data.onderwijs || typeof db.data.onderwijs !== 'object') db.data.onderwijs = {};
-    return db.data.onderwijs;
+    return eigen.bak('onderwijs');
   }
   function paspoort(key) {
     const alle = borden();

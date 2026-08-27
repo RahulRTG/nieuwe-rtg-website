@@ -9170,7 +9170,7 @@
       '<span style="margin-top:0.6rem;font-size:0.8rem;">'+esc(locTxt)+'</span><i>'+T('buzz.close','Tik om te bevestigen')+'</i></div>';
     el.classList.add('on');
   }
-  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,s2=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s2])); }
   function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   async function addStaff(){
     const name = ($('#ttName').value||'').trim();

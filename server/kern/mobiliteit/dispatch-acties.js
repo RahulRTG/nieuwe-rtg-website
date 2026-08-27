@@ -7,7 +7,7 @@
    hoort: hierboven wordt er GEKEKEN, hier wordt er iets veranderd. */
 module.exports = (ctx) => {
   const { db, save, nu, schoon, assetMet, matchRangschik, poolVan,
-    opdrachtMet, opdrachtBeeld, opdrachtMaak, opdrachtNaar, logActivity, sseToOffice } = ctx;
+    opdrachtMet, opdrachtBeeld, opdrachtMaak, opdrachtNaar, logActivity, sseToOffice, opslag } = ctx;
 
   /* Toewijzen. Met de hand of automatisch -- het is dezelfde functie, want
      het resultaat hoort identiek te zijn. Automatisch kiest alleen de bovenste
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
     if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
     if (o.vervoerder !== vervoerder) return { status: 403, error: 'Deze opdracht hoort bij een andere vervoerder.' };
     const naar = schoon(body.naar, 20);
-    const partner = (db.data.suppliers || []).find(s => s.code === naar);
+    const partner = (opslag.vreemd.leveranciers() || []).find(s => s.code === naar);
     if (!partner) return { status: 404, error: 'Onbekende partnervervoerder.' };
     if (['voltooid', 'afgerekend', 'geannuleerd'].includes(o.status))
       return { status: 409, error: 'Een afgeronde rit boek je niet meer over.' };

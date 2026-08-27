@@ -23,7 +23,7 @@
 module.exports = (ctx) => {
   const { db, save, nu, schoon, assetsVan, assetBeeld, assetMet, matchRangschik,
     opdrachtMet, opdrachtBeeld, opdrachtMaak, opdrachtNaar, opdrachtenVanVervoerder, opdrachtenOpen,
-    wachtOpAkkoord, logActivity, sseToOffice } = ctx;
+    wachtOpAkkoord, logActivity, sseToOffice, opslag } = ctx;
 
   /* De pool die de matcher krijgt. Hier -- en niet in matching.js -- wordt
      bepaald wie er uberhaupt meedoet: alleen voertuigen van deze vervoerder
@@ -62,7 +62,7 @@ module.exports = (ctx) => {
      Ibiza te kijken. */
   function dispatchBeeld(vervoerder, waar = {}) {
     const eigen = opdrachtenVanVervoerder(vervoerder);
-    const zaak = (db.data.suppliers || []).find(s => s.code === vervoerder);
+    const zaak = (opslag.vreemd.leveranciers() || []).find(s => s.code === vervoerder);
     const stad = (waar && waar.stad) || (zaak && zaak.city) || null;
     const markt = opdrachtenOpen().filter(o => !o.vervoerder &&
       ['aangevraagd', 'geprijsd', 'aangeboden'].includes(o.status) &&

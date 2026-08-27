@@ -25,17 +25,12 @@ const KANALEN = ['chat', 'email', 'telefoon', 'qr', 'code', 'bulk', 'directory']
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, entiteitVind, entiteitBeeld, vestigingVind,
-    employmentNieuw, employmentVanPersoon, tijdVandaag } = ctx;
+    employmentNieuw, employmentVanPersoon, tijdVandaag, opslag } = ctx;
 
   const nu = () => new Date().toISOString();
   const DAGEN_GELDIG = 30;
 
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!db.data.concern.uitnodigingen || typeof db.data.concern.uitnodigingen !== 'object')
-      db.data.concern.uitnodigingen = {};
-    return db.data.concern.uitnodigingen;
-  }
+  const bak = () => opslag.tak('uitnodigingen');
 
   const vind = (id) => bak()[String(id || '')] || null;
   const vindCode = (code) => Object.values(bak())

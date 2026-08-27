@@ -109,6 +109,20 @@ const METERS = [
      groeit vanzelf (routes schrijven is stap een, de catalogus bijwerken stap
      twee), dus het hoort aan een ratel. scripts/schakelbaar.js meet het. */
   { sleutel: 'routesNietSchakelbaar', richting: 'omlaag', wat: 'API-routes die niet vanuit de boardroom te schakelen zijn' },
+  /* DE DEUREN NAAR db.data (scripts/deuren.js).
+
+     De contractlaag is de enige weg naar een andere opslag, en de afbouw die
+     daarvoor nodig is duurt langer dan wie dan ook onthoudt. 706 bestanden
+     buiten server/db/ raken db.data rechtstreeks aan; er is dus geen doorgang
+     waar een Data Fabric onder past. Zonder ratel komt er stilletjes een deur
+     bij zodra iemand haast heeft, en dan is de afbouw geen afbouw meer.
+
+     TWEE METERS EN GEEN EEN. Een schrijver bepaalt of de invarianten van een
+     domein kloppen; een lezer bepaalt of je de opslag kunt vervangen. Opgeteld
+     zou een opgeruimde lezer een nieuwe schrijver maskeren -- dezelfde
+     verrekening waarvoor keuringOmvang en keuringTeGroot al zijn gesplitst. */
+  { sleutel: 'dbDeuren', richting: 'omlaag', wat: 'bestanden buiten server/db/ die db.data rechtstreeks aanraken' },
+  { sleutel: 'dbDeurenSchrijvend', richting: 'omlaag', wat: 'bestanden buiten server/db/ die rechtstreeks IN db.data schrijven' },
   /* DE GRENZEN TUSSEN DE DOMEINEN (scripts/grenzen.js).
 
      server.js geeft elke router hetzelfde object `kern` met ruim driehonderd
@@ -701,6 +715,12 @@ function meet(bronnen) {
   try { routesNietSchakelbaar = require('./schakelbaar').meet().ongedekt.length; }
   catch (e) { throw new Error('schakelbaarheid kon niet worden gemeten (' + e.message + '); een meter zonder invoer is geen meter'); }
 
+  /* De deuren naar db.data uit dezelfde bron als het losse script, om dezelfde
+     reden als hierboven: een tweede implementatie loopt binnen een week uiteen. */
+  let deuren = null;
+  try { deuren = require('./deuren').meet(); }
+  catch (e) { throw new Error('de deuren naar db.data konden niet worden geteld (' + e.message + '); een meter zonder invoer is geen meter'); }
+
   /* Hoeveel meters staan er in de ijk-registratie met alleen een REDEN? Die
      hebben we dus NIET zien uitslaan. De teller leest het registratiebestand
      zelf, want een getal dat je hier hardcodeert is precies het soort meter
@@ -779,6 +799,8 @@ function meet(bronnen) {
     routesNietSchakelbaar,
     bronBlindeBestanden,
     delenZonderOnderwerp,
+    dbDeuren: deuren.deuren,
+    dbDeurenSchrijvend: deuren.schrijvendeDeuren,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,
     keuringStuk: k.stuk, keuringScheef: k.scheef,

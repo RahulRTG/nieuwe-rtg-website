@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const { maakUiBronnen } = require('../server/lib/ui-bronnen');
+const { MERK: IJKMERK } = require('../scripts/lib/schonebron');
 
 const ROOT = path.join(__dirname, '..');
 
@@ -48,6 +49,7 @@ test('automatische UI-laag zet schrift-richting per taal en herstelt de basis', 
 
 function loop(dir, uit) {
   for (const naam of fs.readdirSync(dir)) {
+    if (naam.includes(IJKMERK)) continue;             // een ijkrestant is geen scherm; zie scripts/lib/schonebron.js
     const p = path.join(dir, naam), st = fs.statSync(p);
     if (st.isDirectory()) loop(p, uit); else if (naam.endsWith('.html')) uit.push(p);
   }

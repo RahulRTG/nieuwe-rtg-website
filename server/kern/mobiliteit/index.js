@@ -58,6 +58,8 @@ function maakMobiliteit(state) {
   const ctx = { db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
     notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts };
 
+  ctx.opslag = require('./opslag')({ db: ctx.db });   // de enige db-aanraking; zie ./opslag.js
+
   Object.assign(ctx, require('./register')(ctx));
   Object.assign(ctx, require('./plekken')(ctx));
   Object.assign(ctx, require('./assets')(ctx));

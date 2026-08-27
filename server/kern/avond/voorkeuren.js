@@ -43,9 +43,9 @@ const SOORTEN = {
 const STANDEN = ['nooit', 'gevraagd', 'altijd'];
 
 module.exports = ({ db, save, schoon, zorgVoor }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/avond/voorkeuren', bezit: { gastVoorkeuren: 'kaart' } });
   const lijst = () => {
-    if (!db.data.gastVoorkeuren) db.data.gastVoorkeuren = {};
-    return db.data.gastVoorkeuren;
+    return eigen.bak('gastVoorkeuren');
   };
 
   function leeg() {

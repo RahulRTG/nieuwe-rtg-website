@@ -23,6 +23,7 @@ const crypto = require('node:crypto');
 
 const { maakRegister } = require('../server/kern/command/register');
 const { maakZandbak } = require('../server/kern/command/zandbak');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 /* Twee werelden met dezelfde vorm: de productie en de zaaiset. De namen
    verschillen expres, zodat elke verwisseling meteen zichtbaar is. */
@@ -45,7 +46,7 @@ function maak() {
     orders: [{ ref: 'ECHT-1', status: 'open' }, { ref: 'ECHT-2', status: 'open' }]
   } };
   const zaai = () => ({ orders: [{ ref: 'ZAAI-1', status: 'open' }, { ref: 'ZAAI-2', status: 'klaar' }] });
-  const zandbak = maakZandbak({ db, save: () => {}, crypto, zaai, register: REGISTER, catalogus: RECEPT });
+  const zandbak = maakZandbak({ db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto, zaai, register: REGISTER, catalogus: RECEPT });
   return { db, zandbak };
 }
 
@@ -91,7 +92,7 @@ test('een lege zandbak zegt dat hij leeg is', () => {
   /* In productie start de zaaiset bewust zonder demogegevens. Dan is een lege
      zandbak de normale uitkomst en geen storing, en dat hoort er te staan. */
   const db = { data: {} };
-  const z = maakZandbak({ db, save: () => {}, crypto, zaai: () => ({}), register: REGISTER, catalogus: RECEPT });
+  const z = maakZandbak({ db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto, zaai: () => ({}), register: REGISTER, catalogus: RECEPT });
   const k = z.maak('leeg', { door: 'ik' }).zandbak;
   assert.equal(k.objecten, 0);
   assert.match(k.let, /RTG_DEMO/);

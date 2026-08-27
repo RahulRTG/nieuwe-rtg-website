@@ -262,6 +262,9 @@ if (require.main === module) {
       : 'ARCHITECTUUR.md loopt achter op de code. Draai: node scripts/kaart.js');
     process.exit(1);
   }
+  /* Niet schrijven terwijl er toetsen draaien: dan legt deze afdruk hun
+     tijdelijke bestanden vast. Zie scripts/lib/schonebron.js. */
+  require('./lib/schonebron').eisSchoneBron('ARCHITECTUUR.md');
   fs.writeFileSync(DOEL, tekst);
   console.log('ARCHITECTUUR.md geschreven (' + tekst.split('\n').length + ' regels).');
 }

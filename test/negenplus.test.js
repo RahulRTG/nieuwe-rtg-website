@@ -7,6 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
+const { MERK: IJKMERK } = require('../scripts/lib/schonebron');
 
 function api(base, pad, body) {
   return fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })
@@ -31,6 +32,7 @@ test('1. de app-gids dekt ELKE app-pagina met een eigen uitleg (wat, doe, tip)',
   (function loop(dir, pre) {
     for (const f of fs.readdirSync(dir)) {
       const vol = path.join(dir, f);
+      if (f.includes(IJKMERK)) continue;              // een ijkrestant is geen scherm; zie scripts/lib/schonebron.js
       if (fs.statSync(vol).isDirectory()) loop(vol, pre + f + '/');
       else if (f.endsWith('.html')) paginas.push(pre + f);
     }

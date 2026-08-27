@@ -27,9 +27,9 @@ const { s } = require('./register');
    toetsen. */
 const { groepeer, GEEN_OORZAAK } = require('./oorzaak');
 
-function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak }) {
+function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak, opslag }) {
   const reg = register;
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   function plannen() {
     const v = V();
     if (!Array.isArray(v.commandPlannen)) v.commandPlannen = [];

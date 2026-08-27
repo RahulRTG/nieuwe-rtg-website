@@ -37,12 +37,12 @@ const MAX_PER_LIJST = 300;
 const MAX_GEDEELD = 25;
 
 module.exports = ({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mediaos/lijsten', bezit: { mediaLijsten: 'kaart' } });
   const nu = () => new Date().toISOString();
   const id = () => 'ml' + crypto.randomBytes(4).toString('hex');
 
   function tabel() {
-    if (!db.data.mediaLijsten || typeof db.data.mediaLijsten !== 'object') db.data.mediaLijsten = {};
-    return db.data.mediaLijsten;
+    return eigen.bak('mediaLijsten');
   }
   const mijne = (key) => {
     const t = tabel();

@@ -27,14 +27,9 @@ const MAX_DIEPTE = 12;     // een eigendomsketen dieper dan dit is een ring of e
 
 module.exports = (ctx) => {
   const { db, save, crypto, schoon, entiteitVind, entiteitAlle, entiteitBeeld,
-    vestigingAlleVanEntiteit, tijdOpDatumVan, tijdVandaag, tijdVerlooptBinnen } = ctx;
+    vestigingAlleVanEntiteit, tijdOpDatumVan, tijdVandaag, tijdVerlooptBinnen, opslag } = ctx;
 
-  function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!db.data.concern.concerns || typeof db.data.concern.concerns !== 'object')
-      db.data.concern.concerns = {};
-    return db.data.concern.concerns;
-  }
+  const bak = () => opslag.tak('concerns');
 
   const concernVind = (id) => bak()[String(id || '')] || null;
 

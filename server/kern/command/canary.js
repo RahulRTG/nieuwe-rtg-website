@@ -39,13 +39,10 @@ const STANDAARD = {
   tikMs: 30000      // hoe vaak de weging vanzelf draait
 };
 
-function maakCanary({ db, save, meting, journaal, functies }) {
+function maakCanary({ opslag, save, meting, journaal, functies }) {
   const OP_ID = (functies && functies.OP_ID) || {};
 
-  function staat() {
-    db.data.techniek = db.data.techniek || {};
-    return (db.data.techniek.functies = db.data.techniek.functies || {});
-  }
+  const staat = () => opslag.gedeeld.schakelkast();
 
   /* De cijfers van dit moment op de paden van deze functie: hoeveel antwoorden
      en hoeveel serverfouten. Prefix-match op het routepatroon, want zo telt

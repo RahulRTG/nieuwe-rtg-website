@@ -67,13 +67,10 @@ const telOp = (rijen) => {
   return uit;
 };
 
-function maakAangifte({ db, save, nu, crypto, run: runLaag }) {
+function maakAangifte({ opslag, save, nu, crypto, run: runLaag }) {
   const tijd = nu || (() => new Date().toISOString());
 
-  function bak() {
-    if (!Array.isArray(db.data.payrollAangiftes)) db.data.payrollAangiftes = [];
-    return db.data.payrollAangiftes;
-  }
+  const bak = () => opslag.bak('payrollAangiftes');
   const vind = (id) => bak().find(a => a.id === id) || null;
 
   /* ---------- opmaken ---------- */

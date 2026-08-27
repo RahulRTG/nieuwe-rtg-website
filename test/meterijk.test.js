@@ -141,6 +141,45 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  /* DE TWEE DEURMETERS, EN WAAROM ZE ALLEBEI EEN EIGEN PROEF KRIJGEN.
+
+     dbDeuren telt de bestanden buiten server/db/ die db.data rechtstreeks
+     aanraken; dbDeurenSchrijvend het deel daarvan dat er ook IN schrijft. Ze
+     staan los omdat lezen en schrijven verschillende dingen bepalen -- een
+     schrijver bepaalt of de invarianten van een domein kloppen, een lezer of je
+     de opslag kunt vervangen.
+
+     Twee losse meters zijn alleen strakker als de ZEEF ze ook echt uit elkaar
+     houdt. Zou hij elk db.data-bestand als schrijver tellen, dan bewegen beide
+     proeven netjes omhoog en ziet de ijking niets. Daarom kijkt elke proef ook
+     naar de ANDERE meter: het leesbestand hoort dbDeurenSchrijvend te laten
+     staan, en het schrijfbestand hoort in allebei te tellen. Dat is de helft
+     die een enkelzijdige ijking mist. */
+  dbDeuren: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-deur.js',
+      "'use strict';\n" +
+      '/* ijking: raakt db.data alleen LEZEND aan */\n' +
+      'module.exports = (db) => (db.data.leden || []).length;\n',
+      () => {
+        const na = norm.meet();
+        assert.equal(na.dbDeurenSchrijvend - voor.dbDeurenSchrijvend, 0,
+          'een bestand dat db.data alleen LEEST mag de schrijvende meter niet bewegen; ' +
+          'doet hij dat wel, dan meten de twee meters hetzelfde en is de splitsing schijn');
+        return na.dbDeuren - voor.dbDeuren;
+      })
+  },
+  dbDeurenSchrijvend: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-schrijf.js',
+      "'use strict';\n" +
+      '/* ijking: schrijft rechtstreeks IN db.data, langs de datalaag heen */\n' +
+      'module.exports = (db) => { db.data.zzIjkTeller = (db.data.zzIjkTeller || 0) + 1; };\n',
+      () => {
+        const na = norm.meet();
+        assert.equal(na.dbDeuren - voor.dbDeuren, 1,
+          'een schrijver is ook een deur en hoort in BEIDE meters te tellen');
+        return na.dbDeurenSchrijvend - voor.dbDeurenSchrijvend;
+      })
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
@@ -879,6 +918,7 @@ test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
+    'server/kern/zz-ijk-tijdelijk-deur.js', 'server/kern/zz-ijk-tijdelijk-schrijf.js',
     'server/kern/zz-ijk-tijdelijk-c.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }

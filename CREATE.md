@@ -405,6 +405,28 @@ iedere ontwikkelaar toch stelt.
 
 ## 7. Vraagt een besluit
 
+### De besluiten die zijn genomen (27 augustus 2026)
+
+Vier vragen zijn aan de eigenaar voorgelegd en beantwoord. Ze staan hier met de
+uitkomst, want een besluit dat alleen in een gesprek is gevallen, is over een
+maand een mening.
+
+| vraag | besluit | wat dat betekent |
+|---|---|---|
+| Wie mag publiceren zonder rechtspersoon? | **Een geverifieerd natuurlijk persoon mag GRATIS publiceren** | betaald distribueren blijft aan een rechtspersoon; er komt een verificatiestap en een tweede uitgeverssoort. Par. 7.1 hieronder is daarmee beantwoord. |
+| Wat mag er per app gemeten worden? | **Privacyarme tellingen per dag** | aanroepen en weigeringen per foutcode, per app, per dag. Geen bezoeker, geen tijdstip — hetzelfde ontwerp als `kern/webmaker-meting.js`. Daarmee kan de console echte getallen tonen (par. 9.3). |
+| Wanneer blokkeert de toegankelijkheidskeuring? | **Vanaf nu alles** | ook een update van een bestaande app. Sterkste belofte aan leden met een handicap; de prijs is dat een vandaag toegelaten app zonder aanpassing geen update meer kan inzenden. |
+| Wat eerst? | **De mutatieclassificatie uitbreiden** | de voorwaarde voor P5. Gebouwd; zie hieronder wat dat wel en niet oplevert. |
+
+**Bij het derde besluit hoort een ontwerpgevolg dat niet vrij te kiezen is.**
+Blokkeren kan niet ín `keur()` gebeuren: die is synchroon en heeft geen browser,
+en de toegankelijkheidskeuring rendert je app juist in de cel. De poort komt dus
+te staan bij het **besluit**, niet bij het inzenden: inzenden mag altijd, maar
+een versie kan niet worden goedgekeurd zolang de keuring niet is gedraaid en
+geslaagd. Dat past bovendien bij twee bestaande grenzen — de machine keurt nooit
+goed (APPSTORE.md grens 2), en een ingediend stuk is geen bewijs, dus RTG draait
+hem en niet de uitgever. **Dit is nog niet gebouwd.**
+
 ### 7.1 Ontwikkelen zonder eerst bedrijf te zijn
 
 Vandaag loopt inzenden via `supplierAuth`, en de uitgeversplek eist een
@@ -422,7 +444,10 @@ De uitweg is een ladder van identiteiten, zonder een vijfde identiteitsbegrip:
 
 > **Bouw vrij; publiceer naar risico.**
 
-**Het besluit zit op de tweede regel, niet op de eerste.** Bouwen en lokaal
+**Besloten op 27 augustus 2026: de tweede regel.** Een geverifieerd natuurlijk
+persoon mag gratis publiceren; betaald distribueren blijft aan een rechtspersoon.
+
+**Het besluit zat op de tweede regel, niet op de eerste.** Bouwen en lokaal
 draaien vragen geen enkele identiteit — dat kan morgen, want `rtg check` en
 `rtg dev` raken de server niet. Maar zodra code van een natuurlijk persoon voor
 een LID draait, staat er geen aanspreekbare partij meer achter.
@@ -558,7 +583,15 @@ zonder `<title>` kreeg "in orde". Een keuring die zwijgt ziet er precies zo uit
 als een keuring die niets vindt, en dat is de gevaarlijkste soort stilte.
 `test/rtg-a11y.test.js` toets 1 zakt daar nu op.
 
-**Het is bewijs en geen poort**, met twee redenen. Blokkeren zou apps weigeren
+**Besloten op 27 augustus 2026: het wordt een poort, en vanaf nu voor alles** --
+ook voor een update van een bestaande app. De twee redenen hieronder waren de
+argumenten om het nog niet te doen; de eigenaar heeft ze gewogen en anders
+gekozen. Wat er dan moet worden gebouwd, staat in par. 7 onder de besluiten: de
+poort komt bij het BESLUIT te staan en niet bij het inzenden, want `keur()` is
+synchroon en heeft geen browser.
+
+De oorspronkelijke afweging, voor wie hem later terugleest: **het was bewijs en
+geen poort**, met twee redenen. Blokkeren zou apps weigeren
 die vandaag zijn toegelaten — een verandering van de afspraak met bestaande
 uitgevers. En dit is de eerste keer dat dit huis toegankelijkheid op derdencode
 meet; we kennen de uitgangsstand niet, en een poort waarvan niemand weet wat hij
@@ -623,6 +656,34 @@ in plaats van dat een megaproject vooraf moet slagen.
 Dit is de reden dat cron, jobs en functies in bak vier staan: retries bovenop een
 laag waarvan de herhaalbaarheid grotendeels ongemeten is, vermenigvuldigen een
 bestaand gat in plaats van een functie te leveren.
+
+### Wat er nu staat, en wat het eerlijk NIET oplost
+
+`scripts/mutatiesemantiek.js` + `MUTATIESEMANTIEK.json`. Het legt wat er is
+**verklaard** naast wat er is **gemeten**, en meldt de tegenspraak: een route die
+zegt idempotent te zijn terwijl de proef bij een tweede oproep een ander antwoord
+zag. Dat is de duurste fout die hier bestaat, want een taakloper gelooft de
+verklaring en niet de meting.
+
+Een verklaring staat **bij de route** en niet in een lijst ernaast — achter de
+regel voor de vele eenregelige routes, erboven waar een echte uitleg hoort. Een
+lijst naast de code loopt achter op de dag dat iemand een route verplaatst.
+
+De stand vandaag: **20 routes verklaard** (de hele App Store) plus **6 aan de
+rand** (de brug, structureel afgedwongen), tegen 3074 routes met een rol.
+
+**En dat is met opzet geen 3074.** `IDEMPROEF.json` laat zien waarom: van de 2959
+"ongemeten" kwam de proef 1100 keer op een 404, 562 keer op een 403 en 346 keer
+op een 400 — hij had geen geldige invoer of geen rechten en raakte de mutérende
+code nooit aan. Bij 738 veranderde het antwoord sowieso niet. Ze zijn dus niet
+ongemeten omdat niemand keek, maar omdat de meting er niet BIJ kon. Wie ze op
+grond daarvan een klasse geeft, verzint hem — en dat is precies wat LAT-regel 10
+verbiedt.
+
+Ze slinken langs twee wegen, en allebei zijn ze werk: de proef geldige invoer en
+de juiste rol geven zodat hij er wél bij komt, of iemand die de route kent laten
+verklaren wat een tweede aanroep doet. Het getal blijft in de uitslag staan
+zodat het niet uit beeld raakt.
 
 ### De envelop deelt vorm, geen betekenis
 

@@ -33,20 +33,24 @@ module.exports = (kern) => {
   };
 
   // wie ben ik hier, en wat mag ik
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/uitgever', supplierAuth, metOrg((req, o) => Object.assign(
     { status: 200, org: o.org, organisatie: o.naam }, appstore.mijnUitgeverij(o.org))));
 
   // de uitgeversplek aanvragen; een MENS van RTG laat toe
+  /* mutatie: idempotent -- een tweede aanvraag werkt de eerste bij of zegt dat hij er al is */
   app.post('/api/appstore/uitgever/aanvraag', supplierAuth, metOrg((req, o) => appstore.uitgeverAanvragen({
     org: o.org, naam: String(req.body.naam || o.naam || ''), contact: String(req.body.contact || ''), leverancier: req.supplier.code })));
 
   /* Inzenden. Het antwoord bij een afkeuring draagt per bestand en regel wat er
      is gevonden EN hoe het wel kan; dat is het verschil tussen een poort waar je
      doorheen leert komen en een poort waar je tegenaan blijft lopen. */
+  /* mutatie: idempotent -- dezelfde bundel levert dezelfde hash en dus geen tweede versie */
   app.post('/api/appstore/uitgever/inzenden', supplierAuth, metOrg((req, o) => appstore.inzenden({
     org: o.org, manifest: req.body.manifest, bestanden: req.body.bestanden })));
 
   // de eigen app terugtrekken: dat wacht niet op een kantoor
+  /* mutatie: idempotent -- twee keer intrekken laat dezelfde stand achter */
   app.post('/api/appstore/uitgever/intrekken', supplierAuth, metOrg((req, o) => appstore.intrekken({
     sleutel: req.body.sleutel, reden: req.body.reden, door: (req.actor && req.actor.name) || 'de uitgever', doorOrg: o.org })));
 
@@ -54,6 +58,7 @@ module.exports = (kern) => {
      tot nu toe alleen de stand van een versie en niet wat er onderweg gebeurde --
      wie er wanneer naar keek, waarop de machine aansloeg, wanneer een mens
      aftekende. Dat is zijn eigen informatie en die hoort hij te kunnen lezen. */
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/uitgever/journaal', supplierAuth, metOrg((req, o) => ({
     status: 200, lijst: appstore.journaalVan(o.org, req.body && req.body.n)
   })));
@@ -62,12 +67,14 @@ module.exports = (kern) => {
      wat er BEWUST niet is. Dezelfde bron als `rtg sdk` gebruikt
      (kern/appstore/naslag.js), zodat het scherm en de gegenereerde typings niet
      uiteen kunnen lopen. */
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/naslag', supplierAuth, (req, res) =>
     res.json(require('../../kern/appstore/naslag').naslag()));
 
   /* De proefkeuring: dezelfde machinepoort, zonder dat er iets wordt bewaard.
      Hij bestaat omdat de rem op inzenden (twaalf per uur) anders het leren
      tegenhoudt -- en een uitgever die niet kan leren, zendt slechte bundels in. */
+  /* mutatie: idempotent -- de proefkeuring bewaart niets */
   app.post('/api/appstore/uitgever/proef', supplierAuth, metOrg((req, o) => {
     const r = appstore.proef({ manifest: req.body.manifest, bestanden: req.body.bestanden });
     return Object.assign({ status: 200 }, r);
@@ -76,6 +83,7 @@ module.exports = (kern) => {
   /* Wat mijn verkopen hebben opgeleverd: aantallen en bedragen, nooit wie. Een
      uitgever hoort niet te kunnen zien welk lid zijn app kocht -- ook niet op
      codenaam, want een codenaam plus een tijdstip is een spoor. */
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/uitgever/omzet', supplierAuth, metOrg((req, o) => {
     if (!appstore.geld) return { status: 503, error: 'De betaallaag draait niet mee.', nietGebouwd: 'RTG Pay is in dit proces niet gemount.' };
     return Object.assign({ status: 200 }, appstore.geld.omzet(o.org));

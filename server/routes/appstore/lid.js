@@ -17,27 +17,32 @@ module.exports = (kern) => {
   };
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
 
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/catalogus', auth, (req, res) => res.json(
     appstoreWinkel.catalogus(req.body || {}, req.session.key)));
 
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/mijn', auth, (req, res) => res.json({
     apps: appstoreWinkel.mijn(req.session.key), berichten: appstoreBrug.bakjes(req.session.key) }));
 
   /* Installeren EN verlenen in een handeling, maar niet als een knop: het lid
      stuurt mee welke van de gevraagde machtigingen hij geeft. Stuurt hij er geen
      mee, dan krijgt de app er geen -- en dat is een geldige uitkomst. */
+  /* mutatie: idempotent -- twee keer installeren laat dezelfde app op het startscherm */
   app.post('/api/appstore/installeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
     antwoord(res, appstoreWinkel.installeer(req.session.key, req.body.sleutel, req.body.machtigingen));
   });
+  /* mutatie: idempotent -- de verlening wordt GEZET en niet opgeteld */
   app.post('/api/appstore/verleen', auth, (req, res) => {
     if (geenGast(req, res)) return;
     antwoord(res, appstoreWinkel.verleen(req.session.key, req.body.sleutel, req.body.machtigingen));
   });
-  app.post('/api/appstore/weg', auth, (req, res) => antwoord(res, appstoreWinkel.verwijder(req.session.key, req.body.sleutel)));
-  app.post('/api/appstore/wis-opslag', auth, (req, res) => antwoord(res, appstoreWinkel.wisOpslag(req.session.key, req.body.sleutel)));
+  app.post('/api/appstore/weg', auth, (req, res) => antwoord(res, appstoreWinkel.verwijder(req.session.key, req.body.sleutel)));   /* mutatie: idempotent -- twee keer verwijderen laat dezelfde stand achter */
+  app.post('/api/appstore/wis-opslag', auth, (req, res) => antwoord(res, appstoreWinkel.wisOpslag(req.session.key, req.body.sleutel)));   /* mutatie: idempotent -- twee keer wissen laat dezelfde lege opslag */
 
   // wat de celpagina nodig heeft om een app te openen
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/open', auth, (req, res) => {
     if (geenGast(req, res)) return;
     antwoord(res, appstoreWinkel.open(req.session.key, req.body.sleutel));
@@ -47,6 +52,12 @@ module.exports = (kern) => {
      komt hier uit de sessie en uit de verlening -- nooit uit de body. Een app die
      een andere sleutel meestuurt dan de app die draait, spreekt daarmee alleen
      over zichzelf: de verlening wordt op die sleutel opgezocht. */
+  /* GEEN mutatieklasse op deze route, en dat is met opzet. Wat een tweede
+     aanroep doet, hangt hier niet aan de ROUTE maar aan de methode die erin
+     zit: opslag.zet is idempotent, bericht.zet is nietHerhaalbaar. Een klasse
+     op de route zou de ene of de andere helft van de waarheid zijn. De
+     verklaring staat daarom per methode in kern/appstore/brug.js, waar
+     kern/mutatie.js hem structureel afdwingt. */
   app.post('/api/appstore/brug', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const sleutel = String(req.body.sleutel || '');
@@ -69,13 +80,14 @@ module.exports = (kern) => {
      de gegevens blijven, en -- het belangrijkste -- wat wij NIET kunnen
      aantonen. Een document dat alleen een inkoper mag lezen, is een
      verkooppraatje; dit hoort iedereen te kunnen openen die de app overweegt. */
-  app.post('/api/appstore/dossier', auth, (req, res) => antwoord(res, appstore.dossier(String(req.body.sleutel || ''))));
+  app.post('/api/appstore/dossier', auth, (req, res) => antwoord(res, appstore.dossier(String(req.body.sleutel || ''))));   /* mutatie: idempotent -- lezen */
   // en wat voor het HELE kanaal geldt, los opvraagbaar: dat scheelt het per app lezen
-  app.post('/api/appstore/kanaal', auth, (req, res) => res.json(appstore.kanaal()));
+  app.post('/api/appstore/kanaal', auth, (req, res) => res.json(appstore.kanaal()));   /* mutatie: idempotent -- lezen */
 
   /* De tijdlijn van het lid: wat gaf ik, wanneer, en wanneer nam ik het terug.
      Alleen de eigen tijdlijn -- de sleutel komt uit de sessie en nooit uit de
      body, want dan zou een lid die van een ander kunnen opvragen. */
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/tijdlijn', auth, (req, res) => res.json({
     tijdlijn: appstore.tijdlijn(req.session.key, req.body.sleutel ? String(req.body.sleutel) : null, req.body.n),
     soorten: appstore.TIJDLIJN_SOORTEN,
@@ -83,8 +95,10 @@ module.exports = (kern) => {
 
   /* Het bakje van een app, gelezen door het lid. Loopt met opzet NIET over de
      brug: een app hoort niet te kunnen zien of zijn bericht is gelezen. */
+  /* mutatie: idempotent -- lezen */
   app.post('/api/appstore/berichten', auth, (req, res) => res.json({
     berichten: appstoreBrug.bakje(req.session.key, String(req.body.sleutel || '')) }));
+  /* mutatie: idempotent -- twee keer gelezen melden laat dezelfde stand */
   app.post('/api/appstore/berichten/gelezen', auth, (req, res) => res.json(
     appstoreBrug.bakjeGelezen(req.session.key, String(req.body.sleutel || ''))));
 };

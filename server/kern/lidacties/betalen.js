@@ -60,6 +60,16 @@ async function betaalOrderVoor(session, body) {
   const geld = await rekenAf({ session, supplierCode: o.supplierCode, supplierNaam: o.supplierName,
     bedrag: o.total, fooi, korting, voordeel, soort: 'bestelling', ref: o.ref, idem: 'order:' + o.ref });
   if (geld.error) return geld;   // rekenAf gaf het tegoed al terug
+  /* EEN HERHALING IS GEEN TWEEDE BETALING, en mag dus ook de gevolgen niet nog
+     eens hebben. De grendel hierboven (`o.paid`) vangt de tweede tik pas als de
+     eerste KLAAR is; twee tikken tegelijk glippen er allebei langs, want op dat
+     moment staat paid nog op false. Het geld ging dan wel een keer -- daar is de
+     idem-sleutel voor, en die werkte -- maar alles erna liep twee keer: punten
+     erbij, een tweede factuur, de ingredienten nog eens afgeboekt en de zaak
+     kreeg "Nieuwe bestelling (betaald)" in tweevoud. `herhaald` is precies het
+     signaal dat de kas dit verzoek al kende, dus hier hoort dezelfde 409 als
+     hierboven. rekenAf heeft het verrekende tegoed al teruggegeven. */
+  if (geld.herhaald) return { status: 409, error: 'Al betaald.' };
   o.payBetaaldCenten = geld.betaaldCenten;
   o.payBijgelegdCenten = geld.bijgelegdCenten;
   o.paid = true;

@@ -2177,7 +2177,15 @@ const hulp = {
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
-  ordersVanKlant, ordersVanZaak, pasTegoedToe, path, pickupCode, pinSlot, pushLive, rememberSession,
+  /* pasTegoedToe EN herstelTegoed horen als PAAR mee. Alleen de eerste stond
+     hier, en dat viel niet op omdat de tweede alleen wordt geroepen als een
+     betaling MISLUKT of een HERHALING is -- kern/lidacties/afrekenen.js geeft
+     het verrekende puntentegoed dan terug. Bij een dubbele betaling op
+     dezelfde bestelling (twee tikken, een race) viel de server daardoor met
+     "herstelTegoed is not a function": het lid kreeg een 500 waar een nette
+     409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
+     paar doorgeven zonder de andere. */
+  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende

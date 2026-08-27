@@ -108,17 +108,21 @@ module.exports = (ctx) => {
     const geld = await rekenAf({ session, supplierCode: s.code, supplierNaam: s.name,
       bedrag: subtotaal, fooi, korting, voordeel, soort: 'rekening',
       ref: bonnen[0].ref, idem: 'rekening:' + bonnen.map(o => o.ref).join(',') });
-    if (geld.error) {
+    if (geld.error || geld.herhaald) {
       /* Niets is doorgegaan, dus alles terug: de bonnen stonden al op betaald in
          het geheugen. Zonder deze regel is een mislukte betaling een rekening
          die betaald LIJKT en het niet is -- precies de fout die deze ronde
-         wegneemt, dan andersom. */
+         wegneemt, dan andersom.
+         EEN HERHALING HOORT HIER OOK, en om dezelfde reden als bij de
+         bestelling (zie ./betalen.js): twee tikken tegelijk glippen allebei
+         langs de grendel, het geld gaat een keer, maar de markers, de facturen
+         en het bericht aan de zaak zouden twee keer gezet worden. */
       bonnen.forEach((o, i) => {
         for (const [veld, waarde] of Object.entries(voorstand[i])) {
           if (waarde === undefined) delete o[veld]; else o[veld] = waarde;
         }
       });
-      return geld;
+      return geld.error ? geld : { status: 409, error: 'Deze rekening is al betaald.' };
     }
     /* DE MARKER OP ELKE BON, EN NIET ALLEEN OP DE EERSTE.
 

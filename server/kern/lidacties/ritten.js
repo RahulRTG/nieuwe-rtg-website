@@ -111,6 +111,10 @@ async function betaalRitVoor(session, body) {
     bedrag: r.quote, fooi: fooiR, korting: kortingR, voordeel: voordeelR,
     soort: 'rit', ref: r.ref, idem: 'rit:' + r.ref });
   if (geld.error) return geld;   // rekenAf gaf het tegoed al terug
+  /* Zelfde reden als bij de bestelling (zie ./betalen.js): twee tikken tegelijk
+     komen allebei langs `r.paid`, en zonder deze regel loopt alles na het geld
+     twee keer. */
+  if (geld.herhaald) return { status: 409, error: 'Deze rit is al betaald.' };
   r.payBetaaldCenten = geld.betaaldCenten;
   r.payBijgelegdCenten = geld.bijgelegdCenten;
   r.paid = true;

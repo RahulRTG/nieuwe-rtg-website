@@ -33,11 +33,29 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# DE TIJDGRENS PER BAAN, EN WAAROM HIJ OP 120 STAAT.
+#
+# Hij stond op 90, en dat was op 27 augustus 2026 geen ruime grens meer maar
+# een randje. Gemeten op main (545f876, run 33079669786): de toetsstap deed
+# 76m56s, Postgres 2m29s, de rest ruim een minuut -- 83m06s in totaal. Zeven
+# minuten over. De baan "Toegankelijkheid" zat er met 76 minuten net zo tegenaan.
+#
+# Een tak die toetsen toevoegt eet die zeven minuten dus op, en dan zakt niet
+# EEN toets maar de hele baan: hij wordt AFGEBROKEN, en dat ziet er in de
+# uitslag heel anders uit dan rood. De kostprijstak liep er als eerste in --
+# toetsstap 84m18s, Postgres afgebroken op de 90e minuut, en de vier stappen
+# erna (norm, routes, build) niet eens gedraaid.
+#
+# 120 is dus geen ruimte om trager te worden maar het herstel van de marge die
+# er hoorde te zijn. Wat het NIET is: een oplossing voor een suite die naar
+# twee uur groeit. Als de toetsstap boven de 100 minuten komt, hoort de baan
+# gesplitst te worden (Postgres draait maar 2,5 minuut en hoeft niet achter de
+# JSON-ronde te wachten) en niet dit getal nog eens omhoog.
 jobs:
   test:
     name: Tests, checks en build
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     services:
       postgres:
         image: postgres:16-alpine
@@ -239,7 +257,9 @@ jobs:
   a11y:
     name: Toegankelijkheid (eigen keuring)
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Zelfde marge als de toetsbaan hierboven, om dezelfde reden: deze scan
+    # loopt elk scherm af, dus elk scherm dat erbij komt kost hier tijd.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7

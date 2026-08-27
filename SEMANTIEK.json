@@ -1,12 +1,12 @@
 {
-  "catalogi": 939,
+  "catalogi": 951,
   "verschillendeNamen": 571,
-  "namenInMeerDomeinen": 104,
-  "woordenMetMeerBetekenissen": 89,
-  "betekenissenTotaal": 324,
+  "namenInMeerDomeinen": 107,
+  "woordenMetMeerBetekenissen": 92,
+  "betekenissenTotaal": 334,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 43,
-  "dubbelingen": 27,
+  "dubbelingen": 28,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -202,6 +202,25 @@
         "kind",
         "tiener",
         "jong"
+      ]
+    },
+    {
+      "naam": "NIET_GEBOUWD",
+      "betekenissenVanDitWoord": 2,
+      "waar": [
+        "server/kern/command/opslag-register.js",
+        "server/kern/concern/opslag.js",
+        "server/kern/levensdossier/velden.js",
+        "server/kern/mobiliteit/opslag.js",
+        "server/kern/payroll/opslag.js",
+        "server/kern/veiligheid/opslag.js"
+      ],
+      "leden": 5,
+      "voorbeeld": [
+        "schema",
+        "validatie",
+        "bevoegdheid",
+        "gebeurtenissen"
       ]
     },
     {
@@ -2402,8 +2421,8 @@
     },
     {
       "naam": "VELDEN",
-      "domeinen": 6,
-      "betekenissen": 6,
+      "domeinen": 7,
+      "betekenissen": 7,
       "hoogsteOverlap": 0.09,
       "soort": "botsing",
       "waar": [
@@ -2429,6 +2448,18 @@
             "adres",
             "identiteit",
             "reisdocument"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 24,
+          "voorbeeld": [
+            "verzoeken",
+            "bezittingen",
+            "afspraken",
+            "dossier"
           ]
         },
         {
@@ -2790,6 +2821,63 @@
       ]
     },
     {
+      "naam": "DOMEINEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0.09,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/bureau/delegatie.js"
+          ],
+          "leden": 14,
+          "voorbeeld": [
+            "huishouden",
+            "vervoer",
+            "kring",
+            "reizen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/levensdossier/velden.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "lifestyle",
+            "rechterhand",
+            "bureau",
+            "levensgraaf"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/rtmail-adres.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "personeel",
+            "kantoor",
+            "rtf",
+            "rtg"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/stad/domeinen.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "verkeer",
+            "licht",
+            "lucht",
+            "geluid"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "FASES",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3016,6 +3104,63 @@
       ]
     },
     {
+      "naam": "REGISTER",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/command/opslag-register.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "steden",
+            "landen",
+            "zandbakken",
+            "overnames"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/concern/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "concerns",
+            "entiteiten",
+            "vestigingen",
+            "employments"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/fiscaal/zekerheid.js"
+          ],
+          "leden": 19,
+          "voorbeeld": [
+            "btw.aangifte",
+            "btw.regel",
+            "btw.herbouw",
+            "btw.categorie"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/veiligheid/opslag.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "alarmen",
+            "wachten",
+            "momenten",
+            "kring"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "SCENARIOS",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3116,96 +3261,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "DOELGROEPEN",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0.1,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/functies/register/doelgroepen.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "rtg",
-            "lifestyle",
-            "business",
-            "gast"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtfos/berichten.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "vrijwilligers",
-            "partners",
-            "projectgroep",
-            "deelnemers"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/school/peiling.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "ouders",
-            "leerlingen",
-            "personeel"
-          ]
-        }
-      ]
-    },
-    {
-      "naam": "DOMEINEN",
-      "domeinen": 3,
-      "betekenissen": 3,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/bureau/delegatie.js"
-          ],
-          "leden": 14,
-          "voorbeeld": [
-            "huishouden",
-            "vervoer",
-            "kring",
-            "reizen"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/rtmail-adres.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "personeel",
-            "kantoor",
-            "rtf",
-            "rtg"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/stad/domeinen.js"
-          ],
-          "leden": 8,
-          "voorbeeld": [
-            "verkeer",
-            "licht",
-            "lucht",
-            "geluid"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 2728
+  "bestanden": 2737
 }

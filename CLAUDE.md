@@ -202,7 +202,8 @@ Par. 9 staat er even groot bij: drie dingen die makkelijk voor bestaand worden
 aangezien en het niet zijn — **Magnaat is een leerspel voor mensen en hoort niet
 in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
-App Store-keuring kijkt niet naar toegankelijkheid, en er is geen kostenvlak. En
+App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
+zie par. 9.2), en er is geen kostenvlak. En
 par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
 zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met

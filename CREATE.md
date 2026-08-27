@@ -600,7 +600,7 @@ geen onafhankelijke pentest is) en `scripts/chaos.js` (een server omleggen en
 meten of de rest het overneemt). Daar hoort `rtg break` te beginnen — niet in
 Magnaat. Magnaat kan later scenario's aanleveren; het is niet dezelfde motor.
 
-### 9.2 De keuring keek niet naar toegankelijkheid — de adapter staat er nu
+### 9.2 De keuring keek niet naar toegankelijkheid — nu is het een poort
 
 `kern/appstore/keuring.js` controleert bestandssoort, budget, verboden vormen,
 externe verwijzingen en de virusscan. Meer niet. De a11y-machinerie
@@ -636,11 +636,29 @@ uitgevers. En dit is de eerste keer dat dit huis toegankelijkheid op derdencode
 meet; we kennen de uitgangsstand niet, en een poort waarvan niemand weet wat hij
 tegenhoudt is geen poort maar een verrassing.
 
-**Wat er nog niet is: de uitslag als bewijs bij de app in de winkel.** Dat vraagt
-een browser op het moment van inzenden, en die heeft de server niet — `keur()` is
-synchroon en browserloos. Vandaar dat dit een eigen opdracht is en geen stap in
-de machinepoort. Wie het wel wil, bouwt een keurloper naast de server; dat is
-een besluit met een eigen bewijslast en geen regel erbij.
+**De keurloper is er inmiddels** (`scripts/appstore-a11y.js`). Hij draait naast
+de server, op een machine waar wél een browser staat: hij haalt de wachtrij op,
+rendert elke bundel in de cel en zet de uitslag terug. De poort zelf staat in
+`kern/appstore/toegankelijk.js` en knelt bij het **besluit**, alleen in de
+publiceer-tak — inzenden mag altijd, en weigeren mag ook zonder keuring, want een
+mens die een app afkeurt hoeft niet eerst te meten.
+
+Drie dingen daaraan zijn geen implementatiedetail:
+
+- **De uitslag hangt aan de bundelhash, niet aan de app.** Zou hij aan de app
+  hangen, dan keurt de eerste versie de volgende goed — het gat waar zo'n poort
+  doorheen lekt.
+- **`niet vast te stellen` is geen ja.** Draait de keuring niet, dan gaat de
+  poort dicht en niet open. Dezelfde regel als de virusscanner in de
+  machinepoort.
+- **Hij keurt niets goed.** `in-orde` haalt alleen de blokkade weg; een mens van
+  RTG tekent nog steeds af (APPSTORE.md grens 2). En RTG draait hem zelf — een
+  ingediend stuk is geen bewijs.
+
+**Wat er nog niet is: de uitslag als bewijs bij de app in de winkel.** De meting
+bestaat nu en staat bij de versie; wat er niet staat is een lezer aan de
+LEDEN-kant. Dat is een eigen besluit — wat je een lid met een handicap belooft op
+een kaart in de Mall, is een belofte die je niet met één getal doet.
 
 ### 9.3 Er is geen kosten- of metervlak, en dat begrenst de console
 

@@ -35,10 +35,13 @@
    ========================================================================== */
 'use strict';
 
-/* De grens is een miljard cent (tien miljoen euro). Niet omdat dat een beleid
-   is maar omdat een bedrag daarboven in dit huis altijd een invoerfout is, en
-   een som die stilletijgs doorloopt tot Infinity is erger dan een weigering. */
-const MAX_CENTEN = 1000000000;
+/* HEET REKENGRENS EN NIET `REKENGRENS`. Dat woord staat al op drie plekken en
+   betekent daar telkens een BELEIDSplafond: een miljoen euro op een geldpot
+   (kern/geldbeleid), 50.000 per transactie (kern/directpay), 5.000 bij het
+   podium. Dit is iets anders: geen plafond dat iemand heeft gekozen maar de
+   grens waarboven een getal in dit huis altijd een invoerfout is. Een som die
+   stilletjes doorloopt tot Infinity is erger dan een weigering. */
+const REKENGRENS = 1000000000;
 
 /* `Number(null)` is 0 en `Number('')` ook, en dat is precies hoe een leeg veld
    een boeking van nul euro wordt zonder dat iemand het merkt. Leeg is hier geen
@@ -57,7 +60,7 @@ function naarCenten(euro) {
   const n = getal(euro);
   if (n == null) return null;
   const c = Math.round(n * 100);
-  return Math.abs(c) > MAX_CENTEN ? null : c;
+  return Math.abs(c) > REKENGRENS ? null : c;
 }
 
 /* Terug, om te TONEN. Nooit om mee te rekenen: wie in euro's verder rekent,
@@ -85,7 +88,7 @@ function regelCenten(stukCenten, aantal) {
   const a = Math.floor(n);
   if (a < 0) return null;
   const c = s * a;
-  return Math.abs(c) > MAX_CENTEN ? null : c;
+  return Math.abs(c) > REKENGRENS ? null : c;
 }
 
 /* Een som van centen. Weigert zodra er iets tussen zit dat geen geheel getal
@@ -99,7 +102,7 @@ function somCenten(lijst) {
     if (n == null || !Number.isInteger(n)) return null;
     t += n;
   }
-  return Math.abs(t) > MAX_CENTEN ? null : t;
+  return Math.abs(t) > REKENGRENS ? null : t;
 }
 
-module.exports = { naarCenten, naarEuro, rondEuro, regelCenten, somCenten, MAX_CENTEN };
+module.exports = { naarCenten, naarEuro, rondEuro, regelCenten, somCenten, REKENGRENS };

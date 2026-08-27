@@ -27,7 +27,7 @@ module.exports = (sctx) => {
      alleen afronden. Zie de kop van kern/geld/eenheid.js. De grens van een
      miljoen euro die hier stond, blijft: een schoolbudget daarboven is een
      typefout en geen bedrag. */
-  const naarCenten = (v) => Math.min(EENHEID.MAX_CENTEN, EENHEID.naarCenten(Math.max(0, Number(v) || 0)) || 0);
+  const naarCenten = (v) => Math.min(EENHEID.REKENGRENS, EENHEID.naarCenten(Math.max(0, Number(v) || 0)) || 0);
   const open = (f) => Math.max(0, f.centen - (f.betaald || 0) + (f.terugbetaald || 0));
   const NOOIT = { blokkeertOnderwijs: false,
     uitleg: 'Een openstaande post heeft geen enkel gevolg voor het onderwijs: geen uitsluiting, geen geblokkeerd account, geen verborgen cijfers.' };

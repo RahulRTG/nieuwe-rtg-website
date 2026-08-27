@@ -32,13 +32,18 @@
 /* De gronden. Gesloten lijst: een vrij tekstveld als reden zou binnen een maand
    vijftien spellingen van "klant wilde niet" opleveren, en dan is er niets meer
    over te tellen. De toelichting mag er los bij. */
-const GRONDEN = [
+/* HEET ANNULEERGRONDEN EN NIET `ANNULEERGRONDEN`. Dat woord staat al in
+   kern/commerce/retourlijst.js voor de gronden van een RETOUR, en dat is een
+   ander begrip: daar brengt een koper iets terug, hier draait een kassa een bon
+   terug. Twee lijsten onder een naam is precies wat SEMANTIEK.json meet, en dit
+   huis heeft er al 80. Naar buiten heette hij toch al zo. */
+const ANNULEERGRONDEN = [
   { id: 'betaling-mislukt', label: 'Betaling ketste af', wat: 'De bon was geschreven, de betaling kwam niet rond.' },
   { id: 'vergissing', label: 'Vergissing aan de kassa', wat: 'Verkeerd artikel, verkeerd aantal, dubbel aangeslagen.' },
   { id: 'klant-zag-af', label: 'Klant zag ervan af', wat: 'De klant heeft de aankoop bij de kassa teruggedraaid.' },
   { id: 'retour', label: 'Retour van de klant', wat: 'De klant bracht het terug; het geld gaat langs RTG Pay.' }
 ];
-const OP_ID = new Map(GRONDEN.map(g => [g.id, g]));
+const OP_ID = new Map(ANNULEERGRONDEN.map(g => [g.id, g]));
 
 module.exports = (ctx) => {
   const { db, save, id, nu, rond, schoon, isRetail, variantVan, sseToSupplier, sseToOffice } = ctx;
@@ -52,7 +57,7 @@ module.exports = (ctx) => {
     if (!isRetail(s)) return { status: 400, error: 'Deze zaak is geen retail.' };
     const o = opt || {};
     const grond = OP_ID.get(schoon(o.grond, 30));
-    if (!grond) return { status: 400, error: 'Kies een grond: ' + GRONDEN.map(g => g.id).join(', ') + '.' };
+    if (!grond) return { status: 400, error: 'Kies een grond: ' + ANNULEERGRONDEN.map(g => g.id).join(', ') + '.' };
 
     const lijst = bonnen(s.code);
     const bon = (saleOfId && typeof saleOfId === 'object')
@@ -118,5 +123,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { annuleerVerkoop, verkoopTerug, bonBeeld, GRONDEN };
+  return { annuleerVerkoop, verkoopTerug, bonBeeld, GRONDEN: ANNULEERGRONDEN };
 };

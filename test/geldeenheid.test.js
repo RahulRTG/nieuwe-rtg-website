@@ -67,13 +67,13 @@ test('4. somCenten weigert een lijst waar een euro-bedrag tussen zit', () => {
 });
 
 test('5. de grens houdt een som tegen die wegloopt', () => {
-  assert.equal(G.somCenten([G.MAX_CENTEN, 1]), null);
-  assert.equal(G.regelCenten(G.MAX_CENTEN, 2), null);
+  assert.equal(G.somCenten([G.REKENGRENS, 1]), null);
+  assert.equal(G.regelCenten(G.REKENGRENS, 2), null);
 });
 
 test('6. geen van de drie heet `centen` -- dat is de hele bedoeling', () => {
   assert.deepEqual(Object.keys(G).sort(),
-    ['MAX_CENTEN', 'naarCenten', 'naarEuro', 'regelCenten', 'rondEuro', 'somCenten']);
+    ['REKENGRENS', 'naarCenten', 'naarEuro', 'regelCenten', 'rondEuro', 'somCenten']);
 });
 
 /* ---- en de wacht op de naam zelf ---- */

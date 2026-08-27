@@ -68,6 +68,30 @@ module.exports = (kern) => {
     stuur(res, commerce.mandBeeld(wie(req)));
   });
 
+  /* ---------- de overdracht (kern/commerce/overdracht.js) ----------
+
+     De keuze afleveren bij de deur die wel bevestigt. Er wordt hier NIETS
+     besteld: het antwoord is een briefje-id en het adres van de pagina waar het
+     domein zijn eigen bevestiging doet. Wat er in het briefje staat, komt uit
+     het doorgerekende mandbeeld van deze sessie -- de body zegt alleen WELKE
+     verkoper en, als er twee deuren zijn, welke. */
+  app.post('/api/commerce/overdracht/maak', auth, (req, res) => {
+    const b = req.body || {};
+    stuur(res, commerce.overdrachtMaak(wie(req), {
+      verkoper: tekst(b.verkoper, 40), pagina: tekst(b.pagina, 200)
+    }));
+  });
+
+  /* Lezen op het scherm van het DOMEIN: shared/overdracht.js haalt hem op zodra
+     er `?overdracht=` in het adres staat. De sleutel komt uit de sessie en niet
+     uit het adres -- een id in een adresbalk is anders een leesbaar briefje voor
+     iedereen met wie die link wordt gedeeld. */
+  app.post('/api/commerce/overdracht/lees', auth, (req, res) =>
+    stuur(res, commerce.overdrachtLees(tekst((req.body || {}).id, 60), wie(req))));
+
+  app.post('/api/commerce/overdracht/mijn', auth, (req, res) =>
+    res.json({ ok: true, overdrachten: commerce.overdrachtMijn(wie(req)) }));
+
   /* ---------- de weg terug (COMMERCE.md par. 6, kern/commerce/retour.js) ----------
 
      WIE WAT MAG, ZIT IN DE KERN EN NIET HIER. `door` zegt namens welke partij

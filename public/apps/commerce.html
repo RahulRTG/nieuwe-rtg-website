@@ -85,6 +85,11 @@
   .klaar{border:1px dashed var(--gold);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;font-size:.84rem;color:var(--muted);}
   .klaar b{color:var(--txt);}
   .deur a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--line);}
+  .ga{font:inherit;font-size:.8rem;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:.3rem .9rem;cursor:pointer;margin-right:.35rem;}
+  .ga:hover:not(:disabled){background:var(--gold);color:var(--bg);}
+  .ga:focus-visible{outline:2px solid var(--txt);outline-offset:2px;}
+  .ga:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line);color:var(--soft);}
+  .gaf{display:block;font-size:.74rem;color:var(--soft);margin-top:.1rem;}
   .samen{border:1px dashed var(--line);border-radius:14px;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
   .samen b{color:var(--txt);font-weight:600;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
@@ -133,6 +138,7 @@ const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<'
    tot precies het bedrag dat je betaalt, verdraagt geen afronding op hele
    euro's. Zelfde reden als euroC() in mall.html. */
 const euroC = c => (c==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c)/100);
+const tijd = ms => { try { return new Date(ms).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } };
 let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity='1'; clearTimeout(m._t); m._t = setTimeout(()=>m.style.opacity='0',2400); }
 const api = (pad, body) => fetch(pad, {
@@ -276,20 +282,32 @@ function toonMand(m){
   if (m.volledig === false) h += '<div class="stuk">Niet alle bronnen waren bereikbaar toen dit bedrag werd uitgerekend. Er kan een regel ontbreken.</div>';
   h += (m.afrekeningen||[]).map(a =>
     '<div class="afrek"><div class="top"><h3>'+esc(a.aanbiederNaam)+'</h3><span class="bedrag">'+euroC(a.totaalCenten)+'</span></div>'+
-    (a.regels||[]).map(r => '<div class="regel"><span class="l">'+r.aantal+'× '+esc(r.titel)+'</span><span>'+(r.gratis?'gratis':euroC(r.totaalCenten))+'</span></div>').join('')+
+    (a.regels||[]).map(r => '<div class="regel"><span class="l">'+r.aantal+'× '+esc(r.titel)+
+      /* HET MERKJE: aan wie is deze regel doorgegeven, en wanneer. Er staat met
+         opzet niet "besteld" -- RTG hoort niet van het domein of de koper heeft
+         doorgezet, en dat zou een bewering zijn zonder meting. Weghalen doet de
+         koper zelf. */
+      (r.overdracht ? '<span class="gaf">Doorgegeven aan '+esc(r.overdracht.naar)+' om '+tijd(r.overdracht.at)+'. Of het is bevestigd, weet RTG niet.</span>' : '')+
+      '</span><span>'+(r.gratis?'gratis':euroC(r.totaalCenten))+'</span></div>').join('')+
     '<div class="btwr">'+(a.btw
       ? 'Inclusief '+a.btw.tariefProcent+'% btw ('+euroC(a.btw.btwCenten)+') over '+euroC(a.btw.nettoCenten)+' netto.'
       : esc(a.btwOnbekend||''))+'</div>'+
     ((a.blokkades||[]).length ? '<div class="blok">'+a.blokkades.map(b=>esc(b.titel)+': '+esc(b.reden)).join('<br>')+'</div>' : '')+
-    /* WAAR JE HET BEVESTIGT. Deze laag doet dat met opzet niet zelf, dus zonder
-       deze regel eindigt het scherm in het niets. Meerdere deuren bij een
-       verkoper worden ook als meerdere getoond -- een tafel en een artikel
-       worden op verschillende plekken bevestigd, en dat samentrekken zou hier
-       een belofte maken die de kern juist weigert. */
+    /* WAAR JE HET BEVESTIGT, EN JE KEUZE GAAT MEE. Deze laag bevestigt met opzet
+       niet zelf; zonder deze knop eindigt het scherm in het niets en begint de
+       koper in het domein opnieuw. De knop maakt een OVERDRACHT: een briefje met
+       wat je koos en wat RTG rekende, dat op het scherm van het domein bovenaan
+       verschijnt (shared/overdracht.js). Bevestigen doet het domein.
+
+       Meerdere deuren bij een verkoper worden ook als meerdere knoppen getoond --
+       een tafel en een artikel worden op verschillende plekken bevestigd, en dat
+       samentrekken zou hier een belofte maken die de kern juist weigert. */
     ((a.bevestigBij||[]).length
-      ? '<div class="deur">Bevestigen doe je bij de verkoper zelf: ' +
-        a.bevestigBij.map(p => '<a href="'+esc(p)+'">'+esc((p.replace('/apps/','').replace('.html','')||'').replace(/^./, c => c.toUpperCase()))+'</a>').join(' &middot; ') + '</div>'
-      : '<div class="deur">Voor deze verkoper is geen plek bekend waar dit wordt bevestigd.</div>')+
+      ? '<div class="deur">Bevestigen doe je bij de verkoper zelf. Je keuze gaat mee: ' +
+        a.bevestigBij.map(p => '<button type="button" class="ga" data-ga="'+esc(a.aanbiederCode||'__rtg')+'" data-pagina="'+esc(p)+'"'+
+          (a.bevestigbaar ? '' : ' disabled')+'>Naar '+
+          esc((p.replace('/apps/','').replace('.html','')||'').replace(/^./, c => c.toUpperCase()))+'</button>').join(' ') + '</div>'
+      : '<div class="deur">Voor deze verkoper is geen plek bekend waar dit wordt bevestigd. RTG stuurt je niet naar een deur die hij niet kent.</div>')+
     '</div>').join('');
 
   /* De belangrijkste zin van dit scherm. Er is geen knop "betaal alles", en dat
@@ -300,6 +318,35 @@ function toonMand(m){
   if (m.genegeerd) h += '<div class="stuk" style="margin-top:.8rem;">'+esc(m.genegeerd)+'</div>';
   if ((m.geweigerd||[]).length) h += geweigerdBlok(m.geweigerd);
   el.innerHTML = h;
+
+  /* De knoppen worden NA het tekenen gebonden en niet met een inline-handler:
+     de nonce-CSP van dit huis staat die niet toe. Zelfde patroon als de rest
+     van dit scherm. */
+  el.querySelectorAll('[data-ga]').forEach(b => b.onclick = () => overdragen(b));
+}
+
+/* DE OVERDRACHT AANVRAGEN EN DE DEUR OPENEN. Wat er meegaat, bepaalt de server
+   uit de mand van deze sessie -- deze knop stuurt alleen mee WELKE verkoper en
+   WELKE deur. Een knop die zijn eigen regels meestuurt, is een prijslijst die de
+   browser mag invullen. */
+async function overdragen(knop){
+  const oud = knop.textContent;
+  knop.disabled = true; knop.textContent = 'Momentje';
+  try {
+    const r = await api('/api/commerce/overdracht/maak',
+      { verkoper: knop.getAttribute('data-ga'), pagina: knop.getAttribute('data-pagina') });
+    const p = r.overdracht.pagina;
+    location.assign(p + (p.indexOf('?') >= 0 ? '&' : '?') + 'overdracht=' + encodeURIComponent(r.overdracht.id));
+  } catch (e) {
+    /* Niet stil: een mislukte overdracht die je toch naar de pagina stuurt, laat
+       de koper daar zoeken naar een briefje dat er niet is. Eén melding per
+       deur en niet een stapel: twee keer drukken is niet twee problemen. */
+    knop.disabled = false; knop.textContent = oud;
+    const bak = knop.parentNode;
+    let p = bak.querySelector(':scope > .stuk');
+    if (!p) { p = document.createElement('div'); p.className = 'stuk'; bak.appendChild(p); }
+    p.textContent = e.message;
+  }
 }
 
 /* HET AANVRAAGFORMULIER. Drie dingen worden gevraagd en geen vierde: welke

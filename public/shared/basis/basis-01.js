@@ -19,6 +19,10 @@
       standaard over elke ring gelegd, maar leeft als concept op /apps/horloge.html
    8. navigatie: verzekert de centrale iOS-laag en het appmenu op iedere app
       die de basis laadt, tenzij het scherm zichzelf expliciet uitsluit
+   9. overdracht: laadt shared/overdracht.js bij zodra er `?overdracht=` in het
+      adres staat -- de balk met wat een lid uit zijn mand meenam naar dit
+      scherm. Bevestigen doet het domein zelf; deze balk vertelt alleen wat er
+      was gekozen (kern/commerce/overdracht.js)
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';

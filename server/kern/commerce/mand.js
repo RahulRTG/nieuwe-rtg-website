@@ -88,6 +88,11 @@ module.exports = ({ db, save, nu }) => {
       m.regels = m.regels.filter(r => r.koopbaarId !== id);
     } else if (bestaand) {
       bestaand.aantal = vervang ? n : Math.min(MAX_AANTAL, bestaand.aantal + n);
+      /* Wie het aantal verandert, heeft iets anders in gedachten dan wat er is
+         doorgegeven. Het merkje van ./overdracht.js hoort dan weg: een briefje
+         dat "2 stuks" zegt naast een regel die er 5 telt, is erger dan geen
+         briefje. */
+      delete bestaand.overdracht;
     } else {
       if (m.regels.length >= MAX_REGELS) return { status: 409, error: 'Deze mand zit vol (' + MAX_REGELS + " regels). Reken eerst af wat erin zit." };
       m.regels.push({ koopbaarId: id, aantal: n, at: klok() });
@@ -106,5 +111,26 @@ module.exports = ({ db, save, nu }) => {
     return { ok: true, regels: [] };
   }
 
-  return { lees, zet, leeg, ruim, MAX_REGELS, VERVAL_MS };
+  /* EEN MERKJE OP EEN REGEL: naar wie is deze doorgegeven, en wanneer. Dit is
+     geen bedrag en dus geen breuk met de kop hierboven -- het is wat er met de
+     regel is GEBEURD. En het is met opzet geen stand `besteld`: RTG hoort niet
+     van het domein of de koper heeft doorgezet, dus staat er alleen wat RTG zelf
+     heeft gedaan (zie ./overdracht.js). De koper haalt zelf uit zijn mand wat
+     hij heeft afgerond; dat is een handeling van een mens en geen gok. */
+  function merk(sleutel, ids, o) {
+    const s = sleutelVan(sleutel);
+    const m = pot()[s];
+    if (!s || !m) return { ok: true, gemerkt: 0 };
+    const lijst = (Array.isArray(ids) ? ids : []).map(x => String(x || ''));
+    let n = 0;
+    for (const r of m.regels) {
+      if (!lijst.includes(r.koopbaarId)) continue;
+      r.overdracht = { id: String((o && o.id) || ''), naar: String((o && o.naar) || ''), at: klok() };
+      n++;
+    }
+    if (n) { m.bij = klok(); save(); }
+    return { ok: true, gemerkt: n };
+  }
+
+  return { lees, zet, leeg, merk, ruim, MAX_REGELS, VERVAL_MS };
 };

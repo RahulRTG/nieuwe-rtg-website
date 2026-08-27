@@ -71,3 +71,20 @@
   window.addEventListener('offline', function () { toost(rtf ? 'Even geen internet; de app werkt gewoon door waar dat kan.' : 'Geen verbinding; de app werkt door waar dat kan.'); });
   window.addEventListener('online', function () { toost('De verbinding is terug.'); });
 
+
+  /* ---- 9. de overdracht: wat een lid uit zijn mand meenam naar dit scherm
+     (shared/overdracht.js). Bevestigen gebeurt in het domein dat er al over
+     gaat, en die deuren staan verspreid over tientallen schermen -- dus staat
+     de balk op EEN plek en niet in elk van hen. Hij wordt alleen bijgeladen als
+     er ook werkelijk een briefje in het adres staat; op elk ander scherm kost
+     dit niets. De uitleg staat in kern/commerce/overdracht.js.
+
+     Hij hoort hier en niet bij punt 5 en 6 in basis-02.js, waar de andere twee
+     bijladers staan: dat deel zat op 9894 bytes en zou met dit blok over de
+     10 kB-leesgrens gaan. Een deelbestand is een GROOTTE-grens en geen
+     betekenisgrens -- alle delen draaien in dezelfde functie. ---- */
+  if (location.search.indexOf('overdracht=') >= 0) {
+    var ovdS = document.createElement('script');
+    ovdS.src = '/shared/overdracht.js'; ovdS.async = true;
+    (document.head || document.documentElement).appendChild(ovdS);
+  }

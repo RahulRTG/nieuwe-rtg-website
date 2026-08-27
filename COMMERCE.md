@@ -32,9 +32,9 @@ behandeld. De meting is **met opzet royaal**: een werkwoord telt mee bij de
 vaagste naamverwantschap, een koopbare vorm bij het minste prijsveld. Dat maakt
 `Koopbaar` rijker dan hij is — en dus weegt een negatieve uitslag zwaar.
 
-**437 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
+**438 vormen met een prijsveld, in 100 van 430 domeinen.** Na aftrek van de
 42 envelop-velden blijven er 849 velden over, waarvan **660 (78%) in precies één
-domein** voorkomen. Van de 437 koopbare vormen halen **7 paren** uit verschillende
+domein** voorkomen. Van de 438 koopbare vormen halen **7 paren** uit verschillende
 domeinen de 60%-drempel.
 
 De acht werkwoorden, over die 100 domeinen:
@@ -364,6 +364,27 @@ autonome betaling die grens 2 verbiedt.
   blijft grens 5 staan zonder dat er iets voor moest wijken: Webmaker heeft nog
   steeds 14 bloktypes en nul commerce-logica. Wat de bron toont is wat er te
   koop staat; kopen gebeurt waar het al gebeurde.
+- **De overdracht** (`kern/commerce/overdracht.js`, `shared/overdracht.js`): het
+  sluitstuk van de afrekening. Die zegt "wij stoppen bij de deur" en wijst hem
+  met `bevestigBij` aan; zonder dit was dat een doodlopend eind — de koper landde
+  op `/apps/mall.html` en begon opnieuw, en dan is vier verkopers in één mand
+  geen verbetering maar vier keer zoeken. Nu maakt de knop een **briefje**: wat
+  je koos, hoeveel, en wat RTG rekende, afgeleverd bovenaan het scherm van het
+  domein. **Hij draagt de keuze over en nooit de bevestiging** — er komt geen
+  order bij, geen betaling en geen tweede orderwaarheid. Vijf grenzen: de regels
+  komen uit het doorgerekende mandbeeld en nooit uit het verzoek (een aanroeper
+  die zijn eigen regels stuurt, stuurt zijn eigen prijs); een briefje is alleen
+  te lezen met de sleutel waarop het is gemaakt, want het id staat in een
+  adresbalk; het bedrag staat vast en draagt zijn datum, zodat een afwijking bij
+  de verkoper *zichtbaar* is in plaats van weggepoetst; twee deuren bij één
+  verkoper is een keuze van de koper en geen gok van RTG; en er bestaat **geen
+  stand `bevestigd`** — RTG hoort niet van het domein of de koper heeft
+  doorgezet, dus loopt een briefje na twee uur gewoon af. De mandregel krijgt een
+  merkje ("doorgegeven aan X om 12:40; of het is bevestigd, weet RTG niet") dat
+  vervalt zodra iemand het aantal verandert. De balk staat op **één** plek en
+  niet in de tientallen schermen waar domeinen bevestigen: `shared/basis.js`
+  laadt hem pas bij als er `?overdracht=` in het adres staat, zoals hij
+  `shared/kaart.js` ook bijlaadt.
 - **Wat een aanbod NIET kan, met de reden erbij.** De unieke opbrengst van deze
   laag. Een ondernemer ziet per regel waarom er geen koopknop staat, en het
   verschil tussen *er is iets te doen* (zet een prijs) en *er is niets aan de
@@ -379,14 +400,7 @@ autonome betaling die grens 2 verbiedt.
   of het gerecht afhangt. Die worden getoond en niet verkocht, want wie op een
   vanaf-prijs afrekent incasseert iets wat niemand heeft afgesproken. Het echte
   bedrag hoort uit het domein zelf te komen.
-- **Bevestigen vanuit de mand.** De afrekening rekent door, stopt bij de deur en
-  **wijst hem aan**: elke afrekening draagt `bevestigBij` met de plek(ken) waar
-  die verkoper werkelijk bevestigt, en het scherm zet er een link heen. Meerdere
-  deuren bij één verkoper worden ook als meerdere getoond — een tafel en een
-  artikel worden niet op dezelfde plek bevestigd, en dat samentrekken zou een
-  belofte maken die de kern juist weigert. Wat er nog niet is: de bestelling
-  meegeven aan dat domein, zodat de koper daar niet opnieuw begint. Dat is een
-  overdracht en geen tweede orderwaarheid, maar hij is nog niet gebouwd.
+- ~~Bevestigen vanuit de mand~~ — **gebouwd**, zie *De overdracht* hieronder.
 
 ### Vraagt een besluit van de eigenaar
 
@@ -409,11 +423,19 @@ autonome betaling die grens 2 verbiedt.
 
 ### Jaren weg
 
-- **De 90 optellingen.** 90 plekken in 49 domeinen rekenen regelbedragen uit of
+- **De 91 optellingen.** 91 plekken in 49 domeinen rekenen regelbedragen uit of
   tellen ze op. Dat is de prijs van geen gedeelde afrekening, en het is precies
   het patroon dat `fiscaal/tarief.js` al één keer heeft laten ontsporen. Ze zijn
   niet in één ronde samen te brengen, en een poging daartoe die halverwege stopt,
-  laat het huis met 91 achter.
+  laat het huis met nóg één meer achter.
+
+  Er stonden er 90 toen dit stuk werd geschreven; de 91ste is **deze laag zelf**.
+  De meter kent geen uitzondering voor de bouwer, en dat hoort zo — `kern/commerce`
+  staat er nu bij met twee plekken (`afrekening.js` en `overdracht.js`) en als
+  achttiende manddomein. Wat de meting níét kan zien is dat die twee dezelfde som
+  gebruiken: de overdracht rekent niet, hij krijgt het doorgerekende mandbeeld als
+  parameter. Een getal dat zijn eigen maker meetelt is eerlijker dan een getal dat
+  dat niet doet, ook als het daardoor iets erger lijkt dan het is.
 
 ---
 

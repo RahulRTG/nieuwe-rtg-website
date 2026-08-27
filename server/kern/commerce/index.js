@@ -12,6 +12,7 @@
      ./koopbaar.js     vertaalt een aanbod-rij naar werkwoorden, geen tweede vorm
      ./retour.js       de weg terug; zet een geldbesluit KLAAR en voert niets uit
      ./verkoopweg.js   waarlangs een zaak verkoopt; weigert `publiek` met de reden
+     ./overdracht.js   levert de keuze af bij de deur; draagt nooit de bevestiging
 
    ER WORDT HIER NIETS BETAALD EN NIETS BESTELD. De weg van bevestigen loopt
    langs de domeinen die er al over gaan (kern/lidacties voor een order bij een
@@ -42,6 +43,9 @@ function maakCommerce(state) {
      eigen kopie zou binnen een week uiteenlopen met wat er werkelijk te koop
      staat, en dan staat er een winkel met een verzonnen aantal artikelen. */
   const wegen = require('./verkoopweg')({ db, save, nu, etalage: graaf.etalage });
+  /* De overdracht rekent zelf niets uit: hij krijgt het doorgerekende mandbeeld
+     als parameter mee. Zo staat er geen tweede som naast die van ./afrekening.js. */
+  const overdracht = require('./overdracht')({ db, save, nu });
 
   /* De mand van deze sleutel, doorgerekend. Dit is de enige plek waar de drie
      bij elkaar komen, en de volgorde is niet vrij: eerst de opzoeker (EEN
@@ -55,6 +59,14 @@ function maakCommerce(state) {
     }
     const op = graaf.opzoeker();
     const uit = rekenaar.reken(m.regels, op.bij);
+    /* Het merkje van ./overdracht.js reist mee met de afrekenregel waar het bij
+       hoort. De rekenaar kent het niet en hoort het niet te kennen -- die rekent
+       en weet niets van wat er met een regel is gebeurd. Samenvoegen gebeurt hier,
+       op een plek, en op de sleutel die beide lagen al delen. */
+    const merken = new Map(m.regels.map(r => [r.koopbaarId, r.overdracht || null]));
+    for (const a of uit.afrekeningen || []) {
+      for (const r of a.regels || []) r.overdracht = merken.get(r.koopbaarId) || null;
+    }
     return Object.assign(uit, {
       leeg: false,
       bijgewerkt: m.bij,
@@ -76,6 +88,17 @@ function maakCommerce(state) {
     mandZet: (sleutel, koopbaarId, aantal, vervang) => mand.zet(sleutel, koopbaarId, aantal, vervang),
     mandLeeg: (sleutel) => mand.leeg(sleutel),
     mandBeeld,
+    /* DE OVERDRACHT: de keuze afleveren bij de deur die wel bevestigt. De regels
+       komen uit het doorgerekende mandbeeld en niet uit het verzoek -- zie de kop
+       van ./overdracht.js. Lukt hij, dan krijgen de betrokken mandregels een
+       merkje: doorgegeven, aan wie, wanneer. Nooit "besteld"; dat weet RTG niet. */
+    overdrachtMaak: (sleutel, o) => {
+      const uit = overdracht.maak(sleutel, Object.assign({}, o, { beeld: mandBeeld(sleutel) }));
+      if (uit && uit.ok) mand.merk(sleutel, uit.koopbaarIds, { id: uit.overdracht.id, naar: uit.overdracht.verkoper.naam });
+      return uit && uit.ok ? { ok: true, overdracht: uit.overdracht, mand: mandBeeld(sleutel) } : uit;
+    },
+    overdrachtLees: (id, sleutel) => overdracht.lees(id, sleutel),
+    overdrachtMijn: (sleutel) => overdracht.vanSleutel(sleutel),
     /* rekenen zonder mand: een directe afrekening van meegegeven regels */
     reken: (regels) => rekenaar.reken(regels, graaf.opzoeker().bij),
     /* de weg terug. `retourVraag` zoekt het koopbaar zelf op: een aanroeper die

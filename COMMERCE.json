@@ -2,9 +2,9 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-27",
   "gemeten": {
-    "bestanden": 1539,
+    "bestanden": 1540,
     "domeinenTotaal": 430,
-    "koopbareVormen": 437,
+    "koopbareVormen": 438,
     "koopbareDomeinen": 100,
     "envelopDrempel": 6,
     "envelop": 42,
@@ -14,10 +14,10 @@
     "werkwoordenVolledig": 0,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
-    "wagenVormen": 24,
-    "wagenVormenUniek": 22,
-    "wagenDomeinen": 17,
-    "optellingen": 90,
+    "wagenVormen": 25,
+    "wagenVormenUniek": 23,
+    "wagenDomeinen": 18,
+    "optellingen": 91,
     "optelDomeinen": 49
   },
   "envelop": [
@@ -2038,6 +2038,7 @@
     "bedrijf",
     "kern/bank",
     "kern/command",
+    "kern/commerce",
     "kern/eten",
     "kern/gast",
     "kern/geldgraaf",
@@ -2138,6 +2139,14 @@
         "server/kern/waarde/oormerk.js",
         "server/kern/waarde/reserve.js",
         "server/kern/waarde/samenstellen.js"
+      ]
+    },
+    {
+      "domein": "kern/commerce",
+      "plekken": 2,
+      "waar": [
+        "server/kern/commerce/afrekening.js",
+        "server/kern/commerce/overdracht.js"
       ]
     },
     {
@@ -2253,13 +2262,6 @@
       "plekken": 1,
       "waar": [
         "server/kern/bureau/reisdek.js"
-      ]
-    },
-    {
-      "domein": "kern/commerce",
-      "plekken": 1,
-      "waar": [
-        "server/kern/commerce/afrekening.js"
       ]
     }
   ]

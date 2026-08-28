@@ -59,6 +59,20 @@ const bordVan = (kanaal) => {
 const bord = () => bordVan('account');
 const zaakBord = () => bordVan('zaak');
 
+/* Een JSON-snapshot is bewust write-behind. Onder de coverage-instrumentatie
+   op CI kan die flush langer duren dan een vaste slaap van 400 ms. Wacht daarom
+   op het waarneembare resultaat, met een harde bovengrens: zo blijft een echt
+   ontbrekend auditspoor gewoon een snelle, duidelijke fout. */
+const wachtOpAantal = async (lees, aantal, timeoutMs = 5000) => {
+  const tot = Date.now() + timeoutMs;
+  let rijen = lees();
+  while (rijen.length < aantal && Date.now() < tot) {
+    await new Promise(z => setTimeout(z, 100));
+    rijen = lees();
+  }
+  return rijen;
+};
+
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, RTG_DEMO: '1', SMTP_URL: '', RTG_STORE: 'json' } }));
   const r = await post('/api/auth/register', { name: 'Spoor Lid', email: MAIL,
@@ -74,8 +88,7 @@ test('een GESLAAGDE accountinlog komt op het veiligheidsbord', async () => {
   const voor = bord().length;
   const r = await post('/api/auth/login', { login: MAIL, password: 'geheim123' });
   assert.equal(r.status, 200, 'de inlog hoort te slagen');
-  await new Promise(z => setTimeout(z, 400));
-  const na = bord();
+  const na = await wachtOpAantal(bord, voor + 1);
   assert.equal(na.length, voor + 1,
     'een geslaagde inlog op de hoofdingang hoort een regel op te leveren; het log belooft "elke ' +
     'inlogpoging op elk kanaal"');
@@ -88,8 +101,7 @@ test('een MISLUKTE accountinlog komt er ook op, en dat is de belangrijkste', asy
   const voor = bord().length;
   const r = await post('/api/auth/login', { login: MAIL, password: 'fout-wachtwoord' });
   assert.equal(r.status, 401);
-  await new Promise(z => setTimeout(z, 400));
-  const na = bord();
+  const na = await wachtOpAantal(bord, voor + 1);
   assert.equal(na.length, voor + 1, 'een mislukte poging hoort een regel op te leveren');
   assert.equal(na[0].ok, false);
 });
@@ -99,8 +111,8 @@ test('een poging op een ONBEKEND account laat ook een spoor na', async () => {
   const voor = bord().length;
   const r = await post('/api/auth/login', { login: 'bestaat-niet@voorbeeld.test', password: 'x' });
   assert.equal(r.status, 401);
-  await new Promise(z => setTimeout(z, 400));
-  assert.equal(bord().length, voor + 1);
+  const na = await wachtOpAantal(bord, voor + 1);
+  assert.equal(na.length, voor + 1);
 });
 
 test('de ZAKEN-ingang logt het bedrijfsaccount, gelukt en mislukt', async () => {
@@ -110,16 +122,14 @@ test('de ZAKEN-ingang logt het bedrijfsaccount, gelukt en mislukt', async () => 
   const voor = zaakBord().length;
   const mis = await post('/api/supplier/login', { username: 'rahul', password: 'fout-wachtwoord' });
   assert.equal(mis.status, 401);
-  await new Promise(z => setTimeout(z, 400));
-  const naMis = zaakBord();
+  const naMis = await wachtOpAantal(zaakBord, voor + 1);
   assert.equal(naMis.length, voor + 1, 'een mislukte zaak-inlog hoort een regel op te leveren');
   assert.equal(naMis[0].ok, false);
 
   const goed = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' });
   assert.equal(goed.status, 200, 'de demo-inlog van de zaak hoort te slagen');
   assert.ok(goed.data && goed.data.token);
-  await new Promise(z => setTimeout(z, 400));
-  const naGoed = zaakBord();
+  const naGoed = await wachtOpAantal(zaakBord, voor + 2);
   assert.equal(naGoed.length, voor + 2, 'een geslaagde zaak-inlog hoort ook een regel op te leveren');
   assert.equal(naGoed[0].ok, true);
 });

@@ -56,6 +56,22 @@ test('2. een huis van binnen: cijfers, wat loopt er, bezetting en taken', async 
   assert.ok(r.body.cijfers.length >= 4, 'er staan echte cijfers');
   assert.ok(r.body.loopt.length >= 3, 'er staat wat er loopt');
   assert.ok(Array.isArray(r.body.mensen) && Array.isArray(r.body.taken));
+  assert.equal(r.body.kantoren.length, 16, 'de enterprise-campus heeft zestien afdelingskantoren');
+  const ids = r.body.kantoren.map(k => k.id);
+  for (const id of ['directie', 'finance', 'business', 'operations', 'lifestyle', 'technology', 'data', 'risk']) {
+    assert.ok(ids.includes(id), id + ' heeft een eigen kantoor');
+  }
+  for (const k of r.body.kantoren) {
+    assert.ok(k.naam && k.doel && k.glyf && k.verdieping, k.id + ' is een volwaardig kantoor');
+    assert.ok(k.functies.length >= 4, k.id + ' benoemt de functies die er werken');
+    assert.ok(k.tools.length >= 3, k.id + ' heeft specialistische systemen');
+    for (const t of k.tools) {
+      if (t.href.startsWith('/apps/')) {
+        const bestand = path.join(__dirname, '..', 'public', t.href.replace(/^\//, ''));
+        assert.ok(fs.existsSync(bestand), k.id + ' linkt naar een bestaande app: ' + t.href);
+      }
+    }
+  }
   assert.equal((await post('/api/werkplek/overzicht', { bedrijf: 'bestaatniet' }, eigenaar)).status, 404);
 });
 
@@ -101,6 +117,21 @@ test('6. sleutels uitdelen en intrekken doet alleen de eigenaar', async () => {
   assert.equal(weg.status, 200);
   assert.equal((await post('/api/werkplek/overzicht', { bedrijf: 'rtf' }, medewerker)).status, 403);
   assert.equal((await post('/api/werkplek/mijn', {}, medewerker)).body.bedrijven.length, 0);
+});
+
+test('6b. bezetting en werkvoorraad blijven bij hun eigen afdelingskantoor', async () => {
+  await post('/api/werkplek/mens', { bedrijf: 'rtg', codenaam: 'Koperen Valk 7C8D',
+    functie: 'Controller', afdeling: 'finance' }, eigenaar);
+  await post('/api/werkplek/taak', { bedrijf: 'rtg', tekst: 'Liquiditeitsprognose bijwerken', afdeling: 'finance' }, eigenaar);
+  const r = (await post('/api/werkplek/overzicht', { bedrijf: 'rtg' }, eigenaar)).body;
+  const finance = r.kantoren.find(k => k.id === 'finance');
+  const business = r.kantoren.find(k => k.id === 'business');
+  assert.equal(finance.mensen, 1, 'de controller zit in Finance');
+  assert.equal(finance.takenOpen, 1, 'de prognose ligt op de tafel van Finance');
+  assert.equal(business.mensen, 0, 'Business neemt de bezetting niet over');
+  assert.equal(business.takenOpen, 0, 'Business neemt het werkpunt niet over');
+  assert.equal(r.mensen.find(m => m.codenaam === 'Koperen Valk 7C8D').afdeling, 'finance');
+  assert.equal(r.taken.find(t => t.tekst === 'Liquiditeitsprognose bijwerken').afdeling, 'finance');
 });
 
 test('7. elk huis heeft een eigen kantoordrive met alle drie de soorten', async () => {

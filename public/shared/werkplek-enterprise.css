@@ -1,0 +1,145 @@
+/* RTG Enterprise Campus. De werkplek gebruikt dezelfde onyx-, bordeaux- en
+   goudtaal als de command- en boardroomschermen, maar met de ruimtelijke
+   hierarchie van een echt hoofdkantoor: huis, verdieping, kantoor, werktafel. */
+.werkplek-enterprise{--campus-bg:#090908;--campus-rail:#0e0d0c;--campus-panel:#121110;
+  --campus-panel2:#171513;--campus-line:rgba(244,241,236,.105);--campus-gold:#c9ad55;
+  --campus-burgundy:#771b38;--campus-green:#76bd97;background:var(--campus-bg);
+  background-image:radial-gradient(55rem 34rem at 78% -12%,rgba(119,27,56,.19),transparent 67%);}
+.werkplek-enterprise .wrap{width:100%;max-width:none;margin:0;padding:0;min-height:100dvh;}
+.werkplek-enterprise>.wrap>.terug,.werkplek-enterprise>.wrap>.intro{display:none;}
+.campus-landing{min-height:100dvh;display:grid;place-items:center;padding:clamp(1.2rem,4vw,4rem);}
+.campus-door{width:min(1120px,100%);}
+.campus-wordmark{display:flex;align-items:center;gap:1rem;margin-bottom:clamp(2rem,5vw,4rem);}
+.campus-seal{width:3.1rem;height:3.1rem;border:1px solid rgba(201,173,85,.42);border-radius:50%;
+  display:grid;place-items:center;color:var(--campus-gold);font:500 1.05rem 'Bodoni Moda',serif;}
+.campus-wordmark p{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-soft);}
+.campus-wordmark b{display:block;font:500 1.1rem 'Bodoni Moda',serif;letter-spacing:.02em;}
+.campus-door>header{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(18rem,1fr);gap:2rem;
+  align-items:end;padding-bottom:1.4rem;border-bottom:1px solid var(--campus-line);}
+.campus-kicker,.campus-eyebrow{display:block;color:var(--campus-gold);font-size:.58rem;font-weight:650;
+  letter-spacing:.2em;text-transform:uppercase;}
+.campus-door h1{font:500 clamp(2.7rem,7vw,5.4rem)/.93 'Bodoni Moda',serif;letter-spacing:-.045em;}
+.campus-door header p{max-width:41rem;color:var(--rtg-soft);font-size:.83rem;line-height:1.7;}
+.campus-huizen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:1.5rem;
+  border:1px solid var(--campus-line);background:var(--campus-line);}
+.campus-huis{position:relative;min-height:17rem;border:0;background:var(--campus-panel);padding:1.7rem;
+  color:inherit;text-align:left;overflow:hidden;cursor:pointer;}
+.campus-huis:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,transparent 48%,rgba(119,27,56,.16));opacity:0;transition:opacity .2s;}
+.campus-huis:hover:before,.campus-huis:focus-visible:before{opacity:1;}
+.campus-huis:focus-visible{outline:2px solid var(--campus-gold);outline-offset:-2px;}
+.campus-huis .nummer{display:block;color:var(--rtg-soft);font-size:.59rem;letter-spacing:.16em;}
+.campus-huis .huisglyf{display:grid;place-items:center;width:3rem;height:3rem;margin:2.2rem 0 1rem;
+  border:1px solid rgba(201,173,85,.3);color:var(--campus-gold);}
+.campus-huis .huisglyf .rtg-glyf{width:1.45rem;height:1.45rem;}
+.campus-huis h2{font:500 1.75rem 'Bodoni Moda',serif;}
+.campus-huis .aard{max-width:32rem;margin:.45rem 0 1.2rem;color:var(--rtg-soft);font-size:.74rem;line-height:1.55;}
+.campus-huis .voet{display:flex;gap:1.2rem;padding-top:.8rem;border-top:1px solid var(--campus-line);
+  color:var(--rtg-soft);font-size:.64rem;}
+.campus-huis .voet b{color:var(--rtg-txt);font-size:.78rem;}
+.campus-laden{min-height:100dvh;display:grid;place-items:center;color:var(--rtg-soft);font-size:.8rem;}
+
+.campus-shell{min-height:100dvh;display:grid;grid-template-columns:16rem minmax(0,1fr);}
+.campus-side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;background:rgba(12,11,10,.96);
+  border-right:1px solid var(--campus-line);overflow:hidden;}
+.campus-brand{display:flex;align-items:center;gap:.8rem;min-height:4.6rem;padding:1rem 1.15rem;border-bottom:1px solid var(--campus-line);}
+.campus-brand .campus-seal{width:2.4rem;height:2.4rem;font-size:.78rem;flex:none;}
+.campus-brand b{display:block;font:500 .95rem 'Bodoni Moda',serif;}
+.campus-brand small{display:block;margin-top:.16rem;color:var(--rtg-soft);font-size:.5rem;letter-spacing:.13em;text-transform:uppercase;}
+.campus-nav{flex:1;overflow:auto;padding:.8rem .55rem 1rem;scrollbar-width:thin;}
+.campus-nav>span{display:block;margin:.7rem .65rem .45rem;color:var(--rtg-soft);font-size:.5rem;letter-spacing:.19em;text-transform:uppercase;}
+.campus-nav button{display:grid;grid-template-columns:1.35rem 1fr auto;gap:.55rem;align-items:center;width:100%;
+  min-height:2.65rem;padding:.45rem .65rem;border:1px solid transparent;border-left:2px solid transparent;
+  background:transparent;color:var(--rtg-soft);text-align:left;font:inherit;cursor:pointer;}
+.campus-nav button:hover{color:var(--rtg-txt);background:rgba(255,255,255,.025);}
+.campus-nav button.aan{color:var(--rtg-txt);border-left-color:var(--campus-gold);
+  background:linear-gradient(90deg,rgba(119,27,56,.34),transparent);}
+.campus-nav button:focus-visible{outline:1px solid var(--campus-gold);outline-offset:-1px;}
+.campus-nav .rtg-glyf{width:1rem;height:1rem;color:var(--campus-gold);}
+.campus-nav button b{font-size:.68rem;font-weight:540;}
+.campus-nav button i{font-style:normal;color:var(--rtg-soft);font-size:.55rem;font-variant-numeric:tabular-nums;}
+.campus-exit{display:flex;gap:.5rem;padding:.8rem;border-top:1px solid var(--campus-line);}
+.campus-exit button,.campus-exit a{flex:1;border:1px solid var(--campus-line);background:transparent;color:var(--rtg-soft);
+  padding:.55rem;text-align:center;text-decoration:none;font:500 .61rem Inter,sans-serif;cursor:pointer;}
+.campus-main{min-width:0;}
+.campus-top{height:4.6rem;display:flex;align-items:center;gap:1rem;padding:0 clamp(1rem,2.5vw,2rem);
+  border-bottom:1px solid var(--campus-line);background:rgba(9,9,8,.82);backdrop-filter:blur(18px);}
+.campus-top .live{display:flex;align-items:center;gap:.45rem;color:var(--rtg-soft);font-size:.59rem;letter-spacing:.08em;text-transform:uppercase;}
+.campus-top .live:before{content:"";width:.38rem;height:.38rem;border-radius:50%;background:var(--campus-green);box-shadow:0 0 .8rem rgba(118,189,151,.55);}
+.campus-top .crumb{flex:1;color:var(--rtg-soft);font-size:.65rem;}
+.campus-top .crumb b{color:var(--rtg-txt);font-weight:550;}
+.campus-top a{color:var(--campus-gold);text-decoration:none;font-size:.65rem;}
+.campus-content{padding:clamp(1rem,3vw,2.5rem);}
+.campus-hero{position:relative;display:grid;grid-template-columns:minmax(16rem,.7fr) minmax(22rem,1.3fr);gap:2rem;
+  align-items:end;min-height:15rem;padding:clamp(1.3rem,3vw,2.3rem);border:1px solid var(--campus-line);
+  background:radial-gradient(38rem 20rem at 90% 0,rgba(119,27,56,.22),transparent 70%),var(--campus-panel);}
+.campus-hero:before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--campus-gold),transparent);}
+.campus-hero h1{margin:.55rem 0 0;font:500 clamp(2.4rem,5vw,4.8rem)/.94 'Bodoni Moda',serif;letter-spacing:-.045em;}
+.campus-hero p{max-width:43rem;color:var(--rtg-soft);font-size:.78rem;line-height:1.7;}
+.campus-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:1px 0 1.6rem;background:var(--campus-line);border:1px solid var(--campus-line);}
+.campus-stat{min-height:6rem;padding:1rem;background:var(--campus-panel);}
+.campus-stat b{display:block;font:500 1.7rem 'Bodoni Moda',serif;font-variant-numeric:tabular-nums;}
+.campus-stat span{display:block;margin-top:.3rem;color:var(--rtg-soft);font-size:.54rem;letter-spacing:.13em;text-transform:uppercase;}
+.campus-sectionkop{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin:1.7rem 0 .75rem;}
+.campus-sectionkop h2{font:500 1.45rem 'Bodoni Moda',serif;}
+.campus-sectionkop p{color:var(--rtg-soft);font-size:.62rem;}
+.office-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--campus-line);border:1px solid var(--campus-line);}
+.office-card{position:relative;min-height:13.5rem;padding:1.1rem;border:0;background:var(--campus-panel);color:inherit;text-align:left;cursor:pointer;}
+.office-card:hover{background:var(--campus-panel2);}
+.office-card:focus-visible{outline:2px solid var(--campus-gold);outline-offset:-2px;}
+.office-card .level{display:flex;justify-content:space-between;color:var(--rtg-soft);font-size:.5rem;letter-spacing:.13em;text-transform:uppercase;}
+.office-card .ico{display:grid;place-items:center;width:2.3rem;height:2.3rem;margin:1.5rem 0 .85rem;border:1px solid var(--campus-line);color:var(--campus-gold);}
+.office-card .ico .rtg-glyf{width:1.15rem;height:1.15rem;}
+.office-card h3{font:500 1.08rem/1.15 'Bodoni Moda',serif;}
+.office-card p{margin:.42rem 0;color:var(--rtg-soft);font-size:.61rem;line-height:1.52;}
+.office-card footer{position:absolute;left:1.1rem;right:1.1rem;bottom:.85rem;display:flex;gap:.8rem;padding-top:.55rem;border-top:1px solid var(--campus-line);color:var(--rtg-soft);font-size:.54rem;}
+.office-card footer b{color:var(--rtg-txt);font-weight:600;}
+
+.office-detail{border:1px solid var(--campus-line);background:var(--campus-panel);}
+.office-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1.2rem;align-items:start;padding:clamp(1.3rem,3vw,2.2rem);border-bottom:1px solid var(--campus-line);background:radial-gradient(38rem 18rem at 100% 0,rgba(119,27,56,.22),transparent 70%);}
+.office-head .ico{display:grid;place-items:center;width:3.4rem;height:3.4rem;border:1px solid rgba(201,173,85,.35);color:var(--campus-gold);}
+.office-head .ico .rtg-glyf{width:1.55rem;height:1.55rem;}
+.office-head h1{margin:.3rem 0 .5rem;font:500 clamp(2rem,4vw,3.7rem)/.95 'Bodoni Moda',serif;letter-spacing:-.035em;}
+.office-head p{max-width:47rem;color:var(--rtg-soft);font-size:.73rem;line-height:1.65;}
+.office-head .close{border:1px solid var(--campus-line);background:transparent;color:var(--rtg-soft);padding:.55rem .7rem;font-size:.62rem;cursor:pointer;}
+.office-body{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(17rem,.6fr);gap:1px;background:var(--campus-line);}
+.office-col{min-width:0;padding:clamp(1rem,2.5vw,1.7rem);background:var(--campus-panel);}
+.office-col h2,.design-floor h2{margin:0 0 .8rem;color:var(--rtg-soft);font-size:.55rem;letter-spacing:.17em;text-transform:uppercase;}
+.tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--campus-line);border:1px solid var(--campus-line);}
+.tool-card{display:block;min-height:8.2rem;padding:1rem;background:var(--campus-panel2);color:inherit;text-decoration:none;}
+.tool-card:hover,.tool-card:focus-visible{background:#1d1a17;outline:none;box-shadow:inset 0 -1px var(--campus-gold);}
+.tool-card .rtg-glyf{width:1.15rem;height:1.15rem;color:var(--campus-gold);}
+.tool-card b{display:block;margin:1rem 0 .25rem;font-size:.72rem;}
+.tool-card span{display:block;color:var(--rtg-soft);font-size:.59rem;line-height:1.45;}
+.role-list{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.2rem;}
+.role-list span{border:1px solid var(--campus-line);padding:.34rem .48rem;color:var(--rtg-soft);font-size:.56rem;}
+.work-list{border-top:1px solid var(--campus-line);}
+.work-row{display:flex;align-items:center;gap:.65rem;min-height:2.75rem;border-bottom:1px solid var(--campus-line);font-size:.67rem;}
+.work-row>span{flex:1;}.work-row small{color:var(--rtg-soft);font-size:.55rem;}
+.work-row button{border:1px solid var(--campus-line);background:transparent;color:var(--rtg-soft);padding:.35rem .5rem;font-size:.55rem;cursor:pointer;}
+.work-row input{accent-color:var(--campus-burgundy);}
+.campus-form{display:grid;grid-template-columns:1fr 1fr auto;gap:.4rem;margin-top:.8rem;}
+.campus-form.taakform{grid-template-columns:1fr auto;}
+.taak-afgerond{color:var(--rtg-soft);text-decoration:line-through;}
+.campus-form input{min-width:0;border:1px solid var(--campus-line);background:#0c0c0b;color:var(--rtg-txt);padding:.58rem .65rem;font:inherit;font-size:.64rem;}
+.campus-form button{border:1px solid rgba(201,173,85,.42);background:rgba(201,173,85,.06);color:var(--campus-gold);padding:.55rem .7rem;font:600 .58rem Inter,sans-serif;cursor:pointer;}
+.office-empty{padding:.85rem 0;color:var(--rtg-soft);font-size:.63rem;}
+.design-floor{padding:clamp(1rem,2.5vw,1.7rem);border:1px solid var(--campus-line);background:var(--campus-panel);}
+.design-floor>.kop{display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;}
+.design-floor>.kop h1{font:500 clamp(2rem,4vw,3.5rem) 'Bodoni Moda',serif;}
+.design-floor>.kop p{max-width:40rem;color:var(--rtg-soft);font-size:.68rem;line-height:1.55;}
+.design-floor .bureaus{grid-template-columns:repeat(3,minmax(0,1fr));}
+.design-floor .bureau{background:var(--campus-panel2);min-height:8rem;padding:1rem;}
+.design-floor .vak{border:0;background:transparent;padding:0;margin:0;}
+
+@media(max-width:1180px){.office-grid{grid-template-columns:repeat(3,minmax(0,1fr));}.campus-shell{grid-template-columns:14rem 1fr;}}
+@media(max-width:880px){.campus-shell{display:block}.campus-side{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--campus-line)}
+  .campus-brand{min-height:3.8rem}.campus-nav{display:flex;overflow-x:auto;padding:.4rem}.campus-nav>span{display:none}.campus-nav button{flex:0 0 9rem}.campus-exit{display:none}
+  .campus-hero,.campus-door>header{grid-template-columns:1fr;gap:1rem}.campus-hero{min-height:0}.office-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .office-body{grid-template-columns:1fr}.tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:580px){.campus-landing{padding:.8rem}.campus-door>header{gap:.7rem}.campus-door h1{font-size:2.8rem}.campus-huizen{grid-template-columns:1fr}
+  .campus-huis{min-height:14rem;padding:1.2rem}.campus-huis .huisglyf{margin:1.4rem 0 .8rem}.campus-content{padding:.7rem}.campus-top{height:3.7rem;padding:0 .8rem}
+  .campus-top .live{display:none}.campus-hero{padding:1.2rem}.campus-hero h1{font-size:2.45rem}.campus-stats{grid-template-columns:repeat(2,1fr)}
+  .office-grid{grid-template-columns:1fr}.office-card{min-height:11.8rem}.office-head{grid-template-columns:auto 1fr;padding:1rem}.office-head .close{grid-column:1/-1;width:100%}
+  .office-head h1{font-size:2rem}.tool-grid{grid-template-columns:1fr}.tool-card{min-height:6.5rem}.campus-form,.campus-form.taakform{grid-template-columns:1fr}
+  .design-floor .bureaus{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.werkplek-enterprise *{scroll-behavior:auto!important;transition:none!important;}}

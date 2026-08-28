@@ -87,8 +87,20 @@ function draai(db, opties) {
   const uit = [];
   for (const m of MIGRATIES.slice().sort((a, b) => a.n - b.n)) {
     if (al.has(m.n)) continue;
-    db.exec('BEGIN');
+    /* IMMEDIATE EN NIET ZOMAAR BEGIN. Een gewone BEGIN is `deferred`: het
+       schrijfslot valt pas bij de eerste schrijfactie, dus twee verse processen
+       zitten allebei IN de transactie voordat een van beiden iets doet. Dat
+       gebeurt echt -- de failover-vloot start er vier tegelijk. Eentje commit,
+       de ander loopt stuk op "UNIQUE constraint failed: users.username" en
+       meldt dat als een mislukte migratie. IMMEDIATE neemt het slot meteen, dus
+       de tweede wacht netjes zijn busy_timeout uit. */
+    db.exec('BEGIN IMMEDIATE');
     try {
+      /* En dan opnieuw kijken. `al` is gelezen VOOR het slot; wie stond te
+         wachten, wacht op iemand die deze migratie net heeft gedraaid. Zonder
+         deze tweede blik draait hij hem alsnog over de zojuist geschreven rijen
+         heen -- en dat is precies de UNIQUE-fout hierboven. */
+      if (gedraaid(db).some(r => r.n === m.n)) { db.exec('COMMIT'); continue; }
       m.op(db);
       db.prepare('INSERT INTO schema_versie (n, naam, gedraaid_op) VALUES (?, ?, ?)')
         .run(m.n, m.naam, new Date().toISOString());

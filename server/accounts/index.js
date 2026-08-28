@@ -82,10 +82,16 @@ function init() {
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
      herstart die de oude instance een tel overlapt, parallelle testservers)
      wacht de tweede even in plaats van hard te crashen op "database is
-     locked". Dit was de bron van de sporadische testflake. */
+     locked". Dit was de bron van de sporadische testflake.
+
+     DE VOLGORDE DOET ERTOE, en dat stond hier nog verkeerd om: journal_mode=WAL
+     neemt zelf even een exclusief slot, dus een busy_timeout die ERNA komt geldt
+     niet voor de PRAGMA die hem het hardst nodig heeft. Precies de fout die
+     ../db/sqlite.js al had opgelost en die ../db/tx/sqliteachter.js de vloot
+     twee keer liet zakken. */
+  db.exec('PRAGMA busy_timeout=5000');
   db.exec('PRAGMA journal_mode=WAL');
   db.exec('PRAGMA synchronous=NORMAL');
-  db.exec('PRAGMA busy_timeout=5000');
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een
      keer draaien, met een grootboek erbij en een weigering om te starten op een

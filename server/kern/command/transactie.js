@@ -32,6 +32,7 @@
 const klok = require('../../lib/klok');
 
 const poorten = require('./transactie-poorten');
+const { NIVEAUS } = require('./risico');
 
 /* Zonder certificaat draait een recept gewoon, maar dan zonder bovengrens en
    met alleen de universele verificatie. Een standaardcertificaat verzinnen zou
@@ -94,7 +95,7 @@ function maakTransactie({ db, runbooks, register, journaal, gezondheid }) {
       nietVanToepassing: !!ver.nietVanToepassing, at: klok.datum().toISOString() });
 
     journaal.noteer({ actor: o.door || 'transactie', actie: 'herstel verifiëren',
-      objectType: 'runbook', objectId: rb.id, niveau: 'assist',
+      objectType: 'runbook', objectId: rb.id, niveau: NIVEAUS.assist,
       reden: ver.goed === null ? 'niets geraakt, dus niets te verifiëren'
         : ver.goed ? 'verificatie geslaagd' : 'verificatie mislukt: ' + ver.waarom,
       voor: { geraakt: r.run.geraakt },

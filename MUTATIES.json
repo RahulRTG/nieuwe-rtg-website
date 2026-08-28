@@ -451,6 +451,29 @@
       "soort": "puur",
       "staat": "geen module gevonden"
     },
+    "begroting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begroting.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "begrotingroute.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "begrotingsgrenzen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begrotingsgrenzen.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "belasting-groothandels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -758,6 +781,14 @@
       "module": "scripts/lib/bronblind.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "bronmutanten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/geisoleerd.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "btw-aangifte.test.js": {
@@ -1798,6 +1829,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "gezag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gezag.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "gezakte-toetsen.test.js": {
       "soort": "puur",
       "staat": "te langzaam",
@@ -1919,6 +1958,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "handeling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/handeling.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "handelsketen.test.js": {
       "soort": "server",
@@ -2406,6 +2453,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "kappen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kappen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "kassa-herhaling.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2576,6 +2631,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "krimpronde.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/begroting.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "kruisscan.test.js": {
       "soort": "puur",
@@ -3425,6 +3488,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "migratierace.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/migraties/lijst.js",
+      "operator": "getal+1#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "migraties.test.js": {
       "soort": "puur",

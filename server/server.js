@@ -262,7 +262,7 @@ const DEMO = testomgeving.actief(process.env);
 
    Het commentaar hierboven redeneerde over de volgorde ten opzichte van
    'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
-function zetEigenaarsAccount() {
+function zetEigenaarsAccountEens() {
   const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
   let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
   if (!u) {
@@ -305,6 +305,33 @@ function zetEigenaarsAccount() {
       sleutelbos.push({ rol: 'zaak', code: zc, zaakNaam: zaak ? zaak.name : zc, naam: 'Beheer', at: new Date().toISOString() });
     }
     save();
+  }
+}
+
+/* EEN VERLOREN RACE IS GEEN FOUT, ook hier niet.
+
+   De vloot start leden, kantoor en rtf als aparte processen op dezelfde
+   accountsdatabase. Alle drie kijken ze of het eigenaarsaccount bestaat, alle
+   drie zien ze van niet, en alle drie maken ze het aan -- waarna twee van de
+   drie fataal omvallen op UNIQUE constraint failed: users.username. Dat was de
+   tweede helft van de flake in test/vloot.test.js; de eerste helft zat in
+   server/migraties/index.js en is daar met een slot opgelost.
+
+   Hier past geen slot maar een herlezing: de bedoeling van deze functie is
+   IDEMPOTENT -- zorg dat de eigenaar bestaat -- dus een botsing op de unieke
+   sleutel betekent dat een ander proces het al heeft gedaan. Dan kijken we
+   opnieuw, en die tweede ronde vindt het account en loopt door. Elke andere
+   fout blijft staan zoals hij is.
+
+   Een keer opnieuw en niet in een lus: na de botsing BESTAAT de rij (SQLite
+   commit synchroon), dus ziet de tweede ronde hem nog steeds niet, dan is er
+   iets anders aan de hand dan drukte. */
+function zetEigenaarsAccount() {
+  try { return zetEigenaarsAccountEens(); }
+  catch (e) {
+    const bericht = String((e && e.message) || e);
+    if (!/UNIQUE constraint failed: users\./.test(bericht)) throw e;
+    return zetEigenaarsAccountEens();
   }
 }
 // bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
@@ -2237,7 +2264,10 @@ const { server, backupData } = require('./opzet/start')({
   log, db, accounts, save, eigenaar, webpush, kern,
   checkpointSqlite, checkpointGrootboek,
   initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
-  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer
+  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer,
+  // voor de kappen in de onderhoudsronde: een weggeknipte snap heeft ook een
+  // bestand op schijf (zie kern/kappen.js)
+  media
 });
 
 /* Naar buiten toe is dit een startscript, geen module: niets require't

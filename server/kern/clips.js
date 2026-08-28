@@ -158,7 +158,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
     db.data.clipsMeldingen.push({ id: id(), clipId: c.id, titel: c.titel, maker: codenaamVan(c.key),
       van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
-    db.data.clipsMeldingen = db.data.clipsMeldingen.slice(-200);
+    // de kap op deze lijst staat in kern/kappen.js en draait in de
+    // onderhoudsronde -- afkappen is huishouden, geen handeling van een lid
     save(); sseToOffice('sync', { scope: 'clips' });
     return { status: 200, ok: true };
   }

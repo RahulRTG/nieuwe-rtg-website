@@ -17,7 +17,14 @@ const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
 
 const WORTEL = path.join(__dirname, '..');
-const geefAfbouwSlotVrij = pak('volledige Node-tests');
+/* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is
+   terecht -- maar een draaier die vanuit een toets wordt aangeroepen (zie
+   `--toon` hieronder) draait binnen een run die het slot al heeft. Zelfde
+   afspraak als test/meterijk.test.js: de ouder geeft het door met
+   RTG_AFBOUW_SLOT_ACTIEF=1. */
+const geefAfbouwSlotVrij = process.env.RTG_AFBOUW_SLOT_ACTIEF === '1'
+  ? () => {}
+  : pak('volledige Node-tests');
 const TESTMAP = path.join(WORTEL, 'test');
 const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
@@ -44,11 +51,42 @@ if (!bestanden.length) {
   process.exit(2);
 }
 
-const journaal = path.join(WORTEL, '.routejournaal');
-try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+/* WIE HET JOURNAAL VRAAGT, KRIJGT HET WAAR HIJ HET VRAAGT.
+
+   Hier stond onvoorwaardelijk `RTG_ROUTELOG: <wortel>/.routejournaal`, en dat
+   overschreef de keuze van de aanroeper zonder iets te zeggen. De keuring zet
+   die variabele zelf (RTG_ROUTELOG: $GITHUB_WORKSPACE/routejournaal.log) omdat
+   een latere stap -- scripts/dekking.js --lees -- er een waargenomen
+   dekkingscijfer uit haalt. Zolang test:gate een kaal `node --test` was, ging
+   die variabele gewoon door; sinds hij via deze draaier loopt niet meer, en de
+   stap erna zakte met "Het routejournaal bestaat niet. Draaide de suite met
+   RTG_ROUTELOG gezet?" -- een vraag waarop het antwoord ja was.
+
+   Een draaier die een meegegeven pad stil vervangt door zijn eigen pad, maakt
+   van een goede vraag een verwarrende. Dus: het meegegeven pad wint, en de
+   eigen keuze is alleen de terugval. */
+const journaal = process.env.RTG_ROUTELOG || path.join(WORTEL, '.routejournaal');
 const env = { ...process.env, RTG_ROUTELOG: journaal, RTG_AFBOUW_SLOT_ACTIEF: '1' };
 
-function draai(namen, parallel) {
+/* HET JOURNAAL LEEGGOOIEN DOET ALLEEN WIE OOK ECHT GAAT DRAAIEN, en die regel
+   is duur geleerd. De unlink stond hier onvoorwaardelijk, boven de --toon-poort
+   verderop. Twee toetsen van deze tak roepen de draaier aan met --toon om te
+   controleren dat de isolatielijst wordt toegepast; die aanroep draait niets,
+   maar wiste wel het journaal -- MIDDEN IN DE SUITE, want die toetsen draaien
+   zelf mee.
+
+   Wat CI daarvan zag: `scripts/dekking.js --lees` telde 493 endpoints als
+   "nooit aangeraakt" terwijl main op 4292 van 4292 stond. Niet omdat er iets
+   minder werd aangeroepen, maar omdat het bewijs ervan halverwege was
+   weggegooid. Een meter die het goede meet aan een leeggemaakt logboek, meldt
+   een gat dat er niet is.
+
+   `leegMaken()` staat daarom bij de plek waar er echt gedraaid wordt. */
+function leegMaken() {
+  try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+}
+
+function draai(namen, parallel, metVloer) {
   if (!namen.length) return 0;
   const args = ['--test', '--test-concurrency=' + parallel];
   if (reporter) args.push('--test-reporter=' + reporter);
@@ -63,13 +101,33 @@ function draai(namen, parallel) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = bestanden.filter(n => !GEISOLEERD.has(n));
-const geïsoleerd = bestanden.filter(n => GEISOLEERD.has(n));
-console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk');
-let code = draai(gewoon, concurrency);
+const gewoon = bestanden.filter(n => !isGeisoleerd(n));
+const geïsoleerd = bestanden.filter(n => isGeisoleerd(n));
+
+/* WAT ZOU JE DOEN? -- `--toon` drukt de indeling af en draait niets.
+
+   Dit is er niet voor het gemak. test/bronmutanten.test.js bewaakt dat de
+   isolatielijst bestaat en dat elke suite-opdracht via deze draaier loopt, maar
+   het kon niet bewaken dat DEZE draaier de lijst ook echt toepast: die splits
+   staat hier als losse regel, en een mutatie erop (`filter(n => true)`) liet
+   geen enkele toets zakken. Een handhaver met een gat op de laatste meter is
+   geen handhaver (LAT.md regel 10).
+
+   De toets in een echte run laten kijken zou minuten kosten voor een
+   bewering van een regel. Zo kost het niets, en een mens die zich afvraagt wat
+   er straks apart draait, krijgt hetzelfde antwoord. */
+if (argv.includes('--toon')) {
+  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking, journaal }, null, 2));
+  geefAfbouwSlotVrij();
+  process.exit(0);
+}
+leegMaken();
+console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk' +
+  (dekking.length ? ' (met dekkingsvloer ' + dekking.join('/') + ')' : ''));
+let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
-  const uit = draai([naam], 1);
+  const uit = draai([naam], 1, false);
   if (uit && !code) code = uit;
 }
 geefAfbouwSlotVrij();

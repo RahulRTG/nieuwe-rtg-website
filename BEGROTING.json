@@ -1,0 +1,127 @@
+{
+  "uitleg": "De grens per collectie voor server/opzet/begroting.js, en of hij mag WEIGEREN. Het mechanisme staat in server/opzet/begroting.js, het besluit hier. Elk getal komt uit KRIMP.json (de meting) plus een regel die erbij staat -- geen verzonnen risicoklassen. DE REGEL: een grens is een blast radius en geen gebruiksgrens. De vraag is niet hoeveel iemand normaal verwijdert, maar hoeveel er in EEN handeling kapot mag. DE UITZONDERINGEN ZIJN HET BELANGRIJKSTE DEEL: zes collecties worden geraakt door het vergeetpad (server/kern/vergeten/), waar een handeling alles van een lid weghaalt. Dat is per ontwerp onbegrensd, dus daar mag geen grens op -- handhaaf:false, met de reden erbij. WAT HIER NIET STAAT valt op de standaardgrens: dat is geen collectie waarvan we weten dat hij nooit krimpt, maar een waar niets over is gemeten (de catalogus is een ondergrens). EN DE STAND: server/opzet/begroting.js staat standaard op MELDEN, dus vandaag weigert hier niets. Met RTG_BEGROTING=weigeren gaan deze grenzen bijten -- behalve de uitgezonderde.",
+  "bron": "KRIMP.json, ronde grens-0.5",
+  "standaard": 1000,
+  "collecties": {
+    "balieZetels": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/office/balie/zetel"
+    },
+    "blocks": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/member/unblock, /api/rtf/social/unblock"
+    },
+    "boardroomToegang": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/office/boardroom/toegang/weg"
+    },
+    "clips": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/office/clips/verwijder, /api/clips/weg"
+    },
+    "clipsMeldingen": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/office/clips/verwijder"
+    },
+    "connections": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/member/block, /api/rtf/social/kind/verwijder, /api/rtf/social/block"
+    },
+    "contacts": {
+      "handhaaf": false,
+      "gezien": 2,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
+      "gezienBij": "/api/privacy/delete"
+    },
+    "flitsMeldingen": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/flits/rond"
+    },
+    "meetKamers": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/meet/weg"
+    },
+    "muziek": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/muziek/weg"
+    },
+    "orders": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/techniek/archief"
+    },
+    "ovVoertuigen": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/staff/ov/dienst, /api/staff/ov/lijn/zet"
+    },
+    "posts": {
+      "handhaaf": false,
+      "gezien": 2,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
+      "gezienBij": "/api/privacy/delete"
+    },
+    "snaps": {
+      "handhaaf": false,
+      "gezien": 1,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
+      "gezienBij": "/api/rtf/social/snap/view"
+    },
+    "spelTeams": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/member/spel/team-verlaat"
+    },
+    "stories": {
+      "handhaaf": false,
+      "gezien": 1,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
+      "gezienBij": "/api/rtf/social/story/post"
+    },
+    "theaterKijkplicht": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/theater/kijkplicht/zet"
+    },
+    "theaterVideos": {
+      "grens": 100,
+      "gezien": 1,
+      "waarom": "De routes die deze collectie laten krimpen halen er per handeling EEN rij uit (gemeten maximum: 1). Honderd is twee ordes boven het gemetene en het ontworpene, en ver onder een massaverwijdering.",
+      "gezienBij": "/api/theater/verwijder, /api/office/theater/verwijder"
+    },
+    "vakbewijzen": {
+      "handhaaf": false,
+      "gezien": 1,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. Een lid met achthonderd rijen hoort die achthonderd te kunnen laten wissen; een grens hierop breekt het recht om vergeten te worden. Blijft uitgezonderd tot dat pad buiten een verzoek draait.",
+      "gezienBij": "/api/privacy/delete"
+    },
+    "spelUitslagen": {
+      "handhaaf": false,
+      "gezien": null,
+      "waarom": "Het vergeetpad (server/kern/vergeten/) herschrijft deze collectie: een handeling haalt alles van EEN lid weg, en dat is per ontwerp onbegrensd. NIET in de meting gezien -- geen enkele toets lokte hier een krimp uit -- maar de uitzondering komt uit de code en niet uit de ronde.",
+      "gezienBij": null
+    }
+  }
+}

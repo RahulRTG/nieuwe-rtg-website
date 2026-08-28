@@ -32,9 +32,13 @@ module.exports = function maakSqliteAchter(opslag) {
     const bestand = path.join(DATA_DIR, 'grootboek.db');
     sdb = new DatabaseSync(bestand);
     besloten(bestand);
+    /* De wachttijd VOOR het aanzetten van WAL: dat aanzetten neemt zelf een
+       exclusief slot, en twee processen die tegelijk opstarten botsen daar
+       zonder geduld meteen op "database is locked". Zie de kop van
+       server/db/sqlite.js, waar dat als eerste werd opgeschreven. */
+    sdb.exec('PRAGMA busy_timeout=5000');
     sdb.exec('PRAGMA journal_mode=WAL');
     sdb.exec('PRAGMA synchronous=NORMAL');
-    sdb.exec('PRAGMA busy_timeout=5000');
     sdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
   }
 

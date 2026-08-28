@@ -3,6 +3,8 @@
    binnenkomt. De eigenaar mag in beide huizen en is de enige die sleutels
    uitdeelt en weer intrekt. Wie geen sleutel heeft, krijgt niet te horen wat er
    in dat huis speelt: dan is het gewoon dicht. */
+const envelop = require('../opzet/envelop');
+
 module.exports = (kern) => {
   const { app, boardroomWie, boardroomBaas, werkplek } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
@@ -24,6 +26,13 @@ module.exports = (kern) => {
     }
     req.werkplekCode = code;
     req.werkplekBaas = baas;
+    /* Het huis is hier de tenant, en de sleutelhouder het gezag. De actor
+       komt uit wie(req) -- dezelfde sleutel waar magIn() net op oordeelde,
+       dus geen tweede afleiding van dezelfde waarheid. */
+    envelop.zet(req, { soort: 'werkplek', id: key || null,
+      identiteit: key ? 'bewezen' : 'anoniem',
+      tenantSoort: 'werkplek', tenantId: code,
+      gezagBron: baas ? 'eigenaar' : 'sleutel', gezagBaas: !!baas });
     next();
   }
   /* Sleutels uitdelen doet alleen de eigenaar. */

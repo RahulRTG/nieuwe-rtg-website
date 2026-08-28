@@ -80,15 +80,69 @@ function controleer(db) {
    grootboek; faalt hij, dan is er niets half gebeurd en stopt de rij daar. Half
    doorgaan na een mislukte migratie is hoe je een schema krijgt dat nergens
    meer op lijkt. */
+/* TWEE PROCESSEN DIE TEGELIJK OPSTARTEN, en waarom dat hier echt misging.
+
+   RTG draait in groepen: server/vloot.js start leden, kantoor en rtf als aparte
+   processen op DEZELFDE databasemap. Ze migreren dus allemaal bij het opstarten.
+
+   Hier stond: lees welke migraties al gedraaid zijn, en draai daarna wat
+   ontbreekt. Dat lezen en dat schrijven stonden NIET in dezelfde transactie.
+   Twee processen zagen dus allebei "migratie 2 ontbreekt", allebei draaiden ze
+   hem, en de tweede liep vast op UNIQUE constraint failed: schema_versie.n.
+   Die fout was fataal, dus de kantoor-groep viel om, de poortwachter gaf 502,
+   en test/vloot.test.js zakte op "de vloot komt op binnen 120s". Vier ronden op
+   dezelfde code: twee keer rood, twee keer groen -- hij bijt alleen als de
+   machine vol staat, en dat is precies wanneer je hem niet kunt gebruiken.
+
+   DE REPARATIE IS EEN SLOT EN GEEN VANGNET. Elke migratie opent nu met
+   BEGIN IMMEDIATE: SQLite geeft dan meteen een schrijfslot af, en een tweede
+   proces WACHT (busy_timeout) in plaats van er blind naast te schrijven. En
+   omdat wachten niet genoeg is -- na het wachten is de wereld veranderd --
+   kijkt hij BINNEN de transactie opnieuw of het nummer er al staat. Staat het
+   er, dan is een ander proces hem voor geweest: dat is geen fout maar een
+   verloren race, en dan hoort hij door te lopen.
+
+   Wat NIET verandert: elke migratie houdt zijn eigen transactie (faalt hij, dan
+   is er niets half gebeurd en stopt de rij daar), en elke andere fout dan deze
+   blijft fataal. Half doorgaan na een echte migratiefout is hoe je een schema
+   krijgt dat nergens meer op lijkt.
+
+   HET SLOT HEEFT GEDULD NODIG, EN DAT KOMT VAN DE AANROEPER. Zonder
+   busy_timeout krijgt de verliezer meteen SQLITE_BUSY in plaats van te
+   wachten. Dat geduld hoort bij het OPENEN van de database en staat daar ook,
+   op alle drie de plekken die er een openen -- met de wachttijd VOOR het
+   aanzetten van WAL, want dat aanzetten neemt zelf een exclusief slot. Daar
+   zat de tweede helft van deze fout: twee van die drie zetten hem erna.
+   test/migratierace.test.js bewaakt die volgorde nu.
+
+   Hier stond eerst een eigen wachttijd-omhulsel dat de busy_timeout optilde
+   voor de duur van de rij. Dat is eruit gehaald omdat het niet te laten zakken
+   was: met die wachttijd op nul bleef de raceproef drie ronden groen. Tegen de
+   tijd dat de rij begint, hebben de processen elkaar al gevonden bij het
+   openen. Een tweede plek die dezelfde waarheid draagt en waarvan niemand kan
+   aantonen dat hij iets doet, is geen veiligheidsnet maar ruis (LAT.md regel 4
+   en 9). */
 function draai(db, opties) {
   const o = opties || {};
   controleer(db);
   const al = new Set(gedraaid(db).map(r => r.n));
   const uit = [];
+  const overgeslagen = [];
   for (const m of MIGRATIES.slice().sort((a, b) => a.n - b.n)) {
     if (al.has(m.n)) continue;
-    db.exec('BEGIN');
+    db.exec('BEGIN IMMEDIATE');
     try {
+      /* Opnieuw kijken, nu MET het slot in de hand. Tussen het lezen hierboven
+         en dit moment kan een ander proces hem hebben gedraaid; dan is er hier
+         niets meer te doen. */
+      const er = db.prepare('SELECT 1 AS x FROM schema_versie WHERE n = ?').get(m.n);
+      if (er) {
+        db.exec('COMMIT');
+        al.add(m.n);
+        overgeslagen.push(m.n);
+        if (o.log) o.log('migratie ' + m.n + ' (' + m.naam + ') was al gedraaid door een ander proces');
+        continue;
+      }
       m.op(db);
       db.prepare('INSERT INTO schema_versie (n, naam, gedraaid_op) VALUES (?, ?, ?)')
         .run(m.n, m.naam, new Date().toISOString());
@@ -100,7 +154,7 @@ function draai(db, opties) {
     uit.push({ n: m.n, naam: m.naam });
     if (o.log) o.log('migratie ' + m.n + ' (' + m.naam + ') gedraaid');
   }
-  return { gedraaid: uit, stand: stand(db) };
+  return { gedraaid: uit, overgeslagen, stand: stand(db) };
 }
 
 module.exports = { draai, stand, gedraaid, controleer, hoogsteBekend, MIGRATIES };

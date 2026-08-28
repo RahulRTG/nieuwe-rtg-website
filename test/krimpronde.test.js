@@ -1,0 +1,237 @@
+/* DE KRIMPRONDE MOET KUNNEN ZEGGEN "IK WEET HET NIET".
+
+   scripts/krimpronde.js leest een suite-log en bouwt de catalogus van legitieme
+   grote krimpen die TAKEN.md 4.62 eist voordat RTG_BEGROTING=weigeren aan kan.
+   Zijn gevaarlijkste uitslag is niet een fout getal maar een LEEG getal dat op
+   een uitslag lijkt: "nul meldingen" betekent er kromp niets OF de val stond
+   niet aan, en die twee zijn niet uit elkaar te houden zonder bewijs.
+
+   Dat bewijs is het levensteken -- de regel die server/opzet/begroting.js bij
+   zijn eerste installatie schrijft, met de grens erin. Deze toets bewaakt de
+   drie manieren waarop dat mis kan gaan:
+
+     1. het levensteken ontbreekt          -> geen uitslag, en dat zegt hij
+     2. het levensteken staat op de standaardgrens -> de ronde meet niets, en dat zegt hij
+     3. de tekst van de regel loopt uiteen -> de twee bestanden dragen een
+        gezamenlijke waarheid (LAT.md regel 4), en die wordt hier vastgeprikt
+        aan de ECHTE regel die de begroting schrijft, niet aan een nagetypte.
+
+   WAT DEZE TOETS NIET ZIET: of de suite de begroting ook echt LANGS komt. Dat
+   is een eigenschap van de ronde, niet van dit script; krimpronde.js zegt in
+   zijn eigen kop dat zijn catalogus een ondergrens is.
+
+   Draai los: node --test test/krimpronde.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { spawnSync } = require('child_process');
+/* Deze require doet twee dingen. Hij haalt de standaardgrens uit de module in
+   plaats van hem hier over te typen -- en hij is het enige spoor waaraan
+   scripts/mutatie.js kan zien WELKE module deze toets onderzoekt: die motor
+   zoekt letterlijk require('../server/...'), en require.resolve() telt niet
+   mee. Zonder hem meldt hij "geen module gevonden" en telt dit bestand als
+   niet gemeten. */
+const BEGROTING = require('../server/opzet/begroting');
+
+const WORTEL = path.join(__dirname, '..');
+const RONDE = path.join(WORTEL, 'scripts', 'krimpronde.js');
+
+function draai(logtekst) {
+  const p = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'krimp-')), 'x.log');
+  fs.writeFileSync(p, logtekst);
+  const r = spawnSync(process.execPath, [RONDE, '--lees', p], { encoding: 'utf8' });
+  try { fs.rmSync(path.dirname(p), { recursive: true, force: true }); } catch (e) {}
+  return { code: r.status, uit: (r.stdout || '') + (r.stderr || '') };
+}
+
+/* DE ECHTE REGEL, opgehaald bij de bron. Zou iemand het bericht in begroting.js
+   veranderen, dan verandert deze invoer mee en zakt niet deze toets maar de
+   ronde -- precies andersom als het zou moeten. Daarom staat er hieronder OOK
+   een toets die eist dat de ronde die letterlijke regel herkent. */
+function echteLevensteken(grens, installaties) {
+  const regels = [];
+  const mod = requireVers();
+  const log = (niveau, bericht, velden) =>
+    regels.push(new Date().toISOString() + ' ' + niveau.toUpperCase().padEnd(5) + ' ' +
+      bericht + ' ' + JSON.stringify(velden));
+  /* Elke installatie krijgt een EIGEN object, want bewaak() geeft voor dezelfde
+     data dezelfde wikkel terug -- twee keer hetzelfde object zou de val nooit
+     een tweede keer installeren en de proef hieronder waardeloos maken. */
+  for (let i = 0; i < (installaties || 1); i++) mod.bewaak({ ['iets' + i]: [] }, { grens, log });
+  return regels;
+}
+
+/* Het levensteken valt EEN keer per proces. Deze toets heeft er meerdere nodig
+   met verschillende grenzen, dus moet de module echt opnieuw geladen worden. */
+function requireVers() {
+  const p = require.resolve('../server/opzet/begroting');
+  delete require.cache[p];
+  return require(p);
+}
+
+test('zonder levensteken is het GEEN uitslag, en de ronde zegt dat met exitcode 2', () => {
+  const r = draai('ok 1 - van alles\nok 2 - en nog wat\n');
+  assert.equal(r.code, 2, 'een log zonder levensteken hoort geen groene uitslag te geven');
+  assert.match(r.uit, /GEEN ENKEL LEVENSTEKEN/);
+});
+
+test('DE VAL WAAR HIJ IN LIEP: een toetsnaam over een projectbegroting is geen bewijs', () => {
+  /* Dit is de echte regel uit de eerste ronde. De eerste versie van dit script
+     zocht op /begroting:/ en zou hierop hebben gemeld "de begroting was aan het
+     woord" -- over een ronde waarin de module geen letter schreef. */
+  const r = draai('ok 5596 - begroting: een project kent zijn nulmeting, zijn uitgaven en zijn effect\n');
+  assert.equal(r.code, 2, 'een TOETSNAAM met het woord begroting telt ten onrechte als bewijs');
+});
+
+test('een ronde op de STANDAARDGRENS meet niets, en dat is ook geen uitslag', () => {
+  const regels = echteLevensteken(BEGROTING.STANDAARDGRENS);
+  const r = draai(regels.join('\n') + '\n');
+  assert.equal(r.code, 2,
+    'een ronde op ' + BEGROTING.STANDAARDGRENS + ' zegt niets over wat daaronder gebeurt');
+  assert.match(r.uit, /STANDAARDGRENS/);
+});
+
+test('met het levensteken op 1 en geen meldingen is nul een ECHTE uitslag', () => {
+  const regels = echteLevensteken(1);
+  const r = draai(regels.join('\n') + '\n');
+  assert.equal(r.code, 0, r.uit);
+  assert.match(r.uit, /processen met de val aan\s*:\s*1/);
+  assert.match(r.uit, /GEEN ENKELE collectie kromp/);
+});
+
+test('DE BRUG: de ronde herkent de regel die de begroting ECHT schrijft', () => {
+  /* Twee bestanden dragen hier een gezamenlijke waarheid: het bericht
+     "begroting: waakt" en het veld "grens". Zou een van de twee verschuiven,
+     dan valt de ronde stil terug op "geen uitslag" -- luidruchtig, maar pas als
+     iemand hem draait. Deze toets is het moment waarop dat meteen opvalt. */
+  /* EEN KEER PER PROCES, en dat is geen netheid maar een getal. De ronde telt
+     deze regels en publiceert ze als "processen met de val aan". Valt hij bij
+     elke installatie, dan telt hij processen die er niet zijn -- en een te hoog
+     getal leest als meer dekking dan er is. redis.js vervangt db.data bij elke
+     externe wijziging, dus dat verschil is in productie niet klein. */
+  const regels = echteLevensteken(7, 4);
+  assert.equal(regels.length, 1,
+    'de begroting schrijft geen levensteken meer, of een per installatie in plaats van per proces');
+  assert.match(regels[0], /begroting: waakt/, 'het bericht is veranderd; de ronde zoekt nog het oude');
+  assert.match(regels[0], /"grens":7/, 'de grens staat niet meer in de regel; de ronde kan hem niet lezen');
+  const r = draai(regels[0] + '\n');
+  assert.equal(r.code, 0, 'de ronde herkent de echte regel niet meer:\n' + r.uit);
+});
+
+test('in de GEWONE stand blijft het levensteken van stdout af', () => {
+  /* DIT KOSTTE METEEN EEN METER. Het levensteken stond eerst op `info`, en
+     server/log.js stuurt alles onder warn naar STDOUT. Daar zet
+     scripts/routekaart.js zijn JSON neer, die `npm run norm` inleest -- en die
+     viel dus om op "de routekaart gaf geen routes". Een regel die niets kost in
+     de ene bril, breekt een meter in de andere.
+
+     Vandaar: warn (stderr) zodra de stand afwijkt, en debug in de gewone stand
+     -- onder de standaarddrempel, dus hij komt er niet eens uit. */
+  const stil = [];
+  /* De grens staat er EXPLICIET bij, om dezelfde reden als in
+     test/begroting.test.js: zonder haar erft dit de module-constante, en in de
+     meetstand van de krimpronde (0,5) is dat niet de GEWONE stand. */
+  requireVers().bewaak({ a: [] },
+    { grens: BEGROTING.STANDAARDGRENS, log: (niveau) => stil.push(niveau) });
+  assert.deepEqual(stil, ['debug'],
+    'de gewone stand hoort DEBUG te zijn: info en hoger komen op stdout terecht, ' +
+    'en daar staat de JSON van scripts/routekaart.js');
+
+  const luid = [];
+  requireVers().bewaak({ a: [] }, { grens: 1, log: (niveau) => luid.push(niveau) });
+  assert.deepEqual(luid, ['warn'],
+    'een verlaagde grens hoort WARN te zijn, anders staat het bewijs van de ronde niet in het log');
+});
+
+test('de meldingen zelf worden in BEIDE logvormen gelezen, plat en JSON', () => {
+  /* server/log.js schrijft JSON als LOG_JSON aanstaat en anders platte tekst.
+     De eerste versie van de ronde eiste "bericht":"..." en was dus blind in de
+     testmodus -- precies waar hij draait. */
+  const teken = echteLevensteken(1)[0];
+  const plat = '2026-08-23T20:00:00.000Z WARN  begroting: zou zijn geweigerd ' +
+    '{"id":"a1","p":"/api/x","collectie":"leden","rijen":42,"grens":1}';
+  const json = '{"t":"2026-08-23T20:00:00.000Z","niveau":"warn","bericht":"begroting: zou zijn geweigerd",' +
+    '"id":"a2","p":"/api/y","collectie":"boekingen","rijen":9,"grens":1}';
+  const r = draai([teken, plat, json].join('\n') + '\n');
+  assert.equal(r.code, 0, r.uit);
+  assert.match(r.uit, /leden/, 'de platte logvorm wordt niet gelezen');
+  assert.match(r.uit, /boekingen/, 'de JSON-logvorm wordt niet gelezen');
+  assert.match(r.uit, /\/api\/x/, 'de route komt niet in de catalogus');
+  assert.match(r.uit, /collecties die krimpen\s*:\s*2/);
+});
+
+test('een RODE suite geeft geen schone ronde', () => {
+  /* De ronde draait de HELE suite en gooide die uitvoer weg op de
+     begrotingsregels na. Vielen er driehonderd toetsen om, dan zag de catalogus
+     eruit als elke andere. Wat erin staat is dan nog steeds echt -- wat er NIET
+     in staat kan door een omgevallen toets zijn gemist, en dat is precies het
+     verschil tussen onvolledig en schoon. */
+  const teken = echteLevensteken(1)[0];
+  const r = draai([teken, 'not ok 12 - iets viel om', '# tests 3', '# fail 1'].join('\n') + '\n');
+  assert.equal(r.code, 3, 'een ronde over een rode suite hoort niet als schoon te eindigen');
+  assert.match(r.uit, /de suite was ROOD/);
+  assert.match(r.uit, /3 toetsen, 1 rood/);
+});
+
+test('zonder TAP-totalen zegt hij ONBEKEND en niet nul', () => {
+  /* Een log waarin de totalen ontbreken is geen log van een groene suite.
+     "0 rood" opschrijven zou daar een uitslag van maken (LAT.md regel 3). */
+  const teken = echteLevensteken(1)[0];
+  const r = draai(teken + '\n');
+  assert.equal(r.code, 0);
+  assert.match(r.uit, /de suite zelf\s*:\s*onbekend/);
+});
+
+test('een grens met een punt erin wordt als 0,5 gelezen en niet als 0', () => {
+  /* De ronde las de grens met /"grens":(\d+)/ en maakte van 0,5 dus een 0: hij
+     legde zichzelf vast onder "grens-0" en meldde een grens die niet bestaat.
+     Juist die halve rij is de stand waarin ook de enkele krimpen zichtbaar
+     worden, dus het is de stand die het vaakst gedraaid gaat worden. */
+  const regels = echteLevensteken(0.5);
+  assert.match(regels[0], /"grens":0\.5/, 'de begroting schrijft zijn grens niet meer voluit');
+  const r = draai(regels[0] + '\n');
+  assert.equal(r.code, 0, r.uit);
+  assert.match(r.uit, /grenzen die zij meldden\s*:\s*0\.5/,
+    'de ronde leest een gebroken grens niet terug');
+});
+
+test('per collectie staat erbij of er een KAP op zit, en dat is gescand', () => {
+  /* De catalogus zegt wat er krimpt; dit zegt of een grens op die collectie
+     veilig te handhaven is. Ruim zestig plekken doen "push, dan afkappen"
+     (db.data.X = X.slice(0, N)). In rust is dat een rij per verzoek, maar staat
+     de collectie ooit ver boven zijn kap, dan wil hij er duizenden weghalen --
+     en een weigering daarop houdt zichzelf in stand: de collectie blijft te
+     groot, dus het volgende verzoek wordt opnieuw geweigerd.
+
+     Gescand op de BRON en niet op de meting: een kap die geen enkele toets
+     uitlokt is precies de kap die je later verrast. */
+  const teken = echteLevensteken(1)[0];
+  const meld = (collectie) => '2026-08-24T00:00:00.000Z WARN  begroting: zou zijn geweigerd ' +
+    '{"id":"x","p":"/api/proef","collectie":"' + collectie + '","rijen":9,"grens":1}';
+
+  /* clipsMeldingen is VERHUISD naar het onderhoud (kern/kappen.js), dus hij
+     hoort als ongevaarlijk gemeld te worden -- en niet meer als kap in het
+     verzoek. */
+  const onderhoud = draai([teken, meld('clipsMeldingen')].join('\n') + '\n');
+  assert.equal(onderhoud.code, 0, onderhoud.uit);
+  assert.match(onderhoud.uit, /kap \(onderhoud\)/,
+    'de kap op clipsMeldingen wordt niet meer gevonden sinds hij in kern/kappen.js staat');
+  assert.doesNotMatch(onderhoud.uit, /KAP IN VERZOEK/,
+    'een kap die in het onderhoud draait, hoort niet als kap in het verzoek te gelden');
+
+  /* EN EEN DIE ER NOG WEL IN ZIT. Dit is de gevaarlijke soort en die hoort er
+     luid uit te komen -- gemeenteMeldingen kapt nog in zijn eigen schrijfpad. */
+  const inVerzoek = draai([teken, meld('gemeenteMeldingen')].join('\n') + '\n');
+  assert.equal(inVerzoek.code, 0, inVerzoek.uit);
+  assert.match(inVerzoek.uit, /KAP IN VERZOEK\s+server\/kern\/gemeente/,
+    'een kap die nog in een schrijfroute staat, wordt niet meer gevonden');
+
+  /* DE TEGENPROEF. Zonder haar zou "KAP" overal kunnen staan en zou de eerste
+     bewering ook groen zijn als de scan altijd ja zegt. */
+  const zonder = draai([teken, meld('muziek')].join('\n') + '\n');
+  assert.equal(zonder.code, 0, zonder.uit);
+  assert.doesNotMatch(zonder.uit, /KAP/,
+    'muziek heeft geen kap in de bron; de scan ziet er ten onrechte een');
+});

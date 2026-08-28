@@ -37,6 +37,8 @@
    ========================================================================== */
 'use strict';
 
+const envelop = require('./envelop');
+
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
   grootSupplierSync, busGeef, kernGeef }) => {
   const routepoort = require('../kern/commercie/routepoort');
@@ -92,6 +94,10 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
       return res.status(401).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
     // Wie is er aan het werk (voor toeschrijving van activiteiten).
     req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
+    envelop.zet(req, { soort: 'medewerker', id: sess.staffId || sess.lidKey || null,
+      naam: sess.actor || null, rol: sess.staffRole || 'manager',
+      tenantSoort: 'zaak', tenantId: req.supplier.code || null,
+      gezagBron: 'zaakrol', gezagBaas: !!sess.manager });
     /* DE PERSOONSEIS. Hier en niet bij de inlog, want dit is het enige keelgat
        waar ELKE supplier-route doorheen moet -- een tweede poort bij /login zou
        de route missen die iemand er later naast bouwt (LAT-regel 5: niets slaat

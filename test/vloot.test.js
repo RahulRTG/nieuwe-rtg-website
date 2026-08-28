@@ -9,6 +9,8 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+/* Alleen voor het geduld: zie de kop van geduldFactor() in helper.js. */
+const { geduldFactor } = require('./helper');
 
 const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
 const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
@@ -79,7 +81,8 @@ test.before(async () => {
     return a && b && c;
   }, OPKOMST);
   assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op binnen ' +
-    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand));
+    Math.round(OPKOMST / 1000) + 's (belasting ' + DRUK + ' per kern, geduldfactor ' + GEDULD +
+    '); laatste stand per groep: ' + JSON.stringify(stand));
 });
 test.after(() => {
   if (vloot) try { vloot.kill('SIGTERM'); } catch (e) {}

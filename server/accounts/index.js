@@ -82,10 +82,19 @@ function init() {
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
      herstart die de oude instance een tel overlapt, parallelle testservers)
      wacht de tweede even in plaats van hard te crashen op "database is
-     locked". Dit was de bron van de sporadische testflake. */
+     locked". Dit was de bron van de sporadische testflake.
+
+     DE VOLGORDE IS DE HELFT VAN DIE REPARATIE, en die stond hier fout. Het
+     aanzetten van WAL neemt zelf een exclusief slot; zonder wachttijd DAARVOOR
+     krijgt het tweede proces meteen "database is locked" en valt het om --
+     precies de crash die deze regels moesten voorkomen. server/db/sqlite.js
+     had dat al door en zette de wachttijd vooraan; deze plek en
+     server/db/tx/sqliteachter.js waren nooit meegegaan. Gemeten met zes
+     processen die tegelijk migreren (test/migratierace.test.js): met de oude
+     volgorde vielen er een tot drie om, met deze geen. */
+  db.exec('PRAGMA busy_timeout=5000');
   db.exec('PRAGMA journal_mode=WAL');
   db.exec('PRAGMA synchronous=NORMAL');
-  db.exec('PRAGMA busy_timeout=5000');
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een
      keer draaien, met een grootboek erbij en een weigering om te starten op een

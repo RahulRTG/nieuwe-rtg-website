@@ -14,6 +14,8 @@
    ========================================================================== */
 'use strict';
 
+const envelop = require('./envelop');
+
 module.exports = function maakDiensten2(deps) {
   const {
     DATA_DIR, PERSONAS, accounts, crypto, db, dirTouch, eigenaarAccount, findSupplier, 
@@ -145,6 +147,13 @@ function auth(req, res, next) {
   if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
     return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
   }
+  /* DE ENVELOP (server/opzet/envelop.js). Additief: req.session blijft precies
+     wat hij was, hier komt alleen de canonieke vorm bij zodat een teller, een
+     rem of een bonnetje niet zeven vormen hoeft te kennen. `capability` draagt
+     de functie-id uit de boardroom -- de enige plek in dit huis waar een
+     poortwachter vandaag al een RECHT kent en geen rol. */
+  envelop.zet(req, { soort: 'lid', id: sess.key || null, rol: sess.tier || null,
+    capability: _fid || null });
   dirTouch(sess);
   next();
 }

@@ -1,5 +1,11 @@
 /* de demomelding: een demo is een toestand, geen terugval na een storing */
-  const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
+  /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `|| zoekParams.get('demo')
+     === '1'`, en daarmee kon iedereen met ?demo=1 een RTG-portaal openen dat
+     met verzonnen leden, reizen en Salon-berichten gevuld werd. Dat is precies
+     wat RTG niet mag zijn: wat hier staat is echt, of het staat er niet.
+     Magnaat is de plek waar gesimuleerd wordt (MAGNAATLAB.md), en die houdt
+     zijn eigen ingang. */
+  const explicieteDemo = magnaatProef;
 
   /* Een demo is een toestand, geen terugval na een storing. De melding stond
      altijd op het homescreen en daardoor leek ook een echte installatie een

@@ -9,8 +9,25 @@
 
   /* ---------- PWA ---------- */
 
+  /* EEN UITROL KOMT BIJ DE EERSTE OPENING BINNEN, NIET BIJ DE TWEEDE.
+
+     De nieuwe worker neemt over, maar wat je dan ziet is al door de OUDE
+     geserveerd -- bij een PWA die je nooit afsluit duurde dat een dag. De
+     bouwstempelwacht ving het niet: komen html EN script uit dezelfde oude
+     cache, dan kloppen de stempels met elkaar. Het slot is geen versiering:
+     zonder `hadWorker` herlaadt ook de eerste installatie, en zonder
+     `herlaadtAl` kan een hernieuwde claim een lus maken. */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    var hadWorker = !!navigator.serviceWorker.controller;
+    var herlaadtAl = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadWorker || herlaadtAl) return;
+      herlaadtAl = true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('/sw.js')
+      .then(function (reg) { if (reg && reg.update) { try { reg.update(); } catch (e) {} } })
+      .catch(() => {});
   }
 
   const logoutBtn = document.getElementById('logoutBtn');

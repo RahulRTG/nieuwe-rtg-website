@@ -4,7 +4,8 @@
    Achter de gewone leden-inlog; chauffeurs gebruiken dezelfde functies via de
    PDA-inlog. Op codenaam, geen externe kaartdienst. */
 module.exports = (kern) => {
-  const { app, auth, liveCodename, navBestemmingen, navRoute, navPoi, navKaart, navMeld } = kern;
+  const { app, auth, supplierAuth, liveCodename, navBestemmingen, navRoute, navPoi, navKaart, navMeld,
+    navStatus, navPartnerEvent, navPartnerEvents } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Navigatie is voor leden.' }); return true; }
@@ -26,7 +27,13 @@ module.exports = (kern) => {
   app.post('/api/nav/route', auth, (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
-    stuur(res, navRoute({ van: b.van, naar: b.naar, modus: b.modus }));
+    stuur(res, navRoute({ van: b.van, naar: b.naar, modus: b.modus, profiel: b.profiel,
+      vertrekAt: b.vertrekAt, accuProcent: b.accuProcent, bereikKm: b.bereikKm }));
+  });
+  // wat de eigen motor nu werkelijk weet; de cockpit toont bronversheid eerlijk
+  app.post('/api/nav/status', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, navStatus(hier(req.body)));
   });
   // POI-lagen rond een punt (incl. flits via de Flits-laag)
   app.post('/api/nav/poi', auth, (req, res) => {
@@ -38,5 +45,15 @@ module.exports = (kern) => {
   app.post('/api/nav/meld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, navMeld(req.session.key, liveCodename(req.session), req.body || {}));
+  });
+
+  /* Partners leveren een genormaliseerd mobiliteitssignaal, nooit een te
+     volgen route. RTG houdt daarmee de besluitvorming, herkomst en vervaldatum
+     in eigen hand. */
+  app.post('/api/supplier/nav/event', supplierAuth, (req, res) => {
+    stuur(res, navPartnerEvent(req.supplier, req.body || {}));
+  });
+  app.post('/api/supplier/nav/events', supplierAuth, (req, res) => {
+    stuur(res, navPartnerEvents(req.supplier.code));
   });
 };

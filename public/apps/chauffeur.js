@@ -18,7 +18,7 @@
     van: { label: 'Ibiza Airport' }, naar: { label: 'Sal de Mar' }, reizigers: 2,
     bagage: 2, km: 8.4, minuten: 23, prijs: 1240, status: 'aangevraagd',
     reizigerCodenaam: 'Zonvogel', gemaakt: new Date(Date.now() - 2 * 60000).toISOString(),
-    vertrekWens: null, notitie: 'Ophalen bij aankomsthal 1.'
+    vertrekWens: null, notitie: 'Ophalen bij aankomsthal 1.', ophaalcode: '6109'
   };
   var DEMO_GEPLAND = {
     ref: 'RTG-DEMO-1640', ritsoort: 'reservering', boeking: 'op-aanvraag', categorie: 'taxi',
@@ -191,7 +191,16 @@
   }
 
   function tekenActief(rit) {
-    var kaart = maak('article', 'ritkaart actief');
+    var luchthavenrit = /ibiza airport/i.test(plaats(rit.van));
+    var kaart = maak('article', 'ritkaart actief' + (luchthavenrit ? ' met-beeld' : ''));
+    if (luchthavenrit) {
+      var beeld = maak('div', 'ritbeeld');
+      var beeldtekst = maak('div');
+      beeldtekst.appendChild(maak('small', '', 'OPHAALPUNT'));
+      beeldtekst.appendChild(maak('strong', '', plaats(rit.van)));
+      beeldtekst.appendChild(maak('span', '', rit.notitie || 'Volg de officiële ophaalzone in de ritinformatie.'));
+      beeld.appendChild(beeldtekst); kaart.appendChild(beeld);
+    }
     var kop = maak('div', 'actiefkop'), titels = maak('div');
     titels.appendChild(maak('p', 'kaartlabel', 'ACTIEVE RIT'));
     titels.appendChild(maak('h2', '', rit.reizigerCodenaam || 'RTG-reiziger'));
@@ -200,7 +209,27 @@
     var balk = maak('div', 'fasebalk'), fase = FASE[rit.status] || 1;
     for (var i = 1; i <= 5; i++) balk.appendChild(maak('i', i <= fase ? 'gedaan' : ''));
     kaart.appendChild(balk);
-    if (rit.notitie) kaart.appendChild(maak('p', 'afstand', rit.notitie));
+    var fasen = maak('div', 'faselabels');
+    ['TOEGEWEZEN', 'ONDERWEG', 'AANGEKOMEN', 'AAN BOORD', 'KLAAR'].forEach(function (label, index) {
+      fasen.appendChild(maak('span', index + 1 <= fase ? 'gedaan' : '', label));
+    });
+    kaart.appendChild(fasen);
+    if (rit.notitie && !luchthavenrit) kaart.appendChild(maak('p', 'afstand', rit.notitie));
+    if (['aangekomen', 'ingestapt', 'rijdt'].includes(rit.status)) {
+      var passagier = maak('div', 'passagierkaart');
+      var persoon = maak('div');
+      persoon.appendChild(maak('small', '', 'PASSAGIER'));
+      persoon.appendChild(maak('strong', '', rit.reizigerCodenaam || 'RTG-reiziger'));
+      persoon.appendChild(maak('span', '', (rit.reizigers || 1) + ' reiziger' + ((rit.reizigers || 1) === 1 ? '' : 's') + ' · ' + (rit.bagage || 0) + ' bagage'));
+      passagier.appendChild(persoon);
+      if (rit.ophaalcode) {
+        var code = maak('div', 'ophaalcode');
+        code.appendChild(maak('small', '', 'OPHAALCODE'));
+        code.appendChild(maak('b', '', String(rit.ophaalcode)));
+        passagier.appendChild(code);
+      }
+      kaart.appendChild(passagier);
+    }
     var volgende = STATUS[rit.status];
     if (volgende) {
       var actie = maak('button', 'hoofdactie'); actie.type = 'button'; actie.appendChild(maak('span', '', volgende[1])); actie.appendChild(maak('b', '', '→'));
@@ -275,6 +304,13 @@
 
   function render() {
     zetModus(); tekenWerk(); tekenVandaag(); tekenNavigatie();
+    var actief = actieveRit();
+    var titels = {
+      geaccepteerd: 'RIT TOEGEWEZEN', onderweg: 'U BENT ONDERWEG', aangekomen: 'U BENT ER',
+      ingestapt: 'PASSAGIER AAN BOORD', rijdt: 'RIT IN UITVOERING', voltooid: 'RIT VOLTOOID', incident: 'INCIDENT ACTIEF'
+    };
+    $('#pda').setAttribute('data-ritfase', actief ? actief.status : 'beschikbaar');
+    $('#rittenTitel').textContent = actief ? (titels[actief.status] || 'ACTIEVE RIT') : 'U BENT BESCHIKBAAR';
     var naam = actor() && actor().name ? actor().name.split(/\s+/)[0] : 'chauffeur';
     $('#groet').textContent = groet() + ', ' + naam.toLocaleUpperCase('nl-NL');
   }

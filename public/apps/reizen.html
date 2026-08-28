@@ -1,24 +1,36 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="onyx">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>RTG Reizen</title>
-<meta name="theme-color" content="#080909">
+<title>TravelOS · RTG Reizen</title>
+<meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifests/reizen.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/canvas.css" rel="stylesheet">
 <link href="/apps/reizen-performance.css" rel="stylesheet">
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body>
+<body class="rtg-stijl" data-rtg-world="travel">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html" aria-current="page"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 
 <div class="reisapp">
   <header class="prestatiekop">
     <a class="rtgmerk" href="/apps/app.html" aria-label="Naar RTG Vandaag">RTG</a>
-    <p>REIZEN</p>
+    <p>TRAVELOS</p>
     <button class="veiligknop" type="button" data-open-veilig aria-label="Bekijk beveiliging">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z"/></svg>
       <i></i><span>BEVEILIGD</span>
@@ -29,12 +41,18 @@
     <section class="appblad actief" data-blad="vandaag" aria-labelledby="titelVandaag">
       <div class="bladbinnen vandaagblad">
         <div class="dagkop">
-          <p class="micro" id="groet">GOEDEMIDDAG</p>
-          <div class="bestemmingkop">
-            <h1 id="titelVandaag">IBIZA</h1>
-            <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+          <div class="dagkop-inhoud">
+            <p class="micro" id="groet">GOEDEMIDDAG</p>
+            <div class="bestemmingkop">
+              <h1 id="titelVandaag">IBIZA</h1>
+              <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+            </div>
+            <p class="sub" id="dagzin">Alles staat klaar.</p>
           </div>
-          <p class="sub" id="dagzin">Alles staat klaar.</p>
+          <div class="reisdag-klok" aria-label="Huidige tijd">
+            <span>LOKALE TIJD</span>
+            <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
+          </div>
         </div>
 
         <div class="vandaagraster">
@@ -117,8 +135,11 @@
     <section class="appblad" data-blad="taxi" aria-labelledby="titelTaxi" hidden>
       <div class="bladbinnen taxiblad">
         <header class="sectiekop taxikop">
-          <p class="micro">TAXI</p>
-          <h1 id="titelTaxi">Waar wilt u heen?</h1>
+          <div class="taxikop-inhoud">
+            <p class="micro">RTG EXECUTIVE MOBILITY</p>
+            <h1 id="titelTaxi">Waar wilt u heen?</h1>
+            <p>Van eerste deur tot laatste aankomst, met één vaste lijn van aandacht.</p>
+          </div>
         </header>
 
         <div class="taxiraster">
@@ -353,6 +374,12 @@
     ['Reisboek', 'Uw reizen, bij elkaar', '/apps/reisboek.html', ICO.koffer],
     ['Hangar', 'Charter en eigen toestel', '/apps/hangar.html', ICO.vlieg]
   ];
+  const WERELDSCENE = {
+    '/apps/reizen-veilig.html':'desk', '/apps/vluchten.html':'aviation', '/apps/reisbureau.html':'desk',
+    '/apps/hotels.html':'villa', '/apps/residentie.html':'residence', '/apps/ov.html':'mobility',
+    '/apps/navigatie.html':'road', '/apps/flits.html':'road', '/apps/stad.html':'city',
+    '/apps/reisboek.html':'documents', '/apps/hangar.html':'aviation'
+  };
 
   const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
   const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
@@ -536,7 +563,7 @@
   }
 
   $('#poorten').innerHTML = WERELD.map(([naam, uitleg, url, icoon]) =>
-    '<a class="poort" href="' + url + '"><span class="ic">' + ic(icoon, 26) + '</span>' +
+    '<a class="poort" data-scene="' + WERELDSCENE[url] + '" href="' + url + '"><span class="ic">' + ic(icoon, 26) + '</span>' +
     '<b>' + esc(naam) + '</b><span>' + esc(uitleg) + '</span></a>').join('');
 
   /* Een regel oppakken en aan de schil aanbieden. Alleen binnen een surface:
@@ -887,6 +914,8 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-performance-taxi.js"></script>
 <script src="/apps/reizen-performance-boeken.js"></script>
 <script src="/apps/reizen-performance-rahul.js"></script>
+<script src="/shared/uurwerk.js"></script>
+<script src="/shared/klok.js" defer></script>
 <script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

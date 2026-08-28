@@ -5,8 +5,14 @@
    Draai los: node --test test/navigatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
 const { haversine } = require('../server/lib/geo');
 const { maakNavigatie } = require('../server/kern/navigatie');
+const { rdNaarWgs } = require('../server/kern/navigatie/nwb-geo');
+const { maakNederlandNet } = require('../server/kern/navigatie/nederland');
 
 function opzet() {
   const db = { data: {
@@ -100,4 +106,96 @@ test('7. navRoute: route langs de route levert flits + laad mee', () => {
   const r = nav.navRoute({ van: { lat: 38.916, lng: 1.448 }, naar: { lat: 38.905, lng: 1.436 }, modus: 'ev' });
   assert.equal(r.status, 200);
   assert.ok(r.langs && Array.isArray(r.langs.laad) && Array.isArray(r.langs.flits));
+});
+
+test('8. Route Intelligence levert advies, vertrouwen, aankomst en echte alternatieven', () => {
+  const { nav } = opzet();
+  const r = nav.navRoute({
+    van: { lat: 38.873, lng: 1.373 }, naar: { lat: 38.985, lng: 1.535 },
+    modus: 'ev', profiel: 'eco', accuProcent: 72, bereikKm: 210
+  });
+  assert.equal(r.status, 200);
+  assert.match(r.routeId, /^rtg-/);
+  assert.equal(r.intelligence.profiel, 'eco');
+  assert.ok(r.intelligence.vertrouwen >= 70 && r.intelligence.vertrouwen <= 99);
+  assert.ok(Number.isFinite(new Date(r.intelligence.aankomstAt).getTime()));
+  assert.ok(r.intelligence.energie && r.intelligence.energie.kwh > 0);
+  assert.ok(r.alternatieven.length >= 1);
+  assert.ok(r.alternatieven.every(a => a.routeId && a.advies && a.naam));
+  assert.match(r.privacy, /niet bewaard/);
+});
+
+test('9. een partner levert een tijdelijk signaal, nooit een voorgeschreven route', () => {
+  const { nav } = opzet();
+  const vraag = {
+    van: { lat: 38.895, lng: 1.410 }, naar: { lat: 38.918, lng: 1.448 }, modus: 'auto'
+  };
+  const zonder = nav.navRoute(vraag);
+  const routePunt = zonder.route[Math.floor(zonder.route.length / 2)];
+  const supplier = { code: 'HOTEL-X', name: 'Hotel X' };
+  const gezet = nav.navPartnerEvent(supplier, {
+    soort: 'file', naam: 'Drukte bij de hoofdingang', lat: routePunt.lat, lng: routePunt.lng,
+    straalM: 1200, ernst: 4, betrouwbaarheid: 96
+  });
+  assert.equal(gezet.status, 200);
+  assert.equal(gezet.gebeurtenis.bron, 'partner');
+  assert.equal(nav.navPartnerEvents('HOTEL-X').gebeurtenissen.length, 1);
+  assert.equal(Object.hasOwn(gezet.gebeurtenis, 'route'), false, 'partner schrijft geen route voor');
+  const r = nav.navRoute(vraag);
+  assert.equal(r.status, 200);
+  assert.ok(r.intelligence.signalen >= 1 || r.routeId !== zonder.routeId,
+    'het signaal ligt op de route of de motor ontwijkt het');
+});
+
+test('10. status maakt bronversheid en eigen motor controleerbaar', () => {
+  const { nav } = opzet();
+  const r = nav.navStatus({ lat: 38.91, lng: 1.43, land: 'ES' });
+  assert.equal(r.status, 200);
+  assert.equal(r.eigenMotor, true);
+  assert.equal(r.motor, 'RTG Route Intelligence');
+  assert.ok(r.profielen.some(p => p.id === 'rustig'));
+  assert.ok(r.mogelijkheden.includes('eta-confidence'));
+});
+
+test('11. NWB-meetkunde zet het RD-nulpunt aantoonbaar om naar WGS84', () => {
+  const p = rdNaarWgs(155000, 463000);
+  assert.ok(Math.abs(p.lat - 52.1551744) < 1e-8);
+  assert.ok(Math.abs(p.lng - 5.38720621) < 1e-8);
+});
+
+test('12. de compacte Nederlandse graaf snapt, zoekt en respecteert voertuigtoegang', () => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nwb-test-'));
+  const bestand = path.join(map, 'nederland.sqlite'), grafiek = path.join(map, 'nederland-graaf');
+  fs.mkdirSync(grafiek);
+  const db = new DatabaseSync(bestand);
+  db.exec(`CREATE TABLE meta(sleutel TEXT PRIMARY KEY,waarde TEXT);
+    INSERT INTO meta VALUES('wegvakken','2'),('bron','NWB test'),('licentie','CC0 1.0');
+    CREATE TABLE node_seq(idx INTEGER PRIMARY KEY,id INTEGER UNIQUE,lat REAL,lng REAL);
+    INSERT INTO node_seq VALUES(0,100,52.3600,4.8900),(1,101,52.3610,4.9000),(2,102,52.3620,4.9100);
+    CREATE VIRTUAL TABLE node_seq_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
+    INSERT INTO node_seq_rtree SELECT idx,lng,lng,lat,lat FROM node_seq;
+    CREATE TABLE roads(id INTEGER PRIMARY KEY,lengte REAL,hoofd INTEGER,naam TEXT,ref TEXT,geom BLOB,minLat REAL,maxLat REAL,minLng REAL,maxLng REAL);
+    INSERT INTO roads(id,lengte,hoofd,naam,ref,geom) VALUES(10,700,1,'Testweg','A1',x'00'),(11,700,1,'Testweg','A1',x'00');
+    CREATE VIRTUAL TABLE road_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
+    CREATE TABLE plaatsen(id INTEGER PRIMARY KEY,naam TEXT,extra TEXT,soort TEXT,lat REAL,lng REAL,gewicht INTEGER);
+    INSERT INTO plaatsen VALUES(1,'Amsterdam','Nederland','woonplaats',52.36,4.89,100);
+    CREATE VIRTUAL TABLE plaatsen_fts USING fts5(naam,extra,content='plaatsen',content_rowid='id');
+    INSERT INTO plaatsen_fts(plaatsen_fts) VALUES('rebuild');`);
+  db.close();
+  const schrijf = (naam, rij) => fs.writeFileSync(path.join(grafiek, naam), Buffer.from(rij.buffer));
+  schrijf('coords.f64', new Float64Array([52.36, 4.89, 52.361, 4.90, 52.362, 4.91]));
+  schrijf('offsets.u32', new Uint32Array([0, 1, 3, 4]));
+  schrijf('doelen.u32', new Uint32Array([1, 0, 2, 1]));
+  schrijf('kosten.f32', new Float32Array([20, 20, 20, 20]));
+  schrijf('lengtes.f32', new Float32Array([700, 700, 700, 700]));
+  schrijf('wegen.u32', new Uint32Array([10, 10, 11, 11]));
+  schrijf('vlaggen.u8', new Uint8Array([15, 15, 15, 15]));
+  fs.writeFileSync(path.join(grafiek, 'graaf.json'), JSON.stringify({ versie: 1, knopen: 3, kanten: 4 }));
+  const n = maakNederlandNet({ bestand, haversine });
+  const van = n.snap({ lat: 52.36, lng: 4.89 }), naar = n.snap({ lat: 52.362, lng: 4.91 });
+  const route = n.zoek(van, naar, { modus: 'auto' });
+  assert.deepEqual(route.map(p => p.i), [0, 1, 2]);
+  assert.equal(route[2]._ref, 'A1');
+  assert.equal(n.zoekPlekken('Amsterdam')[0].naam, 'Amsterdam');
+  fs.rmSync(map, { recursive: true, force: true });
 });

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RTG Chauffeur</title>
-<meta name="theme-color" content="#080909">
+<meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifests/chauffeur.webmanifest">
@@ -26,18 +26,20 @@
 
   <main id="inhoud">
     <section class="pda-blad actief" data-blad="ritten" aria-labelledby="rittenTitel">
-      <div class="beschikbaarheid">
-        <p class="bovenregel" id="groet">GOEDEMIDDAG</p>
-        <div class="beschikbaar-kop">
-          <h1 id="rittenTitel">U BENT BESCHIKBAAR</h1>
-          <span class="verbinding" id="verbinding"><i></i> LIVE</span>
+      <div class="chauffeur-hero">
+        <div class="beschikbaarheid">
+          <p class="bovenregel" id="groet">GOEDEMIDDAG</p>
+          <div class="beschikbaar-kop">
+            <h1 id="rittenTitel">U BENT BESCHIKBAAR</h1>
+            <span class="verbinding" id="verbinding"><i></i> LIVE</span>
+          </div>
         </div>
-      </div>
 
-      <section class="klokpodium" aria-label="Huidige tijd">
-        <p>NU</p>
-        <div class="klokhouder"><div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div></div>
-      </section>
+        <section class="klokpodium" aria-label="Huidige tijd">
+          <p>OFFICIËLE RTG-TIJD</p>
+          <div class="klokhouder"><div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div></div>
+        </section>
+      </div>
 
       <div class="werkstapel" id="werkstapel" aria-live="polite" aria-busy="true">
         <section class="ritkaart laadkaart">
@@ -114,6 +116,7 @@
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/shared/uurwerk.js"></script>
 <script src="/shared/klok.js"></script>
 <script src="/apps/chauffeur.js"></script>
 <script src="/shared/metgezel.js" defer></script>

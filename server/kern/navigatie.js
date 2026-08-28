@@ -1,29 +1,17 @@
-/* Kern-module "navigatie": RTG Navigatie, het huiseigen navigatiesysteem.
-   Alles zelf, niets naar derden: geen Google, geen Mapbox, geen externe tegels.
-   De route komt uit een eigen wegennet (een raster met hoofdwegen) waarover een
-   A*-zoeker de snelste weg vindt; de bocht-voor-bocht-aanwijzingen en de ETA per
-   vervoerwijze rekenen we er zelf uit.
-
-   De kracht zit in de koppeling: bestemmingen komen uit onze eigen leveranciers,
-   de OV-haltes, de overheids- en gemeenteloketten en de POI-lagen (tankstations,
-   laadpalen). Onderweg schuift RTG Flits erin: flitsers, files en gevaren van het
-   eigen netwerk liggen op de route. Een wegprobleem melden gaat via dezelfde
-   Flits-laag terug het netwerk in.
-
-   Privacy by design: plaatsen zijn plaatsen (zaken en loketten), nooit personen;
-   een melding draagt een codenaam, nooit een echte naam. De positie van de rijder
-   blijft op het toestel -- de server rekent met wat de app stuurt en bewaart die
-   niet.
-
-   maakNavigatie(state) volgt het vaste kern-patroon. Na flits gemount. */
+/* Huiseigen navigatie: lokaal stadsnet plus de dagelijkse CC0-import van alle
+   Nederlandse NWB-wegvakken. Eigen A*, bestemmingen uit RTG/NWB, Flits als
+   live laag en positie alleen voor de berekening, nooit als reisgeschiedenis. */
 
 const REF = { lat: 38.91, lng: 1.43 };                          // Ibiza-stad, het midden
 const BOUNDS = { lat0: 38.855, lat1: 38.995, lng0: 1.28, lng1: 1.56 };
 const GRID = 22;                                                 // rasterknopen per as
 const ARTERIE = 3;                                               // elke 3e lijn is hoofdweg
 const V_HOOFD = 22, V_STAD = 11;                                 // m/s (~80 / ~40 km/h)
-const MODI = { auto: 13.9, ev: 13.9, fiets: 4.4, lopen: 1.4 };  // gemiddelde m/s
+const MODI = { auto: 13.9, ev: 13.9, fiets: 4.4, lopen: 1.4 };  // terugval-ETA per m/s
 const LANGS_M = 450;                                             // "langs de route" straal
+const intelligence = require('./navigatie/intelligentie');
+const { maakNederlandNet, binnenNederland } = require('./navigatie/nederland');
+let nederlandNetCache;
 
 // de eigen POI-lagen: tankstations, laadpalen en civiele loketten rond Ibiza
 const POI = {
@@ -50,6 +38,9 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
      bocht-voor-bocht) draaien als submodule op de constanten; zie
      navigatie/wegennet.js. */
   const { meters, snap, zoek, stappenVan } = require('./navigatie/wegennet')({ REF, BOUNDS, GRID, ARTERIE, V_HOOFD, V_STAD, haversine });
+  const partners = require('./navigatie/partner-events')({ db, save, crypto, haversine });
+  if (nederlandNetCache === undefined) nederlandNetCache = maakNederlandNet({ haversine });
+  const nederland = nederlandNetCache;
 
   // ---- de koppeling: alle bronnen als bestemming ----
   function eigenPlekken() {
@@ -77,12 +68,26 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   }
 
   function bestemmingen(query, hier) {
-    const q = String(query || '').trim().toLowerCase();
+    const q = zonderTekens(query);
     let rij = eigenPlekken();
-    if (q) rij = rij.filter(p => (p.naam + ' ' + (p.extra || '') + ' ' + p.soort).toLowerCase().includes(q));
+    const laagZoek = ['laad', 'laadpaal', 'tank', 'tankstation', 'halte', 'ov', 'gemeente', 'overheid', 'leverancier'].includes(q);
+    if (nederland && !laagZoek && (String(query || '').trim().length >= 2 || !query)) rij.push(...nederland.zoekPlekken(query));
+    if (q) rij = rij.map(p => ({ ...p, zoekScore: scoreZoek(p, q) })).filter(p => p.zoekScore > 0);
     if (hier && hier.lat != null) rij.forEach(p => { p.afstandM = Math.round(meters(hier, p)); });
-    rij.sort((a, b) => (a.afstandM ?? 9e9) - (b.afstandM ?? 9e9));
+    rij.sort((a, b) => (b.zoekScore || 0) - (a.zoekScore || 0) || (a.afstandM ?? 9e9) - (b.afstandM ?? 9e9));
     return { status: 200, bestemmingen: rij.slice(0, 40) };
+  }
+
+  function zonderTekens(v) {
+    return String(v || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function scoreZoek(p, q) {
+    const naam = zonderTekens(p.naam), extra = zonderTekens((p.extra || '') + ' ' + p.soort + ' ' + p.laag);
+    if (naam === q) return 100;
+    if (naam.startsWith(q)) return 82;
+    if (naam.includes(q)) return 64;
+    const woorden = q.split(/\s+/).filter(Boolean);
+    return woorden.every(w => (naam + ' ' + extra).includes(w)) ? 42 + woorden.length : 0;
   }
 
   function poiLagen(lagen, hier) {
@@ -102,38 +107,37 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
     return { status: 200, lagen: uit };
   }
 
-  // ---- de route zelf ----
-  function langsRoute(poly, punten) {
-    return punten.filter(p => poly.some(q => meters(p, q) <= LANGS_M));
+  const lokaleRoute = require('./navigatie/route-engine')({ MODI, LANGS_M, GRID, POI, crypto, haversine,
+    flitsRond, partners, meters, snap, zoek, stappenVan, intelligence });
+  const nederlandRoute = nederland && require('./navigatie/route-engine')({ MODI, LANGS_M, GRID: null, POI, crypto, haversine,
+    flitsRond, partners, meters, snap: nederland.snap, zoek: nederland.zoek, stappenVan: nederland.stappenVan,
+    intelligence, netwerk: { bron: 'RTG Route Intelligence op het Rijkswaterstaat Nationaal Wegenbestand (NWB, CC0); geen externe kaartdienst' } });
+
+  function route(vraag) {
+    const vanNL = binnenNederland(vraag && vraag.van), naarNL = binnenNederland(vraag && vraag.naar);
+    if (vanNL || naarNL) {
+      if (!nederlandRoute) return { status: 503, error: 'Het Nederlandse wegennet is nog niet ingeladen.' };
+      if (!vanNL || !naarNL) return { status: 422, error: 'Deze route kruist de huidige landsdekking.' };
+      vraag.van.land = 'NL'; vraag.naar.land = 'NL';
+      return nederlandRoute(vraag);
+    }
+    return lokaleRoute(vraag);
   }
-  function route({ van, naar, modus }) {
-    const gv = van && Number.isFinite(Number(van.lat)) && Number.isFinite(Number(van.lng));
-    const gn = naar && Number.isFinite(Number(naar.lat)) && Number.isFinite(Number(naar.lng));
-    if (!gv || !gn) return { status: 400, error: 'Geef een geldig vertrek- en aankomstpunt.' };
-    const m = MODI[modus] ? modus : 'auto';
-    const vanN = snap({ lat: +van.lat, lng: +van.lng }), naarN = snap({ lat: +naar.lat, lng: +naar.lng });
-    const kern = zoek(vanN, naarN);
-    if (!kern) return { status: 422, error: 'Geen route gevonden binnen het netwerk.' };
-    const poly = [{ lat: +van.lat, lng: +van.lng }, ...kern.map(k => ({ lat: k.lat, lng: k.lng })), { lat: +naar.lat, lng: +naar.lng }];
-    // dubbele opeenvolgende punten eruit (snap kan samenvallen met van/naar)
-    const schoon = poly.filter((p, i) => i === 0 || meters(p, poly[i - 1]) > 5);
-    let afstandM = 0; for (let i = 1; i < schoon.length; i++) afstandM += meters(schoon[i - 1], schoon[i]);
-    const eta = {}; for (const k of Object.keys(MODI)) eta[k] = Math.max(1, Math.round(afstandM / MODI[k] / 60));
-    const langs = {
-      laad: langsRoute(schoon, POI.laad.map(p => ({ ...p, laag: 'laad', afstandM: 0 }))),
-      tank: langsRoute(schoon, POI.tank.map(p => ({ ...p, laag: 'tank' }))),
-      flits: (flitsRond ? (flitsRond({ lat: schoon[Math.floor(schoon.length / 2)].lat, lng: schoon[Math.floor(schoon.length / 2)].lng }, (van.land || naar.land)).meldingen || []) : [])
-        .filter(f => schoon.some(q => haversine(f, q) <= LANGS_M))
-    };
-    return {
-      status: 200, modus: m, afstandM: Math.round(afstandM), afstandKm: Math.round(afstandM / 100) / 10,
-      etaMin: eta, route: schoon, stappen: stappenVan(schoon), langs,
-      bron: 'eigen wegennet (A*); geen externe kaartdienst'
-    };
+
+  function status(hier) {
+    const partnerEvents = partners.partnerEventsRond(hier, 40);
+    const netwerk = flitsRond && hier ? (flitsRond(hier, hier.land).meldingen || []) : [];
+    return { status: 200, motor: 'RTG Route Intelligence', versie: 3, eigenMotor: true,
+      live: { netwerk: netwerk.length, partners: partnerEvents.length, bijgewerktAt: new Date().toISOString() },
+      dekking: nederland ? { land: 'Nederland', actief: true, hierActief: binnenNederland(hier), wegvakken: Number(nederland.info.wegvakken || 0),
+        bron: nederland.info.bron, licentie: nederland.info.licentie, gebouwdAt: nederland.info.gebouwd_at } : { land: 'Nederland', actief: false },
+      profielen: Object.entries(intelligence.PROFIELEN).map(([id, p]) => ({ id, naam: p.naam })),
+      mogelijkheden: ['live-verkeer', 'alternatieve-routes', 'eta-confidence', 'ev-energie', 'partner-events', 'privacy-routing', 'nederland-nwb'] };
   }
 
   // ---- de kaart voor de 3D-app: net-definitie + koppelpunten ----
   function kaart(hier) {
+    if (nederland && binnenNederland(hier)) return nederland.kaart(hier, eigenPlekken());
     return {
       status: 200, ref: REF, bounds: BOUNDS, grid: GRID, arterie: ARTERIE,
       plekken: eigenPlekken().map(p => {
@@ -151,7 +155,8 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   }
 
   void crypto; void save;
-  return { navBestemmingen: bestemmingen, navRoute: route, navPoi: poiLagen, navKaart: kaart, navMeld: meld };
+  return { navBestemmingen: bestemmingen, navRoute: route, navPoi: poiLagen, navKaart: kaart, navMeld: meld,
+    navStatus: status, navPartnerEvent: partners.navPartnerEvent, navPartnerEvents: partners.navPartnerEvents };
 }
 
 /* REF, BOUNDS en POI gaan mee naar buiten omdat het STADSWEEFSEL ze leest: de

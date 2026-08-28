@@ -10,6 +10,7 @@
     "start": "node scripts/start.js",
     "telefoon": "RTG_LOKAAL_TLS=1 node server/trio.js",
     "single": "node server/server.js",
+    "navigatie:nederland": "node scripts/navigatie-nederland.js",
     "gateway": "node server/poort.js",
     "vloot": "node server/vloot.js",
     "sleutels": "node scripts/sleutels.js",

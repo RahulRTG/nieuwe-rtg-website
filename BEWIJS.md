@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1348 bestanden en 9353 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1348 bestanden en 9358 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1348 |
-| losse beweringen (`test(...)`) | 9353 |
+| losse beweringen (`test(...)`) | 9358 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 947 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1179 bestanden, 9064 beweringen.
+1179 bestanden, 9069 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -639,7 +639,7 @@ toets omvalt.
 | `muziek.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Studio: zelf muziek maken. Toetst de drie beloftes van kern/muziek.js -- alles wordt opgewekt en niets geleend (dus mag je eigen stuk onder je eigen clip), Rahul zet neer maar jij bent de maker, en het stuk is... |
 | `naamlaag.test.js` | 2 | gezakt op `liegpoort /api/` | De persoonlijke naamlaag + het bedrijfsdorp per genre. Getoetst: (1) een lid geeft een verbonden vriend een eigen naam en ziet die naam in de eigen lijsten, vindt de vriend onder die naam, en Rahul-resolutie... |
 | `naarkassa.test.js` | 2 | gezakt op `liegpoort /api/` | Order naar de kassa (server): het lid kiest "stuur naar de kassa" -- de bestelling gaat direct als open bon naar de zaak (de keuken maakt hem), en wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag... |
-| `navigatie.test.js` | 7 | gezakt op `+->-#0` | RTG Navigatie (server/kern/navigatie.js): het huiseigen navigatiesysteem. Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling: het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per... |
+| `navigatie.test.js` | 12 | gezakt op `+->-#0` | RTG Navigatie (server/kern/navigatie.js): het huiseigen navigatiesysteem. Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling: het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per... |
 | `negenplus.test.js` | 4 | gezakt op `liegpoort /api/` | De 9+-ronde: de app-gids dekt elke app-pagina met echte uitleg, en Rahul is er kindveilig voor het hele gezin in de RTFoundation. |
 | `nieuwe-endpoints.test.js` | 1 | -- | DE NIEUWE ENDPOINTS VAN DE SAMENVOEGRONDE, EEN KEER ECHT AANGEROEPEN. WAT DIT IS. |
 | `nieuweroutes.test.js` | 6 | gezakt op `true->false#0` | DE POORT OP DE INSTROOM VAN ONGETOETSTE ROUTES. scripts/nieuweroutes.js vergelijkt de routekaart van deze tak met die van main en eist een toets voor alles wat NIEUW is. |

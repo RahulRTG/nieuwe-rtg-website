@@ -83,7 +83,7 @@
     var r = (MODEL.taken || []).filter(function (t) { return (t.afdeling || 'operations') === k.id; });
     return '<div class="work-list" id="campusTaken">' + (r.length ? r.map(function (t) {
       return '<label class="work-row"><input type="checkbox" data-taak="' + esc(t.id) + '"' + (t.af ? ' checked' : '') +
-        '><span' + (t.af ? ' style="color:var(--rtg-soft);text-decoration:line-through"' : '') + '>' + esc(t.tekst) + '</span></label>';
+        '><span' + (t.af ? ' class="taak-afgerond"' : '') + '>' + esc(t.tekst) + '</span></label>';
     }).join('') : '<p class="office-empty">Geen open werk op deze tafel.</p>') + '</div>' +
       '<form class="campus-form taakform" id="campusTaakForm"><input id="campusTaak" maxlength="200" placeholder="Nieuw werkpunt" aria-label="Nieuw werkpunt" required>' +
       '<button type="submit">Zet op tafel</button></form>';

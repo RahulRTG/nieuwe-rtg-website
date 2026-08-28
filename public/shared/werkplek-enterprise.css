@@ -119,6 +119,7 @@
 .work-row input{accent-color:var(--campus-burgundy);}
 .campus-form{display:grid;grid-template-columns:1fr 1fr auto;gap:.4rem;margin-top:.8rem;}
 .campus-form.taakform{grid-template-columns:1fr auto;}
+.taak-afgerond{color:var(--rtg-soft);text-decoration:line-through;}
 .campus-form input{min-width:0;border:1px solid var(--campus-line);background:#0c0c0b;color:var(--rtg-txt);padding:.58rem .65rem;font:inherit;font-size:.64rem;}
 .campus-form button{border:1px solid rgba(201,173,85,.42);background:rgba(201,173,85,.06);color:var(--campus-gold);padding:.55rem .7rem;font:600 .58rem Inter,sans-serif;cursor:pointer;}
 .office-empty{padding:.85rem 0;color:var(--rtg-soft);font-size:.63rem;}

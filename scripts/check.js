@@ -390,7 +390,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        verspreiding weer in gang, en test/genreregister.test.js bewaakt precies
        dat het EEN plek blijft. */
     ['server/seed/genres-lijst.js', 'het genre-register: 73 regels pure data zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
-    ['server/kern/werkplek-kantoren.js', 'de enterprise-kantoorcatalogus: zestien afdelingen met rollen en bestaande app-ingangen, een pure definitietabel die opknippen weer twee bronnen van waarheid maakt'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],

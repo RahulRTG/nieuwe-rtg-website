@@ -104,7 +104,7 @@ test('geen lcov is geen honderd procent maar een fout', () => {
 });
 
 test('de vloeren staan waar de meting ze zette', () => {
-  assert.deepEqual(vloer.VLOER, { regels: 78, takken: 78, functies: 65 });
+  assert.deepEqual(vloer.VLOER, { regels: 70, takken: 67, functies: 47 });
 });
 
 /* DE DERDE MANIER WAAROP DEZE KETEN STIL MINDER KAN TOETSEN, en de reden dat

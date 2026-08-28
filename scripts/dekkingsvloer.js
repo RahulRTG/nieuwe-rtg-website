@@ -19,7 +19,7 @@
    ========================================================================== */
 const fs = require('fs');
 const path = require('path');
-const { voegSamen, tel, lees } = require('./lib/lcov');
+const { ontleed, voegSamen: voegTekstenSamen, tel: telKaart, lees } = require('./lib/lcov');
 
 const WORTEL = path.join(__dirname, '..');
 const ARG = process.argv.slice(2);
@@ -63,22 +63,24 @@ function eisen() {
   return uit;
 }
 
-const map = ARG.includes('--map') ? ARG[ARG.indexOf('--map') + 1] : path.join(WORTEL, 'dekking-scherven');
+const map = ARG.includes('--map') ? ARG[ARG.indexOf('--map') + 1]
+  : (ARG[0] && !ARG[0].startsWith('--') ? ARG[0] : path.join(WORTEL, 'dekking-scherven'));
 const verwacht = getal('--scherven', 0);
 
-let paden = [];
-try {
-  paden = fs.readdirSync(map, { withFileTypes: true })
-    .filter((n) => !n.isDirectory() && /\.info$|\.lcov$/.test(n.name))
-    .map((n) => path.join(map, n.name)).sort();
-} catch (e) {
-  console.error('\x1b[31mDe map met scherfdekking is niet te lezen: ' + map + '\x1b[0m');
-  process.exit(2);
-}
+function main() {
+  let paden = [];
+  try {
+    paden = fs.readdirSync(map, { withFileTypes: true })
+      .filter((n) => !n.isDirectory() && /\.info$|\.lcov$/.test(n.name))
+      .map((n) => path.join(map, n.name)).sort();
+  } catch (e) {
+    console.error('\x1b[31mDe map met scherfdekking is niet te lezen: ' + map + '\x1b[0m');
+    process.exit(2);
+  }
 
-console.log('\n=== De dekkingsvloer, over alle scherven ===\n');
-const toon = (p) => { const r = path.relative(WORTEL, p); return r.startsWith('..') ? p : r; };
-console.log('  ' + paden.length + ' dekkingsbestand(en) gevonden in ' + toon(map));
+  console.log('\n=== De dekkingsvloer, over alle scherven ===\n');
+  const toon = (p) => { const r = path.relative(WORTEL, p); return r.startsWith('..') ? p : r; };
+  console.log('  ' + paden.length + ' dekkingsbestand(en) gevonden in ' + toon(map));
 
 /* FAIL-CLOSED: een ontbrekende scherf maakt de meting anders, niet lager.
 
@@ -91,47 +93,86 @@ console.log('  ' + paden.length + ' dekkingsbestand(en) gevonden in ' + toon(map
    wachter dat nummer terug: een scherf die twee bestanden oplevert (een solo-
    ronde naast de gewone) telt een keer, en een scherf die er nul oplevert valt
    op met naam en nummer. */
-const nummers = new Set();
-for (const p of paden) {
-  const m = /-(\d+)\.(?:info|lcov)$/.exec(path.basename(p));
-  if (m) nummers.add(Number(m[1]));
-}
-if (verwacht) {
-  const zoek = [];
-  for (let i = 1; i <= verwacht; i++) if (!nummers.has(i)) zoek.push(i);
-  if (zoek.length) {
-    console.error('\n\x1b[31m  Er werden ' + verwacht + ' scherven verwacht; scherf ' + zoek.join(', ') +
-      ' ontbreekt.\x1b[0m\n  Een som over een deel van de scherven is geen lagere dekking maar een ANDERE\n' +
-      '  meting, en die hoort niet te bepalen of een tak doorkomt.\n');
+  const nummers = new Set();
+  for (const p of paden) {
+    const m = /-scherf-(\d+)\.(?:info|lcov)$/.exec(path.basename(p)) ||
+      /-(\d+)\.(?:info|lcov)$/.exec(path.basename(p));
+    if (m) nummers.add(Number(m[1]));
+  }
+  if (verwacht) {
+    const zoek = [];
+    for (let i = 1; i <= verwacht; i++) if (!nummers.has(i)) zoek.push(i);
+    if (zoek.length) {
+      console.error('\n\x1b[31m  Er werden ' + verwacht + ' scherven verwacht; scherf ' + zoek.join(', ') +
+        ' ontbreekt.\x1b[0m\n  Een som over een deel van de scherven is geen lagere dekking maar een ANDERE\n' +
+        '  meting, en die hoort niet te bepalen of een tak doorkomt.\n');
+      process.exit(1);
+    }
+    console.log('  scherven met dekking: ' + [...nummers].sort((a, b) => a - b).join(', '));
+  }
+  if (!paden.length) {
+    console.error('\n\x1b[31m  Geen lcov-gegevens: er valt niets te handhaven.\x1b[0m\n');
     process.exit(1);
   }
-  console.log('  scherven met dekking: ' + [...nummers].sort((a, b) => a - b).join(', '));
-}
-if (!paden.length) {
-  console.error('\n\x1b[31m  Geen enkele scherf: er valt niets te handhaven.\x1b[0m\n');
-  process.exit(1);
+
+  const totaal = telKaart(voegTekstenSamen(lees(paden)));
+  const eis = eisen();
+
+  console.log('  ' + totaal.bestanden + ' bestand(en) in de opgetelde meting\n');
+  const rij = [
+    ['regels', totaal.regels, eis.regels],
+    ['takken', totaal.takken, eis.takken],
+    ['functies', totaal.functies, eis.functies]
+  ];
+  let gezakt = 0;
+  for (const [naam, m, e] of rij) {
+    const ok = m.pct >= e;
+    if (!ok) gezakt++;
+    console.log('  ' + (ok ? '\x1b[32m✓\x1b[0m' : '\x1b[31m✗\x1b[0m') + ' ' + naam.padEnd(10) +
+      String(m.pct).padStart(6) + '%  (' + m.gedekt + '/' + m.totaal + ')   vloer ' + e + '%');
+  }
+
+  if (gezakt) {
+    console.error('\n\x1b[31mDE DEKKINGSVLOER IS NIET GEHAALD (' + gezakt + ' van de 3).\x1b[0m');
+    console.error('Dit is dezelfde eis als bij het enkele proces; het verdelen verandert er niets aan.\n');
+    process.exit(1);
+  }
+  console.log('\n\x1b[32mDe vloer is gehaald.\x1b[0m\n');
 }
 
-const totaal = tel(voegSamen(lees(paden)));
-const eis = eisen();
-
-console.log('  ' + totaal.bestanden + ' bestand(en) in de opgetelde meting\n');
-const rij = [
-  ['regels', totaal.regels, eis.regels],
-  ['takken', totaal.takken, eis.takken],
-  ['functies', totaal.functies, eis.functies]
-];
-let gezakt = 0;
-for (const [naam, m, e] of rij) {
-  const ok = m.pct >= e;
-  if (!ok) gezakt++;
-  console.log('  ' + (ok ? '\x1b[32m✓\x1b[0m' : '\x1b[31m✗\x1b[0m') + ' ' + naam.padEnd(10) +
-    String(m.pct).padStart(6) + '%  (' + m.gedekt + '/' + m.totaal + ')   vloer ' + e + '%');
+/* Module-API voor de kleine samenvoegproeven. De uitvoer gebruikt de rijkere
+   tellingsobjecten; de proeven hebben alleen percentages en ruwe tellerparen
+   nodig. Beide lopen over exact dezelfde lcov-parser. */
+function voegSamen(kaart, tekst) {
+  for (const [bestand, bron] of ontleed(tekst)) {
+    let doel = kaart.get(bestand);
+    if (!doel) {
+      doel = { pad: bron.pad, regels: new Map(), functies: new Map(), takken: new Map() };
+      kaart.set(bestand, doel);
+    }
+    for (const soort of ['regels', 'functies', 'takken']) {
+      for (const [sleutel, aantal] of bron[soort]) {
+        doel[soort].set(sleutel, (doel[soort].get(sleutel) || 0) + aantal);
+      }
+    }
+  }
+  return kaart;
 }
 
-if (gezakt) {
-  console.error('\n\x1b[31mDE DEKKINGSVLOER IS NIET GEHAALD (' + gezakt + ' van de 3).\x1b[0m');
-  console.error('Dit is dezelfde eis als bij het enkele proces; het verdelen verandert er niets aan.\n');
-  process.exit(1);
+function tel(kaart) {
+  const uit = telKaart(kaart);
+  return {
+    bestanden: uit.bestanden,
+    regels: uit.regels.pct,
+    takken: uit.takken.pct,
+    functies: uit.functies.pct,
+    ruw: {
+      regels: [uit.regels.gedekt, uit.regels.totaal],
+      takken: [uit.takken.gedekt, uit.takken.totaal],
+      functies: [uit.functies.gedekt, uit.functies.totaal]
+    }
+  };
 }
-console.log('\n\x1b[32mDe vloer is gehaald.\x1b[0m\n');
+
+if (require.main === module) main();
+module.exports = { VLOER: eisen(), voegSamen, tel };

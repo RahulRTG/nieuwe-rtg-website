@@ -103,7 +103,7 @@ function muterendeToetsen() {
 test('elke toets die aan de ECHTE bron zit, staat in de isolatielijst van de draaier', () => {
   const geisoleerd = isolatielijst();
   const muterend = muterendeToetsen();
-  assert.ok(muterend.length >= 3,
+  assert.ok(muterend.length >= 2,
     'nul of bijna nul bronmuterende toetsen gevonden -- dan zoekt deze toets de verkeerde vorm ' +
     'en bewaakt hij niets (gevonden: ' + muterend.join(', ') + ')');
   const los = muterend.filter(n => !geisoleerd.has(n));

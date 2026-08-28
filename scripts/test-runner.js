@@ -53,7 +53,15 @@ const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
 const selectie = (argv.find(a => a.startsWith('--bestanden=')) || '').slice(12)
   .split(',').map(s => s.trim()).filter(Boolean);
-const dekkingMap = (argv.find(a => a.startsWith('--dekking=')) || '').slice(10);
+const dekkingWaarde = (argv.find(a => a.startsWith('--dekking=')) || '').slice(10);
+const dekkingVloer = dekkingWaarde.includes(',')
+  ? dekkingWaarde.split(',').map(s => s.trim()).filter(Boolean)
+  : [];
+const dekkingMap = dekkingVloer.length ? '' : dekkingWaarde;
+if (dekkingVloer.length && (dekkingVloer.length !== 3 || dekkingVloer.some(n => !Number.isFinite(Number(n))))) {
+  console.error('[tests] --dekking wil een map of drie getallen: regels,takken,functies');
+  process.exit(2);
+}
 const deelVlag = (argv.find(a => a.startsWith('--deel=')) || '').slice(7);
 const deel = (() => {
   if (!deelVlag) return null;
@@ -70,7 +78,7 @@ const zonderIjkingen = argv.includes('--zonder-ijkingen');
    met require() opent om alleen die lijst te lezen, start de hele suite. Dat is
    niet theoretisch; het is hier gebeurd. Een lijst die twee lezers heeft, hoort
    in een bestand dat niets doet als je het opent. */
-const { GEISOLEERD } = require('./lib/geisoleerd');
+const { isGeisoleerd } = require('./lib/geisoleerd');
 const gevraagd = Number(process.env.RTG_TEST_CONCURRENCY);
 const concurrency = Number.isInteger(gevraagd) && gevraagd > 0
   ? Math.min(gevraagd, 32)
@@ -122,9 +130,19 @@ function leegMaken() {
 }
 
 let batch = 0;
-function draai(namen, parallel) {
+function draai(namen, parallel, metVloer) {
   if (!namen.length) return 0;
-  const args = ['--test', '--test-concurrency=' + parallel];
+  /* Een toets die niet afkomt krijgt na tien minuten een naam en een fout.
+     --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
+     een gelekt handvat houdt het kindproces anders onbeperkt open. */
+  const args = ['--test', '--test-concurrency=' + parallel,
+    '--test-timeout=600000', '--test-force-exit'];
+  if (metVloer && dekkingVloer.length === 3) {
+    args.push('--experimental-test-coverage',
+      '--test-coverage-lines=' + dekkingVloer[0],
+      '--test-coverage-branches=' + dekkingVloer[1],
+      '--test-coverage-functions=' + dekkingVloer[2]);
+  }
   if (dekkingMap) {
     fs.mkdirSync(dekkingMap, { recursive: true });
     const merk = deel ? 'deel-' + deel.nr
@@ -145,8 +163,8 @@ function draai(namen, parallel) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = verdeel(bestanden.filter(n => !GEISOLEERD.has(n)), deel);
-const geïsoleerd = verdeel(bestanden.filter(n => GEISOLEERD.has(n) &&
+const gewoon = verdeel(bestanden.filter(n => !isGeisoleerd(n)), deel);
+const geïsoleerd = verdeel(bestanden.filter(n => isGeisoleerd(n) &&
   (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
 
 /* WAT ZOU JE DOEN? -- `--toon` drukt de indeling af en draait niets.
@@ -162,19 +180,21 @@ const geïsoleerd = verdeel(bestanden.filter(n => GEISOLEERD.has(n) &&
    bewering van een regel. Zo kost het niets, en een mens die zich afvraagt wat
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
-  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking: dekkingMap, journaal }, null, 2));
+  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency,
+    dekking: dekkingMap || dekkingVloer, journaal }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }
 leegMaken();
 console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk' +
-  (dekkingMap ? ' (dekking naar ' + dekkingMap + ')' : ''));
+  (dekkingMap ? ' (dekking naar ' + dekkingMap + ')'
+    : (dekkingVloer.length ? ' (met dekkingsvloer ' + dekkingVloer.join('/') + ')' : '')));
 if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
 if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
-let code = draai(gewoon, concurrency);
+let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
-  const uit = draai([naam], 1);
+  const uit = draai([naam], 1, false);
   if (uit && !code) code = uit;
 }
 geefAfbouwSlotVrij();

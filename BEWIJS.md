@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1409 bestanden en 9901 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1409 bestanden en 9902 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1409 |
-| losse beweringen (`test(...)`) | 9901 |
+| losse beweringen (`test(...)`) | 9902 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 968 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1235 bestanden, 9604 beweringen.
+1235 bestanden, 9605 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -226,7 +226,7 @@ toets omvalt.
 | `command-routes-herstel.test.js` | 8 | gezakt op `liegpoort /api/` | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
 | `command.test.js` | 19 | gezakt op `===->!==#0` | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
 | `commandlagen.test.js` | 11 | gezakt op `liegpoort /api/` | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
-| `commerce-kern.test.js` | 18 | gezakt op `&&->||#0` | DE COMMERCE-KERN -- werkwoorden, koopbaar, afrekening. WAT HIER WORDT VASTGEHOUDEN. |
+| `commerce-kern.test.js` | 19 | gezakt op `&&->||#0` | DE COMMERCE-KERN -- werkwoorden, koopbaar, afrekening. WAT HIER WORDT VASTGEHOUDEN. |
 | `commerce-overdracht.test.js` | 15 | -- | DE OVERDRACHT -- de keuze afleveren bij de deur die wel bevestigt. DE ZWAARSTE TOETSEN ZIJN 2 EN 3. |
 | `commerce-prijsvraag.test.js` | 9 | -- | DE PRIJSVRAAG -- het werkwoord `prijs` waar het bedrag van een keuze afhangt. DE ZWAARSTE TOETS IS 6. |
 | `commerce-publiek.test.js` | 9 | -- | DE TWEE SLOTEN OP PUBLIEK VERKOPEN -- gelezen, niet nagemaakt. DE ZWAARSTE TOETS IS 7. |

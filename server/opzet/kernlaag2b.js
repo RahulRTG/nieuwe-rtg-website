@@ -42,4 +42,22 @@ kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft
 kern.overheid.registreerVloot();
+
+/* RTG Commerce (kern/commerce/): de verkooplaag boven de domeinen. Deze
+   montage stond in de commerce-tak ook in kernlaag2b, maar verdween toen deze
+   zelfde laag in de TravelOS-tak voor gemeente en overheid werd gebruikt. De
+   twee blokken zijn aanvullend: Commerce leest de Mall en de fiscale tabel;
+   zij deelt geen staat met de overheidslaag hierboven. */
+Object.assign(kern, require('../kern/commerce').maakCommerce({
+  db, save, nu: require('../lib/klok').nu,
+  aanbodAlles: () => kern.mall.aanbodAlles(),
+  tariefVan: require('../kern/fiscaal/tarief').tariefVan,
+  basisCat: require('../kern/fiscaal/tarief').basisCat,
+  zaakVan: findSupplier,
+  capsVan: (s) => db.capsVan(s)
+}));
+/* Een winkelblok van het webplatform gebruikt dezelfde levende etalage. */
+if (kern.webplatform && kern.webplatform.koppelWinkel) {
+  kern.webplatform.koppelWinkel((code) => kern.commerce.etalage(code));
+}
 };

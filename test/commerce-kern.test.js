@@ -20,6 +20,8 @@
    Draai los: node --test test/commerce-kern.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('fs');
+const path = require('path');
 
 const V = require('../server/kern/commerce/werkwoorden');
 const K = require('../server/kern/commerce/koopbaar');
@@ -261,4 +263,37 @@ test('18. een vanaf-prijs krijgt een ANDERE reden dan geen prijs', () => {
   assert.ok(!/Zet een prijs,/.test(K.waaromNietTeKoop(vanaf)), 'er STAAT een prijs');
   assert.match(K.waaromNietTeKoop(geen), /Zet een prijs/);
   assert.notEqual(K.waaromNietTeKoop(vanaf), K.waaromNietTeKoop(geen));
+});
+
+test('19. de commerce-kern is gemonteerd en alle twaalf deuren blijven aangesloten', () => {
+  /* Deze koppeling verdween bij het samenvoegen van twee versies van
+     kernlaag2b: de routes bleven bestaan, maar kregen `commerce: undefined`
+     en antwoordden daardoor met 500. De grens-sweep bewijst het gedrag op een
+     echte server; deze kleine toets wijst bij een volgende breuk meteen naar
+     de ontbrekende montage. */
+  const wortel = path.join(__dirname, '..');
+  const laag = fs.readFileSync(path.join(wortel, 'server', 'opzet', 'kernlaag2b.js'), 'utf8');
+  assert.match(laag, /require\('\.\.\/kern\/commerce'\)\.maakCommerce/,
+    'kernlaag2b bouwt kern.commerce niet meer op');
+
+  const routes = fs.readFileSync(path.join(wortel, 'server', 'routes', 'commerce.js'), 'utf8');
+  const paden = [
+    '/api/commerce/aanbod',
+    '/api/commerce/etalage',
+    '/api/commerce/mand',
+    '/api/commerce/mand/zet',
+    '/api/commerce/mand/leeg',
+    '/api/commerce/overdracht/maak',
+    '/api/commerce/overdracht/lees',
+    '/api/commerce/overdracht/mijn',
+    '/api/commerce/retour/vraag',
+    '/api/commerce/retour/verstuurd',
+    '/api/commerce/retour/mijn',
+    '/api/commerce/reken'
+  ];
+  for (const p of paden) assert.ok(routes.includes("app.post('" + p + "'"), 'route ontbreekt: ' + p);
+
+  const grenzen = JSON.parse(fs.readFileSync(path.join(wortel, 'GRENZEN.json'), 'utf8')).domeinen;
+  assert.ok((grenzen.commerce || []).includes('commerce'),
+    'de commerce-router mag zijn eigen kern niet door de domeingrens lezen');
 });

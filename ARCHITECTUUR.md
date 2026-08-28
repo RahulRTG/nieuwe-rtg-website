@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4741 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4748 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,7 +18,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4741 |
+| API-endpoints | 4748 |
 | servermodules (`server/**/*.js`) | 2857 |
 | routebestanden (`server/routes/**`) | 541 |
 | kernmodules (`server/kern/**`) | 1794 |
@@ -109,7 +109,7 @@ zie §5 -- er zijn nog 212 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 48 |
 | `member` | 671 | 64 | 14 | 413 |
-| `supplier` | 608 | 116 | 6 | 309 |
+| `supplier` | 615 | 118 | 6 | 309 |
 | `office` | 59 | 15 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 70 |

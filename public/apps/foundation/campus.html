@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTF Campus · leren, maken en spelen</title>
-<meta name="theme-color" content="#0c0c0b">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="/shared/media.css">
 <script src="/shared/media.js"></script>
 <style>
-  :root{--campus-blauw:#6aa6c9;--campus-groen:#5fa56a;--campus-paars:#9a7ac0}
+  :root{--campus-blauw:#2874d0;--campus-groen:#63d587;--campus-paars:#c39b4a}
   *{box-sizing:border-box}
   body{min-height:100%;overflow-x:hidden}
   button,a{font:inherit}
@@ -47,6 +47,7 @@
   @media(max-width:520px){.werelden,.eco-grid,.werkplekgrid{grid-template-columns:1fr}.wereld{min-height:8rem}.hero{padding:1.1rem}.hero h1{font-size:1.8rem}.eco-kop{align-items:stretch;flex-direction:column}.eco-zoek{width:100%}}
   @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="premium.css">
 </head>
 <body>
 <div class="app">
@@ -75,13 +76,13 @@
   <main class="werk" id="dashboard">
     <header class="top">
       <a class="topknop mobiel" href="index.html" aria-label="Terug naar Foundation">←</a>
-      <div class="toptekst"><small>Jouw campus</small><strong id="groet">Goed dat je er bent</strong></div>
+      <div class="toptekst"><small>RTFoundation Campus</small><strong id="groet">Goed dat je er bent</strong></div>
       <div class="topacties"><button class="topknop verberg-mobiel" data-url="rust.html" data-titel="Even rust">Even rust</button><a class="topknop" href="index.html">Profiel</a></div>
     </header>
     <div class="inhoud">
       <section class="welkom">
-        <div class="hero"><div class="kick">Vandaag op de campus</div><h1>Leren door te maken, kiezen en spelen.</h1><p>Je schoolwerk, projecten en spellen horen bij dezelfde ontwikkeling. Wat je in de les ontdekt, kun je hier veilig oefenen in de praktijk.</p><button class="doorgaan" data-url="school.html" data-titel="Mijn school" data-app="rtf-school">Ga verder met vandaag →</button></div>
-        <div class="kaart dag"><h2>Jouw daglijn</h2><div class="daglijn"><i></i></div><p><b>1 van 3 stappen verkend.</b><br>De campus beloont aandacht en groei, nooit gedachteloos blijven klikken.</p></div>
+        <div class="hero"><div class="kick">Vandaag op de campus</div><h1>Jouw toekomst. Op wereldniveau.</h1><p>School, talent, projecten en spel horen bij dezelfde ontwikkeling. Alles wat je nodig hebt om verder te komen, in één veilige en toegankelijke wereld.</p><button class="doorgaan" data-url="school.html" data-titel="Mijn school" data-app="rtf-school">Ga verder met school →</button></div>
+        <div class="kaart dag"><h2>Jouw ontwikkeling</h2><div class="daglijn"><i></i></div><p><b>2 van 4 stappen verkend.</b><br>De campus beloont aandacht, groei en eigen keuzes. Nooit gedachteloos blijven klikken.</p></div>
       </section>
       <section class="passen" id="passen" aria-label="Jouw toegangspassen"><div class="passtatus"><i></i><div><b>Foundation-pas</b><span>controle wordt geladen</span></div></div></section>
       <section class="sectie"><div class="sectiekop"><div><h2>Jouw leerlingwerkplek</h2><p>De losse schooltools werken hier als één geheel.</p></div></div>
@@ -193,5 +194,6 @@
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

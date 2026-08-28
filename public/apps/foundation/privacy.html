@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Privacy en veiligheid</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -24,7 +24,7 @@
   .blok ul{margin:.2rem 0 .6rem 1.1rem;line-height:1.6;}
   .blok li{margin-bottom:.3rem;}
   /* Lopende tekst, dus de tekstkleur en niet het accent: --goud2 is voor de
-     drie leeftijdsgroepen bordeaux (#C23A5E) en haalt op deze grond 2,84:1.
+     drie leeftijdsgroepen bordeaux (#A6002F) en haalt op deze grond 2,84:1.
      CLAUDE.md zegt het met zoveel woorden -- bordeaux-op-donker is genoeg
      voor grote tekst en te weinig voor lopende tekst en kleine labels. */
   .blok b{color:var(--txt);}
@@ -42,9 +42,10 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
-<div class="topnav"><span class="brand">RT<b>Foundation</b></span><a href="index.html">← Terug</a></div>
+<div class="topnav"><span class="brand">Rahul Travel <b>Foundation</b></span><a href="index.html">← Terug</a></div>
 <div class="wrap" role="main">
   <h1>Privacy en veiligheid</h1>
   <div class="lead">Deze app helpt gezinnen die het niet breed hebben. Juist dan gaan we zorgvuldig om met jullie gegevens. Hieronder leggen we in gewone taal uit wat we bewaren, hoe we het beschermen, en hoe je alles kunt wissen.</div>
@@ -124,5 +125,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

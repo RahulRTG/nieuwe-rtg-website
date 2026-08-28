@@ -103,12 +103,13 @@ function opKleur(hex) {
       opties = opties || {};
       var s = lees(); if (!s || !s.profiel) return;
       var p = s.profiel;
-      var terug = opties.terug ? '<a class="sb-terug" href="' + opties.terug + '">' + (opties.terugTekst || '← Alle hulp') + '</a>' : '';
+      var terug = opties.terug ? '<a class="sb-terug" href="' + opties.terug + '">' + (opties.terugTekst || '← Foundation') + '</a>' : '';
       el.innerHTML =
         '<div class="sb-balk">' +
-        '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
+        '<span class="sb-brand">Rahul Travel <b>Foundation</b></span>' + terug +
+        '<span class="sb-safe"><i aria-hidden="true"></i>Veilig</span>' +
         '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span data-glyf="berichten" aria-hidden="true"></span><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#164A98') + ';color:' + opKleur(p.kleur || '#164A98') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +

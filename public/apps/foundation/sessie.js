@@ -46,16 +46,16 @@
     }
     if (!el) {
       el = document.createElement('dialog'); el.id = id; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
-      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:#0c0c0b;color:#f6f1e7;font-family:Inter,system-ui,sans-serif';
+      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%);color:#f4f0e7;font-family:Inter,system-ui,sans-serif';
       (document.body || document.documentElement).appendChild(el);
     }
     var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:0;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
-      '<div style="font:600 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#c9a24b">RTF veilige toegang</div>' +
-      '<h1 style="font:500 1.75rem/1.15 Georgia,serif;margin:.55rem 0">' + (laden ? 'Jouw passen worden gecontroleerd…' : 'Deze ruimte blijft nog dicht') + '</h1>' +
+    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.5rem;border:1px solid rgba(195,155,74,.38);border-radius:0;background:linear-gradient(145deg,#121923,#0b0e14);box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
+      '<div style="font:800 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#e0c487">RTF · veilige toegang</div>' +
+      '<h1 style="font:900 1.75rem/1.08 Inter,sans-serif;letter-spacing:-.035em;text-transform:uppercase;margin:.65rem 0">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
       '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
+      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#2874d0,#c39b4a,#63d587)"></div>' :
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#a6002f;color:#fff;text-decoration:none;font-weight:800">Kies een profiel →</a>' +
         '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
         (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
@@ -189,12 +189,13 @@ function opKleur(hex) {
       opties = opties || {};
       var s = lees(); if (!s || !s.profiel) return;
       var p = s.profiel;
-      var terug = opties.terug ? '<a class="sb-terug" href="' + opties.terug + '">' + (opties.terugTekst || '← Alle hulp') + '</a>' : '';
+      var terug = opties.terug ? '<a class="sb-terug" href="' + opties.terug + '">' + (opties.terugTekst || '← Foundation') + '</a>' : '';
       el.innerHTML =
         '<div class="sb-balk">' +
-        '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
+        '<span class="sb-brand">Rahul Travel <b>Foundation</b></span>' + terug +
+        '<span class="sb-safe"><i aria-hidden="true"></i>Veilig</span>' +
         '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span data-glyf="berichten" aria-hidden="true"></span><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#164A98') + ';color:' + opKleur(p.kleur || '#164A98') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +
@@ -245,12 +246,13 @@ function opKleur(hex) {
   function injectCss() {
     if (cssGedaan) return; cssGedaan = true;
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:0;}.sb-brand b{color:#F4E9C8;}' +
+      '.sb-brand{font-family:var(--serif);font-weight:600;background:transparent;color:#C39B4A;padding:0;white-space:nowrap;}.sb-brand b{color:#F4F0E7;font-weight:500;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
+      '.sb-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.35rem;color:var(--zacht);font-size:.62rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;}.sb-safe i{width:.42rem;height:.42rem;border-radius:50%;background:#63D587;box-shadow:0 0 0 3px rgba(99,213,135,.12);}' +
       /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
          envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
          component en niet bij het toeval van zijn inhoud. */
-      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
+      '.sb-bel{background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
         'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
       '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
@@ -262,7 +264,7 @@ function opKleur(hex) {
          maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
          duwde daarmee een andere actie naar de tweede rij. De avatar zegt
          hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
-      '@media (max-width:640px){.sb-nm{display:none;}}' +
+      '@media (max-width:640px){.sb-nm{display:none;}.sb-brand{font-size:.82rem}.sb-safe{font-size:0}.sb-safe i{display:block}}' +
       '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
       '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--rtg-leesgoud,var(--goud));}' +
@@ -274,7 +276,7 @@ function opKleur(hex) {
       '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
       '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
       '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:0;}';
+      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:#A6002F;color:#fff;font-weight:800;font-size:.82rem;text-decoration:none;padding:.4rem .75rem;border-radius:0;}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   }
   w.Sessie = Sessie;

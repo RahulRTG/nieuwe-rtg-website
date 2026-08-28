@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>FOUNDATION</title>
-<meta name="theme-color" content="#0C0C0B">
+<title>RTFoundation · jouw toekomst op wereldniveau</title>
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation-192.png">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -173,6 +173,7 @@
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -192,8 +193,9 @@
 <!-- 1. Welkom: nog geen gezin -->
 <section id="vWelkom" class="wrap" hidden>
   <div class="hero">
-    <div class="kick">FOUNDATION</div>
-    <div class="logo">Alles om <b>vooruit</b> te komen</div>
+    <div class="kick">RTFoundation</div>
+    <div class="logo">Jouw toekomst. <b>Op wereldniveau.</b></div>
+    <p class="deck">Onderwijs, talent en ondersteuning van de hoogste klasse. Toegankelijk voor ieder kind en ieder gezin.</p>
     <!-- De twee ingangen staan hier als PAAR en niet als een hoofdknop met een
          losse tweede: "Maak een gezin aan" is de hoofdhandeling (hij draagt
          .hoofd, de ander .grijs -- het scherm wees hem zelf al aan), maar wie
@@ -225,8 +227,9 @@
 
 <!-- 2. Profielkiezer: gezin bekend, kies wie je bent -->
 <section id="vProfielen" class="profwrap" hidden>
-  <div class="kick">Wie leert er vandaag?</div>
+  <div class="kick">Veilige gezinsomgeving</div>
   <div class="logo" style="font-size:1.9rem;margin-top:.4rem;" id="pGezinNaam">Gezin</div>
+  <p class="deck">Wie gaat er vandaag groeien?</p>
   <div class="profgrid" id="pGrid"></div>
   <div class="mini"><a id="pAnder">Ander gezin</a></div>
 </section>
@@ -238,7 +241,21 @@
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck"></div>
     <div id="hPass" class="passband" hidden></div>
-    <div id="hImpact" class="kaart" style="margin-top:.7rem;padding:.7rem .6rem;" hidden></div>
+  </div>
+
+  <div class="rtf-hubgrid">
+    <a class="kaart rtf-focus" href="campus.html">
+      <small>RTF Campus</small>
+      <strong>School, talent en toekomst in één wereld</strong>
+      <span>Ga verder met je les, ontdek je talent of bouw aan je eigen onderneming.</span>
+      <b>Open jouw campus →</b>
+    </a>
+    <aside class="kaart rtf-impact" aria-label="De belofte van RTFoundation">
+      <small>Onze belofte</small>
+      <strong>100%</strong>
+      <span>Veilig, waardig en ontworpen om ieder talent serieus te nemen.</span>
+      <div id="hImpact" class="rtf-impact-detail" hidden></div>
+    </aside>
   </div>
 
   <a class="campus-ingang kaart" href="campus.html">
@@ -580,9 +597,11 @@
 <script>
 const $ = s => document.querySelector(s);
 const api = Sessie.api;
-const AVATARS = ['','','','','','','','','','','','','','','','','','','',''];
+const AVATARS = ['ster','kompas','boek','maan','zon','vonk','bloei','golf'];
 const KLEUREN = ['#C9A24B','#5FA56A','#6AA6C9','#B4574E','#B07AC0','#D08A3E'];
-let mAv = '', mKl = KLEUREN[0];
+let mAv = AVATARS[0], mKl = KLEUREN[0];
+const AVATAR_MARK = {ster:'ST',kompas:'KO',boek:'BK',maan:'MA',zon:'ZN',vonk:'VK',bloei:'BL',golf:'GL'};
+function avatarMark(a){ return AVATAR_MARK[a] || String(a || 'RT').slice(0,2).toUpperCase(); }
 
 /* Per leeftijdsgroep een eigen bril: de RTF-apps staan in het RTG OS (map
    RTFoundation) en openen de hub met ?groep=mini t/m ?groep=volw. De hub
@@ -638,7 +657,7 @@ function toonRol(profiel){
   if (profiel.groepNaam && !gast){
     $('#hWelkom').innerHTML = esc($('#hWelkom').textContent) + ' <span class="grpbadge">' + esc(profiel.groepNaam) + '</span>';
   }
-  $('#hDeck').textContent = '';
+  $('#hDeck').textContent = 'Alles wat je nodig hebt om vandaag een stap verder te komen.';
   laadImpact();
 }
 
@@ -663,7 +682,7 @@ async function laadImpact(){
 
 // avatar/kleur kiezers vullen
 (function(){
-  const av = $('#mAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.textContent=a; if(a===mAv)b.classList.add('aan'); b.onclick=()=>{ mAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.textContent===a)); }; av.appendChild(b); });
+  const av = $('#mAv'); AVATARS.forEach(a=>{ const b=document.createElement('button'); b.dataset.avatar=a; b.dataset.mark=avatarMark(a); b.setAttribute('aria-label',a); b.title=a; if(a===mAv)b.classList.add('aan'); b.onclick=()=>{ mAv=a; [...av.children].forEach(c=>c.classList.toggle('aan',c.dataset.avatar===a)); }; av.appendChild(b); });
   const kl = $('#mKl'); KLEUREN.forEach(c=>{ const b=document.createElement('button'); b.style.background=c; if(c===mKl)b.classList.add('aan'); b.onclick=()=>{ mKl=c; [...kl.children].forEach(x=>x.classList.toggle('aan',x.style.background===b.style.background)); }; kl.appendChild(b); });
 })();
 
@@ -725,7 +744,8 @@ function veiligeKeuzes(code, d, pin){
   Sessie.zet({code,gezin:d.gezin});$('#pGezinNaam').textContent=d.gezin.naam;
   const grid=$('#pGrid');grid.innerHTML='';
   (d.keuzes||[]).forEach(p=>{const a=document.createElement('button');a.className='prof';
-    a.innerHTML='<span class="av" style="background:'+p.kleur+'">'+p.avatar+'</span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+'</span>';
+    const avatar=esc(p.avatar||'ster');
+    a.innerHTML='<span class="av" data-avatar="'+avatar+'" data-mark="'+avatarMark(p.avatar||'ster')+'" style="--avatar-color:'+esc(p.kleur||'#164A98')+'"></span><span class="nm">'+esc(p.naam)+'</span><span class="slot">'+rolTekst(p)+'</span>';
     a.onclick=()=>open(code,p.id,pin);grid.appendChild(a);});toon('vProfielen');
 }
 function rolTekst(p){ return p.beheerder?'Beheerder':({ouder:'Ouder',kind:'Kind',gezinslid:'Gezinslid',gast:'Oppas of familie'}[p.rol]||''); }
@@ -859,5 +879,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/glyf.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

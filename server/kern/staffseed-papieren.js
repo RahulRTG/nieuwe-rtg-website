@@ -72,7 +72,7 @@ function zaaiPapieren({ db, save, accounts, findSupplier, log }) {
         try {
           let u = accounts.findByLogin(email);
           if (!u) {
-            u = accounts.createUserSync({ username: email.split('@')[0], email,
+            u = accounts.createUserZaai({ username: email.split('@')[0], email,
               password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: st.name });
             accountsGemaakt++;
           }

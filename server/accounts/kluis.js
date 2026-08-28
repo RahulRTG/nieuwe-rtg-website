@@ -75,6 +75,48 @@ const { scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPasswor
   SCRYPT_N, SCRYPT_R, SCRYPT_P } = wachtwoord;
 
 
+/* DE ZAAI-HASH: HET DEMO-WACHTWOORD EEN KEER UITREKENEN, NIET TWEEHONDERD KEER.
+
+   De demo-seed maakt bij elke start ruim tweehonderd accounts aan -- het
+   personeel van elke demozaak, de papieren van dat personeel, de eigenaar en
+   Nora -- en elk daarvan kreeg zijn eigen scrypt-hash. scrypt is met opzet duur;
+   dat IS de bescherming. Maar de seed gebruikt VIER wachtwoorden, en die vier
+   staan als letterlijke tekst in deze repo.
+
+   GEMETEN OP 26 AUGUSTUS 2026, een verse serverstart:
+     220 scryptSync-aanroepen, 4 verschillende wachtwoorden, 7,3 s
+     van de 10,6 s die de hele start kost. Het laden van alle 2294 modules: 0,3 s.
+   De toetsen starten per CI-ronde bijna negenhonderd servers (685 in de
+   unit-suite, 199 in de schermtoetsen). Dat is ruim anderhalf CPU-uur per ronde,
+   besteed aan het steeds opnieuw uitrekenen van dezelfde vier hashes.
+
+   Deze functie onthoudt de uitkomst per wachtwoord, binnen dit ene proces. Twee
+   demo-accounts met hetzelfde wachtwoord delen daarmee hun ZOUT. Voor een
+   wachtwoord dat in de broncode staat beschermt een uniek zout niets: er valt
+   niets te verbergen dat niet al openbaar is.
+
+   VOOR ECHTE ACCOUNTS MAG DIT NOOIT. Een gedeeld zout maakt van gelijke
+   wachtwoorden gelijke hashes, en dan is aan de database af te lezen wie
+   hetzelfde wachtwoord koos. Bij de viercijferige PIN van personeel -- die langs
+   createStaffSync loopt wanneer een bedrijfsaanmelding wordt goedgekeurd, zie
+   kern/aanmeldingen/bedrijf.js -- zou dat de tabel meteen in groepjes verdelen.
+
+   Daarom is dit geen afspraak maar een grendel: buiten de demostand WEIGERT de
+   functie. In productie draait de seed niet en bestaat de zaai-hash niet; wie
+   hem daar toch aanroept krijgt een fout in plaats van een zwakkere hash. De
+   echte wegen (registratie, PIN zetten, wachtwoord herstellen) blijven bij
+   hashPassword en hashPasswordSync. test/zaaihash.test.js houdt dat vast. */
+const zaaiKast = new Map();
+function zaaiHash(pw) {
+  if (process.env.RTG_DEMO !== '1') {
+    throw new Error('zaaiHash bestaat alleen in de demostand (RTG_DEMO=1) en is alleen voor de seed; gebruik hashPassword of hashPasswordSync.');
+  }
+  const sleutel = String(pw);
+  let hash = zaaiKast.get(sleutel);
+  if (hash === undefined) { hash = hashPasswordSync(sleutel); zaaiKast.set(sleutel, hash); }
+  return hash;
+}
+
 function makeCodename() {
   return CODENAMES[crypto.randomInt(CODENAMES.length)] + ' ' + crypto.randomBytes(2).toString('hex').toUpperCase();
 }

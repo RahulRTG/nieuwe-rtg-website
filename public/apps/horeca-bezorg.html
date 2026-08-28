@@ -51,7 +51,18 @@
       <input class="veld" id="bZoneMinuten" type="number" min="5" max="180" value="30" aria-label="Bezorgtijd in minuten" style="flex:0 1 6rem;">
       <button class="knop p" id="bZoneZet" type="button">Zone erbij</button>
     </div>
-    <div class="rij h-mt60">
+    <!-- Deze rij MOET kunnen afbreken. Op telefoonformaat nemen het label en de
+         knop hun eigen breedte, en het veld ertussen had geen ondergrens: het
+         werd 23 pixels breed -- een tekstveld waar je niet in kunt tikken en
+         niets van kunt lezen. Gevonden door de a11y-raakvlakronde toen die in
+         delen ging draaien. De andere velden op dit scherm dragen hun basis al
+         inline (flex:0 1 7rem); dit veld krijgt er een die mag groeien, en de
+         rij mag omslaan in plaats van te knijpen. Allebei via een hulpklasse en
+         niet via een stijlattribuut: NORM.json telt die attributen en dat getal
+         mag alleen omlaag -- zie de kop van shared/rtg-hulpklassen.css. Ook deze
+         toelichting mag het attribuut dus niet letterlijk noemen; de meter leest
+         commentaar gewoon mee, en dat is terecht. -->
+    <div class="rij h-mt60 h-wrap">
       <label class="stil"><input type="checkbox" id="bOpen" checked> De bezorging staat open</label>
       <input class="veld z-g11" id="bReden" maxlength="120" placeholder="Reden als hij dicht is" aria-label="Reden van sluiting">
       <button class="knop" id="bOpenZet" type="button">Vastleggen</button>

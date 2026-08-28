@@ -21,6 +21,13 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
+  # MET DE HAND TE STARTEN, en dat is geen luxe. Een tak zonder PR krijgt geen
+  # keuring (zie hierboven), en een PR die op een ANDERE tak staat dan main --
+  # zoals een vervolgtak op een tak die nog niet gemerged is -- kreeg op
+  # 26 augustus 2026 helemaal geen run: de trigger vuurde niet bij het openen.
+  # Zonder deze knop is de enige uitweg dan wachten op de merge eronder, en dat
+  # is precies wanneer je de keuring wilt hebben.
+  workflow_dispatch:
 
 # Geen workflowstap krijgt stilzwijgend schrijfrechten op de repository.
 permissions:
@@ -32,6 +39,44 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+# ============================================================================
+# WAAROM DEZE KETEN ER ZO UITZIET (26 augustus 2026)
+#
+# Hij stond op 83 minuten, en dat kwam uit twee jobs die elk een uur duurden:
+# de unit-suite (76m44s) en de schermtoetsen plus de a11y-scan (66 min). Alles
+# daaromheen -- audit, container, registers -- was samen geen drie minuten.
+#
+# De oorzaak zat NIET in de keten maar in de code eronder: een serverstart kostte
+# 10,6 seconden, waarvan 7,3 aan 220 scrypt-hashes voor VIER demo-wachtwoorden.
+# De toetsen starten er per ronde bijna negenhonderd. Die reparatie staat in
+# server/accounts/kluis.js (zaaiHash) en scheelt op dezelfde bestanden een factor
+# 2,4. Dat is de eerste helft.
+#
+# De tweede helft staat hier: de twee lange jobs zijn opgedeeld. Wat daarbij
+# oppast is niet het opdelen zelf maar de METERS. Drie ervan rekenden over de
+# hele ronde, en die zouden per deel stilletjes minder streng worden:
+#
+#   - de dekkingsvloer stond in de vlaggen --test-coverage-* en rekent PER
+#     PROCES. Elk deel schrijft nu lcov; scripts/dekkingsvloer.js telt ze op en
+#     oordeelt daarna. Een deel zonder lcov is een fout, geen 100%.
+#   - de waargenomen endpoint-dekking leest het routejournaal. Elk deel schrijft
+#     zijn eigen journaal; de meter draait op de samengevoegde versie.
+#   - de schermdekking (welke app heeft een toets echt geopend) idem, met
+#     .schermjournaal.
+#
+# En de a11y-scan, die eerst NIET opgedeeld kon worden en het nu wel is. Zijn
+# oordeel is een budget over de hele ronde ("ingelogd ten hoogste N
+# contrastfouten"), en vier delen die elk hun kwart tegen dat HELE budget leggen
+# laten samen vier keer zoveel door. Daarom is daar op 27 augustus 2026 eerst de
+# meting van het oordeel gescheiden (BESTUUR.md): vier delen meten, een job telt
+# op en velt het oordeel. Zelfde budget, vier keer minder wachten.
+#
+# Wat er van die dag NIET is opgedeeld en waarom: niets meer. De zes
+# bronmuterende ijkingen hebben elk een eigen job gekregen omdat ze traag zijn
+# en op niets hoeven te wachten -- meterijk alleen duurde 18 van de 19 minuten
+# van het langste toetsdeel.
+# ============================================================================
 
 jobs:
   # ==========================================================================
@@ -394,6 +439,18 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/rtgtest
           RTG_VAULT_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
           RTG_SECRET_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+
+  norm:
+    name: De norm, de instroom en de build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
       # DE NORM: een ratel, geen rapportcijfer. NORM.json legt vast waar de code
       # staat; deze stap zakt zodra een van die meters SLECHTER wordt. Beter mag
       # altijd -- dan meldt hij dat de norm strakker gezet kan worden. Zonder
@@ -636,9 +693,25 @@ jobs:
         run: node scripts/containerproef.js
 
   a11y:
-    name: Toegankelijkheid (eigen keuring)
+    # OPGEDEELD METEN, EEN KEER OORDELEN. Deze scan was met ruim een kwartier de
+    # op een na langste job, en hij kon lang NIET opgedeeld worden: zijn oordeel
+    # is een budget over de hele ronde (A11Y-INGELOGD.json, vandaag overal nul),
+    # en vier delen die elk hun kwart tegen dat hele budget leggen laten samen
+    # vier keer zoveel door -- alle vier groen.
+    #
+    # Sinds 27 augustus 2026 is de meting van het oordeel gescheiden
+    # (BESTUUR.md): elk deel meet zijn kwart en schrijft ruwe tellingen weg, en
+    # de job `a11y-oordeel` hieronder telt ze op en velt daarna EEN keer het
+    # oordeel -- tegen precies hetzelfde budget als toen alles in een job zat.
+    # test/a11yoordeel.test.js laat dat zakken zodra iemand het per deel gaat
+    # afrekenen; die toets heeft geen browser nodig.
+    name: Toegankelijkheid deel ${{ matrix.deel }} van 4
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        deel: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -650,32 +723,84 @@ jobs:
         run: |
           npm i --no-save playwright@^1.49.0
           npx playwright install --with-deps chromium
-      # De naam stond hier tot 17 augustus 2026 als "de vlaggenschip-schermen",
-      # en dat was op een gegeven moment een leugen in de logregel: de scan gaat
-      # sinds de uitbreiding over ALLE schermen, uitgelogd en ingelogd -- en sinds
-      # de raakvlakronde over alle schermen nog een derde keer, op telefoonformaat.
-      - name: Eigen a11y-scan, uitgelogd + ingelogd + raakvlak op telefoonformaat
-        run: node scripts/a11y.js
+      # De scan gaat over ALLE schermen, uitgelogd en ingelogd, en sinds de
+      # raakvlakronde nog een derde keer op telefoonformaat. Dit deel meet zijn
+      # kwart daarvan en oordeelt niet.
+      - name: Eigen a11y-scan (dit kwart), uitgelogd + ingelogd + raakvlak
+        run: node scripts/a11y.js --deel=${{ matrix.deel }}/4 --meting=a11ymeting/deel-${{ matrix.deel }}.json
         env:
           A11Y_STRICT: '1'
+      - name: De meting van dit deel bewaren
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: a11ymeting-deel-${{ matrix.deel }}
+          path: a11ymeting/
+          if-no-files-found: error
+          retention-days: 5
+
+  a11y-oordeel:
+    name: Toegankelijkheid - het oordeel over alle delen
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: a11y
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: De metingen van de vier delen ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: a11ymeting-deel-*
+          path: a11ymeting
+      # --delen=4 is de helft van de grendel: minder metingen dan beloofde delen
+      # zakt. De andere helft zit in het script zelf -- de delen samen moeten
+      # ELK scherm hebben gezien dat scripts/schermen.js kent, anders oordeelt
+      # hij over een gat en dat is geen oordeel.
+      - name: Het oordeel over de hele ronde
+        run: node scripts/a11y-oordeel.js a11ymeting --delen=4
+
+  schermen:
+    name: Schermtoetsen deel ${{ matrix.deel }} van 4
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        deel: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Playwright + Chromium
+        run: |
+          npm i --no-save playwright@^1.49.0
+          npx playwright install --with-deps chromium
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
       # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
       # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium
       # ontbreekt, en meldt de stap "0 fail" -- groen zonder iets gezien te
       # hebben. De stap hierboven installeert de browser; deze vlag controleert
       # dat dat ook echt gelukt is.
-      # Serieel is hier bewust: elk bestand start een echte server en vaak een
-      # Chromium. Met concurrency 2 wisselde onder runnerbelasting alleen WELK
-      # goed scherm zijn lokale 8/20s-grens miste (Boeken, daarna Mobiliteit).
-      # Een volledige seriele ronde blijft ruim binnen deze jobs 90 minuten.
-      # Dezelfde herhaling als bij de unit-toetsen, en om dezelfde reden: deze
-      # stap draait ruim veertig minuten en zet per schermtoets een server en een
-      # Chromium op. Zakt er een, dan staat zijn blok duizenden regels hoger.
+      #
+      # BINNEN EEN DEEL BLIJFT HET SERIEEL, en dat is bewust: elk bestand start
+      # een echte server en vaak een Chromium. Met concurrency 2 wisselde onder
+      # runnerbelasting alleen WELK goed scherm zijn lokale 8/20s-grens miste
+      # (Boeken, daarna Mobiliteit). De winst van het opdelen komt van vier
+      # MACHINES, niet van meer processen op dezelfde machine.
+      #
+      # Dezelfde herhaling van gezakte toetsen als bij de unit-toetsen, en om
+      # dezelfde reden: zakt er een, dan staat zijn blok duizenden regels hoger.
       - name: Scherm-tests (PDA in de browser)
         run: |
           set -o pipefail
           uitslag=0
-          npm run e2e 2>&1 | tee /tmp/e2e.log || uitslag=$?
+          npm run e2e -- --deel=${{ matrix.deel }}/4 2>&1 | tee /tmp/e2e.log || uitslag=$?
           if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/e2e.log; fi
           exit "$uitslag"
         env:

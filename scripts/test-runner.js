@@ -8,13 +8,36 @@
 
    Daarom: gewone bestanden begrensd parallel, bronmuterende ijkingen en de
    twee zwaarste hele-serverproeven daarna een voor een. Geen globbing, shell
-   of npm-pakket nodig. */
+   of npm-pakket nodig.
+
+   DRIE VLAGGEN VOOR DE CI:
+
+     --deel=2/4      draai alleen deel 2 van vier. De verdeling is om en om over
+                     de gesorteerde lijst (bestand i hoort bij deel i % 4), zodat
+                     een reeks zware buren niet in een deel belandt. De
+                     geisoleerde bestanden worden apart verdeeld en blijven ook
+                     binnen hun deel een voor een draaien -- anders zou de
+                     isolatie juist in het deel verdwijnen waar hij nodig is.
+     --dekking=<map> schrijf per batch een lcov-bestand in <map>. De vloer
+                     rekent daarna over ALLE delen samen (scripts/dekkingsvloer.js);
+                     de vlaggen --test-coverage-* konden dat niet, want die
+                     rekenen per proces.
+     --zonder-ijkingen  laat de zes bronmuterende ijkingen weg (scripts/lib/
+                     ijkingen.js). De CI geeft die elk een eigen job: meterijk
+                     alleen duurde 18 van de 19 minuten van het langste deel, en
+                     achter een deel aansluiten is voor een ijking geen eis --
+                     apart draaien is dat wel.
+
+   Zonder die vlaggen gedraagt dit script zich precies als vroeger: dan draaien
+   de ijkingen gewoon mee, een voor een, na de rest. */
 'use strict';
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { pak } = require('./afbouw-slot');
+const { ontleedDeel, verdeel } = require('./lib/delen');
+const { IJKINGEN } = require('./lib/ijkingen');
 
 const WORTEL = path.join(__dirname, '..');
 /* HET SLOT NIET TWEE KEER PAKKEN. pak() werpt als het bezet is, en dat is

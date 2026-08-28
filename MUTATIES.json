@@ -7,6 +7,14 @@
       "operator": "true->false",
       "gezakt": 1
     },
+    "a11yoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/a11yoordeel.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "aanmeldbesluit.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1216,6 +1224,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "delen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/delen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "demostand.test.js": {
       "soort": "server",
@@ -7143,6 +7159,13 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "zaaihash.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "overleefd"
     },
     "zaak-balie.test.js": {
       "soort": "server",

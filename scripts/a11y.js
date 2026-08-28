@@ -47,7 +47,32 @@ const hermeet = require('./a11y-hermeet');
    viel daarmee buiten de keuring -- terwijl het juist een scherm is dat een
    bezoeker onverwacht krijgt. Er is geen derde plek: dit zijn alle .html onder
    public. */
-const PAGINAS = alleSchermen().concat(['/site/404.html']);
+const ALLE_PAGINAS = alleSchermen().concat(['/site/404.html']);
+
+/* OPGEDEELD METEN, EEN KEER OORDELEN (27 augustus 2026).
+
+     --deel=2/4          meet alleen dit kwart van de schermen
+     --meting=<bestand>  schrijf de RUWE tellingen daarheen en vel geen oordeel
+
+   Waarom die twee bij elkaar horen: het oordeel van deze scan is een budget over
+   de HELE ronde (A11Y-INGELOGD.json). Een deel dat zijn eigen kwart tegen dat
+   budget legt, laat vier keer zoveel door. Dus meet een deel alleen, en telt
+   scripts/a11y-oordeel.js de delen op voordat er een oordeel valt. Zonder deze
+   vlaggen doet dit script precies wat het altijd deed: alles meten en zelf
+   oordelen -- dat is wat `npm run a11y` lokaal draait. */
+const deelVlag = (process.argv.find(a => a.startsWith('--deel=')) || '').slice(7);
+const deel = (() => {
+  if (!deelVlag) return null;
+  const d = ontleedDeel(deelVlag);
+  if (!d) { console.error('[a11y] --deel verwacht de vorm N/M met 1 <= N <= M, kreeg: ' + deelVlag); process.exit(2); }
+  return d;
+})();
+const metingUit = (process.argv.find(a => a.startsWith('--meting=')) || '').slice(9);
+const PAGINAS = verdeel(ALLE_PAGINAS, deel);
+if (!PAGINAS.length) {
+  console.error('[a11y] dit deel heeft geen schermen; dat is geen groene ronde maar een lege.');
+  process.exit(2);
+}
 
 /* DE BROWSER KOMT UIT scripts/lib/scherm.js EN NIET UIT EEN EIGEN LADER.
 
@@ -719,6 +744,36 @@ function startEchteServer() {
      hieronder blijft staan zoals hij is: hij leest het getal uit het register,
      dus als iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven,
      met een reden, en niet hier in de code wegwerken. */
+  const meting = { perRonde, totaal, raakTotaal, paginas: PAGINAS.length,
+    deel: deel ? deel.nr + '/' + deel.totaal : 'heel' };
+
+  /* EEN DEEL OORDEELT NIET. Het schrijft wat het gezien heeft en zwijgt verder;
+     scripts/a11y-oordeel.js telt de delen op en velt daarna een keer het oordeel
+     tegen het budget van de hele ronde. Zie scripts/lib/a11yoordeel.js. */
+  if (metingUit) {
+    fs.mkdirSync(path.dirname(path.resolve(metingUit)), { recursive: true });
+    fs.writeFileSync(metingUit, JSON.stringify(meting, null, 2) + '\n');
+    console.log(`\n[a11y] deel ${meting.deel}: ${PAGINAS.length} schermen gemeten, ` +
+      `${totaal} structureel, ${contrastTotaal} contrast, ${raakTotaal} raakvlak -> ${metingUit}`);
+    console.log('[a11y] dit deel velt geen oordeel; dat doet scripts/a11y-oordeel.js over alle delen samen.');
+    return;
+  }
+
+  /* DE RATEL IS OP NUL AANGEKOMEN, EN DAT IS DE HELE BEDOELING GEWEEST.
+
+     De ingelogde ronde bracht 25 contrastfouten mee die nooit eerder gemeten
+     waren -- negen unieke plekken, vrijwel allemaal het accent als kleine tekst
+     op een donkere grond. Die op dag een hard afkeuren zou betekenen: de poort
+     staat rood tot iemand negen CSS-plekken heeft nagelopen, en dan wordt hij
+     uitgezet. Die op nul zetten zou liegen. Dus stond er een bovengrens die
+     alleen omlaag mocht.
+
+     Op 17 augustus 2026 zijn die negen plekken gerepareerd en meet de ingelogde
+     ronde nul. De grens in A11Y-INGELOGD.json staat daarmee op nul en de poort
+     is hard in BEIDE staten, op structuur en op contrast. De constructie
+     blijft staan zoals hij is: hij leest het getal uit het register, dus als
+     iemand ooit weer ruimte nodig heeft moet hij dat DAAR opschrijven, met een
+     reden, en niet hier in de code wegwerken. */
   const grens = JSON.parse(fs.readFileSync(path.join(ROOT, 'A11Y-INGELOGD.json'), 'utf8'));
   const uitgelogd = perRonde.find(r => r.naam === 'uitgelogd') || { struct: 0, contr: 0 };
   const ingelogd = perRonde.find(r => r.naam === 'ingelogd') || { struct: 0, contr: 0 };
@@ -792,7 +847,7 @@ function startEchteServer() {
   }
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
-    for (const f of fouten) console.error('  · ' + f);
+    for (const f of uit.fouten) console.error('  · ' + f);
     process.exit(1);
   }
   if (raakOordeel.melding) console.log(raakOordeel.melding);

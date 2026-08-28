@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Werkplek</title>
+<title>RTG Enterprise Campus</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -88,23 +88,26 @@
   .prijsveld{flex:none;width:8.5rem;min-width:0;padding:.3rem .55rem;font-size:.78rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/werkplek-enterprise.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/glyf.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl werkplek-enterprise">
 <main class="wrap" id="hoofd">
   <a class="terug" href="/apps/app.html">← naar de app</a>
   <div class="intro">
-    <h1>Waar werk je vandaag?</h1>
-    <p>RTG en de RTFoundation zijn twee huizen. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun takenlijst. Kies een huis; je ziet daarna alleen dat huis.</p>
+    <h1>Enterprise Campus</h1>
+    <p>De beveiligde kantoorwereld voor het personeel van RTG en de RTFoundation. Kies het huis waarvoor u een sleutel hebt.</p>
   </div>
   <div id="kiezer"><p class="melding" id="melding">Werkplekken laden&hellip;</p></div>
   <div id="huis" hidden></div>
 </main>
 <script src="/apps/werkplek-bureaus.js" defer></script>
+<script src="/apps/werkplek-landing.js" defer></script>
+<script src="/apps/werkplek-campus.js" defer></script>
 <!-- uitvoer.js met defer en VOOR werkplek.js: defer-scripts draaien in
      documentvolgorde, dus de laag staat er als dat script zijn model aanmeldt -->
 <script src="/shared/uitvoer.js" defer></script>

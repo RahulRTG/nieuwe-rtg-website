@@ -115,17 +115,26 @@ async function zetProef(page, wat) {
    toets die daardoor zakt zegt iets over de toetsdriver en niets over het
    product. */
 async function trek(page, hoogte) {
-  const b = await page.locator('#rtgCommand .cmd-balk').boundingBox();
-  await page.mouse.move(b.x + b.width * 0.62, b.y + b.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(b.x + b.width * 0.62, b.y - hoogte, { steps: 12 });
-  await page.mouse.up();
   /* Omhoog trekken OPENT een laag -- een lade bij een kleine trek, de taakmodus
      bij een grote. Wachten tot die laag er staat is de toestand waar elke
      aanroeper daarna over beweert; wachtOpRust keert terug voordat er iets is
-     opengegaan, want tot dat moment verandert er niets. */
-  await page.waitForFunction(() => !!document.querySelector('.rtg-laag.open'),
-    null, { timeout: 15000 });
+     opengegaan, want tot dat moment verandert er niets. Wacht op de JUISTE
+     laag en herhaal de echte aanwijzerinvoer een keer wanneer een zwaar
+     belaste browserrunner de eerste sleep niet aan de pagina bezorgt. */
+  const selector = hoogte >= 150 ? '.rtg-laag-taak.open' : '.rtg-laag-lade.open';
+  for (let poging = 0; poging < 2; poging++) {
+    const b = await page.locator('#rtgCommand .cmd-balk').boundingBox();
+    await page.mouse.move(b.x + b.width * 0.62, b.y + b.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(b.x + b.width * 0.62, b.y - hoogte, { steps: 12 });
+    await page.mouse.up();
+    try {
+      await page.waitForSelector(selector, { timeout: 10000 });
+      return;
+    } catch (e) {
+      if (poging === 1) throw e;
+    }
+  }
 }
 
 test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) => {

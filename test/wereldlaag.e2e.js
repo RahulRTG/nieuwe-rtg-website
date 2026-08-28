@@ -64,7 +64,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     await page.waitForSelector('#werelden button', { timeout: 15000 });
     await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
     assert.match(await page.locator('#passport').innerText(), /Member passport/i);
-    assert.match(await page.locator('#passport').innerText(), /Verified/,
+    assert.match(await page.locator('#passport').innerText(), /Verified/i,
       'RTG Pass hoort als Verified in het member passport te staan');
     assert.match(await page.locator('#identiteit').innerText(), /loopt/,
       'een net account mag geen vals afgerond identiteitsvinkje krijgen');
@@ -167,7 +167,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page2.waitForSelector('#werelden button', { timeout: 15000 });
-    assert.match(await page2.locator('#passport').innerText(), /Signature/,
+    assert.match(await page2.locator('#passport').innerText(), /Signature/i,
       'Lifestyle hoort als Signature in het member passport te staan');
     assert.equal(await page2.locator('#lenzen [aria-disabled="true"]').count(), 0,
       'Signature krijgt alle vijf de lenzen');

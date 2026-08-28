@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e24e2922';
+var RTG_BOUW = '344e0881';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -9329,22 +9329,21 @@ var RTG_BOUW = 'e24e2922';
 
   /* ---------- PWA ---------- */
 
-  /* EEN UITROL MOET ACTIEF WORDEN NAGEVRAAGD.
+  /* WAAROM HIER NIETS EXTRA'S STAAT.
 
-     De nieuwe worker neemt over (skipWaiting + clients.claim), maar WANNEER de
-     browser sw.js opnieuw ophaalt bepaalt hij zelf -- bij een PWA die je nooit
-     afsluit duurde dat een dag. update() vraagt het bij elke opening na, dus de
-     nieuwe schil staat klaar zodra je opent en is er bij de eerstvolgende
-     navigatie.
-
-     Hier stond ook een reload() op controllerchange, om die navigatie niet af
-     te wachten. Eruit: hij sloot de lade halverwege (grammatica.e2e.js liep in
-     zijn tijdslimiet op `.rtg-laag-lade.open`). Een pagina die zichzelf onder
-     je handen herlaadt is een echte bijwerking, geen toetsartefact. */
+     Na de uitrol van 28 augustus 2026 zag de eigenaar nog de oude schil. Er
+     stonden hier kort twee toevoegingen; allebei weer weg. Een reload() op
+     controllerchange sloot de lade halverwege (grammatica.e2e.js liep in zijn
+     tijdslimiet) -- een pagina die zichzelf onder je handen herlaadt is een
+     echte bijwerking. En registration.update() voegt niets toe: sw.js komt met
+     `cache-control: no-cache`, dus de browser hervalideert hem AL bij elke
+     navigatie; de 24-uursregel geldt alleen voor een cachebare worker. Hij
+     schaadde wel -- met die regel erin zakte de toegankelijkheidskeuring twee
+     rondes op twee VERSCHILLENDE toetsen, terwijl die taak op andere takken 7
+     van de 7 groen stond. Een extra netwerkronde in elk opstartpad verschuift
+     precies zulke timing. */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function (reg) { if (reg && reg.update) { try { reg.update(); } catch (e) {} } })
-      .catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 
   const logoutBtn = document.getElementById('logoutBtn');

@@ -94,7 +94,7 @@
 <script src="/shared/rtg-edge-icons.js"></script>
 <script src="/shared/rtg-edge-library.js"></script>
 <script src="/shared/rtg-edge-system.js"></script>
-<script src="/shared/rtg-schil.js?v=6880d97b"></script>
+<script src="/shared/rtg-schil.js?v=382540c5"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -103,45 +103,72 @@
      eigen pagina blijft: de schil weet alleen naam en adres, niet wat erin
      gebeurt (PLATFORM.md -- de apps houden hun diepte, de bovenlaag verbindt). */
   const PERSOONLIJK = [
-    { id: 'reizen', naam: 'Reizen', kort: 'RE', url: '/apps/reizen.html' },
-    { id: 'veilig', naam: 'Veilig', kort: 'VE', url: '/apps/veilig.html' },
-    { id: 'agenda', naam: 'Agenda', kort: 'AG', url: '/apps/agenda.html' },
-    { id: 'bestanden', naam: 'Bestanden', kort: 'BF', url: '/apps/bestanden.html' },
-    { id: 'notities', naam: 'Notities', kort: 'NT', url: '/apps/notities.html' },
-    { id: 'office', naam: 'Documenten', kort: 'DO', url: '/apps/office.html' },
-    { id: 'kantoor', naam: 'RTG Kantoor', kort: 'KA', url: '/apps/kantoor.html' },
-    { id: 'sociaal', naam: 'RTG Sociaal', kort: 'SO', url: '/apps/sociaal.html' }
+    { id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
+    { id: 'veilig', naam: 'Veilig', url: '/apps/veilig.html' },
+    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
+    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
+    { id: 'notities', naam: 'Notities', url: '/apps/notities.html' },
+    { id: 'office', naam: 'Documenten', url: '/apps/office.html' },
+    { id: 'kantoor', naam: 'RTG Kantoor', url: '/apps/kantoor.html' },
+    { id: 'sociaal', naam: 'RTG Sociaal', url: '/apps/sociaal.html' }
   ];
 
-  /* Dezelfde Spatial Shell heeft een eigen bedrijfsstand. Dit is geen tweede
-     desktop en geen kopie van de kantoorfuncties: elke surface opent de echte
-     bestaande app met haar eigen rechten. De schil bewaart alleen de indeling. */
-  const KANTOOR = [
-    { id: 'vandaag', naam: 'Vandaag', kort: 'VD', url: '/apps/kantoor.html' },
-    { id: 'afdelingen', naam: 'Afdelingen', kort: 'AF', url: '/apps/kantoren.html' },
-    { id: 'personeel', naam: 'Personeel', kort: 'HR', url: '/apps/personeel.html?kantoor=1' },
-    { id: 'office', naam: 'RTG Office', kort: 'OF', url: '/apps/office.html?werk=kantoor' },
-    { id: 'agenda', naam: 'Agenda', kort: 'AG', url: '/apps/agenda.html' },
-    { id: 'mail', naam: 'RTG Mail', kort: 'ML', url: '/apps/rtmail.html' },
-    { id: 'bestanden', naam: 'Bestanden', kort: 'BF', url: '/apps/bestanden.html' },
-    { id: 'backoffice', naam: 'Backoffice', kort: 'BO', url: '/apps/backoffice.html' },
-    { id: 'command', naam: 'RTG Command', kort: 'CM', url: '/apps/command.html' }
-  ];
-  const kantoorModus = new URLSearchParams(location.search).get('gebied') === 'kantoor';
-  const WERELDEN = kantoorModus ? KANTOOR : PERSOONLIJK;
+  /* De catalogus is de ene bron voor rail, functiebibliotheek en werkruimte.
+     Daardoor kan een nieuwe functie nooit wel in een wereld bestaan maar hier
+     onvindbaar blijven. In een surface krijgt de app alleen de embed-vlag. */
+  function kaderUrl(url) {
+    const doel = new URL(url, location.origin);
+    doel.searchParams.set('embed', '1');
+    return doel.pathname + doel.search + doel.hash;
+  }
+  function appsVan(wereld) {
+    return RTGEdgeWorlds[wereld].all.map(item => ({ id: item[0], naam: item[1], url: kaderUrl(item[3]) }));
+  }
+  const KANTOOR = appsVan('work');
+  const TRAVEL = appsVan('travel');
+  const LIVING = appsVan('living');
+  const FOUNDATION = appsVan('foundation');
+  const gebied = new URLSearchParams(location.search).get('gebied') || 'persoonlijk';
+  const MODI = {
+    kantoor: { wereld: 'work', titel: 'RTG Work OS', wie: 'Rahul Travel Group · Kantooromgeving', label: 'Werkbanken', actie: 'Werk in', apps: KANTOOR },
+    reizen: { wereld: 'travel', titel: 'RTG Travel OS', wie: 'Reizen · live en beveiligd', label: 'Reisfuncties', actie: 'Open', apps: TRAVEL },
+    living: { wereld: 'living', titel: 'RTG Living OS', wie: 'Intent · werelden · beslissingen', label: 'Leeflagen', actie: 'Gebruik', apps: LIVING },
+    foundation: { wereld: 'foundation', titel: 'RTFoundation', wie: 'Leren · gezin · vooruitkomen', label: 'Foundation', actie: 'Ga naar', apps: FOUNDATION },
+    persoonlijk: { wereld: 'work', titel: 'RTG Workspace', wie: 'Nederland / RTG', label: 'Werelden', actie: 'Open', apps: PERSOONLIJK }
+  };
+  const modus = MODI[gebied] || MODI.persoonlijk;
+  const kantoorModus = gebied === 'kantoor';
+  const WERELDEN = modus.apps;
+  document.title = modus.titel;
+  $('#ruimteTitel').textContent = modus.titel;
+  $('#wie').textContent = modus.wie;
+  $('#wereldLabel').textContent = modus.label;
+  document.body.dataset.omgeving = gebied;
   if (kantoorModus) {
     $('#ruimteTerug').href = '/apps/personeel.html?kantoor=1';
     $('#ruimteTerug').textContent = '‹ Personeelsingang';
   }
 
-  const SNEL = kantoorModus
-    ? ['vandaag', 'office', 'agenda', 'mail', 'bestanden']
-    : ['reizen', 'agenda', 'notities', 'office', 'bestanden'];
-  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN, dock: SNEL });
+  RTGEdge.start({
+    world: modus.wereld,
+    workspace: true,
+    context: { scope: modus.label, title: WERELDEN[0].naam, tool: WERELDEN[0].id, actie: modus.actie + ' ' + WERELDEN[0].naam },
+    onTool: (id) => {
+      const app = WERELDEN.find(x => x.id === id);
+      if (app) RTGSchil.open(app.id, { naam: app.naam, url: app.url, kort: app.naam });
+    },
+    onAction: () => {
+      const actief = RTGSchil.actief;
+      if (actief) actief.el.querySelector('iframe')?.focus();
+    }
+  });
+  document.body.classList.add('rtg-edge-workspace');
+  RTGEdge.setLayout(innerWidth < 768 ? 1 : 2);
+
+  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN, actionPrefix: modus.actie });
 
   $('#werelden').innerHTML = WERELDEN.map(w =>
-    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' +
-    '<span class="app-kort" aria-hidden="true">' + w.kort + '</span><span class="app-label">' + w.naam + '</span></button>').join('');
+    '<button type="button" data-open="' + w.id + '" aria-label="' + w.naam + '">' + w.naam + '</button>').join('');
   $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
     const w = WERELDEN.find(x => x.id === b.dataset.open);
     if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
@@ -169,7 +196,6 @@
     $('#paletIn').value = ''; $('#paletIn').focus(); paletTeken();
   }
   function paletDicht() { $('#palet').hidden = true; }
-  $('#ruimte').addEventListener('rtg-palet-open', paletOpen);
   $('#paletIn').addEventListener('input', () => { paletKeuze = 0; paletTeken(); });
   $('#paletIn').addEventListener('keydown', (e) => {
     const t = RTGSchil.palet($('#paletIn').value);

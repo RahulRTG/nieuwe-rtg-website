@@ -22,7 +22,7 @@
    het weer en de dag, en dat weet de manager beter dan een dashboard. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, Hlees, nu, id, centen, uitEuro, totaal } = horeca;
+  const { H, Hlees, nu, id, centen: heleCenten, uitEuro, totaal } = horeca;
 
   const P = (code) => { const h = H(code); if (!h.personeel) h.personeel = { potten: {}, loon: {} }; return h.personeel; };
   /* De leesbroer van P: geen doos scheppen om in een lege doos te kijken.

@@ -109,6 +109,13 @@ function zetGelijktijdigheid(db) {
   S.RING = loadRing(RING_FILE, S.VAULT);
 }
 
+function init() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  const db = new DatabaseSync(DB_FILE);
+  S.db = db;
+  zetGelijktijdigheid(db);
+}
+
 /* De WAL van rtg.db leegdrukken in het hoofdbestand.
 
    De identiteitskluis draait in WAL-modus: verse accounts staan in rtg.db-wal

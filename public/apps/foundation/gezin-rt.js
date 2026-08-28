@@ -139,9 +139,6 @@
       eindeGesprek(false);
     }
   }
-
-  w.GezinRT = GezinRT;
-})(window);
 /* Gezin-RT, deel 3: HET GESPREKSSCHERM zelf -- de stijl en de opbouw van de
    overlay, plus de tekstbaan erin (shared/meelezen.js).
 
@@ -156,7 +153,7 @@
       '#grt-remote{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;}' +
       '#grt-local{position:absolute;right:14px;top:14px;width:88px;height:120px;object-fit:cover;border-radius:0;border:2px solid rgba(255,255,255,.5);z-index:2;background:#111;}' +
       '#grt-av{width:96px;height:96px;border-radius:50%;background:#2a2417;display:flex;align-items:center;justify-content:center;font-size:2.6rem;z-index:1;}' +
-      '#grt-naam,#grt-inaam{font-size:1.5rem;margin-top:1rem;z-index:1;}#grt-status,#grt-isoort{color:var(--rtg-leeszacht,#A79F92);margin-top:.3rem;z-index:1;font-family:Arial,sans-serif;font-size:.9rem;}' +
+      '#grt-naam,#grt-inaam{font-size:1.5rem;margin-top:1rem;z-index:1;}#grt-status,#grt-isoort{color:#A79F92;margin-top:.3rem;z-index:1;font-family:Arial,sans-serif;font-size:.9rem;}' +
       '#grt-tijd{position:absolute;top:20px;left:0;right:0;text-align:center;color:#fff;z-index:2;font-family:Arial,sans-serif;}' +
       '.grt-knoppen{position:absolute;bottom:40px;display:flex;gap:1.2rem;z-index:3;}' +
       '.grt-b{width:60px;height:60px;border-radius:50%;border:none;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;background:#2a2724;}' +
@@ -189,3 +186,5 @@
     document.getElementById('grt-cam').onclick = function () { if (!call) return; var t = call.stream.getVideoTracks()[0]; if (!t) return; t.enabled = !t.enabled; this.classList.toggle('dicht', !t.enabled); };
   }
 
+  w.GezinRT = GezinRT;
+})(window);

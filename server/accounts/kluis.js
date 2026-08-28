@@ -6,6 +6,7 @@
    sleutels komen live uit ./state (na init). */
 const crypto = require('crypto');
 const S = require('./state');
+const testomgeving = require('../testomgeving');
 
 const CODENAMES = [
   'Zilveren Valk', 'Gouden Ibis', 'Noordelijke Ster', 'Witte Reiger', 'Blauwe Fenix',
@@ -108,8 +109,8 @@ const { scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPasswor
    hashPassword en hashPasswordSync. test/zaaihash.test.js houdt dat vast. */
 const zaaiKast = new Map();
 function zaaiHash(pw) {
-  if (process.env.RTG_DEMO !== '1') {
-    throw new Error('zaaiHash bestaat alleen in de demostand (RTG_DEMO=1) en is alleen voor de seed; gebruik hashPassword of hashPasswordSync.');
+  if (!testomgeving.actief(process.env)) {
+    throw new Error('zaaiHash bestaat alleen in Magnaat Test en is alleen voor de seed; gebruik hashPassword of hashPasswordSync.');
   }
   const sleutel = String(pw);
   let hash = zaaiKast.get(sleutel);
@@ -155,5 +156,5 @@ function sleutelVoor(doel) { return afleidSleutel(S.SECRET, doel); }
 module.exports = {
   CODENAMES, enc, dec, encVeld, decVeld, emailHash, normalizePhone, phoneHash,
   scryptAsync, hashPasswordSync, hashDemoSync, hashPassword, verifyPassword, moetVernieuwen,
-  makeCodename, sign, SCRYPT_N, SCRYPT_R, SCRYPT_P, sleutelVoor, afleidSleutel
+  zaaiHash, makeCodename, sign, SCRYPT_N, SCRYPT_R, SCRYPT_P, sleutelVoor, afleidSleutel
 };

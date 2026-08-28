@@ -43,13 +43,9 @@
    --------------------------------------------------------------------------- */
 module.exports = (ctx) => {
 const { codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd, sociaalRate,
-  statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin } = ctx;
-
-const UUR = 60 * 60 * 1000;
-/* De gedeelde deurrem van RTG Link. Rechtstreeks binnengehaald en niet via de
-   context: hij is een singleton en geen laag, en wie hem uit ctx zou halen kan
-   hem ook per ongeluk vervangen. */
-const { misserGeteld, deurDicht, remReset, MIS_PER_MINUUT } = require('../link/rem');
+  statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin,
+  pinBevroren, pinBeveiligingNoteer, pinIntentMaak, pinIntentGebruik, crypto } = ctx;
+const rem = require('./pin-deur-rem')({ crypto });
 
 /* Opzoeken wie er achter een pin zit -- zonder iets te doen. Dat is met opzet
    een aparte stap: het scherm toont eerst "dit is Gouden Ibis", en de MENS
@@ -136,7 +132,7 @@ function pinNaarHandle(ruw) {
 /* Alleen voor de toetsen: het budget terugzetten zonder een minuut te wachten.
    Blijft hier staan onder zijn oude naam, want de contactpin-toetsen roepen hem
    zo aan; hij zet nu de gedeelde rem terug en niet een eigen kopie. */
-const pinDeurReset = remReset;
+const pinDeurReset = () => rem.reset();
 
 return { pinZoek, pinVerbind, pinNaarHandle, pinKijk: kijk, pinDeurReset,
   MIS_PER_MINUUT: rem.MIS_PER_MINUUT };

@@ -380,9 +380,9 @@ test('6b. een tafelticket op contant telt de maandboekhouding NIET dubbel', asyn
 
    Er was GEEN betaalwijze 'cadeaukaart' aan de kassa. De kassa moest dus een bon
    aanslaan en daarnaast de kaart verzilveren, en dan telde `financeVoor` de
-   omzet twee keer: een keer als bon en een keer als inwisseling. Andersom miste
-   de btw-aangifte een LOSSE inwisseling helemaal, want een verzilvering is geen
-   bon en boekt dus geen factuur.
+   omzet twee keer: een keer als bon en een keer als inwisseling. Een losse
+   inwisseling is inmiddels expliciet een saldo-correctie zonder omzet of
+   factuur; de boekhouding meldt hem apart.
 
    'cadeaukaart' is nu een betaalwijze: de bon draagt de omzet met zijn eigen
    regels (dus het juiste tarief per artikel) en de verzilveringen die bij een
@@ -424,19 +424,20 @@ test('6c. een bon die met een cadeaukaart wordt betaald telt EEN keer, en de aan
     assert.equal(rest.status, 200, 'er staat nog zestig op: de kaart is EEN keer belast');
     assert.equal(rest.body.saldo, 0);
 
-    /* Vijftig euro is door de kassa gegaan (40) en vijftig los verzilverd (60):
-       samen honderd, en dat is precies wat de boekhouding hoort te tellen. Zou
-       de bon dubbel tellen, dan stond hier 140. */
+    /* Alleen de veertig euro op de kassabon is omzet. De resterende zestig is
+       met de hand als saldo-correctie afgeboekt en hoort niet zonder bon in de
+       omzet of aangifte terecht te komen. */
     const fin = await api(base, '/api/supplier/finance', {}, mgr);
     const omzet = Math.round((fin.body.btw || []).reduce((x, r) => x + r.omzet, 0) * 100);
-    assert.equal(omzet, 10000,
-      'de bon (40) plus de losse inwisseling (60); bij 14000 telt de kassabon dubbel');
+    assert.equal(omzet, 4000,
+      'alleen de bon (40); de handmatige saldo-correctie (60) is geen omzet');
     assert.equal(Math.round(fin.body.giftcards.ingewisseld * 100), 10000,
       'het kaartrapport blijft het VOLLE bedrag melden: dat is een andere vraag dan waar de omzet staat');
+    assert.equal(Math.round(fin.body.giftcards.handmatig * 100), 6000,
+      'de saldo-correctie staat afzonderlijk en zichtbaar in het rapport');
 
     /* En de andere kant: de bon boekt een factuur, dus de btw-aangifte ziet die
-       omzet nu wel. Voor de losse inwisseling geldt dat nog steeds niet -- die
-       staat als open punt bij 4.27. */
+       omzet nu wel. De losse correctie blijft daar bewust buiten. */
     const op = await api(base, '/api/supplier/btw/opmaken', { periode: fin.body.maand }, mgr);
     assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
     const omzetAangifte = (op.body.aangifte.tarieven || []).reduce((x, t) => x + t.omzetCenten, 0);
@@ -610,7 +611,7 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
     assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
     assert.equal(bon.body.sale.method, 'cadeaukaart');
     assert.equal(bon.body.sale.gcRest, Math.round((500 - totaal) * 100) / 100, 'het saldo is met de bon afgeboekt');
-    await even();
+    await wachtOpFacturen(base, mgr, bon.body.sale.id);
 
     // dezelfde twee cijfers als in toets 7, op de grondslag (exclusief btw)
     const fin = await api(base, '/api/supplier/finance', {}, mgr);
@@ -650,7 +651,6 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
     const onbekend = await api(base, '/api/supplier/pos/sale',
       { items, total: 1, method: 'cadeaukaart', gcCode: 'RTG-GC-ZZZZZZ' }, mgr);
     assert.equal(onbekend.status, 404, 'een onbekende kaart wordt geweigerd');
-    await even();
     const naWeigering = await api(base, '/api/supplier/finance', {}, mgr);
     assert.equal(Math.round((naWeigering.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), omzetBoekhouding,
       'een geweigerde betaling laat geen bon en dus geen omzet achter');
@@ -704,7 +704,7 @@ test('10. een cadeaukaart verkopen met dezelfde sleutel geeft EEN kaart, geen tw
 
     // dezelfde sleutel voor een ander bedrag is een fout, geen stille echo
     const ander = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500, idem: 'gc-vast-1' }, mgr);
-    assert.equal(ander.status, 409, 'dezelfde sleutel voor een ander bedrag wordt geweigerd');
+    assert.equal(ander.status, 409, 'dezelfde sleutel voor een ander bedrag wordt geweigerd: ' + JSON.stringify(ander.body));
 
     /* En de proef op de som die er echt toe doet: hoeveel saldo staat er nu bij
        deze zaak open? Twee kaarten van 250, niet drie -- want de herhaling en

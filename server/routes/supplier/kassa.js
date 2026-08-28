@@ -14,10 +14,7 @@ const herhaling = require('../../kern/kassa/herhaling')({
 require('./kassa/verkoop')(kern, herhaling);
 require('./kassa/innen')(kern);
 require('./kassa/afrekenen')(kern, herhaling);
-/* De cadeaukaarten (onze afsplitsing om de 10 kB-maat) zonder herhaling:
-   main's idempotentieronde wikkelde het uitchecken en de verkoop in, de
-   kaartroutes bewust niet. */
-require('./kassa/cadeaukaart')(kern);
+require('./kassa/cadeaukaart')(kern, herhaling);
 require('./kassa/modus')(kern);
 require('./kassa/premium')(kern);
 };

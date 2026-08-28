@@ -150,6 +150,6 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, geboekt: echt, restVraag: wil - echt, saldo: b.saldo, bon: b.code };
   }
 
-  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen, uitEuro, regelSom, kortingCenten, waarde,
+  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, uitEuro, regelSom, kortingCenten, waarde,
     totaal, openstaand, controleerSom, happyKorting, bonMaak, bonBoek };
 };

@@ -10,7 +10,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 /* Alleen voor het geduld: zie de kop van geduldFactor() in helper.js. */
-const { geduldFactor } = require('./helper');
+const { drukte } = require('./helper');
 
 const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
 const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
@@ -54,7 +54,9 @@ async function wachtTot(fn, ms = 20000) {
    scherven draait. Vier minuten is nog steeds ruim onder een echte hanger (die
    komt nooit) en ruim boven wat een trage start kost. De melding zegt al welke
    groep achterbleef -- dat is de aanwijzing die telt, niet het cijfer zelf. */
-const OPKOMST = 240000;
+const { extra: GEDULD, druk } = drukte();
+const DRUK = Math.round(druk * 100) / 100;
+const OPKOMST = 120000 * GEDULD;
 
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {

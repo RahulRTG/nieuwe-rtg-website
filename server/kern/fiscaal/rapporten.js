@@ -25,6 +25,7 @@ const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 const tarief = require('./tarief');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
+  const rondEuro = centen;
   /* De regelbron komt uit maakFiscaal; zonder jaargangen valt hij netjes terug
      op de lopende tabel en zegt dat ook in de stempel. */
   const regelbron = ctx.regelbron || require('./regelbron')(null);
@@ -98,7 +99,7 @@ module.exports = (ctx) => {
     const btw = Object.entries(potten).map(([cat, o2]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, regelbron.tariefOp(landCode, cat, dag)) }))
       .sort((a, b) => b.omzet - a.omzet);
-    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw,
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, openstaandGezet, btw,
       regelstand: regelbron.stempel(landCode, dag) };
   }
 

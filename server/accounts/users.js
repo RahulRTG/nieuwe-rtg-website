@@ -199,12 +199,12 @@ const { getMemberState, saveMemberState, setVerification, listByVerification,
 const { findByPublicMail, reservePublicMail } = require('./publiekmail')({ getUserById, getMemberState, saveMemberState });
 
 module.exports = {
-  createUser, createUserSync, getUserById, findByLogin, count, publicUser,
+  createUser, createUserSync, createUserZaai, getUserById, findByLogin, count, publicUser,
   /* uit ./publiekmail.js -- hier doorgegeven zodat de gevel (accounts/index.js)
      en alle bestaande aanroepers niets merken van de opsplitsing. */
   findByPublicMail, reservePublicMail,
   renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
   issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
-  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, vernieuwWachtwoordHash,
+  setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser
 };

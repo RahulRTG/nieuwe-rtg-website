@@ -9,18 +9,18 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 448 delen, 0 zonder onderwerp.**
+**58 bundels, 452 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 92 delen, 9502 regels in de delen
+`public/apps/app-main/` -- 93 delen, 9637 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-main-01.js` | de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw |
 | `app-main-01b.js` | de inhoud van de expliciete demostand |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
-| `app-main-02a.js` | De trainingsmelding bestaat uitsluitend in Magnaat |
+| `app-main-02a.js` | de demomelding: een demo is een toestand, geen terugval na een storing |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
@@ -174,7 +174,7 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 3 delen, 191 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 190 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -204,7 +204,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 111 delen, 9551 regels in de delen
+`public/apps/leverancier/` -- 112 delen, 9592 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -541,7 +541,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 562 regels in de delen
+`public/shared/basis/` -- 4 delen, 583 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -640,7 +640,7 @@ omlaag.
 
 ## `shared/glyf.js`
 
-`public/shared/glyf/` -- 3 delen, 240 regels in de delen
+`public/shared/glyf/` -- 3 delen, 242 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -782,7 +782,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 771 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 805 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -818,7 +818,7 @@ omlaag.
 
 ## `shared/teamcall.js`
 
-`public/shared/teamcall/` -- 3 delen, 290 regels in de delen
+`public/shared/teamcall/` -- 3 delen, 312 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -38,6 +38,7 @@
 'use strict';
 
 const envelop = require('./envelop');
+const kostenhaak = require('../kern/kosten/haak');
 
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
   grootSupplierSync, busGeef, kernGeef }) => {

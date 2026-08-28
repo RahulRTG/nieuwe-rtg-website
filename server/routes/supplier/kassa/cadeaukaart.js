@@ -18,31 +18,36 @@
    klant; het btw-moment is de inwisseling. Zie kern/fiscaal/index.js voor hoe
    de maandboekhouding daarmee rekent, en waarom een verzilvering `viaBon`
    draagt. */
-module.exports = (kern) => {
+module.exports = (kern, herhaling) => {
   const { app, db, gcCode, logActivity, save, supplierAuth } = kern;
+  const metIdem = herhaling.metEigenAfdruk;
   // dezelfde drie grenzen als de kassabon die met een kaart betaalt
   const { verzilver: verzilverKaart } = require('./kaart');
 
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
+app.post('/api/supplier/giftcard/sell', supplierAuth, async (req, res) => {
   const bedrag = Math.round(Number(req.body.bedrag));
   if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
+  const idem = req.body.idem ? 'gc:' + req.supplier.code + ':' + String(req.body.idem).slice(0, 60) : null;
+  const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, () => {
+    const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
+      kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
+    db.data.giftcards.unshift(kaart);
+    db.data.giftcards = db.data.giftcards.slice(0, 20000);
+    save();
+    logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
+    return { ok: true, kaart };
+  });
+  if (r && r.error) return res.status(r.status || 409).json({ error: r.error });
+  res.json(r);
 });
 
-/* De LOSSE inwisseling: saldo van de kaart halen zonder dat er een kassabon bij
-   hoort. Zonder `viaBon` is deze verzilvering zelf het omzetmoment in de
-   maandboekhouding -- er is immers geen bon die de omzet draagt. */
+/* De LOSSE inwisseling is een handmatige saldo-correctie zonder kassabon. De
+   maandboekhouding meldt hem apart en rekent hem niet als omzet of btw. */
 app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
   const r = verzilverKaart(db, req.supplier.code, req.body.code, req.body.bedrag, req.actor.name, null);
   if (r.error) return res.status(r.status).json({ error: r.error });
   save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + r.bedrag + ' van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ')');
+  logActivity(req.supplier.code, req.actor, 'boekte € ' + r.bedrag + ' met de hand af van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ', geen kassabon)');
   res.json({ ok: true, saldo: r.kaart.saldo, kaart: { code: r.kaart.code, saldo: r.kaart.saldo } });
 });
 };

@@ -39,6 +39,9 @@
    "appstoreBrug",
    "appstoreWinkel",
    "codenaamVan",
+   "geborenVan",
+   "idGeverifieerd",
+   "leeftijdVan",
    "onboarding",
    "tenant"
   ],
@@ -80,6 +83,7 @@
    "stateFor",
    "telefoon",
    "tier",
+   "webauthn",
    "webauthnLijst",
    "webauthnLoginMaak",
    "webauthnLoginOpties",
@@ -738,6 +742,7 @@
    "bezitWeg",
    "bezitZet",
    "bezittingen",
+   "bijeen",
    "bijeenkomst",
    "boekingMetRef",
    "boekingenVanKlant",
@@ -1509,6 +1514,7 @@
    "socialewereld"
   ],
   "social": [
+   "appUrl",
    "blokkeer",
    "commDm",
    "connectieTussen",
@@ -1543,6 +1549,7 @@
    "nietBeschermd",
    "onboarding",
    "ouderVerbind",
+   "pinBeveiliging",
    "pinKaart",
    "pinUit",
    "pinVerbind",
@@ -1697,6 +1704,7 @@
   ],
   "supplier": [
    "ALT_IDEE",
+   "ANNULEERGRONDEN",
    "AUTOVERKOOP_BRANDSTOF",
    "B",
    "BEVEILIGING_ERNST",
@@ -1934,6 +1942,8 @@
    "reserveerSlot",
    "reserveringKomst",
    "reserveringTafel",
+   "retailAnnuleer",
+   "retailBon",
    "retailState",
    "retailVerkoop",
    "retailVerkoopTerug",

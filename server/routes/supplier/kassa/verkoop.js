@@ -70,7 +70,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const bonId = crypto.randomBytes(4).toString('hex');
   let kaartCode = null;
   if (method === 'cadeaukaart') {
-    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.payCode,
+    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.gcCode || req.body.payCode,
       total, req.actor.name, bonId);
     /* EEN OBJECT EN GEEN res.status(), net als elke andere uitgang hierboven.
        Deze tak is ouder dan de idempotentiewikkel van main: binnen eenmalig()
@@ -81,6 +81,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
        res-object terug in plaats van de fout. */
     if (k.error) return { status: k.status, error: k.error };
     kaartCode = k.kaart.code;
+    req.body.gcRest = k.kaart.saldo;
   }
   const sale = {
     id: bonId,
@@ -94,6 +95,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde, kaartCode,
+    gcCode: kaartCode, gcRest: method === 'cadeaukaart' ? req.body.gcRest : null,
     betaaldienstKosten: betaaldienstKosten || null,
     /* EEN BON UIT DE OFFLINE-WACHTRIJ DRAAGT ZIJN EIGEN MOMENT, maar bepaalt er
        niets mee. `at` blijft de tijd van AANKOMST, want dat is de tijd die de
@@ -107,14 +109,6 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
-  // saldo eraf met de bon erbij; `bron` scheidt hem van de handmatige afboeking
-  if (gcKaart) {
-    gcKaart.saldo = Math.round((gcKaart.saldo - total) * 100) / 100;
-    gcKaart.verzilveringen = gcKaart.verzilveringen || [];
-    gcKaart.verzilveringen.push({ bedrag: total, at: sale.at, actor: req.actor.name, bron: 'kassa', saleId: sale.id });
-    sale.gcCode = gcKaart.code;
-    sale.gcRest = gcKaart.saldo;
-  }
   save();
   // het keukenbrein boekt de ingredienten van de bon af via de recepten
   try { kern.keuken.boekVerkoopAf(req.supplier, items || [], 'kassa (' + req.actor.name + ')'); } catch (e) {}
@@ -135,7 +129,4 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
  res.json(antwoord);
 });
 
-/* De inwisselroute woont in ./inwissel.js -- dit bestand ging met main's
-     idempotentieronde en onze kaartimport samen door de 10 kB-maat. */
-  require('./inwissel')(kern);
 };

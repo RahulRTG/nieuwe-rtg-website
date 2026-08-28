@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="0c7df0d9">
+<meta name="rtg-bouw" content="382540c5">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -861,7 +861,7 @@
   .sc-pin-kop{display:flex;align-items:baseline;gap:0.6rem;}
   .sc-pin-kop span{font-size:0.68rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.08em;}
   .sc-pin-kop b{font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;letter-spacing:0.14em;}
-  .sc-pin-status{margin-left:auto;border:1px solid rgba(46,125,79,0.45);border-radius:999px;padding:0.18rem 0.5rem;
+  .sc-pin-status{margin-left:auto;border:1px solid rgba(46,125,79,0.45);border-radius:0;padding:0.18rem 0.5rem;
     color:var(--green,#2E7D4F);font-size:0.58rem;font-style:normal;text-transform:uppercase;letter-spacing:0.06em;}
   .sc-pin-status.alarm{border-color:rgba(179,39,63,0.55);color:#B3273F;}
   .sc-pin-belofte{margin-top:0.45rem;padding:0.5rem 0.65rem;border-left:2px solid var(--gold);background:rgba(169,143,28,0.06);
@@ -881,7 +881,7 @@
   .sc-av.klein{width:34px;height:34px;font-size:0.7rem;}
   .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
   .sc-pin-noot{margin-top:0.55rem;font-size:0.7rem;line-height:1.45;color:var(--soft);}
-  .sc-pin-noot.alarm{border:1px solid rgba(179,39,63,0.4);border-radius:10px;padding:0.55rem 0.65rem;color:#B3273F;background:rgba(179,39,63,0.06);}
+  .sc-pin-noot.alarm{border:1px solid rgba(179,39,63,0.4);border-radius:0;padding:0.55rem 0.65rem;color:#B3273F;background:rgba(179,39,63,0.06);}
   .sc-pin-noot[hidden]{display:none;}
   .sc-pin-historie{margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;}
   .sc-pin-historie>strong{display:block;margin-bottom:0.25rem;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--soft);}
@@ -1678,17 +1678,17 @@
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
-<script src="/shared/command/catalog.js" defer></script>
-<script src="/shared/command/console.js" defer></script>
-<script src="/shared/command/verdeler.js" defer></script>
-<script src="/shared/command/bank.js" defer></script>
-<script src="/shared/command/praat.js" defer></script>
-<script src="/shared/command/inlogpoort.js" defer></script>
-<script src="/shared/command/bladhaak.js" defer></script>
-<script src="/shared/command/romp.js" defer></script>
-<script src="/shared/command/geheugen.js" defer></script>
-<script src="/shared/command/werktafel.js" defer></script>
-<script src="/shared/command.js" defer></script>
+<script src="/shared/command/catalog.js?v=382540c5" defer></script>
+<script src="/shared/command/console.js?v=382540c5" defer></script>
+<script src="/shared/command/verdeler.js?v=382540c5" defer></script>
+<script src="/shared/command/bank.js?v=382540c5" defer></script>
+<script src="/shared/command/praat.js?v=382540c5" defer></script>
+<script src="/shared/command/inlogpoort.js?v=382540c5" defer></script>
+<script src="/shared/command/bladhaak.js?v=382540c5" defer></script>
+<script src="/shared/command/romp.js?v=382540c5" defer></script>
+<script src="/shared/command/geheugen.js?v=382540c5" defer></script>
+<script src="/shared/command/werktafel.js?v=382540c5" defer></script>
+<script src="/shared/command.js?v=382540c5" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2373,8 +2373,8 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=6880d97b"></script>
-<script src="/apps/magnaat-data.js?v=6880d97b"></script>
+<script src="/apps/magnaat-sandbox.js?v=382540c5"></script>
+<script src="/apps/magnaat-data.js?v=382540c5"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {

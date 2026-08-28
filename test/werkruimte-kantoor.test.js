@@ -9,6 +9,7 @@ const notities=fs.readFileSync(path.join(__dirname,'../public/apps/notities.html
 const bestanden=fs.readFileSync(path.join(__dirname,'../public/apps/bestanden.html'),'utf8');
 const klok=fs.readFileSync(path.join(__dirname,'../public/shared/klok.js'),'utf8');
 const cookie=fs.readFileSync(path.join(__dirname,'../public/shared/cookie.js'),'utf8');
+const werelden=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-edge-worlds.js'),'utf8');
 
 test('RTG Work OS opent de echte kantoorsoftware als zelfstandige surfaces',()=>{
   for(const url of ['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html?kantoor=1',

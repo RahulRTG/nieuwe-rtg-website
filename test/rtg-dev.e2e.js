@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { laadBrowser } = require('./browser');
+const { laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const rtg = require('../scripts/rtg');
 const dev = require('../scripts/rtg-dev');
 
@@ -46,10 +46,10 @@ function start() {
 }
 
 test('rtg dev in een echte browser', async (t) => {
-  const pw = laadBrowser();
-  if (!pw) { t.skip('geen browser beschikbaar'); return; }
+  const pw = laadPlaywright();
+  if (geenBrowser(pw)) { t.skip(geenBrowser(pw)); return; }
   await start();
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   try {
     const pagina = await browser.newPage();
     const consolefouten = [];

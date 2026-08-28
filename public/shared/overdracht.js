@@ -54,7 +54,7 @@
       '.ovd-in{max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:flex-start;}' +
       '.ovd-kop{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold,#C9A24B);' +
         'width:100%;display:flex;justify-content:space-between;gap:1rem;align-items:center;}' +
-      '.ovd-x{background:transparent;border:1px solid #3a3733;border-radius:8px;color:#e8e6e2;' +
+      '.ovd-x{background:transparent;border:1px solid #3a3733;border-radius:0;color:#e8e6e2;' +
         'padding:.15rem .55rem;cursor:pointer;font:inherit;letter-spacing:0;text-transform:none;}' +
       '.ovd-x:hover{border-color:var(--gold,#857007);}' +
       '.ovd-x:focus-visible{outline:2px solid #fff;outline-offset:2px;}' +

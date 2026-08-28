@@ -10,7 +10,7 @@
    toetsen, dan is die grens weg en niet alleen de winst.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
-   - de RTG_DEMO-grendel uit zaaiHash gehaald
+   - de Magnaat-Test-grendel uit zaaiHash gehaald
      -> "zaaiHash bestaat niet buiten de demostand" ZAKT (RAAK)
    - de kast niets meer laten onthouden (dus weer een hash per account)
      -> "zaaiHash geeft hetzelfde wachtwoord dezelfde hash" en
@@ -29,31 +29,35 @@ const path = require('path');
 const kluis = require('../server/accounts/kluis');
 const { startServer, stop } = require('./helper');
 
-function inDemostand(doe) {
-  const was = process.env.RTG_DEMO;
-  process.env.RTG_DEMO = '1';
+function inTeststand(doe) {
+  const was = { node: process.env.NODE_ENV, magnaat: process.env.RTG_MAGNAAT_TEST };
+  process.env.NODE_ENV = 'test';
+  process.env.RTG_MAGNAAT_TEST = '1';
   try { return doe(); } finally {
-    if (was === undefined) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = was;
+    if (was.node === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = was.node;
+    if (was.magnaat === undefined) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = was.magnaat;
   }
 }
 
-test('zaaiHash bestaat niet buiten de demostand', () => {
-  const was = process.env.RTG_DEMO;
-  delete process.env.RTG_DEMO;
+test('zaaiHash bestaat niet buiten Magnaat Test', () => {
+  const was = { node: process.env.NODE_ENV, magnaat: process.env.RTG_MAGNAAT_TEST };
+  delete process.env.RTG_MAGNAAT_TEST;
   try {
-    assert.throws(() => kluis.zaaiHash('werk'), /demostand/);
-    process.env.RTG_DEMO = '0';
-    assert.throws(() => kluis.zaaiHash('werk'), /demostand/);
+    assert.throws(() => kluis.zaaiHash('werk'), /Magnaat Test/);
+    process.env.NODE_ENV = 'production';
+    process.env.RTG_MAGNAAT_TEST = '1';
+    assert.throws(() => kluis.zaaiHash('werk'), /Magnaat Test/);
   } finally {
-    if (was === undefined) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = was;
+    if (was.node === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = was.node;
+    if (was.magnaat === undefined) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = was.magnaat;
   }
 });
 
 test('zaaiHash geeft hetzelfde wachtwoord dezelfde hash, en die hash werkt gewoon', async () => {
-  const a = inDemostand(() => kluis.zaaiHash('werk'));
-  const b = inDemostand(() => kluis.zaaiHash('werk'));
+  const a = inTeststand(() => kluis.zaaiHash('werk'));
+  const b = inTeststand(() => kluis.zaaiHash('werk'));
   assert.equal(a, b, 'twee demo-accounts met hetzelfde wachtwoord delen hun hash');
-  assert.match(a, /^[0-9a-f]{32}:[0-9a-f]{128}$/, 'zelfde vorm als elke andere hash');
+  assert.match(a, /^s2\$\d+\$\d+\$\d+\$[0-9a-f]+\$[0-9a-f]+$/, 'zelfde vorm als elke andere hash');
   assert.equal(await kluis.verifyPassword('werk', a), true);
   assert.equal(await kluis.verifyPassword('Werk', a), false);
 });

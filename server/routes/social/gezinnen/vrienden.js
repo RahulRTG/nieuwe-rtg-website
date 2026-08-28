@@ -2,7 +2,7 @@
    (met ouderakkoord), dm, snaps en verhalen. Gemount vanuit
    routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
-  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd } = sctx;
+  const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, gezinsPoort, nietBeschermd, pinClusterRem } = sctx;
   const { app, express, rtf, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties,
           socialDm, socialDmSend, socialGoedkeur, socialIntrek, socialTeKeuren, snapSturen, snapsVoor, snapOpenen,
           verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht, onboarding, pinKaart } = kern;

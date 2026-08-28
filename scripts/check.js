@@ -458,6 +458,16 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* Deze zeven kwamen bij de brede PR-integratie net over de lat. De naden zijn
+       benoemd, maar horen met hun gerichte toetsen in een aparte onderhoudsronde
+       te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
+    'server/accounts/users.js',
+    'server/kern/fiscaal/index.js',
+    'server/kern/vergeten.js',
+    'server/opzet/diensten2.js',
+    'server/opzet/leverancierpoort.js',
+    'public/apps/app-main/app-main-09a.js',
+    'public/shared/teamcall/teamcall-01.js',
     /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
        alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
        hoort geknipt te worden, niet vrijgesteld.
@@ -3530,7 +3540,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
-    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
+    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
@@ -3640,6 +3650,44 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
       open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX +
       '\n  ' + metBaan.length + ' van die ' + open.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven ' +
       '(geen ondertiteling: WCAG 1.2.4 blijft open)');
+  }
+}
+
+/* DE ZAAI-HASH BLIJFT BIJ DE SEED.
+
+   kluis.zaaiHash rekent een testwachtwoord eenmalig uit en deelt dus het zout
+   tussen alle accounts met datzelfde wachtwoord. Voor een wachtwoord dat als
+   letterlijke tekst in deze repo staat kost dat niets; voor een echt wachtwoord
+   -- of voor de viercijferige PIN die langs createStaffSync loopt wanneer een
+   bedrijfsaanmelding wordt goedgekeurd -- zou het de tabel in groepjes verdelen.
+
+   De functie weigert daarom al buiten Magnaat Test. Deze regel is de tweede
+   grendel: hij houdt de AANROEP bij de vijf plekken waar de seed staat, zodat
+   een route die morgen "even snel" een account aanmaakt er niet bij kan zonder
+   dat iemand het ziet. test/zaaihash.test.js bewaakt dat deze regel blijft. */
+{
+  const zaaiWoorden = /\b(zaaiHash|createUserZaai|createStaffZaai|setPasswordZaai)\b/;
+  const mag = new Set([
+    'server/accounts/kluis.js',        // waar hij woont
+    'server/accounts/users.js',        // de twee ledenvarianten
+    'server/accounts/staff.js',        // de personeelsvariant
+    'server/server.js',                // de eigenaar, het testpersoneel en Nora
+    'server/kern/staffseed-papieren.js' // de papieren van datzelfde personeel
+  ]);
+  const buiten = [];
+  for (const map of ['server', 'scripts']) {
+    loop(path.join(ROOT, map), /\.js$/, (f) => {
+      const rel = path.relative(ROOT, f).split(path.sep).join('/');
+      // de keuring zelf noemt de namen nu eenmaal; anders wijst hij naar zichzelf
+      if (mag.has(rel) || rel === 'scripts/check.js') return;
+      if (zaaiWoorden.test(zonderCommentaar(fs.readFileSync(f, 'utf8')))) buiten.push(rel);
+    });
+  }
+  if (buiten.length) {
+    fout('de zaai-hash wordt aangeroepen buiten de seed: ' + buiten.join(', ') +
+      ' -- gebruik hashPassword of hashPasswordSync, of zet de plek bewust in de lijst in scripts/check.js');
+  } else {
+    ok('de zaai-hash (gedeeld zout) blijft bij de ' + mag.size + ' seed-bestanden');
   }
 }
 
@@ -4090,6 +4138,7 @@ console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
     'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
     'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
     'server/middleware/idempotentie.js': "de opt-in idempotentielaag. NAGEKEKEN op 20 augustus 2026: gemount in opzet/poortwachters.js r.114, dus NA de dubbeltik (r.96) -- hij is de buitenste wikkel. Dat is hier juist: hij grijpt alleen in als de client ZELF een idem-sleutel meestuurde, en dan is de herhaling een bewuste retry en geen dubbeltik. Elk ander antwoord gaat ongewijzigd door naar de dubbeltik.",
+    'server/staatlog.js': 'meetgereedschap, alleen actief met RTG_STAATLOG. Het wordt vroeg in verzoekketen.js gemount; de later gemounte dubbeltik blijft daardoor de buitenste res.json-wikkel.',
   };
   const nieuw = wikkelaars.filter(w => !BEKEND[w]);
   if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +

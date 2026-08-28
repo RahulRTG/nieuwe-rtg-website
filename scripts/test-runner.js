@@ -53,6 +53,18 @@ const argv = process.argv.slice(2);
 const reporter = (argv.find(a => a.startsWith('--reporter=')) || '').slice(11);
 const selectie = (argv.find(a => a.startsWith('--bestanden=')) || '').slice(12)
   .split(',').map(s => s.trim()).filter(Boolean);
+const dekkingMap = (argv.find(a => a.startsWith('--dekking=')) || '').slice(10);
+const deelVlag = (argv.find(a => a.startsWith('--deel=')) || '').slice(7);
+const deel = (() => {
+  if (!deelVlag) return null;
+  const d = ontleedDeel(deelVlag);
+  if (!d) {
+    console.error('[tests] --deel verwacht de vorm N/M met 1 <= N <= M, kreeg: ' + deelVlag);
+    process.exit(2);
+  }
+  return d;
+})();
+const zonderIjkingen = argv.includes('--zonder-ijkingen');
 /* DE SOLO-LIJST WOONT IN scripts/lib/geisoleerd.js. Hij stond hier, en dat was
    bijna goed: hij hoort bij deze loper. Maar dit bestand IS een script -- wie het
    met require() opent om alleen die lijst te lezen, start de hele suite. Dat is
@@ -109,10 +121,19 @@ function leegMaken() {
   try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 }
 
-function draai(namen, parallel, metVloer) {
+let batch = 0;
+function draai(namen, parallel) {
   if (!namen.length) return 0;
   const args = ['--test', '--test-concurrency=' + parallel];
-  if (reporter) args.push('--test-reporter=' + reporter);
+  if (dekkingMap) {
+    fs.mkdirSync(dekkingMap, { recursive: true });
+    const merk = deel ? 'deel-' + deel.nr
+      : (selectie.length === 1 ? selectie[0].replace(/\.test\.js$/, '') : 'alles');
+    const naam = merk + '-' + (++batch) + '.info';
+    args.push('--experimental-test-coverage',
+      '--test-reporter=' + (reporter || 'tap'), '--test-reporter-destination=stdout',
+      '--test-reporter=lcov', '--test-reporter-destination=' + path.join(dekkingMap, naam));
+  } else if (reporter) args.push('--test-reporter=' + reporter);
   args.push(...namen.map(n => path.join('test', n)));
   const r = spawnSync(process.execPath, args, {
     cwd: WORTEL, env, stdio: 'inherit', timeout: 90 * 60 * 1000
@@ -124,8 +145,9 @@ function draai(namen, parallel, metVloer) {
   return r.status == null ? 2 : r.status;
 }
 
-const gewoon = bestanden.filter(n => !isGeisoleerd(n));
-const geïsoleerd = bestanden.filter(n => isGeisoleerd(n));
+const gewoon = verdeel(bestanden.filter(n => !GEISOLEERD.has(n)), deel);
+const geïsoleerd = verdeel(bestanden.filter(n => GEISOLEERD.has(n) &&
+  (!zonderIjkingen || selectie.length || !IJKINGEN.includes(n))), deel);
 
 /* WAT ZOU JE DOEN? -- `--toon` drukt de indeling af en draait niets.
 
@@ -140,17 +162,19 @@ const geïsoleerd = bestanden.filter(n => isGeisoleerd(n));
    bewering van een regel. Zo kost het niets, en een mens die zich afvraagt wat
    er straks apart draait, krijgt hetzelfde antwoord. */
 if (argv.includes('--toon')) {
-  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking, journaal }, null, 2));
+  console.log(JSON.stringify({ parallel: gewoon, geisoleerd: geïsoleerd, concurrency, dekking: dekkingMap, journaal }, null, 2));
   geefAfbouwSlotVrij();
   process.exit(0);
 }
 leegMaken();
 console.log('[tests] ' + gewoon.length + ' bestanden, maximaal ' + concurrency + ' tegelijk' +
-  (dekking.length ? ' (met dekkingsvloer ' + dekking.join('/') + ')' : ''));
-let code = draai(gewoon, concurrency, true);
+  (dekkingMap ? ' (dekking naar ' + dekkingMap + ')' : ''));
+if (deel) console.log('[tests] deel ' + deel.nr + ' van ' + deel.totaal);
+if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijkingen; die draaien in de CI elk in een eigen job');
+let code = draai(gewoon, concurrency);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
-  const uit = draai([naam], 1, false);
+  const uit = draai([naam], 1);
   if (uit && !code) code = uit;
 }
 geefAfbouwSlotVrij();
@@ -174,7 +198,7 @@ geefAfbouwSlotVrij();
    ALLEEN BIJ EEN VOLLE RONDE. Wie `node scripts/test-runner.js pay.test.js`
    draait heeft de suite niet gedraaid; dat stempel zou de meter laten liegen
    op precies het punt waarvoor hij bestaat. */
-if (!selectie.length) {
+if (!selectie.length && !deel && !zonderIjkingen) {
   try {
     const { stempel } = require('./lib/stempel');
     fs.writeFileSync(path.join(WORTEL, 'SUITE.json'), JSON.stringify({

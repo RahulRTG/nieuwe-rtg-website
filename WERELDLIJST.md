@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 46 |
+| **LivingOS** | `/apps/rtg.html` | 47 |
 | **WorkOS** | `/apps/kantoor.html` | 13 |
 | **TravelOS** | `/apps/reizen.html` | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 2 |
-| | **samen** | **72** |
+| | **samen** | **73** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 46 onderdelen.
+Huis: `/apps/rtg.html` — 47 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -59,6 +59,7 @@ Huis: `/apps/rtg.html` — 46 onderdelen.
 | Rendez-vous | `link:rendezvous` | `/apps/rendezvous.html` |
 | Attenties | `link:attenties` | `/apps/attenties.html` |
 | Ontdekken | `link:ontdek` | `/apps/rtg.html` |
+| **lost niet op** | `link:commerce` | **nergens** |
 | Bestellen | `tab:bestellen` | `/apps/app.html (stand bestellen)` |
 | Zorg | `tab:zorg` | `/apps/app.html (stand zorg)` |
 | Gezin | `tab:gezin` | `/apps/app.html (stand gezin)` |
@@ -75,6 +76,8 @@ Huis: `/apps/rtg.html` — 46 onderdelen.
 | Nieuws | `link:nieuws` | `/apps/nieuws.html` |
 | Krant | `link:krant` | `/apps/krant.html` |
 | Sport | `link:sport` | `/apps/sport.html` |
+
+> **Deze onderdelen lossen niet op** en tekenen zich op het scherm stil weg: `link:commerce`. Zie `test/wereldregister.test.js`.
 
 ## WorkOS
 

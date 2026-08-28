@@ -38,6 +38,7 @@ const STRICT = process.env.A11Y_STRICT === '1';
    EERSTE render bekeken, uitgelogd, en alles wat achter de inlog opengaat blijft
    ongemeten. Dat is de volgende stap en geen eigenschap van deze lijst. */
 const { alleSchermen } = require('./schermen');
+const { ontleedDeel, verdeel } = require('./lib/delen');
 /* WIE IETS VINDT, MEET NOG EEN KEER -- zie scripts/a11y-hermeet.js. Kwam met
    main mee (7bb6a6e8) en was bij de samenvoeging van 24 augustus stil verdwenen:
    de module bleef staan, haar aanroepers niet. Twee volle scans op dezelfde code
@@ -823,6 +824,7 @@ function startEchteServer() {
      kloppen, dus het LAS goed.
      Wat dit leert over de poort zelf: een keuring die slaagt hoort haar eigen
      slotregel te schrijven, want de afwezigheid daarvan was het enige spoor.
+  */
   /* DE THEMA'S STAAN OP NUL, EN DAT WAS EEN WEG VAN TWEE DAGEN.
      Hier stond dat ze een BOVENGRENS hadden en geen nul, met de reden erbij: wat
      er na de onzichtbare tekst overbleef leek EEN soort -- het goud en de andere
@@ -847,7 +849,7 @@ function startEchteServer() {
   }
   if (fouten.length) {
     console.error('\n[a11y] MISLUKT:');
-    for (const f of uit.fouten) console.error('  · ' + f);
+    for (const f of fouten) console.error('  · ' + f);
     process.exit(1);
   }
   if (raakOordeel.melding) console.log(raakOordeel.melding);

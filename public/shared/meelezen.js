@@ -65,7 +65,7 @@
     knop.className = 'meelees-knop';
     knop.textContent = 'Meelezen';
     knop.setAttribute('aria-expanded', 'false');
-    knop.style.cssText = 'padding:.35rem .7rem;border:1px solid rgba(255,255,255,.22);border-radius:999px;' +
+    knop.style.cssText = 'padding:.35rem .7rem;border:1px solid rgba(255,255,255,.22);border-radius:0;' +
       'background:transparent;color:inherit;font:inherit;font-size:.85rem;cursor:pointer;';
     kop.appendChild(knop);
     wrap.appendChild(kop);
@@ -79,7 +79,7 @@
     baan.setAttribute('role', 'log');
     baan.setAttribute('aria-live', 'polite');
     baan.setAttribute('aria-label', 'Meelezen: wat er getypt wordt in dit gesprek');
-    baan.style.cssText = 'max-height:9rem;overflow-y:auto;padding:.5rem .6rem;border-radius:10px;' +
+    baan.style.cssText = 'max-height:9rem;overflow-y:auto;padding:.5rem .6rem;border-radius:0;' +
       'background:rgba(255,255,255,.06);font-size:.9rem;line-height:1.45;';
     wrap.appendChild(baan);
 
@@ -93,12 +93,12 @@
     veld.maxLength = MAX;
     veld.placeholder = 'Typ mee zodat iedereen meeleest';
     veld.setAttribute('aria-label', 'Typ een regel mee in dit gesprek');
-    veld.style.cssText = 'flex:1;min-width:0;padding:.45rem .6rem;border-radius:8px;border:1px solid rgba(255,255,255,.22);' +
+    veld.style.cssText = 'flex:1;min-width:0;padding:.45rem .6rem;border-radius:0;border:1px solid rgba(255,255,255,.22);' +
       'background:rgba(0,0,0,.25);color:inherit;font:inherit;';
     var zend = d.createElement('button');
     zend.type = 'submit';
     zend.textContent = 'Stuur';
-    zend.style.cssText = 'padding:.45rem .8rem;border:0;border-radius:8px;background:#7F1634;color:#fff;font:inherit;cursor:pointer;';
+    zend.style.cssText = 'padding:.45rem .8rem;border:0;border-radius:0;background:#7F1634;color:#fff;font:inherit;cursor:pointer;';
     rij.appendChild(veld); rij.appendChild(zend);
     wrap.appendChild(rij);
 

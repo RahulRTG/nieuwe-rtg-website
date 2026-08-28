@@ -141,6 +141,9 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   const { stapOpOpties, stapOpMaak } = require('./webauthn-stapop')({
     credsVan, zetChallenge, pakChallenge, vanB64, save,
     generateAuthenticationOptions, verifyAuthenticationResponse });
+  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = require('./webauthn-actie')({
+    crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
+    credsVan, zetChallenge, pakChallenge, vanB64, save });
 
   /* ---- beheer ---- */
   function publiekeLijst(user) {
@@ -166,7 +169,8 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
     webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,
-    webauthnAantal: user => (user ? credsVan(user.id).length : 0) };
+    webauthnAantal: user => (user ? credsVan(user.id).length : 0),
+    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

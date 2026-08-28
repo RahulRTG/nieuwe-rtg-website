@@ -89,7 +89,7 @@ test('financeVoor: een tafelticket telt de bestellingen een keer, niet ook de bu
     // de gebundelde kassabon die /tafelticket/afrekenen eroverheen legt
     posSales: { KIKUNOI: [{ total: 218, method: 'contant', items: null, omzetElders: 'bestellingen', at: maand + '-05' }] }
   });
-  const { financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
   const omzet = financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0);
   assert.equal(omzet, 218, 'de twee bestellingen, en de bundelbon eroverheen niet nog eens');
 });
@@ -98,7 +98,7 @@ test('financeVoor: een openstaande tafelrekening telt pas bij het afrekenen mee'
   const maand = new Date().toISOString().slice(0, 7);
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL' } };
   const bon = m => ({ total: 50, method: m, items: null, room: 'Tafel 7', at: maand + '-05' });
-  const { financeVoor } = maakFiscaal({ db: stubDb({ posSales: { KIKUNOI: [bon('tafel')] } }), centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db: stubDb({ posSales: { KIKUNOI: [bon('tafel')] } }), rondEuro, btwSplit });
   assert.equal(financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0), 0,
     'een bon die nog op de tafel staat is nog niet afgerekend');
 
@@ -106,7 +106,7 @@ test('financeVoor: een openstaande tafelrekening telt pas bij het afrekenen mee'
   const na = maakFiscaal({ db: stubDb({ posSales: { KIKUNOI: [
     { ...bon('tafel'), settled: true }, { ...bon('kamer'), room: 'Kamer 3', settled: true },
     { total: 100, method: 'contant', items: null, at: maand + '-05' }
-  ] } }), centen, btwSplit });
+  ] } }), rondEuro, btwSplit });
   assert.equal(na.financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0), 100,
     'de gebundelde check-outbon draagt de omzet van kamer en tafel samen');
 });
@@ -130,7 +130,7 @@ test('dagrapport: een bestelling van VOOR de betaalwijze-ronde valt terug op de 
     ],
     posSales: { KIKUNOI: [{ total: 218, method: 'contant', items: null, omzetElders: 'bestellingen', at: dag }] }
   });
-  const { dagrapport } = maakFiscaal({ db, centen, btwSplit });
+  const { dagrapport } = maakFiscaal({ db, rondEuro, btwSplit });
   const z = dagrapport(s, dag);
   assert.equal(z.omzet, 218, 'de omzet van de dag, niet twee keer dezelfde tafel');
   assert.equal(z.btw.reduce((x, r) => x + r.omzet, 0), 218, 'en de btw-grondslag telt hem ook een keer');
@@ -151,7 +151,7 @@ test('financeVoor: een cadeaukaart aan de kassa telt een keer, via de bon', () =
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL' } };
   const kaart = bron => ({ supplierCode: 'KIKUNOI', bedrag: 100, saldo: 50, at: maand + '-01',
     verzilveringen: [{ bedrag: 50, at: maand + '-05', bron }] });
-  const omzetVan = db => maakFiscaal({ db, centen, btwSplit }).financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0);
+  const omzetVan = db => maakFiscaal({ db, rondEuro, btwSplit }).financeVoor(s).btw.reduce((x, r) => x + r.omzet, 0);
 
   // de kassaweg: een bon van 50 die de kaart afboekt -- 50, niet 100
   assert.equal(omzetVan(stubDb({
@@ -161,7 +161,7 @@ test('financeVoor: een cadeaukaart aan de kassa telt een keer, via de bon', () =
 
   // de handmatige afboeking maakt geen bon, dus draagt geen omzet -- maar dat
   // wordt wel MELD, want geld dat buiten de boeken valt mag niet stil zijn
-  const fin = maakFiscaal({ db: stubDb({ giftcards: [kaart('handmatig')] }), centen, btwSplit }).financeVoor(s);
+  const fin = maakFiscaal({ db: stubDb({ giftcards: [kaart('handmatig')] }), rondEuro, btwSplit }).financeVoor(s);
   assert.equal(fin.btw.reduce((x, r) => x + r.omzet, 0), 0, 'een afboeking zonder bon is geen omzet');
   assert.equal(fin.giftcards.handmatig, 50, 'en staat apart gemeld');
   assert.ok(fin.regels.some(r => /met de hand/.test(r) && /50/.test(r)),
@@ -206,7 +206,7 @@ test('dagrapport: alle zeven wegen tellen hun omzet, bonnen en betaalwijzen prec
       109, 1, { cadeaukaart: 109 }, {}]
   ];
   for (const [naam, data, omzet, bonnen, wijzen, openstaand] of wegen) {
-    const z = maakFiscaal({ db: stubDb(data), centen, btwSplit }).dagrapport(s, dag);
+    const z = maakFiscaal({ db: stubDb(data), rondEuro, btwSplit }).dagrapport(s, dag);
     assert.equal(z.omzet, omzet, naam + ': de omzet van de dag');
     assert.equal(z.btw.reduce((x, r) => x + r.omzet, 0), omzet, naam + ': en dezelfde btw-grondslag');
     assert.equal(z.bonnen, bonnen, naam + ': het aantal verkopen, niet het aantal papiertjes');
@@ -368,7 +368,7 @@ test('tarief: het Z-rapport rekent met dezelfde categorie als de maandboekhoudin
     orders: [{ supplierCode: 'ALPEN', paid: true, at: nu.toISOString(), paidAt: nu.toISOString(),
       items: [{ name: 'Overnachting', price: 214, qty: 1 }, { name: 'Pils', price: 119, qty: 1 }] }]
   });
-  const { dagrapport, financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { dagrapport, financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
 
   const z = dagrapport(hotel, dag);
   const catsZ = Object.fromEntries(z.btw.map(r => [r.cat, r.tarief]));

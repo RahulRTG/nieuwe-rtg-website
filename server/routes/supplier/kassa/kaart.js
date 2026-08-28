@@ -27,7 +27,8 @@ function verzilver(db, supplierCode, ruweCode, ruwBedrag, actor, viaBon) {
   if (bedrag > g.saldo) return { status: 409, error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' };
   g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
   g.verzilveringen = g.verzilveringen || [];
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor, viaBon: viaBon || null });
+  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor,
+    viaBon: viaBon || null, bron: viaBon ? 'kassa' : 'handmatig' });
   return { kaart: g, bedrag };
 }
 

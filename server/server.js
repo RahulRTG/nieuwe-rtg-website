@@ -273,7 +273,7 @@ function zetEigenaarsAccountEens() {
   const bijwerken = (rij) => {
     let x = rij;
     if (accounts.realNameOf(x) !== 'Rahul Imran Ismail') x = accounts.renameUser(x.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
-    accounts.setPasswordSync(x.id, DEMO_WACHTWOORD);
+    accounts.setPasswordZaai(x.id, DEMO_WACHTWOORD);
     accounts.setVerification(x.id, 'verified');
     return x;
   };
@@ -289,7 +289,7 @@ function zetEigenaarsAccountEens() {
       accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
       accounts.setVerification(u.id, 'verified');
     } else {
-      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+      u = accounts.createUserZaai({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
       accounts.saveMemberState(u.id, demoLidInhoud());
       accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
     }
@@ -390,12 +390,12 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      /* createStaffDemo en niet createStaffSync: dit zijn 183 rijen met een
+      /* createStaffZaai en niet createStaffSync: dit zijn 183 rijen met een
          pincode die twee regels hierboven te lezen is. Op volle scrypt-kosten
          duurde deze lus alleen al twintig seconden voor 'listen' -- zie
          server/accounts/wachtwoord.js bij hashDemoSync voor het waarom en de
          drie grendels eromheen. */
-      people.forEach(([name, role, func], i) => accounts.createStaffDemo({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      people.forEach(([name, role, func], i) => accounts.createStaffZaai({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
@@ -810,6 +810,7 @@ function demoLidInhoud() {
 // Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
 // het proces leeft.)
 app.get('/api/health', (req, res) => {
+  const omgeving = testomgeving.status(process.env);
   const model = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({
     ok: true, ...omgeving, ai: model.modus, verwerking: model.verwerking,
@@ -1943,7 +1944,7 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
    altijd op de lopende tabel blijven rekenen. Vandaar een functie: hij wordt pas
    uitgevoerd als er echt een rapport wordt gemaakt, en dan staat de laag er.
    Hetzelfde idioom als de bevoegdheidslaag hierboven ("lui doorgegeven"). */
-const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit,
+const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, rondEuro, btwSplit,
   jaargangen: () => kern.regelwacht && kern.regelwacht.jaargangen });
 
 
@@ -2219,7 +2220,7 @@ const kern = {
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
+  broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,

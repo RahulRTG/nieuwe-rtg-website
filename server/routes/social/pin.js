@@ -11,6 +11,7 @@
    Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, linkBon: bon } = sctx;
+  const { pinClusterRem, pinBeveiliging } = sctx;
   const { app, auth, geenGast, pinKaart, pinVernieuw, pinUit, pinZoek, pinVerbind,
           liveMaak, liveKijk, liveVerbind, appUrl } = kern;
   const PIN_ACTIES = new Set(['rtg-pin-vernieuw', 'rtg-pin-noodslot-uit', 'rtg-pin-vast-aan']);

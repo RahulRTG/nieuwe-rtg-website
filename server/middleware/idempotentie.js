@@ -46,15 +46,8 @@
      en de handler draait niet. Ook een 4xx wordt herhaald: dezelfde vraag,
      hetzelfde oordeel.
 
-     DAT VELD IS NIET VERSIERING MAAR DE HUISTAAL, en het ontbrak: de geldlaag
-     antwoordt al jaren met `Object.assign({}, bestaand, { herhaald: true })`
-     (server/betaal.js). Deze laag ging ervoor staan en gaf alleen het kale
-     eerste antwoord terug, met de melding in een KOP -- die niemand las. Zestien
-     toetsen zakten daarop, van "dubbel tikken laadt nooit dubbel" tot "twee keer
-     bestellen met dezelfde sleutel is een keer bestellen", en ze zakten stil
-     omdat er na die verandering geen volle suite meer is gedraaid. Een lijst met
-     routes die hun eigen idempotentie doen zou hier de verkeerde reparatie zijn
-     (LAT.md regel 4): dezelfde taal spreken is de goede.
+     `herhaald` is de bestaande huistaal van de geldlaag. Het hoort in het lijf,
+     niet alleen in een kop die clients niet lezen.
    - EEN STORING WORDT NOOIT ONTHOUDEN. Een 5xx mag opnieuw geprobeerd worden;
      een storing vastspijkeren zou van een haperend moment een permanente
      weigering maken.
@@ -94,7 +87,10 @@ const EIGEN = [
   '/api/betaal/',         // de betaalkern: direct betalen en een verzoek voldoen
   '/api/supplier/pay/',   // de zaak int en betaalt uit via de wallet
   '/api/supplier/pos/',   // kassa-checkout en losse verkoop
+  '/api/supplier/giftcard/', // kaartverkoop bindt de sleutel duurzaam aan zaak + bedrag
   '/api/supplier/ticket/', // deurverkoop
+  '/api/supplier/staff/invite', // uitnodigingslaag bewaart zelf sleutel + verzoekafdruk
+  '/api/office/bank/mislukking', // sleutel identificeert de clearing die de bankkern ontdubbelt
 
   /* En deze drie vond de toets op zijn TWEEDE ronde, na de samenvoeging van
      24 takken. Ze zijn stuk voor stuk nieuw geldwerk dat zijn `idem` uit het

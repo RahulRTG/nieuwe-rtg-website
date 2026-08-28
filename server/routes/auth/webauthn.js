@@ -53,7 +53,7 @@ module.exports = (actx) => {
     const bronBucket = 'webauthn:bron:' + req.ip;
     const doelBucket = 'webauthn:doel:' + vingerafdruk(login ? 'account:' + login.trim().toLowerCase() : 'sleutel:' + credential);
     if (tooManyTries(res, bronBucket) || tooManyTries(res, doelBucket)) return;
-    const r = await webauthnLoginMaak(login, req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
+    const r = await webauthn.login.maak(login, req.body.ceremonie, req.body.antwoord, oorsprong(req), gastheer(req));
     if (r.error) { noteFailedTry(bronBucket, req.ip); noteFailedTry(doelBucket, req.ip); return stuur(res, r); }
     loginFails.delete(bronBucket); loginFails.delete(doelBucket);
     const user = r.user;

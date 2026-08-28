@@ -4,7 +4,7 @@
    antwoord. Puur: geen database, alleen de tabellen uit ./landen en de centen-helper.
    De maandboekhouding en de AI-boekhouder wonen in index.js. */
 const { FISCAAL_PEILJAAR, LANDEN, ZZP } = require('./landen');
-const { centen } = require('../util');
+const { rondEuro } = require('../util');
 const { zekerheid, zin } = require('./zekerheid');
 
 /* Landen zonder eigen zzp-regime in de tabel (de wereldtabel) krijgen een
@@ -84,7 +84,7 @@ function zzpBerekening(land, winstIn, opties) {
   out.belasting = belasting;
   out.netto = rondEuro(winst - belasting);
   out.reserveerPct = Math.max(20, Math.min(50, Math.round(belasting / winst * 100) + 5));
-  out.perMaand = centen(belasting / 12);
+  out.perMaand = rondEuro(belasting / 12);
   out.zekerheid = zekerheid('zzp.berekening');
   out.regels.push('Berekend met de tarieven van ' + (teruggehaald ? jaar : FISCAAL_PEILJAAR) + '. ' + zin('zzp.berekening'));
   return out;

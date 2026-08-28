@@ -36,6 +36,7 @@
    terecht weigeren. */
 'use strict';
 const crypto = require('crypto');
+const testomgeving = require('../testomgeving');
 
 const DEMO_N = 1024;
 
@@ -46,8 +47,8 @@ const DEMO_N = 1024;
    zwakste wint zodra iemand er een gebruikt (LAT.md regel 4). */
 module.exports = ({ scryptOpties, schrijfHash, SCRYPT_R, SCRYPT_P }) => {
   function hashDemoSync(pw) {
-    if (process.env.RTG_DEMO !== '1')
-      throw new Error('hashDemoSync bestaat alleen in de demostand (RTG_DEMO=1); gebruik hashPassword.');
+    if (!testomgeving.actief(process.env))
+      throw new Error('hashDemoSync bestaat alleen in Magnaat Test; gebruik hashPassword.');
     const salt = crypto.randomBytes(16);
     const hash = crypto.scryptSync(String(pw), salt, 64, scryptOpties(DEMO_N, SCRYPT_R, SCRYPT_P));
     return schrijfHash(salt, hash, DEMO_N, SCRYPT_R, SCRYPT_P);

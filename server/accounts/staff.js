@@ -14,13 +14,12 @@ async function createStaff(gegevens) {
 function createStaffSync(gegevens) {
   return schrijfStaff(gegevens, kluis.hashPasswordSync(String(gegevens.pin)));
 }
-/* Alleen voor de demoseed in server.js: 183 rijen met een pincode die in de
-   repo staat. Waarom die goedkoper mag hashen staat in ./wachtwoord.js bij
-   hashDemoSync -- en die functie weigert buiten de demostand, dus deze ook.
-   De ECHTE weg (een bedrijf dat zich aanmeldt, server/kern/aanmeldingen/
-   bedrijf.js) blijft bij createStaffSync op volle kosten. */
-function createStaffDemo(gegevens) {
-  return schrijfStaff(gegevens, kluis.hashDemoSync(String(gegevens.pin)));
+/* Alleen voor de testzaai. LET OP het verschil met createStaffSync hierboven:
+   die loopt OOK op een echte weg (de eigenaar-PIN bij een goedgekeurde
+   bedrijfsaanmelding, kern/aanmeldingen/bedrijf.js) en houdt dus zijn eigen
+   zout per rij. Zie kluis.zaaiHash. */
+function createStaffZaai(gegevens) {
+  return schrijfStaff(gegevens, kluis.zaaiHash(String(gegevens.pin)));
 }
 function schrijfStaff({ supplierCode, name, role, func, memberId, memberTier }, pinHash) {
   const vals = [String(supplierCode || '').toUpperCase(), String(name).slice(0, 60), pinHash, role === 'manager' ? 'manager' : 'staff', func ? String(func).slice(0, 40) : null, new Date().toISOString(),
@@ -119,7 +118,7 @@ function publicStaff(s) { return s ? { id: s.id, name: s.name, role: s.role, fun
 function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
-  createStaff, createStaffSync, createStaffDemo, getStaffById, listStaff, countStaff, verifyStaffPin,
+  createStaff, createStaffSync, createStaffZaai, getStaffById, listStaff, countStaff, verifyStaffPin,
   setStaffPin, deactivateStaff, deactivateStaffVanZaak, staffByMember, staffPositions,
   setStaffMember, claimStaffMember, releaseStaffMember, publicStaff, makePin
 };

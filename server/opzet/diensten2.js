@@ -15,6 +15,7 @@
 'use strict';
 
 const envelop = require('./envelop');
+const kostenhaak = require('../kern/kosten/haak');
 
 module.exports = function maakDiensten2(deps) {
   const {

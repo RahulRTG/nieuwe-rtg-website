@@ -22,6 +22,7 @@
       ]],
       ['Ondernemen', [
         ['rtgone', 'RTG One', 'shield', '/apps/rtgone.html'], ['onderneming', 'Onderneming', 'brief', '/apps/onderneming.html'],
+        ['commerce', 'Commerce', 'brief', '/apps/commerce.html'],
         ['magnaat', 'Magnaat', 'money', '/apps/magnaat.html'], ['backoffice', 'Backoffice', 'brief', '/apps/backoffice.html']
       ]],
       ['Regie', [

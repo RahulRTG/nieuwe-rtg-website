@@ -17,7 +17,7 @@
       ingetypte zin gaat naar een derde partij (vaak buiten de EU) zonder dat
       daar een lid tegenover staat.
 
-   Draai los: node --experimental-sqlite --test test/poortwacht.test.js */
+   Draai los: node --test test/poortwacht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const config = require('../server/config');

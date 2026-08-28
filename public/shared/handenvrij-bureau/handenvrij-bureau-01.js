@@ -47,9 +47,9 @@
   var css =
     /* het paneel rechtsonder; de rest van het scherm blijft van het werk */
     'body.hv-bureau .hv-balk{left:auto;right:1rem;bottom:1rem;width:var(--hv-breed,min(30rem,42vw));' +
-    'border:1px solid var(--gold,#857007);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5);}' +
+    'border:1px solid var(--gold,#857007);border-radius:0;box-shadow:0 12px 34px rgba(0,0,0,.5);}' +
     'body.hv-bureau .hv-chat{left:auto;right:1rem;bottom:4.6rem;width:var(--hv-breed,min(30rem,42vw));' +
-    'border:1px solid #2a2a28;border-radius:14px;}' +
+    'border:1px solid #2a2a28;border-radius:0;}' +
     /* verplaatst: dan telt de eigen plek en niet meer de hoek rechtsonder */
     'body.hv-bureau.hv-verzet .hv-balk{right:auto;bottom:auto;left:var(--hv-x);top:calc(var(--hv-y) + var(--hv-hoog));}' +
     'body.hv-bureau.hv-verzet .hv-chat{right:auto;bottom:auto;left:var(--hv-x);top:var(--hv-y);' +
@@ -73,9 +73,9 @@
     'body.hv-werkrij .hv-chat{bottom:6.1rem;}' +
     'body.hv-werkrij.hv-ruimte{padding-bottom:6.3rem;}' +
     'body.hv-bureau .hv-werk{left:auto;right:1rem;bottom:4.6rem;width:min(30rem,42vw);' +
-    'border:1px solid #2a2a28;border-radius:12px;}' +
+    'border:1px solid #2a2a28;border-radius:0;}' +
     'body.hv-bureau.hv-werkrij .hv-chat{bottom:7.3rem;}' +
-    '.hv-werk button{background:transparent;border:1px solid #3a3733;border-radius:9px;color:#d8d5d0;' +
+    '.hv-werk button{background:transparent;border:1px solid #3a3733;border-radius:0;color:#d8d5d0;' +
     'font:inherit;font-size:.74rem;padding:.3rem .5rem;cursor:pointer;max-width:11rem;overflow:hidden;' +
     'text-overflow:ellipsis;white-space:nowrap;}' +
     '.hv-werk button:hover{border-color:var(--gold,#857007);color:#fff;}' +

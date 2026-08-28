@@ -23,6 +23,100 @@
     return (p && p.matches('.filters, .tabs, [role="group"], [role="tablist"], nav')) ? p : null;
   }
 
+  /* DE BALK HEEFT EEN BOVENGRENS, en die stond nergens opgeschreven.
+
+     bouwBalk() hieronder verplaatst ELKE bedienbare knop naar .ios-nav-acties.
+     Dat gaat goed bij twee of drie acties en het gaat stuk bij zeven: op
+     foundation/vrienden.html stonden Samen, Rahul, de avatar, de naam, Gezin
+     beheren, Ander profiel en Gezin uitloggen naast elkaar, samen 666px in een
+     scherm van 390. De balk werd niet te vol -- de PAGINA werd te breed, en
+     alles schoof zijwaarts. De tweede rij bestond al (naarTweedeRij), maar die
+     kiest op SOORT (een zoekveld, een tabrij) en nooit op RUIMTE. Dat is het
+     gat: er was geen regel die zei hoeveel er in een balk past.
+
+     Hier is die regel, en hij MEET in plaats van te tellen. Een vaste
+     bovengrens ("hoogstens drie") is net zo fout: drie lange labels passen
+     niet en vier pictogrammen wel.
+
+     ios.css houdt daarnaast de kolom zelf krimpbaar. Die twee doen niet
+     hetzelfde: het blad garandeert dat de pagina niet meer verbreedt, deze
+     functie zorgt dat de acties daarbij leesbaar blijven in plaats van
+     samengeperst. Zonder het blad schuift de pagina; zonder deze functie
+     staan er zeven knoppen op de ruimte van drie.
+
+     Twee dingen blijven altijd staan. De menuknop van appmenu.js (.amn-knop),
+     want dat is de uitweg zelf -- die wegzetten is de deur achter je
+     dichttrekken. En de terugknop, die staat in kolom 1 en komt hier niet
+     langs.
+
+     Wat naar beneden gaat is niet weg: appmenu.js leest .ios-nav-extra al even
+     goed als .ios-nav-acties (zie uitKnoppen daar), dus een uitgeweken actie
+     staat nog steeds in het menu. En de weg terug is er ook: wordt het venster
+     breder, dan gaat alles eerst terug naar de balk en meet hij opnieuw. */
+  var UITGEWEKEN = 'data-ios-uitgeweken';
+
+  function overloopVak(kop) {
+    var extra = kop.querySelector('.ios-nav-extra');
+    if (!extra) {
+      extra = el('div', 'ios-nav-extra');
+      var eersteRij = kop.querySelector('.ios-nav-rij');
+      kop.insertBefore(extra, eersteRij ? eersteRij.nextSibling : kop.firstChild);
+    }
+    var vak = extra.querySelector('.ios-nav-overloop');
+    if (!vak) { vak = el('div', 'ios-nav-overloop'); extra.appendChild(vak); }
+    return vak;
+  }
+
+  function pasActiesIn(kop) {
+    var acties = kop.querySelector('.ios-nav-acties');
+    if (!acties) return;
+
+    /* Eerst alles terug. Anders zakt de balk bij elke resize verder leeg: hij
+       zou wel kunnen uitplaatsen en nooit meer terughalen. */
+    var terug = kop.querySelectorAll('[' + UITGEWEKEN + ']');
+    for (var i = terug.length - 1; i >= 0; i--) {
+      terug[i].removeAttribute(UITGEWEKEN);
+      acties.appendChild(terug[i]);
+    }
+
+    /* HET BUDGET. Meten op overloop alleen is niet genoeg, en dat bleek pas op
+       een echte telefoon. De balk van vrienden.html liep namelijk NIET over:
+       de kolommen kregen 82 + 11 + 264 op 390 en pasten precies. Maar die 11
+       is de titelkolom, tot een streep geknepen, en de acties namen 68% van de
+       balk. Technisch klopte alles; het zag eruit alsof er zes dingen over
+       elkaar heen stonden, en dat was de melding.
+
+       Een navigatiebalk is navigatie en geen werkbalk. Meer dan 45% aan acties
+       betekent dat er geen balk meer is maar een rij knoppen met een pijl
+       ervoor. Vandaar twee voorwaarden: hij wijkt uit als het NIET PAST, en
+       ook als het wel past maar te vol staat. */
+    var BUDGET = 0.45;
+    var rij = acties.parentElement;
+    function teVol() {
+      if (acties.scrollWidth > acties.clientWidth + 1) return true;
+      if (!rij || !rij.clientWidth) return false;
+      return acties.getBoundingClientRect().width > rij.clientWidth * BUDGET;
+    }
+
+    var vak = null, rem = 40;
+    while (teVol() && rem--) {
+      var kandidaat = null;
+      for (var j = acties.children.length - 1; j >= 0; j--) {
+        var k = acties.children[j];
+        if (k.className && String(k.className).indexOf('amn-knop') >= 0) continue;
+        kandidaat = k; break;
+      }
+      if (!kandidaat) break;
+      if (!vak) vak = overloopVak(kop);
+      kandidaat.setAttribute(UITGEWEKEN, '');
+      vak.insertBefore(kandidaat, vak.firstChild);
+    }
+
+    /* Een lege wikkel is het behang waar dit bestand elders vanaf wil. */
+    var oud = kop.querySelector('.ios-nav-overloop');
+    if (oud && !oud.children.length) oud.remove();
+  }
+
   function bouwBalk(kop) {
     merkWegChrome(kop);
 

@@ -19,7 +19,48 @@ module.exports = (ctx) => {
      50.001 verdween (LAT.md regel 1), en hier zou het een openstaande betaling
      zijn die niemand meer indient. Blijven er te veel onafgeronde staan, dan is
      dat een storing en geen opslagprobleem -- dus klagen, niet wissen. */
+  /* IDEMPOTENTIE, EN ZE WERKTE NIET. Elke opdracht droeg al een `idemSleutel` --
+     'rtf:<lid>:<factuur>', 'pay-uit:<zaak>:<boeking>', 'bank-sepa:<iban>:<boeking>'
+     -- die keurig aan de rail werd meegegeven. Alleen keek RTG er zelf nooit
+     naar. Twee aanroepen met dezelfde sleutel leverden dus twee opdrachten van
+     samen het dubbele bedrag, en of dat geld ook echt twee keer wegging hing af
+     van de goede wil van een externe partij.
+
+     Dat is precies de fout die dit huis elders opruimt: een veld dat eruitziet
+     als een grendel en er geen is. Een zoekopdracht naar `idemSleutel` gaf zes
+     plekken die hem SCHRIJVEN en geen enkele die hem LEEST.
+
+     DE SLEUTEL IDENTIFICEERT DE ECONOMISCHE HANDELING, niet een poging. Bestaat
+     hij al, dan krijgt de aanroeper de bestaande opdracht terug -- ook als die
+     mislukt is. Opnieuw proberen is dan `dienIn` of de ronde, en dat is het hele
+     punt: een herhaling hoort dezelfde handeling te raken en geen tweede te
+     maken. Wie werkelijk een nieuwe betaling wil, heeft een nieuwe sleutel.
+
+     `hergebruikt` staat erbij zodat een aanroeper (en een toets) het verschil
+     kan zien. Stil dezelfde opdracht teruggeven zou een tweede stil gedrag zijn
+     op de plek waar we er net een weghalen. */
+  function vindOpIdem(sleutel) {
+    const k = String(sleutel || '');
+    /* De lege-sleutel-afslag is een SNELKOPPELING en geen grendel -- dezelfde
+       lezing als bij vindOpSettlement hieronder. Elke opdracht die via maak()
+       ontstaat draagt een sleutel (desnoods 'opdracht:' + ledgerRef, en
+       ledgerRef is verplicht), dus er staat nooit een lege in de rij en zonder
+       deze regel zou de lus alleen zinloos de hele rij aflopen. Het als grendel
+       opschrijven zou suggereren dat er een geval is dat hij tegenhoudt. */
+    if (!k) return null;
+    const r = rij();
+    for (let i = r.length - 1; i >= 0; i--) if (r[i].idemSleutel === k) return r[i];
+    return null;
+  }
+
   function plaats(o) {
+    const bestaand = vindOpIdem(o.idemSleutel);
+    if (bestaand) {
+      klacht('dezelfde economische handeling werd twee keer aangeboden', {
+        idemSleutel: o.idemSleutel, bestaand: bestaand.id, status: bestaand.status, centen: o.centen });
+      bestaand.hergebruikt = true;
+      return bestaand;
+    }
     const r = rij();
     r.push(o);
     if (r.length > ramMax) {
@@ -119,5 +160,5 @@ module.exports = (ctx) => {
     return { status: 200, aantal: r.length, opdrachten: r.slice(0, Math.min(500, Math.max(1, limit))).map(publiek) };
   }
 
-  return { plaats, ronde, bevestig, openstaand, vind, vindOpSettlement, lijst };
+  return { plaats, ronde, bevestig, openstaand, vind, vindOpSettlement, vindOpIdem, lijst };
 };

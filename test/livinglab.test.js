@@ -1,7 +1,7 @@
 /* Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de
    bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de
    pijplijn naar echte verandering. Draai los:
-   node --experimental-sqlite --test test/livinglab.test.js
+   node --test test/livinglab.test.js
 
    Wat deze toetsen bewaken is niet "werkt de knop" maar "houdt de belofte". Elke
    test hieronder hoort te ZAKKEN als de bijbehorende poort wegvalt; waar dat
@@ -428,22 +428,28 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
    leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
    probeert af te dwingen.
 
-   In productie start het Living Lab leeg -- een echt lab hoort door de RTF zelf
-   te worden neergezet. */
+   Zonder demo start het Living Lab leeg -- een echt lab hoort door de RTF zelf
+   te worden neergezet.
+
+   DE VLAG IS VERANDERD, EN DAT IS DE HELE WIJZIGING HIER. Deze toets las de
+   demostand af aan `NODE_ENV !== 'production'`: dat wás de regel van de seed, en
+   het was dezelfde regel die voor de demo-INLOG al was afgekeurd (server.js bij
+   `const DEMO`). Op een echte server die geen NODE_ENV had gezet stond de demo
+   dus aan. De seed volgt nu dezelfde schakelaar als de inlog -- RTG_DEMO=1 -- en
+   deze toets meet dat voortaan ook. Wat hij TOETST is niet veranderd. */
 test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
-  const laad = (stand) => {
-    const oud = process.env.NODE_ENV, oudDemo = process.env.RTG_DEMO;
-    process.env.NODE_ENV = stand;
-    delete process.env.RTG_DEMO;
+  const laad = (demoAan) => {
+    const oudDemo = process.env.RTG_DEMO;
+    if (demoAan) process.env.RTG_DEMO = '1'; else delete process.env.RTG_DEMO;
     delete require.cache[require.resolve('../server/seed')];
     delete require.cache[require.resolve('../server/seed/livinglab')];
     const uit = require('../server/seed')();
-    process.env.NODE_ENV = oud; if (oudDemo != null) process.env.RTG_DEMO = oudDemo;
+    if (oudDemo != null) process.env.RTG_DEMO = oudDemo; else delete process.env.RTG_DEMO;
     delete require.cache[require.resolve('../server/seed')];
     return uit;
   };
 
-  const demo = laad('development').livingLab;
+  const demo = laad(true).livingLab;
   assert.equal(demo.labs.length, 1, 'de demostand geeft één lab');
   const tek = demo.labs[0].tekenaars.map(t => t.rol);
   for (const rol of ['professional', 'reviewer', 'toezichthouder'])
@@ -464,9 +470,9 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
     assert.equal(s.besluit, null, 'geen verzonnen besluit');
   }
 
-  const prod = laad('production').livingLab;
-  assert.deepEqual(prod.labs, [], 'in productie start het Living Lab leeg');
-  assert.deepEqual(prod.studies, [], 'en zonder studies');
+  const schoon = laad(false).livingLab;
+  assert.deepEqual(schoon.labs, [], 'zonder RTG_DEMO start het Living Lab leeg');
+  assert.deepEqual(schoon.studies, [], 'en zonder studies');
 });
 
 test('het spel beloont kwaliteit en niet volume', async () => {

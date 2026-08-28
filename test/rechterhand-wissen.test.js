@@ -26,7 +26,7 @@
       Zou een van deze functies ooit op de hele database gaan filteren in plaats
       van op het eigen dossier, dan valt hij hier om en nergens anders.
 
-   Draai los: node --experimental-sqlite --test test/rechterhand-wissen.test.js
+   Draai los: node --test test/rechterhand-wissen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -83,7 +83,7 @@ function nepServer(antwoord) {
   };
 }
 const TOKENS = () => ({ member: 'tok-member', supplier: 'tok-supplier', office: 'tok-office' });
-const ROUTES = [{ method: 'POST', pad: '/api/zaak/prijs', rol: 'supplier' }];
+const ROUTES = [{ methode: 'POST', pad: '/api/zaak/prijs', rol: 'supplier' }];
 
 test('een route die iedereen binnenlaat, wordt per route aangewezen', async () => {
   const nep = nepServer(() => ({ status: 200, data: { ok: true } }));
@@ -119,7 +119,7 @@ test('een route die NIET is geprobeerd, staat nergens als in orde', async () => 
   const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
   const uit = await draaiRolproef({
     post: nep.post,
-    routes: [...ROUTES, { method: 'POST', pad: '/api/nooit/geprobeerd', rol: 'open' }],
+    routes: [...ROUTES, { methode: 'POST', pad: '/api/nooit/geprobeerd', rol: 'open' }],
     tokensVoor: TOKENS
   });
   assert.ok(uit.perRoute['POST /api/zaak/prijs'], 'de beproefde route staat er wel in');
@@ -130,7 +130,7 @@ test('een route die NIET is geprobeerd, staat nergens als in orde', async () => 
 test('een leesroute wordt niet geprobeerd -- dit gaat over muteren', async () => {
   const nep = nepServer(() => ({ status: 200, data: { ok: true } }));
   const uit = await draaiRolproef({
-    post: nep.post, routes: [{ method: 'GET', pad: '/api/iets/lezen', rol: 'member' }], tokensVoor: TOKENS });
+    post: nep.post, routes: [{ methode: 'GET', pad: '/api/iets/lezen', rol: 'member' }], tokensVoor: TOKENS });
   assert.deepEqual(uit.perRoute, {});
   assert.equal(uit.pogingen, 0);
 });

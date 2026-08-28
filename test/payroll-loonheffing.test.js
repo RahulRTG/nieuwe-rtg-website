@@ -24,7 +24,7 @@
       betekent het maal twaalf herleiden -- en dan jaagt een enkele
       vakantiegeldbetaling de hele strook een schijf omhoog.
 
-   Draai los: node --experimental-sqlite --test test/payroll-loonheffing.test.js */
+   Draai los: node --test test/payroll-loonheffing.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,6 +32,7 @@ const assert = require('node:assert/strict');
 const lh = require('../server/kern/payroll/loonheffing');
 const motor = require('../server/kern/payroll/motor');
 const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 /* Een verzonnen maar goed rekenbare tabel:
      - tot 30.000 euro (3.000.000 cent): 30%
@@ -171,7 +172,7 @@ test('de keuring houdt een tabel tegen die niet klopt', () => {
 
 test('het regelpakket weigert een pakket met een kapotte tabel', () => {
   const db = { data: {} };
-  const rp = maakRegelpakket({ db, save: () => {}, nu: () => '2026-03-01T00:00:00.000Z' });
+  const rp = maakRegelpakket({ opslag: maakOpslag({ db }), save: () => {}, nu: () => '2026-03-01T00:00:00.000Z' });
   const r = rp.neemOp(pakket({ loonheffing: { schijven: [{ tot: 100, deel: 9 }] } }), { soort: 'test' });
   assert.equal(r.status, 422);
   assert.ok(r.bezwaren.some(b => /niet aannemelijk/.test(b)), r.bezwaren.join(' '));

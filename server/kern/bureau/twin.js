@@ -27,23 +27,18 @@ const SOORTEN = ['klimaat', 'water', 'elektra', 'beveiliging', 'keuken', 'zwemba
 
 module.exports = (ctx) => {
   const { db, save, nu, rid, schoon, isDatum } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
-  function L(key) {
-    if (!db.data.lifestyle) db.data.lifestyle = {};
-    if (!db.data.lifestyle[key]) db.data.lifestyle[key] = {};
-    return db.data.lifestyle[key];
-  }
   // de woningen komen UIT het register; hier staat geen tweede lijst
   function woningen(key) {
-    const l = db.data.lifestyle && db.data.lifestyle[key];
-    return ((l && l.bezittingen) || []).filter(b => b.soort === 'vastgoed');
+    /* VREEMDE SECTIE: `bezittingen` is van kern/lifestyle. */
+    return levens.leesVeld(key, 'bezittingen').filter(b => b.soort === 'vastgoed');
   }
   function T(key, huisId, maak) {
-    const l = L(key);
-    if (!l.twin || typeof l.twin !== 'object') l.twin = {};
+    const tw = levens.veld(key, 'twin');
     if (!woningen(key).some(b => b.id === huisId)) return null;
-    if (!l.twin[huisId]) { if (!maak) return { ruimtes: [] }; l.twin[huisId] = { ruimtes: [] }; }
-    const t = l.twin[huisId];
+    if (!tw[huisId]) { if (!maak) return { ruimtes: [] }; tw[huisId] = { ruimtes: [] }; }
+    const t = tw[huisId];
     if (!Array.isArray(t.ruimtes)) t.ruimtes = [];
     return t;
   }
@@ -129,8 +124,7 @@ module.exports = (ctx) => {
      twee met een datum deze maand" is wat je wilt zien voordat je doorklikt. */
   function twin(key, huisId) {
     const huizen = woningen(key);
-    const l = db.data.lifestyle && db.data.lifestyle[key];
-    const alle = (l && l.twin) || {};
+    const alle = levens.leesVeld(key, 'twin');
     const kop = huizen.map(h => {
       const t = alle[h.id] || { ruimtes: [] };
       const inst = (t.ruimtes || []).reduce((a, r) => a.concat(r.installaties || []), []);

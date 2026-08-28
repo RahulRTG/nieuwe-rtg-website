@@ -45,7 +45,7 @@ module.exports = ({ nu, save, schoon, bericht, aanslagen, open }) => {
   const pak = (r) => aanslagen().find(x => x.ref === String(r || ''));
   // dezelfde vergelijking als kern/uitgifte.js en de naheffing: naam op naam,
   // hoofdletters en spaties tellen niet mee
-  const gelijk = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+  const gelijk = require('../ogen').zelfdeOgen;   // een plek voor de ogenregel; zie kern/ogen.js
 
   /* De drie voorwaarden die alle handelingen delen, op EEN plek: bestaat hij,
      staat er iets open, en staat er een naam onder. Een besluit zonder naam is

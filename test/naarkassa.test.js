@@ -3,10 +3,10 @@
    wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag aanBalie,
    dat de bon meteen loopt (status nieuw, onbetaald), dat de kassa hem met de
    code afrekent en uitgeeft, en dat een jeugdlid toch eerst moet betalen.
-   Draai los: node --experimental-sqlite --test test/naarkassa.test.js */
+   Draai los: node --test test/naarkassa.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, keurLidGoed } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nk-')); }
@@ -17,10 +17,14 @@ async function api(base, pad, body, token) {
 }
 async function registreer(base, extra) {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  return (await api(base, '/api/auth/register', Object.assign({
+  const r = (await api(base, '/api/auth/register', Object.assign({
     name: 'Kassa Lid', email: u + '@x.nl', phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
     password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business'
-  }, extra))).body.token;
+  }, extra))).body;
+  // de leeftijdsregels gelden pas als het paspoort de datum bevestigt: een
+  // opgegeven geboortedatum telt niet, ook niet die van een jeugdlid.
+  await keurLidGoed(base, r.token, r.state.user.codename, (extra && extra.geboortedatum) || '1990-01-01');
+  return r.token;
 }
 // een bestaand menu-item van de demozaak ophalen
 async function eersteItem(base, token, code) {

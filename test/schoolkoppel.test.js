@@ -16,7 +16,7 @@
    daarom staat RTG_SCHOOL_WEBHOOK_INTERN=1 aan (zelfde schakelaar als bij de
    fout-melder). Zonder die vlag weigert de SSRF-afweer een intern adres, en dat
    hoort ook zo.
-   Draai los: node --experimental-sqlite --test test/schoolkoppel.test.js */
+   Draai los: node --test test/schoolkoppel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -212,6 +212,23 @@ test('peiling: geen uitslag onder de vijf antwoorden, en niemand telt twee keer'
 test('peiling: vanaf vijf antwoorden een uitslag, zonder weg terug naar een gezin', async () => {
   const p = (await api('/school/peiling/maak', Object.assign({ titel: 'Tevredenheid periode 2',
     stellingen: ['De school informeert mij op tijd'], doelgroep: 'personeel' }, D))).body.peiling;
+
+  /* Eerst de vraag die het personeel zelf stelt: staat er iets voor mij open?
+     Die bestond niet, en zonder hem was de personeelspeiling alleen te
+     beantwoorden door een peiling-id ergens vandaan te toveren. */
+  const voorMij = (await api('/school/peiling/mijn-personeel',
+    { schoolCode: D.schoolCode, personeelToken: leraar.personeelToken })).body;
+  const staatOpen = voorMij.peilingen.find(x => x.id === p.id);
+  assert.ok(staatOpen, 'de personeelspeiling staat open voor het personeel');
+  assert.equal(staatOpen.alGeantwoord, false);
+  assert.deepEqual(staatOpen.stellingen, ['De school informeert mij op tijd']);
+
+  // een peiling voor OUDERS hoort hier niet tussen te staan
+  const vanOuders = (await api('/school/peiling/maak', Object.assign({ titel: 'Alleen voor ouders',
+    stellingen: ['Ik voel me welkom'], doelgroep: 'ouders' }, D))).body.peiling;
+  assert.ok(!(await api('/school/peiling/mijn-personeel',
+    { schoolCode: D.schoolCode, personeelToken: leraar.personeelToken })).body.peilingen
+    .some(x => x.id === vanOuders.id), 'een ouderpeiling staat niet in de personeelslijst');
 
   // vijf personeelsleden antwoorden
   const scores = [4, 5, 3, 4, 5];

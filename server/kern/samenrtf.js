@@ -8,10 +8,10 @@
    uur stilte. Alleen plekken binnen de gezinsapps. */
 
 module.exports = ({ db, save, crypto, schoon, zijnVrienden }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/samenrtf', bezit: { samenRtfKamers: 'kaart' } });
   const UUR = 3600000;
   const K = () => {
-    if (!db.data.samenRtfKamers || typeof db.data.samenRtfKamers !== 'object') db.data.samenRtfKamers = {};
-    return db.data.samenRtfKamers;
+    return eigen.bak('samenRtfKamers');
   };
   const pub = (k) => ({ code: k.code, gastheer: k.gastheerNaam, leden: k.leden.map(l => l.codenaam),
     pad: k.pad, titel: k.titel, door: k.door || null, volg: k.volg || 0, chat: k.chat.slice(-30), at: k.at });

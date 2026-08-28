@@ -31,13 +31,13 @@ const PRODUCTEN = {
 
 module.exports = (ctx) => {
   const { db, save, crypto, id, schoon, nu, codenaamVan, haversine, pay,
-    findSupplier, ovPrijsVan, modAan, magVerkopen, notify } = ctx;
+    findSupplier, ovPrijsVan, modAan, magVerkopen, notify, opslag } = ctx;
 
   function ensureKaartjes() {
-    if (!Array.isArray(db.data.mobKaartjes)) db.data.mobKaartjes = [];
+    opslag.bak('mobKaartjes');
   }
-  const kaartMet = code => { ensureKaartjes(); return db.data.mobKaartjes.find(k => k.code === code) || null; };
-  const kaartenVan = key => { ensureKaartjes(); return db.data.mobKaartjes.filter(k => k.key === key); };
+  const kaartMet = code => { ensureKaartjes(); return opslag.bak('mobKaartjes').find(k => k.code === code) || null; };
+  const kaartenVan = key => { ensureKaartjes(); return opslag.bak('mobKaartjes').filter(k => k.key === key); };
 
   const lijnVanZaak = (zaak, lijnId) => (zaak.lijnen || []).find(l => l.id === lijnId) || null;
   const halteVan = (lijn, halteId) => (lijn.haltes || []).find(h => h.id === halteId) || null;
@@ -139,7 +139,7 @@ module.exports = (ctx) => {
       overeenkomst: mag.overeenkomst ? mag.overeenkomst.id : null,
       validaties: [], terugbetaald: null, gekocht: nu()
     };
-    db.data.mobKaartjes.push(k);
+    opslag.bak('mobKaartjes').push(k);
     save();
     notify(session.key, { icon: 'ticket', title: 'RTG OV',
       body: p.naam + ' voor ' + lijn.naam + ' staat in uw app.', scope: 'ov' });

@@ -101,7 +101,8 @@ function planVan(doel, nu = new Date()) {
 }
 
 module.exports = ({ db, save, crypto, schoon }) => {
-  const lijst = () => { if (!Array.isArray(db.data.doelen)) db.data.doelen = []; return db.data.doelen; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/doelen', bezit: { doelen: 'lijst' } });
+  const lijst = () => eigen.bak('doelen');
   const mijne = key => lijst().filter(d => d.key === key && d.status !== 'weg');
   const getal = v => { const n = Number(v); return Number.isFinite(n) ? Math.round(n * 100) / 100 : null; };
   const datum = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : null;

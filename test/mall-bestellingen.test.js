@@ -15,7 +15,7 @@
         staat null, en null is niet false.
 
    Elke toets is met een mutatie nagetrokken (LAT-regel 2).
-   Draai los: node --experimental-sqlite --test test/mall-bestellingen.test.js */
+   Draai los: node --test test/mall-bestellingen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

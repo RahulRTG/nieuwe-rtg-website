@@ -70,10 +70,30 @@ function ledenGidsAantal() {
 // schrijf het juiste antwoord krijgt) en de rij in Postgres upserten.
 async function ledenGidsZet(key, codename, tier) {
   if (!ledenPool) return;
+  /* EERST DE OUDE NAAM WEG, DAN PAS DE NIEUWE ERIN.
+
+     Zonder deze regel bleef een HERNOEMD lid onder zijn oude codenaam
+     vindbaar. In Postgres gaat dat goed -- de upsert draait op `key`, dus daar
+     is en blijft het een rij -- maar ledenRev is een aparte map op codenaam, en
+     die kreeg er bij elke hernoeming stilletjes een sleutel bij die naar
+     hetzelfde lid wees.
+
+     Twee gevolgen, en het tweede is het ernstige. Een lid was onder twee namen
+     te vinden; en codenamen worden opnieuw uitgegeven, dus die losgeraakte oude
+     naam kan later aan een ANDER lid toebehoren terwijl de cache hem nog naar
+     de vorige eigenaar wijst -- een p2p-betaling of uitnodiging die bij de
+     verkeerde persoon uitkomt. Het viel niet om, het werd alleen nooit
+     opgeruimd, en niets klaagde. */
+  const vorige = ledenCache.get(key);
   ledenCache.set(key, { codename, tier });
+  const nu = String(codename || '').trim().toLowerCase();
+  if (vorige && vorige.codename) {
+    const oudLower = String(vorige.codename).trim().toLowerCase();
+    if (oudLower && oudLower !== nu) ledenRev.delete(oudLower);
+  }
   // meteen omgekeerd vindbaar op codenaam (synchroon), nog voor Postgres klaar is
   if (ledenRev.size > 100000) ledenRev.clear();
-  ledenRev.set(String(codename || '').trim().toLowerCase(), { key, codename, tier });
+  ledenRev.set(nu, { key, codename, tier });
   try {
     const r = await ledenPool.query(
       'INSERT INTO member_dir(key, codename, tier, codename_lower) VALUES($1,$2,$3,$4) ' +

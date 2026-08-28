@@ -1,40 +1,44 @@
-/* KOMT DEZE ROUTE IN EEN TOETS VOOR?
+/* WANNEER TELT EEN ROUTE ALS "KOMT IN EEN TEST VOOR".
 
-   Stond in scripts/keuring.js, binnen dekking(). Toen scripts/nieuweroutes.js
-   dezelfde vraag moest stellen -- niet over alle routes maar alleen over de
-   routes die in deze tak nieuw zijn -- was de keuze: een kopie, of een plek.
-   Een kopie is LAT.md regel 4, en juist hier zou hij uiteenlopen: de twee
-   tellers zouden verschillende antwoorden geven over dezelfde route, en dan
-   ratelt de ene terwijl de andere doorlaat.
+   Deze regels stonden in scripts/keuring.js, binnen in dekking(), als een
+   functie die verder niemand kon aanroepen. Toen scripts/deltapoort.js en later
+   scripts/nieuweroutes.js dezelfde vraag moesten stellen over de routes die
+   NIEUW zijn in een wijziging, waren er twee wegen: de regels overtypen, of ze hierheen halen.
 
-   WAT DEZE VRAAG WEL EN NIET IS. Hij is een TEKSTZOEKTOCHT en geen bewijs. Het
-   echte cijfer komt uit scripts/dekking.js, dat het journaal leest dat de server
-   tijdens de testrun zelf schrijft. Deze vorm blijft bestaan omdat hij snel is
-   en geen suite hoeft te draaien -- maar hij zit er twee kanten op naast, en dat
-   staat woordelijk in de kop van dekking() in keuring.js.
+   Overtypen is regel 4 van de lat (nooit twee plekken die een waarheid
+   vasthouden), en juist bij deze regels loopt dat gegarandeerd mis: ze zijn
+   drie keer bijgesteld omdat de teller de verkeerde vorm zocht. Een tweede
+   kopie zou die correcties niet hebben, en dan meet de poort iets anders dan
+   de ratel -- terwijl de poort er juist is om de ratel vooruit te helpen.
 
-   DRIE VORMEN, EN DE REDEN VOOR ELK. Bijna elke toets heeft bovenaan een helper:
-
-       const api = (pad, body, token) => fetch(base + '/api/' + pad, ...)
-       await api('bank/overzicht', {}, lid.token)
-
-   De volledige route staat dan NERGENS in het bestand terwijl hij wel degelijk
-   wordt aangeroepen. Zoeken op alleen de volledige vorm telde 187 routes als
-   ongedekt die het niet zijn. Daarom ook de afgeknipte vorm, en die MET een
-   leidende slash maar zonder /api-prefix (`l.call('/member/boardroom/zetveel')`).
-   De eis dat ze tussen aanhalingstekens staan is streng met opzet: 'bank/overzicht'
-   als losse string is een aanroep, bank/overzicht in lopende tekst niet. */
+   WAT DIT WEL EN NIET IS. Het is een TEKSTZOEKTOCHT, en die zit er twee kanten
+   op naast; de kop van dekking() in keuring.js schrijft dat uit. Het echte
+   dekkingscijfer komt uit scripts/dekking.js, dat het journaal leest dat de
+   server tijdens een echte testronde zelf schrijft. Dit is de indicatie. */
 'use strict';
 
-function gedektIn(route, testTekst) {
-  if (testTekst.includes(route)) return true;
-  const staart = route.slice(5);          // zonder '/api/'
-  for (const vorm of [staart, '/' + staart]) {
-    if (testTekst.includes("'" + vorm + "'") ||
-        testTekst.includes('"' + vorm + '"') ||
-        testTekst.includes('`' + vorm + '`')) return true;
-  }
-  return false;
+const { maakDekkingsIndex } = require('./dekkingsindex');
+
+/* Geeft een functie terug die zegt of een route in de meegegeven testtekst
+   voorkomt. De tekst gaat er ONTDAAN VAN COMMENTAAR in -- dat is geen detail
+   maar de reparatie waardoor het cijfer niet meer met een zoek-en-vervang op te
+   poetsen is. De aanroeper doet dat, want die weet welke bestanden het zijn. */
+function maakZoeker(testTekst) {
+  return maakDekkingsIndex(testTekst);
 }
 
-module.exports = { gedektIn };
+/* Dezelfde vraag, maar zonder eerst een zoeker te maken -- de vorm die
+   scripts/nieuweroutes.js gebruikt in een filter-lus. Het register wordt per
+   tekst EEN keer gebouwd en vastgehouden; zonder die cache zou elke route de
+   hele toetstekst opnieuw indexeren, en dat is precies de traagheid waar
+   dekkingsindex.js voor bestaat. */
+const losseTeksten = new Map();
+function gedektIn(route, testTekst) {
+  const sleutel = typeof testTekst === 'string' ? testTekst : null;
+  if (sleutel === null) return maakZoeker(String(testTekst))(route);
+  let zoek = losseTeksten.get(sleutel);
+  if (!zoek) { zoek = maakZoeker(sleutel); losseTeksten.set(sleutel, zoek); }
+  return zoek(route);
+}
+
+module.exports = { maakZoeker, gedektIn };

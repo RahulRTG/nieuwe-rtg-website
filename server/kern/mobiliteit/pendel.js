@@ -16,13 +16,13 @@ const DAGNAMEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 const VENSTERS_MAX = 6;
 
 module.exports = (ctx) => {
-  const { db, save, id, schoon, nu, modAan, plekBepaal } = ctx;
+  const { db, save, id, schoon, nu, modAan, plekBepaal, opslag } = ctx;
 
   function ensurePendel() {
-    if (!Array.isArray(db.data.mobPendels)) db.data.mobPendels = [];
+    opslag.bak('mobPendels');
   }
-  const pendelsVan = code => { ensurePendel(); return db.data.mobPendels.filter(p => p.werkgever === code); };
-  const pendelMet = pid => { ensurePendel(); return db.data.mobPendels.find(p => p.id === pid) || null; };
+  const pendelsVan = code => { ensurePendel(); return opslag.bak('mobPendels').filter(p => p.werkgever === code); };
+  const pendelMet = pid => { ensurePendel(); return opslag.bak('mobPendels').find(p => p.id === pid) || null; };
 
   const tijd = t => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(t || '')) ? String(t) : null);
   const minutenVan = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -38,7 +38,7 @@ module.exports = (ctx) => {
     const bestaand = body.id ? pendelMet(schoon(body.id, 40)) : null;
     if (body.id && (!bestaand || bestaand.werkgever !== werkgever)) return { status: 404, error: 'Pendeldienst niet gevonden.' };
     if (bestaand && body.weg) {
-      db.data.mobPendels = db.data.mobPendels.filter(p => p.id !== bestaand.id);
+      opslag.zetBak('mobPendels', opslag.bak('mobPendels').filter(p => p.id !== bestaand.id));
       save();
       return { ok: true, weg: bestaand.id };
     }
@@ -75,7 +75,7 @@ module.exports = (ctx) => {
       stad: schoon(body.stad, 40) || null,
       gewijzigd: nu()
     });
-    if (!bestaand) db.data.mobPendels.push(p);
+    if (!bestaand) opslag.bak('mobPendels').push(p);
     save();
     return { ok: true, pendel: pendelBeeld(p) };
   }

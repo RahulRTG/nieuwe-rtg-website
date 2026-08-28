@@ -87,13 +87,13 @@ const deelPinDeur = require('./sociaal/pin-deur')(ctx);
 Object.assign(ctx, deelPinDeur);
 const deelPinLive = require('./sociaal/pin-live')(ctx);
 Object.assign(ctx, deelPinLive);
-const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur } = deelVrienden;
+const { kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialIntrek, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur } = deelVrienden;
 const { geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht } = deelSnaps;
 const { pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar } = deelPin;
 const { pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT } = deelPinDeur;
 const { liveMaak, liveKijk, liveVerbind, liveOpen } = deelPinLive;
 
-  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht,
+  return { dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle, isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, kindContacten, kindVerwijder, statusVan, socialZoek, socialVerbind, ouderVerbind, socialAntwoord, socialIntrek, socialConnecties, socialDm, socialDmSend, zijnVrienden, socialTeKeuren, socialGoedkeur, geldigeFoto, opschonenSnaps, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor, verhaalBekijken, dagOpdracht,
     pinVan, pinKaart, pinVernieuw, pinUit, handleVanPin, pinHuidig, pinNormaliseer, pinToonbaar,
     pinZoek, pinVerbind, pinNaarHandle, pinKijk, pinDeurReset, MIS_PER_MINUUT, liveMaak, liveKijk, liveVerbind, liveOpen };
 };

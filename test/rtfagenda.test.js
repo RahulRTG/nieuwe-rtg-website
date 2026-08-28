@@ -1,7 +1,7 @@
 /* De RTF-gezinsagenda op RTG-niveau: herhalingen met DEZELFDE keerN-regel
    als de ledenagenda (de 31e klemt en keert terug), verzetten zonder
    verdubbelen, en het bereik met naam en kleur per gezinslid.
-   Draai los: node --experimental-sqlite --test test/rtfagenda.test.js */
+   Draai los: node --test test/rtfagenda.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

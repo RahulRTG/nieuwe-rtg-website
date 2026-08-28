@@ -22,7 +22,7 @@
      vormtaal;
    - het zorgdeel gaat pas open voor een externe na een EXPLICIETE deelactie.
 
-   Draai los: node --experimental-sqlite --test test/schoolrest.test.js */
+   Draai los: node --test test/schoolrest.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

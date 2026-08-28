@@ -1,7 +1,7 @@
 /* RTG Office: het eigen kantoorpakket. Tekstdocumenten en rekenbladen op het
    account (op elk toestel terug), alleen-lezen delen op codenaam (nooit op
    echte naam), en per-lid/per-document begrenzingen. Draai los:
-   node --experimental-sqlite --test test/office.test.js */
+   node --test test/office.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

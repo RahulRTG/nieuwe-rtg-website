@@ -10,7 +10,7 @@
    - een koppeling deelt alleen de velden die zijn aangevinkt, en zorg,
      incidenten en het journaal staan niet eens in de lijst;
    - toestemming is intrekbaar, en geen antwoord telt nooit als ja.
-   Draai los: node --experimental-sqlite --test test/schoolbeeld.test.js */
+   Draai los: node --test test/schoolbeeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -185,4 +185,22 @@ test('het portaal van het gezin: facturen, aanwezigheid, rapport en afspraak op 
   assert.ok(p.rapporten.some(r => r.periode === 'Periode 1'));
   assert.ok(p.afspraken.some(a => a.tijd === '18:20'));
   assert.ok(p.toestemmingen.length >= 1);
+
+  /* De vrije momenten. Zonder deze lijst kon een ouder wel boeken maar geen
+     moment vinden: /afspraak/boek wil een momentId en dat stond nergens waar
+     een gezin bij kon. Wat er NIET in hoort: de momenten die een ander gezin
+     al heeft geboekt. */
+  const tweede = (await api('/school/afspraak/momenten', { schoolCode: D.schoolCode, personeelToken: leraar.personeelToken,
+    klasCode: klas.code, momenten: [{ datum: '2026-09-10', tijd: '18:40', minuten: 10 }] })).body;
+  assert.equal(tweede.klaargezet, 1);
+
+  const na = (await api('/school/portaal', { code: gezin.code, token: gezin.token })).body;
+  assert.ok(na.vrijeMomenten.some(m => m.tijd === '18:40'), 'het vrije moment staat in het portaal');
+  assert.ok(!na.vrijeMomenten.some(m => m.tijd === '18:20'), 'een geboekt moment staat niet meer als vrij');
+  assert.ok(na.vrijeMomenten.every(m => !('bezet' in m)), 'wie er geboekt heeft gaat een ander gezin niets aan');
+
+  // en boeken op dat gevonden moment werkt
+  const boek = await api('/school/afspraak/boek', { code: gezin.code, token: gezin.token,
+    momentId: na.vrijeMomenten.find(m => m.tijd === '18:40').id });
+  assert.equal(boek.status, 200);
 });

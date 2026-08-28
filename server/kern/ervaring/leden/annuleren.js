@@ -4,20 +4,57 @@
    afgesplitst uit leden.js. */
 module.exports = (ctx) => {
   const { db, save, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, sseToCustomer,
-    ticketsVoorSlot, orderMetRef, boekingMetRef, id, nu } = ctx;
+    ticketsVoorSlot, orderMetRef, boekingMetRef, id, nu, payVan } = ctx;
+
+  /* GELD TERUG, EN ALLEEN VOOR WAT ECHT IS BETAALD.
+
+     Deze functie zette `paid = false, refunded = true` en meldde "€ x retour" --
+     zonder dat er ooit iets was overgemaakt. Dat kon, want de betaalpaden
+     verplaatsten zelf ook geen geld. Nu ze dat wel doen, zou dezelfde regel het
+     omgekeerde betekenen: de zaak houdt het geld en het lid krijgt een bericht
+     dat het terug is.
+
+     De marker `payBetaaldCenten` bepaalt of er iets te boeken valt. Dat is met
+     opzet en niet `paid`: transacties van VOOR deze ronde en paden die nog niet
+     via RTG Pay lopen (een ticket, een boeking) dragen hem niet, en die horen
+     zich precies te gedragen zoals ze deden. Wie zo'n pad omzet, zet de marker
+     en krijgt de terugweg cadeau.
+
+     De codenaam komt van de TRANSACTIE en niet uit de sessie: het geld hoort
+     terug naar de wallet waar het vandaan kwam, ook als het lid inmiddels een
+     andere codenaam draagt. */
+  async function geldTerug(item, oms) {
+    if (item.payBetaaldCenten == null) return { ok: true, overgeslagen: true };
+    const pay = typeof payVan === 'function' ? payVan() : null;
+    if (!pay || !pay.terugZaak) return { ok: true, overgeslagen: true };
+    const r = await pay.terugZaak({
+      codenaam: item.customerCodename, supplierCode: item.supplierCode,
+      centen: item.payBetaaldCenten, bijlageCenten: item.payBijgelegdCenten || 0,
+      oms, ref: item.ref, idem: 'terug:' + item.ref
+    });
+    if (r.error) return r;
+    item.payTerugCenten = r.terugCenten;
+    item.payBetaaldCenten = null;   // een bon gaat maar een keer retour
+    item.payBijgelegdCenten = null;
+    return r;
+  }
 
   /* ---- 2. annuleren door het lid ----
      Terugbetaalregels: een betaalde annulering spiegelt de refund-flow van de
      zaak (paid=false, refunded=true). Orders kunnen tot de bereiding begint;
      ritten tot er een chauffeur op zit; tickets tot 24 uur voor het tijdslot;
      overige boekingen zolang ze niet afgerond zijn. */
-  function annuleerItem(sess, soort, ref) {
+  async function annuleerItem(sess, soort, ref) {
     const key = sess.key;
     if (soort === 'order') {
       const o = orderMetRef(ref);
       if (!o || (o.customerKey || o.customerTier) !== key) return { status: 404, error: 'Bestelling niet gevonden.' };
       if (!['wacht-op-betaling', 'nieuw'].includes(o.status)) return { status: 409, error: 'Deze bestelling is al in behandeling (' + o.status + ') en kan niet meer geannuleerd worden.' };
       const wasBetaald = o.paid;
+      if (wasBetaald) {
+        const terug = await geldTerug(o, 'Bestelling geannuleerd');
+        if (terug.error) return terug;
+      }
       if (o.paid) { o.paid = false; o.refunded = true; o.refundedAt = nu(); }
       o.status = wasBetaald ? 'terugbetaald' : 'geweigerd';
       o.geannuleerdDoor = 'lid';
@@ -35,7 +72,11 @@ module.exports = (ctx) => {
       if (!['wacht-op-betaling', 'aangevraagd'].includes(r.status) || r.driver)
         return { status: 409, error: 'Deze rit is al toegewezen en kan niet meer geannuleerd worden. Bel de vervoerder.' };
       const wasBetaald = r.paid && r.quote > 0;
-      if (wasBetaald) { r.paid = false; r.refunded = true; r.refundedAt = nu(); }
+      if (wasBetaald) {
+        const terug = await geldTerug(r, 'Rit geannuleerd');
+        if (terug.error) return terug;
+        r.paid = false; r.refunded = true; r.refundedAt = nu();
+      }
       r.status = 'geweigerd';
       r.geannuleerdDoor = 'lid';
       save();
@@ -54,7 +95,11 @@ module.exports = (ctx) => {
           return { status: 409, error: 'Tickets annuleert u tot 24 uur voor het tijdslot.' };
       }
       const wasBetaald = b.paid && (b.price || 0) > 0;
-      if (wasBetaald) { b.paid = false; b.refunded = true; b.refundedAt = nu(); }
+      if (wasBetaald) {
+        const terug = await geldTerug(b, 'Boeking geannuleerd');
+        if (terug.error) return terug;
+        b.paid = false; b.refunded = true; b.refundedAt = nu();
+      }
       b.status = 'geweigerd';
       b.geannuleerdDoor = 'lid';
       save();

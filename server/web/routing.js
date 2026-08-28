@@ -35,7 +35,19 @@ function mountMatch(prefix, pn) {
    er niet in. Wie op dat halve beeld toetst, meldt kloppende paden als kapot.
 
    Deze functie loopt de mounts wel na en geeft elk ECHT pad terug met zijn
-   methode. Ze leest alleen; er verandert niets aan het routeren zelf. */
+   methode. Ze leest alleen; er verandert niets aan het routeren zelf.
+
+   EN MET DE NAAM VAN DE FUNCTIE OP DIE LAAG (`laagNaam`). Een route is hier EEN
+   laag per middleware, zelfde pad en methode, in ophangvolgorde: de laatste is
+   de handler, alles ervoor een bewaker. Met de naam erbij is uit de ROUTER te
+   lezen wie een route beschermt (officeAuth, supplierAuth, techAuth) in plaats
+   van dat uit brontekst te raden -- en dat raden was duur: de regex van
+   scripts/lib/routes.js ziet niet wat via app.use('/api/foundation', router) of
+   een voorvoegsel-hulpje hangt, en de vier bewijsproeven (rol, idempotentie,
+   invoer, staat) misten daardoor alle vier exact dezelfde 1257 routes.
+   `laagNaam` is leeg bij een anonieme functie -- de meeste handlers, en dat
+   hoort: alleen de bewakers zijn benoemd. De wikkel in opzet/verzoekketen.js
+   geeft zijn naam door, anders was dit veld op het topniveau altijd leeg. */
 function leesLagen(lagen, voorvoegsel) {
   const uit = [];
   for (const l of lagen) {
@@ -48,7 +60,7 @@ function leesLagen(lagen, voorvoegsel) {
     }
     if (typeof l.pad !== 'string') continue;              // RegExp-pad: niet te noemen
     const pad = (voorvoegsel + l.pad).replace(/\/+$/, '') || '/';
-    uit.push({ pad, methode: l.method || 'ALL' });
+    uit.push({ pad, methode: l.method || 'ALL', laagNaam: (l.fn && l.fn.name) || '' });
   }
   return uit;
 }

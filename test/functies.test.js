@@ -145,6 +145,90 @@ test('doelgroep: de doelgroep van een verzoek volgt pad of pas', () => {
   assert.equal(functies.doelgroepVanVerzoek('/api/member/dm', null), null);
 });
 
+test('WorkOS: op de werkpaden bepaalt je relatie tot een organisatie de doelgroep', () => {
+  /* DIT KOMT UIT EEN GEMETEN FOUT, en het soort fout dat geruststelt. Elf
+     werkfuncties droegen op het bord een schakelaar voor `leverancier` en
+     `personeel` die geen enkel verzoek ooit raakte: hun paden hebben geen
+     /api/supplier- of /api/staff-prefix, dus viel de doelgroep terug op de PAS,
+     en een partner of medewerker heeft geen pas. De knop stond er, kleurde, en
+     stuurde niets.
+
+     WERELDEN.md geeft het antwoord: in WorkOS zegt je pas niet wie je bent,
+     je relatie tot een organisatie doet dat. Drie relaties, een wereld.
+
+     DE LIJST STAAT HIER UITGESCHREVEN EN WORDT NIET UIT DE CODE GELEZEN, en dat
+     is niet slordig maar de eerste versie van deze toets herstellen. Die liep
+     over functies.WERKPADEN heen -- en toen de mutatie '/api/werkvloer' uit die
+     lijst haalde, controleerde de toets dat pad gewoon niet meer en bleef
+     vrolijk groen. Een toets die zijn eigen meetlat uit het gemetene haalt,
+     meet niets (LAT.md regel 3). Nu draagt hij zijn eigen lijst, en de
+     vergelijking eronder zegt het als de bron ervan afwijkt.
+
+     DE MUTATIE: haal '/api/werkvloer' uit WERKPADEN in functies/doelgroep.js. */
+  const WERK = ['/api/werkvloer', '/api/werkplek', '/api/metier', '/api/vak', '/api/verkoop',
+    '/api/doos', '/api/facturen', '/api/kantoor', '/api/werkmail', '/api/mail/binnen',
+    '/api/werving', '/api/bedrijf'];
+  assert.deepEqual([...functies.WERKPADEN].sort(), [...WERK].sort(),
+    'de werkpaden in de code wijken af van de lijst die deze toets bewaakt');
+
+  const zaak = { role: 'supplier', manager: true };
+  const medewerker = { role: 'supplier', manager: false };
+  const kantoor = { role: 'office' };
+  const mis = [];
+  for (const pad of WERK) {
+    const gezien = {
+      leverancier: functies.doelgroepVanVerzoek(pad, null, zaak),
+      personeel: functies.doelgroepVanVerzoek(pad, null, medewerker),
+      intern: functies.doelgroepVanVerzoek(pad, null, kantoor),
+      business: functies.doelgroepVanVerzoek(pad, { tier: 'business' }, null)
+    };
+    for (const [wil, kreeg] of Object.entries(gezien)) {
+      if (kreeg !== wil) mis.push(pad + ': verwacht ' + wil + ', kreeg ' + kreeg);
+    }
+  }
+  assert.deepEqual(mis, [], 'deze werkpaden geven de verkeerde doelgroep');
+
+  /* En de paden die hun doelgroep al UIT HUN PREFIX halen, veranderen niet:
+     daar zegt het pad welk scherm belt, en dat wint van de sessie. */
+  assert.equal(functies.doelgroepVanVerzoek('/api/staff/rooster', null, zaak), 'personeel');
+  assert.equal(functies.doelgroepVanVerzoek('/api/supplier/order', null, medewerker), 'leverancier');
+  // en een gewoon ledenpad blijft de pas volgen, ook met een werksessie erbij
+  assert.equal(functies.doelgroepVanVerzoek('/api/member/dm', { tier: 'rtg' }, zaak), 'rtg');
+});
+
+test('WorkOS: elke schakelaar op een werkfunctie is ook echt te bereiken', () => {
+  /* De tegenhanger van de toets hierboven, en de reden dat die fout zo lang
+     onzichtbaar bleef: het register en de doelgroepbepaling wisten niets van
+     elkaar. Hier worden ze naast elkaar gelegd -- elke doelgroep die een
+     werkfunctie op het bord aanbiedt, moet door minstens een soort beller te
+     bereiken zijn.
+
+     DE MUTATIE: zet de doelgroepen van 'De werkvloer' terug op
+     ['leverancier', 'personeel', 'foundation']. Die laatste is dan een knop
+     zonder verkeer en deze toets noemt hem. */
+  const BELLERS = [
+    [null, { role: 'supplier', manager: true }],
+    [null, { role: 'supplier', manager: false }],
+    [null, { role: 'office' }],
+    [{ tier: 'business' }, null],
+    [{ tier: 'rtg' }, null],
+    [{ tier: 'lifestyle' }, null]
+  ];
+  const dood = [];
+  /* Hier mag WERKPADEN wel uit de code komen: de toets hierboven pint die lijst
+     al vast, en wat hier gemeten wordt is iets anders -- of het REGISTER en de
+     doelgroepbepaling het over dezelfde groepen hebben. */
+  for (const pad of functies.WERKPADEN) {
+    const f = functies.functieVoorPad(pad);
+    if (!f) { dood.push(pad + ' wordt door geen enkele functie bewaakt'); continue; }
+    const bereikt = new Set(BELLERS.map(([u, s]) => functies.doelgroepVanVerzoek(pad, u, s)).filter(Boolean));
+    for (const d of f.doelgroepen || []) {
+      if (!bereikt.has(d)) dood.push(f.naam + ' biedt "' + d + '" aan op ' + pad + ', maar niemand komt daar zo binnen');
+    }
+  }
+  assert.deepEqual(dood, [], 'deze schakelaars staan op het bord en sturen niets');
+});
+
 test('AI-taalhulp: "zet de sociale laag uit voor lifestyle" levert een correct voorstel', () => {
   const { voorstel } = functies.duidVoorstel('zet de sociale laag uit voor lifestyle', {});
   assert.ok(voorstel.some(w => w.id === 'social' && w.doelgroep === 'lifestyle' && w.aan === false),

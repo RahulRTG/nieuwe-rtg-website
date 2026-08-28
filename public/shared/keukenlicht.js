@@ -129,7 +129,7 @@
     var kop = st.querySelector('.st-head'); if (!kop || document.getElementById('keukenLichtKnop')) return;
     var b = document.createElement('button');
     b.id = 'keukenLichtKnop'; b.type = 'button';
-    b.style.cssText = 'background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem 1rem;color:var(--muted);' +
+    b.style.cssText = 'background:none;border:1px solid var(--line);border-radius:0;padding:.5rem 1rem;color:var(--muted);' +
       'font-family:Inter,system-ui,sans-serif;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;cursor:pointer;';
     b.textContent = standTekst(stand());
     b.addEventListener('click', function(){ zetStand(volgende()); });

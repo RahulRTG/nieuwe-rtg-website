@@ -2,7 +2,7 @@
    ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet
    elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de klant
    wie er komt rijden.
-   Draai: node --experimental-sqlite --test test/transfer.test.js */
+   Draai: node --test test/transfer.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

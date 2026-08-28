@@ -36,40 +36,42 @@
 const RUBRIEKEN = ['loonLoonheffing', 'loonPremies', 'loonZvw',
   'ingehoudenLoonheffing', 'premiesWerkgever', 'zvwWerkgever'];
 
-function maakAangifte({ db, save, nu, crypto, run: runLaag }) {
+/* Het nominatieve deel: een regel per werknemer, rechtstreeks uit zijn strook.
+   De grondslagen komen van de strook en niet uit een nieuwe optelling over de
+   componenten -- anders staat er op twee plekken hoe een grondslag wordt
+   bepaald.
+
+   OP MODULESCOPE EN GEEXPORTEERD, want de bewijsketen (./herkomst.js) herbouwt
+   een aangifte hiermee. Dat MOET dezelfde routine zijn: een herbouw die net
+   anders optelt dan de aangifte die hij nareken, vindt altijd een verschil, en
+   dan zegt een verschil niets meer. Puur -- alleen de run gaat erin. */
+function nominatief(run) {
+  return run.stroken.map(s => {
+    const st = s.strook;
+    const g = (st.stappen.find(x => x.stap === 'grondslagen') || {});
+    return {
+      staffId: s.staffId, naam: s.naam,
+      loonLoonheffing: g.loonheffing != null ? g.loonheffing : st.brutoCenten,
+      loonPremies: g.premies != null ? g.premies : 0,
+      loonZvw: g.zvw != null ? g.zvw : 0,
+      ingehoudenLoonheffing: st.loonheffingCenten,
+      premiesWerkgever: (st.stappen.find(x => x.stap === 'premies') || {}).centen || 0,
+      zvwWerkgever: (st.stappen.find(x => x.stap === 'zvw') || {}).centen || 0
+    };
+  });
+}
+
+const telOp = (rijen) => {
+  const uit = {};
+  for (const r of RUBRIEKEN) uit[r] = rijen.reduce((s, x) => s + (x[r] || 0), 0);
+  return uit;
+};
+
+function maakAangifte({ opslag, save, nu, crypto, run: runLaag }) {
   const tijd = nu || (() => new Date().toISOString());
 
-  function bak() {
-    if (!Array.isArray(db.data.payrollAangiftes)) db.data.payrollAangiftes = [];
-    return db.data.payrollAangiftes;
-  }
+  const bak = () => opslag.bak('payrollAangiftes');
   const vind = (id) => bak().find(a => a.id === id) || null;
-
-  /* Het nominatieve deel: een regel per werknemer, rechtstreeks uit zijn
-     strook. De grondslagen komen van de strook en niet uit een nieuwe
-     optelling over de componenten -- anders staat er op twee plekken hoe een
-     grondslag wordt bepaald. */
-  function nominatief(run) {
-    return run.stroken.map(s => {
-      const st = s.strook;
-      const g = (st.stappen.find(x => x.stap === 'grondslagen') || {});
-      return {
-        staffId: s.staffId, naam: s.naam,
-        loonLoonheffing: g.loonheffing != null ? g.loonheffing : st.brutoCenten,
-        loonPremies: g.premies != null ? g.premies : 0,
-        loonZvw: g.zvw != null ? g.zvw : 0,
-        ingehoudenLoonheffing: st.loonheffingCenten,
-        premiesWerkgever: (st.stappen.find(x => x.stap === 'premies') || {}).centen || 0,
-        zvwWerkgever: (st.stappen.find(x => x.stap === 'zvw') || {}).centen || 0
-      };
-    });
-  }
-
-  const telOp = (rijen) => {
-    const uit = {};
-    for (const r of RUBRIEKEN) uit[r] = rijen.reduce((s, x) => s + (x[r] || 0), 0);
-    return uit;
-  };
 
   /* ---------- opmaken ---------- */
   /* Uit EEN definitieve run. Meerdere runs over dezelfde periode (een zaak met
@@ -177,4 +179,4 @@ function maakAangifte({ db, save, nu, crypto, run: runLaag }) {
   return { maak, dienIn, vanZaak, haal: haalAangifte, sluitAanOpJournaal, RUBRIEKEN };
 }
 
-module.exports = { maakAangifte, RUBRIEKEN };
+module.exports = { maakAangifte, nominatief, telOp, RUBRIEKEN };

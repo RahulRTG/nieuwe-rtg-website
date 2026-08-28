@@ -11,22 +11,18 @@
    En de andere kant: een lid dat NERGENS werkt hoort dit blok helemaal niet te
    zien. Een tab die altijd nee zegt is geen tab.
 
-   Draai: npm run e2e (of los: node --experimental-sqlite --test test/mediazaak.e2e.js) */
+   Draai: npm run e2e (of los: node --test test/mediazaak.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem niet',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mzscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -50,7 +46,7 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     assert.equal((await api('/api/supplier/staff/join', { bedrijf: roster.supplier.name,
       kassacode: inv.body.invite.kassacode, login: email, password: wachtwoord })).status, 200);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const maakPagina = async (token) => {
       const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
       await ctx.addInitScript((t) => {
@@ -61,7 +57,7 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
 
     const page = await maakPagina(baas.body.token);
     const fouten = letOpFouten(page, []);
-    await page.goto(base + '/apps/theater.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/theater.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#blokZaak:not(.weg)', { timeout: 20000 });
     assert.match(await page.$eval('#zaakBeheer', e => e.textContent), /nog geen interne bibliotheek/,
       'zijn zaak heeft er nog geen, en dat staat er');
@@ -84,7 +80,7 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     const eigen = (await api('/api/office/theater', {}, office)).body.wacht.find(k => k.naam === 'Eigen kanaal');
     assert.equal((await api('/api/office/theater/beslis', { id: eigen.id, besluit: 'goedgekeurd' }, office)).status, 200);
 
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#vDoel', { timeout: 20000 });
     const opties = await page.$$eval('#vDoel option', els => els.map(e => e.textContent));
     assert.equal(opties.length, 2, 'twee bestemmingen: ' + opties.join(' | '));
@@ -101,7 +97,7 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
       headers: { 'Content-Type': 'video/webm', Authorization: 'Bearer ' + baas.body.token },
       body: Buffer.concat([Buffer.from([0x1A, 0x45, 0xDF, 0xA3]), Buffer.alloc(600, 7)]) });
 
-    await page.reload({ waitUntil: 'load' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#kijkplicht .kaart', { timeout: 20000 });
     await page.locator('#kijkplicht .knop', { hasText: 'Zet op de werklijst' }).click();
     await page.waitForFunction(() => /werklijst gezet/.test(document.querySelector('#melding').textContent),
@@ -134,7 +130,7 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     // en wie nergens werkt, ziet het hele blok niet
     const kaal = await maakPagina(buiten.body.token);
     const fouten2 = letOpFouten(kaal, []);
-    await kaal.goto(base + '/apps/theater.html', { waitUntil: 'load' });
+    await kaal.goto(base + '/apps/theater.html', { waitUntil: 'domcontentloaded' });
     await kaal.waitForSelector('#vZaal:not(.weg)', { timeout: 20000 });
     assert.equal(await kaal.$eval('#blokZaak', e => e.className.indexOf('weg') >= 0), true,
       'wie nergens werkt ziet geen zakenblok');

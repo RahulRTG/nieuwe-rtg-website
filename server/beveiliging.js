@@ -28,12 +28,14 @@ const ERNST = { info: 0, waarschuwing: 1, kritiek: 2 };
 const MAX = 200;                 // audit-staart: hoeveel regels we bewaren
 const SAMENVOEG_MS = 2 * 60000;  // zelfde soort+bron hierbinnen -> tellen
 const ESCALATIE_MS = 5 * 60000;  // niet vaker dan 1x per 5 min per soort escaleren
-const NOODREM_VENSTER_MS = 10 * 60000; // aanvalsvenster voor de automatische noodrem
-const NOODREM_REGISTRATIE = 3;   // brute force vanaf zoveel bronnen -> registratie eraf
-const NOODREM_ONDERHOUD = 6;     // ... vanaf zoveel bronnen -> hele app in onderhoud
 
 module.exports = (ctx) => {
   const { db, save, notifyOwner } = ctx;
+  /* Trede 1 van de noodrem-ladder. De Wacht bestaat nog niet als dit object
+     gebouwd wordt (die krijgt juist ONS mee); daarom een zetter, gezet in
+     opzet/diensten2.js zodra hij er is. Zonder haak vallen trede 2 en 3 niet
+     weg -- er is dan alleen geen per-bron-quarantaine. */
+  let isoleerBron = null;
   const laatstGemeld = new Map(); // sleutel -> ts van laatste escalatie (in geheugen)
 
   function lijst() {
@@ -80,31 +82,12 @@ module.exports = (ctx) => {
     return arr[0];
   }
 
-  /* De automatische noodrem: telt hoeveel VERSCHILLENDE bronnen binnen het
-     venster een brute-force-alarm gaven. Vanaf drie bronnen gaat de
-     registratie-zekering eruit (geen nieuwe accounts), vanaf zes de
-     onderhouds-zekering (hele app op slot, alleen de eigenaar erin). */
-  function noodrem() {
-    if (!autoStaat().aan) return;
-    const nu = Date.now();
-    const bronnen = new Set(lijst()
-      .filter(m => m.type === 'brute-force' && (nu - m.atMs) < NOODREM_VENSTER_MS)
-      .map(m => m.sleutel));
-    if (bronnen.size >= NOODREM_REGISTRATIE) spring('registratie', bronnen.size);
-    if (bronnen.size >= NOODREM_ONDERHOUD) spring('onderhoud', bronnen.size);
-  }
-  function spring(id, aantalBronnen) {
-    const z = zekeringen()[id];
-    if (!z || z.aan === false) return; // al gesprongen: niets te doen
-    z.aan = false;
-    z.reden = 'automatische noodrem: brute force vanaf ' + aantalBronnen + ' bronnen';
-    z.sindsGesprongen = Date.now();
-    save();
-    meld('auto-reactie', 'kritiek',
-      'Automatische noodrem: de zekering "' + z.naam + '" is eruit gehaald (brute force vanaf ' +
-      aantalBronnen + ' bronnen binnen tien minuten). Alleen jij kunt hem er weer in doen, op de technische pagina.',
-      { bron: 'zekering:' + id });
-  }
+  /* De automatische noodrem-ladder staat in ./beveiliging-noodrem.js -- zie de
+     kop daar voor de naad en voor wat elke trede doet. isoleerBron wordt LAAT
+     gebonden (opzet/diensten2.js hangt hem er pas in), dus hij gaat als een
+     functie mee die hem elke keer opnieuw opzoekt. */
+  const { noodrem } = require('./beveiliging-noodrem')({
+    lijst, zekeringen, autoStaat, save, meld, isoleer: (b, r) => isoleerBron && isoleerBron(b, r) });
 
   // Bij een kritieke gebeurtenis de eigenaar waarschuwen, met een rem per soort.
   function escaleer(sleutel, tekst) {
@@ -143,5 +126,5 @@ module.exports = (ctx) => {
     return n;
   }
 
-  return { meld, samenvatting, handelAf, openKritiek, openTotaal, zetAuto, autoAan: () => autoStaat().aan };
+  return { meld, samenvatting, handelAf, openKritiek, openTotaal, zetAuto, autoAan: () => autoStaat().aan, zetIsoleer: (fn) => { isoleerBron = fn; } };
 };

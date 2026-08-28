@@ -42,7 +42,19 @@
 function maakPatroon(ruw) {
   const delen = String(ruw || '').split(',').map(s => s.trim()).filter(Boolean);
   if (!delen.length) return null;
-  return (pad) => delen.some(d => pad === d || pad.startsWith(d));
+  /* Een patroon met een PADPARAMETER (/api/gezin/:code/mij) matcht op vorm:
+     elk :segment staat voor precies een echt segment. Zonder dit ging de
+     leugen over zo'n route wel AAN maar nooit AF -- het letterlijke patroon
+     matcht het echte verzoek (/api/gezin/ABC123/mij) niet, en drieendertig
+     routes stonden daardoor op "blind" zonder dat er ooit over ze gelogen is.
+     De vertaling zelf woont in server/lib/padvorm.js (de schorspoort stelt
+     dezelfde vraag); letterlijke patronen houden het oude voorvoegsel-gedrag. */
+  const { segmentPatroon } = require('../lib/padvorm');
+  const vormen = delen.map(d => {
+    const rx = segmentPatroon(d);
+    return rx ? { rx } : { letterlijk: d };
+  });
+  return (pad) => vormen.some(v => v.rx ? v.rx.test(pad) : (pad === v.letterlijk || pad.startsWith(v.letterlijk)));
 }
 
 /* WAT NOOIT LIEGT, en dit is de kern van de scherpe ronde.

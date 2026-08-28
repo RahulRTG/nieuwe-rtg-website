@@ -1,7 +1,7 @@
 /* Integratietests voor wachtwoordherstel met tweestapsverificatie (link per
    e-mail + code op de telefoon) en wachtwoord wijzigen vanuit de eigen
    backoffice. Zonder SMTP geeft de server dev-velden terug zodat de flow
-   volledig te testen is. Draai: node --experimental-sqlite --test test/herstel2fa.test.js */
+   volledig te testen is. Draai: node --test test/herstel2fa.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

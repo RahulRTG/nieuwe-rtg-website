@@ -7,7 +7,7 @@
    vriendengraaf. Een toets die elk niveau apart afvinkt had dat nooit gezien;
    een toets die ze op één opstelling naast elkaar legt wel.
 
-   Draai los: node --experimental-sqlite --test test/wereldprofiel.test.js */
+   Draai los: node --test test/wereldprofiel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

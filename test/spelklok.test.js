@@ -10,7 +10,7 @@
       potje beeindigt (en de uitslag dus vanzelf klopt);
    4. de vervaltermijn volgt het tempo, met de oude dertig dagen als bodem.
 
-   Draai los: node --experimental-sqlite --test test/spelklok.test.js */
+   Draai los: node --test test/spelklok.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

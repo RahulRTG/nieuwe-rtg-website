@@ -15,21 +15,28 @@ const RV = require('./rechtsvorm');
 
 const rond1 = (n) => Math.round(Number(n) * 10) / 10;
 
-module.exports = ({ save, scho, mag, bak, zittend, bestuur, ROLLEN }) => {
+const vandaag = () => new Date().toISOString().slice(0, 10);
 
-  function bestuurderZet(o, body) {
+module.exports = ({ save, scho, mag, bak, zittend, bestuur, ROLLEN, duidPersoon }) => {
+
+  async function bestuurderZet(o, body) {
     const m = mag(o);
     if (!m.bestuur) return { status: 409, error: 'Deze rechtsvorm heeft geen bestuur.' };
-    const codenaam = scho((body || {}).codenaam, 60);
-    if (codenaam.length < 2) return { status: 400, error: 'Geef de codenaam van de bestuurder op.' };
     const rol = String((body || {}).rol || 'bestuurder');
     if (!ROLLEN[rol]) return { status: 400, error: 'Deze rol kennen wij niet.', rollen: Object.keys(ROLLEN) };
+    /* Naar WIE wijst dit? Zie ./bestuur-persoon.js: een lid wordt opgezocht en
+       krijgt zijn sleutel en niveau mee, iemand van buiten RTG moet met zoveel
+       woorden als extern worden opgegeven, en een codenaam die geen van beide
+       is wordt geweigerd -- dat is meestal een typefout. */
+    const p = await duidPersoon(body, 'bestuurder');
+    if (p.error) return p;
     const b = bak(o);
-    if (zittend(b).some(x => x.codenaam === codenaam)) {
+    if (zittend(b).some(x => x.codenaam === p.codenaam)) {
       return { status: 409, error: 'Deze persoon staat al in het bestuur.' };
     }
     b.bestuurders.push({ id: 'B' + (b.bestuurders.length + 1) + '-' + Date.now().toString(36),
-      codenaam, rol, sinds: new Date().toISOString().slice(0, 10), tot: null });
+      codenaam: p.codenaam, rol, bron: p.soort, key: p.key, niveauBij: p.niveauBij,
+      sinds: vandaag(), tot: null });
     save();
     return Object.assign({ ok: true }, bestuur(o));
   }
@@ -45,7 +52,17 @@ module.exports = ({ save, scho, mag, bak, zittend, bestuur, ROLLEN }) => {
     return Object.assign({ ok: true }, bestuur(o));
   }
 
-  function aandeelZet(o, body) {
+  /* EEN BELANG WORDT NIET OVERSCHREVEN MAAR AFGESLOTEN, net als een bestuurder
+     niet wordt gewist maar aftreedt. Dat stond hierboven al met zoveel woorden
+     voor het bestuur -- "juist die geschiedenis is waar een
+     aansprakelijkheidsvraag over gaat" -- en gold voor de aandelen niet: een
+     nieuw percentage overschreef het oude en een verkocht belang werd uit de
+     lijst gesneden. Terwijl de UBO juist UIT de aandelen volgt, en de vraag bij
+     een geschil altijd is wie er WANNEER boven de drempel zat. Nu draagt een
+     belang `sinds` en `tot`, en de open regels zijn de huidige verdeling. */
+  const open = b => b.aandelen.filter(a => !a.tot);
+
+  async function aandeelZet(o, body) {
     const m = mag(o);
     if (!m.aandelen) {
       const rv = RV.rechtsvormVan(o.rechtsvorm);
@@ -53,34 +70,39 @@ module.exports = ({ save, scho, mag, bak, zittend, bestuur, ROLLEN }) => {
         error: 'Een ' + (rv ? rv.label.toLowerCase() : 'onderneming zonder rechtsvorm') + ' kent geen aandelen.',
         uitleg: 'Dat is geen instelling maar een eigenschap van de rechtsvorm; zie kern/onderneming/rechtsvorm.js.' };
     }
-    const codenaam = scho((body || {}).codenaam, 60);
-    if (codenaam.length < 2) return { status: 400, error: 'Geef de codenaam van de aandeelhouder op.' };
-    const p = rond1(Number((body || {}).percentage));
-    if (!Number.isFinite(p) || p <= 0 || p > 100) {
+    const pct = rond1(Number((body || {}).percentage));
+    if (!Number.isFinite(pct) || pct <= 0 || pct > 100) {
       return { status: 400, error: 'Een belang ligt boven nul en op ten hoogste 100 procent.' };
     }
+    const p = await duidPersoon(body, 'aandeelhouder');
+    if (p.error) return p;
     const b = bak(o);
-    const bestaand = b.aandelen.find(a => a.codenaam === codenaam);
-    const anderen = b.aandelen.filter(a => a.codenaam !== codenaam)
+    const bestaand = open(b).find(a => a.codenaam === p.codenaam);
+    const anderen = open(b).filter(a => a.codenaam !== p.codenaam)
       .reduce((n, a) => n + a.percentage, 0);
-    if (rond1(anderen + p) > 100) {
+    if (rond1(anderen + pct) > 100) {
       return { status: 409, error: 'Samen komt dat boven de 100 procent uit.',
         alUitgegeven: rond1(anderen), ruimte: rond1(100 - anderen) };
     }
-    if (bestaand) { bestaand.percentage = p; bestaand.soort = scho((body || {}).soort, 40) || bestaand.soort; }
-    else {
-      b.aandelen.push({ id: 'A' + (b.aandelen.length + 1) + '-' + Date.now().toString(36),
-        codenaam, percentage: p, soort: scho((body || {}).soort, 40) || 'gewoon' });
+    const soort = scho((body || {}).soort, 40) || (bestaand && bestaand.soort) || 'gewoon';
+    if (bestaand) {
+      if (bestaand.percentage === pct && bestaand.soort === soort) {
+        return Object.assign({ ok: true }, bestuur(o));   // niets veranderd, geen lege regel in de historie
+      }
+      bestaand.tot = vandaag();
     }
+    b.aandelen.push({ id: 'A' + (b.aandelen.length + 1) + '-' + Date.now().toString(36),
+      codenaam: p.codenaam, percentage: pct, soort, bron: p.soort, key: p.key, niveauBij: p.niveauBij,
+      sinds: vandaag(), tot: null });
     save();
     return Object.assign({ ok: true }, bestuur(o));
   }
 
   function aandeelWeg(o, id) {
     const b = bak(o);
-    const i = b.aandelen.findIndex(a => a.id === String(id || ''));
-    if (i < 0) return { status: 404, error: 'Dit belang staat niet in uw register.' };
-    b.aandelen.splice(i, 1);
+    const a = open(b).find(x => x.id === String(id || ''));
+    if (!a) return { status: 404, error: 'Dit belang staat niet in uw register.' };
+    a.tot = vandaag();
     save();
     return Object.assign({ ok: true }, bestuur(o));
   }

@@ -27,6 +27,14 @@ const PASSEN = {
     welkom: 'Dank voor uw interesse in de Lifestyle Pass. Ik bereid alles voor u voor; de toelating zelf beslist een mens.',
     open: false // alleen na menselijke goedkeuring of op uitnodiging
   },
+  'business-lite': {
+    naam: 'RTG Business Lite', stem: 'u',
+    /* Zakelijk en scherp, net als Business -- maar dit is de zzp'er en het
+       kleine MKB, dus zonder de toon van een enterprise-relatie. Geen
+       accountmanager, wel meteen werkende software. */
+    welkom: 'Dank voor uw aanvraag voor Business Lite. Ik loop de aanmelding met u door en zet uw zaak klaar; de toelating beslist een mens.',
+    open: true // zakelijk instapniveau: aan te vragen, mens beslist alsnog
+  },
   business: {
     naam: 'RTG Business Pass', stem: 'u',
     // "efficiente strategische partner": zakelijk, scherp, u-vorm
@@ -65,70 +73,17 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   /* Het betaalschema (de 12 maandtermijnen met de 30%-foundation-split en het
      kantooroverzicht) draait als submodule op dezelfde context; zie
      aanmeldingen/betaalschema.js. */
-  const { startBetalingen, betalingen } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN });
+  const { startBetalingen, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten } = require('./aanmeldingen/betaalschema')({ B, geldPasprijzen, rid, nu, eur, PASSEN, db, save });
   /* De ondernemersintake en de automatische bedrijfsprovisioning na de
      eerste voldane termijn; zie aanmeldingen/bedrijf.js. */
   const bedrijfMod = require('./aanmeldingen/bedrijf')({ db, save, kap, nu, accounts });
   const vind = id => A().find(a => a.id === String(id || ''));
 
-  // De geautomatiseerde reis opbouwen in de toon van de pas. Elke stap is meteen
-  // 'gedaan': de AI verzorgt hem automatisch. Alleen het besluit blijft open.
-  function bouwReis(stem) {
-    const t = nu();
-    return REIS.map(s => ({ id: s.id, naam: s.naam, tekst: stem === 'u' ? s.u : s.je, auto: true, at: t }));
-  }
+  /* De aanvraagkant staat apart: hoe een aanmelding ONTSTAAT en hoe hij eruit
+     ziet. Zie ./aanmeldingen/aanvraag.js. */
+  const { bouwReis, beeld, aanvraag, lijst } = require('./aanmeldingen/aanvraag')({
+    A, PASSEN, REIS, accounts, bedrijfMod, kap, nu, rid, save });
 
-  function beeld(a) {
-    return { id: a.id, pas: a.pas, pasNaam: (PASSEN[a.pas] || {}).naam || a.pas,
-      naam: a.naam, contact: a.contact, status: a.status,
-      reis: a.reis, welkom: a.welkom, viaUitnodiging: !!a.viaUitnodiging,
-      gekoppeld: !!a.accountId,  // account gekoppeld? dan tilt een akkoord het op
-      bedrijf: a.bedrijf || null, gezaakt: a.gezaakt || null,
-      besluit: a.besluit || null, at: a.at, bijgewerkt: a.bijgewerkt };
-  }
-
-  /* Een nieuwe aanmelding. De AI verzorgt meteen de hele reis (berichten,
-     onboarding-bevestiging, rondleiding, RTF, veiligheid, privacy). De status
-     komt op 'in behandeling': klaar voor de menselijke ja of nee. Voor Lifestyle
-     en Business wordt NOOIT toegang beloofd of gezet -- de reis is voorbereiding,
-     geen toelating. */
-  function aanvraag(b, aanvragerId) {
-    b = b || {};
-    const pas = String(b.pas || '');
-    const def = PASSEN[pas];
-    if (!def) return { status: 400, error: 'Kies een geldige pas (RTG, Lifestyle of Business).' };
-    const naam = kap(b.naam, 80);
-    if (naam.length < 2) return { status: 400, error: 'Vul de naam van de aanvrager in.' };
-    const contact = kap(b.contact, 120);
-    const viaUitnodiging = !!b.viaUitnodiging;
-    // Was de aanvrager ingelogd, dan koppelen we zijn account (zodat een akkoord
-    // dat kan optillen). Het id komt UITSLUITEND uit het geverifieerde token via
-    // de route, nooit uit de body -- anders tilde je andermans account op.
-    const accountId = (aanvragerId && accounts && accounts.getUserById(aanvragerId)) ? aanvragerId : null;
-    // De poort van het merk: Lifestyle/Business alleen na menselijke goedkeuring
-    // of op uitnodiging. De aanvraag zelf mag altijd binnenkomen (de AI belooft
-    // niets); alleen beslis() door een mens kent hem later toe.
-    const a = { id: rid(), pas, naam, contact, viaUitnodiging, accountId,
-      welkom: def.welkom, reis: bouwReis(def.stem),
-      status: 'in behandeling', besluit: null, at: nu(), bijgewerkt: nu() };
-    // de ondernemersintake; een gesloten genre wordt geweigerd en niet stil
-    // iets anders gemaakt. Zie CONCERN.md.
-    const bedrijf = bedrijfMod.zetBedrijf(a, b.bedrijf, { viaUitnodiging });
-    if (!bedrijf.ok) return bedrijf;
-    A().unshift(a);
-    if (A().length > 5000) A().pop();
-    save();
-    return { ok: true, aanmelding: beeld(a) };
-  }
-
-  // De wachtrij voor het personeel (optioneel op status gefilterd).
-  function lijst(status) {
-    let L = A();
-    if (status) L = L.filter(a => a.status === String(status));
-    return { ok: true, aantal: L.length,
-      openstaand: A().filter(a => a.status === 'in behandeling').length,
-      aanmeldingen: L.slice(0, 200).map(beeld) };
-  }
   function een(id) { const a = vind(id); return a ? { ok: true, aanmelding: beeld(a) } : { status: 404, error: 'Deze aanmelding bestaat niet.' }; }
 
   /* De ENE menselijke handeling: accepteren of afwijzen. Vereist een naam (wie
@@ -167,6 +122,6 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   // De zaak klaarzetten: ./aanmeldingen/klaarzetten.js (stond op de NOG-lijst).
   const klaarzetten = require('./aanmeldingen/klaarzetten')({ A, bedrijfMod });
 
-  return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen,
+  return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
     termijnVoldaan, magAutomatischToekennen, PASSEN }, klaarzetten) };
 };

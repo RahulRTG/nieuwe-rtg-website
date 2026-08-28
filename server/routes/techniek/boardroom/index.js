@@ -3,6 +3,8 @@
    vanuit routes/techniek.js op de gedeelde context. De directe schakelaars staan
    in ./schakelaar, de AI-hulp (Rahul) in ./ai; hier de gedeelde helpers en de
    lees-/onboarding-routes. */
+const { idVanKey } = require('../../../lib/lidsleutel');
+
 const functies = require('../../../functies');
 module.exports = (tctx) => {
   // alleen wat deze module echt gebruikt (de rest van de gedeelde context hoort
@@ -42,9 +44,9 @@ module.exports = (tctx) => {
   }
   // een leesbaar label voor een persoonssleutel op het bord
   function persoonLabel(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return key;
-    const u = accounts.getUserById(Number(m[1]));
+    const id = idVanKey(key);
+    if (id == null) return key;
+    const u = accounts.getUserById(id);
     return u ? (accounts.realNameOf(u) + ' · ' + (u.codename || '')) : key;
   }
   const landenLijst = () => Object.entries(LANDEN || {}).map(([code, v]) => ({ code, naam: (v && v.naam) || code }));

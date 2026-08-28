@@ -61,10 +61,18 @@
       return;
     }
     try {
-      const [sd, od] = await Promise.all([API.call('/suppliers', { city: trip.dest }), API.call('/orders/mine')]);
+      /* De stad komt van de EIGEN reis. Stond hier onvoorwaardelijk trip.dest,
+         en trip was altijd gevuld -- desnoods met de demo-reis, waardoor elk lid
+         "RTG-partners in Ibiza" te zien kreeg. Zonder reis vragen we de hele
+         lijst op en zegt de ondertitel dat ook. */
+      const stad = trip ? trip.dest : null;
+      const [sd, od] = await Promise.all([API.call('/suppliers', stad ? { city: stad } : {}), API.call('/orders/mine')]);
       suppliers = sd.suppliers || [];
       myOrders = od.orders || [];
-      $('#tpSub').textContent = T('app.tp.partnersin','RTG-partners in') + ' ' + (sd.city || trip.dest) + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.');
+      const waar = sd.city || stad;
+      $('#tpSub').textContent = waar
+        ? T('app.tp.partnersin','RTG-partners in') + ' ' + waar + ', ' + T('app.tp.orderpayreserve','bestel, betaal en reserveer.')
+        : T('app.tp.partnersall','Alle RTG-partners: bestel, betaal en reserveer. Zodra er een reis staat, ziet u hier de partners op uw bestemming.');
     } catch (e) { return; }
 
     renderLive();  // live "onderweg"-paneel bovenaan

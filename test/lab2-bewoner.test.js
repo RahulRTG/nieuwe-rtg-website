@@ -3,7 +3,7 @@
    storing sluiten, reservering intrekken), de klachtenprocedure van allebei de
    kanten, het stilleggen door de toezichthouder en de conclusie die de coach
    voorstelt. Draai los:
-   node --experimental-sqlite --test test/lab2-bewoner.test.js
+   node --test test/lab2-bewoner.test.js
 
    WAAROM DIT BESTAND BESTAAT. test/livinglab.test.js loopt de onderzoekscyclus
    af en raakt daarbij vooral de kantoordeuren. De deuren die een BEWONER ZONDER

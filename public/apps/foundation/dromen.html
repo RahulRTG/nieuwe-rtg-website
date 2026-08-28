@@ -18,17 +18,17 @@
   .maak{padding:1rem 1.1rem;margin-bottom:1.3rem;}
   .maak .rijveld{display:flex;gap:.5rem;}
   .maak textarea{flex:1;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   h2.sec{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--zacht);font-weight:700;margin:1.4rem 0 .7rem;}
   .droom{padding:.9rem 1rem;margin-bottom:.7rem;position:relative;border-left:4px solid var(--goud);}
   .droom .wie{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--zacht);margin-bottom:.35rem;}
   .droom .av{width:1.6rem;height:1.6rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.9rem;}
   .droom .tk{font-size:1rem;line-height:1.45;}
   .droom .acties{display:flex;gap:.5rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;}
-  .moedig{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;align-items:center;gap:.35rem;}
-  .moedig.aan{background:#2a2417;border-color:var(--goud);color:var(--goud2);}
+  .moedig{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .8rem;font-size:.85rem;display:inline-flex;align-items:center;gap:.35rem;}
+  .moedig.aan{background:#2a2417;border-color:var(--goud);color:var(--accent-tekst);}
   .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.35rem .3rem;}
-  .mini:hover{color:var(--goud);}
+  .mini:hover{color:var(--rtg-leesgoud,var(--goud));}
   .droom.behaald{border-left-color:var(--groen);opacity:.92;}
   .droom.behaald .tk{text-decoration:line-through;text-decoration-color:var(--groen);}
   .vlag{color:var(--groen);font-weight:700;font-size:.85rem;}
@@ -49,9 +49,9 @@
 
   <div class="deel">Dromen</div>
   <div class="kaart maak">
-    <div class="rijveld">
+    <div class="rijveld rtg-duimeind">
       <textarea class="veld" id="nTekst" rows="1" placeholder="Mijn droom of doel is..." maxlength="240"></textarea>
-      <button class="knop" id="nMaak">Plaats</button>
+      <button class="knop" id="nMaak" data-hoofdactie>Plaats</button>
     </div>
     <div class="fout" id="nFout"></div>
   </div>

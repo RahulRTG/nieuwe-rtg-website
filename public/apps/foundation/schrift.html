@@ -16,7 +16,7 @@
 <style>
   body{height:100vh;overflow:hidden;display:flex;flex-direction:column;}
   .kop{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border-bottom:1px solid var(--lijn);}
-  .kop .brand{font-family:var(--serif);font-weight:500;}.kop .brand b{color:var(--goud);}
+  .kop .brand{font-family:var(--serif);font-weight:500;}.kop .brand b{color:var(--rtg-leesgoud,var(--goud));}
   .kop .mini{color:var(--zacht);font-size:.8rem;}
   .kop .status{margin-left:auto;font-size:.78rem;color:var(--zacht);display:flex;align-items:center;gap:.4rem;}
   .view{flex:1;overflow:hidden;position:relative;}
@@ -33,20 +33,20 @@
     letter-spacing:.12em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:.15rem;}
   .tabbar button .ic{font-size:1.2rem;letter-spacing:0;}
   .tabbar button.aan{color:var(--txt);border-top-color:var(--goud);}
-  .boardbox{flex:1;background:var(--bord);border:1px solid var(--lijn);border-radius:var(--radius);position:relative;overflow:hidden;min-height:0;}
+  .boardbox{flex:1;background:var(--bord);border:1px solid var(--lijn);border-radius:0;position:relative;overflow:hidden;min-height:0;}
   .boardbox canvas{position:absolute;inset:0;width:100%;height:100%;}
   .wachtbord{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--zacht);font-size:.9rem;text-align:center;padding:2rem;}
   .pgstrip{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
-  .pgstrip .pg{min-width:2.2rem;height:2.2rem;border-radius:8px;background:#26221d;color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
+  .pgstrip .pg{min-width:2.2rem;height:2.2rem;border-radius:0;background:#26221d;color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
   .pgstrip .pg.aan{border-color:var(--goud);}
-  .pgstrip .add{background:#1c1a16;color:var(--goud);font-size:1.1rem;}
+  .pgstrip .add{background:#1c1a16;color:var(--rtg-leesgoud,var(--goud));font-size:1.1rem;}
   .paginabox{flex:1;min-height:0;display:flex;flex-direction:column;}
-  textarea.schrijf{flex:1;background:#fbf7ec;color:#1a1a1a;border:1px solid var(--lijn);border-radius:12px;padding:1rem;font-size:1.05rem;line-height:1.9;
+  textarea.schrijf{flex:1;background:#fbf7ec;color:#1a1a1a;border:1px solid var(--lijn);border-radius:0;padding:1rem;font-size:1.05rem;line-height:1.9;
     background-image:repeating-linear-gradient(#fbf7ec 0 30px,#e6dcc4 30px 31px);resize:none;outline:none;}
-  .tekencanvasbox{flex:1;position:relative;background:var(--bord);border:1px solid var(--lijn);border-radius:12px;overflow:hidden;min-height:0;}
+  .tekencanvasbox{flex:1;position:relative;background:var(--bord);border:1px solid var(--lijn);border-radius:0;overflow:hidden;min-height:0;}
   .tekencanvasbox canvas{position:absolute;inset:0;width:100%;height:100%;}
   .schrijftools{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
-  .tbtn{width:2rem;height:2rem;border-radius:9px;background:#26221d;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .tbtn{width:2rem;height:2rem;border-radius:0;background:#26221d;color:#fff;display:flex;align-items:center;justify-content:center;}
   .tbtn.aan{background:var(--goud);color:#1a1710;}
   .kleur{width:1.4rem;height:1.4rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
   .kleur.aan{border-color:#fff;}
@@ -57,14 +57,14 @@
   .opgave-open textarea{width:100%;min-height:6rem;margin:.5rem 0;}
   .klaar{color:var(--groen);font-weight:600;}
   .chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:.5rem;padding:.2rem;}
-  .bubbel{max-width:85%;padding:.6rem .8rem;border-radius:14px;font-size:.92rem;line-height:1.45;white-space:pre-wrap;}
+  .bubbel{max-width:85%;padding:.6rem .8rem;border-radius:0;font-size:.92rem;line-height:1.45;white-space:pre-wrap;}
   .bubbel.bram{background:var(--paneel);border:1px solid var(--lijn);align-self:flex-start;border-bottom-left-radius:4px;}
   .bubbel.ik{background:var(--goud);color:#1a1710;align-self:flex-end;border-bottom-right-radius:4px;}
-  .tip{background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:12px;padding:.7rem .9rem;font-size:.9rem;}
-  .tip b{color:var(--goud);}
+  .tip{background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:0;padding:.7rem .9rem;font-size:.9rem;}
+  .tip b{color:var(--rtg-leesgoud,var(--goud));}
   .chatrij{display:flex;gap:.5rem;}
   .chatrij input{flex:1;}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}.merkvlak b{color:#F4E9C8;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}.merkvlak b{color:#F4E9C8;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -176,7 +176,7 @@ function huidigePagina(){
   if(!p){ box.innerHTML='<div class="mini">Nog geen bladzijde. Maak er een met T (typen) of ✎ (tekenen).</div>'; $('#pgTitel').value=''; return; }
   $('#pgTitel').value = p.titel||'';
   if(p.type==='tekst'){ box.innerHTML='<textarea class="schrijf" id="schrijf" placeholder="Schrijf hier…"></textarea>'; const ta=$('#schrijf'); ta.value=p.inhoud||''; ta.addEventListener('input', ()=>{ p.inhoud=ta.value; markDirty(); }); }
-  else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:12px;background:#12110F;">'; }
+  else if(p.type==='foto'){ box.innerHTML='<img alt="Foto in je schrift" src="'+(String(p.data).startsWith('data:image/')?p.data:'')+'" style="width:100%;border-radius:0;background:#12110F;">'; }
   else { box.innerHTML='<div class="tekencanvasbox"><canvas id="schrijfcanvas"></canvas></div>'; $('#tekentools').style.display='flex';
     setTimeout(()=>{ tekenbord=new TekenBord($('#schrijfcanvas'), { background:'#12110F', kleur:'#111111', onStroke:()=>markDirty() }); tekenbord.kleur='#111111'; tekenbord.dikte=5; tekenbord.setStrokes(p.strokes||[]); },20); }
 }
@@ -202,7 +202,7 @@ function toonOpgaven(){
   }));
 }
 
-function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini" style="color:var(--goud)">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
+function toonAgenda(list){ $('#agLijst').innerHTML = (list&&list.length) ? list.map(a=> '<div class="kaart item">'+(a.datum?'<div class="mini" style="color:var(--rtg-leesgoud,var(--goud))">'+esc(a.datum)+'</div>':'')+'<div>'+esc(a.tekst)+'</div></div>').join('') : '<div class="mini">Nog niets in de agenda.</div>'; }
 
 const BUDDYNM={vrouw:'Rahul',man:'Rahul',nonbinair:'Rahul'};
 function buddyKeuze(){ try{ return localStorage.getItem('rtf_buddy')||'vrouw'; }catch(e){ return 'vrouw'; } }

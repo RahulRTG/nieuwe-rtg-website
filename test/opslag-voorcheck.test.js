@@ -13,7 +13,7 @@
    4. netjes afsluiten kijkt alles na en vouwt de WAL dicht;
    5. onder de grens verandert er niets aan het oude gedrag.
    Draai los:
-   node --experimental-sqlite --test test/opslag-voorcheck.test.js */
+   node --test test/opslag-voorcheck.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -22,7 +22,7 @@ const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 
 const WORTEL = path.join(__dirname, '..');
-const wacht = ms => new Promise(r => setTimeout(r, ms));
+const { wachtOpWaarde } = require('./helper');
 
 /* Elke toets krijgt een eigen datamap EN een eigen modulecache: db/sqlite houdt
    verbinding en maten in modulescope, dus een schone lei per scenario. */
@@ -100,7 +100,8 @@ test('een overgeslagen collectie blijft niet hangen: na het venster komt er een 
     o.db.data.sessions.t0.gezien = 9999;
     o.dbmod.save();
     // geen enkel verzoek meer: de geplande naronde moet het alsnog wegschrijven
-    for (let i = 0; i < 40 && o.opSchijf('sessions').t0.gezien !== 9999; i++) await wacht(50);
+    await wachtOpWaarde(() => o.opSchijf('sessions').t0.gezien === 9999,
+      { wat: 'de sessie op schijf op 9999' });
     assert.equal(o.opSchijf('sessions').t0.gezien, 9999, 'de naronde schrijft de uitgestelde wijziging weg');
   } finally { o.op(); }
 });
@@ -205,7 +206,10 @@ test('maar een logboek blijft NIET hangen: na het venster staat alles op schijf'
     o.dbmod.save();
     o.db.data.doorgeefjournaal.push({ t: 'nieuw', wat: '/api/y', nr: 4000, vul: 'x' });
     o.dbmod.save();
-    await wacht(400);                       // venster voorbij + naronde
+    /* Wachten tot de regel er STAAT en niet tot de klok 400 zegt: die tijd was
+       een gok om het venster heen, en dit heeft een positief signaal. */
+    await wachtOpWaarde(() => o.opSchijf('doorgeefjournaal').length === 4001,
+      { wat: 'de nieuwe regel na het venster' });
     const opSchijf = o.opSchijf('doorgeefjournaal');
     assert.equal(opSchijf.length, 4001, 'na het venster staat de nieuwe regel er wel degelijk');
     assert.equal(opSchijf[4000].t, 'nieuw', 'en het is de regel die we schreven');

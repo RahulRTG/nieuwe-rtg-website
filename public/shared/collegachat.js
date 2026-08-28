@@ -11,22 +11,22 @@
   let API = null, T = (k, nl) => nl, toast = () => {}, mij = () => null;
   let openMet = null; // { staffId, naam } zolang het paneel open staat
 
-  function esc(x){ return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function esc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   function stijl(){
     if (document.getElementById('ccStijl')) return;
     const s = document.createElement('style');
     s.id = 'ccStijl';
     s.textContent = '#ccPaneel{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;}' +
-      '#ccKaart{background:#151312;border:1px solid rgba(255,255,255,0.12);border-radius:20px 20px 0 0;width:100%;max-width:560px;height:min(70vh,560px);display:flex;flex-direction:column;color:#F4F1EC;font-family:Inter,sans-serif;}' +
+      '#ccKaart{background:#151312;border:1px solid rgba(255,255,255,0.12);border-radius:0;width:100%;max-width:560px;height:min(70vh,560px);display:flex;flex-direction:column;color:#F4F1EC;font-family:Inter,sans-serif;}' +
       '#ccKop{display:flex;align-items:center;gap:0.6rem;padding:0.9rem 1rem;border-bottom:1px solid rgba(255,255,255,0.08);font-weight:600;font-size:0.9rem;}' +
       '#ccKop button{margin-left:auto;background:none;border:none;color:#F4F1EC;font-size:1.2rem;cursor:pointer;padding:0.2rem 0.5rem;}' +
       '#ccLijst{flex:1;overflow-y:auto;padding:0.8rem 1rem;display:flex;flex-direction:column;gap:0.45rem;}' +
-      '.cc-msg{max-width:82%;padding:0.5rem 0.8rem;border-radius:14px;font-size:0.84rem;line-height:1.45;background:#221E1C;align-self:flex-start;}' +
+      '.cc-msg{max-width:82%;padding:0.5rem 0.8rem;border-radius:0;font-size:0.84rem;line-height:1.45;background:#221E1C;align-self:flex-start;}' +
       '.cc-msg.mijn{background:#2E2A3F;align-self:flex-end;}' +
       '.cc-msg time{display:block;font-size:0.62rem;opacity:0.55;margin-top:0.2rem;}' +
       '#ccVoet{display:flex;gap:0.5rem;padding:0.7rem 1rem;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);border-top:1px solid rgba(255,255,255,0.08);}' +
-      '#ccVoet input{flex:1;background:#221E1C;border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:0.6rem 1rem;color:#F4F1EC;font-size:0.85rem;outline:none;}' +
-      '#ccVoet button{background:#B99A5F;border:none;border-radius:999px;padding:0.6rem 1.1rem;font:600 0.82rem Inter,sans-serif;color:#141210;cursor:pointer;}';
+      '#ccVoet input{flex:1;background:#221E1C;border:1px solid rgba(255,255,255,0.12);border-radius:0;padding:0.6rem 1rem;color:#F4F1EC;font-size:0.85rem;outline:none;}' +
+      '#ccVoet button{background:#B99A5F;border:none;border-radius:0;padding:0.6rem 1.1rem;font:600 0.82rem Inter,sans-serif;color:#141210;cursor:pointer;}';
     document.head.appendChild(s);
   }
   function tijd(iso){

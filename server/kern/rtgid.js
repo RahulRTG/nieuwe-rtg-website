@@ -3,8 +3,13 @@
    efficienter en veiliger door ontwerp:
 
    - Sneller: een dienst start een inlog en krijgt een koppelcode; het lid
-     bevestigt met een tik in de eigen app (die al met passkey/inlog is
-     beveiligd). Geen wachtwoord, geen sms.
+     bevestigt in de eigen app met zijn passkey -- gezicht, vinger of pincode
+     op het eigen toestel. Geen wachtwoord, geen sms.
+   - Het is de PERSOON die bevestigt, niet het toestel. Een tik alleen bewees
+     dat iemand de telefoon had waarop de sessie leeft; een geleend of gestolen
+     toestel met een openstaande app kon dus een identiteit weggeven. De
+     passkey-ceremonie hangt bovendien aan DEZE koppel, dus een opgevangen
+     assertie past niet op een andere inlog. Zie bevestig() hieronder.
    - Veiliger (phishing-bestendig): de code loopt van het scherm van de
      dienst NAAR het lid, en het lid ziet in de eigen app welke dienst er
      aanklopt en welke gegevens die vraagt, voor er iets gebeurt. Een
@@ -20,12 +25,15 @@
 
    Opslag in db.data.rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
+const { idVanKey } = require('../lib/lidsleutel');
+const { bestaat } = require('./betrouwbaarheid');
+
 const KOPPEL_TTL_MS = 2 * 60 * 1000;      // een koppelcode leeft twee minuten
 const SESSIE_TTL_MS = 20 * 60 * 1000;     // een iD-sessie bij een dienst: twintig minuten
 const MAX_LOG = 100, MAX_KOPPELS = 300, MAX_SESSIES = 300;
 const ATTRIBUTEN = ['codenaam', '18plus', 'leeftijd', 'nationaliteit', 'naam'];
 
-function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam }) {
+function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan }) {
   const nu = () => Date.now();
   const iso = t => new Date(t == null ? Date.now() : t).toISOString();
   const hash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
@@ -42,29 +50,19 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
   function logVan(key) { const s = S(); if (!s.logs[key]) s.logs[key] = []; return s.logs[key]; }
 
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   const codenaamUit = key => ((typeof gidsHaal === 'function' ? gidsHaal(key) : null) || {}).codename || 'lid';
 
-  /* Selectieve deling: alleen de gevraagde attributen worden berekend en
-     geleverd; 18plus is een afgeleid bewijs zonder de geboortedatum. */
-  function attributenVoor(key, gevraagd) {
-    const u = accountVanKey(key);
-    const md = u ? (accounts.getMemberState(u.id) || {}) : {};
-    const geboren = md.geboren || null;
-    const lft = geboren && typeof leeftijdVan === 'function' ? leeftijdVan(geboren) : null;
-    const uit = { geverifieerd: !!(u && u.verified === 'verified') };
-    for (const a of gevraagd) {
-      if (a === 'codenaam') uit.codenaam = codenaamUit(key);
-      else if (a === '18plus') uit['18plus'] = lft != null ? lft >= 18 : null;
-      else if (a === 'leeftijd') uit.leeftijd = lft;
-      else if (a === 'nationaliteit') uit.nationaliteit = md.nationaliteit || null;
-      else if (a === 'naam') uit.naam = u ? accounts.realNameOf(u) : null;
-    }
-    return uit;
-  }
+  /* Wat een dienst te horen krijgt en waar dat op rust, staat apart in
+     ./rtgid-claims.js: selectieve deling, het afgeleide 18plus-bewijs, de
+     herkomst van de leeftijd en het betrouwbaarheidsniveau. Dit bestand gaat
+     over WIE er aanklopt en of het lid akkoord gaat; dat over WAT er dan de
+     deur uit mag. De gedeelde helpers gaan mee via de context. */
+  const { niveauVoor, attributenVoor } = require('./rtgid-claims')({
+    accounts, accountVanKey, codenaamUit, leeftijdVan });
 
   /* ---- de dienst-kant: een inlog starten en de uitkomst ophalen ---- */
   function start(b) {
@@ -73,10 +71,17 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     if (!dienst) return { status: 400, error: 'Welke dienst vraagt de inlog?' };
     const gevraagd = (Array.isArray(b.attributen) ? b.attributen : []).filter(a => ATTRIBUTEN.includes(a));
     if (!gevraagd.length) gevraagd.push('codenaam');
+    /* Een dienst mag een betrouwbaarheidsniveau eisen: niet alleen "is dit lid
+       18+", maar "en hoe hard weet u dat". Een eis die niet bestaat wordt hier
+       geweigerd en niet stil genegeerd -- anders is een typefout in de eis
+       precies zo goed als geen eis, en faalt de strengste vraag het stilst. */
+    const eis = b.minBetrouwbaarheid ? String(b.minBetrouwbaarheid) : null;
+    if (eis && !bestaat(eis)) return { status: 400, error: 'Onbekend betrouwbaarheidsniveau: ' + eis + '.' };
     const k = { id: 'k' + crypto.randomBytes(6).toString('hex'), code: codeMaak(), dienst,
-      attributen: gevraagd, status: 'wacht', gemaakt: iso(), verloopt: nu() + KOPPEL_TTL_MS };
+      attributen: gevraagd, eis, status: 'wacht', gemaakt: iso(), verloopt: nu() + KOPPEL_TTL_MS };
     s.koppels.unshift(k); cap(s.koppels, MAX_KOPPELS); save();
-    return { status: 200, koppelId: k.id, code: k.code, dienst, attributen: gevraagd, verloopt: iso(k.verloopt) };
+    return { status: 200, koppelId: k.id, code: k.code, dienst, attributen: gevraagd,
+      minBetrouwbaarheid: eis, verloopt: iso(k.verloopt) };
   }
   function statusVan(koppelId) {
     const s = S();
@@ -88,57 +93,45 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
     if (k.status === 'bevestigd' && k.tokenEenmalig) { uit.idToken = k.tokenEenmalig; delete k.tokenEenmalig; save(); }
     return uit;
   }
+  /* EEN INLOG IS EEN REGEL IN HET LOG; EEN OPHALING WAS DAT NIET.
+
+     Bevestigen werd genoteerd, en daarna kon een dienst binnen zijn sessie van
+     twintig minuten zo vaak `wie` aanroepen als hij wilde -- elke keer met
+     dezelfde attributen terug, en het lid zag er een regel van: "inlog". Wie
+     zijn inzagelog las, wist dus dat er een deur was opengegaan, maar niet
+     hoeveel er doorheen was gelopen.
+
+     De TELLER staat op de sessie, en er komt hoogstens een extra regel per
+     sessie bij. Een regel per ophaling zou het log vullen met ruis van een
+     dienst die elke seconde ververst; een teller zegt hetzelfde in een getal
+     dat blijft kloppen. */
   function wie(idToken) {
     const s = S();
     const h = hash(String(idToken || ''));
     const sess = s.sessies.find(x => x.tokenHash === h);
     if (!sess || sess.ingetrokken || nu() > sess.verloopt)
       return { status: 403, error: 'Deze iD-sessie is niet (meer) geldig.' };
+    sess.opgehaald = (sess.opgehaald || 0) + 1;
+    if (sess.opgehaald === 2) {
+      /* Pas bij de TWEEDE: de eerste ophaling hoort bij de inlog die er al
+         staat, en die twee keer melden leest als twee gebeurtenissen. */
+      const log = logVan(sess.memberKey);
+      log.unshift({ om: iso(), dienst: sess.dienst, attributen: sess.attributen,
+        soort: 'haalde uw gegevens opnieuw op binnen dezelfde inlog' });
+      cap(log, MAX_LOG);
+    }
+    save();
     return { status: 200, dienst: sess.dienst, attributen: attributenVoor(sess.memberKey, sess.attributen),
-      namens: sess.namens || undefined, verloopt: iso(sess.verloopt) };
+      namens: sess.namens || undefined, verloopt: iso(sess.verloopt), opgehaald: sess.opgehaald };
   }
 
-  /* ---- de app-kant: de code opzoeken, bevestigen of weigeren ---- */
-  function koppelZoek(key, code) {
-    const s = S();
-    const c = schoon(code, 20).toUpperCase();
-    const k = s.koppels.find(x => x.code === c && x.status === 'wacht');
-    if (!k || nu() > k.verloopt) return { status: 404, error: 'Geen wachtende inlog met die code; codes leven twee minuten.' };
-    // de machtigingen waarmee dit lid ook namens een ander kan inloggen
-    const machtigingen = s.machtigingen.filter(m => m.naarKey === key && !m.ingetrokken && nu() <= m.tot)
-      .map(m => ({ id: m.id, van: codenaamUit(m.vanKey), dienst: m.dienst }));
-    return { status: 200, koppelId: k.id, dienst: k.dienst, attributen: k.attributen, machtigingen };
-  }
-  function bevestig(key, koppelId, machtigingId) {
-    const s = S();
-    const k = s.koppels.find(x => x.id === String(koppelId || ''));
-    if (!k || k.status !== 'wacht') return { status: 404, error: 'Deze inlog wacht niet (meer).' };
-    if (nu() > k.verloopt) { k.status = 'verlopen'; save(); return { status: 410, error: 'De code is verlopen; laat de dienst een nieuwe tonen.' }; }
-    let voorKey = key, namens = null;
-    if (machtigingId) {
-      const m = s.machtigingen.find(x => x.id === String(machtigingId));
-      if (!m || m.naarKey !== key || m.ingetrokken || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' };
-      if (m.dienst !== k.dienst) return { status: 403, error: 'Deze machtiging geldt voor ' + m.dienst + ', niet voor ' + k.dienst + '.' };
-      voorKey = m.vanKey; namens = codenaamUit(key);
-    }
-    const raw = crypto.randomBytes(24).toString('hex');
-    const sess = { tokenHash: hash(raw), dienst: k.dienst, memberKey: voorKey, attributen: k.attributen,
-      namens, gemaakt: iso(), verloopt: nu() + SESSIE_TTL_MS, ingetrokken: false };
-    s.sessies.unshift(sess); cap(s.sessies, MAX_SESSIES);
-    k.status = 'bevestigd'; k.tokenEenmalig = raw;
-    const log = logVan(voorKey);
-    log.unshift({ om: iso(), dienst: k.dienst, attributen: k.attributen,
-      soort: namens ? 'inlog door gemachtigde ' + namens : 'inlog' });
-    cap(log, MAX_LOG); save();
-    return { status: 200, ok: true, dienst: k.dienst, namens: namens || undefined };
-  }
-  function weiger(key, koppelId) {
-    const s = S();
-    const k = s.koppels.find(x => x.id === String(koppelId || ''));
-    if (!k || k.status !== 'wacht') return { status: 404, error: 'Deze inlog wacht niet (meer).' };
-    k.status = 'geweigerd'; save();
-    return { status: 200, ok: true };
-  }
+  /* De app-kant -- de code opzoeken, bevestigen met een passkey, weigeren --
+     staat in ./rtgid-bevestigen.js. Daar woont ook de passkey-eis zelf: dat is
+     de enige plek waar een identiteit de deur uit gaat, en die plek hoort de
+     eis te dragen. */
+  const { koppelZoek, bevestig, weiger } = require('./rtgid-bevestigen')({
+    S, save, nu, iso, crypto, schoon, hash, cap, logVan, codenaamUit, accountVanKey,
+    niveauVoor, stapOp, passkeysVan, MAX_LOG, MAX_SESSIES, SESSIE_TTL_MS });
 
   /* Inzage, regie (intrekken) en de mantelzorg-machtigingen staan apart, in
      ./rtgid-regie.js; de gedeelde interne helpers gaan mee via de context. */

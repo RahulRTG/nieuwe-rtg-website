@@ -1,0 +1,48 @@
+/* Kassa (deelmodule): CADEAUKAARTEN -- verkopen aan de balie en losse
+   inwisselingen. Krijgt de gedeelde kern een keer bij het opstarten vanuit
+   routes/supplier/kassa.js.
+
+   WAAROM DIT EEN EIGEN BESTAND IS. Het stond in ./afrekenen.js, en dat bestand
+   ging over uitchecken; twee onderwerpen in een module die met 9642 bytes vlak
+   onder de tienkilobyte-grens zat. De keuring wees hem aan (meter
+   keuringOmvang) en het advies was "knip er een deelbestand af zolang het
+   rustig kan" -- dit is dat deelbestand.
+
+   WAT HIER NIET STAAT: de kassabon die MET een cadeaukaart wordt betaald. Dat
+   is ./verkoop.js, want dat is een verkoop en geen kaarthandeling; de kaart is
+   daar alleen de betaalwijze. De drie grenzen van een verzilvering (de kaart is
+   van DEZE zaak, het bedrag is echt een bedrag, er kan nooit meer af dan erop
+   staat) delen ze via ./kaart.js.
+
+   DE VERKOOP VAN EEN KAART IS NOG GEEN OMZET. Het saldo is een schuld aan de
+   klant; het btw-moment is de inwisseling. Zie kern/fiscaal/index.js voor hoe
+   de maandboekhouding daarmee rekent, en waarom een verzilvering `viaBon`
+   draagt. */
+module.exports = (kern) => {
+  const { app, db, gcCode, logActivity, save, supplierAuth } = kern;
+  // dezelfde drie grenzen als de kassabon die met een kaart betaalt
+  const { verzilver: verzilverKaart } = require('./kaart');
+
+app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
+  const bedrag = Math.round(Number(req.body.bedrag));
+  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
+  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
+    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
+  db.data.giftcards.unshift(kaart);
+  db.data.giftcards = db.data.giftcards.slice(0, 20000);
+  save();
+  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
+  res.json({ ok: true, kaart });
+});
+
+/* De LOSSE inwisseling: saldo van de kaart halen zonder dat er een kassabon bij
+   hoort. Zonder `viaBon` is deze verzilvering zelf het omzetmoment in de
+   maandboekhouding -- er is immers geen bon die de omzet draagt. */
+app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
+  const r = verzilverKaart(db, req.supplier.code, req.body.code, req.body.bedrag, req.actor.name, null);
+  if (r.error) return res.status(r.status).json({ error: r.error });
+  save();
+  logActivity(req.supplier.code, req.actor, 'inde € ' + r.bedrag + ' van cadeaukaart ' + r.kaart.code + ' (rest € ' + r.kaart.saldo + ')');
+  res.json({ ok: true, saldo: r.kaart.saldo, kaart: { code: r.kaart.code, saldo: r.kaart.saldo } });
+});
+};

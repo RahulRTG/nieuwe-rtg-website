@@ -50,5 +50,10 @@ module.exports = {
     'De motor kijkt na, maar de leraar beslist: elk cijfer is pas een cijfer als een mens erop drukt.'),
   '/apps/residentie.html': G('De Residence: het virtuele grandhotel van RTG om elkaar te leren kennen -- voor je echt op date gaat.',
     ['Speel samen: midgetgolf, darts, kegelen of baantjes zwemmen; in het restaurant stelt het huis vragen', 'Praat met de zaal via de balk onderin, of stuur een schittering of hartje', 'Je suite is een compleet penthouse (bed, douche, keuken, telefoon); nodig iemand uit via de huistelefoon'],
-    'Alles is inbegrepen bij de pas en iedereen heet er bij zijn codenaam: gezellig zonder scores, streaks of winkeltjes.')
+    'Alles is inbegrepen bij de pas en iedereen heet er bij zijn codenaam: gezellig zonder scores, streaks of winkeltjes.'),
+  '/apps/platformregister.html': G('Het platformregister: van elk ding wat het is, wat het doet, of het aan staat en wat we ervan weten.',
+    ['Kies een soort: functie, bediening, scherm of control',
+     'Vink "alleen wat aandacht vraagt" aan om bij het werk te komen',
+     'Open een ding voor zijn kaart: wat het doet, de schakelstand en de status met de getallen eronder'],
+    'Kijken doe je hier, schakelen in de boardroom. Staat er een route bij geen enkel ding, dan zegt het scherm dat met zoveel woorden: dan is "wij weten van alles wat het is" niet waar.'),
 };

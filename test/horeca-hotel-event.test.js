@@ -10,7 +10,7 @@
      wijzigen na akkoord vraagt een nieuw akkoord;
    - een nacalculatie zonder kosten toont geen marge van 100%, maar zegt dat
      hij niet compleet is.
-   Draai: node --experimental-sqlite --test test/horeca-hotel-event.test.js */
+   Draai: node --test test/horeca-hotel-event.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

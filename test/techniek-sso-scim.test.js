@@ -26,7 +26,7 @@
         bewaard; een beheerscherm dat geheimen toont, lekt ze zodra iemand
         meekijkt of een schermafdruk maakt.
 
-   Draai los: node --experimental-sqlite --test test/techniek-sso-scim.test.js
+   Draai los: node --test test/techniek-sso-scim.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -203,6 +203,45 @@ test('5. de SCIM-endpoints zitten ALLEMAAL achter de sleutel, ook de metadata', 
 
   const een = await scim('/Users/' + encodeURIComponent(id), { method: 'GET', headers: goed });
   assert.equal(een.status, 200, 'en is op id op te vragen');
+
+  /* DE DRIE SCHRIJFMETHODEN OP DEZELFDE BRON, elk apart.
+
+     Waarom dit erbij moest: op /api/scim/v2/Users/:id hangen vier methoden
+     (GET, PATCH, PUT, DELETE), en de dekkingsmeting telde tot deze ronde per
+     PAD. De GET hierboven zette dus alle vier op groen, terwijl PATCH, PUT en
+     DELETE nooit door een verzoek waren aangeraakt -- juist de drie die iemands
+     account kunnen uitzetten. Sinds de meting per METHODE telt, valt dat op.
+
+     De uitzetten-kant is hier de bewering die telt: DELETE mag in dit huis
+     niets WISSEN maar alleen op non-actief zetten (zie server/scim/index.js).
+     Een toets die alleen de statuscode leest zou dat verschil niet zien, dus
+     halen we de gebruiker er daarna nog een keer bij. */
+  const opId = '/Users/' + encodeURIComponent(id);
+  const uit = await scim(opId, { method: 'PATCH', headers: goed, body: {
+    schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+    Operations: [{ op: 'replace', path: 'active', value: false }] } });
+  assert.equal(uit.status, 200, 'PATCH zet hem uit: ' + uit.tekst.slice(0, 200));
+  assert.equal(uit.body.active, false, 'en het antwoord zegt dat hij uit staat');
+
+  const aan = await scim(opId, { method: 'PUT', headers: goed, body: {
+    schemas: ['urn:ietf:params:scim:schemas:core:2.0:User'],
+    userName: 'nieuw.medewerker@klantx.nl', active: true } });
+  assert.equal(aan.status, 200, 'PUT zet hem weer aan: ' + aan.tekst.slice(0, 200));
+  assert.equal(aan.body.active, true, 'en het antwoord zegt dat hij aan staat');
+
+  /* PATCH kent maar EEN veld. Zonder deze bewering zou een IdP de
+     identiteitskluis via SCIM kunnen overschrijven, en dat is precies wat
+     server/scim/index.js belooft tegen te houden. */
+  const teveel = await scim(opId, { method: 'PATCH', headers: goed, body: {
+    schemas: ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
+    Operations: [{ op: 'replace', path: 'name.givenName', value: 'Overschreven' }] } });
+  assert.equal(teveel.status, 400, 'PATCH op een ander veld dan active wordt geweigerd');
+
+  const weggehaald = await scim(opId, { method: 'DELETE', headers: goed });
+  assert.equal(weggehaald.status, 204, 'DELETE antwoordt zonder inhoud');
+  const na = await scim(opId, { method: 'GET', headers: goed });
+  assert.equal(na.status, 200, 'en de gebruiker BESTAAT nog: DELETE wist niets');
+  assert.equal(na.body.active, false, 'hij staat alleen op non-actief');
 
   /* De sleutel van klant X mag niet ineens ook klant Y beheren. We hebben maar
      een koppeling, dus toetsen we de andere kant: een ingetrokken sleutel werkt

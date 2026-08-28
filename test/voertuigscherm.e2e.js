@@ -14,7 +14,7 @@
       het bij een andere vervoerder hoort of niet bestaat, want dat verschil
       verraadt of een voertuig ergens anders bestaat.
 
-   Draai los: node --experimental-sqlite --test test/voertuigscherm.e2e.js */
+   Draai los: node --test test/voertuigscherm.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

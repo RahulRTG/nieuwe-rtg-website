@@ -2,7 +2,7 @@
    24 uur per jaar, tien jaar lang. Access loopt af; Asset heeft een aandeel
    in de restwaarde (waarde / 300) en stapt uit via een Tik. Alleen voor
    betalende leden. Draai los:
-   node --experimental-sqlite --test test/assets.test.js */
+   node --test test/assets.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

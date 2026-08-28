@@ -15,6 +15,7 @@
    maakOv(state) volgt het vaste kern-patroon. Dit is de orkestrator: de
    demo-zaak, de gedeelde state-helpers, de rit-start en het rit-beeld wonen
    hier; de ledenkant in ./reizen, de PDA/zaak-kant in ./dienst. */
+const { demoAan } = require('../demostand');
 
 const SOORTEN = { bus: '\u{1F68C}', trein: '\u{1F686}', metro: '\u{1F687}', veerboot: '\u{26F4}\u{FE0F}', tram: '\u{1F68A}' };
 const VOERTUIG_TTL_MS = 120 * 1000;   // een positie is zo lang vers
@@ -30,9 +31,17 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   /* ---- de demo-zaak: Ibiza Transit met vier lijnsoorten ---- */
   function ensureOv() {
     require('../../seed/genres').zetGenre(db, 'ov');
+    /* De opslag bestaat ALTIJD -- ook zonder vervoerder rijdt er straks iemand,
+       en een lijst die niet bestaat is een 500 in plaats van een leeg scherm. */
+    if (!Array.isArray(db.data.ovVoertuigen)) db.data.ovVoertuigen = [];
+    if (!Array.isArray(db.data.ovRitten)) db.data.ovRitten = [];
+    // de ZAAK is verzonnen: alleen in demostand aanmaken (kern/demostand.js)
+    if (!demoAan()) return;
     if (!db.data.suppliers.find(s => s.code === 'TRANSIT')) {
       db.data.suppliers.push({
         code: 'TRANSIT', name: 'Ibiza Transit', type: 'ov', city: 'Ibiza',
+        // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
+        geseed: true,
         loc: { lat: 38.908, lng: 1.432, label: 'Ibiza-stad, busstation' }, rate: 0.08,
         menu: [], photos: [],
         lijnen: [
@@ -63,8 +72,6 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
         ]
       });
     }
-    if (!Array.isArray(db.data.ovVoertuigen)) db.data.ovVoertuigen = [];
-    if (!Array.isArray(db.data.ovRitten)) db.data.ovRitten = [];
   }
 
   const ovZaak = code => db.data.suppliers.find(s => s.code === code && s.type === 'ov') || null;

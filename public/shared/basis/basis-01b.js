@@ -28,11 +28,11 @@
     'html.rtg-rustig [class*="badge"],html.rtg-rustig [class*="pill"]{filter:saturate(.35);}' +
     'html.rtg-rustig *{border-width:1px!important;box-shadow:none!important;}' +
     'html.rtg-linkstreep a{text-decoration:underline!important;text-underline-offset:.18em;}' +
-    '.bss-net{position:fixed;left:50%;transform:translateX(-50%);top:.6rem;z-index:60;background:#0C0C0B;border:1px solid #444;border-radius:10px;color:#eee;font:500 .8rem Inter,system-ui,sans-serif;padding:.45rem .8rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
-    '.bss-sheet{position:fixed;left:1rem;bottom:1rem;z-index:38;width:min(340px,92vw);background:#151312;border:1px solid var(--gold,#A98F1C);border-radius:16px;padding:1rem;color:#eee;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:.55rem;}' +
+    '.bss-net{position:fixed;left:50%;transform:translateX(-50%);top:.6rem;z-index:60;background:#0C0C0B;border:1px solid #444;border-radius:0;color:#eee;font:500 .8rem Inter,system-ui,sans-serif;padding:.45rem .8rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
+    '.bss-sheet{position:fixed;left:1rem;bottom:1rem;z-index:38;width:min(340px,92vw);background:#151312;border:1px solid var(--gold,#A98F1C);border-radius:0;padding:1rem;color:#eee;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:.55rem;}' +
     '.bss-sheet[hidden]{display:none;}' +
     '.bss-kop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-weight:600;font-size:.92rem;}' +
-    '.bss-x{background:transparent;border:1px solid #444;border-radius:8px;color:#eee;padding:.12rem .5rem;cursor:pointer;font:inherit;}' +
+    '.bss-x{background:transparent;border:1px solid #444;border-radius:0;color:#eee;padding:.12rem .5rem;cursor:pointer;font:inherit;}' +
     '.bss-wat{font-size:.84rem;color:#ccc;line-height:1.55;}' +
     '.bss-doe{margin:0;padding-left:1.1rem;font-size:.82rem;color:#bbb;line-height:1.6;}' +
     '.bss-tip{font-size:.8rem;color:#d7c690;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;}' +
@@ -62,6 +62,21 @@
   var tgs = document.createElement('script');
   tgs.src = '/shared/toegankelijk.js'; tgs.async = true;
   (document.head || document.documentElement).appendChild(tgs);
+
+  /* ---- de gebarenlaag: twee laden onder elke regel ----------------------
+     Hij ligt op elk appscherm en DOET IN RUST NIETS. Geen element erbij, geen
+     stijl erover; hij wordt pas wakker als een scherm zegt welke acties een
+     regel draagt (RTGGebaar.zet / RTGGebaar.lijst). Zo staat de bediening op
+     EEN plek in plaats van acht keer net anders (LAT.md regel 4), en kost een
+     scherm dat hem niet gebruikt precies niets.
+
+     Zonder haast: een veeg is een tweede handeling, nooit de eerste. Het blad
+     laadt de laag zelf bij, dus een pagina hoeft er geen <link> voor te kennen. */
+  if (!window.RTGGebaar && !document.querySelector('script[src^="/shared/gebaar.js"]')) {
+    var gb = document.createElement('script');
+    gb.src = '/shared/gebaar.js'; gb.async = true;
+    (document.head || document.documentElement).appendChild(gb);
+  }
 
   function toost(t) {
     var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;

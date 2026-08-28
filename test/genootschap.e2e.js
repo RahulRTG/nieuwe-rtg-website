@@ -6,16 +6,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
@@ -23,7 +19,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
 test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-genoot-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -32,7 +28,7 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
     const reg = await api(base, '/api/auth/register', { name: 'Lid ' + t, email: 'v' + t + '@v.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1987-07-07', tier: 'rtg' });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -40,7 +36,7 @@ test('Genootschap: oprichten, een bijeenkomst uitroepen en een peiling houden',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
-    await page.goto(base + '/apps/genootschap.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/genootschap.html', { waitUntil: 'domcontentloaded' });
 
     // 1. leeg begin
     await page.waitForFunction(() => /Je zit nog nergens in/.test(document.querySelector('#main').textContent), null, { timeout: 15000 });

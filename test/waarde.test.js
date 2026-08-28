@@ -50,10 +50,13 @@ const klok = () => tijd;
 
 test('het plafond van een wallet bestaat echt, en het antwoord zegt hoeveel ruimte er was', () => {
   const { w } = bouw(klok);
-  const saldi = { 'lid:ANNA': 490000 };   // 4.900 euro staat er al
+  const saldi = { 'lid:ANNA': 990000 };   // 9.900 euro staat er al (plafond 10.000)
   const saldoVan = r => saldi[r] || 0;
   const plafond = KLASSEN.PERSONAL_FUNDED.plafondCenten;
-  assert.equal(plafond, 500000, 'het plafond is 5.000 euro per wallet');
+  /* 10.000 euro: gelijkgetrokken met kern/bankregie op 26 augustus 2026. Dit is
+     de TERUGVAL uit de tabel; draait de waardelaag in het huis, dan wint de
+     ingestelde waarde via koppelWalletPlafond(). */
+  assert.equal(plafond, 1000000, 'het plafond is 10.000 euro per wallet');
 
   // 100 euro erbij past nog precies
   assert.equal(w.poort({ van: 'extern:oplaad', naar: 'lid:ANNA', centen: 10000, soort: 'oplaad', saldoVan }), null);
@@ -316,18 +319,30 @@ test.after(() => {
 });
 
 test('door de voordeur: opladen stopt bij het plafond van de wallet', async () => {
-  // tot precies het plafond mag het (5.000 euro is ook exact MAX_CENTEN per boeking)
+  /* HET PLAFOND IS 10.000 EURO EN DAT KOST TWEE OPLAADBEURTEN, want MAX_CENTEN
+     begrenst EEN boeking op 5.000. Hier stond een enkele oplading van 5.000 met
+     "tot precies het plafond": dat leunde op een tweede getal in
+     kern/waarde/klassen.js dat op de helft van het bankplafond stond. Die twee
+     zijn op 26 augustus 2026 samengevoegd tot een bron (de boardroom stelt het
+     in, kern/pay/plafond.js en de waardelaag lezen allebei die), en toen bleek
+     deze toets de oude verborgen waarde te bevestigen. */
+  const eerste = await api('pay/oplaad', { centen: 500000, idem: 'plafond-1' }, walletLid.token);
+  assert.equal(eerste.status, 200, 'de eerste helft laadt gewoon');
   const vol = await api('pay/oplaad', { centen: 500000, idem: 'plafond-vol' }, walletLid.token);
   assert.equal(vol.status, 200, 'tot het plafond laadt gewoon');
-  assert.equal(vol.body.saldo, 500000);
+  assert.equal(vol.body.saldo, 1000000);
 
   // en er kan geen cent meer bij
   const over = await api('pay/oplaad', { centen: 100, idem: 'plafond-over' }, walletLid.token);
   assert.equal(over.status, 409, 'boven het plafond weigert de oplaadroute');
-  assert.match(over.body.error, /maximum/i, 'en zegt waarom');
+  /* De melding komt van de poort die als EERSTE weigert -- kern/pay/plafond.js
+     spreekt van "maximaal", de waardelaag van "maximum". Beide noemen het
+     bedrag, en dat is wat deze bewering wil: een grens die zegt waarom. */
+  assert.match(over.body.error, /maxima(al|um)/i, 'en zegt waarom');
+  assert.match(over.body.error, /10000|10\.000/, 'en noemt het bedrag');
 
   const na = await api('pay/overzicht', {}, walletLid.token);
-  assert.equal(na.body.saldo, 500000, 'de geweigerde oplading heeft niets bijgeschreven');
+  assert.equal(na.body.saldo, 1000000, 'de geweigerde oplading heeft niets bijgeschreven');
 });
 
 test('door de voordeur: het grootboek sluit nog steeds op nul', async () => {

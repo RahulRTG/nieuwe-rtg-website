@@ -32,7 +32,8 @@
 const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
-module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi, codenaamVan, tierVan, keyVanCodenaam, lidstandVan }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/onderneming', bezit: { ondernemingen: 'lijst' } });
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -44,8 +45,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort, staffLijst, anthropic, magAi });
 
   const bak = () => {
-    if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
-    return db.data.ondernemingen;
+    return eigen.bak('ondernemingen');
   };
   const nu = () => new Date().toISOString();
   const scho = (v, n) => schoon(v, n);
@@ -53,6 +53,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const vind = (id) => bak().find(o => o.id === id) || null;
   const vanEigenaar = (key) => bak().filter(o => o.eigenaar === key);
   const vanZaak = (code) => bak().find(o => o.supplierCode === code) || null;
+
+  /* De catalogus-wensen (./catalogus.js): wat een ondernemer bij de onboarding
+     vroeg, en wat het kantoor ermee deed. Codenaam en niet de echte naam; het
+     besluit maakt nadrukkelijk geen zaak -- die weg blijft ./aanvraag.js. */
+  const cat = require('./catalogus')({ bak, save, nu, scho, codenaamVan, tierVan });
 
   /* Het leesdeel (feiten + beeld) staat in ./beeld.js: dit bestand ging over
      de 10 kB-grens, en dat is de natuurlijke naad -- hier de levensloop van het
@@ -64,7 +69,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
      wie bezit is een juridisch feit, geen operationeel. Hij staat hier en niet
      in ./lagen.js omdat hij de samengevoegde capslijst van ./beeld.js leest, en
      die wordt hierboven pas gemaakt. */
-  const bst = require('./bestuur')({ save, schoon, ondernemingCaps });
+  const bst = require('./bestuur')({ save, schoon, ondernemingCaps, keyVanCodenaam, lidstandVan });
 
   /* De vier handelingen die het object zelf veranderen staan in
      ./levensloop.js -- dit bestand ging over de 10 kB van het modulebeleid, en
@@ -112,6 +117,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     /* Het levende register: Nederland en het buitenland samen. Bewust de
        tabel zelf en geen kopie -- de Rechtsvormwacht werkt hem in place bij,
        en een kopie zou de oude stand blijven tonen. */
+    catalogusWensen: cat.catalogusWensen,
+    catalogusWensBesluit: cat.catalogusWensBesluit,
     ONDERNEMING_RECHTSVORMEN: RV.RECHTSVORMEN,
     ondernemingRechtsvormenVanLand: RV.rechtsvormenVanLand,
     ondernemingRechtsvormLanden: RV.LANDEN_MET_VORMEN,

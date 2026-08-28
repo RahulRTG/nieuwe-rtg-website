@@ -20,12 +20,12 @@ const DAG = 24 * 60 * 60 * 1000;
 const BIJNA_OP_DAGEN = 30;                  // zo lang van tevoren waarschuwen
 
 module.exports = (ctx) => {
-  const { db, save, id, schoon, nu, modAan } = ctx;
+  const { db, save, id, schoon, nu, modAan, opslag } = ctx;
 
   function ensureAssets() {
-    if (!Array.isArray(db.data.mobAssets)) db.data.mobAssets = [];
+    opslag.bak('mobAssets');
   }
-  const assetsVan = code => { ensureAssets(); return db.data.mobAssets.filter(a => a.vervoerder === code); };
+  const assetsVan = code => { ensureAssets(); return opslag.bak('mobAssets').filter(a => a.vervoerder === code); };
   const assetMet = (code, assetId) => assetsVan(code).find(a => a.id === assetId) || null;
 
   const datum = v => {
@@ -91,7 +91,7 @@ module.exports = (ctx) => {
     if (body.id && !bestaand) return { status: 404, error: 'Voertuig niet gevonden.' };
     if (!bestaand && !cat) return { status: 400, error: 'Kies een voertuigcategorie: ' + Object.keys(CATEGORIEEN).join(', ') };
     if (bestaand && body.weg) {
-      db.data.mobAssets = db.data.mobAssets.filter(x => x.id !== bestaand.id);
+      opslag.zetBak('mobAssets', opslag.bak('mobAssets').filter(x => x.id !== bestaand.id));
       save();
       return { ok: true, weg: bestaand.id };
     }
@@ -123,7 +123,7 @@ module.exports = (ctx) => {
       }
     }
     a.gewijzigd = nu();
-    if (!bestaand) db.data.mobAssets.push(a);
+    if (!bestaand) opslag.bak('mobAssets').push(a);
     save();
     return { ok: true, asset: assetBeeld(a), verplichtePapieren: c.papieren };
   }

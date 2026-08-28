@@ -21,7 +21,7 @@
    zou een verkoper die aanroep kunnen doen, dan kan hij zijn eigen verkoop
    als betaald afstempelen zonder dat er iets is overgemaakt.
 
-   Draai los: node --experimental-sqlite --test test/markt-zaak.test.js
+   Draai los: node --test test/markt-zaak.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

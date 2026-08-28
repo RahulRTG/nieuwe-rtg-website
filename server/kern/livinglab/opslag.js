@@ -8,6 +8,9 @@
    meer is dan opruimwerk. */
 'use strict';
 
+/* De hashketen onder het auditspoor; zie audit() verderop. */
+const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('../../lib/keten');
+
 module.exports = ({ db, save, crypto }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(5).toString('hex');
@@ -36,14 +39,31 @@ module.exports = ({ db, save, crypto }) => {
      langs. Het spoor is append-only voor de code eromheen: er is geen functie
      die een regel wijzigt of wist, alleen de bewaartermijn van het lab knipt de
      staart (./bestuur.js). Wie het spoor mag lezen hangt aan het lab, niet aan
-     de studie -- een toezichthouder moet juist kunnen zien wat er NIET doorging. */
+     de studie -- een toezichthouder moet juist kunnen zien wat er NIET doorging.
+
+     AAN DE KETEN. "Append-only voor de code eromheen" is een afspraak, geen
+     eigenschap: wie bij de database kan, wijzigt een regel zonder dat het
+     ergens afwijkt. Elke regel draagt daarom de hash van zijn voorganger, zodat
+     een wijziging of verwijdering MIDDEN in het spoor aantoonbaar breekt. Wat
+     dat wel en niet tegenhoudt staat in de kop van lib/keten.js.
+
+     LET OP BIJ HET LEZEN: de keten loopt over het HELE spoor, waarin de regels
+     van alle labs door elkaar staan. Een op lab gefilterde weergave (auditlog()
+     in ./bestuur.js) is daardoor zelf niet na te rekenen -- het onderliggende
+     journaal wel. Dat is de juiste kant op: filteren mag het bewijs niet
+     bepalen. */
   function audit(labId, wat, wie, over, extra) {
-    const a = { id: rid(), labId: String(labId || ''), wat: String(wat || '').slice(0, 60),
+    return ketenNoteerIn(S().audit, {
+      id: rid(), labId: String(labId || ''), wat: String(wat || '').slice(0, 60),
       wie: schoon(wie, 80) || 'onbekend', over: String(over || '').slice(0, 40),
-      detail: schoon(extra, 300), at: nu() };
-    S().audit.unshift(a);
-    if (S().audit.length > 20000) S().audit.pop();
-    return a;
+      detail: schoon(extra, 300), at: nu()
+    }, 20000);
+  }
+
+  /* De ketenstand van dit spoor, voor wie wil weten of het nog klopt. */
+  function auditKeten() {
+    const rij = S().audit;
+    return Object.assign({ top: ketenTop(rij) }, ketenVerifieer(rij));
   }
 
   const vindLab = id => S().labs.find(l => l.id === String(id || '')) || null;
@@ -75,5 +95,5 @@ module.exports = ({ db, save, crypto }) => {
     };
   }
 
-  return { nu, rid, schoon, getal, lijst, code, S, K, audit, vindLab, vindStudie, leegDossier, save };
+  return { nu, rid, schoon, getal, lijst, code, S, K, audit, auditKeten, vindLab, vindStudie, leegDossier, save };
 };

@@ -2,7 +2,7 @@
    TURN-inloggegevens. Extern verkeer wordt gesimuleerd met een
    X-Forwarded-For-header (trust proxy staat aan); localhost zelf is
    uitgezonderd zodat health-checks en de testsuite nooit geraakt worden.
-   Draai: node --experimental-sqlite --test test/schild.test.js */
+   Draai: node --test test/schild.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

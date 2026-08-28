@@ -6,7 +6,7 @@ module.exports = (wctx) => {
   // alleen wat deze wervingsmodule echt gebruikt (de rest van de gedeelde kern
   // hoort hier niet thuis; opgeruimd om dode destructuring te vermijden)
   const { DEMO, accounts, app, logActivity, loginFails, noteFailedTry,
-    notifySupplier, save, schoon, supplierAuth, tooManyTries } = kern;
+    notifySupplier, save, schoon, supplierAuth, tooManyTries, werkmail } = kern;
   /* De uitnodiging zelf -- maken, terugvinden, en er iemand mee verbinden --
      staat in ./uitnodiging.js. Hier staan de routes eromheen. */
   const uitnodiging = require('./uitnodiging')({ kern });
@@ -29,6 +29,10 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
   const st = accounts.getStaffById(Number(req.body.staffId));
   if (st && String(st.supplier_code).toUpperCase() === req.supplier.code) {
     accounts.deactivateStaff(st.id);
+    /* Uit dienst is ook meteen uit de persoonlijke mailbox. Niet wachten tot
+       de volgende overzichtsaanvraag: een nog open personeelsessie mag na dit
+       besluit geen post meer lezen of versturen. */
+    if (werkmail && werkmail.trekPersoneelIn) werkmail.trekPersoneelIn(req.supplier.code, st.id);
     logActivity(req.supplier.code, req.actor, req.actor.name + ' verwijderde ' + st.name + ' uit het team');
   }
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
@@ -92,21 +96,21 @@ app.post('/api/supplier/staff/join', async (req, res) => {
      personeelslogin op een gedeeld apparaat, dus kiest iemand er zelf geen, dan
      maken we er een en hoeft hij er nooit aan te denken. */
   const gekozen = String(req.body.pin || '').trim();
-  if (!bedrijf || !kassacode) { noteFailedTry(bucket); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
+  if (!bedrijf || !kassacode) { noteFailedTry(bucket, req.ip); return res.status(400).json({ error: 'Vul de bedrijfsnaam en de kassacode in.' }); }
   if (gekozen && !/^\d{4}$/.test(gekozen)) return res.status(400).json({ error: 'Een pincode is vier cijfers; laat hem leeg als u er geen wilt.' });
   const pin = gekozen || accounts.makePin();
   // 1) bewijs dat u een eigen RTG-account hebt (een betaalde pas is niet nodig)
   const lid = accounts.findByLogin(req.body.login);
   if (!lid || !(await accounts.verifyPassword(String(req.body.password || ''), lid.password_hash))) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     return res.status(401).json({ error: 'Onjuiste RTG-inloggegevens. Meld u aan met uw eigen RTG-account.' });
   }
   // 2) het bedrijf moet bestaan en de kassacode moet erbij horen (eenmalig)
   const s = findSupplierByName(bedrijf);
-  if (!s) { noteFailedTry(bucket); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
+  if (!s) { noteFailedTry(bucket, req.ip); return res.status(404).json({ error: 'We kennen geen bedrijf met die naam. Controleer de bedrijfsnaam bij uw werkgever.' }); }
   const lijst = invitesVan(s.code);
   const inv = lijst.find(i => i.kassacode === kassacode && !i.used && i.expires > Date.now());
-  if (!inv) { noteFailedTry(bucket); return res.status(403).json({ error: 'Deze kassacode klopt niet, is al gebruikt of verlopen. Vraag uw werkgever om een nieuwe uitnodiging.' }); }
+  if (!inv) { noteFailedTry(bucket, req.ip); return res.status(403).json({ error: 'Deze kassacode klopt niet, is al gebruikt of verlopen. Vraag uw werkgever om een nieuwe uitnodiging.' }); }
   // 3) niet dubbel aanmelden bij hetzelfde bedrijf
   if (accounts.staffByMember(s.code, lid.id)) {
     inv.used = true; save();

@@ -3,20 +3,16 @@
    een tafel-QR-payload in (headless heeft geen camera). De app hoort dan het menu
    van die zaak te openen met de tafel voorgekozen: precies de "scan en bestel"-
    belofte. Draait alleen waar een browser beschikbaar is; anders overgeslagen.
-   Draai: node --experimental-sqlite --test test/scan-tafel.e2e.js */
+   Draai: node --test test/scan-tafel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scan-')); }
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
@@ -24,7 +20,7 @@ async function api(base, pad, body, token) {
 }
 
 test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -41,15 +37,32 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     const payload = 'rtg:tafel:KIKUNOI:' + tafel;
 
     // 3) browser: token in localStorage, app openen
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.addInitScript(([tok]) => {
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [reg.token]);
-    await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
+    /* DE ONBOARDINGPOORT PAS WEGHALEN ALS DE APP ZIJN BESLUIT HEEFT GENOMEN.
+
+       checkOnboarding() (app-main-07.js) haalt /api/onboarding/status op en zet
+       daarna zelf `#onbGate.hidden` -- op true als de intake rond is, op FALSE
+       als hij dat niet is. Haalt deze toets de poort weg voordat dat antwoord
+       binnen is, dan zet de app hem een tel later gewoon weer terug, en dan
+       onderschept die poort elke klik in de scanstroom.
+
+       Zolang de navigatie op `load` wachtte was dat antwoord altijd al binnen.
+       Met `domcontentloaded` is het een race, en die is in de e2e-ronde van 20
+       augustus ook echt geknapt. Vandaar: het antwoord AANMELDEN vóór de goto
+       (daarna is het te laat, waitForResponse ziet alleen wat nog komt) en er
+       hieronder op wachten. */
+    const statusAntwoord = page.waitForResponse(
+      r => r.url().includes('/api/onboarding/status'), { timeout: 30000 }).catch(() => null);
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await statusAntwoord;
 
     // 4) de eigen QR-onderdelen zijn geladen en scannen is bereikbaar. Sinds
     //    het OS-beginscherm staat scannen in het bedieningspaneel en niet meer
@@ -86,9 +99,22 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
        De echte weg is de bovenrand omlaag halen (shared/randen.js). Dat is
        meteen de betere toets: hij meet de ingang die er nu is en niet de knop
        die er toevallig nog staat. */
+    /* EERST WACHTEN TOT DIE RAND ER IS. shared/randen.js hangt zijn luisteraars
+       pas 60 ms na DOMContentLoaded op, en alleen als er iets te openen valt;
+       `window.RTGRanden` is het teken dat hij klaar is.
+
+       Deze regel stond er niet, en dat viel niet op zolang de navigatie op
+       `load` wachtte -- die tijd dekte het toe. In de e2e-ronde van 20 augustus
+       zakte deze toets een keer op precies dat gat: de haal ging over een
+       pagina die nog niet luisterde, en daarna wachtte hij acht seconden op een
+       #osCcScan die verborgen bleef. Dat is dus geen bijwerking van de
+       omzetting maar een race die er al zat. Zelfde reparatie als in
+       test/vooruitscherm.e2e.js. */
+    await page.waitForFunction(() => !!window.RTGRanden, null, { timeout: 20000 });
     await page.mouse.move(196, 4);
     await page.mouse.down();
-    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    // een veeg is een reeks bewegingen, geen sprong: `steps` in plaats van pauzes
+    for (const y of [20, 50, 90, 130]) await page.mouse.move(196, y, { steps: 4 });
     await page.mouse.up();
     await page.waitForSelector('#osCcScan', { state: 'visible', timeout: 8000 });
     await page.click('#osCcScan');
@@ -98,7 +124,24 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     await page.fill('.rtg-scan-hand input', payload);
     await page.evaluate(() => { const f = document.querySelector('.rtg-scan-hand'); if (f) f.requestSubmit(); });
 
-    // 6) het menu van KIKUNOI opent
+    /* 6) EERST DE KAART, DAN PAS HET MENU. Hier stond alleen de regel hieronder:
+       scannen en het menu ging open. Sinds RTG Link (LINK.md stap 4) gaat elke
+       gescande code langs EEN deur, komt er een kaart met wie/wat/waarom/hoelang,
+       en gebeurt er pas iets als een mens erop drukt. Deze toets beschreef dus
+       het gedrag van ervoor, en zakte terecht -- alleen zag niemand dat, omdat
+       de volle e2e-ronde nooit was gedraaid.
+
+       De kaart hoort er eerst te staan, en dat wordt hier ook echt beproefd: een
+       toets die meteen op de knop drukt, zou net zo groen zijn als de kaart werd
+       overgeslagen. */
+    await page.waitForSelector('.rtg-bedoeling', { timeout: 10000 });
+    const kaartTekst = await page.evaluate(() => (document.querySelector('.rtg-bedoeling .blad') || {}).innerText || '');
+    assert.match(kaartTekst, /Menu openen/i, 'de kaart zegt wat er gaat gebeuren');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#menu-sheet.open')), false,
+      'kijken is geen daad: het menu gaat niet vanzelf open');
+
+    // en dan pas het menu van KIKUNOI
+    await page.click('.rtg-bedoeling button.doen');
     await page.waitForSelector('#menu-sheet.open', { timeout: 10000 });
     const naam = await page.textContent('#msName');
     assert.ok(naam && naam.trim().length > 0, 'de menukaart toont de naam van de zaak');

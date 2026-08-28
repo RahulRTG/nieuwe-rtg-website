@@ -2,7 +2,7 @@
    een bord, bewaart lijsten met kaarten en leest ze terug (de sanitizer
    klemt labels en datums); de zaak heeft hetzelfde bord als team-drive;
    en de soortenlijst weigert nog steeds onzin.
-   Draai los: node --experimental-sqlite --test test/officebord.test.js */
+   Draai los: node --test test/officebord.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -24,7 +24,7 @@
       '#paneel .mc-tx{flex:1;min-width:0;}' +
       '#paneel .mc-tx .badge{margin-left:.35rem;}' +
       '#paneel .mc-zg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#paneel .mc-fd{color:var(--rtg-rood,#C23A5E);border-color:rgba(194,58,94,.4);}' +
+      '#paneel .mc-fd{color:var(--rtg-leesrood,var(--rtg-rood,#C23A5E));border-color:rgba(194,58,94,.4);}' +
       '#paneel .mc-mini{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;' +
         'cursor:pointer;padding:0;text-decoration:underline;font-family:inherit;}' +
       '#paneel .mc-rechts{text-align:right;flex-shrink:0;}' +
@@ -32,7 +32,7 @@
       '#paneel .mc-half>*{flex:1;min-width:0;}' +
       '#paneel .mc-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
       '#paneel .mc-vraag input{flex:1;width:auto;}' +
-      '#paneel .mc-uit{border:1px solid var(--rtg-line);border-radius:12px;padding:.6rem .8rem;' +
+      '#paneel .mc-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;' +
         'margin-top:.6rem;font-size:.85rem;line-height:1.55;white-space:pre-wrap;}';
     d.head.appendChild(s);
   };

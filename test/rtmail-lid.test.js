@@ -1,7 +1,7 @@
 /* RTMAIL aan de lid-kant: elk nieuw lid krijgt een welkom in zijn eigen
    postvak, dat als kanaal in de verenigde Berichten-app verschijnt en te lezen
    is. End-to-end tegen een echte server.
-   Draai: node --experimental-sqlite --test test/rtmail-lid.test.js */
+   Draai: node --test test/rtmail-lid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

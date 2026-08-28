@@ -3,13 +3,24 @@
    en rioolheffing; deterministisch per inwoner, betalen via de geld-drempel) en de
    bekendmakingen. Plus het regie-dashboard van de medewerker. Krijgt de gedeelde
    ctx van kern/gemeente/index.js. */
+const { demoAan } = require('../demostand');
 module.exports = (ctx) => {
   const { db, save, nu, vandaag, id, ref, schoon, seed, deGemeente, sseToSupplier, publiekeMelding, FRACTIES } = ctx;
 
   function afvalVoor(postcode) {
     seed();
     const g = deGemeente();
-    const pat = (g && g.gemeente && g.gemeente.afval && g.gemeente.afval.patroon) || { rest: 2, gft: 5, papier: 4, pmd: 1 };
+    /* GEEN GEMEENTE, GEEN KALENDER. De terugval hieronder ({rest:2, gft:5, ...})
+       rekende een volledige ophaalkalender uit zonder dat er een gemeente was
+       aangesloten: drie data per fractie, netjes op de dag, en volledig
+       verzonnen. Iemand die zijn container buiten zet op een datum die wij
+       hebben bedacht, staat er 's ochtends alleen. Zonder gemeente zegt dit
+       antwoord dat er nog geen kalender is. */
+    if (!g || !g.gemeente || !g.gemeente.afval || !g.gemeente.afval.patroon) {
+      return { ok: true, postcode: postcode || null, fracties: {}, gemeente: null,
+        reden: 'Er is nog geen gemeente aangesloten, dus er is geen ophaalkalender. Zodra jouw gemeente meedoet, staat hij hier.' };
+    }
+    const pat = g.gemeente.afval.patroon;
     // de postcode schuift het patroon een paar dagen op, zodat wijken verschillen
     const off = [...String(postcode || '00000')].reduce((n, c) => (n * 31 + c.charCodeAt(0)) >>> 0, 7) % 7;
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -46,11 +57,18 @@ module.exports = (ctx) => {
     return { ok: true, aanvraag: publiekeMelding(m) };
   }
 
-  /* De gemeentelijke aanslagen. In de demo staan er voorbeeldaanslagen klaar per
+  /* De gemeentelijke aanslagen. IN DE DEMO staan er voorbeeldaanslagen klaar per
      inwoner (OZB, afvalstoffenheffing, rioolheffing), deterministisch afgeleid
      van de sleutel zodat de bedragen stabiel blijven. Betalen loopt via de
      geld-drempel (de AI vraagt eerst bevestiging); nooit de belofte dat een
-     betaling al bij de belastingdienst verwerkt is voordat een mens dat ziet. */
+     betaling al bij de belastingdienst verwerkt is voordat een mens dat ziet.
+
+     DIT STOND ER, MAAR HET GEBEURDE ALTIJD. De regel hierboven zei "in de demo"
+     en ensureAanslagen keek daar niet naar: elk lid dat zijn belastingen opende
+     kreeg drie aanslagen op zijn naam, met bedragen en een openstaand saldo, van
+     een gemeente die niet bestaat. Een verzonnen rekening van de overheid is het
+     scherpste voorbeeld van wat een demo nooit mag doen. Nu volgt hij zijn eigen
+     zin (kern/demostand.js): zonder demo is de lijst leeg. */
   const BELASTINGEN = [
     { soort: 'OZB', basis: 180, spreiding: 520 },
     { soort: 'Afvalstoffenheffing', basis: 240, spreiding: 120 },
@@ -58,7 +76,7 @@ module.exports = (ctx) => {
   ];
   function hash(s) { let h = 0x811c9dc5 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h >>> 0; }
   function ensureAanslagen(key) {
-    if (!key) return;
+    if (!key || !demoAan()) return;
     const jaar = new Date().getFullYear();
     if ((db.data.gemeenteAanslagen || []).some(a => a.key === key && a.jaar === jaar)) return;
     const h = hash(String(key) + jaar);

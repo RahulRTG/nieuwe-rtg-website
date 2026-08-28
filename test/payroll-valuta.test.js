@@ -15,7 +15,7 @@
    - een strook zonder valuta uitgeven (of erger: met een stille aanname);
    - een SEPA-betaalbestand maken voor een run die niet in euro's staat.
 
-   Draai los: node --experimental-sqlite --test test/payroll-valuta.test.js */
+   Draai los: node --test test/payroll-valuta.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -27,6 +27,7 @@ const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
 const { maakComponenten } = require('../server/kern/payroll/componenten');
 const { maakRun } = require('../server/kern/payroll/run');
 const { maakJournaal } = require('../server/kern/payroll/journaal');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 const pakket = (over) => Object.assign({
   land: 'NL', versie: 'proef-1', geldigVan: '2026-01-01', geldigTot: '2026-12-31',
@@ -69,7 +70,7 @@ test('bedragen worden getoond in hun eigen munt en hun eigen schaal', () => {
 
 test('het regelpakket weigert een verzonnen muntcode', () => {
   const db = { data: {} };
-  const rp = maakRegelpakket({ db, save: () => {}, nu: () => '2026-03-01T00:00:00.000Z' });
+  const rp = maakRegelpakket({ opslag: maakOpslag({ db }), save: () => {}, nu: () => '2026-03-01T00:00:00.000Z' });
   const fout = rp.neemOp(pakket({ valuta: 'euro' }), { soort: 'test' });
   assert.equal(fout.status, 422);
   assert.ok(fout.bezwaren.some(b => /ISO 4217/.test(b)), fout.bezwaren.join(' '));
@@ -109,12 +110,12 @@ test('een SEPA-betaalbestand wordt geweigerd voor een run die niet in euro staat
   const save = () => {};
   let t = 0;
   const nu = () => '2026-04-01T10:0' + (t++ % 10) + ':00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp(pakket({ land: 'JP', versie: 'jp-2026.1', valuta: 'JPY' }), { soort: 'test' });
   regelpakket.merkAan('JP', 'jp-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
 
   const r = run.open({ code: 'TOKIO', zaak: 'RTG Tokio', periode: '2026-03', land: 'JP',
     regels: [{ staffId: 1, naam: 'K. Tanaka', contract: { uurloonCenten: 1800, soort: 'vast' },
@@ -143,12 +144,12 @@ test('in euro werkt het betaalbestand gewoon', () => {
   const save = () => {};
   let t = 0;
   const nu = () => '2026-04-01T10:0' + (t++ % 10) + ':00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp(pakket({ versie: 'nl-2026.1', valuta: 'EUR' }), { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
   const r = run.open({ code: 'MERIDIAAN', zaak: 'Meridiaan Toren', periode: '2026-03', land: 'NL',
     regels: [{ staffId: 1, naam: 'Timo Vos', contract: { uurloonCenten: 1800, soort: 'vast' },
       invoer: [{ component: 'gewerkte_uren', aantal: 160 }], leeftijdsgroep: '21+', gewerkteUren: 160 }],

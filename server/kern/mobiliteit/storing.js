@@ -18,10 +18,10 @@ const TERUGGAVE = {
 const STORING_MAX_UREN = 24;      // een venster langer dan een dag is geen storing
 
 module.exports = (ctx) => {
-  const { db, save, id, schoon, nu, pay, findSupplier, notify, logActivity, ensureKaartjes } = ctx;
+  const { db, save, id, schoon, nu, pay, findSupplier, notify, logActivity, ensureKaartjes, opslag } = ctx;
 
   function ensureStoringen() {
-    if (!Array.isArray(db.data.mobStoringen)) db.data.mobStoringen = [];
+    opslag.bak('mobStoringen');
   }
 
   /* Een storing melden. Alleen de vervoerder zelf, over zijn eigen lijn: een
@@ -45,7 +45,7 @@ module.exports = (ctx) => {
       soort, oorzaak: schoon(body.oorzaak, 200) || null,
       van: van.toISOString(), tot: tot.toISOString(),
       gemeldDoor: schoon(actor, 60) || 'personeel', gemeld: nu(), verwerkt: null };
-    db.data.mobStoringen.push(s);
+    opslag.bak('mobStoringen').push(s);
     save();
     logActivity(supplier.code, actor, 'meldde een ' + TERUGGAVE[soort].naam + ' op ' + lijn.naam);
     return { ok: true, storing: storingBeeld(s) };
@@ -57,7 +57,7 @@ module.exports = (ctx) => {
 
   const storingLijst = supplier => {
     ensureStoringen();
-    return { ok: true, storingen: db.data.mobStoringen.filter(s => s.vervoerder === supplier.code)
+    return { ok: true, storingen: opslag.bak('mobStoringen').filter(s => s.vervoerder === supplier.code)
       .slice(-40).reverse().map(storingBeeld), soorten: TERUGGAVE };
   };
 
@@ -69,14 +69,14 @@ module.exports = (ctx) => {
   async function storingTeruggave(supplier, actor, body = {}) {
     ensureStoringen();
     ensureKaartjes();
-    const s = db.data.mobStoringen.find(x => x.id === schoon(body.id, 40) && x.vervoerder === supplier.code);
+    const s = opslag.bak('mobStoringen').find(x => x.id === schoon(body.id, 40) && x.vervoerder === supplier.code);
     if (!s) return { status: 404, error: 'Storing niet gevonden.' };
     if (s.verwerkt) return { status: 409, error: 'Deze storing is al verwerkt op ' + s.verwerkt.at.slice(0, 16).replace('T', ' ') + '.' };
 
     const deel = TERUGGAVE[s.soort].deel;
     const vanMs = new Date(s.van).getTime(), totMs = new Date(s.tot).getTime();
     // wie had een kaartje voor DEZE lijn dat in het venster geldig was?
-    const geraakt = db.data.mobKaartjes.filter(k => k.vervoerder === s.vervoerder &&
+    const geraakt = opslag.bak('mobKaartjes').filter(k => k.vervoerder === s.vervoerder &&
       // een abonnement hangt niet aan een lijn maar aan een lijstje lijnen
       (k.product === 'abonnement' ? (k.lijnen || []).includes(s.lijnId) : k.lijnId === s.lijnId) &&
       !(k.terugbetaald && k.terugbetaald.volledig) &&

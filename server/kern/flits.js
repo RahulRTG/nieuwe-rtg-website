@@ -36,13 +36,13 @@ const MELD_PAUZE_MS = 20000;  // een tik per derde minuut per melder is genoeg
 const MAX_MELDINGEN = 4000;   // wereldwijd plafond (oudste eerst weg)
 
 function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/flits', bezit: { flitsMeldingen: 'lijst' } });
   const id = () => 'fl' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const laatsteMelder = new Map();   // key -> ts (rate-limit, alleen in RAM)
 
   function lijst() {
-    if (!Array.isArray(db.data.flitsMeldingen)) db.data.flitsMeldingen = [];
-    return db.data.flitsMeldingen;
+    return eigen.bak('flitsMeldingen');
   }
   function vers(m) {
     const s = SOORTEN[m.soort]; if (!s) return false;
@@ -52,7 +52,7 @@ function maakFlits({ db, save, crypto, haversine, ghostSimuleer }) {
   function opschonen() {
     const rij = lijst().filter(vers);
     if (rij.length > MAX_MELDINGEN) rij.splice(0, rij.length - MAX_MELDINGEN);
-    db.data.flitsMeldingen = rij;
+    eigen.zetBak('flitsMeldingen', rij);
     return rij;
   }
   const flitsVerbodenIn = land => GEEN_FLITS_LANDEN.includes(String(land || '').toUpperCase());

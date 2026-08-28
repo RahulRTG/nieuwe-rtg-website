@@ -6,14 +6,27 @@
    toe en beheert de eigen portemonnee. Munten zijn een saldo-item per
    zaak: kopen verhoogt, inwisselen verlaagt, en onder nul kan nooit.
    Opslag per lid in db.data.wallet[key]; maakWallet(state) volgt het
-   vaste kern-patroon. */
+   vaste kern-patroon.
+
+   DE FEESTMUNT WERD NIET BETAALD. muntKoop() verhoogde het saldo en gaf een
+   `prijs` terug -- en dat was alles: er ging geen boeking langs RTG Pay, er
+   werd niets geind, en het scherm toonde een prijs die niemand ooit betaalde.
+   Een munt met een saldo die uit het niets ontstaat, is precies wat het
+   pay-grootboek een laag hoger verbiedt ("geld ontstaat nooit uit het niets"),
+   en hij ontstond hier honderd stuks tegelijk.
+
+   Kopen loopt daarom via pay.huisIn: het geld gaat van de wallet van het lid
+   naar de huisrekening (extern:treasury), met autolaad eromheen zoals elk
+   ander geld-moment in dit huis. INWISSELEN boekt met opzet niets terug -- het
+   geld is bij de aankoop al betaald, en de munt inleveren is besteden, geen
+   verkoop. */
 
 const SOORTEN = ['pas', 'ticket', 'sleutel', 'munt', 'klantenkaart'];
 const ZELF_SOORTEN = ['ticket', 'sleutel', 'klantenkaart'];
 const MAX_ITEMS = 100;
 const MUNT_PRIJS = 3.5;
 
-function maakWallet({ db, save, crypto, schoon }) {
+function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
   const nu = () => new Date().toISOString();
   const id = () => 'w' + crypto.randomBytes(5).toString('hex');
 
@@ -70,20 +83,30 @@ function maakWallet({ db, save, crypto, schoon }) {
   }
 
   /* ---- feestmunten: een saldo per zaak, nooit onder nul ---- */
-  function muntKoop(key, b) {
+  async function muntKoop(key, b) {
     const zaak = schoon(b.zaak, 60);
     const aantal = Math.round(Number(b.aantal));
     if (!zaak) return { status: 400, error: 'Bij welke zaak of welk feest horen de munten?' };
     if (!(aantal >= 1 && aantal <= 100)) return { status: 400, error: 'Koop 1 tot 100 munten tegelijk.' };
     const items = bak(key);
-    let m = items.find(x => x.soort === 'munt' && x.titel === 'Feestmunten · ' + zaak);
-    if (!m) {
-      if (items.length >= MAX_ITEMS) return { status: 409, error: 'De wallet zit vol; ruim eerst iets op.' };
-      m = voeg(key, { soort: 'munt', titel: 'Feestmunten · ' + zaak, code: 'M-' + crypto.randomBytes(2).toString('hex').toUpperCase(), bron: 'munt', saldo: 0 });
-    }
+    const titel = 'Feestmunten · ' + zaak;
+    let m = items.find(x => x.soort === 'munt' && x.titel === titel);
+    /* DE VOLLE WALLET WORDT VOOR DE KASSA GECONTROLEERD en niet erna. Zou dat
+       omgekeerd staan, dan betaalt het lid en krijgt het daarna te horen dat de
+       munten er niet meer bij passen -- geld weg, niets terug. */
+    if (!m && items.length >= MAX_ITEMS) return { status: 409, error: 'De wallet zit vol; ruim eerst iets op.' };
+    const codenaam = codenaamVan && codenaamVan(key);
+    if (!codenaam) return { status: 403, error: 'Voor feestmunten hoort een wallet bij uw account.' };
+    const centen = Math.round(aantal * MUNT_PRIJS * 100);
+    const betaald = await pay.huisIn({ vanCodenaam: codenaam, centen, oms: titel, idem: schoon(b.idem, 60) || null });
+    if (betaald.error) return betaald;
+    /* Pas NA de betaling ontstaan de munten. voeg() kan hier niet meer op null
+       lopen: de wallet-ruimte is hierboven al gecontroleerd en er is sindsdien
+       niets aan deze bak toegevoegd. */
+    if (!m) m = voeg(key, { soort: 'munt', titel, code: 'M-' + crypto.randomBytes(2).toString('hex').toUpperCase(), bron: 'munt', saldo: 0 });
     m.saldo += aantal;
     save();
-    return { status: 200, ok: true, item: m, prijs: Math.round(aantal * MUNT_PRIJS * 100) / 100 };
+    return { status: 200, ok: true, item: m, prijs: centen / 100, betaaldCenten: centen, bijgeladen: betaald.bijgeladen || 0 };
   }
   function muntWissel(key, b) {
     const items = bak(key);

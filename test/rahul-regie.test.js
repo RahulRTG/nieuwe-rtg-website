@@ -3,7 +3,7 @@
    geld-regie (pasprijzen, ledenvoordeel, partnervergoeding). Mens beslist:
    de AI stelt alleen voor; er verandert pas iets als de eigenaar toepast.
    Zonder AI-sleutel draait de ingebouwde taal-hulp; die toetsen we hier.
-   Draai los: node --experimental-sqlite --test test/rahul-regie.test.js */
+   Draai los: node --test test/rahul-regie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

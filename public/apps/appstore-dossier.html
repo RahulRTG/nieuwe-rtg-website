@@ -13,21 +13,28 @@
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
-    --burgundy:#C23A5E; --gold:#A98F1C; }
+    /* HET GOUD VOLGT DE GROND. #A98F1C is nagerekend op onyx (6,18:1) en stond
+       hier vast, terwijl deze pagina in alle vier de thema's wordt getoond: op
+       champagne haalde hij 2,45, op bordeaux 3,25, op royal 3,62. --rtg-leesgoud
+       is de tint die per thema WEL leest (6,25 / 9,05 / 10,23 / 8,11) -- op
+       fluweel en satijn is dat ivoor, en dat is een besluit dat in
+       rtg-themas.css al staat. De vaste waarde blijft als terugval voor een
+       scherm zonder thema. */
+    --burgundy:#C23A5E; --gold:var(--rtg-leesgoud,#A98F1C); }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);
     padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.3rem;margin-top:.05rem;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kaart h2{font-size:1.05rem;margin-bottom:.15rem;}
   .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
   .lead{font-size:.85rem;color:var(--muted);line-height:1.65;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;text-decoration:none;display:inline-flex;align-items:center;}
   .bw{margin-top:.45rem;padding-left:.7rem;border-left:2px solid var(--line);}
   .bw b{font-size:.8rem;display:block;}

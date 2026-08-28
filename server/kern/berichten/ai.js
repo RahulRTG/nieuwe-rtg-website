@@ -11,7 +11,7 @@
    De draad komt van buiten binnen (kern/berichten/index.js): alleen de laatste
    berichten, op codenaam, zonder enige verwijzing naar wie iemand echt is. Dat
    is het enige wat het model van een gesprek ziet. */
-const { tekst } = require('../../ai');
+const { tekst } = require('../../ai-kort');
 const { samenvat: lokaalSamenvatten, zinnen } = require('../../lib/lokale-taal');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, ' +

@@ -4,7 +4,8 @@
    bij de backoffice, met dezelfde opvolging als De Salon. */
 module.exports = (kern) => {
   const { app, auth, officeAuth,
-    vonkProfielZet, vonkSelectie, vonkLike, vonkBetaal, vonkBericht, vonkMijn, vonkBlokkeer, vonkMeldingen } = kern;
+    vonkProfielZet, vonkSelectie, vonkLike, vonkBetaal, vonkBericht, vonkMijn, vonkBlokkeer, vonkMeldingen,
+    vonkHalfweg, vonkKies } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const gast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Vonk is voor leden met een pas.' }); return true; }
@@ -17,6 +18,8 @@ module.exports = (kern) => {
   app.post('/api/vonk/betaal', auth, async (req, res) => { if (gast(req, res)) return; stuur(res, await vonkBetaal(req.session.key, String(req.body.id || ''))); });
   app.post('/api/vonk/bericht', auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkBericht(req.session.key, String(req.body.id || ''), req.body.tekst)); });
   app.post('/api/vonk/mijn', auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkMijn(req.session.key)); });
+  app.post('/api/vonk/halfweg', auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkHalfweg(req.session.key, String(req.body.id || ''))); });
+  app.post('/api/vonk/kies', auth, (req, res) => { if (gast(req, res)) return; stuur(res, vonkKies(req.session.key, String(req.body.id || ''), req.body.optie)); });
   app.post('/api/vonk/blokkeer', auth, async (req, res) => { if (gast(req, res)) return; stuur(res, await vonkBlokkeer(req.session.key, req.body.codenaam, req.body.meld)); });
   // de backoffice ziet de meldingen (Salon-niveau opvolging)
   app.post('/api/office/vonk/meldingen', officeAuth, (req, res) => stuur(res, vonkMeldingen()));

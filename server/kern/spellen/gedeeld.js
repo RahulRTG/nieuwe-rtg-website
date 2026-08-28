@@ -40,7 +40,7 @@ module.exports = (ctx) => {
   function leeftijdFout(soort, handle) {
     const s = spel(soort);
     if (s && s.volwassen && !volwassen(handle))
-      return 'Proost is 18+. Dit spel kan alleen met leden met een geverifieerde volwassen leeftijd.';
+      return 'Proost is 18+. Dit spel kan alleen met leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.';
     return null;
   }
 

@@ -26,12 +26,12 @@
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.8rem;padding:0.45rem 0.75rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
   .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .stil{color:var(--soft);font-size:0.8rem;line-height:1.55;}
@@ -43,16 +43,25 @@
     border-bottom:2px solid transparent;}
   .standen button[aria-current="true"]{color:var(--txt);border-bottom-color:var(--gold);}
   /* de rij eronder zijn LINKS naar de losse apps en geen knoppen -- ze horen er
-     ook anders uit te zien, dus hier alleen de MAAT: 20px hoog was onder de 24
-     van WCAG 2.5.8. Verder blijft hun uiterlijk zoals het was. */
-  .standen a{padding:0.32rem 0.4rem;min-height:24px;display:inline-flex;align-items:center;white-space:nowrap;}
+     ook anders uit te zien, dus hier stond eerst alleen de MAAT: 20px hoog was
+     onder de 24 van WCAG 2.5.8.
+     "Verder blijft hun uiterlijk zoals het was" stond er ook, en dat was een
+     fout: hun uiterlijk WAS de standaardlinkkleur van de browser, en die kantelt
+     mee met color-scheme. Op onyx gaf dat rgb(158,158,255) -- leesbaar, dus
+     niemand zag het. Op champagne gaf dat #0000EE op een donker vlak: 1,85:1,
+     acht keer op dit ene scherm. Een kleur die je niet zelf zet, zet de browser.
+     Nu de huisinkt met een gouden onderstreping: goud is hier een accent en
+     geen tekstkleur, en in elk van de vier materialen leesbaar. */
+  .standen a{padding:0.32rem 0.4rem;min-height:24px;display:inline-flex;align-items:center;white-space:nowrap;
+    color:var(--txt);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.18em;
+    text-decoration-color:var(--gold);}
 
   main{padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 8rem);}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 0.6rem;}
   .stukken{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.7rem;}
-  .stuk{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0.8rem 0.85rem;
+  .stuk{border:1px solid var(--line);border-radius:0;background:var(--card);padding:0.8rem 0.85rem;
     display:flex;flex-direction:column;gap:0.35rem;}
-  .stuk .vorm{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+  .stuk .vorm{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .stuk .t{font-family:'Bodoni Moda',serif;font-size:1.05rem;line-height:1.25;}
   .stuk .m{font-size:0.74rem;color:var(--soft);}
   .stuk .waarom{font-size:0.72rem;color:var(--soft);border-left:2px solid var(--line);padding-left:0.5rem;}
@@ -61,7 +70,7 @@
   /* padding in plaats van 0: een makersnaam is een knop en hoort 24px hoog (WCAG 2.5.8) */
   .maker{background:none;border:0;color:var(--txt);padding:5px 0;font-size:0.74rem;text-decoration:underline;text-underline-offset:2px;min-height:24px;}
 
-  .kader{border:1px solid var(--line);border-radius:12px;padding:0.75rem 0.85rem;margin:0.8rem 0;background:var(--card2);}
+  .kader{border:1px solid var(--line);border-radius:0;padding:0.75rem 0.85rem;margin:0.8rem 0;background:var(--card2);}
   .kader b{font-weight:600;}
   .bodem{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:0.9rem;}
 
@@ -71,7 +80,7 @@
   .lade{position:fixed;inset:0;background:rgba(12,12,11,0.86);display:none;z-index:60;overflow-y:auto;}
   .lade.open{display:block;}
   .lade .vlak{max-width:52rem;margin:2.5rem auto;background:var(--bg);border:1px solid var(--line);
-    border-radius:16px;padding:1.1rem 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.4rem);}
+    border-radius:0;padding:1.1rem 1.2rem calc(env(safe-area-inset-bottom,0px) + 1.4rem);}
   .lade h2{margin-top:1.1rem;}
   .lade h3{font-family:'Bodoni Moda',serif;font-size:1.4rem;font-weight:600;}
 
@@ -82,22 +91,22 @@
   .speler .info{flex:1;min-width:0;}
   .speler .titel{font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .speler .sub{font-size:0.7rem;color:var(--soft);}
-  .speler video{width:100%;max-height:36vh;background:#000;border-radius:10px;margin-bottom:0.5rem;display:none;}
+  .speler video{width:100%;max-height:36vh;background:#000;border-radius:0;margin-bottom:0.5rem;display:none;}
   .speler video.zien{display:block;}
   #clipvlak{margin-bottom:0.5rem;}
   #clipvlak[hidden]{display:none;}
   #clipvlak video{display:block;max-height:40vh;}
   #filmvlak{position:relative;}
   #clipvlak .ondert{text-align:center;font-size:0.85rem;padding:0.3rem 0;}
-  #clipvlak .ondert span{background:rgba(0,0,0,0.7);padding:0.1rem 0.4rem;border-radius:4px;}
+  #clipvlak .ondert span{background:rgba(0,0,0,0.7);padding:0.1rem 0.4rem;border-radius:0;}
 
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:6.5rem;background:var(--card2);
-    border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.9rem;font-size:0.8rem;z-index:30;
+    border:1px solid var(--line);border-radius:0;padding:0.55rem 0.9rem;font-size:0.8rem;z-index:30;
     opacity:0;pointer-events:none;transition:opacity .2s;}
   .melding.zien{opacity:1;}
 </style>
 </head>
-<body>
+<body data-rtg-eigenvlak="onyx">
 <aside class="media-bank" aria-label="RTG hoofdnavigatie">
   <nav>
     <a href="/apps/vandaag.html"><span aria-hidden="true">⌂</span><b>Vandaag</b></a>
@@ -113,12 +122,14 @@
 <header class="kop">
   <div class="media-titel"><span>Media · Rahul</span><h1>Uw mediawereld.</h1><p>Kijken, luisteren en produceren in één rustige ruimte.</p></div>
   <span class="rek"></span>
-  <button class="knop media-nieuw" id="nieuwKnop" type="button">Nieuwe productie</button>
   <button class="knop" id="lijstKnop" type="button">Lijsten</button>
   <button class="knop" id="samenKnop" type="button">Samen</button>
   <button class="knop" id="biebKnop" type="button">Bibliotheek</button>
   <button class="knop" id="bordKnop" type="button">Mijn bord</button>
 </header>
+<!-- "Nieuwe productie" stond in deze kopbalk, op y 197 van 844 en achter vier
+     andere knoppen. Zie GRAMMATICA.md: de handeling hoort bij de duim. -->
+<div class="rtg-duimbalk"><button class="knop media-nieuw" id="nieuwKnop" type="button" data-hoofdactie>Nieuwe productie</button></div>
 
 <nav class="media-ruimtes" aria-label="Media ruimtes">
   <button type="button" data-media-ruimte="wereld" aria-current="true"><span>Vandaag</span><small>voor u gekozen</small></button>

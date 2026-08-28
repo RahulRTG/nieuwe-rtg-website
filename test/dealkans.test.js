@@ -1,7 +1,7 @@
 /* De dealvinder: de voorspeller herkent combinatiegedrag (twee zaken
    binnen een dagdeel door dezelfde leden) en zet er een kant-en-klaar
    Synergie-voorstel van klaar; de aandelen tellen exact op tot de prijs.
-   Draai los: node --experimental-sqlite --test test/dealkans.test.js */
+   Draai los: node --test test/dealkans.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

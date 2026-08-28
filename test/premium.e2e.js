@@ -26,13 +26,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot, elevateTier } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 /* Vierentwintig zelfstandige RTG- en kantoorruimtes werden alleen door de
    algemene paginascan aangeraakt. Dit is hun eigen zichtbare contract zonder
@@ -86,12 +82,12 @@ async function lidMetNotities(base) {
 }
 
 test('premium: meenemen geeft echte velden, en weigert schermtekst',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -160,12 +156,12 @@ test('premium: meenemen geeft echte velden, en weigert schermtekst',
 });
 
 test('premium: sneltoetsen wijzen naar knoppen die er echt zijn',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await page.goto(base + '/apps/notities.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, token);
@@ -210,18 +206,19 @@ test('premium: sneltoetsen wijzen naar knoppen die er echt zijn',
    een open venster hoort de toetsen eronder stil te leggen -- inVeld()
    dekte dat niet, want in een venster staat de focus op een KNOP. */
 test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen stil',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     await context.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t);
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     const page = await context.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/home.html', { waitUntil: 'domcontentloaded' });
@@ -293,25 +290,32 @@ test('premium: de meeneemknop is geen deel, en een open venster legt de toetsen 
    voor een gebruiker weg. Deze toets meet de getekende maat, niet of het
    element bestaat. */
 test('premium: de knop blijft getekend als de app zijn gastheer sluit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
     const token = await lidMetNotities(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext();
     await context.addInitScript((t) => {
       localStorage.setItem('rtg_member_token', t);
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
     const page = await context.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
     /* deze app meldt zijn bron pas aan als er gegevens zijn; we melden er
        zelf een aan zodat plaats() gedwongen wordt te kiezen */
     await page.evaluate(() => RTGUitvoer.bron(function () { return { kolommen: ['a', 'b'], rijen: [['1', '2']] }; }));
-    await page.waitForTimeout(3000);
+    /* Wachten tot de knop er ECHT staat en getekend is -- dat is de bewering
+       eronder. Drie seconden was een gok die op een trage machine te kort en op
+       een snelle drie seconden te lang was. */
+    await wachtTot(page, () => {
+      const k = document.querySelector('.rtguitvoer-knop');
+      return !!k && k.offsetParent !== null && k.offsetHeight > 0;
+    }, null, { wat: 'de getekende uitvoerknop' });
     const zicht = await page.evaluate(() => {
       const k = document.querySelector('.rtguitvoer-knop');
       if (!k) return { knop: false };
@@ -335,16 +339,16 @@ test('premium: de knop blijft getekend als de app zijn gastheer sluit',
    om zichzelf te corrigeren. Hij zakt zodra inBeeld() in shared/uitvoer niet
    meer meeweegt. */
 test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     await page.setViewportSize({ width: 390, height: 844 });
     const buiten = [];
     for (const pad of ['/apps/navigatie.html', '/apps/ov.html', '/apps/balans.html', '/apps/home.html']) {
-      await page.goto(base + pad, { waitUntil: 'load' });
+      await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => !!window.RTGUitvoer, null, { timeout: 12000 });
       // een bron aanmelden zoals een ingelogde app dat doet; zonder bron is er
       // geen knop, en dan meet deze toets niets
@@ -364,11 +368,11 @@ test('premium: de meeneemknop staat op telefoonmaat overal binnen beeld',
 });
 
 test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige bediening',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const context = await browser.newContext({ serviceWorkers: 'block' });
     await context.addInitScript(() => {
       try {
@@ -377,6 +381,7 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
       } catch (e) {}
     });
     const page = await context.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     const stuk = [];
@@ -384,7 +389,7 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     for (const [naam, titel, doel] of PREMIUM_ZELFSTANDIG) {
       const pad = '/apps/' + naam + '.html';
       await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(350);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         titel: document.title,
@@ -402,7 +407,9 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
        omleiding naar de juiste stand. */
     for (const [naam, doelpad, hash] of PREMIUM_ALIASSEN) {
       await page.goto(base + '/apps/' + naam + '.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(250);
+      /* Een alias STUURT DOOR; wachten op rust is hier wachten tot die sprong
+         gebeurd is, in plaats van hopen dat 250 ms genoeg was. */
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({ pad: location.pathname, hash: location.hash }));
       if (r.pad !== doelpad || r.hash !== hash) {
         stuk.push(naam + ': alias kwam uit op ' + r.pad + r.hash + ' in plaats van ' + doelpad + hash);
@@ -415,7 +422,9 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     for (const [naam, doelpad] of PREMIUM_TOEGANG) {
       const bron = '/apps/' + naam + '.html';
       await page.goto(base + bron, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(450);
+      /* Deze drie sturen door naar hun inlogdeur; wachten op rust is wachten
+         tot die sprong klaar is. */
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         pad: location.pathname,
         kantoor: new URLSearchParams(location.search).get('kantoor'),
@@ -430,6 +439,55 @@ test('premium: alle overige zelfstandige ruimtes tonen hun eigen doel en veilige
     assert.deepEqual(stuk, [], 'zelfstandige premiumruimtes:\n  ' + stuk.join('\n  '));
     const echt = fouten.filter(f => !/^geen sessie$/.test(String(f).trim()));
     assert.deepEqual(echt, [], 'paginafouten (anders dan de bedoelde sessiestop): ' + echt.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+test('partner worden: land en handelsactiviteit sturen de juiste bewijsvelden',
+  { skip: geenBrowser(pw) }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    /* MET EEN PAS DIE PARTNER MAG ZIJN, en dat is sinds de ladderronde een eis
+       en geen beleefdheid: /api/partner/types is de volledige kaart van wat RTG
+       van een partner vraagt, en die staat achter can_be_partner (business-lite
+       of business -- test/commercie.test.js legt die twee vast). Deze toets is
+       ouder dan die poort en kwam anoniem binnen: de landenlijst bleef dan op
+       zijn ene hardgecodeerde optie staan en de wachttijd liep vol. De poort is
+       een bewust veiligheidsbesluit (de ladder handhaaft hem op norm nul), dus
+       de toets logt in -- niet andersom. */
+    const t = Date.now();
+    const reg = await (await fetch(base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Partner ' + t, email: 'pw' + t + '@v.test', phone: '06' + String(t).slice(-8),
+        password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })
+    })).json();
+    assert.ok(reg.token, 'de proef heeft een ingelogd lid nodig');
+    await elevateTier(base, reg.token, 'business');
+
+    browser = await pw.chromium.launch(browserOpties(pw));
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    await page.addInitScript((tok) => { try { localStorage.setItem('rtg_member_token', tok); } catch (e) {} }, reg.token);
+    await page.goto(base + '/apps/partner-worden.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelectorAll('[name="landCode"] option').length > 100,
+      null, { timeout: 12000 });
+    await page.selectOption('[name="landCode"]', 'BE');
+    await page.selectOption('[name="type"]', 'restaurant');
+    assert.equal(await page.textContent('#registratieLabel'), 'Officieel registratienummer');
+    assert.equal(await page.locator('#registerBronVeld').isVisible(), true);
+    assert.equal(await page.locator('[data-bewijs="sector_lokaal"]').count(), 1,
+      'België krijgt een lokale sectorvergunning en geen Nederlandse NVWA-eis');
+    assert.equal(await page.locator('[data-bewijs="nvwa"]').count(), 0);
+    await page.check('[name="goederen"]');
+    await page.check('[name="douane"]');
+    assert.equal(await page.isChecked('[name="internationaleHandel"]'), true);
+    assert.equal(await page.locator('[data-bewijs="goederencode"]').count(), 1);
+    assert.equal(await page.locator('[data-bewijs="eori"]').count(), 1);
+    assert.deepEqual(fouten, []);
   } finally {
     if (browser) await browser.close();
     child.kill();

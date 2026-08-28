@@ -41,6 +41,7 @@ const kostenhaak = require('../kern/kosten/haak');
 
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
   grootSupplierSync, busGeef, kernGeef }) => {
+  const routepoort = require('../kern/commercie/routepoort');
   const bus = { publish: (a, b) => busGeef().publish(a, b) };
   const kern = new Proxy({}, { get: (_, naam) => kernGeef()[naam] });
 
@@ -106,8 +107,16 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
        eigen VOG kan aftekenen, heeft geen VOG nodig. */
     const poort = persoonsPoort(req.supplier, req.actor);
     if (!poort.ok) return res.status(403).json({ error: poort.error, persoonseis: poort.missend || null });
-    // Kostencontext op de ZAAKCODE: per medewerker zou het een
-    // productiviteitscijfer zijn (KOSTEN.md par. 6).
+
+    /* HET ABONNEMENT VAN DE ZAAK. Hier, om precies dezelfde reden als de
+       persoonseis erboven: dit is het enige keelgat waar elke leveranciersroute
+       doorheen moet, dus een kassaroute die er morgen naast wordt gebouwd valt
+       er vanzelf onder. Waarom deze poort TERUGVALT waar de persoonseis
+       DICHTVALT, staat in kern/commercie/routepoort.js. */
+    const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path, kern.handhavingSchaduw);
+    if (!abo.ok) return res.status(402).json({ error: abo.error, capability: abo.cap, nodig: abo.nodig || null });
+
+    // Kostencontext op de ZAAKCODE en NA de abonnementspoort (KOSTEN.md par. 6).
     const drager = kostenhaak.drager('zaak', req.supplier.code);
     kostenhaak.meld('verzoek', 1, { drager, pas: 'zaak' });
     kostenhaak.binnen(drager, next, 'zaak');

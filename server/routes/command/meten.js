@@ -62,6 +62,24 @@ module.exports = (ctx) => {
   app.post('/api/command/canary/af', officeAuth, (req, res) => veilig(res, () =>
     command.canary.af(String(req.body.id || ''), wie(req))));
 
+  /* DE UITROLREGIE. Waar de canary EEN functie over de mensen verdeelt, loopt
+     deze de hele trap af: live op de smalste trede, en verder zolang het houdt.
+     Staat om dezelfde reden bij "besturen" en niet bij "zien".
+
+     'bevestig' is de enige die een trede met de mensrem opent -- geld en het
+     kanaal tussen twee leden gaan nooit vanzelf open. Zie de kop van
+     server/kern/command/uitrolregie.js; die grens komt uit GELD.md en LIFE.md
+     en is met opzet geen instelling. */
+  app.post('/api/command/uitrol', officeAuth, (req, res) => veilig(res, () => command.uitrolregie.stand()));
+  app.post('/api/command/uitrol/zet', officeAuth, (req, res) => veilig(res, () =>
+    command.uitrolregie.zet(String(req.body.trede || ''), wie(req), 'hand')));
+  app.post('/api/command/uitrol/klim', officeAuth, (req, res) => veilig(res, () =>
+    command.uitrolregie.klim(wie(req))));
+  app.post('/api/command/uitrol/pauze', officeAuth, (req, res) => veilig(res, () =>
+    command.uitrolregie.pauze(wie(req), req.body.reden ? String(req.body.reden) : null)));
+  app.post('/api/command/uitrol/bevestig', officeAuth, (req, res) => veilig(res, () =>
+    command.uitrolregie.bevestig(wie(req))));
+
   /* De zandbak. Zoeken en recepten draaien hier op een DB-VENSTER met
      zaaigegevens; er is geen pad waarlangs zo'n handeling bij een
      productiecollectie komt. De uitslag draagt altijd `zandbak: true`, zodat

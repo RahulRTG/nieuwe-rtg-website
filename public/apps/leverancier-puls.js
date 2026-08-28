@@ -6,8 +6,8 @@
    van de server geen pols en zien dit blok dus nooit. */
 (function () {
   'use strict';
-  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
-  var STIL = 'background:none;border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
+  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
+  var STIL = 'background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
 
   function bind(el, ctx) {
     var api = ctx.api, T = ctx.T, esc = ctx.esc, toast = ctx.toast, S = ctx.S;
@@ -28,10 +28,10 @@
     var h = '<div class="st-sec h-mt120">' + T('pu.kop', 'De pols van vandaag') + '</div>';
     h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:0.5rem;">' +
       p.meters.map(function (m) {
-        return '<div style="border:1px solid var(--line);border-radius:12px;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.05rem;display:block;">' + esc(String(m[1])) + '</b><span class="sub">' + esc(m[0]) + '</span></div>';
+        return '<div style="border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;text-align:center;"><b style="font-size:1.05rem;display:block;">' + esc(String(m[1])) + '</b><span class="sub">' + esc(m[0]) + '</span></div>';
       }).join('') + '</div>';
     if ((p.signalen || []).length) {
-      h += '<div style="border:1px solid var(--gold);border-radius:12px;padding:0.6rem 0.8rem;margin-top:0.6rem;">' +
+      h += '<div style="border:1px solid var(--gold);border-radius:0;padding:0.6rem 0.8rem;margin-top:0.6rem;">' +
         p.signalen.map(function (s) { return '<div class="sub" style="padding:0.15rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') + '</div>';
     } else {
       h += '<p class="sub h-mt50">' + T('pu.rust', 'Geen signalen; de dag loopt zoals hij hoort.') + '</p>';

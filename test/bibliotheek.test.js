@@ -1,6 +1,6 @@
 /* De echte RTG Bibliotheek: de RTF-afdeling in de Mall (open voor iedereen,
    ook de gast) en de bibliothecaris die in beide werelden alleen echte apps
-   aanraadt. Draai los: node --experimental-sqlite --test test/bibliotheek.test.js */
+   aanraadt. Draai los: node --test test/bibliotheek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -41,11 +41,11 @@
       '#paneel .bk-hrow:last-child{border-bottom:0;}' +
       '#paneel .bk-sub{color:var(--rtg-soft);font-size:.7rem;margin-top:.1rem;}' +
       '#paneel .bk-bed{white-space:nowrap;font-variant-numeric:var(--rtg-cijfers);}' +
-      '#paneel .bk-pil{display:inline-block;border:1px solid var(--rtg-line);border-radius:999px;' +
+      '#paneel .bk-pil{display:inline-block;border:1px solid var(--rtg-line);border-radius:0;' +
         'padding:.06rem .5rem;font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;' +
         'color:var(--rtg-soft);margin-left:.4rem;vertical-align:middle;}' +
       '#paneel .bk-pil.bk-rtg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#paneel .bk-staaf{height:6px;background:var(--rtg-line);border-radius:3px;overflow:hidden;margin-top:.25rem;}' +
+      '#paneel .bk-staaf{height:6px;background:var(--rtg-line);border-radius:0;overflow:hidden;margin-top:.25rem;}' +
       '#paneel .bk-staaf i{display:block;height:100%;background:var(--gold-basis);}' +
       '#paneel .bk-snel{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem;}';
     d.head.appendChild(s);

@@ -49,7 +49,7 @@ module.exports = (wctx) => {
     if (tooManyTries(res, bucket)) return;
     // gezin-token: het profiel moet kloppen en mag geen gast zijn (privezaak)
     const sess = rtf.verifieerProfiel(b.code, b.token);
-    if (!sess) { noteFailedTry(bucket); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
+    if (!sess) { noteFailedTry(bucket, req.ip); return res.status(403).json({ error: 'Log opnieuw in bij je gezin om te solliciteren.' }); }
     if (sess.gast) return res.status(403).json({ error: 'Als oppas of familielid solliciteer je niet namens het gezin.' });
     /* De leeftijd komt uit het PROFIEL, niet uit het verzoek. Hier stond
        `parseInt(b.leeftijd, 10)` -- een getal dat de client zelf meestuurde, en

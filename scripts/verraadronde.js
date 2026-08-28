@@ -35,14 +35,14 @@
    scenario moet zonder verraad wel degelijk zijn spoor achterlaten. Doet het dat
    niet, dan meet de waarnemer niets en mag hij niet oordelen.
 
-   Draai:  node --experimental-sqlite scripts/verraadronde.js
-           node --experimental-sqlite scripts/verraadronde.js --seed=99
+   Draai:  node scripts/verraadronde.js
+           node scripts/verraadronde.js --seed=99
    ========================================================================== */
 'use strict';
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const { CATALOGUS } = require('../server/lib/verraad');
 const { telSamen, zakt } = require('./lib/verraadtelling');
 
@@ -56,29 +56,18 @@ const SEED = (argv.find(a => a.startsWith('--seed=')) || '--seed=20260811').slic
    dekking die er niet is. */
 const TE_PROEVEN = CATALOGUS.filter(v => v.waar && v.waar.includes('db/index.js')).map(v => v.naam);
 
-function vrijePoort() {
-  const net = require('net');
-  return new Promise((res, rej) => {
-    const s = net.createServer(); s.unref(); s.on('error', rej);
-    s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); });
-  });
-}
 
+/* De gedeelde wegwerpserver (scripts/lib/wegwerpserver.js) met magSterven:
+   deze ronde saboteert de start bewust en wil WETEN dat de server stierf.
+   Een hangende start telt hier ook als dood -- dat was altijd al de
+   betekenis van deze uitslag. De datamap is van de aanroeper en wordt
+   dus niet door de lib opgeruimd. */
 async function start(datamap, extra) {
-  const poort = await vrijePoort();
-  const basis = 'http://127.0.0.1:' + poort;
-  const kind = spawn(process.execPath, ['--experimental-sqlite', path.join(WORTEL, 'server', 'server.js')], {
-    cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra }
-  });
-  const eind = Date.now() + 45000;
-  while (Date.now() < eind) {
-    if (kind.exitCode !== null) return { kind, basis, dood: true };
-    try { const r = await fetch(basis + '/api/health'); if (r.ok) return { kind, basis, dood: false }; } catch (e) {}
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return { kind, basis, dood: true };
+  try {
+    const s = await wegwerp({ naam: 'verraad', datamap, magSterven: true, wachtMs: 45000,
+      env: { RTG_DEMO: '1', RTG_VERRAAD_SEED: SEED, ...extra } });
+    return { kind: s.kind, basis: s.basis, dood: s.dood };
+  } catch (e) { return { kind: null, basis: '', dood: true }; }
 }
 const stop = (s) => { try { s.kind.kill('SIGKILL'); } catch (e) {} };
 
@@ -152,6 +141,12 @@ function verschillen(schoon, met) {
   }
   return uit;
 }
+
+/* ALLEEN DOEN ALS IEMAND DIT BESTAND DRAAIT. Zonder deze wacht start een
+   volledige verraadronde zodra iets dit bestand require't -- dat is hier echt
+   gebeurd bij een onschuldige laadcontrole. Zelfde wacht als de andere
+   instrumenten (zie scripts/meetkeuring.js). */
+if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
   console.log('\n=== DE VERRAADRONDE ===\n');

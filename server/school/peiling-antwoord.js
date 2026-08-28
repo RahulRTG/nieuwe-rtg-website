@@ -67,6 +67,20 @@ module.exports = (sctx) => {
     res.status(404).json({ error: 'Die peiling kennen we niet.' });
   });
 
+  /* Welke peilingen staan er voor MIJ open? Het gezin had die vraag al
+     (/peiling/mijn); het personeel niet, en daarmee was de personeelspeiling
+     onbereikbaar: je kon alleen antwoorden als je het id van een peiling
+     ergens vandaan toverde. Zelfde vorm, zelfde anonimiteit -- alGeantwoord
+     komt uit het merk en niet uit een lijst met namen. */
+  router.post('/school/peiling/mijn-personeel', (req, res) => {
+    const pv = personeelVan(req, res); if (!pv) return;
+    const uit = P(pv.sch).filter(p => p.open && p.doelgroep === 'personeel')
+      .map(p => ({ id: p.id, titel: p.titel, stellingen: p.stellingen, tot: p.tot,
+        alGeantwoord: p.merken.includes(merk(pv.sch, p, 'p:' + pv.p.id)) }));
+    res.json({ ok: true, peilingen: uit.slice(0, 20),
+      uitleg: 'Anoniem: alleen uw scores worden bewaard, niet wie u bent. De school ziet pas een uitslag vanaf vijf antwoorden.' });
+  });
+
   // en het personeel, met hetzelfde slot en dezelfde anonimiteit
   router.post('/school/peiling/antwoord-personeel', (req, res) => {
     const pv = personeelVan(req, res); if (!pv) return;

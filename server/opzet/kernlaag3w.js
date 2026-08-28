@@ -12,6 +12,12 @@ module.exports = (kern, hulp) => {
    hele kern mee en leest die laat, want hij hangt aan lagen die in dezelfde
    ronde worden samengesteld. */
 Object.assign(kern, require('../kern/reiswereld').maakReiswereld({ kern }));
+/* DE REIS (kern/reizen.js): fase 1 van REIZEN.md -- de losse regels van de
+   reiswereld gegroepeerd tot reizen. Leest uitsluitend `reiswereld.komend()` en
+   nooit de domeinen zelf, want anders zijn er twee plekken die weten wat er in
+   uw agenda staat. Bezit geen boeking; wat hij niet kan plaatsen legt hij los
+   met de reden erbij. */
+Object.assign(kern, require('../kern/reizen').maakReizen({ kern }));
 /* RTG Kantoor (kern/kantoorwereld.js): dezelfde laag, maar dan over de
    kantoorwereld -- agenda, taken, documenten en gedeelde bestanden. Ook deze
    bezit niets en schrijft nooit; werken doet u in de specialist. Dezelfde

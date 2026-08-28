@@ -18,14 +18,14 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1100px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
@@ -33,24 +33,24 @@
   .knop:focus-visible,input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.3rem 0 .5rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.05rem;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.3rem 0 .5rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.05rem;}
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.4rem .55rem;}
   /* het raster: kanalen naast elkaar, stappen onder elkaar */
   .kanaal{display:grid;grid-template-columns:9.5rem 1fr;gap:.6rem;align-items:center;
     padding:.35rem 0;border-top:1px solid var(--line);}
   .kanaal:first-child{border-top:none;}
-  .kanaal.gekozen .knaam{color:var(--gold);}
+  .kanaal.gekozen .knaam{color:var(--rtg-leesgoud,var(--gold));}
   .kkop{display:grid;grid-template-columns:1fr auto;gap:.25rem .4rem;align-items:center;}
   .knaam{background:none;border:0;color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;
     text-align:left;cursor:pointer;padding:0;}
-  .kstil{background:var(--card2);border:1px solid var(--line);border-radius:999px;color:var(--soft);
+  .kstil{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--soft);
     font:inherit;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.1rem .45rem;cursor:pointer;}
   .kstil.aan{color:var(--burgundy);border-color:rgba(194,58,94,.5);}
   .kvol{grid-column:1 / -1;width:100%;accent-color:var(--gold);height:.9rem;}
   .baan{display:grid;gap:2px;}
-  .cel{background:var(--card2);border:1px solid transparent;border-radius:3px;height:1.5rem;
+  .cel{background:var(--card2);border:1px solid transparent;border-radius:0;height:1.5rem;
     padding:0;cursor:pointer;min-width:0;}
   .cel.tel{background:#221F1D;}
   .cel.maat{border-left:1px solid var(--line);}
@@ -61,7 +61,7 @@
   .cel.zwart{background:#100E0D;}
   .cel.zwart.aan{background:var(--burgundy);}
   /* de notenrol */
-  .rol{max-height:22rem;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:.4rem;}
+  .rol{max-height:22rem;overflow:auto;border:1px solid var(--line);border-radius:0;padding:.4rem;}
   .rrij{display:grid;grid-template-columns:3rem 1fr;gap:.4rem;align-items:center;margin-bottom:2px;}
   .rlabel{font-size:.6rem;color:var(--soft);font-variant-numeric:tabular-nums;}
   .rlabel.kruis{color:rgba(244,241,236,0.3);}
@@ -69,20 +69,20 @@
   .rbaan .cel{height:1.1rem;}
   /* de lijst met stukken */
   .stuk{display:flex;gap:.7rem;align-items:center;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:.6rem .75rem;margin-bottom:.45rem;width:100%;text-align:left;
+    border-radius:0;padding:.6rem .75rem;margin-bottom:.45rem;width:100%;text-align:left;
     color:inherit;font:inherit;cursor:pointer;}
   .stuk:hover{border-color:var(--gold);}
   .stuk .nm{font-weight:600;font-size:.9rem;}
   .stuk .mt{font-size:.72rem;color:var(--soft);}
   .stuk .rechts{margin-left:auto;font-size:.68rem;color:var(--soft);text-align:right;}
   .merk{display:inline-block;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;
-    border:1px solid var(--line);border-radius:999px;padding:.05rem .45rem;color:var(--gold);margin-left:.4rem;}
+    border:1px solid var(--line);border-radius:0;padding:.05rem .45rem;color:var(--rtg-leesgoud,var(--gold));margin-left:.4rem;}
   /* de tekstregel onder een stemkanaal */
   .tekstrij{margin-top:.7rem;border-top:1px solid var(--line);padding-top:.6rem;}
   .lettergrepen{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem;}
   .lg{display:grid;gap:.15rem;}
   .lgtijd{font-size:.55rem;color:var(--soft);font-variant-numeric:tabular-nums;}
-  .lg input{background:var(--card2);border:1px solid var(--line);border-radius:7px;color:var(--txt);
+  .lg input{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.78rem;padding:.2rem .35rem;width:4.2rem;}
   /* de vorm, de makers en de uitgave */
   .deel{display:flex;gap:.6rem;align-items:center;border-top:1px solid var(--line);padding:.4rem 0;}
@@ -97,11 +97,11 @@
   .maker{display:flex;gap:.5rem;align-items:center;border-top:1px solid var(--line);padding:.4rem 0;
     font-size:.85rem;}
   .maker:first-child{border-top:none;}
-  .maker .rol{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);}
+  .maker .rol{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .maker .rechts{margin-left:auto;}
   .fout{font-size:.8rem;color:#E78AA0;margin-top:.5rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
 </style>

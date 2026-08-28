@@ -78,6 +78,7 @@ function maakLidboard({ db, save }) {
     lidBoardUit: bewustUit,
     lidBoardLog: journaal.lijst,
     lidBoardLogWis: journaal.wis,
+    lidBoardLogKeten: journaal.keten,
     // het werkgeversbeleid (kan alleen dichtzetten, nooit openzetten)
     werkbeleid: werk.werkbeleid,
     werkbeleidZet: werk.werkbeleidZet,

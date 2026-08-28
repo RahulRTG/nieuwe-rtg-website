@@ -1,6 +1,7 @@
 /* Afdelingsregister deel 2, kamergroep "kantoorkamers" (kern/afdelingen): de
    zeven jongere bedrijfskamers - Support team, Ingenieurs, Integratiekamer, Controleregister,
-   Consumenten- en Partner-abonnementen en de Kantine. Zelfde vorm als register.js:
+   Consumenten- en Partner-abonnementen en de Kantine (het Reisbureau staat in
+   ./reisbalie.js). Zelfde vorm als register.js:
    per kamer de naam, KPI's en lijsten, alles defensief lezend. Kamers met
    naamInzage: true mogen via de identiteitskluis de echte naam bij een codenaam
    opvragen (elke opvraging komt in het auditlog). Verbatim uit register2.js. */
@@ -49,7 +50,19 @@ module.exports = (ctx) => {
             + (m.stroom && m.stroom.bron === 'batterij' ? ', OP BATTERIJ' + (m.stroom.pct != null ? ' (' + m.stroom.pct + '%)' : '') : ''));
         })() },
         { titel: 'Laatste update-meldingen', items: lijst(d().doosUpdateStatus).slice(0, 6).map(s => s.doos + ': ' + (s.gelukt ? 'gelukt' : 'NIET gelukt') + (s.naar ? ' naar v' + s.naar : '') + ', ' + s.melding) },
-        { titel: 'Verder kijken', items: ['Het volledige techniekbord staat op techniek.html (eigenaar-inlog); de Zaakdozen staan in de kamer Intern & IT.'] }
+        /* GEEN TWEEDE DEKKINGSCIJFER HIER, EN DAT IS OPZET.
+
+           Een KPI met de routedekking erin zou aantrekkelijk zijn, maar deze
+           kamer heeft de routekaart van de server niet (die komt uit
+           app._routes(), en dit register wordt lang voor de routes opgehangen).
+           Ze zou dus moeten rekenen met alleen DEKKING.json -- en dan kan hier
+           100% staan terwijl het kantoorscherm "achterhaald" meldt, omdat dat
+           laatste het bewijsstuk WEL naast de levende routekaart houdt. Twee
+           plekken die een waarheid vasthouden, lopen uiteen (LAT.md regel 4),
+           en bij een cijfer dat 100% moet zijn is dat het ergste wat er kan
+           gebeuren. Dus een wegwijzer en geen getal. */
+        { titel: 'Verder kijken', items: ['De routedekking -- elke route van dit huis en of een toets hem echt heeft aangeroepen -- staat op routedekking.html.',
+          'Het volledige techniekbord staat op techniek.html (eigenaar-inlog); de Zaakdozen staan in de kamer Intern & IT.'] }
       ] },
     integraties: { naam: 'Integratiekamer', icoon: 'antenne', eigenApp: true,
       missie: 'SMTP, SMS, Connect en SEPA veilig testen, bewaken en als één keten laten samenwerken.',

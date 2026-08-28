@@ -24,8 +24,9 @@
    punten, begrensd opgeslagen, zodat het klein blijft en overal opnieuw
    te tekenen is. */
 module.exports = ({ db, save, crypto, schoon, dyncode, sseToSupplier }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/koppel', bezit: { koppelVerzoeken: 'lijst' } });
   const nu = () => new Date().toISOString();
-  const lijst = () => { if (!Array.isArray(db.data.koppelVerzoeken)) db.data.koppelVerzoeken = []; return db.data.koppelVerzoeken; };
+  const lijst = () => eigen.bak('koppelVerzoeken');
 
   const SOORTEN = {
     betaal: { label: 'Betalen op afstand', werkt: 'De telefoon toont de RTG-code; de klant scant en betaalt in zijn eigen app.' },

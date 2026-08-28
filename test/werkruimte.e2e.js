@@ -9,24 +9,20 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wr-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const page = await ctx.newPage();
     const fouten = [];
@@ -39,6 +35,29 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     // de ruimte begint met twee surfaces
     const begin = await page.evaluate(() => RTGSchil.surfaces.map(s => s.id));
     assert.deepEqual(begin.sort(), ['agenda', 'reizen'], 'de tafel hoort niet leeg te beginnen');
+
+    /* De standaardkamer is geen raster meer. De zichtbare app vult op desktop
+       én telefoon exact de ruimte tussen linkerbank, tabbalk en onderbalk. */
+    const maten = async () => page.evaluate(() => {
+      const pak = (s) => { const r = document.querySelector(s).getBoundingClientRect();
+        return { x:r.x, y:r.y, width:r.width, height:r.height }; };
+      return { scherm:{ width:innerWidth, height:innerHeight }, werk:pak('.rtg-surface[data-actief]'),
+        links:pak('.rtg-console'), boven:pak('.rtg-tabbar'), onder:pak('.rtg-onderbalk'),
+        zichtbaar:getComputedStyle(document.querySelector('.rtg-werkruimte')).display };
+    });
+    const volledig = (m) => {
+      assert.equal(m.zichtbaar, 'block');
+      assert.ok(Math.abs(m.werk.x - m.links.width) < 1);
+      assert.ok(Math.abs(m.werk.y - m.boven.height) < 1);
+      assert.ok(Math.abs(m.werk.width + m.links.width - m.scherm.width) < 1);
+      assert.ok(Math.abs(m.werk.height + m.boven.height + m.onder.height - m.scherm.height) < 1);
+    };
+    volledig(await maten());
+    await page.setViewportSize({ width:390, height:844 });
+    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 56);
+    volledig(await maten());
+    await page.setViewportSize({ width:1440, height:900 });
+    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 178);
 
     // er komt er een bij, en dan bewaren we de kamer
     await page.evaluate(() => RTGSchil.open('office', { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));

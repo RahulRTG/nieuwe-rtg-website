@@ -32,13 +32,13 @@ const BRONNEN = {
 };
 
 function maakUitgifte({ db, save, crypto }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/uitgifte', bezit: { uitgiften: 'lijst' } });
   const nu = () => new Date().toISOString();
   const id = () => 'ug' + crypto.randomBytes(4).toString('hex');
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
 
   function U() {
-    if (!Array.isArray(db.data.uitgiften)) db.data.uitgiften = [];
-    return db.data.uitgiften;
+    return eigen.bak('uitgiften');
   }
   const vind = (domein, eigenaar, uid) => U().find(u => u.id === String(uid || '') && u.domein === domein && u.eigenaar === eigenaar);
   const nodig = u => u.ogen / 2;
@@ -65,7 +65,7 @@ function maakUitgifte({ db, save, crypto }) {
       domein, eigenaar, bron, ogen, doel: schoon(data.doel, 80) || 'harde schijf',
       handtekeningen: [{ door: wie, at: nu() }], status: 'wacht-op-ogen', at: nu(), overgeschrevenAt: null };
     U().unshift(u);
-    db.data.uitgiften = U().slice(0, 10000);
+    eigen.zetBak('uitgiften', U().slice(0, 10000));
     save();
     return { ok: true, uitgifte: publiek(u) };
   }
@@ -77,7 +77,11 @@ function maakUitgifte({ db, save, crypto }) {
     if (u.status !== 'wacht-op-ogen') return { status: 409, error: 'Deze uitgifte is al ' + u.status + '.' };
     const wie = schoon(actor, 60);
     if (wie.length < 2) return { status: 400, error: 'Een handtekening staat altijd op naam.' };
-    if (u.handtekeningen.some(h => h.door.toLowerCase() === wie.toLowerCase()))
+    /* De ogenregel komt uit kern/ogen.js. Hij stond hier zonder trim en aan de
+       overheidskant met -- wat hier niets uitmaakte, want `schoon()` hierboven
+       trimt al aan beide kanten. Het gaat dus niet om een gat maar om de vier
+       plekken zelf; zie de kop daar. */
+    if (require('./ogen').magMeetekenen(u.handtekeningen, wie).error)
       return { status: 409, error: 'Dezelfde ogen tellen niet dubbel; een ANDERE collega moet meetekenen.' };
     u.handtekeningen.push({ door: wie, at: nu() });
     if (u.handtekeningen.length >= nodig(u)) u.status = 'vrijgegeven';

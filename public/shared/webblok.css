@@ -6,34 +6,57 @@
    een container: de blokken buigen mee met de DOEK-breedte (de gekozen versie),
    niet met het venster -- zo klopt de telefoon-, tablet- en desktopversie. */
 .doek{
-  width:100%;max-width:1080px;margin:0 auto;border-radius:16px;overflow:hidden;
+  width:100%;max-width:1080px;margin:0 auto;border-radius:0;overflow:hidden;
   container-type:inline-size;transition:max-width .28s ease;
 }
-.doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:rgba(244,241,236,.66); --dline:rgba(255,255,255,.12); --dcard:#151312; }
-.doek[data-thema="licht"]{ --dbg:#F5F1EA; --dtxt:#20160F; --dmut:rgba(32,22,15,.66); --dline:rgba(32,22,15,.14); --dcard:#FBF8F2; }
+/* DE SITE VAN EEN LID IS EEN EIGEN DOCUMENT, EN DRAAGT DUS ZIJN EIGEN TOKENS --
+   ook als er nog geen thema gekozen is. Zonder deze basisregel stonden --dbg en
+   --dmut ongedefinieerd tot het doek een data-thema kreeg, en dan viel elke
+   `var(--dbg)` terug op niets: geen grond, geen inkt, en in de Website-maker
+   een grijs vlak met onleesbare hulptekst (1,34:1, gemeten 20 augustus 2026).
+
+   EN --dmut IS DEKKEND. Hij stond op 66% van de inkt; wat dat OPLEVERT hangt af
+   van de grond, en de grond van de hero mengt 22% van het ACCENT van het lid
+   erdoor -- een kleur die dit blad niet kent. Op de lichte stand zakte dat naar
+   4,30:1 zodra iemand een donker accent koos. De twee tonen hieronder zijn
+   uitgerekend op het UITERSTE van dat mengsel (een spierwit en een gitzwart
+   accent) en halen daar allebei 4,88:1. Een bezoeker van een gepubliceerde site
+   is geen lid van RTG en kan niets aan die kleuren doen; dan hoort het huis het
+   goed te zetten. */
+.doek{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:#B5B3AF; --dline:rgba(255,255,255,.12); --dcard:#151312; }
+.doek[data-thema="donker"]{ --dbg:#0C0C0B; --dtxt:#F4F1EC; --dmut:#B5B3AF; --dline:rgba(255,255,255,.12); --dcard:#151312; }
+.doek[data-thema="licht"]{ --dbg:#F5F1EA; --dtxt:#20160F; --dmut:#4E4640; --dline:rgba(32,22,15,.14); --dcard:#FBF8F2; }
 .doek{background:var(--dbg);color:var(--dtxt);font-family:'Inter',system-ui,sans-serif;}
-.blok{position:relative;}
-.blok h1,.blok h2,.blok h3{font-family:'Bodoni Moda',serif;font-weight:500;color:var(--dtxt);line-height:1.1;}
+/* .wb-blok EN NIET .blok, EN DAT IS EEN NAAMBOTSING DIE ECHT PIJN DEED.
+   De UI-kit van RTG claimt `.blok` als sectiekaart (body.rtg-stijl .blok in
+   shared/rtg-ui.css), en die selector is specifieker dan alles wat dit blad
+   over een blok zei. Gevolg: de site van een LID werd binnen de Website-maker
+   en de RTG-browser getekend met de kaartachtergrond, de rand, de hoeken en de
+   padding van RTG -- op champagne zelfs een half doorzichtig WIT vlak, waar de
+   hulptekst van de hero 1,91:1 op haalde. De site van een lid is een vreemd
+   document in een RTG-pagina; het huis hoort er niet in te tekenen. */
+.wb-blok{position:relative;}
+.doek .wb-blok h1,.doek .wb-blok h2,.doek .wb-blok h3{font-family:'Bodoni Moda',serif;font-weight:500;color:var(--dtxt);line-height:1.1;}
 .b-hero{padding:clamp(2.4rem,7cqw,5rem) clamp(1.4rem,5cqw,3.4rem);text-align:center;background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 22%,var(--dbg)),var(--dbg));}
 .b-hero h1{font-size:clamp(1.9rem,5cqw,3.4rem);}
-.b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
-.b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:999px;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
+.doek .b-hero .sub{color:var(--dmut);font-size:clamp(1rem,2cqw,1.2rem);margin:.9rem auto 0;max-width:44ch;line-height:1.6;}
+.b-knop{display:inline-block;margin-top:1.4rem;background:var(--acc);color:#fff;border-radius:0;padding:.7rem 1.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border:0;cursor:inherit;}
 .b-kop{padding:1.6rem clamp(1.4rem,5cqw,3.4rem) .3rem;}
 .b-kop h2{font-size:clamp(1.4rem,3cqw,2rem);}
-.b-tekst{padding:.6rem clamp(1.4rem,5cqw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
+.doek .b-tekst{padding:.6rem clamp(1.4rem,5cqw,3.4rem);color:var(--dmut);font-size:1rem;line-height:1.7;max-width:62ch;}
 .b-knoprij{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
 .b-beeld{padding:1rem clamp(1.4rem,5cqw,3.4rem);}
-.b-beeld img{width:100%;border-radius:12px;display:block;}
-.b-beeld .bij{font-size:.78rem;color:var(--dmut);margin-top:.4rem;text-align:center;}
+.b-beeld img{width:100%;border-radius:0;display:block;}
+.doek .b-beeld .bij{font-size:.78rem;color:var(--dmut);margin-top:.4rem;text-align:center;}
 .b-kol{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
 .b-kol h3{font-size:1.15rem;margin-bottom:.4rem;}
-.b-kol .kt{color:var(--dmut);line-height:1.6;font-size:.95rem;}
+.doek .b-kol .kt{color:var(--dmut);line-height:1.6;font-size:.95rem;}
 .b-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem;padding:1.2rem clamp(1.4rem,5cqw,3.4rem);}
-.b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block;}
+.b-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:0;display:block;}
 .b-citaat{padding:2rem clamp(1.4rem,5cqw,3.4rem);text-align:center;}
-.b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3cqw,1.9rem);line-height:1.35;color:var(--dtxt);}
+.doek .b-citaat .q{font-family:'Bodoni Moda',serif;font-size:clamp(1.3rem,3cqw,1.9rem);line-height:1.35;color:var(--dtxt);}
 .b-citaat .bron{color:var(--acc);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.8rem;}
-.b-voet{padding:1.6rem clamp(1.4rem,5cqw,3.4rem);border-top:1px solid var(--dline);color:var(--dmut);font-size:.82rem;text-align:center;}
+.doek .b-voet{padding:1.6rem clamp(1.4rem,5cqw,3.4rem);border-top:1px solid var(--dline);color:var(--dmut);font-size:.82rem;text-align:center;}
 /* de versies buigen mee met de doek-breedte (container), niet met het venster */
 @container (max-width:640px){ .b-kol{grid-template-columns:1fr;} .b-gal{grid-template-columns:repeat(auto-fill,minmax(46%,1fr));} }
 /* per versie verbergen: geldt in het voorbeeld en in de browser, niet tijdens bewerken */

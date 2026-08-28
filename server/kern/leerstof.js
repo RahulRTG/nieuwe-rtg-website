@@ -8,101 +8,59 @@
    leerpaspoort bijgeschreven (kern/onderwijs.js). Er zijn bewust geen
    scores buiten de sessie, geen reeksen en geen ranglijsten: leren is geen
    wedstrijd, en een fout is gewoon de volgende stap in de les. */
-const { REKENEN } = require('./leerstof-data/rekenen');
-const { TAAL } = require('./leerstof-data/taal');
-const { AARDRIJKSKUNDE, GESCHIEDENIS } = require('./leerstof-data/wereld');
-const { NATUUR, VERKEER, ENGELS_PO } = require('./leerstof-data/natuur');
-const { VO } = require('./leerstof-data/vo');
-const { VO2 } = require('./leerstof-data/vo2');
-const { VO3 } = require('./leerstof-data/vo3');
-const { VERVOLG } = require('./leerstof-data/vervolg');
 const { opgave } = require('./leerstof-gen');
+const { DOELEN, PER_GROEP, PER_FASE, BEHAALD_BIJ } = require('./leerstof-bibliotheek');
+/* De graaflaag (voorkennis, uitlegvormen, meting, de keuring en het pad naar
+   een doel) staat in ./leerstof-fabric.js; hij bezit de doelen niet, dus die
+   komen er hier bij. */
+const { UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad: fabricPad } = require('./leerstof-fabric');
+/* De Memory Engine: wat een leerling dreigt te vergeten komt terug als drie
+   korte vragen. De planning staat in kern/onderwijs-geheugen.js, de vragen in
+   ./leerstof-herhalen.js -- en die lopen met opzet door dezelfde antwoordweg
+   als een gewone oefensessie. */
+const { maakHerhalen } = require('./leerstof-herhalen');
+/* De Misconception Graph: een fout antwoord wordt geduid als denkpatroon, en
+   daaraan hangt Explain Differently -- dezelfde stof in de vorm die bij dat
+   patroon past. Zegt niets als er niets narekenbaars te zeggen valt. */
+const { duiding, andersUitgelegd } = require('./leerstof-denkfout');
+/* De Daily Learning Guarantee: wat staat er vandaag klaar. Brengt bij elkaar
+   wat er al is en bewaart zelf niets -- zie de kop van ./leerstof-dag.js. */
+const { maakDag } = require('./leerstof-dag');
+const { maakLijn } = require('./leerstof-lijn');
+const { DENKFOUTEN } = require('./leerstof-denkfout-lijst');
+const pad = (doelId, behaald) => fabricPad(doelId, behaald, DOELEN);
 
-const OPGAVEN_PER_SESSIE = 5;
-const BEHAALD_BIJ = 4;
-
-/* alle leerdoelen plat, geindexeerd op id, met vak en groep erbij -- op
-   moduleniveau, zodat ook de schooltoetsen (school/toets.js) uit dezelfde
-   bibliotheek putten zonder de stateful motor nodig te hebben */
-const DOELEN = {};
-const PER_GROEP = {};
-for (const [vak, lijn] of [['rekenen', REKENEN], ['taal', TAAL], ['aardrijkskunde', AARDRIJKSKUNDE],
-  ['geschiedenis', GESCHIEDENIS], ['natuur', NATUUR], ['verkeer', VERKEER], ['engels', ENGELS_PO]]) {
-  for (const g of lijn) {
-    PER_GROEP[g.groep] = PER_GROEP[g.groep] || [];
-    for (const d of g.doelen) {
-      DOELEN[d.id] = Object.assign({ vak, groep: g.groep }, d);
-      PER_GROEP[g.groep].push(d.id);
-    }
-  }
-}
-/* golf 3: het voortgezet en vervolgonderwijs, per FASE uit de niveauladder
-   (vmbo t/m wo). Zelfde bibliotheek, dus toetsen en huiswerk kunnen er net
-   zo uit putten als bij groep 1 t/m 8. */
-const PER_FASE = {};
-for (const blok of VO.concat(VO2, VO3, VERVOLG)) {
-  for (const fase of blok.fasen) {
-    PER_FASE[fase] = PER_FASE[fase] || [];
-    for (const d of blok.doelen) {
-      DOELEN[d.id] = DOELEN[d.id] || Object.assign({ vak: blok.vak, fase: blok.fasen[0] }, d);
-      PER_FASE[fase].push(d.id);
-    }
-  }
-}
 
 function maakLeerstof({ db, save, onderwijs }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/leerstof', bezit: { leerstofSessies: 'kaart' } });
   const nu = () => new Date().toISOString();
 
   function sessies() {
-    if (!db.data.leerstofSessies || typeof db.data.leerstofSessies !== 'object') db.data.leerstofSessies = {};
-    return db.data.leerstofSessies;
+    return eigen.bak('leerstofSessies');
   }
   const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 
-  /* ---- de leerlijn voor een groep: wat leer je hier, en wat heb je al ---- */
-  function vakken(key, d) {
-    // per fase (vmbo t/m wo) of per groep (1 t/m 8): zelfde antwoordvorm
-    const fase = String(d && d.fase || '').trim();
-    if (fase) {
-      if (!PER_FASE[fase]) return { status: 400, error: 'Voor deze fase is er (nog) geen leerlijn.' };
-      const behaaldF = (onderwijs.mijn(key).doelen) || {};
-      const perVakF = {};
-      for (const id of PER_FASE[fase]) {
-        const doel = DOELEN[id];
-        perVakF[doel.vak] = perVakF[doel.vak] || [];
-        perVakF[doel.vak].push({ id, naam: doel.naam, ref: doel.ref || null, behaald: !!behaaldF[id] });
-      }
-      return { ok: true, fase, vakken: Object.entries(perVakF).map(([vak, doelen]) => ({ vak, doelen })) };
-    }
-    const groep = Number(String(d && d.groep || '').replace(/\D/g, ''));
-    if (!PER_GROEP[groep]) return { status: 400, error: 'Kies een groep van 1 tot en met 8, of een fase uit de ladder.' };
-    const pas = onderwijs.mijn(key);
-    const behaald = (pas.doelen) || {};
-    const perVak = {};
-    for (const id of PER_GROEP[groep]) {
-      const doel = DOELEN[id];
-      perVak[doel.vak] = perVak[doel.vak] || [];
-      perVak[doel.vak].push({ id, naam: doel.naam, ref: doel.ref || null, behaald: !!behaald[id] });
-    }
-    return { ok: true, groep, vakken: Object.entries(perVak).map(([vak, doelen]) => ({ vak, doelen })) };
-  }
+  /* De LEES-kant (de leerlijn per groep of fase, de les, het pad naar een doel)
+     staat in ./leerstof-lijn.js: dat zijn vragen met een antwoord, hier staat
+     wat een leerling doet. */
+  const { vakken, les, leerstofPad } = maakLijn({ onderwijs });
 
-  function les(d) {
-    const doel = DOELEN[String(d && d.doel || '')];
-    if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
-    return { ok: true, doel: { id: doel.id, naam: doel.naam, vak: doel.vak, groep: doel.groep, les: doel.les, ref: doel.ref || null } };
-  }
+  const { dagplan } = maakDag({ onderwijs, DOELEN, PER_GROEP, PER_FASE });
+
+  const { herhaalLijst, herhaalStart, herhaalKlaar } =
+    maakHerhalen({ onderwijs, sessies, save, opgave, DOELEN, nu });
 
   /* ---- oefenen: vijf verse opgaven, een tegelijk, antwoorden op de server ---- */
   function oefenStart(key, d) {
     const doel = DOELEN[String(d && d.doel || '')];
     if (!doel) return { status: 404, error: 'Dat leerdoel staat niet in de leerlijn.' };
+    const meting = doel.meting || STANDAARD_METING;
     const vragen = [];
-    for (let i = 0; i < OPGAVEN_PER_SESSIE; i++) vragen.push(opgave(doel.gen));
-    sessies()['lid:' + key] = { doel: doel.id, vragen, ix: 0, goed: 0, at: nu() };
+    for (let i = 0; i < meting.opgaven; i++) vragen.push(opgave(doel.gen));
+    sessies()['lid:' + key] = { doel: doel.id, vragen, ix: 0, goed: 0, drempel: meting.drempel, at: nu() };
     save();
     const v = vragen[0];
-    return { ok: true, doel: doel.id, naam: doel.naam, totaal: OPGAVEN_PER_SESSIE, nr: 1, vraag: v.v, opties: v.opties || null };
+    return { ok: true, doel: doel.id, naam: doel.naam, totaal: meting.opgaven, nr: 1, vraag: v.v, opties: v.opties || null };
   }
 
   function oefenAntwoord(key, d) {
@@ -115,14 +73,54 @@ function maakLeerstof({ db, save, onderwijs }) {
     s.ix += 1;
     const klaar = s.ix >= s.vragen.length;
     const uit = { ok: true, goed, juisteAntwoord: vraag.a, nr: s.ix, totaal: s.vragen.length, aantalGoed: s.goed, klaar };
-    if (klaar) {
-      uit.behaald = s.goed >= BEHAALD_BIJ;
+    /* Een fout antwoord dat op een bekend denkpatroon uitkomt, krijgt de duiding
+       en meteen een ANDERE uitleg van hetzelfde doel mee. Komt het nergens op
+       uit, dan zeggen we niets: een verzonnen denkfout stuurt een kind een
+       verkeerde uitleg in. */
+    if (!goed) {
+      const df = duiding(vraag.feit, vraag.a, d && d.antwoord);
+      if (df) {
+        uit.denkfout = { id: df.id, naam: df.naam, uitleg: df.uitleg };
+        uit.anders = andersUitgelegd(DOELEN[s.doel], df);
+        s.patronen = (s.patronen || []).concat(df.id);
+      }
+    }
+    if (klaar && s.herhaling) {
+      /* Een herhaling loopt tot hier precies gelijk aan een oefensessie -- dat
+         is de belofte -- en pas aan het eind anders: het doel is al behaald,
+         dus er valt niets bij te schrijven maar wel iets te plannen. */
+      Object.assign(uit, herhaalKlaar(key, s));
+      delete sessies()['lid:' + key];
+    } else if (klaar) {
+      uit.behaald = s.goed >= (s.drempel || BEHAALD_BIJ);
       if (uit.behaald) {
-        const b = onderwijs.doelBehaald(key, { doel: s.doel });
+        /* Het bewijs reist mee: wat er is gedaan en hoe het ging. Zonder dat
+           is "behaald" een bewering zonder onderbouwing -- precies wat Proof
+           of Learning uit de wereld helpt. */
+        const b = onderwijs.doelBehaald(key, { doel: s.doel,
+          bewijs: { soort: 'oefening', detail: s.goed + ' van ' + s.vragen.length + ' goed' } });
         if (b.error) uit.behaald = false; // geen paspoort (bijv. niet ingeschreven): eerlijk melden
         uit.paspoort = b.error || 'bijgeschreven';
       } else {
-        uit.advies = 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
+        /* Niet gehaald is geen aansporing maar een vraag: ligt er iets onder
+           dat nog niet af is? Dan wijst het advies daarheen, en anders naar een
+           andere uitleg van hetzelfde doel. */
+        const behaald = (onderwijs.mijn(key).doelen) || {};
+        const mist = pad(s.doel, behaald).filter(x => x.id !== s.doel && !x.behaald);
+        const doel = DOELEN[s.doel];
+        uit.ontbreekt = mist.slice(0, 3);
+        /* Een patroon dat zich HERHAALT weegt zwaarder dan ontbrekende
+           voorkennis: wie twee keer hetzelfde denkt, mist geen bouwsteen maar
+           heeft een stap anders geleerd. Daarom staat dit vooraan. */
+        const vaak = (s.patronen || []).find((id, i, l) => l.indexOf(id) !== i);
+        uit.advies = vaak
+          ? 'Twee keer ging het hier op dezelfde manier: ' + DENKFOUTEN[vaak].naam + '. ' + DENKFOUTEN[vaak].uitleg + ' Lees de uitleg hieronder; die legt het van een andere kant.'
+          : mist.length
+            ? 'Hieronder staat nog iets open: ' + mist.slice(0, 2).map(x => x.naam).join(' en ') + '. Doe dat eerst; daarna gaat dit vanzelf beter.'
+            : (doel.uitleg || []).length
+              ? 'Lees de uitleg eens op een andere manier; dezelfde stof kan er heel anders uitzien.'
+              : 'Lees de les nog eens rustig door en probeer het opnieuw; elke poging is gewoon oefening.';
+        if (vaak) uit.anders = andersUitgelegd(doel, DENKFOUTEN[vaak]);
       }
       delete sessies()['lid:' + key];
     } else {
@@ -134,7 +132,10 @@ function maakLeerstof({ db, save, onderwijs }) {
     return uit;
   }
 
-  return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord, DOELEN };
+  return { leerstofVakken: vakken, leerstofLes: les, leerstofOefenStart: oefenStart, leerstofOefenAntwoord: oefenAntwoord,
+    leerstofHerhalen: herhaalLijst, leerstofHerhaalStart: herhaalStart, leerstofDag: dagplan,
+    leerstofPad,
+    DOELEN };
 }
 
-module.exports = { maakLeerstof, DOELEN, PER_FASE };
+module.exports = { maakLeerstof, DOELEN, PER_FASE, UITLEG_SOORTEN, STANDAARD_METING, keurLeerstof, pad };

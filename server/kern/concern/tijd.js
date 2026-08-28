@@ -47,15 +47,13 @@ const dagVoor = (d) => {
   return t.toISOString().slice(0, 10);
 };
 
-module.exports = ({ db, save, crypto, vandaag }) => {
+module.exports = ({ opslag, save, crypto, vandaag }) => {
 
   const nu = () => new Date().toISOString();
   const dag = () => (typeof vandaag === 'function' ? vandaag() : new Date().toISOString().slice(0, 10));
 
   function bak() {
-    if (!db.data.concern || typeof db.data.concern !== 'object') db.data.concern = {};
-    if (!Array.isArray(db.data.concern.feiten)) db.data.concern.feiten = [];
-    return db.data.concern.feiten;
+    return opslag.tak('feiten');
   }
 
   /* Geldt dit feit op deze dag? Inclusief aan beide kanten, precies zoals

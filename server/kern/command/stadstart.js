@@ -26,20 +26,16 @@
 
 const MAX_STEDEN = 100;
 
-function maakStadstart({ db, save, journaal, landpakket, functies, plaatsNorm, weefsel }) {
+function maakStadstart({ opslag, save, journaal, landpakket, functies, plaatsNorm, weefsel }) {
   /* Het weefsel mag lui binnenkomen: het hangt pas aan de kern na de aanbouw,
      en deze laag wordt daarvoor gebouwd. Dezelfde late binding als bij
      genrepuls en de API-poort. */
   const W = () => (typeof weefsel === 'function' ? weefsel() : weefsel);
   const norm = typeof plaatsNorm === 'function' ? plaatsNorm : (v => String(v || '').toLowerCase().trim());
 
-  function staat() {
-    db.data.techniek = db.data.techniek || {};
-    return (db.data.techniek.functies = db.data.techniek.functies || {});
-  }
+  const staat = () => opslag.gedeeld.schakelkast();
   function alle() {
-    if (!db.data.steden || typeof db.data.steden !== 'object') db.data.steden = {};
-    return db.data.steden;
+    return opslag.bak('steden');
   }
 
   /* Wat er per stad nodig is, met per stap waar het antwoord vandaan komt. */

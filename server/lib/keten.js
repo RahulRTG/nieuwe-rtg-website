@@ -144,6 +144,27 @@ function verifieer(regels) {
   return { ok: gebroken.length === 0, gebroken, afgekapt, zonderKeten, geteld: l.length };
 }
 
+/* EEN REGEL BIJSCHRIJVEN IN EEN BEGRENSD JOURNAAL, in één handeling.
+
+   Waarom dit hier staat en niet bij elke aanroeper: het zijn drie stappen die
+   samen één regel vormen, en er is er één bij die stil fataal is als je hem
+   verkeerd doet. Snoeien moet aan de STAART gebeuren -- de oudste regels. Wie
+   aan de kop snoeit, gooit precies de nieuwste hash weg, en dan klopt de
+   overgebleven keten nog steeds met zichzelf terwijl het bewijs van het laatste
+   uur verdwenen is. Dat is geen zichtbare fout maar een onzichtbare, en het is
+   dezelfde aanval waar de kop van dit bestand voor waarschuwt.
+
+   `regels` staat nieuwste-eerst, net als bij verifieer(). Geeft de weggeschreven
+   regel terug (mét vorige, nr en hash). */
+function noteerIn(regels, regel, max) {
+  if (!Array.isArray(regels)) throw new TypeError('noteerIn: journaal is geen lijst');
+  const geschreven = hangAan(regels, regel);
+  regels.unshift(geschreven);
+  const grens = Number(max) || 0;
+  if (grens > 0 && regels.length > grens) regels.length = grens; // staart eraf, nooit de kop
+  return geschreven;
+}
+
 /* De TOP van de keten: de hash van de nieuwste regel. Dit is het ene getal dat
    naar buiten moet om de keten echt onherschrijfbaar te maken -- zie de kop.
    Publiceer je hem, dan kan niemand het verleden meer opnieuw uitrekenen zonder
@@ -161,18 +182,26 @@ const CONTROL = {
   control: 'AUDIT-KETEN-LOKAAL',
   wat: 'wijziging en verwijdering MIDDEN in het auditspoor breken de keten aantoonbaar',
   eigenaar: 'Security',
-  bewijs: ['test/keten.test.js'],
-  bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop())',
-  /* EEN JOURNAAL VAN DE VIER. livingLab.audit, securityLog en de boardroom-rij
-     hangen er nog niet aan; die noemer hoort in beeld te staan en niet in een
-     voetnoot. Handmatig geteld omdat er geen register is dat auditjournalen
-     opsomt -- dat is zelf een gat, en het staat hier als getal in plaats van
-     als indruk. */
-  dekking: { beproefd: 1, totaal: 4, eenheid: 'auditjournalen aan de keten' },
+  bewijs: ['test/keten.test.js', 'test/securitylog-keten.test.js', 'test/boardlog-keten.test.js'],
+  bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop(), securityLogKeten().top)',
+  /* ALLE VIJF. Het inzagejournaal was de eerste; daarna zijn securityLog (het
+     inlog-auditlog), livingLab.audit, het boardroom-journaal van het lid en het
+     handelingsspoor (server/lib/handelingsspoor.js) eraan gehangen. De noemer hoort in beeld te blijven staan, ook nu hij vol is:
+     komt er een vijfde journaal bij, dan hoort dit getal te zakken en niet stil
+     te blijven staan.
+
+     Handmatig geteld omdat er geen register is dat auditjournalen opsomt -- dat
+     is zelf een gat, en het staat hier als getal in plaats van als indruk.
+
+     EN LET OP WAT DIT NIET ZEGT. Vier journalen aan de keten is niet "het
+     auditspoor is dicht". De meeste schrijfroutes laten helemaal GEEN spoor na;
+     die staan niet in deze noemer omdat er niets te ketenen valt. Zie de
+     AUDIT-kolom in BEWIJSMATRIX.json, die daarom nog op nul staat. */
+  dekking: { beproefd: 5, totaal: 5, eenheid: 'auditjournalen aan de keten' },
   grens: 'ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de ' +
     'NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen ' +
     'van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD ' +
     'nodig, en die is nog niet in bedrijf.'
 };
 
-module.exports = { schakel, hangAan, verifieer, top, hashVan, kanoniek, CONTROL };
+module.exports = { schakel, hangAan, noteerIn, verifieer, top, hashVan, kanoniek, CONTROL };

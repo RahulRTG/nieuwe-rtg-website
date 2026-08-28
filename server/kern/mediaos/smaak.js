@@ -24,11 +24,11 @@
 const RICHTINGEN = ['meer', 'minder', 'nooit', 'reset'];
 
 function maakSmaak({ db, save, schoon }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mediaos/smaak', bezit: { mediaSmaak: 'kaart' } });
   const nu = () => new Date().toISOString();
 
   function tabel() {
-    if (!db.data.mediaSmaak || typeof db.data.mediaSmaak !== 'object') db.data.mediaSmaak = {};
-    return db.data.mediaSmaak;
+    return eigen.bak('mediaSmaak');
   }
   function leeg() {
     return { makers: {}, onderwerpen: {}, nooitMakers: [], nooitOnderwerpen: [], verras: false, at: null };

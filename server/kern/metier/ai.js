@@ -14,7 +14,7 @@
      dag van het gesprek in de problemen brengen);
    - hij belooft nooit toegang tot de Lifestyle of Business Pass, en niet aan een
      baan. Dat is mensenwerk, altijd. */
-const { tekst } = require('../../ai');
+const { tekst } = require('../../ai-kort');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Je helpt een lid met zijn ' +
   'beroepsprofiel en sollicitaties. Schrijf rustig, zeker en zonder opsmuk. Geen uitroeptekens, ' +

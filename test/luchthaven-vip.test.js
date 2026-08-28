@@ -2,7 +2,7 @@
    privejets (GA-stands via het charterloket), de Koninklijke Vleugel (vips
    onder protocolnaam; de boarding wacht op het protocol) en de lounges
    (binnen op de boarding pass; royal alleen met vip-protocol).
-   Draai los: node --experimental-sqlite --test test/luchthaven-vip.test.js */
+   Draai los: node --test test/luchthaven-vip.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -25,10 +25,10 @@
 const DAGNAMEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
 
 module.exports = (ctx) => {
-  const { db, save, schoon, nu, accounts, findSupplier } = ctx;
+  const { db, save, schoon, nu, accounts, findSupplier, opslag } = ctx;
 
   function ensureBeleid() {
-    if (!db.data.mobBeleid || typeof db.data.mobBeleid !== 'object') db.data.mobBeleid = {};
+    opslag.bak('mobBeleid');
   }
 
   /* Werkt dit lid bij dit bedrijf? Op het moment zelf nagevraagd bij de
@@ -45,7 +45,7 @@ module.exports = (ctx) => {
 
   const beleidVan = org => {
     ensureBeleid();
-    return db.data.mobBeleid[schoon(org, 20).toUpperCase()] || null;
+    return opslag.bak('mobBeleid')[schoon(org, 20).toUpperCase()] || null;
   };
 
   const tijd = t => (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(t || '')) ? String(t) : null);
@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     const code = schoon(org, 20).toUpperCase();
     if (!findSupplier(code)) return { status: 404, error: 'Onbekende organisatie.' };
 
-    const b = db.data.mobBeleid[code] || (db.data.mobBeleid[code] = { org: code, gemaakt: nu() });
+    const b = opslag.bak('mobBeleid')[code] || (opslag.bak('mobBeleid')[code] = { org: code, gemaakt: nu() });
     const getal = (v, max) => {
       if (v == null) return undefined;
       const n = Math.round(Number(v));

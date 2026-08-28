@@ -12,27 +12,27 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
   main{padding:1rem;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
   select.veld{color-scheme:dark;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
-  .pil.actief{color:var(--green);border-color:var(--green);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
+  .pil.actief{color:var(--rtg-leesgroen,var(--green));border-color:var(--rtg-leesgroen,var(--green));}
   .item{display:flex;gap:.5rem;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.84rem;}
   .item.af span{opacity:.45;text-decoration:line-through;}
   .log{font-size:.82rem;line-height:1.5;padding:.3rem 0;border-bottom:1px solid var(--line);}
-  .log b{color:var(--gold);} .log.club b{color:var(--burgundy);}
+  .log b{color:var(--rtg-leesgoud,var(--gold));} .log.club b{color:var(--burgundy);}
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
   .stad{font-family:'Bodoni Moda',serif;font-size:1.05rem;margin:.4rem 0 .2rem;}
-  .code{font-family:monospace;letter-spacing:.08em;color:var(--gold);}
+  .code{font-family:monospace;letter-spacing:.08em;color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -151,5 +151,6 @@ setTimeout(() => { if (D) document.getElementById('ideeen').innerHTML = D.ideeen
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

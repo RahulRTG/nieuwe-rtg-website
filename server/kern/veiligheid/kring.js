@@ -15,15 +15,13 @@
 
    Buiten RTG kan ook: een e-mailadres. Dat gaat door de gewone maillaag en
    staat versleuteld op schijf zodra er een sleutel is (server/mail.js). */
-module.exports = ({ db, save, schoon, sociaal }) => {
+module.exports = ({ opslag, save, schoon, sociaal }) => {
   const nu = () => new Date().toISOString();
   const MAX_CONTACTEN = 8;
   const MAX_MAIL = 4;
 
   function lijsten() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.kring) db.data.veilig.kring = {};
-    return db.data.veilig.kring;
+    return opslag.tak('kring');
   }
 
   const leeg = () => ({ contacten: [], mails: [], at: null });

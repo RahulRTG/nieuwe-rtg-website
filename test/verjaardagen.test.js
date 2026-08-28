@@ -1,7 +1,7 @@
 /* Integratietests voor Verjaardagen & wensen (RTFoundation-gezin): het
    verjaardagenboek (aankomend gesorteerd), de wensenlijst met het verrassings-
    slot (reserveren, en de jarige ziet dat NIET), en het cadeaupotje. Dicht voor
-   gasten. Draai los: node --experimental-sqlite --test test/verjaardagen.test.js */
+   gasten. Draai los: node --test test/verjaardagen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

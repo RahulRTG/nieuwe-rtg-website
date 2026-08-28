@@ -4,8 +4,9 @@
    wallet zelf bij (autolaad in de kern) en betaalt door. Krijgt de gedeelde ctx van
    kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan,
-    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde, MIN_CENTEN, MAX_CENTEN, KASCODE_MS } = ctx;
+  const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan, walletRuimte,
+    id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
+    MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
   /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
@@ -145,7 +146,11 @@ module.exports = (ctx) => {
        bij wie hij vastzit. Zonder waardelaag zijn saldo en beschikbaar gewoon
        hetzelfde getal en staat er geen reservering. */
     const vast = waarde ? waarde.gereserveerd(rek) : 0;
-    return { ok: true, codenaam, saldo: saldoVan(rek),
+    /* En het PLAFOND staat er ook bij, want een grens die je pas raakt is een
+       grens die je niet kende: de wallet toont hoeveel er nog bij kan voordat
+       opladen weigert. Twee getallen, geen oordeel -- dat blijft aan het scherm
+       (ONTWERP.md, uitzonderingsgestuurd). */
+    return { ok: true, codenaam, saldo: saldoVan(rek), plafond: walletMax(), ruimte: walletRuimte(codenaam),
       gereserveerd: vast, beschikbaar: saldoVan(rek) - vast,
       reserveringen: waarde ? waarde.reserveringen(rek).map(r => ({
         id: r.id, centen: r.centen, doel: r.doel, tot: r.tot, door: r.ref })) : [],

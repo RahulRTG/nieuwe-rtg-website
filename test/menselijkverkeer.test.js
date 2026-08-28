@@ -243,7 +243,9 @@ test('Onboarding op kantoor: een aanvraag wordt door een MENS beslist', async ()
     // met een herleidbaar mens in de backoffice wel
     const mens = await kantoorAlsPersoon(base);
     assert.ok(mens, 'er is een herleidbaar mens in de backoffice om te beslissen');
-    const besluit = await P('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, mens);
+    /* `contractEuro` hoort erbij sinds de ladder: een contractuele pas heeft geen
+       lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd. */
+    const besluit = await P('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, mens);
     assert.equal(besluit.status, 200, 'het mens beslist: ' + JSON.stringify(besluit.body).slice(0, 200));
     assert.equal(besluit.body.aanmelding.status, 'geaccepteerd', 'en de aanmelding staat op geaccepteerd');
   } finally { child.kill('SIGKILL'); }

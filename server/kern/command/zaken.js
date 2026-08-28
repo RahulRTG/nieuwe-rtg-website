@@ -18,8 +18,8 @@
 
 const OPEN = 'open', BEZIG = 'in behandeling', KLAAR = 'afgehandeld';
 
-function maakZaken({ db, save, crypto, journaal, beleid, vak }) {
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+function maakZaken({ db, save, crypto, journaal, beleid, vak, opslag }) {
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   function rij() {
     const v = V();
     if (!Array.isArray(v.commandZaken)) v.commandZaken = [];

@@ -19,7 +19,7 @@
       is een bewuste uitzondering op de schrijfregel en geen gaatje.
 
    Draai los:
-   node --experimental-sqlite --test test/rtf-veilig.test.js */
+   node --test test/rtf-veilig.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

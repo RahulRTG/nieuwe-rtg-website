@@ -16,6 +16,9 @@ const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
 const { kompasStatus } = require('./ai-kompas');
 const kostenhaak = require('./kern/kosten/haak'); // begint leeg; KOSTEN.md par. 6
+const meter = require('./ai-meter');
+const rem = require('./ai-rem');
+const budget = require('./ai-budget');
 
 // welke aanbieders in welke volgorde; env kan de volgorde overschrijven
 function bouwKetting(opts) {
@@ -49,6 +52,14 @@ function maakAI(opts) {
     actief: ketting[0].naam,
     bron: ketting[0].lokaal ? 'lokaal' : 'extern',
     kan(params) { return ketting.some(a => typeof a.kan !== 'function' || a.kan(params)); },
+    /* De staat van de EIGEN modelserver: hoeveel er tegelijk loopt, hoeveel er
+       wacht, en of de onderbreker aanstaat. Zonder dit is een worstelende eigen
+       server onzichtbaar -- je ziet alleen dat het aandeel extern oploopt, maar
+       niet waarom. Zie server/local-ai.js. */
+    lokaleStaat() {
+      const l = ketting.find(a => a.lokaal && typeof a.staat === 'function');
+      return l ? Object.assign({ modellen: l.modellen, verwerking: l.verwerking }, l.staat()) : null;
+    },
     routes(params) { return ketting.filter(a => typeof a.kan !== 'function' || a.kan(params)).map(a => a.naam); },
     messages: {
       async create(params) {
@@ -65,12 +76,43 @@ function maakAI(opts) {
         let laatste = null;
         for (const aanbieder of ketting) {
           if (typeof aanbieder.kan === 'function' && !aanbieder.kan(params)) continue;
+          /* De hoofdkraan. Alleen voor aanbieders die geld kosten: een eigen
+             modelserver draait door, en is die er niet dan valt de keten terug
+             op geen-model -- de handmatige werkmodus die dit huis al draagt.
+             Zie ./ai-meter.js voor waarom dit hier staat en niet per route. */
+          if (!aanbieder.lokaal && !meter.magNog()) {
+            laatste = laatste || Object.assign(new Error('Het dagplafond voor externe modellen is bereikt.'), { code: 'AI_DAGPLAFOND' });
+            try { log && log.warn && log.warn('ai-dagplafond', meter.stand()); } catch (e2) {}
+            continue;
+          }
+          /* En de rem per aanroeper. Telt modelaanroepen en geen routes, zodat
+             een nieuwe route er automatisch onder valt; zie ./ai-rem.js. */
+          if (!aanbieder.lokaal && !rem.magNogVoor()) {
+            laatste = laatste || Object.assign(new Error('Te veel modelaanroepen achter elkaar. Probeer het over een minuut opnieuw.'), { code: 'AI_TE_SNEL' });
+            continue;
+          }
+          /* En het budget van deze PERSOON. Alleen extern, om dezelfde reden
+             als hierboven: de eigen modelserver kost geen geld. Een oppervlak
+             van de RTFoundation sluit hier nooit -- zie ./ai-budget.js. */
+          if (!aanbieder.lokaal) {
+            let ruimte = null;
+            try { ruimte = budget.magNog(); } catch (e2) {}
+            if (ruimte && !ruimte.mag) {
+              laatste = laatste || Object.assign(new Error(budget.BERICHT), { code: 'AI_BUDGET_OP' });
+              continue;
+            }
+          }
           try {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
             /* DE KOSTENMETER (kern/kosten/haak.js), op de enige plek waar elke
-               modelaanroep langskomt. Geen usage: dan melden we niets. */
+               modelaanroep langskomt. Geen usage: dan melden we niets.
+
+               NAAST ./ai-meter.js hieronder en niet in plaats daarvan: die telt
+               wat het HUIS uitgeeft en hoeveel capaciteit de eigen modelserver
+               draagt, deze telt aan WELKE gebruiker de tokens toe te rekenen
+               zijn (KOSTEN.md par. 6). Twee vragen, twee tellers. */
             const u = uit && uit.usage;
             if (u) {
               const inv = (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0);
@@ -78,8 +120,26 @@ function maakAI(opts) {
               if (inv > 0) kostenhaak.meld('ai-invoer', inv, { bron: aanbieder.naam });
               if (uitv > 0) kostenhaak.meld('ai-uitvoer', uitv, { bron: aanbieder.naam });
             }
+            /* Beide tellen, maar in hun eigen emmer: extern kost geld, intern
+               kost capaciteit. De verhouding tussen die twee is het signaal dat
+               je wilt zien -- de keten is lokaal-eerst, dus loopt het aandeel
+               extern op, dan haakt de eigen modelserver af. Zie ./ai-meter.js. */
+            try {
+              if (aanbieder.lokaal) meter.boekLokaal(
+                (typeof aanbieder.modelVoor === 'function' ? aanbieder.modelVoor(params) : null)
+                  || (aanbieder.modellen && aanbieder.modellen.tekst), uit && uit.usage);
+              else {
+                const kosten = meter.boek(params && params.model, uit && uit.usage);
+                /* Het budget telt in euro en de meter in dollar; de omrekening
+                   staat in ./ai-budget-beleid.js. Ook een vrijgestelde aanroep
+                   wordt geboekt -- je wilt zien wat de Foundation kost, hij
+                   wordt er alleen niet op afgesloten. */
+                budget.boek(kosten);
+              }
+            } catch (e2) {}
             return uit;
           } catch (e) {
+            try { if (aanbieder.lokaal) meter.boekLokaalFout(); else meter.boekFout(); } catch (e2) {}
             laatste = e;
             try { log && log.warn && log.warn('ai-uitwijk', { van: aanbieder.naam, fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
             // door naar de volgende aanbieder
@@ -95,95 +155,10 @@ function maakAI(opts) {
   return client;
 }
 
-/* Eén eerlijk contract voor schermen en routes. Beschikbaarheid zegt alleen of
-   vrije modelverrijking mogelijk is; nooit of de onderliggende app werkt. */
-function beschikbaarheid(ai) {
-  const beschikbaar = !!(ai && ai.messages && typeof ai.messages.create === 'function');
-  const kan = (params) => beschikbaar && (typeof ai.kan !== 'function' || ai.kan(params));
-  const infos = beschikbaar && Array.isArray(ai.providerInfo) ? ai.providerInfo : [];
-  const heeftLokaal = infos.some(x => x.lokaal) || (beschikbaar && ai.bron === 'lokaal');
-  const heeftExtern = infos.some(x => !x.lokaal) || (beschikbaar && !infos.length && ai.bron !== 'lokaal');
-  const lokaalViaNetwerk = infos.some(x => x.lokaal && x.verwerking === 'eigen-netwerk');
-  const route = params => beschikbaar
-    ? (typeof ai.routes === 'function' ? ai.routes(params) : (kan(params) ? (ai.aanbieders || []) : []))
-    : [];
-  const pTekst = { messages: [{ role: 'user', content: 'x' }] };
-  const pTools = { tools: [{ name: 'doe' }], messages: [{ role: 'user', content: 'x' }] };
-  const pBeeld = { messages: [{ role: 'user', content: [{ type: 'image' }, { type: 'text', text: 'x' }] }] };
-  const hybride = heeftLokaal && heeftExtern;
-  const lokaleGrens = lokaalViaNetwerk ? 'eigen-netwerk' : 'op-dit-apparaat';
-  const modus = hybride ? 'hybride' : heeftLokaal ? 'lokaal' : beschikbaar ? 'ondersteund' : 'handmatig';
-  const verwerking = hybride ? 'lokaal-met-externe-uitwijk' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model';
-  return {
-    beschikbaar,
-    modus,
-    verwerking,
-    privacy: hybride ? 'kan-extern-verwerken' : heeftLokaal ? lokaleGrens : beschikbaar ? 'externe-provider' : 'geen-model',
-    aanbieders: beschikbaar && Array.isArray(ai.aanbieders) ? ai.aanbieders.slice() : [],
-    mogelijkheden: {
-      tekst: kan(pTekst),
-      hulpmiddelen: kan(pTools),
-      beeld: kan(pBeeld)
-    },
-    routes: { tekst: route(pTekst), hulpmiddelen: route(pTools), beeld: route(pBeeld) },
-    kernprocessen: 'beschikbaar',
-    uitwijk: {
-      navigatie: 'menu-en-zoeken',
-      uitvoering: 'schermen-en-workflows',
-      samenvatten: 'lokale-extractie',
-      beslissingen: 'menselijk-akkoord'
-    },
-    kompas: kompasStatus({ hybride, heeftLokaal, lokaleGrens, beschikbaar })
-  };
-}
+/* Wat we hierover aan SCHERMEN vertellen -- modus, verwerking, privacy, welke
+   capability via welke aanbieder loopt -- staat in ./ai-stand.js. Dat is een
+   andere vraag dan deze: hier wordt uitgeweken, daar wordt verantwoord. */
 
-/* Een kort ja/nee-oordeel, via dezelfde uitwijkketen. Losse modules die maar
-   een classificatie nodig hebben (is dit maatschappelijk belangrijk? hoort dit
-   bij die categorie?) bouwden daar elk hun eigen aanroep voor, met hun eigen
-   modelnaam erin. Dat is precies de plek waar een hardcoded afhankelijkheid
-   ontstaat: zo'n module zit stil vast aan Claude en mist de uitwijk.
-
-   Hier staat het een keer: het lichte model (MODEL_KORT, overschrijfbaar met
-   AI_MODEL_KORT) en het lezen van het antwoord. Geeft true, false, of null --
-   null betekent "geen oordeel" (geen sleutel, geen enkele aanbieder haalde
-   het, of een onleesbaar antwoord). De aanroeper valt dan terug op zijn eigen
-   heuristiek; een AI-storing mag nooit een besluit forceren. */
-const MODEL_KORT = process.env.AI_MODEL_KORT || 'claude-sonnet-5';
-async function jaNee(ai, system, tekst) {
-  if (!ai || !ai.messages) return null;
-  try {
-    const r = await ai.messages.create({
-      model: MODEL_KORT, max_tokens: 8, system: String(system || ''),
-      messages: [{ role: 'user', content: String(tekst || '').slice(0, 500) }]
-    });
-    const t = ((r && r.content) || []).map(b => (b && b.text) || '').join(' ').toLowerCase();
-    if (/\b(ja|yes)\b/.test(t)) return true;
-    if (/\b(nee|no)\b/.test(t)) return false;
-    return null;
-  } catch (e) { return null; }
-}
-
-/* Een kort STUK TEKST, via dezelfde uitwijkketen. Zelfde reden als jaNee: zodra
-   een app zijn eigen messages.create schrijft, staat de modelnaam in die app en
-   mist hij de uitwijk. Apps die de AI iets laten samenvatten, opstellen of
-   uitpluizen roepen dit aan.
-
-   Geeft null bij geen sleutel of als geen enkele aanbieder het haalde -- nooit
-   een verzonnen antwoord, zodat de aanroeper eerlijk "de AI is even niet
-   bereikbaar" kan tonen in plaats van iets te doen alsof. */
-async function tekst(ai, system, prompt, opties) {
-  if (!ai || !ai.messages) return null;
-  const o = opties || {};
-  try {
-    const r = await ai.messages.create({
-      model: o.model || MODEL_KORT,
-      max_tokens: Math.min(2000, Number(o.max) || 400),
-      system: String(system || ''),
-      messages: [{ role: 'user', content: String(prompt || '').slice(0, o.invoerMax || 12000) }]
-    });
-    const t = ((r && r.content) || []).map(b => (b && b.text) || '').join('').trim();
-    return t || null;
-  } catch (e) { return null; }
-}
-
-module.exports = { maakAI, bouwKetting, beschikbaarheid, jaNee, tekst, MODEL_KORT };
+/* De twee korte aanroepen (jaNee, tekst) en het lichte model dat ze gebruiken
+   staan in ./ai-kort.js: dat is een gemakslaag OP deze keten, geen deel ervan. */
+module.exports = { maakAI, bouwKetting };

@@ -4,8 +4,8 @@
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
   const { app, auth, anthropic, aiSystemPrompt, cannedAnswer, trChat, convOf, talen,
-    memberSays, accounts } = kern;
-  const aiStatus = () => require('../../ai').beschikbaarheid(anthropic);
+    memberSays, accounts, ledenInhoudVan } = kern;
+  const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
 
   app.post('/api/ai/status', auth, (req, res) => res.json(aiStatus()));
 
@@ -50,7 +50,11 @@ module.exports = (kern) => {
        eerst niet mee, en dit is de aanroep die zonder API-sleutel ALTIJD loopt
        -- dus in elke demo en de hele suite kreeg een RTG Pass-lid de u-vorm. */
     const stand = aiStatus();
-    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier), source: 'regels', ai: false,
+    /* En de REIS gaat mee, om dezelfde reden als de pas: zonder reis noemt
+       Rahul geen bestemming. Deze antwoorden waren geschreven voor de demo-reis
+       uit de seed en gingen zo ook naar leden die nergens heen gingen. */
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(req.session.key) || {}) : {}).trip || null;
+    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier, eigenReis), source: 'regels', ai: false,
       modus: 'handmatig', verwerking: 'geen-model', kompas: stand.kompas });
   });
 

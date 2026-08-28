@@ -13,7 +13,7 @@
    4. BUITEN DE EIGEN UREN WERKEN WEEGT ZWAARDER DAN EEN VOLLE AGENDA. Dat is
       al gebeurd, en het is de stille manier waarop iemand zichzelf opbrandt.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-capaciteit.test.js */
+   Draai los: node --test test/onderneming-capaciteit.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

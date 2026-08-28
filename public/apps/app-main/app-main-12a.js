@@ -21,7 +21,7 @@
       el.setAttribute('role', 'status');
       el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);z-index:9970;' +
         'bottom:calc(env(safe-area-inset-bottom,0px) + 8.5rem);width:min(26rem,calc(100vw - 2rem));' +
-        'background:var(--card,#151312);border:1px solid var(--line,#2A2724);border-radius:12px;' +
+        'background:var(--card,#151312);border:1px solid var(--line,#2A2724);border-radius:0;' +
         'padding:.7rem .9rem;color:var(--muted,#8A8680);font-family:Inter,system-ui,sans-serif;' +
         'font-size:.76rem;line-height:1.5;text-align:center;';
       el.textContent = 'Een onderdeel van dit scherm laadde niet: ' + wat + '. De rest werkt gewoon.';

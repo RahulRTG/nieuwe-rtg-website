@@ -19,7 +19,7 @@
    een nieuwe meter niet ongemerkt ongeijkt meeliften, en wordt het gat
    kleiner in plaats van vergeten.
 
-   Draai los: node --experimental-sqlite --test test/meterijk.test.js */
+   Draai los: node --test test/meterijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -31,6 +31,7 @@ const WORTEL = path.join(__dirname, '..');
 // testrunner bezit de ouder dat slot al en geeft hij dit expliciet door.
 if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot').pak('meterijking');
 const norm = require('../scripts/norm.js');
+const deuren = require('../scripts/deuren');
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';
 const meld = (tekst) => { if (VERBOSE) process.stderr.write('[meterijk] ' + tekst + '\n'); };
 
@@ -72,9 +73,13 @@ function metAanbouw(relPad, extra, doe) {
 
    HONDERD ROUTES EN NIET EEN. endpointsZonderTest slaat al bij een uit, maar
    dekkingPct is een AFGEROND percentage over ruim tweeduizend routes -- een
-   enkele erbij verdwijnt in de afronding, precies zoals bij
-   dekkingWaargenomenPct. Met honderd zakt hij zichtbaar. Dat is geen ruimere
-   proef maar dezelfde eigenschap, twee keer aangetoond.
+   enkele erbij verdwijnt in de afronding. Met honderd zakt hij zichtbaar. Dat
+   is geen ruimere proef maar dezelfde eigenschap, twee keer aangetoond.
+
+   Hier stond "precies zoals bij dekkingWaargenomenPct", en dat is sinds de
+   dekkingsronde niet meer waar: die rondt naar BENEDEN af en slaat wel bij een
+   uit (zie zijn ijking onderaan). dekkingPct doet dat nog niet -- dus staat de
+   grofheid nu bij de meter die hem heeft, en niet meer bij twee.
 
    HET PAD MAG HIER NERGENS LETTERLIJK STAAN. scripts/keuring.js noemt een route
    gedekt zodra zijn pad ergens in de code van een testbestand voorkomt -- dit
@@ -111,19 +116,31 @@ function journaalMetGat(weglaten) {
   const os = require('os');
   const { execFileSync, spawnSync } = require('child_process');
   const kaart = JSON.parse(execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
     { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 }));
-  const routes = (kaart.routes || []).filter(r => r && r.pad && r.pad.startsWith('/api/'));
+  /* EEN ROUTE IS EEN METHODE PLUS EEN PATROON, en het journaal noteert hem ook
+     zo. Hier stond `(r.methode || 'POST')`, en dat veld bestaat niet in de JSON
+     van routekaart.js -- daar heet het `methoden` en is het een lijst. Elke
+     regel kreeg dus POST, ook de vijfenzeventig GET-routes. Zolang de meting op
+     PADEN telde viel dat niet op; sinds ze op methode+pad telt zou het journaal
+     vijfenzeventig valse gaten opleveren en zou deze ijking meten hoe kapot
+     hijzelf is. Ook het /api/-filter is weg: de meting kent dat onderscheid
+     niet meer, en een ijking die een deelverzameling voedt ijkt de helft. */
+  const routes = [];
+  for (const r of (kaart.routes || [])) {
+    if (!r || !r.pad) continue;
+    for (const mth of (r.methoden || [])) routes.push({ pad: r.pad, methode: String(mth).toUpperCase() });
+  }
   assert.ok(routes.length > 100, 'de routekaart geeft routes (' + routes.length + ')');
 
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ijk-journaal-'));
   const bestand = path.join(map, 'journaal.txt');
   try {
     // alles behalve de laatste n; die horen straks als "nooit aangeraakt" te tellen
-    const regels = routes.slice(0, routes.length - n).map(r => (r.methode || 'POST').toUpperCase() + ' ' + r.pad);
+    const regels = routes.slice(0, routes.length - n).map(r => r.methode + ' ' + r.pad);
     fs.writeFileSync(bestand, regels.join('\n') + '\n');
     const r = spawnSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
+      [path.join(WORTEL, 'scripts', 'dekking.js'), '--lees', bestand, '--json'],
       { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024 });
     let d = null;
     try { d = JSON.parse(r.stdout); } catch (e) { d = null; }
@@ -141,6 +158,98 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  bewijsCellenBewezen: {
+    /* De 100%-tand op het bewijs zelf. De teller krijgt een nep-register
+       gevoerd (zelfde snit als telSkips): eerst een matrix met zeven bewezen
+       cellen, dan een zonder telling, dan een die geen JSON is. De laatste
+       twee horen te GOOIEN en niet nul te geven -- een register dat wegvalt is
+       een gezakte meting, en nul zou hier de allerslechtste stand belonen. */
+    proef: () => {
+      const schuld = JSON.stringify({ telling: { meetwerk: 0, instrument: 0, grens: 9 } });
+      const lees = (matrixTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrixTekst : schuld;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { bewezen: 7 } })));
+      assert.equal(uit.bewijsCellenBewezen, 7, 'zeven bewezen cellen worden er zeven geteld');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: {} }))),
+        /bewijsCellenBewezen niet gemeten/, 'een matrix zonder telling is een gezakte meting, geen nul');
+      assert.throws(() => norm.telBewijslaag(lees('{ kapot')),
+        /BEWIJSMATRIX\.json is niet leesbaar/, 'een onleesbare matrix is een gezakte meting, geen nul');
+      return uit.bewijsCellenBewezen;
+    }
+  },
+  bewijsAchterstand: {
+    /* De andere kant van dezelfde tand: meetwerk en instrument tellen mee,
+       de soort `grens` niet -- die sluit nooit en is geen achterstand. Telde
+       hij wel mee, dan zou de ratel eeuwig 586 punten eisen die per definitie
+       niet te leveren zijn, en dan draait iemand hem stilletjes los. */
+    proef: () => {
+      const matrix = JSON.stringify({ telling: { bewezen: 1 } });
+      const lees = (schuldTekst) => (naam) =>
+        naam === 'BEWIJSMATRIX.json' ? matrix : schuldTekst;
+      const uit = norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3, instrument: 4, grens: 500 } })));
+      assert.equal(uit.bewijsAchterstand, 7, 'meetwerk en instrument tellen; de grens van 500 niet');
+      assert.throws(() => norm.telBewijslaag(lees(JSON.stringify({ telling: { meetwerk: 3 } }))),
+        /bewijsAchterstand niet gemeten/, 'een schuldregister zonder instrument-telling is een gezakte meting');
+      assert.throws(() => norm.telBewijslaag(lees('nee')),
+        /BEWIJSSCHULD\.json is niet leesbaar/, 'een onleesbaar schuldregister is een gezakte meting, geen nul');
+      return uit.bewijsAchterstand;
+    }
+  },
+  /* DE TWEE DEURMETERS, EN WAAROM ER MAAR EEN VAN ZE norm.meet() AANROEPT.
+
+     dbDeuren telt de bestanden buiten server/db/ die db.data rechtstreeks
+     aanraken; dbDeurenSchrijvend het deel daarvan dat er ook IN schrijft. Ze
+     staan los omdat lezen en schrijven verschillende dingen bepalen -- een
+     schrijver bepaalt of de invarianten van een domein kloppen, een lezer of je
+     de opslag kunt vervangen.
+
+     Twee losse meters zijn alleen strakker als de ZEEF ze ook echt uit elkaar
+     houdt. Zou hij elk db.data-bestand als schrijver tellen, dan bewegen beide
+     proeven netjes omhoog en ziet de ijking niets. Daarom kijkt elke proef ook
+     naar de ANDERE meter.
+
+     DE KOSTEN. norm.meet() doet de hele ronde en duurt minuten. Twee proeven die
+     hem allebei aanroepen kosten dat twee keer, bij elke draai van de suite, voor
+     altijd. Dat is niet gratis en het levert hier niets extra's op: beide meters
+     komen in scripts/norm.js uit EEN aanroep van deuren.meet(). Dus roept
+     dbDeurenSchrijvend hem aan -- en die controleert meteen dat norm.js BEIDE
+     velden uit die ene meting overneemt, wat een verwisseling zou vangen die twee
+     losse aanroepen juist niet vangen. dbDeuren meet daarna nog alleen de zeef.
+
+     Dat is een bewuste ruil en geen bezuiniging: wat er wordt bewezen is groter
+     geworden, en de rekening kleiner. */
+  dbDeuren: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-deur.js',
+      "'use strict';\n" +
+      '/* ijking: raakt db.data alleen LEZEND aan */\n' +
+      'module.exports = (db) => (db.data.leden || []).length;\n',
+      () => {
+        const na = deuren.meet();
+        assert.equal(na.schrijvendeDeuren - voor.dbDeurenSchrijvend, 0,
+          'een bestand dat db.data alleen LEEST mag de schrijvende meter niet bewegen; ' +
+          'doet hij dat wel, dan meten de twee meters hetzelfde en is de splitsing schijn');
+        return na.deuren - voor.dbDeuren;
+      })
+  },
+  dbDeurenSchrijvend: {
+    proef: (voor) => metTijdelijkBestand('server/kern/zz-ijk-tijdelijk-schrijf.js',
+      "'use strict';\n" +
+      '/* ijking: schrijft rechtstreeks IN db.data, langs de datalaag heen */\n' +
+      'module.exports = (db) => { db.data.zzIjkTeller = (db.data.zzIjkTeller || 0) + 1; };\n',
+      () => {
+        const na = norm.meet();
+        assert.equal(na.dbDeuren - voor.dbDeuren, 1,
+          'een schrijver is ook een deur en hoort in BEIDE meters te tellen');
+        /* De bedrading, voor allebei: norm.js hoort deze twee velden uit dezelfde
+           meting over te nemen. Een verwisseling (dbDeurenSchrijvend gevuld met
+           het deurental) overleeft de assert hierboven wel en deze niet. */
+        const rechtstreeks = deuren.meet();
+        assert.equal(na.dbDeuren, rechtstreeks.deuren, 'norm.js geeft dbDeuren door uit deuren.meet()');
+        assert.equal(na.dbDeurenSchrijvend, rechtstreeks.schrijvendeDeuren,
+          'norm.js geeft dbDeurenSchrijvend door uit deuren.meet(), en niet per ongeluk het deurental');
+        return na.dbDeurenSchrijvend - voor.dbDeurenSchrijvend;
+      })
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",
@@ -492,6 +601,19 @@ const IJKINGEN = {
       return na.toetsenNietGemeten - voor.toetsenNietGemeten;
     }
   },
+  beweringenZonderVulcontrole: {
+    /* De derde voorraad (scripts/tandeloos.js). De meting zelf staat daar; deze
+       proef vraagt of de meter hem ECHT overneemt en niet ergens een eigen getal
+       vasthoudt. Een verzonnen telling gaat er als functie in -- dezelfde naad
+       als `leesMutaties` hierboven, en om dezelfde reden: er wordt niets op
+       schijf veranderd, dus er is ook niets terug te zetten of te verliezen. */
+    proef: (voor) => {
+      const echt = require('../scripts/tandeloos').meet({ stil: true });
+      if (!echt.bekeken) throw new Error('tandeloos.js keek naar nul beweringen; dan wijst deze ijking niets aan');
+      const na = norm.meet({ meetTandeloos: () => ({ ...echt, meldingen: echt.meldingen + 1 }) });
+      return na.beweringenZonderVulcontrole - voor.beweringenZonderVulcontrole;
+    }
+  },
   dependencies: {
     /* De enige meter waarvan de bron een bestand is dat we ook echt even
        veranderen. Terugzetten gebeurt uit de tekst die we vooraf lazen, niet
@@ -777,8 +899,9 @@ const IJKINGEN = {
     /* HET JOURNAAL MET EEN GAT ERIN. De reden die hier stond ("komt uit het
        routejournaal van een hele testronde") klopte half: het cijfer komt
        daaruit, maar scripts/dekking.js leest met --lees elk journaal dat je
-       hem geeft. Dus bouwen we er zelf een: alle routes van de routekaart,
-       precies EEN weggelaten. De meter hoort die ene te missen.
+       hem geeft. Dus bouwen we er zelf een: alle routes van de routekaart --
+       elke METHODE van elk pad, ook buiten /api/ -- precies EEN weggelaten. De
+       meter hoort die ene te missen.
 
        Een kleiner journaal kan niet: dekking.js weigert er zelf een met te
        weinig patronen, met de melding dat dat geen meting is maar een kapotte
@@ -787,15 +910,19 @@ const IJKINGEN = {
     proef: () => journaalMetGat(1).nooit
   },
   dekkingWaargenomenPct: {
-    /* HET PERCENTAGE IS GROVER DAN ZIJN BUURMAN, en dat is hier zwart op wit te
-       zien: met EEN weggelaten route van ruim tweeduizend rondt hij nog gewoon
-       op honderd af. Precies wat de kop van scripts/dekking.js waarschuwt --
-       "een afgerond percentage dekt bij 2530 routes tot een stuk of twaalf
-       endpoints die nooit zijn aangeraakt". Deze proef laat er daarom vijftig
-       weg. Dat hij dan pas uitslaat is geen tekortkoming van de ijking maar de
-       eigenschap van de meter, en de reden dat endpointsNooitAangeraakt
-       ernaast staat als de scherpe van de twee. */
-    proef: () => 100 - journaalMetGat(50).pct
+    /* HET PERCENTAGE WAS GROVER DAN ZIJN BUURMAN, EN DAT IS GEREPAREERD.
+
+       Hier stond dat deze meter met EEN weggelaten route van ruim tweeduizend
+       nog gewoon op honderd afrondt, en daarom liet deze proef er vijftig weg.
+       Dat was eerlijk opgeschreven en het bleef een meter die een gat kon
+       verzwijgen -- precies wat de kop van scripts/dekking.js waarschuwde.
+
+       Sinds kern/routedekking.js naar BENEDEN afrondt kan dat niet meer: één gat
+       van 4189 geeft 99 en geen 100. De proef laat er daarom weer één weg, met
+       hetzelfde journaal als zijn buurman (dus ook één routekaart-start in
+       plaats van twee). Slaat hij daar niet op uit, dan is de afronding terug en
+       is het cijfer weer op te poetsen. */
+    proef: () => 100 - journaalMetGat(1).pct
   },
   /* DE ZES PRESTATIEMETERS. Hier stond bij alle zes een reden: "prestatiecijfer
      uit een echte beproeving op een echte machine". Dat leek onvermijdelijk --
@@ -824,7 +951,150 @@ const IJKINGEN = {
   eventLoopP99Ms: { proef: () => prestatieIjking('eventLoopP99Ms') },
   herstelSeconden: { proef: () => prestatieIjking('herstelSeconden') },
   verhalenSlaagPctStorm: { proef: () => prestatieIjking('verhalenSlaagPctStorm') },
-  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') }
+  geheugenHellingMBPerMin: { proef: () => prestatieIjking('geheugenHellingMBPerMin') },
+
+  /* DE TWEE METERS DIE OVER DE RATEL ZELF GAAN.
+
+     Ze bewaken niet de code maar de dekking van de ratel, en juist daarom
+     moeten ze zelf een proef hebben: een meter over meters die niet uitslaat,
+     zou de indruk wekken dat de ratel meegroeit terwijl hij stilstaat. Dat is
+     erger dan geen meter, want het is een geruststelling.
+
+     `ratelTanden` telt de geratelde sleutels. De bekend-foute invoer is een
+     script dat een NIEUWE meter declareert: dan hoort de telling mee te
+     bewegen. Dat het langs een tijdelijk BESTAND in scripts/ gaat en niet langs
+     een verzonnen lijst, is met opzet -- zo loopt de hele weg (de map lezen, de
+     METER-constante herkennen, ontdubbelen, tellen) nog steeds door de meter,
+     precies zoals bij de mutatiemeters hierboven. */
+  ratelTanden: {
+    proef: (voor) => metTijdelijkBestand('scripts/zz-ijk-tijdelijk.js',
+      "'use strict';\nconst METER = 'zzIjkTand';\nmodule.exports = { METER };\n",
+      () => norm.meet().ratelTanden - voor.ratelTanden)
+  },
+
+  /* `metingenZonderRatel` telt de meetbestanden in de wortel waar geen ratel
+     achter staat. De bekend-foute invoer is dus een nieuw meetbestand dat in
+     geen enkel register voorkomt: dat is per definitie een gat, en de meter
+     hoort het te zien op het moment dat het ontstaat -- niet pas als iemand er
+     over een half jaar overheen struikelt. */
+  /* DE TWEE METERS VAN DE LADDER.
+
+     Ze komen uit een ronde van vier minuten tegen een echte server, en die is
+     hier niet na te spelen. Dezelfde situatie als bij de zes prestatiemeters
+     hieronder, en dezelfde oplossing: niet het CIJFER namaken maar de meter een
+     bekend-foute uitslag voeren en kijken of hij uitslaat. scripts/ladder.js
+     zet zijn oordeel daarom apart in beoordeel().
+
+     ladderNietGeprobeerd is de belangrijkste van de twee en de minst
+     vanzelfsprekende. Nul bevindingen is triviaal te halen door niets meer te
+     proberen -- en precies dat was hier gebeurd: de insider-trede voerde NUL
+     proeven uit en meldde keurig geen enkele bevinding. Deze meter maakt van
+     "minder proberen" een verslechtering. */
+  /* DE TWEE METERS VAN DE ROLRONDE. Zelfde vorm en zelfde reden als bij de
+     ladder hieronder: de ronde duurt minuten met een echte server, dus de ijking
+     voedt niet de RONDE maar het OORDEEL een bekend-foute uitslag.
+
+     rolscheidingGemeten is de minst vanzelfsprekende en de belangrijkste. Nul
+     gaten is triviaal te halen door minder te onderzoeken, en precies dat was
+     hier aan de hand: test/auth-rol.test.js beloofde "ELK leden-endpoint" en
+     herkende er 1374 van de 1444, omdat een grendel in de body van de handler
+     buiten zijn uitdrukking viel. Deze meter maakt van "minder beproeven" een
+     verslechtering. */
+  /* DE TWEE METERS VAN DE GLUURRONDE (de horizontale scheiding). Zelfde vorm
+     als bij de ladder en de rolronde: het OORDEEL krijgt een bekend-foute
+     uitslag, want de ronde zelf duurt minuten met twee echte leden.
+
+     De ronde heeft daarnaast een eigen zelfproef (GLUUR_ZELFPROEF=1) die zijn
+     vernielingscontrole aantoonbaar laat uitslaan; die draait in CI. Dat is er
+     omdat drie pogingen om die controle met een opzettelijk gat te beproeven
+     afsloegen op de OPSLAGVORM (bundelde notities), en een ijking die van de
+     opslagvorm afhangt is geen ijking. */
+  gluurGaten: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurGecontroleerd: 2410 };
+      assert.equal(g.beoordeel({ gaten: 0, gecontroleerd: 2410 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = g.beoordeel({ gaten: 1, gecontroleerd: 2410 }, norm);
+      assert.equal(stuk.zakt, true, 'een lek tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /1 lek/);
+      return 1;
+    }
+  },
+  gluurGecontroleerd: {
+    proef: () => {
+      const g = require('../scripts/gluurronde.js');
+      const blind = g.beoordeel({ gaten: 0, gecontroleerd: 400 }, { gluurGaten: 0, gluurGecontroleerd: 2410 });
+      assert.equal(blind.zakt, true,
+        'nul lekken over 400 nagekeken dingen terwijl het er 2410 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder nakijken is geen betere uitslag/);
+      return 1;
+    }
+  },
+  gluurOnbewaakt: {
+    proef: () => {
+      /* Een aanmaakroute waarvan het resultaat nergens te lezen is, is geen lek
+         maar een blinde vlek: een schrijflek erop blijft onzichtbaar. De meter
+         hoort dus uit te slaan op een ONVERKLAARDE blinde vlek, en niet op een
+         ronde die er geen heeft. */
+      const g = require('../scripts/gluurronde.js');
+      const norm = { gluurGaten: 0, gluurGecontroleerd: 2417, gluurOnbewaakt: 0 };
+      assert.equal(g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 0 }, norm).zakt, false,
+        'een ronde zonder onverklaarde blinde vlek hoort niet te zakken');
+      const blind = g.beoordeel({ gaten: 0, gecontroleerd: 2417, onbewaakt: 1 }, norm);
+      assert.equal(blind.zakt, true, 'een nieuwe aanmaakroute zonder lezer en zonder reden hoort te zakken');
+      assert.match(blind.redenen[0], /zonder lezer en zonder reden/);
+      return 1;
+    }
+  },
+  rolscheidingGaten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      assert.equal(rol.beoordeel({ gaten: 0, gemeten: 1444 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = rol.beoordeel({ gaten: 2, gemeten: 1444 }, norm);
+      assert.equal(stuk.zakt, true, 'twee gaten tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /2 gat\(en\)/);
+      return 1;
+    }
+  },
+  rolscheidingGemeten: {
+    proef: () => {
+      const rol = require('../scripts/rolronde.js');
+      const norm = { rolscheidingGaten: 0, rolscheidingGemeten: 1444 };
+      const blind = rol.beoordeel({ gaten: 0, gemeten: 900 }, norm);
+      assert.equal(blind.zakt, true,
+        'nul gaten over 900 endpoints terwijl er 1444 waren, is geen schone ronde maar een blinde');
+      assert.match(blind.redenen[0], /Minder beproeven is geen betere uitslag/);
+      return 1;
+    }
+  },
+  ladderRaak: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      assert.equal(ladder.beoordeel({ raak: 0, niet: 1 }, norm).zakt, false, 'een schone ronde hoort niet te zakken');
+      const stuk = ladder.beoordeel({ raak: 3, niet: 1 }, norm);
+      assert.equal(stuk.zakt, true, 'drie bevindingen tegen een norm van nul hoort te zakken');
+      assert.match(stuk.redenen[0], /3 bevinding/);
+      return 1;
+    }
+  },
+  ladderNietGeprobeerd: {
+    proef: () => {
+      const ladder = require('../scripts/ladder.js');
+      const norm = { ladderRaak: 0, ladderNietGeprobeerd: 1 };
+      const stil = ladder.beoordeel({ raak: 0, niet: 9 }, norm);
+      assert.equal(stil.zakt, true,
+        'nul bevindingen bij negen overgeslagen proeven is geen schone ronde maar een blinde');
+      assert.match(stil.redenen[0], /Minder proberen is geen betere uitslag/);
+      return 1;
+    }
+  },
+  metingenZonderRatel: {
+    proef: (voor) => metTijdelijkBestand('zz-ijk-tijdelijk.json',
+      '{ "uitleg": "verzonnen meting zonder ratel, alleen tijdens de ijking" }\n',
+      () => norm.meet().metingenZonderRatel - voor.metingenZonderRatel)
+  }
 };
 
 /* De proef achter alle zes. Ze verschillen alleen in hun sleutel, dus staat de
@@ -865,21 +1135,52 @@ test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');
 
+  /* EEN HERIJKING BIJ EEN MISSER, en waarom dat geen wegmoffelen is. In de
+     volle CI-suite draaien honderden toetsen naast deze; de nulmeting
+     ('voor') is dan een momentopname van een boom die onder je voeten kan
+     bewegen. Een proef die tegen die verschoven nulmeting 0 meet, zegt
+     niets over de meter -- alleen over de gelijktijdigheid. Bij een misser
+     meten we daarom EERST een verse nul en proberen we een keer opnieuw:
+     een echte regressie (de meter ziet de geplante fout niet) zakt ook
+     tegen de verse nul; een verbouwing ernaast niet. En als het dan nog
+     mis is, noemt de melding ALLE gezakte meters met hun verschillen --
+     de vorige vorm stopte bij de eerste en de CI-samenvatting herhaalt
+     alleen de toetsnaam, waardoor het echte detail onvindbaar bleef. */
+  const missers = [];
   for (const sleutel of geijkt) {
     meld('start ' + sleutel);
-    const verschil = IJKINGEN[sleutel].proef(voor);
+    let verschil = IJKINGEN[sleutel].proef(voor);
+    if (!(verschil > 0)) {
+      const versNul = norm.meet();
+      verschil = IJKINGEN[sleutel].proef(versNul);
+      meld('herijking ' + sleutel + ' tegen een verse nulmeting: verschil ' + verschil);
+    }
     meld('klaar ' + sleutel + ': verschil ' + verschil);
-    assert.ok(verschil > 0,
-      'meter "' + sleutel + '" zag de bekend-foute invoer NIET (verschil ' + verschil + '). ' +
-      'Een meter die niet uitslaat op iets wat fout is, meet niets.');
+    if (!(verschil > 0)) missers.push(sleutel + ' (verschil ' + verschil + ')');
   }
+  assert.deepEqual(missers, [],
+    'meters die de bekend-foute invoer NIET zagen, ook niet tegen een verse nulmeting: ' +
+    missers.join(', ') + '. Een meter die niet uitslaat op iets wat fout is, meet niets.');
 });
 
 test('de ijking ruimt zichzelf op: geen enkel spoor blijft achter', () => {
   for (const naam of ['test/zz-ijk-tijdelijk.test.js', 'test/zz-ijk-tijdelijk.e2e.js',
     'server/kern/zz-ijk-tijdelijk.js', 'public/apps/zz-ijk-tijdelijk.html',
+    'scripts/zz-ijk-tijdelijk.js', 'zz-ijk-tijdelijk.json',
     'server/kern/zz-ijk-tijdelijk-a.js', 'server/kern/zz-ijk-tijdelijk-b.js',
-    'server/kern/zz-ijk-tijdelijk-c.js']) {
+    'server/kern/zz-ijk-tijdelijk-deur.js', 'server/kern/zz-ijk-tijdelijk-schrijf.js',
+    'server/kern/zz-ijk-tijdelijk-c.js',
+    /* DEZE ONTBRAK, EN HIJ IS DE GEVAARLIJKSTE VAN DE ZEVEN. Twee ijkingen
+       (keuringStuk en endpointsZonderTest) zetten hier een route neer die een
+       ECHTE naam teruggeeft, en server/routes wordt automatisch gemount: blijft
+       hij staan, dan draait er een open endpoint dat de codenaamregel doorbreekt.
+       Precies het geval dat de opmerking hieronder beschrijft -- en juist die
+       stond niet in de lijst. Gevonden doordat hij op 19 augustus 2026 echt is
+       blijven staan: de suite werd door een time-out gedood, de `finally` van
+       metTijdelijkBestand kwam niet meer aan de beurt, en deze toets zag het
+       niet omdat hij er niet naar keek. `npm run check` regel 28 vond hem wel,
+       en dat is een vangnet en geen vervanging: die draait niet in elke ronde. */
+    'server/routes/zz-ijk-tijdelijk.js']) {
     assert.equal(fs.existsSync(path.join(WORTEL, naam)), false, naam + ' is blijven staan');
   }
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));

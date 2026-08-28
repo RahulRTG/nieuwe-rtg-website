@@ -1,7 +1,7 @@
 /* De Brigade RTG Airport (kern/marechaussee.js): de grensbalie op de echte
    luchthavendata (passagierslijst op codenaam, besluit per reiziger),
    patrouilles door de zones, incidenten en het grens-signaal in de cockpit.
-   Draai los: node --experimental-sqlite --test test/marechaussee.test.js */
+   Draai los: node --test test/marechaussee.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

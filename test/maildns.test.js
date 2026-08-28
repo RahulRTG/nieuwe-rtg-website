@@ -21,7 +21,7 @@
                              publiceren; een melding zonder handeling is een
                              klacht en geen meting
 
-   Draai: node --experimental-sqlite --test test/maildns.test.js */
+   Draai: node --test test/maildns.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { controleer } = require('../server/maildns');

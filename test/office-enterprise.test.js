@@ -6,7 +6,7 @@
    document zet het aantoonbaar terug naar concept.
 
    Draai los:
-   node --experimental-sqlite --test test/office-enterprise.test.js */
+   node --test test/office-enterprise.test.js */
 'use strict';
 
 const test = require('node:test');
@@ -44,11 +44,30 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
+/* WACHTEN TOT DE KLOK VERDER IS, en niet 4 ms gokken.
+
+   `gewijzigd` is een tijdstempel op de milliseconde (server/kern/office/basis.js:
+   `const nu = () => new Date().toISOString()`), en de optimistische
+   vergrendeling vergelijkt precies dat veld. Slaat een toets binnen dezelfde
+   milliseconde op als waarin hij opende, dan is de nieuwe `gewijzigd` gelijk aan
+   de oude -- en dan geeft de tweede opslag geen 409 en zakt de toets op iets
+   dat niet stuk is.
+
+   Hier stond `setTimeout(4)`. Dat is de goede gedachte met het verkeerde middel:
+   de eis is niet "vier milliseconden", de eis is "de klok staat verder dan die
+   stempel". Dat is een TOESTAND, en die kun je aflezen. Meestal is hij na een
+   enkele tik al waar. */
+async function naDeStempel(stempel) {
+  while (new Date().toISOString() <= String(stempel)) {
+    await new Promise(r => setTimeout(r, 1));
+  }
+}
+
 test('een oud Office-venster overschrijft nooit stil een nieuwere versie', async () => {
   const m = await api('/api/kantoorpakket/maak', { soort: 'tekst', titel: 'Directiestuk' }, eigenaar);
   await api('/api/kantoorpakket/deel', { id: m.body.id, codenaam: schrijverCode, rechten: 'bewerken' }, eigenaar);
   const oud = await api('/api/kantoorpakket/open', { id: m.body.id }, schrijver);
-  await new Promise(r => setTimeout(r, 4));
+  await naDeStempel(oud.body.gewijzigd);
   const nieuw = await api('/api/kantoorpakket/bewaar', { id: m.body.id, verwachtGewijzigd: oud.body.gewijzigd,
     inhoud: { tekst: '<p>Besluit van de eigenaar.</p>' } }, eigenaar);
   assert.equal(nieuw.status, 200);
@@ -84,7 +103,7 @@ test('bewerken na goedkeuring heropent het stuk en laat een auditspoor', async (
   await api('/api/kantoorpakket/fase', { id: m.body.id, naar: 'beoordeling' }, eigenaar);
   await api('/api/kantoorpakket/fase', { id: m.body.id, naar: 'goedgekeurd', mens: true }, eigenaar);
   const voor = await api('/api/kantoorpakket/open', { id: m.body.id }, eigenaar);
-  await new Promise(r => setTimeout(r, 4));
+  await naDeStempel(voor.body.gewijzigd);
   const wijzig = await api('/api/kantoorpakket/bewaar', { id: m.body.id, verwachtGewijzigd: voor.body.gewijzigd,
     inhoud: { tekst: '<p>Een materiële wijziging.</p>' } }, eigenaar);
   assert.equal(wijzig.status, 200);

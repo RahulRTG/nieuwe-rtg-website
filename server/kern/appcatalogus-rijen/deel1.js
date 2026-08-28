@@ -20,8 +20,8 @@ module.exports = [
      staat er iets anders dan de app doet, dan zoekt hij op de verkeerde plek. */
   ['cercle', 'Cercle', 'sociaal', '/apps/cercle.html', 'Uw besloten clubs en lidmaatschappen: stad, lidnummer, dresscode, met welke clubs er reciprociteit is en hoeveel gastpassen u nog heeft. Vraag "waar kan ik in Milaan terecht" en u ziet op welk lidmaatschap.'],
   ['entourage', 'Entourage', 'sociaal', '/apps/entourage.html', 'Uw vaste reisgezelschap: wie u meeneemt, hun band, dieet en documenten met vervaldatum. Stel een gezelschap samen en zie wat er ontbreekt voordat u aan de balie staat.'],
-  ['rendezvous', 'Rendez-vous', 'sociaal', '/apps/rendezvous.html', 'Afspraken en ontmoetingen plannen met je kring.'],
-  ['vonk', 'Vonk', 'sociaal', '/apps/vonk.html', 'RTG Vonk: kennismaken op wens; bij een wederzijdse match reserveert RTG een tafel in het midden.'],
+  ['rendezvous', 'Rendez-vous', 'sociaal', '/apps/rendezvous.html', 'Besloten introducties voor Lifestyle en Business: waar u tegelijk bent en welk dagdeel u beiden uitkomt, en met Arrange it regelt De Rechterhand de ontmoeting.'],
+  ['vonk', 'Vonk', 'sociaal', '/apps/vonk.html', 'RTG Vonk: zeg wat er echt toe doet (verplicht, sterke voorkeur, leuk meegenomen); hooguit zes mensen per dag, en bij een match kiest u blind uit drie plekken op gelijke reistijd.'],
   ['attenties', 'Attenties', 'sociaal', '/apps/attenties.html', 'Uw relatiebeheer: per relatie de band, de belangrijke data en hun voorkeuren, plus de giftgeschiedenis zodat u nooit twee keer hetzelfde geeft.'],
 
   // ---- reizen & verblijf ----

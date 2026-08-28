@@ -21,7 +21,7 @@ async function bevestigAi(voorstel, token) {
   return api(base, '/api/supplier/doe/bevestig', { goedkeuringId: g.id, akkoord: true }, token);
 }
 
-let srv, base, lid, rijk, partner;
+let srv, base, lid, lidCode, rijk, partner;
 test.before(async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-overheid-'));
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -30,6 +30,7 @@ test.before(async () => {
   const reg = await api(base, '/api/auth/register', { name: 'Inwoner', email: 'o' + u + '@x.nl',
     phone: '06' + u, password: 'geheim123', geboortedatum: '1988-03-03', tier: 'rtg', pasApp: 'rtg' });
   lid = reg.body.token;
+  lidCode = (await api(base, '/api/state', {}, lid)).body.state.user.codename;
   // rijksambtenaar: log in als de rijks-partner (manager, PIN 1234)
   const roster = await api(base, '/api/supplier/roster', { code: 'RIJK' });
   const man = roster.body.staff.find(m => m.role === 'manager');
@@ -117,10 +118,52 @@ test('5. Sociale zekerheid: aanvraag bij UWV en een besluit van de ambtenaar', a
   assert.equal(mijn.body.uitkeringen.find(x => x.ref === u.body.aanvraag.ref).status, 'toegekend');
 });
 
-test('6. Referendum: stemmen telt mee, dubbel stemmen wordt geweigerd, en de ambtenaar sluit de stemming', async () => {
+test('6. Referendum: alleen wie aantoonbaar een volwassen mens is, stemt', async () => {
+  /* DE POORT. Hiervoor was de enige eis "ingelogd en geen gast": een stemming
+     stond dus open voor iedereen die een e-mailadres kon bedenken, en "een
+     mens, een stem" was een aanname. Drie eisen vervangen die aanname --
+     niveau A3 (RTG heeft het bewijs gezien), 18 jaar, en die leeftijd uit het
+     DOCUMENT en niet uit het aanmeldformulier. Die laatste telt hier het
+     zwaarst: een zelf ingetypte geboortedatum is precies zo hard als de wens om
+     mee te doen. */
   const v0 = await api(base, '/api/overheid/verkiezing', {}, lid);
   assert.equal(v0.status, 200);
   assert.equal(v0.body.verkiezing.alGestemd, false);
+  assert.equal(v0.body.verkiezing.stemrecht.ok, false, 'een ongekeurd lid mag nog niet stemmen');
+  assert.match(v0.body.verkiezing.stemrecht.reden, /A3|identiteitsbewijs/i, 'en hoort waarom');
+  assert.equal(v0.body.verkiezing.stemrecht.niveau.id, 'A1');
+
+  const geweigerd = await api(base, '/api/overheid/stem', { keuze: 'voor' }, lid);
+  assert.equal(geweigerd.status, 403, 'en de stem wordt geweigerd, niet stil genegeerd');
+  const tussen = await api(base, '/api/overheid/verkiezing', {}, lid);
+  assert.equal(tussen.body.verkiezing.totaal, 0, 'er is niets geteld');
+
+  /* De weg erdoorheen: RTG keurt het bewijs en neemt de geboortedatum van het
+     document over. Zonder die laatste stap blijft de poort dicht -- en dat is
+     precies het punt van de eis. */
+  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+  await api(base, '/api/verify/upload', { image: PNG }, lid);
+  await api(base, '/api/verify/selfie', { image: PNG }, lid);
+  const pend = await api(base, '/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === lidCode);
+  assert.ok(mij, 'het lid staat in de keuringsrij');
+
+  // eerst goedkeuren ZONDER de datum van het document: de poort blijft dicht
+  await api(base, '/api/office/verify', { userId: mij.id, decision: 'approve', faceMatch: true }, office);
+  const halverwege = await api(base, '/api/overheid/verkiezing', {}, lid);
+  assert.equal(halverwege.body.verkiezing.stemrecht.niveau.id, 'A4', 'het bewijs is gezien');
+  assert.equal(halverwege.body.verkiezing.stemrecht.ok, false, 'maar de geboortedatum is nog de zelf opgegeven');
+  assert.match(halverwege.body.verkiezing.stemrecht.reden, /zelf opgaf|identiteitsbewijs/i);
+  assert.equal((await api(base, '/api/overheid/stem', { keuze: 'voor' }, lid)).status, 403);
+
+  // en nu mét de datum van het document
+  await api(base, '/api/office/verify', { userId: mij.id, decision: 'approve', faceMatch: true,
+    geboortedatum: '1988-03-03' }, office);
+  const klaar = await api(base, '/api/overheid/verkiezing', {}, lid);
+  assert.equal(klaar.body.verkiezing.stemrecht.ok, true, 'nu mag het');
+  assert.equal(klaar.body.verkiezing.stemrecht.leeftijdBron, 'paspoort');
+
   const s = await api(base, '/api/overheid/stem', { keuze: 'voor' }, lid);
   assert.equal(s.status, 200);
   assert.equal(s.body.verkiezing.alGestemd, true);
@@ -130,6 +173,89 @@ test('6. Referendum: stemmen telt mee, dubbel stemmen wordt geweigerd, en de amb
   const sl = await api(base, '/api/overheid/verkiezing/sluit', { open: false }, rijk);
   assert.equal(sl.status, 200);
   assert.equal(sl.body.verkiezing.open, false);
+});
+
+test('6b. het stembriefje blijft geheim, ook voor wie de database leest', async () => {
+  /* Dit stond er al goed en moet zo blijven: het register weet DAT u stemde, de
+     teller weet WAT er is gekozen, en ze worden nergens aan elkaar geknoopt.
+     Een poort die bijhoudt wie er mag stemmen, is precies het moment waarop
+     iemand in de verleiding komt om er ook de keuze bij te zetten. */
+  const v = await api(base, '/api/overheid/verkiezing', {}, lid);
+  const alles = JSON.stringify(v.body);
+  assert.ok(!/"keuze"/.test(alles), 'geen enkele keuze reist mee met een stemmer');
+  assert.equal(v.body.verkiezing.alGestemd, true, 'wel dat DIT lid heeft gestemd');
+});
+
+test('6c. een ingetrokken verificatie trekt ook het stemrecht in', async () => {
+  /* DIT IS HET GEVAL WAARIN DE NIVEAU-EIS ALS ENIGE OVERBLIJFT, en zonder dit
+     scenario leek die eis overbodig: normaal komt een documentdatum alleen
+     samen met een goedkeuring, dus blokkeerde de herkomst-eis altijd al.
+
+     Maar een afwijzing wist het bewijs en zet de stand terug op 'rejected' --
+     terwijl de eerder overgenomen geboortedatum gewoon blijft staan. Precies
+     wat je wilt als een document later vals blijkt: de datum die ooit is
+     gelezen verdwijnt niet uit het dossier, maar het vertrouwen erin wel. Dan
+     mag er niet meer gestemd worden, en alleen de niveau-eis houdt dat tegen. */
+  const u = Date.now().toString().slice(-7);
+  const reg = await api(base, '/api/auth/register', { name: 'Twijfel', email: 'tw' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: '1985-05-05', tier: 'rtg', pasApp: 'rtg' });
+  const twijfel = reg.body.token;
+  const code = (await api(base, '/api/state', {}, twijfel)).body.state.user.codename;
+  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+  await api(base, '/api/verify/upload', { image: PNG }, twijfel);
+  await api(base, '/api/verify/selfie', { image: PNG }, twijfel);
+  const pend = await api(base, '/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === code);
+  assert.ok(mij);
+
+  await api(base, '/api/overheid/verkiezing/sluit', { open: true }, rijk);
+  await api(base, '/api/office/verify', { userId: mij.id, decision: 'approve',
+    faceMatch: true, geboortedatum: '1985-05-05' }, office);
+  const mag = await api(base, '/api/overheid/verkiezing', {}, twijfel);
+  assert.equal(mag.body.verkiezing.stemrecht.ok, true, 'na goedkeuring mag het');
+
+  // en dan blijkt het document niet te deugen
+  await api(base, '/api/office/verify', { userId: mij.id, decision: 'reject' }, office);
+  const na = await api(base, '/api/overheid/verkiezing', {}, twijfel);
+  assert.equal(na.body.verkiezing.stemrecht.leeftijdBron, 'paspoort',
+    'de eerder gelezen datum staat er nog -- die is niet ongelezen te maken');
+  assert.equal(na.body.verkiezing.stemrecht.niveau.id, 'A1', 'maar het vertrouwen is weg');
+  assert.equal(na.body.verkiezing.stemrecht.ok, false, 'dus het stemrecht ook');
+  assert.equal((await api(base, '/api/overheid/stem', { keuze: 'voor' }, twijfel)).status, 403);
+  await api(base, '/api/overheid/verkiezing/sluit', { open: false }, rijk);
+});
+
+test('6d. een gekeurde zestienjarige stemt niet', async () => {
+  /* En dit is het geval waarin de LEEFTIJDSEIS als enige overblijft. Het
+     lidmaatschap kan vanaf 15, dus een volledig gekeurd lid met een
+     document-geboortedatum kan gewoon minderjarig zijn: niveau A4, herkomst
+     'paspoort', en toch geen stem. Zonder dit scenario zou het weghalen van de
+     leeftijdsgrens door geen enkele toets worden opgemerkt. */
+  const jaar = new Date().getFullYear() - 16;
+  const u = (Date.now() + 1).toString().slice(-7);
+  const reg = await api(base, '/api/auth/register', { name: 'Jong', email: 'jo' + u + '@x.nl',
+    phone: '06' + u, password: 'geheim123', geboortedatum: jaar + '-01-01', tier: 'rtg', pasApp: 'rtg' });
+  const jong = reg.body.token;
+  assert.ok(jong, 'het lidmaatschap kan vanaf 15');
+  const code = (await api(base, '/api/state', {}, jong)).body.state.user.codename;
+  const office = (await api(base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMCAoHf3ZQAAAAASUVORK5CYII=';
+  await api(base, '/api/verify/upload', { image: PNG }, jong);
+  await api(base, '/api/verify/selfie', { image: PNG }, jong);
+  const pend = await api(base, '/api/office/verifications', {}, office);
+  const mij = (pend.body.pending || []).find(x => x.codename === code);
+  await api(base, '/api/office/verify', { userId: mij.id, decision: 'approve',
+    faceMatch: true, geboortedatum: jaar + '-01-01' }, office);
+
+  await api(base, '/api/overheid/verkiezing/sluit', { open: true }, rijk);
+  const v = await api(base, '/api/overheid/verkiezing', {}, jong);
+  assert.equal(v.body.verkiezing.stemrecht.niveau.id, 'A4', 'volledig gekeurd');
+  assert.equal(v.body.verkiezing.stemrecht.leeftijdBron, 'paspoort', 'en de datum komt van het document');
+  assert.equal(v.body.verkiezing.stemrecht.ok, false, 'maar zestien is zestien');
+  assert.match(v.body.verkiezing.stemrecht.reden, /18 jaar/);
+  assert.equal((await api(base, '/api/overheid/stem', { keuze: 'voor' }, jong)).status, 403);
+  await api(base, '/api/overheid/verkiezing/sluit', { open: false }, rijk);
 });
 
 test('7. Bezwaar & bekendmakingen: een lid maakt bezwaar, de ambtenaar beslist, en er zijn rijksbekendmakingen', async () => {

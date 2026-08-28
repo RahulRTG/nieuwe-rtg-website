@@ -61,9 +61,9 @@ const { OP_ID } = require('./catalogus');
 const PAUZE_MINUTEN = 45;
 
 function maakWerkbeleid({ db, save }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/lidboard/werkbeleid', bezit: { werkbeleid: 'kaart' } });
   function store() {
-    if (!db.data.werkbeleid || typeof db.data.werkbeleid !== 'object') db.data.werkbeleid = {};
-    return db.data.werkbeleid;
+    return eigen.bak('werkbeleid');
   }
   const norm = code => String(code || '').toUpperCase();
 

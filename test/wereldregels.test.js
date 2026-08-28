@@ -4,7 +4,7 @@
    de Regelwacht-grenzen), de rijke kernlanden blijven onaangetast, de
    zzp-rekentool en de AI-boekhouder crashen niet op een wereldland, en een
    Regelwacht-update op een wereldland rekent per direct door.
-   Draai los: node --experimental-sqlite --test test/wereldregels.test.js */
+   Draai los: node --test test/wereldregels.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

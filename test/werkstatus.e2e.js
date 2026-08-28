@@ -23,14 +23,14 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpZichtbaar, wachtOpVerandering } = require('./helper');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkstatus-'));
 
 test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar zijn erbij',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;
   let browser;
@@ -57,7 +57,7 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
     await post('/api/techniek/tenant', { org: 'O-STAND', naam: 'Standhuis Groep', modus: 'powered' }, tech);
     await post('/api/techniek/tenant/bind', { org: 'O-STAND', soort: 'werkruimte', code: w.werkruimte }, tech);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* Een hoog venster: dit scherm heeft twee kolommen met elk vier kaarten, en
    op 720 pixels valt de onderste knop buiten beeld. Een groter venster is
    eerlijker dan de knop programmatisch aanklikken -- dan toets je of hij
@@ -71,13 +71,38 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtg_werk_sessie'); });
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      /* Niet 500 ms, maar: de bedrading staat er (kern.js zet window.RTGWerk) en
+         K.poort() heeft de inlogkaart open GELATEN. Dat tweede is het echte
+         teken: had de pagina alsnog een sessie gevonden, dan verdween het veld
+         dat we hieronder vullen. */
+      await wachtTot(page, () => {
+        const kaart = document.getElementById('inlog');
+        return !!window.RTGWerk && !!kaart && !kaart.hidden;
+      }, null, { wat: 'de inlogkaart van werk.html, met zijn bedrading geladen' });
       await page.fill('#iWerkruimte', w.werkruimte);
       await page.fill('#iToken', token);
       await page.click('#inlogGa');
-      await page.waitForTimeout(1000);
+      /* De inlog is klaar als de poort openstaat: app.js roept K.poort() pas aan
+         nadat /mijn-rechten heeft geantwoord, en die zet #inhoud zichtbaar. Bij
+         een geweigerde sleutel blijft de kaart staan en zakt deze wacht met de
+         reden -- waar 1000 ms verderop zakte op een knop die er niet was. */
+      await wachtOpZichtbaar(page, '#inhoud');
       await page.click('[data-wk="settings"]');
-      await page.waitForTimeout(900);
+      /* De stand is er pas als de server heeft geantwoord, en dat is aan twee
+         dingen tegelijk te zien. De kop staat niet meer op de vaste tekst uit de
+         HTML (status.js schrijft er de organisatienaam overheen, of bij een
+         rechtenweigering "Deze stand hoort bij het beheer"), en de bijstandskaart
+         is gevuld -- die hangt aan dezelfde laadbeurt en komt als laatste. Op de
+         kop alleen wachten laat de tweede helft van #vStatus nog leeg, en juist
+         die helft wordt hieronder in zijn geheel gelezen. */
+      await wachtTot(page, () => {
+        const st = document.getElementById('vStatus');
+        if (!st || st.hidden) return false;
+        const kop = document.getElementById('stKop');
+        const bij = document.getElementById('stBijstand');
+        return !!kop && kop.textContent.trim() !== 'Uw organisatie.' &&
+          !!bij && bij.textContent.trim() !== '';
+      }, null, { wat: 'de organisatiestand: kop ingevuld en de bijstandskaart gevuld' });
     };
     const lees = () => page.evaluate(() => {
       const t = (id) => { const el = document.getElementById(id); return el ? el.innerText.replace(/\s+/g, ' ') : ''; };
@@ -140,12 +165,42 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
     /* De kolommen van dit scherm scrollen elk apart, dus de knop staat buiten
        het venster tot je erheen scrolt -- net als voor een mens. */
     await page.evaluate(() => document.getElementById('stProef').scrollIntoView({ block: 'center' }));
-    await page.waitForTimeout(200);
+    /* Niet 200 ms na het schuiven, maar: de knop staat in beeld EN ligt stil.
+       Klikken op een doel dat nog beweegt landt naast de knop. Twee gelijke
+       metingen van dezelfde plaats is stilstand -- vandaar de grovere polling,
+       want twee beeldframes vlak na elkaar geven dezelfde afgeronde plaats
+       terwijl er nog geschoven wordt (zie de uitleg bij wachtTot in helper.js). */
+    await wachtTot(page, () => {
+      const knop = document.getElementById('stProef');
+      if (!knop) return false;
+      const r = knop.getBoundingClientRect();
+      const inBeeld = r.top < window.innerHeight && r.bottom > 0;
+      const plek = Math.round(r.top);
+      const stil = window.__proefPlek === plek;
+      window.__proefPlek = plek;
+      return inBeeld && stil;
+    }, null, { wat: 'de knop Herstelproef in beeld en stil na het schuiven', polling: 100 });
     await page.click('#stProef');
-    await page.waitForTimeout(1800);
+    /* De knop zet ZELF meteen "Bezig: exporteren, teruglezen, vergelijken…" neer
+       en vervangt dat pas als de proef terug is. Wachten op "er staat iets"
+       pakt dus die tussentekst; wachten tot die tussentekst weg is, is het
+       moment waarop de uitslag er echt staat. */
+    await wachtTot(page, () => {
+      const el = document.getElementById('stProefUit');
+      const t = el ? String(el.innerText || '').trim() : '';
+      return t !== '' && !/^Bezig/.test(t);
+    }, null, { wat: 'de uitslag van de herstelproef (niet meer "Bezig…")' });
     const uitslag = await page.evaluate(() => document.getElementById('stProefUit').innerText.replace(/\s+/g, ' '));
     assert.match(uitslag, /Geslaagd/, 'de proef slaagt: ' + uitslag);
     assert.match(uitslag, /soorten/);
+    /* De proef roept daarna RTGWerkStatus.laad() aan -- in dezelfde synchrone
+       stap waarin hij de uitslag neerzet -- en die zet #stLet eerst op "Laden…".
+       De beweringen hieronder gaan over de HERLADEN stand, dus wachten we tot
+       dat "Laden…" weer weg is. */
+    await wachtTot(page, () => {
+      const el = document.getElementById('stLet');
+      return !!el && el.textContent.trim() !== 'Laden…';
+    }, null, { wat: 'de opnieuw geladen organisatiestand na de herstelproef' });
     const nu2 = await lees();
     assert.match(nu2.waar, /Uitvoer teruggelezen/, 'en daarna staat hij bij wat WEL waar is');
     assert.ok(!/Uitvoer teruggelezen/.test(nu2.nietWaar), 'en niet meer bij wat niet waar is');
@@ -158,7 +213,12 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
        Ververs naar Modules, een scherm waar de gebruiker niet was. */
     await page.evaluate(() => { document.getElementById('stKop').textContent = 'LEEGGEMAAKT'; });
     await page.click('#ververs');
-    await page.waitForTimeout(700);
+    /* De regel hierboven maakte de kop met opzet leeg, en Ververs hoort hem
+       opnieuw op te halen. Precies daarop wachten we: een ANDERE tekst dan
+       'LEEGGEMAAKT'. Wachten op de naam zelf zou de bewering hieronder
+       overnemen -- dan zakt de toets op een time-out in plaats van op zijn
+       eigen assertie. */
+    await wachtOpVerandering(page, '#stKop', 'LEEGGEMAAKT');
     const na = await lees();
     assert.equal(na.open, true, 'Ververs laat de organisatiestand staan');
     assert.match(na.kop, /Standhuis Groep/, 'en haalt hem opnieuw op');
@@ -167,7 +227,11 @@ test('de tenantstand staat onder Instellingen, met de beweringen die NIET waar z
        SLUITEN. De bank deed dat al; de tabs niet -- en dan staan er twee
        schermen over elkaar met de bovenste als winnaar. */
     await page.evaluate(() => document.getElementById('tabStart').click());
-    await page.waitForTimeout(500);
+    /* Op de briefing wachten en niet op het sluiten van de stand: dat sluiten is
+       juist de bewering hieronder, en daar mag de wacht niet overheen gaan
+       staan. Staat #vStart er, dan heeft toon('start') gedraaid en zeggen de
+       twee asserties zelf wat er van de andere weergave is geworden. */
+    await wachtOpZichtbaar(page, '#vStart');
     assert.equal(await page.evaluate(() => document.getElementById('vStatus').hidden), true,
       'de verborgen starttab sluit de organisatiestand ook');
     assert.equal(await page.evaluate(() => document.getElementById('vStart').hidden), false,

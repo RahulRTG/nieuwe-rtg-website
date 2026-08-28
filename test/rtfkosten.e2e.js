@@ -17,7 +17,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { laadBrowser, browserOpties, geenBrowser } = require('./browser');
 const pw = laadBrowser();
 
 const post = (base, p, b, token) => fetch(base + p, {
@@ -27,7 +27,7 @@ const post = (base, p, b, token) => fetch(base + p, {
 }).then(r => r.json());
 
 test('het gezinsscherm: de belofte staat boven het bedrag, en zonder tarief staat er geen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer();
   const base = srv.base;
   let browser;
@@ -35,7 +35,7 @@ test('het gezinsscherm: de belofte staat boven het bedrag, en zonder tarief staa
     const g = await post(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Kostenfamilie', naam: 'Papa', pin: '1234' });
     assert.ok(g.token, 'geen gezinssessie: ' + JSON.stringify(g).slice(0, 160));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

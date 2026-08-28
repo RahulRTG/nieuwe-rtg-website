@@ -19,7 +19,7 @@
   button{font:inherit;cursor:pointer;}
   .kop{display:flex;align-items:center;gap:1rem;padding:1rem 1.6rem;border-bottom:1px solid var(--line);flex-wrap:wrap;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.5rem;}
-  .kop .zaak{color:var(--gold);font-size:0.95rem;}
+  .kop .zaak{color:var(--rtg-leesgoud,var(--gold));font-size:0.95rem;}
   .kop .rek{flex:1;}
   .kop .klok{font-variant-numeric:tabular-nums;font-size:1.4rem;font-weight:600;letter-spacing:0.04em;}
   /* De werkplekkeuze draagt de stijl van het deelmenu (shared/deelmenu.js):
@@ -35,28 +35,28 @@
   .kies button.spiegel.aan{border-bottom-color:var(--groen);}
   main{flex:1;min-height:0;overflow-y:auto;padding:1.4rem 1.6rem 2rem;}
   .vol{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.15rem 1.25rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.15rem 1.25rem;}
   .kaart.laat{border-color:rgba(226,185,59,0.6);}
   .kaart.langlaat{border-color:rgba(222,110,146,0.7);}
   .kaart .bon{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:0.6rem;}
   .kaart .bon b{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
-  .kaart .tijd{font-size:1.5rem;font-variant-numeric:tabular-nums;font-weight:600;color:var(--gold);}
+  .kaart .tijd{font-size:1.5rem;font-variant-numeric:tabular-nums;font-weight:600;color:var(--rtg-leesgoud,var(--gold));}
   .kaart.laat .tijd{color:var(--oranje);} .kaart.langlaat .tijd{color:var(--rood);}
   .kaart ul{list-style:none;} .kaart li{font-size:1.15rem;padding:0.22rem 0;display:flex;gap:0.6rem;}
-  .kaart li .q{color:var(--gold);font-weight:700;min-width:1.6rem;}
+  .kaart li .q{color:var(--rtg-leesgoud,var(--gold));font-weight:700;min-width:1.6rem;}
   .kaart .meta{margin-top:0.5rem;font-size:0.85rem;color:var(--soft);}
   .groot{font-family:'Bodoni Moda',serif;font-size:3.2rem;line-height:1.1;}
   .cijfers{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;}
-  .cijfer{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem;}
+  .cijfer{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.4rem 1.5rem;}
   .cijfer span{font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);}
-  .rij{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0.9rem 1.1rem;margin-bottom:0.7rem;
+  .rij{background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.9rem 1.1rem;margin-bottom:0.7rem;
     display:flex;align-items:center;gap:1rem;font-size:1.1rem;}
-  .rij .pill{font-size:0.8rem;padding:0.25rem 0.7rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
+  .rij .pill{font-size:0.8rem;padding:0.25rem 0.7rem;border-radius:0;border:1px solid var(--line);color:var(--soft);}
   .rij .pill.g{color:var(--groen);border-color:rgba(105,184,145,0.5);}
   .rij .rek{flex:1;}
   .leeg{color:var(--soft);font-size:1.3rem;text-align:center;padding:4rem 1rem;}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:0.6rem 1.1rem;font-size:0.9rem;opacity:0;transition:opacity .25s;}
+    border:1px solid var(--line);border-radius:0;padding:0.6rem 1.1rem;font-size:0.9rem;opacity:0;transition:opacity .25s;}
   .melding.zien{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
@@ -186,7 +186,7 @@
   function gasten(){
     const rij = state.reserveringen || [];
     if (!rij.length) return leeg('Geen komende reserveringen.');
-    return rij.map(r => '<div class="rij"><span class="tijd" style="font-size:1.3rem;color:var(--gold);">'+esc(r.tijd)+'</span>'+
+    return rij.map(r => '<div class="rij"><span class="tijd" style="font-size:1.3rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(r.tijd)+'</span>'+
       '<span class="rek">'+esc(r.codenaam || r.codename || 'Gast')+' · '+ (r.personen||r.people||2) +' pers.'+(r.notitie?' · '+esc(r.notitie):'')+'</span>'+
       '<span class="pill'+(r.status==='bevestigd'?' g':'')+'">'+esc(r.status)+'</span></div>').join('');
   }

@@ -73,11 +73,11 @@ const OP_ID = {};
 for (const s of STANDEN) OP_ID[s.id] = s;
 
 module.exports = ({ db, save, crypto }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/rahul/stemming', bezit: { rahulStemming: 'kaart' } });
   const nu = () => Date.now();
 
   function pot() {
-    if (!db.data.rahulStemming) db.data.rahulStemming = {};
-    return db.data.rahulStemming;
+    return eigen.bak('rahulStemming');
   }
 
   const uurNu = () => new Date().getHours();

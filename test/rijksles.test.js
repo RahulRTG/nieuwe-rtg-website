@@ -1,6 +1,6 @@
 /* De Rijks-Bibliotheek (10.000 werk-apps per overheidsafdeling) en de
    Lesmaker (AI-lesstof + de interactieve klas-PDA).
-   Draai los: node --experimental-sqlite --test test/rijksles.test.js */
+   Draai los: node --test test/rijksles.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

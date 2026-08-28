@@ -122,7 +122,8 @@ test('zonder factuur zegt de keten waar hij ophoudt, in plaats van te doen alsof
      geven en geen lege lijst die als "gratis" leest. */
   const leeg = await api('/api/office/kosten/herkomst', { drager, soort: 'ai-invoer', periode: p }, kantoor);
   assert.equal(leeg.status, 200);
-  assert.deepEqual(leeg.body.keten, []);
+  /* De REDEN is de bewering, niet de lege keten: dat laatste slaagt ook als de
+     keten nooit iets teruggeeft (scripts/tandeloos.js). */
   assert.match(leeg.body.waarom, /geen ai, invoer gemeten|niet gemeten|geen/i);
 
   // en bij een soort die hij wel verbruikte, maar met een tarief zonder factuur

@@ -17,13 +17,13 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
-  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .7rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.8rem;text-decoration:none;border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;}
   main{padding:1.1rem;max-width:880px;margin:0 auto;}
   .kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.6rem;margin-bottom:1rem;}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;}
   .kpi b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;display:block;}
   .kpi span{font-size:.7rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;}
   /* De tabbladen (Schrijftafel / Drukkerij / Nieuwstips) zijn de eigen
@@ -45,23 +45,23 @@
      hierboven -- alleen deze diepere selector wint er zeker van. */
   body.rtg-stijl .tabs > .tab.aan{background:none;border-width:0 0 2px;color:var(--txt);border-bottom-color:var(--gold);}
   section.paneel{display:none;} section.paneel.aan{display:block;}
-  .item{border:1px solid var(--line);border-radius:12px;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
+  .item{border:1px solid var(--line);border-radius:0;padding:.75rem .9rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
   .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
-  .veld,select.veld,textarea.veld{background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
+  .veld,select.veld,textarea.veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.84rem;padding:.4rem .6rem;}
   textarea.veld{width:100%;min-height:4rem;resize:vertical;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:9px;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.42rem .8rem;font:inherit;font-weight:600;font-size:.82rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop.rood{border-color:var(--burgundy);color:var(--burgundy);background:transparent;}
-  .status{display:inline-block;font-size:.7rem;padding:.12rem .5rem;border-radius:6px;border:1px solid var(--line);color:var(--muted);}
-  .status.gepubliceerd,.status.gedrukt{border-color:var(--green);color:var(--green);}
-  .status.eindredactie,.status.ter-perse{border-color:var(--gold);color:var(--gold);}
+  .status{display:inline-block;font-size:.7rem;padding:.12rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
+  .status.gepubliceerd,.status.gedrukt{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
+  .status.eindredactie,.status.ter-perse{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
   .uit{font-size:.85rem;color:var(--muted);line-height:1.55;white-space:pre-wrap;margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:360px;margin:3rem auto;text-align:center;display:flex;flex-direction:column;gap:.6rem;}
-  .inlog input{background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;padding:.6rem .8rem;}
+  .inlog input{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;padding:.6rem .8rem;}
   .tip{border-left:3px solid var(--gold);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">

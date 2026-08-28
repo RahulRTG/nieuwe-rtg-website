@@ -16,7 +16,7 @@
    ranglijst. Zou die er zijn, dan viel hij onder de progressiegrens en stond de
    helft van een schoolteam er niet op.
 
-   Draai los: node --experimental-sqlite --test test/spelteams.test.js */
+   Draai los: node --test test/spelteams.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

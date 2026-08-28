@@ -50,11 +50,11 @@ function nachtUren(van, tot, nachtVan, nachtTot) {
   return ms / UUR;
 }
 
-function maakUren({ db, regels }) {
+function maakUren({ opslag, regels }) {
   const cfg = Object.assign({}, STANDAARD, regels || {});
 
   const klokVan = (code) => {
-    const k = (db.data.klok || {})[String(code).toUpperCase()];
+    const k = opslag.vreemd.klokVan(code);
     return Array.isArray(k) ? k : [];
   };
 

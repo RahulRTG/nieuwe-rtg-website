@@ -43,7 +43,7 @@
     wrap.setAttribute('aria-label', T('ROS-palet', 'ROS palette'));
     wrap.style.cssText = 'position:fixed;inset:0;z-index:80;background:rgba(12,12,11,0.6);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:12vh 1rem 0;';
     var kaart = document.createElement('div');
-    kaart.style.cssText = 'width:min(560px,94vw);background:#151312;border:1px solid #857007;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,0.6);overflow:hidden;font-family:Inter,system-ui,sans-serif;';
+    kaart.style.cssText = 'width:min(560px,94vw);background:#151312;border:1px solid #857007;border-radius:0;box-shadow:0 24px 80px rgba(0,0,0,0.6);overflow:hidden;font-family:Inter,system-ui,sans-serif;';
     var inp = document.createElement('input');
     inp.id = 'rosPaletIn';
     inp.type = 'text';
@@ -86,7 +86,7 @@
       b.type = 'button';
       b.setAttribute('role', 'option');
       b.style.cssText = 'display:flex;align-items:center;gap:0.6rem;width:100%;text-align:left;background:' +
-        (i === keus ? 'rgba(133,112,7,0.18)' : 'transparent') + ';border:0;border-radius:10px;padding:0.6rem 0.8rem;color:#F4F1EC;font:inherit;font-size:0.9rem;cursor:pointer;';
+        (i === keus ? 'rgba(133,112,7,0.18)' : 'transparent') + ';border:0;border-radius:0;padding:0.6rem 0.8rem;color:#F4F1EC;font:inherit;font-size:0.9rem;cursor:pointer;';
       var teken2 = document.createElement('span');
       teken2.textContent = r.soort === 'rahul' ? '✶' : '→';
       teken2.style.cssText = 'color:#857007;font-size:0.85rem;min-width:1rem;';

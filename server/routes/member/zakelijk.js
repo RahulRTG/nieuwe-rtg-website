@@ -1,14 +1,21 @@
 /* Member-submodule: de zakelijke tools van de Business Pass. De zzp-
    belastingtool (zelfde berekening als de zaak-kant, kern/fiscaal.js) en de
    AI-boekhouder per land. Gemount vanuit routes/member.js. */
+const zek = require('../../kern/fiscaal/zekerheid');
+
 module.exports = (kern) => {
   const { app, auth, db, LANDEN, ZZP, anthropic, ordersVanKlant } = kern;
 
   app.post('/api/member/zzp', auth, (req, res) => {
     if (req.session.tier !== 'business') return res.status(403).json({ error: 'De zzp-belastingtool is onderdeel van de Business Pass.' });
-    // dezelfde berekening als de belastingtool van elke zaak (kern/fiscaal.js)
-    const out = require('../../kern/fiscaal').zzpBerekening(req.body.land, req.body.winst,
-      { urencriterium: req.body.urencriterium, starter: req.body.starter });
+    /* Dezelfde berekening als de belastingtool van elke zaak. Via de zzp-wacht
+       (kern/fiscaal/zzpwacht.js) als die draait: die haalt het regime van het
+       gevraagde jaar uit de jaargangen, en zegt het eerlijk als dat jaar niet
+       is vastgelegd. Zonder wacht blijft de pure som over, met de tabel van nu. */
+    const opties = { urencriterium: req.body.urencriterium, starter: req.body.starter, jaar: req.body.jaar };
+    const out = kern.zzpwacht
+      ? kern.zzpwacht.bereken(req.body.land, req.body.winst, opties)
+      : require('../../kern/fiscaal').zzpBerekening(req.body.land, req.body.winst, opties);
     if (out.error) return res.status(out.status || 400).json({ error: 'Vul uw verwachte jaarwinst in.' });
     res.json(out);
   });
@@ -43,7 +50,7 @@ module.exports = (kern) => {
             'Uitgaven via RTG: horeca € ' + horeca + ', vervoer € ' + vervoer + '. Facturen staan boekhoudklaar in het portaal met afboekcode en btw-specificatie. ' +
             'Antwoord in het Nederlands, maximaal 120 woorden, praktisch, in de u-vorm. ' +
             'Beloof nooit iets namens RTG: geen toegang tot een pas of dienst, geen goedkeuring, en bevestig ' +
-            'nooit dat iets al geboekt of verwerkt is. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+            'nooit dat iets al geboekt of verwerkt is. Sluit af met deze zin: ' + zek.zin('boekhouding.advies'),
           messages: [{ role: 'user', content: vraag }]
         });
         answer = msg.content[0].text;
@@ -57,7 +64,7 @@ module.exports = (kern) => {
       else if (/taxi|vervoer|rit|jet|vlieg/.test(v)) answer = L.naam + ': ' + zak.vervoer + ' ' + zak.jet + ' Via RTG gaf u € ' + vervoer + ' uit aan vervoer.';
       else if (/eten|diner|restaurant|horeca|lunch|terugvorder|aftrek|btw/.test(v)) answer = L.naam + ': ' + zak.horeca + ' Via RTG gaf u € ' + horeca + ' uit in de horeca. Uw facturen staan boekhoudklaar in het portaal, met afboekcode en btw-specificatie.';
       else answer = 'Voor ' + L.naam + ' geldt: ' + zak.horeca + ' ' + zak.logies + ' ' + zak.vervoer + ' Vraag me gerust naar een specifieke uitgave.';
-      answer += ' Dit is voorlichting, geen bindend fiscaal advies.';
+      answer += ' ' + zek.zin('boekhouding.advies');
     }
     res.json({ answer, land: landCode, landen: Object.entries(LANDEN).map(([k, v2]) => ({ code: k, naam: v2.naam })).sort((a, b) => a.naam.localeCompare(b.naam)), ai: !!anthropic });
   });

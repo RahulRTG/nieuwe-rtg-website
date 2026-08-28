@@ -51,6 +51,7 @@ const R = [
   ['magnaat', 'Magnaat', 'spelen', 'kind', '/apps/spelen.html?pas=foundation&open=magnaat', 'Bouw samen een eerlijke onderneming en leer over handel, risico, bank, mensen en verantwoordelijkheid.'],
 
   // ---- samen in het gezin ----
+  ['mail', 'RTF Mail', 'gezin', 'kind', '/apps/foundation/mail.html', 'Je eigen Foundation-postvak, publiek uitsluitend op codenaam.'],
   ['agenda', 'Gezinsagenda', 'gezin', 'gezin', '/apps/foundation/agenda.html', 'Alle afspraken van het gezin op een rij, voor iedereen zichtbaar.'],
   ['ochtend', 'Ochtendritme', 'gezin', 'mini', '/apps/foundation/ochtend.html', 'Aankleden, tanden, jas: de ochtend in stapjes die een kleuter zelf snapt.'],
   ['klusjes', 'Klusjes en sterren', 'gezin', 'kind', '/apps/foundation/klusjes.html', 'Klusjes verdelen en sterren verdienen, zonder gedoe aan tafel.'],

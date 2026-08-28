@@ -18,24 +18,24 @@
   .blok{padding:1.2rem;margin-bottom:1.2rem;}
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
-  .doel{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.9rem 1rem;margin-bottom:.7rem;}
+  .doel{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1rem;margin-bottom:.7rem;}
   .doel .kop{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;}
   .doel .naam{font-weight:600;}
   .doel .bedrag{font-size:.85rem;color:var(--zacht);white-space:nowrap;}
-  .balk{height:.7rem;background:#231f18;border-radius:999px;overflow:hidden;margin:.6rem 0;}
-  .balk i{display:block;height:100%;background:linear-gradient(90deg,var(--goud),var(--goud2));border-radius:999px;transition:width .4s;}
+  .balk{height:.7rem;background:#231f18;border-radius:0;overflow:hidden;margin:.6rem 0;}
+  .balk i{display:block;height:100%;background:linear-gradient(90deg,var(--goud),var(--goud2));border-radius:0;transition:width .4s;}
   .doel.klaar .balk i{background:linear-gradient(90deg,var(--groen),#7cc389);}
   .doel .acties{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
   .doel .acties input{width:5.5rem;}
   .klaarbadge{color:var(--groen);font-weight:700;font-size:.85rem;}
   .rijveld{display:flex;gap:.5rem;flex-wrap:wrap;}
   .rijveld .veld{flex:1;min-width:8rem;}
-  .tip{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:8px;padding:.8rem 1rem;line-height:1.5;font-size:.92rem;}
+  .tip{background:var(--paneel2);border-left:3px solid var(--goud);border-radius:0;padding:.8rem 1rem;line-height:1.5;font-size:.92rem;}
   .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
-  .b{padding:.6rem .8rem;border-radius:12px;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+  .b{padding:.6rem .8rem;border-radius:0;max-width:85%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
   .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
   .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .leeg{color:var(--zacht);font-size:.88rem;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
@@ -55,7 +55,7 @@
       <input class="veld" id="nBedrag" style="max-width:8rem;" inputmode="decimal" placeholder="Bedrag €">
     </div>
     <div class="fout" id="dFout"></div>
-    <button class="knop h-mt60" id="dMaak">Spaardoel toevoegen</button>
+    <button class="knop h-mt60" id="dMaak" data-hoofdactie>Spaardoel toevoegen</button>
   </div>
 
   <div class="kaart blok">

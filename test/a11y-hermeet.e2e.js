@@ -23,23 +23,53 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { startServer, laadPlaywright, browserOpties, geenBrowser, wachtTot, wachtOpNetstilte } = require('./helper');
 const { BRON } = require('../scripts/a11ykeuring');
 const hermeet = require('../scripts/a11y-hermeet');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-hermeet-'));
 const KEUR = '(function(){' + BRON + '\nreturn window.__a11yKeur()})()';
 const vondIets = (r) => r.overtredingen.length || r.contrast.length;
 const telContrast = (r) => r.contrast.reduce((n, v) => n + v.aantal, 0);
 
+/* WAAR DE 600 ms VOOR STOND, en waarop deze toets in werkelijkheid wacht.
+
+   Na `load` is dit scherm nog niet af. Twee dingen lopen door, en allebei raken
+   ze juist datgene wat hieronder gemeten wordt:
+
+   1. shared/i18n.js haalt de wereldtalen op (POST /api/talen) en tekent de
+      taalkiezer daarna opnieuw. Dat is netverkeer, dus wachten we op de STILTE
+      ervan: geen nieuw verzoek meer. Dat is een toestand -- op een trage machine
+      wacht hij vanzelf langer dan de 600 ms die hier stond.
+   2. shared/seizoen.css laat de grond zacht overgaan zodra seizoen.js zijn vlag
+      `data-licht-zacht` zet (transition 0.8s op body). Meten tijdens die
+      overgang is exact de fout die dit hele bestand beschrijft: een grond die er
+      een tel later niet meer is. Dus wachten we tot er geen overgang of animatie
+      meer loopt.
+
+   Bewust NIET wachtOpRust: die kijkt naar TEKST, en de tekst van dit scherm
+   staat al stil vanaf de eerste verf. Hij zou meteen doorvallen en niets van
+   het bovenstaande afdekken -- wat er verandert is een KLEUR.
+
+   Blijft er toch iets bewegen, dan keuren we het scherm zoals het staat. Dat is
+   dezelfde afweging als in scripts/a11y-hermeet.js zelf, en om dezelfde reden:
+   een scherm waar altijd iets loopt mag deze toets niet laten zakken. */
+const stilNaLaden = async (p) => {
+  await wachtOpNetstilte(p);
+  try {
+    await wachtTot(p, () => !document.getAnimations ||
+      document.getAnimations().every((a) => a.playState !== 'running'),
+    null, { ms: 1500, wat: 'een scherm zonder lopende overgang of animatie' });
+  } catch (e) { /* het blijft bewegen: keuren zoals het staat */ }
+};
+
 test('de tweede meting laat een echte contrastfout staan en een voorbijgaande vallen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     await ctx.addInitScript(() => { try { localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {} });
     const page = await ctx.newPage();
@@ -48,7 +78,7 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
        komt en niet van de pagina. Blijkt het scherm zelf iets te melden, dan
        zegt de toets dat en meet hij niet stil iets anders. */
     await page.goto(base + '/site/404.html', { waitUntil: 'load' });
-    await page.waitForTimeout(600);
+    await stilNaLaden(page);   // de bewering hieronder geldt over het UITGEVERFDE scherm
     const schoon = await page.evaluate(KEUR);
     assert.equal(telContrast(schoon), 0, 'het meetscherm is zelf schoon');
 
@@ -73,7 +103,9 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
 
     /* 2. voorbijgaand -- moet vallen, want dat is waar deze routine voor is */
     await page.goto(base + '/site/404.html', { waitUntil: 'load' });
-    await page.waitForTimeout(600);
+    /* Pas als de grond van de pagina zelf stilstaat, is de enige veranderende
+       grond die van de meetregel -- en dat is wat deze stap wil aantonen. */
+    await stilNaLaden(page);
     await zet(false);
     const vluchtig = await hermeet(page, KEUR, vondIets);
     assert.equal(telContrast(vluchtig), 0, 'een grond die er een tel later niet meer is, telt niet');
@@ -81,7 +113,10 @@ test('de tweede meting laat een echte contrastfout staan en een voorbijgaande va
     /* 3. en zonder bevinding wordt er niet twee keer gemeten: de routine geeft
        de eerste uitkomst ongewijzigd terug. */
     await page.goto(base + '/site/404.html', { waitUntil: 'load' });
-    await page.waitForTimeout(600);
+    /* Hier is de wacht het scherpst: telt het scherm nog een bevinding omdat er
+       iets aan het veranderen was, dan meet hermeet twee keer en zakt de telling
+       hieronder op 2 -- op iets dat niets met deze bewering te maken heeft. */
+    await stilNaLaden(page);
     let metingen = 0;
     const tellend = { evaluate: (b) => { metingen++; return page.evaluate(b); },
       waitForFunction: page.waitForFunction.bind(page), waitForTimeout: page.waitForTimeout.bind(page) };

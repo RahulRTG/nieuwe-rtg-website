@@ -7,7 +7,7 @@
    - een gebroken reeks is geen gebeurtenis: geen melding, geen rood, geen tekst
      die zegt dat u iets verspeelde;
    - er is geen percentage, geen score en geen ranglijst.
-   Draai los: node --experimental-sqlite --test test/gewoonten.test.js */
+   Draai los: node --test test/gewoonten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

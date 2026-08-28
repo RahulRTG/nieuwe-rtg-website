@@ -1,7 +1,7 @@
 /* De premium-laag van De Kassa, gewoon inbegrepen: derving (verspil, breuk,
    eigen gebruik, repro), retour als minbon, wachtbonnen (parkeren en
    terughalen), korting met reden op de bon, het dagrapport en de kasopmaak.
-   Draai: node --experimental-sqlite --test test/kassa-premium.test.js */
+   Draai: node --test test/kassa-premium.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

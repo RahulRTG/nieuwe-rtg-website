@@ -3,7 +3,7 @@
    (wachtend personeel, klas zonder rooster), de schoolbrede mededeling die
    in elke klas landt met de directie als afzender, en dat de cockpit
    NOOIT leerlingnamen of cijfers bevat.
-   Draai los: node --experimental-sqlite --test test/schooldirectie.test.js */
+   Draai los: node --test test/schooldirectie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

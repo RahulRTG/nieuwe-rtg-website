@@ -1,95 +1,106 @@
 {
+  "stempel": {
+    "op": "2026-08-20T15:47:51.090Z",
+    "commit": "fcba02e",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": null,
-  "routes": 4182,
+  "journaalGelezen": ".routejournaal",
+  "routes": 4188,
   "schakels": 11,
-  "cellen": 46002,
+  "cellen": 46068,
   "telling": {
-    "bewezen": 16521,
+    "bewezen": 16475,
     "verklaard": 0,
     "nvt": 272,
-    "ongemeten": 29081,
-    "gezakt": 128
+    "ongemeten": 29205,
+    "gezakt": 116
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4181,
+      "bewezen": 4187,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 0,
-      "gezakt": 1
+      "ongemeten": 297,
+      "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3073,
+      "bewezen": 3079,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 2618,
+      "bewezen": 2632,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1564,
+      "ongemeten": 1556,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 759,
+      "bewezen": 4157,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3423,
+      "ongemeten": 4188,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 236,
+      "bewezen": 266,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3878,
+      "ongemeten": 3854,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 236,
+      "bewezen": 266,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3878,
+      "ongemeten": 3854,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 0,
+      "bewezen": 575,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4182,
+      "ongemeten": 3613,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 133,
+      "bewezen": 175,
       "verklaard": 0,
       "nvt": 68,
-      "ongemeten": 3862,
-      "gezakt": 119
+      "ongemeten": 3840,
+      "gezakt": 105
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4180,
+      "ongemeten": 4186,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2210,
+      "bewezen": 2214,
       "verklaard": 0,
       "nvt": 68,
       "ongemeten": 1896,
-      "gezakt": 8
+      "gezakt": 10
     },
     "PRIVACY": {
-      "bewezen": 3073,
+      "bewezen": 3079,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1109,
+      "ongemeten": 1117,
       "gezakt": 0
     }
+  },
+  "verslechteringToegestaan": {
+    "reden": "De routeset groeide van 3987 naar 4188 (+201, waaronder de uitrol-routes en wat er met main meekwam), dus het aantal cellen van 43857 naar 46068. Absoluut staat er daardoor meer ongemeten, maar PROPORTIONEEL is elke kolom gelijk gebleven of vooruitgegaan, en AUDIT ging van 0 naar 13,7 procent (575 routes) doordat scripts/handelingproef-route.js nu bestaat. Alle vijf de meetrondes zijn ruimer gedraaid dan de vorige vastlegging: rolproef 2937->3081, invoerproef 2510->2634, staatproef 2338->2491.",
+    "cellenVoor": 43857,
+    "cellenNa": 46068
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

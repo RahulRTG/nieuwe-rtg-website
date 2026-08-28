@@ -28,6 +28,8 @@
 
    maakPaspoort(state) volgt het vaste kern-patroon. */
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 const NIVEAUS = ['bevestiging', 'idkaart', 'paspoort'];
 const VIEW_TTL_MS = 10 * 60 * 1000;     // een goedgekeurde inzage is 10 minuten geldig
 const KIND_GRENS = 15;                   // bescherming minderjarigen: nooit delen t/m deze leeftijd
@@ -50,21 +52,25 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   // Een sleutel ('user-<id>') terug naar het account. Alleen echte accounts
   // hebben een paspoort; persona's/gasten niet.
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   function memberState(u) { try { return accounts.getMemberState(u.id) || {}; } catch (e) { return {}; } }
 
   /* De vervaldatum van het eigen reisdocument, of null.
 
      Bestaat omdat de levensgraaf hem nodig heeft en hem NIET zelf moet gaan
-     opzoeken: dan zou er een vijftiende kopie van /^user-(\d+)$/ in de code
-     komen (er zijn er al veertien) en zou de graaf moeten weten hoe het
-     ledendossier heet. De vraag "wanneer verloopt het paspoort van dit lid"
-     hoort in de module die over paspoorten gaat, en het antwoord is een datum
-     -- niet het dossier, niet het nummer, niet de nationaliteit. Wie alleen
-     hoeft te waarschuwen, hoort ook alleen de datum te krijgen. */
+     opzoeken: dan zou de graaf moeten weten hoe het ledendossier heet. De
+     vraag "wanneer verloopt het paspoort van dit lid" hoort in de module die
+     over paspoorten gaat, en het antwoord is een datum -- niet het dossier,
+     niet het nummer, niet de nationaliteit. Wie alleen hoeft te waarschuwen,
+     hoort ook alleen de datum te krijgen.
+
+     (Hier stond dat een tweede opzoeker "de vijftiende kopie van de
+     sleutelvorm" zou worden. Die kopieen zijn er niet meer -- ze zijn een
+     functie geworden, server/lib/lidsleutel.js. De reden hierboven staat
+     los daarvan en geldt onverkort.) */
   function vervaldatumVan(key) {
     const u = accountVanKey(key);
     if (!u) return null;

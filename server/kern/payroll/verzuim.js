@@ -59,14 +59,11 @@ function keur(m) {
   return bez;
 }
 
-function maakVerzuim({ db, save, nu }) {
+function maakVerzuim({ opslag, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
   const sleutel = (code, staffId) => String(code).toUpperCase() + ':' + staffId;
 
-  function bak() {
-    if (!db.data.payrollVerzuim || typeof db.data.payrollVerzuim !== 'object') db.data.payrollVerzuim = {};
-    return db.data.payrollVerzuim;
-  }
+  const bak = () => opslag.bak('payrollVerzuim');
   const rijVan = (code, staffId) => {
     const b = bak(); const k = sleutel(code, staffId);
     if (!Array.isArray(b[k])) b[k] = [];

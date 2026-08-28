@@ -4,7 +4,7 @@
    (Bearer + Idempotency-Key) verstuurd, een API-fout wordt een nette
    Error, en de webhook-handtekeningcontrole aanvaardt een echte Stripe-
    handtekening maar weigert een geknoeide of te oude.
-   Draai los: node --experimental-sqlite --test test/stripe-eigen.test.js */
+   Draai los: node --test test/stripe-eigen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('http');

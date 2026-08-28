@@ -70,6 +70,42 @@ test('4. de partner stuurt een betaalverzoek op codenaam; het lid ziet het en be
   assert.ok(!lijst2.body.verzoeken.some(v => v.ref === ref), 'niet meer open');
 });
 
+test('4b. twee keer op "stuur" drukken maakt EEN betaalverzoek', async () => {
+  /* Een betaling was al dubbeltik-vast; een verzoek OM te betalen niet, en dat
+     is het geval waarin de klant twee openstaande bedragen ziet voor dezelfde
+     aankoop. Gemeten met npm run idemproef (TAKEN 3.8) en hier vastgelegd.
+
+     De sleutel hangt aan de ZAAK en niet aan de medewerker: twee mensen achter
+     dezelfde balie die hetzelfde verzoek versturen, sturen hetzelfde verzoek. */
+  const voor = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.openVerzoeken.length;
+  const een = await api(base, '/api/supplier/betaalverzoek', { codename, bedrag: 45, omschrijving: 'Sjaal', idem: 'kassa-bon-991' }, winkel);
+  const twee = await api(base, '/api/supplier/betaalverzoek', { codename, bedrag: 45, omschrijving: 'Sjaal', idem: 'kassa-bon-991' }, winkel);
+  assert.equal(een.status, 200);
+  assert.equal(twee.status, 200);
+  assert.equal(twee.body.verzoek.ref, een.body.verzoek.ref, 'hetzelfde verzoek, niet een tweede');
+  assert.equal(twee.body.herhaald, true, 'en de server zegt dat hij de herhaling zag');
+  const na = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.openVerzoeken.length;
+  assert.equal(na, voor + 1, 'er staat er precies EEN bij, geen twee');
+
+  /* EN HET WERKBOEK VAN DE ZAAK SCHRIJFT ER OOK MAAR EEN. Dat stond hier niet
+     en het ging dan ook mis: de idem-laag zit in de kern, maar `logActivity`
+     stond in de route ERBUITEN, dus de herhaling zette wel een tweede "stuurde
+     een betaalverzoek van € 45,00" onder. Een regel over een handeling die niet
+     gebeurd is -- en juist een werkboek hoort daarin te kloppen. Gevonden
+     doordat de staatproef `supplierActivity` zag bewegen bij een herhaling die
+     verder niets deed. */
+  const boek = (await api(base, '/api/supplier/state', {}, winkel)).body.state.activity || [];
+  const regels = boek.filter(a => /betaalverzoek/.test(String(a.text || '')) && /45[,.]00/.test(String(a.text || '')));
+  assert.equal(regels.length, 1, 'precies EEN regel in het werkboek, niet twee. Werkboek: ' + JSON.stringify(boek.slice(0, 6)));
+
+  /* Een VERSE sleutel is wel een nieuw verzoek -- anders zou deze bescherming
+     betekenen dat een zaak nooit twee keer hetzelfde bedrag kan vragen. */
+  const derde = await api(base, '/api/supplier/betaalverzoek', { codename, bedrag: 45, omschrijving: 'Sjaal', idem: 'kassa-bon-992' }, winkel);
+  assert.notEqual(derde.body.verzoek.ref, een.body.verzoek.ref);
+  const na2 = (await api(base, '/api/supplier/ontvangsten', {}, winkel)).body.openVerzoeken.length;
+  assert.equal(na2, voor + 2);
+});
+
 test('5. een betaalverzoek twee keer afrekenen kan niet dubbel', async () => {
   const mk = await api(base, '/api/supplier/betaalverzoek', { codename, bedrag: 30 }, winkel);
   const ref = mk.body.verzoek.ref;

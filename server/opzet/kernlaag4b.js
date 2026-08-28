@@ -4,6 +4,7 @@
      bankregie
      bank
      reis
+     invoerbalie + reisuitnodiging
      fiscaal/regelwacht
      fiscaal/btwaangifte
      thuis
@@ -59,6 +60,22 @@ Object.assign(kern, require('../kern/bank')({ db, save, bijeen, crypto, schoon, 
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
 Object.assign(kern, require('../kern/reis')({ LANDEN }));
+/* DE INVOERBALIE (kern/invoer.js): een reis die elders geboekt is, alsnog in
+   RTG krijgen -- REIZEN.md fase 2. Staat hier omdat hij twee dingen nodig heeft
+   die hierboven pas ontstaan: de plaatsbepaling van de Reiswijzer (om een
+   bestemming in vrije tekst te herkennen) en de kluis van het lid (waar het
+   originele bewijsstuk heen gaat, met quotum en virusscan en al -- deze module
+   krijgt geen eigen opslag). */
+Object.assign(kern, require('../kern/invoer').maakInvoer({
+  db, save, crypto, plaatsVind: kern.plaatsVind, bestandenUpload: kern.bestanden.bestandenUpload }));
+/* DE REISUITNODIGING (kern/reisuitnodiging.js): een klaargezette reis plus een
+   link. Het kantoor zet een reis klaar voor iemand die nog geen lid is, en een
+   lid nodigt zijn reisgenoot uit. Krijgt de Invoerbalie mee (daar landen de
+   overgenomen onderdelen; een tweede plek zou een tweede antwoord geven op
+   "waar staat mijn reis") en de bestaande identiteitscontrole -- er komt geen
+   eigen manier bij om vast te stellen wie iemand is. */
+Object.assign(kern, require('../kern/reisuitnodiging').maakReisuitnodiging({
+  db, save, crypto, invoer: kern.invoer, idGeverifieerd: kern.idGeverifieerd }));
 /* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
    "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd
@@ -84,6 +101,17 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    reisbureau en de tafelplanning roepen de laat gebonden, optionele haken
    visumtaakVan/tafeldekVan aan, die vanaf hier iets teruggeven. */
 Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.agenda, reiswijzer: kern.reiswijzer }));
+/* DE REISWACHT (kern/reiswacht.js): wat er speelt rond de komende reizen --
+   REIZEN.md fase 3. Een momentopname bij opvraging en uitdrukkelijk geen
+   achtergrondwachter; elke bron meldt zichzelf, ook (juist) de bronnen die er
+   niet zijn. Leest laat uit de kern, want hij hangt aan De Reis (kernlaag3w),
+   Entourage (kernlaag4) en de agenda. */
+Object.assign(kern, require('../kern/reiswacht').maakReiswacht({ kern }));
+/* DE OPLOSSER (kern/reisoplosser.js): de knop "Los het op" -- REIZEN.md fase 5.
+   Leest de wacht en de domeinen, zet hoogstens een taak in de eigen agenda
+   (na een klik van de mens, idempotent); boeken en betalen blijft bij het
+   domein. Zelfde late lezing als de wacht, om dezelfde reden. */
+Object.assign(kern, require('../kern/reisoplosser').maakReisoplosser({ kern }));
 Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
@@ -97,6 +125,14 @@ Object.assign(kern, require('../kern/werkvormen')({ db }));
    levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
    net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
 Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  /* Codenaam en pas van de eigenaar, voor de catalogus-wensen op het kantoor.
+     Uit de sociale kern, die eerder is gebouwd -- zo staat er ook daar geen
+     echte naam in een lijst. */
+  codenaamVan: kern.codenaamVan, tierVan: kern.soortVan,
+  /* Een bestuurder of aandeelhouder wijst naar een MENS, en niet naar zestig
+     tekens tekst: kern/onderneming/bestuur-persoon.js zoekt de codenaam op en
+     legt het betrouwbaarheidsniveau vast dat er op dat moment stond. */
+  keyVanCodenaam, lidstandVan: require('../kern/betrouwbaarheid').maakLidstand({ accounts }),
   ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
   /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
      (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur
@@ -114,6 +150,13 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
      poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
      data. Zie kern/onderneming/ontwerper.js. */
   anthropic, magAi }));
+/* De onboarding kan nu pas weten hoe De Salon en de bedrijvenkant heten: ze
+   worden later gebouwd dan zij. Hier gaan de haken erin, zodat het meebouwen
+   (het eerste Salon-bericht en het eigen bedrijf) echt ergens op uitkomt.
+   Bewust ZONDER `if`: raakt deze bedrading zoek, dan hoort dat bij het opstarten
+   om te vallen en niet stil een onboarding op te leveren die niets doet. */
+kern.onboarding.zetHaken({ salon: kern.salon, ondernemingNieuw: kern.ondernemingNieuw,
+  ondernemingVanEigenaar: kern.ondernemingVanEigenaar });
 /* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
    Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
    in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een
@@ -143,6 +186,25 @@ if (rvTimer.unref) rvTimer.unref();
 kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
   ? kern.bank.bankDekWallet({ codenaam, centen })
   : { status: 403, error: 'De leden-bank is niet live.' });
+/* DE TWEE PLAFONDS KOMEN HIER AAN HUN BRON. Ze zijn de grond onder het besluit
+   in kern/bevoegdheid/lijst.js (WALLET_SALDO: gesloten circuit, harde
+   plafonds), en stonden tot nu toe als constante in de twee lagen die ze
+   handhaven -- alleen te verzetten door een programmeur. De boardroom zet ze nu
+   (kern/bankregie/instellingen.js) en die twee lagen lezen ze hier vandaan.
+   Late binding om dezelfde reden als de regel hierboven: pay en de puntenlaag
+   bestaan al voordat de bankregie is gebouwd, en tot dat moment geldt hun eigen
+   standaard. */
+kern.pay.koppelPlafond(() => bankregie.bankPlafonds().walletCenten);
+/* EN DE WAARDELAAG LEEST HETZELFDE GETAL. kern/waarde/klassen.js droeg voor
+   PERSONAL_FUNDED een eigen plafondCenten, en dat liep meteen uit de pas: de
+   boardroom verzette het walletplafond naar 10.000 en die laag weigerde nog
+   steeds op 5.000, met een melding die een ander bedrag noemde dan het scherm
+   van het lid. Twee waarheden over hetzelfde getal is precies wat LAT.md
+   regel 4 verbiedt. */
+if (kern.waarde && typeof kern.waarde.koppelWalletPlafond === 'function') {
+  kern.waarde.koppelWalletPlafond(() => bankregie.bankPlafonds().walletCenten);
+}
+kern.puntenKoppelPlafond(() => bankregie.bankPlafonds().puntenCenten);
 /* De geldnaden (cutover-reconcile en de late binding van het fonds aan de bank)
    staan in ./kern-geldnaden.js: dit deel liep over de 10 kB-grens. Ze horen
    achteraan, want ze kunnen pas als alles hierboven er is. bankregie gaat mee

@@ -16,6 +16,7 @@ const CATEGORIEEN = [
   'Diensten (leden)',
   'Toegang en identiteit',
   'Genres & diensten',
+  'Festival',
   'Cultuur en gezelschap',
   'Sociaal (De Salon)',
   'Eigen apps',
@@ -50,5 +51,17 @@ const LEDEN = ['rtg', 'lifestyle', 'business'];
 const LEDEN_RTF = ['rtg', 'lifestyle', 'business', 'foundation'];
 // mét de gratis app: de functies die ook zonder pas bereikbaar zijn
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
+/* WORKOS IS EEN WERELD MET DRIE RELATIES (WERELDEN.md). Een werknemer krijgt de
+   werkvloer VIA zijn werkgever, een werkgever KOOPT de werkruimte, en RTG zit er
+   als werkgever zelf ook in. Dat zijn geen drie producten maar drie relaties tot
+   dezelfde wereld, en het bord hoort ze alle drie apart te kunnen sturen.
 
-module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, LEDEN_GAST };
+   Deze groep stond er niet, en dat was te meten: elf werkfuncties droegen alleen
+   `leverancier` en `personeel`, terwijl hun paden geen /api/supplier- of
+   /api/staff-prefix hebben. De doelgroep viel dus terug op de PAS -- en een
+   partner heeft geen pas. Het gevolg was dat de knop voor die twee groepen niets
+   stuurde, en de knop voor een Business-lid helemaal niet bestond. Zie
+   functies/doelgroep.js voor de andere helft van die reparatie. */
+const WERKOS = ['intern', 'business', 'leverancier', 'personeel'];
+
+module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, LEDEN_GAST, WERKOS };

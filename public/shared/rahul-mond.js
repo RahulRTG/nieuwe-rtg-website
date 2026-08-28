@@ -28,7 +28,7 @@
        daarboven. Alleen het bedieningspaneel (9995) gaat er nog overheen. */
     'bottom:calc(env(safe-area-inset-bottom,0px) + 0.7rem);z-index:9981;' +
     'display:flex;align-items:center;gap:.5rem;background:#0C0C0B;' +
-    'border:1px solid var(--gold,#857007);border-radius:999px;padding:.32rem .4rem .32rem .32rem;' +
+    'border:1px solid var(--gold,#857007);border-radius:0;padding:.32rem .4rem .32rem .32rem;' +
     'box-shadow:0 10px 30px rgba(0,0,0,.5);font-family:Inter,system-ui,sans-serif;max-width:min(30rem,92vw);}' +
     '.rmond canvas{width:2.2rem;height:2.2rem;border-radius:50%;background:#0C0C0B;flex:0 0 auto;cursor:pointer;display:block;}' +
     '.rmond .rm-veld{flex:1;min-width:0;background:transparent;border:none;outline:none;color:#F4F1EC;font:inherit;font-size:.86rem;padding:.2rem .2rem;}' +
@@ -37,7 +37,7 @@
     'background:var(--gold,#857007);color:#0C0C0B;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;}' +
     '.rmond.rm-weg,.rm-uit.rm-weg{display:none;}' +
     '.rm-uit{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 3.6rem);' +
-    'z-index:9982;max-width:min(30rem,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:14px;' +
+    'z-index:9982;max-width:min(30rem,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:0;' +
     'padding:.6rem .8rem;color:#eee;font-family:Inter,system-ui,sans-serif;font-size:.85rem;line-height:1.5;' +
     'box-shadow:0 10px 30px rgba(0,0,0,.5);white-space:pre-wrap;max-height:40vh;overflow-y:auto;}' +
     '.rm-uit[hidden]{display:none;}' +
@@ -148,7 +148,7 @@
     // de knop-stijl, voor het geval de leden-metgezel niet meedraait op deze pagina
     if (!document.getElementById('rahul-leeg-stijl')) {
       var s2 = document.createElement('style'); s2.id = 'rahul-leeg-stijl';
-      s2.textContent = '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:999px;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
+      s2.textContent = '.rahul-leeg-knop{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--gold,#857007);color:var(--gold,#857007);border-radius:0;padding:.5rem .9rem;font-family:Inter,system-ui,sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;}.rahul-leeg-knop:hover{background:var(--gold,#857007);color:#0C0C0B;}';
       (document.head || document.documentElement).appendChild(s2);
     }
   }

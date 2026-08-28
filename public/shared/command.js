@@ -100,26 +100,26 @@
     return [{naam:'Rahul',teken:'mens',doe:rahul}].concat(systeem);
   }
   function rahul(){if(!mag())return;bouwTafel().praat()}
-  /* THUIS IS HET BEGINSCHERM, EN DAT IS DE LEGE WERKTAFEL. De home-knop op de
-     console ging naar de klok; die is weg, en er is nu maar één thuis. */
+  /* DRIE WEGEN, EN TWEE ERVAN EINDIGEN LEEG (WERELD.md, geheugen.js):
+
+       thuis()  Home -> lege tafel, en dat is de enige knop die dat doet
+       land()   inloggen -> je laatste bladen staan er weer
+       sluiten  je laatste blad dicht -> lege tafel
+
+     Hier stond t.wis() ook in land(), en dat WAS de oude regel: inloggen kwam
+     altijd op een lege keuze uit. De werktafel hervat nu je bladen, en dan is
+     wissen bij binnenkomst het tegenovergestelde van wat er beloofd wordt.
+     thuis() wist wel, en moet dat blijven doen -- anders is er geen weg terug
+     naar een schone tafel en is hervatten geen gemak maar een gevangenis.
+
+     land() wordt rechtstreeks aangeroepen zodra de onboarding klaar is:
+     probeer() volgt de sessie via DOM-waarnemers, en dat is een vangnet en
+     geen navigatiebelofte. */
   function thuis(){if(!tafel)return;tafel.wis();tafel.sync()}
-
-  /* INLOGGEN LANDT ALTIJD OP EEN LEGE KEUZE.
-
-     probeer() houdt de werktafel normaal via DOM-waarnemers gelijk met de
-     sessie. Dat is een goed vangnet, maar niet de navigatiebelofte zelf: een
-     geslaagde inlog hoort niet afhankelijk te zijn van het moment waarop een
-     class-mutatie wordt gezien. De inloglaag roept land() daarom rechtstreeks
-     aan zodra de onboarding klaar is.
-
-     Ook een eerder open blad wordt hier bewust gewist. Wie opnieuw binnenkomt
-     kiest zelf een wereld; het huis opent geen activiteit of voorbeeld voor
-     hem. */
   function land(){
     if(!mag())return false;
     var t=bouwTafel();
     t.zet('open');
-    t.wis();
     t.sync();
     return true;
   }

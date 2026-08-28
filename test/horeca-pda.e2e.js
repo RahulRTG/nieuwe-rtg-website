@@ -31,9 +31,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering, klikEnWacht, tekstVan } = require('./helper');
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pda-'));
 
 const post = (base, pad, body, token) => fetch(base + pad, {
@@ -41,11 +41,11 @@ const post = (base, pad, body, token) => fetch(base + pad, {
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
 test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -59,7 +59,13 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
       localStorage.removeItem('rtg_pda_modus');
     });
     await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
-    await page.waitForTimeout(900);
+    /* Uitgelogd tekent shared/deur.js de deur IN de pagina (geen omleiding), en
+       pas in een setTimeout na het laden. Deze wacht is met opzet net zo ruim als
+       de bewering eronder: de deur zelf, of de tekst die naar de personeelsinlog
+       wijst -- anders zou de wacht strenger zijn dan wat de toets beweert. */
+    await wachtTot(page, () => !!document.querySelector('.rtgdeur') ||
+      /personeel|inlog|zaak/i.test(document.body.innerText), null,
+      { wat: 'de deur voor wie uitgelogd komt' });
     const uit = await page.evaluate(() => ({ pad: location.pathname,
       deur: !!document.querySelector('.rtgdeur'), tekst: document.body.innerText.replace(/\s+/g, ' ') }));
     assert.equal(uit.pad, '/apps/horeca-pda.html', 'de pagina stuurt niemand weg');
@@ -106,13 +112,29 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     /* ---- ingelogd: de lijst ---- */
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, tok);
     await page.goto(base + '/apps/horeca-pda.html', { waitUntil: 'load' });
-    await page.waitForTimeout(900);
+    /* De werklijst tekent zichzelf in EEN keer: de werkstanden, "nu", "ook open"
+       en de wijken komen alle vier uit hetzelfde antwoord. De vier knoppen zijn
+       dus het teken dat het hele beeld er staat -- en het is meteen de eerste
+       bewering hieronder. */
+    await wachtTot(page, () => document.querySelectorAll('#pModi button').length >= 4, null,
+      { wat: 'de vier werkstandknoppen van de werklijst' });
 
     const lees = () => page.evaluate(() => ({
       nu: document.getElementById('pNu').innerText.replace(/\s+/g, ' '),
       open: document.getElementById('pOpen').innerText.replace(/\s+/g, ' '),
       modi: [...document.querySelectorAll('#pModi button')].map(b => b.textContent)
     }));
+
+    /* DE LENS-KNOPPEN (modus en wijk) krijgen hun aria-pressed uit het ANTWOORD
+       van de server (`d.modus` / `d.wijk`), in dezelfde hertekening als de twee
+       lijsten. Wachten tot de aangetikte knop ingedrukt STAAT is dus wachten tot
+       het nieuwe beeld er is, en niet tot de klik geregistreerd is. Dat is hier
+       belangrijk omdat de beweringen na een lenswissel deels ONTKENNEND zijn: op
+       het oude beeld gelezen zouden ze zakken zonder dat er iets stuk is. */
+    const lensAan = (sel) => wachtTot(page, (s) => {
+      const b = document.querySelector(s);
+      return !!b && b.getAttribute('aria-pressed') === 'true';
+    }, sel, { wat: sel + ' ingedrukt (dus opnieuw getekend)' });
     let beeld = await lees();
     assert.deepEqual(beeld.modi, ['Bediening', 'Runner', 'Host', 'Alles'], 'de vier werkstanden staan er');
 
@@ -134,18 +156,31 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* 3. het verzoek oppakken */
     assert.match(beeld.nu + beeld.open, /gebarsten/, 'het verzoek van de gast staat er');
-    const gaan = await page.$('[data-stand="opgepakt"]');
-    assert.ok(gaan, 'er staat een knop "Ik ga"');
-    await gaan.click();
-    await page.waitForTimeout(700);
+    /* EEN VERWIJZING EN GEEN VASTE HANDLE, en dat is met schade geleerd bij de
+       knop hieronder. `page.$()` levert een handle naar DIT element; pakt de
+       PDA een taak op, dan hertekent hij de kaart en is dat element weg. De
+       klik komt dan uit op iets wat niet meer in het document staat
+       ("Element is not attached to the DOM"). Een locator zoekt op het moment
+       van klikken opnieuw en wacht tot het element stabiel is -- dat is precies
+       wat een scherm doet dat zichzelf hertekent. */
+    const gaan = page.locator('[data-stand="opgepakt"]');
+    assert.ok(await gaan.count(), 'er staat een knop "Ik ga"');
+    await gaan.first().click();
+    // oppakken hertekent de kaart met de naam van wie het heeft: dat is het teken
+    await wachtOpTekst(page, /U heeft dit opgepakt/);
     beeld = await lees();
     assert.match(beeld.nu + beeld.open, /U heeft dit opgepakt/, 'na oppakken staat er wie het heeft');
 
     /* 6. oppakken van een gang vinkt niets af */
-    const pak = await page.$('[data-pak]');
-    assert.ok(pak, 'er staat een knop om de gang te dragen');
-    await pak.click();
-    await page.waitForTimeout(700);
+    const pak = page.locator('[data-pak]');
+    assert.ok(await pak.count(), 'er staat een knop om de gang te dragen');
+    await pak.first().click();
+    /* Opgepakt betekent dat "Ik draag hem" plaatsmaakt voor "Loslaten" (pda-taak.js).
+       Staat [data-pak] er nog, dan is de claim niet verwerkt -- en dan zou de vraag
+       aan de server hieronder een oude stand lezen. Op de tekst "U heeft dit
+       opgepakt" kan hier niet gewacht worden: die staat al bij het verzoek. */
+    await wachtTot(page, () => !document.querySelector('[data-pak]'), null,
+      { wat: 'de gang opgepakt (de knop "Ik draag hem" is weg)' });
     const naPak = (await H('/api/supplier/horeca/rekening', { rekeningId: draag.id })).body.rekening;
     assert.equal(naPak.regels[0].stand, 'klaar', 'het bord staat nog op klaar, niet op uitgegeven');
     beeld = await lees();
@@ -153,7 +188,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* 5. de modus is een lens */
     await page.click('[data-modus="runner"]');
-    await page.waitForTimeout(700);
+    await lensAan('[data-modus="runner"]');
     beeld = await lees();
     assert.match(beeld.nu + beeld.open, /PDA-DRAAG/, 'de runner ziet de gang');
     assert.doesNotMatch(beeld.nu + beeld.open, /gebarsten/, 'en niet het verzoek van de gast');
@@ -162,7 +197,12 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
 
     /* en uitgeven haalt hem er wel af */
     await page.click('[data-uit]');
-    await page.waitForTimeout(700);
+    /* Uitgeven haalt de draagtaak van de lijst, en in de runner-lens staan alleen
+       pas-taken -- dus verdwijnt met die ene taak ook zijn knop. Dat is het teken
+       dat de server klaar is met /pas/uit; de vraag eronder gaat rechtstreeks
+       naar hem toe en zou anders te vroeg komen. */
+    await wachtTot(page, () => !document.querySelector('[data-uit]'), null,
+      { wat: 'de draagtaak weg (geen knop "Uitgegeven" meer)' });
     const naUit = (await H('/api/supplier/horeca/rekening', { rekeningId: draag.id })).body.rekening;
     assert.equal(naUit.regels[0].stand, 'uitgegeven', 'nu pas is hij uitgegeven');
     beeld = await lees();
@@ -189,7 +229,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.ok(pass, 'de aankomst is aangevraagd');
 
     await page.click('[data-modus="host"]');
-    await page.waitForTimeout(800);
+    await lensAan('[data-modus="host"]');
     let host = await lees();
     assert.match(host.nu + host.open, /Aankomst /, 'de aankomst staat op de lijst van de host');
     /* De beloften als LIJST, niet alleen als knoplabel: de statustekst
@@ -211,8 +251,14 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     for (let i = 0; i < knoppen.length + 2; i++) {
       const knop = await page.$('[data-belofte]');
       if (!knop) break;
+      const hoeveel = (await page.$$('[data-belofte]')).length;
       await knop.click();
-      await page.waitForTimeout(700);
+      /* Elke aftekening haalt EEN belofte weg (hij wacht niet meer op een mens),
+         en met de laatste verdwijnt de hele aankomsttaak. Het aantal knoppen is
+         dus de teller die verandert; wachten op een tekst kan hier niet, want wat
+         er komt te staan verschilt per ronde. */
+      await wachtTot(page, (n) => document.querySelectorAll('[data-belofte]').length < n, hoeveel,
+        { wat: 'een belofte minder die op een mens wacht' });
     }
     host = await lees();
     assert.doesNotMatch(host.nu + host.open, /Aankomst /,
@@ -235,19 +281,24 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
       'ze zijn persoonlijk bevestigd: ' + standen.join(', '));
 
     await page.click('[data-modus="alles"]');
-    await page.waitForTimeout(600);
+    await lensAan('[data-modus="alles"]');
 
     /* ---- 7. de wijklens ----
        De modus filtert op SOORT werk, de wijk op WIENS tafel het is. Twee
        lenzen, twee rijen knoppen: samengevoegd zou "runner in mijn wijk"
        onmogelijk zijn. */
-    await page.click('[data-modus="alles"]');
-    await page.waitForTimeout(600);
+    /* Nog een keer "Alles": die lens stond er al op, dus er verandert niets aan
+       het scherm en lensAan() zou meteen doorvallen. Het enige eerlijke teken is
+       hier het ANTWOORD van /werklijst op deze klik. */
+    await klikEnWacht(page, '[data-modus="alles"]', '/horeca/werklijst');
 
     const wijk = (await H('/api/supplier/horeca/wijk/zet', { naam: 'Terras', tafels: ['PDA-DRAAG'] })).body.wijk;
     await H('/api/supplier/horeca/wijk/neem', { wijkId: wijk.id });
     await page.click('#pVerversNu');
-    await page.waitForTimeout(800);
+    /* De wijk is zojuist via de API gezet en genomen; hij bestond nog niet op het
+       scherm ("Er zijn nog geen wijken"). Zijn naam in het wijkbeeld is dus het
+       teken dat deze ververs binnen is. */
+    await wachtOpTekst(page, /Terras/, { in: '#pWijken' });
 
     const wijkbeeld = await page.evaluate(() => document.getElementById('pWijken').innerText.replace(/\s+/g, ' '));
     assert.match(wijkbeeld, /Terras/, 'de wijk staat in het wijkbeeld');
@@ -255,7 +306,7 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.match(wijkbeeld, /Zonder wijk/, 'en de tafels die in geen wijk zitten staan er apart');
 
     await page.click('[data-wijklens="mijn"]');
-    await page.waitForTimeout(800);
+    await lensAan('[data-wijklens="mijn"]');
     let beeldW = await lees();
     assert.match(beeldW.nu + beeldW.open, /PDA-DRAAG/, 'mijn eigen wijk staat er');
     assert.match(beeldW.nu + beeldW.open, /PDA-LEEG/, 'een tafel zonder wijk is van iedereen');
@@ -266,7 +317,10 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     /* Nu de wijk loslaten: dan is hij van niemand, dus van iedereen -- en de
        tafel hoort NIET te verdwijnen. */
     await page.click('[data-wijklaat]');
-    await page.waitForTimeout(800);
+    /* Losgelaten = het wijkbeeld zegt dat niemand hem meer draagt (pda-wijk.js).
+       Die zin komt uit dezelfde hertekening als de twee lijsten hieronder, dus is
+       hij het teken dat het scherm de nieuwe verdeling toont. */
+    await wachtOpTekst(page, /Niemand draagt deze wijk/, { in: '#pWijken' });
     beeldW = await lees();
     assert.match(beeldW.nu + beeldW.open, /PDA-DRAAG/,
       'een wijk die niemand draagt is van iedereen; de tafel verdwijnt niet');
@@ -287,7 +341,10 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.equal(bod.status, 200, JSON.stringify(bod.body));
 
     await page.click('#pVerversNu').catch(() => {});
-    await page.waitForTimeout(900);
+    /* Het aanbod komt uit hetzelfde werklijst-antwoord als het wijkbeeld
+       (`voorMij`), dus deze zin is het teken dat het blok opnieuw getekend is met
+       de overdracht erin. */
+    await wachtOpTekst(page, /Er ligt een aanbod voor u/, { in: '#pWijken' });
     const metBod = await page.evaluate(() => document.getElementById('pWijken').innerText.replace(/\s+/g, ' '));
     assert.match(metBod, /Er ligt een aanbod voor u/, 'het aanbod staat op de PDA: ' + metBod);
     assert.match(metBod, /draagt uw collega het nog/, 'met wat er tot dan geldt');
@@ -297,17 +354,23 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
       { overdrachtId: bod.body.overdracht.id }, tokB);
 
     await page.click('[data-wijklens="alles"]');
-    await page.waitForTimeout(600);
+    await lensAan('[data-wijklens="alles"]');
 
     /* ---- 8. de hele keten op dit scherm ---- */
     await page.click('#tTerug').catch(() => {});
-    await page.waitForTimeout(300);
+    /* Het tafelvenster stond hier nog niet open, dus die klik doet meestal niets.
+       Wat de regels hieronder nodig hebben is dat de WERKLIJST in beeld is: daar
+       staan #pNieuwTafel en #pNieuw op. */
+    await wachtOpZichtbaar(page, '#pLijst');
 
     // ONTVANGEN
     await page.fill('#pNieuwTafel', 'PDA-KETEN');
     await page.fill('#pNieuwGasten', '3');
     await page.click('#pNieuw');
-    await page.waitForTimeout(900);
+    /* Openen wisselt van venster EN haalt daarna de rekening op; de kop draagt de
+       tafelnaam pas als dat allebei gebeurd is -- en dat is precies wat de twee
+       beweringen hieronder lezen. */
+    await wachtOpTekst(page, /PDA-KETEN/, { in: '#tKop' });
     assert.equal(await page.evaluate(() => document.getElementById('pTafel').hidden), false,
       'na het openen staat de tafel in beeld');
     assert.match(await page.evaluate(() => document.getElementById('tKop').textContent),
@@ -316,7 +379,9 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     // een stoel erbij, zodat een bord straks een naam draagt
     await page.fill('#tStoelNaam', 'bij het raam');
     await page.click('#tStoelBij');
-    await page.waitForTimeout(600);
+    /* De stoel verschijnt in dezelfde hertekening die ook de keuzelijst "Voor
+       wie" vult -- en die wordt drie regels lager gebruikt. */
+    await wachtOpTekst(page, /bij het raam/, { in: '#tStoelen' });
     assert.match(await page.evaluate(() => document.getElementById('tStoelen').innerText),
       /bij het raam/, 'de stoel zit aan tafel');
 
@@ -326,8 +391,12 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const kaartKnop = await page.$('#tKaart [data-item]');
     assert.ok(kaartKnop, 'de kaart van de zaak staat op de PDA');
     const wat = await kaartKnop.evaluate(el => el.textContent);
+    /* WAT ER OP DE REKENING KOMT IS DE BEWERING HIERONDER, dus daar mag deze wacht
+       niet op vooruitlopen. De rekening zei "Nog niets besteld"; zodra hij iets
+       anders zegt, is de regel binnen en mogen de beweringen hun werk doen. */
+    const voorBestellen = await tekstVan(page, '#tRegels');
     await kaartKnop.click();
-    await page.waitForTimeout(800);
+    await wachtOpVerandering(page, '#tRegels', voorBestellen);
     const opRekening = await page.evaluate(() => document.getElementById('tRegels').innerText);
     assert.match(opRekening, /schaaldieren/, 'de allergie staat op de regel');
     assert.match(opRekening, /nog niet naar de keuken/, 'en de keuken ziet hem nog niet');
@@ -347,7 +416,11 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     const naarKeuken = await page.$('#tRegels [data-vrij]');
     assert.ok(naarKeuken, 'er staat een knop om de gang naar de keuken te sturen');
     await naarKeuken.click();
-    await page.waitForTimeout(800);
+    /* Vrijgeven laat de knop verdwijnen: er staat in die gang niets meer open. Dat
+       is meteen het teken dat de server klaar is -- de vraag ertussen gaat
+       rechtstreeks naar hem toe. */
+    await wachtTot(page, () => !document.querySelector('#tRegels [data-vrij]'), null,
+      { wat: 'de gang vrijgegeven (geen knop "Naar de keuken" meer)' });
     const naVrij = (await H('/api/supplier/horeca/rekening', { rekeningId: keten.id })).body.rekening;
     assert.ok(naVrij.regels[0].vrijAt, 'nu pas ziet de keuken hem');
     assert.equal(await page.evaluate(() => !!document.querySelector('#tRegels [data-vrij]')), false,
@@ -358,7 +431,10 @@ test('de PDA toont uitgelogd een deur en ingelogd een werkbare servicelijst',
     assert.ok(betaal, 'er staat een pinknop met het openstaande bedrag');
     assert.match(await betaal.evaluate(el => el.textContent), /\d/, 'met een bedrag erin');
     await betaal.click();
-    await page.waitForTimeout(900);
+    /* Een gesloten rekening klapt het tafelvenster dicht en zet de werklijst terug
+       in beeld (KLAAR -> terug). Zolang #pLijst verborgen is, is de betaling nog
+       niet rond en zou de vraag aan de server hieronder te vroeg komen. */
+    await wachtOpZichtbaar(page, '#pLijst');
     const naBetaal = (await H('/api/supplier/horeca/rekening', { rekeningId: keten.id })).body.rekening;
     assert.equal(naBetaal.status, 'betaald', 'de rekening is betaald');
     assert.equal(naBetaal.openstaand, 0);

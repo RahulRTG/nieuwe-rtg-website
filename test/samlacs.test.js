@@ -198,11 +198,19 @@ test('6. zonder geconfigureerd webadres gaat de SAML-deur NIET open', async () =
         body: new URLSearchParams({ SAMLResponse: 'x', RelayState: 'y' }) }]
     ]) {
       const r = await fetch(srv2.base + pad, opties);
-      assert.equal(r.status, 503, pad + ' hoort dicht te zijn zonder vast webadres');
+      /* 404 EN GEEN 503 (25 augustus 2026). Hier stond 503 met de volledige
+         reden in de body, en dat was twee poorten die elkaar tegenspraken: de
+         ladder telt elke 5xx op een tokenloos verzoek als serverfout, en de
+         storingswachter telt ze mee in zijn drempel -- een scanner die deze
+         publieke paden afloopt zou zo de beschermstand kunnen laten vallen.
+         De deur blijft dicht en de REDEN blijft bestaan, alleen woont hij nu in
+         het logboek (voor de beheerder die SAML inricht) en niet in de body
+         (voor een vreemde die omgevingsvariabelen leert). */
+      assert.equal(r.status, 404, pad + ' hoort dicht te zijn zonder vast webadres');
       const b = await r.json();
-      assert.match(b.error, /geen vast webadres/);
-      assert.match(b.waarom, /controleert die toets zichzelf/,
-        'en de weigering zegt WAAROM, niet alleen dat het niet kan');
+      assert.match(b.error, /SAML/i, 'de weigering noemt SAML en verder niets over de configuratie');
+      assert.ok(!JSON.stringify(b).includes('APP_URL'),
+        'de body noemt geen omgevingsvariabelen aan een naamloze beller');
     }
   } finally {
     stop(srv2 && srv2.child);

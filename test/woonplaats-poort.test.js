@@ -19,7 +19,7 @@
    niet met zekerheid uit de eigen zin van het lid halen, dan raden we niet maar
    vragen we hem, en een antwoord dat geen plaatsnaam is wordt niet geslikt.
 
-   Draai los: node --experimental-sqlite --test test/woonplaats-poort.test.js
+   Draai los: node --test test/woonplaats-poort.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

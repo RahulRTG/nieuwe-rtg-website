@@ -81,56 +81,35 @@ module.exports = (kern, { stuur }) => {
     stuur(res, pay.graafVanZaak(req.supplier.code, { dagen: req.body.dagen }));
   });
 
-  /* ---- de treasury van de zaak ----
-     Geld dat binnenkomt is niet hetzelfde als geld dat van u is: er zit btw in
-     en er komt een loonrun aan. De zaak stelt percentages in en bij elke
-     ontvangst gaat dat deel meteen apart. Het heeft tanden omdat `uitbetaal`
-     hieronder BESCHIKBAAR uitbetaalt en niet het saldo -- zonder die helft is
-     een btw-reservering een getal dat de volgende uitbetaling meeneemt.
-     Instellen en vrijgeven zijn geldhandelingen en vragen de manager. */
-  app.post('/api/supplier/pay/treasury', supplierAuth, (req, res) => {
-    stuur(res, pay.treasuryStand(req.supplier.code));
+  /* DE TREASURY EN DE PRE-AUTORISATIE (./pay-zaak-treasury.js): geld dat
+     blijft STAAN met een bestemming -- opzij voor de belasting, of
+     vastgehouden tot een levering klopt -- tegenover het geld dat hier NU
+     beweegt. De snede loopt langs de tijd. */
+  require('./pay-zaak-treasury')(kern, { stuurZaak });
+
+  /* HET ZAAKTEGOED, hierheen verhuisd bij de samenvoeging van 26 augustus 2026.
+     Deze drie stonden in routes/pay.js; main splitste de zaakkant af naar dit
+     bestand en toen stond /api/supplier/pay/in twee keer geregistreerd -- de
+     tweede registratie wint stil, en dan hangt een route aan een andere poort
+     dan je leest. Ze horen hier: dit is het bestand waar niets binnenkomt dat
+     niet langs supplierAuth is geweest, en managerOnly woont hier ook. */
+  /* De zaak zet tegoed klaar voor personeel of klanten (kern/pay/tegoed-zaak.js).
+     Klaarzetten en terugnemen zijn van de MANAGER en niet van elke ingelegde
+     medewerker, om dezelfde reden als bij uitbetalen hieronder: het haalt geld
+     uit de kas op een moment dat de eigenaar niet koos. Kijken mag iedereen --
+     dat is het werk. */
+  app.post('/api/supplier/pay/tegoed', supplierAuth, (req, res) => {
+    res.json(pay.tegoedZaakOverzicht(req.supplier.code));
   });
-  app.post('/api/supplier/pay/treasury/zet', supplierAuth, (req, res) => {
+  app.post('/api/supplier/pay/tegoed/zet', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    stuur(res, pay.treasuryZet(req.supplier.code, req.body || {}));
+    stuur(res, await pay.tegoedZaakKoop({ supplierCode: req.supplier.code, centen: req.body.centen, aanCodenaam: req.body.aan, oms: req.body.oms, idem: req.body.idem }));
   });
-  app.post('/api/supplier/pay/treasury/apart', supplierAuth, (req, res) => {
+  app.post('/api/supplier/pay/tegoed/terug', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    stuur(res, pay.treasuryApart(req.supplier.code, req.body || {}));
-  });
-  app.post('/api/supplier/pay/treasury/vrij', supplierAuth, (req, res) => {
-    if (!managerOnly(req, res)) return;
-    stuur(res, pay.treasuryVrij(req.supplier.code, String(req.body.id || '')));
+    stuur(res, await pay.tegoedZaakTerug({ supplierCode: req.supplier.code, tegoedId: String(req.body.id || ''), idem: req.body.idem }));
   });
 
-  /* ---- vooraf vastzetten: de pre-autorisatie ----
-     Drie handelingen van de ZAAK op een code van het lid: een maximum
-     vastzetten, later het werkelijke bedrag vastleggen, of vrijgeven. Het lid
-     heeft er geen eigen knop voor -- hij toont dezelfde kassacode als altijd en
-     ziet het vastgezette bedrag terug in zijn overzicht. Dat is met opzet: een
-     borg vastzetten is iets wat een zaak vraagt, en een tweede soort code zou
-     het lid laten kiezen tussen twee dingen die voor hem hetzelfde zijn. */
-  app.post('/api/supplier/pay/vooraf', supplierAuth, async (req, res) => {
-    const r = await pay.kasVooraf({ supplierCode: req.supplier.code, code: req.body.code,
-      maxCenten: req.body.maxCenten, oms: req.body.oms, idem: req.body.idem, urenGeldig: req.body.urenGeldig });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuurZaak(res, r);
-  });
-  app.post('/api/supplier/pay/vastleg', supplierAuth, async (req, res) => {
-    const r = await pay.kasVastleg({ supplierCode: req.supplier.code, reservering: req.body.reservering,
-      centen: req.body.centen, oms: req.body.oms, idem: req.body.idem, genre: req.supplier.type });
-    if (r.ok) sseToOffice('sync', { scope: 'pay' });
-    stuurZaak(res, r);
-  });
-  app.post('/api/supplier/pay/vrijgeef', supplierAuth, (req, res) => {
-    stuur(res, pay.kasVrijgeef({ supplierCode: req.supplier.code, reservering: req.body.reservering }));
-  });
-  app.post('/api/supplier/pay/vooraf/lijst', supplierAuth, (req, res) => {
-    stuur(res, pay.voorafVanZaak(req.supplier.code));
-  });
-
-  // de partnerkant: code innen aan de kassa, saldo zien, uitbetalen
   app.post('/api/supplier/pay/in', supplierAuth, async (req, res) => {
     /* Het genre komt uit het PARTNERREGISTER en niet uit het verzoek. Een zaak
        die haar eigen genre mag opgeven, kan een maaltijdbudget innen door

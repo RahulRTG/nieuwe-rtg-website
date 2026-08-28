@@ -25,7 +25,7 @@
 const { nu: klokNu } = require('../lib/klok');
 
 module.exports = (kern, { wie, lidCodenaam }) => {
-  const { app, auth, geenGast, rtmail, agenda, leren, facturatie } = kern;
+  const { app, auth, geenGast, rtmail, agenda, leren, facturatie, accounts } = kern;
   /* ---- de lid-kant: het RTMAIL-postvak in de verenigde Berichten-app ----
      Het adres is de codenaam van het lid; leden lezen alleen (RTMAIL bezorgt,
      het lid antwoordt niet naar de systeem-afzender). */
@@ -36,20 +36,30 @@ module.exports = (kern, { wie, lidCodenaam }) => {
      hoort in de kluis te blijven (server/accounts.js). */
   const lidSoort = wie.lidSoort;
   const lidAdres = wie.lidAdres;
+  const mailPubliek = require('../kern/mail-publiek')({ accounts });
+  const publiekLid = req => req.session.account ? mailPubliek.geefLid({
+    user: req.session.account,
+    naam: accounts.realNameOf(req.session.account),
+    tier: req.session.tier
+  }) : null;
 
   app.post('/api/member/rtmail/adres', auth, (req, res) => {
     const adres = lidAdres(req);
     if (!adres) return res.json({ adres: null });
     const soort = lidSoort(req);
-    res.json({ ok: true, adres, soort, domein: rtmail.DOMEINEN[soort],
+    const publiekAdres = publiekLid(req);
+    res.json({ ok: true, adres, publiekAdres, publiekActief: !!publiekAdres,
+      soort, domein: rtmail.DOMEINEN[soort],
       domeinen: rtmail.DOMEINEN,
-      uitleg: 'Je adres volgt je lidmaatschap. Verandert je pas, dan verandert het domein mee -- en post aan je vorige adres komt gewoon aan.' });
+      uitleg: publiekAdres
+        ? 'Je publieke adres gebruikt je naam en je door RTG vastgestelde pasniveau. Intern blijft je postvak op codenaam beschermd.'
+        : 'Je interne adres volgt je lidmaatschap. Publieke mail gaat pas open nadat domein en mailprovider zijn gekeurd.' });
   });
 
   app.post('/api/member/rtmail/inbox', auth, (req, res) => {
     const codenaam = lidCodenaam(req);
     if (!codenaam) return res.json({ adres: null, ongelezen: 0, berichten: [] });
-    res.json({ adres: lidAdres(req), soort: lidSoort(req),
+    res.json({ adres: lidAdres(req), publiekAdres: publiekLid(req), soort: lidSoort(req),
       ongelezen: rtmail.ongelezen(codenaam), berichten: rtmail.postvak(codenaam) });
   });
   /* Receipt Vault: RTMAIL is de documenteninbox, maar de factuurmotor blijft

@@ -10,11 +10,13 @@
 // opslaglaag: db.js is een singleton en de index hoort bij de collecties zelf.
 const { orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe } = require('../db');
 
+const subsidie = require('./commercie/subsidie');
+
 module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
-  fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+  fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-  ledenvoordeelVoor, facturatie }) => {
+  ledenvoordeelVoor, facturatie, pay }) => {
 
   /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
      waarom het op EEN plek staat: zie de kop van ./lidacties/factuur.js. */
@@ -38,6 +40,12 @@ function koopTicketVoor(session, body) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || datum < new Date().toISOString().slice(0, 10))
     return { status: 400, error: 'Kies een datum vanaf vandaag.' };
   if (!(act.tijden || []).includes(tijd)) return { status: 400, error: 'Kies een tijdslot van deze activiteit.' };
+  /* De sluitdag van de zaak (kern/activiteitendicht.js): een gesloten dag is
+     niet vol maar DICHT, en dat verschil hoort de gast te lezen -- "vol" nodigt
+     uit tot een ander slot op dezelfde dag, "gesloten" niet. */
+  const dicht = require('./activiteitendicht').dichtOp(s, datum, act.id);
+  if (dicht) return { status: 409, error: s.name + ' is op ' + datum + ' gesloten' +
+    (dicht.reden ? ' (' + dicht.reden + ')' : '') + '. Kies een andere dag.' };
   const personen = Math.min(10, Math.max(1, parseInt(body.personen, 10) || 1));
   const bezet = ticketsVoorSlot(s.code, act.id, datum, tijd).reduce((n, t) => n + (t.personen || 1), 0);
   if (bezet + personen > act.capaciteit)
@@ -77,7 +85,7 @@ function betaalBoekingVoor(session, body) {
   if (kortingB) b.puntenKorting = kortingB;
   // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij)
   const voordeelB = ledenvoordeelVoor(findSupplier(b.supplierCode), (b.price || 0) - kortingB);
-  if (voordeelB) b.regieKorting = voordeelB;
+  if (voordeelB) { b.regieKorting = voordeelB; b.voordeelOpbouw = subsidie.opbouwVan((b.price || 0) - kortingB, voordeelB); }
   b.paid = true;
   b.paidAt = new Date().toISOString();
   if (b.status === 'wacht-op-betaling') b.status = 'aangevraagd';
@@ -101,7 +109,7 @@ function betaalBoekingVoor(session, body) {
      kan geen van de vier er zijn eigen variant naast zetten. */
   const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
-    fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+    fooiUit, pasTegoedToe, herstelTegoed, verdienPunten, liveCodename, haversine, pushLive, pay,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
     orderMetRef, ordersVoegToe, ordersVanKlant, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor };
   const { plaatsOrderVoor, betaalOrderVoor } = require('./lidacties/bestellen')(ctx);

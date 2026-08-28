@@ -31,7 +31,7 @@
         wat een mutatieproef hoort te vinden, en de tweede assertie in toets 4
         staat er sindsdien.
 
-   Draai los: node --experimental-sqlite --test test/command-routes-herstel.test.js
+   Draai los: node --test test/command-routes-herstel.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

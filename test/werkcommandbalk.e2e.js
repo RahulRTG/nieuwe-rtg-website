@@ -23,14 +23,14 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpZichtbaar, wachtOpVerandering, tekstVan, klikEnWacht } = require('./helper');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmdbalk-'));
 
 test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;
   let browser;
@@ -57,7 +57,7 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
     await api('/project/maak', { werkruimte: w.werkruimte, lidToken: pl.lidToken,
       naam: 'Zonnepanelen Zaandam', werkvorm: 'stadsuitrol' });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -67,20 +67,48 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtg_werk_sessie'); });
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      /* De inlogkaart STAAT in de HTML, dus dat hij er is zegt niets. Wie te
+         vroeg klikt, klikt op een knop waar app.js zijn handler nog niet aan
+         heeft gehangen, en dan gebeurt er simpelweg niets. ai-toggle.js draait
+         NA app.js en zet de Rahul-balk op hidden -- die dichte balk is dus het
+         teken dat de pagescripts geweest zijn en de inlogknop echt werkt. */
+      await wachtTot(page, () => {
+        const balk = document.querySelector('.wk-rahul');
+        const ga = document.getElementById('inlogGa');
+        return !!balk && balk.hidden && !!ga && ga.offsetParent !== null;
+      }, null, { wat: 'een opgestarte pagina met een bruikbare inlogkaart (Rahul-balk dicht)' });
       await page.fill('#iWerkruimte', w.werkruimte);
       await page.fill('#iToken', token);
       await page.click('#inlogGa');
-      await page.waitForTimeout(900);
+      /* Inloggen is pas gelukt als de poort #inhoud opent, en dat doet kern.js
+         PAS in het antwoord op /mijn-rechten. Deze ene wacht dekt dus zowel de
+         server als het scherm; blijft de kaart staan, dan is de inlog geweigerd
+         en zegt de wacht dat met de tekst die er wel stond. */
+      await wachtOpZichtbaar(page, '#inhoud');
       /* De balk staat dicht tot je hem opent -- ai-toggle.js zet hem op hidden
          en de tab "Rahul" vouwt hem uit. Dat is het echte pad van een
          gebruiker; hem met de hand zichtbaar maken zou een scherm toetsen dat
          niemand zo te zien krijgt. */
       await page.click('#wkRahulTab');
-      await page.waitForTimeout(400);
+      // open is niet hetzelfde als bruikbaar: de balk krijgt de klasse `page`
+      // en pas daarmee is het invoerveld zichtbaar (.wk-main>.wk-rahul staat
+      // op display:none). Vullen voor dat moment vult een onzichtbaar veld.
+      await wachtOpZichtbaar(page, '#wkRahulInput');
       await page.fill('#wkRahulInput', tekst);
+      /* Wat er VOOR de vraag stond, want daar wachten we straks vanaf. Op "de
+         tekst is veranderd" alleen wachten zou te vroeg zijn: command.js zet
+         binnen een tel 'Even kijken...' neer en bij een zoekopdracht daarna nog
+         'Zoeken...'. Het antwoord is pas binnen als geen van die twee
+         tussenstanden er meer staat. */
+      const voorVraag = await tekstVan(page, '#wkRahulContext');
       await page.click('#wkRahulSend');
-      await page.waitForTimeout(900);
+      await wachtTot(page, ([s, o]) => {
+        const el = document.querySelector(s);
+        if (!el) return false;
+        const t = String(el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+        return !!t && t !== o && !/^(Even kijken|Zoeken)/.test(t);
+      }, ['#wkRahulContext', voorVraag],
+      { wat: 'een afgerond antwoord van Rahul in #wkRahulContext' });
       return page.evaluate(() => ({
         tekst: document.getElementById('wkRahulContext').innerText.replace(/\s+/g, ' '),
         ingelogd: document.getElementById('inhoud').hidden === false,
@@ -126,8 +154,13 @@ test('de commandobalk zoekt in het register van de rol, en zegt waar hij keek',
     const voorKnop = await api('/taken', { werkruimte: w.werkruimte, lidToken: pl.lidToken });
     assert.ok(!JSON.stringify(voorKnop).includes('Dakgoot'), 'nog geen taak');
 
-    await page.click('#wkDoe');
-    await page.waitForTimeout(700);
+    /* Uitvoeren is een verzoek en daarna een hertekening, en dat zijn twee
+       momenten. Eerst het antwoord van /handeling/doe, dan het moment waarop
+       command.js het VOORSTEL (met de knop erin) door het resultaat vervangt --
+       op alleen het antwoord wachten leest nog de oude tekst. */
+    const voorDoe = await tekstVan(page, '#wkRahulContext');
+    await klikEnWacht(page, '#wkDoe', '/handeling/doe');
+    await wachtOpVerandering(page, '#wkRahulContext', voorDoe);
     const naKnop = await page.evaluate(() => document.getElementById('wkRahulContext').innerText.replace(/\s+/g, ' '));
     assert.match(naKnop, /Uitgevoerd/, 'na de knop wel: ' + naKnop);
     assert.match(naKnop, /actiebon/, 'met een actiebon erbij');

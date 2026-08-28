@@ -45,7 +45,7 @@ module.exports = (kern) => {
   app.post('/api/gast/tafel', (req, res) => {
     if (geremd(req, res, 'qr')) return;
     const plek = sessie.zaakBijToken((req.body || {}).token);
-    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
+    if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
     const s = findSupplier(plek.zaakcode);
     /* Bij een KAMER wordt hier al gekeken of er een gastrekening op staat, dus
        voordat iemand een kaart doorbladert. Wie is uitgecheckt hoort dat meteen
@@ -71,7 +71,7 @@ module.exports = (kern) => {
     if (geremd(req, res, 'aanschuif')) return;
     const b = req.body || {};
     const plek = sessie.zaakBijToken(b.token);
-    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
+    if (!plek) { noteFailedTry(req.gastBucket, req.ip); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
     const uit = sessie.schuifAan(plek.zaakcode, plek.plek, {
       soort: plek.soort, folioVan,
       naam: b.naam, codenaam: b.codenaam, lid: !!b.lid,

@@ -29,6 +29,7 @@
 'use strict';
 
 const { maakBtwTelling, periodeVak } = require('./btwtelling');
+const { zekerheid } = require('./zekerheid');
 
 const tussenstand = (vak) => 'De periode loopt nog tot en met ' + vak.tot +
   '. Dit is een tussenstand; indienen kan pas als de periode voorbij is.';
@@ -73,7 +74,9 @@ function maakBtwAangifte({ db, save, crypto, nu }) {
     const scheef = controleerRegister(t);
     if (scheef) return scheef;
 
-    const cijfers = { tarieven: tarievenPerTarief(t.verkoop, land),
+    /* De aangifte is GETELD en niet geschat; ./zekerheid.js zegt dat met zoveel
+       woorden, inclusief waar hij ophoudt (omzet zonder factuur). */
+    const cijfers = { zekerheid: zekerheid('btw.aangifte'), tarieven: tarievenPerTarief(t.verkoop, land),
       verschuldigdCenten: t.verkoopSom, voorbelastingCenten: t.voorbelasting,
       saldoCenten: t.verkoopSom - t.voorbelasting,
       verkoopFacturen: t.verkoopAantal, inkoopFacturen: t.inkoopAantal };

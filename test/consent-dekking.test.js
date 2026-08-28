@@ -18,7 +18,7 @@
    hier niet gevonden -- die staat in het register omdat een mens hem erin heeft
    gezet. Een derde vorm die iemand morgen verzint, vindt hij ook niet. Dit is
    dus een net dat een gat kleiner maakt, geen deksel erop.
-   Draai los: node --experimental-sqlite --test test/consent-dekking.test.js */
+   Draai los: node --test test/consent-dekking.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

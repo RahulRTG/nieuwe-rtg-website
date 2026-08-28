@@ -18,7 +18,7 @@
    geklokte feiten lopen in plaats van over het personeel met een contract, of
    haal de verzuim-tak uit `voorMens()`.
 
-   Draai los: node --experimental-sqlite --test test/payroll-samenstellen.test.js */
+   Draai los: node --test test/payroll-samenstellen.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,6 +32,7 @@ const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
 const { maakComponenten } = require('../server/kern/payroll/componenten');
 const { maakRun } = require('../server/kern/payroll/run');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 const PERIODE = '2026-03';   // maart 2026: 22 werkdagen
 
@@ -40,9 +41,9 @@ function opzet() {
   const save = () => {};
   let t = 0;
   const nu = () => '2026-04-01T10:0' + (t++ % 10) + ':00.000Z';
-  const contracten = maakContracten({ db, save, nu });
-  const uren = maakUren({ db });
-  const verzuim = maakVerzuim({ db, save, nu });
+  const contracten = maakContracten({ opslag: maakOpslag({ db }), save, nu });
+  const uren = maakUren({ opslag: maakOpslag({ db })});
+  const verzuim = maakVerzuim({ opslag: maakOpslag({ db }), save, nu });
   const samenstellen = maakSamenstellen({ contracten, uren, verzuim });
   return { db, save, nu, contracten, uren, verzuim, samenstellen };
 }
@@ -204,13 +205,13 @@ test('zonder contract geen strook, ook niet met geklokte uren', () => {
 
 test('de hele keten: van contract en ziekmelding tot een berekende strook', () => {
   const k = opzet();
-  const regelpakket = maakRegelpakket({ db: k.db, save: k.save, nu: k.nu });
-  const componenten = maakComponenten({ db: k.db, save: k.save, nu: k.nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db: k.db }), save: k.save, nu: k.nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db: k.db }), save: k.save, nu: k.nu });
   regelpakket.neemOp({ land: 'NL', versie: 'nl-2026.1', geldigVan: '2026-01-01', geldigTot: '2026-12-31',
     valuta: 'EUR', regels: { minimumUurloon: { '21+': 1499 }, loonheffing: { tarief: 0.37 },
       premies: { tarief: 0.20 }, zvw: 0.0657, vakantiegeld: 0.08 } }, { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db: k.db, save: k.save, nu: k.nu, crypto, motor, regelpakket, componenten });
+  const run = maakRun({ opslag: maakOpslag({ db: k.db }), save: k.save, nu: k.nu, crypto, motor, regelpakket, componenten });
 
   k.contracten.leg('MERIDIAAN', 7, vastContract({ maandloonCenten: 220000 }), 'M. de Wit');
   k.verzuim.meld('MERIDIAAN', 7, { soort: 'ziek', van: '2026-03-09', tot: '2026-03-13' }, 'Evi van Dalen');

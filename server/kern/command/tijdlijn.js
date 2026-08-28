@@ -57,8 +57,8 @@ function grens(waarde, standaard, max) {
   return Math.max(1, Math.min(Number.isFinite(gevraagd) ? gevraagd : standaard, max));
 }
 
-function maakTijdlijn({ db, journaal }) {
-  const techniek = () => (db.data.techniek || {});
+function maakTijdlijn({ opslag, journaal }) {
+  const techniek = () => opslag.gedeeld.techniek();
 
   function uitJournaal() {
     const rij = journaal.recent(2000) || [];

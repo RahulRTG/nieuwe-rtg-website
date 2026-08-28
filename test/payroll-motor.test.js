@@ -16,7 +16,7 @@
      pas op hun ingangsdatum;
    - onder het minimumloon is een WAARSCHUWING, geen stille correctie.
 
-   Draai los: node --experimental-sqlite --test test/payroll-motor.test.js */
+   Draai los: node --test test/payroll-motor.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -25,6 +25,7 @@ const { maakRegelpakket } = require('../server/kern/payroll/regelpakket');
 const { maakComponenten } = require('../server/kern/payroll/componenten');
 const { maakBijwerken } = require('../server/kern/payroll/bijwerken');
 const { bereken, controleer } = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 /* Een nepdatabase: deze modules bewaren in db.data en verder nergens. */
 function nepDb() {
@@ -47,8 +48,8 @@ function pakket(versie, over) {
 
 function opzet() {
   const { db, save, nu } = nepDb();
-  const regels = maakRegelpakket({ db, save, nu });
-  const comps = maakComponenten({ db, save, nu });
+  const regels = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const comps = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   const register = Object.fromEntries(comps.alle().map(c => [c.sleutel, c]));
   return { db, save, nu, regels, comps, register };
 }
@@ -138,7 +139,7 @@ test('een pakket dat de keuring niet haalt komt er niet in', () => {
 
 test('automatisch binnengehaalde pakketten staan ongecontroleerd klaar', async () => {
   const { db, save, nu, regels } = opzet();
-  const bij = maakBijwerken({ regelpakket: regels, db, save, nu });
+  const bij = maakBijwerken({ regelpakket: regels, opslag: maakOpslag({ db }), save, nu });
   bij.meldBronAan({ naam: 'proefbron', soort: 'url', haal: async () => pakket('nl-2027.1', {
     geldigVan: '2027-01-01', geldigTot: '2027-12-31' }) });
 

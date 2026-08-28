@@ -45,14 +45,18 @@ app.post('/api/supplier/login', async (req, res) => {
       logInlog('zaak', false, s.code + ' · ' + staff.name + ' (werkvenster)', req);
       return res.status(403).json({ error: wv.error, venster: wv.venster || null, ...(wv.locatieNodig ? { locatieNodig: true } : {}) });
     }
-    logInlog('zaak', true, s.code + ' · ' + staff.name, req);
     actor = { name: staff.name, role: staff.role, staffId: staff.id, manager: staff.role === 'manager' };
   } else if (hasCred(req.body)) {
     if (!DEMO) return res.status(403).json({ error: 'Demo-inlog is uitgeschakeld. Log in op uw naam met uw persoonlijke pincode.' });
     const bucket = 'sup:' + req.ip;
     if (tooManyTries(res, bucket)) return;
     if (!checkCred(req.body.username, req.body.password)) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
+      /* Deze tak logde NIETS -- niet de misser en niet de treffer. De
+         personeelstak eronder deed het wel, dus liet de route "soms wel, soms
+         geen spoor" na en was "laat een spoor na" geen eigenschap van de
+         ingang. Zie test/inlogspoor.test.js. */
+      logInlog('zaak', false, req.body.username, req);
       return res.status(401).json({ error: 'Onjuiste gebruikersnaam of wachtwoord.' });
     }
     loginFails.delete(bucket);
@@ -65,8 +69,10 @@ app.post('/api/supplier/login', async (req, res) => {
     return res.status(401).json({ error: 'Kies wie u bent en voer uw persoonlijke pincode in.' });
   }
   if (!s) return res.status(404).json({ error: 'Deze leverancierscode kennen we niet.' });
-  if (s.partnerStatus === 'geschorst' || s.partnerStatus === 'beeindigd')
+  if (s.partnerStatus === 'geschorst' || s.partnerStatus === 'beeindigd') {
+    logInlog('zaak', false, s.code + ' (werkplek gesloten)', req);
     return res.status(403).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
+  }
   /* De persoonseis van het genre, met DEZELFDE functie die supplierAuth
      gebruikt. Hem hier herhalen in eigen woorden zou de tweede plek zijn die
      dit besluit neemt, en die twee lopen uiteen. Wat dit toevoegt is alleen het
@@ -79,7 +85,15 @@ app.post('/api/supplier/login', async (req, res) => {
     logInlog('zaak', false, s.code + ' · ' + actor.name + ' (persoonseis)', req);
     return res.status(403).json({ error: pp.error, persoonseis: pp.missend || null });
   }
+  /* EEN GESLAAGDE INLOG IS ER PAS ALS ER EEN TOKEN IS. De PIN-tak zette zijn
+     `ok: true` hierboven neer, nog voor deze twee weigeringen -- wie bij een
+     gesloten werkplek de juiste pincode intikte, kwam als geslaagde inlog op
+     het bord terwijl er nooit een sessie ontstond. Een auditlog met een regel
+     die niet is gebeurd, is erger dan een ontbrekende regel. Daarom staat de
+     succesregel nu op de enige plek waar hij waar is, en dekt hij meteen ook
+     het bedrijfsaccount, dat helemaal niets logde. */
   const token = crypto.randomBytes(24).toString('hex');
+  logInlog('zaak', true, s.code + ' · ' + actor.name, req);
     rememberSession(token, { role: 'supplier', code: s.code, actor: actor.name, staffId: actor.staffId,
       staffRole: actor.role, manager: actor.manager,
       ...(staff && staff.member_id != null ? { lid: Number(staff.member_id), lidKey: 'user-' + staff.member_id } : {}) });

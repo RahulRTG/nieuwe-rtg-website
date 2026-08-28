@@ -9,7 +9,7 @@
    In-process op een lege database, met een injecteerbare klok: vervaldatums
    toetsen vraagt om de tijd te kunnen verzetten, en dat kan niet met wachten.
 
-   Draai los: node --experimental-sqlite --test test/levensband.test.js */
+   Draai los: node --test test/levensband.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

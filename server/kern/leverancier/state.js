@@ -1,6 +1,7 @@
 /* Leverancier (deelmodule): de volledige zaak-status voor de leverancier-app (een samengestelde kaart van alles).
    Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/leverancier.js. */
+const GS = require('../geschikt');
 module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
@@ -23,14 +24,15 @@ module.exports = (ctx) => {
     const alleBoekingen = boekingenVanZaak(s.code).filter(b => b.status !== 'wacht-op-betaling');
     const zichtBoekingen = alleBoekingen.filter(b => !BOEK_KLAAR[b.status] || String(b.finishedAt || b.at).slice(0, 10) === vandaag).slice(0, 80);
     return {
-      /* modules: welke eigen PDA-tabs deze zaak aanzet. Die afbeelding stond in
-         de browser (caps.includes('marina') en zo, verspreid over de delen van
-         personeel.js) en dus wist de client hetzelfde als de server -- zie
-         kern/pda/modules.js voor waarom dat hier hoort. industry is de sector
-         uit het genre-register. */
+      /* modules: welke PDA-tabs deze zaak aanzet. Dat stond in de browser
+         verspreid (caps.includes over de delen van personeel.js), dus wist de
+         client hetzelfde als de server -- zie kern/pda/modules.js. industry is
+         de sector uit het genre-register. */
       supplier: { code: s.code, name: s.name, type: s.type, typeLabel: t.label, icon: t.icon, city: s.city,
         caps: t.caps || [], industry: t.industry || null, modules: pdaModules(s, t.caps || []),
-        loc: s.loc, rate: s.rate, vak: s.vak || null },
+        loc: s.loc, rate: s.rate, vak: s.vak || null,
+        // wat de zaak verklaarde te kunnen, plus de woordenlijst zelf (../geschikt)
+        geschikt: GS.geschiktVan(s), geschiktLijst: GS.lijst() },
       activiteiten: s.activiteiten || null,
       transfer: s.type === 'activiteit' ? (s.transfer || { aan: false, prijs: 0 }) : null,
       autos: (s.type === 'verhuur' || s.type === 'tweewielers') ? (s.autos || []) : null,

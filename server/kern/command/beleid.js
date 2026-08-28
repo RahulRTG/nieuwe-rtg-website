@@ -38,8 +38,8 @@ const START = [
   { id: 'zaak.termijnUren', wat: 'Binnen hoeveel uur een uitzondering een eigenaar en besluit hoort te hebben', waarde: 48, eenheid: 'uur', vierOgen: false }
 ];
 
-function maakBeleid({ db, save, crypto, journaal, vak, start }) {
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   const REGELS = Array.isArray(start) ? start : START;
   function reg() {
     const v = V();

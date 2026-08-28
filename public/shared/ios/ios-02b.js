@@ -125,7 +125,7 @@
       'width:150px;min-width:24px;height:24px;min-height:24px;' +
       'background:none;border:0;padding:0;cursor:pointer;display:flex;' +
       'align-items:center;justify-content:center;touch-action:none;}' +
-      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:2.5px;' +
+      '.ios-thuis::after{content:"";width:134px;height:5px;border-radius:0;' +
       'background:rgba(244,241,236,.55);}';
     (document.head || document.documentElement).appendChild(st);
   }
@@ -143,8 +143,17 @@
     if (document.getElementById('rtg-ios-acties-basis')) return;
     var st = document.createElement('style');
     st.id = 'rtg-ios-acties-basis';
+    /* 24 voor de werkbalk, 44 voor de aangewezen hoofdhandeling. Die tweede
+       regel moet HIER staan en niet alleen in shared/rtg-ui.css: dit blad wordt
+       bij het laden aan <head> geplakt, dus het komt na de bundel EN
+       `.ios-nav-acties > *` (0,1,1) is zwaarder dan `[data-hoofdactie]` (0,1,0).
+       Zonder deze regel won de balkgrens van de duimgrens en stond "Ga online"
+       op /apps/sitemaker.html op 26,6 hoog terwijl rtg-ui.css 44 voorschreef --
+       een uur zoeken, want in de CSSOM matchte geen enkele regel: dit blad
+       bestaat alleen op de pagina. */
     st.textContent = '.ios-nav-acties > *{min-width:24px;min-height:24px;box-sizing:border-box;' +
-      'display:inline-flex;align-items:center;justify-content:center;}';
+      'display:inline-flex;align-items:center;justify-content:center;}' +
+      '.ios-nav-acties > [data-hoofdactie]{min-width:44px;min-height:44px;}';
     (document.head || document.documentElement).appendChild(st);
   }
 

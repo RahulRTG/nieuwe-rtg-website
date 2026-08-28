@@ -9,13 +9,13 @@
    (WAL + synchronous=NORMAL); een proces-SIGKILL verliest een gecommitte WAL niet
    (de bytes staan bij de kernel, de herstart speelt de WAL terug). Deze test
    bewaakt dat contract. Draai los:
-   node --experimental-sqlite --test test/duurzaamheid-kill.test.js */
+   node --test test/duurzaamheid-kill.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopHard } = require('./helper');
 
 /* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
 
@@ -92,8 +92,16 @@ test('een harde SIGKILL midden in de betaalstroom verliest geen bevestigde tik e
     assert.equal(await saldo(srv.base, B.token), K * BEDRAG, 'B ontving alle tikken voor de crash');
 
     // ---- de HARDE crash: SIGKILL, geen kans om te flushen ----
-    stop(srv.child);
-    await new Promise(r => setTimeout(r, 300)); // laat de OS-poort echt vrijkomen
+    /* SIGKILL EN WACHTEN TOT HIJ WEG IS. Het blijft een stroomstoring -- niets
+       wordt afgemaakt, en dat is precies wat hier getoetst wordt -- maar de
+       wacht erna is nu een teken en geen gok.
+
+       Hier stond `setTimeout(300) // laat de OS-poort echt vrijkomen`. Die
+       reden klopte niet: startServer pakt elke keer een verse vrije poort. Wat
+       er wel onder zat: zolang het oude proces leeft heeft het de datamap nog
+       vast, en dan start ronde 2 op een half afgesloten sqlite. `exit` is
+       daarvoor het teken. */
+    await stopHard(srv.child);
 
     // ---- ronde 2: herstart op DEZELFDE datamap, tokens overleefden ----
     srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
@@ -142,8 +150,7 @@ test('conservatie houdt ook als de crash midden in een burst van tikken valt', a
     const BEDRAG = 1000;
     for (let i = 0; i < 30; i++) api(srv.base, 'pay/stuur', { aan: B.codenaam, centen: BEDRAG, oms: 'burst', idem: 'burst-' + i }, A.token).catch(() => {});
     await new Promise(r => setTimeout(r, 40));
-    stop(srv.child);   // SIGKILL, ergens midden in de burst
-    await new Promise(r => setTimeout(r, 300));
+    await stopHard(srv.child);   // SIGKILL, ergens midden in de burst; zie hierboven
 
     srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
     const aNa = await saldo(srv.base, A.token);

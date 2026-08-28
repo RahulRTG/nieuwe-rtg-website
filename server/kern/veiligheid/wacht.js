@@ -17,16 +17,14 @@
    Twee treden, zie alarm.js: eerst een genadetijd met een por naar jezelf,
    daarna pas de kring. En een wacht loopt nooit stiekem door: elke wacht
    heeft een einde, en na het alarm stopt hij. */
-module.exports = ({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal }) => {
+module.exports = ({ opslag, save, crypto, schoon, alarm, plek, meldAan, sociaal }) => {
   const nu = () => new Date().toISOString();
   const MIN_MIN = 1;          // minstens een minuut (en dat is al kort)
   const MAX_MIN = 24 * 60;    // hoogstens een etmaal; langer is geen wacht meer
   const GENADE_STD = 10;      // minuten tussen "je bent over tijd" en de kring
 
   function lijst() {
-    if (!db.data.veilig) db.data.veilig = {};
-    if (!db.data.veilig.wachten) db.data.veilig.wachten = [];
-    return db.data.veilig.wachten;
+    return opslag.tak('wachten');
   }
 
   const LOOPT = ['loopt', 'genade'];
@@ -86,9 +84,9 @@ module.exports = ({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal }) =
     if (w8.length > 500) {
       const lopend = w8.filter(x => LOOPT.includes(x.status) || x.status === 'alarm');
       const klaar = w8.filter(x => !LOOPT.includes(x.status) && x.status !== 'alarm');
-      db.data.veilig.wachten = klaar.slice(-Math.max(0, 500 - lopend.length)).concat(lopend);
+      opslag.zetTak('wachten', klaar.slice(-Math.max(0, 500 - lopend.length)).concat(lopend));
     } else {
-      db.data.veilig.wachten = w8;
+      opslag.zetTak('wachten', w8);
     }
     // meekijken mag zolang de wacht loopt, plus de marge; daarna dicht
     if (body.deelLocatie !== false) plek.vensterOpen(handle, minuten + marge + 30, 'wacht');

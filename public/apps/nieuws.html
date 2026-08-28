@@ -18,8 +18,8 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.5rem;}
   main{padding:1.1rem;max-width:680px;margin:0 auto;}
   /* de rubriekenrij is de eigen schakelaar van deze app; hij houdt zijn eigen
@@ -32,22 +32,22 @@
     letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
   .rub:hover{color:var(--txt);}
   .rub.aan{color:var(--txt);border-bottom-color:var(--gold);}
-  .art{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;cursor:pointer;transition:border-color .15s;}
+  .art{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;cursor:pointer;transition:border-color .15s;}
   .art:hover{border-color:var(--gold);}
-  .art .rlbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);}
+  .art .rlbl{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   .art h2{font-size:1.25rem;line-height:1.25;margin:.25rem 0 .3rem;}
   .art .intro{font-size:.9rem;color:var(--muted);line-height:1.55;}
   .art .meta{font-size:.72rem;color:var(--soft);margin-top:.45rem;}
   .lees h2{font-size:1.5rem;margin:.3rem 0 .5rem;}
   .lees .tekst{font-size:.98rem;line-height:1.7;color:var(--txt);white-space:pre-wrap;margin-top:.6rem;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.84rem;padding:.45rem 1rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.84rem;padding:.45rem 1rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .ai{border-top:1px solid var(--line);margin-top:1rem;padding-top:.8rem;}
   .ai .rij{display:flex;gap:.4rem;}
-  .ai input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:9px;color:var(--txt);font:inherit;font-size:.85rem;padding:.45rem .65rem;}
+  .ai input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.85rem;padding:.45rem .65rem;}
   .ai .uit{font-size:.9rem;color:var(--muted);line-height:1.6;margin-top:.6rem;white-space:pre-wrap;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>

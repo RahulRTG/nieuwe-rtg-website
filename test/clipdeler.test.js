@@ -12,7 +12,7 @@
    toestelopslag, en dat is een e2e-vraag. Wat hij wel kan: aanwijzen dat er
    ergens een tweede RTCPeerConnection of een tweede OPFS-schrijver opduikt.
 
-   Draai los: node --experimental-sqlite --test test/clipdeler.test.js */
+   Draai los: node --test test/clipdeler.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

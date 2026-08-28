@@ -107,7 +107,7 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
     if (!anthropic) return demoAnalyse(vraag, bevindingen);
     try {
       const r = await anthropic.messages.create({
-        model: 'claude-opus-4-8', max_tokens: 400,
+        model: 'claude-sonnet-5', max_tokens: 400,
         system: 'Je bent de Onderzoeker van het RTG Kantoor. Schrijf in het Nederlands een korte, zakelijke analyse (3-5 zinnen) op basis van UITSLUITEND de aangeleverde bevindingen. Verzin geen cijfers. Sluit af met een advies; benoem dat de mens beslist.',
         messages: [{ role: 'user', content: 'Onderzoeksvraag: ' + vraag + '\nBevindingen:\n- ' + bevindingen.join('\n- ') }]
       });

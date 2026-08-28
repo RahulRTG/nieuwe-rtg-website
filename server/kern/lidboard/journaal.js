@@ -21,14 +21,27 @@
 
    Begrensd op MAX regels per boardroom: loopt hij vol, dan valt de oudste eraf.
    Zonder grens groeit een enkel bord ongelimiteerd en zou een lus met
-   schakelverzoeken de opslag kunnen laten vollopen. */
+   schakelverzoeken de opslag kunnen laten vollopen.
+
+   3. AAN DE HASHKETEN. De twee vragen waarvoor dit journaal bestaat -- "stond
+      dat altijd al uit?" en "wie heeft dat aangezet?" -- zijn precies zoveel
+      waard als de zekerheid dat er niemand achteraf aan gesleuteld heeft. Elke
+      regel draagt daarom de hash van zijn voorganger. Wat dat wel en niet
+      tegenhoudt staat in de kop van ../../lib/keten.js.
+
+      De keten loopt PER BOARDROOM, want zo is dit journaal opgeslagen: een
+      lijst per lid. Dat past ook bij regel 2 -- wissen op verzoek van de
+      betrokkene haalt zijn hele lijst weg en laat geen gat in andermans
+      keten. */
 
 const MAX = 200;
 
+const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('../../lib/keten');
+
 function maakJournaal({ db, save }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/lidboard/journaal', bezit: { ledenBoardLog: 'kaart' } });
   function store() {
-    if (!db.data.ledenBoardLog || typeof db.data.ledenBoardLog !== 'object') db.data.ledenBoardLog = {};
-    return db.data.ledenBoardLog;
+    return eigen.bak('ledenBoardLog');
   }
   const kort = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 
@@ -41,6 +54,20 @@ function maakJournaal({ db, save }) {
     const s = store();
     if (!Array.isArray(s[sleutel])) s[sleutel] = [];
     const r = {
+      /* WIENS JOURNAAL DIT IS, IN DE REGEL ZELF.
+
+         De keten bindt alleen wat er in de regel staat. Stond de boardroom er
+         niet in, dan zijn twee regels met dezelfde inhoud in dezelfde
+         milliseconde letterlijk identiek -- inclusief hun hash -- en is een
+         regel onopgemerkt van het ene lid naar het andere te verplaatsen. Dat
+         is precies het soort verschuiving waarvoor dit journaal bestaat: "wie
+         heeft dat aangezet?" mag niet te beantwoorden zijn met de regel van een
+         ander. Zo gevonden, door de toets die twee leden vergeleek.
+
+         Dit voegt geen gegeven toe dat er niet al was: de sleutel IS de plek
+         waar deze lijst onder staat. Hij wordt hier alleen expliciet, zodat de
+         hash hem dekt. */
+      boardroom: String(sleutel),
       at: new Date().toISOString(),
       door: door === 'ouder' ? 'ouder' : 'lid',
       bron: kort(bron, 60) || 'boardroom',
@@ -49,10 +76,18 @@ function maakJournaal({ db, save }) {
         van: w.van === true, naar: w.naar === true
       }))
     };
-    s[sleutel].unshift(r);
-    if (s[sleutel].length > MAX) s[sleutel].length = MAX;
+    const geschreven = ketenNoteerIn(s[sleutel], r, MAX);
     if (save) { try { save(); } catch (e) { /* de schakeling zelf is al bewaard */ } }
-    return r;
+    return geschreven;
+  }
+
+  /* De ketenstand van één boardroom-journaal: klopt dit spoor nog met zichzelf?
+     Het lid kan dit over zijn eigen journaal opvragen -- het journaal is van hem,
+     dus de controle erop ook. */
+  function keten(sleutel) {
+    const s = store();
+    const l = Array.isArray(s[sleutel]) ? s[sleutel] : [];
+    return Object.assign({ top: ketenTop(l) }, ketenVerifieer(l));
   }
 
   /* Het journaal van een boardroom, nieuwste eerst. */
@@ -72,7 +107,7 @@ function maakJournaal({ db, save }) {
     return true;
   }
 
-  return { noteer, lijst, wis, MAX };
+  return { noteer, lijst, wis, keten, MAX };
 }
 
 module.exports = { maakJournaal, MAX };

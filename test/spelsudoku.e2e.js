@@ -18,13 +18,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, keurLidGoed } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sudoku-e2e-'));
 
 async function nieuwLid(base) {
@@ -34,16 +30,22 @@ async function nieuwLid(base) {
     body: JSON.stringify({ name: 'Puzzelaar', email: 'su' + u + '@x.nl', phone: '06' + u.slice(0, 8),
       password: 'geheim12345', geboortedatum: '1982-02-02', tier: 'rtg' }) }).then(r => r.json());
   assert.ok(reg.token, 'het lid is aangemeld: ' + JSON.stringify(reg).slice(0, 160));
+  /* EN LANGS DE KEURING, want de progressielaag stopt bij 18+ EN A3 (zie
+     kern/volwassen.js en de grens in kern/spellen/grens.js). Zonder deze stap
+     speelt het lid gewoon, maar wordt er niets bewaard -- en dan zakt deze
+     toets op de punten in plaats van op het spel. */
+  const codenaam = (reg.state && reg.state.user && reg.state.user.codename) || reg.codename;
+  if (codenaam) await keurLidGoed(base, reg.token, codenaam, '1982-02-02');
   return reg.token;
 }
 
 test('een lid opent Sudoku, krijgt een puzzel van de server en lost hem op',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -121,13 +123,13 @@ test('een lid opent Sudoku, krijgt een puzzel van de server en lost hem op',
    uit wat ze weet, en dan is de maatregel in de kern niets waard.
    ========================================================================== */
 test('een lid doet de dagopgave, en die loopt langs de dag-ingangen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sudokudag-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

@@ -25,7 +25,7 @@
    dienst gaat. Of onderhoudskosten optellen. Of een lijst opnieuw sorteert als
    er iets afgevinkt wordt.
 
-   Draai los: node --experimental-sqlite --test test/rechterhand-huis.test.js
+   Draai los: node --test test/rechterhand-huis.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

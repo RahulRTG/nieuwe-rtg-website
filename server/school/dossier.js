@@ -28,7 +28,13 @@ module.exports = (sctx) => {
     const g = poort(req, res, 'leerling'); if (!g) return;
     const l = vind(g.sch, req.body.leerlingId);
     if (!l) return res.status(404).json({ error: 'Deze leerling staat niet in de administratie.' });
-    const uit = { ok: true, leerling: leerlingKort(l), geboren: l.geboren || null, herkomst: l.herkomst || null,
+    /* De klas-sleutel reist mee. Zonder hem is het dossier een doodlopende
+       weg: aanwezigheid, voortgang en rapport verwijzen naar de sleutel en
+       niet naar het leerling-id, dus een scherm dat een dossier open heeft kon
+       de cijfers van datzelfde kind nergens bij halen. Nieuwe gegevens zijn
+       het niet -- de leraar ziet dezelfde sleutel al in de klaslijst. */
+    const uit = { ok: true, leerling: leerlingKort(l), sleutel: l.sleutel || null,
+      geboren: l.geboren || null, herkomst: l.herkomst || null,
       contact: l.contact || {}, documenten: (l.documenten || []).map(d => ({ id: d.id, soort: d.soort, titel: d.titel, at: d.at, door: d.door })),
       overstappen: l.overstappen || [], zorg: null, zorgToegang: null };
 

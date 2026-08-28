@@ -10,7 +10,7 @@
      WIE er achter de pin zit, en pas daarna is er een knop. Een gescande code
      die meteen een verzoek de deur uit doet, is een verzoek dat niemand
      bewust deed. */
-  let mijnPin = null, pinScanner = null;
+  let mijnPin = null;
 
   function pinBlokVul(){
     const el = $('#scPin'); if (!el) return;
@@ -35,7 +35,6 @@
         '<button id="scPinGo">' + T('pin.zoek','Zoek') + '</button>' +
         '<button id="scPinScan" class="grijs">' + T('pin.scan','Scan') + '</button>' +
       '</div>' +
-      '<video id="scPinCam" playsinline muted hidden></video>' +
       '<div class="sc-res" id="scPinRes"></div>';
     $('#scPinKopie').addEventListener('click', pinKopieer);
     $('#scPinQr').addEventListener('click', pinQrWissel);
@@ -43,7 +42,7 @@
     $('#scPinLive').addEventListener('click', pinLiveWissel);
     $('#scPinUit').addEventListener('click', pinUitWissel);
     $('#scPinGo').addEventListener('click', () => pinOpzoeken($('#scPinIn').value));
-    $('#scPinScan').addEventListener('click', pinScanWissel);
+    $('#scPinScan').addEventListener('click', pinScanOpen);
     $('#scPinIn').addEventListener('keydown', e => { if (e.key === 'Enter') pinOpzoeken($('#scPinIn').value); });
     if (!mijnPin) pinHalen();
   }
@@ -98,35 +97,41 @@
     return true;
   }
 
-  /* Scannen: het beeld verlaat het toestel niet -- elk frame wordt lokaal
-     ontleed (/shared/scanner.js). Een gescande code die geen RTG-pin is, zegt
-     dat gewoon; we sturen hem nergens heen. */
-  function pinScanWissel(){
-    if (pinScanner) { pinScanUit(); return; }
-    if (!window.RTGScanner) { toast(T('pin.scanniet','Scannen kan hier niet. Typ de pin over.')); return; }
-    const cam = $('#scPinCam'); if (!cam) return;
-    cam.hidden = false;
-    pinScanner = new RTGScanner.Scanner({ video: cam, onCode: c => {
-      const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort: 'tekst', tekst: c.tekst };
-      /* Twee soorten, want er zijn er twee: de vaste pin staat leesbaar in de
-         code (rtg:pin:...), de levende is een ondertekend token (RTG1....) dat
-         alleen de server kan duiden. Voor wie scant is dat hetzelfde gebaar. */
-      if (g.soort === 'rtg1') { pinScanUit(); pinLiveKijken(g.token); return; }
-      if (g.soort !== 'pin') { toast(T('pin.geenpin','Dit is geen RTG-pin.')); return; }
-      pinScanUit();
-      $('#scPinIn').value = g.pin;
-      pinOpzoeken(g.pin);
-    } });
-    pinScanner.start().catch(() => { toast(T('pin.camniet','Geen toegang tot de camera.')); pinScanUit(); });
-    $('#scPinScan').textContent = T('pin.scanstop','Stop');
+  /* Scannen gaat langs de HUISOVERLAY (/shared/scanknop.js). Hier stond een
+     eigen camerablad met een RTGScanner eromheen -- de laatste tweede
+     uitvoering van iets dat het huis al heeft. Wat dit scherm ermee wint is
+     geen netheid maar een uitweg: de overlay draagt altijd een handinvoer, en
+     legt uit waarom de camera niet start (buiten https geeft de browser hem
+     niet vrij -- op een telefoon de meest voorkomende reden). Het beeld
+     verlaat het toestel nog steeds niet.
+
+     Een gescande code die GEEN RTG-pin is, houdt de overlay open: `onCode` mag
+     `false` teruggeven. Anders viel het venster dicht op een verkeerde QR en
+     moest een mens opnieuw beginnen. */
+  function pinScanOpen(){
+    if (!window.RTGScanknop) { toast(T('pin.scanniet','Scannen kan hier niet. Typ de pin over.')); return; }
+    RTGScanknop.open({
+      titel: T('pin.scantitel','Pin scannen'),
+      hint: T('pin.scanhint','Richt de camera op de QR van de ander.'),
+      handTekst: T('pin.oftyp','Of typ de code'),
+      onCode: (c) => {
+        const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort: 'tekst', tekst: c.tekst };
+        /* Twee soorten, want er zijn er twee: de vaste pin staat leesbaar in de
+           code (rtg:pin:...), de levende is een ondertekend token (RTG1....) dat
+           alleen de server kan duiden. Voor wie scant is dat hetzelfde gebaar. */
+        if (g.soort === 'rtg1') { pinLiveKijken(g.token); return; }
+        if (g.soort !== 'pin') { toast(T('pin.geenpin','Dit is geen RTG-pin.')); return false; }
+        $('#scPinIn').value = g.pin;
+        pinOpzoeken(g.pin);
+      }
+    });
   }
+  /* Blijft bestaan, en niet als restje: hij stopt de LEVENDE CODE, die zichzelf
+     elke minuut ververst en niet hoort door te lopen in een la die dicht is of
+     een balk die weg is. Het camerawerk zat er alleen bij in; dat doet de
+     overlay nu zelf. */
   function pinScanUit(){
-    // ook de levende code stopt hier: hij ververst zichzelf elke minuut, en dat
-    // hoort niet door te lopen in een la die dicht is of een balk die weg is
     pinLiveUit();
-    if (pinScanner) { try { pinScanner.stop(); } catch(e){} pinScanner = null; }
-    const cam = $('#scPinCam'); if (cam) cam.hidden = true;
-    const knop = $('#scPinScan'); if (knop) knop.textContent = T('pin.scan','Scan');
   }
 
   // stap 1: wie is dit? (nog niets versturen)

@@ -18,10 +18,11 @@
 
 module.exports = (ctx) => {
   const { db, save, liveCodename, notify, lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN, bezitZet } = ctx;
+  const levens = require('../levensdossier')({ db }).voor('bureau');
 
   function bureauDesk() {
     const uit = [];
-    for (const [key, l] of Object.entries(db.data.lifestyle || {})) {
+    for (const [key, l] of Object.entries(levens.alleLezend())) {
       for (const c of (l.cases || [])) {
         if (!openCase(c) || c.besloten) continue;
         uit.push({ key, codenaam: liveCodename ? liveCodename(key) : '', id: c.id, titel: c.titel,
@@ -37,8 +38,7 @@ module.exports = (ctx) => {
   }
 
   function bureauVoortgang(key, id, status, notitie) {
-    const l = db.data.lifestyle && db.data.lifestyle[key];
-    const c = l && (l.cases || []).find(x => x.id === id);
+    const c = levens.leesVeld(key, 'cases').find(x => x.id === id);
     if (!c) return { status: 404, error: 'Deze zaak is er niet meer.' };
     if (c.besloten) return { status: 403, error: 'Deze zaak is besloten en niet vanaf het bureau te behandelen.' };
     if (!KANTOOR_STATUSSEN.includes(status)) return { status: 400, error: 'Onbekende status.' };

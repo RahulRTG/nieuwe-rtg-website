@@ -32,7 +32,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, bijeen, inBundel, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
+  const { accounts, anthropic, bijeen, inBundel, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
   // sseToCustomer/sseToSupplier/sseToOffice worden via hulp.* gelezen (zie kern.comm)
 
 
@@ -45,8 +45,19 @@ kern.huis = require('../kern/huis')({
     : (sess && sess.tier !== 'guest' ? db.data.trip : null)) || null,
   entourageVan: (sess) => { try { return kern.entourage(sess.key); } catch (e) { return null; } }
 });
-// Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date)
-Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, liveCodename, anthropic, notify }));
+/* Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass (match -> jetset-date).
+   accounts + leeftijdVan zijn er voor de ontmoetpoort (18+ en KYC, kern/ontmoetpoort.js),
+   die Rendez-vous deelt met Vonk. De pas-eis blijft op routes/member/rendezvous.js. */
+Object.assign(kern, require('../kern/rendezvous')({ db, save, crypto, anthropic, notify, accounts, leeftijdVan,
+  /* codenaamVan en niet liveCodename: zie de kop van kern/rendezvous.js. Laat
+     gebonden, want de sociale laag wordt later samengesteld. */
+  codenaamVan: (k) => kern.codenaamVan(k),
+  /* tableZet komt uit kern/rechterhand (kernlaag3) en staat er dus al: bij twee
+     akkoorden krijgt elk lid de gelegenheid in zijn EIGEN dossier. */
+  tableZet: kern.tableZet,
+  /* De contactpin uit kern/sociaal: Encounter LEENT hem als adres en maakt geen
+     eigen koppelcode. Zie de kop van kern/rendezvous-kring.js. */
+  handleVanPin: (pin) => kern.handleVanPin(pin) }));
 // De wauw-laag: stemming, verjaardagsglans en De Terugblik over alle socials
 Object.assign(kern, require('../kern/wauw')({ db, save, accounts, socialConnecties: kern.socialConnecties }));
 // RTG Pulse: het eigen 9+-microblog (chronologisch, zonder verslavende trucs)
@@ -131,7 +142,7 @@ Object.assign(kern, require('../kern/geldregie').maakGeldregie({ db, save }));
    codenaam, gesplitst per stad/land/alfabet/geslacht en pas, met de omzet per pas
    en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
    het leunt op de pasprijzen daaruit. */
-Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
+Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal, db }));
 /* RTG Kostprijs (KOSTEN.md) met de economielaag ervoor (ECONOMIE.md). Die
    volgorde is een afhankelijkheid: de kostprijs verdeelt zijn nota's over de vier
    werelden en vraagt de firewall of de ene wereld de andere iets mag neerleggen.

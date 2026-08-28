@@ -20,15 +20,21 @@
   .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
   .intro{color:var(--zacht);line-height:1.5;margin-bottom:1rem;}
-  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
-  .mijncn b{color:var(--goud);}
+  .mijncn{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.7rem .9rem;margin-bottom:1rem;font-size:.9rem;}
+  .mijncn b{color:var(--rtg-leesgoud,var(--goud));}
   /* De contactpin: je eigen code, als tekst en als QR. Geen geheim maar een
      adres -- zie server/kern/sociaal/pin.js. */
   .pinrij{display:flex;align-items:baseline;gap:.6rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--lijn);}
-  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--goud);}
+  .pinrij .pincode{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;letter-spacing:.14em;color:var(--rtg-leesgoud,var(--goud));}
   .pinakt{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
-  #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:10px;}
-  #pinCam{display:block;width:100%;max-height:200px;margin-top:.5rem;border-radius:12px;background:#000;object-fit:cover;}
+  .pinbeheer{margin-top:.5rem;}
+  .pinbeheer > summary{list-style:none;cursor:pointer;font-size:.78rem;color:var(--zacht);display:inline-flex;align-items:center;gap:.35rem;padding:.35rem 0;min-height:24px;}
+  .pinbeheer > summary::-webkit-details-marker{display:none;}
+  .pinbeheer > summary::before{content:"";width:.42rem;height:.42rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;}
+  .pinbeheer[open] > summary::before{transform:rotate(45deg);}
+  .pinbeheer > summary:hover{color:var(--accent-tekst);}
+  .uitlegrij{color:var(--zacht);font-size:.82rem;line-height:1.5;margin:0 0 .6rem;}
+  #pinQrBeeld{display:block;margin:.6rem auto 0;width:min(180px,60%);height:auto;border-radius:0;}
   /* een eigen display wint van de [hidden]-regel van de browser */
   #pinUitNoot{margin-top:.55rem;font-size:.75rem;line-height:1.45;color:var(--zacht);}
   .pinlabel{color:var(--zacht);font-size:.8rem;}
@@ -36,57 +42,71 @@
   .pinst.ok{color:var(--groen,#7ecb8f);}
   #pinLiveDoek{margin-top:.6rem;}
   .pincode.uit{opacity:.45;text-decoration:line-through;}
-  #pinQrBeeld[hidden],#pinCam[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
+  #pinQrBeeld[hidden],#mijnpin[hidden],#pinLiveDoek[hidden],#pinUitNoot[hidden]{display:none;}
   .stories{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;}
   .story{flex:0 0 auto;text-align:center;width:4.2rem;cursor:pointer;}
   .story .ring{width:3.4rem;height:3.4rem;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:var(--paneel2);border:2px solid var(--goud);}
   .story.gezien .ring{border-color:var(--lijn);}
-  .story .nm{font-size:.65rem;color:var(--zacht);margin-top:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Twee regels in plaats van afkappen. "Jouw verhaal" werd "Jouw ..." en dat
+     is geen label meer maar een raadsel; de bel eronder is even breed. */
+  .story .nm{font-size:.65rem;color:var(--zacht);margin-top:.25rem;line-height:1.25;overflow-wrap:break-word;}
   .zoekrij{display:flex;gap:.5rem;margin-bottom:.6rem;}
   .zoekrij .veld{flex:1;}
   .lijst{display:flex;flex-direction:column;gap:.5rem;}
-  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;}
   .rij .av{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--paneel);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;}
   .rij .nm{flex:1;min-width:0;font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;}
   .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
-  .mini{padding:.3rem .6rem;font-size:.78rem;border-radius:999px;}
+  .mini{padding:.3rem .6rem;font-size:.78rem;border-radius:0;}
   .sec{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--zacht);margin:1.2rem 0 .5rem;}
   .leeg{color:var(--zacht);font-size:.85rem;padding:.4rem 0;}
-  .badge{background:var(--rood);color:#fff;border-radius:999px;font-size:.62rem;font-weight:700;padding:.05rem .4rem;margin-left:.3rem;}
+  .badge{background:var(--rood);color:#fff;border-radius:0;font-size:.62rem;font-weight:700;padding:.05rem .4rem;margin-left:.3rem;}
   /* overlays */
   .ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;}
   .ov.open{display:flex;}
-  .ovkaart{background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:16px;width:min(100%,40rem);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
+  .ovkaart{background:var(--achtergrond,#0C0C0B);border:1px solid var(--lijn);border-radius:0;width:min(100%,40rem);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;}
   .ovkop{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--lijn);}
   .ovkop b{flex:1;}
   .ovx{background:none;border:none;color:var(--zacht);font-size:1.3rem;cursor:pointer;}
   .msgs{flex:1;overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;min-height:12rem;}
-  .bel{align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:12px;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap;}
+  .bel{align-self:flex-start;max-width:82%;padding:.45rem .75rem;border-radius:0;background:var(--paneel2);border:1px solid var(--lijn);white-space:pre-wrap;}
   .bel.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
   .invoer{display:flex;gap:.5rem;padding:.7rem 1rem;border-top:1px solid var(--lijn);}
   .invoer .veld{flex:1;}
-  .snapfull{max-width:100%;max-height:70vh;border-radius:10px;}
+  .snapfull{max-width:100%;max-height:70vh;border-radius:0;}
   /* de dag-opdracht */
-  .opkaart{display:flex;align-items:center;gap:.7rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:14px;padding:.7rem .9rem;margin:.4rem 0 .8rem;}
+  .opkaart{display:flex;align-items:center;gap:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);border:1px solid #4a3d1c;border-radius:0;padding:.85rem 1rem;margin:.4rem 0 .8rem;}
+  .opkaart .em{flex:none;}
+  .leegregel{color:var(--zacht);font-size:.85rem;line-height:1.5;margin:.1rem 0 1rem;}
   .opkaart .em{font-size:1.6rem;}
   .opkaart .tx{flex:1;font-size:.9rem;line-height:1.35;}
-  .opkaart .tx b{color:var(--goud);}
+  .opkaart .tx b{color:var(--rtg-leesgoud,var(--goud));}
   .opkaart .tx small{display:block;color:var(--zacht);font-size:.72rem;margin-top:.15rem;}
+  /* Op een telefoon paste de knop niet naast de tekst: de zin brak in stukjes
+     van drie woorden en de kleine letter eronder werd vier regels. Stapelen is
+     hier geen concessie maar de goede volgorde -- eerst wat er gevraagd wordt,
+     dan de knop waarmee je meedoet. */
+  @media (max-width:560px){
+    .opkaart{flex-wrap:wrap;}
+    .opkaart .tx{flex:1 1 100%;order:2;}
+    .opkaart .em{order:1;}
+    .opkaart .knop{order:3;margin-left:auto;}
+  }
   /* snap-studio */
-  .studio-cv{width:100%;border-radius:12px;display:block;touch-action:none;background:#111;}
+  .studio-cv{width:100%;border-radius:0;display:block;touch-action:none;background:#111;}
   .strij{display:flex;gap:.4rem;align-items:center;margin-top:.5rem;flex-wrap:wrap;}
-  .stchip{background:#26221d;color:#fff;border-radius:999px;padding:.3rem .7rem;font-size:.78rem;border:2px solid transparent;cursor:pointer;}
-  .stchip.aan{border-color:var(--goud);color:var(--goud2);}
+  .stchip{background:#26221d;color:#fff;border-radius:0;padding:.3rem .7rem;font-size:.78rem;border:2px solid transparent;cursor:pointer;}
+  .stchip.aan{border-color:var(--goud);color:var(--accent-tekst);}
   .stkleur{width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;}
   .stkleur.aan{border-color:#fff;transform:scale(1.12);}
-  .stemoji{font-size:1.2rem;background:#26221d;border-radius:9px;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
+  .stemoji{font-size:1.2rem;background:#26221d;border-radius:0;width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;}
   .stemoji.aan{border-color:var(--goud);}
-  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--goud);cursor:pointer;opacity:.75;}
+  .vt-knop{background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));cursor:pointer;opacity:.75;}
   /* bellen */
   .ovkop .belk-kop{background:none;border:none;font-size:1.15rem;cursor:pointer;padding:0 .1rem;}
   .belwrap{position:relative;width:100%;height:70vh;max-height:70vh;display:flex;align-items:center;justify-content:center;background:#000;}
   #belRemote{width:100%;height:100%;object-fit:cover;background:#000;}
-  #belLocal{position:absolute;right:.7rem;bottom:5.4rem;width:6.5rem;border-radius:8px;border:1px solid #333;object-fit:cover;background:#111;}
+  #belLocal{position:absolute;right:.7rem;bottom:5.4rem;width:6.5rem;border-radius:0;border:1px solid #333;object-fit:cover;background:#111;}
   .belaudio{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
   .belav{width:5.5rem;height:5.5rem;border-radius:50%;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:2.2rem;border:2px solid var(--goud);}
   .belinfo{position:absolute;top:1rem;left:0;right:0;text-align:center;color:#fff;}
@@ -94,9 +114,9 @@
   .belknoppen{position:absolute;bottom:1.1rem;left:0;right:0;display:flex;gap:1.2rem;justify-content:center;}
   .belk{width:3.2rem;height:3.2rem;border-radius:50%;border:none;font-size:1.2rem;cursor:pointer;background:#333;color:#fff;}
   .belk.op{background:var(--rood,#d33);}
-  #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:10px;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
+  #melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;border-radius:0;z-index:10001;font-size:.85rem;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;}
   .skip{position:absolute;left:.6rem;top:-3rem;z-index:60;background:var(--goud,#C9A24B);color:#0C0C0B;padding:.5rem .9rem;
-    border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+    border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--goud,#C9A24B);outline-offset:2px;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
@@ -111,23 +131,37 @@
 <header id="balk"></header>
 <main class="wrap" id="hoofd" tabindex="-1">
   <h1>Contacten</h1>
-  <div class="intro">Voeg vrienden toe op codenaam, waar ze ook zitten: in de RTFoundation of in de RTG-app. Chat, bel of videobel, deel snaps die verdwijnen, en plaats een verhaal van 24 uur. Vind je vriend op zijn codenaam, of voeg hem toe met zijn pin: overtypen of de QR scannen.</div>
+  <div class="intro">Chat, bel en deel met wie je kent &mdash; in de RTFoundation of in de RTG-app. Iedereen vindt elkaar op codenaam.</div>
+  <!-- Codenaam en pin horen bij elkaar: allebei antwoorden ze op "hoe vindt
+       iemand mij". Vandaar een kaart. De pin staat niet bij een beschermd
+       profiel (15 of jonger): daar voegt de ouder toe. -->
+  <section class="ident">
   <div class="mijncn" id="mijncn"></div>
-  <!-- je eigen pin: voorlezen, kopieren of voorhouden. Staat niet bij een
-       beschermd profiel (15 of jonger): daar voegt de ouder toe. -->
   <div class="mijncn" id="mijnpin" hidden>
     <div class="pinrij"><span class="pinlabel">Jouw pin</span><b class="pincode" id="pinCode">····-····</b></div>
+    <!-- DELEN EN BEHEREN ZIJN NIET HETZELFDE. Er stonden vijf even zware
+         knoppen naast elkaar, waarvan je er twee dagelijks gebruikt en drie
+         hooguit een keer. Vijf gelijke knoppen betekent dat er geen belangrijk
+         is. Kopieer en Toon QR zijn delen; de rest is beheer en staat een tik
+         verderop -- weggestopt is het niet, het staat er gewoon niet bovenop. -->
     <div class="pinakt">
       <button class="knop grijs mini" id="pinKopie">Kopieer</button>
       <button class="knop grijs mini" id="pinQrKnop">Toon QR</button>
-      <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
-      <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
-      <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
     </div>
+    <details class="pinbeheer">
+      <summary>Pin beheren</summary>
+      <div class="pinakt">
+        <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
+        <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
+        <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
+        <button class="knop grijs mini" id="pinKoppelKnop">Mijn koppelingen</button>
+      </div>
+    </details>
     <img id="pinQrBeeld" alt="QR-code met jouw pin" hidden>
     <div id="pinLiveDoek" hidden></div>
     <div id="pinUitNoot" hidden>Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel, want die houd je bewust op.</div>
   </div>
+  </section>
 
   <div class="deel">Verhalen</div>
   <div id="opdrachtKaart"></div>
@@ -136,6 +170,7 @@
   <div class="deel">Toevoegen</div>
   <div id="zoekBlok">
     <div class="sec">Vriend toevoegen</div>
+    <p class="uitlegrij">Vind iemand op zijn codenaam, of voeg hem toe met zijn pin: overtypen of de QR scannen.</p>
     <div class="zoekrij">
       <input class="veld" id="zoek" placeholder="Zoek op codenaam (bijv. Gouden Vos)" maxlength="40">
       <button class="knop" id="zoekBtn">Zoek</button>
@@ -147,7 +182,6 @@
       <button class="knop" id="pinZoekBtn">Zoek</button>
       <button class="knop grijs" id="pinScanBtn">Scan</button>
     </div>
-    <video id="pinCam" playsinline muted hidden></video>
     <div class="lijst" id="pinRes"></div>
   </div>
   <!-- beschermd profiel (15 of jonger): zoeken staat dicht, de ouder voegt toe -->
@@ -245,6 +279,7 @@
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
 
 <script src="/apps/util.js"></script>
+<script src="/shared/glyf.js" defer></script>
 <script src="sessie.js"></script>
 <script src="/apps/translate.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
@@ -255,6 +290,11 @@
 <script src="/shared/qrteken.js" defer></script>
 <script src="/shared/qrscan.js" defer></script>
 <script src="/shared/scanner.js" defer></script>
+<script src="/shared/scanknop.js" defer></script>
+<!-- RTG Link: het bedoelingsscherm en mijn koppelingen (LINK.md). Dezelfde twee
+     schermen als in de leden-app; de gezinskant heeft zijn eigen deur ervoor. -->
+<script src="/shared/linkkaart.js" defer></script>
+<script src="/shared/linkkoppelingen.js" defer></script>
 <script src="/shared/rtgcode.js" defer></script>
 <script src="/shared/dyncode.js" defer></script>
 <script>
@@ -266,6 +306,14 @@ Sessie.balk($('#balk'), { terug:'index.html' });
 const esc = Util.escapeHTML;
 const initcn = Util.initialen;
 const E = Util.el, vervang = Util.vervang; // veilige component-bouwer
+/* De server stuurt PICTOGRAMNAMEN mee ('emo-hart', 'taal', 'ster'), geen
+   emoji: sinds shared/glyf.js de set draagt is dat een sleutel en geen teken.
+   Dit scherm zette die sleutel rechtstreeks in de tekst, en dus stond er
+   letterlijk "emo-hart" in een letter van 1,6rem naast de dag-opdracht.
+   RTGGlyf.tekst() maakt er het pictogram van, en laat een onbekende naam
+   ontsmet staan -- zodat een echte emoji uit oudere data gewoon blijft. */
+function glyfSpan(klasse, naam){ const sp=document.createElement("span"); sp.className=klasse; sp.innerHTML=ico(naam); return sp; }
+function ico(naam){ return (window.RTGGlyf ? RTGGlyf.tekst(naam) : esc(String(naam==null?"":naam))); }
 // social-endpoints lopen via /api/rtf/social met het gezin-token
 function soc(pad, body){
   return fetch('/api/rtf/social'+pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
@@ -304,7 +352,7 @@ if (belModus){
   if (intro){
     const h = document.createElement('div');
     h.className = 'kaart';
-    h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--goud);font-size:.9rem;';
+    h.style.cssText = 'padding:.7rem .9rem;margin:.4rem 0 .8rem;border-color:var(--accent-tekst);font-size:.9rem;';
     h.textContent = belModus === 'bel' ? '✆ Tik op een vriend om te bellen.'
       : belModus === 'video' ? '⌲ Tik op een vriend om te videobellen.'
       : '◨ Tik op een vriend om een snap te sturen.';
@@ -465,7 +513,25 @@ async function kindContacten(kindHandle, cn){
    en een RTG-lid voegen elkaar er dus gewoon mee toe. Zoeken en versturen staan
    met opzet uit elkaar: eerst zien WIE het is, dan pas een knop. Een gescande
    code die meteen een verzoek verstuurt, is een verzoek dat niemand deed. */
-let mijnPin = null, pinScanner = null;
+/* RTG Link loopt langs een eigen deur (/api/rtf/link), met dezelfde
+   gezinssessie in het lijf als /api/rtf/social. Twee loketten, een laag. */
+/* Het pad komt hier VOLUIT binnen en wordt niet uit een voorvoegsel geplakt: de
+   huismeters lezen de klantkant als tekst (scripts/onbetreden.js noteert of een
+   route "door geen enkele client aangeroepen" wordt). Een samengesteld pad is
+   voor zo'n meter een route die niemand roept, en dat is dan een fout label op
+   een deur die het prima doet -- LAT.md regel 3.
+
+   Wat het voorvoegsel wél gratis gaf, staat er daarom expliciet onder. Dit lijf
+   draagt de gezinscode en het profieltoken; een pad dat buiten /api/rtf/ wijst,
+   zou die geloofsbrief aan een vreemde deur aanbieden. Leesbaarheid mag geen
+   sleutel weggeven, dus hier weigert hij liever. */
+function lnk(pad, body){
+  if (String(pad).slice(0, 9) !== '/api/rtf/') return Promise.reject(new Error('Er ging iets mis.'));
+  return fetch(pad, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.assign({ code:s.code, token:s.token }, body||{})) })
+    .then(r => r.json().catch(()=>({})).then(d => { if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }));
+}
+
+let mijnPin = null;
 let pinLive = null;
 /* De trefferregel voor allebei de pin-wegen. Stond twee keer -- de vaste pin en
    de levende code bouwden dezelfde rij met dezelfde statussen -- en dat is hoe
@@ -559,30 +625,71 @@ function pinQrTeken(){
   catch(e){ alert('De QR-code kan hier niet getekend worden.'); return false; }
   return true;
 }
-/* Scannen gebeurt op het toestel zelf: elk frame wordt lokaal ontleed
-   (/shared/scanner.js), er gaat geen beeld de deur uit. */
-function pinScanWissel(){
-  if (pinScanner){ pinScanUit(); return; }
-  if (!window.RTGScanner){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
-  $('#pinCam').hidden = false;
-  pinScanner = new RTGScanner.Scanner({ video: $('#pinCam'), onCode: c=>{
-    const g = window.RTGCode ? RTGCode.lees(c.tekst) : { soort:'tekst' };
-    // twee soorten: de vaste pin staat leesbaar in de code, de levende is een
-    // ondertekend token dat alleen de server kan duiden. Zelfde gebaar.
-    if (g.soort === 'rtg1'){ pinScanUit(); pinLiveKijken(g.token); return; }
-    if (g.soort !== 'pin') return;
-    pinScanUit();
-    $('#pinIn').value = g.pin;
-    pinOpzoeken(g.pin);
-  } });
-  pinScanner.start().catch(()=>{ alert('Geen toegang tot de camera.'); pinScanUit(); });
-  $('#pinScanBtn').textContent = 'Stop';
+/* Scannen gaat langs de HUISOVERLAY (/shared/scanknop.js) en niet langs een
+   eigen camerablad. Hier stond dat eigen blad: een <video> in de pagina, een
+   RTGScanner eromheen en "Geen toegang tot de camera." als het misging. Dat was
+   een tweede uitvoering van iets dat het huis al heeft -- en de gedeelde versie
+   kan meer dan deze kon.
+
+   Wat dit scherm daarmee wint, is precies wat het miste: de overlay draagt
+   altijd een handinvoer ("Of typ/plak de code"), dus een levende code of een
+   vraagcode die je geplakt kreeg, kan hier nu ook zonder camera naar binnen. Het
+   pinveld eronder blijft een pinveld -- typen blijft wat het was (LINK.md par.
+   4), en de laag bereik je via de scanweg, net als aan de ledenkant.
+
+   En de overlay legt uit waarom de camera niet start (RTGMedia): op een gewoon
+   http-adres geeft de browser hem niet vrij, en dat is op een telefoon de meest
+   voorkomende reden. "Geen toegang tot de camera" liet een mens zelf zoeken. */
+function pinScanOpen(){
+  if (!window.RTGScanknop){ alert('Scannen kan hier niet. Typ de pin over.'); return; }
+  RTGScanknop.open({ titel: 'Code scannen', onCode: c => { scanRoute(c.tekst); } });
 }
-function pinScanUit(){
-  if (pinScanner){ try{ pinScanner.stop(); }catch(e){} pinScanner = null; }
-  $('#pinCam').hidden = true;
-  $('#pinScanBtn').textContent = 'Scan';
+
+/* RTG SCAN, GEZINSKANT (LINK.md par. 2). Hier stond een kleine keten van
+   als-dans: is het een vaste pin, dan opzoeken; is het een levende code, dan een
+   ander scherm; anders niets. Nu vraagt de app EEN keer wat het is en wat je
+   ermee kunt, en toont het bedoelingsscherm -- wie, wat, welke gegevens, hoe
+   lang -- voordat er iets gebeurt.
+
+   Typen blijft wat het was: wie een pin overtypt, doet een opzoeking en ziet de
+   treffer in de lijst eronder. Dat is dezelfde twee-staps-weg, alleen zonder
+   camera. */
+const LINK_ACTIES = {
+  'contact.verbinden': async (kaart, tekst, intentie) => {
+    const g = window.RTGCode ? RTGCode.lees(tekst) : { soort:'tekst' };
+    const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+    const r = await soc(String(intentie.weg).replace('/api/rtf/social',''), lijf);
+    alert(r.status === 'wacht-op-ouder'
+      ? 'Verzoek verstuurd. Een ouder moet het nog goedkeuren.'
+      : 'Verzoek verstuurd naar ' + (kaart.onderwerp.codename || ''));
+    laden();
+  },
+  'contact.gesprek': async (kaart) => {
+    alert('Jullie zijn al verbonden. Open het gesprek in je vriendenlijst.');
+  }
+};
+async function scanRoute(tekst){
+  if (!window.RTGLinkKaart){ alert('Dit scherm is nog niet geladen.'); return; }
+  let kaart;
+  try { kaart = await lnk('/api/rtf/link/los', { tekst }); }
+  catch(e){ alert(e.message); return; }
+  const keuze = await RTGLinkKaart.toon(kaart, {});
+  if (!keuze) return;
+  const doen = LINK_ACTIES[keuze.id];
+  if (!doen){ alert('Dit kan hier nog niet.'); return; }
+  try { await doen(kaart, tekst, keuze); } catch(e){ alert(e.message); }
 }
+
+/* Mijn koppelingen (LINK.md stap 6): wat er van je openstaat, wat je met een
+   code in gang zette, en wat je daar nog aan kunt doen. */
+const _pinKoppel = $('#pinKoppelKnop');
+if (_pinKoppel) _pinKoppel.addEventListener('click', () => {
+  if (!window.RTGKoppelingen){ alert('Dit scherm is nog niet geladen.'); return; }
+  RTGKoppelingen.toon(() => lnk('/api/rtf/link/koppelingen', {}), {
+    doe: (weg, lijf) => soc(String(weg).replace('/api/rtf/social', ''), lijf),
+    melden: (m) => alert(m)
+  });
+});
 // stap 1: wie is dit?
 async function pinOpzoeken(ruw){
   const pin = String(ruw||'').trim(); if (!pin) return;
@@ -620,7 +727,7 @@ $('#zoekBtn').addEventListener('click', zoek);
 $('#zoek').addEventListener('keydown', e=>{ if(e.key==='Enter') zoek(); });
 $('#pinZoekBtn').addEventListener('click', ()=> pinOpzoeken($('#pinIn').value));
 $('#pinIn').addEventListener('keydown', e=>{ if(e.key==='Enter') pinOpzoeken($('#pinIn').value); });
-$('#pinScanBtn').addEventListener('click', pinScanWissel);
+$('#pinScanBtn').addEventListener('click', pinScanOpen);
 $('#pinKopie').addEventListener('click', pinKopieer);
 $('#pinQrKnop').addEventListener('click', pinQrWissel);
 $('#pinNieuwKnop').addEventListener('click', pinNieuw);
@@ -693,7 +800,7 @@ function stChips(){
   $('#stFilters').querySelectorAll('[data-f]').forEach(b=> b.addEventListener('click', ()=>{ ST.filter=b.dataset.f; stChips(); stTeken(); }));
   $('#stKleuren').innerHTML = ST_KLEUREN.map(k=> '<button type="button" class="stkleur'+(ST.modus==='pen'&&ST.pen===k?' aan':'')+'" data-k="'+k+'" style="background:'+k+'" aria-label="Penkleur"></button>').join('');
   $('#stKleuren').querySelectorAll('[data-k]').forEach(b=> b.addEventListener('click', ()=>{ ST.pen=b.dataset.k; ST.modus='pen'; ST.emoji=null; stChips(); }));
-  $('#stEmojis').innerHTML = ST_EMOJIS.map(em=> '<button type="button" class="stemoji'+(ST.modus==='sticker'&&ST.emoji===em?' aan':'')+'" data-e="'+em+'">'+em+'</button>').join('');
+  $('#stEmojis').innerHTML = ST_EMOJIS.map(em=> '<button type="button" class="stemoji'+(ST.modus==='sticker'&&ST.emoji===em?' aan':'')+'" data-e="'+em+'" aria-label="'+esc(em)+'">'+ico(em)+'</button>').join('');
   $('#stEmojis').querySelectorAll('[data-e]').forEach(b=> b.addEventListener('click', ()=>{ ST.emoji=b.dataset.e; ST.modus='sticker'; stChips(); }));
 }
 function stOpen(dataUrl){
@@ -749,7 +856,7 @@ async function laadOpdracht(){
   const el=$('#opdrachtKaart');
   el.innerHTML='';
   const kaart=E('div',{class:'opkaart'},
-    E('span',{class:'em'}, opdrachtVandaag.emoji),
+    glyfSpan('em', opdrachtVandaag.emoji),
     E('div',{class:'tx'}, E('b', null, 'Dag-opdracht: '), 'snap '+opdrachtVandaag.tekst,
       E('small', null, 'Elke dag een nieuwe, voor iedereen dezelfde. Jouw inzending staat 24 uur in je verhaal.')),
     E('button',{class:'knop mini', onclick:()=>kiesStory(true)}, 'Doe mee'));
@@ -791,7 +898,19 @@ async function laadStories(){
   const st = d.stories||[];
   let html = '<div class="story" id="storyPlus"><div class="ring">＋</div><div class="nm">Jouw verhaal</div></div>';
   html += st.map(v=> '<div class="story'+(v.gezien?' gezien':'')+'" data-story="'+esc(v.id)+'"'+(v.opdracht?' title="'+esc(v.opdracht)+'"':'')+'><div class="ring">'+initcn(v.van)+'</div><div class="nm">'+(v.opdracht?'✶ ':'')+esc(v.vanMij?'Jij':v.van)+'</div></div>').join('');
+  /* EEN LEGE RIJ IS GEEN LEGE RIJ MAAR EEN VRAAG. Stond hier alleen de
+     plus-bel, dan zag je een knop zonder context en niets wat vertelt of er
+     iets mis is of dat er gewoon nog niemand iets heeft geplaatst. Een regel
+     ernaast is het verschil tussen "leeg" en "stuk". */
   $('#stories').innerHTML = html;
+  const leegRij = $('#storiesLeeg');
+  if (leegRij) leegRij.remove();
+  if (!st.length) {
+    const p = document.createElement('p');
+    p.id = 'storiesLeeg'; p.className = 'leegregel';
+    p.textContent = 'Nog geen verhalen van anderen. Wat jij plaatst blijft 24 uur staan.';
+    $('#stories').insertAdjacentElement('afterend', p);
+  }
   $('#storyPlus').addEventListener('click', ()=>kiesStory(false));
   $('#stories').querySelectorAll('[data-story]').forEach(b=> b.addEventListener('click', ()=> openStory(b.dataset.story)));
 }

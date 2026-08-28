@@ -10,7 +10,7 @@
         iedereen buiten en kan wie dat adres later registreert het overnemen;
      3. een spoor dat blijft staan.
 
-   Draai los: node --experimental-sqlite --test test/eigenaarschap.test.js */
+   Draai los: node --test test/eigenaarschap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

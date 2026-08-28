@@ -7,7 +7,7 @@
    2. EEN SYSTEEM VAN BUITEN. De koppeling werkte omdat alles in een database
       staat. Een partner met een eigen kassa had geen weg naar binnen.
 
-   Draai los: node --experimental-sqlite --test test/mall-extern.test.js */
+   Draai los: node --test test/mall-extern.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

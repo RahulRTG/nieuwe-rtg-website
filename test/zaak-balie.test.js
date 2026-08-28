@@ -27,7 +27,7 @@
    is de afspraak anders en duidelijker -- kern/markt.js zetStatus antwoordt
    "Onbekende status." met 400 -- en die afspraak geldt nu ook hier.
 
-   Draai los: node --experimental-sqlite --test test/zaak-balie.test.js
+   Draai los: node --test test/zaak-balie.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -29,7 +29,7 @@
       verplaatsen, zoeken, een concept schrijven en versturen, een regel
       maken, een handtekening zetten, delegeren, exporteren.
 
-   Draai los: node --experimental-sqlite --test test/rtmail-zaak.test.js
+   Draai los: node --test test/rtmail-zaak.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

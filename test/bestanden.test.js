@@ -1,6 +1,6 @@
 /* RTG Bestanden: de kluis met mappen en quotum, versies, delen op codenaam,
    de prullenbak als zichtbare la en de stukken-upload voor grote bestanden.
-   Draai los: node --experimental-sqlite --test test/bestanden.test.js */
+   Draai los: node --test test/bestanden.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

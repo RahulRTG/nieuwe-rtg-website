@@ -24,30 +24,20 @@
    ========================================================================== */
 'use strict';
 const { lokaalAdres } = require('../lib/lokaaladres');
+const foutisolatie = require('../lib/foutisolatie');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, betaalWaarheid, muntbetaal, opslagKlaar,
     zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
 
   /* ---------- foutisolatie per verzoek ----------
-     Een bug in EEN route mag nooit het proces (en dus alle andere apps) raken.
-     Express 4 vangt een gegooide fout in een async handler niet zelf op: het
-     verzoek blijft hangen en de fout wordt een unhandledRejection. Daarom
-     omhullen we elke route-handler: een (async) fout wordt netjes next(err),
-     de centrale foutafhandelaar geeft die ENE aanvraag een 500, en de rest
-     van het systeem merkt er niets van. */
-  for (const methode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
-    const orig = app[methode].bind(app);
-    app[methode] = (...args) => orig(...args.map(f => {
-      if (typeof f !== 'function') return f; // paden en opties ongemoeid laten
-      return (req, res, next) => {
-        try {
-          const r = f(req, res, next);
-          if (r && typeof r.catch === 'function') r.catch(next);
-        } catch (e) { next(e); }
-      };
-    }));
-  }
+     De wikkel zelf staat in lib/foutisolatie.js, en daar alleen. Hij stond hier
+     EN woordelijk hetzelfde in foundation/basis.js (die wordt voor de hoofdkern
+     gemount en kon deze omhulling niet lenen). Twee plekken die een waarheid
+     vasthouden lopen uiteen, en dat bleek meteen toen de wikkel de NAAM van zijn
+     functie moest gaan doorgeven -- zonder die naam is uit de router niet te
+     lezen welke bewaker voor een route hangt. Zie de kop van die module. */
+  foutisolatie.isoleer(app);
   app.disable('x-powered-by');
   /* Hoeveel proxy-hops staan er ECHT voor deze app?
 
@@ -74,6 +64,10 @@ module.exports = function verzoekketen(deps) {
      (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
      een tekstzoektocht door de tests -- zie server/routelog.js. */
   require('../routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
+
+  /* De auditmeting (liet dit verzoek een spoor na) staat in ./auditmeting.js --
+     een eigen onderwerp, en dit bestand ging er met dat blok erin over de 10 KB. */
+  require('./auditmeting')({ app, db: deps && deps.db });
 
   // In productie: alles naar https, en HSTS zodat browsers het onthouden.
   // (De security-headers zelf, inclusief Referrer-Policy, staan verderop in het

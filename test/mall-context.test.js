@@ -8,7 +8,7 @@
    gekozen plek, een periode, de reismand waar hij in werkt) en niet als
    gedragsprofiel. Toets 6 houdt dat vast.
 
-   Draai los: node --experimental-sqlite --test test/mall-context.test.js */
+   Draai los: node --test test/mall-context.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

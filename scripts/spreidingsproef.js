@@ -285,7 +285,7 @@ function padenBestand() {
   let regels = [];
   try {
     const uit = execFileSync(process.execPath,
-      ['--experimental-sqlite', path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
+      [path.join(WORTEL, 'scripts/routekaart.js'), '--json'],
       { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
     const kaart = JSON.parse(uit);
     for (const r of kaart.routes || []) {

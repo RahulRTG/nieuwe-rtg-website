@@ -17,9 +17,9 @@
      is, niet of hij ook RTG-lid is, geen contactgegevens.
    - HET IS WERK VAN DE LEIDING (de route zet daar managerOnly op). */
 module.exports = ({ db, save, listStaff }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webmaker-team', bezit: { siteTeam: 'kaart' } });
   function pot() {
-    if (!db.data.siteTeam || typeof db.data.siteTeam !== 'object') db.data.siteTeam = {};
-    return db.data.siteTeam;
+    return eigen.bak('siteTeam');
   }
   const gekozen = code => (pot()[String(code || '').toUpperCase()] || []).map(Number);
 

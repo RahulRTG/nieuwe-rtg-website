@@ -1,0 +1,74 @@
+{
+ "uitleg": "De bedradingsgraaf en zijn eigen onzekerheid. ONBEKEND MAG ALLEEN KRIMPEN -- zie test/bedrading.test.js en keuringsregel 59. Voor identity, money en security is de eis nul: daar mag geen enkele kant onbepaald zijn, want daar mag een impactzone nooit stilzwijgend te klein uitvallen.",
+ "hoe": "node scripts/check.js (regel 59)",
+ "gemeten": {
+  "opgelost": 3730,
+  "benaderd": 3,
+  "onbekend": 2
+ },
+ "vertrouwen": {
+  "identity": {
+   "opgelost": 67,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 67,
+   "pct": 100
+  },
+  "algemeen": {
+   "opgelost": 3509,
+   "benaderd": 3,
+   "onbekend": 2,
+   "totaal": 3514,
+   "pct": 99.86
+  },
+  "security": {
+   "opgelost": 35,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 35,
+   "pct": 100
+  },
+  "money": {
+   "opgelost": 119,
+   "benaderd": 0,
+   "onbekend": 0,
+   "totaal": 119,
+   "pct": 100
+  }
+ },
+ "onbekend": [
+  {
+   "bestand": "server/kern/spellen/register.js",
+   "lijn": 98,
+   "vorm": "path.join met een variabele",
+   "reden": "de map komt uit een variabele; welke bestanden erin zitten is pas op runtime bekend"
+  },
+  {
+   "bestand": "server/routes/office/register.js",
+   "lijn": 74,
+   "vorm": "kale variabele",
+   "reden": "het pad staat in een variabele die van buiten dit bestand komt"
+  }
+ ],
+ "benaderd": [
+  {
+   "bestand": "server/kern/fiscaal/wereld.js",
+   "lijn": 17,
+   "vorm": "voorvoegsel + lijst uit ditzelfde bestand",
+   "kandidaten": 5
+  },
+  {
+   "bestand": "server/kern/reis.js",
+   "lijn": 15,
+   "vorm": "voorvoegsel + lijst uit ditzelfde bestand",
+   "kandidaten": 5
+  },
+  {
+   "bestand": "server/opzet/routes.js",
+   "lijn": 62,
+   "vorm": "voorvoegsel + lijst uit ditzelfde bestand",
+   "kandidaten": 9
+  }
+ ],
+ "groei": "De opgeloste kanten gingen van 3687 naar 3730 doordat de index sinds 21 augustus 2026 ook LEESkanten kent: een letterlijke bestandsnaam met een gegevens-extensie (.md, .json, .html) telt als afhankelijkheid. Zonder die kanten zou een gewijzigde WERELDLIJST.md nergens aankomen en zou de keuring die hem leest ten onrechte bewijs erven. Onbekend bleef 2; dat is het getal waar deze ratel over gaat."
+}

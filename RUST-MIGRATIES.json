@@ -13,7 +13,7 @@
       "rust": "motor/src/capabilities.rs",
       "fase": "canary",
       "noodstop": "RTG_CAPABILITY_RUST_MODE=uit",
-      "bewijs": ["cargo test --release --manifest-path motor/Cargo.toml --locked capabilities", "node --experimental-sqlite --test test/magnaat-capabilities.test.js"]
+      "bewijs": ["cargo test --release --manifest-path motor/Cargo.toml --locked capabilities", "node --test test/magnaat-capabilities.test.js"]
     },
     {
       "volgorde": 2,
@@ -22,7 +22,7 @@
       "rust": "motor/src/magnaat.rs",
       "fase": "pariteit",
       "noodstop": "RTG_MAGNAAT_RUST=uit",
-      "bewijs": ["node scripts/motor-cutover.js", "node --experimental-sqlite --test test/magnaat-rust-integratie.test.js"]
+      "bewijs": ["node scripts/motor-cutover.js", "node --test test/magnaat-rust-integratie.test.js"]
     },
     {
       "volgorde": 3,
@@ -31,7 +31,7 @@
       "rust": "motor/src/grootboek.rs",
       "fase": "pariteit",
       "noodstop": "RTG_MOTOR_GELD=schaduw",
-      "bewijs": ["node scripts/motor-cutover.js", "node --experimental-sqlite --test test/pay.test.js test/motor-vingerafdruk.test.js"]
+      "bewijs": ["node scripts/motor-cutover.js", "node --test test/pay.test.js test/motor-vingerafdruk.test.js"]
     },
     {
       "volgorde": 4,
@@ -49,7 +49,7 @@
       "rust": "motor/src/db.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/herstelproef.test.js"]
+      "bewijs": ["node --test test/herstelproef.test.js"]
     },
     {
       "volgorde": 6,
@@ -67,7 +67,7 @@
       "rust": "motor/src/magnaat_controle.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/magnaat-controle.test.js"]
+      "bewijs": ["node --test test/magnaat-controle.test.js"]
     },
     {
       "volgorde": 8,
@@ -76,7 +76,7 @@
       "rust": "motor/src/magnaatwereld.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/magnaatwereld.test.js"]
+      "bewijs": ["node --test test/magnaatwereld.test.js"]
     },
     {
       "volgorde": 9,
@@ -85,7 +85,7 @@
       "rust": "motor/src/rtgone.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/rtgone.test.js"]
+      "bewijs": ["node --test test/rtgone.test.js"]
     },
     {
       "volgorde": 10,
@@ -94,7 +94,7 @@
       "rust": "motor/src/mail.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/mail-eigen.test.js test/mailauth.test.js test/mailbijlage.test.js"]
+      "bewijs": ["node --test test/mail-eigen.test.js test/mailauth.test.js test/mailbijlage.test.js"]
     },
     {
       "volgorde": 11,
@@ -103,7 +103,7 @@
       "rust": "motor/src/rtmail.rs",
       "fase": "geregistreerd",
       "noodstop": "RTG_RUST_ALLES_UIT=1",
-      "bewijs": ["node --experimental-sqlite --test test/rtmail.test.js"]
+      "bewijs": ["node --test test/rtmail.test.js"]
     },
     {
       "volgorde": 12,

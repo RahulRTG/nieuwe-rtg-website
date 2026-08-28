@@ -122,14 +122,23 @@ async function beheer(sql) {
       continue;
     }
     const t0 = Date.now();
-    const r = spawnSync(process.execPath, ['--experimental-sqlite', '--test', bestand], {
+    /* MET EEN VASTE VERSLAGGEVER. Zonder deze twee vlaggen kiest Node zelf, en
+       dat verschilt per versie en per soort uitvoer: de ene drukt "# pass 4"
+       (tap), de andere "i pass 4" (spec). De teller hieronder kende alleen de
+       eerste vorm, dus een bestand dat gewoon SLAAGDE werd geteld als nul
+       toetsen en heette LEEG -- en tien lege bestanden lieten de hele stap
+       zakken terwijl er niets stuk was. De teller verstaat nu allebei de
+       vormen, en de vlag zorgt dat er niet nog een derde bij komt. */
+    const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap',
+      '--test-reporter-destination=stdout', bestand], {
       cwd: WORTEL, stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, DATABASE_URL: metDb(BRON, naam), PG_URL: '' }
     });
     const uit = String(r.stdout || '') + String(r.stderr || '');
     const geslaagd = r.status === 0;
-    const tel = Number((uit.match(/^# pass (\d+)/m) || [])[1] || 0);
-    const over = Number((uit.match(/^# skipped (\d+)/m) || [])[1] || 0);
+    const lees = (naam) => Number((uit.match(new RegExp('^[#\u2139] ' + naam + ' (\\d+)', 'm')) || [])[1] || 0);
+    const tel = lees('pass');
+    const over = lees('skipped');
     /* OVERGESLAGEN IS GEEN GESLAAGD. Een bestand dat nul toetsen draait en toch
        exitcode 0 geeft, leest als dekking en is het niet -- precies de vorm
        waar deze runner tegen bedoeld is. Twee bestanden hebben naast Postgres
@@ -139,8 +148,41 @@ async function beheer(sql) {
     console.log('  ' + merk + K.reset + '  ' + bestand.padEnd(38)
       + K.grijs + tel + ' geslaagd' + (over ? ', ' + over + ' overgeslagen' : '')
       + ', ' + ((Date.now() - t0) / 1000).toFixed(0) + ' s' + K.reset);
-    if (!geslaagd) for (const regel of uit.split('\n').filter(l => /^not ok|error:/.test(l.trim())).slice(0, 4))
-      console.log('        ' + K.rood + regel.trim().slice(0, 150) + K.reset);
+    /* WAAROM, EN NIET ALLEEN DAT. Deze regel zocht naar "not ok" of "error:" en
+       zweeg als het kind daar niets van drukte -- en dat is precies wat er
+       gebeurt bij een val VOOR de eerste toets: dan is er geen enkele toetsregel
+       en staat er in CI tien keer "0 geslaagd" zonder een woord uitleg. Op 27
+       augustus 2026 stond de hele pg-stap zo rood en moest de reden lokaal
+       worden nagespeeld. Nu komt bij elk bestand dat zakt OF nul toetsen draait
+       de afloop mee, plus de laatste betekenisvolle regels van zijn uitvoer. */
+    if (!geslaagd || tel === 0) {
+      /* DE GEZAKTE TOETS MET ZIJN BLOK, en pas daarna de staart.
+
+         Twee keer bijgesteld, en allebei de keren stond er iets anders dan de
+         reden. Eerst waren het de laatste acht regels, en dat bleek precies de
+         samenvatting ("# fail 2"): wel dat er twee vielen, niet welke. Daarna
+         de regels die op "not ok" of op "error:" leken -- maar in tap staat de
+         reden in een INGESPRONGEN blok onder de not-ok-regel, en dat blok viel
+         door dat filter heen; er bleef "error: |-" over met niets erachter.
+         Nu wordt vanaf elke not-ok-regel het hele blok meegenomen tot het
+         afsluitende "...", en dat is waar de melding zelf staat. */
+      const alles = uit.split('\n').map(l => l.trimEnd());
+      const gevallen = [];
+      for (let i = 0; i < alles.length; i++) {
+        if (!/^\s*not ok /.test(alles[i])) continue;
+        gevallen.push(alles[i].trim());
+        for (let j = i + 1; j < alles.length && j < i + 20; j++) {
+          if (/^\s*(not ok |ok |# )/.test(alles[j])) break;
+          if (/^\s*\.\.\.\s*$/.test(alles[j])) break;
+          if (alles[j].trim() && !/^\s*(---|\*)/.test(alles[j])) gevallen.push('  ' + alles[j].trim());
+        }
+      }
+      const gezien = gevallen.length ? gevallen : alles
+        .filter(l => l.trim() && !/^(ok |# Subtest|# {2}|TAP version)/.test(l.trim()));
+      console.log('        ' + K.grijs + 'afloop=' + r.status + ' signaal=' + r.signal + K.reset);
+      for (const regel of gezien.slice(0, 24)) console.log('        ' + K.rood + regel.slice(0, 160) + K.reset);
+      if (!gezien.length) console.log('        ' + K.grijs + '(het kind drukte niets af)' + K.reset);
+    }
     uitslag.push({ bestand, code: r.status, geslaagd: tel, over });
     if (gemaakt) { try { await beheer('DROP DATABASE IF EXISTS ' + naam); } catch (e) {} }
   }
@@ -152,7 +194,9 @@ async function beheer(sql) {
     : K.groen + 'alle ' + uitslag.length + ' bestanden geslaagd' + K.reset));
   if (leeg.length) console.log('  ' + (MAG_OVERSLAAN ? K.geel : K.rood) + leeg.length + ' bestand(en) draaiden GEEN enkele toets' + K.reset
     + K.grijs + ' -- ' + leeg.map(x => path.basename(x.bestand)).join(', ')
-    + '\n  (die vragen naast Postgres ook een REDIS_URL; zonder die slaan ze zichzelf over)' + K.reset);
+    + (process.env.REDIS_URL
+      ? '\n  (REDIS_URL staat gezet, dus overslaan verklaart dit NIET -- de reden staat per bestand hierboven)'
+      : '\n  (die vragen naast Postgres ook een REDIS_URL; zonder die slaan ze zichzelf over)') + K.reset);
   if (leeg.length && !MAG_OVERSLAAN) console.log('  ' + K.grijs +
     'Zet REDIS_URL, of geef --mag-overslaan mee als je bewust zonder wilt draaien.' + K.reset);
   console.log('');

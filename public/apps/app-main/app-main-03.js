@@ -59,6 +59,17 @@
       .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
+  /* De expliciete demostand (?demo=1, zonder backend) laadt zijn inhoud hier,
+     op het moment dat iemand er echt voor kiest. Stond die inhoud als
+     beginwaarde in app-main-01.js, dan droeg ELK scherm hem -- ook dat van een
+     echt, leeg account (zie de uitleg bij DEMO_DATA). */
+  function laadDemoData(tier){
+    invoices = JSON.parse(JSON.stringify(DEMO_DATA.invoices));
+    trip = JSON.parse(JSON.stringify(DEMO_DATA.trip));
+    posts = JSON.parse(JSON.stringify(DEMO_DATA.posts));
+    creatorLikes = DEMO_DATA.creatorLikes[tier] || 0;
+  }
+
   async function login(tier, cred){
     if (cred){
       if (API.enabled){
@@ -87,7 +98,7 @@
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
         }
-        tier = 'business'; user = {...PERSONAS[tier]};
+        tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
       }
     } else {
       if (API.enabled){
@@ -97,16 +108,16 @@
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
       } else if (explicieteDemo) {
-        user = {...PERSONAS[tier]};
+        user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
         toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
       }
     }
-    if (!API.live) creatorLikes = ({rtg:320, lifestyle:680, business:210})[tier] || 0;
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
     $('#gate').style.display = 'none';
     $('#app').classList.add('active');
     renderAll();
+    await verwerkWebsiteAanvraag();
     if (API.live && window.RTGRealtime){
       RTGRealtime.start(API.token, { onSync: syncScope, onChange: renderBell, onSocial: opSociaal, onCall: opBelsignaal, onBezorg: opBezorg, onOntmoetSignaal: opOntmoetSignaal });
     }

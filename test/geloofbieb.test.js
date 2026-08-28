@@ -2,7 +2,7 @@
    en levensbeschouwingen, als gelijken naast elkaar, altijd gratis (cadeau van
    de RTFoundation), met de leeftijdspoort van het profiel. Elk item heeft een
    echte tekst die je kunt openen en lezen. Draai los:
-   node --experimental-sqlite --test test/geloofbieb.test.js */
+   node --test test/geloofbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

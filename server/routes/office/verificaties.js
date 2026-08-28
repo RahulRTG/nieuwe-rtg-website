@@ -1,3 +1,4 @@
+const klok = require('../../lib/klok');
 /* Backoffice (deelmodule): de identiteitsverificaties.
 
    De wachtrij, het besluit (goedkeuren of afwijzen) en wat er daarna met het
@@ -15,6 +16,7 @@ module.exports = (octx, gedeeld) => {
   const { kern } = octx;
   const { UPLOAD_DIR, accounts, app, mail, notify, officeAuth, pendingVerifications } = kern;
   const { wieKijkt } = gedeeld;
+  const inzagelog = require('../../inzagelog');  // dezelfde als kern/kantoor: een boek, geen kopie
 
   app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
 
@@ -23,19 +25,62 @@ module.exports = (octx, gedeeld) => {
     if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
     const status = req.body.decision === 'approve' ? 'verified' : 'rejected';
     accounts.setVerification(user.id, status);
+    /* HET BESLUIT ZELF LIET GEEN SPOOR NA, en dat is de zwaarste handeling die
+       dit kantoor kent: iemand kijkt naar een paspoortscan en een selfie, legt
+       nationaliteit en geslacht vast, of wist het bewijs. De enige regel die
+       hier ontstond kwam per ongeluk mee met pendingVerifications() hieronder,
+       die de wachtrij voor het antwoord opnieuw opbouwt -- en die zwijgt bij
+       een lege rij (noteerVeel geeft null zonder id's). Was dit de laatste
+       verificatie in de rij, dan verdween het besluit spoorloos.
+
+       Het inzagejournaal is hier het juiste boek en niet het kantooraudit: dit
+       gaat over EEN persoon, met een reden, en er ligt een hashketen onder
+       (server/lib/keten.js), dus de regel is achteraf niet stil te wijzigen.
+       Gemeten op de AUDIT-as, vastgehouden door test/kycspoor.test.js. */
+    try {
+      inzagelog.noteer({ door: wieKijkt(req), over: { id: user.id },
+        waarom: 'KYC-besluit: identiteit ' + (status === 'verified' ? 'goedgekeurd' : 'afgewezen, bewijs gewist'),
+        bron: 'backoffice/verificaties' });
+    } catch (e) {}
     // gezichtscontrole (selfie x paspoort) en nationaliteit vastleggen bij goedkeuren:
     // zo weten we dat het paspoort bij de codenaam en de persoon hoort (eis 5)
     if (status === 'verified') {
       const md = accounts.getMemberState(user.id) || {};
       if (req.body.faceMatch !== undefined) md.faceMatch = req.body.faceMatch === true;
       if (req.body.nationaliteit) md.nationaliteit = String(req.body.nationaliteit).slice(0, 40);
+      /* DE GEBOORTEDATUM VAN HET DOCUMENT, en dit was het gat.
+
+         `md.geboren` komt uit het aanmeldformulier -- het lid typt hem zelf
+         (routes/auth/account.js zegt daar met zoveel woorden "het paspoort komt
+         pas later"). Bij de goedkeuring werden nationaliteit, geslacht en de
+         gezichtscontrole wel van het document overgenomen en de geboortedatum
+         niet. Daardoor rustte elke leeftijdsclaim in dit huis -- 18plus naar een
+         dienst, alcohol aan de bar, de progressiegrens -- op een zelf ingetypte
+         datum, ook bij een volledig goedgekeurd paspoort. De keurder KIJKT naar
+         het document; hij legt hem nu ook vast.
+
+         Optioneel, want een bestaande keuringsstroom mag hier niet op stuklopen:
+         zonder datum blijft de opgegeven staan, en dan blijft de bron eerlijk
+         'opgegeven'. Wat er WEL binnenkomt, wordt gecontroleerd -- een
+         onleesbare datum is erger dan geen datum, want die ziet eruit als
+         bewijs. */
+      const gebIn = String(req.body.geboortedatum || '').slice(0, 10);
+      if (gebIn) {
+        const jaar = Number(gebIn.slice(0, 4));
+        const nuJaar = klok.datum().getFullYear();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(gebIn) || isNaN(Date.parse(gebIn)) || jaar < nuJaar - 120 || jaar > nuJaar) {
+          return res.status(400).json({ error: 'Die geboortedatum lijkt niet te kloppen; controleer hem op het document.' });
+        }
+        md.geboren = gebIn;
+        md.geborenBron = 'paspoort';
+      }
       // geslacht uit het paspoort vastleggen (v/m/x); stuurt de "naar de vrouw"-regel bij ontmoetingen
       const g = String(req.body.geslacht || '').toLowerCase();
       if (g === 'v' || g === 'm' || g === 'x') md.geslacht = g;
       /* De klok van de bewaartermijn: een jaar na DEZE datum wist de
          bewaarveger de scan en de selfie (besluit van de eigenaar in het
          papierwerkregister, 2 augustus 2026). */
-      md.geverifieerdOp = new Date().toISOString();
+      md.geverifieerdOp = klok.datum().toISOString();
       accounts.saveMemberState(user.id, md);
     } else {
       /* Afgewezen = direct wissen. De afwijzingsmail vraagt om een nieuwe,

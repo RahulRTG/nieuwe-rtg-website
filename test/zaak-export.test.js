@@ -34,7 +34,7 @@
    - JE EXPORTEERT JE EIGEN ZAAK. De regels komen uit sess.code, niet uit een
      parameter, dus er valt niets te verdraaien -- maar dat moet wel vaststaan.
 
-   Draai los: node --experimental-sqlite --test test/zaak-export.test.js
+   Draai los: node --test test/zaak-export.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

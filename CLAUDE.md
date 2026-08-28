@@ -31,6 +31,55 @@ bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
 de grenzen: een relatie is geen trechter, en er komt geen score op het leven
 tussen mensen.
 
+**`REIZEN.md` is het diepte-document van RTG Reizen** — het Travel OS: niet een
+reisbureau met een boekingssite, maar een wereld die reizen beheert, ook de reis
+die RTG niet verkocht heeft. Het werkwoord daar is **vóór zijn**: opmerken en
+klaarzetten voordat de reiziger het merkt, en uitvoeren alleen waar het domein
+dat al mocht. De zin die het ontwerp stuurt: het maakt niet uit waar een
+onderdeel vandaan komt, het maakt wel uit dat RTG dat weet — vandaar dat elk
+reisonderdeel een **soort** (wat de reiziger ziet) én een **herkomst** (wat het
+systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
+grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
+bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
+wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
+Personal & Civic Operating System, op drie niveaus tegelijk: individu,
+professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat
+over de mens zelf) maar voegt de civiele helft toe: zaken over meerdere
+instanties, documenten die iets van iemand vragen, processen met een
+doorlooptijd, en het bewijs eronder. Lees vóór je hieraan werkt vooral
+paragraaf 2, het werkwoord: **de Foundation opent en zet klaar — bevestigen doet
+de mens**, en uitvoeren richting een instantie doet zij nooit zelf. Er is bewust
+geen `EXECUTE_LOW_RISK`: wie bouwt weet niet in wiens leven hij staat, en een
+grens die per geval anders had gemoeten is geen grens. Paragraaf 5 heeft zeven
+eigen grenzen bovenop die van LEVEN.md; de scherpste twee zijn dat een
+eligibility-motor alleen mag tóevoegen (nooit "dit is niets voor jou") en dat de
+meeteenheid van een capaciteitsmotor de taak is en nooit de mens. Paragraaf 7
+zet vijftig voorgestelde onderdelen op een rij met per stuk of hij al bestaat en
+welke grens hem eerlijk houdt.
+**`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
+Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
+zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
+match het product, bij Rendez-vous de ontmoeting. De toetsvraag bij elke nieuwe
+functie is dus: maakt dit het vínden beter of het ontmóéten? Lees vóór je aan
+daten, matchen of introduceren werkt vooral paragraaf 4, de grenzen: de software
+port nooit aan tot een volgende stap (de knop mag, de aansporing niet), een
+introductie leunt nooit op een derde, aanwezigheid is zelf opgegeven en nooit
+afgeleid uit RTG Travel, en er komt geen cijfer op een mens — ook niet intern als
+sorteersleutel. De poort (18+ met geverifieerd paspoort) staat op één plek,
+`server/kern/ontmoetpoort.js`, en wordt door beide apps gedeeld; de pas-eis is
+iets anders en blijft op de route. Par. 4 van `LIFE.md` staat er onverkort boven.
+**`TOKEN.md` gaat over de geldvorm zelf** — wat een eigen betaaltoken hier mag
+zijn. De kern in één zin: RTG heeft er al een, hij heet RTG Pay, en de vraag is
+niet of we er een bouwen maar of we hem uit het gesloten circuit halen. Dat is
+namelijk de grens tussen een besluit (`WALLET_SALDO` in
+`kern/bevoegdheid/lijst.js`: gesloten circuit, harde plafonds, niet uitbetaald
+aan het lid) en een vergunning (`GELD_UITGEVEN`, en daar staat geen partnerrail
+naast). Lees vóór je aan tegoed, punten of munten werkt vooral paragraaf 5 en 7:
+wat er bewust niet komt (een eigen chain, crypto eruit, een koers, tegoed dat
+verjaart ten gunste van RTG) en de drie besluiten die openstaan — waarvan de
+eerste, de bank-uitgang, vóór de leden-bank opengaat genomen moet worden en
+niet erna.
 **`WAARDE.md` is de laag onder het geld** — RTG Value: niet wat één lid met zijn
 geld doet (dat is GELD.md) maar wat waarde binnen RTG zélf is. De kern in één
 zin: elke euro, elk tegoed en elk budget weet wie het bezit, waarvoor het
@@ -148,6 +197,64 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
+was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
+PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden
+uitgeeft. De kern in één zin: **een code zegt wie of wat, nooit wat er mag** —
+dat wordt bij het scannen berekend uit wie er scant, waar hij staat en wat hij
+al mocht. Lees vóór je een QR, een scanner of een koppelweg bouwt vooral
+paragraaf 3, de grenzen: de intentielijst toont wat DEZE scanner mag vragen en
+nooit wat de ander heeft (anders is het menu zelf een profieluitdraai), een scan
+bewijst geen mens, een sticker is geen bron van gezag, en alles wat met een oude
+foto nog iets in gang kan zetten hoort tijdelijk te zijn. Er komt geen tweede
+scanner, geen tweede parser en geen tweede rem naast de huisbrede uit
+`server/kern/sociaal/pin-deur.js`.
+**`COMMERCIE.md` is de Commercial Core** — het commerciële subsysteem onder de
+prijslijst, in `server/kern/commercie/`: catalogus (`../pasladder.js`), pricing
+(`../pasprijs.js`), contract, verbruik (`tegoed.js`), vergoedingen, subsidie,
+fee, allocatie, btw en claims. Drie prijsmechanismen (free, fixed, contract) en
+het onderscheid dat alles bij elkaar houdt: **catalogusprijs ≠ contractprijs ≠
+factuurbedrag**. Vijf regels die er hard staan: de partnervergoeding over omzet
+is **nul** en dat is geen instelling; een **bodem is geen prijs** en mag nooit op
+een factuur belanden; het ledenvoordeel heeft **vier** bedragen met de invariant
+`lid + RTG === bruto === zaak`; een **prijswijziging raakt geen lopend contract**;
+en er ontstaan **nooit ongemerkt** variabele kosten (AI boven het tegoed vraagt
+altijd een keuze vooraf, en automatisch aanvullen vraagt een maandmaximum).
+`claims.poort()` is de release-gate: een bewering die zich AFGEDWONGEN noemt
+zonder toets, komt er niet door. Lees COMMERCIE.md als je aan de structuur werkt,
+PRIJZEN.md als je een bedrag zoekt.
+
+**`PRIJZEN.md` is de commerciële architectuur** — de ladder (gratis, RTG Pass
+65, Business Lite 150, Business vanaf 5.000, Lifestyle vanaf 20.000) en de
+prijsformule waar alles aan hangt: **prijs = toegang + verbruik +
+verantwoordelijkheid**. Lees die vóór je aan een prijs, een bundel of een
+factuurregel werkt. De harde regel daar: **een bodem is geen prijs** — een
+ondergrens weigert invoer en toont "vanaf", en mag nooit op een factuur belanden
+(dat is de € 9.075-fout uit `kern/pasprijs.js`, met een nieuw getal). De ladder
+staat op één plek, `kern/pasladder.js`; `test/pasladder.test.js` handhaaft de vier
+regels die machinaal te handhaven zijn. Paragraaf 4 is de eerlijke lijst open
+gaten — waaronder drie plekken waar de code iets anders doet dan de
+partnervoorwaarden beloven.
+
+**`CONTROLPLANE.md` is het Economic Control Plane** — de laag die vóór iedere
+economische handeling bepaalt of zij mag, en achteraf kan bewijzen waarom. Lees
+die met COMMERCIE.md ernaast: dat beschrijft wat iets kost, dit wie iets mag.
+Vier regels dragen het geheel, en alle vier komen ze uit een fout die hier echt
+is gemaakt: **geen belofte zonder afdwingbare capability, geen capability zonder
+caller, geen bevoegdheid zonder oorsprong, geen economische actie zonder bewijs.**
+
+De drie die je het snelst nodig hebt: een bevoegdheid is **geen ja of nee** maar
+vier dimensies (wat, waar, hoeveel, wanneer) en **delegatie kan alleen
+versmallen** — structureel, niet als vuistregel. Een besluit kent **acht
+uitkomsten** en "nee" is er maar één van; `ONBEKEND` is met opzet géén synoniem
+van `WEIGEREN`, want een storing hoort niet te klinken als een overtreding. En
+een nieuwe handhavingsregel **loopt eerst mee** zonder te blokkeren: je kunt niet
+afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
+
+`scripts/capabilityroepers.js` is de meting die dit document eerlijk houdt — hij telt
+per capability of er ergens een caller is, en hij vond er vijf die er geen
+hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
+lijst van wat er nog openstaat.
 **`TENANT.md` is de buitenkant van de bedrijvenkant** — hoe een partner het
 Werk OS onder zijn eigen naam gebruikt zonder dat er een tweede platform
 ontstaat. Lees die vóór je aan white-label, SSO-inrichting of "enterprise"
@@ -250,7 +357,7 @@ heeft veel operating layers" maar "RTG is één besturingssysteem van
 gestandaardiseerde capabilities". Lees die vóór je een capability, een woordenlijst
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
-(`scripts/capabilities.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
+(`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
 geen capabilitylaag in deze code, er zijn er **twintig**, 91% van de leden woont in
 precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
@@ -409,19 +516,110 @@ app-main. Rahul woont in de schilbalk zelf: zijn mond staat rechts in de balk
 bestaat nog als **la** voor die panelen, niet als scherm. Lees ook wat er bewust NIET staat (een verzonnen statusstrook, een
 voorgekookt werkblad) vóór je er iets bij zet.
 
+**`WERELDEN.md` is de kaart** — vier werelden, een kern eronder, en de pas die er
+dwars op staat. **LivingOS** (mijn dagelijks leven), **WorkOS** (mijn werk en
+organisaties), **TravelOS** (mijn reizen) en **FoundationOS** (RTFoundation en
+haar maatschappelijke werk), met de domeinen een niveau lager. Het document trekt
+vier begrippen uit elkaar die steeds door elkaar liepen: **World** (waar ben ik),
+**Capability** (wat kan het systeem), **Access** (wat mag ik) en **Pass** (waar
+betaal ik voor) — *Core ondersteunt Worlds, Worlds organiseren Experiences,
+Access bepaalt wat zichtbaar is, Passes bepalen commerciële rechten.* Bij twijfel
+is er één vraag: **in welke context denkt de mens dat hij zich bevindt wanneer hij
+dit gebruikt?** Daaruit volgt dat de bouwer van een capability niet bepaalt in
+welke wereld hij hoort — RTFoundation mag eigenaar zijn van iets dat in LivingOS
+verschijnt. Twee harde regels: **een wereld draagt nooit de naam van een pas, ook
+niet de stam ervan** (`LifeOS` sneuvelde daarop tegenover Lifestyle Pass), en
+**RTG Core is geen wereld** — 24 functies zitten in élke doelgroep en reizen met
+de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
+vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
+laat zakken in plaats van stil verkeerd te blijven staan.
+
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — zeventig
+onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
+bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
+laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten
+staat nergens in de code, en dat is een ontwerpbesluit en geen afleiding.
+
+**De ladder van de drie passen staat daar ook**, en hij is na te rekenen met
+`npm run groepen` (dat schrijft `GROEPEN.md` uit de bron): **RTG Pass** is het
+hele platform voor één mens (140 functies), **Lifestyle** is hetzelfde platform
+maar er doet iemand het vóór je (143, met De Rechterhand, RTG Zakelijk en het
+Privékantoor als verschil — je koopt uitvoering, geen functies), en **Business**
+krijgt daarbovenop een hele wereld (157, waarvan twaalf van de veertien
+exclusieve functies WorkOS zijn). Lifestyle is een strikte deelverzameling van
+Business; er is geen enkele functie die alleen Lifestyle heeft, en dat is een
+vorm en geen gat. **Waar de prijs aan hangt is wel besloten en staat in
+WERELDEN.md:** RTG betaalt voor het platform, Lifestyle voor **uitvoering** (er
+doet iemand het vóór je) en Business voor **schaal** (per organisatie, per
+vestiging, per medewerker). Niet op functies — drie functies verschil dragen geen
+factor driehonderd, en functies weghalen bij RTG Pass botst met "premium, ook aan
+de onderkant". Het bedrag zelf staat nergens in de code.
+
+**`ADAPTIEF.md` is de adaptieve interactielaag** — hoe dezelfde capability zich
+gedraagt op bureau, tablet, telefoon en stem. In één zin: **bureau toont veel
+context tegelijk, telefoon toont één duidelijke taak met zijn handelingen binnen
+bereik, en de capability zelf verandert niet — alleen zijn vorm.** Geen mobiele
+versie en geen responsive-ronde: een capability declareert per vorm zijn
+presentatie (werkbalk, contextmenu, selectiebalk, lade, paneel, taakmodus), en de
+harde grens is dat **verbergen niet bestaat** — een handeling die op bureau
+bestaat en op telefoon geen vorm heeft, is een gebrek en laat de toets zakken.
+De schilbalk onderin is het eerste instrument: zijn middenzone draagt de werelden,
+de bladacties of de selectieacties, met links altijd de bank en rechts altijd
+Rahul. Lees die vóór je iets mobiel "even responsive" maakt.
+
+**`GRAMMATICA.md` is de RTG Mobile Interaction Grammar** — de vaste manier waarop
+álle RTG-software op een telefoon reageert, in zeven zinnen: *ik wil iets doen →
+mijn duim vindt het onderaan; ik wil meer → ik trek de interface naar me toe; ik
+selecteer iets → RTG begrijpt mijn context; ik wil weten wat er gebeurt → RTG toont
+de toestand zonder mij te storen; ik doe iets gevoeligs → RTG vertraagt precies
+genoeg; ik maak een fout → ik kan bijna altijd terug; ik wissel van RTG-product →
+de bediening voelt bekend.* Vijf gebaren met elk één betekenis (tik doet, lang
+drukken legt uit, omhoog trekken geeft meer, selectie verandert de acties, de orb
+stelt voor), vijf gewichten van `licht` tot `plechtig`, en drie grenzen die niet
+mogen sneuvelen: **ongedaan vóór bevestigen** (twintig "weet u het zeker?"-vragen
+leren mensen op ja drukken), **een verhindering draagt altijd een reden** (er komt
+geen grijze knop zonder uitleg bij), en **de orb stelt voor maar beslist nooit** —
+wat er gebeurt loopt langs capability, verhindering en gewicht, en `plechtig` wordt
+door een mens afgemaakt. Lees die vóór je een handeling toevoegt aan een scherm.
+
 **`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
 pages, it is a movable operational space. Surfaces met een gouden greep rond een
 centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
+**`ONDERHOUD.md` is de onderhoudslaag** — vier wachters voor de grond die
+zonder commit verschuift (runtime, browser, live-site, wet) en de herstellus
+die van elk rood licht een fix-issue met diagnose maakt. De twee vaste grenzen
+daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
+Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
+juridische oordeel blijft bij een mens.
+
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
+**`PROOF.md` is het diepte-document van de vertrouwenslaag** (werknaam RTG
+ProofOS): vertrouwen als levende uitkomst in plaats van instelling. De
+hoofdregel staat in paragraaf 0 en is mechanisch: **altijd voor de 100%, nooit
+minder** -- bewijs mag alleen groeien en schuld alleen krimpen (normtanden
+`bewijsCellenBewezen` en `bewijsAchterstand`), en elke afwijking heeft een naam,
+een reden en een sluitweg in BEWIJSSCHULD.json. Lees vooral paragraaf 9, de
+grenzen: bewijs is nooit een verhaal, degraderen is nooit stil, en niemand zet
+een vervalstaat met de hand op bewezen. `scripts/vertrouwen.js` meet de
+vervalstaten per route.
+
+**`FABRIC.md` is het richtingsdocument van de laag BOVEN PROOF** -- de AI
+Execution Fabric: van software bedienen naar een doel uitspreken. De zin die de
+architectuur draagt: **een onbewezen handeling staat niet in de lijst waaruit de
+AI kiest** (proof-aware routing; de bewijspoort in `server/kern/stuur/beleid.js`
+laat een geschorste capability uit `toegestanePaden` vallen). Lees vooral
+paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt,
+geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
+mens, en autonomie wordt gepromoveerd en nooit geslopen.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 
-- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
+- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 182 schermen), `apps/foundation/` (de RTFoundation, 71), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
-- Starten: `npm start` (gebruikt `--experimental-sqlite`, vereist Node 22+) → http://localhost:3000
+- Starten: `npm start` (vereist Node 22.13+; `node:sqlite` laadt sinds die versie zonder vlag, dus `--experimental-sqlite` is overal weg) → http://localhost:3000
 - AI is optioneel en lokaal-eerst: regelwerk en controleerbare extractie gebruiken geen model; vrije verrijking loopt bij voorkeur via `LOCAL_AI_URL`. `RTG_EXTERNE_AI_UIT=1` sluit externe modellen hard af. Zonder model blijven alle kernprocessen in handmatige werkmodus beschikbaar. Sleutels nooit in de repo of client-side JS zetten.
 - `server/data/db.json` verwijderen = terug naar de seed-data. Sleutels (`secret.key`, `vault.key`) worden automatisch aangemaakt.
 
@@ -456,6 +654,14 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 1. **Premium, ook aan de onderkant.** RTG Pass is de instap, maar mag nooit budget aanvoelen.
 2. **Eén signatuurelement, geen stapeling van trucjes.** Niet steeds nieuwe visuele devices toevoegen.
 3. **Stark zwart/wit ritme**, geen beige/marmer-gradients, geen ronde hoeken of gouden randjes.
+   *Sinds 20 augustus 2026 ook in code:* elke `border-radius` in `public/` is `0`.
+   De vormtaal deed jarenlang het tegenovergestelde (18px op kaarten, 12px op
+   velden, 999px op knoppen, plus 195 losse pixelwaarden die zich aan geen van
+   beide hielden); 3169 hoeken zijn omgezet. **Eén uitzondering: een cirkel is
+   geen hoek.** Een statusstip, een monogram of een avatar is een vorm en geen
+   afgeronde rechthoek, dus `border-radius:50%` mag — en dat is de enige waarde
+   naast `0` die er nog voorkomt. `scripts/check.js` regel 51 houdt het zo; een
+   merkregel die alleen in dit document staat, is over een half jaar weer weg.
 4. **Veel lucht** — genereuze verticale padding; bij twijfel meer ruimte.
 5. **De Salon levert het beeld.** Site- en campagnebeeld zijn uitgelichte Salon-posts (featured, altijd met naamsvermelding — label "Uit De Salon · naam"; endpoint `/api/salon/promo`, alleen featured posts, RTG cureert). De onderliggende demo-beelden zijn AI-gegenereerd in eigen huis (`public/campagne/`, via Pollinations; quiet luxury, gedempte tinten, géén mensen) — geen stockfoto's, geen modellen, geen extern beeld. Overige visuals met CSS/SVG bouwen.
 
@@ -469,13 +675,14 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 - **Lifestyle & Business Pass**: uitsluitend na menselijke goedkeuring of op uitnodiging — de AI mag **nooit** zelf toegang beloven of verlenen
 - Nooit echte hotel-/luchtvaartmerken als bevestigde partners opvoeren; nooit claimen dat een boeking daadwerkelijk verwerkt is
 - **Privacy by design (codenamen)**: klantdata draait op codenamen, echte namen staan in de gescheiden kluis (`accounts.js`) — dit ontwerp niet omzeilen
+- **Fiscale uitspraken zijn geklasseerd, niet vlak.** Elke fiscale uitkomst droeg dezelfde zin — "voorlichting, geen bindend fiscaal advies" — en die stond zowel onder een btw-aangifte die tot op de cent uit het factuurregister is geteld als onder een zzp-schatting op een verwachte jaarwinst. Dat doet allebei tekort en wordt na een week niet meer gelezen. Er zijn nu vier klassen (`server/kern/fiscaal/zekerheid.js`): **bepaald** (wet + gegevens leiden eenduidig tot deze uitkomst; mag als feit worden gepresenteerd), **uitlegbaar** (meerdere verdedigbare behandelingen; wij kiezen er één en zeggen welke en waarom), **advies** (wij rekenen voor, een mens met vakkennis beoordeelt) en **voorbehouden** (dit mag RTG juridisch of procedureel niet zelfstandig doen). De regel eronder: **automatiseer wat objectief automatiseerbaar is, en maak nergens zekerheid waar die niet is.** Drie dingen mogen niet sneuvelen: een uitkomst die niemand heeft ingedeeld valt terug op de vóórzichtige klasse en zegt dat hij niet is ingedeeld (nooit stilzwijgend "bepaald"); `voorbehouden` is een grens en geen nog-te-bouwen functie — indienen namens een ondernemer, een boete opleggen, een naheffing vaststellen en toegang tot een pas beloven staan er alle vier in; en `bepaald` betekent "over de uitkomst is geen discussie als de gegevens kloppen", niet "gegarandeerd juist" — waarvoor de bewijsketen (`kern/fiscaal/herkomst.js`) laat zien waar het getal vandaan komt. Deze klassen gelden ook in system prompts: een AI-antwoord over de boekhouding sluit af met de zin van zijn klasse en niet met een zelfbedacht voorbehoud.
 - **De zaak wordt gecontroleerd én de mens.** Acht genres houden de ZAAK tegen tot een medewerker een vergunning heeft gezien (`server/kern/aanmeldingen/bewijs.js`); daarnaast vraagt een genre iets van de PERSOON die er werkt — `server/kern/persoonseis.js`, met de stukken in `server/kern/vakbewijs.js`. Twee reikwijdtes: **werk** houdt de sessie tegen (kinderopvang, beveiliging, hulpdiensten — ook voor de manager, want juist de vrijstelling voor de baas is de deur waar een fraudeur op mikt), **handeling** houdt alleen die handeling tegen (voorschrijven, verwijzen, uitreiken). Een balie van een huisartsenpraktijk werkt dus gewoon en schrijft niets voor. Het documentNUMMER woont in de identiteitskluis (`member_state`, versleuteld en gebonden aan de rij) en niet in de operationele data: een BIG-registratie staat in een openbaar register, dus een nummer naast een codenaam voert die codenaam terug naar een echte naam. Het kantoor opent dat met een verplichte reden, een regel in het inzagejournaal en bericht aan de betrokkene; zelf-inzage gaat vrij. Drie regels die niet mogen sneuvelen: een ingediend stuk is geen bewijs (een mens van RTG tekent af, en nooit de werkgever zelf), een stuk verloopt en wordt bij élke vraag opnieuw gerekend, en RTG valideert niets inhoudelijk — wij bellen het BIG-register niet en doen niet alsof. Een handeling in het register die nergens wordt afgedwongen, laat `test/persoonseis.test.js` zakken.
 
 ## Wat NIET te doen
 
 - **Geen marketingsite terugbouwen.** De publieke marketingpagina's zijn er bewust uit; `/` komt direct op de inlog uit. Een landingspagina, "over ons", een prijzenpagina of een publieke homepage is dus geen ontbrekend stuk dat je even aanvult — het is een besluit. Alleen terugbouwen als daar expliciet om gevraagd wordt
 - Geen "verslavende" engagement-patronen (kunstmatige urgentie, oneindige scroll-tricks)
-- **De progressielaag stopt bij 18+.** Alles wat een prestatie bewaart búiten het potje — highscores, ranglijsten, niveaus, prestaties, toernooien, seizoenen — bestaat alleen voor leden die de 18+-poort halen (`volwassen()`: paspoort-geboortedatum gecontroleerd én 18 of ouder). Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De Arena belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er bestaat geen ranglijst", en School houdt vast aan "leren is geen wedstrijd". De grens staat op één plek in de code (`progressieMag` in `server/kern/spellen/grens.js`); nieuwe progressievormen hangen daaraan en krijgen geen eigen kopie van de regel.
+- **De progressielaag stopt bij 18+.** Alles wat een prestatie bewaart búiten het potje — highscores, ranglijsten, niveaus, prestaties, toernooien, seizoenen — bestaat alleen voor leden die de 18+-poort halen (`volwassen()` in `server/kern/volwassen.js`: een eigen account, door RTG gekeurd — betrouwbaarheidsniveau A3, het identiteitsbewijs is gezien — én 18 of ouder). Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De Arena belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er bestaat geen ranglijst", en School houdt vast aan "leren is geen wedstrijd". De grens staat op één plek in de code (`progressieMag` in `server/kern/spellen/grens.js`, die `volwassen()` leest); nieuwe progressievormen hangen daaraan en krijgen geen eigen kopie van de regel. Let op de tweede helft: de gecontroleerde geboortedatum komt pas van het document als de keurder hem bij de goedkeuring overneemt (`server/routes/office/verificaties.js`). Doet hij dat niet, dan is de identiteit wél gezien maar staat de datum nog zoals het lid hem opgaf; RTG iD en de stempoort tonen dat verschil met `leeftijdBron`.
 - Geen nieuwe kleuren of fonts zonder de merkregels hierboven te checken
 - `server/data/` (database, sleutels) en `.env` nooit committen
 - Bij CSS-zoek-vervang: daarna clamp()/calc()-waarden en brace-balans controleren (eerder misgegaan)

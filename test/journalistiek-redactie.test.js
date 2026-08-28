@@ -21,7 +21,7 @@
    richtingen: een concept mag er nooit uit, een teruggetrokken stuk moet er
    weer uit kunnen, en de redactie van de een is niet die van de ander.
 
-   Draai los: node --experimental-sqlite --test test/journalistiek-redactie.test.js
+   Draai los: node --test test/journalistiek-redactie.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

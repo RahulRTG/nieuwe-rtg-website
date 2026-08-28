@@ -141,6 +141,34 @@ test('niet-ASCII onderwerp wordt een RFC 2047 encoded-word', async () => {
   } finally { sluitServer(s); }
 });
 
+test('persoonlijk publiek From-adres houdt de SPF-envelope op het hoofddomein', async () => {
+  const s = await nepServer({});
+  try {
+    await smtp.createTransport('smtp://127.0.0.1:' + s.poort).sendMail({
+      from:'jan@bedrijf.rahultravelgroup.com',
+      envelopeFrom:'RTG <no-reply@rahultravelgroup.com>',
+      to:'klant@voorbeeld.nl', subject:'Hallo', text:'Persoonlijke buitenpost' });
+    assert.ok(s.vangst.cmds.includes('MAIL FROM:<no-reply@rahultravelgroup.com>'));
+    assert.match(s.vangst.data, /^From: jan@bedrijf\.rahultravelgroup\.com$/m);
+  } finally { sluitServer(s); }
+});
+
+test('ook smarthost-post kan door RTG zelf met DKIM worden ondertekend', () => {
+  const dkim = require('../server/dkim');
+  const paar = dkim.maakSleutelpaar(2048);
+  const ruw = smtp._bouwBericht({ naam:'mail.rtg.test' }, {
+    from:'RTG <post@rtg.test>', to:'lid@voorbeeld.test', subject:'Veilig', text:'Oorspronkelijk',
+    dkim:{ priveSleutel:paar.prive, domein:'rtg.test', selector:'rtg' }
+  });
+  const [kop, lijf] = ruw.split('\r\n\r\n');
+  const koppen = {};
+  for (const regel of kop.split('\r\n')) {
+    const i = regel.indexOf(': '); if (i > 0) koppen[regel.slice(0, i)] = regel.slice(i + 2);
+  }
+  assert.ok(koppen['DKIM-Signature'], 'de smarthost-boodschap draagt een DKIM-handtekening');
+  assert.equal(dkim.controleer({ koppen, lijf, veld:koppen['DKIM-Signature'], publiekeSleutel:paar.publiek }).ok, true);
+});
+
 test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: !TLS_OK }, async () => {
   const oud = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

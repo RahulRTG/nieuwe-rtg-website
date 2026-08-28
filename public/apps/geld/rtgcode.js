@@ -32,7 +32,7 @@
     doek.setAttribute('aria-label', 'RTG-code, ververst automatisch');
     var ring = d.createElement('canvas');
     ring.width = 120; ring.height = 6;
-    ring.style.cssText = 'width:min(15rem,60%);height:4px;margin:.6rem auto 0;display:block;border-radius:2px;';
+    ring.style.cssText = 'width:min(15rem,60%);height:4px;margin:.6rem auto 0;display:block;border-radius:0;';
     el.appendChild(doek); el.appendChild(ring);
 
     /* bordeaux, net als de code zelf: het merk zit in de kleur (de originele
@@ -47,7 +47,7 @@
     function toon(token, exp) {
       try {
         var cv = w.RTGQRteken.tekenRTG(token, { merk: opts.merk, schaal: 7 });
-        cv.style.cssText = 'width:min(16rem,80vw);height:auto;image-rendering:pixelated;border-radius:12px;';
+        cv.style.cssText = 'width:min(16rem,80vw);height:auto;image-rendering:pixelated;border-radius:0;';
         doek.innerHTML = ''; doek.appendChild(cv);
       } catch (e) { doek.textContent = 'Kon de code niet tekenen.'; }
       huidig = { token: token, exp: exp };

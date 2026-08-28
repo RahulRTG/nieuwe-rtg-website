@@ -57,7 +57,7 @@ het gereedschap al** — het staat alleen ergens anders dan de opzet denkt.
 | **35/36** progressive deployment + rollback | een functie gaat open voor tien procent en draait automatisch dicht bij een golf serverfouten | `kern/command/canary.js`, `server/functies/wachter.js` |
 | **37/38** evidence ledger | claim → control → test → bewijs, per bewering een bron, en een weigering als het bewijs ontbreekt | `BEWIJS.md`, `CONTROLS.json`, `scripts/bewijsmatrix.js` |
 | **44** duplication detection | twee modules met gelijkenis 1,00 zijn gevonden en benoemd (`kern/command` en `kern/zaakcommand`) | `scripts/objectmodel.js`, `DEVELOPERCLOUD.md` par. 2 |
-| **45** architectuurpolitie | 51 codeafspraken binair, plus een motor die de wetten ECHT overtreedt | `scripts/check.js`, `scripts/sabotage.js` |
+| **45** architectuurpolitie | 53 codeafspraken binair, plus een motor die de wetten ECHT overtreedt | `scripts/check.js`, `scripts/sabotage.js` |
 
 **Dat is veertien van de vijftig plus een bijna-treffer, en het is niet het
 makkelijke deel.** Chaos, aanvallen, isolatie, bewijs, canary en shadow execution
@@ -247,7 +247,7 @@ keurt goed op grond van niets — en dat is erger dan geen poort, want hij koopt
 vertrouwen dat er niet is (`LAT.md` regel 9).
 
 Er staat bovendien al een poort op die plek, en die is streng: `npm run check`
-(51 regels), de mutatiemotor, `scripts/sabotage.js` en de bewijsmatrix. **Magnaat
+(53 regels), de mutatiemotor, `scripts/sabotage.js` en de bewijsmatrix. **Magnaat
 hoort daar niet naast maar áchter**: eerst bewijzen dat één capability via
 Magnaat aantoonbaar bereikt wordt, dan pas een regel in de poort.
 

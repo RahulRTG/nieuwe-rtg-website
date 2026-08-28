@@ -20,7 +20,7 @@
   .rij{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;margin-bottom:.5rem;}
   .rij .nm{flex:1;min-width:0;}
   .rij small{display:block;color:var(--zacht);font-size:.78rem;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0 .8rem;}
   .mini{background:transparent;color:var(--zacht);font-size:.82rem;padding:.3rem;}
   .taak{display:flex;align-items:center;gap:.6rem;padding:.55rem .2rem;border-bottom:1px solid var(--lijn);}
@@ -28,12 +28,12 @@
   .taak input[type=checkbox]{width:1.2rem;height:1.2rem;accent-color:var(--goud);}
   .taak .tk{flex:1;min-width:0;line-height:1.35;}
   .taak.af .tk{text-decoration:line-through;color:var(--zacht);}
-  .wiebadge{font-size:.72rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:999px;padding:.15rem .55rem;color:var(--goud2);white-space:nowrap;}
-  .noot{padding:.55rem .8rem;background:var(--paneel2);border-radius:12px;margin-bottom:.45rem;font-size:.92rem;line-height:1.4;}
+  .wiebadge{font-size:.72rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.15rem .55rem;color:var(--accent-tekst);white-space:nowrap;}
+  .noot{padding:.55rem .8rem;background:var(--paneel2);border-radius:0;margin-bottom:.45rem;font-size:.92rem;line-height:1.4;}
   .noot small{display:block;color:var(--zacht);font-size:.75rem;margin-bottom:.15rem;}
   .keuzerij{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0;}
-  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
-  .chip.aan{border-color:var(--goud);color:var(--goud2);}
+  .chip{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
+  .chip.aan{border-color:var(--goud);color:var(--accent-tekst);}
   .ledenregel{color:var(--zacht);font-size:.85rem;margin:.2rem 0 .8rem;}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
 </style>
@@ -51,7 +51,7 @@
     <div class="kaart blok">
       <input class="veld" id="nTitel" placeholder="Waar gaan jullie aan werken? (bijv. Spreekbeurt over dolfijnen)" maxlength="80">
       <input class="veld h-mt40" id="nWat" placeholder="Vertel er iets bij (mag leeg)" maxlength="300">
-      <button class="knop" id="nMaak" style="width:100%;margin-top:.4rem;">Start het project</button>
+      <button class="knop" id="nMaak" style="width:100%;margin-top:.4rem;" data-hoofdactie>Start het project</button>
       <div class="fout" id="nFout"></div>
     </div>
     <div id="uitnodigingen"></div>

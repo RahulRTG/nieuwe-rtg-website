@@ -84,7 +84,7 @@ test('de vergelijking kijkt naar de hele inhoud, niet naar de sleutelvolgorde', 
 test('drie oproepen per route, en de sleutel van de derde is een andere', async () => {
   const gezien = [];
   const post = async (pad, lijf) => { gezien.push(lijf.idem); return ok({ id: gezien.length }); };
-  const uit = await draaiIdemproef({ post, routes: [{ method: 'POST', pad: '/api/x', rol: 'member' }],
+  const uit = await draaiIdemproef({ post, routes: [{ methode: 'POST', pad: '/api/x', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({ naam: 'proef' }) });
   assert.equal(gezien.length, 3);
   assert.equal(gezien[0], gezien[1], 'de eerste twee delen een sleutel');
@@ -94,7 +94,7 @@ test('drie oproepen per route, en de sleutel van de derde is een andere', async 
 
 test('de ronde oordeelt NIET als geen enkele route een gevoelig antwoord gaf', async () => {
   const uit = await draaiIdemproef({ post: async () => ok({ stil: true }),
-    routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }, { method: 'POST', pad: '/api/b', rol: 'member' }],
+    routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }, { methode: 'POST', pad: '/api/b', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({}) });
   assert.ok(uit.meterStuk, 'nul beoordeelde routes hoort een blinde ronde te zijn');
   assert.equal(uit.telling.ongemeten, 2);
@@ -103,7 +103,7 @@ test('de ronde oordeelt NIET als geen enkele route een gevoelig antwoord gaf', a
 test('een dood token wordt hernieuwd in plaats van als ongemeten geteld', async () => {
   let beurt = 0;
   const post = async () => (++beurt === 1 ? { status: 401, data: {} } : ok({ id: beurt }));
-  const uit = await draaiIdemproef({ post, routes: [{ method: 'POST', pad: '/api/a', rol: 'member' }],
+  const uit = await draaiIdemproef({ post, routes: [{ methode: 'POST', pad: '/api/a', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({}), hernieuw: async () => true });
   assert.equal(uit.hernieuwd, 1);
   assert.notEqual(uit.perRoute['POST /api/a'].idempotentie, 'ongemeten');

@@ -25,63 +25,66 @@
   .scherm::after{content:'';flex:1 0 .2rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:2.1rem;margin:0;color:var(--s-creme);}
   .sub{color:var(--s-mat);text-align:center;margin-bottom:.6rem;max-width:26rem;}
-  .kaart-s{width:min(26rem,92vw);border:1px solid rgba(201,163,74,.35);border-radius:14px;padding:1.05rem 1.25rem;
+  .kaart-s{width:min(26rem,92vw);border:1px solid rgba(201,163,74,.35);border-radius:0;padding:1.05rem 1.25rem;
     cursor:pointer;display:flex;align-items:center;gap:1rem;font:inherit;text-align:left;
     background:var(--s-paneel);color:var(--s-creme);}
   .kaart-s b{font-family:var(--serif);font-weight:500;font-size:1.35rem;display:block;}
   .kaart-s span{font-size:.9rem;color:var(--s-mat);}
+  /* .kaart-s span wint van .duelbadge op specificiteit, en zette het label
+     op de matte tint: 3,94 op het gouden pilletje. Deze regel wint terug. */
+  .kaart-s .duelbadge{color:var(--s-creme);}
   .kaart-s svg{width:2.9rem;height:2.9rem;flex:0 0 auto;}
-  .duelbadge{margin-left:auto;background:rgba(201,163,74,.14);color:var(--s-goud);border-radius:999px;
+  .duelbadge{margin-left:auto;background:rgba(201,163,74,.14);color:var(--s-creme);border-radius:0;
     padding:.2rem .7rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
-  .rand{background:transparent;border:2px solid var(--s-mat);color:var(--s-mat);border-radius:999px;
+  .rand{background:transparent;border:2px solid var(--s-mat);color:var(--s-mat);border-radius:0;
     padding:.55rem 1.3rem;font:inherit;font-size:.95rem;cursor:pointer;margin-top:.4rem;}
-  .neon{background:var(--s-goud);border:0;color:#241A06;border-radius:999px;padding:.8rem 2rem;
+  .neon{background:var(--s-goud);border:0;color:#241A06;border-radius:0;padding:.8rem 2rem;
     font:inherit;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 0 24px rgba(201,163,74,.3);}
   .neon[disabled]{opacity:.4;box-shadow:none;cursor:default;}
   .bovenrij{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:.7rem;padding:.8rem 1rem;}
   .bovenrij[hidden]{display:none;}
-  .terugknop{background:rgba(23,19,16,.85);border:2px solid var(--s-goud);color:var(--s-creme);border-radius:999px;
+  .terugknop{background:rgba(23,19,16,.85);border:2px solid var(--s-goud);color:var(--s-creme);border-radius:0;
     padding:.5rem 1.05rem;font:inherit;font-size:.95rem;font-weight:700;cursor:pointer;}
   .kop-info{flex:1;text-align:center;font-weight:700;font-size:1.05rem;}
   .uitnodiging{width:min(26rem,92vw);background:rgba(169,116,74,.12);border:1px solid var(--s-koper);
-    border-radius:14px;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
-  .uitnodiging button{margin-left:auto;background:var(--s-koper);border:0;color:#26150A;border-radius:999px;
+    border-radius:0;padding:.75rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.95rem;}
+  .uitnodiging button{margin-left:auto;background:var(--s-koper);border:0;color:#26150A;border-radius:0;
     padding:.45rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
   .keuze{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.45rem;}
   .keuze h3{margin:.4rem 0 .1rem;font-size:.95rem;color:var(--s-mat);text-transform:uppercase;letter-spacing:.08em;}
-  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--s-paneel);border-radius:12px;
+  .persoon{display:flex;align-items:center;gap:.7rem;background:var(--s-paneel);border-radius:0;
     padding:.65rem .9rem;cursor:pointer;border:2px solid transparent;}
   .persoon.aan{border-color:var(--s-goud);}
   .persoon .wie{font-weight:700;}
   .persoon .waar{margin-left:auto;font-size:.8rem;color:var(--s-mat);}
   .persoon .vink{width:1.3rem;text-align:center;color:var(--s-goud);font-weight:800;}
   .cnrij{display:flex;gap:.5rem;}
-  .cnrij input{flex:1;font:inherit;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--s-mat);
+  .cnrij input{flex:1;font:inherit;padding:.6rem .9rem;border-radius:0;border:1px solid var(--s-mat);
     background:var(--s-paneel);color:var(--s-creme);}
-  .cnrij button{background:var(--s-paneel);border:1px solid var(--s-goud);color:var(--s-goud);border-radius:12px;
+  .cnrij button{background:var(--s-paneel);border:1px solid var(--s-goud);color:var(--s-goud);border-radius:0;
     padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
   /* de keuzerij van het Quizduel: waar de vragen vandaan komen, en hoe je speelt */
   .bronrij{display:flex;flex-wrap:wrap;gap:.4rem;}
-  .bronrij button{background:var(--s-paneel);border:1px solid var(--s-mat);color:var(--s-creme);border-radius:12px;
+  .bronrij button{background:var(--s-paneel);border:1px solid var(--s-mat);color:var(--s-creme);border-radius:0;
     padding:.5rem .85rem;font:inherit;cursor:pointer;}
   .bronrij button.aan{border-color:var(--s-goud);color:var(--s-goud);font-weight:700;}
-  .stofkeuze{font:inherit;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--s-mat);
+  .stofkeuze{font:inherit;padding:.6rem .9rem;border-radius:0;border:1px solid var(--s-mat);
     background:var(--s-paneel);color:var(--s-creme);width:100%;}
   /* het duel */
   .vraag{font-family:var(--serif);font-size:clamp(1.5rem,5.6vw,2rem);text-align:center;max-width:24rem;
     min-height:4.6rem;text-wrap:balance;}
   .opties{width:min(24rem,90vw);display:flex;flex-direction:column;gap:.6rem;}
-  .opties button{font:inherit;font-size:1.1rem;font-weight:700;padding:.9rem 1.1rem;border-radius:14px;
+  .opties button{font:inherit;font-size:1.1rem;font-weight:700;padding:.9rem 1.1rem;border-radius:0;
     border:1px solid rgba(201,163,74,.4);background:var(--s-paneel);color:var(--s-creme);cursor:pointer;text-align:left;}
   .invoer{min-height:3.2rem;font-size:2.1rem;font-weight:800;color:var(--s-goud);letter-spacing:.06em;}
   .eenheid{color:var(--s-mat);margin-top:-.6rem;}
   .toetsen{display:grid;grid-template-columns:repeat(3,minmax(4.6rem,5.6rem));gap:.55rem;}
-  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:14px;border:0;
+  .toetsen button{font:inherit;font-size:1.5rem;font-weight:800;padding:.85rem 0;border-radius:0;border:0;
     background:var(--s-paneel);color:var(--s-creme);cursor:pointer;}
   .toetsen .ok{background:var(--s-goud);color:#241A06;}
   .toetsen .wis{color:var(--s-koper);font-size:1.1rem;}
   .stand{width:min(26rem,92vw);display:flex;flex-direction:column;gap:.3rem;font-size:.92rem;}
-  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:10px;padding:.4rem .8rem;}
+  .stand .rij{display:flex;gap:.6rem;align-items:center;background:rgba(255,255,255,.04);border-radius:0;padding:.4rem .8rem;}
   .stand .rij b{flex:1;font-weight:700;}
   .stand .rij.ik b{color:var(--s-goud);}
   .voortgang{color:var(--s-mat);}
@@ -611,5 +614,8 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<!-- Deze drie spelschermen dragen sessie.js niet (ze hebben geen
+     gezinsdeur nodig), maar wel dezelfde wereldbalk als de rest. -->
+<script src="sessie.js" defer></script>
 </body>
 </html>

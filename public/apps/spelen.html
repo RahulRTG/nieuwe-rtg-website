@@ -21,7 +21,7 @@
   .spelkaart:hover{transform:translateY(-2px);border-color:var(--goud);}
   .spelkaart .ic{font-size:2rem;}
   .spelkaart h2{font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-top:.3rem;}
-  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;margin-bottom:.5rem;}
+  .rij{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;margin-bottom:.5rem;}
   .rij .nm{flex:1;min-width:0;font-size:.9rem;font-weight:600;}
   .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
   .beurtstip{width:9px;height:9px;border-radius:50%;background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.8);}
@@ -39,10 +39,10 @@
   .zichtbaarknop[data-uit="1"]{color:var(--txt);}
   .blok{padding:1rem;margin-bottom:.8rem;}
   .keuzerij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0;}
-  .chip{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
+  .chip{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:0;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
   .chip.aan{border-color:var(--goud);color:var(--goud2);}
-  .terug{color:var(--goud);cursor:pointer;font-size:.85rem;text-decoration:none;}
-  canvas.bord{width:100%;border-radius:12px;display:block;background:var(--paneel2);touch-action:none;}
+  .terug{color:var(--rtg-leesgoud,var(--goud));cursor:pointer;font-size:.85rem;text-decoration:none;}
+  canvas.bord{width:100%;border-radius:0;display:block;background:var(--paneel2);touch-action:none;}
   /* Het schaakbord is de wereld van het SPEL en niet de chrome van RTG: hier
      mag noten en ivoor staan waar de app zelf zwart-wit blijft. Wat het niet
      overneemt zijn de ronde hoeken -- dat blijft een huisregel, ook hier. */
@@ -63,12 +63,12 @@
   /* Witte stukken zijn een outline-glyph: op ivoor vallen ze anders weg. */
   .schaak .wit{color:#FFFDF7;text-shadow:0 0 1px #2a221a,0 1px 1px rgba(0,0,0,.35);}
   .schaak .zwart{color:#17120C;text-shadow:0 1px 0 rgba(255,255,255,.14);}
-  .wgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:var(--lijn);border-radius:8px;overflow:hidden;}
+  .wgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:var(--lijn);border-radius:0;overflow:hidden;}
   .wgrid div{aspect-ratio:1;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;text-transform:uppercase;cursor:pointer;}
   .wgrid .p3W{background:#5a2323;} .wgrid .p2W{background:#4a3a20;} .wgrid .p3L{background:#1f3a4a;} .wgrid .p2L{background:#23404a;}
   .wgrid .vast{background:#C9A24B;color:#1a1710;} .wgrid .nieuw{background:#e0bd6b;color:#1a1710;}
   .rek{display:flex;gap:.4rem;justify-content:center;margin:.7rem 0;}
-  .rek button{width:2.4rem;height:2.6rem;border-radius:8px;background:#C9A24B;color:#1a1710;font-weight:800;font-size:1.1rem;text-transform:uppercase;border:2px solid transparent;}
+  .rek button{width:2.4rem;height:2.6rem;border-radius:0;background:#C9A24B;color:#1a1710;font-weight:800;font-size:1.1rem;text-transform:uppercase;border:2px solid transparent;}
   .rek button.aan{border-color:#fff;transform:translateY(-3px);}
   .rek button.op{opacity:.35;}
   .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
@@ -76,8 +76,8 @@
      partij van drie dagen hoort niet aan je te trekken. */
   .klokrij{margin-top:.6rem;text-align:center;color:var(--zacht);font-size:.85rem;letter-spacing:.02em;}
   .knoprij .knop{flex:1;min-width:6rem;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--paneel);border:1px solid var(--goud);color:var(--txt);border-radius:999px;padding:.5rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
-  .winbanner{padding:1rem;text-align:center;border:1px solid var(--goud);border-radius:14px;margin-bottom:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--paneel);border:1px solid var(--goud);color:var(--txt);border-radius:0;padding:.5rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
+  .winbanner{padding:1rem;text-align:center;border:1px solid var(--goud);border-radius:0;margin-bottom:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);}
   .winbanner b{color:var(--goud2);font-family:var(--serif);font-size:1.15rem;font-weight:500;}
   .leeg{color:var(--zacht);font-size:.85rem;padding:.6rem 0;}
   .kop2{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;}
@@ -87,18 +87,18 @@
   .dobbel{font-size:2.6rem;text-align:center;margin:.4rem 0;min-height:3rem;}
   /* pesten */
   .ptafel{display:flex;align-items:center;justify-content:center;gap:1rem;margin:.6rem 0;}
-  .pkaart{width:3.4rem;height:4.8rem;border-radius:9px;background:#F6F1E4;color:#1a1710;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem;border:2px solid rgba(0,0,0,.25);}
+  .pkaart{width:3.4rem;height:4.8rem;border-radius:0;background:#F6F1E4;color:#1a1710;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem;border:2px solid rgba(0,0,0,.25);}
   .pkaart.rood{color:#B4372E;}
   .pkaart.rug{background:repeating-linear-gradient(45deg,#7A5C24 0 6px,#5E461B 6px 12px);color:transparent;cursor:pointer;}
   .phand{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:center;margin:.6rem 0;}
-  .phand button{width:2.9rem;height:4.1rem;border-radius:8px;background:#F6F1E4;color:#1a1710;font-weight:800;font-size:.95rem;border:2px solid rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .phand button{width:2.9rem;height:4.1rem;border-radius:0;background:#F6F1E4;color:#1a1710;font-weight:800;font-size:.95rem;border:2px solid rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;}
   .phand button.rood{color:#B4372E;}
   .phand button:disabled{opacity:.45;}
   .pinfo{text-align:center;color:var(--zacht);font-size:.82rem;min-height:1.2rem;}
-  .badge18{font-size:.62rem;background:#B4372E;color:#fff;border-radius:6px;padding:.1rem .3rem;vertical-align:middle;}
+  .badge18{font-size:.62rem;background:#B4372E;color:#fff;border-radius:0;padding:.1rem .3rem;vertical-align:middle;}
   /* rummi */
-  .rset{display:flex;gap:.2rem;flex-wrap:wrap;padding:.35rem;border:1px dashed rgba(255,255,255,.18);border-radius:10px;margin:.3rem 0;cursor:pointer;}
-  .rtile{width:2.1rem;height:2.8rem;border-radius:6px;background:#F6F1E4;border:2px solid rgba(0,0,0,.25);font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;color:#1a1710;}
+  .rset{display:flex;gap:.2rem;flex-wrap:wrap;padding:.35rem;border:1px dashed rgba(255,255,255,.18);border-radius:0;margin:.3rem 0;cursor:pointer;}
+  .rtile{width:2.1rem;height:2.8rem;border-radius:0;background:#F6F1E4;border:2px solid rgba(0,0,0,.25);font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;color:#1a1710;}
   .rtile.r{color:#B4372E;} .rtile.b{color:#2B5FA8;} .rtile.g{color:#B07E1E;} .rtile.z{color:#1a1710;}
   .rtile.aan{outline:3px solid var(--goud);transform:translateY(-3px);}
   button.rtile{cursor:pointer;}
@@ -113,10 +113,10 @@
   .sudoku button.b3r{border-right-width:2px;border-right-color:var(--goud);}
   .sudoku button.b3b{border-bottom-width:2px;border-bottom-color:var(--goud);}
   /* vingerroulette */
-  .vlekzone{position:relative;height:26rem;border-radius:16px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.2);touch-action:none;overflow:hidden;}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  .vlekzone{position:relative;height:26rem;border-radius:0;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.2);touch-action:none;overflow:hidden;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
   /* Rahul als spelmaatje */
-  .rahulmaatje{margin:1rem 0 .4rem;padding:.7rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.03);}
+  .rahulmaatje{margin:1rem 0 .4rem;padding:.7rem .8rem;border:1px solid rgba(255,255,255,.12);border-radius:0;background:rgba(255,255,255,.03);}
   .rmkop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;font-size:.9rem;color:var(--zacht);}
   .rmantwoord{margin:.6rem 0 .2rem;font-size:.92rem;line-height:1.5;white-space:pre-wrap;}
   .rmvraag{display:flex;gap:.5rem;margin-top:.6rem;}

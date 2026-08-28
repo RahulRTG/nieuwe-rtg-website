@@ -118,8 +118,32 @@
   const pasAdres = (doelPas) => {
     const p = new URLSearchParams(location.search);
     p.set('pas', doelPas);
-    return location.pathname + '?' + p.toString();
+    return location.pathname + '?' + p.toString() + location.hash;
   };
+
+  /* Een aanvraag van de publieke website reist uitsluitend in het fragment
+     (#aanvraag=...), niet in queryparameters. Een fragment wordt niet naar de
+     webserver gestuurd en belandt daardoor niet in toegangslogs. De app leest
+     alleen de eigen, versie-1 envelop, begrenst elk veld en bewaart hem enkel
+     in dit browservenster totdat de ingelogde app-lijn hem heeft aangenomen. */
+  function websiteAanvraagUitAdres(){
+    const raw = new URLSearchParams(location.hash.replace(/^#/, '')).get('aanvraag');
+    if (!raw || raw.length > 6000) return null;
+    try {
+      const basis = raw.replace(/-/g, '+').replace(/_/g, '/');
+      const binair = atob(basis + '='.repeat((4 - basis.length % 4) % 4));
+      const bytes = Uint8Array.from(binair, teken => teken.charCodeAt(0));
+      const data = JSON.parse(new TextDecoder().decode(bytes));
+      if (!data || data.version !== 1 || data.source !== 'rtravelgroup.store') return null;
+      const veld = (waarde, grens) => String(waarde || '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, grens);
+      const aanvraag = {
+        name: veld(data.name, 80), email: veld(data.email, 180), phone: veld(data.phone, 30),
+        requirement: veld(data.requirement, 100), message: veld(data.message, 500)
+      };
+      return aanvraag.name && aanvraag.email && aanvraag.requirement && aanvraag.message ? aanvraag : null;
+    } catch(e){ return null; }
+  }
+  let websiteAanvraag = websiteAanvraagUitAdres();
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';

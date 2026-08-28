@@ -3,7 +3,7 @@
    karakter (RAHUL_LEAD), de leden-AI met het volledige verhaal, en de
    tool-lus van het AI-stuur. Valt de regel ergens weg, dan breekt deze
    test voordat het de assistenten bereikt. Draai los:
-   node --experimental-sqlite --test test/rahul-eerlijk.test.js */
+   node --test test/rahul-eerlijk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -163,16 +163,36 @@ test('geen enkel vast antwoord beweert dat iets al geregeld is', () => {
     'wat moet ik inpakken?', 'heb ik een visum nodig?', 'wat voor weer wordt het?',
     'maak een dagplan', 'welk restaurant?', 'iets heel anders'];
 
-  /* Woorden die een VOLTOOIDE handeling beweren. "in aanvraag", "voorstel" en
-     "zal ik" mogen juist wel: dat is precies de eerlijke vorm. */
-  const beweert = /(geregeld|geboekt|bevestigd|betaald|is ingepland|staat vast|afgerond)/i;
+  /* DEZE TOETS KON NIET ZAKKEN, EN DAT IS PRECIES DE FOUT DIE HIJ BEWAAKT.
+
+     Er stond `const beweert = /<BS>(geregeld|...)<BS>/i` -- met twee LITERALE
+     backspace-tekens (0x08) waar `\b` bedoeld was. Een backspace komt in geen
+     enkel antwoord voor, dus de regex matchte nooit en de lus keurde alles goed.
+     Het antwoord dat begon met "Geregeld." zou hier ook doorheen zijn gelopen.
+     In een editor en in `grep` zie je het verschil niet: het teken wordt
+     weggetekend. Gevonden doordat de antwoorden veranderden en deze toets
+     onbewogen groen bleef -- LAT.md regel 9, een toets die je niet hebt zien
+     zakken is geen toets.
+
+     En hij is meteen scherper gezet. Op de hele tekst toetsen kon niet, want de
+     EERLIJKE vorm gebruikt dezelfde woorden ("nog niets is bevestigd"). Daarom
+     per zin: een zin die een voltooide handeling noemt zonder ontkenning is een
+     bewering. "In aanvraag", "voorstel" en "zal ik" blijven gewoon goed. */
+  const AF = /\b(geregeld|geboekt|bevestigd|betaald|ingepland|afgerond)\b/i;
+  const ONTKEND = /\b(niets|niet|geen|nooit|zonder)\b/i;
+  const beweringenIn = (tekst) => String(tekst).split(/(?<=[.!?:])\s+|\n+/)
+    .filter(z => AF.test(z) && !ONTKEND.test(z));
+
+  // de tegenproef op de toets zelf: op deze zin MOET hij aanslaan
+  assert.deepEqual(beweringenIn('Geregeld. De tafel staat klaar.'), ['Geregeld.'],
+    'de meter meet: een zin die zegt dat het geregeld is, wordt gezien');
 
   const gezien = [];
   for (const v of vragen) {
     const a = cannedAnswer(v);
     assert.ok(a && a.length > 20, 'er komt een echt antwoord op "' + v + '"');
     gezien.push(v);
-    assert.doesNotMatch(a, beweert,
+    assert.deepEqual(beweringenIn(a), [],
       'het vaste antwoord op "' + v + '" beweert dat iets al gedaan is: ' + a.slice(0, 140));
   }
   assert.equal(gezien.length, vragen.length, 'alle vragen zijn echt langsgekomen');

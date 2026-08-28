@@ -22,7 +22,7 @@
    - res.status(204) vervangen door res.json(req.body)
      -> "de melder krijgt niets terug" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/fout-client-route.test.js
+   Draai los: node --test test/fout-client-route.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');

@@ -33,13 +33,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-deelwacht-'));
 
 /* De kale pagina. main > #laag, en #laag is bij het laden LEEG -- dan telt
@@ -61,13 +57,14 @@ const DRIE_KAARTEN =
   '<div class="kaart"><h2>Derde deel</h2><p>drie</p></div>';
 
 test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zijn kinderen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -85,7 +82,10 @@ test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zij
     /* En nu de mutatie waar het om gaat: de kaarten komen in #laag, dus NIET
        als direct kind van main. Op `subtree: false` ziet de observer dit niet. */
     await page.evaluate(html => { document.getElementById('laag').innerHTML = html; }, DRIE_KAARTEN);
-    await page.waitForTimeout(700);   // de wacht kijkt 120 ms na de laatste rust
+    /* Wachten op de UITKOMST: de wacht kijkt 120 ms na de laatste rust, dus
+       "het scherm is even stil" kan nog net te vroeg zijn -- de balk zelf niet. */
+    await wachtTot(page, () => document.querySelectorAll('.rtgdeel-balk').length === 1,
+      null, { wat: 'de balk die de wacht bouwt' });
 
     const balken = await page.evaluate(() => document.querySelectorAll('.rtgdeel-balk').length);
     assert.equal(balken, 1, 'de wacht is wakker geworden en heeft het menu gebouwd');
@@ -109,7 +109,7 @@ test('de wacht wordt wakker van een verandering DIEP in main, niet alleen op zij
 });
 
 test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De andere kant van dezelfde belofte. Zonder deze helft zou de toets
      hierboven ook slagen als de wacht bij ELKE verandering een balk plakt, en
      dan is "een menu bij drie delen" geen regel maar toeval. De kop van
@@ -118,9 +118,10 @@ test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -134,7 +135,11 @@ test('een pagina met minder dan drie delen krijgt bewust GEEN menu',
         '<div class="kaart"><h2>Enig deel</h2><p>een</p></div>' +
         '<div class="kaart"><h2>Tweede deel</h2><p>twee</p></div>';
     });
-    await page.waitForTimeout(700);
+    /* Hier wordt een AFWEZIGHEID beweerd, en die kun je niet afwachten met
+       "verschijnt het?". Drie stille rondes overleven de eigen wachttijd van de
+       wacht (120 ms na de laatste wijziging); blijft er dan nog niets, dan komt
+       er ook niets. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     const balken = await page.evaluate(() => document.querySelectorAll('.rtgdeel-balk').length);
     assert.equal(balken, 0, 'bij twee delen blijft de pagina een gewone rol');

@@ -36,8 +36,9 @@ const SOORTEN = ['eten', 'vervoer', 'uitgaan', 'verblijf', 'thuis'];
 const STATEN = ['voorstel', 'aangevraagd', 'bevestigd', 'mislukt'];
 
 module.exports = ({ db, save, crypto, schoon }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/avond/plan', bezit: { avonden: 'kaart' } });
   const nu = () => new Date().toISOString();
-  const lijst = () => { if (!db.data.avonden) db.data.avonden = {}; return db.data.avonden; };
+  const lijst = () => eigen.bak('avonden');
 
   /* De klok (de 04:00-knip en de tijdlijn) staat in ./klok.js: het enige stuk
      van deze laag dat met tijd rekent, en dit bestand ging over de 10 kB. */

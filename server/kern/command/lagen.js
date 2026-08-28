@@ -14,7 +14,7 @@
    gebruikt. */
 'use strict';
 
-function maakLagen({ db, save, crypto, journaal, register, kern }) {
+function maakLagen({ db, save, crypto, journaal, register, kern, opslag }) {
   /* Master data voor bedrijven en locaties. Welke collecties een partij dragen
      en welk veld de naam en de plaats is, staat HIER en niet in de module: dat
      is aangegeven en geen meting, en het hoort op één plek te staan. De
@@ -26,34 +26,58 @@ function maakLagen({ db, save, crypto, journaal, register, kern }) {
     partijen: [
       { type: 'zaak', collectie: 'suppliers', sleutel: 'code', naam: 'name', plaats: 'city', loc: 'loc' },
       { type: 'partner', collectie: 'partners', sleutel: 'code', naam: 'name', plaats: 'city' }
-    ] });
+    ], opslag });
   /* Landpakketten: een land aanzetten als configuratiebundel. LANDEN.json draagt
      ALLEEN wat nergens anders staat (munt, voertaal, schakelkaststand,
      mensenwerk); de fiscale kennis, de muntschaal en de talen komen uit wat het
      huis al heeft. Een tweede kopie zou binnen een jaar iets anders beweren. */
-  const landpakket = require('./landpakket').maakLandpakket({ db, save, journaal,
+  const landpakket = require('./landpakket').maakLandpakket({ opslag, save, journaal,
     fiscaal: require('../fiscaal/landen'), valuta: require('../payroll/valuta'),
-    talen: () => db.data.talen || { actief: [] }, functies: require('../../functies/register') });
+    talen: () => opslag.vreemd.talen(), functies: require('../../functies/register') });
   /* De API-poort: sleutels, scopes, quota en contractregels voor koppelingen.
      De toelating begint LEEG, dus er staat niets achter deze poort tot iemand
      er een pad in zet. Dat is een besluit; zie de kop van ./apipoort.js. */
-  const apipoort = require('./apipoort').maakApiPoort({ db, save, crypto, journaal });
+  const apipoort = require('./apipoort').maakApiPoort({ db, save, crypto, journaal, opslag });
   /* Overnamemodus: de administratie van een overgenomen bedrijf inlezen, in
      vier stappen waarvan de volgorde de veiligheid is. Uitvoeren kan alleen met
      het zegel van precies de droogloop die is bekeken. */
-  const overname = require('./overname').maakOvername({ db, save, crypto, journaal, register });
+  const overname = require('./overname').maakOvername({ db, save, crypto, journaal, register, opslag });
   /* De zandbak: dezelfde motoren op een DB-VENSTER met zaaigegevens. Er is geen
      aanroep waarlangs een handeling daarbinnen bij een productiecollectie komt,
      want het object dat die motoren zien heeft die collecties niet. */
   const zandbak = require('./zandbak').maakZandbak({ db, save, crypto, register,
-    zaai: require('../../seed') });
+    zaai: require('../../seed'), opslag });
   /* De canary: een functie uit de schakelkast stap voor stap openzetten, met
      een terugroldrempel die op DEZELFDE tellers rekent als de servicedoelen.
      De verdeling zelf woont niet hier maar in server/functies/toegang.js, bij
      de code die al beslist of een pad open is -- één beslisser, geen tweede. */
   const canary = require('./canary').maakCanary({ db, save, journaal,
-    meting: require('../../meting'), functies: require('../../functies/register') });
+    meting: require('../../meting'), functies: require('../../functies/register'), opslag });
   canary.tikker();
+
+  /* De uitrolregie: de trap uit functies/register/index.js vanzelf op, en bij
+     tegenwind vanzelf een tree terug. Zelfde tellers als de canary en de
+     servicedoelen, want twee metingen die elkaar kunnen tegenspreken maken
+     achteraf onbeslisbaar welke had moeten stoppen.
+
+     schakelFase komt LAAT binnen: hij hangt aan kern.afdelingen, en die wordt in
+     kernlaag1 gebouwd terwijl deze laag eerder aan de beurt kan zijn. Zelfde
+     patroon als weefsel hieronder.
+
+     Twee treden dragen een mensrem en gaan nooit vanzelf open -- geld en het
+     kanaal tussen twee leden. Waarom dat geen instelling is, staat in de kop
+     van ./uitrolregie.js. */
+  const uitrolregie = require('./uitrolregie').maakUitrolregie({
+    opslag, save, meting: require('../../meting'), functies: require('../../functies/register'),
+    schakelFase: (id, door) => {
+      const a = kern && kern.afdelingen;
+      if (!a || typeof a.schakelFase !== 'function') {
+        return { status: 503, error: 'De schakelkast is nog niet gebouwd.' };
+      }
+      return a.schakelFase(id, door);
+    }
+  });
+  uitrolregie.tikker();
 
   /* Stadsstart: een stad inrichten. Hij krijgt het landpakket mee omdat een
      stad zonder ingericht land een stad zonder munt en zonder tarieven is, en
@@ -66,9 +90,9 @@ function maakLagen({ db, save, crypto, journaal, register, kern }) {
        de boom meerdere steden, dus kan deze laag er een bouwen in plaats van
        hem als openstaande stap te melden. Late binding, want kern.weefsel hangt
        er pas na de aanbouw. */
-    weefsel: () => (kern && kern.weefsel) || null });
+    weefsel: () => (kern && kern.weefsel) || null, opslag });
 
-  return { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart };
+  return { mdm, landpakket, apipoort, overname, zandbak, canary, uitrolregie, stadstart };
 }
 
 module.exports = { maakLagen };

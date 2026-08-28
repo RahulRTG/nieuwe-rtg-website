@@ -31,11 +31,12 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 
 const { maakApiPoort } = require('../server/kern/command/apipoort');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 function maak() {
   const db = { data: {} };
   const regels = [];
-  const poort = maakApiPoort({ db, save: () => {}, crypto,
+  const poort = maakApiPoort({ db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto,
     journaal: { noteer: r => regels.push(r) } });
   return { db, poort, regels };
 }
@@ -126,7 +127,7 @@ test('het quotum overleeft een herstart', () => {
   assert.ok(op.herstartOver > 0, 'en er staat bij wanneer het weer mag');
 
   /* Herstart: een nieuwe motor op dezelfde opslag. De teller staat er nog. */
-  const opnieuw = maakApiPoort({ db, save: () => {}, crypto, journaal: null });
+  const opnieuw = maakApiPoort({ db, opslag: maakCmdOpslag({ db }), save: () => {}, crypto, journaal: null });
   assert.equal(opnieuw.apiSleutelOk(r.geheim, '/api/extern/aanbod', 'GET').status, 429);
 
   /* Een uur later mag het weer. */

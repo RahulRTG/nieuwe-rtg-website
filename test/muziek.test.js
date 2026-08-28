@@ -2,7 +2,7 @@
    alles wordt opgewekt en niets geleend (dus mag je eigen stuk onder je eigen
    clip), Rahul zet neer maar jij bent de maker, en het stuk is een handvol
    getallen die je kunt lezen en meenemen.
-   Draai: node --experimental-sqlite --test test/muziek.test.js */
+   Draai: node --test test/muziek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

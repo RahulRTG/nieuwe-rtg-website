@@ -35,10 +35,9 @@ const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 const UUR = 3600000;
 const MAX_SLEUTELS = 50;
 
-function maakApiPoort({ db, save, crypto, journaal }) {
+function maakApiPoort({ opslag, save, crypto, journaal }) {
   function vak() {
-    if (!db.data.apiPoort || typeof db.data.apiPoort !== 'object') db.data.apiPoort = {};
-    const v = db.data.apiPoort;
+    const v = opslag.bak('apiPoort');
     if (!v.sleutels || typeof v.sleutels !== 'object') v.sleutels = {};
     if (!Array.isArray(v.toelating)) v.toelating = [];
     return v;

@@ -1,12 +1,12 @@
 {
   "simulatiemodules": 66,
-  "kernmodules": 1426,
-  "kernDomeinen": 415,
+  "kernmodules": 1680,
+  "kernDomeinen": 505,
   "perWereld": {
     "magnaat": {
       "modules": 63,
       "regels": 0,
-      "raaktKern": 2
+      "raaktKern": 3
     },
     "hospitality": {
       "modules": 3,
@@ -14,10 +14,10 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 116,
-  "geraakteKernmodules": 2,
-  "geraakteKernDomeinen": 2,
-  "bereikPct": 0,
+  "requiresTotaal": 117,
+  "geraakteKernmodules": 3,
+  "geraakteKernDomeinen": 3,
+  "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
   "kruisWereld": [
@@ -46,6 +46,13 @@
       "aantal": 1
     },
     {
+      "doel": "server/kern/magnaat-kantoorregels/tabel",
+      "door": [
+        "server/kern/magnaat-kantoorregels.js"
+      ],
+      "aantal": 1
+    },
+    {
       "doel": "server/kern/pay",
       "door": [
         "server/kern/spellen/magnaat/rtg-keten.js"
@@ -53,8 +60,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 12,
-  "kandidaatparen": 34,
+  "gedeeldeOnderwerpen": 13,
+  "kandidaatparen": 35,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -191,9 +198,9 @@
       "meetbaar": false
     },
     {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
-      "rtg": "server/kern/markt/handel.js",
+      "onderwerp": "foundation",
+      "simulatie": "server/kern/spellen/magnaat/foundation.js",
+      "rtg": "server/kern/wereldroutes/foundation.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

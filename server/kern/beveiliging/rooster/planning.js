@@ -55,7 +55,11 @@ module.exports = (ctx) => {
       id: d.id, datum: d.datum, shiftId: d.shiftId, shift: sh ? sh.naam : d.shiftId, uren: sh ? sh.uren : 0,
       postId: d.postId, post: p ? p.naam : 'Post', klant: p ? p.klant : '',
       guardId: d.guardId, guardNaam: d.guardNaam || guardNaam(s, d.guardId), status: d.status,
-      inklokAt: d.inklokAt || null, uitklokAt: d.uitklokAt || null
+      inklokAt: d.inklokAt || null, uitklokAt: d.uitklokAt || null,
+      /* De aanwezigheid bij de post: binnen of buiten met een tijd, en nooit een
+         coordinaat (PLAATS.md grens 4). Hier stond niets, terwijl er wel een
+         rauwe positie werd bewaard die niemand las -- dat is nu omgedraaid. */
+      plekIn: d.plekIn || null
     };
   }
   function rooster(s, van, dagen) {

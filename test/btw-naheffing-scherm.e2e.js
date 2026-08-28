@@ -14,23 +14,15 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, stopNet } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 const api = (base, pad, body, token) => fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
   body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
-const wacht = (ms) => new Promise(r => setTimeout(r, ms));
 
 function vorigKwartaal() {
   const d = new Date();
@@ -40,7 +32,7 @@ function vorigKwartaal() {
 }
 
 test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat eraf',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nhscherm-'));
   const env = { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_STORE: 'json' };
   const K = vorigKwartaal();
@@ -67,9 +59,17 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     assert.equal(rek.status, 200, 'de zakelijke rekening is open');
     const iban = rek.body.rekening.iban;
 
-    await wacht(1500);
-    stop(srv.child);
-    await wacht(2500);
+    /* NETJES stoppen en WACHTEN TOT HIJ WEG IS, in plaats van twee klokwachten.
+
+       Hier stond `wacht(1500); stop(); wacht(2500)`. Die 1500 gokte dat de
+       write-behind van de JSON-opslag klaar was, en die 2500 gokte dat het
+       kindproces intussen wel weg zou zijn -- op een trage machine allebei mis,
+       en dan leest de regel hieronder een db.json zonder de factuur erin.
+
+       stopNet() is SIGTERM en wacht op `exit`. Dat is precies het teken waar de
+       bewering op rust: de server FLUSHT zijn snapshot op SIGTERM (zie
+       server/db/snapshot.js) en is bij `exit` aantoonbaar van het bestand af. */
+    await stopNet(srv.child);
     const pad = path.join(TMP, 'db.json');
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
     db.facturen[0].datum = K.datum;
@@ -92,7 +92,7 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
 
     // ---- het scherm van de zaak ----
     const zaakTok = (await api(srv.base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -102,7 +102,7 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
       localStorage.setItem('rtg_lang', 'nl');
       localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, zaakTok);
-    await page.goto(srv.base + '/apps/leverancier.html', { waitUntil: 'load' });
+    await page.goto(srv.base + '/apps/leverancier.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#app.active', { timeout: 20000 });
     await page.waitForSelector('[data-ksec="fin"]', { state: 'visible', timeout: 15000 });
     await page.click('[data-ksec="fin"]');

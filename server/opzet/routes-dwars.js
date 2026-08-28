@@ -84,6 +84,9 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/payroll-os')(grens('payroll-os'));
   /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
   require('../routes/rtfbieb')(grens('rtfbieb'));
+  /* Publieke FOUNDATION-aanmelding en het menselijke controlebesluit delen de
+     Foundation-, mail- en Boardroomlaag en horen daarom bij de dwarse routes. */
+  require('../routes/foundationregistratie')(grens('foundationregistratie'));
   /* Dezelfde leermotor als RTG School, achter de drie leerlingpassen. */
   require('../routes/rtfleerling')(grens('rtfleerling'));
   /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */

@@ -2,7 +2,7 @@
    - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts
    - de demo-inlog is dicht (leden en zaken)
    - de rate-limiter staat aan
-   Draai: node --experimental-sqlite --test test/livegang.test.js */
+   Draai: node --test test/livegang.test.js */
 const test = require('node:test');
 /* Deze productie-opstelling zet OFFICE_TOTP_SECRET, dus de kantoordeur vraagt
    ook de tweede factor. Idioom uit test/bankbeveiliging.test.js. */

@@ -22,7 +22,7 @@
    deel heeft één ingang die NIET achter officeAuth zit (/api/sonde/melding),
    met de reden erbij in de kop daar. */
 module.exports = (kern) => {
-  const { app, officeAuth, boardroomWie, command } = kern;
+  const { app, officeAuth, boardroomWie, command, apiSpoor } = kern;
 
   const stuur = (res, r) => (r && r.error) ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const veilig = (res, werk) => {
@@ -30,7 +30,7 @@ module.exports = (kern) => {
     catch (e) { console.error('[command]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   };
   const wie = (req) => boardroomWie(req) || 'kantoor (gedeelde code)';
-  const ctx = { stuur, veilig, wie, officeAuth, app, command };
+  const ctx = { stuur, veilig, wie, officeAuth, app, command, apiSpoor };
 
   /* HET BEGINSCHERM IN ÉÉN VERZOEK. Vier losse verzoeken op een beginscherm
      zijn vier momenten waarop het scherm half gevuld kan blijven staan; dit is

@@ -13,6 +13,7 @@
                   cockpit, de AI-clubmanager en het publieke sportbord
    De AI-clubmanager adviseert; beslissen doet de club.
    Vast patroon: maakSportclub(state) -> { sport: api }. */
+const { demoAan } = require('../demostand');
 
 const TEAM_CATEGORIEEN = ['jeugd', 'senioren', 'vrouwen'];
 const VELD_STATUS = ['goed', 'onderhoud', 'afgekeurd'];
@@ -42,9 +43,13 @@ function maakSportclub({ db, save, crypto, anthropic }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     require('../../seed/genres').zetGenre(db, 'sportclub');
+    // verzonnen instelling: alleen in demostand aanmaken (kern/demostand.js)
+    if (!demoAan()) return;
     if (!db.data.suppliers.find(s => s.code === 'FCRTG')) {
       db.data.suppliers.push({
         code: 'FCRTG', name: 'FC RTG', type: 'sportclub', city: 'Ibiza',
+        // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
+        geseed: true,
         loc: { lat: 38.906, lng: 1.420, label: 'Estadio RTG' }, rate: 0,
         menu: [{ id: 'k1', name: 'Stadionbroodje', price: 4.5 }, { id: 'k2', name: 'Koffie', price: 2.5 }, { id: 'k3', name: 'Ranja jeugd', price: 1 }],
         photos: [], sportclub: {}

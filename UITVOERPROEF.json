@@ -1,13 +1,13 @@
 {
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "161786",
+ "kanariekenmerk": "371383",
  "gemeten": {
-  "routesMetRol": 3074,
-  "gemeten": 759,
-  "pogingen": 3081,
-  "schoon": 759,
+  "routesMetRol": 3092,
+  "gemeten": 766,
+  "pogingen": 3099,
+  "schoon": 766,
   "gezakt": 0,
-  "achterEenPoort": 2315,
+  "achterEenPoort": 2326,
   "tokensHernieuwd": 7,
   "begrenzing": 0
  },
@@ -27,6 +27,12 @@
   {
    "methode": "POST",
    "pad": "/api/aanmelding/betalingen",
+   "rol": "office",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/herkeuring",
    "rol": "office",
    "uitvoer": "schoon"
   },
@@ -1151,6 +1157,12 @@
    "pad": "/api/command/apipoort/toelating-weg",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apispoor",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -5222,6 +5234,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/pin",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/connect",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/kijk",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/live/verbind",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/nieuw",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/uit",
+   "rol": "member",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pin/zoek",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/pulse/bewaar",
    "rol": "member",
    "uitvoer": "poort"
@@ -8255,6 +8315,30 @@
    "pad": "/api/office/uitgifte/teken",
    "rol": "office",
    "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/intrek",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/nummer",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijs/teken",
+   "rol": "office",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/vakbewijzen",
+   "rol": "office",
+   "uitvoer": "schoon"
   },
   {
    "methode": "POST",
@@ -12592,7 +12676,7 @@
    "methode": "POST",
    "pad": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
-   "uitvoer": "schoon"
+   "uitvoer": "poort"
   },
   {
    "methode": "POST",
@@ -15872,6 +15956,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/persoonseis",
+   "rol": "supplier",
+   "uitvoer": "schoon"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/photo/add",
    "rol": "supplier",
    "uitvoer": "poort"
@@ -17336,6 +17426,12 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/theater/ondertitels",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/theater/reactie",
    "rol": "member",
    "uitvoer": "poort"
@@ -17679,6 +17775,18 @@
   {
    "methode": "POST",
    "pad": "/api/vak/wachtlijst/zet",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vakbewijs",
+   "rol": "member",
+   "uitvoer": "poort"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vakbewijs/zet",
    "rol": "member",
    "uitvoer": "poort"
   },

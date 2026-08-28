@@ -3,7 +3,7 @@
    het concept uit (silhouet, aandrijving, materialen, gedempt palet,
    uitrusting, verhaal), levert een specsheet en de blik van de
    chef-ontwerper.
-   Draai los: node --experimental-sqlite --test test/studio.test.js */
+   Draai los: node --test test/studio.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

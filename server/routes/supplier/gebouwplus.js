@@ -12,9 +12,22 @@ module.exports = (kern) => {
   const LEADFASEN = ['nieuw', 'rondleiding', 'voorstel', 'getekend', 'afgewezen'];
   const MAX = 200;
 
+  /* LEZEN MAAKT NIETS AAN, en dat is geen netheid maar een meting. De staatproef
+     betrapte `/api/supplier/gebouwplus/contract` op "geweigerd (400) en de
+     toestand veranderde toch". Er was niets mis met het contract: deze functie
+     stond bovenaan de route en zette een leeg vakje in `db.data.gebouwPlus`
+     voordat de controles ook maar begonnen. Een afgekeurd verzoek hoort NIETS
+     achter te laten, ook geen leeg vakje -- anders kan niemand meer aan de
+     opslag zien of er werk is gedaan (TAKEN.md 4.35). Vandaar twee functies:
+     `bak` leest en laat met rust, `bakSchrijf` maakt aan, en die tweede staat
+     in elke route ONDER de controles. */
+  const LEEG = () => ({ contracten: [], leads: [], energie: [] });
   function bak(code) {
+    return (db.data.gebouwPlus && db.data.gebouwPlus[code]) || LEEG();
+  }
+  function bakSchrijf(code) {
     if (!db.data.gebouwPlus) db.data.gebouwPlus = {};
-    if (!db.data.gebouwPlus[code]) db.data.gebouwPlus[code] = { contracten: [], leads: [], energie: [] };
+    if (!db.data.gebouwPlus[code]) db.data.gebouwPlus[code] = LEEG();
     return db.data.gebouwPlus[code];
   }
   const cap = l => { if (l.length > MAX) l.length = MAX; };
@@ -54,7 +67,6 @@ module.exports = (kern) => {
   /* ---- huurcontracten: vastleggen, verlengen, beeindigen ---- */
   app.post('/api/supplier/gebouwplus/contract', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
     const huurder = txt(req.body.huurder, 60);
     const verdiepingen = txt(req.body.verdiepingen, 30);
     const maandhuur = Math.round(Number(req.body.maandhuur));
@@ -63,6 +75,7 @@ module.exports = (kern) => {
     if (!huurder) return res.status(400).json({ error: 'Welke huurder tekent dit contract?' });
     if (!(maandhuur > 0)) return res.status(400).json({ error: 'Vul een maandhuur in euro\'s in.' });
     if (!eind || eind <= start) return res.status(400).json({ error: 'Kies een einddatum na de startdatum.' });
+    const b = bakSchrijf(req.supplier.code);
     const c = { id: rid(), huurder, verdiepingen, maandhuur, start, eind, status: 'actief' };
     b.contracten.unshift(c); cap(b.contracten); save();
     logActivity(req.supplier.code, req.actor, 'legde het huurcontract van ' + huurder + ' vast');
@@ -91,9 +104,9 @@ module.exports = (kern) => {
   /* ---- leads voor lege verdiepingen: van kennismaking tot handtekening ---- */
   app.post('/api/supplier/gebouwplus/lead', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
     const naam = txt(req.body.naam, 60), wens = txt(req.body.wens, 160);
     if (!naam) return res.status(400).json({ error: 'Wie is de kandidaat-huurder?' });
+    const b = bakSchrijf(req.supplier.code);
     const l = { id: rid(), naam, wens, fase: 'nieuw', sinds: vandaag() };
     b.leads.unshift(l); cap(b.leads); save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'gebouw' });
@@ -115,12 +128,12 @@ module.exports = (kern) => {
   /* ---- energie: een weekstand per week, de trend leest zichzelf ---- */
   app.post('/api/supplier/gebouwplus/energie', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = bak(req.supplier.code);
     const week = txt(req.body.week, 8);
     if (!/^\d{4}-W\d{2}$/.test(week)) return res.status(400).json({ error: 'Geef de week als 2026-W31.' });
     const stroomKwh = Math.round(Number(req.body.stroomKwh));
     const waterM3 = Math.round(Number(req.body.waterM3));
     if (!(stroomKwh >= 0) || !(waterM3 >= 0)) return res.status(400).json({ error: 'Stroom (kWh) en water (m3) horen nul of hoger te zijn.' });
+    const b = bakSchrijf(req.supplier.code);
     const bestaand = b.energie.find(x => x.week === week);
     if (bestaand) { bestaand.stroomKwh = stroomKwh; bestaand.waterM3 = waterM3; }
     else { b.energie.unshift({ week, stroomKwh, waterM3 }); b.energie.sort((a, x) => x.week.localeCompare(a.week)); cap(b.energie); }

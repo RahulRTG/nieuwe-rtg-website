@@ -2,7 +2,7 @@
    voorraad-afboeking bij de kassabon EN de betaalde gastbestelling, telling,
    verspilling, levering (met nieuwe kostprijs), het inkoopadvies en de marge
    per gerecht. Draai los:
-   node --experimental-sqlite --test test/keuken.test.js */
+   node --test test/keuken.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

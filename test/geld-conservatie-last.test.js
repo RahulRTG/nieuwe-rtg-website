@@ -5,7 +5,7 @@
    allemaal tegelijk, en de invariant is hard -- de som van alle wallets blijft op
    de cent gelijk aan wat er is opgeladen, en geen wallet zakt ooit onder nul (een
    dubbeltelling of een race zou juist daar zichtbaar worden). Draai los:
-   node --experimental-sqlite --test test/geld-conservatie-last.test.js */
+   node --test test/geld-conservatie-last.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -46,7 +46,7 @@ const hoger = (a, b) => (GRAAD.indexOf(a) > GRAAD.indexOf(b) ? a : b);
    Ze blijven WEL injecteerbaar: zonder die haak is deze module alleen met een
    draaiende server te toetsen, en dan wordt hij niet getoetst. */
 function maakGezondheid(o) {
-  const { db, save, slo, sonde, alarm, kwaliteit, journaal } = o;
+  const { opslag, save, slo, sonde, alarm, kwaliteit, journaal } = o;
   const meting = o.meting || require('../../meting');
   const functies = o.functies || require('../../functies');
   const backup = o.backup || require('../../backupstand');
@@ -54,11 +54,8 @@ function maakGezondheid(o) {
     require('path').join(__dirname, '..', '..', 'data');
   const bronnen = maakBronnen({ meting, functies, slo, sonde, alarm, kwaliteit, journaal, backup, dataDir });
 
-  const vak = () => {
-    if (!db.data.commandProeven || typeof db.data.commandProeven !== 'object') db.data.commandProeven = {};
-    return db.data.commandProeven;
-  };
-  const schakelkast = () => ((db.data.techniek || {}).functies) || {};
+  const vak = () => opslag.bak('commandProeven');
+  const schakelkast = () => (opslag.gedeeld.techniek().functies) || {};
 
   /* ---------- het oordeel over een vermogen ---------- */
   function beoordeel(v, snap, staat) {

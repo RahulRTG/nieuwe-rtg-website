@@ -14,6 +14,12 @@
     if (T) document.querySelectorAll('#osCcThema button').forEach(b => b.classList.toggle('actief', b.dataset.thema === T.huidig()));
     const push = $('#osCcPush');
     if (push && window.RTGRealtime) push.classList.toggle('aan', RTGRealtime.pushOn && RTGRealtime.pushOn());
+    const gps = $('#osCcGps');
+    if (gps) {
+      const g = window.RTGPlek ? RTGPlek.aan() : false;
+      gps.classList.toggle('aan', g);
+      gps.setAttribute('aria-pressed', String(g));
+    }
   }
   document.querySelectorAll('#osCcThema button').forEach(b => b.addEventListener('click', () => {
     if (window.RTGOSThema) { RTGOSThema.zet(b.dataset.thema); ccSync(); }
@@ -22,6 +28,26 @@
   if (ccTaal) ccTaal.addEventListener('click', () => { sluitScrims(); if (window.RTGi18n) RTGi18n.openModal(); });
   const ccPush = $('#osCcPush');
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
+  /* DE LOCATIESCHAKELAAR, DIE ER NIET WAS.
+
+     Zeven plekken (navigatie, flits, ov, ovdienst, de sterrenhemel, het
+     levensteken van RTG Veilig en de ontmoet-lus) lezen `rtg_os_gps` en
+     behandelen hem als de waarheid: alleen een uitdrukkelijke '1' geeft je
+     positie vrij. Terecht -- maar niemand zette hem ooit op '1', want deze
+     tegel bestond niet en shared/osmenu.js, waar de commentaren naar
+     verwijzen, bestaat evenmin. De schakelaar stond dus voor iedereen, voor
+     altijd, op uit. Dat is geen instelling maar een dode functie: "de gps doet
+     het niet", en gelijk heeft wie dat zegt.
+
+     shared/plek.js houdt de sleutel; hier staat alleen de knop. Aanzetten
+     vraagt meteen een positie op, zodat de tegel niet "aan" zegt terwijl het
+     toestel weigert -- dan springt hij zichtbaar terug op uit. */
+  const ccGps = $('#osCcGps');
+  if (ccGps) ccGps.addEventListener('click', async () => {
+    if (!window.RTGPlek) return;
+    await RTGPlek.zetAan(!RTGPlek.aan());
+    ccSync();
+  });
   const ccPin = $('#osCcPin');
   if (ccPin) ccPin.addEventListener('click', () => { sluitScrims(); metAlgPin(() => {}); });
   const ccZoek = $('#osCcZoek');
@@ -40,6 +66,16 @@
     const t = $(tegel), k = $(knop);
     if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
     else if (t) t.hidden = true;
+  });
+  /* De vier van Instellingen: identiteit, bescherming, sleutels en akkoorden.
+     Ze staan hier als tegel en in MAPPEN als map zonder `wereld` -- twee
+     weergaven van EEN lijst, want de tegel leest zijn item uit het attribuut en
+     opent hem met dezelfde openItem als overal. Wie er een vijfde bij zet, zet
+     hem op beide plekken of nergens; dat is de prijs van een paneel dat in HTML
+     staat en een register dat in JS staat, en hij hoort hier genoemd te worden
+     in plaats van pas op te vallen als er een mist. */
+  document.querySelectorAll('[data-cc-open]').forEach((t) => {
+    t.addEventListener('click', () => { sluitScrims(); openItem(t.dataset.ccOpen); });
   });
   // twee apps naast elkaar (split screen)
   const ccSplit = $('#osCcSplit');

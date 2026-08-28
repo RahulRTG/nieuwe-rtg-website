@@ -32,6 +32,7 @@ const assert = require('node:assert/strict');
 
 const { maakSlo } = require('../server/kern/command/slo');
 const { maakSonde } = require('../server/kern/command/sonde');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 /* Een nagemaakte meting. Dezelfde vorm als server/meting.js reeksen() geeft,
    want dat is het contract tussen die twee. */
@@ -137,7 +138,7 @@ test('een doel kiest zijn eigen routes', () => {
 
 function sonde(monsters) {
   const db = { data: { sondeMonsters: (monsters || []).slice() } };
-  return { db, s: maakSonde({ db, save: () => {},
+  return { db, s: maakSonde({ db, opslag: maakCmdOpslag({ db }), save: () => {},
     reizen: () => [{ id: 'gezond', naam: 'De server antwoordt', pad: '/api/health', verwacht: [200], maxMs: 500 }] }) };
 }
 
@@ -209,7 +210,7 @@ test('een onverwachte status is een storing, ook als de server antwoordt', async
   await new Promise(k => srv.listen(0, '127.0.0.1', k));
   const basis = 'http://127.0.0.1:' + srv.address().port;
   const db = { data: {} };
-  const s = maakSonde({ db, save: () => {}, reizen: () => [
+  const s = maakSonde({ db, opslag: maakCmdOpslag({ db }), save: () => {}, reizen: () => [
     { id: 'goed', naam: 'Werkt', pad: '/goed', verwacht: [200], maxMs: 2000 },
     { id: 'stuk', naam: 'Stuk', pad: '/stuk', verwacht: [200], maxMs: 2000 }
   ] });

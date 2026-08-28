@@ -3,7 +3,7 @@
    fout erbij die ze tegenhouden. De laag bewaart niets: hij leest de levende
    lijst van open live-verbindingen, dus is hij met stubs precies na te spelen.
 
-   Draai los: node --experimental-sqlite --test test/spelpresence.test.js */
+   Draai los: node --test test/spelpresence.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

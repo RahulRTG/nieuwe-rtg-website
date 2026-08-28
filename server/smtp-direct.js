@@ -30,6 +30,7 @@
 'use strict';
 const net = require('net');
 const tls = require('tls');
+const { sniVan } = require('./lib/sni');
 const dns = require('dns').promises;
 const os = require('os');
 
@@ -105,12 +106,9 @@ async function bijServer(host, poort, { van, naar, bericht, naam }) {
         /* STARTTLS is alleen bescherming als het certificaat ook bij de MX-host
            hoort. Een onbekend certificaat wordt daarom een tijdelijke fout:
            opnieuw proberen is veilig, doorsturen via een mogelijke MITM niet. */
-        /* SNI alleen bij een NAAM: een IP-adres als servername is volgens
-           RFC 6066 niet toegestaan, wordt door de ontvanger genegeerd en levert
-           in Node alleen een waarschuwing op in het logboek. */
-        const ipAdres = /^[\d.]+$/.test(host) || host.includes(':');
-        sok = tls.connect(Object.assign({ socket: sok, rejectUnauthorized: true },
-          ipAdres ? {} : { servername: host }));
+        /* SNI alleen bij een NAAM -- de regel woont sinds 26 augustus 2026 in
+           ./lib/sni.js, omdat hij hier wel stond en in smtp.js en redis.js niet. */
+        sok = tls.connect(Object.assign({ socket: sok, rejectUnauthorized: true }, sniVan(host)));
         await new Promise((res, rej) => { sok.once('secure', res); sok.once('error', rej); });
         g = praat(sok);
         a = await g.zeg('EHLO ' + ik);

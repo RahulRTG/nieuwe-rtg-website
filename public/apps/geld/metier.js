@@ -36,7 +36,7 @@
       '#mtVak .chips button[aria-pressed="true"]{border-color:var(--gold-rand);color:var(--gold-tekst);}' +
       '#paneel .mt-mini{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;cursor:pointer;' +
         'padding:0;text-decoration:underline;}' +
-      '#paneel .mt-uit{border:1px solid var(--rtg-line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;' +
+      '#paneel .mt-uit{border:1px solid var(--rtg-line);border-radius:0;padding:.6rem .8rem;margin-top:.6rem;' +
         'font-size:.85rem;line-height:1.5;white-space:pre-wrap;}' +
       '#paneel .mt-knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}' +
       '#paneel .mt-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +

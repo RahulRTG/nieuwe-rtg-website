@@ -2,7 +2,7 @@
    school alleen mee (open huiswerk en toetsen als bron 'school', net als de
    RTG-ecosysteemlaag), de leerplanner zet huiswerk, leerstappen en toetsen
    per dag op een rij, en afvinken loopt via de bestaande wegen.
-   Draai los: node --experimental-sqlite --test test/rtfschool2.test.js */
+   Draai los: node --test test/rtfschool2.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

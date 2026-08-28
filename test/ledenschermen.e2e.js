@@ -28,13 +28,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ledenscherm-'));
 
 /* De schermen die met een ledenpas gewoon opengaan, elk met wat het scherm over
@@ -47,8 +43,13 @@ const OPEN = [
   { app: 'pulse', eist: /volgend|ontdek|mijn plank/i },
   { app: 'thuis', eist: /van lid aan lid|logeren bij leden/i },
   { app: 'stad', eist: /voor bewoners|hoe de stad/i },
-  { app: 'horloge', eist: /signatuur|skelet|horloge/i },
-  { app: 'uitzicht', eist: /skyline|het huis in de nacht/i },
+  /* horloge en uitzicht stonden hier tot 19 augustus 2026. Commit 261f1f83
+     ("Elf schermen waren nergens vandaan te bereiken; twee zijn weg") haalde die
+     twee pagina's weg maar liet deze lijst staan, en dan eist een toets een
+     scherm dat met opzet niet meer bestaat: 404, en de melding luidt "zegt niet
+     waar het voor is" terwijl er helemaal niets meer is. Het horloge leeft nog
+     wel, maar alleen op het inlogscherm (WERELD.md), en dat is geen ledenscherm
+     met een eigen pagina. */
   { app: 'browser', eist: /browser|rtg:\/\//i },
   { app: 'lesmaker', eist: /les|maker|opdracht/i },
   { app: 'pakketten', eist: /pakket|zending|bezorg/i }
@@ -94,7 +95,7 @@ async function toon(page, base, app, token, wachtOp) {
       wachtOp, { timeout: 15000 }
     ).catch(() => { throw new Error('gewacht op "' + wachtOp + '" op ' + pad + ', maar dat verscheen niet'); });
   } else {
-    await page.waitForTimeout(1000);
+    await wachtOpRust(page);
   }
   return page.evaluate(() => ({
     pad: location.pathname,
@@ -104,16 +105,17 @@ async function toon(page, base, app, token, wachtOp) {
 }
 
 async function opstelling() {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   return { browser, page, fouten };
 }
 
 test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit staat',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -140,7 +142,7 @@ test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit sta
 });
 
 test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -164,7 +166,7 @@ test(OPEN.length + ' ledenschermen tonen waar ze voor zijn',
 });
 
 test('daten gaat op codenaam, en "wie ben ik" vraagt niets verplicht',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {

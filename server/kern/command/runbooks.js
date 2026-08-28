@@ -25,7 +25,7 @@ const { s } = require('./register');
 /* De recepten zelf staan in ./runbookcatalogus.js: gegevens, geen werking. */
 const { RUNBOOKS, OP_ID, BEVROREN } = require('./runbookcatalogus');
 
-function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, catalogus, vak }) {
+function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, catalogus, vak, opslag }) {
   const reg = register;
   const BOEKEN = (catalogus && catalogus.RUNBOOKS) || RUNBOOKS;
   /* De id-kaart hoort bij de BOEKEN die we net gekozen hebben. Hier stond
@@ -35,7 +35,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, ca
      404 op precies de knop die er stond. Afgeleid uit BOEKEN kan dat niet. */
   const OPID = (catalogus && catalogus.OP_ID) ||
     (catalogus ? new Map(BOEKEN.map(b => [b.id, b])) : OP_ID);
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   function draaien() {
     const v = V();
     if (!Array.isArray(v.commandRuns)) v.commandRuns = [];

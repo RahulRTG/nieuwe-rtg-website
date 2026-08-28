@@ -66,10 +66,7 @@ module.exports = (ctx) => {
     ondernemingVind, vestigingAlleVanEntiteit, findSupplier } = ctx;
 
   function bak() {
-    if (!ctx.db.data.concern || typeof ctx.db.data.concern !== 'object') ctx.db.data.concern = {};
-    if (!ctx.db.data.concern.voorstellen || typeof ctx.db.data.concern.voorstellen !== 'object')
-      ctx.db.data.concern.voorstellen = {};
-    return ctx.db.data.concern.voorstellen;
+    return ctx.opslag.tak('voorstellen');
   }
 
   /* Het zinsdeel rond een treffer, zodat een mens kan nakijken waar het vandaan

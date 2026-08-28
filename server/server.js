@@ -3,17 +3,35 @@
    De kern werkt zonder model. Vrije taal kan lokaal via LOCAL_AI_URL; externe
    aanbieders zijn optionele, expliciete uitwijk. */
 
-/* De accountsdatabase gebruikt de ingebouwde SQLite van Node, die nog achter
-   een vlag zit. Wordt de server zonder die vlag gestart, dan herstarten we
-   onszelf ermee, zodat zowel `npm start` als `node server/server.js` werkt. */
-if (!process.execArgv.some(a => a.includes('experimental-sqlite'))) {
-  const r = require('child_process').spawnSync(
-    process.execPath,
-    ['--experimental-sqlite', __filename, ...process.argv.slice(2)],
-    { stdio: 'inherit' }
+/* DE ONDERGRENS VAN DE RUNTIME, en waarom hij hier hard staat.
+
+   De accountsdatabase draait op `node:sqlite`. Die bestaat vanaf Node 22 en
+   laadt sinds 22.13 ZONDER `--experimental-sqlite`; de zelf-herstart met die
+   vlag die hier stond is daarmee vervallen. Op een oudere Node klapt het pas
+   veel later stuk op een `require('node:sqlite')` diep in de opslaglaag -- een
+   foutmelding die niets zegt over de echte oorzaak. `LAUNCH.md` beloofde
+   bovendien jarenlang "Node 18+", dus dit was geen theoretisch scenario maar een
+   gedocumenteerde valkuil.
+
+   Een `engines`-veld in package.json waarschuwt alleen bij `npm install` en doet
+   niets bij `node server/server.js`. Daarom staat de grens hier, vóór het eerste
+   require: falen op de eerste regel met de reden erbij. De grens staat op 22.13
+   en niet op 22.0, want dat is de versie waarop node:sqlite zonder vlag laadt --
+   precies wat deze server doet. Zelfde getal als in package.json en .nvmrc. */
+const NODE_MINIMAAL = [22, 13];
+const nodeDelen = process.versions.node.split('.').map(Number);
+if (!Number.isFinite(nodeDelen[0]) ||
+    nodeDelen[0] < NODE_MINIMAAL[0] ||
+    (nodeDelen[0] === NODE_MINIMAAL[0] && nodeDelen[1] < NODE_MINIMAAL[1])) {
+  console.error(
+    '[start] Node ' + process.versions.node + ' is te oud. RTG vereist Node ' +
+    NODE_MINIMAAL.join('.') + ' of nieuwer, omdat de accountsdatabase op de ' +
+    'ingebouwde node:sqlite draait. Zie LIVEGANG.md.'
   );
-  process.exit(r.status == null ? 1 : r.status);
+  process.exit(78);
 }
+
+const { idVanKey } = require('./lib/lidsleutel');
 
 /* Wachtwoord-hashing (scrypt) rekent in de libuv-threadpool, die standaard
    maar 4 draden heeft, ongeacht de machine. scrypt is puur rekenwerk, dus de
@@ -33,6 +51,9 @@ const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const rtgKlok = require('./lib/klok');
+/* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
+   dat log eraan hangt. */
+const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
 const { db, load, save, bijeen, inBundel, bewerkCollectie, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
@@ -279,7 +300,7 @@ function zetEigenaarsAccount() {
         accounts.setVerification(u.id, 'verified');
       } else {
         u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
-        accounts.saveMemberState(u.id, memberTemplate());
+        accounts.saveMemberState(u.id, demoLidInhoud());
         accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
       }
     } catch (e) {
@@ -352,7 +373,12 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      people.forEach(([name, role, func], i) => accounts.createStaffSync({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      /* createStaffDemo en niet createStaffSync: dit zijn 183 rijen met een
+         pincode die twee regels hierboven te lezen is. Op volle scrypt-kosten
+         duurde deze lus alleen al twintig seconden voor 'listen' -- zie
+         server/accounts/wachtwoord.js bij hashDemoSync voor het waarom en de
+         drie grendels eromheen. */
+      people.forEach(([name, role, func], i) => accounts.createStaffDemo({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
@@ -436,7 +462,7 @@ const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 /* De haak voor eigen domeinen: hij wordt hier leeg meegegeven en pas gevuld
    zodra de webmaker bestaat. Zolang hij leeg is, verandert er niets. */
 const eigenWeb = {};
-const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters')({
+const { rtf, CSP_NONCE, zetScanNet, functies, auditspoor } = require('./opzet/poortwachters')({
   app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar, eigenWeb,
   // hoisted of verderop in dit bestand; lui doorgegeven
   sseToOffice: (ev, data) => sseToOffice(ev, data),
@@ -456,7 +482,7 @@ try {
   anthropic = require('./ai').maakAI({ log });
   if (anthropic) {
     i18n.setAnthropic(anthropic);
-    const aiStand = require('./ai').beschikbaarheid(anthropic);
+    const aiStand = require('./ai-stand').beschikbaarheid(anthropic);
     console.log('Modelverrijking actief (' + aiStand.modus + '); aanbieders: ' + anthropic.aanbieders.join(', ') + '.');
   } else {
     console.log('Regelgestuurde werkmodus actief; vrije modelverrijking staat uit.');
@@ -540,7 +566,30 @@ function tooManyTries(res, bucket) {
   }
   return false;
 }
-function noteFailedTry(bucket, limiet) {
+/* DE BUCKET IS DE DEUR, DE BRON IS DE AANVALLER -- EN DAT ZIJN TWEE DINGEN.
+
+   `bucket` is waar geteld wordt voor de snelheidsrem, en die is met opzet fijn:
+   'auth:<ip>:<inlognaam>'. De inlognaam hoort daarin, want anders kan iemand
+   het account van een ander op slot zetten door het tien keer fout te raden.
+
+   `bron` is WIE er klopt. Die gaat apart mee naar het beveiligingsjournaal,
+   want de noodrem daar stelt een andere vraag: hoeveel AANVALLERS zijn er?
+   Telde je daar buckets, dan is een script vanaf een adres dat zes namen
+   probeert -- credential stuffing, de meest gewone aanval die er is -- goed
+   voor zes "bronnen", en ging het hele platform in onderhoud. Zonder ook maar
+   een account te raken. Zie server/beveiliging.js bij noodrem() en
+   test/noodrem-bron.test.js.
+
+   Wie geen bron meegeeft valt terug op de bucket. Dat is de oude, te
+   schrikachtige stand -- veilig maar luidruchtig -- en hij zegt het er ook bij,
+   zodat een vergeten aanroep opvalt in plaats van stil de noodrem te voeden.
+
+   De GRENS staat los van allebei: de deur van een lid gaat na tien pogingen
+   dicht, maar een emmer die een heel adres of een heel doelwit telt heeft er
+   meer nodig voor hij iemand onterecht buitensluit. Wie niets meegeeft krijgt
+   tien. */
+let bronLoosGemeld = false;
+function noteFailedTry(bucket, bron, limiet) {
   const grens = Number(limiet) > 0 ? Number(limiet) : 10;
   const f = loginFails.get(bucket) || { n: 0, until: 0 };
   f.n += 1;
@@ -553,10 +602,15 @@ function noteFailedTry(bucket, limiet) {
   f.laatst = Date.now();
   if (f.n >= grens) {
     f.until = Date.now() + 5 * 60000; f.n = 0;
+    if (!bron && !bronLoosGemeld) {
+      bronLoosGemeld = true;
+      try { require('./log').log.warn('noteFailedTry zonder bron (' + String(bucket).split(':')[0] +
+        '): de noodrem telt deze deur als aparte aanvaller. Geef req.ip mee.'); } catch (e) {}
+    }
     // de rate-limit sloeg aan: dit ziet eruit als brute force op een inlog
     if (beveilig) beveilig.meld('brute-force', 'kritiek',
       'Te veel mislukte inlogpogingen (' + String(bucket).split(':')[0] + '). De inlog is tijdelijk op slot gezet; mogelijk een brute-force-aanval.',
-      { bron: bucket });
+      { bron: bucket, aanvaller: String(bron || bucket) });
   }
   loginFails.set(bucket, f);
 }
@@ -579,12 +633,54 @@ function checkCred(username, password) {
 /* ---------- het inlog-auditlog ----------
    Elke inlogpoging (gelukt of mislukt, op elk kanaal) komt in een afgeschermd
    log: wie, waar vandaan, wanneer. Zo is een aanval of een gestolen code
-   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ. */
+   achteraf altijd te reconstrueren; het kantoor leest het log in RTG HQ.
+
+   AAN DE KETEN. Dit log is precies wat iemand die binnen is als eerste zou
+   willen bijstellen: één mislukte reeks pogingen wegpoetsen en het bezoek is
+   nooit gebeurd. Elke regel draagt daarom de hash van de vorige, zodat een
+   wijziging of een verwijdering MIDDEN in het log aantoonbaar breekt. Wat dat
+   wel en niet tegenhoudt staat in de kop van lib/keten.js -- kort: het ziet
+   niet dat iemand de NIEUWSTE regels wegknipt, daar is het anker voor.
+
+   Regels van vóór deze keten dragen geen hash; verifieer() telt die apart en
+   veroordeelt ze niet, dus een bestaande installatie gaat hier niet stuk op. */
 function logInlog(kanaal, ok, wie, req) {
   const lijst = db.data.securityLog = db.data.securityLog || [];
-  lijst.unshift({ at: new Date().toISOString(), kanaal, ok: !!ok, wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '') });
-  if (lijst.length > 5000) lijst.length = 5000;
+  ketenNoteerIn(lijst, {
+    at: new Date().toISOString(), kanaal, ok: !!ok,
+    wie: schoon(wie, 60) || null, ip: String((req && req.ip) || '')
+  }, 5000);
   save();
+}
+
+/* De ketenstand van het inlog-auditlog: hetzelfde getal dat inzagelog.ketenTop()
+   voor het inzagejournaal geeft. Het kantoor toont hem naast het log, zodat
+   "klopt dit spoor nog" een antwoord heeft in plaats van een aanname. */
+/* HET HANDELINGSSPOOR, als EEN instantie.
+
+   De lijfpoort maakt er zelf ook een aan om de middleware te hangen. Dat mag,
+   want het spoor houdt geen staat in het geheugen -- alles staat in
+   db.data.handelingLog en de keten wordt per regel uitgerekend. Twee instanties
+   schrijven dus in hetzelfde journaal en zien elkaars regels. Wat NIET mag is
+   twee verschillende opslagplekken, en die zijn er niet.
+
+   Deze instantie bestaat voor het LEZEN: het kantoor vraagt het hele spoor op,
+   een lid alleen zijn eigen regels. Zie ../lib/handelingsspoor.js. */
+const handelingsspoor = require('./lib/handelingsspoor')({ db, save });
+
+/* DE ANKERDIENST: het ene getal dat naar buiten moet.
+
+   De keten ziet gesleutel MIDDEN in een spoor. Kopafknipping ziet hij niet --
+   wie de nieuwste regels weggooit houdt een kloppende keten over. Daarvoor moet
+   er een blok naar een GESCHEIDEN plek, en dat besluit is van een mens.
+
+   Deze dienst verzamelt de koppen van alle journalen en rekent af met een blok
+   dat wordt teruggevoerd. Hij schrijft zelf niets weg: een anker dat deze
+   software op dezelfde schijf zet, is geen anker. Zie ./lib/ankerdienst.js. */
+const ankerdienst = require('./lib/ankerdienst').maakAnkerdienst({ db });
+function securityLogKeten() {
+  const lijst = (db.data && db.data.securityLog) || [];
+  return Object.assign({ top: ketenTop(lijst) }, ketenVerifieer(lijst));
 }
 
 /* DE LEVERANCIERSPOORT staat in ./opzet/leverancierpoort.js: de twee
@@ -653,16 +749,26 @@ const talen = maakTalen({ db, save });
    Zonder deze regel viel lid.js terug op eigen, hard ingetikte bedragen. */
 const lidDeps = { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null) };
-const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications } =
-  maakLid(lidDeps);
+const lidKern = maakLid(lidDeps);
+const { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications,
+  ledenInhoudVan, eersteBijdrageFactuur } = lidKern;
 
-/* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
-   -facturen. Hoisted en dus ook bruikbaar door de demo-seed hierboven (die vóór
-   de leden-kern draait); de lid-module heeft intern zijn eigen kopie. */
+/* Startinhoud voor een nieuw account: LEEG -- waarom staat in kern/lid.js, bij
+   dezelfde functie. Hoisted en dus ook bruikbaar door de demo-seed hierboven
+   (die vóór de leden-kern draait); kern/lid.js is de bron, dit is de doorgifte. */
 function memberTemplate() {
+  return lidKern.memberTemplate();
+}
+
+/* De DEMO-inhoud voor het geseede demo-account: een eigen kopie van de
+   voorbeeldreis en -facturen uit de seed. Alleen zetEigenaarsAccount() gebruikt
+   dit, en dat draait uitsluitend onder DEMO. Zo blijft de demo een volle app om
+   te laten zien wat RTG doet, zonder dat iemand die zich ECHT aanmeldt de reis
+   en de rekeningen van een ander in zijn app aantreft. */
+function demoLidInhoud() {
   return {
-    invoices: JSON.parse(JSON.stringify(db.data.invoices)),
-    trip: JSON.parse(JSON.stringify(db.data.trip)),
+    invoices: JSON.parse(JSON.stringify(db.data.invoices || [])),
+    trip: db.data.trip ? JSON.parse(JSON.stringify(db.data.trip)) : null,
     creatorCredit: 0,
     creatorLikes: 0
   };
@@ -687,7 +793,7 @@ function memberTemplate() {
 // Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
 // het proces leeft.)
 app.get('/api/health', (req, res) => {
-  const model = require('./ai').beschikbaarheid(anthropic);
+  const model = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({
     ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
@@ -1015,6 +1121,10 @@ const galerij = require('./kern/galerij').maakGalerij({ db, save, crypto, schoon
 const boeken = require('./kern/boeken').maakBoeken({ db, save });
 const onderwijs = require('./kern/onderwijs').maakOnderwijs({ db, save, schoon });
 const leerstof = require('./kern/leerstof').maakLeerstof({ db, save, onderwijs });
+/* De school mag bewijs in het leerpaspoort schrijven: een becijferde toets is
+   bewijs dat een leerling een leerdoel beheerst. Laat gebonden, want de
+   foundation-router bestaat eerder dan deze kern (zie foundation.js). */
+rtf.setOnderwijs(onderwijs, leerstof);
 const bijles = require('./kern/bijles').maakBijles({ winkel: () => (db.data.bijles = db.data.bijles || {}), save, schoon, anthropic });
 const vervolg = require('./kern/leerstof-vervolg').maakVervolg({ db, save, onderwijs });
 /* RTG Klok (kern/klok.js): wekkers en timers die op de server aftellen,
@@ -1027,15 +1137,31 @@ function geenGast(req, res) {
   if (req.session.tier === 'guest' && !req.session.account) { res.status(403).json({ error: 'Maak een gratis account (met paspoort) om vrienden toe te voegen en te chatten.' }); return true; }
   return false;
 }
-/* Is de identiteit RTG-geverifieerd? Een GRATIS account mag pas reserveren
-   (en telt pas als volwassene) nadat RTG het paspoort echt gecontroleerd
-   heeft; tot die tijd geldt de standaard "onder de 18". De betaalde passen
-   lopen door de ballotage (aanmelden met paspoort) en houden hun bestaande
-   rechten; een anonieme demo-gast zonder account telt nooit als bekend. */
+/* Is de identiteit RTG-GEVERIFIEERD? Een lid telt pas als volwassene -- en mag
+   pas alcohol bestellen -- nadat RTG het identiteitsbewijs echt heeft gezien;
+   tot die tijd geldt de standaard "onder de 18".
+
+   HIER STOND EEN AANNAME IN PLAATS VAN EEN CONTROLE. De regel luidde: "pas-leden:
+   met paspoort geballoteerd", en gaf `true` voor IEDEREEN die geen gast was.
+   Dat is hoe het bedoeld is -- een betaalde pas loopt door de ballotage -- maar
+   het werd nergens nagegaan. Een lid dat zich zojuist had aangemeld en nog in de
+   keuringsrij stond, gold dus al als geverifieerd, met een geboortedatum die hij
+   bij dat aanmelden zelf had ingetypt. De foutmelding aan de bar zei intussen
+   "je leeftijd is via je paspoort geverifieerd" (kern/lidacties/bestellen.js).
+
+   Nu wordt het gevraagd in plaats van aangenomen, voor iedereen langs dezelfde
+   weg. Een anonieme demo-gast zonder account telt nooit als bekend. */
 function idGeverifieerd(sess) {
   if (!sess) return false;
-  if (sess.tier !== 'guest') return true; // pas-leden: met paspoort geballoteerd
-  if (!sess.account) return false;        // anonieme demo-gast
+  if (!sess.account) {
+    /* Geen dossier. Voor een GAST is het antwoord altijd nee. Een DEMO-PERSONA
+       (inloggen met alleen een pas-tier, kan uitsluitend met RTG_DEMO aan) is
+       iets anders: die speelt een volledig geballoteerd lid -- de zaaiset geeft
+       hem een dossier, reizen en facturen -- en de demo bestaat juist om de
+       hele stroom te tonen, inclusief wat er achter de keuring zit. In
+       productie staat DEMO uit en bestaat deze sessie niet eens. */
+    return DEMO && sess.tier !== 'guest' && !String(sess.key || '').startsWith('guest-');
+  }
   const u = accounts.getUserById(sess.account.id);
   return !!u && u.verified === 'verified';
 }
@@ -1393,12 +1519,19 @@ const {
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet,
   favorietenVan, isFavoriet, fooiUit, agendaVoor, maakSplits, mijnSplitsen,
   betaalSplits, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer,
-  puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur
+  puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, herstelTegoed, puntenKoppelPlafond, voorkeurVan, zetVoorkeur
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
   // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
-  tafeldekVan: () => kern.tafeldek
+  tafeldekVan: () => kern.tafeldek,
+  /* RTG Pay wordt pas in kernlaag3 gebouwd -- ver na deze regel -- en de
+     annuleerlaag heeft hem nodig om een betaalde annulering ECHT terug te
+     boeken. Laat gebonden, net als de gedekte tafel hierboven. */
+  payVan: () => kern.pay,
+  /* codenaamVan hoort erbij: het geld van een verzilverde punt gaat naar de
+     WALLET van dit lid, en die hangt aan de codenaam. */
+  codenaamVan
 });
 
 /* De retail-/mode-laag (kern/retail.js): collecties, artikelen met varianten,
@@ -1502,7 +1635,9 @@ const {
   bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
-  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
+  // de sleuf waar opzet/plaatsbronnen.js de plaatslaag in hangt (late binding)
+  bevKoppelPlaats
 } = maakBeveiliging({ db, save, crypto, accounts, findSupplier, notify, notifySupplier, sseToSupplier, sseToOffice, logActivity, haversine });
 
 /* De idempotentie-administratie van de betaal-naad (server/betaal.js) durable
@@ -1548,14 +1683,36 @@ const {
    op. Hij wordt hier gebouwd omdat hij ouder moet zijn dan zijn drie gebruikers;
    elk van hen meldt daarna zijn eigen teruggang aan (registreerTeruggang), want
    terugboeken kan alleen in het grootboek waar het geld vandaan kwam. */
+/* DE GEZONDHEID VAN DE RAIL, per capability en niet per platform. Elke
+   inzending zegt of hij lukte; kern/commercie/capgezondheid.js telt en rekent de
+   stand. Zo is "de uitbetaalrail hapert" een eigen antwoord in plaats van een
+   rood lampje over het hele huis.
+
+   HIJ MEET EN HIJ BLOKKEERT NIET. Automatisch de geldrail dichtzetten is
+   precies het soort regel dat eerst een tijd hoort mee te lopen (zie
+   kern/commercie/schaduw.js); wat er nu staat is de meting, en de boardroom kan
+   met de hand in quarantaine zetten. Eerst meten, dan afdwingen. */
+const capGezondheid = require('./kern/commercie/capgezondheid').maakGezondheid({ db, save });
 const betaalOpdrachten = require('./kern/betaalopdracht')({
   d: () => db.data, save, crypto, nu: () => Date.now(), log,
   // aanbieden bij de rail: dezelfde sleutel bij elke poging, zodat een
   // herhaling bij de provider nooit een tweede betaling wordt
-  railInzenden: (o) => betaal.maakUitbetaling({
-    bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
-    referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
-  })
+  railInzenden: async (o) => {
+    try {
+      const uit = await betaal.maakUitbetaling({
+        bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
+        referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+      });
+      capGezondheid.meld('money.payout', true);
+      return uit;
+    } catch (e) {
+      /* De melding mag de fout niet opeten: hij gaat door naar de opdrachtenrij,
+         die hem herhaalt en desnoods terugboekt. Meten is meekijken, niet
+         ingrijpen. */
+      capGezondheid.meld('money.payout', false, (e && e.message) || String(e));
+      throw e;
+    }
+  }
 });
 
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
@@ -1759,8 +1916,17 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
 
 
 /* De fiscale rekenlaag komt uit kern/fiscaal.js en draagt db + de reken-helpers.
-   financeVoor: de maandboekhouding van de zaak; cannedBoekhouder: de AI-antwoorden. */
-const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit });
+   financeVoor: de maandboekhouding van de zaak; cannedBoekhouder: de AI-antwoorden.
+
+   DE JAARGANGEN GAAN LUI MEE. Deze laag wordt hier opgebouwd, maar de
+   Regelwacht -- en daarmee de fiscale jaargangen (kern/fiscaal/jaargangen.js) --
+   ontstaat pas in kernlaag4c, ruim honderd regels verderop. Een directe
+   verwijzing zou hier dus `undefined` opleveren en dan zou de boekhouding voor
+   altijd op de lopende tabel blijven rekenen. Vandaar een functie: hij wordt pas
+   uitgevoerd als er echt een rapport wordt gemaakt, en dan staat de laag er.
+   Hetzelfde idioom als de bevoegdheidslaag hierboven ("lui doorgegeven"). */
+const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit,
+  jaargangen: () => kern.regelwacht && kern.regelwacht.jaargangen });
 
 
 // AI-boekhouder voor het Business Pass-lid: wat is per land terug te vorderen
@@ -1907,10 +2073,10 @@ const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.ran
 const stemming = require('./kern/rahul/stemming')({ db, save, crypto });
 const geloof = require('./kern/geloof')({ accounts });
 const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, noteerBeurt, conciergeInbox } =
-  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
+  maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
     stemmingVoor: (c) => stemming.stemmingVoor(c), geloofRegel: (key) => {
-      const m = /^user-(\d+)$/.exec(String(key || ''));
-      return m ? geloof.promptRegel(Number(m[1]), null) : null;
+      const id = idVanKey(key);
+      return id != null ? geloof.promptRegel(id, null) : null;
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
@@ -1931,6 +2097,10 @@ const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, 
    uitsluitend via deze kern met de gedeelde data en realtime praat. Zo kan een
    domein later als eigen proces draaien zonder de routecode te veranderen. */
 const kern = {
+  /* Het API-spoor komt uit de poortwachters (opzet/auditspoor.js) en gaat als
+     `apiSpoor` de kern in, zodat RTG Command hem kan tonen en nakijken. Hij
+     wordt daar gelezen, nooit geschreven: schrijven doet de middleware. */
+  apiSpoor: auditspoor.journaal,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal,
@@ -1946,7 +2116,7 @@ const kern = {
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
-  leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
+  eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
@@ -1955,6 +2125,7 @@ const kern = {
   sendPushToUser, sessionFor, sessions, setRoomHk, sortRunsheet, speelOpnieuw, sseBuffer, sseClients,
   sseSend, sseToCustomer, sseToOffice, sseToSupplier, stateFor, stationsForOrder, supplierAuth, supplierState, persoonsPoort,
   toRad, tokenHash, tooManyTries, totpOk, trChat, trustVan, unlockDoor, urenVan, validDept, veiligGelijk, logInlog,
+  securityLogKeten, handelingsspoor, ankerdienst,
   zorgContact, klantSalon,
   // de stemming van Rahul + de geloofslaag (kern/rahul/stemming.js, kern/geloof/)
   geloof, stemmingToon: stemming.stemmingToon, stemmingZet: stemming.stemmingZet,
@@ -1965,7 +2136,7 @@ const kern = {
   tafelplanning, reserveringTafel, reserveringKomst, walkIn,
   annuleerItem, plaatsReview, reviewsVoor, ratingVan, reviewReageer, toggleFavoriet, favorietenVan, isFavoriet,
   fooiUit, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst,
-  meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe,
+  meldWachtlijst, rsvpAnnuleer, puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, herstelTegoed, puntenKoppelPlafond,
   voorkeurVan, zetVoorkeur,
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
@@ -2004,7 +2175,7 @@ const kern = {
   bevRooster, bevZetDienst, bevSchrapDienst, bevPlanAuto,
   bevAanvraag, bevAanvraagLijst, bevBeslisAanvraag,
   bevMijnDiensten, bevInklok, bevUitklok, bevRondeStart, bevRondeCheckpoint, bevRondeKlaar,
-  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand,
+  bevMeldIncident, bevBeslisIncident, bevSos, bevCommand, bevKoppelPlaats,
   // de directe-betaallaag (kern/directpay.js)
   DP_MIN_CENTEN, DP_MAX_CENTEN, dpBetaalDirect, dpMijnBetalingen,
   dpVerzoekMaak, dpVerzoekenVoor, dpBetaalVerzoek, dpVerzoekIntrek, dpOntvangsten,
@@ -2029,12 +2200,20 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
-  ordersVanKlant, ordersVanZaak, pasTegoedToe, path, pickupCode, pinSlot, pushLive, rememberSession,
+  /* pasTegoedToe EN herstelTegoed horen als PAAR mee. Alleen de eerste stond
+     hier, en dat viel niet op omdat de tweede alleen wordt geroepen als een
+     betaling MISLUKT of een HERHALING is -- kern/lidacties/afrekenen.js geeft
+     het verrekende puntentegoed dan terug. Bij een dubbele betaling op
+     dezelfde bestelling (twee tikken, een race) viel de server daardoor met
+     "herstelTegoed is not a function": het lid kreeg een 500 waar een nette
+     409 hoorde, en het tegoed bleef verrekend. Nooit de ene helft van dit
+     paar doorgeven zonder de andere. */
+  ordersVanKlant, ordersVanZaak, pasTegoedToe, herstelTegoed, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
   sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
   /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
@@ -2054,12 +2233,14 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
+require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
 require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);
 require('./opzet/kernlaag4b')(kern, hulp);
 require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, want regering leest kern.bank
 require('./opzet/kernlaag5')(kern, hulp);
+require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naam, zie de kop daar
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet

@@ -1,7 +1,7 @@
 /* De interne lijn tussen collega's: het directe chatbericht (1-op-1, met
    ongelezen-tellers) en de interne call (signalering; alleen ingeklokte
    collega's zijn belbaar). Draai los:
-   node --experimental-sqlite --test test/collegachat.test.js */
+   node --test test/collegachat.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

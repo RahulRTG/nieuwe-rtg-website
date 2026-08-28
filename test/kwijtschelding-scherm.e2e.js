@@ -18,18 +18,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, { method: 'POST',
   headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}),
@@ -41,10 +34,10 @@ const zegJa = (page, antwoord) => {
 };
 
 async function open(pw, base, token, fouten) {
-  const page = await (await pw.chromium.launch({ args: ['--no-sandbox'] })).newPage();
+  const page = await (await pw.chromium.launch(browserOpties(pw))).newPage();
   letOpFouten(page, fouten);
   await page.addInitScript(t => { localStorage.setItem('rtg_werk_rijk', t); }, token);
-  await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'load' });
+  await page.goto(base + '/apps/belastingkantoor.html', { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#app:not([hidden])', { timeout: 20000 });
   await page.click('.tab[data-t="aan"]');
   await page.waitForSelector('#aanLijst .item', { timeout: 15000 });
@@ -52,7 +45,7 @@ async function open(pw, base, token, fouten) {
 }
 
 test('Belastingkantoor: kwijtschelden is voordragen en beslissen, door twee mensen',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kwijt-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let p1, p2;

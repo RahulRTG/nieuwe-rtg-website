@@ -3,23 +3,19 @@
    dat op het SSE-seintje opent. Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 })).json();
 
 test('Gereedschap: rekenen, btw, een wekker en een timer, en het alarm via SSE',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-gereedschap-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -28,7 +24,7 @@ test('Gereedschap: rekenen, btw, een wekker en een timer, en het alarm via SSE',
     const reg = await api(base, '/api/auth/register', { name: 'Gereed Echt', email: 'gr' + t + '@e.test',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1986-08-08', tier: 'rtg' });
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -85,10 +81,26 @@ test('Gereedschap: rekenen, btw, een wekker en een timer, en het alarm via SSE',
     /* ---- stopwatch en wereldklok bestaan en tekenen ---- */
     await page.evaluate(() => { document.querySelector('[data-tab="tijd"]').click(); });
     await page.evaluate(() => { document.querySelector('#swStart').click(); });
-    await new Promise(r => setTimeout(r, 400));
+    /* WACHTEN OP DE TELLER, niet op de klok van de toets.
+
+       Hier stond `setTimeout(400)`. Dat kocht wat tijd zodat de stopwatch
+       ergens tussen 0 en de ronde zou lopen -- maar 400 ms is geen bewering en
+       een trage machine kan er meer nodig hebben. Het teken waar het op rust
+       staat op het scherm: #swTijd tikt elke 100 ms en gaat dan van 0:00,0 af.
+       Zodra hij van nul af is LOOPT de stopwatch aantoonbaar, en daar hoort de
+       ronde bij. */
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#swTijd');
+      return !!el && el.textContent.trim() !== '0:00,0';
+    }, null, { timeout: 10000 });
     await page.evaluate(() => { document.querySelector('#swRonde').click(); });
     await page.waitForFunction(() => document.querySelectorAll('#swRondes .ronde').length === 1,
       null, { timeout: 5000 });
+    // en die ronde heeft een ECHTE tijd: een stopwatch die op 0:00,0 blijft staan
+    // zou de wacht hierboven al niet gehaald hebben, maar de ronde bewijst het.
+    const rondetijd = await page.evaluate(() =>
+      document.querySelector('#swRondes .ronde').lastElementChild.textContent.trim());
+    assert.notEqual(rondetijd, '0:00,0', 'de ronde legt een lopende stopwatch vast');
     const klokken = await page.evaluate(() => document.querySelectorAll('#klokken .kaart').length);
     assert.ok(klokken >= 3, 'de wereldklok toont de begin-steden');
 

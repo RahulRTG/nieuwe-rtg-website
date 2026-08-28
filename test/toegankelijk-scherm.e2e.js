@@ -10,23 +10,30 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 // de gemeten tekstgrootte van de wortel: dit is wat een lezer echt merkt
 const wortelMaat = (page) => page.evaluate(() =>
   parseFloat(getComputedStyle(document.documentElement).fontSize));
+
+/* WAT DEZE TOETS ECHT NODIG HEEFT NA EEN NAVIGATIE, en dat is minder dan `load`.
+
+   Elke goto stond op `waitUntil: 'load'`: wachten tot ELK subverzoek binnen is,
+   elk plaatje en elk lettertype. Dat houdt stand op een rustige machine en valt
+   onder belasting om -- dezelfde vorm als wachten op de klok (TAKEN.md 6.5),
+   alleen met een ander teken ernaast.
+
+   Wat er wel toe doet is de OPMAAK, want deze toets meet een gemeten
+   tekstgrootte (`getComputedStyle`). Let op: `window.__rtgBasis` alleen is niet
+   genoeg -- shared/basis.js zet die vlag op zijn EERSTE regel, dus hij zegt
+   alleen dat het script begonnen is. Vandaar het stijlblad erbij. */
+const opgemaakt = (page) => page.waitForFunction(
+  () => document.styleSheets.length > 0 && !!window.__rtgBasis, null, { timeout: 15000 });
 
 /* ik.html is een lange pagina en shared/deelmenu.js knipt hem op in stukken
    met een balk erboven; alles wat niet open staat is display:none. De toets
@@ -38,7 +45,7 @@ async function openHetDeel(page) {
 }
 
 test('een instelling op ik.html werkt door op een app die er niets van weet',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-toegscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -50,7 +57,7 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
     }).then(r => r.json());
     assert.ok(reg.token, 'lid-registratie geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -64,14 +71,14 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
 
     /* 1. de nulmeting op de andere app, VOOR er iets is ingesteld. Zonder deze
        meting zou "groter" een getal zijn zonder betekenis. */
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !!window.__rtgBasis, null, { timeout: 10000 });
+    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await opgemaakt(page);
     const voor = await wortelMaat(page);
     assert.ok(voor > 0, 'de nulmeting levert een echte tekstgrootte op');
     assert.equal(await page.evaluate(() => document.documentElement.className.includes('rtg-tekst')), false);
 
     /* 2. instellen waar het hoort: op ik.html, met een echte tik op de knop. */
-    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
     await openHetDeel(page);
     await page.waitForSelector('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="groter"]', { timeout: 10000 });
     const knop = page.locator('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="groter"]');
@@ -85,8 +92,8 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
     /* 3. en dan de vraag waar het om gaat: merkt een app die hier niets van
        weet er iets van? balans.html heeft geen regel voor toegankelijkheid en
        leest de instelling nergens; hij krijgt hem van de gedeelde laag. */
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !!window.__rtgBasis, null, { timeout: 10000 });
+    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await opgemaakt(page);
     const na = await wortelMaat(page);
     assert.ok(na > voor * 1.2, 'de tekst op de andere app is echt groter geworden (' + voor + ' -> ' + na + ')');
 
@@ -101,7 +108,7 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
        Daarom: de server-weg wordt hier hard afgesneden. Wat er dan nog staat,
        staat er van de plaatselijke kopie. Dit bewijst meteen de belofte in
        shared/toegankelijk.js dat een onbereikbare server niets uitzet. */
-    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
     await openHetDeel(page);
     const opnieuw = page.locator('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="groter"]');
     await opnieuw.scrollIntoViewIfNeeded();
@@ -112,8 +119,8 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
     }, null, { timeout: 10000 });
 
     await page.route('**/api/ik/toegankelijk', r => r.abort());
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !!window.__rtgBasis, null, { timeout: 10000 });
+    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await opgemaakt(page);
     const zonderServer = await wortelMaat(page);
     assert.ok(zonderServer > voor * 1.2,
       'zonder server staat de tekst er nog steeds groot (' + voor + ' -> ' + zonderServer + ')');
@@ -121,7 +128,7 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
 
     /* 4. terugzetten moet ook echt terugzetten. Een instelling die vastzit is
        erger dan een die er niet is. */
-    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="normaal"]', { timeout: 10000 });
     const terug = page.locator('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="normaal"]');
     await terug.scrollIntoViewIfNeeded();
@@ -130,8 +137,8 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
       const b = document.querySelector('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="normaal"]');
       return b && b.getAttribute('aria-pressed') === 'true';
     }, null, { timeout: 10000 });
-    await page.goto(base + '/apps/balans.html', { waitUntil: 'load' });
-    await page.waitForFunction(() => !!window.__rtgBasis, null, { timeout: 10000 });
+    await page.goto(base + '/apps/balans.html', { waitUntil: 'domcontentloaded' });
+    await opgemaakt(page);
     assert.equal(await wortelMaat(page), voor, 'terug op de oorspronkelijke maat');
 
     /* 5. "Een ding tegelijk" is de enige instelling die geen OPMAAK zet maar
@@ -139,7 +146,7 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
        drie delen, en met deze klas al vanaf twee. Dat is precies het soort
        belofte dat op een echt scherm nagekeken moet worden -- een klas die
        nergens gelezen wordt, is een knop naar niets. */
-    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
     await openHetDeel(page);
     const eenDing = page.locator('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="altijd"]');
     await eenDing.scrollIntoViewIfNeeded();
@@ -151,12 +158,12 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
 
     /* apps/tijdlijn.html heeft precies TWEE delen: normaal geen menu, met deze
        stand wel. */
-    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.documentElement.classList.contains('rtg-eending'),
       null, { timeout: 10000 });
     const metMenu = await page.locator('.rtgdeel-balk button').count();
 
-    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
     await openHetDeel(page);
     const terugEen = page.locator('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="normaal"]');
     await terugEen.scrollIntoViewIfNeeded();
@@ -165,7 +172,7 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
       const b = document.querySelector('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="normaal"]');
       return b && b.getAttribute('aria-pressed') === 'true';
     }, null, { timeout: 10000 });
-    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !document.documentElement.classList.contains('rtg-eending'),
       null, { timeout: 10000 });
     const zonderMenu = await page.locator('.rtgdeel-balk button').count();

@@ -2,7 +2,7 @@
    We toetsen dat bouwen + lezen elkaars omgekeerde zijn, dat tafelnamen met
    dubbele punt en spatie heel terugkomen, en dat vreemde tekst netjes als
    'tekst' geldt (zodat een Zegel-token niet als code wordt aangezien).
-   Draai los: node --experimental-sqlite --test test/rtgcode.test.js */
+   Draai los: node --test test/rtgcode.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const C = require('../public/shared/rtgcode');
@@ -37,4 +37,17 @@ test('4. gewone tekst (Zegel-token) blijft tekst, met trim', () => {
   const token = 'v1.eyJhIjoxfQ.zzz-_AAA';
   assert.deepEqual(C.lees('  ' + token + '  '), { soort: 'tekst', tekst: token });
   assert.equal(C.lees('').soort, 'tekst');
+});
+
+test('een ondertekende code is hoofdlettergevoelig, een getypte code niet', () => {
+  /* DE FOUT DIE DEZE REGEL TEGENHOUDT stond bij de kassa: het scanscherm zette
+     alles in kapitalen (prettig voor een code van zes tekens), en maakte daarmee
+     elke RTG1-code stuk -- base64url is hoofdlettergevoelig, dus de handtekening
+     klopte ineens niet meer. Het loket zei "geen geldige code" over een code die
+     prima was, en niemand kon zien waarom. */
+  assert.equal(C.hoofdlettersMogen('a1b2c3'), true, 'een getypte kassacode mag in kapitalen');
+  assert.equal(C.hoofdlettersMogen('rtg:pin:7k2m9xpq'), true, 'een pin normaliseert de server toch');
+  assert.equal(C.hoofdlettersMogen('RTG1.Y2FwfFZlUk9n.aBcDeF'), false, 'een ondertekende code niet');
+  assert.equal(C.lees('RTG1.Y2FwfFZlUk9n.aBcDeF').token, 'RTG1.Y2FwfFZlUk9n.aBcDeF',
+    'en hij komt er ongeschonden uit');
 });

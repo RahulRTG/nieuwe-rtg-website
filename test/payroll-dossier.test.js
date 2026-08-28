@@ -18,7 +18,7 @@
    Dus: nog niet aangegeven hoort `open` te zijn en niet stilzwijgend
    weggelaten, en `volledig` hoort pas waar te worden als het echt waar is.
 
-   Draai los: node --experimental-sqlite --test test/payroll-dossier.test.js */
+   Draai los: node --test test/payroll-dossier.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -32,6 +32,7 @@ const { maakJournaal } = require('../server/kern/payroll/journaal');
 const { maakAangifte } = require('../server/kern/payroll/aangifte');
 const { maakDossier } = require('../server/kern/payroll/dossier');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 const pakket = (versie) => ({ land: 'NL', versie, geldigVan: '2026-01-01', geldigTot: '2026-12-31',
   valuta: 'EUR',
@@ -43,14 +44,14 @@ function opzet(merkAan) {
   const save = () => {};
   let t = 0;
   const nu = () => '2026-04-01T10:0' + (t++ % 10) + ':00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
-  const contracten = maakContracten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
+  const contracten = maakContracten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp(pakket('nl-2026.1'), { soort: 'bron', naam: 'Proefbron' });
   if (merkAan !== false) regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
-  const aangifte = maakAangifte({ db, save, nu, crypto, run });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
+  const aangifte = maakAangifte({ opslag: maakOpslag({ db }), save, nu, crypto, run });
   const dossier = maakDossier({ run, journaal, aangifte, regelpakket, contracten });
   return { db, save, nu, regelpakket, contracten, run, journaal, aangifte, dossier };
 }

@@ -2,7 +2,7 @@
    de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per
    voertuig, aangeleerde spullen en het knoploze uitgifteregister (richting
    volgt het item: mee -> terug). Draai los:
-   node --experimental-sqlite --test test/oog.test.js */
+   node --test test/oog.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -15,7 +15,7 @@
    - een ingediende aangifte die alsnog verandert;
    - een correctie die niet naar zijn oorspronkelijke aangifte verwijst.
 
-   Draai los: node --experimental-sqlite --test test/payroll-aangifte.test.js */
+   Draai los: node --test test/payroll-aangifte.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -27,6 +27,7 @@ const { maakRun } = require('../server/kern/payroll/run');
 const { maakJournaal, TEGENREKENINGEN } = require('../server/kern/payroll/journaal');
 const { maakAangifte } = require('../server/kern/payroll/aangifte');
 const motor = require('../server/kern/payroll/motor');
+const maakOpslag = require('../server/kern/payroll/opslag');
 
 const pakket = (versie) => ({ land: 'NL', versie, geldigVan: '2026-01-01', geldigTot: '2026-12-31',
   regels: { minimumUurloon: { '21+': 1499 }, loonheffing: { tarief: 0.37 },
@@ -42,13 +43,13 @@ function opzet() {
   const save = () => {};
   let teller = 0;
   const nu = () => '2026-04-01T10:0' + (teller++ % 10) + ':00.000Z';
-  const regelpakket = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
+  const regelpakket = maakRegelpakket({ opslag: maakOpslag({ db }), save, nu });
+  const componenten = maakComponenten({ opslag: maakOpslag({ db }), save, nu });
   regelpakket.neemOp(pakket('nl-2026.1'), { soort: 'test' });
   regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
-  const aangifte = maakAangifte({ db, save, nu, crypto, run });
+  const run = maakRun({ opslag: maakOpslag({ db }), save, nu, crypto, motor, regelpakket, componenten });
+  const journaal = maakJournaal({ opslag: maakOpslag({ db }), save, nu, crypto });
+  const aangifte = maakAangifte({ opslag: maakOpslag({ db }), save, nu, crypto, run });
   return { db, run, journaal, aangifte };
 }
 

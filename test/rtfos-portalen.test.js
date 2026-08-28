@@ -40,7 +40,7 @@
    expliciet overgeslagen). Hij is vervangen door een luide melding plus een
    auditregel, en daar bijt de mutatie nu wel.
 
-   Draai los: node --experimental-sqlite --test test/rtfos-portalen.test.js
+   Draai los: node --test test/rtfos-portalen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

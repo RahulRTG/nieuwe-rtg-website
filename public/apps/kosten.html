@@ -48,16 +48,16 @@
      tientallen objecten). Stonden ze hier als vaste rem-waarden, dan zette
      data-rtg-modus niets en was de modus een lege belofte -- dezelfde fout die
      /apps/geld.html eerder maakte. */
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;
     padding:calc(var(--rtg-ruim) * 1.2) calc(var(--rtg-ruim) * 1.4);margin-bottom:var(--rtg-ruim);}
   .kaart h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--merkgoud);margin-bottom:.35rem;}
   .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
   .rij.strak{margin-top:0;}
   .groei{flex:1 1 auto;min-width:8rem;}
-  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
   .veld.breed{flex:1 1 12rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;min-width:2.6rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;min-width:2.6rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .scheiding{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;}
   /* Het dominante getal per kaart komt uit de tokenlaag (.rtg-kpi): daar staat
@@ -72,7 +72,7 @@
      met het token en het vlak eronder niet. color-mix laat een kleur EEN keer
      wonen; dezelfde weg als shared/command.css. */
   .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.5rem;
-    background:color-mix(in srgb,var(--burgundy) 7%,transparent);border-radius:0 10px 10px 0;font-size:.8rem;line-height:1.5;}
+    background:color-mix(in srgb,var(--burgundy) 7%,transparent);border-radius:0;font-size:.8rem;line-height:1.5;}
   .bev.letop{border-left-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,transparent);}
   .bev.rust{border-left-color:var(--groen);background:color-mix(in srgb,var(--groen) 8%,transparent);}
   /* .st is de NEUTRALE pil ("vast", "bestaat nog niet"): een etiket zonder
@@ -83,7 +83,7 @@
      als op het ledenscherm, en die hoort op EEN plek te staan:
      /shared/kostenbeeld.js. Twee schermen die "vermoed" verschillend kleuren,
      zeggen iets anders over hetzelfde bewijs. */
-  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:7px;border:1px solid var(--line);color:var(--muted);}
+  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
   table{width:100%;border-collapse:collapse;font-size:.83rem;}
   th,td{text-align:left;padding:var(--rtg-ruim-klein) .35rem;border-bottom:1px solid var(--line);vertical-align:top;}
   th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
@@ -94,7 +94,7 @@
   .kop3{font-size:.9rem;color:var(--soft);margin-top:1rem;font-weight:500;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--merkgoud);}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+    border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
 </style>
 </head>
 <body data-rtg-modus="command">

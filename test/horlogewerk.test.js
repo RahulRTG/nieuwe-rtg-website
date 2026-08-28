@@ -1,7 +1,7 @@
 /* Het RTG-uurwerk (public/shared/horlogewerk.js): de pure, wiskundig kloppende
    mechaniek van het RTG-horloge. Deze toets bewijst de foutmarge 0,0 -- de
    perioden, de frequentie en de wijzerhoeken moeten tot op de bit exact zijn.
-   Draai los: node --experimental-sqlite --test test/horlogewerk.test.js */
+   Draai los: node --test test/horlogewerk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const W = require('../public/shared/horlogewerk');

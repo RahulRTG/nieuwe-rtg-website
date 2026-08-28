@@ -4,10 +4,10 @@
    d = het /supplier/gebouw-overzicht. Rapport: -gebouwrapport.js. */
 (function () {
   'use strict';
-  var K = 'border:1px solid var(--line);border-radius:12px;padding:0.8rem;';
+  var K = 'border:1px solid var(--line);border-radius:0;padding:0.8rem;';
   var IN = 'class="st-in"';
-  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:8px;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
-  var STIL = 'background:none;border:1px solid var(--line);border-radius:8px;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
+  var GOUD = 'background:var(--gold);color:#000;border:none;border-radius:0;padding:0.45rem 0.8rem;font-weight:600;font-family:inherit;';
+  var STIL = 'background:none;border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--soft);font-family:inherit;font-size:0.72rem;';
 
   function toren(d, esc) {
     // de toren in 3D: elke verdieping een plak; verhuurd kleurt bordeaux
@@ -16,7 +16,7 @@
     var n = d.vloeren || 1, h = '';
     for (var i = n; i >= 1; i--) {
       var wie = bezet[i];
-      h += '<div title="' + esc('Verdieping ' + i + (wie ? ' · ' + wie : ' · vrij')) + '" style="position:absolute;left:0;right:0;height:11px;bottom:' + ((i - 1) * 13) + 'px;transform:rotateX(55deg) rotateZ(-45deg);border-radius:2px;' +
+      h += '<div title="' + esc('Verdieping ' + i + (wie ? ' · ' + wie : ' · vrij')) + '" style="position:absolute;left:0;right:0;height:11px;bottom:' + ((i - 1) * 13) + 'px;transform:rotateX(55deg) rotateZ(-45deg);border-radius:0;' +
         (wie ? 'background:var(--burgundy,#7F1634);opacity:0.9;' : 'background:none;border:1px solid var(--line);opacity:0.7;') + '"></div>';
     }
     return '<div style="display:flex;gap:1.2rem;align-items:flex-end;">' +
@@ -77,7 +77,7 @@
         '<button id="geENieuw" style="' + GOUD + 'flex:1;">' + T('ge.e.leg', 'Noteer') + '</button></div>' +
         '<div style="display:flex;gap:3px;align-items:flex-end;height:56px;margin-top:0.5rem;">' +
         (p.energie || []).slice(0, 16).reverse().map(function (x) {
-          return '<div title="' + esc(x.week + ' · ' + x.stroomKwh + ' kWh') + '" style="flex:1;background:var(--burgundy,#7F1634);opacity:0.85;height:' + Math.max(6, Math.round(x.stroomKwh / em * 52)) + 'px;border-radius:2px 2px 0 0;"></div>';
+          return '<div title="' + esc(x.week + ' · ' + x.stroomKwh + ' kWh') + '" style="flex:1;background:var(--burgundy,#7F1634);opacity:0.85;height:' + Math.max(6, Math.round(x.stroomKwh / em * 52)) + 'px;border-radius:0;"></div>';
         }).join('') + '</div>';
 
       h += '<div class="row-gap h-mt90"><button id="geRapport" style="' + GOUD + 'flex:1;">' + T('ge.rapport', 'Gebouwrapport (print)') + '</button>' +

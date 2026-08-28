@@ -32,11 +32,11 @@
 const merkkern = require('./tenant/merkkern');
 
 module.exports = ({ db, save, scho, webmaker, findSupplier }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webmerk', bezit: { webMerken: 'kaart' } });
   const MAX_VESTIGINGEN = 500;
 
   function pot() {
-    if (!db.data.webMerken || typeof db.data.webMerken !== 'object') db.data.webMerken = {};
-    return db.data.webMerken;
+    return eigen.bak('webMerken');
   }
   const norm = c => scho(String(c || '').toUpperCase(), 30);
 

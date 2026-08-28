@@ -12,7 +12,10 @@ module.exports = (kern) => {
 app.post('/api/tickets/aanbod', auth, (req, res) => {
   const partners = db.data.suppliers
     .filter(s => (db.capsVan(s)).includes('tickets') && (s.activiteiten || []).length && salonZichtbaar(s))
-    .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null, activiteiten: s.activiteiten.slice(0, 30) }));
+    .map(s => ({ code: s.code, name: s.name, city: s.city, loc: s.loc || null, activiteiten: s.activiteiten.slice(0, 30),
+      /* de gesloten dagen gaan mee, zodat het lid ze ziet VOOR hij het
+         probeert; de reden is van de zaak en mag hij lezen */
+      dicht: (s.activiteitenDicht || []).map(r => ({ datum: r.datum, activiteitId: r.activiteitId || null, reden: r.reden || null })) }));
   res.json({ partners });
 });
 

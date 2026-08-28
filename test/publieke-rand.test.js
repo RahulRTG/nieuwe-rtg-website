@@ -19,7 +19,7 @@
    3. VALT ER IETS OM? Rommel, een lege body, een verzonnen code. Een 500 op de
       publieke rand is een uitnodiging.
 
-   Draai los: node --experimental-sqlite --test test/publieke-rand.test.js
+   Draai los: node --test test/publieke-rand.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

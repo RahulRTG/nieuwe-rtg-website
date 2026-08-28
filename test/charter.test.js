@@ -2,7 +2,7 @@
    met of zonder schipper, bareboat alleen met vaarbewijs, dubbele boekingen
    onmogelijk, staat met foto's VOOR het uitvaren en NA de teruggave, een SOS-knop
    op zee die de zaak EN RTG bereikt, en vrijwillig live positie delen.
-   Draai: node --experimental-sqlite --test test/charter.test.js */
+   Draai: node --test test/charter.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -95,6 +95,7 @@ npm run poortwacht -- --json --per-route > POORTWACHT.json    AUTH
 npm run rolproef -- --max=8000                                ACL + PRIVACY
 npm run invoerproef                                           INPUT
 npm run idemproef                                             IDEMPOTENCY
+npm run auditproef                                            AUDIT
 npm run bewijsmatrix -- --vastleggen
 ```
 

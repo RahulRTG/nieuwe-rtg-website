@@ -11,6 +11,9 @@ const ctx = require('./foundation/basis')();
 const { db, save, eigenVeld, crypto,
   encS, decS, teVaak, misluktePoging, goedePoging, ipVan, anthropic, tokenUit,
   router, F, nu, rid, schoon, LETTERS, DEMO, TIPS } = ctx;
+/* Foundation start vóór de hoofd-postlaag. Dit levende brugobject wordt na de
+   bouw van RTMAIL gevuld; de schoolroutes houden dezelfde verwijzing. */
+const schoolMailBrug = { dienst:null };
 // de onderwijslaag registreert zijn routes op dezelfde router
 require('./foundation/onderwijs')(ctx);
 
@@ -30,6 +33,7 @@ const gctx = { router, F, G, save, nu, rid, schoon, crypto, eigenVeld, encS, dec
   hashPin, checkPin, geldigePin, schoonAvatar, schoonKleur, nieuweCodenaam, ensureCodenaam, rtfHandle,
   socialProfielen, profielInfoVanHandle, pubProfiel, pubGezin, gezinVan, profielVan, beheerderVan, berichtVoorMij };
 require('./foundation/gezin')(gctx);
+require('./foundation/gezinstoegang')(gctx);
 
 /* Wat dit gezin kost, en wie het betaalt (foundation/kosten.js). Een eigen
    bestandje, want het antwoord draagt een belofte en geen bedrag: de
@@ -70,6 +74,10 @@ const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
 require('./foundation/berichten')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
 gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
+/* Volwassen gezinsleden en gasten komen niet binnen op alleen de gedeelde
+   gezinscode. De beheerder maakt een persoonlijke, eenmalige uitnodiging en
+   de ontvanger accepteert die zelf. */
+const { accepteerGast } = require('./foundation/gezinsuitnodiging')(gctx);
 /* De server bindt hier het welkom-draaiboek in: elk nieuw RTF-profiel krijgt
    een welkom in zijn eigen RTMAIL-postvak (op codenaam). Los te laten (blijft
    de lege functie hierboven) als de automatisering niet meedraait. */
@@ -88,59 +96,43 @@ const { setMarkt } = require('./foundation/markt')(ctx);
    een load balancer heeft er niets aan. De cijfers staan op het RTF-kantoor,
    achter een inlog; hier blijft alleen het leven-teken over. */
 router.get('/health', (req, res) => {
-  const s = require('./ai').beschikbaarheid(anthropic);
+  const s = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({ ok: true, ai: s.modus, verwerking: s.verwerking });
 });
 
+/* De onderwijskern (het leerpaspoort) komt LAAT binnen: hij wordt in
+   server.js gemaakt, na deze module. School heeft hem nodig om bewijs van
+   beheersing in het paspoort van een leerling te schrijven -- een toets die
+   een leraar becijfert, is bewijs dat die leerling iets kan.
+
+   Daarom een getter en geen waarde: bij het opstarten is hij er nog niet, en
+   een school die dan al draait, hoort niet om te vallen maar het bewijs
+   gewoon over te slaan. */
+let onderwijsKern = null;
+let leerstofKern = null;
+function setOnderwijs(o, l) { onderwijsKern = o; if (l) leerstofKern = l; }
+
 // RTF School (het schoolkanaal, "slimmer dan Magister"): aparte module op
 // dezelfde router en dezelfde gezins-authenticatie. Zie server/school.js.
-require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic });
+/* DE PARAMETERS VAN BEIDE KANTEN. De laatste drie van de verzameling
+   (onderwijs, leerstof, rtfHandle) stonden er niet, en daardoor gaf
+   /school/bewijs/leerling altijd 503 en landde een becijferde toets nooit in het
+   leerpaspoort -- als GETTER, om de reden die bij setOnderwijs hierboven staat.
+   De tak voegt encS/decS, goedePoging en de schoolmailbrug toe. Een van de twee
+   kanten kiezen betekent hier: of het leerpaspoort weer stuk, of de schoolmail
+   niet aangesloten. */
+const schoolMail = require('./school')({ router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+  encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug,
+  onderwijs: () => onderwijsKern, leerstof: () => leerstofKern, rtfHandle });
+const foundationMail = require('./foundation/leden-mail')({ router, G, save, sessieVan, isGast, schoolMailBrug });
+function setSchoolMail(dienst) { schoolMailBrug.dienst=dienst || null; }
 
-/* De vijf leeftijdsgroepen als alleen-lezen gegeven, voor kern/levenslijn.
-
-   WAAROM DIT NAAR BUITEN MAG EN DE REST NIET. Sinds LEVEN.md par. 1.1 zijn
-   mini/kind/tiener/jong/volw geen INDELING meer maar een WEERGAVEFILTER op de
-   levenslijn: "laat me de lijn zien zoals een tiener hem ziet". Daarvoor heeft
-   de levenslijn niets van een profiel nodig, alleen de vijf namen met hun
-   bereik. Zou hij ze zelf overtikken, dan staat dezelfde lijst op twee plekken
-   en lopen ze uiteen (LAT.md regel 4).
-
-   `vanaf` (de ondergrens in jaren) gaat MET OPZET niet mee. Die hoort bij
-   magSolliciteren/groepLeeftijd, waar een leeftijdsgrens een echte functie
-   heeft. In de levenslijn zou hij precies een ding worden waarvoor hij daar
-   niet bedoeld is: een getal waarmee je fasen kunt afsluiten voor iemand die
-   er "nog niet aan toe" is. De lens mag de verzameling mogelijkheden nooit
-   verkleinen (LEVEN.md par. 2.2), dus krijgt hij geen grens om op te
-   vergelijken. */
-function groepen() {
-  return GROEPEN.map(id => ({ id, naam: GROEP_INFO[id].naam, bereik: GROEP_INFO[id].bereik }));
-}
-
-/* De drie leerlingpassen zijn afgeleide rechten, nooit vinkjes die een
-   browser zelf mag zetten. Foundation is de geldige gezinssessie, Leeftijd
-   komt uitsluitend uit de geboortedatum en School uitsluitend uit een echte
-   klasinschrijving. Daardoor opent een gekopieerde URL geen leerlingenscherm. */
-function leerlingPassen(sess) {
-  if (!sess || !sess.p || !sess.g) return null;
-  const geboorte = actualiseerGroep(sess.p);
-  const sleutel = sess.g.code + ':' + sess.p.id;
-  const f = F();
-  const klassen = Object.values(f.klassen || {}).filter(k => (k.leerlingen || []).some(l => l.sleutel === sleutel));
-  const scholen = f.scholen || {};
-  const actieveKlassen = klassen.filter(k => !k.schoolCode || !scholen[k.schoolCode] || (scholen[k.schoolCode].status || 'actief') === 'actief');
-  const leerling = sess.p.rol === 'kind' && !sess.gast;
-  const passen = ['foundation'];
-  if (geboorte) passen.push('leeftijd');
-  if (geboorte && leerling) passen.push('leerling');
-  if (geboorte && leerling && actieveKlassen.length) passen.push('school');
-  return {
-    groep: sess.p.groep || null, leeftijd: geboorte ? geboorte.leeftijd : null,
-    leeftijdBevestigd: !!geboorte, leerling, passen,
-    school: actieveKlassen.length ? { actief: true, aantalKlassen: actieveKlassen.length,
-      klassen: actieveKlassen.map(k => ({ code: k.code, naam: k.naam, school: k.school })) } : { actief: false, aantalKlassen: 0, klassen: [] }
-  };
-}
+/* De leeftijdsgroepen en wat eruit volgt, wonen in ./foundation/leeftijdsgroepen.js
+   -- zie de kop daar. Hier doorgegeven zodat niets buiten dit bestand iets
+   van de opsplitsing merkt. */
+const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ GROEPEN, GROEP_INFO, F, actualiseerGroep });
 
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
-module.exports = { router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen };
+// setKostenHook: de kostenpoort van de RTFoundation (foundation/kostenpoort.js).
+module.exports = { setOnderwijs, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };

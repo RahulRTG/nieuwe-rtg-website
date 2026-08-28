@@ -3,7 +3,7 @@
    BEWAKER zelf: dat de detectie klopt (crashes wel, client-fouten niet) en dat een
    opgevangen regel echt geregistreerd wordt. We ruimen de gedeelde lijst daarna op,
    zodat deze test de run niet per ongeluk laat falen.
-   Draai: node --experimental-sqlite --test test/strenge-poort.test.js */
+   Draai: node --test test/strenge-poort.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

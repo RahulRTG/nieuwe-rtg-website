@@ -28,5 +28,9 @@
    eigen module. */
 module.exports = ({ volwassen }) => ({
   progressieMag: (handle) => volwassen(handle),
-  GEEN_PROGRESSIE: 'Scores en ranglijsten bestaan alleen voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.'
+  /* De melding zegt sinds deze ronde ook WAT eraan te doen is. De poort kijkt
+     nu echt naar de keuring (kern/volwassen.js), en daarmee kan iemand er ook
+     echt buiten vallen die dat gisteren nog niet deed. Een grens zonder deur
+     ernaast leest als een storing. */
+  GEEN_PROGRESSIE: 'Scores en ranglijsten bestaan alleen voor leden van wie RTG het identiteitsbewijs heeft gezien en die 18 of ouder zijn. Laat je identiteit verifieren in de app; het spel zelf speel je gewoon door.'
 });

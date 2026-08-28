@@ -20,7 +20,10 @@ function maakTafeldek({ tafelwensen, zorgVoor }) {
 
   function dekUitReservering(zaakCode, r) {
     if (!r || !r.customerKey || !r.tafel) return { gedekt: false };
-    const zorg = zorgVoor(r.customerKey);
+    /* De zaak leest hier het profiel van de GAST, niet van zichzelf. Dat gaat
+       dus het inzagejournaal in (kern/gastzorg.js); een lid hoort te kunnen
+       zien welke zaak zijn allergieen heeft gelezen. */
+    const zorg = zorgVoor(r.customerKey, { zaak: zaakCode, reden: 'tafel dekken op allergenen en dieet' });
     if (!zorg) return { gedekt: false };
     /* Het zorgprofiel is vrije tekst, de tafellijst kent vaste woorden: wat
        daar niet in past gaat leesbaar mee in de notitie in plaats van stil

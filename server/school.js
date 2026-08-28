@@ -16,8 +16,16 @@
    dezelfde router; alles onder /api/foundation/school/... */
 const { eigenVeld } = require('./kern/util'); // veilige objecttoegang (geen prototype-pollution)
 
+const { maakPoorten } = require('./school/poorten');
+
 module.exports = (ctx) => {
-  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic } = ctx;
+  const { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
+    encS, decS, teVaak, misluktePoging, goedePoging, ipVan, schoolMailBrug,
+    /* onderwijs en leerstof zijn GETTERS (zie de opmerking bij setOnderwijs in
+       foundation.js): bij het opstarten bestaat die kern nog niet. Ze stonden
+       hier niet, en dus ook niet in sctx hieronder -- waardoor school/bewijs.js
+       altijd 503 gaf en een becijferde toets nooit in het leerpaspoort landde. */
+    onderwijs, leerstof, rtfHandle } = ctx;
 
   function K() {
     const f = F();
@@ -38,60 +46,10 @@ module.exports = (ctx) => {
   const schoolCode = () => { let c; do { c = 'S' + crypto.randomBytes(3).toString('hex').toUpperCase().slice(0, 5); } while (S()[c]); return c; };
 
   // directie-authenticatie: schoolcode + beheer-token
-  function schoolVan(req, res) {
-    const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
-    if (!sch || sch.token !== String(req.body.beheerToken || '')) {
-      res.status(403).json({ error: 'Onbekende school of verkeerd beheer-token.' });
-      return null;
-    }
-    return sch;
-  }
-  // personeels-authenticatie: schoolcode + personeel-token (status telt apart)
-  function personeelVan(req, res) {
-    const sch = eigenVeld(S(), String(req.body.schoolCode || '').trim().toUpperCase());
-    const tok = String(req.body.personeelToken || '');
-    const p = sch && tok ? Object.values(sch.personeel || {}).find(x => x.token === tok) : null;
-    if (!p) { res.status(403).json({ error: 'Onbekende school of verkeerd personeel-token.' }); return null; }
-    return { sch, p };
-  }
-
-  /* klas-authenticatie: klascode + token. Toegestaan zijn:
-     - het eigen klas-token (oudere, losse klassen blijven zo leesbaar);
-     - het personeel-token van de leraar die de klas geeft (mits actief);
-     - het beheer-token van de school (de directie kan bij alle klassen). */
-  function klasVan(req, res) {
-    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
-    const tok = String(req.body.leraarToken || req.body.personeelToken || req.body.beheerToken || '');
-    let mag = false;
-    if (k && tok) {
-      if (k.token === tok) mag = true;
-      const sch = k.schoolCode ? S()[k.schoolCode] : null;
-      if (sch) {
-        if (sch.token === tok) mag = true; // directie
-        const p = Object.values(sch.personeel || {}).find(x => x.token === tok);
-        // de eigen leraar, een teamlid (max 3 vast) of de actieve waarnemer
-        if (p && p.status === 'actief' && (p.id === k.leraarId
-          || (k.leraren || []).some(x => x.id === p.id)
-          || (k.waarnemer && k.waarnemer.id === p.id))) mag = true;
-      }
-    }
-    if (!mag) {
-      res.status(403).json({ error: 'Onbekende klas of verkeerd token.' });
-      return null;
-    }
-    return k;
-  }
-  // gezins-authenticatie (ouder of kind), zoals overal in de foundation
-  function gezinSessie(req, res) {
-    const g = gezinVan(req, res); if (!g) return null;
-    const p = profielVan(g, req.body.token);
-    if (!p) { res.status(403).json({ error: 'Log opnieuw in bij je gezin.' }); return null; }
-    return { g, p, beheerder: p.rol === 'beheerder' || p.rol === 'ouder' };
-  }
-  const leerlingSleutel = (gezinCode, profielId) => gezinCode + ':' + profielId;
-  function leerlingVan(k, g, profielId) {
-    return (k.leerlingen || []).find(l => l.sleutel === leerlingSleutel(g.code, profielId));
-  }
+  /* De poorten (wie mag wat openen) staan in ./school/poorten.js: dat is een
+     eigen begrip en het hoort niet verspreid te raken over de deelmodules. */
+  const { schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, leerlingSleutel } =
+    maakPoorten({ K, S, gezinVan, profielVan });
 
   // een school is pas bruikbaar als RTG hem heeft goedgekeurd. Oude scholen
   // (van voor deze stap) hebben geen status en blijven gewoon actief.
@@ -106,8 +64,15 @@ module.exports = (ctx) => {
   /* De drie lagen (beheer, klas, gezin) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten; de klaslaag
      levert gemiddelde() aan de gezinslaag via die context. */
-  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic,
-    eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief };
+  const sctx = { router, F, G, save, rid, nu, schoon, gezinVan, profielVan, crypto, anthropic, encS, decS,
+    teVaak, misluktePoging, goedePoging, ipVan,
+    schoolMailBrug,
+    eigenVeld, K, S, schoolVan, personeelVan, klasVan, gezinSessie, leerlingVan, klasCode, schoolCode, leerlingSleutel, isActief,
+    /* onderwijs en leerstof zijn GETTERS (zie setOnderwijs in foundation.js):
+       bij het opstarten bestaat die kern nog niet. Zonder deze drie gaf
+       /school/bewijs/leerling altijd 503 en landde een becijferde toets nooit
+       in het leerpaspoort. */
+    onderwijs, leerstof, rtfHandle };
   Object.assign(sctx, require('./school/beheer')(sctx));
   Object.assign(sctx, require('./school/klas')(sctx));
   require('./school/directie')(sctx); // golf 3: de directie-cockpit op kantoren-niveau
@@ -122,6 +87,9 @@ module.exports = (ctx) => {
   require('./school/bijles')(sctx); // de eigen Rahul Bijles van elk kind
   require('./school/bellen')(sctx); // bellen binnen de app (klas-belkanaal, geen nummers nodig)
   require('./school/hulplijn')(sctx); // golf 4: de ene knop van het kind (toestemming bepaalt wie meeleest)
+  require('./school/bewijs')(sctx); // Proof of Learning: observaties van de leraar in het leerpaspoort
+  require('./school/denkfout')(sctx); // Misconception Graph: het klasbeeld, geteld zonder wie
+  require('./school/dag')(sctx); // Daily Learning Guarantee: wat staat er vandaag klaar
 
   /* ---------- de enterprise-lagen ----------
      Rollen eerst: die levert poort() en het journaal waar alle lagen hieronder
@@ -130,6 +98,9 @@ module.exports = (ctx) => {
      smaak: dossier en organisatie halen leerlingLijst() uit de context die
      inschrijving.js daar neerzet. */
   Object.assign(sctx, require('./school/rollen')(sctx)); // rollen, rechten, inzagejournaal
+  Object.assign(sctx, require('./school/personeel-mail')(sctx)); // persoonlijke naam@school.rtg-post
+  Object.assign(sctx, require('./school/personeelstoegang')(sctx)); // directie nodigt persoonlijk uit
+  require('./school/personeel-inlog')(sctx); // eenmalige schoolmail-link + intrekken
   Object.assign(sctx, require('./school/webhook')(sctx)); // de bezorger; zet sctx.meld voor de lagen hieronder
   require('./school/inschrijving')(sctx); // aanmelding, wachtlijst, plaatsing, uitschrijving, overstap
   Object.assign(sctx, require('./school/dossier')(sctx)); // dossier, contact, documenten, zorg
@@ -154,4 +125,19 @@ module.exports = (ctx) => {
   require('./school/koppelingen')(sctx); // integraties, webhooks, export
   Object.assign(sctx, require('./school/ouderportaal')(sctx)); // toestemming en afspraken
   require('./school/ouderportaal-mijn')(sctx); // het ene overzicht van het gezin
+
+  /* Teacher Flow. Deze twee staan met opzet ONDERAAN: ze kijken over de andere
+     lagen heen (presentie, toetsen, huiswerk, rapporten, denkpatronen) en
+     hebben dus nodig wat die lagen aan sctx hebben toegevoegd. */
+  require('./school/aandacht')(sctx); // Attention OS: een lijst per dag, in drie bakken
+  require('./school/les')(sctx); // de les afronden in een handeling, en het lesgeheugen
+  require('./school/instap')(sctx); // de vervanger en de nieuwe docent: minimale context, vijf stappen
+  require('./school/taalpoort')(sctx); // de taallaag: vakbeleid, en de terugvertaling voor de deur uitgaat
+  require('./school/opvolging')(sctx); // No-Lost-Child: de keten na de hulplijn, en de escalatie
+  require('./school/toetskeuring')(sctx); // de toets als meetinstrument: keuring vooraf, spiegel achteraf
+  require('./school/belasting')(sctx); // de donderdag van de leerling en de week van de docent
+  require('./school/overdracht')(sctx); // Transition Continuity en de adapters: wat gaat mee, en in welke vorm
+  require('./school/taalcheck')(sctx); // Language Independence Test: dezelfde vraag opnieuw gesteld in de thuistaal
+
+  return { schoolMailAdresActief:sctx.schoolMailAdresActief };
 };

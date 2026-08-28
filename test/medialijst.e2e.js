@@ -11,22 +11,18 @@
    uitgaven uit de eigen klankmotor. Dat is met opzet de enige vorm die dit huis
    zelf kan opwekken -- een geseede clip zou eeuwig "maker offline" zijn.
 
-   Draai: npm run e2e (of los: node --experimental-sqlite --test test/medialijst.e2e.js) */
+   Draai: npm run e2e (of los: node --test test/medialijst.e2e.js) */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('een lid maakt een lijst en zet er een stuk in',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-medialijst-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -38,7 +34,7 @@ test('een lid maakt een lijst en zet er een stuk in',
         password: 'geheim12345', geboortedatum: '1990-03-03', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
     assert.ok(lid.token, 'het lid is ingelogd');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 }, serviceWorkers: 'block' });
     await ctx.addInitScript((t) => {
       try { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
@@ -46,7 +42,7 @@ test('een lid maakt een lijst en zet er een stuk in',
     const page = await ctx.newPage();
     const fouten = letOpFouten(page, []);
 
-    await page.goto(base + '/apps/media.html', { waitUntil: 'load' });
+    await page.goto(base + '/apps/media.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.stuk .t', { timeout: 20000 });
     const eersteTitel = await page.$eval('.stuk .t', e => e.textContent);
     assert.ok(eersteTitel, 'er staat werk in de wereld');

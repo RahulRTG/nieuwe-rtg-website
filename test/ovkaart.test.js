@@ -1,6 +1,6 @@
 /* De OV-kaartverkoop: een vervoerbewijs mag alleen bestaan als er een geldige
    overeenkomst met de vervoerder onder ligt. Draai los:
-   node --experimental-sqlite --test test/ovkaart.test.js
+   node --test test/ovkaart.test.js
 
    Wat deze toetsen bewaken:
 

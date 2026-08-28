@@ -1,7 +1,7 @@
 /* De Berichten-app (routes/member/berichten.js): alle gesprekken van het
    platform op een plek -- Rahul, de Berichtenbox van MijnOverheid en de
    Pulse-reacties (de vrienden-DM's en werk-chats liften op dezelfde lijst mee).
-   Draai los: node --experimental-sqlite --test test/berichten.test.js */
+   Draai los: node --test test/berichten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

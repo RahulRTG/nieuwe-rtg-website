@@ -17,17 +17,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
-const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
+const skip = geenBrowser(pw);
 
 async function post(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -45,8 +38,9 @@ async function open(opts) {
   });
   assert.ok(reg.token, 'registratie geeft een sessietoken');
 
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const page = await browser.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   await page.addInitScript((tok) => {
@@ -167,7 +161,7 @@ test('de hele weg: rechtsvorm kiezen, de lijst zien, afvinken en de zaak aanvrag
 
     // het plan vastleggen en inschrijven, dan pas kan de zaak worden aangevraagd
     await t.page.click('#planKnop');
-    await t.page.waitForTimeout(1500);
+    await wachtOpRust(t.page);
     await post(t.base, '/api/onderneming/ingeschreven', { id: (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0].id, kvk: '12345678' }, t.token);
     await t.page.reload({ waitUntil: 'domcontentloaded' });
     await t.page.waitForSelector('#aanvKnop', { timeout: 15000 });
@@ -207,7 +201,7 @@ test('een afgeraden plan wordt niet stilzwijgend vastgelegd', { skip }, async ()
     // de bevestiging wegklikken: er mag dan niets worden vastgelegd
     t.page.on('dialog', d => d.dismiss());
     await t.page.click('#planKnop');
-    await t.page.waitForTimeout(1200);
+    await wachtOpRust(t.page);
 
     const ond = (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0];
     assert.equal(ond.fase, 'idee', 'weigeren betekent weigeren: de fase is niet verschoven');

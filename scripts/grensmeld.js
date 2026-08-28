@@ -57,7 +57,7 @@ const uitlezer = `
 
 function meet() {
   const uit = path.join(require('os').tmpdir(), 'rtg-grensmeld-' + process.pid + '.json');
-  const r = spawnSync(process.execPath, ['--experimental-sqlite', '-e', uitlezer], {
+  const r = spawnSync(process.execPath, ['-e', uitlezer], {
     cwd: WORTEL, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024,
     env: Object.assign({}, process.env, { RTG_MELDUIT: uit, PORT: '0',
       RTG_DATA_DIR: path.join(require('os').tmpdir(), 'rtg-grensmeld-data') })

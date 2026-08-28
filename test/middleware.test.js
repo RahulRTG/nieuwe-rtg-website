@@ -11,7 +11,7 @@
    We rijden hier geen echte HTTP-server op: de lagen krijgen een nagebouwd
    req/res-paar met precies de methoden die de webmotor ze aanreikt. Dat is
    sneller, bindt geen poorten, en laat per laag zien wat hij doet.
-   Draai los: node --experimental-sqlite --test test/middleware.test.js */
+   Draai los: node --test test/middleware.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
@@ -117,8 +117,15 @@ test('4b. ieder appscherm krijgt in Magnaat vóór zijn eigen code de dichte tra
   const uit = await draai(cspNonce(PUBLIC, true), req, nepRes());
   const html = String(uit.res.body);
   const csp = uit.res.kop['content-security-policy'] || '';
-  assert.equal((html.match(/src="\/apps\/magnaat-sandbox\.js"/g) || []).length, 1);
-  const externeScripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => m[1]);
+  /* Het pad zonder querystring, want elke verwijzing draagt sinds
+     server/middleware/versieadres.js de versie van het bestand mee (?v=...).
+     Dat verandert niets aan WELK script er staat of in welke VOLGORDE -- en dat
+     is precies wat deze toets bewaakt -- dus vergelijken we op het pad. */
+  const padVan = (u) => String(u).split('?')[0];
+  const sandboxTags = [...html.matchAll(/src="([^"]*magnaat-sandbox\.js[^"]*)"/g)];
+  assert.equal(sandboxTags.length, 1, 'de blokkade staat er precies een keer');
+  assert.equal(padVan(sandboxTags[0][1]), '/apps/magnaat-sandbox.js');
+  const externeScripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => padVan(m[1]));
   assert.equal(externeScripts[0], '/apps/magnaat-sandbox.js',
     'de blokkade draait vóór het eerste externe paginascript');
   assert.match(csp, /connect-src 'none'/);
@@ -142,6 +149,20 @@ test('5. de compressielaag laat kleine antwoorden met rust', async () => {
     const res = nepRes();
     await draai(jsonGzip(), req, res);
     res.json(data);
+    /* WACHTEN, WANT COMPRIMEREN GEBEURT NIET MEER OP DE EVENT-LOOP.
+
+       Hier stond `res.json(data)` en meteen daarna de kop uitlezen. Dat kon
+       zolang de laag brotliCompressSync/gzipSync gebruikte: die zette de kop
+       nog binnen dezelfde tik. Sinds de compressie in de threadpool draait
+       (zie server/middleware/compressie.js) is het antwoord een tik later
+       klaar, en las deze toets de kop voordat hij bestond -- 'geen' in plaats
+       van 'gzip'.
+
+       res.wacht is de belofte die nepRes aflost zodra send/end/json het
+       antwoord afsluit, en die gaat af in ALLE takken: ook bij een klein
+       antwoord en bij een client die niets vraagt. Dit is dus geen soepeler
+       toets maar dezelfde toets op het juiste moment. */
+    await res.wacht;
     return res.kop['content-encoding'] || 'geen';
   };
   assert.equal(await proef(klein, 'gzip'), 'geen', 'onder een kilobyte kost gzip meer dan het oplevert');
@@ -164,6 +185,7 @@ test('5b. brotli levert echt kleinere bytes, en alleen aan wie erom vraagt', asy
     const res = nepRes();
     await draai(jsonGzip(), req, res);
     res.json(groot);
+    await res.wacht;   // zie toets 5: de compressie draait in de threadpool
     return { kop: res.kop['content-encoding'], bytes: Buffer.from(res.body) };
   };
   const g = await meet('gzip'), b = await meet('br');

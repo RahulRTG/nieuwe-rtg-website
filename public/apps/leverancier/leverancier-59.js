@@ -63,6 +63,22 @@
         ? '<span><button class="obtn js-walkin" data-tafel="'+esc(t.name)+'" style="padding:0.15rem 0.5rem;">'+esc(t.name)+' · '+T('res.vrij','vrij')+'</button></span>'
         : '<span>'+esc(t.name)+' · '+t.status+(t.reserveringen.length?' · '+t.reserveringen.join(', '):'')+(t.rekening?' · '+eur(t.rekening.totaal):'')+'</span>').join('')+'</div>'+ '<div class="softline h-mt30">'+T('res.walkins','Een vrije tafel aantikken plaatst een walk-in.')+'</div>' : '';
     const rekeningen = plan.tafels.filter(t => t.rekening);
-    const rekBlok = rekeningen.length ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'"><span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--gold);">'+eur(t.rekening.totaal)+'</b></span><span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;"><button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button><button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button><button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span></div>').join('') : '';
-    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div><div class="pos-chips h-mt40"><span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+(plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+(plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+'</div>'+chips+rekBlok+(plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+'</div>'+(later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
+    const rekBlok = rekeningen.length
+      ? rekeningen.map(t => '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;margin-top:0.55rem;font-size:0.82rem;flex-wrap:wrap;" data-tafelrek="'+esc(t.name)+'">'+
+          '<span><b>'+esc(t.name)+'</b> · '+t.rekening.posten+' '+T('pos.posts','post(en)')+' · <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(t.rekening.totaal)+'</b></span>'+
+          '<span style="display:flex;gap:0.4rem;flex-shrink:0;flex-wrap:wrap;">'+
+            '<button class="obtn primary js-rekpay" data-method="rtgpay">RTG Pay</button>'+
+            '<button class="obtn js-reksplit">'+T('res.splits','Splits')+'</button>'+
+            '<button class="obtn js-rekpay" data-method="contant">'+T('pos.cash','Contant')+'</button></span>'+
+        '</div>').join('')
+      : '';
+    wrap.innerHTML = '<div class="card"><div class="tt-h">'+T('res.vandaag','Tafelplanning vandaag')+'</div>'+
+      '<div class="pos-chips h-mt40">'+
+        '<span>'+plan.verwachtePersonen+' '+T('res.verwacht','verwacht')+'</span>'+
+        (plan.openAanvragen?'<span>'+plan.openAanvragen+' '+T('res.open','open aanvraag(en)')+'</span>':'')+
+        (plan.zonderTafel?'<span>'+plan.zonderTafel+' '+T('res.zonder','zonder tafel')+'</span>':'')+
+      '</div>'+chips+rekBlok+
+      (plan.reserveringen.length ? plan.reserveringen.map(r => resRij(r, true)).join('') : '<div class="softline h-mt50">'+T('res.leeg','Nog geen reserveringen voor vandaag.')+'</div>')+
+      '</div>'+
+      (later.length ? '<div class="card"><div class="tt-h">'+T('res.later','Komende dagen')+'</div>'+later.map(r => resRij(r, false)).join('')+'</div>' : '');
     // een open rekening afrekenen: RTG Pay (met tap to pay) of contant, tafel weer vrij

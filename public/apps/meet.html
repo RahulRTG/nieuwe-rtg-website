@@ -21,29 +21,29 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1000px;margin:0 auto;padding-bottom:3rem;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop.uit{background:#7F1634;border-color:#7F1634;}
   .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.85rem;padding:.45rem .6rem;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;margin-bottom:.55rem;
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem .9rem;margin-bottom:.55rem;
     display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
   .kaart b{font-size:.9rem;}
-  .kaart .code{font-family:ui-monospace,monospace;color:var(--gold);letter-spacing:.14em;}
+  .kaart .code{font-family:ui-monospace,monospace;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.14em;}
   .kaart .meta{font-size:.68rem;color:var(--soft);width:100%;}
 
   /* de kamer: tegels + balk */
@@ -52,15 +52,15 @@
   #wieLijst{text-align:center;color:var(--soft);font-size:.7rem;padding-bottom:.3rem;}
   #tegels{flex:1;display:grid;gap:6px;padding:6px;overflow:hidden;
     grid-template-columns:repeat(auto-fit,minmax(180px,1fr));align-content:center;}
-  .tegel{position:relative;background:var(--card);border-radius:14px;overflow:hidden;min-height:130px;}
+  .tegel{position:relative;background:var(--card);border-radius:0;overflow:hidden;min-height:130px;}
   .tegel video{width:100%;height:100%;object-fit:cover;display:block;}
   .tegel .nm{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;
-    font:600 .7rem 'Inter',sans-serif;padding:.2rem .55rem;border-radius:999px;}
+    font:600 .7rem 'Inter',sans-serif;padding:.2rem .55rem;border-radius:0;}
   #balk{display:flex;align-items:center;justify-content:center;gap:.7rem;
     padding:.8rem 1rem calc(env(safe-area-inset-bottom) + .9rem);}
-  #balk .knop{border-radius:999px;padding:.6rem 1rem;}
+  #balk .knop{border-radius:0;padding:.6rem 1rem;}
   .melding{position:fixed;left:50%;bottom:5.2rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
@@ -88,7 +88,11 @@
   <div class="rij">
     <input class="veld" id="komCode" maxlength="6" placeholder="Bijv. XKPT47"
       style="flex:1;text-transform:uppercase;letter-spacing:.2em;font-family:ui-monospace,monospace;" aria-label="Kamercode">
-    <button class="knop vol" id="komBtn" type="button">Kom binnen</button>
+    <!-- BEWUST GEEN data-hoofdactie. Dit scherm heeft twee gelijkwaardige
+     ingangen: binnenkomen met een code, of zelf een kamer maken. Er een van
+     de twee tot hoofdhandeling verheffen maakt de meting mooier en het
+     scherm niet beter (GRAMMATICA.md). -->
+      <button class="knop vol" id="komBtn" type="button">Kom binnen</button>
   </div>
   <div class="kop">Een nieuwe kamer</div>
   <div class="rij">

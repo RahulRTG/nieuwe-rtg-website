@@ -70,7 +70,7 @@
   function renderPaspoort(){
     const el = $('#paspoortWrap'); if (!el) return;
     if (!paspoortData){ el.innerHTML = '<div class="empty">…</div>'; laadPaspoort(); return; }
-    const sel = 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"';
+    const sel = 'style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.7rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;"';
     let html = '';
     // aanvraagformulier
     html += '<div class="card"><div class="tt-h">'+T('pn.vraag','Identiteit opvragen')+'</div>'+

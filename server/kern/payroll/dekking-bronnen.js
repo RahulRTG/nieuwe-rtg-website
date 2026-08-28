@@ -15,17 +15,14 @@
    ertussen zit, bepaalt wat honderden mensen krijgen uitbetaald. */
 'use strict';
 
-module.exports = ({ db, save, tijd }) => {
+module.exports = ({ opslag, save, tijd }) => {
   const norm = (l) => String(l || 'NL').toUpperCase();
 
   /* ---------- bronnen per land ----------
    Een bron is een adres waar een regelpakket vandaan komt. Ze staan in de
    opslag en niet in de code, want een land erbij hoort geen uitrol te zijn.
    De bijwerkronde leest ze hier op (zie ./bijwerken.js). */
-function bronbak() {
-  if (!db.data.payrollBronnen || typeof db.data.payrollBronnen !== 'object') db.data.payrollBronnen = {};
-  return db.data.payrollBronnen;
-}
+const bronbak = () => opslag.bak('payrollBronnen');
 const bronnenVan = (land) => (bronbak()[norm(land)] || []).slice();
 const alleBronnen = () => Object.keys(bronbak())
   .flatMap(l => bronbak()[l].map(b => Object.assign({ land: l }, b)));

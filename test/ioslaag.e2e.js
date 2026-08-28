@@ -35,7 +35,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -43,13 +43,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+const pw = laadPlaywright({ eigenDriver: false });
 
 /* Alle app-pagina's onder public/apps, als webpad. */
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
@@ -73,12 +67,12 @@ function kopIds(webpad) {
 }
 
 test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 
     /* Alles wat JavaScript oplevert gaat eruit -- op resourceType, niet op
@@ -100,9 +94,10 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
       const ids = kopIds(pad);
       if (!ids.length) continue;
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        await page.waitForTimeout(120);
+        await wachtOpRust(page);
         // wegnavigeerd (inlogdeur)? dan meten we een andere pagina
         if (new URL(page.url()).pathname !== pad) { await page.close(); continue; }
         // stond de kop er sowieso niet? dan valt er niets te verliezen
@@ -117,7 +112,7 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
           s.onload = klaar; s.onerror = klaar;
           document.head.appendChild(s);
         }));
-        await page.waitForTimeout(80);
+        await wachtOpRust(page);
 
         const na = await page.evaluate((x) => x.filter((i) => !document.getElementById(i)), ids);
         gemeten++;
@@ -137,18 +132,18 @@ test('de iOS-laag gooit geen element met een id uit de kopbalk weg',
 });
 
 test('een app-pagina draagt geen woordmerk meer in zijn chrome',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
     const steek = ['/apps/vluchten.html', '/apps/agenda.html', '/apps/berichten.html', '/apps/rtgschool.html'];
 
     for (const pad of steek) {
       await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(250);
+      await wachtOpRust(page);
       const r = await page.evaluate(() => ({
         ios: document.body.hasAttribute('data-ios'),
         merk: document.querySelectorAll('.os-merk, .os-merk-logo, .osbar, .os-kick, img[alt="RTG"]').length,
@@ -168,7 +163,7 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
 });
 
 test('een knoppengroep in de kop blijft een groep',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
   const CODE = 'KANTOOR-IOSGROEP-1';
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
@@ -179,10 +174,11 @@ test('een knoppengroep in de kop blijft een groep',
     const tok = (await (await fetch(base + '/api/office/login', { method: 'POST',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: CODE }) })).json()).token;
     assert.ok(tok, 'kantoorsessie');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 1100, height: 900 } });
     await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) {} }, tok);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
 
     /* WAAROM DEZE TOETS APART BESTAAT. De andere hierboven kijkt of elementen
        met een ID blijven bestaan, en dat was niet genoeg: de tabs van
@@ -195,7 +191,7 @@ test('een knoppengroep in de kop blijft een groep',
        Een groep verhuist daarom als geheel. Deze toets bewaakt dat via de
        kiezer die de pagina zelf gebruikt, niet via het bestaan van de knop. */
     await page.goto(base + '/apps/payroll.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
+    await wachtOpRust(page);
     const r = await page.evaluate(() => ({
       losseKnoppen: document.querySelectorAll('[data-tab]').length,
       viaDeNav: document.querySelectorAll('nav [data-tab]').length

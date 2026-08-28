@@ -16,6 +16,7 @@
    GELD.md par. 3 verbiedt -- ook als de richting sympathiek is.
    ========================================================================== */
 'use strict';
+const crypto = require('crypto');
 
 module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankopen, noteer }) {
 
@@ -32,7 +33,10 @@ module.exports = function maakTeruggave({ S, save, nu, boek, eigen, pay, aankope
       const b = eigen(bak, key) ? eigen(bak, key)[String(sleutel)] : null;
       if (!b || b.brutoCenten <= 0) continue;
       if (rechten().some(x => x.key === key && x.sleutel === sleutel && x.status === 'open')) continue;
-      rechten().unshift({ id: 'tg' + Math.random().toString(36).slice(2, 10), key, sleutel, naam: b.naam,
+      /* crypto en geen Math.random(): dit id is de sleutel van een TERUGGAVERECHT --
+         wie hem kan raden, kan een teruggave aanwijzen die niet van hem is.
+         Math.random() is voorspelbaar en hoort nergens waar geld aan hangt. */
+      rechten().unshift({ id: 'tg' + crypto.randomBytes(5).toString('hex').slice(0, 8), key, sleutel, naam: b.naam,
         codenaam: b.codenaam || null,
         /* De drie potjes van de bon gaan MEE op het recht. Terugbetalen loopt de
            weg van de verkoop terug -- de uitgever geeft zijn netto terug, RTG de

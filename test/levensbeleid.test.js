@@ -17,13 +17,14 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const maakBeleid = require('../server/kern/levensbeleid');
 const maakBand = require('../server/kern/levensband');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 
 const STUKKEN = ['lijn', 'talenten', 'interesses', 'bijdrage', 'diplomas', 'talen', 'afspraken', 'gezondheid'];
 const straks = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
 
 function opzet() {
   const db = { data: {} };
-  const b = maakBeleid({ db, save: () => {}, stukken: STUKKEN }).levensbeleid;
+  const b = maakBeleid({ db, opslag: maakCmdOpslag({ db }), save: () => {}, stukken: STUKKEN }).levensbeleid;
   const band = maakBand({ db, save: () => {}, beleid: b }).levensband;
   return { b, band, db };
 }

@@ -21,9 +21,16 @@
       if (!wvCart.length) return;
       const body = { method: b.dataset.wvbetaal, regels: wvCart.map(r => ({ vsku: r.vsku, aantal: r.aantal })) };
       if (body.method === 'rtgpay'){
-        const c = window.prompt(T('wv.paycode','Betaalcode van de klant (uit de app):'));
-        if (!c) return;
-        body.payCode = c.trim().toUpperCase();
+        /* Hier stond een EIGEN window.prompt met een onvoorwaardelijke
+           toUpperCase(). Dat is de vierde uitvoering van iets dat het huis al
+           heeft -- en hij droeg de fout die elders al was gerepareerd: een
+           ondertekende RTG-code is hoofdlettergevoelig, dus kapitalen sloopten
+           hem. Nu de gedeelde weg: tap to pay, scannen, of typen, met de kaart
+           erachter (LAT.md regel 4).
+
+           Zonder bedrag: het totaal komt van de serverprijzen en staat pas na
+           het boeken vast. */
+        body.payCode = await payCodeMetKaart(); if (!body.payCode) return;
       }
       if (wvKlant) body.klantKey = wvKlant.key;
       try {
@@ -98,7 +105,7 @@
           '<div class="ds">'+T('zb.gast','Gast')+': '+esc(a.codenaam || '')+' · '+a.duurMin+' min</div>'+
           (a.zorg ? '<div class="ds" style="color:#E2B93B;">'+esc([((a.zorg.allergenen||[]).length?T('zb.allergie','Allergie')+': '+a.zorg.allergenen.join(', '):''), a.zorg.dieet, a.zorg.medisch].filter(Boolean).join(' · '))+'</div>' : '')+
           (a.intake ? '<div class="ds" style="color:#E2B93B;">'+esc(a.intake)+'</div>' : '')+
-          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--green,#4C9A75);">'+T('zb.klaar','Afgerond')+'</div>'
+          (a.status === 'afgerond' ? '<div class="ds" style="color:var(--rtg-leesgroen,var(--green,#4C9A75));">'+T('zb.klaar','Afgerond')+'</div>'
             : '<button class="obtn primary" data-zblevklaar="'+esc(a.ref)+'" class="h-mt35">'+T('zb.afronden','Afronden')+'</button>')+
           '</div>').join('')
         : '<div class="empty">'+T('zb.leeg','Geen afspraken op deze dag.')+'</div>')+

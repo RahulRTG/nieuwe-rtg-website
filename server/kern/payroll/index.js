@@ -38,6 +38,7 @@ const { maakContracten } = require('./contracten');
 const { maakRun } = require('./run');
 const { maakJournaal } = require('./journaal');
 const { maakAangifte } = require('./aangifte');
+const { maakPayrollHerkomst } = require('./herkomst');
 const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
@@ -48,30 +49,39 @@ const { maakUren } = require('./uren');
 const { maakSamenstellen } = require('./samenstellen');
 const { maakControles } = require('./controles');
 const motor = require('./motor');
+const maakOpslag = require('./opslag');
 
 function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logActivity, log }) {
-  const regels = maakRegelpakket({ db, save, nu });
-  const componenten = maakComponenten({ db, save, nu });
-  const contracten = maakContracten({ db, save, nu });
-  const run = maakRun({ db, save, nu, crypto, motor, regelpakket: regels, componenten });
-  const journaal = maakJournaal({ db, save, nu, crypto });
-  const aangifte = maakAangifte({ db, save, nu, crypto, run });
+  /* DE ENIGE PLEK WAAR PAYROLL db AANRAAKT. Vanaf hier krijgt geen enkele
+     laag de database nog mee, alleen het contract -- zie ./opslag.js voor
+     waarom dat de volgorde is en niet andersom. */
+  const opslag = maakOpslag({ db });
+  const regels = maakRegelpakket({ opslag, save, nu });
+  const componenten = maakComponenten({ opslag, save, nu });
+  const contracten = maakContracten({ opslag, save, nu });
+  const run = maakRun({ opslag, save, nu, crypto, motor, regelpakket: regels, componenten });
+  const journaal = maakJournaal({ opslag, save, nu, crypto });
+  const aangifte = maakAangifte({ opslag, save, nu, crypto, run });
   /* Het dossier verzamelt alleen; het rekent niets opnieuw uit en vult geen
      gaten. Daarom krijgt het de andere lagen mee in plaats van de database. */
   const dossier = maakDossier({ run, journaal, aangifte, regelpakket: regels, contracten });
-  const verzuim = maakVerzuim({ db, save, nu });
-  const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
+  /* De bewijsketen van de aangifte: van het collectieve bedrag omlaag naar de
+     nominatieve regels, en van daaruit naar het dossier hierboven. Hij bouwt
+     dat detail niet na -- hij wijst ernaar. */
+  const { payrollHerkomst } = maakPayrollHerkomst({ aangifte, run, regelpakket: regels, dossier });
+  const verzuim = maakVerzuim({ opslag, save, nu });
+  const identiteit = maakIdentiteit({ accounts, opslag, save, nu, inzagelog, notify, logActivity });
   /* De dekking eerst: de bijwerklaag leest er zijn bronnen uit, per land. Zo is
      een land erbij een adres neerzetten en geen uitrol. */
-  const dekking = maakDekking({ db, save, nu, regelpakket: regels, LANDEN, accounts });
-  const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log, dekking });
-  const uren = maakUren({ db });
+  const dekking = maakDekking({ opslag, save, nu, regelpakket: regels, LANDEN, accounts });
+  const bijwerken = maakBijwerken({ regelpakket: regels, opslag, save, nu, log, dekking });
+  const uren = maakUren({ opslag });
   /* De invoer van een loonrun begint bij het CONTRACT en niet bij de klok.
      Stond die samenstelling in de route, dan was hij niet te toetsen zonder
      server -- en dan kon een maandsalaris eruit vallen zonder dat iets het zei.
      Zie ./samenstellen.js voor wat daar mis ging. */
   const samenstellen = maakSamenstellen({ contracten, uren, verzuim });
-  const controles = maakControles({ db, save, nu });
+  const controles = maakControles({ opslag, save, nu });
 
   /* De meegeleverde jaargang een keer binnenhalen. Hij komt binnen langs
      dezelfde keuring als elk ander pakket -- geen achterdeur voor "onze eigen"
@@ -91,7 +101,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, samenstellen, controles, dekking, dossier, herkomst: payrollHerkomst,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

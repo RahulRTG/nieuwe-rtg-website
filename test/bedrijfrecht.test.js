@@ -11,7 +11,7 @@
    - HET BEHEER-TOKEN STEMT NIET. Een stem hangt aan een mens met een sleutel.
    - EEN AANGENOMEN BESLUIT KRIJGT EEN EVALUATIEDATUM, en de bezwaren blijven
      eraan hangen.
-   Draai los: node --experimental-sqlite --test test/bedrijfrecht.test.js */
+   Draai los: node --test test/bedrijfrecht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -3,7 +3,7 @@
    kring), het Flitsduel (tien dezelfde sommen, buiten de beurt, eerlijke
    uitslag) en het Reactieduel (vijf ronden, valse start bestraft). Overal
    alleen codenamen, nooit echte namen.
-   Draai los: node --experimental-sqlite --test test/arena.test.js */
+   Draai los: node --test test/arena.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

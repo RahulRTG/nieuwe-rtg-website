@@ -16,7 +16,9 @@
       kopiëren, zonder ook maar iets naar een kaart-provider te sturen
    7. (vervallen) de OS-klok is nu zelf een rustige analoge wijzerplaat in
       shared/klok.js; het uitbundige 3D-skelet (klok3d.js) wordt niet meer
-      standaard over elke ring gelegd, maar leeft als concept op /apps/horloge.html
+      standaard over elke ring gelegd. Het losse vitrinescherm daarvoor is weg (19
+      augustus 2026, nergens vandaan te bereiken); de mechaniek zelf leeft in
+      shared/horlogewerk.js, op het inlogscherm
    8. navigatie: verzekert de centrale iOS-laag en het appmenu op iedere app
       die de basis laadt, tenzij het scherm zichzelf expliciet uitsluit
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */

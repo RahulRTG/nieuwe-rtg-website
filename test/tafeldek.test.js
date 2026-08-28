@@ -5,7 +5,7 @@
    De toestemming wordt OP HET MOMENT ZELF gecontroleerd: wie het delen
    intrekt tussen reserveren en dekken, staat nergens. En het werk van de
    gastvrouw die de tafel al had gedekt blijft staan.
-   Draai los: node --experimental-sqlite --test test/tafeldek.test.js */
+   Draai los: node --test test/tafeldek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

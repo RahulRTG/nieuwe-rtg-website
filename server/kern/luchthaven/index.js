@@ -15,6 +15,7 @@
      ./royaal     het charterloket (operations beslist), de Koninklijke
                   Vleugel (vips onder protocolnaam) en de lounges
    Vast patroon: maakLuchthaven(state) -> { lucht: api }. */
+const { demoAan } = require('../demostand');
 
 const GATES = ['A1', 'A2', 'A3', 'B1', 'B2', 'C1'];
 const STANDS = ['P1', 'P2', 'P3'];          // general aviation: de privejets
@@ -67,9 +68,13 @@ function maakLuchthaven({ db, save, crypto, anthropic, visumtaakVan }) {
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
     require('../../seed/genres').zetGenre(db, 'luchthaven');
+    // verzonnen instelling: alleen in demostand aanmaken (kern/demostand.js)
+    if (!demoAan()) return;
     if (!db.data.suppliers.find(s => s.code === 'LUCHT')) {
       db.data.suppliers.push({
         code: 'LUCHT', name: 'RTG Airport', type: 'luchthaven', city: 'Ibiza',
+        // geseed: opruimbaar op een database die ooit mét demo begon (kern/demostand.js)
+        geseed: true,
         loc: { lat: 38.873, lng: 1.373, label: 'RTG Airport' }, rate: 0, menu: [], photos: [], luchthaven: {}
       });
     }

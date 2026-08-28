@@ -19,7 +19,7 @@
   position:absolute;z-index:2;right:clamp(1rem,4vw,4.5rem);top:50%;box-sizing:border-box;width:min(43vw,590px);
   min-width:420px;padding:1rem 1.1rem .85rem;overflow:hidden;color:#edf2ec;
   border:1px solid rgba(153,234,255,.2);border-right-color:rgba(203,179,112,.35);
-  background:linear-gradient(135deg,rgba(12,15,14,.9),rgba(19,22,20,.74));
+  background:linear-gradient(135deg,rgba(12,15,14,.97),rgba(19,22,20,.94));
   box-shadow:0 28px 70px rgba(0,0,0,.28),inset 0 0 45px rgba(153,234,255,.025);
   backdrop-filter:blur(18px);transform:translate3d(calc(var(--graph-x) * -8px),calc(-50% + var(--graph-y) * -6px),0);
   transition:transform .18s ease-out;
@@ -28,7 +28,7 @@
 .rtg-reality-graph::before{top:-1px;left:-1px;border-top:1px solid var(--rtg-ion);border-left:1px solid var(--rtg-ion);}
 .rtg-reality-graph::after{right:-1px;bottom:-1px;border-right:1px solid #c8ad6b;border-bottom:1px solid #c8ad6b;}
 .rtg-graph-head,.rtg-graph-foot{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem;font:600 .52rem/1 Inter,system-ui,sans-serif;letter-spacing:.17em;}
-.rtg-graph-head>span{color:rgba(239,244,238,.42);}
+.rtg-graph-head>span{color:#8E918C;}
 .rtg-graph-head b{display:flex;align-items:center;gap:.55rem;color:var(--rtg-ion);font:inherit;}
 .rtg-graph-head i,.rtg-intel-state::before,.rtg-intel-deck footer i{width:5px;height:5px;background:var(--rtg-ion);box-shadow:0 0 12px var(--rtg-ion);}
 .rtg-reality-graph svg{display:block;width:100%;height:auto;margin:.25rem 0;overflow:visible;}
@@ -43,8 +43,8 @@
 .rtg-graph-node.is-active .rtg-node-core{fill:var(--rtg-ion);filter:url(#rtgIon);}
 .rtg-graph-node.is-active text{fill:#e8fbff;}
 .rtg-graph-node.is-active .rtg-node-code{fill:var(--rtg-ion);}
-.rtg-graph-foot{padding-top:.65rem;border-top:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:1.25rem;color:rgba(239,244,238,.28);font-size:.45rem;}
-.rtg-graph-foot span:last-child{margin-left:auto;color:rgba(203,179,112,.62);}
+.rtg-graph-foot{padding-top:.65rem;border-top:1px solid rgba(255,255,255,.08);justify-content:flex-start;gap:1.25rem;color:#8E918C;font-size:.45rem;}
+.rtg-graph-foot span:last-child{margin-left:auto;color:#A08D58;}
 
 /* De live registerbalk is geen navigatie en geen marketing. Hij vertelt wat
    de interface nu werkelijk weet, en waar haar bevoegdheid stopt. */
@@ -52,10 +52,10 @@
 .rtg-intel-strip::before{content:"";position:absolute;top:-1px;left:0;width:18%;height:1px;background:var(--rtg-ion);box-shadow:0 0 18px var(--rtg-ion);animation:rtg-scan 8s ease-in-out infinite;}
 .rtg-intel-identity{display:flex;flex-direction:column;justify-content:center;gap:.45rem;padding:1rem clamp(1rem,2.8vw,2.7rem);border-right:1px solid var(--rtg-intel-line);}
 .rtg-intel-identity span{color:var(--rtg-ion);font:600 .56rem/1 Inter,system-ui,sans-serif;letter-spacing:.2em;}
-.rtg-intel-identity b{color:rgba(236,238,233,.44);font:500 .47rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;}
+.rtg-intel-identity b{color:#9DA09B;font:500 .47rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;}
 .rtg-intel-data{display:grid;grid-template-columns:.75fr .9fr .8fr 1.2fr 1.1fr;margin:0;min-width:0;}
 .rtg-intel-cell{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.45rem;padding:.8rem clamp(.65rem,1.4vw,1.4rem);border-right:1px solid var(--rtg-intel-line);}
-.rtg-intel-cell dt{color:rgba(236,238,233,.32);font:600 .45rem/1 Inter,system-ui,sans-serif;letter-spacing:.16em;}
+.rtg-intel-cell dt{color:#8E918C;font:600 .45rem/1 Inter,system-ui,sans-serif;letter-spacing:.16em;}
 .rtg-intel-cell dd{overflow:hidden;margin:0;color:#eef0eb;font:600 .61rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.07em;white-space:nowrap;text-overflow:ellipsis;}
 .rtg-intel-state{display:flex;align-items:center;gap:.5rem;color:#d7f8f0!important;}
 .rtg-intel-state::before{content:"";flex:0 0 auto;}
@@ -94,7 +94,7 @@ body.rtg-intel-messages .rtg-intel-strip{position:fixed;z-index:50;top:var(--sui
 body.rtg-intel-messages .comm{inset:calc(var(--suite-stack) + var(--rtg-intel-height)) 0 0!important;}
 
 /* Commandodeck: een controlekamer voor intentie, grens en uiteindelijke keuze. */
-.rtg-intel-scrim{position:fixed;z-index:100000;inset:0;display:grid;place-items:center;padding:clamp(1rem,4vw,4rem);background:rgba(7,9,8,.78);backdrop-filter:blur(20px);}
+.rtg-intel-scrim{position:fixed;z-index:100000;inset:0;display:grid;place-items:center;padding:clamp(1rem,4vw,4rem);background:rgba(7,9,8,.96);backdrop-filter:blur(20px);}
 .rtg-intel-deck{position:relative;width:min(1040px,100%);max-height:calc(100dvh - 2rem);overflow:auto;color:#edf0ea;border:1px solid rgba(153,234,255,.22);background:linear-gradient(145deg,#111310,#181b18 70%,#111713);box-shadow:0 50px 120px rgba(0,0,0,.55);}
 .rtg-intel-deck::before,.rtg-intel-deck::after{content:"";position:absolute;z-index:2;width:34px;height:34px;pointer-events:none;}
 .rtg-intel-deck::before{top:-1px;left:-1px;border-top:1px solid var(--rtg-ion);border-left:1px solid var(--rtg-ion);}

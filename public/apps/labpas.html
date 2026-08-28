@@ -17,25 +17,25 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
   header{padding:1.4rem 1rem .8rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.45rem;margin-top:.2rem;}
   main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.6rem .7rem;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.88rem;padding:.6rem .7rem;}
   select.veld{color-scheme:dark;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;line-height:1.5;}
   .log{font-size:.82rem;color:var(--muted);line-height:1.5;padding:.35rem 0;border-bottom:1px solid var(--line);}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
-  .pil.ok{color:var(--green);border-color:var(--green);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
+  .pil.ok{color:var(--rtg-leesgroen,var(--green));border-color:var(--rtg-leesgroen,var(--green));}
 
   /* De uitdaging: waar dit voor een bewoner mee begint. Geen projectkaart maar
      een vraag die ergens over gaat. */
-  .uitdaging{border:1px solid var(--gold);border-radius:16px;padding:1.1rem;background:linear-gradient(180deg,rgba(169,143,7,.08),transparent);}
-  .uitdaging .sec{color:var(--gold);}
+  .uitdaging{border:1px solid var(--gold);border-radius:0;padding:1.1rem;background:linear-gradient(180deg,rgba(169,143,7,.08),transparent);}
+  .uitdaging .sec{color:var(--rtg-leesgoud,var(--gold));}
   .uitdaging h2{font-size:1.2rem;margin:.25rem 0 .4rem;}
   .uitdaging .vraag{font-size:.92rem;color:var(--muted);line-height:1.55;}
 
@@ -43,8 +43,8 @@
      want het is hetzelfde onderzoek. */
   .route{display:flex;gap:0;overflow-x:auto;padding:.6rem 0 .3rem;}
   .stap{flex:0 0 auto;display:flex;align-items:center;gap:.35rem;padding-right:.35rem;}
-  .stap .bol{width:1.35rem;height:1.35rem;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;font-size:.62rem;color:var(--muted);}
-  .stap.af .bol{background:var(--green);border-color:var(--green);color:#000;}
+  .stap .bol{width:1.35rem;height:1.35rem;border-radius:0;border:1px solid var(--line);display:grid;place-items:center;font-size:.62rem;color:var(--muted);}
+  .stap.af .bol{background:var(--green);border-color:var(--rtg-leesgroen,var(--green));color:#000;}
   .stap.nu .bol{background:var(--gold);border-color:var(--gold);color:#000;}
   .stap .nm{font-size:.72rem;color:var(--muted);white-space:nowrap;}
   .stap.nu .nm{color:var(--txt);font-weight:600;}
@@ -53,8 +53,8 @@
   /* Het labpaspoort. */
   .pas{display:flex;align-items:center;gap:.9rem;}
   .pas .nv{font-family:'Bodoni Moda',serif;font-size:2rem;font-weight:500;line-height:1;}
-  .badge{display:inline-block;font-size:.7rem;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:.2rem .6rem;margin:.15rem .15rem 0 0;}
-  .balk{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:.4rem;}
+  .badge{display:inline-block;font-size:.7rem;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:.2rem .6rem;margin:.15rem .15rem 0 0;}
+  .balk{height:3px;background:var(--line);border-radius:0;overflow:hidden;margin-top:.4rem;}
   .balk i{display:block;height:100%;background:var(--gold);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -71,8 +71,8 @@
   <div class="kaart" id="poort">
     <div class="sec">Uw labpas</div>
     <div class="leeg">U heeft geen account nodig. Vul de labpas in die u bij uw onderzoek heeft gekregen.</div>
-    <div class="rij"><input class="veld" id="pasVeld" placeholder="LABPAS-XXXXXXX" maxlength="20" autocomplete="off">
-      <button class="knop" id="pasOpen" type="button">Open</button></div>
+    <div class="rij rtg-duimeind"><input class="veld" id="pasVeld" placeholder="LABPAS-XXXXXXX" maxlength="20" autocomplete="off">
+      <button class="knop" id="pasOpen" type="button" data-hoofdactie>Open</button></div>
     <div class="leeg" id="pasFout"></div>
   </div>
 

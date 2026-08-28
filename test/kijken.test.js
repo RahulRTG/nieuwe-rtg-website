@@ -5,7 +5,7 @@
    toetsen we wat er NIET doorheen komt, en wat hij zegt als hij niet kan
    kijken (want dan hoort hij niet te gokken).
 
-   Draai los: node --experimental-sqlite --test test/kijken.test.js */
+   Draai los: node --test test/kijken.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakKijken, leesFoto, MAX, OPDRACHT } = require('../server/kern/kijken');

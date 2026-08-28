@@ -159,6 +159,14 @@ beeld kunnen elk een apart lokaal model krijgen via `LOCAL_AI_MODEL_KORT`,
 `LOCAL_AI_MODEL_TOOLS` en `LOCAL_AI_MODEL_VISION`. Zonder vision-model wordt
 beeld nooit stil verwijderd of aan een tekstmodel voorgelegd.
 
+Die proef spreekt ELK ingesteld model apart aan, en dat is niet vanzelfsprekend
+geweest: hij stuurde een vraag met `max_tokens: 32`, en `modelVoor()` kiest bij
+<= 200 het KORTE model. Stond `LOCAL_AI_MODEL` verkeerd -- een typefout, een
+model dat de server niet geladen heeft -- dan slaagde de check gewoon, terwijl
+elk normaal verzoek daarna stilletjes naar de betaalde uitwijk viel. Nagemeten
+met een kapot tekstmodel: de oude proef gaf exit 0 en sprak alleen het korte
+model aan; de huidige geeft exit 1 en noemt `tekst=... FOUT`.
+
 Zonder model start RTG in **handmatige werkmodus**. Alle schermen, navigatie,
 controles en regelgestuurde opdrachten blijven werken; alleen vrije
 modelverrijking valt weg. Met `RTG_AI_UIT=1` is ook in productie aantoonbaar
@@ -801,6 +809,54 @@ Regel voor dit bestand: vind je een nieuw soort stille fout, dan komt er een
 scanner bij. En een scanner die roept bij dingen die kloppen is erger dan geen
 scanner -- dus liever iets milder dan valse alarmen.
 
+### De routedekking (`npm run dekking`, en het kantoorscherm ernaast)
+
+**De eis is 100% van álle routes, en er is geen norm om die eis te verlagen.**
+
+Wat er gemeten wordt komt niet uit de tekst van de toetsen maar uit de server
+zelf: met `RTG_ROUTELOG` gezet schrijft `server/routelog.js` elk routepatroon weg
+dat hij werkelijk heeft afgehandeld (`npm test` doet dat standaard naar
+`.routejournaal`, `npm run e2e` naar `.schermjournaal`). Wat in zo'n journaal
+staat is aangeroepen; wat er niet in staat, niet.
+
+```bash
+npm run dekking        # leest de staande journalen, of draait de suite alsnog
+npm run dekking:vast   # en schrijft het bewijsstuk DEKKING.json
+node --experimental-sqlite scripts/dekking.js --lees a.log --lees b.log
+```
+
+Twee versimpelingen zijn eruit, en samen kostten ze twintig routes die het cijfer
+niet kende:
+
+- **de eenheid is METHODE + PATROON**, niet het pad. Op
+  `/api/scim/v2/Users/:id` hangen DELETE, GET, PATCH en PUT; een toets op één
+  daarvan zette alle vier op groen. Elf paden hadden zo een tweede methode die
+  meeliftte.
+- **alle routes tellen mee**, niet alleen die onder `/api/`. De zeven
+  pagina-routes -- waaronder `/scriptbundel.js` en `/stijlbundel.css`, die op
+  élke pagina van dit huis staan -- vielen buiten de meting. Niet als ongedekt:
+  ze bestonden niet voor het cijfer. `test/paginaroutes.test.js` dekt ze nu, en
+  vond daarbij meteen twee kapotte routes (`/apps` gaf 404 terwijl de routekaart
+  hem meldde, en `/werken/:code` herschreef naar een laag die er niet meer was).
+
+Het rekenwerk staat op **één** plek, `server/kern/routedekking.js`, en zowel de
+poort (`scripts/dekking.js`) als het kantoorscherm rekenen met diezelfde functie.
+Twee optellingen voor één waarheid lopen uiteen, en juist bij een cijfer dat 100%
+moet zijn is dat het laatste wat je wil (LAT.md regel 4).
+
+**Het personeel kan het nakijken: `/apps/routedekking.html`**, in de wereld RTG
+Kantoor, achter de gewone kantoor-inlog. Dat scherm toont geen bewaard
+percentage maar een **vergelijking**: het bewijsstuk `DEKKING.json` naast de
+routes die deze server op dít moment registreert. Een route die er na de meting
+bij komt staat er dus meteen als ongedekt bij, zonder dat er eerst een testronde
+hoeft te draaien -- en is er geen bewijsstuk, dan zegt het scherm "niet gemeten"
+in plaats van 0% of 100% (LAT.md regel 3). Doorzoekbaar per domein, met een
+filter op alleen de gaten.
+
+Gehandhaafd door `test/routedekking.test.js`: die houdt de levende routekaart
+naast `DEKKING.json` en zakt op elk gat. Wie een route toevoegt zonder toets ziet
+dat in de gewone suite, niet pas in CI.
+
 ### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
 
 De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*
@@ -835,6 +891,199 @@ De meter `wettenOnbewezen` in `NORM.json` telt wat er niet bewezen is en mag
 alleen omlaag; `test/meterijk.test.js` ijkt hem (keuringsregel 35), en
 `test/wetten.test.js` ijkt de motor zelf -- onder andere dat een wachter die al
 rood was nooit als bewijs meetelt.
+
+## Snelheid en kosten: vier lagen, allemaal nagemeten
+
+Vier lagen die de pagina lichter maken en de rekening drukken. Ze staan alle
+vier standaard AAN en zijn los uit te zetten; de cijfers komen uit een echte
+browser over HTTP/2 op 80 ms latentie en 12 Mbit, mediaan van vijf ronden.
+
+| laag | wat | uit met |
+|---|---|---|
+| `middleware/stijlafsplitsing.js` | groot inline `<style>`-blok wordt een eigen blad | `RTG_STIJLAFSPLITSING=0` |
+| `middleware/scriptafsplitsing.js` | groot inline `<script>`-blok wordt een eigen bestand | `RTG_SCRIPTAFSPLITSING=0` |
+| `middleware/versieadres.js` | elke `.js`/`.css`-verwijzing krijgt `?v=`, en mag dan `immutable` | `RTG_VINGERAFDRUK=0` |
+| `middleware/voordeur.js` | paginacompressie asynchroon (libuv-threadpool i.p.v. de event loop) | -- |
+
+De eerste twee zijn EEN machine met twee instellingen: het gereedschap
+(codering, padcontrole, vingerafdruk, cache, compressie, koppen) staat in
+`middleware/blokafsplitsing.js`, de afweging per soort blok bij de twee lagen
+zelf -- waarom een stijlblok mag verhuizen zonder dat de cascade schuift, en
+een scriptblok zonder dat de uitvoervolgorde schuift.
+
+Waarom dit ertoe doet: over alle 258 schermen was 74% van de 4,7 MB HTML inline
+CSS en JS. Dat is de ene bron die NOOIT gecachet kan worden -- een pagina draagt
+een eigen nonce, dus elk antwoord is anders. Op `/apps/app.html`:
+
+    rauwe HTML      185.444 -> 51.883 bytes
+    over de lijn     52.636 -> 13.910 bytes gzip (74% minder)
+    CPU per verzoek     7,9 ->    1,05 ms
+    plafond             127 ->     948 pagina's/seconde per proces
+
+En met de versie in het adres hoeft een terugkerende bezoeker niet meer na te
+vragen of zijn scripts nog goed zijn: 908 -> 637 ms en 67 -> 29 verzoeken bij
+de server.
+
+Elke laag laat de pagina exact hetzelfde: de uitgeleverde CSS en JS zijn
+byte-voor-byte de inline blokken, en over 1294 elementen x 25 berekende
+eigenschappen is er geen verschil. Alle 259 schermen zijn met en zonder de
+lagen langsgelopen; geen enkel scherm gedraagt zich anders.
+
+## De modelkraan: een meter en twee kranen (`server/ai-meter.js`, `server/ai-rem.js`)
+
+EERST DE STAND VAN ZAKEN, want die is minder alarmerend dan het klinkt:
+`npm run live:init` schrijft `RTG_AI_UIT=1`, dus productie start ZONDER model,
+in de regelgestuurde werkmodus. En zodra er wel AI is, is de keten lokaal-eerst
+(`server/ai.js`): de eigen modelserver (`LOCAL_AI_URL`) staat vooraan, externe
+aanbieders zijn uitwijk voor wat lokaal niet kan of uitvalt. De
+configuratiekeuring (`server/config/productie-ai.js`) weigert zelfs een
+achtergebleven providersleutel naast `RTG_AI_UIT=1`: uit moet aantoonbaar uit
+zijn.
+
+Wat er dus geregeld moest worden, geldt voor het moment dat er externe sleutels
+staan. Dan sturen honderd aanroepplekken werk naar een extern model, en
+`usage.output_tokens` kwam wel binnen maar werd weggegooid: de eerste keer dat
+je de kosten zag, was op de factuur. De rem aan de deur (300 verzoeken per
+minuut per IP) ziet bovendien geen verschil tussen een endpoint van een tiende
+cent en een Opus-aanroep van $0,0136 -- een uur volloopen is ongeveer $244.
+
+EN DE EIGEN AI TELT OOK MEE, in een eigen emmer. Die kost geen geld maar
+CAPACITEIT: eigen ijzer, eigen wachttijd. Er hangt dus geen bedrag aan, wel een
+telling. Daaruit volgt het getal dat je echt wilt zien: **het aandeel dat naar
+buiten ging**. De keten is lokaal-eerst, dus dat hoort laag te zijn. Loopt het
+op, dan is dat geen kostenpost maar een signaal -- de eigen modelserver haakt
+af, en de rekening merkt het eerder dan een mens.
+
+`server/ai.js` is het enige punt waar elke aanroep langskomt, dus daar wordt
+geteld en daar staan de kranen:
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `RTG_AI_DAGPLAFOND` | dagplafond in dollar voor het hele huis; daarboven gaan externe modellen dicht | 50 (`npm run live:init` schrijft hem) |
+| `RTG_AI_BEURTEN_PER_MINUUT` | modelaanroepen per aanroeper per minuut; 0 zet de rem uit | 60 |
+| `RTG_AI_PRIJZEN` | prijstabel overschrijven (JSON), zodat een prijswijziging geen codewijziging is | ingebouwde tabel |
+
+De stand is af te lezen op `GET /api/techniek/ai/kosten` (techniek-inlog en
+alleen de eigenaar): aanroepen, tokens, kosten en de uitsplitsing per model,
+plus de interne emmer (`lokaal`) en `aandeelExtern`. Een totaalbedrag zegt dat
+het duur is, de uitsplitsing zegt waardoor, en het aandeel zegt of de eigen
+modelserver zijn werk nog doet.
+
+Beide kranen raken alleen EXTERNE aanbieders: een eigen modelserver
+(`LOCAL_AI_URL`) draait door, en anders valt de keten terug op geen-model -- de
+handmatige werkmodus die dit huis al draagt. De rem telt MODELAANROEPEN en geen
+routes, via dezelfde `AsyncLocalStorage` die `db/index.js` al gebruikt, zodat
+een nieuwe route er automatisch onder valt. Meter en rem staan apart
+(`ai-meter.js` en `ai-rem.js`) omdat ze verschillende dingen doen: de meter
+meet en grijpt in als het geld op is, de rem stopt iemand die er in een minuut
+doorheen gaat. De prijzen zijn een tabel met een
+peildatum en verouderen; ze bewaken een orde van grootte, ze zijn geen
+boekhouding.
+
+## Het AI-budget per persoon (`server/ai-budget.js`)
+
+De twee grenzen hierboven missen allebei iets. Het huisplafond telt het HELE
+huis: dat vangt een lek, maar pas als iedereen er last van heeft -- de kraan
+gaat voor de honderdste bezoeker dicht doordat de eerste hem heeft
+leeggetrokken. De rem telt per MINUUT: die vangt een uitschieter, maar een
+script dat netjes 59 per minuut doet loopt een dag lang door.
+
+Wat ertussen zat is een grens die bij de **persoon** hoort.
+
+| pas | venster | budget |
+|---|---|---|
+| gratis (en wie niet is ingelogd) | per dag | € 0,50 |
+| RTG Pass | per maand | € 15 |
+| Lifestyle Pass en Business Pass | per maand | € 5.000 |
+
+**Kijk naar het venster, niet naar het bedrag.** € 0,50 per dag is over een
+maand ook € 15 -- precies de RTG Pass. Het verschil is dus niet hoeveel je
+krijgt maar hoe vrij je erin bent: een RTG-lid mag zijn maand op één dag
+opmaken, een gratis gebruiker nooit meer dan een halve euro op een dag. Wie wil
+dat een betalend lid ook méér krijgt, verandert één getal in `BUDGETTEN`
+(`server/ai-budget-beleid.js`, of `RTG_AI_BUDGETTEN` als JSON in de omgeving).
+
+**Een IP is geen persoon.** De rem hiernaast sleutelt op IP, en voor een grens
+per minuut is dat prima. Voor een dag- of maandbudget is het op twee manieren
+fout tegelijk: een kantoor deelt één IP met honderd collega's, die dan samen
+één budget zouden krijgen, en een lid dat van wifi naar 4G loopt zou opeens
+iemand anders zijn met een vol budget. De sleutel is daarom de sessiesleutel
+van het lid (`user-<id>`) -- pseudoniem, zoals de rest van de operationele
+data; de echte naam blijft in de identiteitskluis. Wie niet is ingelogd valt
+terug op het IP en krijgt het gratis-budget, want anders is uitloggen de manier
+om er onderuit te komen.
+
+**De Foundation sluit nooit.** Alles onder `/api/foundation`, `/api/rtf`,
+`/api/bijles`, `/api/onderwijs` en `/api/member/leren` telt wel mee maar wordt
+nooit afgesloten. Dat volgt uit een regel die er al stond (`test/modelkeuze.test.js`):
+wat een kind te horen krijgt is geen kostenpost. Een bijlesdocent die halverwege
+een som stopt omdat het tegoed op is, is precies dat wel. Alleen het huisplafond
+kan die aanroepen nog stoppen. De lijst staat op één plek, met een reden per
+regel, en is bewust géén vlag die elke aanroeper zelf moet zetten -- zo'n vlag
+ben je een keer vergeten, en dan valt een kind stil.
+
+**Wat het niet is: geen aftelteller en geen verkooptrechter.** Er komt nergens
+"nog twaalf vragen vandaag" in beeld; dat is kunstmatige schaarste, en dat is
+precies wat CLAUDE.md verbiedt. Het budget is onzichtbaar tot het op is. En het
+bericht dat je dan krijgt noemt met opzet géén andere pas: zodra een grens per
+pas verschilt is "upgrade voor meer AI" de vanzelfsprekende volgende zin, en
+dan is de rem een verkoopargument geworden (LIFE.md: een relatie is geen
+trechter). Het bericht wijst naar wat er wél kan -- de handmatige werkmodus.
+
+**De munt.** De aanbieders factureren in dollar, deze budgetten staan in euro.
+Daar zit dus een koers tussen, met een peildatum, overschrijfbaar met
+`RTG_AI_KOERS` -- en die veroudert net zo hard als de prijstabel. Hij bewaakt
+een orde van grootte; het is geen boekhouding. **De ingebouwde koers (1 EUR =
+1,08 USD, peildatum 19 augustus 2026) is een aanname die iemand hoort na te
+kijken: dit huis heeft geen koersbron en verzint er ook geen.**
+
+De stand staat op hetzelfde luik als de meter (`GET /api/techniek/ai/kosten`):
+de bedragen per pas, hoeveel mensen er verbruik hebben, hoeveel er aan hun
+grens zitten, en wat de vrijgestelde oppervlakken kostten. Bewust een AANTAL en
+geen lijst -- wie er aan zijn grens zit is een gegeven over een lid, en dat
+hoort niet in een kostenoverzicht te staan omdat het toevallig te tellen is.
+
+## De eigen modelserver heeft een poort (`server/local-ai-poort.js`)
+
+Een externe aanbieder schaalt mee; een eigen modelserver niet. Die doet er twee,
+misschien vier tegelijk, en daarboven wordt hij niet langzamer maar STUK: alles
+kruipt, alles loopt in de timeout, en de uitwijkketen stuurt vervolgens ALLES
+naar de betaalde aanbieder. Dat is de dure faalstand, en hij is stil -- de
+rekening ziet hem eerder dan een mens, en ondertussen verlaat de inhoud wel het
+huis.
+
+Twee kleppen daartegen, allebei in `local-ai-poort.js` en niet in de HTTP-laag
+eronder (die bedient ook de betaalprovider en weet niets van een GPU).
+`local-ai.js` ernaast gaat over modelkeuze en de netwerkgrens; de poort gaat
+over capaciteit:
+
+| schakelaar | wat | standaard |
+|---|---|---|
+| `LOCAL_AI_GELIJKTIJDIG` | hoeveel verzoeken tegelijk naar de eigen server | 2 |
+| `LOCAL_AI_WACHT_MS` | hoe lang een verzoek in de wachtrij mag staan voordat de keten uitwijkt | 20000 |
+| `LOCAL_AI_STORINGSGRENS` | storingen op rij voordat de onderbreker aanslaat | 3 |
+| `LOCAL_AI_HERSTEL_MS` | hoe lang lokaal dan wordt overgeslagen, voordat er weer een verzoek langs mag | 30000 |
+
+Nul is bij deze twee tijden een geldig antwoord en geen leegte:
+`LOCAL_AI_WACHT_MS=0` betekent "niet in de rij, meteen uitwijken" en
+`LOCAL_AI_HERSTEL_MS=0` betekent "geen herstelvenster".
+
+Waarom de wachtrij een grens heeft: een lid drie minuten naar een leeg scherm
+laten kijken is erger dan de vraag naar buiten sturen. Waar die grens ligt is
+een keuze en geen natuurwet, dus hij staat in de env.
+
+Waarom de onderbreker bestaat: blijft de server *hangen* (niet weigeren, maar
+hangen), dan betaalt elk verzoek eerst de volle timeout voordat de uitwijk
+begint. Na een paar storingen slaat `kan()` over op false en slaat de keten hem
+meteen over. Na het herstelvenster mag er weer een verzoek langs; lukt dat, dan
+gaat de klep dicht en staat de teller weer op nul.
+
+Af te lezen op `GET /api/techniek/ai/kosten` als `lokaleServer`: bezig,
+wachtend, storingen, onderbroken. `aandeelExtern` zegt DAT de eigen server
+afhaakt; dit zegt waarom.
+
+`test/lokale-ai-poort.test.js` toetst dit tegen een echte nagemaakte
+modelserver -- gelijktijdigheid, de wachtgrens, de onderbreker en het herstel.
 
 ## Datamap instelbaar (RTG_DATA_DIR)
 
@@ -1002,6 +1251,575 @@ uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
   van `eten`.** De boekhouding zette elke zaak zonder kamers of ritten op
   `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
   cijfer verandert daardoor, en dat is de bedoeling.
+
+### Welke regels golden er op die dag (`kern/fiscaal/jaargangen.js`)
+
+De Regelwacht hield zijn overlay bij als een platte kaart van laatste waarden
+(`Object.assign(eerder, wijz)`). Dat beantwoordde "wat geldt er nu" en maakte
+"wat gold er toen" **onbeantwoordbaar**: de oude waarde werd overschreven, niet
+bewaard. Wat het NL-eten-tarief op 15 maart 2026 was, stond daarna nergens meer.
+Een administratie krijgt jaren later precies die tweede vraag — bij een controle,
+een bezwaar of een due diligence.
+
+De oplossing is geleend en niet verzonnen. Payroll doet dit al met jaargangen
+(`kern/payroll/regelpakket.js`): een tarief is daar nooit een constante maar een
+**versie** met een geldigheidsperiode en een herkomst, en de loonrun stempelt de
+versie die hij gebruikte op zichzelf. Twee regelmotoren in één huis is precies
+wat LAT-regel 4 verbiedt, dus de fiscale kant krijgt hetzelfde model.
+
+Het verschil met payroll: dat krijgt hele pakketten binnen (een JSON per land per
+jaar), de Regelwacht krijgt losse velden ("NL, eten, 11%") en zijn basis staat in
+code. Een momentopname per wijziging zou voor ~200 landen absurd zijn. Dus:
+
+    de basis (peiljaar, uit landen.js) + de wijzigingen tot een datum
+    = de tabel zoals hij op die datum was
+
+**Het scharnier is de basis.** De projectie schrijft in de gedeelde
+`LANDEN`-tabel — dat moet, anders zou elke lezer in huis moeten veranderen — dus
+na een projectie is `LANDEN` de huidige stand en niet meer het peiljaar. Er staat
+daarom een diepe kopie van de tabel zoals `landen.js` hem oplevert, gemaakt
+vóórdat er iets overheen ging. Het opbouwen zelf is puur en staat apart
+(`jaargangen-tijdlijn.js`).
+
+Wat dat oplevert:
+
+- **een tariefwijziging van juli verplaatst het tarief van juni niet** — de toets
+  waar het om begonnen is, en die vóór deze laag niet te schrijven was;
+- **een wijziging met een ingangsdatum in de toekomst ligt klaar en doet niets**,
+  dezelfde eigenschap als een payroll-jaargang die in november binnenkomt voor
+  1 januari. Voorheen onmogelijk: de overlay kende geen ingangsdatum, dus alles
+  wat binnenkwam gold meteen;
+- **de geschiedenis zegt wat er veranderde en wat het verving**, per land en per
+  (genest) veld;
+- **de projectie stapelt niet** maar bouwt terug op vanaf de basis, zodat een
+  wijziging die wegvalt ook echt uit het beeld verdwijnt.
+
+De oude platte overlay wordt eenmalig omgezet. Eerlijk over wat niet te redden
+is: wanneer elk veld veranderde is nooit vastgelegd, dus alles landt op de laatst
+bekende updatedatum met de herkomst `overlay-migratie` en die reden erbij. Een
+verzonnen ingangsdatum is erger dan een grove.
+
+Een wijziging draagt een `stand` (`ongecontroleerd` / `goedgekeurd`): wat het
+kantoor doorvoert heeft een mens gezien, wat een automatische bron levert niet.
+Beide worden geprojecteerd — net als voorheen. Aan die projectie een goedkeuring
+hangen zou bij de eerste de beste storing stilletjes de tarieven van het hele
+huis bevriezen; dat is een eigen besluit met een eigen zichtbare schakelaar. De
+stand wordt hier alleen vastgelegd, zodat dat besluit later te nemen is zonder
+archeologie.
+
+De tariefkeuze zelf (categorie, anders standaard) staat op één plek —
+`tarief.js` `uitTabel`, gedeeld door de lopende tabel en de teruggerekende. Een
+herbouwd bedrag dat net anders terugvalt dan het oorspronkelijke is geen herbouw.
+
+`test/fiscaal-jaargangen.test.js` dekt de vijf beweringen; elk is met een mutatie
+zien zakken.
+
+#### En de rekenplekken die het moeten doen
+
+De jaargangen maken terugrekenen *mogelijk*; drie rekenplekken deden het niet en
+herschreven daarmee stilletjes een afgesloten dag of maand zodra de Regelwacht
+iets bijwerkte. Ze vragen het nu aan één plek (`kern/fiscaal/regelbron.js`), die
+zonder jaargangen netjes terugvalt op de lopende tabel — en dat ook zegt.
+
+**De maandboekhouding (`financeVoor`)** pot nu per categorie **én per tarief**,
+met het percentage van de dag van de transactie zelf. Verandert een tarief
+halverwege de maand, dan staan er twee regels in plaats van één: de omzet van
+voor en na de ingangsdatum hoort niet op een hoop, want dan draagt één van beide
+helften het verkeerde percentage af. Zo telt de btw-aangifte ook
+(`btwtelling.js` pot per tarief). Verandert er niets, dan is er per categorie
+precies één pot en ziet niemand verschil. De werkgeverslasten, het vakantiegeld
+en het minimumloon komen van een **peildag**: de laatste dag van de maand, maar
+nooit later dan vandaag — anders telt op de tiende al een wijziging mee die pas
+op de dertigste ingaat.
+
+**Het Z-rapport (`rapporten.js`)** gebruikt het tarief van díé dag. Daar zat nog
+een tweede probleem: dit bestand had een **eigen kopie** van de categorie-logica
+— de derde — met precies de bug die `tarief.js` kwam opheffen. Een zaak zonder
+kaart, kamers of ritten werd `eten`, dus een kledingwinkel kreeg het lage tarief
+over een jas terwijl zijn factuur en zijn maandboekhouding het standaardtarief
+zeiden. Eén zaak, één dag, twee cijfers.
+
+> **Dit verandert een cijfer.** Het Z-rapport van een zaak zonder kaart, kamers
+> of ritten gaat van het verlaagde naar het standaardtarief. Dat cijfer hoort te
+> veranderen — het stond fout, en het is dezelfde correctie die de factuur en de
+> boekhouding al hadden ondergaan.
+
+**De zzp-tool** is bewust *niet* half temporeel gemaakt. De schijven,
+aftrekposten en heffingskortingen staan als vaste data op het peiljaar en de
+Regelwacht raakt ze niet aan, dus er valt niets terug te rekenen. Een jaartal
+laten aannemen zou een antwoord geven dat eruitziet als "de regels van 2023" en
+het niet is. Hij accepteert nu een `jaar` en zegt bij een jaar buiten het
+peiljaar uitdrukkelijk dat dit niet de regels van dat jaar zijn — de som blijft
+gelijk, en juist daarom moet die zin er staan. **De ZZP-tabellen onder de
+jaargangen brengen is de volgende echte stap**, en die is hiermee niet gezet.
+
+Elke uitkomst draagt een `regelstand`: op welke dag is teruggerekend, uit welke
+bron (`jaargangen` of `lopend`), en welke wijzigingen golden er toen. Zonder die
+stempel is het herbouwen van een bedrag later een gok.
+
+`test/fiscaal-terugrekenen.test.js` dekt de vijf beweringen, elk met een mutatie
+zien zakken.
+
+### De bewijsketen (`kern/fiscaal/herkomst.js`)
+
+Een aangifte zegt "€ 4.812 te betalen". Dat getal is te vertrouwen zolang je het
+kunt openvouwen, en dat kon niet: de aangifte droeg de optelling maar niet de
+posten. Deze laag vouwt hem open langs de keten die er echt is — aangifte →
+periode → tarief → factuur → factuurregel → de regel die op de factuurdatum
+gold — en doet drie dingen.
+
+**Verklaren** geeft de opbouw van een periode, per tarief, met de factuurnummers
+eronder. **Herbouwen** rekent een ingediende aangifte opnieuw uit de primaire
+bronnen en vergelijkt cent voor cent; gelijk is groen. Anders dan de controle in
+`dienIn` weigert die niets — weigeren hoort bij het indienen, verantwoorden bij
+het terugkijken, en een controleur die alleen "geweigerd" ziet weet nog steeds
+niet hoeveel het scheelt.
+
+Het derde is het interessantst: **wat de keten zichzelf tegenspreekt.** Een
+factuurregel draagt het tarief dat de facturatiemotor erop zette; de jaargangen
+weten welke tarieven er in dat land op die dag *bestonden*. Staat er een
+percentage op een regel dat op die dag helemaal niet voorkwam, dan klopt er iets
+niet — een regel die vóór een tariefwijziging is geboekt en ná de ingangsdatum is
+gedateerd, of een met de hand ingetypt tarief.
+
+> Let op wat die controle wél en niet zegt. Hij zegt **niet** "deze regel had het
+> lage tarief moeten hebben": welke categorie een regel had staat niet op de
+> regel, en dat verzinnen zou een bewering zijn die wij niet kunnen waarmaken.
+> Hij zegt alleen: dit percentage bestond die dag niet in dit land. Dat is smal,
+> en juist daarom is het waar.
+
+**Eén telling, niet twee.** De centensom per regel komt uit `btwtelling.js` —
+dezelfde die de aangifte en de inspecteur gebruiken. De verklaring telt de posten
+los op en legt die som ernaast: wijken ze af, dan is dat geen detail maar een
+bevinding (`sluitAan: false` met het verschil erbij). Zo bewijst de verklaring
+zichzelf tegen het getal dat ze verklaart.
+
+De omgekeerde weg — **wat raakt deze regelwijziging** — telt de facturen die ná
+de ingangsdatum nog een percentage dragen dat door die wijziging is vervangen,
+per zaak. Wat er geteld wordt is smal en nagaanbaar, en de nuance reist mee: een
+levering van vóór de wijziging mág het oude tarief dragen, dus dit is de lijst om
+na te lopen en geen lijst met fouten.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/verklaar` `{periode}` | De opbouw van een periode per tarief, met de facturen eronder; manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/herbouw` `{id}` | Een eigen aangifte herbouwen uit de bronnen en cent voor cent vergelijken |
+| `POST /api/office/bank/regels/geschiedenis` `{land, veld?}` | Wat er veranderde, wanneer, en wat het verving |
+| `POST /api/office/bank/regels/geraakt` `{land, jaargang}` | Wat die wijziging raakt: facturen, regels en zaken |
+
+De impact-vraag hangt bij het **kantoor** en niet bij de inspecteur: wie de knop
+indrukt hoort te zien wat eronder beweegt.
+
+`test/fiscaal-herkomst.test.js` dekt zeven beweringen — vijf op de motor, elk met
+een mutatie zien zakken, en twee door de API heen op de poorten, want een
+verklaring legt de complete omzet mét factuurnummers open en is daarmee zo
+mogelijk gevoeliger dan de aangifte zelf.
+
+#### "Waarom dit bedrag?" in het Kantoor
+
+De bewijsketen staat als kaart onder de btw-aangifte
+(`public/apps/leverancier/leverancier-12a2.js`): vouw open geeft de opbouw per
+tarief met de factuurnummers eronder, en op een ingediende aangifte staat
+"Herbouw dit bedrag" — op de cent gelijk of niet, zonder tussenweg.
+
+Het scherm rekent **niets** uit, ook niet "even" de som als controle: dan staat
+er een derde teller in huis. Ook het oordeel of de opbouw aansluit komt van de
+server.
+
+**Uitzonderingsgestuurd** (ONTWERP.md): klopt alles, dan staat er een rustige
+opbouw en verder niets. Alleen een opbouw die niet aansluit en een tarief dat die
+dag niet bestond krijgen kleur. Een scherm dat bij "alles in orde" al een groen
+vinkje toont, leert de lezer over kleur heen te kijken — en dan valt de ene keer
+dat het misgaat ook niet meer op. `test/btw-waarom-scherm.e2e.js` toetst dus
+beide kanten: dat de eigen factuur eronder verschijnt, én dat er géén bevinding
+staat als er niets aan de hand is.
+
+#### "Wat veranderde?" bij de Regelwacht
+
+De landenlijst in de bankkamer zei *dát* een land was bijgewerkt; nu zegt hij
+wat er is gebeurd, wanneer het inging en **wat het verving** — dat laatste is
+waar de jaargangen voor zijn. Bij een tariefwijziging staat er een knop "Wat
+raakt dit?" naast: hoeveel facturen dragen ná de ingangsdatum nog het vervangen
+percentage, bij hoeveel zaken.
+
+Die knop staat er alleen bij een tariefwijziging; bij een minimumloon-wijziging
+valt er geen factuur van behandeling te veranderen, en de schermtoets eist dat er
+dan ook geen knop is. En het scherm neemt de zin van de server letterlijk over:
+bij een lijst om na te lopen staat er dat het niet fout hoeft te zijn, bij nul
+geraakte facturen staat er dat er niets is. Het schrijft daar niets stelligers
+overheen.
+
+#### En dezelfde keten voor het loon (`kern/payroll/herkomst.js`)
+
+De loonkant is de tweede grote geldstroom, en had al iets: `dossier.js`
+beantwoordt per medewerker per run de vier vragen — waarom is dit bedrag
+berekend, welke regelversie, is het betaald, is het aangegeven. Dat is de
+onderste helft van de keten. Wat ontbrak is de weg **van de aangifte omlaag**:
+het collectieve bedrag openvouwen naar de nominatieve regels, en van daaruit
+naar dat dossier. Deze laag bouwt die brug en **verwijst** voor het detail —
+het hier nog eens verzamelen zou een tweede dossier zijn.
+
+Herbouwen gebruikt `nominatief()` uit `aangifte.js`, dezelfde routine waarmee de
+aangifte is opgemaakt (daarvoor staat die nu op modulescope). Een herbouw die
+anders optelt vindt altijd een verschil, en dan zegt een verschil niets meer.
+
+De twee controles die bij het opmaken al draaiden, draaien hier **opnieuw** — en
+dat is de hele bedoeling: bij het opmaken bewijzen ze dat de aangifte goed
+begon, hier dat hij dat nog steeds is. De optelling van het nominatieve deel
+moet het collectieve deel zijn, en de aangegeven loonheffing moet zijn wat er op
+de stroken staat. Ze zijn onafhankelijk: draai je aan één rubriek, dan slaat de
+eerste uit en blijft het te betalen bedrag kloppen.
+
+Plus een derde die alleen achteraf te stellen is: **op welk regelpakket rustte de
+run**. Een pakket dat later van zijn aanmerking valt of dat zelf meldt dat zijn
+cijfers niet tegen het Handboek zijn gelegd, maakt de aangifte niet fout — het
+maakt hem twijfelachtig, en dat hoort naast het bedrag te staan in plaats van te
+verdwijnen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/office/payroll/verklaar` `{id}` | Het collectieve bedrag open naar de nominatieve regels, met de verwijzing naar het dossier |
+| `POST /api/office/payroll/herbouw` `{id}` | De aangifte herbouwen uit de run en rubriek voor rubriek vergelijken |
+
+Beide staan als knop bij de loonaangifte in `apps/payroll.html`
+("Waarom dit bedrag?" en "Herbouw uit de run"). Uitzonderingsgestuurd: sluit
+alles aan, dan staat er één regel dat het aansluit; alleen bevindingen krijgen
+een pil. Het detail per medewerker staat in het dossier eronder en wordt hier
+niet overgetikt — twee ingangen op dezelfde keten, geen twee ketens.
+
+Bij het **kantoor** en niet bij de zaak: dit legt de loonheffing per werknemer
+open, en de werkgever leest zijn aangifte al mee via zijn eigen route. Een
+tweede, ruimere ingang op dezelfde gegevens is geen extra dienst maar een tweede
+sleutel op dezelfde deur.
+
+### De zzp-regimes per ingangsdatum (`kern/fiscaal/zzpwacht.js`)
+
+De landentabel stond al per jaargang vast; de zzp-tabel niet, dus de zzp-tool
+rekende elk jaar met de tarieven van nu. Diezelfde jaargangen-store draagt nu ook
+deze tabel — eigen bak, eigen basis, eigen geneste velden — met een eigen
+validatie, want wat een bron mag leveren verschilt per tabel: een btw-tarief
+tussen 0 en 30 zegt niets over een heffingskorting.
+
+Twee dingen die hier stuk waren of bijna stuk gingen:
+
+- **De diepe kopie liep door JSON.** De hoogste belastingschijf staat als
+  `[Infinity, 0.495]` in de tabel, en `JSON.stringify` maakt daar `null` van.
+  De schijvenlus rekent dan `Math.min(belastbaar, null)` = 0 en kent de
+  toptariefschijf geen inkomen meer toe: een berekening die er goed uitziet en
+  te laag is. De kopie gaat nu via `structuredClone`.
+- **`regimeOp` geeft altijd iets terug** — is er niets vastgelegd, dan de basis.
+  Dat doorgeven als "de regels van 2023" is precies de schijnzekerheid die deze
+  ronde moest wegnemen. Er gaat nu pas een regime mee als de tijdlijn iets over
+  die datum te zeggen heeft; anders zegt de tool zelf dat er met de tabel van nu
+  is gerekend.
+
+De schijventabel wordt als geheel vervangen en nooit samengevoegd: schijf 1 van
+2026 met schijf 3 van 2024 eronder telt gewoon door en ziet er volstrekt normaal
+uit.
+
+### De afsluiting van een periode (`kern/fiscaal/aansluiting.js`)
+
+Dit huis had controles genoeg — de aangifte weigert op een register dat zichzelf
+tegenspreekt, het toezicht legt facturatie naast wat er is aangegeven, de
+bewijsketen herbouwt een bedrag. Wat er niet was, is het antwoord op de vraag die
+een controller aan het eind van een kwartaal stelt: **is dit af, en waar zit de
+rest?**
+
+De dekking wordt in **centen** gemeten en niet in aantal controles. Drie
+controles waarvan er één faalt is 67%, of die ene nu over twee euro of over twee
+ton gaat.
+
+| | Betekenis |
+|---|---|
+| `bewezen` | centen onder een controle die is uitgevoerd en klopt |
+| `uitzondering` | centen waar een controle is uitgevoerd en níét klopt |
+| `ontbrekend` | centen waar geen controle overheen ligt |
+
+Die derde is de gevaarlijkste, want ontbrekende dekking ziet er in elk dashboard
+uit als nul. Een periode zonder aangifte staat dus niet op 100% maar op 0%
+bewezen.
+
+**Het telt per geldstroom en niet per controle.** Meerdere controles lopen over
+hetzelfde geld; die elk hun centen laten optellen was de eerste opzet hier en gaf
+200% dekking op een kwartaal met één factuur erin — de toets ving dat. Per pot
+bepaalt de zwaarste uitslag wat ermee gebeurt: wijkt er één af, dan is dat
+verschil uitzondering; is er één niet uitgevoerd, dan is de rest ontbrekend en
+niet bewezen.
+
+> Bewezen betekent dat twee onafhankelijke wegen op hetzelfde bedrag uitkomen —
+> niet dat het bedrag juist is. Een factuur met een verkeerd tarief die netjes in
+> de aangifte staat telt hier als bewezen; daar is de vreemd-tarief-controle
+> voor. Dit meet **dekking, geen correctheid**, en dat staat in het antwoord.
+
+`POST /api/supplier/btw/afsluiting` `{periode}`.
+
+### De pre-flight (`kern/fiscaal/preflight.js`)
+
+De controles staan op het juiste moment — een weigering die pas komt als het al
+is gebeurd, is geen weigering. Maar de gebruiker hoort het dus pas ná de klik:
+kenmerk invullen, indienen, en dán te horen krijgen dat de cijfers zijn
+veranderd. Niet fout, wel laat.
+
+`keur(handeling, context)` stelt dezelfde vragen vóór de klik en geeft **GO**,
+**REVIEW** of **BLOCK**, met alle redenen — niet alleen de zwaarste, want wie het
+eerste oplost hoort niet tegen het tweede aan te lopen.
+
+**De harde regel: deze laag controleert niets zelf.** Er staat geen enkele `if`
+over een fiscale regel in. Elke uitslag komt uit een routine die de handeling
+straks ook aanroept — de zekerheidsklassen, het ogenregister, de btw-telling. Een
+pre-flight met eigen controles is een tweede waarheid naast de echte, en die twee
+lopen uiteen op precies het moment dat het ertoe doet: dan zegt het scherm GO en
+weigert de server.
+
+Twee dingen die het bouwen ervan aan het licht bracht:
+
+- **`voorbehouden` betekent niet vanzelf, niet nooit.** De klasse heet
+  PROHIBITED_AUTOMATION en gaat over de software, niet over de mens. Een
+  inspecteur die een naheffing vaststelt doet precies wat de bedoeling is; wat
+  niet mag is een knop die het zonder hem doet. Zonder mens erop is het BLOCK,
+  met een mens REVIEW.
+- **`btw.indienen` en `btw.verzenden` deelden ten onrechte een klasse.**
+  Vastleggen dát er is ingediend is administratie die een manager doet;
+  verzenden is wat RTG nooit doet. Op één hoop maakte dat de pre-flight
+  onbruikbaar — hij blokkeerde de handeling die juist wel mag. Nu gesplitst.
+
+Een handeling zonder droogloop krijgt **nooit** GO: anders leest "wij hebben
+niets nagekeken" op het scherm hetzelfde als "alles is in orde".
+
+`POST /api/supplier/btw/preflight` `{id, kenmerk?}`.
+
+#### Beide op het scherm
+
+De afsluiting staat als kaart onder de btw-aangifte
+(`leverancier-12a3.js`, afgesplitst van de Waarom-kaart op de naad
+terugkijken/vooruitkijken). Een balk met drie stukken, en de bedragen erbij:
+99,96% leest als "af", terwijl de 0,04% ernaast juist het enige is dat werk
+vraagt. Alleen uitzondering en ontbrekend krijgen kleur; van de controles krijgt
+alleen wat níét sluit een accent. De schermtoets eist daarom ook wat er *niet*
+staat als alles klopt.
+
+De pre-flight staat als knop bij het indienen — "Wat gebeurt er als ik indien?"
+— en alleen op een aangifte waarvan de periode voorbij is en die nog niet is
+ingediend. Daarbuiten valt er niets te keuren en zou de kaart ruis zijn.
+
+### De scenario-engine (`kern/fiscaal/scenario.js`)
+
+"Wat als ik twaalf mensen aanneem in Duitsland?" De harde eis is dat er níéts
+verandert, en dat is hier **structureel** opgelost en niet met discipline: de
+module krijgt geen `db`, geen `save` en geen enkele functie die schrijft. Hij
+kán niet muteren — en dat is de enige vorm van die belofte die over vijf jaar
+nog waar is. De toets legt de volledige staat voor en na naast elkaar.
+
+Hij rekent ook niet zelf: elk getal komt uit de landentabel of uit de
+payroll-dekking. Daardoor stelt hij een vraag die een rekenmachine niet stelt —
+*kunnen wij daar überhaupt loon draaien?* Een kostenplaatje voor een land zonder
+goedgekeurde loontabel is een plaatje van iets dat niet kan, en dat staat
+erbij zonder dat het bedrag verandert.
+
+Elke **aanname** staat in het antwoord, en wat we niet weten staat er als eigen
+lijst — een aanname die je niet ziet is een aanname die je gelooft. Een
+doorrekening is `advies`, nooit vastgesteld.
+
+**Wat deze module niet doet: een gekozen scenario doorvoeren.** Dat is geen
+vergetelheid. "Klaarzetten mag, doorvoeren is een mensbesluit" loopt door dit
+hele huis, en een knop die een doorrekening in werkelijkheid omzet zou in één
+klap twaalf arbeidsovereenkomsten aanmaken.
+
+### De verbintenis (`kern/fiscaal/verbintenis.js`)
+
+Aangever en toezichthouder tellen hetzelfde register met dezelfde routine. Dat
+is de kracht van dit huis — een verschil betekent iets — maar het heeft een prijs
+die niemand had opgeschreven: om te kunnen tellen moet de inspecteur het **hele**
+factuurregister lezen. Voor een controle op een bedrag is dat de complete
+commerciële administratie van een onderneming.
+
+Een merkleboom over de getelde feiten lost dat op. De inspecteur krijgt een
+**wortel** en een totaal — geen factuurnummer, geen datum, geen bedrag per regel.
+Twijfelt hij over één factuur, dan krijgt hij die ene regel plus het pad naar de
+wortel en rekent zelf na dat hij in de getelde verzameling zat, zonder de rest te
+zien.
+
+> **Wat dit wél en niet is.** Een verbintenis met selectieve openbaarmaking, geen
+> zero-knowledge bewijs. De inspecteur kan **niet** nagaan dat er een factuur is
+> weggelaten — daarvoor zou hij de verzameling moeten kennen. Wat hij wel kan:
+> vaststellen dat de aangever zich op een moment aan een verzameling heeft
+> vastgelegd en daar achteraf niets aan kan veranderen zonder dat de wortel
+> verandert. Dat is minder dan het klinkt, en daarom staat het erbij.
+
+Twee valkuilen die de toets afdekt: dezelfde feiten in een andere volgorde geven
+dezelfde wortel (anders krijgen twee partijen met dezelfde administratie
+verschillende wortels), en een oneven knoop wordt **doorgeschoven en niet
+verdubbeld** — bij verdubbeling geeft `[a,b,c]` dezelfde wortel als `[a,b,c,c]`
+en kun je een regel toevoegen zonder dat iets verandert.
+
+Het spoor van wie waarnaar keek en waarom staat al in `server/inzagelog.js`, met
+een eigen keten en anker. Dat is niet opnieuw gebouwd — een tweede journaal is
+een tweede waarheid.
+
+### Het bronnenregister (`kern/fiscaal/bronnen/`)
+
+De Regelwacht kon al *één* bron ophalen: één url uit `FISCAAL_BRON_URL`, met een
+vorm die precies moest passen. Dat werkt zolang er precies één bron is en die
+toevallig onze taal spreekt.
+
+**Wat het opzoeken opleverde.** De officiële bron voor de EU-btw-tarieven is de
+[Taxes in Europe Database](https://ec.europa.eu/taxation_customs/tedb/) van de
+Europese Commissie, die een SOAP-dienst aanbiedt; daaromheen bestaan spiegels
+die dezelfde gegevens als JSON leveren. Elke bron draagt nu drie dingen die
+nergens stonden: **gezag** (officieel / afgeleid / indicatief), **dekking**
+(welke landen en velden) en **vorm** (met de adapter die hem vertaalt). Urls
+staan niet in de code maar in de omgeving — een url in de repository is een
+keuze die niemand heeft gemaakt en die bij elke uitrol meereist.
+
+#### De vondst die de vorm bepaalde
+
+Een tarievenbron zegt welke *tarieven* een land kent — `standard`, `reduced`,
+`super_reduced`. Hij zegt **niet** welke categorie welk tarief krijgt, en dat is
+precies wat RTG bewaart:
+
+```
+NL   eten 9   (verlaagd)      DE   eten 19  (standaard!)
+NL   logies 9 (verlaagd)      DE   logies 7 (verlaagd)
+```
+
+In Duitsland valt een restaurantmaaltijd onder het standaardtarief en een
+hotelovernachting onder het verlaagde; in Nederland allebei verlaagd. Dezelfde
+"reduced rate" landt dus in het ene land op eten en in het andere niet. Dat is
+een juridische toewijzing per land, en geen tarievenbron ter wereld levert hem
+mee.
+
+Daarom doet de adapter drie dingen, en het derde is het belangrijkst:
+
+- **automatisch** — het standaardtarief. `standard` is `tarieven.standaard`, in
+  elk land, zonder oordeel.
+- **signaleren** — verschuift een verlaagd tarief, dan wordt er níéts
+  toegewezen. Er komt een signaal: "eten staat bij ons op 9%, maar dat tarief
+  komt in deze bron niet meer voor; de verlaagde tarieven zijn nu 10%."
+- **nooit** — een categorie een tarief geven dat de bron niet over die categorie
+  heeft gezegd.
+
+Dat is dezelfde regel als bij de zekerheidsklassen: automatiseer wat objectief
+automatiseerbaar is, en maak nergens zekerheid waar die niet is. Een adapter die
+de verlaagde tarieven "slim" verdeelt, levert een tabel op die er goed uitziet en
+in de helft van de landen fout is.
+
+De dagelijkse controle loopt alle geconfigureerde bronnen af. Wat binnenkomt is
+`ongecontroleerd` tot een mens het aanmerkt — automatisch binnenhalen is iets
+anders dan ongezien in gebruik nemen — en het **gezag reist mee naar de
+jaargang**, want een tarief uit de instantie zelf en een tarief uit een spiegel
+zijn niet even hard. Bronnen en openstaande signalen staan in de bankkamer bij
+de Regelwacht; alleen de signalen krijgen kleur, want dat is het enige dat werk
+vraagt.
+
+De keuring van wat een bron mag leveren staat apart (`regelwacht-keuring.js`),
+op dezelfde naad als bij payroll tussen regelpakket en -keuring: die keuring is
+de enige muur tussen een slechte bron en de tabellen waarmee dit hele huis
+rekent.
+
+### De aangiftegateway (`kern/fiscaal/gateway/`) — klaargezet, niet aangezet
+
+RTG dient geen aangiften in. Dat is een productgrens en hij staat in het
+zekerheidsregister (`btw.verzenden` en `loon.verzenden` zijn `voorbehouden`).
+Deze laag verandert daar niets aan — hij bouwt de machinerie eromheen, zodat die
+grens ooit een **besluit** kan zijn in plaats van een verbouwing.
+
+| Onderdeel | Waarom het nu al moet staan |
+|---|---|
+| **Verzegeling** | Een zending draagt de sha256 van zijn eigen inhoud, canoniek geserialiseerd. Zonder dat is "wij hebben dit verstuurd" later een bewering |
+| **Idempotentie** | Dezelfde inhoud → dezelfde sleutel. Bij een instantie die traag antwoordt is dat het verschil tussen één aangifte en twee |
+| **Staatmachine** | Eén kant op, met `AANGEBODEN` en `BEVESTIGD` apart — een toestand die "verzonden" heet laat die twee samenvallen |
+| **Keten** | Elke overgang draagt de zegel van de vorige; een record dat achteraf is bijgewerkt verraadt zichzelf |
+| **Mandaat** | Zonder toestemming wordt er niet eens iets klaargezet — andermans cijfers klaarzetten is al een verwerking |
+| **Retry** | Begrensd, en alleen op dezelfde verzegelde inhoud |
+
+**Er is geen weg naar buiten, en dat is getoetst met een kanaal dat wél actief
+is en wél zou versturen.** `biedAan` kijkt eerst naar het zekerheidsregister en
+pas daarna naar het kanaal; vandaag zegt het eerste nee. Geen vlag, geen
+omgevingsvariabele, geen `force`. Wie dit ooit aanzet, verandert het register en
+vervangt `actief` in de adapter — twee bewuste handelingen met een naam eronder.
+
+Er is ook **geen route om iets aan te bieden**. Niet vergeten maar weggelaten:
+een knop die altijd afketst is een knop die niet had moeten staan.
+
+**De richting:** generieke kern, SBR/Digipoort als eerste adapter (`sbr.js`).
+Die beschrijft wat het kanaal *vraagt* — dat is nu al te controleren, zodat een
+zending die vandaag wordt klaargezet straks niet ineens onvolledig blijkt — en
+weigert te versturen. De XML-signature met PKIoverheid-certificaat is
+**niet** nagebouwd met een eigen sleutel: een zelfgemaakte handtekening die er
+officieel uitziet is erger dan geen. De inhoud is wel verzegeld; dat is intern
+bewijs en doet niet alsof het meer is.
+
+De zaak verleent het mandaat, het kantoor leest en rekent de keten na. De naam
+van de gever komt uit het token en nooit uit het verzoek — anders is "verleend
+door" een tekstveld.
+
+Eén ding dat het bouwen opleverde: zolang de gateway inert is, is de hele
+bevestigingstak (`BEVESTIGD` / `AFGEWEZEN`) langs de gewone weg **onbereikbaar**
+— een ontvangstbewijs voor iets dat nooit is weggegaan hoort niet te kunnen, en
+de staatmachine zegt dat zelf. Die overgangen liggen wel vast en zijn puur
+getoetst.
+
+### De ogenregel op één plek (`kern/ogen.js`)
+
+"Dezelfde ogen tellen niet dubbel" stond in **vier formuleringen** in huis en
+werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het
+bezwaar, het dwangbevel en de kwijtschelding. Drie schreven het met een trim, de
+vierde zonder.
+
+**Eerlijk over wat dat wel en niet betekende:** in `kern/uitgifte.js` was dat
+niet uit te buiten, want de naam gaat daar eerst door `schoon()` en die trimt al
+— aan beide kanten van de vergelijking. Er is dus geen gat gedicht. Wat het wél
+is: dezelfde waarheid op vier plekken, in formuleringen die nu al niet letterlijk
+gelijk zijn. LAT-regel 4 bestaat niet omdat het vandaag misgaat maar omdat het
+morgen misgaat — iemand haalt `schoon()` weg, of voegt een vijfde plek toe met
+weer een eigen variant.
+
+Wat er nu bij komt is het **register**: per handeling hoeveel ogen die vraagt
+(4 = twee mensen, 6 = drie), wat er nog omkeerbaar is, en een haak voor
+bedrag-drempels.
+
+> **Er staat één drempel, en die is door een mens gezet:** een naheffing boven
+> €25.000 vraagt een derde inspecteur. Hoog genoeg dat het dagelijkse werk niet
+> vastloopt, laag genoeg dat de zware gevallen een extra paar ogen krijgen.
+> Verschuift die grens, dan verschuift hij op die ene plek en nergens anders.
+> Voor alle andere handelingen staat de lijst leeg, en dan zegt `eist()` dat er
+> ook bij in plaats van een grens te suggereren die niemand heeft vastgesteld.
+
+Dit is **geen derde rechtenmodel**. Het beslist niet wie mag inloggen, wat een
+beheerder heeft uitgezet of wat RTG zelf mag — dat zijn de twee assen die er al
+zijn (`middleware/functieschakelaars.js` en `kern/bevoegdheid/`). Het is de
+telling van handtekeningen die die assen al veronderstelden en nergens
+opschreven. CONCERN.md's grens blijft dus staan.
+
+### De vier zekerheidsklassen (`kern/fiscaal/zekerheid.js`)
+
+Elke fiscale uitkomst droeg dezelfde zin — "voorlichting, geen bindend fiscaal
+advies" — en die stond zowel onder een btw-aangifte die tot op de cent uit het
+factuurregister is geteld als onder een zzp-schatting op een verwachte jaarwinst.
+Dat doet allebei tekort: het eerste wordt onnodig vaag, het tweede onterecht
+stevig, en wie overal hetzelfde voorbehoud leest, leest het na een week niet meer.
+
+| Klasse | Term | Betekenis |
+|---|---|---|
+| `bepaald` | DETERMINISTIC | Wet en gegevens leiden eenduidig tot deze uitkomst; mag als feit worden gepresenteerd |
+| `uitlegbaar` | INTERPRETIVE | Meerdere verdedigbare behandelingen; wij kiezen er één en zeggen welke en waarom |
+| `advies` | ADVISORY | Wij rekenen voor, een mens met vakkennis beoordeelt |
+| `voorbehouden` | PROHIBITED_AUTOMATION | Dit mag RTG niet zelfstandig doen |
+
+De regel eronder: **automatiseer wat objectief automatiseerbaar is, en maak
+nergens zekerheid waar die niet is.**
+
+Drie dingen die niet mogen sneuvelen. Een uitkomst die niemand heeft ingedeeld
+valt terug op de vóórzichtige klasse en zégt dat hij niet is ingedeeld — nooit
+stilzwijgend "bepaald". `voorbehouden` is een grens en geen nog-te-bouwen
+functie; indienen namens een ondernemer, een boete opleggen, een naheffing
+vaststellen en toegang tot een pas beloven staan er alle vier in. En `bepaald`
+betekent "over de uitkomst is geen discussie als de gegevens kloppen", niet
+"gegarandeerd juist" — daarvoor is de bewijsketen er.
+
+De klassen hangen aan de maandboekhouding, de aangifte, de verklaring en de
+zzp-som, en vervangen de vlakke zin ook in de system prompts van de
+AI-boekhouders. CLAUDE.md draagt de merkregel.
 
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
@@ -3708,9 +4526,54 @@ eerste aanroep een 500 omdat het domein `reis` `kern.reiswereld` niet in
 `GRENZEN.json` had staan. Dat is geen hindernis maar de bedoeling — een domein
 dat verder reikt dan het opschrijft, hoort te stuiten.
 
+### De reisbalie: het kantoor achter het reisbureau
+
+Het RTG-reisbureau (`server/kern/reisbureau.js` + `/apps/reisbureau.html`) verkocht
+al: leden bladeren door de samengestelde reizen tegen de nettoprijs en vragen er
+een aan. Boven in die module stond de belofte dat een aanvraag *"aangevraagd"
+heet tot een mens hem bevestigt* — en die mens bestond niet. `boek()` zette de
+stand op `aangevraagd`, het lid kon hem zelf intrekken, en verder kon niemand er
+iets aan doen. De rest van het huis rekende er ondertussen wél op: de reisagenda
+toont alleen `aangevraagd` en `bevestigd` (`kern/ervaring/leden/spaarpot.js`) en
+de reiswereld heeft voor `bevestigd` en `afgewezen` allang een teken en een
+signaal klaarliggen (`kern/reiswereld.js`). Er was een openstaand endpoint
+(`/api/office/reisbureau`), maar geen kamer, geen scherm en geen knop.
+
+Die kamer is er nu: **Reisbureau**, de zesentwintigste kamer van het RTG-kantoor
+(`kern/afdelingen/register2/reisbalie.js`, zichtbaar op `/apps/kantoren.html?kamer=reisbureau`).
+Ze telt wat er open staat en wat er langer dan twee dagen ligt, en de balie
+eronder bevestigt of wijst af via `/api/office/reisbureau/besluit`.
+
+Vier dingen die daarbij vastliggen:
+
+1. **Wie beslist komt uit de sessie, niet uit het verzoek.** Dezelfde reden als
+   bij de identiteitskluis: een naam die de aanvrager zelf invult is geen naam.
+   Wie op de gedeelde kantoorcode binnenkwam, staat er ook zo bij.
+2. **Afwijzen kan alleen met een reden**, want die reden leest het lid.
+   Bevestigen mag zonder bericht: de bevestiging *is* het bericht.
+3. **Het lid ziet het besluit, niet de medewerker.** `mijn()` geeft de stand, het
+   tijdstip en het bericht terug — de interne sleutel van wie besloot blijft in
+   het kantoor.
+4. **Een besluit valt maar één keer**, en het gaat het kantoor-auditlog in: een
+   toezegging aan een lid hoort navraagbaar te zijn.
+
+Aan de ledenkant blijft een aanvraag nu ook in beeld ná het besluit. Zolang
+`/apps/reisbureau.html` alleen open aanvragen toonde, verdween een reis uit
+"Mijn aanvragen" op het moment dat de adviseur hem bevestigde — precies het
+bericht waar je op wacht.
+
+Getoetst met `test/reisbureau.test.js` (toets 7 t/m 9: de balie is dicht zonder
+kantoor-inlog, het besluit landt bij het lid zonder de medewerker mee te sturen,
+een tweede besluit ketst af en afwijzen zonder reden verandert niets) en
+`test/reisbalie.e2e.js` (het scherm liegt niet: de knop raakt alleen zijn eigen
+aanvraag, en een geweigerde afwijzing laat de regel gewoon staan).
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails. Alles wat het huis ECHT verlaat krijgt naast de boeking een **betaalopdracht** (`kern/betaalopdracht/`, voor de bank bedraad in `kern/bank/uitgang.js`): die wordt vastgelegd voordat de rail wordt gebeld, wordt bij een mislukking opnieuw ingediend met dezelfde idempotentiesleutel, en boekt het geld terug als de rail hem blijft weigeren. Het openstaande bedrag staat als **reconciliatie** naast de sluitcontrole in `/api/office/bank/gezond` (`railOpenCenten`) -- twee verschillende metingen, want een grootboek kan perfect sluiten terwijl er geen euro is aangekomen. De provider-webhook sluit een opdracht ook echt af: `payout.paid` zet hem op AFGEWIKKELD, `payout.failed`/`payout.canceled` boeken het geld terug -- de mislukte payout is daar het belangrijke geval, want dan staat het geld van de klant af zonder aan te komen. Alle drie de uitgangen delen die rij -- de bank-SEPA, de partneruitbetaling van RTG Pay en de 30%-afdracht van het fonds -- zodat `railOpenCenten` het getal van het hele huis is en niet van een van de drie. De teruggang blijft per rail, want elk boekt in zijn eigen grootboek terug; een soort zonder geregistreerde teruggang wordt geweigerd in plaats van geraden.
+- **De punten waren al geld, en de cadeaukaart kostte niets** (`server/kern/ervaring/leden/punten.js`, `routes/member/cadeaukaart.js`): RTG-punten bestonden al en zijn WEL inwisselbaar -- 100 punten worden EUR 10 tegoed dat bij de volgende betaling automatisch wordt verrekend. Dat bedrag stond in EURO'S ALS DRIJVENDE KOMMA, kende geen plafond, en de schakelaar van `/api/punten` hing aan geen enkel vermogen uit de bevoegdhedenlijst; er stond ook geen enkele toets op. Het staat nu in centen, met een plafond (EUR 500) en met `vermogen: 'WALLET_SALDO'`, zodat deze geldhandeling aan hetzelfde vastgelegde besluit hangt als de wallet; een bestaande installatie wordt bij de eerste lezing eenmalig omgerekend. **En `/api/giftcard/buy` inde niets**: het maakte een kaart met saldo aan, meldde de zaak "Cadeaukaart verkocht" en schreef nergens iets af -- terwijl die kaart aan de kassa van diezelfde zaak inwisselbaar is (`/api/supplier/giftcard/redeem`) en in `kern/fiscaal` als verplichting op zijn balans komt. Een lid kon gratis een kaart van EUR 5.000 maken en uitgeven; de zaak bleef met de schuld zitten. Kopen loopt nu via **`pay.partnerIn`** (`kern/pay/partner.js`): lid naar zaak, met autolaad en met de betaaldienstkosten net als aan de kassa, en pas NA de betaling ontstaat de kaart. De kassa-variant (`/api/supplier/giftcard/sell`) blijft ongemoeid: daar rekent de kassa af. Bij het toetsen bleek de betaling wel idempotent en de KAART niet -- een dubbeltik schreef een keer af en muntte twee kaarten; de sleutel staat nu op de kaart. Zie `TOKEN.md`.
+- **De handelslaag betaalt echt** (`server/kern/pay/zaakbetaling.js`, `kern/lidacties/afrekenen.js`): een bestelling, een lopende rekening en een rit zetten `paid = true`, schreven een factuur en stuurden een bericht -- en verplaatsten geen cent. Er stond "betaald" op het scherm en er was nooit iets geboekt; zolang alles binnen dezelfde demo bleef viel dat niet op, maar zodra een zaak zijn RTG Pay-saldo wil uitbetalen is het het verschil tussen omzet en niets. De drie paden lopen nu via EEN plek, en dat is een **driehoek** en geen overboeking: het lid betaalt zijn deel aan de zaak, en wat RTG weggeeft (ledenvoordeel, oud punten-tegoed) legt RTG er vanuit `extern:treasury` bovenop -- de belofte is dat de zaak altijd het VOLLE bedrag ontvangt, dus een korting van RTG is een korting van RTG en niet van de ondernemer. De twee boekingen zijn alles-of-niets (mislukt de tweede, dan gaat de eerste met de hand terug, net als in `kern/bank/walletbrug.js`), en de volgorde is eerst betalen en dan pas de vlag: een mislukte betaling laat geen half betaalde bestelling achter. Het verrekende punten-tegoed komt terug bij een fout **en bij een herhaling** met dezelfde idem-sleutel -- dat laatste is het gemene geval, want dat antwoord is `ok` en wie alleen op `.error` kijkt laat het lid daar stil tegoed verliezen. **Annuleren boekt sindsdien ook echt terug** (`kern/ervaring/leden/annuleren.js`): dat pad meldde "EUR x retour" zonder ooit iets over te maken; het geld gaat nu terug waar het vandaan kwam, en alleen voor wat een `payBetaaldCenten`-marker draagt -- oudere transacties en nog niet omgezette paden gedragen zich precies zoals ze deden. Een zaak die zijn saldo al heeft uitbetaald kan niet terugbetalen, en dat zegt het dan ook in plaats van het geld stil te laten verdwijnen. **En daarmee kon het tweede saldo weg**: verzilverde RTG-punten landen nu in de WALLET in plaats van in `tegoedCenten` (`kern/ervaring/leden/punten.js`). Dat kon niet eerder -- zolang de drie paden geen geld verplaatsten, was verzilverd tegoed in de wallet juist ONbesteedbaar. `pasTegoedToe` blijft alleen nog staan om saldi van voor deze ronde leeg te laten lopen. Bekende grens: een betaling boven EUR 5.000 (de boekingsgrens van RTG Pay) weigert, met die reden erbij. Zie `TOKEN.md` punt 4.
+- **Het walletplafond en het tegoed** (`server/kern/pay/stand.js`, `kern/pay/tegoed.js`): `kern/bevoegdheid/lijst.js` staat het aanhouden van walletsaldo toe op grond van een **besluit** en niet van een vergunning, en dat besluit noemt drie voorwaarden: alleen binnen RTG besteedbaar, niet uitbetaald aan het lid, en een maximum per wallet én per boeking. Van die drie bestond de laatste maar half -- `MAX_CENTEN` begrensde de boeking (EUR 5.000), het maximum per wallet stond nergens. Er staat nu `WALLET_MAX` (EUR 10.000), en waar hij valt is belangrijker dan dat hij bestaat: in `boek()`, in `boekAsync()` **vóór** de motor wordt gebeld, en in `laadOp()` **vóór** de kaart wordt belast -- een plafond dat pas in de boeking valt, laat de kaart eerst betalen en weigert daarna. Het autolaadpad laadt exact het tekort als de afronding op tientjes er niet meer bij past, zodat een bijna volle wallet gewoon blijft betalen. **De walletbrug is sinds 20 augustus 2026 eenrichtingsverkeer** (): geld mag van een eigen bankrekening naar de wallet, niet andersom. Dat is een besluit en geen beperking-uit-luiheid -- de tweede voorwaarde onder het WALLET_SALDO-besluit is dat saldo NIET aan het lid wordt uitbetaald, en zodra de leden-bank live gaat loopt de keten wallet -> bank -> SEPA gewoon naar buiten. De grendel houdt het besluit overeind; wie de brug weer opent, opent de vergunningsvraag. Daarop staat het **tegoed voor een ander** (`/api/pay/tegoed/*`): kopen zet het geld vast op een escrow-rekening (`extern:tegoed`), verzilveren haalt het eruit naar de wallet van de ontvanger, een bon kan op naam staan of vrij zijn, en hij verloopt na een jaar. Verlopen tegoed gaat **terug naar de koper** en niet naar RTG (niet-opgehaald geld dat in huis blijft is inkomen dat ontstaat doordat iemand iets vergat), en niet vanzelf: de koper drukt zelf, want een leesactie die geld verplaatst bestaat hier niet. Het grootboek bewaakt dit stuk **niet** -- `boek()` slaat de saldocontrole over voor elke `extern:`-rekening -- dus wat een dubbele verzilvering tegenhoudt is de staat per bon, die synchroon wordt geclaimd vóór de `await`. Wat er bewust niet is: een **bestemming** ("alleen voor Reizen"), want verzilverd tegoed is gewoon walletsaldo en dus inwisselbaar voor alles; dat zou een tweede saldo-dimensie in het grootboek vragen. Op het scherm staat het als eigen deel op **apps/pay.html** ("Tegoed voor een ander"): klaarzetten met de code die je doorgeeft, verzilveren, en wat jij hebt klaargezet en nog niet is opgehaald -- dat laatste vak bestaat alleen zolang er iets openstaat. Een tegoed op naam hoeft de ontvanger niet over te tikken: dat is EEN knop in zijn eigen overzicht. De ZAAKKANT staat op **apps/zaakpay.html**, een werkplek-scherm dat er nooit was: heel `/api/supplier/pay/*` (innen, saldo, uitbetalen) had geen eigen scherm, de kassa gebruikte alleen de betaalcode van het lid. Daar staan nu het kassaldo (de enige ceremoniele KPI van dat scherm), innen met de code van het lid, uitbetalen naar de bank en tegoed klaarzetten/terugnemen; bereikbaar vanaf `kantoor.html`. Alle gouden TEKST op **apps/pay.html** staat sinds deze ronde op `--rtg-leesgoud` in plaats van op de vaste `--gold` (die haalt als tekst 2,94:1 op de champagne-kaart #F9F6F2 -- onder de 3,0 voor grote tekst, laat staan de 4,5 voor kleine; de leesbare toon haalt daar 4,51), net als de focusring op beide pay-schermen; wat op `--gold` blijft is geen tekst (kaartranden, de achtergrond van de springlink, het vinkje), en zonder gekozen thema verandert er niets omdat `--rtg-leesgoud` alleen mét een thema bestaat. De manager-knoppen worden GETOOND en niet verborgen -- wie ze niet mag gebruiken leest de weigering van de server in plaats van te raden waar ze zijn -- en de richting van een boeking komt uit de rekeningnaam, zodat het scherm zijn eigen zaakcode niet hoeft te kennen. Zie `TOKEN.md`. **En de feestmunt wordt sindsdien betaald**: `kern/wallet.js` verhoogde het saldo en gaf een prijs terug zonder ooit iets te innen -- honderd munten tegelijk uit het niets, één laag boven een grootboek dat precies dat verbiedt. Kopen loopt nu via `pay.huisIn` naar de huisrekening, en de route staat achter dezelfde eenmalige paspoortpoort als de rest van RTG Pay; zonder die poort was dit de enige plek waar een lid zijn wallet kon uitgeven zonder hem ooit te hebben laten zien.
 - **Van uren naar uitbetaling, in één keten.** Een medewerker klokt, het contract bepaalt het loon, de loonrun rekent (`kern/payroll/`), manager en administrateur tekenen apart, de run wordt definitief, en pas dan maakt het betaalbestand de **netto** posten die de bankbatch uitbetaalt (`/api/office/bank/salaris/run` met een `runId`). Dat was er niet: de bank had een eigen salarisrun die **bruto** uitbetaalde -- uren maal het uurloon van de zaak -- buiten de loonadministratie om, zonder inhouding, zonder vier ogen en zonder aangifte, terwijl payroll ondertussen het goede netto bestand maakte dat niemand uitbetaalde. Twee administraties van hetzelfde loon, en de verkeerde had de knop. De raming uit de geklokte uren bestaat nog wel (`/api/office/bank/salaris/voorstel`) maar zegt nu zelf `uitbetaalbaar: false`: hij is om mee te plannen, niet om mee te betalen. De loonrun levert de bedragen, de bank de bestemmingen (welk personeelslid aan welk RTG-lid hangt en welke rekening dat lid heeft) -- elk levert wat hij echt weet. Gevolg dat je moet kennen: een zaak in een land zonder geladen jaargang kan geen salaris meer uitbetalen, zie TAKEN.md 4.25. En een jaargang die in zijn eigen bestand meldt dat de cijfers niet tegen de bron zijn gelegd -- zoals de meegeleverde NL-jaargang -- gaat niet zomaar aan: aanmerken kan alleen uitdrukkelijk en met een reden die blijft staan, en elke run die erop draait draagt `opDemoTabellen` tot na definitief -- tot op de loonstrook van de medewerker, die dan zegt hem niet als inkomensbewijs te gebruiken, en op het dekkingsoverzicht per land.
 - **De bevoegdheid** (`server/kern/bevoegdheid.js`): de zesde as waarop een functie dicht kan. De vijf uit `middleware/functieschakelaars.js` (globaal, pas, land, plaats, persoon, genre) gaan over wie de gebruiker is en wat de beheerder uitzette; deze gaat over wat **RTG zelf mag**. Veertien handelingen, elk met wat ze vragen: *software* (inzichten, budgetten, doelen -- rekenen op eigen gegevens, altijd toegestaan), *rail* (betalen, passen, rekeningen: via de kaart-naad is de partner bevoegd, over de eigen rails moeten we het zelf zijn) *vergunning* (krediet uit eigen boek, rente over spaargeld -- dat hangt aan geen enkele rail) en *besluit* (het walletsaldo: toegestaan omdat RTG heeft vastgesteld dat een gesloten circuit met plafonds erbuiten valt, met de grond erbij en met wanneer die grond vervalt). Die vierde soort is er zodat een aanname niet als weglating in de lijst zit; de partneruitbetaling van een zaak hangt aan dezelfde sepa-partnerrail als de bank, zodat die rail niet half uit kan staan. De rangen zijn betaalinstelling < elektronischgeldinstelling < bank. Wat er is afgegeven wordt in de boardroom **vastgelegd** en niet aangezet (`kern/bankregie/vergunning.js`; de twaalf handelingen zelf staan apart in `kern/bevoegdheid/lijst.js`, want dat is het stuk dat een bestuurder moet kunnen lezen zonder code): een lege registratie betekent nee, een verlopen of te lage vergunning ook. In de hybride stand telt de eigen rail en niet de partner die er ook nog is -- anders zou hybride de stand zijn waarin alles mag. Zonder vastgelegde vergunning clearen de eigen rails niet: de drie-standen-knop weigert het opschalen, ook met vier ogen. De matrix staat op `/api/office/bank/bevoegdheid` en **in de bankkamer van de boardroom** (`kantoren.html`, `?kamer=bank`), naast de rail-reconciliatie: per handeling of hij open staat, waarlangs, en anders waarom niet. Getoetst met `test/bank.test.js` (de regels) en `test/bankkamer.e2e.js` (het scherm liegt niet: hetzelfde bedrag als de API, de reden erbij, en het vergunningsformulier legt echt vast).
 - **RTG Stad** (`server/kern/stad/`): het slimme-stad-platform op eigen hardware (de Stadsdoos-vloot, aanmelden met een eenmalig getoonde apparaat-sleutel; poorten `/api/stad/doos/*` met een rem per doos) en eigen software: acht domeinen met standen en regimes, één scenario-knop (nacht t/m nood, nood meldt de meldkamer en staat in het rampbeeld), een zelfschrijvende werklijst voor de veld-app en de bewonersapp Mijn Stad (meldingen op codenaam die als klus bij de veldploeg landen). Privacy by design: de stad meet dingen, geen mensen — geen camera's, geen persoonsvolging; de vrije tekst van bewonersmeldingen gaat niet mee in de AI-dataset.
@@ -3983,6 +4846,29 @@ Wat er bewust **niet** in zit: een regel die post doorstuurt naar een ander adre
 
 Bedrijven worden aangemaakt vanuit de backoffice (de losse publieke wervingspagina is met de marketingsite verwijderd; het aanvraag-endpoint blijft bestaan). Bij goedkeuring maakt de server het bedrijf aan (leverancierscode + manager-PIN) en mailt die naar de aanvrager, waarna de hele partner-app direct werkt.
 
+**Een pas, niet DE Business Pass.** `POST /api/partner/apply` eiste een actieve
+**Business Pass**. Dat stelde twee dingen gelijk die niets met elkaar te maken
+hebben: een pas is een lidmaatschapsniveau, geen vergunning om te ondernemen.
+Wie met een gewone RTG Pass een zaak runt was niet minder ondernemer -- hij kon
+alleen zijn bedrijf niet aanmelden. Dezelfde vorm van grens die `CONCERN.md` aan
+de werknemerskant al verbiedt: niemand koopt hier een pas om te mogen werken.
+
+Wat blijft staan is dat er een **lid** achter de aanvraag hoort, want er gaat een
+bedrijfscode en een beheer-inlog de deur uit; de gratis gast-laag valt er dus
+buiten. Die lijst staat op één plek (`server/kern/paseis.js`) en wordt door
+allebei de deuren gelezen: het formulier *Partner worden* en het vinkje in de
+onboarding (`kern/onboarding/meebouwen.js`). Het kantoor keurt alleen goed met
+ledenbewijs op de aanvraag en leest daarbij zowel het nieuwe veld `pas` als het
+oude `businessPass`, zodat aanvragen van vóór deze wijziging behandelbaar
+blijven. Op het kantoorscherm is de pas een **inlichting**, geen drempel: je ziet
+met wie je spreekt, en verder niets.
+
+Getoetst in `test/partnerpas.test.js` (zonder pas geen aanvraag; een gewone RTG
+Pass levert een bedrijfscode op), `test/office-tweede-helft.test.js` (de echte
+accountweg, van registreren tot bedrijfscode) en `test/catalogus-wensen.test.js`
+(de pas wordt echt opgezocht -- een Business-lid leest als `business` -- en de
+gratis laag krijgt geen catalogus-wens, wel zijn eigen bedrijf).
+
 E-mail (verificatie, wachtwoord-herstel, sollicitatie- en partner-besluiten) is af, en de verzendlaag is helemaal van onszelf -- er zit geen pakket meer onder. `server/mail.js` kent drie standen, in deze volgorde:
 
 1. **`SMTP_URL`** (+ optioneel `MAIL_FROM`): afleveren bij een ingehuurde smarthost via de eigen SMTP-client `server/smtp.js` (EHLO, STARTTLS, AUTH, MAIL/RCPT/DATA, MIME met base64 en dot-stuffing; credentials gaan nooit over een onversleutelde verbinding).
@@ -3994,6 +4880,52 @@ Aanzetten gaat met **`npm run eigenpost -- <domein> <ip>`**: dat meet eerst of u
 Wat stand 2 *niet* kan oplossen staat hardop in de kop van `server/smtp-direct.js`, omdat een verzendlaag die dat verzwijgt post wegstuurt die nergens aankomt: uitgaand poort 25 is bij de meeste hosters dicht (`beschikbaar()` **probeert** het in plaats van het te beweren), PTR hoort bij de hosting, en SPF en DMARC zijn DNS-records -- `dkim.dnsRegels()` schrijft die drie voor u uit, publiceren is mensenwerk. `test/mail-eigen.test.js` rekent elke handtekening ook echt na met de publieke sleutel en kijkt of hij breekt zodra het lijf of een ondertekende kop wijzigt.
 
 Zie **LAUNCH.md** voor de volledige livegang-checklist (hosting, domein, betalingen, sleutels).
+
+## Het reisaanbod & de instellingsweg
+
+Twee bakken werden wel gelezen maar door niets geschreven, en dat viel pas op
+toen de demo-inhoud eruit ging (`RTG_DEMO`). Op een echte installatie stond
+daardoor iets stil.
+
+**Het reisaanbod.** `db.data.partnerTrips` had geen enkele schrijver: de seed was
+de enige bron. Zonder demo toonde het reisbureau nul reizen, gaf `reisbureau.boek()`
+op elke aanvraag een 404, en kreeg het reisdossier van een lid dus nooit iets te
+schrijven -- de kern van een reismembership. `server/kern/reisaanbod.js` is nu de
+**enige** schrijver, met de balie in `routes/kantoren/reizen.js`
+(`/api/office/reisaanbod{,/zet,/weg}`, achter de kantoorinlog, naast de bestaande
+aanvraag-routes die daar nu ook wonen). De veldnamen liggen vast omdat drie
+lezers ze delen (`reisAanbod()`, `publicTrip()` en de Mall-vindlaag): een reis die
+hier anders heet, bestaat in het ene scherm en is leeg in het andere.
+
+Twee regels die het aanbod eerlijk houden: een reis met een **open aanvraag**
+verdwijnt niet (409 -- die aanvraag staat in het dossier van een lid en moet eerst
+af), en een **ontbrekende prijs is geen nul**. Dat laatste was een echte fout:
+`Number(null)` is 0, dus een reis zonder prijsveld kwam er als gratis in te staan,
+zonder melding. Een uitdrukkelijke 0 mag wel; dat is een keuze die iemand maakt.
+
+**De instellingsweg.** Acht genres staan in het register op `status: 'intern'` --
+ov, luchthaven, gemeente, rijk, politie, brandweer, ambulance, marechaussee -- met
+als uitleg "hoort bij de wereld zelf en wordt niet door een partner aangevraagd".
+Dat is juist, maar er was ook geen *andere* weg: die instellingen kwamen alleen uit
+de demo-seed. Vier werelden stonden op een echte installatie dus permanent leeg,
+met een eerlijke lege stand en geen deur ernaast. `server/kern/instelling.js` is die
+deur, achter **boardroomAuth** (aansluiten maakt een bedrijfscode en een
+beheer-inlog -- hetzelfde gewicht als een partnerbesluit). De keuzelijst komt uit
+het register zelf, en een aangesloten instelling krijgt géén `geseed`-merkteken,
+anders ruimt de eerstvolgende start hem op.
+
+Daarbij hoorde een tweede reparatie: `POST /api/partner/apply` controleerde alleen
+óf een genre bestond, niet de **genrepoort**. `genreToegang()` werd al gehandhaafd
+in de aanmeldingsstroom en de onderneming-intake, maar niet daar -- dus 'intern' en
+'op uitnodiging' stonden via dat formulier gewoon open, terwijl het register iets
+anders beweerde. Nu leest die route dezelfde poort, met de uitleg uit het register.
+
+Beide schermen staan in de backoffice (`#raList`, `#rbList`, `#instList`). Getoetst
+in `test/reisaanbod.test.js` (de hele keten zonder `RTG_DEMO`: leeg → samengesteld →
+aangevraagd → bevestigd in het dossier) en `test/instellingsweg.test.js`. Vier
+mutaties gedaan, alle vier zagen we de juiste toets zakken: de prijscontrole
+weghalen, de open-aanvraag-grendel weghalen, elk genre als instelling toestaan, en
+de genrepoort op het partnerformulier negeren.
 
 ## Live updates & push-notificaties
 

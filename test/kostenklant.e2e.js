@@ -24,7 +24,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, letOpFouten, kantoorAlsPersoon } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { laadBrowser, browserOpties, geenBrowser } = require('./browser');
 const pw = laadBrowser();
 
 const post = (base, pad, body, token) => fetch(base + pad, {
@@ -34,7 +34,7 @@ const post = (base, pad, body, token) => fetch(base + pad, {
 }).then(r => r.json());
 
 test('de stand Kosten: geen bedrag zonder tarief, wel met, en de keten opent',
-  { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer();
   const base = srv.base;
   let browser = null;
@@ -44,7 +44,7 @@ test('de stand Kosten: geen bedrag zonder tarief, wel met, en de keten opent',
       phone: '06' + String(t).slice(-8), password: 'geheim123', geboortedatum: '1984-05-05', tier: 'rtg' });
     assert.ok(lid.token, 'registreren hoort een token te geven');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 430, height: 932 } });
     const fouten = letOpFouten(page, []);
     await page.addInitScript((tok) => {
@@ -121,7 +121,7 @@ test('de stand Kosten: geen bedrag zonder tarief, wel met, en de keten opent',
 });
 
 test('het zaakscherm: dezelfde eerlijkheid, op de sessie van de zaak',
-  { skip: !pw && 'Playwright niet beschikbaar' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer();
   const base = srv.base;
   let browser = null;
@@ -129,7 +129,7 @@ test('het zaakscherm: dezelfde eerlijkheid, op de sessie van de zaak',
     const lg = await post(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });
     assert.ok(lg.token, 'geen zaak-sessie: ' + JSON.stringify(lg).slice(0, 160));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
     const fouten = letOpFouten(page, []);
     await page.addInitScript((tok) => {

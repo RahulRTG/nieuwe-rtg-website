@@ -1,7 +1,7 @@
 /* De RTG AI van het RTG Kantoor: leest mee, traint zichzelf, meldt zich
    klaar, en krijgt het roer ALLEEN via de knop; daarna draait het
    routinewerk automatisch door en de terug-knop werkt.
-   Draai los: node --experimental-sqlite --test test/rtgai.test.js */
+   Draai los: node --test test/rtgai.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

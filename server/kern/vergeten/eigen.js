@@ -47,7 +47,7 @@ module.exports = ({ db, lidBoardLogWis }) => {
      een post moeten genoteerd zijn VOORDAT de post uit de lijst valt, anders
      zijn ze daarna niet meer terug te vinden en blijven ze als wees op schijf
      staan. Verzamelen voor het weggooien, want daarna is de link weg. */
-  function wisEigen(key, noteerPostBeelden, teWissen) {
+  function wisEigen(key, noteerPostBeelden, teWissen, codenaam) {
     // cv en live-locatie weg, gastchats weg, likes weg
     delete db.data.cvs[key];
     delete db.data.live[key];
@@ -62,6 +62,23 @@ module.exports = ({ db, lidBoardLogWis }) => {
     // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
     if (db.data.notifications[key]) db.data.notifications[key] = [];
     for (const tak of EIGEN_TAKKEN) { if (db.data[tak]) delete db.data[tak][key]; }
+    /* DE IDEMPOTENTIESLEUTELS VAN BETALEN. betaalIdem is geen tak op de sleutel
+       van het lid maar een ring van antwoorden op een idem-sleutel, en in zo'n
+       bewaard antwoord staat de codenaam. Een `delete tak[key]` raakt hem dus
+       niet, en na wissing bleef de codenaam daar staan. Het is puur techniek --
+       een herhaalde betaalopdracht mag niet dubbel landen -- met geen andere
+       grond dan dat, dus hij hoort mee te gaan. (De boekhouding zelf, paySaldi
+       en payBoekingen, blijft: dat is het grootboek van RTG Pay met een eigen
+       bewaarplicht. Zie test/vergeten.test.js voor waar die grens ligt.) */
+    const ring = db.data.betaalIdem;
+    if (ring && typeof ring === 'object') {
+      for (const k of Object.keys(ring)) {
+        if (k === '_keys') continue;
+        const inhoud = JSON.stringify(ring[k] == null ? null : ring[k]);
+        if (inhoud.includes(key) || (codenaam && inhoud.includes(codenaam))) delete ring[k];
+      }
+      if (Array.isArray(ring._keys)) ring._keys = ring._keys.filter(k => k in ring);
+    }
     /* En het journaal van de eigen boardroom. Dat staat apart omdat het geen tak
        op de sleutel is maar een eigen lijst; het hoort er wel bij, want het legt
        vast WIE welke knop zette -- bij een kind is dat een ouder. Blijft het

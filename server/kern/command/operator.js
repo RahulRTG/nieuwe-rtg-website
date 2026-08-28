@@ -27,9 +27,9 @@ const { s } = require('./register');
    toetsen. */
 const { groepeer, GEEN_OORZAAK } = require('./oorzaak');
 
-function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak }) {
+function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak, opslag }) {
   const reg = register;
-  const V = typeof vak === 'function' ? vak : (() => db.data);
+  const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   function plannen() {
     const v = V();
     if (!Array.isArray(v.commandPlannen)) v.commandPlannen = [];
@@ -118,7 +118,7 @@ function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, bel
     if (!anthropic) return p.tekst;
     try {
       const r = await anthropic.messages.create({
-        model: 'claude-opus-4-8', max_tokens: 320,
+        model: 'claude-sonnet-5', max_tokens: 320,
         system: 'U bent de operator van RTG Command. Schrijf de aangeleverde MEETUITSLAG in maximaal vier zakelijke Nederlandse zinnen, u-vorm, zonder opsmuk. Voeg NIETS toe wat er niet staat: geen oorzaken, aantallen, partners of merken die niet in de uitslag voorkomen. Beloof nooit dat u iets zult doen; het besluit ligt bij de medewerker.',
         messages: [{ role: 'user', content: 'Vraag: "' + p.vraag + '"\nMeetuitslag:\n' +
           JSON.stringify(p.delen.map(d => ({ wat: d.naam, totaal: d.totaal, oorzaakVeld: d.oorzaakVeld,

@@ -18,13 +18,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, geenBrowser, browserOpties, volgVerzoeken, wachtOpRust,
+  wachtOpTekst, wachtOpVerandering, wachtOpZichtbaar, wachtTot, tekstVan } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-horecascherm-'));
 
 async function zaakToken(base) {
@@ -46,17 +43,18 @@ const zaakApi = (base, token) => (pad, body) => fetch(base + '/api/supplier/hore
   body: JSON.stringify(body || {}) }).then(r => r.json());
 
 test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
     const browserApi = pw.chromium ? pw : null;
     assert.ok(browserApi, 'er is een browser-API');
-    browser = await browserApi.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await browserApi.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
+    await volgVerzoeken(page);
 
     /* ---- uitgelogd: een deur, geen leeg scherm ---- */
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
@@ -65,7 +63,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       localStorage.removeItem('rtg_sup_token');
     });
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(900);
+    await wachtOpRust(page);
     const uit = await page.evaluate(() => ({ pad: location.pathname,
       deur: !!document.querySelector('.rtgdeur'), tekst: document.body.innerText.replace(/\s+/g, ' ') }));
     assert.equal(uit.pad, '/apps/horeca.html', 'de pagina stuurt niemand weg');
@@ -85,17 +83,17 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     ] });
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, token);
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(700);
+    await wachtOpRust(page);
 
     await page.fill('#zTafel', 'Tafel 24');
     await page.fill('#zGasten', '2');
     await page.click('#zOpen');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Tafel 24/);
     let tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Tafel 24/, 'de open rekening staat in de lijst');
 
     await page.click('[data-open]');
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     await page.fill('#zNaam', 'Tournedos');
     await page.fill('#zPrijs', '34.50');
     await page.fill('#zAantal', '2');
@@ -103,7 +101,7 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.fill('#zStation', 'grill');
     await page.fill('#zAllergie', 'noten');
     await page.click('#zRegel');
-    await page.waitForTimeout(500);
+    await wachtOpTekst(page, /Tournedos/);
     tekst = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Tournedos/, 'de regel staat op de rekening');
     assert.match(tekst, /noten/, 'de allergie staat op het zaalscherm');
@@ -115,7 +113,9 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
        ziet -- en dat is precies het gat waar deze suite voor bestaat. */
     await page.fill('#zStoelNaam', 'Bij het raam');
     await page.click('#zStoelBij');
-    await page.waitForTimeout(500);
+    // de stoel komt van de server terug en wordt pas daarna getekend: wachten
+    // tot zijn naam echt in het gezelschap staat
+    await wachtOpTekst(page, /Bij het raam/, { in: '#zGezelschap' });
     tekst = await page.evaluate(() => document.getElementById('zGezelschap').innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Bij het raam/, 'de stoel staat op het zaalscherm');
     assert.match(tekst, /Op de tafel/, 'en wat op niemands naam staat, blijft zichtbaar van de tafel');
@@ -127,26 +127,31 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       sel.value = String([...sel.options].find(o => o.text === 'Bij het raam').value);
       sel.dispatchEvent(new Event('change'));
     });
-    await page.waitForTimeout(700);
+    /* De STOEL stond er al, dus op zijn naam wachten valt meteen door. Wat
+       verandert is de telling erachter (0 -> 1 regel), en die komt pas terug
+       nadat de server de regel heeft omgehangen. Vandaar een wacht op een
+       nieuwe tekst in plaats van op een bekende: de assertie hieronder blijft
+       zo zelf de bewering doen. */
+    await wachtOpVerandering(page, '#zGezelschap', tekst);
     tekst = await page.evaluate(() => document.getElementById('zGezelschap').innerText.replace(/\s+/g, ' '));
     assert.match(tekst, /Bij het raam .*1 regel/, 'de regel telt nu bij die stoel: ' + tekst.slice(0, 120));
 
     // de keuken ziet nog niets: de gang is niet vrijgegeven
     await page.click('#tabKeuken');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /alleen wat de zaal heeft vrijgegeven/i);
     let keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.ok(!/Tournedos/.test(keuken), 'zonder vrijgave staat er niets op het keukenscherm');
     assert.match(keuken, /alleen wat de zaal heeft vrijgegeven/i, 'en het scherm zegt waarom');
 
     // gang vrijgeven in de zaal, daarna staat hij er wel -- met de allergie
     await page.click('#tabZaal');
-    await page.waitForTimeout(400);
+    await wachtOpRust(page);
     await page.fill('#zVrijGang', '2');
     await page.fill('#zServeerOm', '19:42');
     await page.click('#zVrij');
-    await page.waitForTimeout(500);
+    await wachtOpRust(page);
     await page.click('#tabKeuken');
-    await page.waitForTimeout(700);
+    await wachtOpTekst(page, /Tournedos/);
     keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(keuken, /Tournedos/, 'na vrijgave staat de bon op het keukenscherm');
     /* EN DE VRIJGAVE LIEP VIA DE OFFLINE-LAAG, ook nu er gewoon verbinding is.
@@ -164,7 +169,11 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     /* ---- de zaal zonder lijn ---- */
     await page.click('#tabZaal');
-    await page.waitForTimeout(400);
+    /* De tabwissel laadt de zaal opnieuw (app.js roept laad() aan) en tekent de
+       open rekening opnieuw; pas als dat detail stil ligt, staat er weer een
+       rekening waar een regel bij kan. Rust MAG hier: de klik zet zelf meteen
+       een verzoek uit, dus er is geen stilte "omdat er nog niets begonnen is". */
+    await wachtOpRust(page, '#zDetail');
     await page.fill('#zNaam', 'Kaasplank');
     await page.fill('#zPrijs', '18');
     await page.fill('#zAantal', '1');
@@ -172,7 +181,8 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.fill('#zStation', 'koud');
     await page.fill('#zAllergie', '');
     await page.click('#zRegel');
-    await page.waitForTimeout(600);
+    // de kaasplank moet echt op de rekening staan voordat gang 3 wordt vrijgegeven
+    await wachtOpTekst(page, /Kaasplank/, { in: '#zDetail' });
 
     let lijnDicht = true;
     await page.route('**/api/supplier/horeca/offline/handelingen', async (route) => {
@@ -182,24 +192,39 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await page.fill('#zVrijGang', '3');
     await page.fill('#zServeerOm', '');
     await page.click('#zVrij');
-    await page.waitForTimeout(800);
+    /* Zonder lijn valt de vrijgave in de wachtrij van dit toestel en zegt het
+       scherm dat met zoveel woorden ("Geen lijn..."). Die melding is het teken
+       dat de offline-weg is gelopen; de asserties hieronder gaan over de rij
+       en de strook, en blijven dus zelf iets bewijzen. */
+    await wachtOpTekst(page, /Geen lijn/, { in: '#melding' });
     assert.equal(await page.evaluate(() => window.RTGHorecaEdge.handRij().length), 1,
       'zonder lijn staat de gang op dit toestel');
     assert.equal(await page.evaluate(() => !!document.getElementById('zEdgeStrook').hidden), false,
       'en dat staat op het scherm');
     await page.click('#tabKeuken');
-    await page.waitForTimeout(600);
+    /* Hier MOET er juist niets verschijnen -- dat is de bewering -- dus is er
+       geen tekst om op te wachten. Wachten tot het bord opnieuw is opgehaald en
+       stil ligt; de tabwissel start dat verzoek meteen, dus deze rust kan niet
+       doorvallen op een scherm dat nog niet begonnen was. */
+    await wachtOpRust(page, '#kBord');
     keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.ok(!/Kaasplank/.test(keuken), 'de keuken heeft hem nog niet');
 
     lijnDicht = false;
     await page.evaluate(() => window.RTGHorecaEdge.handLeeg());
-    await page.waitForTimeout(1000);
+    /* leeg() haalt een pakket pas uit de rij als de SERVER het heeft bevestigd
+       (shared/wachtrij.js, regel 3), dus een lege rij is hier het bewijs dat de
+       gang is aangekomen -- en pas daarna kan de keuken hem tonen. */
+    await wachtTot(page, () => window.RTGHorecaEdge.handRij().length === 0, null,
+      { wat: 'de wachtrij van dit toestel leeg (de gang is bevestigd)' });
     assert.equal(await page.evaluate(() => window.RTGHorecaEdge.handRij().length), 0, 'de rij is leeg');
     await page.click('#tabZaal');
-    await page.waitForTimeout(300);
+    // heen en terug om de keuken te laten herladen; de zaal is klaar zodra zijn
+    // lijst met open rekeningen stil ligt
+    await wachtOpRust(page, '#zLijst');
     await page.click('#tabKeuken');
-    await page.waitForTimeout(800);
+    // en nu hoort de gang er WEL te staan: dat is het teken, niet een duur
+    await wachtOpTekst(page, /Kaasplank/, { in: '#kBord' });
     keuken = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(keuken, /Kaasplank/, 'en zodra de lijn terug is, staat de gang alsnog bij de keuken');
     assert.match(keuken, /Allergie: noten/, 'met de allergie in een eigen label');
@@ -226,7 +251,10 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
        er een bord bij de pas dat niet af is. */
     await page.fill('#kStation', 'grill');
     await page.click('#kToon');
-    await page.waitForTimeout(700);
+    /* "stap 2 van 3" bestaat alleen op een bord MET een station: zonder filter
+       stuurt de server geen mijnStap mee (routes/supplier/horeca/keuken.js).
+       Het is dus het eerste dat er nieuw staat zodra het grillbord er is. */
+    await wachtOpTekst(page, /stap 2 van 3/, { in: '#kBord' });
     const grill = await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
     assert.match(grill, /Tournedos/, 'de tournedos staat op het bord van de grill');
     assert.match(grill, /grillen/, 'met de eigen stap van dit station');
@@ -240,19 +268,25 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     await page.fill('#kStation', 'warm');
     await page.click('#kToon');
-    await page.waitForTimeout(700);
+    /* Het grillbord heeft GEEN statusknoppen (de assertie hierboven), het warme
+       wel. Het verschijnen van zo'n knop is dus precies het moment waarop het
+       nieuwe bord er staat. */
+    await wachtOpZichtbaar(page, '.bon [data-stand]');
     assert.equal(await page.evaluate(() =>
       !!document.querySelector('.bon [data-stand]')), true,
       'het laatste station heeft ze wel');
     await page.fill('#kStation', '');
     await page.click('#kToon');
-    await page.waitForTimeout(500);
+    /* Zonder filter komt de kaasplank (station koud) terug op het bord; op het
+       warme bord stond hij niet. Dat is het teken dat het volle bord er weer
+       is -- nodig voor de statusknop die hieronder wordt aangeklikt. */
+    await wachtOpTekst(page, /Kaasplank/, { in: '#kBord' });
     assert.match(keuken, /Bij het raam/, 'en de stoel staat op de bon, zodat de runner weet waar het bord heen gaat');
     assert.match(keuken, /aanzetten \d\d:\d\d/, 'de cadans zegt wanneer het aan moet, niet alleen hoe lang het loopt');
 
     // een stand doorzetten werkt vanaf het keukenscherm
     await page.click('[data-stand="gestart"]');
-    await page.waitForTimeout(600);
+    await wachtOpTekst(page, /Tafel 24/, { in: '#kRegie' });
     const regie = await page.evaluate(() => document.getElementById('kRegie').innerText.replace(/\s+/g, ' '));
     assert.match(regie, /Tafel 24/, 'de tafel staat op het regiescherm');
 
@@ -267,12 +301,15 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     await api('/rekening/regel', { rekeningId: rek4.rekening.id, naam: 'Wijn', prijs: 40, station: 'bar', gang: 0 });
 
     await page.goto(base + '/apps/horeca.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(900);
+    // de lijst met open rekeningen komt van de server; zonder Tafel 11 valt er
+    // niets te openen
+    await wachtOpTekst(page, /Tafel 11/, { in: '#zLijst' });
     await page.evaluate(() => {
       [...document.querySelectorAll('#zLijst [data-open]')]
         .find(b => b.closest('.item').textContent.includes('Tafel 11')).click();
     });
-    await page.waitForTimeout(900);
+    // het openen haalt de rekening op; pas dan staan de regels er
+    await wachtOpTekst(page, /Vergissing/, { in: '#zDetail' });
 
     // een misgetikte regel eraf, zolang de keuken er niet aan begon
     const eraf = await page.evaluate(() => {
@@ -284,7 +321,13 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       [...document.querySelectorAll('#zDetail .item')].find(x => x.textContent.includes('Vergissing'))
         .querySelector('[data-regelweg]').click();
     });
-    await page.waitForTimeout(900);
+    /* De regel moet WEG zijn, en op iets dat verdwijnt kun je niet met
+       wachtOpTekst wachten: hier wachten we tot het detail hem niet meer noemt.
+       Pas daarna is de rekening hieronder een eerlijke meting. */
+    await wachtTot(page, (s) => {
+      const el = document.querySelector(s);
+      return !!el && !/Vergissing/.test(el.innerText || el.textContent || '');
+    }, '#zDetail', { wat: 'de regel Vergissing van de rekening verdwenen' });
     let stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
     assert.equal(stand.regels.length, 1, 'de regel is er echt af');
     assert.equal(stand.totalen.bruto, 2400);
@@ -292,7 +335,10 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
     // korting vraagt een reden, en het SCHERM vraagt hem -- niet pas de server
     await page.fill('#zKortProcent', '10');
     await page.click('#zKorting');
-    await page.waitForTimeout(500);
+    /* Hier gaat er BEWUST geen verzoek uit: het scherm weigert zelf, zonder de
+       server. Er valt dus niets netstil af te wachten -- het enige dat gebeurt,
+       is de melding. */
+    await wachtOpTekst(page, /Waarom wordt er korting gegeven/, { in: '#melding' });
     let melding = await page.evaluate(() => document.getElementById('melding').innerText);
     assert.match(melding, /Waarom wordt er korting gegeven/, 'zonder reden gebeurt er niets');
     stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
@@ -300,7 +346,10 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
 
     await page.fill('#zKortReden', 'stamgast');
     await page.click('#zKorting');
-    await page.waitForTimeout(900);
+    /* Nu gaat hij WEL naar de server, en de melding verandert pas als die heeft
+       geantwoord. Wachten op een verandering ten opzichte van de weigering
+       hierboven, zodat de assertie over het bedrag zelfstandig blijft. */
+    await wachtOpVerandering(page, '#melding', melding);
     stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
     assert.equal(stand.totalen.korting, 240, '10% van 24,00');
 
@@ -318,8 +367,13 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       return o.value;
     });
     assert.equal(gekozen, rek4.rekening.id, 'Tafel 12 staat in de samenvoeglijst');
+    /* De stand van de meldbalk VOOR de klik, want daar zegt het scherm het
+       samengevoegde bedrag hardop terug -- en dat gebeurt pas als de server
+       heeft geantwoord. De assertie op die tekst staat hieronder en blijft zo
+       zelf iets bewijzen. */
+    const voorSamen = await tekstVan(page, '#melding');
     await page.click('#zVoegSamen');
-    await page.waitForTimeout(1200);
+    await wachtOpVerandering(page, '#melding', voorSamen);
     stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
     assert.equal(stand.totalen.netto, voor + ander, 'samenvoegen brengt geen cent bij of af');
     melding = await page.evaluate(() => document.getElementById('melding').innerText);

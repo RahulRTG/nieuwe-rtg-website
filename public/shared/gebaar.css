@@ -1,0 +1,298 @@
+/* RTG Gebaren -- de twee laden onder een regel, en het licht dat de hand volgt.
+
+   HET BEELD. Een regel is een PLANK. Eronder liggen twee laden: veeg de plank
+   naar links en de rechterlade komt tevoorschijn, veeg hem naar rechts en de
+   linker. De plank is dus geen lijst-item met verstopte knopjes, maar een deksel
+   -- en dat is precies waarom hij ondoorzichtig is zolang hij beweegt.
+
+   DE REGELS DIE HIER GELDEN (ONTWERP.md):
+   - par. 7: geen afgerond doosje erbij. De lade is een VLAK in onyx, gescheiden
+     door een haarlijn, met de actie in kapitaaltjes. Geen gekleurde blokken met
+     een prullenbakje.
+   - par. 12: beweging is extreem subtiel en staat in tokens. De lade volgt de
+     vinger 1-op-1 (dat is geen animatie maar directe bediening); alles wat de
+     vinger NIET stuurt loopt op --rtg-tijd-paneel.
+   - MATERIAAL.md: licht is een eigenschap, geen effect. De rand van de lade is
+     goud omdat daar het licht op de snede valt, en de glans onder de muis is
+     hetzelfde licht -- niet een tweede truc.
+
+   IN RUST VERANDERT DIT BLAD NIETS. Elke regel hieronder hangt aan [data-gb] of
+   aan een element dat shared/gebaar.js zelf aanmaakt. Een scherm dat de laag
+   laadt maar geen gebaar zet, ziet exact wat het zag. */
+
+/* ------------------------------------------------------------- de plank -- */
+/* pan-y: verticaal scrollen blijft van de browser, horizontaal is van ons.
+   Zonder deze regel vecht de veeg met de pagina en verliest hij altijd.
+
+   EN position:relative, want de lade is absoluut geplaatst en zoekt een
+   voorouder om zich aan vast te houden. Die stond hier NIET: hij stond in de
+   muis-mediaquery onderaan dit blad, bij het aanwijslicht. Op een telefoon --
+   `(hover:hover) and (pointer:fine)` is daar onwaar -- was de regel dus
+   `position:static` en plaatste de lade zich tegen de PAGINA. Gemeten in een
+   echte browser met aanraakemulatie: regel 350x62 op y=80, lade 97x844 op y=0.
+   Een balk van boven naar beneden over het hele scherm, naast de regel, in
+   plaats van erin. De veeg heeft daarmee nog nooit op een telefoon gewerkt --
+   en dat is precies het apparaat waar hij voor is.
+
+   Waarom niemand het zag: elke toets en elke schermafdruk draaide in een
+   browsercontext met een muis, en daar zette de lichtregel de positie er per
+   ongeluk bij. Een eigenschap die je nodig hebt, hoort niet als bijwerking van
+   een andere regel te bestaan; hier staat hij nu zelf. */
+.gb-rij{position:relative;touch-action:pan-y;-webkit-touch-callout:none;}
+
+/* Tijdens het gebaar geen tekstselectie en geen sleeplink: allebei zijn ze de
+   browser die denkt dat je iets anders doet dan vegen. */
+.gb-rij[data-gb]{user-select:none;-webkit-user-select:none;}
+
+/* Alleen TIJDENS een gebaar wordt de regel een deksel. clip-path en niet
+   overflow:hidden: clip-path snijdt zonder de doos zelf te veranderen, dus een
+   flexrij blijft een flexrij en er ontstaat geen scrollcontext die er in rust
+   niet was. */
+/* TWEE MATEN DIE DE REGEL ZELF ZET, EN DE LAAG NOOIT KAN RADEN.
+
+   Op deze schermen loopt links van een regel bijna altijd een TIJDLIJN: een
+   haarlijn met een stip erop, die DOOR de regels heen loopt. Die hoort niet bij
+   de plank maar bij de lijn, en hij hoort dus te blijven staan terwijl de plank
+   wegschuift. Waar hij ligt weet alleen het scherm.
+     --gb-inzet   de lade begint zoveel verder naar binnen (de lijn zit BINNEN
+                  de regel, zoals de tijdlijn van .reis in zijn linkerpadding)
+     --gb-marge   de snede laat zoveel buiten de regel staan (de stip hangt
+                  BUITEN de regel, zoals die van .cv-wat op -3,5px)
+   Allebei nul als een scherm niets zegt, en dan gebeurt er precies niets. */
+/* `round` erachter, want een regel met ronde hoeken hoort niet met een rechte
+   snede te eindigen. --gb-rond wordt bij het vastklikken gemeten (zie
+   gebaar-02b.js); zonder meting is hij nul en snijdt hij zoals hiervoor. */
+.gb-rij[data-gb]{clip-path:inset(0 0 0 calc(-1 * var(--gb-marge,0px)) round var(--gb-rond,0px));}
+
+/* De inhoud schuift, de lade niet, en wat absoluut gepositioneerd is blijft
+   staan: een tijdlijnstip hoort bij de TIJDLIJN en niet bij de plank. */
+.gb-rij[data-gb] > *:not(.gb-lade):not(.gb-greep):not([data-gb-vast]){
+  transform:translateX(var(--gb-x,0px));
+  transition:transform var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
+}
+
+/* -------------------------------------------------------------- de lade -- */
+/* De lade is precies zo breed als er plank is weggeschoven. Daardoor overlappen
+   plank en lade elkaar nooit en is er geen z-index-vraag: de een gaat weg waar
+   de ander komt. */
+.gb-lade{
+  /* content-box, en dat is geen detail: de snedelijn hieronder is een border van
+     1px, en met border-box zou die pixel van de INHOUD afgaan. De knoppenrij is
+     precies --gb-vol breed, dus dan puilt hij er een pixel uit en ziet de laatste
+     letter er geschaafd uit. Zo staat de lijn ernaast in plaats van erin. */
+  box-sizing:content-box;
+  position:absolute;top:0;bottom:0;width:var(--gb-lade,0px);
+  overflow:hidden;background:var(--onyx-glans,#0C0C0B);
+  transition:width var(--gb-duur,0ms) var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
+}
+/* Alleen de BUITENhoeken: aan de snede sluit de lade recht op de plank aan,
+   want daar raken ze elkaar. */
+.gb-lade[data-kant="rechts"]{right:0;border-left:1px solid var(--gold-rand,rgba(192,165,68,.52));
+  border-radius:0;}
+.gb-lade[data-kant="links"]{left:var(--gb-inzet,0px);border-right:1px solid var(--gold-rand,rgba(192,165,68,.52));
+  border-radius:0;}
+
+/* De knoppen zijn aan de SNEDE geplakt en niet aan de buitenrand: ze rijden met
+   de plank mee naar binnen in plaats van op hun plek te wachten. */
+.gb-binnen{position:absolute;top:0;bottom:0;width:var(--gb-vol,0px);display:flex;}
+.gb-lade[data-kant="rechts"] .gb-binnen{left:0;}
+/* DE LINKERLADE SPIEGELT, EN DAT WAS HET NIET. De knoppenrij hangt aan de snede
+   en steekt de andere kant uit; bij een lade die vanaf de snede opengaat betekent
+   dat: je ziet eerst wat er het VERST van de snede af staat. Aan de rechterkant
+   is dat de eerste actie -- goed. Aan de linkerkant was het de LAATSTE, en de
+   eerste kwam pas in beeld als de lade helemaal open stond.
+
+   Gemeten op de post, veeg naar rechts: bij 40, 90 en 150 pixels stond 'Ster'
+   op 0 van 55 pixels zichtbaar. Nul. Terwijl een volle veeg juist DIE actie
+   uitvoert. Wat je wel zag was het midden van een tweeregelig label -- oftewel
+   een grijze bak. De actie die afgaat, hoort de actie te zijn die je ziet.
+
+   row-reverse zet de eerste actie tegen de snede aan zonder de VOLGORDE in de
+   DOM te draaien: die blijft de logische volgorde, en daar hangen data-i, de
+   voorleesvolgorde en .gb-eerste aan. De scheidingslijn draait mee -- hij hoort
+   TUSSEN de knoppen te staan en niet op de snede, waar de lade zijn eigen rand
+   al heeft. */
+.gb-lade[data-kant="links"]  .gb-binnen{right:0;flex-direction:row-reverse;}
+.gb-lade[data-kant="links"] .gb-doe{border-inline-start:0;
+  border-inline-end:1px solid rgba(255,255,255,.07);}
+.gb-lade[data-kant="links"] .gb-doe:first-child{border-inline-end:0;}
+
+.gb-doe{
+  flex:1 0 auto;min-width:3.4rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.34rem;
+  background:transparent;border:0;border-inline-start:1px solid rgba(255,255,255,.07);
+  /* RUIM AAN DE ZIJKANT, want deze labels staan in kapitaaltjes met .16em
+     spatiering: bij .4rem raakte WEGGOOIEN de rand van zijn eigen vlak en las
+     het als afgekapte tekst. De laatste letterspatie telt bovendien mee in de
+     breedte, dus optisch stond het woord al iets te links. */
+  padding:.4rem .8rem;cursor:pointer;
+  font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
+  font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--rtg-soft,#8A8680);
+  transition:color var(--rtg-tijd-kort,120ms) ease,flex-basis var(--rtg-tijd-kort,120ms) var(--rtg-veer,ease),opacity var(--rtg-tijd-kort,120ms) ease;
+}
+.gb-doe:first-child{border-inline-start:0;}
+.gb-doe svg{width:20px;height:20px;stroke-width:1.5;flex:none;}
+/* Een naam mag over twee regels: liever twee regels dan een half woord. */
+.gb-doe > span{text-align:center;line-height:1.3;max-width:8.5rem;margin-inline-end:-.16em;}
+.gb-doe:hover,.gb-doe:focus-visible{color:var(--op-onyx,#F4F0E9);}
+
+/* STATUS NOOIT OP KLEUR ALLEEN (ONTWERP.md par. 5): een ingrijpende actie is
+   fluweel EN staat vooraan EN vraagt vasthouden. De kleur is de derde bevestiging,
+   niet de enige. */
+.gb-doe[data-sig="incident"]{background:var(--bordeaux-glans,#7F1634);color:var(--op-bordeaux,#F4F0E9);}
+.gb-doe[data-sig="aandacht"]{color:var(--gold-tekst,#C0A544);}
+
+/* ---------------------------------------------------------- de drempel -- */
+/* Het punt waarop doorvegen de eerste actie UITVOERT. Je moet hem zien aankomen,
+   anders is doorvegen een verrassing -- en een verrassing die iets doet is geen
+   bediening maar een ongeluk. De eerste knop neemt de hele lade over, de rest
+   wijkt, en de snede licht op. Precies EEN keer, precies op de drempel. */
+.gb-lade[data-gereed]{border-color:var(--gold-tekst,#C0A544);}
+.gb-lade[data-gereed] .gb-doe{opacity:0;}
+.gb-lade[data-gereed] .gb-doe.gb-eerste{opacity:1;flex:1 0 100%;color:var(--op-onyx,#F4F0E9);}
+
+/* ------------------------------------------------------------- de greep -- */
+/* Een gebaar dat je niet kunt zien, bestaat niet voor wie het niet toevallig
+   probeert. Bij aanwijzen en bij toetsenbordfocus komt daarom een greep in
+   beeld die exact dezelfde acties opent (WCAG 2.5.7: geen enkele weg mag alleen
+   door slepen begaanbaar zijn). Absoluut gepositioneerd, dus geen flex- of
+   rasteritem: de regel eromheen merkt er niets van. */
+.gb-greep{
+  position:absolute;top:50%;inset-inline-end:.15rem;transform:translateY(-50%);
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:0;border-radius:0;cursor:pointer;padding:0;
+  color:var(--rtg-soft,#8A8680);z-index:2;
+}
+.gb-greep:hover,.gb-greep:focus-visible{color:var(--gold-tekst,#C0A544);}
+/* Staat de lade open, dan staat de greep in de weg: hij zit precies waar de
+   eerste actie tevoorschijn komt. Weg dus -- de lade IS op dat moment de greep. */
+.gb-rij[data-gb] .gb-greep{opacity:0;pointer-events:none;}
+.gb-greep svg{width:18px;height:18px;}
+
+/* ---------------------------------------------------------- de actielade -- */
+/* Vasthouden, rechtermuis of de menutoets openen alle acties als LIJST. Een
+   <dialog> in de bovenlaag en geen zwevend paneeltje: dat werkt ook binnen een
+   voorouder met een transform, en levert Esc en focusopsluiting gratis. */
+.gb-blad{
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:0;
+  background:var(--onyx-glans,#0C0C0B);color:var(--op-onyx,#F4F0E9);
+  padding:0;width:min(23rem,92vw);
+  font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
+}
+.gb-blad::backdrop{background:rgba(5,5,5,.62);}
+.gb-blad h2{
+  margin:0;padding:1rem 1.15rem .55rem;font-family:inherit;
+  font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--rtg-soft,#8A8680);
+}
+.gb-blad .gb-titel{
+  display:block;padding:0 1.15rem .85rem;font-size:.95rem;line-height:1.4;
+  color:var(--op-onyx,#F4F0E9);border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));
+}
+.gb-blad menu{margin:0;padding:.3rem 0 .5rem;list-style:none;}
+.gb-blad menu li{list-style:none;}
+.gb-blad menu button{
+  display:flex;align-items:center;gap:.8rem;width:100%;min-height:44px;
+  background:transparent;border:0;padding:.55rem 1.15rem;cursor:pointer;
+  font:inherit;font-size:.9rem;text-align:start;color:inherit;
+}
+.gb-blad menu button:hover,.gb-blad menu button:focus-visible{background:rgba(255,255,255,.05);}
+.gb-blad menu button svg{width:20px;height:20px;flex:none;color:var(--rtg-soft,#8A8680);}
+.gb-blad menu button[data-sig="incident"]{color:var(--rtg-sig-incident,#DE6E92);}
+.gb-blad menu button[data-sig="incident"] svg{color:inherit;}
+.gb-blad .gb-kant{
+  padding:.75rem 1.15rem .2rem;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--rtg-soft,#8A8680);
+}
+
+/* Met een toets is vasthouden geen gebaar maar een tweede druk: de eerste zet
+   hem op scherp en dat moet je zien, anders is de tweede druk een verrassing. */
+.gb-blad menu button[data-scherp]{
+  background:rgba(158,28,64,.18);
+  box-shadow:inset 2px 0 0 var(--gold-tekst,#C0A544);
+}
+
+/* ------------------------------------------------ vasthouden om te doen -- */
+/* Wat niet terug te draaien is, gaat niet op een tik en niet op een veeg: je
+   houdt hem vast en ziet de rand vollopen. LIFE.md: klaarzetten mag de machine,
+   bevestigen doet de mens. */
+.gb-borg{position:relative;}
+.gb-borg::before{
+  content:"";position:absolute;inset:0;border-radius:0;pointer-events:none;
+  background:linear-gradient(90deg,var(--gold-rand,rgba(192,165,68,.52)) 0 var(--gb-borg,0%),transparent var(--gb-borg,0%));
+  opacity:.55;
+}
+
+/* --------------------------------------------------- licht volgt de hand -- */
+/* MATERIAAL.md: licht is een eigenschap van het materiaal. Onder de muis licht
+   de rand op waar de hand is -- EEN lichtpunt, want geborsteld metaal heeft een
+   richting en glitter heeft er tien. Alleen op een fijne aanwijzer: op een
+   telefoon is er geen hand boven het glas, en dan is dit alleen batterij. */
+@media (hover:hover) and (pointer:fine){
+  /* :where() ZET DE SPECIFICITEIT OP NUL, en dat is hier het hele punt. Deze
+     regel ligt over 176 schermen met 1402 knoppen die dit blad niet kennen; een
+     pagina die morgen zelf iets over de positie van zijn knop zegt, hoort dat
+     te winnen zonder dat iemand hier hoeft te kijken. Nagerekend voor het
+     aanzetten: vandaag zet geen enkele pagina position op .knop, en geen enkele
+     pagina gebruikt .knop::after -- maar dat is een meting van vandaag en geen
+     garantie van morgen. Vandaar :where(). */
+  :where(.rtg-knop,.knop,.gb-rij){position:relative;}
+  :where(.rtg-knop,.knop,.gb-rij)::after{
+    content:"";position:absolute;inset:0;border-radius:0;pointer-events:none;
+    opacity:0;transition:opacity var(--rtg-tijd-paneel,180ms) ease;
+    background:radial-gradient(20rem 20rem at var(--gb-lx,50%) var(--gb-ly,50%),
+      rgba(192,165,68,.10) 0%,rgba(192,165,68,0) 62%);
+  }
+  :where(.rtg-knop,.knop,.gb-rij):hover::after{opacity:1;}
+  /* Een uitgeschakelde knop reageert nergens op, ook niet op licht. */
+  :where(.rtg-knop,.knop)[disabled]:hover::after,
+  :where(.rtg-knop,.knop)[aria-disabled="true"]:hover::after{opacity:0;}
+}
+
+/* ------------------------------------------------------- de regel die gaat --
+   Een regel die de server in gaat, klapt in plaats van te verdwijnen: springt
+   de lijst, dan verliest het oog waar het was. De hoogte wordt in JS gezet
+   (een element klapt niet in vanaf `auto`); dit blad doet de rest. */
+.gb-rij.gb-weg{
+  opacity:0;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-width:0;
+  transition:height var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease),
+             opacity var(--rtg-tijd-kort,120ms) ease,
+             padding var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease),
+             margin var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease);
+}
+html.rtg-stil .gb-rij.gb-weg{transition:none;}
+@media (prefers-reduced-motion:reduce){ .gb-rij.gb-weg{transition:none;} }
+
+/* ------------------------------------------------------------ de terugweg -- */
+/* Doorvegen VOERT UIT, dus er hoort een weg terug te zijn. Rustig, onderin, en
+   met role=status zodat hij ook wordt voorgelezen. */
+.gb-terug{
+  position:fixed;left:50%;bottom:4.5rem;transform:translateX(-50%);z-index:9998;
+  display:flex;align-items:center;gap:.9rem;max-width:92vw;
+  background:var(--onyx-glans,#0C0C0B);border:1px solid var(--gold-rand,rgba(192,165,68,.52));
+  border-radius:0;padding:.5rem .6rem .5rem 1.05rem;
+  font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);font-size:.82rem;
+  color:var(--op-onyx,#F4F0E9);
+}
+/* Een bestandsnaam is zo lang als hij is; op telefoonformaat viel de melding
+   daardoor uiteen in vier regels met de knop ernaast. Een pil hoort een pil te
+   blijven: de tekst kapt af, de knop wijkt niet. */
+.gb-terug > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gb-terug button{flex:none;
+  background:transparent;border:1px solid var(--rtg-line,rgba(255,255,255,.18));
+  border-radius:0;padding:.3rem .75rem;min-height:24px;cursor:pointer;
+  font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold-tekst,#C0A544);
+}
+.gb-terug button:hover,.gb-terug button:focus-visible{border-color:var(--gold-tekst,#C0A544);}
+
+/* ------------------------------------------------------------------ rust -- */
+/* Wie minder beweging vraagt, krijgt dezelfde bediening zonder de reis ernaartoe:
+   de lade staat er of staat er niet. Het gebaar zelf blijft werken -- beweging
+   uitzetten is geen functie uitzetten. */
+@media (prefers-reduced-motion:reduce){
+  .gb-lade,.gb-rij[data-gb] > *,.gb-doe{transition:none;}
+}
+html.rtg-stil .gb-lade,html.rtg-stil .gb-rij[data-gb] > *,html.rtg-stil .gb-doe{transition:none;}
+html.rtg-stil :where(.rtg-knop,.knop,.gb-rij)::after{display:none;}

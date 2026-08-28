@@ -18,10 +18,10 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
-  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:999px;padding:.15rem .6rem;}
+  header .tel{margin-left:auto;font-size:.72rem;background:var(--burgundy);color:#fff;border-radius:0;padding:.15rem .6rem;}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
   /* De mapbalk draagt dezelfde stijl als het deelmenu elders in het huis:
      kale knoppen op een dunne lijn, de actieve map met een gouden streep
@@ -32,49 +32,49 @@
     letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding:.55rem .8rem .6rem;cursor:pointer;}
   .schakel button:hover{color:var(--txt);}
   .schakel button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
-  .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
+  .rij{display:flex;gap:.8rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .9rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;color:inherit;font:inherit;}
   .rij:hover{border-color:var(--gold);}
-  .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:12px;flex-shrink:0;font-size:.72rem;font-weight:600;}
+  .rij .ic{width:2.4rem;height:2.4rem;display:grid;place-items:center;background:var(--card2);border-radius:0;flex-shrink:0;font-size:.72rem;font-weight:600;}
   .rij .b{flex:1;min-width:0;}
   .rij .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
   .rij.ongelezen .nm::before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy);flex:0 0 auto;}
   .rij .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rij .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
   .terug{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:.8rem;padding:.2rem 0;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.15rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.15rem;}
   .kaart h2{font-size:1.15rem;margin-bottom:.3rem;}
   .kaart .meta{font-size:.72rem;color:var(--soft);margin-bottom:.9rem;}
   .kaart .body{font-size:.92rem;line-height:1.65;white-space:pre-wrap;color:var(--muted);word-break:break-word;}
-  .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:10px;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
+  .band{display:flex;align-items:center;gap:.5rem;font-size:.72rem;border-radius:0;padding:.45rem .6rem;margin-bottom:.8rem;border:1px solid var(--line);}
   .band svg{width:1rem;height:1rem;flex:0 0 auto;}
   .band.ok{color:#8FD6A6;background:rgba(70,150,95,.1);border-color:rgba(120,200,150,.28);}
-  .band.sys{color:var(--gold);background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
+  .band.sys{color:var(--rtg-leesgoud,var(--gold));background:rgba(169,143,28,.1);border-color:rgba(169,143,28,.3);}
   .band.no{color:#E78AA0;background:rgba(194,58,94,.12);border-color:rgba(194,58,94,.35);}
   .lk{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;}
   .lk.no{color:var(--soft);text-decoration:line-through;text-decoration-color:rgba(194,58,94,.6);}
   .lk.no .lkb{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#E78AA0;text-decoration:none;margin-left:.25rem;}
-  a.lk.ok{color:var(--gold);text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  a.lk.ok{color:var(--rtg-leesgoud,var(--gold));text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
   .rij .lt .ongev{color:#E78AA0;font-weight:600;}
   .bijlaag-noot{font-size:.72rem;color:var(--soft);margin-top:.9rem;border-top:1px solid var(--line);padding-top:.7rem;line-height:1.5;}
-  .ai{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.85rem .9rem;margin-bottom:.9rem;}
-  .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+  .ai{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.85rem .9rem;margin-bottom:.9rem;}
+  .ai h3{font-family:'Inter',sans-serif;font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.4rem;}
   .ai .tx{font-size:.86rem;line-height:1.6;color:var(--muted);white-space:pre-wrap;}
-  .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:10px;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
+  .ai-knop{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;font-weight:600;border-radius:0;padding:.55rem;cursor:pointer;margin-bottom:.9rem;}
   .ai-knop:hover{border-color:var(--gold);}
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.66);display:grid;place-items:center;z-index:20;padding:1.2rem;}
-  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.2rem;max-width:420px;width:100%;}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.2rem;max-width:420px;width:100%;}
   .modal h2{font-size:1.1rem;margin-bottom:.5rem;}
   .modal p{font-size:.85rem;color:var(--muted);line-height:1.55;margin-bottom:.4rem;word-break:break-word;}
-  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--gold);background:var(--card2);border-radius:8px;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
+  .modal .url{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--rtg-leesgoud,var(--gold));background:var(--card2);border-radius:0;padding:.5rem .6rem;margin:.6rem 0;word-break:break-all;}
   .modal .rij2{display:flex;gap:.5rem;margin-top:.8rem;}
-  .modal button{flex:1;border-radius:10px;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
+  .modal button{flex:1;border-radius:0;font:inherit;font-size:.85rem;font-weight:600;padding:.6rem;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt);}
   .modal button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
-  .knop{display:inline-block;background:var(--burgundy);color:#fff;border:0;border-radius:10px;font:inherit;font-size:.85rem;font-weight:600;padding:.55rem 1rem;cursor:pointer;margin-top:1rem;}
+  .knop{display:inline-block;background:var(--burgundy);color:#fff;border:0;border-radius:0;font:inherit;font-size:.85rem;font-weight:600;padding:.55rem 1rem;cursor:pointer;margin-top:1rem;}
   .knop.rand{background:transparent;border:1px solid var(--line);color:var(--muted);}
-  .veld{display:block;width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.9rem;border-radius:10px;padding:.6rem .7rem;margin-top:.6rem;}
+  .veld{display:block;width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.9rem;border-radius:0;padding:.6rem .7rem;margin-top:.6rem;}
   textarea.veld{min-height:8rem;resize:vertical;line-height:1.5;}
   label.lab{display:block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-top:.9rem;}
-  .nieuwbtn{margin-left:.4rem;font-size:.72rem;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.15rem .7rem;cursor:pointer;font:inherit;}
+  .nieuwbtn{margin-left:.4rem;font-size:.72rem;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.15rem .7rem;cursor:pointer;font:inherit;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
   .inlog{text-align:center;padding:3rem 1rem;}
   .noot{font-size:.72rem;color:var(--soft);text-align:center;margin-top:1rem;line-height:1.5;}
@@ -160,38 +160,39 @@ function bindBalk(){
 }
 
 /* ---------- Werkmail: het zakelijke adresboek van de zaak ----------
-   Eigen domein <zaak>.rtg, standaardadressen voor de eigenaar en elke
-   manager, rahul@<domein> dat zelf terugschrijft, en de buitenpost om ook
-   buiten RTG te mailen. Alles van buiten valt in de onbetrouwde baan. */
+   Elk teamlid krijgt automatisch voornaam.achternaam@<zaak>.rtg. Het adres is
+   persoonlijk aan de personeelslogin gebonden; management beheert de uitgifte
+   maar leest niet ongemerkt de persoonlijke post van collega's. */
 async function apiW(pad, body){
   const r=await fetch('/api/supplier/werkmail/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})});
   const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;
 }
-const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'personeel'};
+const ROLNAAM={eigenaar:'eigenaar',management:'management',rahul:'AI van het huis',personeel:'persoonlijk',gedeeld:'gedeeld adres'};
 async function wmLaad(){
   MAP='werkmail'; LIJST=[]; $('#tel').hidden=true;   // het adressenscherm is geen postvak
   let d; try{ d=await apiW('overzicht'); }catch(e){ $('#main').innerHTML=schakelBalk()+'<div class="leeg">'+esc(e.message)+'</div>'; bindBalk(); return; }
   $('#main').innerHTML = schakelBalk()+
     '<div class="kaart" style="margin-bottom:.8rem;"><h2>'+esc(d.domein)+'</h2>'+
-    '<div class="meta">Het eigen domein van de zaak. Extern mailen kan (via de '+(d.echteBuitenpost?'buitenpost':'outbox, er is nog geen SMTP-sleutel')+'); alles wat van buiten binnenkomt is onbetrouwbaar: links op slot, bijlagen bestaan niet.</div></div>'+
-    d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'" data-wa="'+esc(a.adres)+'"'+(a.actief?'':' style="opacity:.55"')+'>'+
+    '<div class="meta">'+esc(d.uitleg)+' Externe afzenders blijven onbetrouwbaar tot SPF, DKIM en DMARC slagen.</div></div>'+
+    d.adressen.map((a,i)=>'<button class="rij'+(a.ongelezen?' ongelezen':'')+'"'+(a.toegang?' data-wa="'+esc(a.adres)+'"':'')+((a.actief&&a.toegang)?'':' style="opacity:.55"')+'>'+
       '<span class="ic">'+esc(a.adres.slice(0,2).toUpperCase())+'</span>'+
-      '<span class="b"><span class="nm">'+esc(a.adres)+(a.ongelezen?' ('+a.ongelezen+')':'')+'</span>'+
-      '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">afgepakt</span>')+'</span></span>'+
-      (a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Afpakken':'Teruggeven')+'</span>')+
+      '<span class="b"><span class="nm">'+esc(a.publiekAdres||a.adres)+(a.ongelezen?' ('+a.ongelezen+')':'')+'</span>'+
+      (a.publiekAdres?'<span class="lt">Intern: '+esc(a.adres)+'</span>':'')+
+      '<span class="lt">'+esc(a.label)+' · '+esc(ROLNAAM[a.rol]||a.rol)+(a.actief?'':' · <span class="ongev">ingetrokken</span>')+(a.actief&&!a.toegang?' · adresbeheer, inhoud privé':'')+'</span></span>'+
+      (!d.magBeheren||a.rol==='eigenaar'||a.rol==='rahul'?'':'<span class="nieuwbtn" data-slot="'+esc(a.adres)+'" data-aan="'+(a.actief?'0':'1')+'">'+(a.actief?'Intrekken':'Teruggeven')+'</span>')+
       '</button>').join('')+
-    '<div class="kaart h-mt80"><h2 style="font-size:1rem;">Nieuw adres (werkgever)</h2>'+
+    (d.magBeheren?'<div class="kaart h-mt80"><h2 style="font-size:1rem;">Gedeeld functieadres</h2>'+
     '<label class="lab">Naam voor de apenstaart</label><input class="veld" id="wmLokaal" placeholder="bijv. balie of jamal">'+
-    '<label class="lab">Voor wie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
+    '<label class="lab">Functie</label><input class="veld" id="wmLabel" placeholder="bijv. De balie">'+
     '<div class="fout" id="wmFout" hidden></div>'+
-    '<button class="knop" id="wmMaak">Adres aanmaken</button></div>';
+    '<button class="knop" id="wmMaak">Adres aanmaken</button></div>':'');
   bindBalk();
   $('#main').querySelectorAll('[data-wa]').forEach(b=>b.addEventListener('click',e=>{
     const slot=e.target.closest('[data-slot]');
     if(slot){ e.stopPropagation(); wmSlot(slot.dataset.slot, slot.dataset.aan==='1'); return; }
     wmInbox(b.dataset.wa);
   }));
-  $('#wmMaak').addEventListener('click', async()=>{
+  const maak=$('#wmMaak'); if(maak) maak.addEventListener('click', async()=>{
     const f=$('#wmFout'); f.hidden=true;
     try{ await apiW('maak',{lokaal:$('#wmLokaal').value.trim(), label:$('#wmLabel').value.trim()}); wmLaad(); }
     catch(e){ f.textContent=e.message; f.hidden=false; }
@@ -206,7 +207,7 @@ async function wmInbox(adres){
   const lijst=d.berichten||[];
   LIJST=lijst;
   $('#main').innerHTML='<button class="terug" id="terug">← alle adressen</button>'+
-    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--gold);cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
+    '<div class="noot" style="text-align:left;margin:0 0 .8rem;">Postvak van '+esc(adres)+' · <span id="wmSchrijf" style="color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">nieuw bericht vanaf dit adres</span></div>'+
     (lijst.length?lijst.map((m,i)=>'<button class="rij'+(m.gelezen?'':' ongelezen')+'" data-i="'+i+'"><span class="ic">'+esc((m.van||'@').slice(0,4).toUpperCase())+'</span><span class="b"><span class="nm">'+esc(m.onderwerp)+'</span><span class="lt">'+(m.vertrouwd?'':'<span class="ongev">niet-geverifieerd</span> · ')+esc(m.tekst)+'</span></span><span class="tijd">'+tijd(m.at)+'</span></button>').join('')
     :'<div class="leeg">Dit postvak is nog leeg.</div>');
   $('#terug').addEventListener('click', wmLaad);

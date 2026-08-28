@@ -25,6 +25,8 @@
    ========================================================================== */
 'use strict';
 
+const { maakVolwassen } = require('../kern/volwassen');
+
 module.exports = (kern, hulp) => {
   const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer, sseToOffice } = hulp;
 
@@ -52,14 +54,10 @@ Object.assign(kern, require('../kern/spellen')({
   // praten in het potje gaat de communicatiekern in; die bestaat pas in laag 4,
   // dus als FUNCTIE (zie kern/spellen/praat.js)
   comm: () => kern.comm,
-  // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
-  // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
-  volwassen: (handle) => {
-    const m = /^user-(.+)$/.exec(String(handle || ''));
-    const geboren = m ? ((accounts.getMemberState(m[1]) || {}).geboren || null) : ((PERSONAS[handle] || {}).geboren || null);
-    const lft = leeftijdVan(geboren);
-    return lft != null && lft >= 18;
-  }
+  /* De 18+-poort staat in kern/volwassen.js: een eigen account, door RTG
+     gekeurd (A3) en 18 of ouder. Daar staat ook waarom die keuring er eerst
+     niet in zat en wat dat gat betekende. */
+  volwassen: maakVolwassen({ accounts: hulp.accounts })
 }));
 /* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
    ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in

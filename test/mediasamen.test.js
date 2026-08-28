@@ -12,7 +12,7 @@
        krijgt de REDEN, geen stil zwart scherm;
      - gaat de gastheer weg, dan gaat de kamer dicht.
 
-   Draai los: node --experimental-sqlite --test test/mediasamen.test.js */
+   Draai los: node --test test/mediasamen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

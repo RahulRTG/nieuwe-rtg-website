@@ -31,6 +31,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const { maakCanary } = require('../server/kern/command/canary');
+const maakCmdOpslag = require('../server/kern/command/opslag');
 const toegang = require('../server/functies/toegang');
 
 /* Een nagemaakte meting met dezelfde vorm als server/meting.js reeksen(). De
@@ -61,7 +62,7 @@ function maak(opties) {
   const m = meting(f.paden);
   const regels = [];
   const journaal = { noteer: (r) => regels.push(r) };
-  const canary = maakCanary({ db, save: () => {}, meting: m, journaal,
+  const canary = maakCanary({ db, opslag: maakCmdOpslag({ db }), save: () => {}, meting: m, journaal,
     functies: { OP_ID: Object.assign({ proef: f }, o.extra || {}) } });
   return { db, f, m, canary, regels };
 }

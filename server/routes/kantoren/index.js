@@ -52,8 +52,9 @@ module.exports = (kern) => {
     catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
 
-  // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
-  app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+  // het reisbureau (aanvragen, het besluit, en de klaargezette reizen): ./reisbureau.js
+  require('./reisbureau')({ app, officeAuth, veilig, stuur, afdelingen, kern });
+
   /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
      WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
      de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van
@@ -100,4 +101,5 @@ module.exports = (kern) => {
   require('./betaalproviders')(ctx);
   require('./zelfzorg')(ctx);
   require('./magnaat-leren')(ctx);
+  require('./reizen')(ctx);       // de reisbalie: het aanbod en de aanvragen
 };

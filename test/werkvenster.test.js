@@ -3,7 +3,7 @@
    manager/vrijstelling, Rahuls advies) met een vaste klok, en de echte
    ingangen (personeelslogin met PIN en het starten via het ene RTG-account)
    die buiten het venster geen sessie meer geven. Rahul adviseert alleen.
-   Draai los: node --experimental-sqlite --test test/werkvenster.test.js */
+   Draai los: node --test test/werkvenster.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop } = require('./helper');

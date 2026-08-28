@@ -17,6 +17,35 @@
 <link href="/shared/social-suite.css" rel="stylesheet">
 <link href="/shared/social-intelligence.css" rel="stylesheet">
 <link href="/shared/dating-premium.css" rel="stylesheet">
+<style>
+  /* Samenvoeging 26-8-2026: de premium-opzet (dating-premium.css) is de basis;
+     dit blok bevat ALLEEN de componenten uit de ONTMOETEN.md-ronde die daar
+     geen klasse hebben (voorkeurstaal-assen, dagdelenrooster, Meet-Halfway-
+     opties, de waaromregels). Uitsluitend tokens en tinten uit die laag;
+     geen nieuwe kleuren, en border-radius blijft 0. */
+  .vonk-blok{margin-top:2.2rem;}
+  .vonk-weg{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  .vonk-as{border-top:1px solid var(--dating-line);}
+  .vonk-as summary{display:flex;gap:.6rem;align-items:baseline;min-height:48px;padding:.85rem 0;cursor:pointer;list-style:none;color:#211f1a;font:600 .8rem/1.3 Inter,system-ui,sans-serif;}
+  .vonk-as summary::-webkit-details-marker{display:none;}
+  .vonk-as summary::after{content:'+';margin-left:auto;color:var(--dating-muted);}
+  .vonk-as[open] summary::after{content:'\2212';}
+  .vonk-as .stand{color:var(--dating-muted);font-size:.72rem;font-weight:400;}
+  .vonk-as .body{display:grid;gap:.9rem;padding:0 0 1.1rem;}
+  .vonk-rooster{width:100%;border-collapse:collapse;font-size:.75rem;}
+  .vonk-rooster th{padding:.35rem .25rem;color:var(--dating-muted);font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;text-align:left;}
+  .vonk-rooster td{padding:0;}
+  .vonk-rooster label{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0;border:1px solid var(--dating-line);background:rgba(255,255,255,.28);cursor:pointer;}
+  .vonk-rooster label:has(input:checked){border-color:var(--dating-gold);background:rgba(192,165,68,.09);}
+  .vonk-waarom{margin-top:.75rem;padding-top:.6rem;border-top:1px solid var(--dating-line);font-size:.76rem;line-height:1.7;color:#4f4a41;}
+  .vonk-waarom .ja::before{content:'\2713\00a0';color:#6fa889;}
+  .vonk-waarom .op{color:var(--dating-muted);}
+  .vonk-waarom .op::before{content:'\25B3\00a0';}
+  .vonk-optie{margin-top:.55rem;padding:.8rem .9rem;border:1px solid var(--dating-line);background:rgba(255,255,255,.28);}
+  .vonk-optie.mijn{border-color:var(--dating-gold);}
+  .vonk-optie .waar{margin-top:.2rem;color:var(--dating-muted);font-size:.72rem;}
+  .vonk-optie .dating-button{margin-top:.6rem;}
+</style>
 <script src="/shared/schermrust.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/social-suite.js" defer></script>
@@ -58,6 +87,9 @@
   </form>
 </dialog>
 
+<!-- uitvoer.js zonder defer en vlak voor het eigen script: dat meldt zijn
+     model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
+     zonder dat het iets won. -->
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
@@ -66,8 +98,18 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
   let tab = 'vandaag', selectie = null, matches = [], geo = null, safetyTarget = null, payTarget = null;
+  /* Uit de ONTMOETEN.md-ronde: de assentabel (kern/vonk/wensen.js), de dagdelen
+     (kern/beschikbaar.js) en de tafelkaart (kern/vonk/halfweg.js) komen van de
+     server mee met /selectie. Het scherm heeft geen eigen lijst -- een as erbij
+     is een regel in de server en verder niets (LAT.md regel 4). */
+  let TABEL = null, ROOSTER = null, KAART = null;
   const tabs = [['profiel','Profiel'],['vandaag','Vandaag'],['matches','Matches']];
   const interesses = ['Reizen','Gastronomie','Muziek','Kunst','Sport','Natuur','Boeken','Wellness'];
+  /* De labels bij de voorkeurstaal en de tafelkaart. Alleen vertaling van
+     server-ids naar leestekst; de waarheid zelf woont in de kern. */
+  const GEWICHTLABEL = { verplicht: 'Verplicht', sterk: 'Sterke voorkeur', mee: 'Leuk meegenomen' };
+  const ZICHTLABEL = { kandidaten: 'Iedereen in mijn selectie', match: 'Pas na een match', engine: 'Niemand; alleen voor het matchen' };
+  const BUDGETLABEL = { laag: 'Liefst laag', midden: 'Middenklasse', hoog: 'Maakt niet uit qua prijs', egaal: 'Maakt niet uit' };
   document.addEventListener('DOMContentLoaded', () => { document.querySelector('.rtg-spring')?.remove(); document.body.prepend($('.skip')); }, { once:true });
 
   function meld(tekst) { const m=$('#melding');m.textContent=tekst;m.style.opacity='1';clearTimeout(m._timer);m._timer=setTimeout(()=>{m.style.opacity='0';},3400); }
@@ -85,6 +127,12 @@
   function shell(werk, context, titel, detail) { return command(titel,detail)+'<div class="dating-layout"><article class="dating-work">'+werk+'</article><aside class="dating-context" aria-label="Vertrouwen en uitleg">'+context+'</aside></div>'; }
   const trust=(titel,tekst,regels)=>'<div><span class="dating-eyebrow">Veilig by design</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p></div><div><dl>'+regels.map(r=>'<div><dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd></div>').join('')+'</dl><a href="/apps/app.html">Beheer uw identiteit</a></div>';
   const statusLabel=x=>x==='bevestigd'?'Tafel bevestigd':x==='betaald'?'Betaald · reservering volgt':'Wacht op beide akkoorden';
+  /* Het betrouwbaarheidsniveau (kern/betrouwbaarheid.js) op het kaartje zelf:
+     de poort garandeert al A3, dus dit is geen zeef maar een onderscheid --
+     A4 zegt dat RTG de selfie naast het paspoort heeft gelegd. Dat is precies
+     wat je wilt weten voordat je met een vreemde afspreekt, en de belofte
+     "de ander is echt" bereikte het lid eerder nergens. */
+  const niveau=n=>n?' · '+esc(n.id)+' · '+esc(n.naam):'';
   function toonGate(fout) {
     $('#tabs').hidden=true;
     const kyc=/verifieer|paspoort|kyc/i.test(fout.message), leeftijd=/vanaf 18|18 jaar/i.test(fout.message);
@@ -97,7 +145,94 @@
   async function betalen(){if(!payTarget)return;try{const r=await api('betaal',{id:payTarget.id});$('#payDialog').close();meld(r.status2==='bevestigd'?'De date staat. De tafel is bevestigd.':'Uw aandeel is bevestigd. De tafel blijft in afwachting van de ander.');await laad();}catch(e){meld(e.message);}}
   $('#blockOnly').onclick=e=>{e.preventDefault();safety(false);}; $('#blockReport').onclick=e=>{e.preventDefault();safety(true);}; $('#payConfirm').onclick=e=>{e.preventDefault();betalen();};
 
+  /* Meenemen (shared/uitvoer.js): uw matches met de tafel die erbij hoort --
+     wie, sinds wanneer, waar en wanneer, en hoe het ervoor staat. Alleen
+     codenamen, precies zoals het scherm ze toont; de chat blijft in de app. */
   if(window.RTGUitvoer)RTGUitvoer.bron(()=>matches.length?{naam:'vonk-matches',kolommen:['codenaam','match sinds','zaak','plek','datum','tijd','status'],rijen:matches.map(x=>{const t=x.tafel||{};return[x.met,String(x.at||'').slice(0,10),t.supplierName||'',t.plek||'',t.datum||'',t.tijd||'',x.status||''];})}:null);
+
+  /* ---- de voorkeurstaal, het rooster en de tafelkaart (ONTMOETEN.md-ronde) ---- */
+
+  /* De merkjes op een kaartje: alleen de assen die die persoon zelf zichtbaar
+     liet zijn (kern/vonk/wensen.js, toonKenmerken). Wat iemand van een ander
+     VRAAGT komt hier nooit binnen. */
+  const merken=k=>Object.values(k||{}).map(x=>'<span class="dating-chip">'+esc(x.as)+': '+esc(x.label)+'</span>').join('');
+  /* Waarom deze kandidaat: wat aan uw wensen voldoet (ja) en wat nog open
+     staat (op). Een onbekend antwoord is een open punt, geen afwijzing. */
+  const waarom=w=>(!w||(!w.ja.length&&!w.open.length))?'':'<div class="vonk-waarom">'+w.ja.map(t=>'<div class="ja">'+esc(t)+'</div>').join('')+w.open.map(t=>'<div class="op">'+esc(t)+'</div>').join('')+'</div>';
+
+  function assenHtml(p){
+    const mijn=(p&&p.kenmerken)||{}, wens=(p&&p.wensen)||{}, zicht=(p&&p.zicht)||{};
+    return TABEL.assen.map(as=>{
+      const eigen=(mijn[as.id]&&mijn[as.id].waarde)||'';
+      const w=wens[as.id]||null;
+      const z=zicht[as.id]||as.standaardZicht;
+      const stand=[eigen?(as.opties.find(o=>o.v===eigen)||{}).label:null,w?GEWICHTLABEL[w.gewicht]:null].filter(Boolean).join(' · ')||'niet ingevuld';
+      return '<details class="vonk-as"><summary><span>'+esc(as.label)+'</span><span class="stand">'+esc(stand)+'</span></summary><div class="body">'+
+        '<div class="dating-field"><label for="k_'+as.id+'">Mijn antwoord</label><select class="dating-input" id="k_'+as.id+'" data-k="'+as.id+'"><option value="">Zeg ik liever niet</option>'+
+        as.opties.map(o=>'<option value="'+esc(o.v)+'"'+(o.v===eigen?' selected':'')+'>'+esc(o.label)+'</option>').join('')+'</select></div>'+
+        '<div class="dating-field"><label for="z_'+as.id+'">Wie ziet mijn antwoord</label><select class="dating-input" id="z_'+as.id+'" data-z="'+as.id+'">'+
+        TABEL.zicht.map(v=>'<option value="'+esc(v)+'"'+(v===z?' selected':'')+'>'+esc(ZICHTLABEL[v]||v)+'</option>').join('')+'</select></div>'+
+        '<fieldset class="dating-fieldset"><legend class="dating-legend">Bij een ander aanvaard ik</legend><div class="dating-segments">'+
+        as.opties.map(o=>'<label><input type="checkbox" data-w="'+as.id+'" value="'+esc(o.v)+'"'+(w&&w.in.includes(o.v)?' checked':'')+'><span>'+esc(o.label)+'</span></label>').join('')+'</div></fieldset>'+
+        '<div class="dating-field"><label for="g_'+as.id+'">Hoe zwaar weegt dit</label><select class="dating-input" id="g_'+as.id+'" data-g="'+as.id+'"><option value="">Niet meegenomen</option>'+
+        TABEL.gewichten.map(g=>'<option value="'+esc(g)+'"'+(w&&w.gewicht===g?' selected':'')+'>'+esc(GEWICHTLABEL[g]||g)+'</option>').join('')+'</select></div>'+
+        '</div></details>';
+    }).join('');
+  }
+
+  /* Eenentwintig hokjes: zeven dagen maal drie dagdelen. Een tabel omdat het er
+     een IS -- dag in de rij, dagdeel in de kolom -- en dat leest een schermlezer
+     als zodanig voor. Elk vinkje draagt zijn hele naam ("donderdagavond"), zodat
+     hij ook los van zijn rij te begrijpen is. */
+  function roosterHtml(mijn){
+    const aan=new Set(mijn||[]);
+    const kop='<tr><th></th>'+ROOSTER.delen.map(p=>'<th scope="col">'+esc(p.label)+'</th>').join('')+'</tr>';
+    const rijen=ROOSTER.dagen.map(d=>'<tr><th scope="row">'+esc(d.label)+'</th>'+ROOSTER.delen.map(p=>{
+      const s=ROOSTER.slots.find(x=>x.id===d.id+'-'+p.id);
+      return '<td><label><input type="checkbox" data-slot="'+esc(s.id)+'"'+(aan.has(s.id)?' checked':'')+' aria-label="'+esc(s.label)+'"></label></td>';
+    }).join('')+'</tr>').join('');
+    return '<table class="vonk-rooster"><caption class="vonk-weg">Wanneer u meestal kunt</caption>'+kop+rijen+'</table>';
+  }
+
+  /* De eisen aan de plek, het budget en de soort uitje. Uit de kaart van de
+     server (kern/vonk/halfweg.js), dus ook hier geen tweede lijst. */
+  function datewensHtml(w){
+    w=w||{eisen:[],budget:'egaal',soorten:[]};
+    return '<fieldset class="dating-fieldset"><legend class="dating-legend">De plek moet</legend><div class="dating-segments">'+
+      KAART.eisen.map(e=>'<label><input type="checkbox" data-eis="'+esc(e.id)+'"'+((w.eisen||[]).includes(e.id)?' checked':'')+'><span>'+esc(e.label)+'</span></label>').join('')+'</div></fieldset>'+
+      '<fieldset class="dating-fieldset dating-bovenk"><legend class="dating-legend">Ik hou van</legend><div class="dating-segments">'+
+      KAART.soorten.map(x=>'<label><input type="checkbox" data-soort="'+esc(x.id)+'"'+((w.soorten||[]).includes(x.id)?' checked':'')+'><span>'+esc(x.label)+'</span></label>').join('')+'</div></fieldset>'+
+      '<div class="dating-field dating-bovenk"><label for="dBudget">Prijsklasse</label><select class="dating-input" id="dBudget">'+
+      KAART.budgetten.map(b=>'<option value="'+esc(b)+'"'+(b===w.budget?' selected':'')+'>'+esc(BUDGETLABEL[b]||b)+'</option>').join('')+'</select></div>';
+  }
+
+  /* Meet Halfway: de drie plekken rond het midden, met de blinde keuze -- de
+     ander ziet uw keuze pas als hij zelf ook gekozen heeft (kern/vonk/kiezen.js). */
+  function tekenOpties(mid,hw){
+    if(!hw||!hw.opties.length)return '<p class="dating-copy">Er staan geen plekken klaar; spreek zelf iets af in de chat.</p>';
+    const rond=hw.rond, beide=hw.beideGekozen;
+    return '<p class="dating-copy">'+(rond?'U koos allebei dezelfde plek.'
+      :beide?'U koos allebei; hieronder ziet u wat de ander koos.'
+      :hw.mijnKeuze?'Uw keuze staat genoteerd. U ziet die van de ander zodra hij gekozen heeft.'
+      :'Kies er een. De ander ziet uw keuze pas als hij zelf ook gekozen heeft.')+'</p>'+
+      hw.opties.map(o=>'<div class="vonk-optie'+(o.id===hw.mijnKeuze?' mijn':'')+'">'+
+        '<div class="soort">'+esc(o.soortLabel)+' &middot; '+esc(o.supplierName)+'</div>'+
+        '<div class="waar">'+esc(o.plek||'')+' &middot; '+o.reisMinA+' / '+o.reisMinB+' min reizen'+(o.klasse?' &middot; '+esc(o.klasse):'')+'</div>'+
+        (beide&&o.id===hw.keuzeAnder?'<div class="waar">De ander koos deze.</div>':'')+
+        '<button class="dating-button'+(o.id===hw.mijnKeuze?' quiet':'')+'" type="button" data-kies="'+esc(mid)+'" data-optie="'+esc(o.id)+'">'+(o.id===hw.mijnKeuze?'Uw keuze':'Kies deze')+'</button></div>').join('');
+  }
+  function koppelKies(mid){
+    document.querySelectorAll('[data-kies="'+CSS.escape(mid)+'"]').forEach(b=>b.onclick=async()=>{
+      try{
+        const r=await api('kies',{id:mid,optie:b.dataset.optie});
+        meld(r.rond?'U koos allebei dezelfde plek.':r.beideGekozen?'U koos verschillend; u ziet nu allebei de keuzes.':'Genoteerd.');
+        if(r.rond){await laad();return;} // de tafel staat nu klaar; het hele blad mag mee
+        const doel=document.getElementById('hw-'+mid);
+        const hw=await api('halfweg',{id:mid});
+        doel.innerHTML=tekenOpties(mid,hw); koppelKies(mid);
+      }catch(e){meld(e.message);}
+    });
+  }
 
   function renderProfiel(){
     const p=selectie.profiel||{over:'',stad:'',geslacht:'x',zoekt:['v','m','x'],leeftijdMin:18,leeftijdMax:99,maxKm:100,interesses:[],actief:true,afstandActief:false};
@@ -112,16 +247,61 @@
       '<div class="dating-field"><span class="dating-legend">Afstand bepalen</span><button class="dating-button" type="button" id="geoButton">'+(p.afstandActief?'Afstand opnieuw bepalen':'Gebruik apparaatlocatie')+'</button><small class="dating-help" id="geoStatus">'+(p.afstandActief?'Afstand is ingesteld; coördinaten blijven verborgen.':'Optioneel, voor afstand en een tafel rond het midden.')+'</small></div>'+
       '<div class="dating-field"><span class="dating-legend">Gewenste leeftijd</span><div class="dating-range"><div><label for="pMin">Van</label><input class="dating-input" id="pMin" inputmode="numeric" value="'+esc(p.leeftijdMin||18)+'"></div><span>tot</span><div><label for="pMax">Tot</label><input class="dating-input" id="pMax" inputmode="numeric" value="'+esc(p.leeftijdMax||99)+'"></div></div></div>'+
       '<div class="dating-field"><label for="pKm">Maximale afstand</label><select class="dating-input" id="pKm">'+[25,50,100,250,500].map(n=>'<option value="'+n+'"'+(Number(p.maxKm)===n?' selected':'')+'>'+n+' km</option>').join('')+'</select></div>'+
-      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+belang+'</div><div class="dating-field" style="margin-top:.75rem"><label for="pExtra">Aanvullend</label><input class="dating-input" id="pExtra" value="'+esc(extra.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"></div></fieldset></div>'+
-      '<div class="dating-actions"><button class="dating-button primary" type="button" id="pBewaar">Profiel veilig bewaren</button><span class="dating-save-status" id="pStatus">'+(p.codenaam?'Codenaam: '+esc(p.codenaam):'Nog niet gepubliceerd')+'</span></div>';
-    $('#inhoud').innerHTML=shell(werk,trust('Alleen wat matching nodig heeft','Vonk gebruikt leeftijd, voorkeuren en optioneel afstand. Andere leden zien nooit uw precieze positie.',[['Identiteit','Geverifieerd'],['Zichtbaar','Codenaam + woonplaats'],['Locatie','Niet gedeeld met leden']]),'Uw Vonk-profiel',p.actief!==false?'Actief':'Verborgen');
+      '<fieldset class="dating-fieldset wide"><legend class="dating-legend">Interesses</legend><div class="dating-segments">'+belang+'</div><div class="dating-field dating-bovenm"><label for="pExtra">Aanvullend</label><input class="dating-input" id="pExtra" value="'+esc(extra.join(', '))+'" placeholder="Andere interesses, gescheiden met komma’s"></div></fieldset></div>'+
+      '<div class="dating-actions"><button class="dating-button primary" type="button" id="pBewaar" data-hoofdactie>Profiel veilig bewaren</button><span class="dating-save-status" id="pStatus">'+(p.codenaam?'Codenaam: '+esc(p.codenaam):'Nog niet gepubliceerd')+'</span></div>'+
+      /* Drie blokken uit de ONTMOETEN.md-ronde. Ze bewaren elk hun eigen deel
+         via hetzelfde /profiel-endpoint; zonder profiel is er nog geen tabel
+         en staat er alleen de uitleg. */
+      '<section class="vonk-blok" aria-label="Wat er voor u toe doet"><div class="dating-section-head"><div><span class="dating-eyebrow">Voorkeurstaal</span><h2>Wat er voor u toe doet</h2></div></div>'+
+      '<p class="dating-copy">Per onderwerp kunt u zeggen wat u zelf bent, wat u bij een ander aanvaardt, en hoe zwaar dat weegt. <strong>Verplicht</strong> haalt iemand met een uitgesproken tegengesteld antwoord uit uw selectie; heeft iemand er niets over gezegd, dan blijft hij staan en ziet u dat als open punt. Wat u van een ander vraagt, is voor niemand zichtbaar &mdash; alleen uw eigen antwoord, en daarvan bepaalt u per onderwerp wie het ziet.</p>'+
+      (TABEL?assenHtml(p)+'<div class="dating-actions"><button class="dating-button" type="button" id="wBewaar">Bewaar wat er toe doet</button><span class="dating-save-status" id="wStatus"></span></div>':'<p class="dating-copy">Bewaar eerst uw profiel.</p>')+'</section>'+
+      '<section class="vonk-blok" aria-label="Wanneer u kunt"><div class="dating-section-head"><div><span class="dating-eyebrow">Beschikbaarheid</span><h2>Wanneer u kunt</h2></div></div>'+
+      '<p class="dating-copy">Kruis aan wanneer u meestal kunt. Dit is geen agenda: er staat geen datum en geen tijdstip in, en niemand ziet uw vinkjes. Heeft u een match, dan krijgt u allebei één dagdeel te zien dat u beiden aankruiste &mdash; verder niets.</p>'+
+      (ROOSTER?roosterHtml(p.beschikbaar)+'<div class="dating-actions"><button class="dating-button" type="button" id="bBewaar">Bewaar wanneer u kunt</button><span class="dating-save-status" id="bStatus"></span></div>':'<p class="dating-copy">Bewaar eerst uw profiel.</p>')+'</section>'+
+      '<section class="vonk-blok" aria-label="Wat de plek moet kunnen"><div class="dating-section-head"><div><span class="dating-eyebrow">De plek</span><h2>Wat de plek moet kunnen</h2></div></div>'+
+      '<p class="dating-copy">Voor als het tot een afspraak komt. Dit staat niet op uw profiel en niemand ziet het &mdash; het bepaalt alleen welke plekken Vonk voorstelt. Wat u hier als eis aankruist, geldt voor de plek waar u samen komt. <strong>Een zaak die er niets over heeft gezegd, telt als nee</strong>: liever geen voorstel dan een verrassing bij de deur.</p>'+
+      (KAART?datewensHtml(p.datewens)+'<div class="dating-actions"><button class="dating-button" type="button" id="dBewaar">Bewaar</button><span class="dating-save-status" id="dStatus"></span></div>':'<p class="dating-copy">Bewaar eerst uw profiel.</p>')+'</section>';
+    $('#inhoud').innerHTML=shell(werk,trust('Alleen wat matching nodig heeft','Vonk gebruikt leeftijd, voorkeuren en optioneel afstand. Andere leden zien nooit uw precieze positie.',[['Identiteit','Geverifieerd'],['Zichtbaar','Codenaam + woonplaats'],['Locatie','Niet gedeeld met leden'],['Uw wensen','Voor niemand zichtbaar']]),'Uw Vonk-profiel',p.actief!==false?'Actief':'Verborgen');
     $('#geoButton').onclick=()=>{if(!navigator.geolocation){meld('Dit apparaat ondersteunt geen locatiebepaling.');return;}$('#geoStatus').textContent='Locatie wordt alleen voor afstand bepaald…';navigator.geolocation.getCurrentPosition(pos=>{geo={lat:pos.coords.latitude,lng:pos.coords.longitude};$('#geoStatus').textContent='Afstand ingesteld. Uw precieze positie wordt niet aan leden getoond.';meld('Afstand is ingesteld.');},()=>{$('#geoStatus').textContent='Locatie niet gedeeld. U kunt uw profiel zonder afstand bewaren.';meld('Locatie is niet gedeeld.');},{enableHighAccuracy:false,timeout:8000,maximumAge:300000});};
     $('#pBewaar').onclick=async()=>{const target=[...document.querySelectorAll('[data-looking]:checked')].map(x=>x.dataset.looking);if(!target.length){meld('Kies ten minste één voorkeur.');return;}const data={over:$('#pOver').value,stad:$('#pStad').value,geslacht:(document.querySelector('[name="gender"]:checked')||{}).value||'x',zoekt:target,leeftijdMin:$('#pMin').value,leeftijdMax:$('#pMax').value,maxKm:$('#pKm').value,actief:$('#pActief').checked,interesses:[...document.querySelectorAll('[data-interest]:checked')].map(x=>x.dataset.interest).concat($('#pExtra').value.split(',').map(x=>x.trim()).filter(Boolean))};if(geo)Object.assign(data,geo);try{await api('profiel',data);$('#pStatus').textContent='Bewaard · '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});meld('Uw Vonk-profiel is veilig bewaard.');await laad();}catch(e){meld(e.message);}};
+    const wB=$('#wBewaar');if(wB)wB.onclick=async()=>{
+      const kenmerken={},wensen={},zicht={};
+      for(const as of TABEL.assen){
+        const k=document.querySelector('[data-k="'+as.id+'"]');
+        const g=document.querySelector('[data-g="'+as.id+'"]');
+        const z=document.querySelector('[data-z="'+as.id+'"]');
+        if(k)kenmerken[as.id]=k.value;          // leeg wist de as
+        if(z&&z.value)zicht[as.id]=z.value;
+        const in_=Array.from(document.querySelectorAll('[data-w="'+as.id+'"]')).filter(c=>c.checked).map(c=>c.value);
+        /* Geen gewicht of niets aangevinkt = geen wens. Zo kan een lid een eis
+           ook weer INTREKKEN; een eis die je niet kwijtraakt is een val. */
+        wensen[as.id]=(g&&g.value&&in_.length)?{in:in_,gewicht:g.value}:'';
+      }
+      try{await api('profiel',{kenmerken,wensen,zicht});$('#wStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+    };
+    const bB=$('#bBewaar');if(bB)bB.onclick=async()=>{
+      const beschikbaar=Array.from(document.querySelectorAll('[data-slot]')).filter(c=>c.checked).map(c=>c.dataset.slot);
+      try{await api('profiel',{beschikbaar});$('#bStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+    };
+    const dB=$('#dBewaar');if(dB)dB.onclick=async()=>{
+      const eisen=Array.from(document.querySelectorAll('[data-eis]')).filter(c=>c.checked).map(c=>c.dataset.eis);
+      const soorten=Array.from(document.querySelectorAll('[data-soort]')).filter(c=>c.checked).map(c=>c.dataset.soort);
+      const budget=($('#dBudget')||{}).value||'egaal';
+      try{await api('profiel',{datewens:{eisen,soorten,budget}});$('#dStatus').textContent='Bewaard.';await laad();}catch(e){meld(e.message);}
+    };
   }
 
   function renderVandaag(){
     const mensen=selectie.mensen||[];
-    const lijst=!mensen.length?'<div class="dating-empty"><strong>Uw selectie is voor vandaag compleet</strong><p>'+esc(selectie.uitleg||'Morgen ontstaat een nieuwe kleine selectie.')+'</p></div>':'<div class="dating-list">'+mensen.map(p=>'<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Wederzijds passend</div><h3>'+esc(p.codenaam)+', '+esc(p.leeftijd)+'</h3><div class="dating-meta">'+esc(p.stad||'Woonplaats privé')+(p.gemeen&&p.gemeen.length?' · gedeeld: '+p.gemeen.map(esc).join(', '):'')+'</div><p class="dating-bio">'+esc(p.over||'Dit lid heeft nog geen introductie geschreven.')+'</p><div class="dating-chips">'+(p.interesses||[]).map(i=>'<span class="dating-chip'+((p.gemeen||[]).includes(i)?' shared':'')+'">'+esc(i)+'</span>').join('')+'</div></div><div class="dating-person-actions"><button class="dating-button wine" data-like="'+esc(p.codenaam)+'">Interesse</button><button class="dating-button" data-pass="'+esc(p.codenaam)+'">Voorbij</button><button class="dating-button quiet" data-safe="'+esc(p.codenaam)+'">Veiligheid</button></div></article>').join('')+'</div>';
+    /* Een lege dag is een antwoord en geen storing: `leeg` komt van de server
+       en noemt zijn eigen bron (harde eisen of gewoon niemand vandaag). */
+    const lijst=!mensen.length?'<div class="dating-empty"><strong>Uw selectie is voor vandaag compleet</strong><p>'+esc(selectie.leeg||selectie.uitleg||'Morgen ontstaat een nieuwe kleine selectie.')+'</p></div>':'<div class="dating-list">'+mensen.map(p=>'<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">Wederzijds passend'+niveau(p.betrouwbaarheid)+'</div><h3>'+esc(p.codenaam)+', '+esc(p.leeftijd)+'</h3><div class="dating-meta">'+esc(p.stad||'Woonplaats privé')+(p.gemeen&&p.gemeen.length?' · gedeeld: '+p.gemeen.map(esc).join(', '):'')+'</div><p class="dating-bio">'+esc(p.over||'Dit lid heeft nog geen introductie geschreven.')+'</p><div class="dating-chips">'+(p.interesses||[]).map(i=>'<span class="dating-chip'+((p.gemeen||[]).includes(i)?' shared':'')+'">'+esc(i)+'</span>').join('')+'</div>'+
+      (merken(p.kenmerken)?'<div class="dating-chips">'+merken(p.kenmerken)+'</div>':'')+
+      waarom(p.waarom)+
+      '</div><div class="dating-person-actions"><button class="dating-button wine" data-like="'+esc(p.codenaam)+'">Interesse</button><button class="dating-button" data-pass="'+esc(p.codenaam)+'">Voorbij</button><button class="dating-button quiet" data-safe="'+esc(p.codenaam)+'">Veiligheid</button></div></article>').join('')+'</div>'+
+      /* Wat er NIET meeweegt hoort bij de uitleg: dat is precies het vertrouwen
+         dat een datingapp normaal niet geeft (ONTMOETEN.md par. 3.2). */
+      (selectie.nietGebruikt&&mensen.length?'<p class="dating-help">Niet meegewogen: '+selectie.nietGebruikt.map(esc).join(' · ')+'.</p>':'');
     const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">Vandaag voor u</span><h2>Klein, passend, eindig</h2></div><p>Geen ranglijst of populariteitsscore. Alleen profielen die over en weer bij de wensen passen.</p></div>'+lijst;
     $('#inhoud').innerHTML=shell(werk,trust('Geen oneindige feed','Na maximaal zes introducties is vandaag bewust klaar. Voorbijgaan is stil; een like wordt pas zichtbaar als die wederzijds is.',[['Per dag','Maximaal zes'],['Volgorde','Passend, geen populariteit'],['Afwijzing','Privé en zonder melding']]),'Uw selectie van vandaag',mensen.length+' introducties');
     document.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{try{const r=await api('like',{codenaam:b.dataset.like});meld(r.match?'Een Vonk. De besloten chat staat open.':'Uw interesse is discreet genoteerd.');await laad();}catch(e){meld(e.message);}});
@@ -130,16 +310,33 @@
   }
 
   function renderMatches(){
-    const lijst=!matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Zodra jullie elkaar allebei kiezen, opent hier een besloten chat en kan er een tafel klaarstaan.</p></div>':'<div class="dating-list">'+matches.map(x=>{const t=x.tafel;return '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">'+esc(statusLabel(x.status))+'</div><h3>'+esc(x.met)+'</h3>'+(t?'<div class="dating-meta">'+esc(t.supplierName)+' · '+esc(t.plek)+' · '+esc(t.datum)+' om '+esc(t.tijd)+'</div><div class="dating-date"><strong>€ '+esc(t.prijsPP)+' p.p.</strong> · € '+esc(t.rtgDeel)+' RTG en € '+esc(t.prijsPP-t.rtgDeel)+' aanbetaling bij de zaak. '+(x.ikBetaalde?'Uw aandeel is bevestigd.':x.anderBetaalde?'De ander heeft al bevestigd.':'Nog niemand heeft betaald.')+'</div>':'<div class="dating-meta">Geen automatische tafel; spreek samen iets af in de chat.</div>')+'<div class="dating-chat" aria-label="Chat met '+esc(x.met)+'">'+((x.berichten||[]).map(b=>'<div class="dating-chat-line"><span class="dating-chat-who">'+esc(b.van)+'</span> '+esc(b.tekst)+'</div>').join('')||'<div class="dating-meta">De chat is open. U bepaalt wie begint.</div>')+'</div><div class="dating-message"><input class="dating-input" data-text="'+esc(x.id)+'" maxlength="300" placeholder="Schrijf een bericht" aria-label="Bericht aan '+esc(x.met)+'"><button class="dating-button" data-send="'+esc(x.id)+'">Zelf versturen</button></div></div><div class="dating-person-actions">'+(t&&!x.ikBetaalde?'<button class="dating-button primary" data-pay="'+esc(x.id)+'">Aandeel controleren</button>':'')+'<button class="dating-button quiet" data-safe="'+esc(x.met)+'">Veiligheid</button></div></article>';}).join('')+'</div>';
+    const lijst=!matches.length?'<div class="dating-empty"><strong>Nog geen wederzijdse match</strong><p>Zodra jullie elkaar allebei kiezen, opent hier een besloten chat en kan er een tafel klaarstaan.</p></div>':'<div class="dating-list">'+matches.map(x=>{const t=x.tafel;return '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">'+esc(statusLabel(x.status))+niveau(x.betrouwbaarheid)+'</div><h3>'+esc(x.met)+'</h3>'+(t?'<div class="dating-meta">'+esc(t.supplierName)+' · '+esc(t.plek)+' · '+esc(t.datum)+' om '+esc(t.tijd)+'</div><div class="dating-date"><strong>€ '+esc(t.prijsPP)+' p.p.</strong> · € '+esc(t.rtgDeel)+' RTG en € '+esc(t.prijsPP-t.rtgDeel)+' aanbetaling bij de zaak. '+(x.ikBetaalde?'Uw aandeel is bevestigd.':x.anderBetaalde?'De ander heeft al bevestigd.':'Nog niemand heeft betaald.')+'</div>':'<div class="dating-meta">Geen automatische tafel; kies samen een plek of spreek iets af in de chat.</div>')+
+      (merken(x.kenmerken)?'<div class="dating-chips">'+merken(x.kenmerken)+'</div>':'')+
+      /* Eén dagdeel dat u allebei aankruiste, of niets -- nooit de hokjes van
+         de ander (kern/beschikbaar.js). */
+      (x.wanneer&&x.wanneer.samen?'<div class="dating-date">'+esc(x.wanneer.tekst)+'</div>':'')+
+      /* Meet Halfway: de opties verschijnen pas op verzoek, in dit vak. */
+      '<div id="hw-'+esc(x.id)+'"></div>'+
+      '<div class="dating-chat" aria-label="Chat met '+esc(x.met)+'">'+((x.berichten||[]).map(b=>'<div class="dating-chat-line"><span class="dating-chat-who">'+esc(b.van)+'</span> '+esc(b.tekst)+'</div>').join('')||'<div class="dating-meta">De chat is open. U bepaalt wie begint.</div>')+'</div><div class="dating-message"><input class="dating-input" data-text="'+esc(x.id)+'" maxlength="300" placeholder="Schrijf een bericht" aria-label="Bericht aan '+esc(x.met)+'"><button class="dating-button" data-send="'+esc(x.id)+'">Zelf versturen</button></div></div><div class="dating-person-actions">'+(t&&!x.ikBetaalde?'<button class="dating-button primary" data-pay="'+esc(x.id)+'">Aandeel controleren</button>':'')+'<button class="dating-button" data-halfweg="'+esc(x.id)+'">Kies de plek</button><button class="dating-button quiet" data-safe="'+esc(x.met)+'">Veiligheid</button></div></article>';}).join('')+'</div>';
     const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">Wederzijds gekozen</span><h2>Matches en afspraken</h2></div><p>Chat, controleer en bevestig zelf. Een reservering ontstaat pas na twee persoonlijke akkoorden.</p></div>'+lijst;
     $('#inhoud').innerHTML=shell(werk,trust('Twee mensen, twee akkoorden','RTG kan een tafel voorbereiden. Betalen en reserveren gebeurt nooit op de achtergrond.',[['Chat','Alleen na match'],['Betaling','€ 10 per persoon'],['Reservering','Pas na beide akkoorden']]),'Uw matches',matches.length+' actief');
     document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>openPay(b.dataset.pay));
     document.querySelectorAll('[data-send]').forEach(b=>b.onclick=async()=>{const inp=document.querySelector('[data-text="'+CSS.escape(b.dataset.send)+'"]');if(!inp.value.trim()){meld('Schrijf eerst een bericht.');return;}try{await api('bericht',{id:b.dataset.send,tekst:inp.value});inp.value='';meld('Uw bericht is verstuurd.');await laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-safe]').forEach(b=>b.onclick=()=>openSafety(b.dataset.safe));
+    document.querySelectorAll('[data-halfweg]').forEach(b=>b.onclick=async()=>{
+      const doel=document.getElementById('hw-'+b.dataset.halfweg);
+      doel.innerHTML='<p class="dating-copy">Even kijken…</p>';
+      try{const hw=await api('halfweg',{id:b.dataset.halfweg});doel.innerHTML=tekenOpties(b.dataset.halfweg,hw);koppelKies(b.dataset.halfweg);}
+      catch(e){doel.innerHTML='<p class="dating-copy">'+esc(e.message)+'</p>';}
+    });
   }
 
   function render(){tekenTabs();if(tab==='profiel')renderProfiel();else if(tab==='vandaag')renderVandaag();else renderMatches();}
-  async function laad(){if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}try{selectie=await api('selectie');matches=(await api('mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p></div>';meld(e.message);}}}
+  async function laad(){if(!token){toonGate(new Error('Log eerst in via de leden-app.'));return;}try{selectie=await api('selectie');
+    /* De drie kaarten uit de ONTMOETEN.md-ronde reizen mee met /selectie zolang
+       er een profiel is; eenmaal gezien blijven ze staan. */
+    if(selectie.tabel)TABEL=selectie.tabel;if(selectie.rooster)ROOSTER=selectie.rooster;if(selectie.tafelkaart)KAART=selectie.tafelkaart;
+    matches=(await api('mijn')).matches||[];if(!selectie.profiel)tab='profiel';render();}catch(e){if(e.status===401||e.status===403)toonGate(e);else{$('#inhoud').innerHTML='<div class="dating-empty"><strong>Vonk kon niet laden</strong><p>'+esc(e.message)+'</p></div>';meld(e.message);}}}
   laad();
 })();
 </script>

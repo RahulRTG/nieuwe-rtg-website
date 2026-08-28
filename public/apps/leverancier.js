@@ -6388,6 +6388,10 @@
       '<input id="bevPostMin" type="number" min="1" value="1" style="width:5rem;" title="'+T('bev.min','min. bezetting')+'">'+
       '<button class="abtn" id="bevPostAdd">'+T('bev.postadd','Post toevoegen')+'</button></div></div>';
     // 7) incidenten
+/* Vervolg van leverancier-56 (op de 10 kB-leesgrens geknipt toen het
+   Meer-scherm er een knop bij kreeg -- RTG Commerce). De bundelvolgorde is
+   alfabetisch, dus 56, 56a, 57: de tekst in apps/leverancier.js blijft
+   letterlijk dezelfde. Dit deel: de staart van het beveiligingsbord. */
 /* de incidenten op het beveiligingsbord */
     if (cmd.incidenten && cmd.incidenten.length){
       h += '<div class="st-sec">'+T('bev.incs','Incidenten')+'</div><div class="card" style="margin-bottom:0.5rem;">'+
@@ -6441,7 +6445,8 @@
       try { await API.call('/supplier/beveiliging/aanvraag/beslis', { ref:x.dataset.avweg, actie:'afwijzen' }); renderBeveiliging(); } catch(e){ toast(e.message); }
     }));
   }
-
+/* Vervolg van leverancier-56a. Dit deel: het Meer-scherm (alle overige
+   functies als nette knoppen) en het begin van renderAll. */
   // alle overige functies als nette knoppen in het Meer-scherm
   function renderMeer(){
     const el = $('#meerWrap'); if (!el) return;
@@ -6470,6 +6475,8 @@
        pagina, zelfde zaak-inlog). Zie server/kern/webplatform.js. */
     const festival = '<button class="meer-btn" data-festival="1"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/></svg><b>' + T('tab.festival','Festival') + '</b></button>';
     const web = '<button class="meer-btn" data-zaakweb="1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><b>'+T('tab.zaakweb','Mijn website')+'</b></button>';
+    /* RTG Commerce: verkoopwegen en retouren (COMMERCE.md). */
+    const comm = '<button class="meer-btn" data-commerce="1"><svg viewBox="0 0 24 24"><path d="M4 7h16l-2 11H6z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><b>'+T('tab.commerce','Verkoop &amp; retour')+'</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
     ).join('') + web + office + rtmail + handel + ghost + festival + scherm + '</div>';
@@ -6478,6 +6485,7 @@
     el.querySelectorAll('[data-zaakweb]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/zaakweb.html'; }));
     el.querySelectorAll('[data-office]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/office.html?werk=zaak'; }));
     el.querySelectorAll('[data-rtmail]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/leverancier-rtmail.html'; }));
+    el.querySelectorAll('[data-commerce]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/leverancier-commerce.html'; }));
     el.querySelectorAll('[data-handel]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/handel.html'; }));
     el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
     el.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {

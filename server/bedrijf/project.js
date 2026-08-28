@@ -28,13 +28,19 @@ const WERKVORMEN = ['software', 'stadsuitrol', 'horeca-implementatie', 'school-i
 const KOLOMMEN = ['te doen', 'bezig', 'review', 'klaar'];
 const PRIORITEITEN = ['laag', 'normaal', 'hoog', 'kritiek'];
 
+const EENHEID = require('../kern/geld/eenheid');
+
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld } = sctx;
 
   const P = (w) => { if (!w.projecten) w.projecten = {}; return w.projecten; };
   const T = (w) => { if (!w.taken) w.taken = {}; return w.taken; };
   const takenVan = (w, id) => Object.values(T(w)).filter(t => t.projectId === id);
-  const centen = (x) => Math.round(Math.max(0, Math.min(100000000, Number(x) || 0)) * 100);
+  /* HEET NIET MEER `centen`. Die naam betekende in dit huis drie dingen: hier
+     euro->cent, in kern/util.js euro->euro (afronden) en in kern/horeca.js
+     alleen afronden. Zie de kop van kern/geld/eenheid.js; de grens die hier
+     stond blijft staan. */
+  const naarCenten = (x) => Math.min(100000000, EENHEID.naarCenten(Math.max(0, Number(x) || 0)) || 0);
 
   function voortgang(w, p) {
     const t = takenVan(w, p.id);
@@ -65,8 +71,8 @@ module.exports = (sctx) => {
     const p = { id: rid(5), naam, werkvorm, status: 'loopt',
       omschrijving: schoon(req.body.omschrijving, 500) || null,
       start: schoon(req.body.start, 10) || dag(), eind: schoon(req.body.eind, 10) || null,
-      budgetCenten: req.body.budget != null ? centen(req.body.budget) : 0,
-      uurtariefCenten: req.body.uurtarief != null ? centen(req.body.uurtarief) : 0,
+      budgetCenten: req.body.budget != null ? naarCenten(req.body.budget) : 0,
+      uurtariefCenten: req.body.uurtarief != null ? naarCenten(req.body.uurtarief) : 0,
       mijlpalen: [], risicos: [], at: nu(), door: g.l.naam };
     // naam blijft vrij, id komt ernaast als hij onbedubbelzinnig is
     const eig = sctx.zetWie(g.w, p, 'eigenaar', schoon(req.body.eigenaar, 60) || g.l.naam);
@@ -96,7 +102,7 @@ module.exports = (sctx) => {
     if (!p) return res.status(404).json({ error: 'Dat project kennen we niet.' });
 
     const velden = {};
-    if (req.body.budget != null) velden.budgetCenten = centen(req.body.budget);
+    if (req.body.budget != null) velden.budgetCenten = naarCenten(req.body.budget);
     if (req.body.eigenaar != null) velden.eigenaar = schoon(req.body.eigenaar, 60);
     if (req.body.status != null) velden.status = schoon(req.body.status, 40);
     if (!Object.keys(velden).length)

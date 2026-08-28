@@ -4,7 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP, maakFiscaal } = require('../server/kern/fiscaal');
-const { centen } = require('../server/kern/util');
+const { rondEuro } = require('../server/kern/util');
 const { btwSplit } = require('../server/kern/afgeleid');
 
 // Minimale db met precies de collecties die financeVoor leest.
@@ -40,7 +40,7 @@ test('financeVoor: btw per categorie, keuken=eten en bar=drank (NL)', () => {
       { name: 'Sake', price: 121, qty: 1 }   // 21% -> grondslag 100, btw 21
     ] }]
   });
-  const { financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
   const fin = financeVoor(s);
   assert.equal(fin.land, 'NL');
   assert.equal(fin.peiljaar, FISCAAL_PEILJAAR);
@@ -57,12 +57,12 @@ test('financeVoor: personeelskosten uit klokuren met land-specifieke lasten', ()
   const db = stubDb({
     klok: { KIKUNOI: [{ staffId: 'a', in: maand + '-03T09:00:00.000Z', out: maand + '-03T19:00:00.000Z' }] } // 10 uur
   });
-  const { financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
   const fin = financeVoor(s);
   assert.equal(fin.personeel.uren, 10);
   assert.equal(fin.personeel.bruto, 200, '10 uur x 20');
   assert.equal(fin.personeel.lastenPct, 28, 'NL werkgeverslasten');
-  assert.equal(fin.personeel.totaal, centen(200 * (1 + 0.28 + 0.08)), 'bruto + lasten + vakantiegeld');
+  assert.equal(fin.personeel.totaal, rondEuro(200 * (1 + 0.28 + 0.08)), 'bruto + lasten + vakantiegeld');
 });
 
 /* DE OMZET TELT EEN KEER, OOK ALS ER EEN BON OVERHEEN GAAT.
@@ -219,7 +219,7 @@ test('dagrapport: alle zeven wegen tellen hun omzet, bonnen en betaalwijzen prec
 
 test('cannedBoekhouder: antwoordt gericht op btw, personeel en cadeaukaarten', () => {
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
-  const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), centen, btwSplit });
+  const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), rondEuro, btwSplit });
   const fin = financeVoor(s);
   const L = LANDEN.NL;
   assert.match(cannedBoekhouder('hoeveel btw moet ik afdragen?', fin, L), /btw/i);
@@ -300,7 +300,7 @@ test('tarief: de factuurmotor en de maandboekhouding rekenen met hetzelfde perce
     orders: [{ supplierCode: 'IBZ', paid: true, at: maand + '-05',
       items: [{ name: 'Gazpacho', price: 110, qty: 1 }] }]
   });
-  const { financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
   const eten = financeVoor(zaak).btw.find(r => r.cat === 'eten');
   assert.equal(eten.tarief, LANDEN.ES.tarieven.eten, 'de boekhouding rekent Spaans');
   /* En de motor, langs precies de weg die kern/facturatie/motor.js loopt:

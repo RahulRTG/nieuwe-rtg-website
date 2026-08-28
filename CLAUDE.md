@@ -335,6 +335,39 @@ hier geldt, met de zes machtigingen die met opzet niet bestaan — die vraag ste
 een inkoper maar één keer, en dat kan alleen omdat elke app op dezelfde cel
 draait.
 
+**`COMMERCE.md` is de verkooplaag boven de domeinen** — hoe er één commerce-laag
+op de bestaande fiscale, waarde-, voorraad- en fulfilmentinfrastructuur komt te
+staan zonder dat er een tweede orderwaarheid ontstaat. Lees die vóór je aan een
+winkel, een mand, een afrekening of een retour werkt. De dragende bewering van het
+voorstel — één `Koopbaar`-protocol met acht werkwoorden over dertien soorten
+verkoopbare dingen — is er eerst **gemeten** (`scripts/commerce.js`,
+`COMMERCE.json`) in plaats van aangenomen, want dat is exact de vorm waarin `Asset`
+al een keer sneuvelde. De uitslag is streng: 437 koopbare vormen in 100 domeinen,
+**0 domeinen die alle acht werkwoorden uitvoeren**, **0 werkwoorden die in álle
+koopbare domeinen staan**, en 43 verschillende combinaties. Eén protocol met 42
+invullingen is geen protocol; `Koopbaar` wordt daarom een **verklaring van
+werkwoorden** en geen interface van verplichte methodes — het model daarvoor is
+`kern/appstore/machtigingen.js`, het enige bestand met een doel én een grens. Wat
+er wél gevonden is zijn twee echte gedeelde vormen, allebei tussen precies twee
+domeinen: het artikel met varianten (mall ↔ retail) en de bestelregel (gast ↔
+horeca). Drie dingen om niet te laten sneuvelen: **één mand is niet één
+bevestiging** (`kern/mall/bestellingen.js` weigert "betaal alles" met reden, en
+dat is een grens en geen gat), er komt geen tweede betaalweg langs
+`kern/pay/poort.js`, en Webmaker krijgt géén commerce-logica. En let op par. 3
+vóór je begint: het woord **`Kanaal` is al bezet** — `SEMANTIEK.json` heeft
+`KANALEN` in de top als botsing (4 domeinen, 4 betekenissen, overlap 0,10), dus
+het nieuwe kernbegrip hernoemt eerst of wijkt uit. Het duurste gat wàs `retour`: 6 van de 100
+domeinen kenden iets dat erop lijkt en geen ervan was een goederenretour. Dat gat
+is gevuld -- `kern/commerce/retour*.js` plus `routes/supplier/retour.js`: zes
+gronden, vijf standen die elk zeggen wélke partij ze zet, een bevroren bedrag en
+btw-tarief, en een geldbesluit dat wordt KLAARGEZET en nooit uitgevoerd.
+**De laag staat inmiddels** (`server/kern/commerce/`, acht bestanden, gemonteerd in
+`opzet/kernlaag2b.js`, scherm `/apps/commerce.html`): werkwoorden, koopbaar, graaf,
+mand en een afrekening per verkoper, draaiend op 100 koopbaren uit de seed. Twee
+dingen die echte data blootlegde en die je nergens anders moet herhalen: `bedrag`
+in `kern/mall/aanbod.js` staat in EURO'S en niet in centen, en `vanaf` is een VLAG
+en geen bedrag -- op een vanaf-prijs wordt niet afgerekend.
+
 **`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
 een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,
 billing, compliance, hosting, permissies, observability en enterprise-controls

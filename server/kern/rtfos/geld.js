@@ -26,7 +26,7 @@ const SOORTEN = ['donatie', 'maandelijkse_donatie', 'sponsoring', 'goederen', 's
 const HERBESTEMMING = ['nooit', 'met_toestemming', 'vrij'];
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, poort, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, poort, save } = ctx;
 
   const vindBron = id => S().bronnen.find(b => b.id === String(id || '')) || null;
   const gereserveerd = bronId => S().uitgaven
@@ -71,7 +71,7 @@ module.exports = (ctx) => {
     if (!g.ok) return g;
     const soort = String(b.soort || '');
     if (!SOORTEN.includes(soort)) return { status: 400, error: 'Kies een soort (' + SOORTEN.join(', ') + ').' };
-    const c = centen(b.bedrag);
+    const c = naarCenten(b.bedrag);
     if (c === null || c === 0) return { status: 400, error: 'Wat is het bedrag?' };
     const herb = String(b.herbestemming || 'met_toestemming');
     if (!HERBESTEMMING.includes(herb)) return { status: 400, error: 'Herbestemming is nooit, met_toestemming of vrij.' };

@@ -42,6 +42,7 @@
     "tijd",
     "titel",
     "tot",
+    "type",
     "uitleg",
     "van",
     "wat"
@@ -554,7 +555,6 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
       ]
     },
@@ -574,6 +574,20 @@
     },
     {
       "gelijkenis": 1,
+      "a": "server/kern/commerce/prijsvraag.js",
+      "b": "server/kern/mall/aanbodrtg.js",
+      "domeinA": "kern/commerce",
+      "domeinB": "kern/mall",
+      "gedeeld": [
+        "eenheid",
+        "eenheidMeervoud",
+        "max",
+        "min",
+        "vraag"
+      ]
+    },
+    {
+      "gelijkenis": 1,
       "a": "server/kern/magnaat-werkroutefabriek.js",
       "b": "server/kern/magnaatwereld.js",
       "domeinA": "kern/magnaat-werkroutefabriek",
@@ -582,7 +596,6 @@
         "max",
         "min",
         "placeholder",
-        "type",
         "verplicht"
       ]
     },
@@ -596,8 +609,7 @@
         "lk",
         "lt",
         "rk",
-        "rt",
-        "type"
+        "rt"
       ]
     },
     {
@@ -635,22 +647,7 @@
         "oorzaak",
         "past",
         "terugDraaibaar",
-        "type",
         "veld"
-      ]
-    },
-    {
-      "gelijkenis": 0.83,
-      "a": "server/kern/magnaat-werkroutefabriek.js",
-      "b": "server/kern/magnaatwereld.js",
-      "domeinA": "kern/magnaat-werkroutefabriek",
-      "domeinB": "kern/magnaatwereld",
-      "gedeeld": [
-        "max",
-        "min",
-        "placeholder",
-        "type",
-        "verplicht"
       ]
     },
     {
@@ -682,6 +679,19 @@
         "publiekePrijs",
         "sku",
         "varianten"
+      ]
+    },
+    {
+      "gelijkenis": 0.8,
+      "a": "server/kern/magnaat-werkroutefabriek.js",
+      "b": "server/kern/magnaatwereld.js",
+      "domeinA": "kern/magnaat-werkroutefabriek",
+      "domeinB": "kern/magnaatwereld",
+      "gedeeld": [
+        "max",
+        "min",
+        "placeholder",
+        "verplicht"
       ]
     },
     {

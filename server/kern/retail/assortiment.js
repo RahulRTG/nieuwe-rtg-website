@@ -87,6 +87,56 @@ module.exports = (ctx) => {
     return { ok: true, bericht };
   }
 
+  /* ==========================================================================
+     DE PRIJS VAN EEN SET REGELS -- en waarom die hier een eigen functie is.
+
+     COMMERCE.json mat kern/retail op `prijs: false`: het domein heeft varianten,
+     SKU's en voorraad, maar geen enkele plek die zegt wat iets kost. Dat klopte,
+     en het lag niet aan een ontbrekende prijs maar aan een prijs die MIDDENIN
+     een andere handeling stond: `verkoop` in ./vloer.js rekende zijn totaal ter
+     plekke uit. Dat is een van de 91 optellingen uit COMMERCE.md, en die hier
+     wegnemen is er een minder in plaats van een erbij.
+
+     EN HET REPAREERT EEN ECHTE FOUT. `verkoop` haalde de voorraad eraf TERWIJL
+     hij de regels langsliep, en keerde bij de eerste regel zonder voorraad terug
+     met een 409. De voorraad van de regels ervoor was dan al afgeboekt, zonder
+     bon en zonder dat iemand het zag -- het soort fout dat pas opvalt als de
+     telling een keer niet klopt. Eerst helemaal REKENEN en daarna pas muteren
+     maakt dat structureel onmogelijk; deze functie raakt niets aan.
+
+     De prijs is `a.price`, en dat is al de ledenprijs: zetArtikel hierboven zet
+     hem met ledenPrijs(publiek, a.price). De publieke prijs staat ernaast in
+     `publiekePrijs`. Er wordt hier dus niets opnieuw uitgerekend wat elders al
+     is vastgesteld.
+     ========================================================================== */
+  function prijsVan(s, regels) {
+    if (!isRetail(s)) return { status: 400, error: 'Deze zaak is geen retail.' };
+    const uit = [], tekort = [], onbekend = [];
+    let totaal = 0;
+    for (const r of (Array.isArray(regels) ? regels : []).slice(0, 50)) {
+      const vsku = schoon(r && r.vsku, 60);
+      const hit = vsku ? variantVan(s, vsku) : null;
+      if (!hit) { onbekend.push(vsku || '(leeg)'); continue; }
+      const aantal = Math.max(1, Math.min(50, parseInt(r.aantal, 10) || 1));
+      const stuk = hit.artikel.price;
+      const regel = {
+        vsku, artikelId: hit.artikel.id,
+        naam: hit.artikel.naam + ' (' + hit.variant.kleur + ', ' + hit.variant.maat + ')',
+        aantal, stuk, publiekStuk: hit.artikel.publiekePrijs,
+        totaal: rond(stuk * aantal), voorraad: hit.variant.voorraad
+      };
+      if (hit.variant.voorraad < aantal) {
+        /* Geen 409 halverwege: de regel gaat mee met zijn tekort erbij, zodat een
+           scherm alle problemen tegelijk kan tonen in plaats van ze een voor een
+           te laten ontdekken. Wie tegenhoudt, is de aanroeper. */
+        tekort.push({ vsku, naam: regel.naam, gevraagd: aantal, vrij: hit.variant.voorraad });
+      }
+      uit.push(regel);
+      totaal += regel.totaal;
+    }
+    return { ok: true, regels: uit, totaal: rond(totaal), valuta: 'EUR', tekort, onbekend };
+  }
+
   /* ---- clienteling: het klantprofiel van een modehuis ---- */
-  return { zetCollectie, zetArtikel, pasVoorraad, releaseDrop };
+  return { zetCollectie, zetArtikel, pasVoorraad, releaseDrop, prijsVan };
 };

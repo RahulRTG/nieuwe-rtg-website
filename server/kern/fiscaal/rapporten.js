@@ -134,7 +134,7 @@ module.exports = (ctx) => {
     }
     // wie stond er op de kassa
     const team = {};
-    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = centen((team[v.actor] || 0) + (v.total || 0));
+    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = rondEuro((team[v.actor] || 0) + (v.total || 0));
     // de hotelkant: bezetting, aankomsten en vertrekken van vandaag, en de
     // gemiddelde kamerprijs van wie er nu slaapt (ADR)
     let verblijf = null;
@@ -151,13 +151,13 @@ module.exports = (ctx) => {
         bezet: s.rooms.filter(r => r.hk && r.hk.status === 'bezet').length,
         totaal: s.rooms.length,
         aankomsten, vertrekken, noShows,
-        adr: inHuis ? centen(kamerOmzet / inHuis) : 0
+        adr: inHuis ? rondEuro(kamerOmzet / inHuis) : 0
       };
     }
     return {
       ok: true, datum: z.datum,
       omzet: z.omzet, bonnen: z.bonnen, fooien: z.fooien, betaalwijzen: z.betaalwijzen,
-      gasten, toppers, derving: centen(derving), verblijf,
+      gasten, toppers, derving: rondEuro(derving), verblijf,
       team: Object.entries(team).sort((a, b) => b[1] - a[1]).map(([naam, omzet]) => ({ naam, omzet }))
     };
   }

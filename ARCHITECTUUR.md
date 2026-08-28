@@ -75,6 +75,7 @@ rem
 pinslot
 kernlaag1
 kernlaag2
+kernlaag2b
 kernlaag3
 kernlaag3c
 kernlaag3w

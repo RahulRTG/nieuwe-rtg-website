@@ -21,7 +21,7 @@
 const K = 5; // onder dit aantal wordt een buurt niet apart genoemd
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, code, S, audit, wie, poort, stadVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, code, S, audit, wie, poort, stadVan, save } = ctx;
   const { cijfersVan } = eigen;
 
   const vind = id => S().gemeenten.find(g => g.id === String(id || '')) || null;
@@ -64,7 +64,7 @@ module.exports = (ctx, eigen) => {
     if (!g.ok) return g;
     const oms = schoon(b.omschrijving, 300);
     if (oms.length < 3) return { status: 400, error: 'Wat is de opdracht?' };
-    const c = centen(b.bedrag === undefined ? 0 : b.bedrag);
+    const c = naarCenten(b.bedrag === undefined ? 0 : b.bedrag);
     if (c === null) return { status: 400, error: 'Wat is het subsidiebedrag? Nul mag ook.' };
     const deadline = schoon(b.deadline, 10);
     if (deadline && Number.isNaN(Date.parse(deadline))) return { status: 400, error: 'Gebruik een datum als 2027-01-31.' };

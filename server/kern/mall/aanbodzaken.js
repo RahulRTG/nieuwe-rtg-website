@@ -34,6 +34,12 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: prijzen.length ? prijs(Math.min(...prijzen), 'per gerecht', true) : null,
+          /* EEN PRIJSNIVEAU EN GEEN PRIJS. "Vanaf 12 euro per gerecht" zegt wat
+             voor zaak dit is; je koopt geen restaurant. Er valt hier dus niets
+             exact te maken en dat hoort ook niet -- zonder dit merkje leest deze
+             rij als een aanbod waar iemand de prijs van is vergeten. Wat je hier
+             wel doet is een tafel reserveren; de gerechten bestelt u daar. */
+          prijsAard: 'niveau',
           // de stand komt uit de systemen van de zaak zelf; de losse
           // settings-vlag stond hier eerder rechtstreeks uitgelezen
           open: stand.openNu(s),

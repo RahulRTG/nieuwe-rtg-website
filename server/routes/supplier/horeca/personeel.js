@@ -50,8 +50,8 @@ module.exports = (kern) => {
     // de pot van die dag: alle fooi op rekeningen die die dag zijn gesloten
     const uitRekeningen = Object.values(h.rekeningen)
       .filter(r => (r.geslotenAt || '').slice(0, 10) === datum)
-      .reduce((t, r) => t + centen(r.fooiCenten || 0), 0);
-    const extra = req.body.extraCenten != null ? centen(req.body.extraCenten) : uitEuro(req.body.extra);
+      .reduce((t, r) => t + heleCenten(r.fooiCenten || 0), 0);
+    const extra = req.body.extraCenten != null ? heleCenten(req.body.extraCenten) : uitEuro(req.body.extra);
     const pot = uitRekeningen + extra;
     if (!pot) return res.status(409).json({ error: 'Er is die dag geen fooi binnengekomen.' });
 
@@ -96,7 +96,7 @@ module.exports = (kern) => {
       p.loon[datum] = { datum, diensten: req.body.diensten.slice(0, 200).map(d => ({
         naam: schoon(d && d.naam, 60) || 'medewerker',
         uren: Math.max(0, Math.min(24, Number(d && d.uren) || 0)),
-        uurloonCenten: d && d.uurloon != null ? uitEuro(d.uurloon) : centen(d && d.uurloonCenten),
+        uurloonCenten: d && d.uurloon != null ? uitEuro(d.uurloon) : heleCenten(d && d.uurloonCenten),
         afdeling: schoon(d && d.afdeling, 30) || 'zaal' })), at: nu() };
       save();
     }
@@ -106,7 +106,7 @@ module.exports = (kern) => {
     const h = Hlees(req.supplier.code);
     const rekeningen = Object.values(h.rekeningen).filter(r => (r.geslotenAt || '').slice(0, 10) === datum && r.status === 'betaald');
     const omzet = rekeningen.reduce((t, r) => t + totaal(r).netto, 0);   // zonder fooi: die is niet van de zaak
-    const fooi = rekeningen.reduce((t, r) => t + centen(r.fooiCenten || 0), 0);
+    const fooi = rekeningen.reduce((t, r) => t + heleCenten(r.fooiCenten || 0), 0);
     const loon = dag.diensten.reduce((t, d) => t + Math.round(d.uren * d.uurloonCenten), 0);
     const uren = dag.diensten.reduce((t, d) => t + d.uren, 0);
     const perAfdeling = dag.diensten.reduce((o, d) => Object.assign(o, {

@@ -27,7 +27,7 @@ const RITME = ['eenmalig', 'wekelijks', 'maandelijks', 'doorlopend'];
 const STATUS = ['open', 'gekoppeld', 'benut', 'vervallen'];
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, centen, euro, code, S, audit, wie, poort, stadVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, code, S, audit, wie, poort, stadVan, save } = ctx;
 
   const vind = id => S().ondernemers.find(o => o.id === String(id || '')) || null;
   const vindCode = c => S().ondernemers.find(o => o.code === String(c || '').trim().toUpperCase()) || null;
@@ -77,7 +77,7 @@ module.exports = (ctx) => {
     if (!RITME.includes(ritme)) return { status: 400, error: 'Ritme is eenmalig, wekelijks, maandelijks of doorlopend.' };
     const wat = schoon(b.wat, 200);
     if (wat.length < 3) return { status: 400, error: 'Wat biedt dit bedrijf aan?' };
-    const waarde = centen(b.waarde === undefined ? 0 : b.waarde);
+    const waarde = naarCenten(b.waarde === undefined ? 0 : b.waarde);
     if (waarde === null) return { status: 400, error: 'Wat is de geschatte waarde? Nul mag ook.' };
     const aantal = Math.max(0, Math.min(1000000, Math.round(Number(b.aantal) || 0)));
     if (!Array.isArray(o.aanbod)) o.aanbod = [];

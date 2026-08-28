@@ -46,8 +46,12 @@ function ledenPrijs(publiek, ledenprijs) {
   return Math.min(l, p);
 }
 
-// Bedrag netjes op centen afronden.
-function centen(n) { return Math.round(n * 100) / 100; }
+/* HEET rondEuro EN NIET `centen`, en dat is een reparatie. Hij rondt een bedrag
+   in EURO'S af op twee decimalen en LAAT het euro's -- terwijl `centen(x)` leest
+   als "maak er centen van". Dat woord betekende in dit huis drie dingen: hier
+   afronden, op vier plekken euro naar cent, en in kern/horeca.js een heel getal
+   maken. Zie de kop van kern/geld/eenheid.js, waar de omzetters wonen. */
+function rondEuro(n) { return Math.round(n * 100) / 100; }
 
 // Codes zonder verwarrende tekens (0/O/1/I), makkelijk voor te lezen.
 const LEESBAAR = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -102,4 +106,4 @@ function veiligeFout(e, standaard) {
   return schoongemaakt || standaard || 'Er ging iets mis.';
 }
 
-module.exports = { schoon, veiligeFout, coord, coordPaar, ledenPrijs, centen, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };
+module.exports = { schoon, veiligeFout, coord, coordPaar, ledenPrijs, rondEuro, entreeCode, pickupCode, codeUit, LEESBAAR, veiligGelijk, eigenVeld };

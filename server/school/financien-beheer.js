@@ -10,7 +10,7 @@
    erbij, zodat een koppelend systeem het niet zelf kan verzinnen. */
 module.exports = (sctx) => {
   const { router, save, rid, nu, schoon, eigenVeld, poort, leerlingLijst,
-    facturen: FAC, centen, openBedrag: open, NOOIT } = sctx;
+    facturen: FAC, naarCenten, openBedrag: open, NOOIT } = sctx;
 
   const KAN = (sch) => { if (!sch.kantine) sch.kantine = {}; return sch.kantine; };
   const BUD = (sch) => { if (!sch.budgetten) sch.budgetten = {}; return sch.budgetten; };
@@ -26,7 +26,7 @@ module.exports = (sctx) => {
     if (!l) return res.status(404).json({ error: 'Deze leerling staat niet in de administratie.' });
     const k = KAN(g.sch);
     const rij = k[l.id] || (k[l.id] = { leerlingId: l.id, naam: l.naam, saldo: 0, mutaties: [] });
-    const bij = centen(req.body.bij), af = centen(req.body.af);
+    const bij = naarCenten(req.body.bij), af = naarCenten(req.body.af);
     if (bij) { rij.saldo += bij; rij.mutaties.unshift({ at: nu(), centen: bij, soort: 'opwaardering' }); }
     if (af) {
       const echt = Math.min(af, rij.saldo);
@@ -54,9 +54,9 @@ module.exports = (sctx) => {
     if (!naam) return res.status(400).json({ error: 'Geef het budget een naam (de afdeling of het doel).' });
     const b = BUD(g.sch)[id] || (BUD(g.sch)[id] = { id, naam, centen: 0, besteed: 0, boekingen: [], at: nu() });
     b.naam = naam;
-    if (req.body.bedrag != null) b.centen = centen(req.body.bedrag);
+    if (req.body.bedrag != null) b.centen = naarCenten(req.body.bedrag);
     if (req.body.besteding != null) {
-      const bedrag = centen(req.body.besteding);
+      const bedrag = naarCenten(req.body.besteding);
       b.besteed += bedrag;
       b.boekingen = [{ at: nu(), centen: bedrag, wat: schoon(req.body.wat, 120) || null, door: g.p.naam }].concat(b.boekingen).slice(0, 200);
     }
@@ -69,7 +69,7 @@ module.exports = (sctx) => {
     const naam = schoon(req.body.naam, 80);
     if (!naam) return res.status(400).json({ error: 'Geef de subsidie een naam.' });
     const s = { id: rid(5), naam, verstrekker: schoon(req.body.verstrekker, 80) || null,
-      centen: centen(req.body.bedrag), ontvangen: centen(req.body.ontvangen), doel: schoon(req.body.doel, 200) || null,
+      centen: naarCenten(req.body.bedrag), ontvangen: naarCenten(req.body.ontvangen), doel: schoon(req.body.doel, 200) || null,
       verantwoordVoor: schoon(req.body.verantwoordVoor, 10) || null, at: nu() };
     SUB(g.sch).unshift(s); g.sch.subsidies = SUB(g.sch).slice(0, 500);
     save();

@@ -3,7 +3,12 @@
    activiteiten en de transfers daarbij. Alleen routes; de logica
    woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, centen, liveCodename, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor,
+  /* Hier stond `centen` bij, ongebruikt. Dat viel niet op zolang hij zo heette:
+     `req.body.centen` hieronder is een VELD en geen aanroep, en daar keek de
+     keuring overheen. Na de hernoeming naar rondEuro was het meteen zichtbaar.
+     Het bedrag zelf wordt niet hier bewaakt maar in kern/directpay/betalen.js
+     (ondergrens, bovengrens, en NaN eruit) -- een grens hoort op een plek. */
+  const { app, auth, liveCodename, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor,
           dpBetaalVerzoek } = kern;
 
 /* ============ rechtstreeks betalen aan een leverancier (Face ID) ============

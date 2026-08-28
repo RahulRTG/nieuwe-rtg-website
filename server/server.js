@@ -70,7 +70,7 @@ const log = logboek.log;
 const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
 const systeemKlok = require('./lib/klok');
-const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
+const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
 const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP, maakFiscaal } = require('./kern/fiscaal');
@@ -1559,7 +1559,8 @@ const {
   isRetail: retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, verkoop: retailVerkoop,
-  verkoopTerug: retailVerkoopTerug,
+  verkoopTerug: retailVerkoopTerug, prijsVan: retailPrijsVan,
+  annuleerVerkoop: retailAnnuleer, bonBeeld: retailBon, ANNULEERGRONDEN,
   voorraadZoek, retailStats, retailState, catalogus: retailCatalogus
 } = maakRetail({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
@@ -2127,7 +2128,7 @@ const kern = {
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
   ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
-  bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
+  bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
@@ -2158,7 +2159,7 @@ const kern = {
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
-  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, voorraadZoek,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, retailPrijsVan, retailAnnuleer, retailBon, ANNULEERGRONDEN, voorraadZoek,
   retailStats, retailState, retailCatalogus,
   /* DE GROOTHANDEL ALS EEN NAAM. Vier van deze zestien werden door zowel member
      als supplier aangeraakt (ghMarkt, ghPlaatsBestelling, ghAnnuleer,
@@ -2249,6 +2250,7 @@ const hulp = {
    aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
@@ -2261,6 +2263,25 @@ require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naa
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
+
+/* DE TWEE SLOTEN OP PUBLIEK VERKOPEN, aan de commerce-laag gegeven als LEZERS.
+
+   Precies dezelfde twee reads als eigenWeb.serveer hierboven doet: de
+   boardroom-functie 'dom-eigendomein' en de site die op een eigen adres staat.
+   Ze staan hier omdat webmaker en functies in dit bestand wonen en kern/commerce
+   in kernlaag2b wordt gebouwd; een tweede lezer in de kern zou een tweede
+   antwoord op dezelfde vraag zijn (LAT-regel 4).
+
+   ER GAAT ALLEEN LEESWERK IN. kern/commerce krijgt geen manier om de functie
+   aan te zetten of een domein te koppelen -- het kan alleen zien of dat al is
+   gebeurd. Zonder deze regels blijft `publiek` dicht met de reden "niet vast te
+   stellen", en dat is de goede kant op. */
+if (kern.commerce && kern.commerce.koppelPubliek) {
+  kern.commerce.koppelPubliek({
+    functieAan: (id) => functies.functieAan(id, db.data && db.data.techniek && db.data.techniek.functies),
+    siteVan: (zaakCode) => webmaker.siteVanZaak(zaakCode)
+  });
+}
 
 /* ---------- de afsluiters en de start staan in ./opzet/start.js ----------
 

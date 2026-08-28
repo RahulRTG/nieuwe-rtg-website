@@ -28,7 +28,7 @@ const SOORTEN = ['kamer', 'toeristenbelasting', 'ontbijt', 'restaurant', 'miniba
   'roomservice', 'parkeren', 'wasserij', 'activiteit', 'schade', 'overig'];
 
 module.exports = ({ horeca, save, schoon }) => {
-  const { H, nu, id, centen } = horeca;
+  const { H, nu, id, heleCenten } = horeca;
 
   const F = (code) => { const h = H(code); if (!h.folios) h.folios = {}; return h.folios; };
   const som = (f) => (f.regels || []).reduce((t, r) => t + r.centen, 0);
@@ -52,7 +52,7 @@ module.exports = ({ horeca, save, schoon }) => {
     if (!f) return { status: 404, error: 'Er staat geen open gastrekening op kamer ' + kamer + '.' };
     const soort = SOORTEN.includes(String(regel.soort)) ? String(regel.soort) : 'overig';
     const r = { id: id(3), soort, omschrijving: schoon(regel.omschrijving, 100) || soort,
-      centen: centen(regel.centen), at: nu(), door: regel.door || 'systeem', bron: regel.bron || null };
+      centen: heleCenten(regel.centen), at: nu(), door: regel.door || 'systeem', bron: regel.bron || null };
     if (!r.centen) return { status: 400, error: 'Een boeking zonder bedrag doet niets.' };
     f.regels.push(r);
     save();

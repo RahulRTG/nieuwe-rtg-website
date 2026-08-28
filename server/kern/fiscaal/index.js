@@ -127,7 +127,7 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })).sort((a, b) => a.naam.localeCompare(b.naam)),
       peiljaar: FISCAAL_PEILJAAR,
       maand,
-      btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),
+      btw, btwTotaal: rondEuro(btw.reduce((x, r2) => x + r2.btw, 0)),
       personeel: {
         uren: Math.round(uren * 10) / 10, uurloon, bruto,
         lasten: centen(bruto * R.lasten), lastenPct: Math.round(R.lasten * 100),

@@ -30,7 +30,15 @@
    eruit -- en dat hoort de administratie ook te zeggen. */
 
 const DOELGROEPEN = ['vrijwilligers', 'partners', 'projectgroep', 'deelnemers', 'ondernemers', 'publiek'];
-const KANALEN = ['app', 'email', 'sms', 'push', 'nieuwsbrief'];
+/* HERNOEMD VAN `KANALEN`. Vier domeinen droegen dat woord met vier
+   betekenissen en een onderlinge overlap van 0,10 -- SEMANTIEK.json had het in
+   de top staan als botsing. Het woord `kanaal` is nu van de VERKOOPWEG
+   (kern/horeca.js: tafel, bar, terras, afhaal, bezorging), omdat dat de enige
+   betekenis is waar een nieuwe laag hem voor nodig heeft; zie COMMERCE.md
+   par. 3. Dit is langs welke weg een bericht wordt verstuurd (app, e-mail, sms, push).
+
+   Er is niets aan de WAARDEN veranderd, alleen aan de naam ervan. */
+const BERICHTWEGEN = ['app', 'email', 'sms', 'push', 'nieuwsbrief'];
 const STATUS = ['concept', 'wacht_op_landelijk', 'goedgekeurd', 'verzonden', 'afgekeurd'];
 // Wie hier in staat, spreekt namens de hele stichting.
 const NAAR_BUITEN = ['publiek'];
@@ -51,13 +59,13 @@ module.exports = (ctx) => {
     if (w.landelijk && !stadId) {
       const wacht = B().filter(b => b.status === 'wacht_op_landelijk');
       wacht.sort((a, b) => (b.spoed ? 1 : 0) - (a.spoed ? 1 : 0));
-      return { ok: true, doelgroepen: DOELGROEPEN, kanalen: KANALEN, statussen: STATUS, landelijk: true,
+      return { ok: true, doelgroepen: DOELGROEPEN, kanalen: BERICHTWEGEN, statussen: STATUS, landelijk: true,
         teBeoordelen: wacht.map(beeld), berichten: B().slice(-200).reverse().map(beeld) };
     }
     const g = poort(w, stadId, 'stad.lezen');
     if (!g.ok) return g;
     const rijen = B().filter(b => b.stad === g.stad.id);
-    return { ok: true, doelgroepen: DOELGROEPEN, kanalen: KANALEN, statussen: STATUS, landelijk: !!w.landelijk,
+    return { ok: true, doelgroepen: DOELGROEPEN, kanalen: BERICHTWEGEN, statussen: STATUS, landelijk: !!w.landelijk,
       teBeoordelen: rijen.filter(b => b.status === 'wacht_op_landelijk').map(beeld),
       berichten: rijen.slice(-200).reverse().map(beeld) };
   }
@@ -70,7 +78,7 @@ module.exports = (ctx) => {
     const doelgroep = String(b.doelgroep || '');
     if (!DOELGROEPEN.includes(doelgroep)) return { status: 400, error: 'Kies een doelgroep (' + DOELGROEPEN.join(', ') + ').' };
     const kanaal = String(b.kanaal || 'app');
-    if (!KANALEN.includes(kanaal)) return { status: 400, error: 'Kies een kanaal (' + KANALEN.join(', ') + ').' };
+    if (!BERICHTWEGEN.includes(kanaal)) return { status: 400, error: 'Kies een kanaal (' + BERICHTWEGEN.join(', ') + ').' };
     const onderwerp = schoon(b.onderwerp, 120);
     if (onderwerp.length < 3) return { status: 400, error: 'Waar gaat het bericht over?' };
     const tekst = schoon(b.tekst, 4000);
@@ -175,7 +183,7 @@ module.exports = (ctx) => {
     return { ok: true, bericht: beeld(rij) };
   }
 
-  return { lijst, maak, zet, verzend, besluit, vind, beeld, DOELGROEPEN, KANALEN, STATUS, NAAR_BUITEN };
+  return { lijst, maak, zet, verzend, besluit, vind, beeld, DOELGROEPEN, BERICHTWEGEN, STATUS, NAAR_BUITEN };
 };
 module.exports.DOELGROEPEN = DOELGROEPEN;
 module.exports.NAAR_BUITEN = NAAR_BUITEN;

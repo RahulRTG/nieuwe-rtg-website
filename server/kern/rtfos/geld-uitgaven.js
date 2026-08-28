@@ -25,7 +25,7 @@
    ontdek je het pas bij het tweede besluit. */
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
   const { vindBron, vrij } = eigen;
 
   const uitgaveBeeld = u => ({ id: u.id, stad: u.stad, projectId: u.projectId, bronId: u.bronId,
@@ -60,7 +60,7 @@ module.exports = (ctx, eigen) => {
      Nu is er een weg, en loopt ook inkoop gewoon door de vier ogen en de
      limiet van de ontvangende stad. */
   function boekAanvraag(w, p, b) {
-    const c = centen(b.bedrag);
+    const c = naarCenten(b.bedrag);
     if (c === null || c === 0) return { status: 400, error: 'Wat is het bedrag?' };
     const oms = schoon(b.omschrijving, 200);
     if (oms.length < 3) return { status: 400, error: 'Waar is dit geld voor?' };

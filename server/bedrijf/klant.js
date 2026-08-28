@@ -29,12 +29,18 @@ const FASEN = [
 ];
 const PRODUCTEN = ['horeca-os', 'school-os', 'werk-os', 'betalingen', 'communicatie', 'bezorging', 'consument'];
 
+const EENHEID = require('../kern/geld/eenheid');
+
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld } = sctx;
 
   const K = (w) => { if (!w.klanten) w.klanten = {}; return w.klanten; };
   const KA = (w) => { if (!w.kansen) w.kansen = {}; return w.kansen; };
-  const centen = (x) => Math.round(Math.max(0, Math.min(1000000000, Number(x) || 0)) * 100);
+  /* HEET NIET MEER `centen`. Die naam betekende in dit huis drie dingen: hier
+     euro->cent, in kern/util.js euro->euro (afronden) en in kern/horeca.js
+     alleen afronden. Zie de kop van kern/geld/eenheid.js; de grens die hier
+     stond blijft staan. */
+  const naarCenten = (x) => Math.min(1000000000, EENHEID.naarCenten(Math.max(0, Number(x) || 0)) || 0);
   const faseVan = (id) => FASEN.find(f => f.id === id) || null;
 
   app.post('/api/bedrijf/klant/zet', (req, res) => {
@@ -102,7 +108,7 @@ module.exports = (sctx) => {
     if (!titel) return res.status(400).json({ error: 'Waar gaat deze kans over?' });
     const ka = { id: rid(5), klantId: k.id, klant: k.naam, titel,
       product: PRODUCTEN.includes(String(req.body.product)) ? String(req.body.product) : null,
-      bedragCenten: req.body.bedrag != null ? centen(req.body.bedrag) : 0,
+      bedragCenten: req.body.bedrag != null ? naarCenten(req.body.bedrag) : 0,
       fase: 'lead',
       verwacht: schoon(req.body.verwacht, 10) || null, historie: [], at: nu() };
     const eig = sctx.zetWie(g.w, ka, 'eigenaar', schoon(req.body.eigenaar, 60) || g.l.naam);
@@ -124,7 +130,7 @@ module.exports = (sctx) => {
     if (f.id === 'verloren' && !reden)
       return res.status(400).json({ error: 'Waarom is deze kans verloren? Zonder die reden leert de trechter niets: je ziet dat het misging, maar nooit waardoor.' });
     if (f.id === 'gewonnen') {
-      const bedrag = req.body.bedrag != null ? centen(req.body.bedrag) : ka.bedragCenten;
+      const bedrag = req.body.bedrag != null ? naarCenten(req.body.bedrag) : ka.bedragCenten;
       if (!bedrag) return res.status(400).json({ error: 'Voor welk bedrag is deze kans gewonnen? "Gewonnen" zonder getal is een gevoel.' });
       ka.bedragCenten = bedrag;
       ka.gewonnenAt = nu();

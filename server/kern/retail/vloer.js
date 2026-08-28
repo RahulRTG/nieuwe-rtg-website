@@ -5,22 +5,28 @@ module.exports = (ctx) => {
     ledenPrijs, gidsHaal, meldWachtlijst, MATEN, SEIZOENEN,
     id, nu, vandaag, rond, schoon, isRetail, artikelVan, variantVan, totaleVoorraad } = ctx;
   const { klantRec, klantProfiel, wishlistToggle } = ctx;
+  /* prijsVan komt uit ./assortiment.js, dat vóór deze laag in de context wordt
+     gelegd (zie kern/retail.js). Zo staat de prijs op één plek en rekent de
+     kassa hem niet zelf nog eens uit. */
+  const { prijsVan } = ctx;
+  /* EERST REKENEN, DAN PAS MUTEREN. Dit liep vroeger door elkaar: de voorraad
+     ging eraf terwijl de regels werden langsgelopen, en bij de eerste regel
+     zonder voorraad keerde de functie terug met een 409 -- met de voorraad van
+     de regels ervoor al afgeboekt, zonder bon. Die volgorde is nu onmogelijk:
+     prijsVan (./assortiment.js) raakt niets aan, en er wordt hieronder geen
+     voorraad aangeraakt zolang er een tekort is. */
   function verkoop(s, body, actor) {
-    const regels = Array.isArray(body.regels) ? body.regels : [];
-    const items = [];
-    let totaal = 0;
-    for (const r of regels.slice(0, 50)) {
-      const hit = variantVan(s, r.vsku);
-      if (!hit) continue;
-      const aantal = Math.max(1, Math.min(50, parseInt(r.aantal, 10) || 1));
-      if (hit.variant.voorraad < aantal) return { status: 409, error: 'Onvoldoende voorraad voor ' + hit.artikel.naam + ' (' + hit.variant.maat + '): nog ' + hit.variant.voorraad + '.' };
-      hit.variant.voorraad -= aantal;
-      const stuk = hit.artikel.price;
-      items.push({ vsku: r.vsku, name: hit.artikel.naam + ' (' + hit.variant.kleur + ', ' + hit.variant.maat + ')', qty: aantal, price: stuk });
-      totaal += stuk * aantal;
+    const berekend = prijsVan(s, body.regels);
+    if (berekend.error) return berekend;
+    if (berekend.tekort.length) {
+      const t = berekend.tekort[0];
+      return { status: 409, error: 'Onvoldoende voorraad voor ' + t.naam + ': nog ' + t.vrij + '.', tekort: berekend.tekort };
     }
-    if (!items.length) return { status: 400, error: 'Geen geldige artikelen.' };
-    totaal = rond(totaal);
+    if (!berekend.regels.length) return { status: 400, error: 'Geen geldige artikelen.' };
+
+    const items = berekend.regels.map(r => ({ vsku: r.vsku, name: r.naam, qty: r.aantal, price: r.stuk }));
+    for (const r of berekend.regels) variantVan(s, r.vsku).variant.voorraad -= r.aantal;
+    const totaal = berekend.totaal;
     const method = ['contant', 'rtgpay'].includes(body.method) ? body.method : 'contant';
     // als posSale, zodat het Z-rapport, de fooien en de boekhouding meelopen
     const sale = { id: id(), method, total: totaal, items, actor: (actor && actor.name) || 'Team', at: nu(), room: null, retail: true };
@@ -29,7 +35,10 @@ module.exports = (ctx) => {
     // een variant apart voor deze klant afronden (opgehaald) als die erbij hoort
     if (body.klantKey) {
       const rec = klantRec(s, body.klantKey);
-      for (const it of items) rec.historie.push({ sku: it.vsku, naam: it.name, bedrag: rond(it.price * it.qty), at: nu() });
+      /* Het regelbedrag komt uit dezelfde berekening als de bon en wordt hier
+         niet voor de tweede keer uitgerekend -- anders staat er in de historie
+         van een klant een som die uit een andere bron komt dan zijn kassabon. */
+      for (const r of berekend.regels) rec.historie.push({ sku: r.vsku, naam: r.naam, bedrag: r.totaal, at: nu() });
       rec.historie = rec.historie.slice(-200);
       for (const it of items) { const ap = (db.data.retailApart || []).find(x => x.key === body.klantKey && x.vsku === it.vsku && x.status === 'apart'); if (ap) ap.status = 'opgehaald'; }
     }
@@ -39,17 +48,12 @@ module.exports = (ctx) => {
     return { ok: true, sale };
   }
 
-  /* Ketst de RTG Pay-betaling na de verkoop alsnog af, dan draait de route de
-     verkoop hiermee terug: voorraad erbij, bon eruit. De klanthistorie laten
-     we staan; die is informatief en heeft geen geldwaarde. */
-  function verkoopTerug(s, sale) {
-    for (const it of sale.items || []) {
-      const hit = variantVan(s, it.vsku);
-      if (hit) hit.variant.voorraad += it.qty;
-    }
-    db.data.posSales[s.code] = (db.data.posSales[s.code] || []).filter(x => x.id !== sale.id);
-    save();
-  }
+  /* Terugdraaien woont in ./annulering.js en niet meer hier. Hier stond een
+     functie die de voorraad terughaalde en de BON UIT posSales gooide; dat is
+     geen annulering maar een uitgeveegde regel, en de Z-lijst van gisteren
+     klopte er niet meer mee. Nu is elke ongedaanmaking een tegenboeking met een
+     grond -- zie de kop daar. De klanthistorie laten we staan; die is
+     informatief en heeft geen geldwaarde. */
 
   /* ---- voorraad opzoeken (winkelvloer): naam, sku, kleur of maat ---- */
   function voorraadZoek(s, q, drempel) {
@@ -71,7 +75,12 @@ module.exports = (ctx) => {
     const today = vandaag();
     const sales = (db.data.posSales[s.code] || []);
     const dag = sales.filter(x => String(x.at).slice(0, 10) === today);
+    /* De OMZET telt de tegenboekingen gewoon mee: die zijn negatief, dus een
+       teruggedraaide verkoop valt vanzelf weg. Het AANTAL BONNEN mag dat niet
+       doen -- anders staat er bij een vergissing die meteen wordt hersteld
+       "2 bonnen" terwijl er nul klanten zijn geweest. Zie ./annulering.js. */
     const omzetVandaag = rond(dag.reduce((n, x) => n + (x.total || 0), 0));
+    const tegen = dag.filter(x => x.soort === 'annulering');
     // verkocht per artikel (naam) uit de posSales-historie
     const perArtikel = {};
     for (const x of sales) for (const it of (x.items || [])) {
@@ -98,7 +107,9 @@ module.exports = (ctx) => {
     for (const a of s.artikelen || []) for (const v of a.varianten || [])
       if (v.voorraad <= ((s.settings && s.settings.retailDrempel) || 3)) laag.push({ artikel: a.naam, kleur: v.kleur, maat: v.maat, voorraad: v.voorraad, vsku: v.vsku });
     return {
-      omzetVandaag, bonnenVandaag: dag.length,
+      omzetVandaag,
+      bonnenVandaag: dag.length - tegen.length * 2,
+      teruggedraaidVandaag: tegen.length,
       artikelen: (s.artikelen || []).length,
       voorraadTotaal: (s.artikelen || []).reduce((n, a) => n + totaleVoorraad(a), 0),
       bestsellers, sellThrough, laag: laag.slice(0, 30),
@@ -152,5 +163,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus };
+  return { verkoop, voorraadZoek, retailStats, retailState, catalogus };
 };

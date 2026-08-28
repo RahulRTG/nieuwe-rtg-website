@@ -21,7 +21,7 @@
       onderwerpgrens: hier het geld van de gast, daar de deur. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
-  const { H, nu, id, centen, uitEuro, bonMaak, bonBoek } = horeca;
+  const { H, nu, id, heleCenten, uitEuro, bonMaak, bonBoek } = horeca;
 
   /* De doos van de club (banden, tafels, lijst, deur) komt uit
      kern/horeca/clublaag.js, zodat dit bestand en clubdeur.js er niet elk een
@@ -33,7 +33,7 @@ module.exports = (kern) => {
     const c = C(req.supplier.code);
     const nummer = schoon(req.body.nummer, 40);
     if (!nummer) return res.status(400).json({ error: 'Welk bandnummer? (het nummer dat op de band staat, geen naam)' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     if (!bedrag) return res.status(400).json({ error: 'Voor hoeveel wordt de band opgewaardeerd?' });
     let band = c.banden[nummer];
     if (!band) {
@@ -64,7 +64,7 @@ module.exports = (kern) => {
     const c = C(req.supplier.code);
     const band = c.banden[schoon(req.body.nummer, 40)];
     if (!band) return res.status(404).json({ error: 'Deze band kennen we niet.' });
-    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : centen(req.body.centen);
+    const bedrag = req.body.bedrag != null ? uitEuro(req.body.bedrag) : heleCenten(req.body.centen);
     const uit = bonBoek(req.supplier.code, band.bonCode, bedrag);
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
     res.json({ ok: true, geboekt: uit.geboekt, saldo: uit.saldo, tekort: uit.restVraag || 0,
@@ -93,7 +93,7 @@ module.exports = (kern) => {
     const c = C(req.supplier.code);
     const naam = schoon(req.body.tafel, 30);
     if (!naam) return res.status(400).json({ error: 'Welke tafel?' });
-    const minimum = req.body.minimum != null ? uitEuro(req.body.minimum) : centen(req.body.minimumCenten);
+    const minimum = req.body.minimum != null ? uitEuro(req.body.minimum) : heleCenten(req.body.minimumCenten);
     c.tafels[naam] = { tafel: naam, minimumCenten: minimum, gastnaam: schoon(req.body.gastnaam, 60) || null,
       personen: Math.max(1, Math.min(60, parseInt(req.body.personen, 10) || 2)),
       rekeningId: schoon(req.body.rekeningId, 40) || null, at: nu(), door: req.actor.name };

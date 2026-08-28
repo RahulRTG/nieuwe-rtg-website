@@ -33,7 +33,7 @@
 const STATUS = ['open', 'gesloten', 'geleverd', 'afgeblazen'];
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, poort, stadVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, poort, stadVan, save } = ctx;
   const { boekAanvraag } = eigen;
 
   const I = () => S().inkoop;
@@ -61,7 +61,7 @@ module.exports = (ctx, eigen) => {
     if (!g.ok) return g;
     const wat = schoon(b.wat, 120);
     if (wat.length < 3) return { status: 400, error: 'Wat wordt er samen ingekocht?' };
-    const ind = centen(b.indicatie);
+    const ind = naarCenten(b.indicatie);
     if (ind === null || ind === 0) return { status: 400, error: 'Wat is de indicatieprijs per stuk?' };
     const sluit = schoon(b.sluitDatum, 10);
     if (sluit && Number.isNaN(Date.parse(sluit))) return { status: 400, error: 'Gebruik een datum als 2026-10-01.' };

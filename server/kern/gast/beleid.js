@@ -67,7 +67,7 @@ module.exports = ({ horeca }) => {
     if (v.allergieBevestiging != null && ['nooit', 'ernstig', 'altijd'].includes(String(v.allergieBevestiging)))
       b.allergieBevestiging = String(v.allergieBevestiging);
     if (v.alcoholLeeftijd != null) b.alcoholLeeftijd = Math.max(0, Math.min(25, parseInt(v.alcoholLeeftijd, 10) || 0));
-    if (v.orderPlafondCenten != null) b.orderPlafondCenten = Math.max(0, horeca.centen(v.orderPlafondCenten));
+    if (v.orderPlafondCenten != null) b.orderPlafondCenten = Math.max(0, horeca.heleCenten(v.orderPlafondCenten));
     if (!h.instel) h.instel = {};
     h.instel.gastbeleid = b;
     return b;

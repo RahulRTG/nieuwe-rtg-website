@@ -20,6 +20,9 @@
    bronnen,uitgaven,subsidies,incidenten,gemeenten,ondernemers,voorraad,
    activiteiten,berichten,blauwdrukken,inkoop,uitleen,campagnes,audit}. */
 
+/* De eenheid van geld staat op een plek, en dit deel rekent er niet naast. */
+const EENHEID = require('../geld/eenheid');
+
 /* De modules per stad. Elke stad zet ze zelf aan of uit; staat een module uit,
    dan geeft zijn ingang 403 met de reden, niet stilzwijgend een lege lijst
    (LAT.md regel 5: niets slaat stil over). */
@@ -55,9 +58,18 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
   const code = pre => pre + '-' + Array.from(crypto.randomBytes(7)).map(b => TEKENS[b % TEKENS.length]).join('');
   // Bedragen gaan in centen door het hele OS. Euro's met komma's in een optelling
   // is hoe een boekhouding stil gaat afwijken.
-  const centen = v => {
-    const n = Math.round(Number(v) * 100);
-    return Number.isFinite(n) && n >= 0 ? Math.min(n, 100000000000) : null;
+  /* HEET naarCenten EN NIET `centen`: die naam stond op ZEVEN plekken en deed er
+     drie dingen. Zie de kop van kern/geld/eenheid.js.
+
+     EN DE BOVENGRENS IS VERSCHOVEN, dus dat staat er ook. Hier stond een eigen
+     plafond van een miljard euro; EENHEID weigert al boven de tien miljoen, dus
+     dat oude getal was dode code. Tien miljoen in EEN boeking van een stichting
+     is geen bedrag maar een tikfout. Wat deze laag WEL zelf bepaalt: hier is een
+     bedrag nooit negatief -- terugdraaien gaat via de uitgavenkant en niet via
+     een minteken in het veld. */
+  const naarCenten = v => {
+    const n = EENHEID.naarCenten(v);
+    return Number.isFinite(n) && n >= 0 ? n : null;
   };
   const euro = c => Math.round(Number(c) || 0) / 100;
 
@@ -165,7 +177,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     return Number.isFinite(gezet) && gezet >= 0 ? Math.min(gezet, land) : land;
   }
 
-  return { nu, rid, schoon, code, centen, euro, S, audit, wie, rolIn, magRecht, bereik,
+  return { nu, rid, schoon, code, naarCenten, euro, S, audit, wie, rolIn, magRecht, bereik,
     stadVan, poort, limietVan, vogGeldig, VLAGGEN, ROLLEN, RECHTEN, LIMIET };
 };
 module.exports.VLAGGEN = VLAGGEN;

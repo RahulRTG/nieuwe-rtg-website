@@ -51,15 +51,21 @@ function maakRetail({ db, save, crypto, findSupplier, notify, notifySupplier, ss
   const deelKlant = require('./retail/klant')(ctx);
   Object.assign(ctx, deelKlant);
   const deelVloer = require('./retail/vloer')(ctx);
-  const { zetCollectie, zetArtikel, pasVoorraad, releaseDrop } = deelAssortiment;
+  /* Terugdraaien is een eigen deel: het is boekhouding en geen winkelvloer, en
+     het raakt precies twee dingen (de voorraad en de bon) waar de rest van
+     retail vanaf blijft. Zie de kop van ./retail/annulering.js. */
+  const deelAnnulering = require('./retail/annulering')(ctx);
+  const { zetCollectie, zetArtikel, pasVoorraad, releaseDrop, prijsVan } = deelAssortiment;
   const { klantRec, klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart, vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling } = deelKlant;
-  const { verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus } = deelVloer;
+  const { verkoop, voorraadZoek, retailStats, retailState, catalogus } = deelVloer;
+  const { annuleerVerkoop, verkoopTerug, bonBeeld, GRONDEN: ANNULEERGRONDEN } = deelAnnulering;
 
   return {
-    isRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
+    isRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop, prijsVan,
     klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle,
     legApart, mijnApart, vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling,
-    verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus
+    verkoop, verkoopTerug, voorraadZoek, retailStats, retailState, catalogus,
+    annuleerVerkoop, bonBeeld, ANNULEERGRONDEN
   };
 }
 

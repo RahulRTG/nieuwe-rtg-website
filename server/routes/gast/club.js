@@ -19,7 +19,7 @@
 
 module.exports = (kern) => {
   const { app, schoon, horeca, gastAuth } = kern;
-  const { H, centen } = horeca;
+  const { H, heleCenten } = horeca;
 
   /* ---------- mijn polsband ----------
      Op saldo vragen kan alleen met de boncode, dus met de band in je hand. Het
@@ -52,7 +52,7 @@ module.exports = (kern) => {
       t.rekeningId === rekening.id || (rekening.tafel && t.tafel === rekening.tafel)) || null;
     if (!afspraak) return res.json({ ok: true, minimum: null,
       let: 'Op deze tafel staat geen minimum spend.' });
-    const besteed = (rekening.regels || []).reduce((s, r) => s + centen(r.centen * r.aantal), 0);
+    const besteed = (rekening.regels || []).reduce((s, r) => s + heleCenten(r.centen * r.aantal), 0);
     res.json({ ok: true, minimum: {
       tafel: afspraak.tafel, personen: afspraak.personen,
       minimumCenten: afspraak.minimumCenten, besteed,

@@ -33,7 +33,10 @@ const { CATS, PLOEG, OBJECTSOORT, PRIO, UIT_STAD } = require('./categorien');
 
 const STATUS = ['open', 'in-behandeling', 'klaar', 'afgewezen'];
 const PRIOS = ['laag', 'normaal', 'hoog', 'urgent'];
-const KANALEN = ['bewonersapp', 'gemeente', 'telefoon', 'ambtenaar', 'stadsdoos', 'politie',
+/* Hernoemd van `KANALEN`: vier domeinen droegen dat woord met vier betekenissen
+   (SEMANTIEK.json, botsing, overlap 0,10). Het woord is nu van de verkoopweg;
+   zie COMMERCE.md par. 3. Alleen de naam veranderde, niet de waarden. */
+const MELDWEGEN = ['bewonersapp', 'gemeente', 'telefoon', 'ambtenaar', 'stadsdoos', 'politie',
   'vervoerder', 'bedrijf', 'gebouwbeheer', 'automatisch'];
 const DUP_M = 75;              // zonder object: zo dichtbij is "hetzelfde"
 const DUP_UUR = 72;            // en zo lang telt een open zaak als dezelfde
@@ -101,7 +104,7 @@ module.exports = (ctx) => {
   function waarneming(inv) {
     obj.zorgObjecten();
     inv = inv || {};
-    const kanaal = KANALEN.includes(inv.kanaal) ? inv.kanaal : 'automatisch';
+    const kanaal = MELDWEGEN.includes(inv.kanaal) ? inv.kanaal : 'automatisch';
     const categorie = CATS[inv.categorie] ? inv.categorie
       : (UIT_STAD[inv.soort] || (CATS[inv.soort] ? inv.soort : null));
     if (!categorie) return { status: 400, error: 'Kies waar het over gaat: ' + Object.keys(CATS).join(', ') + '.' };
@@ -155,7 +158,7 @@ module.exports = (ctx) => {
   const { publiek, voorMelder, oorzaakZoek, zaakZet, zaakKlaar, lijst, vanMelder } = require('./zaakbeeld')(ctx, H);
 
   return {
-    CATS, STATUS, PRIOS, KANALEN, DUP_M, DUP_UUR, waarneming, zaak, zaakZet, zaakKlaar, lijst, vanMelder, publiek, voorMelder, oorzaakZoek, open,
+    CATS, STATUS, PRIOS, MELDWEGEN, DUP_M, DUP_UUR, waarneming, zaak, zaakZet, zaakKlaar, lijst, vanMelder, publiek, voorMelder, oorzaakZoek, open,
     api: {
       weefselZaken: (f) => {
         const rij = lijst(f);

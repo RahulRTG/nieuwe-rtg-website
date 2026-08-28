@@ -21,6 +21,10 @@
       shared/horlogewerk.js, op het inlogscherm
    8. navigatie: verzekert de centrale iOS-laag en het appmenu op iedere app
       die de basis laadt, tenzij het scherm zichzelf expliciet uitsluit
+   9. overdracht: laadt shared/overdracht.js bij zodra er `?overdracht=` in het
+      adres staat -- de balk met wat een lid uit zijn mand meenam naar dit
+      scherm. Bevestigen doet het domein zelf; deze balk vertelt alleen wat er
+      was gekozen (kern/commerce/overdracht.js)
    Geen inloggegevens nodig; werkt hetzelfde in beide werelden. */
 (function () {
   'use strict';
@@ -197,6 +201,23 @@
   window.addEventListener('offline', function () { toost(rtf ? 'Even geen internet; de app werkt gewoon door waar dat kan.' : 'Geen verbinding; de app werkt door waar dat kan.'); });
   window.addEventListener('online', function () { toost('De verbinding is terug.'); });
 
+
+  /* ---- 9. de overdracht: wat een lid uit zijn mand meenam naar dit scherm
+     (shared/overdracht.js). Bevestigen gebeurt in het domein dat er al over
+     gaat, en die deuren staan verspreid over tientallen schermen -- dus staat
+     de balk op EEN plek en niet in elk van hen. Hij wordt alleen bijgeladen als
+     er ook werkelijk een briefje in het adres staat; op elk ander scherm kost
+     dit niets. De uitleg staat in kern/commerce/overdracht.js.
+
+     Hij hoort hier en niet bij punt 5 en 6 in basis-02.js, waar de andere twee
+     bijladers staan: dat deel zat op 9894 bytes en zou met dit blok over de
+     10 kB-leesgrens gaan. Een deelbestand is een GROOTTE-grens en geen
+     betekenisgrens -- alle delen draaien in dezelfde functie. ---- */
+  if (location.search.indexOf('overdracht=') >= 0) {
+    var ovdS = document.createElement('script');
+    ovdS.src = '/shared/overdracht.js'; ovdS.async = true;
+    (document.head || document.documentElement).appendChild(ovdS);
+  }
 /* de toegankelijkheidshelpers van de gedeelde laag */
   var MELDPLEKKEN = '#toast,.toast,#melding,.melding,[data-toast],.status';
   /* ---- de toegankelijkheidshelpers van de gedeelde laag ----

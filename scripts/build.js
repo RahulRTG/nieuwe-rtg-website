@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const swAfdruk = require('./lib/swvingerafdruk');
 const { minify } = require('./ast/minify');
 const { bundels, schrijfBundels } = require('./bundel');
 
@@ -144,15 +145,12 @@ function stempelServiceWorkers() {
     let s = fs.readFileSync(p, 'utf8');
     const m = s.match(/const CACHE = '([^']*)';/);
     if (!m) { console.warn('[build] geen CACHE in', sw); continue; }
-    const delen = m[1].split('-'); delen.pop(); // laatste segment (versie/hash) eraf
-    const prefix = delen.join('-') || 'cache';
-    // shell-bestanden ophalen en samen met de sw-logica hashen
-    const shell = (s.match(/'\/[^']+'/g) || []).map((x) => x.slice(2, -1)).filter((r) => /\.(html|js|css|svg|webmanifest)$/.test(r));
-    const h = crypto.createHash('sha256');
-    for (const r of shell) { try { h.update(fs.readFileSync(path.join(PUB, r))); } catch (e) {} }
-    h.update(s.replace(/const CACHE = '[^']*';/, '')); // de sw-code zelf telt ook mee
-    const hash = h.digest('hex').slice(0, 8);
-    const nieuw = prefix + '-' + hash;
+    /* EEN BRON VOOR DE AFDRUK. Dit rekende hier ooit zelf, en anders dan
+       scripts/swcache.js -- zie de kop van ./lib/swvingerafdruk.js voor wat
+       dat kostte. */
+    const uit = swAfdruk.cachenaamVoor(s, PUB);
+    if (!uit) { console.warn('[build] geen SHELL in', sw); continue; }
+    const nieuw = uit.nieuw;
     if (m[1] !== nieuw) { s = s.replace(/const CACHE = '[^']*';/, `const CACHE = '${nieuw}';`); fs.writeFileSync(p, s); }
     console.log(`[build] service-worker ${sw}: CACHE = ${nieuw}`);
   }

@@ -137,6 +137,27 @@ async function trek(page, hoogte) {
   }
 }
 
+/* Wacht tot een doel echt stil ligt voordat een tijdgebaar begint. De balk kan
+   bij het openen of na bladactiviteit nog in- of uitschuiven; een aanwijzer die
+   op het oude vak blijft staan veroorzaakt dan pointerleave en annuleert juist
+   de lange druk die de toets wil meten. */
+async function wachtOpStilVak(page, selector) {
+  await wachtTot(page, (sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    const vak = [r.x, r.y, r.width, r.height].map((n) => Math.round(n * 10) / 10).join(':');
+    const vorig = window.__rtgStilVak;
+    if (!vorig || vorig.selector !== sel || vorig.vak !== vak) {
+      window.__rtgStilVak = { selector: sel, vak: vak, gelijk: 0 };
+      return false;
+    }
+    vorig.gelijk++;
+    return vorig.gelijk >= 2;
+  }, selector, { ms: 10000, polling: 120, wat: 'een stil doelvlak voor de lange druk' });
+}
+
 test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) => {
 
   await t.test('de Trust Rail staat boven het dock en is een ingang, geen mededeling', async () => {
@@ -283,7 +304,9 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        DE MUTATIE: zet in balkknop.js de lange druk terug op openLade(). */
     await metLid(async (page) => {
       await zetProef(page, 'dicht');
-      const doos = await page.locator('#rtgCommand .cmd-actie[data-cap="proef.licht"]').boundingBox();
+      const selector = '#rtgCommand .cmd-actie[data-cap="proef.licht"]';
+      await wachtOpStilVak(page, selector);
+      const doos = await page.locator(selector).boundingBox();
       await page.mouse.move(doos.x + doos.width / 2, doos.y + doos.height / 2);
       await page.mouse.down();
       /* VASTHOUDEN TOT DE UITLEG KOMT, en niet tot het scherm stil is. De drempel

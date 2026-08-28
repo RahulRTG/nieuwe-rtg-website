@@ -45,7 +45,7 @@
     catch (e) { vul('#wdGrens', '<p class="stil">' + G.esc(e.message) + '</p>'); }
   }
   async function grensZet() {
-    var centen = G.centen(($('#wdGrensBedrag') || {}).value);
+    var centen = G.naarCenten(($('#wdGrensBedrag') || {}).value);
     if (centen == null) { G.melding('Vul een bedrag in.'); return; }
     try {
       var r = await G.api('/api/geld/grens/zet',

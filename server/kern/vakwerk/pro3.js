@@ -9,8 +9,9 @@ module.exports = (ctx) => {
   const { db, save, findSupplier, isVak, scho, crypto, notify, notifySupplier,
     sseToCustomer, sseToSupplier, boekingenVoegToe, boekingenVanZaak, vandaagStr, geldigeTijd } = ctx;
   const nu = () => new Date().toISOString();
-  const ritmes = () => (Array.isArray(db.data.vakRitmes) ? db.data.vakRitmes : (db.data.vakRitmes = []));
-  const wacht = () => (Array.isArray(db.data.vakWachtlijst) ? db.data.vakWachtlijst : (db.data.vakWachtlijst = []));
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/vakwerk/pro3', bezit: { vakRitmes: 'lijst', vakWachtlijst: 'lijst' } });
+  const ritmes = () => eigen.bak('vakRitmes');
+  const wacht = () => eigen.bak('vakWachtlijst');
   const pubRitme = r => ({ id: r.id, supplierCode: r.supplierCode, zaak: r.supplierName, klant: r.customerCodename,
     dienst: r.dienstNaam, intervalWeken: r.intervalWeken, tijd: r.tijd, laatst: r.laatst || r.start, actief: r.actief });
 
@@ -75,7 +76,7 @@ module.exports = (ctx) => {
       start, actief: true, at: nu()
     };
     ritmes().unshift(r);
-    db.data.vakRitmes = ritmes().slice(0, 10000);
+    eigen.zetBak('vakRitmes', ritmes().slice(0, 10000));
     const b = plan(r, start);
     save();
     notifySupplier(s.code, { icon: 'agenda', title: 'Vaste afspraak gestart', body: r.customerCodename + ': ' + d.name + ', elke ' + (interval === 1 ? 'week' : interval + ' weken') + ' om ' + r.tijd + '.' });
@@ -109,7 +110,7 @@ module.exports = (ctx) => {
       supplierCode: s.code, customerKey: sessie.key, customerTier: sessie.tier, codenaam: sessie.codename,
       dienst: (d && d.name) || null, datum, uitgenodigd: null, at: nu() };
     wacht().push(w);
-    db.data.vakWachtlijst = wacht().slice(-10000);
+    eigen.zetBak('vakWachtlijst', wacht().slice(-10000));
     save();
     notifySupplier(s.code, { icon: 'agenda', title: 'Wachtlijst', body: sessie.codename + ' wacht op een plek op ' + datum + (w.dienst ? ' (' + w.dienst + ')' : '') + '.' });
     return { status: 200, ok: true };

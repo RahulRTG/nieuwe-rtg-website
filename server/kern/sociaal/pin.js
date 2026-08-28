@@ -28,42 +28,29 @@
    0/O en 1/I/L in elkaars vaarwater, dus die staan niet in het alfabet en
    worden bij het invoeren stil omgezet naar wat de spreker bedoelde. Dat is
    een bestaand, opgeschreven schema; er is hier niets eigens aan verzonnen.
-   Waarom acht van die tekens genoeg zijn tegen raden, staat bij de remmen die
-   dat waarmaken: ./pin-deur.js.
+   Nieuwe pins hebben tien tekens (50 bits). De achttekencodes uit de eerste
+   versie blijven geldig: veiligheid mag nooit een stille buitensluiting zijn.
+   De remmen die raden tegengaan staan in ./pin-deur.js.
 
    DRIE BESTANDEN, DRIE ONDERWERPEN. Hier woont het BEZIT: het alfabet, het
    verzinnen, de eigen pin, vernieuwen en de aan/uit-schakelaar, plus de index
    die daarbij hoort. Het OPZOEKEN staat in ./pin-deur.js (de twee remmen en de
    gelijke antwoorden), en de LEVENDE code in ./pin-live.js. */
+const klok = require('../../lib/klok');
+const { ALFABET, NIEUWE_LENGTE, OUDE_LENGTE, normaliseer, toonbaar } = require('./pin-formaat');
+
 module.exports = (ctx) => {
 const { db, save, crypto, codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd,
-  sociaalRate, statusVan, connectieTussen, socialVerbind } = ctx;
+  sociaalRate, statusVan, connectieTussen, socialVerbind, pinIsIngetrokken,
+  pinTrekIn, pinBeveiligingNoteer, pinBeveiligingBeeld, pinBevries,
+  pinIntentTrekInVoor } = ctx;
 
-/* Crockford base32: geen I, L, O en U. 256 is precies 8 x 32, dus `byte % 32`
-   is zuiver uniform -- er hoeft geen enkele trekking verworpen te worden. */
-const ALFABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-const LENGTE = 8;
 const UUR = 60 * 60 * 1000;
 
 const rij = () => {
   if (!db.data.contactPins || typeof db.data.contactPins !== 'object') db.data.contactPins = {};
   return db.data.contactPins;
 };
-
-/* Van wat een mens intypt naar de pin zoals hij bewaard staat, of null.
-   De omzetting O->0 en I/L->1 is de Crockford-lezing: wie "IBAN" hoort
-   voorlezen weet niet of het een i of een 1 is, en de pin hoort dat niet uit
-   te maken. U->V om dezelfde reden. Streepjes, spaties en punten mogen: het
-   scherm toont 'A1B2-C3D4' en dat plakt iemand terug zoals het er staat. */
-function normaliseer(ruw) {
-  const s = String(ruw == null ? '' : ruw).toUpperCase().replace(/[^0-9A-Z]/g, '')
-    .replace(/O/g, '0').replace(/[IL]/g, '1').replace(/U/g, 'V');
-  if (s.length !== LENGTE) return null;
-  for (const teken of s) if (!ALFABET.includes(teken)) return null;
-  return s;
-}
-// zoals het lid hem ziet: twee groepjes van vier, want acht op een rij overtypt niemand
-const toonbaar = pin => (pin ? pin.slice(0, 4) + '-' + pin.slice(4) : null);
 
 /* De hint van pin naar lid staat in ./pin-index.js -- een eigen bestand, want
    de uitleg waarom een index hier GEEN tweede waarheid is, is langer dan de
@@ -76,7 +63,7 @@ const { zoekRuw, indexZet } = require('./pin-index')(rij);
    lid de pin die iemand tijdelijk had uitgezet, en zijn er twee zodra die ander
    hem weer aanzet. `handleVanPin` zegt of een pin iemand AANWIJST, en daar telt
    de schakelaar wel. */
-const pinBezet = pin => !!zoekRuw(pin);
+const pinBezet = pin => !!zoekRuw(pin) || pinIsIngetrokken(pin);
 function handleVanPin(pin) {
   const handle = zoekRuw(pin);
   if (!handle) return null;
@@ -86,14 +73,14 @@ function handleVanPin(pin) {
 // ontstaan (pinVan maakt er wel een aan, en schrijft dus ook)
 const pinHuidig = handle => { const e = rij()[handle]; return e && e.pin ? e.pin : null; };
 function verzinPin() {
-  /* Botsingen zijn met 1,1 biljoen mogelijkheden zeldzaam, maar "zeldzaam"
+  /* Botsingen zijn met ruim 1 biljard mogelijkheden zeldzaam, maar "zeldzaam"
      is geen "nooit": twee leden met dezelfde pin zou betekenen dat een
      verzoek bij de verkeerde belandt. Dus altijd nakijken, en opgeven met een
      fout in plaats van stil een dubbele uit te delen. */
   for (let poging = 0; poging < 50; poging++) {
-    const bytes = crypto.randomBytes(LENGTE);
+    const bytes = crypto.randomBytes(NIEUWE_LENGTE);
     let pin = '';
-    for (let i = 0; i < LENGTE; i++) pin += ALFABET[bytes[i] % 32];
+    for (let i = 0; i < NIEUWE_LENGTE; i++) pin += ALFABET[bytes[i] % 32];
     if (!pinBezet(pin)) return pin;
   }
   throw new Error('contactpin: geen vrije pin gevonden na 50 pogingen');
@@ -105,27 +92,38 @@ function pinVan(handle) {
   if (!handle) return null;
   const r = rij();
   if (!r[handle] || !r[handle].pin) {
-    r[handle] = { pin: verzinPin(), at: new Date().toISOString() };
+    const at = klok.datum().toISOString();
+    r[handle] = { pin: verzinPin(), versie: 2, at, laatstGewijzigd: at };
     indexZet(handle, null, r[handle].pin);
-    save();
+    pinBeveiligingNoteer(handle, 'pin_gemaakt', { bron: 'vast', uitkomst: 'gelukt' });
   }
   return r[handle].pin;
 }
-const pinKaart = handle => { const p = pinVan(handle); return { pin: p, toon: toonbaar(p), uit: !!(rij()[handle] || {}).uit }; };
+const pinKaart = handle => {
+  const p = pinVan(handle), e = rij()[handle] || {};
+  return { pin: p, toon: toonbaar(p), uit: !!e.uit,
+    versie: p && p.length === OUDE_LENGTE ? 1 : 2,
+    gemaaktOp: e.at || null, laatstGewijzigd: e.laatstGewijzigd || e.at || null,
+    ...pinBeveiligingBeeld(handle) };
+};
 
 /* Een nieuwe pin. Dit is het intrekken van een adres: wie de oude heeft
    (op een oude foto van de QR, in een oude groepsapp) kan er niets meer mee.
    Bestaande vriendschappen raakt het niet -- die staan op de handle. */
 function pinVernieuw(handle) {
   if (!handle) return { status: 400, error: 'Onbekend lid.' };
-  if (!sociaalRate(handle, 'pinnieuw', 10, UUR))
+  if (!sociaalRate(handle, 'pinnieuw', 3, UUR))
     return { status: 429, error: 'Je hebt net al een nieuwe pin gemaakt. Probeer het over een uur opnieuw.' };
   const r = rij(), oud = r[handle] ? r[handle].pin : null;
   // de stand van de schakelaar blijft staan: wie zijn pin uit had, wil na een
   // verse pin niet ineens weer vindbaar zijn
-  r[handle] = { pin: verzinPin(), at: new Date().toISOString(), uit: !!(r[handle] && r[handle].uit) };
+  const nieuw = verzinPin(), at = klok.datum().toISOString();
+  if (oud) pinTrekIn(oud, 'vernieuwd');
+  r[handle] = { pin: nieuw, versie: 2, at,
+    laatstGewijzigd: at, uit: !!(r[handle] && r[handle].uit) };
   indexZet(handle, oud, r[handle].pin);
-  save();
+  pinIntentTrekInVoor(handle);
+  pinBeveiligingNoteer(handle, 'pin_vernieuwd', { bron: 'vast', uitkomst: 'gelukt' });
   return { status: 200, ...pinKaart(handle) };
 }
 
@@ -138,13 +136,19 @@ function pinVernieuw(handle) {
    waar deze schakelaar over gaat: een pin die je hebt afgegeven werkt PASSIEF
    door, ook als je allang niet meer weet aan wie. Een code die je op dit moment
    ophoudt is een HANDELING, met een mens die hem bewust laat zien en een venster
-   van een halve minuut. Wie de eerste dichtdoet, wil zelden de tweede kwijt --
+   van 45 seconden. Wie de eerste dichtdoet, wil zelden de tweede kwijt --
    en het scherm zegt dat er ook bij. */
-function pinUit(handle, uit) {
+function pinUit(handle, uit, opties) {
   if (!handle) return { status: 400, error: 'Onbekend lid.' };
   pinVan(handle);                      // zorgt dat er een rij is om te schakelen
+  if (opties && Object.prototype.hasOwnProperty.call(opties, 'bevroren')) {
+    const r = pinBevries(handle, !!opties.bevroren);
+    pinIntentTrekInVoor(handle);
+    return r.error ? r : { status: 200, ...pinKaart(handle) };
+  }
   rij()[handle].uit = !!uit;
-  save();
+  pinIntentTrekInVoor(handle);
+  pinBeveiligingNoteer(handle, uit ? 'vaste_pin_uit' : 'vaste_pin_aan', { bron: 'vast', uitkomst: 'gelukt' });
   return { status: 200, ...pinKaart(handle) };
 }
 

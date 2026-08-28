@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-28",
   "gemeten": {
-    "bestanden": 1808,
-    "vormen": 1260,
-    "velden": 1812,
-    "modules": 671,
-    "domeinen": 239,
+    "bestanden": 1880,
+    "vormen": 1291,
+    "velden": 1841,
+    "modules": 691,
+    "domeinen": 245,
     "envelopDrempel": 15,
-    "envelop": 31,
-    "veldenDomeineigen": 1273,
-    "veldenGedeeldVanafVier": 181,
-    "gelijkendeVormparen": 18
+    "envelop": 32,
+    "veldenDomeineigen": 1292,
+    "veldenGedeeldVanafVier": 184,
+    "gelijkendeVormparen": 19
   },
   "envelop": [
     "aantal",
@@ -44,9 +44,22 @@
     "tot",
     "uitleg",
     "van",
-    "wat"
+    "wat",
+    "wie"
   ],
   "gedeeld": [
+    {
+      "veld": "type",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/antivirus",
+        "kern/command",
+        "kern/commerce",
+        "kern/instant-reality",
+        "kern/magnaat-werkroutefabriek"
+      ]
+    },
     {
       "veld": "stand",
       "domeinen": 14,
@@ -57,18 +70,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/eten"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 14,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/consent",
-        "kern/fonds",
-        "kern/livinglab",
-        "kern/onderzoekslab"
       ]
     },
     {
@@ -84,15 +85,15 @@
       ]
     },
     {
-      "veld": "type",
+      "veld": "vraag",
       "domeinen": 13,
       "waar": [
-        "bedrijf",
-        "kern/antivirus",
+        "kern/aanmeldingen",
         "kern/command",
-        "kern/instant-reality",
-        "kern/magnaat-werkroutefabriek",
-        "kern/magnaatwereld"
+        "kern/commerce",
+        "kern/livinglab",
+        "kern/magnaat-economenlab-rapport",
+        "kern/magnaat-economie"
       ]
     },
     {
@@ -120,6 +121,18 @@
       ]
     },
     {
+      "veld": "eenheid",
+      "domeinen": 13,
+      "waar": [
+        "kern/boerderij",
+        "kern/command",
+        "kern/commerce",
+        "kern/groothandel",
+        "kern/keuken",
+        "kern/kosten"
+      ]
+    },
+    {
       "veld": "bedrag",
       "domeinen": 13,
       "waar": [
@@ -133,26 +146,26 @@
     },
     {
       "veld": "waarom",
-      "domeinen": 12,
+      "domeinen": 13,
       "waar": [
         "kern/bureau",
         "kern/command",
+        "kern/commerce",
         "kern/commercie",
         "kern/concern",
-        "kern/gewoonten",
-        "kern/horeca"
+        "kern/gewoonten"
       ]
     },
     {
       "veld": "open",
-      "domeinen": 12,
+      "domeinen": 13,
       "waar": [
+        "kern/commerce",
         "kern/concern",
         "kern/festival",
         "kern/labfonds",
         "kern/lidmaatschap",
-        "kern/livinglab",
-        "kern/luchthaven"
+        "kern/livinglab"
       ]
     },
     {
@@ -168,15 +181,15 @@
       ]
     },
     {
-      "veld": "vraag",
+      "veld": "vervalt",
       "domeinen": 11,
       "waar": [
         "kern/aanmeldingen",
         "kern/command",
-        "kern/livinglab",
-        "kern/magnaat-economenlab-rapport",
-        "kern/magnaat-economie",
-        "kern/magnaatwereld"
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
       ]
     },
     {
@@ -240,18 +253,6 @@
       ]
     },
     {
-      "veld": "eenheid",
-      "domeinen": 11,
-      "waar": [
-        "kern/boerderij",
-        "kern/command",
-        "kern/groothandel",
-        "kern/keuken",
-        "kern/life",
-        "kern/magnaat-partnerstudio-bedrijf"
-      ]
-    },
-    {
       "veld": "wanneer",
       "domeinen": 11,
       "waar": [
@@ -288,15 +289,27 @@
       ]
     },
     {
-      "veld": "vervalt",
+      "veld": "geldigTot",
       "domeinen": 10,
       "waar": [
+        "bedrijf",
         "kern/aanmeldingen",
-        "kern/command",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf",
-        "kern/munten"
+        "kern/concern",
+        "kern/festival",
+        "kern/mobiliteit",
+        "kern/navigatie"
+      ]
+    },
+    {
+      "veld": "plek",
+      "domeinen": 10,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/commerce",
+        "kern/festival",
+        "kern/hulpdienst",
+        "kern/mall"
       ]
     },
     {
@@ -333,6 +346,18 @@
         "kern/gebouw-demo",
         "kern/mobiliteit",
         "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "zaak",
+      "domeinen": 10,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/commerce",
+        "kern/fiscaal",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -384,39 +409,15 @@
       ]
     },
     {
-      "veld": "geldigTot",
+      "veld": "waar",
       "domeinen": 9,
       "waar": [
         "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/reisuitnodiging-gebruik"
-      ]
-    },
-    {
-      "veld": "plek",
-      "domeinen": 9,
-      "waar": [
         "kern/afdelingen",
-        "kern/agenda-pro",
-        "kern/festival",
-        "kern/hulpdienst",
-        "kern/mall",
-        "kern/rtfos"
-      ]
-    },
-    {
-      "veld": "zaak",
-      "domeinen": 9,
-      "waar": [
-        "kern/appstore",
-        "kern/avond",
+        "kern/antivirus",
+        "kern/assets",
         "kern/bureau",
-        "kern/fiscaal",
-        "kern/mobiliteit",
-        "kern/overheid"
+        "kern/commerce"
       ]
     },
     {
@@ -504,27 +505,27 @@
       ]
     },
     {
-      "veld": "waar",
+      "veld": "periode",
       "domeinen": 8,
       "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/antivirus",
-        "kern/assets",
-        "kern/bureau",
-        "kern/hoteldorp"
+        "kern/aanmeldingen",
+        "kern/commercie",
+        "kern/fiscaal",
+        "kern/kosten",
+        "kern/overheid",
+        "kern/payroll"
       ]
     },
     {
-      "veld": "url",
+      "veld": "regels",
       "domeinen": 8,
       "waar": [
-        "kern/appbieb",
-        "kern/bedrijfscontrole",
-        "kern/foundationregistratie-register",
-        "kern/handelsregelbronnen",
-        "kern/handelsregelwacht",
-        "kern/lidmaatschap"
+        "kern/agent",
+        "kern/commerce",
+        "kern/facturatie",
+        "kern/gast",
+        "kern/magnaat-economie",
+        "kern/mall"
       ]
     }
   ],
@@ -558,6 +559,20 @@
         "vierOgen",
         "waarom",
         "waaromNiet"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/commerce/prijsvraag.js",
+      "b": "server/kern/mall/aanbodrtg.js",
+      "domeinA": "kern/commerce",
+      "domeinB": "kern/mall",
+      "gedeeld": [
+        "eenheid",
+        "eenheidMeervoud",
+        "max",
+        "min",
+        "vraag"
       ]
     },
     {

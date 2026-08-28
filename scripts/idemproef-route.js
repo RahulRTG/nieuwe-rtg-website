@@ -67,7 +67,7 @@ if (require.main !== module) { module.exports = {}; return; }
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
-      return { status: r.status, data };
+      return { status: r.status, data, staat: r.headers.get('x-rtg-staat') };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
@@ -111,8 +111,81 @@ if (require.main !== module) { module.exports = {}; return; }
   meldZonderRol(verdeling);
   console.log('  oproepen per route                   : 3  (K1, K1 opnieuw, K2 vers)');
 
+  /* DE WERELD KLAARZETTEN, VOOR ER GEMETEN WORDT -- ./lib/idemwereld.js.
+
+     Het plausibele lijf is voor alle routes hetzelfde en weet niet welke IBAN of
+     welke codenaam er in DEZE database bestaan; het gevolg was dat 2.221 routes
+     hun eerste oproep zagen stranden op "deed geen werk". Een route die niets
+     doet, kun je niet betrappen op een tweede keer doen. Daarom bouwt die module
+     eerst een echte wereld (rekening, saldo, pas, vaste betaling, twee klompjes)
+     en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
+     route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
+  const { zetWereldKlaar } = require('./lib/idemwereld');
+  const { extra, perRoute: geldLijven } = await zetWereldKlaar({ post, tokens, login: inlog });
+  console.log('  wereld klaargezet                    : ' +
+    (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
+  console.log('  geldroutes met een eigen lijf        : ' + Object.keys(geldLijven).length);
+
+  /* ============================================================================
+     HET TWEEDE MEETPUNT IJKEN.
+
+     Elk antwoord draagt de stand per collectie. Maar sommige collecties
+     veranderen bij ELK verzoek -- `doorgeefjournaal` schrijft een regel per
+     verzoek, ook bij lezen. Zonder die ruis eruit zou elke oproep "werk gedaan"
+     lijken en was dit meetpunt meteen blind. In stand 2 weegt dit zwaarder dan
+     in stand 1: een inhoudsafdruk ziet ook de tellers en tijdstempels die bij
+     elk verzoek een tik krijgen, dus er is MEER te ijken en niet minder.
+
+     Wie de ruis is, staat daarom nergens als lijst: we METEN het. Een handvol
+     oproepen die niets doen (een leesroute), kijken wat er dan toch groeit, en
+     dat uitsluiten. Een handgeschreven lijst zou stil verouderen zodra er een
+     teller bij komt; deze ijking niet. Zelfde gedachte als de per-route ijking
+     in de proef zelf: eerst zien dat de meter kan bewegen. */
+  const staatlog = require('../server/staatlog');
+  const ruis = new Set();
+  let ijkStand = null, staatWerkt = false;
+  {
+    const eerste = await post('/api/pay/overzicht', {}, tokens.member);
+    ijkStand = eerste.staat || null;
+    for (let i = 0; i < 6 && ijkStand != null; i++) {
+      const nu = await post('/api/pay/overzicht', {}, tokens.member);
+      if (nu.staat == null) break;
+      for (const k of Object.keys(staatlog.verschil(ijkStand, nu.staat))) ruis.add(k);
+      ijkStand = nu.staat;
+    }
+    staatWerkt = ijkStand != null;
+  }
+  /* DE VASTLEGGING wordt hier NIET geijkt, en dat is een gemeten keuze. Deze
+     ijking draait op een LEESroute en vindt daarmee alleen wat bij ELK verzoek
+     groeit (`doorgeefjournaal`). Collecties die bij elke HANDELING een regel
+     schrijven -- `kantoorAudit`, `commandJournaal`, `securityLog` -- groeien bij
+     lezen niet en komen hier dus nooit boven. Twee automatische zeven zijn hier
+     op gemeten data gestrand (een steekproefronde, en een verhouding over alle
+     deltas: die vond er nul, want een kantoorjournaal groeit alleen bij
+     kantoorroutes). Ze staan nu bij naam en met reden in IDEMBESLUIT.json --
+     zie de uitleg in scripts/lib/idemproef.js voor waarom een besluit hier
+     beter is dan een slimmigheid, en hoe die lijst zelf gecontroleerd wordt. */
+  console.log('  tweede meetpunt (de opslag)          : ' + (staatWerkt
+    ? 'aan; ruis geijkt op ' + (ruis.size ? [...ruis].join(', ') : 'niets')
+    : 'UIT -- geen X-RTG-Staat-kop; de proef meet alleen het antwoord'));
+
+  /* Het verschil dat DEZE oproep achterliet. De stand loopt door over de hele
+     ronde: elk antwoord is het nieuwe ijkpunt voor het volgende. */
+  let vorigeStand = ijkStand;
+  const staatVan = !staatWerkt ? null : (antwoord) => {
+    if (!antwoord || antwoord.staat == null) return {};
+    const d = staatlog.verschil(vorigeStand, antwoord.staat, ruis);
+    vorigeStand = antwoord.staat;
+    return d;
+  };
+
+  let register = {};
+  try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
+  const besluiten = register.routes || {};
+
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
-    lijfVoor: (r) => plausibelLijf(r.pad), maxRoutes: MAX });
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
+    vastlegging: register.vastlegging });
 
   if (uit.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.meterStuk);
@@ -126,12 +199,52 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  BEOORDEELD (tweede effect zichtbaar) : ' + beoordeeld + ' / ' + routes.length);
   console.log('      herhaling herkend (beschermd)    : ' + t.beschermd);
   console.log('      deed het opnieuw (onbeschermd)   : ' + t.onbeschermd);
+  console.log('      waarvan gezien aan de OPSLAG     : ' + (uit.uitOpslag || 0) +
+    '   <- het antwoord zei niets; de opslag wel');
   console.log('  ongemeten                            : ' + t.ongemeten +
     '   <- geen werk gedaan, of het antwoord reageert niet op een nieuwe oproep');
+  /* De lijst met vastleggingen uit IDEMBESLUIT.json, met de controle erop: onder
+     hoeveel verschillende routefamilies groeide elk van die collecties? Een
+     doorlopende vastlegging groeit onder routes die verder niets met elkaar te
+     maken hebben; groeit er een onder maar EEN familie, dan is het domeinwerk
+     dat in de lijst is gezet -- en dan verdwijnt er een bevinding achter een
+     regel in een bestand. Dat hoort hardop te klinken. */
+  console.log('  vastlegging (geldt niet als werk)    : ' + ((uit.vastleggingGemeten || []).length
+    ? uit.vastleggingGemeten.map(v => v.collectie + ' (' + v.families + ' routefamilies)').join(', ')
+    : 'niets in IDEMBESLUIT.json'));
+  for (const k of (uit.vastleggingVerdacht || [])) {
+    console.log('      LET OP: ' + k + ' groeide maar onder EEN routefamilie -- dat lijkt domeinwerk, ' +
+      'geen doorlopende vastlegging. Haal hem uit IDEMBESLUIT.json of onderbouw hem opnieuw.');
+  }
+  if (uit.tegenspraken && uit.tegenspraken.length) {
+    console.log('  TEGENSPRAAK antwoord vs opslag       : ' + uit.tegenspraken.length + '   (elk nagetrokken met een vierde oproep)');
+    for (const p of uit.tegenspraken.slice(0, 10)) console.log('      ' + p);
+  }
+  if (uit.vermoedensVerworpen) {
+    console.log('  vermoedens die niet herhaalbaar waren: ' + uit.vermoedensVerworpen +
+      '   <- bij B bewoog er iets dat bij een vierde oproep niet terugkwam');
+  }
 
+  /* ============================================================================
+     ELKE ONBESCHERMDE ROUTE DRAAGT EEN BESLUIT (TAKEN.md 4.30).
+
+     "Onbeschermd" is een telling en geen defect -- twee keer op bewaren drukken
+     hoort twee notities op te leveren. Maar dan moet iemand dat wel HEBBEN
+     BESLOTEN, en niet: het stond er en niemand keek. Het verschil tussen die
+     twee is precies wat deze lijst zonder besluitregister niet kon laten zien.
+
+     IDEMBESLUIT.json draagt per route waarom een herhaling daar mag (of niet).
+     Wat hier onbeschermd uitkomt en er NIET in staat, is een route waarover nog
+     niemand heeft nagedacht. Die worden bij naam genoemd. Ze maken deze proef
+     niet rood -- dat zou een bevinding zijn en geen blindheid -- maar ze staan
+     in het register onder `zonderBesluit`, zodat het getal niet stilletjes kan
+     groeien. */
   const onbeschermd = Object.values(uit.perRoute).filter(r => r.idempotentie === 'onbeschermd');
-  for (const r of onbeschermd.slice(0, 20)) console.log('      ' + r.methode + ' ' + r.pad);
+  const zonderBesluit = onbeschermd.filter(r => !besluiten[r.pad]).map(r => r.pad);
+  for (const r of onbeschermd.slice(0, 20)) console.log('      ' + r.methode + ' ' + r.pad + (besluiten[r.pad] ? '' : '   <- GEEN BESLUIT'));
   if (onbeschermd.length > 20) console.log('      ... en nog ' + (onbeschermd.length - 20));
+  console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
+  if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -148,7 +261,12 @@ if (require.main !== module) { module.exports = {}; return; }
     gemeten: { routesMetRol: routes.length, beoordeeld,
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,
-      blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX },
+      uitOpslag: uit.uitOpslag || 0, ruisGeijkt: [...ruis], vastlegging: uit.vastleggingGemeten || [],
+      blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
+      wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
+      onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length },
+    zonderBesluit, tegenspraken: uit.tegenspraken || [], vastleggingVerdacht: uit.vastleggingVerdacht || [],
+    vermoedensVerworpen: uit.vermoedensVerworpen || 0,
     perRoute: Object.values(uit.perRoute)
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in IDEMPROEF.json');

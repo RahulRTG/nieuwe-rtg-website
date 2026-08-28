@@ -46,11 +46,11 @@
       (payFilterType === 'alle' || (payFilterType === 'abo' ? isContrib(i.desc) : !isContrib(i.desc))));
     const chip = (actief, val, groep, label) => '<button class="js-payfilter" data-groep="' + groep + '" data-val="' + val + '" style="border:1px solid ' + (actief ? 'var(--gold)' : 'var(--line)') + ';color:' + (actief ? 'var(--gold)' : 'var(--soft)') + ';background:none;border-radius:0;padding:0.25rem 0.7rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">' + label + '</button>';
     const filterBar = (jaren.length > 1 || invoices.length > 3)
-      ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;align-items:center;">' +
+      ? '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.75rem;align-items:center;">' +
           chip(payFilterType === 'alle', 'alle', 'type', T('fin.f.alle','Alles')) +
           chip(payFilterType === 'abo', 'abo', 'type', T('fin.f.abo','Abonnement')) +
           chip(payFilterType === 'overig', 'overig', 'type', T('fin.f.overig','Overig')) +
-          (jaren.length > 1 ? '<span style="width:1px;height:1rem;background:var(--line);margin:0 0.2rem;"></span>' + chip(payFilterJaar === 'alle', 'alle', 'jaar', T('fin.f.jaren','Alle jaren')) + jaren.map(j => chip(payFilterJaar === j, j, 'jaar', j)).join('') : '') +
+          (jaren.length > 1 ? '<span style="width:1px;height:1rem;background:var(--line);margin:0 0.25rem;"></span>' + chip(payFilterJaar === 'alle', 'alle', 'jaar', T('fin.f.jaren','Alle jaren')) + jaren.map(j => chip(payFilterJaar === j, j, 'jaar', j)).join('') : '') +
         '</div>'
       : '';
     /* Nog nooit een factuur gehad is iets anders dan "niets in deze selectie".

@@ -106,27 +106,62 @@ function bouw() {
     }
   }
 
-  /* Wat er NIET in een wereld hangt maar wel bestaat: de tabs van de ledenapp
-     die geen enkele wereld noemt. Zonder deze lijst leest het document als
-     "dit is alles", en dat is het niet. */
-  const gebruikt = new Set();
-  for (const s of stuk) for (const x of s.rijen) if (x.soort === 'tab') gebruikt.add(x.sleutel);
-  const los = Object.keys(reg.TABS).filter((t) => !gebruikt.has(t));
+  /* WAT ER NIET IN EEN WERELD HANGT MAAR WEL BESTAAT. Zonder deze lijst leest
+     het document als "dit is alles", en dat is het niet.
+
+     DEZE SECTIE KEEK ALLEEN NAAR TABS, en dat verborg drie onderdelen. Berichten
+     (`link:berichten`), Bellen (`os:bellen`) en Videobellen (`os:videobellen`)
+     stonden in de registry maar in geen enkele map, en werden hier nooit
+     gemeld -- de meting kon het gat dat zij vormden per definitie niet zien.
+     Nu lopen alle drie de soorten langs dezelfde vraag: noemt een MAP je?
+
+     EEN MAP EN NIET EEN WERELD, met opzet. `map-instellingen` draagt geen
+     `wereld` (RTG Core, het bedieningspaneel in de voet) maar geeft zijn vier
+     items wel een vaste plek. Wie alleen op werelden telt, meldt die vier als
+     dakloos terwijl ze dat niet zijn -- en dan gaat deze regel binnen een week
+     uit. */
+  const inMap = new Set();
+  for (const m of reg.MAPPEN) for (const it of (m.items || [])) inMap.add(it);
+  /* CORE IS EEN BESLUIT EN GEEN RESTPOST. Deze twee horen nergens onder te
+     hangen en dat staat hieronder uitgeschreven; al het andere dat hier belandt
+     is een gat en hoort ook zo te lezen. De lijst staat hier en niet in de
+     bundel: het is een uitspraak van dit document over de code, en de code hoeft
+     niet te weten dat er een lijst over hem bestaat. */
+  const CORE = { 'tab:home': 'het beginscherm van de ledenapp zelf', 'tab:ai': 'Rahul, die met de mens meereist' };
+  const daklozen = [];
+  for (const k of Object.keys(reg.LINKS)) if (!inMap.has('link:' + k)) daklozen.push('link:' + k);
+  for (const k of Object.keys(reg.OSAPPS)) if (!inMap.has('os:' + k)) daklozen.push('os:' + k);
+  for (const k of Object.keys(reg.TABS)) if (!inMap.has('tab:' + k)) daklozen.push('tab:' + k);
+  const kern = daklozen.filter((i) => CORE[i]);
+  const gat = daklozen.filter((i) => !CORE[i]);
+  const toon = (i) => {
+    const l = reg.los(i);
+    return '`' + i + '`' + (l && l.naam ? ' (' + l.naam + ')' : '');
+  };
   r.push('## Wat er buiten de werelden valt');
   r.push('');
-  if (los.length) {
-    r.push('Deze standen van de ledenapp staan in geen enkele wereld: ' +
-      los.map((t) => '`tab:' + t + '` (' + reg.TABS[t] + ')').join(', ') + '.');
+  if (kern.length) {
+    r.push('Deze onderdelen hangen met opzet in geen enkele wereld:');
     r.push('');
-    r.push('Dat hoeft geen fout te zijn. `tab:home` ís het beginscherm van de');
-    r.push('ledenapp en hoort nergens onder te hangen, en `tab:ai` is Rahul ' + STREEP + ' die is');
-    r.push('RTG Core en reist met de mens mee in plaats van in één wereld te wonen');
-    r.push('(`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te staan: een');
-    r.push('tab die nergens in hangt is voor een lid alleen via de tabbalk te vinden,');
-    r.push('en het verschil tussen "met opzet overal" en "per ongeluk nergens" is van');
-    r.push('buiten niet te zien.');
+    for (const i of kern) r.push('- ' + toon(i) + ' ' + STREEP + ' ' + CORE[i] + '.');
+    r.push('');
+    r.push('Dat is RTG Core: een laag die overal geldt is geen tegel op een');
+    r.push('beginscherm (`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te');
+    r.push('staan, want het verschil tussen "met opzet overal" en "per ongeluk');
+    r.push('nergens" is van buiten niet te zien.');
+    r.push('');
+  }
+  if (gat.length) {
+    r.push('**Deze onderdelen hebben geen plek en dat is een gat.** Ze bestaan in de');
+    r.push('registry, maar geen enkele map noemt ze ' + STREEP + ' een lid vindt ze alleen als');
+    r.push('hij het pad al kent:');
+    r.push('');
+    for (const i of gat) r.push('- ' + toon(i));
+    r.push('');
+    r.push('Geef ze een map, of haal ze weg. Een derde uitkomst is er niet.');
   } else {
-    r.push('Elke stand van de ledenapp hangt in een wereld.');
+    r.push('Er is geen onderdeel zonder plek: alles wat de registry kent, wordt door');
+    r.push('een map genoemd.');
   }
   r.push('');
   return r.join('\n') + '\n';

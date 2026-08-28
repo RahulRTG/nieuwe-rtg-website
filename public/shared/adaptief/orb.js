@@ -133,11 +133,15 @@
     if (!m || m._orb) return;
     m._orb = 1;
     var klok = null, ging = false;
-    m.addEventListener('pointerdown', function () {
+    m.addEventListener('pointerdown', function (e) {
       ging = false;
+      /* Houd de aanwijzer aan de orb vast. Tijdens het inschuiven van rail en
+         dock kan de knop een paar pixels verplaatsen; zonder capture levert de
+         browser dan pointerleave en wordt een echte lange druk geannuleerd. */
+      try { m.setPointerCapture(e.pointerId); } catch (fout) {}
       klok = w.setTimeout(function () { klok = null; ging = open(); }, LANG);
     });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (n) {
+    ['pointerup', 'pointercancel'].forEach(function (n) {
       m.addEventListener(n, function () { if (klok) { w.clearTimeout(klok); klok = null; } });
     });
     m.addEventListener('click', function (e) {

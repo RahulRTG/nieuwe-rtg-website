@@ -20,6 +20,7 @@
     schil.apps = (opties.apps || []).slice();
     schil.dockApps = (opties.dock || []).slice();
     w.addEventListener('resize', schik);
+    w.addEventListener('rtg-edge-layout', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {

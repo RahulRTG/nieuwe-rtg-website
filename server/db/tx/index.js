@@ -12,7 +12,11 @@
    zichtbaar via de index.
 
    Het Postgres-grootboek (RAM-venster + gepagineerde historie) staat in ./ledger;
-   hier de index en de gemaksnamen waar de app mee leest/schrijft. */
+   hier de index zelf. De gemaksnamen waar de app mee leest en schrijft -- welke
+   collecties er zijn en wat hun grens is -- staan in ./namen.js: dit bestand
+   ging met de vijfde collectie over de 10 kB-grens van de keuring, en dat is de
+   naad waarop het rustig kan. Hier staat HOE de index werkt, daar WELKE namen
+   dit huis erdoorheen stuurt. */
 const fs = require('fs');
 const path = require('path');
 const state = require('../state');
@@ -31,14 +35,15 @@ function wire(saveFn) { ledger.wire({ txStaartNa, txVerwijder, save: saveFn }); 
    allebei customerKey. Een directe betaling draagt `key`, en dan wijst de ene
    kopie een klant aan waar de andere er geen ziet: de RAM-index vindt de
    betaling wel en het grootboek niet, of andersom. */
-const { NAMEN, klantVan: txKlantVan } = require('./collecties');
+const { NAMEN, klantVan: txKlantVan, sleutelVan: txSleutelVan } = require('./collecties');
 const txStaat = Object.fromEntries(NAMEN.map(n => [n, null]));
 function txBouw(naam) {
   const arr = db.data[naam] || [];
   const st = { arr, len: arr.length, byRef: new Map(), byKlant: new Map(), byZaak: new Map() };
   for (const t of arr) {
     if (!t) continue;
-    if (t.ref != null && !st.byRef.has(t.ref)) st.byRef.set(t.ref, t); // .find-semantiek: de eerste (nieuwste) wint
+    const s0 = txSleutelVan(naam, t);
+    if (s0 != null && !st.byRef.has(s0)) st.byRef.set(s0, t); // .find-semantiek: de eerste (nieuwste) wint
     const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); l.push(t); }
     const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); l.push(t); }
   }
@@ -53,11 +58,29 @@ function txZorg(naam) {
 // Nieuw ticket vooraan (nieuwste eerst), incrementeel in de index. Met
 // achteraan:true blijft de oude push-volgorde van die ene kassaroute intact.
 function txVoegToe(naam, t, opties) {
+  /* EERST ZORGEN DAT DE COLLECTIE BESTAAT, en dat is geen overbodige regel.
+
+     txBouw begint met `db.data[naam] || []`. Bestaat de collectie nog niet --
+     een VERSE database, of een stand waarin nog nooit iets van dit soort is
+     gemaakt -- dan is die `[]` een LOSSE array die nergens aan hangt. Het item
+     wordt er netjes in gezet, txVoegToe geeft geen fout, en bij de volgende
+     lezing ziet txZorg dat `st.arr !== db.data[naam]` en bouwt hij opnieuw op
+     de echte (nog steeds afwezige) collectie. Het item is dan weg. Gemeten:
+     zonder deze regel is `db.data.payBoekingen` na een toevoeging nog steeds
+     `undefined`.
+
+     Elke bestaande aanroeper ontliep dat toevallig -- directpay heeft een eigen
+     ensure(), pay heeft grootboek(), en orders en boekingen bestaan al door de
+     seed. Toevallig is geen bescherming: de volgende collectie die erbij komt
+     heeft dat toeval niet, en de fout maakt geen enkel geluid. Repareer de
+     oorzaak, niet het symptoom (LAT.md regel 1). */
+  if (!Array.isArray(db.data[naam])) db.data[naam] = [];
   const st = txZorg(naam);
   const achteraan = !!(opties && opties.achteraan);
   if (achteraan) st.arr.push(t); else st.arr.unshift(t);
   st.len++;
-  if (t.ref != null && (achteraan ? !st.byRef.has(t.ref) : true)) st.byRef.set(t.ref, t);
+  const sl = txSleutelVan(naam, t);
+  if (sl != null && (achteraan ? !st.byRef.has(sl) : true)) st.byRef.set(sl, t);
   const k = txKlantVan(naam, t); if (k != null) { let l = st.byKlant.get(k); if (!l) st.byKlant.set(k, l = []); if (achteraan) l.push(t); else l.unshift(t); }
   const z = t.supplierCode; if (z != null) { let l = st.byZaak.get(z); if (!l) st.byZaak.set(z, l = []); if (achteraan) l.push(t); else l.unshift(t); }
   // Nieuw item ook meteen (best-effort) naar het grootboek als dat actief is;
@@ -116,54 +139,15 @@ function txVerwijder(naam, items) {
 const txMetRef = (naam, ref) => txZorg(naam).byRef.get(ref);
 const txVanKlant = (naam, key) => txZorg(naam).byKlant.get(key) || [];
 const txVanZaak = (naam, code) => txZorg(naam).byZaak.get(code) || [];
-// De gemaksnamen waar de routes en kern-modules mee lezen/schrijven.
-const orderMetRef = ref => txMetRef('orders', ref);
-const ordersVanKlant = key => txVanKlant('orders', key);
-const ordersVanZaak = code => txVanZaak('orders', code);
-const ordersVoegToe = (o, opties) => txVoegToe('orders', o, opties);
-const boekingMetRef = ref => txMetRef('boekingen', ref);
-const boekingenVanKlant = key => txVanKlant('boekingen', key);
-const boekingenVanZaak = code => txVanZaak('boekingen', code);
-// De grens op de levende boekingen-collectie. Instelbaar zoals TX_RAM_* en
-// TX_KAP; de standaard blijft 50000. Wat erbuiten valt gaat naar het archief
-// (zie bewaarStaart), of naar het grootboek als dat actief is.
-const BOEK_CAP = Math.max(1, Number(process.env.TX_BOEKINGEN_CAP || 50000));
-const boekingenVoegToe = b => txVoegToe('boekingen', b, { cap: BOEK_CAP });
-
-/* ---- de twee geldcollecties, sinds vandaag langs dezelfde weg ----
-
-   directBetalingen en betaalVerzoeken werden bijgehouden met
-   `db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N);`. Drie dingen
-   gingen daar mis, en het derde is het ergste:
-
-   1. De slice maakte bij ELKE betaling een kopie van de hele array (tot 200.000
-      items). Dat is werk in het warme pad van een betaalverzoek.
-   2. Zoeken ging met .find() over diezelfde array: O(N) per aanvraag.
-   3. En wat er buiten de grens viel, verdween. Geen regel in de log, geen kopie.
-      Dat is boeking 50.001 nog een keer, nu met betalingen.
-
-   Via txVoegToe krijgen ze de index (O(1) op ref/klant/zaak), gaat de staart bij
-   een actief grootboek daarheen, en gaat hij ANDERS eerst naar het archief --
-   kappen zonder bewaren gebeurt niet meer. */
-const DP_CAP = Math.max(1, Number(process.env.TX_DIRECTBETALINGEN_CAP || 200000));
-const BV_CAP = Math.max(1, Number(process.env.TX_BETAALVERZOEKEN_CAP || 100000));
-const directBetalingMetRef = ref => txMetRef('directBetalingen', ref);
-const directBetalingenVanKlant = key => txVanKlant('directBetalingen', key);
-const directBetalingenVanZaak = code => txVanZaak('directBetalingen', code);
-const directBetalingenVoegToe = b => txVoegToe('directBetalingen', b, { cap: DP_CAP });
-const betaalVerzoekMetRef = ref => txMetRef('betaalVerzoeken', ref);
-// op codenaam, in kleine letters -- zie de reden bij COLLECTIES in ./ledger.js
-const betaalVerzoekenVoorCodenaam = naam => txVanKlant('betaalVerzoeken', String(naam || '').toLowerCase());
-const betaalVerzoekenVanZaak = code => txVanZaak('betaalVerzoeken', code);
-const betaalVerzoekenVoegToe = v => txVoegToe('betaalVerzoeken', v, { cap: BV_CAP });
+/* De gemaksnamen per collectie (welke naam, welke grens) staan in ./namen.js.
+   Hierboven staat HOE de index werkt; daar staat WELKE collecties dit huis
+   erdoorheen stuurt -- de kant die verandert als er een collectie bij komt. */
+const namen = require('./namen')({ txMetRef, txVanKlant, txVanZaak, txVoegToe });
 
 module.exports = {
   wire, initLedger: ledger.initLedger, initLedgerSqlite: ledger.initLedgerSqlite,
   afrondLedger: ledger.afrondLedger, vensterTopUp: ledger.vensterTopUp,
-  orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
-  boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
-  betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe,
+  ...namen,
   txStaartNa, txVerwijder,
   txLedgerActief: ledger.txLedgerActief, txLedgerVanKlant: ledger.txLedgerVanKlant,
   txLedgerVanZaak: ledger.txLedgerVanZaak, txLedgerTel: ledger.txLedgerTel,

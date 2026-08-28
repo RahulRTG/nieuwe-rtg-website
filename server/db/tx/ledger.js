@@ -17,12 +17,15 @@
    items neemt de veegronde mee via de hete kop. Zonder achterkant is dit inert.
    Afgesplitst uit tx/index.js; het RAM-venster (txStaartNa/txVerwijder) en save()
    komen via wire() binnen. */
-const kluis = require('../../kluis');
 const state = require('../state');
 const db = state.db;
 
 // welke collecties er zijn en hoe ze eruitzien: ./collecties (een plek)
-const { COLLECTIES, NAMEN, TX_SOORT, klantVan } = require('./collecties');
+const { COLLECTIES, NAMEN, TX_SOORT, sleutelVan } = require('./collecties');
+/* Hoe een item een grootboekrij wordt (en terug): ./rij. Daar staat ook waarom
+   het tijdstip genormaliseerd wordt -- zonder dat komt payBoekingen in
+   Postgres-stand nergens, en zonder enige melding. */
+const { txDedup, tijdstipVan, rijVan, lees } = require('./rij');
 
 // het RAM-venster + de snapshot-trigger komen uit tx/index (injectie voorkomt
 // een circulaire require: index gebruikt onze zet(), wij gebruiken hun venster)
@@ -38,28 +41,20 @@ let txVeegTimer = null, txVeegBezig = false;
 function txLedgerActief() { return !!achter; }
 // de WAL van het grootboek platslaan voor een backup; zonder achterkant inert
 function checkpointGrootboek() { try { return !!(achter && achter.checkpoint && achter.checkpoint()); } catch (e) { return false; } }
-const txDedup = items => { const gezien = new Set(); const uit = []; for (const t of items) { if (!t || t.ref == null || gezien.has(t.ref)) continue; gezien.add(t.ref); uit.push(t); } return uit; };
-// Een ticket naar een grootboekrij. Hier gebeurt het versleutelen, precies een keer.
-const rijVan = (naam, t) => ({
-  soort: TX_SOORT[naam], ref: String(t.ref), klant: klantVan(naam, t) || null, zaak: t.supplierCode || null,
-  paid: !!t.paid, status: t.status || null, totaal: Number(COLLECTIES[naam].totaal(t)) || 0,
-  at: t.at || new Date().toISOString(), data: kluis.versleutel(JSON.stringify(t))
-});
-const lees = rijen => rijen.map(d => JSON.parse(kluis.ontsleutel(d)));
 
 async function txLedgerZet(naam, t) {
-  if (!achter || !t || t.ref == null) return;
+  if (!achter || !t || sleutelVan(naam, t) == null) return;
   try {
     await achter.upsert([rijVan(naam, t)]);
-    txBekend[naam].add(t.ref);
+    txBekend[naam].add(sleutelVan(naam, t));
   } catch (e) { /* eventueel-consistent: de veegronde (backfill/kop) probeert het opnieuw */ }
 }
 async function txLedgerBulk(naam, items) {
   if (!achter) return false;
-  const schoonItems = txDedup(items);
+  const schoonItems = txDedup(naam, items);
   if (!schoonItems.length) return true;
   await achter.upsert(schoonItems.map(t => rijVan(naam, t)));
-  for (const t of schoonItems) txBekend[naam].add(t.ref);
+  for (const t of schoonItems) txBekend[naam].add(sleutelVan(naam, t));
   return true;
 }
 // Gepagineerde lezers: geindexeerd op (soort, klant/zaak, at), nooit een scan.
@@ -100,11 +95,11 @@ async function txVeegNu() {
   try {
     for (const naam of NAMEN) {
       const arr = db.data[naam] || [];
-      const onbekend = arr.filter(t => t && t.ref != null && !txBekend[naam].has(t.ref)).slice(0, TX_KAP);
+      const onbekend = arr.filter(t => t && sleutelVan(naam, t) != null && !txBekend[naam].has(sleutelVan(naam, t))).slice(0, TX_KAP);
       if (onbekend.length) await txLedgerBulk(naam, onbekend);
       if (arr.length) await txLedgerBulk(naam, arr.slice(0, TX_KOP));
       if (arr.length > COLLECTIES[naam].ramMax) {
-        const staart = venster.txStaartNa(naam, COLLECTIES[naam].ramMax).slice(-TX_KAP).filter(t => t && t.ref != null);
+        const staart = venster.txStaartNa(naam, COLLECTIES[naam].ramMax).slice(-TX_KAP).filter(t => t && sleutelVan(naam, t) != null);
         if (staart.length) {
           await txLedgerBulk(naam, staart);   // eerst duurzaam in het grootboek...
           venster.txVerwijder(naam, staart);  // ...dan pas uit het venster
@@ -137,27 +132,14 @@ const initLedgerSqlite = (opslag, log) => start(require('./sqliteachter')(opslag
 // Netjes afronden bij het afsluiten (alleen de SQLite-achterkant heeft werk).
 function afrondLedger() { if (achter && achter.afronden) achter.afronden(); }
 
-// Venster-top-up uit het grootboek: items die al als rij in het grootboek staan
-// maar nog niet in de blob, komen hier terug in het venster.
-async function vensterTopUp(log) {
-  const warn = m => { if (log && log.warn) log.warn(m); };
-  if (!achter || !db.data) return;
-  for (const naam of NAMEN) {
-    try {
-      const rijen = await achter.recent(TX_SOORT[naam], 500);
-      const arr = Array.isArray(db.data[naam]) ? db.data[naam] : (db.data[naam] = []);
-      const bekend = new Set(arr.map(t => t && t.ref).filter(x => x != null));
-      const missend = [];
-      for (const t of lees(rijen)) if (!bekend.has(t.ref)) missend.push(t);
-      if (missend.length) {
-        missend.sort((a, b) => String(b.at || '').localeCompare(String(a.at || ''))); // nieuwste eerst, zoals unshift
-        db.data[naam] = missend.concat(arr);
-        console.log('[tx] ' + missend.length + ' ' + naam + ' uit het grootboek teruggezet in het venster (kv liep achter).');
-      }
-    } catch (e) { warn('[db] venster-top-up ' + naam + ' mislukt: ' + e.message); }
-  }
-}
-
+/* De omgekeerde beweging van de veegronde hierboven: bij het OPSTARTEN het
+   venster aanvullen met wat al als rij in het grootboek staat maar niet meer in
+   de blob. Staat in ./topup.js, met de reden erbij waarom het geen enkele
+   bladzijde van vijfhonderd meer is. De achterkant gaat als FUNCTIE mee: hij
+   wordt pas gezet als het grootboek start. */
+const vensterTopUp = require('./topup')({
+  db, achter: () => achter, COLLECTIES, NAMEN, TX_SOORT, sleutelVan, lees
+});
 module.exports = { checkpointGrootboek,
   /* Welke collecties een rij-voor-rij grootboek achter zich hebben. Dit is de
      ENIGE plek waar dat staat; de opslaglaag leidt er zijn afsluit-volgorde uit
@@ -165,6 +147,7 @@ module.exports = { checkpointGrootboek,
      de twee vroeg of laat uit elkaar -- en dat is precies hoe de uitstelregel
      ooit collecties is gaan dekken die er nooit in stonden. */
   TX_SOORT, COLLECTIES,
+  tijdstipVan,   // doorgegeven uit ./rij om hem te kunnen toetsen
   wire, actief: txLedgerActief, zet: txLedgerZet,
   txLedgerActief, txLedgerVanKlant, txLedgerVanZaak, txLedgerTel, txLedgerAantal, txVeegNu,
   initLedger, initLedgerSqlite, afrondLedger, vensterTopUp

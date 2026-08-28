@@ -34,7 +34,7 @@
    ========================================================================== */
 'use strict';
 
-const GELDWEGEN = /^\/api\/(pay|bank|pakket|podium|directpay|betaal|munt|supplier\/(kassa|betaalverzoek))\b/;
+const GELDWEGEN = /^\/api\/(pay|bank|pakket|podium|directpay|betaal|munt|supplier\/(kassa|betaalverzoek|giftcard))\b/;
 const GEEN_GELD = new Set(['/api/pay/kascode', '/api/pay/tikcode']);
 
 /* De vraag die poortwachters.js stelt: moet de dubbeltik dit pad overslaan? */

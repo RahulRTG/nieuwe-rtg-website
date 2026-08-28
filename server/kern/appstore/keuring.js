@@ -57,15 +57,34 @@ function zoekRegels(inhoud, patronen, bestand, uit) {
    padvorm is al door ./bundel.js gecontroleerd voordat het hier komt.
 
    Geeft { door, bevindingen, maten }. `door` betekent: door naar een MENS. */
-function keur({ bestanden, manifest, antivirus }) {
+/* `eisScan` staat op de server op true en hoort daar nooit anders te staan: een
+   controle die ontbreekt is geen stilzwijgend "ja", dus dan gaat de poort dicht.
+
+   Hij bestaat voor EEN andere plek, en dat is `rtg check` op de machine van een
+   ontwikkelaar. Daar draait geen virusscanner, en zou hij dwingend blijven dan
+   keurt de CLI elke bundel af om een reden die de bouwer niet kan oplossen --
+   een gereedschap dat altijd rood is, leert niemand iets.
+
+   Wat er dan gebeurt is NIET "de scan overslaan en doen alsof". De uitslag
+   krijgt een derde stand: `scan` wordt 'niet-uitgevoerd', en dat is een
+   eersteklas antwoord naast in orde en storing (BESTUUR.md). Wie die stand
+   negeert en 'door' als goedkeuring leest, leest hem verkeerd -- en de machine
+   keurt sowieso nooit goed (grens 2). */
+function keur({ bestanden, manifest, antivirus, eisScan }) {
   const bevindingen = [];
   const blok = (wat, hoe, bestand) => bevindingen.push({ ernst: 'blokkeert', bestand: bestand || null, regel: null, wat, hoe });
   const let_op = (wat, hoe, bestand) => bevindingen.push({ ernst: 'let-op', bestand: bestand || null, regel: null, wat, hoe });
+  const eist = eisScan !== false;
+  const heeftScanner = !!(antivirus && typeof antivirus.scan === 'function');
 
-  if (!antivirus || typeof antivirus.scan !== 'function') {
+  if (!heeftScanner && eist) {
     blok('de virusscanner draait niet mee',
       'Dit is geen fout van jouw inzending. De poort gaat dicht wanneer een controle ontbreekt; probeer het later opnieuw.');
-    return { door: false, bevindingen, maten: null };
+    return { door: false, scan: 'niet-uitgevoerd', bevindingen, maten: null };
+  }
+  if (!heeftScanner) {
+    let_op('de virusscan is hier niet uitgevoerd',
+      'Deze controle draait alleen op de server van RTG. Wat je hier ziet is de VORM van je bundel; de scan gebeurt bij het inzenden.');
   }
   if (!bestanden.length) {
     blok('een lege bundel', 'Stuur ten minste je startbestand mee.');
@@ -97,7 +116,7 @@ function keur({ bestanden, manifest, antivirus }) {
        uitvoerbaar bestand met een .png-naam wordt hier gepakt en niet door de
        vormregels hierboven. Voor de tekstsoorten gaat er een filter overheen;
        zie scanBundel() hieronder voor wat er wordt overgeslagen en waarom. */
-    const av = scanBundel(antivirus, b.buf, b.pad, e);
+    const av = heeftScanner ? scanBundel(antivirus, b.buf, b.pad, e) : { verdict: 'overgeslagen', redenen: [] };
     if (av.verdict === 'besmet') {
       blok('de virusscanner sloeg aan: ' + av.redenen.join('; '),
         'Deze inzending is geweigerd en gemeld. Controleer de machine waarop je bouwt.', b.pad);
@@ -128,7 +147,7 @@ function keur({ bestanden, manifest, antivirus }) {
   if (manifest.icoon && !paden.has(manifest.icoon)) blok('een icoon dat niet in de bundel zit ("' + manifest.icoon + '")', 'Zet het erbij, of laat "icoon" leeg.');
 
   const blokkeert = bevindingen.filter(b => b.ernst === 'blokkeert');
-  return { door: blokkeert.length === 0, bevindingen, maten };
+  return { door: blokkeert.length === 0, scan: heeftScanner ? 'uitgevoerd' : 'niet-uitgevoerd', bevindingen, maten };
 }
 
 module.exports = { keur, BUDGET, TOEGESTAAN, TEKSTSOORT };

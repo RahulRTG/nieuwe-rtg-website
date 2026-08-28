@@ -119,13 +119,62 @@ function testTekstVan(boom) {
   return uit.join('\n');
 }
 
-/* De beoordeling apart van git en van de bestanden, zodat hij met verzonnen
-   invoer te ijken is in plaats van met de toevallige stand van de repo. */
-function nieuwZonderToets(nu, basis, testTekst) {
+/* HET JOURNAAL: WAT DE SUITE ECHT HEEFT AANGEROEPEN.
+
+   De tekstzeef hierboven is een benadering en dat staat woordelijk in de kop van
+   ./lib/routedekking.js. Voor een POORT is dat de verkeerde soort onzekerheid:
+   hij zit er naar de kant naast waar hij TE VAAK zakt, en een poort die je
+   regelmatig moet omzeilen houdt op een poort te zijn.
+
+   Er ligt al een betere bron. De servers in de testrun schrijven zelf op welk
+   routepatroon ze hebben bediend (server/routelog.js), en in CI staat die stap
+   VOOR deze -- het journaal is er dus al als deze keuring draait. Wat daarin
+   staat is aangeroepen; dat is geen zoektocht maar een waarneming.
+
+   Regels zijn `METHODE patroon`, ontdubbeld. SCHERM-regels zijn geen endpoint
+   en vallen af. */
+function gezienIn(journaalTekst) {
+  const uit = new Set();
+  for (const regel of String(journaalTekst || '').split('\n')) {
+    const sp = regel.indexOf(' ');
+    if (sp < 1) continue;
+    if (regel.slice(0, sp) === 'SCHERM') continue;
+    const pad = regel.slice(sp + 1).trim();
+    if (pad.startsWith('/api/')) uit.add(pad);
+  }
+  return uit;
+}
+
+/* DE BEOORDELING, apart van git en van de bestanden, zodat hij met verzonnen
+   invoer te ijken is in plaats van met de toevallige stand van de repo.
+
+   Drie uitkomsten, en alleen de eerste laat CI zakken:
+
+     kaal          nieuw, nergens aangeroepen en in geen enkele toets te vinden.
+     alleenTekst   nieuw, het pad staat in een toets maar de suite heeft hem
+                   nooit aangeroepen. Dat kan kloppen (alleen een e2e raakt hem,
+                   en die draait later) en het kan een dode verwijzing zijn. Het
+                   is te weinig om op te zakken en te veel om te verzwijgen.
+     waargenomen   nieuw en echt aangeroepen. Klaar.
+
+   Zonder journaal valt hij terug op de tekstzeef alleen -- dan is `alleenTekst`
+   leeg en gedraagt hij zich als voorheen. */
+function weegNieuwe(nu, basis, testTekst, gezien) {
   const bekend = new Set(basis);
-  return nu.filter(r => r.startsWith('/api/'))
-    .filter(r => !bekend.has(r))
-    .filter(r => !gedektIn(r, testTekst));
+  const nieuw = nu.filter(r => r.startsWith('/api/')).filter(r => !bekend.has(r));
+  const kaal = [], alleenTekst = [], waargenomen = [];
+  for (const r of nieuw) {
+    if (gezien && gezien.has(r)) { waargenomen.push(r); continue; }
+    if (!gedektIn(r, testTekst)) { kaal.push(r); continue; }
+    if (gezien) alleenTekst.push(r);   // zonder journaal is dit geen aparte stand
+    else waargenomen.push(r);
+  }
+  return { nieuw, kaal, alleenTekst, waargenomen };
+}
+
+// de oude vorm, voor wie alleen de lijst wil die CI laat zakken
+function nieuwZonderToets(nu, basis, testTekst, gezien) {
+  return weegNieuwe(nu, basis, testTekst, gezien).kaal;
 }
 
 function main() {
@@ -149,11 +198,31 @@ function main() {
     const nu = routesVan(WORTEL);
     const basis = routesVan(boom);
     const testTekst = testTekstVan(WORTEL);
-    const nieuw = nu.filter(r => r.startsWith('/api/')).filter(r => !new Set(basis).has(r));
-    const kaal = nieuwZonderToets(nu, basis, testTekst);
+    const j = process.argv.indexOf('--journaal');
+    let gezien = null;
+    if (j > -1) {
+      try { gezien = gezienIn(fs.readFileSync(process.argv[j + 1], 'utf8')); }
+      catch (e) {
+        /* Een opgegeven journaal dat er niet is, is geen reden om stil terug te
+           vallen op de zwakkere zeef: dan denkt CI dat hij waarneemt terwijl hij
+           raadt. LAT.md regel 10. */
+        console.error('\n  ' + K.rood + 'Het journaal ' + process.argv[j + 1] + ' is niet te lezen.' + K.reset +
+          '\n  Zonder journaal zou deze poort terugvallen op een tekstzoektocht zonder dat te zeggen.\n');
+        return 1;
+      }
+    }
+    const { nieuw, kaal, alleenTekst, waargenomen } = weegNieuwe(nu, basis, testTekst, gezien);
 
     console.log('\n  ' + nu.length + ' routes hier, ' + basis.length + ' op ' + ref +
       ' -- ' + nieuw.length + ' nieuw' + K.grijs + ' (' + (nieuw.length - kaal.length) + ' met een toets)' + K.reset);
+    if (gezien) console.log('  ' + K.grijs + 'journaal: ' + gezien.size + ' endpoints echt aangeroepen; ' +
+      waargenomen.length + ' van de nieuwe daarvan' + K.reset);
+    if (alleenTekst.length) {
+      console.log('\n  ' + alleenTekst.length + ' nieuwe route(s) staan WEL in een toets maar zijn er nooit door aangeroepen:');
+      for (const r of alleenTekst.slice(0, 10)) console.log('    ' + r);
+      console.log('  ' + K.grijs + 'Dat kan kloppen (alleen een e2e raakt hem, en die draait later in de keten),\n' +
+        '  en het kan een dode verwijzing zijn. Te weinig om op te zakken, te veel om te verzwijgen.' + K.reset);
+    }
     if (kaal.length) {
       console.error('\n  ' + K.rood + 'NIEUWE ROUTES ZONDER TOETS.' + K.reset + '\n');
       for (const r of kaal) console.error('    ' + r);
@@ -173,5 +242,5 @@ function main() {
   }
 }
 
-module.exports = { nieuwZonderToets };
+module.exports = { nieuwZonderToets, weegNieuwe, gezienIn };
 if (require.main === module) process.exit(main());

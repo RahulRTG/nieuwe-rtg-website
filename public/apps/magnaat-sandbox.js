@@ -1,5 +1,5 @@
 /* Alleen actief in de expliciete Magnaat-trainingskopie van de echte RTG-app.
-   De schermen en lokale demo-interacties blijven echt; verkeer naar API's en
+   De schermen en lokale testinteracties blijven echt; verkeer naar API's en
    toegang tot apparaatfuncties worden vóór de overige app-code afgevangen. */
 (function () {
   'use strict';
@@ -7,6 +7,39 @@
   if (!proef) return;
 
   window.RTG_MAGNAAT_PROEF = true;
+  window.RTG_MAGNAAT_URL = function (url) {
+    try {
+      var doel = new URL(url, location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return url;
+      doel.searchParams.set('magnaat', '1');
+      return doel.pathname + doel.search + doel.hash;
+    } catch (e) { return url; }
+  };
+
+  /* De testgrens moet ook zichtbaar blijven in geneste schermen en losse
+     functies. Een klein vast keurmerk voorkomt dat iemand een testhandeling
+     voor productie aanziet, zonder de eigen OS-vormgeving te overstemmen. */
+  (function plaatsKeurmerk() {
+    var stijl = document.createElement('style');
+    stijl.textContent =
+      '#rtgMagnaatTestMark{position:fixed;z-index:2147483647;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));' +
+      'display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(207,165,92,.55);border-radius:0;' +
+      'background:rgba(21,5,10,.94);box-shadow:0 10px 34px rgba(0,0,0,.3);color:#f5e8c8;font:700 10px/1.1 system-ui,sans-serif;' +
+      'letter-spacing:.16em;text-transform:uppercase;pointer-events:none;backdrop-filter:blur(14px)}' +
+      '#rtgMagnaatTestMark:before{content:"";width:6px;height:6px;border-radius:50%;background:#d8aa59;box-shadow:0 0 10px rgba(216,170,89,.75)}';
+    (document.head || document.documentElement).appendChild(stijl);
+    function teken() {
+      if (!document.body || document.getElementById('rtgMagnaatTestMark')) return;
+      var merk = document.createElement('div');
+      merk.id = 'rtgMagnaatTestMark';
+      merk.setAttribute('role', 'status');
+      merk.setAttribute('aria-label', 'Magnaat Test. Geen productieomgeving.');
+      merk.textContent = 'Magnaat Test';
+      document.body.appendChild(merk);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', teken, { once: true });
+    else teken();
+  })();
 
   /* De trainingskopie deelt wel dezelfde vormgeving en scripts, maar nooit de
      echte browseropslag. Daardoor kan een bestaand scherm vrij lokaal werken

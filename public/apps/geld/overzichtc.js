@@ -20,10 +20,10 @@
   var SOORT = { minimumbuffer: 'Minimumbuffer', maanddrempel: 'Maanddrempel',
     'reserveer-maandelijks': 'Maandelijks reserveren', 'gift-bevestiging': 'Gift-bevestiging' };
 
-  /* Naar centen via Geld.centen (hulp.js), op EEN plek: het eigen regeltje
+  /* Naar centen via Geld.naarCenten (hulp.js), op EEN plek: het eigen regeltje
      dat hier stond las "1.000" als een euro en zette een minimumbuffer dus
      duizend keer te laag, stil, waarna Rahul op die drempel handelde. */
-  function centen(v) { return w.Geld.centen(v); }
+  function naarCenten(v) { return w.Geld.naarCenten(v); }
 
   function kn(attr, txt) { return '<button class="knop" type="button" ' + attr + '>' + txt + '</button>'; }
 
@@ -102,7 +102,7 @@
   }
 
   function regelNieuw() {
-    var soort = $('#ovRSoort').value, niveau = $('#ovRNiveau').value, c = centen($('#ovRDrempel').value);
+    var soort = $('#ovRSoort').value, niveau = $('#ovRNiveau').value, c = naarCenten($('#ovRDrempel').value);
     if (c == null || c < 0) return meld('Bedrag?');
     /* de servergrens alvast in het scherm */
     if (niveau === 'automatisch' && soort !== 'reserveer-maandelijks')
@@ -113,14 +113,14 @@
   }
 
   function potNieuw() {
-    var naam = $('#ovPNaam').value.trim(), doel = centen($('#ovPDoel').value);
+    var naam = $('#ovPNaam').value.trim(), doel = naarCenten($('#ovPDoel').value);
     if (!naam || doel == null || doel <= 0) return meld('Naam en doel?');
     zet(POT + 'zet', { naam: naam, doelCenten: doel });
   }
 
   /* vrijgeven is negatief reserveren: een route, een waarheid */
   function potDoe(b) {
-    var c = centen((b.parentNode.querySelector('input') || {}).value);
+    var c = naarCenten((b.parentNode.querySelector('input') || {}).value);
     if (c == null || c <= 0) return meld('Bedrag?');
     zet(POT + 'reserveer', { id: b.dataset.ovpot, centen: b.dataset.doe === 'vrij' ? -c : c });
   }

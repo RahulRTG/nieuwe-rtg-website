@@ -21,6 +21,7 @@
   let stream = null;                 // eigen camera en microfoon
   let peers = new Map();             // staffId -> { pc, naam, queue, el }
   let kamer = null;                  // 'team' in een groepsgesprek
+  let mee = null;                    // de tekstbaan van het gesprek (shared/meelezen.js)
   let uitgaand = null;               // { naar, naam } zolang 1-op-1 overgaat
   let binnenkomend = null;           // { van, vanNaam } zolang het rinkelt
   let ice = null, timer = null, t0 = 0;
@@ -85,6 +86,17 @@
       const t = stream && stream.getVideoTracks()[0];
       if (t){ t.enabled = !t.enabled; ev.currentTarget.classList.toggle('uit', !t.enabled); }
     });
+    /* MEELEZEN. Een teamcall is beeld en geluid; wie doof is heeft zonder tekst
+       alleen het beeld. De baan hangt onder de knoppenbalk in dezelfde overlay
+       (shared/meelezen.js) -- getypt door mensen, niet uit spraak herkend. */
+    if (w.RTGMeelezen && !mee){
+      mee = w.RTGMeelezen.maak({ ik: (mij() || {}).name || 'Jij', stuur: regel => {
+        if (kamer) zend('tekst', { kamer, payload: { r: regel } });
+        else peers.forEach((p, id) => zend('tekst', { staffId: id, payload: { r: regel } }));
+      } });
+      mee.el.style.cssText += 'padding:0 12px 10px;';
+      el.appendChild(mee.el);
+    }
     // de eigen tegel (gedempt: je hoort jezelf niet)
     const eigen = document.createElement('div');
     eigen.className = 'tc-tegel';
@@ -167,6 +179,35 @@
   }
   function ringWeg(){ const el = document.getElementById('tcRing'); if (el) el.remove(); }
 
+/* TeamCall, deel 1b: DE VORMGEVING van de gespreksoverlay.
+
+   Stond in deel 1, en is er afgeknipt toen dat deel met de tekstbaan erbij over
+   de tienkilobytelat ging. De naad is een echte: dit deel bepaalt hoe het
+   gesprek ERUITZIET, deel 1 hoe het WERKT. De delen worden op naam gesorteerd
+   aan elkaar geplakt binnen dezelfde omhulsel-functie, dus `stijl()` blijft
+   gewoon zichtbaar voor `overlay()` in deel 1. */
+  /* ---------- de gespreks-UI: een raster van tegels ---------- */
+  function stijl(){
+    if (document.getElementById('tcStijl')) return;
+    const s = document.createElement('style');
+    s.id = 'tcStijl';
+    s.textContent = '#tcOverlay{position:fixed;inset:0;z-index:300;background:#0A0A09;display:flex;flex-direction:column;}' +
+      '#tcGrid{flex:1;display:grid;gap:6px;padding:6px;overflow:hidden;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));align-content:center;}' +
+      '.tc-tegel{position:relative;background:#151312;border-radius:0;overflow:hidden;min-height:120px;}' +
+      '.tc-tegel video{width:100%;height:100%;object-fit:cover;display:block;}' +
+      '.tc-tegel .nm{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.55);color:#fff;font:600 0.7rem Inter,sans-serif;padding:0.2rem 0.55rem;border-radius:0;}' +
+      '#tcBalk{display:flex;align-items:center;justify-content:center;gap:0.8rem;padding:0.8rem calc(env(safe-area-inset-bottom,0px) + 0.4rem);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 0.8rem);}' +
+      '#tcBalk button{width:3.2rem;height:3.2rem;border-radius:50%;border:1px solid rgba(255,255,255,0.18);background:#1B1817;color:#fff;font-size:1.15rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}' +
+      '#tcBalk button svg{width:1.4rem;height:1.4rem;}' +
+      '#tcBalk button.uit{background:#7F1634;}#tcBalk #tcWeg{background:#C23A5E;border:none;}' +
+      '#tcKop{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:0;right:0;text-align:center;color:#F4F1EC;font:500 0.85rem Inter,sans-serif;z-index:2;text-shadow:0 1px 6px rgba(0,0,0,0.6);}' +
+      '#tcRing{position:fixed;inset:0;z-index:310;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;padding:2rem;}' +
+      '#tcRing .kaart{background:#151312;border:1px solid rgba(255,255,255,0.12);border-radius:0;padding:1.6rem;max-width:320px;width:100%;text-align:center;color:#F4F1EC;font-family:Inter,sans-serif;}' +
+      '#tcRing .knoppen{display:flex;gap:0.6rem;margin-top:1.1rem;}' +
+      '#tcRing .knoppen button{flex:1;border:none;border-radius:0;padding:0.7rem;font:600 0.85rem Inter,sans-serif;cursor:pointer;}' +
+      '#tcRing .ja{background:#2E7D5B;color:#fff;}#tcRing .nee{background:#C23A5E;color:#fff;}';
+    document.head.appendChild(s);
+  }
   /* ---------- de publieke knoppen ---------- */
   async function bel(staffId, naam){
     if (stream || kamer){ toast(T('tc.bezig', 'Er loopt al een gesprek.')); return; }
@@ -200,8 +241,8 @@
       if (stream || kamer){ zend('decline', { staffId: d.van }); return; }
       binnenkomend = { van: d.van, vanNaam: d.vanNaam };
       if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 200]);
-      const el = ringUI('<div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg></div><b style="display:block;margin-top:0.4rem;">' + esc(d.vanNaam) + '</b>' +
-        '<div style="font-size:0.85rem;opacity:0.7;margin-top:0.3rem;">' + T('tc.belt', 'belt je (video)...') + '</div>' +
+      const el = ringUI('<div style="display:flex;justify-content:center;"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg></div><b style="display:block;margin-top:0.5rem;">' + esc(d.vanNaam) + '</b>' +
+        '<div style="font-size:0.85rem;opacity:0.7;margin-top:0.25rem;">' + T('tc.belt', 'belt je (video)...') + '</div>' +
         '<div class="knoppen"><button class="ja" id="tcJa">' + T('tc.aan', 'Neem aan') + '</button><button class="nee" id="tcNee">' + T('tc.weiger', 'Weiger') + '</button></div>');
       el.querySelector('#tcJa').addEventListener('click', async () => {
         ringWeg();
@@ -251,6 +292,10 @@
       if (!p) return;
       if (p.pc.remoteDescription){ try { await p.pc.addIceCandidate(d.payload); } catch (err) {} }
       else p.queue.push(d.payload);
+      return;
+    }
+    if (d.kind === 'tekst'){
+      if (mee && d.payload && d.payload.r) mee.voed(d.payload.r, { wie: d.vanNaam || d.van, bron: 'mens' });
       return;
     }
     if (d.kind === 'hangup' || d.kind === 'leave'){

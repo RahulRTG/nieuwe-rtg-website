@@ -2,13 +2,13 @@
 
    Alleen de eigenaar (standaard Rahul Imran Ismail, via RTG_OWNER_EMAIL) komt
    erin; hij kan anderen handmatig toegang geven. Het bord toont per subsysteem
-   een groen/oranje/rood bolletje met de code en uitleg, laat zekeringen resetten
-   ("er weer in doen") of met de hand uitschakelen, en heeft een AI die bij een
-   storing een diagnose en herstelstappen geeft. */
+   een bolletje met code en uitleg, laat zekeringen resetten of met de hand
+   uitschakelen, en heeft een AI die bij een storing herstelstappen geeft. */
 const techniek = require('../techniek');
 const functies = require('../functies');
 const eigenaar = require('../eigenaar');
 const inzagelog = require('../inzagelog');
+const envelop = require('../opzet/envelop');
 const { log } = require('../log');
 
 module.exports = (kern) => {
@@ -69,6 +69,8 @@ module.exports = (kern) => {
         { bron: 'user:' + user.id });
       return res.status(403).json({ error: 'Geen toegang tot de technische pagina.' });
     }
+    envelop.zet(req, { soort: 'techniek', id: 'user-' + user.id, identiteit: 'bewezen',
+      gezagBron: isEigenaar(user) ? 'eigenaar' : 'toegekend', gezagBaas: !!isEigenaar(user) });
     req.techUser = user; next();
   }
   function eigenaarAlleen(req, res, next) {

@@ -6,7 +6,7 @@
 (function (w) {
   var S = { base: '/api/foundation', code: '', token: '', mijnId: '', mijnNaam: '', leden: {} };
   var es = null, onChat = null, onBelStatus = null;
-  var call = null, inkomend = null, ingezet = false;
+  var call = null, inkomend = null, ingezet = false, mee = null;   // mee: de tekstbaan (shared/meelezen.js)
 
   function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
   function post(pad, body) {

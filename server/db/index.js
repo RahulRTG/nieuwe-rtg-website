@@ -146,6 +146,7 @@ module.exports = {
   directBetalingenVanZaak: tx.directBetalingenVanZaak, directBetalingenVoegToe: tx.directBetalingenVoegToe,
   betaalVerzoekMetRef: tx.betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam: tx.betaalVerzoekenVoorCodenaam,
   betaalVerzoekenVanZaak: tx.betaalVerzoekenVanZaak, betaalVerzoekenVoegToe: tx.betaalVerzoekenVoegToe,
+  payBoekingMetId: tx.payBoekingMetId, payBoekingenVoegToe: tx.payBoekingenVoegToe,
   txStaartNa: tx.txStaartNa, txVerwijder: tx.txVerwijder,
   txLedgerActief: tx.txLedgerActief, txLedgerVanKlant: tx.txLedgerVanKlant, txLedgerVanZaak: tx.txLedgerVanZaak,
   txLedgerTel: tx.txLedgerTel, txLedgerAantal: tx.txLedgerAantal, txVeegNu: tx.txVeegNu,

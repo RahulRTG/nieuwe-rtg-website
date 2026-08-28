@@ -10,10 +10,16 @@
    opbouwen.
 
    WAT ER NIET MEEGING, en dat is met opzet. pasToe(), boek() en boekAsync()
-   blijven in ./index.js staan. Niet omdat ze daar mooier staan, maar omdat
-   WETTEN.json de wet geld-conservatie daar handhaaft en zijn sabotagerecept
-   letterlijk EEN REGEL uit pasToe() aanwijst, met bestandsnaam. Een wet die
-   naar een verhuisde regel wijst, toetst niets meer.
+   gingen bij deze knip niet mee, omdat WETTEN.json de wet geld-conservatie
+   handhaaft met een sabotagerecept dat letterlijk EEN REGEL uit pasToe()
+   aanwijst, met bestandsnaam. Een wet die naar een verhuisde regel wijst, toetst
+   niets meer.
+
+   Ze staan sinds 24 augustus wel apart, in ./boeken.js -- de schrijvende kant
+   van deze laag tegenover ./kijken.js als de lezende -- en toen zijn de
+   bestandsnaam in WETTEN.json en zijn handhaverlijst meeverhuisd. De regel
+   waar het recept op zit is letterlijk gelijk gebleven; wie hem opnieuw
+   verplaatst, verplaatst ook die twee.
    ========================================================================== */
 'use strict';
 

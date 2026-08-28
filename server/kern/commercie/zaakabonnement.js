@@ -53,11 +53,8 @@ const TERUGVAL = 'business';
 function maakZaakabonnement({ db, save, nu }) {
   const tijd = nu || klok.nu;
 
-  function alles() {
-    if (!db.data) db.data = {};
-    if (!db.data.zaakAbonnement || typeof db.data.zaakAbonnement !== 'object') db.data.zaakAbonnement = {};
-    return db.data.zaakAbonnement;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/zaakabonnement', bezit: { zaakAbonnement: 'kaart' } });
+  function alles() { return eigen.bak('zaakAbonnement'); }
   const sleutel = code => String(code || '').toUpperCase();
 
   /* Het abonnement van een zaak. Geeft ALTIJD een antwoord, met `herkomst`

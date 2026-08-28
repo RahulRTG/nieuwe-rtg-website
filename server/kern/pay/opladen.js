@@ -77,8 +77,27 @@ function maakOpladen(basis) {
     if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Geen geldig bedrag om bij te schrijven.' };
     const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref });
     if (b.error) return b;
+    /* DE TRANSACTIEKOSTEN, op het OPLAADMOMENT. Dat is niet toevallig de plek:
+       WAARDE.md par. 1 zegt het al met zoveel woorden -- transactiekosten
+       verdwijnen niet, ze verhuizen naar het moment dat er geld van buiten
+       binnenkomt, en dat is hier. Wat een lid daarna met zijn saldo doet, kost de
+       betaalpartner niets meer.
+
+       Pas gemeld NA de boeking: een mislukte oplading heeft ons geen
+       transactiekosten gekost, en een teller die vooraf staat, telt precies de
+       gevallen mee die niet gebeurd zijn. */
+    if (typeof meetTransactie === 'function') {
+      try { await meetTransactie({ codenaam, centen: c, ref }); } catch (e) {}
+    }
     return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
   }
+
+  /* De kostprijslaag hangt hier LAAT aan: kern/kosten wordt na kern/pay gebouwd,
+     en pay hoeft niets van de kosten te weten om te bestaan (zelfde draadje als
+     koppelBank hierboven). Zonder koppeling wordt er niets gemeld, en dat is
+     beter dan een oplading die omvalt op een boekhouding. */
+  let meetTransactie = null;
+  function koppelKosten(fn) { meetTransactie = typeof fn === 'function' ? fn : null; }
 
   /* De eigen bank als eerste dekking: is de RTG Bank live en heeft het lid
      daar een betaalrekening met ruimte, dan komt een saldotekort DAAR vandaan
@@ -136,7 +155,7 @@ function maakOpladen(basis) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
 
-  return { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid };
+  return { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid };
 }
 
 module.exports = { maakOpladen };

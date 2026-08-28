@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Gezondheidsmaatje</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -48,6 +48,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -62,8 +63,8 @@
   <div id="paneel"><div class="kaart blok"><div class="leeg">Laden…</div></div></div>
 
   <div class="deel">Samen gezonder</div>
-  <div class="kaart blok" style="padding:1rem 1.1rem;margin-top:.8rem;">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Samen gezonder, in kleine stappen</h2>
+  <div class="kaart blok" style="padding:1rem 1.1rem;margin-top:0.75rem;">
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Samen gezonder, in kleine stappen</h2>
     <div class="chat" id="chat"><div class="b ai">Waar willen jullie mee beginnen: eten, slapen of bewegen? Kleine stappen tellen het hardst.</div></div>
     <div class="rijveld">
       <textarea class="veld" id="vraag" rows="1" placeholder="Vertel wat jullie willen aanpakken..." maxlength="1000"></textarea>
@@ -219,5 +220,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

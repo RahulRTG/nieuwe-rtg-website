@@ -44,4 +44,4 @@
   function renderTkAanbod(){
     const el = $('#tkAanbod'); if (!el) return;
     if (!tkPartners.length){ el.innerHTML = ''; return; }
-    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';
+    let html = '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.5rem;">'+T('tk.kop','Activiteiten, tours en musea')+'</div>';

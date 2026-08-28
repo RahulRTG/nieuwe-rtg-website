@@ -22,6 +22,8 @@
    proces met RTG_DOMAINS zonder supplier draait. */
 'use strict';
 
+const envelop = require('../opzet/envelop');
+
 module.exports = (kern) => {
   const { db, save, crypto, schoon } = kern;
 
@@ -43,6 +45,13 @@ module.exports = (kern) => {
     if (!gevonden) return res.status(401).json({
       error: 'Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.', code: 'sessie-weg' });
     req.gast = gevonden;
+    /* De actor is hier een TAFEL en geen persoon, en dat is juist -- een gast
+       hoeft zich niet te identificeren om te bestellen. De envelop zegt dat
+       met zoveel woorden ('anoniem'), zodat een handeling die wel een persoon
+       eist er verderop iets mee kan in plaats van er per ongeluk een aan te nemen. */
+    envelop.zet(req, { soort: 'tafel', id: gevonden.id || gevonden.sleutel || null,
+      identiteit: 'anoniem',
+      tenantSoort: 'zaak', tenantId: gevonden.code || gevonden.supplierCode || null });
     next();
   }
 

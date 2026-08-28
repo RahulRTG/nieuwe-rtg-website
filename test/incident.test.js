@@ -110,6 +110,20 @@ test('3. de machine sluit niet: hersteld is geen gesloten', () => {
   assert.ok(i.hersteldAt, 'het moment van herstellen staat er niet bij');
   assert.equal(t.inc.tel().wachtOpVerslag, 1);
   assert.equal(t.inc.tel().gesloten, 0);
+
+  /* EN HET JOURNAAL ZEGT DAT DE MACHINE HET DEED, niet een mens. De trede in een
+     journaalregel is het verschil tussen "de gezondheidskaart herstelde dit
+     zelf" en "iemand heeft dit met de hand gedaan" -- precies het onderscheid
+     waar RTG Command op gebouwd is (zie de kop van server/kern/command/risico.js).
+
+     DE VERWACHTE WAARDE STAAT HIER LETTERLIJK en wordt met opzet NIET uit
+     NIVEAUS gelezen: dan zou de toets met de schaal meebewegen en elke waarde
+     goedkeuren. Zo geschreven zakt hij als de trede verandert -- en dat was de
+     bedoeling, want tot deze regel bestond werd de trede nergens beweerd: een
+     tikfout ('assit') kwam ongehinderd in het journaal. */
+  const herstel = t.regels.find(r => r.actie === 'incident hersteld');
+  assert.ok(herstel, 'het herstel staat niet in het journaal');
+  assert.equal(herstel.niveau, 'auto', 'de machine herstelde het, dus het journaal hoort "auto" te zeggen');
 });
 
 test('4. sluiten kan niet terwijl het nog stuk is', () => {
@@ -222,4 +236,9 @@ test('de maatregelen verwijzen en vertellen niet na', () => {
   const d = t.inc.dossier(id);
   assert.equal(d.maatregelen[0].verwijzing, 'run-123', 'de maatregel wijst nergens naar');
   assert.ok(t.regels.some(x => x.actie === 'incident maatregel'));
+  /* De tegenhanger van de regel in toets 3: dit deed een MENS, dus 'hand'. Twee
+     treden die uit elkaar moeten blijven; een schaal die instort tot een waarde
+     zakt hier. */
+  assert.equal(t.regels.find(x => x.actie === 'incident maatregel').niveau, 'hand',
+    'een maatregel van een mens hoort als "hand" in het journaal te staan');
 });

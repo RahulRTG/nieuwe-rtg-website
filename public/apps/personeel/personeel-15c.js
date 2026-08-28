@@ -119,9 +119,9 @@
     document.querySelectorAll('[data-wvcode]').forEach(b => b.addEventListener('click', async () => {
       try {
         const d = await API.call('/werkvloer/koppel/code', { id: b.dataset.wvcode });
-        $('#wvVak').innerHTML = '<div style="margin-top:0.6rem;text-align:center;">' +
+        $('#wvVak').innerHTML = '<div style="margin-top:0.5rem;text-align:center;">' +
           '<div style="font-size:0.8rem;color:var(--muted);">' + esc(d.tonen) + '</div>' +
-          '<div id="wvQr" style="display:flex;justify-content:center;margin:0.6rem 0;"></div>' +
+          '<div id="wvQr" style="display:flex;justify-content:center;margin:0.5rem 0;"></div>' +
           '<b>' + eur(d.bedrag) + '</b></div>';
         /* De RTG-code als beeld: dezelfde tekenaar als de kassa gebruikt.
            Staat die niet klaar, dan tonen we de code als tekst -- de klant

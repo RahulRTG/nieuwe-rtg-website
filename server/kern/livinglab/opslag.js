@@ -1,6 +1,6 @@
 /* RTF Living Lab, deel "opslag": de bak, het schoonmaakwerk en het auditspoor.
-   Elke andere module van deze map krijgt dit als context mee en raakt `db.data`
-   nooit zelf aan -- dan staat de vorm van de opslag op EEN plek.
+   Elke andere module van deze map krijgt dit als context mee en raakt de
+   database nooit zelf aan -- dan staat de vorm van de opslag op EEN plek.
 
    Wat hier bewust NIET in staat: de link tussen een deelnemersalias en een
    Foundation-profiel. Die staat in een eigen collectie (`livingLabKoppel`) en
@@ -24,15 +24,15 @@ module.exports = ({ db, save, crypto }) => {
   const TEKENS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const code = pre => pre + '-' + Array.from(crypto.randomBytes(7)).map(b => TEKENS[b % TEKENS.length]).join('');
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/livinglab/opslag', bezit: { livingLab: 'kaart', livingLabKoppel: 'lijst' } });
   const S = () => {
-    if (!db.data.livingLab) db.data.livingLab = { labs: [], studies: [], themas: [], apparatuur: [], audit: [] };
-    const s = db.data.livingLab;
+    const s = eigen.bak('livingLab');
     for (const k of ['labs', 'studies', 'themas', 'apparatuur', 'audit']) if (!Array.isArray(s[k])) s[k] = [];
     return s;
   };
   // de koppeltabel staat met opzet BUITEN S(): een studie-antwoord kan hem niet
   // per ongeluk meenemen, want hij zit niet in dezelfde boom.
-  const K = () => { if (!Array.isArray(db.data.livingLabKoppel)) db.data.livingLabKoppel = []; return db.data.livingLabKoppel; };
+  const K = () => eigen.bak('livingLabKoppel');
 
   /* ---------- het auditspoor ----------
      Elke handeling die iets vastlegt, tekent, weigert of verwijdert komt hier

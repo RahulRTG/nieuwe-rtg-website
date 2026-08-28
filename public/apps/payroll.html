@@ -70,7 +70,7 @@
   <section id="tabOverzicht">
     <div class="kaart">
       <div class="sec">Wie werkt waar -- met het past-signaal</div>
-      <div class="noot" style="margin-bottom:.5rem;">Omdat RTG de klok en het rooster al kent, ziet het loonkantoor in een blik of het werk past: overbelast, rustig of in balans.</div>
+      <div class="noot" style="margin-bottom:0.5rem;">Omdat RTG de klok en het rooster al kent, ziet het loonkantoor in een blik of het werk past: overbelast, rustig of in balans.</div>
       <div id="mensen"><div class="leeg">Laden...</div></div>
     </div>
   </section>
@@ -89,7 +89,7 @@
   <section id="tabMatch" hidden>
     <div class="kaart">
       <div class="sec">De matchtafel -- vacatures en mensen die bij elkaar passen</div>
-      <div class="noot" style="margin-bottom:.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
+      <div class="noot" style="margin-bottom:0.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
       <div id="matchIn"><div class="leeg">Laden...</div></div>
     </div>
   </section>
@@ -101,8 +101,8 @@
   <section id="tabOs" hidden>
     <div class="kaart">
       <div class="sec">Regelpakketten</div>
-      <div class="noot" style="margin-bottom:.5rem;">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
-      <div class="rij" style="margin-bottom:.5rem;">
+      <div class="noot" style="margin-bottom:0.5rem;">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
+      <div class="rij" style="margin-bottom:0.5rem;">
         <button class="knop" id="osHaal">Nu bijwerken</button>
       </div>
       <div id="osRegels"><div class="leeg">Laden...</div></div>
@@ -110,8 +110,8 @@
 
     <div class="kaart">
       <div class="sec">Looncomponenten</div>
-      <div class="noot" style="margin-bottom:.5rem;">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
-      <div class="rij" style="margin-bottom:.5rem;">
+      <div class="noot" style="margin-bottom:0.5rem;">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
+      <div class="rij" style="margin-bottom:0.5rem;">
         <button class="knop" id="cpLaad">Toon het register</button>
         <button class="knop" id="cpNieuw">Voeg een component toe</button>
       </div>
@@ -120,7 +120,7 @@
 
     <div class="kaart">
       <div class="sec">Contracten</div>
-      <div class="noot" style="margin-bottom:.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
+      <div class="noot" style="margin-bottom:0.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
       <div class="rij">
         <select class="veld" id="ctZaak" style="flex:2;min-width:12rem;"></select>
         <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
@@ -163,8 +163,8 @@
   <section id="tabWereld" hidden>
     <div class="kaart">
       <div class="sec">Dekking per land</div>
-      <div class="noot" style="margin-bottom:.5rem;">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
-      <div class="rij" style="margin-bottom:.5rem;">
+      <div class="noot" style="margin-bottom:0.5rem;">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
+      <div class="rij" style="margin-bottom:0.5rem;">
         <input class="veld" id="wlPeil" style="flex:1;min-width:9rem;" placeholder="peildatum (leeg = vandaag)">
         <button class="knop" id="wlLaad">Toon de wereld</button>
         <button class="knop" id="wlRonde">Nu overal bijwerken</button>
@@ -176,7 +176,7 @@
 
     <div class="kaart">
       <div class="sec">Een bron toevoegen</div>
-      <div class="noot" style="margin-bottom:.5rem;">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
+      <div class="noot" style="margin-bottom:0.5rem;">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
       <div class="rij">
         <input class="veld" id="brLand" style="width:6rem;" placeholder="NL" maxlength="2">
         <input class="veld" id="brNaam" style="flex:1;min-width:9rem;" placeholder="Naam van de bron">
@@ -767,7 +767,7 @@ function toonDossier(d){
   const knop = document.getElementById('dsStappen');
   if (knop) knop.addEventListener('click', () => {
     knop.disabled = true;
-    knop.insertAdjacentHTML('afterend', '<div class="kpi" style="width:100%;margin-top:.4rem;">' +
+    knop.insertAdjacentHTML('afterend', '<div class="kpi" style="width:100%;margin-top:0.5rem;">' +
       a.waarom.stappen.map(s => esc(s.stap) +
         (s.uitleg ? ' · ' + esc(s.uitleg) : '') +
         (s.tarief != null ? ' · tarief ' + esc(s.tarief) : '') +

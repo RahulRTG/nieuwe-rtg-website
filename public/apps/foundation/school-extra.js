@@ -45,10 +45,10 @@
     var g = await gezinApi('/school/bijles/gesprek').catch(function () { return null; });
     if (!g || !g.ok) return '';
     var lijn = (g.beurten || []).slice(-8).map(function (b) {
-      return '<div class="mini" style="margin:.25rem 0;"><b>' + (b.rol === 'user' ? 'Jij' : 'Rahul') + ':</b> ' + esc(b.tekst) + '</div>';
+      return '<div class="mini" style="margin:0.25rem 0;"><b>' + (b.rol === 'user' ? 'Jij' : 'Rahul') + ':</b> ' + esc(b.tekst) + '</div>';
     }).join('') || '<div class="mini">Stel je eerste vraag; Rahul denkt geduldig met je mee, op jouw niveau.</div>';
     return kaart('Rahul Bijles', lijn +
-      '<div style="display:flex;gap:.4rem;margin-top:.5rem;">' +
+      '<div style="display:flex;gap:.4rem;margin-top:0.5rem;">' +
       '<input class="veld h-flex1" id="bijlesIn" placeholder="Wat wil je leren of snap je nog niet?" maxlength="600">' +
       '<button class="knop mini" data-doe="bijles" data-klas="' + esc(kc) + '">Vraag</button></div>');
   }
@@ -64,7 +64,7 @@
           ' <span class="mini">(' + esc(e.status) + ')</span>';
         var kinderen = e.kinderen.map(function (kind) {
           var t = kind.toestemming;
-          var r = '<div class="mini" style="margin:.3rem 0;">' + esc(kind.naam) + ': ' +
+          var r = '<div class="mini" style="margin:0.25rem 0;">' + esc(kind.naam) + ': ' +
             (t && t.akkoord ? 'locatie-delen mag (van ' + esc(t.door) + ')' : 'nog geen toestemming voor locatie-delen');
           if (ouder && e.status !== 'afgerond') {
             r += ' <button class="knop mini" data-doe="toestem" data-klas="' + esc(kc) + '" data-ex="' + esc(e.id) + '" data-kind="' + esc(kind.profielId) + '" data-ja="' + (t && t.akkoord ? '0' : '1') + '">' +
@@ -83,12 +83,12 @@
           : '<div class="mini">Nog niemand heeft naar de kaart gekeken.</div>';
         return kop + kinderen + log +
           '<div class="mini">Locaties bestaan alleen tijdens de excursie en worden bij de stop gewist.</div>';
-      }).join('<div style="border-top:1px solid var(--lijn);margin:.7rem 0;"></div>'));
+      }).join('<div style="border-top:1px solid var(--lijn);margin:0.75rem 0;"></div>'));
     }
     if (bij && bij.bijdragen && bij.bijdragen.length) {
-      uit += kaart('Ouderbijdrage · klas ' + esc(kc), '<div class="mini" style="margin-bottom:.4rem;">' + esc(bij.vrijwillig) + '</div>' +
+      uit += kaart('Ouderbijdrage · klas ' + esc(kc), '<div class="mini" style="margin-bottom:0.5rem;">' + esc(bij.vrijwillig) + '</div>' +
         bij.bijdragen.map(function (b) {
-          return '<div style="margin:.3rem 0;"><b>' + esc(b.titel) + '</b> <span class="mini">EUR ' + b.bedrag.toFixed(2) + '</span> ' +
+          return '<div style="margin:0.25rem 0;"><b>' + esc(b.titel) + '</b> <span class="mini">EUR ' + b.bedrag.toFixed(2) + '</span> ' +
             b.kinderen.map(function (kind) {
               return kind.betaald
                 ? '<span class="mini">' + esc(kind.naam) + ': betaald</span>'
@@ -99,7 +99,7 @@
     }
     if (boom && boom.ok) {
       var alarm = boom.alarm
-        ? '<div style="margin:.3rem 0;"><b>Alarm:</b> ' + esc(boom.alarm.bericht) + '</div>' +
+        ? '<div style="margin:0.25rem 0;"><b>Alarm:</b> ' + esc(boom.alarm.bericht) + '</div>' +
           (boom.alarm.doorgegeven ? '<div class="mini">Jullie hebben doorgegeven dat er gebeld is.</div>'
             : '<button class="knop mini" data-doe="doorgegeven" data-klas="' + esc(kc) + '">Wij hebben gebeld</button>')
         : '<div class="mini">Geen alarm; de boom staat klaar.</div>';
@@ -111,7 +111,7 @@
         : '<div class="mini">Jullie zijn een blad van de boom: niemand meer te bellen.</div>';
       uit += kaart('Telefoonboom · klas ' + esc(kc),
         '<button class="knop mini" data-doe="belleraar" data-klas="' + esc(kc) + '">Bel de leraar in de app</button>' + alarm + takken +
-        '<div class="rij" style="display:flex;gap:.4rem;margin-top:.4rem;">' +
+        '<div class="rij" style="display:flex;gap:.4rem;margin-top:0.5rem;">' +
         '<input class="veld h-flex1" data-nummer="' + esc(kc) + '" placeholder="' + (boom.nummerGezet ? 'Nummer staat erin; hier wijzigen' : 'Jullie telefoonnummer voor de boom') + '">' +
         '<button class="knop mini" data-doe="nummer" data-klas="' + esc(kc) + '">Bewaar</button></div>');
     }

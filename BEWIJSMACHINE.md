@@ -88,23 +88,23 @@ die niets met elkaar te maken hebben.
 ### De uitkomst
 
 ```
-2363 bestanden, 833 catalogi, 516 verschillende namen
-  95 namen staan in meer dan een domein
-  78 woorden dragen MEER DAN EEN betekenis   (samen 282 betekenissen)
-  28 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
- 101 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
+2395 bestanden, 841 catalogi, 520 verschillende namen
+  96 namen staan in meer dan een domein
+  78 woorden dragen MEER DAN EEN betekenis   (samen 284 betekenissen)
+  29 betekenissen wonen op MEER DAN EEN plek                    (LAT-regel 4)
+ 106 paren dragen dezelfde waarheid onder een ANDERE naam       (LAT-regel 4)
 ```
 
-Van de 95 gedeelde namen dragen er **78 meer dan één betekenis**. Het was dus
+Van de 96 gedeelde namen dragen er **78 meer dan één betekenis**. Het was dus
 geen incident.
 
 De ergste, met het aantal betekenissen dat de meter na clustering overhoudt:
 
 | woord | betekenissen | een greep uit wat het kan zijn |
 |---|---|---|
-| `SOORTEN` | **38** | contractsoorten, gebeurtenissen in een tijdlijn, avondplannen, rekeningsoorten |
+| `SOORTEN` | **39** | contractsoorten, gebeurtenissen in een tijdlijn, avondplannen, rekeningsoorten |
 | `STATUS` | 10 | ontwerpfases bij de architect, betaalstanden, ideeënstanden, subsidiestanden |
-| `STANDEN` | 10 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
+| `STANDEN` | 11 | voorkeursstanden, verzoekstanden, mediastanden, regiestanden |
 | `NIVEAUS` | 9 | dreigingsniveaus, bijstandsniveaus, concern-scopes, geldbeleidsniveaus |
 | `CATEGORIEEN` | 9 → **8** | app-categorieën, voertuigcategorieën, kledingcategorieën, risicocategorieën (atelier is eruit, zie par. 3) |
 | `ROLLEN` | 8 | bedrijfsrollen, gezinsrollen, en zes andere |
@@ -122,8 +122,8 @@ het om ging:
 
 | ronde | wat hij vindt | aantal |
 |---|---|---|
-| **op naam** | dezelfde naam, dezelfde inhoud, twee domeinen | **28** |
-| **op inhoud** | dezelfde inhoud onder een **andere** naam | **101** |
+| **op naam** | dezelfde naam, dezelfde inhoud, twee domeinen | **29** |
+| **op inhoud** | dezelfde inhoud onder een **andere** naam | **106** |
 
 Die tweede ronde bestaat omdat de eerste hem miste. Dat is geen detail: de
 duurste dubbeling van allemaal draagt per definitie twee namen, want anders was
@@ -204,12 +204,19 @@ vergelijkingen, nul verschillen. `paletUit()` krijgt het palet MEE in plaats van
 het te kennen, zodat de vier paletten uit de tabel hierboven gescheiden blijven.
 
 **En de meter bewoog niet mee, wat hij ook niet hoort te doen.** Bij `passen.js`
-ging `dubbelingenZonderNaam` van 111 naar 101; hier blijft hij op 101 staan. Dat
+ging `dubbelingenZonderNaam` van 111 naar 101; hier bleef hij op 101 staan. Dat
 is geen falen maar de reikwijdte: `scripts/semantiek.js` leest *catalogi* —
 gesloten woordenlijsten — en `hash` is een functie. Wie verwacht dat elke
 opgeruimde dubbeling een meter laat zakken, verwacht dat één meter alles ziet.
 Deze dubbeling kwam van `OBJECTMODEL.json`, langs gedeelde vormen, en dat is
 precies waarom er twee metingen zijn.
+
+**Hij staat inmiddels op 106, en dat is geen terugval.** De meter telt de hele
+boom, en de kostprijslaag zette er negen kostensoorten, negen tarieven en een
+beleidkaart bij — nieuwe catalogi paren met bestaande. Een meter die alleen mag
+zakken meet niet de code maar de vlijt: wie hem stil wil houden, hoort geen
+lijsten meer te schrijven. Wat hier telt is dat elke beweging een aanwijsbare
+oorzaak heeft, omhoog zo goed als omlaag.
 
 ### Wat de meting al heeft opgeleverd: de paswaarheid stond op vier plekken
 
@@ -442,7 +449,7 @@ met een eigen klok).
 |---|---|---|
 | ~~**0. De semantiek meten**~~ ✅ | `scripts/semantiek.js` + `SEMANTIEK.json`; de uitkomst staat in par. 3 | zonder dit is een Semantic Registry een la of infrastructuur, en niemand die weet welke |
 | ~~**1. De eerste dubbeling**~~ ✅ | de paswaarheid stond op vier plekken; nu één module (`kern/passen.js`), met `BETALEND` afgeleid. Drie mutaties raak | par. 3 — en de meter bewoog mee: 111 → 101 naamloze dubbelingen |
-| **2. De rest van de 28 + 101** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
+| **2. De rest van de 29 + 106** | per stuk de vraag stellen die `PLATFORM.md` bij Cercle en Entourage stelde: aan de CODE en niet aan de naam | een deel is terecht (weekdagen, maanden), een deel is overgetypt |
 | ~~**3. De vier ontwerpdomeinen wegen**~~ ✅ | met de hand nagelopen: `hash`, `kies` en `palet` zijn één uitvoering in vier kopieën; `maakConcept`, `PALET` en `STATUS` zijn terecht verschillend | par. 3 — en het legde een ketenings­gebrek in de meter zelf bloot |
 | **4. Het register uit de code afleiden** | niet ernaast schrijven; het patroon van `WETTEN.json` (bron + handhaver + sabotage) | par. 4.2 — anders wordt het register zelf de 78ste botsing |
 | **5. De zoeker** | invoervolgordes genereren tegen de wetten die er al staan | par. 5.2 — de wetten staan, de zoeker niet |

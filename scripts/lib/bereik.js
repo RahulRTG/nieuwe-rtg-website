@@ -72,7 +72,6 @@ const MAG_LOS = new Map([
   ['/apps/codewoord.html', 'omleiding: Codewoord is een stand van RTG Veilig geworden'],
   ['/apps/thuisrust.html', 'omleiding: Thuisrust is een stand van RTG Veilig geworden'],
   ['/apps/thuiswacht.html', 'omleiding: Thuiswacht is een stand van RTG Veilig geworden'],
-  ['/apps/vitaal.html', 'omleiding: Vitaal is een stand van RTG Veilig geworden'],
   ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
   ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link'],
   ["/apps/festival-gast.html", "landingspagina: uw eigen kant van het festival. U komt hier met de pas die u al heeft (de code staat groot in beeld aan de poort) of via de link van uw groep -- niet via de bank. Het ORGANISATIEscherm /apps/festival.html hangt wel gewoon, bij de zaakschermen in de leverancier-app."],

@@ -46,6 +46,13 @@
 'use strict';
 const { AsyncLocalStorage } = require('async_hooks');
 const crypto = require('crypto');
+/* De tijd komt van de huisklok en niet van het OS. Dat is hier geen detail: een
+   envelop is de enige tijdstempel die een gebeurtenis draagt, en met `new Date()`
+   trekt hij zich van RTG_KLOK niets aan. Dan is geen enkele beproeving op
+   schrikkeldag, zomertijd of een verlopen mandaat te doen OVER de bus -- terwijl
+   dat precies de plek is waar zulke fouten zich verstoppen. scripts/klok.js
+   telde deze regel dan ook als schuld. */
+const { datum } = require('../lib/klok');
 
 const VERSIE = 1;
 
@@ -96,7 +103,7 @@ function maak(opgave) {
   const classificatie = CLASSIFICATIES[o.classificatie] ? o.classificatie : 'onbekend';
   return Object.freeze({
     id: o.id || nieuwId(),
-    at: o.at || new Date().toISOString(),
+    at: o.at || datum().toISOString(),
     versie: VERSIE,
     kanaal: o.kanaal || null,
     actor: keurActor(o.actor != null ? o.actor : (ouder ? ouder.actor : null)),

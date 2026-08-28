@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Geloof &amp; Wijsheid-Bibliotheek</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -37,6 +37,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -48,14 +49,14 @@
     <b>Alle tradities, als gelijken.</b> Elke religie en levensbeschouwing staat hier naast elkaar, met respect, zonder rangorde en zonder oordeel. Elke traditie vertelt haar eigen waarheid. Ook wie niet gelooft, vindt hier een plek. Je ziet alleen wat bij jouw leeftijd past.
   </div>
 
-  <div class="kaart" style="padding:.8rem .9rem;margin-bottom:.9rem;">
+  <div class="kaart" style="padding:.8rem .9rem;margin-bottom:0.75rem;">
     <b style="font-size:.92rem;">De bibliothecaris</b>
     <p class="intro" style="margin:.25rem 0 .5rem;font-size:.84rem;">Vertel wat je zoekt of wilt begrijpen; de bibliothecaris zoekt door alle tradities heen en raadt echte boeken aan. Neutraal en met respect, nooit om je te overtuigen.</p>
     <div class="zoekrij rtg-duimeind" style="margin-bottom:0;">
       <input id="bibVraag" class="veld" maxlength="300" placeholder="Bijv. verhalen over vrede en vergeving">
       <button class="knop" id="bibGo" type="button" data-hoofdactie>Vraag</button>
     </div>
-    <div id="bibUit" style="font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+    <div id="bibUit" style="font-size:.84rem;color:var(--zacht);line-height:1.6;margin-top:0.5rem;" aria-live="polite"></div>
   </div>
 
   <div class="zoekrij">
@@ -91,7 +92,7 @@ document.getElementById('bibGo').addEventListener('click', async () => {
   try {
     const d = await api('/ai', { vraag: document.getElementById('bibVraag').value });
     uit.innerHTML = esc(d.antwoord) + (d.aanraders && d.aanraders.length
-      ? '<ul style="margin:.4rem 0 0 1.1rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="opacity:.7;">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>' : '');
+      ? '<ul style="margin:0.5rem 0 0 1.25rem;">'+d.aanraders.map(a => '<li><b>'+esc(a.naam)+'</b> <span style="opacity:.7;">· '+esc(a.bieb)+'</span></li>').join('')+'</ul>' : '');
   } catch(e){ uit.textContent = e.message; }
   knop.disabled = false;
 });
@@ -141,9 +142,9 @@ async function lees(id){
     wrap.className = 'lees-overlay';
     wrap.innerHTML = '<div class="lees-blad"><button class="lees-x" aria-label="Sluiten">Sluiten</button>'+
       '<span class="cat">'+esc(b.traditieLabel)+' · '+esc(b.thema)+'</span>'+
-      '<h2 style="font-family:\'Bodoni Moda\',serif;margin:.2rem 0 .8rem;">'+esc(b.naam)+'</h2>'+
-      b.tekst.split('\n\n').map(p=>'<p style="line-height:1.75;margin:.6rem 0;">'+esc(p)+'</p>').join('')+
-      '<p style="margin-top:1.2rem;color:var(--soft,#8A8680);font-size:.82rem;">Uit de Geloof &amp; Wijsheid-Bibliotheek van de RTFoundation. Alle tradities als gelijken, met respect.</p></div>';
+      '<h2 style="font-family:\'Bodoni Moda\',serif;margin:0.25rem 0 0.75rem;">'+esc(b.naam)+'</h2>'+
+      b.tekst.split('\n\n').map(p=>'<p style="line-height:1.75;margin:0.5rem 0;">'+esc(p)+'</p>').join('')+
+      '<p style="margin-top:1.25rem;color:var(--soft,#8A8680);font-size:.82rem;">Uit de Geloof &amp; Wijsheid-Bibliotheek van de RTFoundation. Alle tradities als gelijken, met respect.</p></div>';
     document.body.appendChild(wrap);
     const sluit = ()=>wrap.remove();
     wrap.querySelector('.lees-x').addEventListener('click', sluit);
@@ -198,5 +199,6 @@ start();
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

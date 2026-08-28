@@ -1,12 +1,12 @@
 {
   "simulatiemodules": 66,
-  "kernmodules": 1659,
-  "kernDomeinen": 507,
+  "kernmodules": 1731,
+  "kernDomeinen": 518,
   "perWereld": {
     "magnaat": {
       "modules": 63,
       "regels": 0,
-      "raaktKern": 3
+      "raaktKern": 5
     },
     "hospitality": {
       "modules": 3,
@@ -14,9 +14,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 117,
-  "geraakteKernmodules": 3,
-  "geraakteKernDomeinen": 3,
+  "requiresTotaal": 121,
+  "geraakteKernmodules": 5,
+  "geraakteKernDomeinen": 4,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -39,6 +39,15 @@
   ],
   "bereik": [
     {
+      "doel": "server/kern/eigencollectie",
+      "door": [
+        "server/kern/magnaat-trainingslobby.js",
+        "server/kern/magnaatwereld.js",
+        "server/kern/spellen/magnaat/leerkring.js"
+      ],
+      "aantal": 3
+    },
+    {
       "doel": "server/kern/bestuursroutes",
       "door": [
         "server/kern/magnaat-dekkingsmatrix.js"
@@ -58,10 +67,17 @@
         "server/kern/spellen/magnaat/rtg-keten.js"
       ],
       "aantal": 1
+    },
+    {
+      "doel": "server/kern/pay/loshistorie",
+      "door": [
+        "server/kern/spellen/magnaat/rtg-keten.js"
+      ],
+      "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 12,
-  "kandidaatparen": 33,
+  "gedeeldeOnderwerpen": 13,
+  "kandidaatparen": 35,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -184,23 +200,23 @@
       "meetbaar": false
     },
     {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/magnaat-economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
       "onderwerp": "foundation",
       "simulatie": "server/kern/spellen/magnaat/foundation.js",
       "rtg": "server/kern/wereldroutes/foundation.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
-      "rtg": "server/kern/markt/handel.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel.js",
-      "rtg": "server/kern/markt/handel.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

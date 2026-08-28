@@ -4,8 +4,8 @@
      ondertekende gebeurtenissen; bij de klassieke Mollie-webhook halen we de
      betaling met onze eigen API-sleutel terug. Altijd is de provider -- nooit
      de browser -- de bron voor "betaald".
-   - Anders draait de demo-provider: dezelfde interface, maar hij "bevestigt"
-     direct zonder echt geld. Zo werkt lokaal en in demo alles zonder keys.
+   - Alleen Magnaat Test heeft een synthetische provider. Iedere andere
+     installatie zonder echte provider weigert fail-closed.
 
    Twee dingen zijn hier bewust productie-hard gemaakt, los van de provider:
    1. Idempotentie, twee keer op "betaal" tikken (of een netwerk-herhaling) mag
@@ -17,6 +17,7 @@
    mag een betaling starten, maar niet zichzelf als betaald markeren. */
 const crypto = require('crypto');
 const sandbox = require('./betaal-sandbox');
+const magnaatTest = require('./testomgeving').actief(process.env);
 
 const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || '';
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -33,20 +34,17 @@ const regie = require('./betaal-regie')({
 let stripe = null;
 if (STRIPE_KEY && !BETALEN_UIT) {
   try { stripe = require('./stripe')(STRIPE_KEY); } // eigen dunne client (geen dependency)
-  catch (e) { /* kan niet starten: rail blijft uit, tenzij demo bewust aanstaat */ }
+  catch (e) { /* kan niet starten: rail blijft fail-closed uit */ }
 }
 /* Geen sleutel mag nooit stil hetzelfde betekenen als "de betaling is gelukt".
-   De demo-provider draait daarom alleen wanneer de installatie hem bewust heeft
-   aangezet. RTG_DEMO is de volledige trainingsinstallatie; met
-   STRIPE_DEMO_BEWUST=1 kan een aparte, niet-live omgeving alleen de betaalnaad
-   demonstreren. Zonder een van beide staat de rail UIT en krijgt de aanroeper
-   een zichtbare fout in plaats van fictief geld. */
-const DEMO_BETALEN = process.env.RTG_DEMO === '1' || process.env.STRIPE_DEMO_BEWUST === '1';
-const aanbieder = () => stripe ? 'stripe' : (regie.connectAan ? 'stripe-connect-sandbox' : (DEMO_BETALEN ? 'demo' : 'uit'));
+   De synthetische provider draait daarom uitsluitend in de centraal bewaakte
+   Magnaat Test-installatie. Een oude losse betaalvlag opent niets meer. */
+const DEMO_BETALEN = magnaatTest;
+const aanbieder = () => stripe ? 'stripe' : (regie.connectAan ? 'stripe-connect-sandbox' : (DEMO_BETALEN ? 'magnaat-test' : 'uit'));
 
 function eisBetaalrail() {
   if (!stripe && !DEMO_BETALEN) {
-    const e = new Error('Geen betaalprovider actief. Stel Stripe in of zet de demo-betaalstand bewust aan.');
+    const e = new Error('Geen betaalprovider actief. Stel Stripe in of gebruik de betaaltest uitsluitend in Magnaat Test.');
     e.code = 'BETAALRAIL_UIT';
     throw e;
   }
@@ -82,7 +80,7 @@ const AANBIEDER = BETALEN_UIT ? 'uit'
      stilzwijgend de altijd-slaagt-demo krijgt, bewijst dat de zonnige dag werkt
      en verder niets -- en dat is precies de dag waarop niemand een fout maakt. */
   : SIMULATIE_AAN ? 'simulatie'
-  : DEMO_BETALEN ? 'demo' : 'uit';
+  : DEMO_BETALEN ? 'magnaat-test' : 'uit';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
    persistente store injecteren (bijv. gespiegeld in de database), zodat de
@@ -146,7 +144,7 @@ async function maakUitbetaling(opdracht) {
     e.code = 'UITBETAALRAIL_NIET_ACTIEF';
     throw e;
   } else if (DEMO_BETALEN) {
-    res = { id: 'demo_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland', aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie, iban };
+    res = { id: 'magnaat_uit_' + crypto.randomBytes(8).toString('hex'), status: 'ingepland', aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie, iban };
   } else {
     eisBetaalrail();
   }

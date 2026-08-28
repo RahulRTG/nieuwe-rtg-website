@@ -390,6 +390,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        verspreiding weer in gang, en test/genreregister.test.js bewaakt precies
        dat het EEN plek blijft. */
     ['server/seed/genres-lijst.js', 'het genre-register: 73 regels pure data zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
+    ['server/kern/werkplek-kantoren.js', 'de enterprise-kantoorcatalogus: zestien afdelingen met rollen en bestaande app-ingangen, een pure definitietabel die opknippen weer twee bronnen van waarheid maakt'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
@@ -457,6 +458,16 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* Deze zeven kwamen bij de brede PR-integratie net over de lat. De naden zijn
+       benoemd, maar horen met hun gerichte toetsen in een aparte onderhoudsronde
+       te worden geknipt en niet tijdens het samenvoegen van twintig releases. */
+    'server/accounts/users.js',
+    'server/kern/fiscaal/index.js',
+    'server/kern/vergeten.js',
+    'server/opzet/diensten2.js',
+    'server/opzet/leverancierpoort.js',
+    'public/apps/app-main/app-main-09a.js',
+    'public/shared/teamcall/teamcall-01.js',
     /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
        alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
        hoort geknipt te worden, niet vrijgesteld.
@@ -531,12 +542,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
-    /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
+    /* server/kern/pay/index.js STOND HIER en is er weer af. Drie onderwerpen
        eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
-       zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
-       beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
-       WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
-       zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
+       zes bedragen, ./stand.js), alles wat eruit komt zonder dat er geld
+       beweegt (./kijken.js), en sinds 24 augustus ook de drie functies die een
+       cent verplaatsen (./boeken.js).
+       Die laatste bleven twee rondes staan omdat WETTEN.json de wet
+       geld-conservatie hier handhaafde en zijn sabotagerecept EEN REGEL uit
+       pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
+       bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
+       regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
+       verplaatste regel en toetst ze niets meer. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
@@ -1697,7 +1713,7 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
     ['POSTGRES_PASSWORD_FILE', 'gelezen door de officiele postgres-container; het geheim blijft zo buiten docker inspect'],
     ['PGDATA', 'gelezen door de officiele postgres-container om de datamap te kiezen'],
     ['RTG_ALLOW_PLAINTEXT', 'bevestigingsvlag VOOR de keuring: "ik weet dat er geen sleutel is, start toch"'],
-    ['STRIPE_DEMO_BEWUST', 'bevestigingsvlag VOOR de keuring: "deze afgeschermde testinstallatie gebruikt bewust de demo-provider"'],
+    ['STRIPE_DEMO_BEWUST', 'oude vlag die de productie-keuring alleen nog expliciet afwijst; runtime negeert hem'],
     ['SENTRY_DSN', 'bewust genoemd om te WAARSCHUWEN dat hij niets doet; de echte alarmweg is ERR_WEBHOOK_URL']
   ]);
   // De hele keuringsmap telt als belofte-bron EN wordt uitgesloten van "leest
@@ -3117,37 +3133,35 @@ console.log('\n43) geen weggegooide tekstoptelling in een gebundeld script');
    die telde de tegels door elke map open te klikken. Sinds een wereldtegel de
    APP opent en niet een tegelveld, is die lijst uit het scherm verdwenen. De
    regel is niet vervallen; hij heeft een andere plek nodig, en de bron is de
-   juiste: MAPPEN staat als letterlijke lijst in app-main-24a2.js.
+   juiste: MAPPEN zelf.
+
+   EN NIET MEER MET EEN REGEX OP EEN SNEDE. Deze regel las app-main-24a2.js met
+   een regex, en toen dat bestand over de 10 KB ging (regel 13) en FoundationOS
+   naar een eigen snede verhuisde, zei hij "MAPPEN staat er niet meer" -- terwijl
+   MAPPEN gewoon bestond en over twee snedes liep. Een meter die zakt op de
+   INDELING van de bron in plaats van op de bron, meet de verkeerde dingen. Hij
+   leest nu dezelfde lezer als de toets en de wereldlijst
+   (scripts/lib/wereldregister.js), die de bundel eerst aaneenplakt.
 
    Wat deze regel NIET doet: iets zeggen over welke wereld de juiste is. Dat is
    een ontwerpvraag. Hij zegt alleen dat het er precies een is. */
 console.log('\n44) elke app staat in precies een wereld op het beginscherm');
 {
-  /* Het pad uit ROOT en niet uit PUB: die laatste is een blok-constante die hier
-     niet bestaat. Met een try/catch eromheen werd die ReferenceError een lege
-     bron, en die lege bron werd de melding "MAPPEN staat er niet meer" -- een
-     diagnose die naar het verkeerde bestand wees. Een vangnet dat de oorzaak
-     verbergt is erger dan geen vangnet. */
-  const mappenPad = path.join(ROOT, 'public', 'apps/app-main/app-main-24a2.js');
-  let bron = '';
-  try { bron = fs.readFileSync(mappenPad, 'utf8'); }
-  catch (e) { fout('app-main-24a2.js is niet te lezen: ' + e.message); }
-  const blok = /const MAPPEN = \[([\s\S]*?)\n  \];/.exec(bron);
-  if (!blok) fout('MAPPEN staat niet meer als lijst in app-main-24a2.js; deze regel meet dan niets');
-  else {
-    const zonderCommentaar = blok[1].replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-    const items = (zonderCommentaar.match(/'(?:tab|link|os):[a-z0-9-]+'/g) || []).map(x => x.slice(1, -1));
-    const gezien = new Map();
-    const dubbel = [];
-    for (const it of items) {
-      if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
-      else gezien.set(it, true);
-    }
-    if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
-    else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
-    else ok(items.length + ' items over ' + (blok[1].match(/sleutel:/g) || []).length +
-      ' werelden: geen enkele staat er twee keer in');
+  let items = [], werelden = 0;
+  try {
+    const reg = require('./lib/wereldregister');
+    werelden = reg.MAPPEN.length;
+    for (const m of reg.MAPPEN) for (const it of (m.items || [])) items.push(it);
+  } catch (e) { fout('MAPPEN is niet uit de app-main-bundel te lezen: ' + e.message); }
+  const gezien = new Set();
+  const dubbel = [];
+  for (const it of items) {
+    if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
+    else gezien.add(it);
   }
+  if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
+  else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
+  else ok(items.length + ' items over ' + werelden + ' werelden: geen enkele staat er twee keer in');
 }
 
 /* 45) ELK ROUTEPAD STAAT VOLUIT.
@@ -3299,7 +3313,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
-    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
+    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen'],
+    ['server/kern/vergeten.js', 'AVG-wissing: verwijderd mag pas worden bevestigd nadat de opslag het vastlegt']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
@@ -3503,7 +3518,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
     werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
     ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
-    gesprek:     { open: true },                // live, tweerichting
+    gesprek:     { open: true, baan: true },    // live, tweerichting -- MOET een tekstbaan dragen
     uitzending:  { open: true },                // live, eenrichting
     onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
   };
@@ -3523,24 +3538,24 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
-    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
+    ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden', ['public/apps/app-main.js', 'RTGMeelezen']]],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
     ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
     ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
     ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
-    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen']]],
+    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
+    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen']]],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
-    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
+    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender kan meeschrijven -- geen ondertiteling, wel een weg naar tekst', ['public/apps/podium.html', 'chatKijk']]],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
     ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
@@ -3549,9 +3564,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
     ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
     ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
-    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks']],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen']]],
     ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
-    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij']]
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen']]]
   ]);
 
   const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
@@ -3590,9 +3605,15 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     if (soort.stil && !el.stil) {
       klachten.push(sleutel + ' staat als ' + post[0] + ' (stil) maar is niet meer muted -- of er komt geluid uit, of de reden klopt niet meer');
     }
-    if (soort.anker) {
+    if (soort.anker || soort.baan) {
+      /* Twee ankers met dezelfde tand. Bij ONDERTITELD wijst hij naar de band
+         die de cues toont; bij een GESPREK naar de tekstbaan waarin deelnemers
+         meeschrijven (shared/meelezen.js). In allebei de gevallen geldt: wie
+         zegt dat er een weg naar tekst is, noemt WAAR -- en haalt iemand die
+         weg, dan zakt deze regel ook al is aan het scherm zelf niets veranderd. */
+      const wat = soort.baan ? 'draagt een tekstbaan' : 'staat als ondertiteld';
       const [bestand, naam] = post[2] || [];
-      if (!bestand || !naam) klachten.push(sleutel + ' staat als ondertiteld maar noemt niet waar dat geregeld is');
+      if (!bestand || !naam) klachten.push(sleutel + ' ' + wat + ' maar noemt niet waar dat geregeld is');
       else if (!fs.existsSync(path.join(ROOT, bestand))) klachten.push(sleutel + ': het anker ' + bestand + ' bestaat niet meer');
       else if (!fs.readFileSync(path.join(ROOT, bestand), 'utf8').includes(naam)) {
         klachten.push(sleutel + ': ' + bestand + ' draagt "' + naam + '" niet meer -- de weg naar tekst is eruit gehaald');
@@ -3615,9 +3636,56 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     const per = {};
     for (const k of gevonden.keys()) { const s = REGISTER.get(k)[0]; per[s] = (per[s] || 0) + 1; }
     const noem = (lijst) => lijst.filter(s => per[s]).map(s => per[s] + ' ' + s).join(', ');
+    /* De open elementen tellen mee als open, ook als ze een tekstbaan dragen.
+       Dat is geen slordigheid maar het punt: meelezen is GEEN ondertiteling --
+       er wordt niets van spraak naar tekst omgezet, en WCAG 1.2.4 is dus niet
+       gehaald. Het getal zou stil dalen als we ze hier zouden wegstrepen, en dan
+       leest dit register als dekking die er niet is. Wat er WEL is, telt apart. */
+    const metBaan = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
+      ((SOORTEN[REGISTER.get(k)[0]] || {}).baan || ((SOORTEN[REGISTER.get(k)[0]] || {}).open && (REGISTER.get(k)[2] || []).length)));
     ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
       (gevonden.size - open.length) + ' geregeld (' + noem(['spiegel', 'werktuig', 'ondertiteld']) + '), ' +
-      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX);
+      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX +
+      '\n  ' + metBaan.length + ' van die ' + open.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven ' +
+      '(geen ondertiteling: WCAG 1.2.4 blijft open)');
+  }
+}
+
+/* DE ZAAI-HASH BLIJFT BIJ DE SEED.
+
+   kluis.zaaiHash rekent een testwachtwoord eenmalig uit en deelt dus het zout
+   tussen alle accounts met datzelfde wachtwoord. Voor een wachtwoord dat als
+   letterlijke tekst in deze repo staat kost dat niets; voor een echt wachtwoord
+   -- of voor de viercijferige PIN die langs createStaffSync loopt wanneer een
+   bedrijfsaanmelding wordt goedgekeurd -- zou het de tabel in groepjes verdelen.
+
+   De functie weigert daarom al buiten Magnaat Test. Deze regel is de tweede
+   grendel: hij houdt de AANROEP bij de vijf plekken waar de seed staat, zodat
+   een route die morgen "even snel" een account aanmaakt er niet bij kan zonder
+   dat iemand het ziet. test/zaaihash.test.js bewaakt dat deze regel blijft. */
+{
+  const zaaiWoorden = /\b(zaaiHash|createUserZaai|createStaffZaai|setPasswordZaai)\b/;
+  const mag = new Set([
+    'server/accounts/kluis.js',        // waar hij woont
+    'server/accounts/users.js',        // de twee ledenvarianten
+    'server/accounts/staff.js',        // de personeelsvariant
+    'server/server.js',                // de eigenaar, het testpersoneel en Nora
+    'server/kern/staffseed-papieren.js' // de papieren van datzelfde personeel
+  ]);
+  const buiten = [];
+  for (const map of ['server', 'scripts']) {
+    loop(path.join(ROOT, map), /\.js$/, (f) => {
+      const rel = path.relative(ROOT, f).split(path.sep).join('/');
+      // de keuring zelf noemt de namen nu eenmaal; anders wijst hij naar zichzelf
+      if (mag.has(rel) || rel === 'scripts/check.js') return;
+      if (zaaiWoorden.test(zonderCommentaar(fs.readFileSync(f, 'utf8')))) buiten.push(rel);
+    });
+  }
+  if (buiten.length) {
+    fout('de zaai-hash wordt aangeroepen buiten de seed: ' + buiten.join(', ') +
+      ' -- gebruik hashPassword of hashPasswordSync, of zet de plek bewust in de lijst in scripts/check.js');
+  } else {
+    ok('de zaai-hash (gedeeld zout) blijft bij de ' + mag.size + ' seed-bestanden');
   }
 }
 
@@ -3834,20 +3902,26 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
      De melding NOEMT WAT ER VERSCHILT en niet alleen dat er iets verschilt. Een
      keuring die "loopt achter" zegt over een afdruk met tien blokken, stuurt je
      zelf op zoek; dat is precies het half uur dat deze regel hoort te schelen. */
-  try {
-    const doel = path.join(ROOT, 'OBJECTMODEL.json');
-    const model = require('./objectmodel');
-    const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
-    const vers = model.meet();
-    /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
-       ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
-       sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
-       meting is net zo goed achterstand. */
-    const blokken = [...new Set([...Object.keys(opSchijf || {}), ...Object.keys(vers)])]
-      .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
-    const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
-    if (opSchijf === null) fout('OBJECTMODEL.json bestaat niet -- draai: npm run objectmodel:vast');
-    else {
+  /* TWEE AFDRUKKEN, EEN VERGELIJKING. COMMERCE.json (scripts/commerce.js) draagt
+     precies dezelfde vorm als OBJECTMODEL.json -- een `uitleg`, een `vastgelegd`
+     en daaronder blokken waarvan er een `gemeten` heet -- en hoort dus langs
+     dezelfde controle. Die controle twee keer uitschrijven is de fout waar
+     LAT-regel 4 over gaat, en hier met een scherp randje: de vereniging van
+     beide sleutelverzamelingen hieronder is zelf een reparatie van een eerdere
+     ronde, en een kopie zou die reparatie precies EEN keer dragen. */
+  const afdrukGelijk = ({ bestand, meter, vast, zeg }) => {
+    try {
+      const doel = path.join(ROOT, bestand);
+      const opSchijf = fs.existsSync(doel) ? JSON.parse(fs.readFileSync(doel, 'utf8')) : null;
+      const vers = meter();
+      if (opSchijf === null) { fout(bestand + ' bestaat niet -- draai: ' + vast); return; }
+      /* De datum en de vaste uitleg horen NIET tot de meting; al het andere wel,
+         ook een blok dat er morgen bij komt. Vandaar de vereniging van beide
+         sleutelverzamelingen: een blok dat wel op schijf staat en niet meer in de
+         meting is net zo goed achterstand. */
+      const blokken = [...new Set([...Object.keys(opSchijf), ...Object.keys(vers)])]
+        .filter(k => k !== 'uitleg' && k !== 'vastgelegd');
+      const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
       const verschil = [];
       for (const k of blokken) {
         if (!anders(opSchijf[k], vers[k])) continue;
@@ -3858,21 +3932,29 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
            hieronder geen enkel verschil opleveren -- en dan meldt de regel
            doodleuk dat alles in orde is. */
         const was = opSchijf.gemeten || {};
-        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten)])) {
-          if (was[m] !== vers.gemeten[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + vers.gemeten[m]);
+        for (const m of new Set([...Object.keys(was), ...Object.keys(vers.gemeten || {})])) {
+          if (was[m] !== (vers.gemeten || {})[m]) verschil.push('gemeten.' + m + ': ' + was[m] + ' -> ' + (vers.gemeten || {})[m]);
         }
       }
-      if (verschil.length) {
-        fout('OBJECTMODEL.json loopt achter op de meting (' + verschil.join('; ') +
-          ') -- draai: npm run objectmodel:vast');
-      } else {
-        ok(vers.gemeten.vormen + ' bewaarde vormen in ' + vers.gemeten.bestanden +
-          ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan');
-      }
+      if (verschil.length) fout(bestand + ' loopt achter op de meting (' + verschil.join('; ') + ') -- draai: ' + vast);
+      else ok(zeg(vers));
+    } catch (e) {
+      fout(bestand + ' kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
     }
-  } catch (e) {
-    fout('het objectmodel kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
-  }
+  };
+
+  afdrukGelijk({
+    bestand: 'OBJECTMODEL.json', meter: () => require('./objectmodel').meet(),
+    vast: 'npm run objectmodel:vast',
+    zeg: (v) => v.gemeten.vormen + ' bewaarde vormen in ' + v.gemeten.bestanden +
+      ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan'
+  });
+  afdrukGelijk({
+    bestand: 'COMMERCE.json', meter: () => require('./commerce').meet(),
+    vast: 'npm run commerce:vast',
+    zeg: (v) => v.gemeten.koopbareVormen + ' koopbare vormen in ' + v.gemeten.koopbareDomeinen +
+      ' domeinen, ' + v.gemeten.werkwoordenVolledig + ' domeinen met alle acht werkwoorden, en COMMERCE.json is daar in elk blok gelijk aan'
+  });
 }
 
 
@@ -4054,6 +4136,7 @@ console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
     'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
     'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
     'server/middleware/idempotentie.js': "de opt-in idempotentielaag. NAGEKEKEN op 20 augustus 2026: gemount in opzet/poortwachters.js r.114, dus NA de dubbeltik (r.96) -- hij is de buitenste wikkel. Dat is hier juist: hij grijpt alleen in als de client ZELF een idem-sleutel meestuurde, en dan is de herhaling een bewuste retry en geen dubbeltik. Elk ander antwoord gaat ongewijzigd door naar de dubbeltik.",
+    'server/staatlog.js': 'meetgereedschap, alleen actief met RTG_STAATLOG. Het wordt vroeg in verzoekketen.js gemount; de later gemounte dubbeltik blijft daardoor de buitenste res.json-wikkel.',
   };
   const nieuw = wikkelaars.filter(w => !BEKEND[w]);
   if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +

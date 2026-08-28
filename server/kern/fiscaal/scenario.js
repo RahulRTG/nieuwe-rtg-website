@@ -33,7 +33,7 @@
 
 const { zekerheid } = require('./zekerheid');
 
-const centen = (n) => Math.round((Number(n) || 0) * 100) / 100;
+const rondBedrag = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
 function maakScenario({ LANDEN, dekking, jaargangen }) {
   /* De regels van een land op een datum. Met jaargangen de teruggerekende, en
@@ -74,14 +74,14 @@ function maakScenario({ LANDEN, dekking, jaargangen }) {
     onbekend.push({ wat: 'individueel', let: 'Dit rekent met een gelijk brutoloon voor iedereen en zonder toeslagen, verzuim, pensioen of cao.' });
 
     const uurloonMin = L.uurloonMin;
-    const perUurBijVoltijd = centen((bruto / 100) / 173.33);
+    const perUurBijVoltijd = rondBedrag((bruto / 100) / 173.33);
     if (uurloonMin && perUurBijVoltijd < uurloonMin) onbekend.push({ wat: 'minimumloon',
       let: 'Bij een voltijdweek komt dit neer op ongeveer EUR ' + perUurBijVoltijd + ' per uur; het indicatieve minimum in ' + cc + ' is EUR ' + uurloonMin + '.' });
 
     return { ok: true, soort: 'personeel', land: cc, landNaam: L.naam,
       aannames: [
         n + ' medewerkers in ' + L.naam,
-        'bruto EUR ' + centen(bruto / 100) + ' per persoon per maand',
+        'bruto EUR ' + rondBedrag(bruto / 100) + ' per persoon per maand',
         'werkgeverslasten ' + Math.round(L.lasten * 100) + '%' + (L.vakantiegeld ? ' en vakantiegeld ' + Math.round(L.vakantiegeld * 1000) / 10 + '%' : ' en geen vakantiegeldopbouw'),
         'regels van ' + (datum || 'vandaag') + ' (' + bron + ')'
       ],
@@ -107,7 +107,7 @@ function maakScenario({ LANDEN, dekking, jaargangen }) {
     const grondslag = Math.round(bedrag / (1 + t / 100));
     return { ok: true, soort: 'omzet', land: cc, landNaam: L.naam, categorie: cat, tarief: t,
       aannames: [
-        'EUR ' + centen(bedrag / 100) + ' omzet inclusief btw',
+        'EUR ' + rondBedrag(bedrag / 100) + ' omzet inclusief btw',
         'categorie ' + cat + ' in ' + L.naam + ' (' + t + '%)',
         'regels van ' + (datum || 'vandaag') + ' (' + bron + ')'
       ],

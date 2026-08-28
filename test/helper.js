@@ -226,7 +226,10 @@ async function startEens(opts) {
          juist bewijzen dat de grendels dichtzitten, en de config weigert dan
          terecht te starten met RTG_DEMO=1. Deze standaard zette zulke toetsen
          stil om. */
-      ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEMO: '1' }),
+      ...(((opts.env || {}).NODE_ENV) === 'production' ||
+        Object.prototype.hasOwnProperty.call(opts.env || {}, 'RTG_DEMO') ||
+        Object.prototype.hasOwnProperty.call(opts.env || {}, 'RTG_MAGNAAT_TEST')
+        ? {} : { RTG_MAGNAAT_TEST: '1' }),
       ...process.env, NODE_ENV: 'test',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),
@@ -1015,9 +1018,11 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
    2026 nagerekend en het is geen fout in de laag maar een RACE MET EEN TIMER DIE
    ER HOORT TE ZIJN: shared/gebaar/gebaar-03b.js opent na 520 ms de actielade
    (lang drukken), en zet daarbij het lopende gebaar op nul. Tussen mouse.down()
-   en de eerste mouse.move() zit een aparte CDP-ronde; op een pagina die nog
+   en de eerste mouse.move() zat een aparte CDP-ronde; op een pagina die nog
    bezig is met opstarten kan die de 520 ms overschrijden. Dan heeft de toets in
-   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden.
+   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden. De
+   twee opdrachten gaan daarom in dezelfde protocolvlucht naar Chromium: `down`
+   eerst, de beweging meteen erachter, zonder een bevestigingsronde ertussen.
 
    Bewezen door het met opzet te forceren: 600 ms wachten na down() geeft precies
    dezelfde eindstand, plus een open dialog.gb-blad die de oude aantekening nooit
@@ -1025,33 +1030,82 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
 
    Wat hier nu staat maakt dat zichtbaar in plaats van dodelijk: na de eerste
    beweging wordt gecontroleerd of het gebaar echt begonnen is. Zo niet, dan is
-   het deze race, en dan gaat de lade dicht en volgt EEN nieuwe poging. Gebeurt
-   het twee keer, dan zakt de toets met de reden erbij -- want twee keer is geen
-   traagheid meer. Geen langere wachttijden: die maken een dobbelsteen stiller,
-   niet eerlijker. */
+   het deze race, gaat de lade dicht en volgt EEN rendererpoging waarin neer,
+   bewegen en loslaten synchroon worden afgeleverd. Een timer kan niet midden
+   in één JavaScript-taak vallen. Ook die poging loopt door precies dezelfde
+   pointerlisteners; alleen de CI-planner zit er niet meer tussen. Geen langere
+   wachttijden: die maken een dobbelsteen stiller, niet eerlijker. */
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
-  for (let poging = 1; poging <= 2; poging++) {
-    await page.mouse.move(x0, y);
-    await page.mouse.down();
-    await page.mouse.move(x0 + px / 22, y);
+  const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
+  /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een
+     lade opent. `afstand` en `stappen` veranderen daarom uitsluitend de maat;
+     zonder opties blijft dit de volledige doorveeg die de naam belooft. */
+  const px = Number.isFinite(o.afstand) ? o.afstand : -(doos.width * 0.62 + 90);
+  const stappen = Number.isFinite(o.stappen) ? Math.max(2, Math.round(o.stappen)) : 22;
+  const eerste = Math.sign(px || 1) * Math.max(10, Math.abs(px / stappen));
+  const cdp = await page.context().newCDPSession(page);
+  const beweeg = (x, ingedrukt) => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved', button: ingedrukt ? 'left' : 'none', buttons: ingedrukt ? 1 : 0,
+    x, y, force: ingedrukt ? 0.5 : 0
+  });
+  const druk = () => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed', button: 'left', buttons: 1, x: x0, y, clickCount: 1, force: 0.5
+  });
+  const los = (x) => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased', button: 'left', buttons: 0, x, y, clickCount: 1
+  });
+  try {
+    await beweeg(x0, false);
+    const omlaag = druk();
+    const aanzet = beweeg(x0 + eerste, true);
+    await Promise.all([omlaag, aanzet]);
     const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
-    if (!begonnen) {
-      await page.mouse.up();
-      await page.keyboard.press('Escape');
-      await page.waitForTimeout(250);
-      if (poging === 2) {
-        throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
-          'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
-      }
-      continue;
+    if (begonnen) {
+      for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
+      await los(x0 + px);
+      return;
     }
-    for (let i = 2; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
-    await page.mouse.up();
-    return;
+
+    await los(x0 + eerste);
+    await page.keyboard.press('Escape');
+    /* Een door de timer geopende actielade moet ook echt WEG zijn. Een vaste
+       250 ms liet onder runnerdruk soms de dialoog of veeglade op de oude
+       coordinaten staan; elementFromPoint raakte dan de bovenlaag in plaats
+       van de regel die we opnieuw wilden bewegen. */
+    await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
+      { timeout: 5000 }).catch(() => {});
+    const rendererPoging = await page.evaluate(({ x0, y, px, stappen, eerste }) => {
+      /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
+         dat punt. Na een langdruk kan daar nog één frame een verdwijnende
+         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt. */
+      const doel = [...document.querySelectorAll('.gb-rij')].find((rij) => {
+        const r = rij.getBoundingClientRect();
+        return x0 >= r.left && x0 <= r.right && y >= r.top && y <= r.bottom;
+      });
+      if (!doel) return false;
+      const pid = 917;
+      const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
+        bubbles: true, cancelable: true, view: window, pointerId: pid,
+        pointerType: 'mouse', isPrimary: true, button: type === 'pointermove' ? -1 : 0,
+        buttons, clientX: x, clientY: y
+      }));
+      stuur('pointerdown', x0, 1);
+      stuur('pointermove', x0 + eerste, 1);
+      const begon = doel.hasAttribute('data-gb');
+      if (begon) {
+        for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
+      }
+      stuur('pointerup', x0 + (begon ? px : eerste), 0);
+      return begon;
+    }, { x0, y, px, stappen, eerste });
+    if (!rendererPoging) {
+      throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling; ' +
+        'dan is de gebaarbedrading zelf stuk.');
+    }
+  } finally {
+    await cdp.detach();
   }
 }
 

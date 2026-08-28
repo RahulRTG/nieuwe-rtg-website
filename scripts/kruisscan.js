@@ -180,22 +180,57 @@ function topDecls(s) {
   return namen;
 }
 
-const gebruikt = (s, naam) => new RegExp('(?<![.\\w$])' + naam + '(?![\\w$])(?!\\s*:)').test(s);
+/* Is deze naam ergens KAAL gebruikt? Twee dingen tellen met opzet niet mee:
+
+   - `naam:` -- een property met een dubbele punt. Dat is een sleutel.
+   - `naam(params) {` -- een methode in de KORTE vorm. Dat is ook een sleutel,
+     en dat is niet vanzelfsprekend: hij lijkt op een aanroep. Zonder deze
+     uitzondering meldt de scan `{ save() {}, boek() {} }` als een kale
+     verwijzing naar `save` en `boek` van een zuster-slice -- en dat is precies
+     wat er gebeurde bij kern/appstore/naslag.js, dat de brug echt opbouwt met
+     lege functies erin. Een aanroep ziet er anders uit: `boek(x)` wordt gevolgd
+     door een puntkomma of een haakje, nooit door een accolade.
+
+   Het blijft een test over de HELE tekst: staat dezelfde naam verderop wel kaal,
+   dan matcht die vindplaats gewoon en gaat de melding alsnog op. */
+const gebruikt = (s, naam) => new RegExp(
+  '(?<![.\\w$])' + naam + '(?![\\w$])(?!\\s*:)(?!\\s*\\([^()]*\\)\\s*\\{)').test(s);
 
 /* Doorzoek de hele boom onder `root`. Retourneert een lijst bevindingen:
    { bestand, naam, zuster } -- allemaal repo-relatieve paden. */
+/* EEN BESTAND KAN VERDWIJNEN TERWIJL WIJ LOPEN, en dan hoort deze scanner niet
+   om te vallen. De suite kent toetsen die tijdelijk een proefbestand in
+   server/kern zetten en het weer weghalen (test/keuring.test.js); draait er zo
+   een tegelijk met deze scan -- wat gebeurt zodra de suite ZONDER
+   scripts/test-runner.js wordt gestart, en dat doet `npm run test:gate` -- dan
+   staat de naam nog in readdirSync en is het bestand bij de statSync al weg.
+
+   De uitslag was dan geen bevinding maar een ENOENT, en daarmee werd een
+   geldige build rood op een dobbelsteen. Wat er niet meer is, telt niet mee:
+   dat is de enige eerlijke uitkomst, want over een bestand dat weg is valt
+   niets te beweren. Een andere fout dan ENOENT gaat wel gewoon omhoog -- een
+   leesrecht dat ontbreekt is geen wedloop maar een probleem. */
+const isMap = (p) => {
+  try { return fs.statSync(p).isDirectory(); }
+  catch (e) { if (e.code === 'ENOENT') return false; throw e; }
+};
+const leesOfWeg = (p) => {
+  try { return fs.readFileSync(p, 'utf8'); }
+  catch (e) { if (e.code === 'ENOENT') return null; throw e; }
+};
+
 function scan(root) {
   const bevindingen = [];
   function bezoek(dir) {
     const namen = fs.readdirSync(dir);
     for (const naam of namen) {
       const vol = path.join(dir, naam);
-      if (fs.statSync(vol).isDirectory()) { if (!/node_modules|\.git|data|dist/.test(naam)) bezoek(vol); }
+      if (isMap(vol)) { if (!/node_modules|\.git|data|dist/.test(naam)) bezoek(vol); }
     }
     if (!namen.includes('index.js')) return;
     const slices = namen.filter(n => n.endsWith('.js')).map(n => path.join(dir, n));
     if (slices.length < 2) return;
-    const info = slices.map(f => { const s = strip(fs.readFileSync(f, 'utf8')); return { f, s, D: bindings(s), top: topDecls(s) }; });
+    const info = slices.map(f => { const b = leesOfWeg(f); if (b == null) return null; const s = strip(b); return { f, s, D: bindings(s), top: topDecls(s) }; }).filter(Boolean);
     for (const F of info) {
       const gemeld = new Set();
       for (const S of info) {

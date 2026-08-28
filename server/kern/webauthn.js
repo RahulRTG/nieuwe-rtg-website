@@ -24,11 +24,9 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart' } });
 
-  function lijsten() {
-    if (!db.data.webauthn) db.data.webauthn = {};   // userId -> [credentials]
-    return db.data.webauthn;
-  }
+  const lijsten = () => eigen.bak('webauthn');   // userId -> [credentials]
   const credsVan = userId => lijsten()[userId] || [];
   function index() {
     if (credentialIndex) return credentialIndex;
@@ -143,6 +141,9 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   const { stapOpOpties, stapOpMaak } = require('./webauthn-stapop')({
     credsVan, zetChallenge, pakChallenge, vanB64, save,
     generateAuthenticationOptions, verifyAuthenticationResponse });
+  const { webauthnActieNodig, webauthnActieOpties, webauthnActieMaak } = require('./webauthn-actie')({
+    crypto, generateAuthenticationOptions, verifyAuthenticationResponse,
+    credsVan, zetChallenge, pakChallenge, vanB64, save });
 
   /* ---- beheer ---- */
   function publiekeLijst(user) {
@@ -158,10 +159,18 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return { status: 200, ok: true, sleutels: publiekeLijst(user) };
   }
 
+  const { webauthn, pinBeveiliging } = require('./webauthn-poorten')({
+    regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, weg,
+    actieNodig: webauthnActieNodig,
+    actieOpties: webauthnActieOpties,
+    actieMaak: webauthnActieMaak
+  });
+
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
     webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,
-    webauthnAantal: user => (user ? credsVan(user.id).length : 0) };
+    webauthnAantal: user => (user ? credsVan(user.id).length : 0),
+    webauthnActieNodig, webauthnActieOpties, webauthnActieMaak, webauthn, pinBeveiliging };
 }
 
 module.exports = { maakWebauthn, maakCeremonieOpslag };

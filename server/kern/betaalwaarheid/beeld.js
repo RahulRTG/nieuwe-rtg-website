@@ -27,7 +27,7 @@ function publiek(r, definitiefBetaald) {
 function actieVan(p) {
   if (p.checkoutUrl) return { soort: 'doorsturen', url: p.checkoutUrl };
   if (p.clientSecret) return { soort: 'client-bevestigen', clientSecret: p.clientSecret };
-  return { soort: p.aanbieder === 'demo' ? 'klaar' : 'wachten' };
+  return { soort: ['magnaat-test', 'demo'].includes(p.aanbieder) ? 'klaar' : 'wachten' };
 }
 
 module.exports = { publiek, actieVan };

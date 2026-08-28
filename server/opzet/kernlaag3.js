@@ -129,9 +129,9 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
    betekenis aan de rekeningen die RTG Pay hieronder gebruikt. VOOR pay gemount,
    want pay raadpleegt hem bij elke boeking en niet andersom. */
 Object.assign(kern, require('../kern/waarde').maakWaarde({ db, save, crypto }));
-/* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
-   tikkies, kassacode en automatisch bijladen via de betaal-naad. */
+/* RTG Pay: wallet, grootboek en automatisch bijladen. */
 Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten, waarde: kern.waarde,
+  payBoekingenVoegToe: require('../db').payBoekingenVoegToe,
   accounts, // alleen voor het uitbetaal-IBAN: dat hoort in de kluis, niet naast een codenaam
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
   betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));

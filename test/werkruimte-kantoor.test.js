@@ -9,13 +9,15 @@ const notities=fs.readFileSync(path.join(__dirname,'../public/apps/notities.html
 const bestanden=fs.readFileSync(path.join(__dirname,'../public/apps/bestanden.html'),'utf8');
 const klok=fs.readFileSync(path.join(__dirname,'../public/shared/klok.js'),'utf8');
 const cookie=fs.readFileSync(path.join(__dirname,'../public/shared/cookie.js'),'utf8');
+const werelden=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-edge-worlds.js'),'utf8');
 
 test('RTG Work OS opent de echte kantoorsoftware als zelfstandige surfaces',()=>{
   for(const url of ['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html?kantoor=1',
     '/apps/office.html?werk=kantoor','/apps/agenda.html','/apps/rtmail.html',
-    '/apps/bestanden.html','/apps/backoffice.html','/apps/command.html'])assert.ok(bron.includes(url),url);
+    '/apps/bestanden.html','/apps/backoffice.html','/apps/command.html'])assert.ok(werelden.includes(url),url);
   assert.match(bron,/gebied.*kantoor/);
-  assert.match(bron,/id: 'vandaag'[\s\S]*id: 'afdelingen'/);
+  assert.match(bron,/appsVan\('work'\)/);
+  assert.match(bron,/RTGEdgeWorlds\[wereld\]\.all/);
   assert.match(bron,/data-rtg-schil="standaard"/);
 });
 
@@ -46,12 +48,15 @@ test('RTG Office gebruikt in Work OS geen dubbele of uitgerekte bovenbalk',()=>{
   assert.match(office,/body\.setAttribute\('data-ios-uit',''\)/);
 });
 
-test('de standaard schil heeft links, boven en onder en geeft de app het hele werkvlak',()=>{
+test('de standaard schil draagt navigatie over aan Edge System en geeft apps het hele werkvlak',()=>{
   const schilJs=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.js'),'utf8');
   const schilCss=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.css'),'utf8');
   assert.match(schilJs,/el\('nav', 'rtg-tabbar'/);
   assert.match(schilJs,/el\('nav', 'rtg-onderbalk'/);
-  assert.match(schilJs,/m\.h - tabhoog - onderhoog/);
+  assert.match(schilJs,/if \(standaard\(\)\)[\s\S]*zet\(schil\.console, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/if \(schil\.tabs\) zet\(schil\.tabs, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/if \(schil\.onderbalk\) zet\(schil\.onderbalk, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/r === sr - 1 \? m\.h - r \* sh : sh/);
   assert.doesNotMatch(bron,/\.rtg-werkruimte\{display:none;\}/,
     'Work OS mag op mobiel niet verdwijnen');
   assert.match(schilJs,/Sluit ' \+ esc\(s\.naam\)/);

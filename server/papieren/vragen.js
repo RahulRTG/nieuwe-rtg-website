@@ -83,8 +83,8 @@ const VRAGEN = [
 
   { id: 'vwoAi', groep: 'Verwerkers', veld: 'vwoAi', soort: 'ja-nee-reden',
     vraag: 'Ligt er een verwerkersovereenkomst met de AI-aanbieder, voor het geval er met een echte sleutel wordt gedraaid?',
-    waarom: 'Zonder sleutel draait alles op vaste demo-antwoorden en gaat er niets naar buiten. Mét sleutel gaat alles wat een lid mij typt naar die partij toe. Dat is een verwerking, en vaak ook een doorgifte buiten de EU.',
-    jaVraag: 'Met welke partij, en per wanneer?', neeVraag: 'Wanneer wordt die geregeld, of blijft de AI op demo-antwoorden?' },
+    waarom: 'Zonder sleutel draait alles op vaste basisantwoorden en gaat er niets naar buiten. Mét sleutel gaat alles wat een lid mij typt naar die partij toe. Dat is een verwerking, en vaak ook een doorgifte buiten de EU.',
+    jaVraag: 'Met welke partij, en per wanneer?', neeVraag: 'Wanneer wordt die geregeld, of blijft de AI op vaste basisantwoorden?' },
 
   { id: 'vwoFouten', groep: 'Verwerkers', veld: 'vwoFouten', soort: 'ja-nee-reden',
     vraag: 'Wordt er een externe foutentracker gebruikt, en ligt daar een verwerkersovereenkomst voor?',

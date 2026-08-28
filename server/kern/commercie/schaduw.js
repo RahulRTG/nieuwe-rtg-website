@@ -55,11 +55,8 @@ const VOORBEELDEN = 20;
 function maakSchaduw({ db, save, nu }) {
   const tijd = nu || klok.nu;
 
-  function alles() {
-    if (!db.data) db.data = {};
-    if (!db.data.schaduwregels || typeof db.data.schaduwregels !== 'object') db.data.schaduwregels = {};
-    return db.data.schaduwregels;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/schaduw', bezit: { schaduwregels: 'kaart' } });
+  function alles() { return eigen.bak('schaduwregels'); }
 
   function rij(id) {
     const k = String(id || '');

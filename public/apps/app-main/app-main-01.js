@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '344e0881';
+var RTG_BOUW = '6b238ec1';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -79,13 +79,11 @@ var RTG_BOUW = '344e0881';
     }
   }
 
-  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+  /* ---------- gegevens: echt via API, synthetisch alleen via Magnaat ---------- */
 
-  const PERSONAS = {
-    rtg:       {name:'K. Kiss',    full:'Katja Kiss',    since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Amberen Vos',      tier:'rtg'},
-    lifestyle: {name:'F. Johanna', full:'Fleur Johanna', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
-    business:  {name:'R. Imran',   full:'Rahul Imran',   since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
-  };
+  const MAGNAAT = window.RTG_MAGNAAT_PROEF && window.RTG_MAGNAAT_DATA
+    ? window.RTG_MAGNAAT_DATA : {};
+  const PERSONAS = MAGNAAT.personas || {};
   const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   /* DEZE DRIE BEGINNEN LEEG, en dat is de hele pointe van de demo-erfenis.
@@ -98,16 +96,15 @@ var RTG_BOUW = '344e0881';
      (server/kern/lid.js); dit was de laatste plek waar demo-inhoud nog voor
      eigen gegevens doorging.
 
-     De demo is niet weg maar apart: hij staat in DEMO_DATA hieronder en wordt
-     alleen door laadDemoData() geladen, in de expliciete demostand (?demo=1,
-     zonder backend), waar er per definitie geen echt account is.
+     De trainingsinhoud staat apart in magnaat-data.js en wordt alleen door
+     laadMagnaatData() geladen in de afgeschermde Magnaat-kopie, zonder backend.
 
      test/nieuwlid-leeg.test.js legt allebei de helften vast. */
   let user = null;
   let invoices = [];
   let trip = null;
   let posts = [];
-  let creatorLikes = 320;
+  let creatorLikes = 0;
   let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
 
   /* ---------- backend-koppeling ---------- */

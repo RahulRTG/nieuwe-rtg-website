@@ -144,7 +144,7 @@
         : '') +
       '</div>';
     if (!s.mag){
-      h += '<div style="margin-top:0.6rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
+      h += '<div style="margin-top:0.5rem;font-size:0.72rem;color:var(--soft);border-top:1px solid var(--line);padding-top:0.6rem;">' + escT(s.reden || T('ont.magniet','Nog niet beschikbaar.')) + '</div>';
       el.innerHTML = kaart(h);
       bindOntmoet();
       return;

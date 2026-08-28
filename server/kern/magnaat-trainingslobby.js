@@ -27,10 +27,10 @@ module.exports = ({ db, save, bewerkCollectie = null, crypto, partnerstudio, cod
     if (!s.kamers || typeof s.kamers !== 'object') s.kamers = {};
     return s;
   }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/magnaat-trainingslobby', bezit: { magnaatTrainingslobbies: 'kaart' } });
   function staat() {
     if (actieveStaat) return normaliseer(actieveStaat);
-    db.data.magnaatTrainingslobbies = normaliseer(db.data.magnaatTrainingslobbies);
-    return db.data.magnaatTrainingslobbies;
+    return normaliseer(eigen.bak('magnaatTrainingslobbies'));
   }
   /* In productie levert de opslag een database-slot. De callback zelf blijft
      synchroon; PostgreSQL mag vóór de callback op het slot wachten en commit

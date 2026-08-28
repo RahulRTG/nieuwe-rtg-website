@@ -154,7 +154,8 @@ logboeken, energie-instellingen): `scripts/mac/LEESMIJ.md`. Weghalen kan met
 | `RTG_SECRET_KEY` | Ondertekent de sessietokens. 64 hex-tekens. **Zonder dit weigert de start**, om dezelfde reden: anders komt `secret.key` naast de database te liggen, en kan wie hem heeft zelf geldige sessies maken |
 | `DATABASE_URL` | PostgreSQL voor de gedeelde data (aanbevolen voor productie en meerdere instances). Leeg = lokaal bestand |
 | `APP_URL` | Correcte links in e-mails |
-| `REDIS_URL` | Nodig zodra je meer dan één instance draait (realtime over instances) |
+| `REDIS_URL` | Gedeelde realtime-bus én atomische RTG-PIN-antifraudegrenzen over alle instances |
+| `RTG_PIN_ENTERPRISE=1` | Laat productie fail-closed weigeren wanneer `REDIS_URL` ontbreekt; aanbevolen voor iedere publieke livegang |
 | `RTG_TLS=1` | De app termineert **zelf** TLS/HTTPS op Node's tls-stack (HTTP/2 + HTTP/1.1-terugval via ALPN, TLS 1.2 als vloer, harde ciphers) — een aparte reverse proxy voor TLS is dan niet meer nodig. Zonder cert maakt ze een self-signed voor local |
 | `RTG_ACME=1` + `RTG_TLS_DOMAIN` + `RTG_TLS_EMAIL` | Met `RTG_TLS=1`: de app haalt en vernieuwt **zelf** een echt Let's Encrypt-certificaat (eigen ACME-client, HTTP-01 op poort 80, live cert-herlaad zonder herstart). `RTG_ACME_STAGING=1` om eerst tegen de staging-CA te oefenen |
 
@@ -476,10 +477,15 @@ achter de poortwachter, met Postgres en Redis overal aan.**
    draaien dan op PostgreSQL met transacties, row-locks, `LISTEN/NOTIFY` en de
    3-weg-merge tegen gelijktijdige schrijvers. Zonder dit heeft elke instance
    zijn eigen snapshot en lopen de instances uit elkaar.
-2. **Redis-bus overal aan.** Zet `REDIS_URL`. Realtime-events (SSE) gaan dan
-   over Redis pub/sub, zodat een gebruiker op instance A een event ziet dat op
-   instance B is veroorzaakt. Zonder Redis werkt realtime alleen binnen één
-   proces.
+2. **Redis-bus en PIN-frauderem overal aan.** Zet `REDIS_URL` en
+   `RTG_PIN_ENTERPRISE=1`. Realtime-events (SSE) gaan dan over Redis pub/sub,
+   zodat een gebruiker op instance A een event ziet dat op instance B is
+   veroorzaakt. De RTG-PIN-opzoekdeur telt per account, netwerkbron en globale
+   missers atomisch over hetzelfde cluster. Ook het eenmalige bewijs tussen
+   "bekijken" en "verbinden" wordt clusterbreed geclaimd, zodat load balancing
+   geen bevestiging breekt en een replay niet via een tweede instance kan
+   winnen. Uitval van geconfigureerde Redis laat nieuwe PIN-opzoekingen
+   fail-closed stoppen zonder login of bestaande relaties stil te leggen.
 3. **Deel de gedeelde geheimen.** Bij meerdere instances moeten
    `RTG_VAULT_KEY`, `RTG_SECRET_KEY` (en `RTG_ENC_KEY`) op alle instances
    gelijk zijn, anders kan de ene instance de versleutelde naam/e-mail van de
@@ -584,7 +590,8 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] Weet dat de outbox met een sleutel versleuteld is: mislukte verzendingen teruglezen gaat met `npm run outbox` (met dezelfde `RTG_ENC_KEY`)
 - [ ] `DATABASE_URL` gezet, PostgreSQL draait; back-up/restore van de database één keer geoefend
 - [ ] TLS geregeld: in de lokale-eerst live-route native in de app (`RTG_TLS=1`, `RTG_ACME=1`) met poort 80 + 443 bereikbaar; een reverse proxy is alleen een bewuste alternatieve architectuur
-- [ ] Redis draait en `REDIS_URL` is gezet (bij >1 instance)
+- [ ] Redis draait; `REDIS_URL` en `RTG_PIN_ENTERPRISE=1` zijn gezet, en een
+      startproef zonder Redis is aantoonbaar geblokkeerd
 - [ ] `ERR_WEBHOOK_URL` gezet, en de **zelfproef** op het techniekbord komt
       echt aan (`POST /api/techniek/alarm/proef`, alleen de eigenaar). Dit
       vinkje was niet af te vinken zolang het naar `SENTRY_DSN` wees: die
@@ -602,7 +609,7 @@ dev-lekken, registratie/eigenaar/backoffice werken.
 - [ ] `OFFICE_TOTP_SECRET` gezet en de authenticator-app gekoppeld (2FA op de backoffice; **de keuring blokkeert de productiestart zolang hij ontbreekt**, en een geheim onder de 16 base32-tekens telt niet als tweede factor). Zonder deze factor staat de backoffice — auditlog, tijdlijn met codenamen, export — achter alleen de statische `OFFICE_CODE`, en de officedeur remt per IP, dus verspreid raden komt daar langs. Dit was een waarschuwing; `scripts/docker/controle.js` eiste het al hard voor livegang, en die twee zeggen nu hetzelfde
 - [ ] Inlog-auditlog gecontroleerd na de eerste inlog (RTG HQ, kaart "Inlogactiviteit")
 - [ ] Rate-limiter bevestigd: in productie geeft de API boven 300 verzoeken/minuut/IP een 429 (test/livegang.test.js bewijst dit)
-- [ ] Schone start bevestigd: in productie zonder `RTG_DEMO` zijn er geen demozaken, geen demopersoneel en geen voorbeeldposts; ook een database die als demo begon wordt bij de start opgeschoond (test/livegang.test.js)
+- [ ] Schone start bevestigd: elke echte omgeving heeft `RTG_MAGNAAT_TEST` uit en bevat geen voorbeeldzaken, testpersoneel of voorbeeldposts; ook een database die eerder als testomgeving begon wordt bij de start opgeschoond (test/livegang.test.js)
 - [ ] Schild getest: de applicatie-WAF blokkeert sondes (wp-admin, .env, pad-klimmen) en de DDoS-rem zet een stormend IP 15 minuten op de banlijst; meldingen komen op het beveiligingsbord binnen (test/schild.test.js)
 - [ ] Rand-DDoS geregeld: DNS achter Cloudflare (of gelijkwaardig) met proxy aan, zodat volumetrische golven de server nooit bereiken; de app-WAF en -rem zijn de tweede linie
 - [ ] TURN draait: coturn met `use-auth-secret` en `static-auth-secret` gelijk aan `TURN_SECRET`; `/api/ice` geeft kortlevende inloggegevens terug en (video)bellen werkt vanaf 4G/strenge firewalls

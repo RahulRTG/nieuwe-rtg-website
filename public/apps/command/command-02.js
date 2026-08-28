@@ -33,7 +33,7 @@
       tegel('Beleidsregels', p.beleid.regels, p.beleid.voorstellenOpen ? 'gold' : '', p.beleid.voorstellenOpen + ' voorstel(len) wachten op een tweede paar ogen') +
       '</div>';
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin-top:1.6rem;">Per domein</h2><div class="rooster">';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin-top:1.25rem;">Per domein</h2><div class="rooster">';
     for (var i = 0; i < p.domeinen.length; i++) {
       var d = p.domeinen[i];
       u += '<div class="tegel"><div class="l">' + esc(d.domein) + '</div>' +
@@ -104,7 +104,7 @@
       'dezelfde codenamen en dezelfde gegevens -- ze worden hier geopend, niet nagebouwd. ' +
       'Wat u in Command aan een object doet, ziet u daar terug, en omgekeerd.</p>';
     for (var i = 0; i < SUITE.length; i++) {
-      u += '<h2 class="ckop" style="font-size:1.1rem;margin:1.4rem 0 .6rem;">' + esc(SUITE[i][0]) + '</h2><div class="werkplek">';
+      u += '<h2 class="ckop" style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">' + esc(SUITE[i][0]) + '</h2><div class="werkplek">';
       var rij = SUITE[i][1];
       for (var j = 0; j < rij.length; j++) {
         u += '<a href="' + esc(rij[j][0]) + '"><b>' + esc(rij[j][1]) + '</b><span>' + esc(rij[j][2]) + '</span></a>';

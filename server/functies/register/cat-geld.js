@@ -112,5 +112,14 @@ module.exports = [
     vermogen: 'WALLET_SALDO' },
   { id: 'dom-partner-uitbetaling', categorie: 'Geld', naam: 'Partnersaldo uitbetalen', standaard: true, doelgroepen: ['leverancier'],
     uitleg: 'Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.', paden: ['/api/supplier/pay/uitbetaal'],
-    vermogen: 'PARTNER_UITBETALING' }
+    vermogen: 'PARTNER_UITBETALING' },
+  /* DE KOSTENSPIEGEL VAN HET LID (KOSTEN.md). Alleen het scherm van het lid
+     staat hier; de kantoorkant loopt over /api/office en die hoort bij de
+     bestuurslaag. Zonder VERMOGEN, want dit is geen financiele dienst: er
+     beweegt geen geld en er ontstaat geen vordering -- het lid ziet wat zijn
+     eigen gebruik ons kost. Uitzetten mag dus ook zonder gevolg voor een
+     bevoegdheid; wat er dan wegvalt is inzicht en niet een recht. */
+  { id: 'dom-kosten', categorie: 'Geld', naam: 'Wat mijn gebruik kost', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het lid ziet wat zijn eigen gebruik van RTG kost, met de bewijsgraad erbij, en wie dat betaalt.',
+    paden: ['/api/kosten'] }
 ];

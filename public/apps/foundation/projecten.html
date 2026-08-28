@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Samen aan een project</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -39,6 +39,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -71,18 +72,18 @@
     <h2 class="sec">Taken <small style="text-transform:none;letter-spacing:0;">(tik  om een taak te pakken)</small></h2>
     <div class="kaart blok">
       <div id="pTaken"></div>
-      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+      <div style="display:flex;gap:.5rem;margin-top:0.5rem;">
         <input class="veld h-flex1" id="tNieuw" placeholder="Nieuwe taak…" maxlength="140">
         <button class="knop klein" id="tMaak">+</button>
       </div>
-      <button class="knop grijs" id="pAi" style="width:100%;margin-top:.5rem;">Laat de buddy een plan voorstellen</button>
+      <button class="knop grijs" id="pAi" style="width:100%;margin-top:0.5rem;">Laat de buddy een plan voorstellen</button>
       <div class="fout" id="pFout"></div>
     </div>
 
     <h2 class="sec">Notities en vondsten</h2>
     <div class="kaart blok">
       <div id="pNotities"><div class="leeg">Nog niets genoteerd.</div></div>
-      <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+      <div style="display:flex;gap:.5rem;margin-top:0.5rem;">
         <input class="veld h-flex1" id="nNotitie" placeholder="Idee, bron of afspraak…" maxlength="500">
         <button class="knop klein" id="nPlaats">+</button>
       </div>
@@ -93,7 +94,7 @@
       <div class="keuzerij" id="uVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="uCodenaam" placeholder="Of nodig uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen werken maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
-      <button class="knop grijs" id="uStuur" style="width:100%;margin-top:.4rem;">Nodig uit</button>
+      <button class="knop grijs" id="uStuur" style="width:100%;margin-top:0.5rem;">Nodig uit</button>
       <div class="fout" id="uFout"></div>
     </div>
 
@@ -202,7 +203,7 @@ $('#tMaak').addEventListener('click', async () => {
 $('#tNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#tMaak').click(); });
 $('#pAi').addEventListener('click', async () => {
   $('#pFout').textContent = ''; $('#pAi').disabled = true;
-  try { const d = await api('project-ai', { id: P.id, groep }); $('#pFout').textContent = d.erbij ? 'De buddy zette ' + d.erbij + ' taken klaar' + (d.demo ? ' (demo)' : '') + '.' : 'Alles uit het plan staat er al.'; ververs(); }
+  try { const d = await api('project-ai', { id: P.id, groep }); $('#pFout').textContent = d.erbij ? 'De buddy zette ' + d.erbij + ' taken klaar' + (d.demo ? ' vanuit de vaste basis' : '') + '.' : 'Alles uit het plan staat er al.'; ververs(); }
   catch (e) { $('#pFout').textContent = e.message; }
   $('#pAi').disabled = false;
 });
@@ -252,5 +253,6 @@ if (qs.get('project')) openProject(qs.get('project'));
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

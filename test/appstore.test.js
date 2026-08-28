@@ -170,6 +170,24 @@ test('6. publiceren kan alleen een mens van RTG, niet de uitgever zelf', async (
   const w = await api('/api/appstore/kantoor/wachtrij', {}, office);
   assert.ok(w.body.inzendingen.some(v => v.id === versieId), 'hij staat in de wachtrij');
   assert.match(w.body.let, /keurt nooit goed/);
+  /* De toegankelijkheidspoort (besluit 27 augustus 2026): publiceren kan pas na
+     een geslaagde keuring op DEZE bundelhash. In het echt doet de keurloper dat;
+     deze toets gaat over de zes grenzen en niet over de keuring.
+
+     Wat hier wel bij hoort: de mens die aftekent moet de uitslag KUNNEN ZIEN.
+     Zonder dat drukt hij op Publiceren, krijgt een weigering terug en mag zelf
+     raden waarom -- en dan is de poort een muur. */
+  assert.equal(w.body.inzendingen.find(v => v.id === versieId).toegankelijk, null,
+    'zolang er niets is gekeurd, staat er ook geen uitslag bij de inzending');
+  const zonder = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
+  assert.equal(zonder.status, 409, 'en publiceren kan dan niet');
+  assert.match(zonder.body.error, /nog niet over deze bundel gedraaid/);
+  await api('/api/appstore/kantoor/toegankelijk', { versieId, stand: 'in-orde', fouten: 0 }, office);
+  const w2 = await api('/api/appstore/kantoor/wachtrij', {}, office);
+  const na = w2.body.inzendingen.find(v => v.id === versieId).toegankelijk;
+  assert.equal(na && na.stand, 'in-orde', 'daarna reist de uitslag mee naar het keuringsscherm');
+  assert.equal(na.hash, w.body.inzendingen.find(v => v.id === versieId).hash,
+    'en hij hangt aan de bundel waarover hij gaat');
   const b = await api('/api/appstore/kantoor/besluit', { versieId, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
   assert.equal(b.status, 200);
   assert.equal(b.body.versie.status, 'gepubliceerd');
@@ -292,6 +310,7 @@ test('11. een geschorste uitgever verliest zijn etalage op hetzelfde moment', as
   const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest({ versie: '1.0.1' }),
     bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.0.1' }]) }, sup);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
+  await api('/api/appstore/kantoor/toegankelijk', { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
   assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
   assert.equal((await api('/api/appstore/catalogus', {}, lid)).body.totaal, 1);
 
@@ -311,9 +330,17 @@ test('12. elke machtiging in de catalogus wordt door de brug uitgevoerd', () => 
   /* LAT-regel 6: een belofte in tekst is een belofte in code. Een machtiging die
      wel te vragen is en nergens iets doet, is precies zo'n belofte -- en een
      lid dat hem verleent, verleent iets wat niet bestaat. */
-  const brug = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'appstore', 'brug.js'), 'utf8');
+  /* Uit de DRAAIENDE brug en niet uit zijn broncode. De eerste versie las
+     brug.js als tekst; toen de methodetabel naar een eigen bestand verhuisde,
+     zakte deze toets op een verhuizing in plaats van op een gebroken belofte --
+     en dat is niet wat hij hoort te bewaken. */
+  const { maakBrug } = require('../server/kern/appstore/brug');
+  const staat = { opslag: {}, bakjes: {} };
+  const brug = maakBrug({ S: () => staat, save() {}, boek() {},
+    nu: () => new Date().toISOString(), eigen: (o, k) => o[k] });
+  const gebruikt = new Set(Object.values(brug.machtigingen));
   for (const m of MACHTIGINGEN) {
-    assert.ok(brug.includes("machtiging: '" + m.id + "'"),
+    assert.ok(gebruikt.has(m.id),
       'machtiging ' + m.id + ' staat in de catalogus maar wordt door geen enkele methode van de brug gebruikt');
   }
 });
@@ -328,6 +355,7 @@ test('13. de uitgever heeft zijn eigen noodrem, en het lid zijn eigen gum', asyn
   const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest({ versie: '1.1.0' }),
     bestanden: bundel([{ pad: 'extra.txt', inhoud: 'versie 1.1.0' }]) }, sup);
   assert.equal(r.status, 200, JSON.stringify(r.body.bevindingen || r.body.error || ''));
+  await api('/api/appstore/kantoor/toegankelijk', { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
   assert.equal((await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
 
   // de uitgever ziet wat een lid straks ziet
@@ -393,7 +421,25 @@ test('14. een geweigerde versie laat geen bytes achter, wel het bewijs', async (
   assert.match(afgekeurd.besluit.reden, /niet wat hij in zijn uitleg belooft/);
 });
 
-test('15. zonder inlog en zonder pas blijft alles dicht', async () => {
+test('15. kantoor en uitgever lezen hun nieuwe werktafels via de echte deuren', async () => {
+  const wachtrij = await api('/api/appstore/kantoor/toegankelijk/wachtrij', {}, office);
+  assert.equal(wachtrij.status, 200);
+  assert.ok(Array.isArray(wachtrij.body.lijst));
+
+  const naslag = await api('/api/appstore/naslag', {}, sup);
+  assert.equal(naslag.status, 200);
+  assert.ok(Array.isArray(naslag.body.methodes), 'de SDK-methodes komen uit dezelfde naslagbron');
+
+  const cijfers = await api('/api/appstore/uitgever/cijfers', { dagen: 30 }, sup);
+  assert.equal(cijfers.status, 200);
+  assert.ok(Array.isArray(cijfers.body.apps));
+
+  const journaal = await api('/api/appstore/uitgever/journaal', {}, sup);
+  assert.equal(journaal.status, 200);
+  assert.ok(Array.isArray(journaal.body.lijst));
+});
+
+test('16. zonder inlog en zonder pas blijft alles dicht', async () => {
   assert.equal((await api('/api/appstore/catalogus', {})).status, 401);
   assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lijst' })).status, 401);
   assert.equal((await api('/api/appstore/uitgever/inzenden', { manifest: manifest(), bestanden: bundel() })).status, 401);

@@ -103,10 +103,41 @@ recht op vergetelheid in Postgres-stand niets deed. De pasprijs stond in de
 boardroom en nog een keer hard in `kern/lid.js`. De rate limiter `teVaak` stond
 in drie kernmodules, en geen van de kopieen had de opruimronde van het origineel.
 
+*En het duurste geval, want het zit in de veiligheid zelf:* de vraag "mag de
+machine dit zelf doen" wordt op VIJF plekken beantwoord, met vijf verschillende
+schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `command/risico.js`
+(hand/assist/auto), `geldbeleid/regels.js` (kijken/voorstellen/klaarzetten/
+automatisch), `stadsweefsel/ainiveau.js` (waarnemen tot verboden) en
+`bureau/delegatie.js` (informeren tot autonoom). Elk van de vijf is op zichzelf
+zorgvuldig gebouwd; het bezwaar is dat geen van de vijf de andere vier kan lezen,
+dus geen mens en geen machine kan ze naast elkaar leggen. Ze zijn dan ook al
+uiteengelopen: `ainiveau.js` zet "een vergunning of aanvraag afwijzen" op niveau
+4 ("hier komt geen machine aan, met of zonder sleutel") terwijl `stuur/beleid.js`
+precies die handeling als `voorstel` toelaat, en `magAutomatisch()` -- dat in zijn
+eigen commentaar "de enige plek die daar antwoord op geeft" heet -- op die weg
+nooit wordt aangeroepen. Daarnaast staat `niveau: 'hand'` als kale tekenreeks in
+achttien Command-modules die `risico.js` niet importeren: hernoem de trede en die
+achttien schrijven zwijgend het oude woord.
+
+*En dezelfde fout een laag lager, waar hij het meest kost:* "wie handelt hier"
+stond op ZEVEN plekken op het verzoek -- `req.session`, `req.actor`,
+`req.boardroomKey`, `req.techUser`, `req.gast`, `req.gezinslid`, `req.drive`.
+Zeven namen voor een begrip betekent dat er niets generieks op kan staan: een
+teller, een rem, een bonnetje of een blast radius zou zeven keer geschreven
+moeten worden, en de achtste poortwachter zou de eerste zeven weer niet kennen.
+`server/opzet/envelop.js` is sinds augustus 2026 de canonieke vorm, en tien van
+de elf poortwachters zetten hem. Hij is er ADDITIEF bij gezet en heeft niets
+weggehaald -- een vervanging in het authenticatiepad van 3349 routes ineens is
+precies het soort wijziging waarvan je pas maanden later merkt wat er stuk ging.
+De zeven oude vormen blijven daarom geteld in `ENVELOP.json` tot ze route voor
+route zijn afgebouwd.
+
 **Handhaver:** `check.js` regel 26 (elke naam die je uit een module haalt bestaat
 daar), regel 25, regel 27, regel 28 (de publieke-routelijst mag geen namen
-bevatten die niet meer bestaan of die inmiddels een eigen poort hebben), en
-`scripts/kruisscan.js`.
+bevatten die niet meer bestaan of die inmiddels een eigen poort hebben),
+`scripts/kruisscan.js`, en voor het gezagsgeval `scripts/gezag.js` + `GEZAG.json`
+(het aantal schalen en het aantal losse niveaunamen mag alleen omlaag, en een
+vastgelegde tegenspraak wordt bij elke ronde opnieuw nagetrokken).
 
 ### 5. Niets slaat stil over
 
@@ -457,6 +488,15 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
+| hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |
+| wat een poortwachter vaststelt voor hij JA zegt, en de canonieke vorm daarvoor | `ENVELOP.json` + `scripts/envelop.js` + `server/opzet/envelop.js` |
+| wat een verzoek werkelijk verandert (rijen per collectie, voor en na) | `server/opzet/handeling.js` + `test/handeling.test.js` |
+| een massaverwijdering tegengehouden VOORDAT hij landt (standaard: melden) | `server/opzet/begroting.js` + `server/db/state.js` |
+| die laag ook echt geraakt vanaf een ECHTE route (bewezen weigerend is niet bewezen bereikbaar) | `test/begrotingroute.test.js` |
+| de grens per collectie, en waar er geen mag staan (het vergeetpad) | `BEGROTING.json` + `server/opzet/begrotingsgrenzen.js` |
+| een bovengrens draait in het onderhoud en niet in een schrijfroute | `server/kern/kappen.js` + `test/kappen.test.js` |
+| welke grote krimpen de toetsen echt uitlokken -- met bewijs dat de val aanstond | `KRIMP.json` + `scripts/krimpronde.js` + `test/krimpronde.test.js` |
+| een bronmuterende toets draait alleen, niet naast een server die diezelfde bron leest | `scripts/lib/geisoleerd.js` + `test/bronmutanten.test.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm opent en geeft een teken van leven (dood is stiller dan stuk) | `test/paginas.e2e.js` |
@@ -474,6 +514,10 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
+| de dekkingsvloer, opgeteld over de vier delen van de suite | `scripts/dekkingsvloer.js` |
+| het a11y-oordeel over de hele ronde, niet per deel | `scripts/lib/a11yoordeel.js` + `test/a11yoordeel.test.js` |
+| elke bronmuterende ijking draait ergens, en niet nergens | `scripts/lib/ijkingen.js` + `test/delen.test.js` |
+| gedeeld zout blijft bij de demo-seed en komt nooit op een echt account | `scripts/check.js` + `test/zaaihash.test.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
 

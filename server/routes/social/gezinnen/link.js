@@ -42,7 +42,9 @@ const alsGezin = (req) => ({ soort: 'gezin', key: req.gezinslid.handle });
 app.post('/api/rtf/link/los', gezinsPoort, nietBeschermd, async (req, res) => {
   const r = await kern.linkLos(alsGezin(req), req.body && req.body.tekst);
   if (r.error) return res.status(r.status || 400).json({ error: r.error, soort: r.soort || undefined });
-  res.json({ type: r.type, wat: r.wat, vorm: r.vorm, onderwerp: r.onderwerp, intenties: r.intenties });
+  res.json({ type: r.type, wat: r.wat, vorm: r.vorm, onderwerp: r.onderwerp,
+    bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt,
+    intenties: r.intenties });
 });
 
 /* Mijn koppelingen: wat er van mij openstaat, wat er gebeurde, en met wie. Voor

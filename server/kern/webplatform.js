@@ -19,7 +19,9 @@
    De module kent zelf geen leveranciers; hij krijgt het zaakobject aangereikt
    door de route (die via supplierAuth/findSupplier al weet wie het is). */
 module.exports = ({ db, team }) => {
-  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'salon', 'reviews', 'contact'];
+  /* `winkel` is een BRON en geen bloktype: COMMERCE.md grens 5 houdt
+     commerce-logica uit Webmaker. Geen product-, mand- of afrekenblok. */
+  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'salon', 'reviews', 'contact', 'winkel'];
   const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
   const geld = p => (p == null || p === '' ? '' : '€ ' + p);
@@ -170,5 +172,5 @@ module.exports = ({ db, team }) => {
       .map(s => ({ code: s.code, naam: s.name, stad: s.city || '', typeLabel: typeLabel(s) }));
   }
 
-  return { BRONNEN, genereer, genereerPersoon, los, losSite, zaakInfo, zoekZaken };
+  return { BRONNEN, genereer, genereerPersoon, los, losSite, zaakInfo, zoekZaken, koppelWinkel: los.koppelWinkel };
 };

@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Kostprijs</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De materialenleer NA rtg-ui.css en VOOR de tokenlaag, net als in
+     /apps/werk.html en /apps/geld.html. Dit scherm kopieerde zijn goud en zijn
+     bordeaux als hexcodes; die kopie loopt uit de pas zodra het beeldmerk
+     verandert, en juist op het bord waar over andermans rekening wordt besloten
+     hoort dat niet te kunnen (MATERIAAL.md, "de ankers komen uit het logo"). -->
+<link href="/shared/rtg-materiaal.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<style>
+  /* GEEN EIGEN KLEUREN MEER. Wat hier stond (--burgundy, --gold, --groen) waren
+     drie overgetikte hexcodes, en ze deden twee verschillende dingen door
+     elkaar: het merk dragen EN een toestand aanduiden. Nu staan ze uit elkaar.
+     De merkkant komt uit de materialenleer (het goud van het logo, met het
+     hoogsel als tekstkleur op zwart), de toestandkant uit de signaaltokens van
+     ONTWERP.md par. 4 -- want dat is wat ze op dit scherm werkelijk zijn:
+     "let op", "in orde", "hier moet een mens naar kijken". */
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --merkgoud:var(--gold-tekst);
+    --burgundy:var(--rtg-sig-incident); --gold:var(--rtg-sig-aandacht); --groen:var(--rtg-sig-gezond); }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  /* SERIF STAAT OP EEN GESLOTEN LIJST ROLLEN (ONTWERP.md par. 1), en h2/h3
+     stonden er niet op: een kaarttitel is werk en geen ceremonie. Bodoni overal
+     oogt luxe en leest als modeblad; een signatuur die op elke kop staat, is
+     geen signatuur meer. De koppen hieronder zijn nu werk-labels in Inter, en
+     de enige twee ceremoniele elementen op dit bord zijn de paginatitel en het
+     ene dominante getal per kaart (.rtg-kpi uit de tokenlaag). */
+  h1{font-family:var(--rtg-display);font-weight:500;letter-spacing:-.01em;}
+  h2,h3{font-family:var(--rtg-interface);font-weight:600;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);
+    padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--merkgoud);}
+  header h1{font-size:1.3rem;margin-top:.05rem;}
+  main{padding:1.1rem;max-width:980px;margin:0 auto;}
+  /* De maten komen uit de modus op de body (Command: dit is een directiebord met
+     tientallen objecten). Stonden ze hier als vaste rem-waarden, dan zette
+     data-rtg-modus niets en was de modus een lege belofte -- dezelfde fout die
+     /apps/geld.html eerder maakte. */
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;
+    padding:calc(var(--rtg-ruim) * 1.2) calc(var(--rtg-ruim) * 1.4);margin-bottom:var(--rtg-ruim);}
+  .kaart h2{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--merkgoud);margin-bottom:.35rem;}
+  .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .rij.strak{margin-top:0;}
+  .groei{flex:1 1 auto;min-width:8rem;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  .veld.breed{flex:1 1 12rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;min-width:2.6rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .scheiding{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem;}
+  /* Het dominante getal per kaart komt uit de tokenlaag (.rtg-kpi): daar staat
+     de maat, de serif EN de tabulaire cijfers op een plek. Hier stond een eigen
+     .groot die het derde vergat, dus de percentages en bedragen lijnden niet
+     uit -- precies het detail waaraan je een instrument van een website
+     onderscheidt (ONTWERP.md par. 8). */
+  .rtg-kpi{font-size:1.9rem;}
+  /* En de vulling van een voorbehoud volgt dezelfde toestandkleur in plaats van
+     een overgetikte rgba() van de oude hexcode. Die drie stonden er nog met de
+     cijfers van #C23A5E, #A98F1C en #4C9A75 erin -- dus de rand veranderde mee
+     met het token en het vlak eronder niet. color-mix laat een kleur EEN keer
+     wonen; dezelfde weg als shared/command.css. */
+  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.5rem;
+    background:color-mix(in srgb,var(--burgundy) 7%,transparent);border-radius:0;font-size:.8rem;line-height:1.5;}
+  .bev.letop{border-left-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,transparent);}
+  .bev.rust{border-left-color:var(--groen);background:color-mix(in srgb,var(--groen) 8%,transparent);}
+  /* .st is de NEUTRALE pil ("vast", "bestaat nog niet"): een etiket zonder
+     toestand. De drie gekleurde varianten die hier stonden zijn weg: een
+     bewijsgraad IS een toestand en hoort dus de huiscomponent .rtg-status te
+     dragen, met een teken naast het woord en kleur pas als derde laag
+     (ONTWERP.md par. 5). Het is bovendien dezelfde afbeelding graad -> signaal
+     als op het ledenscherm, en die hoort op EEN plek te staan:
+     /shared/kostenbeeld.js. Twee schermen die "vermoed" verschillend kleuren,
+     zeggen iets anders over hetzelfde bewijs. */
+  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;}
+  th,td{text-align:left;padding:var(--rtg-ruim-klein) .35rem;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+  td.getal,th.getal{text-align:right;white-space:nowrap;font-variant-numeric:var(--rtg-cijfers);}
+  .schuif{overflow-x:auto;}
+  /* Uit een inline stijlattribuut gehaald: die houden style-src-attr in de CSP
+     open en scripts/norm.js telt ze. */
+  .kop3{font-size:.9rem;color:var(--soft);margin-top:1rem;font-weight:500;}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:var(--merkgoud);}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
+    border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+</style>
+</head>
+<body data-rtg-modus="command">
+
+<!-- Geen eigen springlink: shared/basis.js zet er al een neer op elk scherm dat
+     hem laadt, met de juiste maat. Hier stond er wel een, en de a11y-keuring wees
+     hem meteen aan: 116x20 op telefoonformaat, onder de 24x24 van WCAG 2.5.8 --
+     en erger, hij ONDERDRUKTE de gedeelde versie, want basis.js laat de zijne weg
+     zodra de pagina er zelf al een heeft. Een eigen kopie van een gedeelde
+     voorziening is hier dus niet alleen dubbel maar slechter. -->
+
+<header>
+  <a class="knop stil" href="/apps/boardroom.html">&larr; Boardroom</a>
+  <div class="groei"><div class="ey">RTG Kostprijs</div><h1>Wat kost elke gebruiker</h1></div>
+  <input class="veld" id="maand" type="month" aria-label="Maand">
+</header>
+
+<main id="main"><div class="kaart"><p class="sub">Bezig met laden&hellip;</p></div></main>
+<div class="melding" id="melding" role="status"></div>
+
+<!-- De gedeelde kostenlaag van de klantschermen, en dit bord leest er EEN ding
+     uit: hoe een bewijsgraad eruitziet. Zonder defer en voor het script
+     hieronder, want dat tekent er meteen mee. Waarom gedeeld en niet
+     overgetikt: het lid dat straks deze rekening krijgt, hoort "vermoed" in
+     dezelfde kleur en met hetzelfde teken te zien als de mens die hier besluit
+     hem te sturen. -->
+<script src="/shared/kostenbeeld.js"></script>
+
+<script>
+/* HET KOSTENBORD VAN DE BOARDROOM.
+
+   Eén scherm voor de vraag die nergens beantwoord werd: wat kost elke gebruiker
+   ons, en wie betaalt dat. Zie KOSTEN.md voor de laag eronder.
+
+   DIT SCHERM REKENT NIETS. Elk getal komt uit de server. Een scherm dat zelf
+   optelt, zegt op een dag iets anders dan de factuur die uit dezelfde cijfers
+   komt -- dezelfde reden waarom kern/command/gezondheid.js niets zelf meet.
+
+   EN HET TOONT DE BEWIJSGRAAD OVERAL WAAR EEN BEDRAG STAAT. Een verdeelde
+   stroomrekening ziet er net zo uit als een gemeten AI-rekening; het verschil
+   zit in het label ernaast, en dat verschil is precies wat je nodig hebt voordat
+   je iemand een rekening stuurt. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = c => c == null ? '--' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c||0)/100);
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 3600); }
+const api = (pad, body) => fetch(pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+/* De bewijsgraad komt uit de gedeelde laag en niet uit dit bestand: hetzelfde
+   woord, hetzelfde teken en dezelfde kleur als op het scherm van het lid dat
+   straks de rekening krijgt (/shared/kostenbeeld.js). */
+const graad = g => window.RTGKosten.graad(g);
+const wieTekst = w => !w ? '' : (w.soort === 'huis' ? 'het huis' : w.soort + ' ' + w.id);
+
+/* Wat de gebruiker kost, tegenover wat hij betaalt. Het percentage staat er
+   NOOIT alleen: eronder staat over hoeveel gebruikers geen bijdrage bekend is,
+   want hun kosten tellen wel in de noemer en hun bijdrage niet in de teller. */
+function tekenDekking(d){
+  const pct = d.dekkingsgraad == null ? null : Math.round(d.dekkingsgraad * 100);
+  return '<div class="kaart"><h2>Dekken de bijdragen de kosten?</h2>'+
+    '<p class="sub">'+d.gebruikers+' gebruikers in deze maand.</p>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+(pct == null ? '--' : pct + '%')+'</div>'+
+      '<p class="sub">'+eur(d.bijdragenCenten)+' aan bijdragen tegenover '+eur(d.kostenCenten)+' aan kosten'+
+      (d.verschilCenten < 0 ? ' (tekort '+eur(-d.verschilCenten)+')' : ' (over '+eur(d.verschilCenten)+')')+'.</p></div></div>'+
+    '<div class="bev letop"><b>Wat dit percentage niet zegt.</b> Van '+d.zonderBekendeBijdrage.aantal+
+      ' gebruikers is geen bijdrage bekend ('+esc(d.zonderBekendeBijdrage.waarom)+'). Hun kosten van '+
+      eur(d.zonderBekendeBijdrage.kostenCenten)+' tellen wel mee in de noemer, hun bijdrage niet in de teller. '+
+      'Dat drukt het cijfer, en het is niet weggerekend.</div>'+
+    '<div class="bev rust"><b>RTFoundation.</b> '+d.rtfoundation.gezinnen+' gezinnen, samen '+eur(d.rtfoundation.kostenCenten)+
+      '. '+esc(d.rtfoundation.wieBetaalt)+
+      (d.rtfoundation.fonds ? ' In het fonds staat '+eur(d.rtfoundation.fonds.totaalCenten)+'; '+esc(d.rtfoundation.fonds.zegtNiet) : '')+'</div>'+
+    '</div>';
+}
+
+/* WAT WORDT HET DEZE MAAND, en waarom er geen bandbreedte staat.
+
+   De projectie staat er altijd; de band alleen als de trefzekerheid GEMETEN is
+   over afgesloten maanden. Zolang dat niet zo is, staat er waarom niet -- en
+   niet een percentage dat niemand heeft nagerekend. */
+function tekenVooruitblik(v){
+  const tz = v.trefzekerheid || {};
+  return '<div class="kaart"><h2>Wat wordt het deze maand</h2>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+eur(v.verwachtCenten)+'</div>'+
+    '<p class="sub">Nu ' + eur(v.totNuCenten) + ' na ' + v.dagenVoorbij + ' van de ' + v.dagenInMaand + ' dagen. '+
+    esc(v.zegtNiet || '')+'</p></div></div>'+
+    (v.band
+      ? '<div class="bev rust"><b>Bandbreedte '+eur(v.band.vanCenten)+' tot '+eur(v.band.totCenten)+'.</b> '+
+        'Op basis van '+esc(v.band.opBasisVan)+'. '+esc(v.band.zegtNiet)+'</div>'
+      : '<div class="bev letop"><b>Er staat geen bandbreedte.</b> '+esc(tz.waarom || 'De trefzekerheid is nog niet gemeten.')+'</div>')+
+    (tz.gemeten
+      ? '<p class="sub">Gemiddelde afwijking over '+tz.maanden+' afgesloten maanden: '+tz.gemiddeldeAfwijkingPct+'%.</p>'
+      : '')+
+    '</div>';
+}
+
+/* DE MAAND SLUITEN. Elk verschil krijgt een eigen regel met een tekstveld: een
+   verklaring is tekst en geen vinkje, want over een jaar is dit het enige
+   antwoord dat er nog is. */
+function tekenPeriode(pr){
+  const knop = pr.stand === 'gesloten'
+    ? '<div class="rij"><input class="veld breed" id="pReden" maxlength="300" placeholder="Waarom moet deze maand open?" aria-label="Reden voor heropenen">'+
+      '<button class="knop stil" id="pHeropen" type="button">Heropenen</button></div>'
+    : pr.kanSluiten
+      ? '<div class="rij"><button class="knop" id="pSluit" type="button">Maand sluiten</button></div>'
+      : '<p class="sub">'+esc(pr.waarom || '')+'</p>';
+  return '<div class="kaart"><h2>De maand '+esc(pr.periode)+'</h2>'+
+    '<div class="rij strak"><span class="rtg-status"'+
+      (pr.stand === 'gesloten' ? ' data-sig="gezond" data-teken="✓"'
+        : pr.stand === 'in-onderzoek' ? ' data-sig="incident" data-teken="!"' : ' data-teken="◷"')+
+      '>'+esc(pr.stand)+'</span>'+
+    (pr.geslotenOp ? '<span class="sub">gesloten op '+esc(pr.geslotenOp)+' door <code>'+esc(pr.geslotenDoor || '')+'</code></span>' : '')+'</div>'+
+    '<p class="sub">Een maand gaat pas dicht als elk verschil een verklaring draagt. Een maand in onderzoek gaat niet naar de rekening van een lid.</p>'+
+    (pr.verschillen.length
+      ? pr.verschillen.map(v => '<div class="scheiding"><div class="rij strak"><b class="groei">'+esc(v.naam)+'</b>'+
+          '<span class="st">'+eur(v.verschilCenten)+'</span></div>'+
+          '<p class="sub">'+esc(v.wat)+'</p>'+
+          (v.verklaring
+            ? '<div class="bev rust">'+esc(v.verklaring.tekst)+'<br><span class="sub">'+esc(v.verklaring.door)+' &middot; '+esc(v.verklaring.op)+'</span></div>'
+            : '<div class="rij"><input class="veld breed vk" data-sleutel="'+esc(v.sleutel)+'" maxlength="500" placeholder="Wat verklaart dit verschil?" aria-label="Verklaring">'+
+              '<button class="knop stil vkZet" data-sleutel="'+esc(v.sleutel)+'" type="button">Verklaren</button></div>')+
+          '</div>').join('')
+      : '<div class="bev rust">Geen verschillen in deze maand.</div>')+
+    knop + '</div>';
+}
+
+function tekenGebruikers(rijen){
+  if (!rijen.length) return '<div class="kaart"><h2>Gebruikers</h2><p class="sub">In deze maand is er nog niets gemeten.</p></div>';
+  return '<div class="kaart"><h2>Gebruikers</h2>'+
+    '<p class="sub">Op hun sessiesleutel, zaakcode of gezinscode. Er staan hier geen namen: die wonen in de identiteitskluis, en dit scherm is geen achterdeur daaromheen.</p>'+
+    '<div class="schuif"><table><thead><tr><th>Gebruiker</th><th>Soort</th><th class="getal">Kosten</th><th>Bewijs</th></tr></thead><tbody>'+
+    rijen.slice(0, 100).map(r => '<tr><td><code>'+esc(r.drager)+'</code></td><td>'+esc(r.wie.soort)+'</td>'+
+      '<td class="getal">'+eur(r.centen)+'</td><td>'+graad(r.graad)+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    (rijen.length > 100 ? '<p class="sub">'+(rijen.length - 100)+' gebruikers niet getoond; dit zijn de duurste honderd.</p>' : '')+
+    '</div>';
+}
+
+/* De tarieven. Wat ontbreekt staat BOVENAAN en niet verstopt: zolang een tarief
+   mist, rekent de laag die soort niet uit en is elk totaal op dit scherm te laag. */
+function tekenTarieven(t, ontbreekt){
+  return '<div class="kaart"><h2>Tarieven</h2>'+
+    (ontbreekt.length
+      ? '<div class="bev"><b>'+ontbreekt.length+' tarieven ontbreken.</b> Zolang ze ontbreken wordt die soort NIET meegerekend, en is elk bedrag hierboven te laag. Ontbreekt: '+ontbreekt.map(esc).join(', ')+'.</div>'
+      : '<div class="bev rust">Alle tarieven staan er, met een bron.</div>')+
+    '<div class="schuif"><table><thead><tr><th>Soort</th><th>Per</th><th class="getal">Millicent</th><th>Bron</th></tr></thead><tbody>'+
+    t.map(x => '<tr><td>'+esc(x.naam)+'</td><td>'+esc(x.eenheid)+'</td>'+
+      '<td class="getal">'+(x.perEenheid == null ? '--' : x.perEenheid)+'</td>'+
+      '<td>'+(x.bron ? esc(x.bron) : '<i>geen bron, dus geen tarief</i>')+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    '<div class="rij"><select class="veld" id="tSoort" aria-label="Kostensoort">'+
+      t.map(x => '<option value="'+esc(x.soort)+'">'+esc(x.naam)+' (per '+esc(x.eenheid)+')</option>').join('')+
+    '</select>'+
+    '<input class="veld" id="tBedrag" type="number" min="0" step="1" placeholder="millicenten" aria-label="Bedrag in millicenten">'+
+    '<input class="veld breed" id="tBron" maxlength="300" placeholder="Waar komt dit bedrag vandaan? (contract, prijslijst, factuur)" aria-label="Bron">'+
+    '<button class="knop" id="tZet" type="button">Tarief zetten</button></div>'+
+    '<p class="sub">Millicenten: duizendste centen. Duizend AI-tokens kosten een fractie van een cent; in hele centen zou dat nul zijn.</p>'+
+    '</div>';
+}
+
+/* De nota's die RTG zelf betaalde. Stroom en serverhuur worden hieruit verdeeld;
+   voor de gemeten soorten dient het om de eigen optelsom na te rekenen. */
+function tekenNota(posten, ontbreekt, afstemming, soorten, facturen){
+  return '<div class="kaart"><h2>Onze eigen nota&#39;s</h2>'+
+    (ontbreekt.length
+      ? '<div class="bev"><b>Geen nota voor: '+ontbreekt.map(esc).join(', ')+'.</b> Zonder nota wordt er niets verdeeld. Dat is geen nul euro stroom; het is een ontbrekende nota.</div>' : '')+
+    (posten.length ? '<div class="schuif"><table><thead><tr><th>Soort</th><th class="getal">Betaald</th><th>Bron</th></tr></thead><tbody>'+
+      posten.map(p => '<tr><td>'+esc(p.naam)+'</td><td class="getal">'+eur(p.centen)+'</td><td>'+esc(p.bron)+'</td></tr>').join('')+
+      '</tbody></table></div>' : '<p class="sub">Nog geen nota&#39;s voor deze maand.</p>')+
+    '<div class="rij"><select class="veld" id="nSoort" aria-label="Kostensoort van de nota">'+
+      soorten.map(s => '<option value="'+esc(s.id)+'">'+esc(s.naam)+'</option>').join('')+
+    '</select>'+
+    '<input class="veld" id="nBedrag" type="number" min="0" step="1" placeholder="centen" aria-label="Bedrag in centen">'+
+    '<input class="veld breed" id="nBron" maxlength="300" placeholder="Welke nota? (leverancier, factuurnummer)" aria-label="Bron van de nota">'+
+    '<button class="knop" id="nZet" type="button">Nota vastleggen</button></div>'+
+    '<h3 class="kop3">Facturen van onze leveranciers</h3>'+
+    (facturen.length
+      ? '<div class="schuif"><table><thead><tr><th>Leverancier</th><th>Nummer</th><th class="getal">Bedrag</th><th>Ingevoerd door</th></tr></thead><tbody>'+
+        facturen.map(f => '<tr><td>'+esc(f.leverancier)+'</td><td><code>'+esc(f.nummer)+'</code></td>'+
+          '<td class="getal">'+eur(f.centen)+'</td><td class="sub">'+esc(f.door)+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<p class="sub">Nog geen leveranciersfacturen voor deze maand. Zonder factuur eindigt de herkomst van een bedrag bij een ingetikte zin.</p>')+
+    '<div class="rij"><input class="veld" id="fLev" maxlength="120" placeholder="leverancier" aria-label="Leverancier">'+
+    '<input class="veld" id="fNr" maxlength="80" placeholder="factuurnummer" aria-label="Factuurnummer">'+
+    '<input class="veld" id="fBedrag" type="number" min="1" step="1" placeholder="centen" aria-label="Bedrag in centen">'+
+    '<button class="knop stil" id="fZet" type="button">Factuur vastleggen</button></div>'+
+    '<h3 class="kop3">Klopt onze optelsom?</h3>'+
+    '<div class="schuif"><table><thead><tr><th>Soort</th><th class="getal">Gerekend</th><th class="getal">Nota</th><th class="getal">Verschil</th></tr></thead><tbody>'+
+    afstemming.map(a => '<tr><td>'+esc(a.naam)+(a.waarom ? '<br><span class="sub">'+esc(a.waarom)+'</span>' : '')+'</td>'+
+      '<td class="getal">'+eur(a.gerekendCenten)+'</td><td class="getal">'+eur(a.notaCenten)+'</td>'+
+      '<td class="getal">'+(a.verschilCenten == null ? '--' : eur(a.verschilCenten))+'</td></tr>').join('')+
+    '</tbody></table></div></div>';
+}
+
+/* De doorbelasting. Het knopje dat geld bij mensen in rekening brengt staat
+   onderaan, met eerst het bedrag en het aantal erboven: de machine zet klaar,
+   een mens geeft vrij. */
+function tekenVoorstel(v, beleid){
+  const teFactureren = v.rijen.filter(r => r.factureren);
+  return '<div class="kaart"><h2>Doorbelasting</h2>'+
+    '<div class="schuif"><table><thead><tr><th>Pas</th><th>Stand</th><th>Uitleg</th></tr></thead><tbody>'+
+    beleid.map(b => '<tr><td>'+esc(b.pas)+(b.bestaatNog ? '' : ' <span class="st">bestaat nog niet</span>')+'</td>'+
+      '<td>'+esc(b.stand)+(b.vast ? ' <span class="st">vast</span>' : '')+'</td>'+
+      '<td class="sub">'+esc(b.uitleg)+(b.verzet ? '<br>Verzet van '+esc(b.verzet.van)+' naar '+esc(b.verzet.naar)+': '+esc(b.verzet.reden) : '')+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    '<div class="rij"><div class="groei"><div class="rtg-kpi">'+eur(v.totalen.teFactureren)+'</div>'+
+      '<p class="sub">te factureren aan '+teFactureren.length+' gebruikers. '+
+      eur(v.totalen.inbegrepen)+' zit in de pasprijs, '+eur(v.totalen.rtfoundation)+' draagt de RTFoundation, '+
+      eur(v.totalen.huis)+' is verbruik zonder eigenaar.</p></div></div>'+
+    (v.vrijgegeven
+      ? '<div class="bev rust">Deze maand is vrijgegeven op '+esc(v.vrijgegeven.op)+' door <code>'+esc(v.vrijgegeven.door)+'</code>: '+v.vrijgegeven.regels+' regels. Een tweede keer kan niet.</div>'
+      : (teFactureren.length
+        ? '<div class="rij"><button class="knop" id="vrij" type="button">Vrijgeven: '+eur(v.totalen.teFactureren)+' op '+teFactureren.length+' rekeningen</button></div>'+
+          '<p class="sub">Hierna staat het als één regel op de maandfactuur die er al is. Dit kan maar een keer per maand.</p>'
+        : '<p class="sub">Er is niets te factureren in deze maand.</p>'))+
+    '</div>';
+}
+
+/* DE VIER ECONOMIEEN EN DE GRENS ERTUSSEN.
+
+   Dit blok staat op het KOSTENSCHERM en niet op een eigen pagina, met opzet:
+   een firewall die je op een andere plek moet gaan zoeken dan waar je de
+   doorbelasting vrijgeeft, is een firewall die je pas opzoekt als er al iets
+   is misgegaan. Hier staat hij naast het bedrag dat hij tegenhoudt.
+
+   De weigering staat er ALTIJD met de reden en met hoe het wel kan. Een
+   doorbelasting die stilvalt zonder uitleg, laat iemand denken dat er niets te
+   factureren viel. */
+function tekenWerelden(w, posten){
+  const rel = w.relaties || [];
+  return '<div class="kaart"><h2>De vier economieen</h2>'+
+    '<p class="sub">Kosten van de ene economie komen nooit bij een gebruiker van de andere. De RTFoundation is een eigen rechtspersoon met een eigen vermogen; wat zij kost wordt uit haar eigen begroting betaald, niet uit die van RTG-gebruikers.</p>'+
+    '<div class="schuif"><table><thead><tr><th>Economie</th><th class="getal">Gebruikers</th><th>Factureert</th><th>Grond</th></tr></thead><tbody>'+
+    w.werelden.map(x => '<tr><td><b>'+esc(x.naam)+'</b><br><code>'+esc(x.id)+'</code></td>'+
+      '<td class="getal">'+x.gebruikers+'</td>'+
+      '<td>'+(x.factureerbaar ? 'ja' : '<span class="st">nee</span>')+'</td>'+
+      '<td class="sub">'+esc(x.grond)+'</td></tr>').join('')+
+    '</tbody></table></div>'+
+    (posten.length
+      ? '<h3 class="kop3">De nota\'s, verdeeld over de economieen</h3>'+
+        '<div class="schuif"><table><thead><tr><th>Soort</th><th>Economie</th><th class="getal">Deel</th><th>Wie betaalt dit</th></tr></thead><tbody>'+
+        posten.map(x => '<tr><td>'+esc(x.naam)+'</td><td><code>'+esc(x.wereld)+'</code></td>'+
+          '<td class="getal">'+eur(x.centen)+'</td>'+
+          '<td>'+(x.doorbelastbaar
+            ? esc(x.wereld)
+            : '<b>'+esc(x.betaaldDoor)+'</b><br><span class="sub">'+esc(x.firewall.uitleg)+
+              (x.firewall.hoeWel ? ' '+esc(x.firewall.hoeWel) : '')+'</span>')+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<p class="sub">Er zijn deze maand geen nota\'s om over de economieen te verdelen.</p>')+
+    '<h3 class="kop3">Economische relaties</h3>'+
+    (rel.length
+      ? '<div class="schuif"><table><thead><tr><th>Van</th><th>Naar</th><th class="getal">Plafond</th><th>Grondslag</th></tr></thead><tbody>'+
+        rel.map(x => '<tr><td><code>'+esc(x.van)+'</code></td><td><code>'+esc(x.naar)+'</code></td>'+
+          '<td class="getal">'+eur(x.plafondCenten)+'</td>'+
+          '<td class="sub">'+esc(x.grondslag)+' &middot; '+esc(x.door)+'</td></tr>').join('')+
+        '</tbody></table></div>'
+      : '<div class="bev">Er is geen enkele relatie vastgelegd. Zolang dat zo is, wordt er tussen twee economieen niets doorbelast. Dat is de grondstand en geen storing.</div>')+
+    '<div class="rij"><select class="veld" id="rVan" aria-label="Van welke economie">'+
+      w.werelden.map(x => '<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('')+
+    '</select><select class="veld" id="rNaar" aria-label="Naar welke economie">'+
+      w.werelden.map(x => '<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('')+
+    '</select>'+
+    '<input class="veld" id="rPlafond" type="number" min="1" step="1" placeholder="plafond in centen" aria-label="Plafond in centen">'+
+    '<input class="veld breed" id="rGrond" maxlength="300" placeholder="Welke overeenkomst of welk bestuursbesluit?" aria-label="Grondslag">'+
+    '<button class="knop" id="rZet" type="button">Relatie vastleggen</button></div>'+
+    '<p class="sub">Een relatie betekent dat de ene rechtspersoon de andere iets in rekening mag brengen. Dat is een bestuursbesluit; het plafond en de grondslag zijn daarom verplicht.</p>'+
+    '</div>';
+}
+
+function tekenGaten(nietGemeten){
+  if (!nietGemeten.length) return '';
+  return '<div class="kaart"><h2>Wat dit scherm niet weet</h2>'+
+    '<p class="sub">Van deze soorten is in deze maand niets gemeten. Ze staan hier bij naam in plaats van als nul, want nul zou gratis betekenen.</p>'+
+    nietGemeten.map(n => '<div class="scheiding"><b>'+esc(n.naam)+'</b><p class="sub">'+esc(n.waarom)+' '+esc(n.grond)+'</p></div>').join('')+
+    '</div>';
+}
+
+let SOORTEN = [];
+async function laden(){
+  const p = $('#maand').value || undefined;
+  try {
+    const [o, t, n, b] = await Promise.all([
+      api('/api/office/kosten/overzicht', { periode: p }),
+      api('/api/office/kosten/tarieven'),
+      api('/api/office/kosten/nota', { periode: p }),
+      api('/api/office/kosten/beleid')
+    ]);
+    const [w, pr, vb, lf] = await Promise.all([
+      api('/api/office/economie/werelden', { periode: o.periode }),
+      api('/api/office/kosten/periode', { periode: o.periode }),
+      api('/api/office/kosten/vooruitblik', { periode: o.periode }),
+      api('/api/office/kosten/leveranciersfacturen', { periode: o.periode })
+    ]);
+    const v = await api('/api/office/kosten/voorstel', { periode: o.periode });
+    SOORTEN = t.soorten;
+    if (!$('#maand').value) $('#maand').value = o.periode;
+    $('#main').innerHTML = tekenDekking(o.dekking) + tekenVooruitblik(vb) +
+      tekenVoorstel(v, b.beleid) + tekenPeriode(pr) +
+      tekenWerelden(w, w.wereldposten || []) +
+      tekenGebruikers(o.gebruikers) + tekenTarieven(t.tarieven, o.ontbreekt.tarieven) +
+      tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN, lf.facturen || []) + tekenGaten(o.nietGemeten);
+  } catch (e) {
+    $('#main').innerHTML = '<div class="kaart"><h2 style="color:var(--rtg-txt,var(--txt))">Dat lukte niet</h2><p class="sub">'+esc(e.message)+
+      ' Dit scherm hoort achter de boardroom; log in via de boardroom en probeer het opnieuw.</p></div>';
+  }
+}
+
+document.addEventListener('click', async (ev) => {
+  const el = ev.target;
+  try {
+    if (el.id === 'tZet') {
+      await api('/api/office/kosten/tarief/zet', { soort: $('#tSoort').value,
+        perEenheid: Number($('#tBedrag').value), bron: $('#tBron').value });
+      meld('Tarief gezet.'); laden();
+    } else if (el.id === 'nZet') {
+      await api('/api/office/kosten/nota/zet', { periode: $('#maand').value, soort: $('#nSoort').value,
+        centen: Number($('#nBedrag').value), bron: $('#nBron').value });
+      meld('Nota vastgelegd.'); laden();
+    } else if (el.id === 'rZet') {
+      await api('/api/office/economie/relatie/zet', { van: $('#rVan').value, naar: $('#rNaar').value,
+        plafondCenten: Number($('#rPlafond').value), grondslag: $('#rGrond').value });
+      meld('Relatie vastgelegd.'); laden();
+    } else if (el.id === 'fZet') {
+      await api('/api/office/kosten/leveranciersfactuur/zet', { periode: $('#maand').value,
+        leverancier: $('#fLev').value, nummer: $('#fNr').value, centen: Number($('#fBedrag').value) });
+      meld('Factuur vastgelegd.'); laden();
+    } else if (el.classList && el.classList.contains('vkZet')) {
+      const sleutel = el.getAttribute('data-sleutel');
+      const veld = document.querySelector('.vk[data-sleutel="' + sleutel + '"]');
+      await api('/api/office/kosten/periode/verklaar', { periode: $('#maand').value, sleutel, tekst: veld.value });
+      meld('Verklaard.'); laden();
+    } else if (el.id === 'pSluit') {
+      await api('/api/office/kosten/periode/sluit', { periode: $('#maand').value });
+      meld('Maand gesloten.'); laden();
+    } else if (el.id === 'pHeropen') {
+      await api('/api/office/kosten/periode/heropen', { periode: $('#maand').value, reden: $('#pReden').value });
+      meld('Maand heropend.'); laden();
+    } else if (el.id === 'vrij') {
+      const r = await api('/api/office/kosten/vrijgeven', { periode: $('#maand').value });
+      meld(r.geboekt + ' regels geboekt, samen ' + eur(r.totaalCenten) + '.'); laden();
+    }
+  } catch (e) { meld(e.message); }
+});
+$('#maand').addEventListener('change', laden);
+laden();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

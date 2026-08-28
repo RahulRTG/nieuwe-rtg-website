@@ -127,7 +127,7 @@ module.exports = function maakBetaalregie({ d, save, betaal, env, nu }) {
     const providers = Object.keys(PROVIDERS).map(id => providerBeeld(id, r.providers[id], actieveRails, cijfers));
     const problemen = [];
     if (!uit && !providers.some(p => p.actief)) problemen.push({ ernst: 'kritiek', code: 'GEEN-ECHTE-PROVIDER',
-      tekst: 'Er is nog geen echte betaalprovider gekoppeld. De demobetaling mag niet live worden gebruikt.' });
+      tekst: 'Er is nog geen echte betaalprovider gekoppeld. Betalen blijft fail-closed uit; oefenen kan in Magnaat Test.' });
     for (const p of providers) {
       if (p.fase === 'live' && !p.gereed) problemen.push({ ernst: 'kritiek', code: p.id.toUpperCase() + '-ONVOLLEDIG',
         tekst: p.naam + ' staat administratief live, maar de beveiligde serverinstellingen zijn niet compleet.' });

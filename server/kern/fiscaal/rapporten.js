@@ -25,6 +25,7 @@ const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 const tarief = require('./tarief');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
+  const rondEuro = centen;
   /* De regelbron komt uit maakFiscaal; zonder jaargangen valt hij netjes terug
      op de lopende tabel en zegt dat ook in de stempel. */
   const regelbron = ctx.regelbron || require('./regelbron')(null);
@@ -46,7 +47,7 @@ module.exports = (ctx) => {
     const basisCat = tarief.basisCat(s, db.capsVan(s));
     const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const potten = {};
-    const betaalwijzen = {};
+    const betaalwijzen = {}, openstaandGezet = {};
     let bonnen = 0, fooien = 0, omzet = 0;
     const tel = (cat, bedrag) => { if (bedrag > 0) potten[cat] = (potten[cat] || 0) + bedrag; };
     for (const o of db.data.orders) {
@@ -56,13 +57,39 @@ module.exports = (ctx) => {
       let t = 0;
       for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name), b); }
       omzet += t;
-      betaalwijzen.app = centen((betaalwijzen.app || 0) + t);
+      // onder de betaalwijze waarmee er ECHT is afgerekend: een bestelling die
+      // aan tafel contant is voldaan hoort niet onder 'app' (TAKEN.md 4.59).
+      // Oudere bestellingen dragen dat veld niet en waren allemaal app-betalingen.
+      const wijze = o.betaaldMet || 'app';
+      betaalwijzen[wijze] = centen((betaalwijzen[wijze] || 0) + t);
     }
+    /* WAT EEN KASSABON HIER IS. Omzet, bonnen en betaalwijzen lopen samen: een
+       bon telt mee als hij OMZET draagt, en dan onder zijn eigen betaalwijze.
+       Daarmee tellen de betaalwijzen altijd op tot de omzet, en kan de kasopmaak
+       er rechtstreeks op steunen (TAKEN.md 4.59).
+
+       Twee soorten vallen af omdat hun omzet hierboven al bij de bestellingen
+       staat: `rtg` (de bon van pos/redeem) en `omzetElders` (de bundelbon van
+       het tafelticket). En `kamer`/`tafel` zijn geen betaling maar UITSTEL: die
+       komen bij de check-out alsnog langs, en staan tot die tijd apart als
+       `openstaandGezet` -- zichtbaar, maar niet als omzet en niet als ontvangst.
+
+       Hier zaten drie fouten tegelijk. `omzet` telde op VOOR de uitsluiting, dus
+       telde alles mee (gemeten 218 bij 109 verkocht, in drie van de zeven wegen
+       waarlangs geld binnenkomt); `bonnen` telde elk papiertje, ook de twee die
+       bij dezelfde verkoop horen; en `betaalwijzen` telde het uitstel EN de
+       afrekening, samen het dubbele van de lade. De btw-pot deed het al goed --
+       dat was het bewijs dat de uitsluiting zelf klopte en alleen te laat kwam. */
     for (const v of db.data.posSales[s.code] || []) {
       if (!opDag(v.at)) continue;
+      const m = v.method || 'contant';
+      if (m === 'kamer' || m === 'tafel') {
+        openstaandGezet[m] = centen((openstaandGezet[m] || 0) + (v.total || 0));
+        continue;
+      }
+      if (v.omzetElders || m === 'rtg') continue;
       bonnen++;
       omzet += v.total || 0;
-      const m = v.method || 'contant';
       betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
       if (v.omzetElders || m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening (of een bundelbon): de btw loopt via de hoofdboeking
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
@@ -72,7 +99,7 @@ module.exports = (ctx) => {
     const btw = Object.entries(potten).map(([cat, o2]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, regelbron.tariefOp(landCode, cat, dag)) }))
       .sort((a, b) => b.omzet - a.omzet);
-    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw,
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, openstaandGezet, btw,
       regelstand: regelbron.stempel(landCode, dag) };
   }
 
@@ -108,7 +135,7 @@ module.exports = (ctx) => {
     }
     // wie stond er op de kassa
     const team = {};
-    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = centen((team[v.actor] || 0) + (v.total || 0));
+    for (const v of db.data.posSales[s.code] || []) if (opDag(v.at) && v.actor) team[v.actor] = rondEuro((team[v.actor] || 0) + (v.total || 0));
     // de hotelkant: bezetting, aankomsten en vertrekken van vandaag, en de
     // gemiddelde kamerprijs van wie er nu slaapt (ADR)
     let verblijf = null;
@@ -125,13 +152,13 @@ module.exports = (ctx) => {
         bezet: s.rooms.filter(r => r.hk && r.hk.status === 'bezet').length,
         totaal: s.rooms.length,
         aankomsten, vertrekken, noShows,
-        adr: inHuis ? centen(kamerOmzet / inHuis) : 0
+        adr: inHuis ? rondEuro(kamerOmzet / inHuis) : 0
       };
     }
     return {
       ok: true, datum: z.datum,
       omzet: z.omzet, bonnen: z.bonnen, fooien: z.fooien, betaalwijzen: z.betaalwijzen,
-      gasten, toppers, derving: centen(derving), verblijf,
+      gasten, toppers, derving: rondEuro(derving), verblijf,
       team: Object.entries(team).sort((a, b) => b[1] - a[1]).map(([naam, omzet]) => ({ naam, omzet }))
     };
   }

@@ -116,7 +116,7 @@
       '<button class="knop" data-vat="' + esc(it.id) + '" type="button">Samenvatting</button>' +
       '<button class="knop" data-naam="' + esc(it.id) + '" type="button">Hernoem</button>' +
       '<button class="knop" data-weg="' + esc(it.id) + '" type="button">Weg</button></div>' +
-      '<div class="stil vat" data-uit="' + esc(it.id) + '" style="margin-top:.4rem;white-space:pre-wrap;"></div></div>';
+      '<div class="stil vat" data-uit="' + esc(it.id) + '" style="margin-top:0.5rem;white-space:pre-wrap;"></div></div>';
   }
   /* Meenemen (shared/uitvoer.js): de audio zit in je kluis, maar de LIJST is
      ook van jou -- welke memo's er zijn, wanneer je ze insprak, hoe groot ze

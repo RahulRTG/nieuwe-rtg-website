@@ -63,11 +63,6 @@
     /* Work OS heeft een vaste onderbalk; de melding staat erboven en laat alle
        softwarebediening bereikbaar. */
     'body[data-rtg-schil="standaard"] #rtg-cookie{bottom:calc(66px + env(safe-area-inset-bottom,0px));}' +
-    /* op een licht thema draait alleen de inkt om; de vorm blijft dezelfde */
-    ':root[data-rtg-thema="champagne"] #rtg-cookie span{color:rgba(26,23,19,0.58);}' +
-    ':root[data-rtg-thema="champagne"] #rtg-cookie a,' +
-    ':root[data-rtg-thema="champagne"] #rtg-cookie button{color:rgba(26,23,19,0.86);' +
-      'border-bottom-color:rgba(26,23,19,0.3);}' +
     /* de ruimte die de balk zelf inneemt, onder de inhoud gelegd */
     'body{padding-bottom:calc(var(--rtg-eigen-voet,0px) + var(--rtg-cookieruimte,0px) + var(--ws-ruimte,0px));}';
   document.head.appendChild(stijl);

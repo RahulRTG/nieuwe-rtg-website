@@ -5,7 +5,7 @@ module.exports = (kern) => {
   const { app, express, db, supplierAuth, managerOnly, logActivity, sseToOffice, facturatie,
     retailState, RETAIL_MATEN, RETAIL_SEIZOENEN, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
     voorraadZoek, klantProfiel, zetKlantMaten, voegKlantnotitie, legApart, paskamerBreng, stuurStyling,
-    retailVerkoop, retailVerkoopTerug } = kern;
+    retailVerkoop, retailVerkoopTerug, retailAnnuleer, retailBon, ANNULEERGRONDEN } = kern;
 
 /* ================= RETAIL / MODE (kern/retail.js) =================
    Merk-backoffice (manager) + winkelvloer (elke medewerker). De PDA logt in als
@@ -106,6 +106,7 @@ app.post('/api/supplier/retail/verkoop', supplierAuth, async (req, res) => {
     r.sale.betaler = p.van;
   }
   logActivity(req.supplier.code, req.actor, 'verkocht ' + r.sale.items.reduce((n, i) => n + i.qty, 0) + ' stuk(s) · € ' + r.sale.total);
+
   // automatische factuur voor beide partijen (koper gekoppeld via codenaam)
   facturatie.boekMetCodenaam({
     soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
@@ -115,4 +116,31 @@ app.post('/api/supplier/retail/verkoop', supplierAuth, async (req, res) => {
   }, req.body.codenaam || r.sale.betaler || (r.sale.klant && r.sale.klant.codenaam)).catch(() => {});
   res.json(r);
 });
+
+/* EEN KASSABON TERUGDRAAIEN. Geen wisknop: er komt een TEGENBOEKING bij en de
+   bon blijft staan (kern/retail/annulering.js). De grond komt uit een gesloten
+   lijst -- een vrij tekstveld levert binnen een maand vijftien spellingen van
+   dezelfde reden op, en dan valt er niets meer te tellen.
+
+   ALLEEN EEN MANAGER. Een medewerker slaat aan; terugdraaien raakt de omzet en
+   de btw-aangifte, en dat is werk van de leiding. Geld terug gaat NIET langs
+   deze deur: dat wordt klaargezet in kern/commerce/retour.js en een mens drukt.
+   Deze route raakt de voorraad en de boeking, en meer niet. */
+app.post('/api/supplier/retail/annuleer', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const b = req.body || {};
+  const r = retailAnnuleer(req.supplier, String(b.saleId || ''), {
+    grond: String(b.grond || ''), toelichting: String(b.toelichting || ''),
+    door: (req.actor && req.actor.name) || 'Manager'
+  });
+  if (r.error) return res.status(r.status || 400).json(r);
+  logActivity(req.supplier.code, req.actor, 'draaide kassabon ' + r.bon.id + ' terug (' + r.bon.geannuleerd.grond + ') · € ' + r.bon.total);
+  res.json(r);
+});
+
+/* De gronden en een bon opvragen: zodat een scherm de lijst niet hoeft na te
+   maken en kan tonen wat er met een bon is gebeurd. */
+app.post('/api/supplier/retail/bon', supplierAuth, (req, res) =>
+  res.json({ ok: true, gronden: ANNULEERGRONDEN, bon: retailBon(req.supplier, String((req.body || {}).saleId || '')) }));
+
 };

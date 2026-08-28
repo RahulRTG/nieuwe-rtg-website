@@ -9,7 +9,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -36,28 +36,51 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     const begin = await page.evaluate(() => RTGSchil.surfaces.map(s => s.id));
     assert.deepEqual(begin.sort(), ['agenda', 'reizen'], 'de tafel hoort niet leeg te beginnen');
 
-    /* De standaardkamer is geen raster meer. De zichtbare app vult op desktop
-       én telefoon exact de ruimte tussen linkerbank, tabbalk en onderbalk. */
+    /* De Edge-randen zijn de enige navigator. Het werkvlak begint er direct
+       naast en toont op desktop twee apps naast elkaar; op een telefoon vult
+       precies de actieve app het hele overblijvende vlak. */
     const maten = async () => page.evaluate(() => {
       const pak = (s) => { const r = document.querySelector(s).getBoundingClientRect();
         return { x:r.x, y:r.y, width:r.width, height:r.height }; };
-      return { scherm:{ width:innerWidth, height:innerHeight }, werk:pak('.rtg-surface[data-actief]'),
-        links:pak('.rtg-console'), boven:pak('.rtg-tabbar'), onder:pak('.rtg-onderbalk'),
-        zichtbaar:getComputedStyle(document.querySelector('.rtg-werkruimte')).display };
+      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'),
+        zichtbaar:[...document.querySelectorAll('.rtg-surface[data-edge-visible]')].map((e) => {
+          const r=e.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height };
+        }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-edge-bottom') } };
     });
-    const volledig = (m) => {
-      assert.equal(m.zichtbaar, 'block');
-      assert.ok(Math.abs(m.werk.x - m.links.width) < 1);
-      assert.ok(Math.abs(m.werk.y - m.boven.height) < 1);
-      assert.ok(Math.abs(m.werk.width + m.links.width - m.scherm.width) < 1);
-      assert.ok(Math.abs(m.werk.height + m.boven.height + m.onder.height - m.scherm.height) < 1);
+    const randKlopt = (m) => {
+      assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1);
+      assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
+      assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
+      assert.ok(Math.abs(m.ruimte.height + m.rand.boven.height + m.rand.onder.height - m.scherm.height) < 1);
     };
-    volledig(await maten());
+    await page.waitForFunction(() => {
+      const r = document.querySelector('.rtg-surface[data-edge-visible]').getBoundingClientRect();
+      const w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width * 2 - w.width) < 1;
+    }, null, { timeout: 5000 });
+    let m = await maten(); randKlopt(m);
+    assert.equal(m.zichtbaar.length, 2, 'desktop toont de gekozen indeling met twee apps');
+    assert.ok(Math.abs(m.zichtbaar[0].width * 2 - m.ruimte.width) < 1);
+    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
     await page.setViewportSize({ width:390, height:844 });
-    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 56);
-    volledig(await maten());
+    await page.waitForFunction(() => {
+      const v = document.querySelectorAll('.rtg-surface[data-edge-visible]');
+      if (v.length !== 1) return false;
+      const r = v[0].getBoundingClientRect(), w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width - w.width) < 1 && Math.abs(r.height - w.height) < 1;
+    });
+    m = await maten(); randKlopt(m);
+    assert.equal(m.zichtbaar.length, 1);
+    assert.ok(Math.abs(m.zichtbaar[0].width - m.ruimte.width) < 1);
+    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
     await page.setViewportSize({ width:1440, height:900 });
-    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 178);
+    await page.evaluate(() => RTGEdge.setLayout(2));
+    await page.waitForFunction(() => {
+      const v = document.querySelectorAll('.rtg-surface[data-edge-visible]');
+      if (v.length !== 2) return false;
+      const r = v[0].getBoundingClientRect(), w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width * 2 - w.width) < 1;
+    });
 
     // er komt er een bij, en dan bewaren we de kamer
     await page.evaluate(() => RTGSchil.open('office', { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));
@@ -71,7 +94,8 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
 
     /* EN NU TERUG. Dit is waar het om gaat: een klik en de hele kamer staat er,
        met dezelfde apps op dezelfde adressen. */
-    await page.click('[data-ruimtes] [data-ruimte="Mijn Directie"]');
+    await page.click('.rtg-edge-menu');
+    await page.click('[data-edge-ruimte="Mijn Directie"]');
     await page.waitForFunction(() => RTGSchil.surfaces.length === 3, { timeout: 8000 });
     const terug = await page.evaluate(() => RTGSchil.surfaces.map(s => ({ id: s.id, url: s.url })));
     assert.deepEqual(terug.map(s => s.id).sort(), ['agenda', 'office', 'reizen']);
@@ -88,32 +112,34 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
         'een bewaarde surface hoort alleen een meubelplan te zijn: ' + JSON.stringify(s));
     }
 
-    // ---- stap 6: het palet ----
+    // ---- stap 6: het palet zit nu in de dunne linkerrand ----
     await page.keyboard.press('Control+k');
-    await page.waitForSelector('#palet:not([hidden])', { timeout: 5000 });
-    await page.fill('#paletIn', 'Veilig');
-    await page.waitForFunction(() =>
-      document.querySelectorAll('#paletLijst li[role="option"]').length > 0, { timeout: 5000 });
-    const eerste = await page.textContent('#paletLijst li[role="option"] span');
-    assert.equal(eerste.trim(), 'Veilig', 'wat je typt hoort bovenaan te staan');
+    await page.waitForSelector('.rtg-edge-index[aria-hidden="false"] .rtg-edge-find input', { timeout: 5000 });
+    await page.fill('.rtg-edge-find input', 'Bestanden');
+    await page.waitForSelector('.rtg-edge-group a[data-tool="bestanden"]:not([hidden])', { timeout: 5000 });
+    const eerste = await page.textContent('.rtg-edge-group a[data-tool="bestanden"] b');
+    assert.equal(eerste.trim(), 'Bestanden', 'wat je typt hoort bovenaan te staan');
     await page.keyboard.press('Enter');
-    await page.waitForFunction(() => RTGSchil.surfaces.some(s => s.id === 'veilig'), { timeout: 8000 });
-    assert.equal(await page.evaluate(() => document.getElementById('palet').hidden), true,
+    await page.waitForFunction(() => RTGSchil.surfaces.some(s => s.id === 'bestanden'), { timeout: 8000 });
+    assert.equal(await page.getAttribute('.rtg-edge-index', 'aria-hidden'), 'true',
       'het palet hoort dicht te gaan zodra de opdracht is uitgevoerd');
 
     // Escape sluit zonder iets te doen
     await page.keyboard.press('Control+k');
-    await page.waitForSelector('#palet:not([hidden])', { timeout: 5000 });
+    await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { timeout: 5000 });
     const voor = await page.evaluate(() => RTGSchil.surfaces.length);
     await page.keyboard.press('Escape');
-    assert.equal(await page.evaluate(() => document.getElementById('palet').hidden), true);
+    assert.equal(await page.getAttribute('.rtg-edge-index', 'aria-hidden'), 'true');
     assert.equal(await page.evaluate(() => RTGSchil.surfaces.length), voor,
       'Escape hoort niets te openen');
 
     assert.deepEqual(fouten, [], 'de werkruimte hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    /* Eerst wachten tot de server echt weg is. Alleen child.kill() verstuurt
+       het signaal; onder runnerdruk schreef het proces daarna nog in TMP en
+       verloor rmSync de race met ENOTEMPTY. */
+    await stopHard(child);
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

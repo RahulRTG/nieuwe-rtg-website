@@ -195,11 +195,13 @@ async function verzamel(huidig) {
     wijzigingen.STRIPE_SECRET_KEY = await vraag('Stripe secret key', { standaard: huidig.STRIPE_SECRET_KEY || '', geheim: true });
     wijzigingen.STRIPE_WEBHOOK_SECRET = await vraag('Stripe webhook secret', { standaard: huidig.STRIPE_WEBHOOK_SECRET || '', geheim: true });
     wijzigingen.STRIPE_DEMO_BEWUST = '';
+    wijzigingen.RTG_BETALEN_UIT = '';
     wijzigingen.STRIPE_UITGAAND_UIT_BEWUST = '1';
   } else {
     wijzigingen.STRIPE_SECRET_KEY = '';
     wijzigingen.STRIPE_WEBHOOK_SECRET = '';
-    wijzigingen.STRIPE_DEMO_BEWUST = '1';
+    wijzigingen.STRIPE_DEMO_BEWUST = '';
+    wijzigingen.RTG_BETALEN_UIT = '1';
     wijzigingen.STRIPE_UITGAAND_UIT_BEWUST = '1';
   }
 

@@ -16,7 +16,7 @@
 const GASTRAILS = ['bon', 'tegoed', 'kamer'];
 
 module.exports = ({ save, schoon, horeca, beleid, orderlaag, verdeling }) => {
-  const { centen, openstaand, nu, id } = horeca;
+  const { heleCenten, openstaand, nu, id } = horeca;
   const { audit, zetReis, gastBeeld } = orderlaag;
   const { verdeel } = verdeling;
   /* ---------- de fooi ----------
@@ -27,7 +27,7 @@ module.exports = ({ save, schoon, horeca, beleid, orderlaag, verdeling }) => {
   function fooi(zaakcode, rek, deelnemer, bedrag) {
     if (rek.status !== 'open') return { status: 409, error: 'Deze rekening is al ' + rek.status + '.' };
     const was = rek.fooiCenten || 0;
-    rek.fooiCenten = centen(bedrag);
+    rek.fooiCenten = heleCenten(bedrag);
     audit(rek, { actor: deelnemer ? deelnemer.handle : 'gast', bron: 'gast', wat: 'fooi',
       van: was, naar: rek.fooiCenten });
     if (rek.verdeling) {
@@ -66,7 +66,7 @@ module.exports = ({ save, schoon, horeca, beleid, orderlaag, verdeling }) => {
       ? (rek.verdeling.delen.find(d => d.nr === deelnemer.nr) || {}).centen : null;
     const alBetaaldDoorMij = (rek.betalingen || [])
       .filter(b => deelnemer && b.gastNr === deelnemer.nr).reduce((t, b) => t + b.centen, 0);
-    let wil = bedrag != null ? centen(bedrag)
+    let wil = bedrag != null ? heleCenten(bedrag)
       : (mijnDeel != null ? Math.max(0, mijnDeel - alBetaaldDoorMij) : open);
     if (!wil) return { status: 400, error: 'Jouw deel staat al voldaan.', code: 'deel-voldaan' };
     if (wil > open) return { status: 400, code: 'meer-dan-open',

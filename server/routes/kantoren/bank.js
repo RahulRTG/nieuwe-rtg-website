@@ -74,7 +74,8 @@ module.exports = (ctx) => {
     return r;
   }));
   app.post('/api/office/bank/mislukking', officeAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankClearingMislukt(req.body.reden);
+    // `sleutel` hoort bij de mislukte clearing zelf, niet bij de oproep (4.56)
+    const r = kern.bankClearingMislukt(req.body.reden, req.body.sleutel || req.body.idem);
     if (r.getript) { afdelingen.audit(naam(req), 'RTG Bank AUTOMATISCH in nood na ' + r.mislukt + ' mislukte clearings'); sync(); }
     return { ok: true, ...r };
   }));

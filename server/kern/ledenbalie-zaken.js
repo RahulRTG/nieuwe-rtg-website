@@ -4,7 +4,7 @@
    Los van ledenbalie.js langs een echte scheiding: dat bestand kijkt in de
    kluis (zoeken, dossier, herstel) en loopt daarom door het inzagejournaal;
    dit bestand raakt de identiteit niet en houdt gewoon een eigen administratie
-   bij in db.data. Twee soorten werk, twee bestanden -- en zo blijven ze allebei
+   bij. Twee soorten werk, twee bestanden -- en zo blijven ze allebei
    onder de 10 KB van keuringsregel 13.
 
    De gedeelde hulpjes (reden, tijd, id, wie) komen mee uit ledenbalie.js in
@@ -19,8 +19,9 @@ const MENSELIJK = ['lifestyle', 'business']; // deze twee gaan nooit buiten een 
 module.exports = ({ db, save, inzagelog, hulp }) => {
   const { nu, rid, kort, inhoud, wie, redenOf, lidOf, pasVan, PASSEN, REDEN_MIN, geenReden, geenLid } = hulp;
 
-  function K() { if (!Array.isArray(db.data.balieKlachten)) db.data.balieKlachten = []; return db.data.balieKlachten; }
-  function V() { if (!Array.isArray(db.data.balieAboVoorstellen)) db.data.balieAboVoorstellen = []; return db.data.balieAboVoorstellen; }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/ledenbalie-zaken', bezit: { balieKlachten: 'lijst', balieAboVoorstellen: 'lijst' } });
+  const K = () => eigen.bak('balieKlachten');
+  const V = () => eigen.bak('balieAboVoorstellen');
 
   /* Wat het dossier van een lid laat zien: de klachten die nog lopen, en de
      voorstellen die er over hem zijn gedaan. Kort gehouden -- het dossier is

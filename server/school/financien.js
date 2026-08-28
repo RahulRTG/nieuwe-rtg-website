@@ -1,3 +1,4 @@
+const EENHEID = require('../kern/geld/eenheid');
 /* School (deelmodule): de financiele laag -- schoolgeld en ouderbijdragen als
    factuur, betaallinks, terugbetalingen, kantinesaldo, budgetten per afdeling,
    subsidies, debiteurenbeheer en de export naar de boekhouding.
@@ -21,7 +22,12 @@ module.exports = (sctx) => {
   const BUD = (sch) => { if (!sch.budgetten) sch.budgetten = {}; return sch.budgetten; };
   const SUB = (sch) => { if (!sch.subsidies) sch.subsidies = []; return sch.subsidies; };
   const KAN = (sch) => { if (!sch.kantine) sch.kantine = {}; return sch.kantine; };
-  const centen = (v) => Math.round(Math.max(0, Math.min(1000000, Number(v) || 0)) * 100);
+  /* HEET NIET MEER `centen`. Die naam betekende in dit huis drie dingen: hier
+     euro->cent, in kern/util.js euro->euro (afronden) en in kern/horeca.js
+     alleen afronden. Zie de kop van kern/geld/eenheid.js. De grens van een
+     miljoen euro die hier stond, blijft: een schoolbudget daarboven is een
+     typefout en geen bedrag. */
+  const naarCenten = (v) => Math.min(EENHEID.REKENGRENS, EENHEID.naarCenten(Math.max(0, Number(v) || 0)) || 0);
   const open = (f) => Math.max(0, f.centen - (f.betaald || 0) + (f.terugbetaald || 0));
   const NOOIT = { blokkeertOnderwijs: false,
     uitleg: 'Een openstaande post heeft geen enkel gevolg voor het onderwijs: geen uitsluiting, geen geblokkeerd account, geen verborgen cijfers.' };
@@ -34,7 +40,7 @@ module.exports = (sctx) => {
     const g = poort(req, res, 'financieel'); if (!g) return;
     const l = eigenVeld(leerlingLijst(g.sch), req.body.leerlingId);
     if (!l) return res.status(404).json({ error: 'Deze leerling staat niet in de administratie.' });
-    const bedrag = centen(req.body.bedrag);
+    const bedrag = naarCenten(req.body.bedrag);
     if (!bedrag) return res.status(400).json({ error: 'Vul een bedrag in.' });
     const omschrijving = schoon(req.body.omschrijving, 120);
     if (!omschrijving) return res.status(400).json({ error: 'Waar is deze factuur voor?' });
@@ -69,7 +75,7 @@ module.exports = (sctx) => {
     const g = poort(req, res, 'financieel'); if (!g) return;
     const f = FAC(g.sch).find(x => x.id === String(req.body.factuurId || ''));
     if (!f) return res.status(404).json({ error: 'Die factuur kennen we niet.' });
-    const bedrag = centen(req.body.bedrag);
+    const bedrag = naarCenten(req.body.bedrag);
     if (!bedrag) return res.status(400).json({ error: 'Vul het bedrag in.' });
     const terug = req.body.terugbetaling === true;
     if (terug) {
@@ -113,5 +119,8 @@ module.exports = (sctx) => {
     res.json(Object.assign({ ok: true, herinneringen: f.herinneringen.length }, NOOIT));
   });
 
-  return { facturen: FAC, centen, openBedrag: open, NOOIT };
+  /* `naarCenten` en niet `centen`: de ontvanger (./financien-beheer.js) roept
+     hem aan, en de naam hoort daar te zeggen wat er gebeurt. Zie de kop van
+     kern/geld/eenheid.js. */
+  return { facturen: FAC, naarCenten, openBedrag: open, NOOIT };
 };

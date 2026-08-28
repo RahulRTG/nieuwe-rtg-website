@@ -9,6 +9,8 @@
    dezelfde dertien dingen, alleen de sleutel en de kring verschillen.
 
    Gemount vanuit routes/kantoorpakket.js. */
+const envelop = require('../opzet/envelop');
+
 module.exports = (kern, gedeeld) => {
   const { app, rtf, werkplek, boardroomWie, boardroomBaas, officeMijn, officeMaak, officeOpen,
     officeBewaar, officeWeg, officeSter, officeVersies, officeTerug, officeAI, officeKring,
@@ -28,6 +30,10 @@ module.exports = (kern, gedeeld) => {
     if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
     const code = String(req.body.code || '').toUpperCase();
     req.drive = { key: 'rtf:' + code + ':' + sess.handle, kring: 'rtfgezin:' + code, gast: !!sess.gast };
+    /* Een oppas of familielid leest mee maar bewerkt niet; dat verschil zit in
+       de rol en niet in de identiteit -- hij is wel degelijk bekend. */
+    envelop.zet(req, { soort: 'gezinslid', id: req.drive.key, rol: sess.gast ? 'gast' : 'gezinslid',
+      identiteit: 'bewezen', tenantSoort: 'gezin', tenantId: code });
     next();
   }
   /* Voluit. `schrijf: true` betekent: een gast leest mee maar maakt en
@@ -77,6 +83,8 @@ module.exports = (kern, gedeeld) => {
     const s = huisDrive(req);
     if (s.fout) return res.status(s.fout.status).json({ error: s.fout.error });
     req.drive = s;
+    envelop.zet(req, { soort: 'werkplek', id: s.key || null, identiteit: s.key ? 'bewezen' : 'anoniem',
+      tenantSoort: 'werkplek', tenantId: s.kring || null });
     next();
   }
   const huisDoe = (fn) => async (req, res) => stuur(res, await fn(req.drive, req.body || {}));

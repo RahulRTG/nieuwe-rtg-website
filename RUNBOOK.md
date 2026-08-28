@@ -139,6 +139,38 @@ Na een wijziging aan de code horen `ARCHITECTUUR.md` en `BEWIJS.md` mee te
 verschuiven; regel 40 en 41 van `npm run keuring` maken de keuring rood zolang dat
 niet is gebeurd. Bijwerken is een commando, geen schrijfwerk.
 
+### Een collectie wissen uit de gedeelde opslag
+
+**Doe dit nooit met `DELETE FROM kv`.** Dat werkt niet zoals je denkt, en het
+faalt stil.
+
+Elke node houdt een lokale snapshot als warme cache. Bij het opstarten wint
+Postgres alleen *voor elke collectie die hij heeft*. Een rij die je met de hand
+hebt verwijderd, heeft hij niet — dus wint de verouderde snapshot van de eerste
+de beste node die opstart, en die schrijft hem daarna gewoon terug. De collectie
+herrijst. Dat is geen theorie: het is gereproduceerd (`TAKEN.md` 4.38), en het
+is precies zo een keer gebeurd met een automatische lastafworp.
+
+| Wat je wilt | Hoe |
+|---|---|
+| een collectie **weg** | `npm run kvwis -- <collectie>` |
+| zien wat er staat | `npm run kvwis -- --lijst` |
+| een collectie **leegmaken** maar houden | via de applicatie; een lege collectie flusht en wint gewoon |
+
+`npm run kvwis` laat een **grafsteen** achter: de rij blijft staan met
+`weg = true`. Elke node past dat verwijderen alsnog toe — draaiende instances
+binnen enkele seconden via NOTIFY, en een node die later opstart bij het
+opstarten. Ook een node die maanden uit heeft gestaan.
+
+Een grafsteen is geen verbod op de naam: vult de applicatie de collectie later
+opnieuw, dan wordt hij gewoon weer geschreven en is de grafsteen opgeheven.
+
+Wist iemand toch met de hand, dan kan de server dat niet ongedaan maken — zonder
+rij is er geen spoor. Wat hij wél doet is het **luid melden** bij het opstarten:
+welke collecties de snapshot wel heeft en Postgres niet, met naam en aantal
+items. Zie je die melding, dan staan er twee waarheden naast elkaar; draai
+alsnog `npm run kvwis` voor de collectie die weg moest.
+
 ## 6. Wat code nog steeds niet alleen kan
 
 - **De domein- en serverkeuze.** De uitrolpijplijn, automatische rollback,

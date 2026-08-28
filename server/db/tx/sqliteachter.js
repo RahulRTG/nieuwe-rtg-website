@@ -32,13 +32,10 @@ module.exports = function maakSqliteAchter(opslag) {
     const bestand = path.join(DATA_DIR, 'grootboek.db');
     sdb = new DatabaseSync(bestand);
     besloten(bestand);
-    /* DE WACHTTIJD EERST, NET ALS IN ../sqlite.js. Daar staat waarom, en die
-       reden gold hier net zo goed: journal_mode=WAL neemt zelf even een
-       exclusief slot, dus een busy_timeout die ERNA wordt gezet geldt niet voor
-       de PRAGMA die hem nodig heeft. Bij vier processen die tegelijk opkomen
-       (test/vloot.test.js) viel het grootboek daardoor om met "database is
-       locked", waarna de kantoorgroep 502 bleef geven en de vloottoets op zijn
-       opkomstgrens liep -- twee keer, en beide keren leek het een trage start. */
+    /* De wachttijd VOOR het aanzetten van WAL: dat aanzetten neemt zelf een
+       exclusief slot, en twee processen die tegelijk opstarten botsen daar
+       zonder geduld meteen op "database is locked". Zie de kop van
+       server/db/sqlite.js, waar dat als eerste werd opgeschreven. */
     sdb.exec('PRAGMA busy_timeout=5000');
     sdb.exec('PRAGMA journal_mode=WAL');
     sdb.exec('PRAGMA synchronous=NORMAL');
@@ -75,7 +72,7 @@ module.exports = function maakSqliteAchter(opslag) {
         vanZaak: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? AND zaak=? ORDER BY at DESC LIMIT ? OFFSET ?'),
         telAlles: sdb.prepare('SELECT count(*) AS c FROM tx_ledger WHERE soort=?'),
         telKlant: sdb.prepare('SELECT count(*) AS c FROM tx_ledger WHERE soort=? AND klant=?'),
-        recent: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? ORDER BY at DESC LIMIT ?')
+        recent: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? ORDER BY at DESC LIMIT ? OFFSET ?')
       };
     },
     async upsert(rijen) {
@@ -104,9 +101,11 @@ module.exports = function maakSqliteAchter(opslag) {
       const r = klant != null ? st.telKlant.get(soort, String(klant)) : st.telAlles.get(soort);
       return Number((r && r.c) || 0);
     },
-    async recent(soort, limit) {
+    // Met een OFFSET, om dezelfde reden als aan de Postgres-kant: het venster
+    // bijvullen leest verder dan een bladzijde (zie ./topup.js).
+    async recent(soort, limit, offset) {
       verbind();
-      return st.recent.all(soort, limit).map(x => x.data);
+      return st.recent.all(soort, limit, Math.max(0, Number(offset) || 0)).map(x => x.data);
     },
     // Netjes afronden: de WAL in het hoofdbestand vouwen zodat de volgende start
     // niets hoeft in te lezen. Mislukt hij omdat een ander proces nog leest, dan

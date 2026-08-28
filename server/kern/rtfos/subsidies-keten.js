@@ -19,7 +19,7 @@
    Afgesplitst uit subsidies.js op de 10 KB van keuringsregel 13. */
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
   const { vind, beeld, openMomenten, bronUitSubsidie, KETEN, RISICO } = eigen;
 
   /* De statusovergang. Twee stappen dragen een grendel, en ze staan hieronder
@@ -40,7 +40,7 @@ module.exports = (ctx, eigen) => {
         (mag.length ? mag.join(' of ') : 'niets meer') + ', niet naar "' + st + '".' };
     }
     if (st === 'toegekend') {
-      const bedrag = centen(b.bedrag === undefined ? euro(s.aangevraagdCenten) : b.bedrag);
+      const bedrag = naarCenten(b.bedrag === undefined ? euro(s.aangevraagdCenten) : b.bedrag);
       if (bedrag === null || bedrag === 0) return { status: 400, error: 'Welk bedrag is er toegekend?' };
       const grens = limietVan(g.stad, rolIn(w, s.stad));
       if (bedrag > grens) {

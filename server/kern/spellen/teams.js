@@ -25,6 +25,7 @@
    een jaar niets mee gebeurde is geen team meer maar een restant. */
 module.exports = (ctx) => {
   const { db, save, rid, nu, codenaamVan, schoon, sociaalRate } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/spellen/teams', bezit: { spelTeams: 'lijst' } });
   // dezelfde kring als bij het praten in een potje, uit een bron: ./kring.js
   const { bereikbaar } = require('./kring')(ctx);
 
@@ -33,8 +34,7 @@ module.exports = (ctx) => {
   const MAX_NAAM = 40;
 
   function T() {
-    if (!Array.isArray(db.data.spelTeams)) db.data.spelTeams = [];
-    return db.data.spelTeams;
+    return eigen.bak('spelTeams');
   }
   const teamVan = (id) => T().find(t => t.id === String(id || '')) || null;
   const hoortErbij = (t, key) => !!t && (t.leden.includes(key) || t.uitgenodigd.includes(key));
@@ -106,7 +106,7 @@ module.exports = (ctx) => {
     if (!t || !t.leden.includes(mij)) return { status: 404, error: 'Dit team bestaat niet (meer).' };
     t.leden = t.leden.filter(k => k !== mij);
     if (!t.leden.length) {
-      db.data.spelTeams = T().filter(x => x.id !== t.id);
+      eigen.zetBak('spelTeams', T().filter(x => x.id !== t.id));
       save();
       return { status: 200, ok: true, opgeheven: true };
     }
@@ -135,7 +135,7 @@ module.exports = (ctx) => {
       if (t.baas === key) t.baas = t.leden[0];
       over.push(t);
     }
-    db.data.spelTeams = over;
+    eigen.zetBak('spelTeams', over);
     save();
   }
 

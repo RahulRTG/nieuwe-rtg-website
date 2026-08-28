@@ -16,7 +16,8 @@ const { zzpBerekening } = require('./zzp');
 const tarief = require('./tarief');
 const { zekerheid, zin } = require('./zekerheid');
 
-function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
+function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
+  const centen = rondEuro;
   /* De regels-op-datum, met terugval op de lopende tabel als de jaargangen er
      (nog) niet zijn -- zie ./regelbron.js. Lui, want server.js bouwt deze laag
      op voordat de Regelwacht bestaat. */
@@ -46,7 +47,9 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
     const potten = {};
     const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const tel = (cat, bedrag, datum) => {
-      if (!(bedrag > 0)) return;
+      /* Een tegenboeking is een negatief bedrag en moet dezelfde btw-pot weer
+         verlagen. Alleen nul en ongeldige invoer dragen niets bij. */
+      if (!Number.isFinite(bedrag) || bedrag === 0) return;
       const t = regelbron.tariefOp(landCode, cat, String(datum || '').slice(0, 10));
       const sleutel = cat + '@' + t;
       const p = potten[sleutel] || (potten[sleutel] = { cat, tarief: t, omzet: 0 });
@@ -56,12 +59,18 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
     }
+    /* Vier soorten kassabonnen tellen hier niet mee, alle vier omdat hun omzet
+       al ergens anders in deze telling staat (TAKEN.md 4.28): `rtg` hoort bij
+       een bestelling hierboven; `kamer` en `tafel` zijn open rekeningen die pas
+       bij de check-out binnenkomen; en `omzetElders` merkt een gebundelde bon
+       waarvan de onderdelen al geteld zijn. Dat laatste is een merk en geen
+       methode: de methode moet blijven zeggen hoe er echt betaald is. */
     for (const v of db.data.posSales[s.code] || []) {
       /* `omzetElders` is het merk van een kassabon die alleen HET STUK is en
          niet de omzet: het tafelticket bundelt bonnen die hierboven al per
          bestelling zijn geteld. Zonder deze regel stond de maand van een zaak
          die tafels contant laat afrekenen twee keer zo hoog (TAKEN.md 4.28). */
-      if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+      if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || v.method === 'tafel' || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), v.at);
       else tel(basisCat, v.total || 0, v.at);
     }
@@ -87,14 +96,14 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
        vraag dan waar de omzet is geboekt. */
     const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
     const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
-    let gcIngewisseld = 0;
-    /* De inwisseling is het btw-moment, dus die dag bepaalt ook het tarief. En
-       een verzilvering die AL OP EEN BON staat is hierboven al geteld: die hier
-       nog eens meenemen verdubbelt de omzet van de maand. */
+    let gcIngewisseld = 0, gcHandmatig = 0;
+    /* De kassabon draagt omzet, btw en factuur. Een handmatige afboeking draagt
+       alleen saldo en staat daarom apart gemeld; anders zou een correctie zonder
+       bon toch als verkoop in de aangifte belanden. */
     for (const g of kaarten) for (const w of g.verzilveringen || []) {
       if (!inMaand(w.at)) continue;
       gcIngewisseld += w.bedrag;
-      if (!w.viaBon) tel(basisCat, w.bedrag, w.at);
+      if (w.bron === 'handmatig' || (!w.bron && !w.viaBon)) gcHandmatig += w.bedrag;
     }
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.values(potten)
@@ -121,7 +130,7 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       landen: Object.entries(LANDEN).map(([k, v]) => ({ code: k, naam: v.naam })).sort((a, b) => a.naam.localeCompare(b.naam)),
       peiljaar: FISCAAL_PEILJAAR,
       maand,
-      btw, btwTotaal: centen(btw.reduce((x, r2) => x + r2.btw, 0)),
+      btw, btwTotaal: rondEuro(btw.reduce((x, r2) => x + r2.btw, 0)),
       personeel: {
         uren: Math.round(uren * 10) / 10, uurloon, bruto,
         lasten: centen(bruto * R.lasten), lastenPct: Math.round(R.lasten * 100),
@@ -129,7 +138,7 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
         totaal: centen(bruto * (1 + R.lasten + R.vakantiegeld)),
         uurloonMin: R.uurloonMin
       },
-      giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), open: gcOpen, aantal: kaarten.length },
+      giftcards: { verkocht: centen(gcVerkocht), ingewisseld: centen(gcIngewisseld), handmatig: centen(gcHandmatig), open: gcOpen, aantal: kaarten.length },
       /* WELKE REGELS HIER ONDER LIGGEN: op welke dag is teruggerekend, uit
          welke bron, en welke wijzigingen golden er toen. Zonder die stempel is
          een herbouw van dit bedrag later een gok. */
@@ -140,7 +149,8 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       regels: [
         R.aangifte,
         R.extra,
-        'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans en de btw hoort bij de inwisseling.',
+        'Cadeaukaarten zijn bij verkoop nog geen omzet: het saldo (€ ' + gcOpen + ') staat als verplichting op de balans. Reken een kaart af op de kassa met betaalwijze "cadeaukaart": die bon draagt de omzet, de btw en de factuur.',
+        ...(gcHandmatig > 0 ? ['Let op: € ' + centen(gcHandmatig) + ' is deze maand met de hand van een cadeaukaart afgeboekt, zonder kassabon. Dat bedrag staat NIET in de omzet en niet in de btw-aangifte.'] : []),
         'Indicatie minimumuurloon in ' + L.naam + ': € ' + R.uurloonMin + ' per uur. Reken bovenop het brutoloon ~' + Math.round(R.lasten * 100) + '% werkgeverslasten' + (R.vakantiegeld ? ' en ' + Math.round(R.vakantiegeld * 1000) / 10 + '% vakantiegeld' : '') + '.',
         zin('boekhouding.maand') + ' De aangifte en afdracht blijven de verantwoordelijkheid van de onderneming (peiljaar ' + FISCAAL_PEILJAAR + ').'
       ]

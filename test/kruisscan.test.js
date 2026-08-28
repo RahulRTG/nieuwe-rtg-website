@@ -25,6 +25,36 @@ test('de echte server-boom bevat geen kruis-slice-verwijzingen', () => {
     bevindingen.map(b => b.bestand + ' -> ' + b.naam + ' (uit ' + b.zuster + ')').join('; '));
 });
 
+test('een bestand dat tijdens de scan verdwijnt, laat de scan niet omvallen', () => {
+  /* DE WEDLOOP DIE DIT VANGT. De suite kent toetsen die tijdelijk een
+     proefbestand in server/kern zetten en het weer weghalen
+     (test/keuring.test.js). Draait er zo een tegelijk met deze scan -- wat
+     gebeurt zodra de suite ZONDER scripts/test-runner.js start, en dat doet
+     `npm run test:gate` in CI -- dan staat de naam nog in readdirSync en is het
+     bestand bij de statSync al weg. De scan viel dan om met ENOENT, en een
+     geldige build werd rood op een dobbelsteen.
+
+     Een verdwijnend bestand is in een toets niet te timen; een DANGLING
+     SYMLINK geeft exact dezelfde fout op exact dezelfde regel -- statSync op
+     een naam die readdirSync wel teruggaf. Zonder de reparatie zakt deze toets
+     met "ENOENT ... stat"; dat is hier ook echt zien gebeuren.
+
+     En de tegenproef staat erbij: de zusters ERNAAST worden nog steeds
+     gelezen. Een scan die bij het eerste gat stilletjes stopt, zou ook groen
+     zijn -- en niets meer bewaken. */
+  const dir = maakGroep({
+    'index.js': "module.exports = (ctx) => { require('./a')(ctx); require('./b')(ctx); };\n",
+    'a.js': "const SALON_BIO = { tekst: 'x' };\nmodule.exports = (ctx) => { const { db } = ctx; return { a() { return SALON_BIO.tekst + db.x; } }; };\n",
+    'b.js': "module.exports = (ctx) => { const { db } = ctx; return { b() { return SALON_BIO.tekst + db.y; } }; };\n"
+  });
+  try {
+    fs.symlinkSync(path.join(dir, 'bestaat-niet-meer.js'), path.join(dir, 'grp', 'weg.js'));
+    const b = scan(dir);
+    assert.equal(b.length, 1, 'de scan hoort gewoon door te lopen over wat er WEL is');
+    assert.equal(b[0].naam, 'SALON_BIO');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('een kale verwijzing naar een top-level naam van een zuster-slice wordt gevangen', () => {
   const dir = maakGroep({
     'index.js': "module.exports = (ctx) => { require('./a')(ctx); require('./b')(ctx); };\n",
@@ -40,6 +70,32 @@ test('een kale verwijzing naar een top-level naam van een zuster-slice wordt gev
     assert.ok(b[0].bestand.endsWith('b.js'), 'de fout hoort in b.js te zitten');
     assert.ok(b[0].zuster.endsWith('a.js'), 'de herkomst hoort a.js te zijn');
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('een methode in de KORTE vorm is een sleutel en geen verwijzing', () => {
+  /* `{ save() {}, boek() {} }` lijkt op twee aanroepen en is het niet: het zijn
+     property-namen. Zonder die uitzondering meldde de scan kern/appstore/
+     naslag.js -- dat de brug echt opbouwt met lege functies erin -- als een kale
+     verwijzing naar `save` en `boek` uit brug.js.
+
+     Wat NIET verdwijnt, staat er hieronder direct naast: een echte kale
+     verwijzing en een echte AANROEP van dezelfde naam worden nog steeds
+     gevangen. Een uitzondering die ook die twee wegneemt, zou de scan
+     uitschakelen in plaats van hem scherper maken. */
+  const bouw = (b) => maakGroep({ 'index.js': 'module.exports = () => {};\n',
+    'a.js': "const boek = 1;\nmodule.exports = () => boek;\n", 'b.js': b });
+
+  const sleutel = bouw("module.exports = () => { const x = { boek() {} }; return x; };\n");
+  try { assert.deepEqual(scan(sleutel), [], 'een methode-sleutel hoort geen melding te geven'); }
+  finally { fs.rmSync(sleutel, { recursive: true, force: true }); }
+
+  const kaal = bouw("module.exports = () => { return boek + 1; };\n");
+  try { assert.deepEqual(scan(kaal).map(b => b.naam), ['boek'], 'een kale verwijzing hoort nog steeds te knallen'); }
+  finally { fs.rmSync(kaal, { recursive: true, force: true }); }
+
+  const aanroep = bouw("module.exports = () => { boek('x', 1); };\n");
+  try { assert.deepEqual(scan(aanroep).map(b => b.naam), ['boek'], 'en een echte aanroep ook'); }
+  finally { fs.rmSync(aanroep, { recursive: true, force: true }); }
 });
 
 test('de parameters van een methode met een GEQUOTE sleutel gelden als binding', () => {

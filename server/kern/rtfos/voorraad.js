@@ -35,7 +35,7 @@ const SOORTEN = ['voedsel', 'kleding', 'schoolspullen', 'speelgoed', 'apparaten'
 const BEDERFELIJK = ['voedsel', 'hygiene', 'babyspullen'];
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, poort, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, poort, save } = ctx;
 
   const V = () => { if (!Array.isArray(S().voorraad)) S().voorraad = []; return S().voorraad; };
   const vind = id => V().find(b => b.id === String(id || '')) || null;
@@ -94,7 +94,7 @@ module.exports = (ctx) => {
     if (BEDERFELIJK.includes(soort) && !houdbaar) {
       return { status: 400, error: 'Bij ' + soort + ' hoort een houdbaarheidsdatum. Zonder die datum kan het systeem niet tegenhouden dat het te laat de deur uit gaat.' };
     }
-    const waarde = centen(b.waarde === undefined ? 0 : b.waarde);
+    const waarde = naarCenten(b.waarde === undefined ? 0 : b.waarde);
     if (waarde === null) return { status: 400, error: 'Wat is de geschatte waarde? Nul mag ook.' };
     let projectId = schoon(b.projectId, 20) || null;
     if (projectId) {

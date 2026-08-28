@@ -104,6 +104,70 @@ de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
 paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
 oplaadmoment — en dát is het echte voordeel.
 
+**`ECONOMIE.md` is de laag erboven** -- RTG Economic Control Plane: de financiële
+intelligentielaag van het hele ecosysteem, als richtingsdocument met per onderdeel
+of het **staat**, **een stap weg** is, **een besluit vraagt** of **jaren weg** is
+(zoals PLATFORM.md en DEVELOPERCLOUD.md). Lees die vóór je aan doorbelasten,
+werelden of financiële voorspellingen werkt. De kern in één zin: **de RTFoundation
+is geen kostenpost van RTG die je over gebruikers uitsmeert, maar een eigen
+rechtspersoon met een eigen vermogen** -- en dat wordt afgedwongen en niet
+beloofd. Vier economische werelden (`consument`, `commercieel`, `rtg-intern`,
+`rtfoundation`) waarvan de wereld een eigenschap is van de IDENTITEIT en niet van
+de transactie, met een **firewall** ertussen die standaard weigert
+(`kern/economie/firewall.js`): een relatie tussen twee werelden bestaat alleen met
+een grondslag én een plafond, het register is standaard leeg, en een weigering
+zegt altijd hoe het wel kan. De nota's van de infrastructuur gaan daarom eerst
+over de vier werelden en pas daarna binnen elke wereld over haar eigen gebruikers.
+Er is een tweede poort die geen relatie kan openen: een rekening landt bij de
+ENTITEIT van een wereld, nooit bij een gebruiker ervan -- RTG mag de stichting
+factureren, nooit een gezin. Wat er nog niet is (economische graaf, provenance tot
+de providerfactuur, periode sluiten, forecast, cost routing) staat in ECONOMIE.md
+mét de reden en de stand, niet als lege functie.
+
+**`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker ons,
+en wie betaalt dat. WAARDE.md gaat over waarde die BINNEN RTG beweegt; dit gaat
+over het geld dat het huis er zelf aan uitgeeft. Lees die vóór je aan tarieven,
+verbruik, doorbelasten of "wat kost een gratis account" werkt. De kern in één zin:
+**elke euro die dit huis uitgeeft krijgt een eigenaar, of de eerlijke mededeling
+dat hij er geen heeft.** Negen kostensoorten (`kern/kosten/soorten.js`) waarvan er
+zeven per gebruiker meetbaar zijn en twee niet; stroom en serverhuur worden
+verdeeld uit de echte nota met de sleutel erbij en dragen daarom altijd de graad
+`vermoed` -- het plafond volgt uit de meetweg en staat níét per regel, want die
+tweede plek werd door de toerekening genegeerd. De meter houdt tellers en geen
+journaal (een gedragslogboek per lid is voor een factuur niet nodig), de drager
+komt uit de async-context die de poort zet (`kern/kosten/haak.js`), en de AI-meter
+hangt op de enige plek waar élke modelaanroep langskomt (`server/ai.js`). Drie
+grenzen die niet mogen sneuvelen: er staat nooit een getal waar er geen is (geen
+tarief of nota = een REDEN, geen nul), deze laag kent geen namen (sessiesleutel,
+zaakcode, gezinscode -- nooit de kluis), en de machine zet klaar terwijl een mens
+uit de boardroom vrijgeeft. Wie wat betaalt staat in `kern/kosten/beleidkaart.js`:
+vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
+erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
+RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
+(`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
+belofte en niet met het bedrag). **Vier lezers, vier schermen, een antwoord**:
+een lid ziet het in RTG Geld (stand *Kosten*), een zaak op
+`/apps/zaakkosten.html`, het kantoor op `/apps/kosten.html` -- die drie op
+dezelfde gedeelde vormtaal (`public/shared/kostenbeeld.js`), zodat "vermoed" op
+het scherm van het lid hetzelfde betekent en er hetzelfde uitziet als op het bord
+waar een mens besluit hem de rekening te sturen. Het vierde is het gezin, in het
+beheerscherm van de RTFoundation: eigen route, eigen toon, en het opent met de
+belofte in plaats van met het bedrag. **Alle negen soorten hebben nu een teller of een
+verdeling**: AI en verzoeken via de poorten, berichten via mail én sms (twee
+choke points, want er komt een aanroeper rechtstreeks langs `sendSms`), opslag als
+STAND die je peilt in plaats van optelt (`kern/kosten/meterstand.js` -- wie een
+stand als stroom telt, laat de rekening van wie niets doet het hardst groeien), en
+transactiekosten op het oplaadmoment. Daarbovenop: de herkomstketen tot de
+leveranciersfactuur (`kern/kosten/herkomst.js`, en die eindigt eerlijk bij "zo is
+hij overgenomen door een mens"), de maandafsluiting waarin een maand pas dichtgaat
+als elk verschil een verklaring draagt en een maand **in onderzoek** nooit naar een
+rekening gaat (`kern/kosten/periode.js`), een vooruitblik waarvan de bandbreedte
+pas verschijnt als de trefzekerheid over drie afgesloten maanden GEMETEN is
+(`kern/kosten/vooruitblik.js`), en een verbruiksgrens die de AI-weg werkelijk
+dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
+(`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
+andere stand dan `ruim`).
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig
@@ -271,6 +335,39 @@ hier geldt, met de zes machtigingen die met opzet niet bestaan — die vraag ste
 een inkoper maar één keer, en dat kan alleen omdat elke app op dezelfde cel
 draait.
 
+**`COMMERCE.md` is de verkooplaag boven de domeinen** — hoe er één commerce-laag
+op de bestaande fiscale, waarde-, voorraad- en fulfilmentinfrastructuur komt te
+staan zonder dat er een tweede orderwaarheid ontstaat. Lees die vóór je aan een
+winkel, een mand, een afrekening of een retour werkt. De dragende bewering van het
+voorstel — één `Koopbaar`-protocol met acht werkwoorden over dertien soorten
+verkoopbare dingen — is er eerst **gemeten** (`scripts/commerce.js`,
+`COMMERCE.json`) in plaats van aangenomen, want dat is exact de vorm waarin `Asset`
+al een keer sneuvelde. De uitslag is streng: 437 koopbare vormen in 100 domeinen,
+**0 domeinen die alle acht werkwoorden uitvoeren**, **0 werkwoorden die in álle
+koopbare domeinen staan**, en 43 verschillende combinaties. Eén protocol met 42
+invullingen is geen protocol; `Koopbaar` wordt daarom een **verklaring van
+werkwoorden** en geen interface van verplichte methodes — het model daarvoor is
+`kern/appstore/machtigingen.js`, het enige bestand met een doel én een grens. Wat
+er wél gevonden is zijn twee echte gedeelde vormen, allebei tussen precies twee
+domeinen: het artikel met varianten (mall ↔ retail) en de bestelregel (gast ↔
+horeca). Drie dingen om niet te laten sneuvelen: **één mand is niet één
+bevestiging** (`kern/mall/bestellingen.js` weigert "betaal alles" met reden, en
+dat is een grens en geen gat), er komt geen tweede betaalweg langs
+`kern/pay/poort.js`, en Webmaker krijgt géén commerce-logica. En let op par. 3
+vóór je begint: het woord **`Kanaal` is al bezet** — `SEMANTIEK.json` heeft
+`KANALEN` in de top als botsing (4 domeinen, 4 betekenissen, overlap 0,10), dus
+het nieuwe kernbegrip hernoemt eerst of wijkt uit. Het duurste gat wàs `retour`: 6 van de 100
+domeinen kenden iets dat erop lijkt en geen ervan was een goederenretour. Dat gat
+is gevuld -- `kern/commerce/retour*.js` plus `routes/supplier/retour.js`: zes
+gronden, vijf standen die elk zeggen wélke partij ze zet, een bevroren bedrag en
+btw-tarief, en een geldbesluit dat wordt KLAARGEZET en nooit uitgevoerd.
+**De laag staat inmiddels** (`server/kern/commerce/`, acht bestanden, gemonteerd in
+`opzet/kernlaag2b.js`, scherm `/apps/commerce.html`): werkwoorden, koopbaar, graaf,
+mand en een afrekening per verkoper, draaiend op 100 koopbaren uit de seed. Twee
+dingen die echte data blootlegde en die je nergens anders moet herhalen: `bedrag`
+in `kern/mall/aanbod.js` staat in EURO'S en niet in centen, en `vanaf` is een VLAG
+en geen bedrag -- op een vanaf-prijs wordt niet afgerekend.
+
 **`DEVELOPERCLOUD.md` is de richting boven de App Store** — RTG Developer Cloud:
 een ontwikkelaar bouwt hier in dagen wat elders maanden kost, omdat hij auth,
 billing, compliance, hosting, permissies, observability en enterprise-controls
@@ -287,6 +384,34 @@ kamer, podium en leaseauto delen niets buiten hun verpakking. Wat er wél uitkwa
 zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**,
 gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
 niet uit die meting komt.
+
+**`CREATE.md` is de laag bóven de Developer Cloud** — RTG Create: niet één soort
+ontwikkelaar maar de hele ladder van amateur tot enterprise, over de vier
+makersroutes die dit huis al heeft (Website-maker, Website Platform, App Store,
+tenant). Lees die vóór je iets aan een maker, een projectbegrip of een
+publicatiestroom verandert. Alles hangt aan één zin: **Create verenigt
+vindbaarheid, identiteit, publiceren, bewijs en de makerservaring — nooit
+domeinbetekenis zonder gemeten overlap.** Create maakt de ervaring uniform, niet
+de implementatie; de formule is *gedeelde ingang, zelfstandig domein*. Daaruit
+volgt de grondwet CREATE-01 t/m 07 in par. 1, met bij elke regel wie hem
+handhaaft en waar dat nog niemand is. De toetsvraag van PLATFORM.md par. 0b
+beslist per maker of samenvoegen mag, en waar het antwoord niet vaststaat wordt
+het **gemeten** zoals `scripts/objectmodel.js` dat deed — niet aangenomen.
+Website-maker en Website-studio delen aantoonbaar een kern; Lesmaker en
+Clips-studio delen alleen een woord. Let in par. 3 op de bloktaal: de naad loopt
+niet tussen consument en zakelijk maar tussen **inhoud (12), view (`zaakdata`) en
+handeling (`formulier`)** — een blok dat iets DOET is precies waar machtigingen
+aan hangen, en een indeling in consument/zakelijk had die vraag nooit gesteld.
+Par. 9 staat er even groot bij: drie dingen die makkelijk voor bestaand worden
+aangezien en het niet zijn — **Magnaat is een leerspel voor mensen en hoort niet
+in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
+ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
+App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
+zie par. 9.2), en er is geen kostenvlak. En
+par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
+zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
+maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
+`UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
 
 **`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet "RTG
 heeft veel operating layers" maar "RTG is één besturingssysteem van
@@ -336,10 +461,10 @@ code gehouden.
 `GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
-(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
-113 requires, en raakt daarmee **1 van 412 kerndomeinen** aan — 0%. Als testhal
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
+116 requires, en raakt daarmee **2 van 415 kerndomeinen** aan — 0%. Als testhal
 bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
-van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+van de 34 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
 afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
 tenant-isolatie, doelschending, canary met automatische terugrol, shadow
@@ -394,10 +519,10 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 95 namen die in meer dan
-één domein staan, dragen er **77 meer dan één betekenis** — samen 279
-betekenissen, met `SOORTEN` op **38**. Daarnaast **28** betekenissen die op meer
-dan één plek wonen én **101** paren die dezelfde waarheid onder een ándere naam
+`SEMANTIEK.json`) en het was **geen incident**: van de 96 namen die in meer dan
+één domein staan, dragen er **78 meer dan één betekenis** — samen 284
+betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
+dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
 dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
 tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
@@ -408,7 +533,8 @@ gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
 "welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
 en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
 overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
-meter bewoog mee: 111 → 101. De 77 zijn geen foutenlijst
+meter bewoog mee: 111 → 101 (en staat nu op 106: deze tak zette er zelf
+code bij, en de meter telt de hele boom). De 78 zijn geen foutenlijst
 maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
 kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
 en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies
@@ -469,7 +595,7 @@ de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
 vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
 laat zakken in plaats van stil verkeerd te blijven staan.
 
-**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — zeventig
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 76
 onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
 bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
 laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten

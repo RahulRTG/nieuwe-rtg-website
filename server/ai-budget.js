@@ -82,8 +82,8 @@ function zetOpslag(haak) { opslagHaak = haak; }
 function bak() {
   if (opslagHaak) return opslagHaak();
   const { db, save } = require('./db');
-  db.data.aiBudget = db.data.aiBudget || {};
-  return { data: db.data.aiBudget, bewaar: save };
+  const eigen = require('./kern/eigencollectie')({ db, domein: 'ai-budget', bezit: { aiBudget: 'kaart' } });
+  return { data: eigen.bak('aiBudget'), bewaar: save };
 }
 
 /* Alles van een ander venster mag weg: een dagstand van vorige week zegt niets

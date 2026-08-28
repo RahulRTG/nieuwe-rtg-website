@@ -40,6 +40,7 @@ const REDEN_NODIG = ['vernietigen', 'exporteren', 'zoekenBreed', 'inzage'];
 const EIGEN = RECHTEN.filter(r => r !== 'inzage');
 
 module.exports = ({ db, save, crypto }) => {
+  const eigenC = require('./eigencollectie')({ db, domein: 'kern/rtmail-recht', bezit: { rtmailRecht: 'kaart' } });
   const nu = () => new Date().toISOString();
   const busVan = (adres) => {
     const o = adresLaag.ontleed(adres);
@@ -48,9 +49,7 @@ module.exports = ({ db, save, crypto }) => {
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
 
   function D() {
-    if (!db.data.rtmailRecht || typeof db.data.rtmailRecht !== 'object')
-      db.data.rtmailRecht = { delegaties: [], journaal: [] };
-    const d = db.data.rtmailRecht;
+    const d = eigenC.bak('rtmailRecht', (b) => { b.delegaties = []; b.journaal = []; });
     if (!Array.isArray(d.delegaties)) d.delegaties = [];
     if (!Array.isArray(d.journaal)) d.journaal = [];
     return d;

@@ -67,9 +67,10 @@ const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
+const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
 const systeemKlok = require('./lib/klok');
-const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
+const { schoon, ledenPrijs, rondEuro, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
 const { totpOk } = require('./kern/totp');
 const { publicPartner, weekdagFactor, cvReady, btwSplit } = require('./kern/afgeleid');
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP, maakFiscaal } = require('./kern/fiscaal');
@@ -226,7 +227,7 @@ try {
    aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
    gaan lopen. */
 accounts.init();
-/* DEMO-MODUS: UIT, TENZIJ IEMAND HEM BEWUST AANZET.
+/* SYNTHETISCHE DATA: ALLEEN IN MAGNAAT TEST.
 
    Hier stond `NODE_ENV !== 'production' || RTG_DEMO === '1'`, met de belofte
    erboven dat de demo-inlog "nooit per ongeluk open op productie" staat. Die
@@ -239,10 +240,10 @@ accounts.init();
    met de vaste code 'RTG-OFFICE' die in deze repo te lezen staat -- en achter
    die deur ligt de identiteitskluis met echte namen en paspoortscans.
 
-   Een slot dat opengaat als iemand iets vergeet is geen slot. Aanzetten kan
-   alleen nog uitdrukkelijk, met RTG_DEMO=1. Wie lokaal demonstreert zet die
-   vlag; een server die niets weet, doet niets. */
-const DEMO = process.env.RTG_DEMO === '1';
+   Een slot dat opengaat als iemand iets vergeet is geen slot. De echte vier
+   werelden hebben daarom geen demo-stand. Alleen de afzonderlijke Magnaat-
+   testomgeving mag synthetische accounts en gegevens laden. */
+const DEMO = testomgeving.actief(process.env);
 // Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
 // echte accountlogin werkt. Bestaat het account al (een oudere lokale
 // database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
@@ -261,8 +262,21 @@ const DEMO = process.env.RTG_DEMO === '1';
 
    Het commentaar hierboven redeneerde over de volgorde ten opzichte van
    'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
-function zetEigenaarsAccount() {
+function zetEigenaarsAccountEens() {
   const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
+  /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
+     daarmee was de demo-stand een garantie die alleen gold op een verse
+     database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
+     Postgres kwam de rij ergens anders vandaan en was het wachtwoord
+     onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
+     Dit staat achter DEMO en draait dus nooit in productie. */
+  const bijwerken = (rij) => {
+    let x = rij;
+    if (accounts.realNameOf(x) !== 'Rahul Imran Ismail') x = accounts.renameUser(x.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+    accounts.setPasswordZaai(x.id, DEMO_WACHTWOORD);
+    accounts.setVerification(x.id, 'verified');
+    return x;
+  };
   let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
   if (!u) {
     /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
@@ -272,10 +286,10 @@ function zetEigenaarsAccount() {
     const bestaand = accounts.findByLogin('Rahul');
     if (bestaand) {
       u = accounts.renameUser(bestaand.id, { username: 'Rahul', realName: 'Rahul Imran Ismail', email: eigenaar.OWNER_EMAIL });
-      accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+      accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
       accounts.setVerification(u.id, 'verified');
     } else {
-      u = accounts.createUserSync({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
+      u = accounts.createUserZaai({ username: 'Rahul', email: eigenaar.OWNER_EMAIL, password: DEMO_WACHTWOORD, tier: 'business', realName: 'Rahul Imran Ismail', phone: '+31612345678' });
       accounts.saveMemberState(u.id, demoLidInhoud());
       accounts.setVerification(u.id, 'verified'); // demo-account is al geverifieerd
     }
@@ -287,7 +301,7 @@ function zetEigenaarsAccount() {
        Postgres kwam de rij ergens anders vandaan en was het wachtwoord
        onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
        Dit staat achter DEMO en draait dus nooit in productie. */
-    accounts.setPasswordSync(u.id, DEMO_WACHTWOORD);
+    accounts.setPasswordZaai(u.id, DEMO_WACHTWOORD);
     accounts.setVerification(u.id, 'verified');
   }
   /* De sleutelbos van de eigenaar: alles zien en alles doen met het ene
@@ -304,6 +318,33 @@ function zetEigenaarsAccount() {
       sleutelbos.push({ rol: 'zaak', code: zc, zaakNaam: zaak ? zaak.name : zc, naam: 'Beheer', at: new Date().toISOString() });
     }
     save();
+  }
+}
+
+/* EEN VERLOREN RACE IS GEEN FOUT, ook hier niet.
+
+   De vloot start leden, kantoor en rtf als aparte processen op dezelfde
+   accountsdatabase. Alle drie kijken ze of het eigenaarsaccount bestaat, alle
+   drie zien ze van niet, en alle drie maken ze het aan -- waarna twee van de
+   drie fataal omvallen op UNIQUE constraint failed: users.username. Dat was de
+   tweede helft van de flake in test/vloot.test.js; de eerste helft zat in
+   server/migraties/index.js en is daar met een slot opgelost.
+
+   Hier past geen slot maar een herlezing: de bedoeling van deze functie is
+   IDEMPOTENT -- zorg dat de eigenaar bestaat -- dus een botsing op de unieke
+   sleutel betekent dat een ander proces het al heeft gedaan. Dan kijken we
+   opnieuw, en die tweede ronde vindt het account en loopt door. Elke andere
+   fout blijft staan zoals hij is.
+
+   Een keer opnieuw en niet in een lus: na de botsing BESTAAT de rij (SQLite
+   commit synchroon), dus ziet de tweede ronde hem nog steeds niet, dan is er
+   iets anders aan de hand dan drukte. */
+function zetEigenaarsAccount() {
+  try { return zetEigenaarsAccountEens(); }
+  catch (e) {
+    const bericht = String((e && e.message) || e);
+    if (!/UNIQUE constraint failed: users\./.test(bericht)) throw e;
+    return zetEigenaarsAccountEens();
   }
 }
 // bij het laden; in Postgres-modus nogmaals na de gedeelde pull (zie onder)
@@ -349,12 +390,12 @@ if (DEMO) {
       if (seedNamen.has(k) && gezien.has(k)) accounts.deactivateStaff(st.id); else gezien.add(k);
     }
     if (accounts.countStaff(code) === 0) {
-      /* createStaffDemo en niet createStaffSync: dit zijn 183 rijen met een
+      /* createStaffZaai en niet createStaffSync: dit zijn 183 rijen met een
          pincode die twee regels hierboven te lezen is. Op volle scrypt-kosten
          duurde deze lus alleen al twintig seconden voor 'listen' -- zie
          server/accounts/wachtwoord.js bij hashDemoSync voor het waarom en de
          drie grendels eromheen. */
-      people.forEach(([name, role, func], i) => accounts.createStaffDemo({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
+      people.forEach(([name, role, func], i) => accounts.createStaffZaai({ supplierCode: code, name, role, func, pin: i === 0 ? '1234' : '5678' }));
     }
   }
   // het restaurant en de beachclub zijn verbonden in het personeelsnetwerk,
@@ -372,7 +413,7 @@ if (DEMO) {
   try {
     let nora = accounts.findByLogin('nora@rtg.example');
     if (!nora) {
-      nora = accounts.createUserSync({ username: 'nora', email: 'nora@rtg.example', password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: 'Nora Prins', phone: '+31600000002' });
+      nora = accounts.createUserZaai({ username: 'nora', email: 'nora@rtg.example', password: process.env.DEMO_STAFF_PASS || 'werk', tier: 'rtg', realName: 'Nora Prins', phone: '+31600000002' });
       accounts.setVerification(nora.id, 'verified');
     }
     for (const c of ['KIKUNOI', 'VORA']) {
@@ -769,9 +810,10 @@ function demoLidInhoud() {
 // Liveness: draait het proces? (Voor de load balancer/monitor, altijd 200 als
 // het proces leeft.)
 app.get('/api/health', (req, res) => {
+  const omgeving = testomgeving.status(process.env);
   const model = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({
-    ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
+    ok: true, ...omgeving, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
     /* `active` is "schrijft dit proces?", `leider` is "doet dit proces het werk
        dat per installatie een keer hoort te gebeuren?". In spreidingsmodus
@@ -1079,6 +1121,10 @@ const notities = require('./kern/notities').maakNotities({
   db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
 /* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
    (zelfde aanpak als media.js), alleen verwijzingen in de database. */
+/* De opslagpeiling van de kostprijslaag (KOSTEN.md) staat naast de kluis en niet
+   erin; zie de kop van kern/bestanden-opslag.js voor waarom, en welke toets die
+   naad bewaakt. */
+const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
   // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
@@ -1514,7 +1560,8 @@ const {
   isRetail: retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, verkoop: retailVerkoop,
-  verkoopTerug: retailVerkoopTerug,
+  verkoopTerug: retailVerkoopTerug, prijsVan: retailPrijsVan,
+  annuleerVerkoop: retailAnnuleer, bonBeeld: retailBon, ANNULEERGRONDEN,
   voorraadZoek, retailStats, retailState, catalogus: retailCatalogus
 } = maakRetail({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
@@ -1897,7 +1944,7 @@ const gcCode = () => 'RTG-GC-' + crypto.randomBytes(3).toString('hex').toUpperCa
    altijd op de lopende tabel blijven rekenen. Vandaar een functie: hij wordt pas
    uitgevoerd als er echt een rapport wordt gemaakt, en dan staat de laag er.
    Hetzelfde idioom als de bevoegdheidslaag hierboven ("lui doorgegeven"). */
-const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, centen, btwSplit,
+const { financeVoor, cannedBoekhouder, dagrapport, shiftSamenvatting } = maakFiscaal({ db, rondEuro, btwSplit,
   jaargangen: () => kern.regelwacht && kern.regelwacht.jaargangen });
 
 
@@ -2082,14 +2129,14 @@ const kern = {
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
   ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
-  bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
+  bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, rondEuro, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
-  crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
+  crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -2113,7 +2160,7 @@ const kern = {
   // de retail-/mode-laag (kern/retail.js)
   RETAIL_MATEN, RETAIL_SEIZOENEN, retailIsRetail, zetCollectie, zetArtikel, pasVoorraad, releaseDrop,
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
-  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, voorraadZoek,
+  vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, retailPrijsVan, retailAnnuleer, retailBon, ANNULEERGRONDEN, voorraadZoek,
   retailStats, retailState, retailCatalogus,
   /* DE GROOTHANDEL ALS EEN NAAM. Vier van deze zestien werden door zowel member
      als supplier aangeraakt (ghMarkt, ghPlaatsBestelling, ghAnnuleer,
@@ -2173,7 +2220,7 @@ const kern = {
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, capGezondheid, bijeen, bewerkCollectie, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
+  broadcastSync, centen: rondEuro, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
@@ -2204,6 +2251,7 @@ const hulp = {
    aaneengesloten stukken in precies deze volgorde. Zie de kop van kernlaag1.js. */
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
+require('./opzet/kernlaag2b')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3c')(kern, hulp);  // de commerciele kern; NA pay, want de ronde boekt
 require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
@@ -2216,6 +2264,25 @@ require('./opzet/kernlaag5f')(kern, hulp);  // RTG Festival; hangt onder EEN naa
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
 require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
+
+/* DE TWEE SLOTEN OP PUBLIEK VERKOPEN, aan de commerce-laag gegeven als LEZERS.
+
+   Precies dezelfde twee reads als eigenWeb.serveer hierboven doet: de
+   boardroom-functie 'dom-eigendomein' en de site die op een eigen adres staat.
+   Ze staan hier omdat webmaker en functies in dit bestand wonen en kern/commerce
+   in kernlaag2b wordt gebouwd; een tweede lezer in de kern zou een tweede
+   antwoord op dezelfde vraag zijn (LAT-regel 4).
+
+   ER GAAT ALLEEN LEESWERK IN. kern/commerce krijgt geen manier om de functie
+   aan te zetten of een domein te koppelen -- het kan alleen zien of dat al is
+   gebeurd. Zonder deze regels blijft `publiek` dicht met de reden "niet vast te
+   stellen", en dat is de goede kant op. */
+if (kern.commerce && kern.commerce.koppelPubliek) {
+  kern.commerce.koppelPubliek({
+    functieAan: (id) => functies.functieAan(id, db.data && db.data.techniek && db.data.techniek.functies),
+    siteVan: (zaakCode) => webmaker.siteVanZaak(zaakCode)
+  });
+}
 
 /* ---------- de afsluiters en de start staan in ./opzet/start.js ----------
 
@@ -2236,7 +2303,10 @@ const { server, backupData } = require('./opzet/start')({
   log, db, accounts, save, eigenaar, webpush, kern,
   checkpointSqlite, checkpointGrootboek,
   initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
-  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer
+  DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer,
+  // voor de kappen in de onderhoudsronde: een weggeknipte snap heeft ook een
+  // bestand op schijf (zie kern/kappen.js)
+  media
 });
 
 /* Naar buiten toe is dit een startscript, geen module: niets require't

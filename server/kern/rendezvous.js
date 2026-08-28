@@ -29,10 +29,11 @@ module.exports = ({ db, save, crypto, codenaamVan, anthropic, notify, accounts, 
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const lijstUit = (v, max, elk) => (Array.isArray(v) ? v : String(v || '').split(',')).map(x => schoon(x, elk || 40)).filter(Boolean).slice(0, max || 12);
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rendezvous', bezit: { rendezvous: 'kaart' } });
+
   function R() {
-    if (!db.data.rendezvous || typeof db.data.rendezvous !== 'object')
-      db.data.rendezvous = { profielen: {}, likes: {}, passes: {}, blokkades: {}, meldingen: [] };
-    const r = db.data.rendezvous;
+    const r = eigen.bak('rendezvous', (b) =>
+      Object.assign(b, { profielen: {}, likes: {}, passes: {}, blokkades: {}, meldingen: [] }));
     for (const v of ['profielen', 'likes', 'passes', 'blokkades']) if (!r[v] || typeof r[v] !== 'object') r[v] = {};
     if (!Array.isArray(r.meldingen)) r.meldingen = [];
     return r;

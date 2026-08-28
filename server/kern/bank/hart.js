@@ -14,8 +14,8 @@ module.exports = (ctx) => {
   const { d, boekAsync, rekeningen, rekMeta, saldoVan, betaal } = ctx;
 
   const PROVIDERS = { stripe: 'Stripe', adyen: 'Adyen', mollie: 'Mollie',
-    demo: 'Kaartnaad (demo)', uit: 'Geen externe betaalrail' };
-  const providerLabel = () => PROVIDERS[(betaal && betaal.AANBIEDER) || 'demo'] || 'Kaartprovider';
+    'magnaat-test': 'Magnaat Test', demo: 'Magnaat Test', uit: 'Geen externe betaalrail' };
+  const providerLabel = () => PROVIDERS[(betaal && betaal.AANBIEDER) || 'uit'] || 'Kaartprovider';
   const mijnIbans = c => Object.values(rekeningen()).filter(m => m.codenaam === c).map(m => m.iban);
 
   /* Het hart-afschrift: bankboekingen over ALLE eigen rekeningen plus de

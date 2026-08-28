@@ -15,7 +15,7 @@
 
 const rem = require('./rem');
 
-module.exports = ({ handleVanPin, pinKijk, liveKijk, zaakVan, cap, isMens }) => {
+module.exports = ({ pinZoek, liveKijk, zaakVan, cap, isMens }) => {
 
 const NIETS = { status: 404, error: 'Deze code kennen we niet (meer).' };
 const niets = () => { rem.misserGeteld(); return { ...NIETS }; };
@@ -34,12 +34,16 @@ async function onderwerpVan(g, wie, mij, zaakcode) {
          database heet. Zijn eigen rem per lid staat daar al omheen. */
       const r = liveKijk(mij, g.sleutel);
       if (r.error) return { status: r.status, error: r.error };
-      return { onderwerp: { codename: r.codename, tier: r.tier, status: r.st }, band: r.st };
+      return { onderwerp: { codename: r.codename, tier: r.tier, status: r.st }, band: r.st,
+        bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt };
     }
-    const kaart = pinKijk(mij, handleVanPin(g.sleutel));
-    if (!kaart) return niets();
+    /* Leen de HELE pindeur, niet alleen zijn kijkfunctie. Sinds de
+       beveiligingsrand geeft die deur ook het eenmalige bewijs voor de bewuste
+       tweede stap uit en telt hij dezelfde persoons- en huisremmen. */
+    const kaart = pinZoek(mij, g.sleutel);
+    if (!kaart || kaart.error) return kaart || niets();
     return { onderwerp: { key: kaart.key, codename: kaart.codename, tier: kaart.tier, status: kaart.st },
-      band: kaart.st };
+      band: kaart.st, bevestiging: kaart.bevestiging, bevestigingVervalt: kaart.bevestigingVervalt };
   }
   if (g.type === 'plaats' || g.type === 'zaak') {
     const z = typeof zaakVan === 'function' ? zaakVan(g.sleutel) : null;

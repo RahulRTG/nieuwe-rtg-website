@@ -1,3 +1,4 @@
+const EENHEID = require('./geld/eenheid');
 /* Het Lab-fonds (kern/labfonds): leden zamelen samen geld in voor het RTF
    Onderzoekslab. Het opgehaalde geld wordt PER LOCATIE verdeeld, zodat elke plek
    zelf in zijn eigen omgeving kan investeren. Wat er per locatie met de pot
@@ -9,20 +10,23 @@
    staat los in kern/onderzoekslab.js en is niet via dit fonds zichtbaar.
 
    Geld is hier een toezegging in het fondsgrootboek (centen); er wordt nooit
-   geclaimd dat een echte betaling is verwerkt. Opslag: db.data.labFonds. */
+   geclaimd dat een echte betaling is verwerkt. Opslag: labFonds. */
 
 module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
-  const centen = (euro) => Math.max(0, Math.round(Number(euro) * 100) || 0);
+  /* HEET NIET MEER `centen`. Die naam betekende in dit huis drie dingen -- zie
+     de kop van ./geld/eenheid.js. Hier ging hij van euro naar cent, en dat is
+     wat de naam nu zegt. */
+  const naarCenten = (euro) => Math.max(0, EENHEID.naarCenten(euro) || 0);
   const eur = (c) => Math.round(c) / 100;
   // richtingen die geen omgeving dienen maar privaat gewin: de scheidsrechter raadt af
   const PRIVAAT = ['mezelf', 'mijzelf', 'eigen zak', 'prive', 'privé', 'vakantie voor mij', 'cadeau voor mij', 'zakgeld', 'mijn rekening'];
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/labfonds', bezit: { labFonds: 'kaart' } });
   function F() {
-    if (!db.data.labFonds || typeof db.data.labFonds !== 'object') db.data.labFonds = {};
-    const f = db.data.labFonds;
+    const f = eigen.bak('labFonds');
     if (!f.locaties || typeof f.locaties !== 'object') f.locaties = {};
     if (!Array.isArray(f.bijdragen)) f.bijdragen = [];
     if (!Array.isArray(f.voorstellen)) f.voorstellen = [];
@@ -87,7 +91,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   function doneer(lidKey, lidNaam, locId, euro) {
     if (!lidKey) return { status: 403, error: 'Log in met je RTG-account om mee in te zamelen.' };
     const l = loc(locId); if (!l) return { status: 404, error: 'Deze locatie bestaat niet.' };
-    const c = centen(euro);
+    const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Zamel minimaal EUR 1 in.' };
     if (c > 5000000) return { status: 400, error: 'Dat is te veel voor een keer; verdeel het over meerdere keren.' };
     l.pot += c; l.opgehaald += c;
@@ -101,7 +105,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
      datum. fonds() geeft alleen sommen, en die in euro's omdat dat beeld
      rechtstreeks naar het scherm gaat; de geldgraaf (kern/geldgraaf) heeft
      de losse gebeurtenissen nodig voor zijn tijdlijn en mag daarvoor niet
-     zelf in db.data.labFonds graven -- dan leest een tweede plek de vorm
+     zelf in labFonds graven -- dan leest een tweede plek de vorm
      van een bijdrage na en loopt die vanzelf uit de pas met dit domein
      (LAT.md regel 4). Kopieen, geen verwijzingen: meekijken is geen
      meeschrijven. */
@@ -116,7 +120,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   /* De voorstellen, de stemming, de AI-scheidsrechter en de beslissing draaien
      als submodule op dezelfde context; zie labfonds/voorstellen.js. */
   const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
-    F, loc, vindV, locBeeld, voorstelBeeld, schoon, centen, eur, nu, rid, save, PRIVAAT });
+    F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT });
 
   return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom } };
 };

@@ -31,6 +31,48 @@
   'use strict';
   if (w.RTGRanden) return;
 
+  /* Alle Foundation-schermen laden deze module al. Dat maakt dit de ene,
+     bestaande ingang voor de nieuwe Foundation-rand, zonder tientallen
+     pagina's ieder hun eigen kopie van de navigatie te geven. */
+  function startFoundationEdge() {
+    var pad = w.location.pathname, wereld = null;
+    if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
+    else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
+    else if (['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html','/apps/agenda.html','/apps/office.html','/apps/rtmail.html','/apps/bestanden.html','/apps/sitemaker.html','/apps/browser.html','/apps/rtgone.html','/apps/onderneming.html','/apps/magnaat.html','/apps/backoffice.html','/apps/command.html','/apps/rtgschool.html'].includes(pad)) wereld = 'work';
+    if (!wereld) return false;
+    if (new URLSearchParams(w.location.search).get('embed') === '1') {
+      d.body.classList.add('rtg-edge-embed');
+      d.body.dataset.rtgWorld = wereld;
+      var ingebedBlad = d.createElement('link'); ingebedBlad.rel = 'stylesheet';
+      ingebedBlad.href = '/shared/rtg-edge-system.css'; d.head.appendChild(ingebedBlad);
+      return true;
+    }
+    var link = d.createElement('link'); link.rel = 'stylesheet'; link.href = '/shared/rtg-edge-system.css'; d.head.appendChild(link);
+    function laad(bron, klaar) {
+      var script = d.createElement('script'); script.src = bron; script.onload = klaar; d.head.appendChild(script);
+    }
+    laad('/shared/rtg-edge-worlds.js', function () {
+      laad('/shared/rtg-edge-icons.js', function () {
+        laad('/shared/rtg-edge-library.js', function () {
+          laad('/shared/rtg-edge-system.js', function () {
+            var cfg = w.RTGEdgeWorlds[wereld];
+            var huidig = cfg.all.find(function (item) {
+              try { return new URL(item[3], location.href).pathname === location.pathname; } catch (fout) { return false; }
+            });
+            w.RTGEdge.start({ world: wereld, context: { scope: cfg.kort, title: huidig ? huidig[1] : d.title,
+          tool: huidig ? huidig[0] : '', actie: huidig && huidig[0] === 'foundation-home' ? 'Open Campus' : 'Ga verder' },
+          onAction: function () {
+            var knop = d.querySelector('main .knop:not([disabled]),main .campus-ingang,main [data-primary]');
+            if (knop) knop.click();
+          } });
+          });
+        });
+      });
+    });
+    return true;
+  }
+  if (startFoundationEdge() && new URLSearchParams(w.location.search).get('embed') === '1') return;
+
   var RAND = 24;   // hoe dicht bij de rand een haal mag beginnen
   var HAAL = 40;   // hoeveel pixels de goede kant op voordat hij opengaat
 

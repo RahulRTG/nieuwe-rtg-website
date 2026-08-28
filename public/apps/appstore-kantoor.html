@@ -92,6 +92,28 @@ function tekenNaam(){
     '<div class="rij"><input class="veld" id="wie" class="breed" maxlength="80" placeholder="Voor- en achternaam" value="'+esc(naam())+'"></div></div>';
 }
 
+/* DE TOEGANKELIJKHEIDSUITSLAG, op de plek waar de mens aftekent.
+
+   Sinds 27 augustus 2026 houdt deze keuring een versie tegen. Zonder dit blok
+   drukt wie hier zit op Publiceren, krijgt een weigering uit de server terug en
+   moet zelf raden wat er aan de hand is. De server blijft de poort -- dit is
+   alleen het venster erop (LAT-regel 4).
+
+   Er staat met opzet GEEN groen vinkje bij 'in orde'. De machine keurt nooit
+   goed (APPSTORE.md grens 2); een geslaagde keuring haalt alleen de blokkade
+   weg, en de mens tekent nog steeds af. */
+function tekenToegankelijk(t){
+  if (!t) return '<div class="bev"><b>Toegankelijkheid: nog niet gekeurd</b><br>'+
+    'Deze bundel is nog niet gerenderd. Publiceren kan pas na de keuring; draai de keurloper (scripts/appstore-a11y.js) over de wachtrij.</div>';
+  if (t.stand === 'in-orde') return '<div class="bev goed"><b>Toegankelijkheid: geen fouten gevonden</b><br>'+
+    'Gekeurd door '+esc(t.door)+' op '+esc(String(t.at).slice(0,10))+'. Dat is geen goedkeuring: het haalt alleen de blokkade weg.</div>';
+  if (t.stand === 'blokkeert') return '<div class="bev"><b>Toegankelijkheid: '+esc(String(t.fouten))+' fout(en) &middot; gaat zo niet live</b><br>'+
+    'Gekeurd door '+esc(t.door)+' op '+esc(String(t.at).slice(0,10))+'. Weigeren kan wel.'+
+    (t.bevindingen||[]).map(b => '<br>&middot; '+esc(b.bestand)+': '+esc(b.wat)+' &mdash; '+esc(b.hoe)).join('')+'</div>';
+  return '<div class="bev"><b>Toegankelijkheid: niet vast te stellen</b><br>'+
+    'De keuring kon niet draaien. Dat is geen goedkeuring: zolang niemand het heeft gemeten, gaat deze versie niet live.</div>';
+}
+
 function tekenWachtrij(d){
   if (!d.inzendingen.length) return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">Niets in de wachtrij. '+esc(d.let)+'</p></div>';
   return '<div class="kaart"><h2>Wachtrij</h2><p class="sub">'+esc(d.let)+'</p>'+
@@ -116,6 +138,7 @@ function tekenWachtrij(d){
             '</div>'
           : '<div class="bev letop"><b>Eerste versie van deze app</b><br>Er is niets om mee te vergelijken; lees het manifest als geheel.</div>')+
         v.bevindingen.map(b => '<div class="bev'+(b.ernst==='let-op'?' letop':'')+'"><b>'+esc(b.wat)+'</b>'+(b.bestand?' &middot; '+esc(b.bestand):'')+'<br>'+esc(b.hoe)+'</div>').join('')+
+        tekenToegankelijk(v.toegankelijk)+
         '<div class="rij"><input class="veld reden breed" maxlength="600" placeholder="Reden (verplicht bij weigeren)">'+
           '<button class="knop pub" type="button">Publiceren</button>'+
           '<button class="knop stil wei" type="button">Weigeren</button></div>'+

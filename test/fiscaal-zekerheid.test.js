@@ -22,7 +22,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const zek = require('../server/kern/fiscaal/zekerheid');
 const { maakFiscaal, zzpBerekening } = require('../server/kern/fiscaal');
-const { centen } = require('../server/kern/util');
+const { rondEuro } = require('../server/kern/util');
 const { btwSplit } = require('../server/kern/afgeleid');
 
 function stubDb() {
@@ -56,7 +56,7 @@ test('een niet-ingedeelde uitkomst verklaart zichzelf niet tot feit', () => {
 
 test('de uitkomsten dragen hun klasse', () => {
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
-  const { financeVoor } = maakFiscaal({ db: stubDb(), centen, btwSplit });
+  const { financeVoor } = maakFiscaal({ db: stubDb(), rondEuro, btwSplit });
   const fin = financeVoor(s);
   assert.equal(fin.zekerheid.klasse, 'bepaald');
   assert.equal(fin.zekerheid.term, 'DETERMINISTIC');
@@ -94,7 +94,7 @@ test('wat niet vanzelf gaat, staat als voorbehouden -- en de rest niet', () => {
 
 test('de vlakke zin is weg uit wat een gebruiker te zien krijgt', () => {
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
-  const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), centen, btwSplit });
+  const { financeVoor, cannedBoekhouder } = maakFiscaal({ db: stubDb(), rondEuro, btwSplit });
   const fin = financeVoor(s);
   const L = require('../server/kern/fiscaal').LANDEN.NL;
 

@@ -81,6 +81,14 @@ Object.assign(ctx, deelSnaps);
    controles blijven bij socialVerbind; deze lagen zoeken alleen de handle op.
    Alle drie staan NA de vriendenlaag, want die levert statusVan en
    socialVerbind aan. */
+/* Voor de pin zelf komen eerst de twee veiligheidsranden: de duurzame staat
+   (intrekken, noodslot, gebruikersjournaal) en de vluchtige bevestiging die de
+   tweede menselijke stap server-side afdwingt. Ze blijven intern; routes mogen
+   nooit zelf tombstones of intenties schrijven. */
+const deelPinBeveiliging = require('./sociaal/pin-beveiliging')(ctx);
+Object.assign(ctx, deelPinBeveiliging);
+const deelPinIntent = require('./sociaal/pin-intent')(ctx);
+Object.assign(ctx, deelPinIntent);
 const deelPin = require('./sociaal/pin')(ctx);
 Object.assign(ctx, deelPin);
 const deelPinDeur = require('./sociaal/pin-deur')(ctx);

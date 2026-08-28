@@ -19,7 +19,7 @@
   function kaart(titel, binnen) {
     return '<div class="sec">' + titel + '</div><div class="kaart blok">' + binnen + '</div>';
   }
-  function regel(tekst) { return '<div class="mini" style="margin:.25rem 0;">' + tekst + '</div>'; }
+  function regel(tekst) { return '<div class="mini" style="margin:0.25rem 0;">' + tekst + '</div>'; }
 
   async function laad() {
     if (typeof gezinApi !== 'function' || !wortel) return;

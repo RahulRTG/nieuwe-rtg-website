@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Schrijven</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -32,6 +32,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -86,7 +87,7 @@ $('#lees').addEventListener('click', async () => {
     const d = await api('schrijf-feedback', { tekst: $('#tekst').value, opdracht: $('#opdracht').textContent, groep, buddy });
     laatsteFeedback = d.feedback;
     $('#fb').hidden = false;
-    $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy (demo)' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
+    $('#fb').innerHTML = '<small>' + (d.demo ? 'je buddy met de vaste taalbasis' : 'je buddy') + ' las mee</small>' + esc(d.feedback);
   } catch (e) { $('#fout').textContent = e.message; }
   $('#lees').disabled = false; $('#lees').textContent = 'Buddy leest mee';
 });
@@ -145,5 +146,6 @@ laadSchrijfsels();
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

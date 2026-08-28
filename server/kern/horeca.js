@@ -32,16 +32,22 @@ const REGELSTANDEN = ['besteld', 'gestart', 'bereid', 'klaar', 'uitgegeven'];
 module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => new Date().toISOString();
   const id = (n = 5) => crypto.randomBytes(n).toString('hex');
-  const centen = (v) => Math.round(Math.max(0, Math.min(10000000, Number(v) || 0)));
-  const uitEuro = (v) => centen(Math.round((Number(v) || 0) * 100));
+  /* HEET heleCenten EN NIET `centen`. Hij verandert de eenheid NIET: hij maakt
+     van een bedrag een HEEL getal in centen, met een bovengrens. De naam
+     `centen` betekende in dit huis drie dingen -- in kern/util.js rondt hij
+     euro's af, op vier plekken maakte hij er centen van, en hier doet hij dit.
+     Zie de kop van kern/geld/eenheid.js; `uitEuro` hieronder zet wel om. */
+  const heleCenten = (v) => Math.round(Math.max(0, Math.min(10000000, Number(v) || 0)));
+  const uitEuro = (v) => heleCenten(Math.round((Number(v) || 0) * 100));
 
   /* De staat per zaak. Bewust per zaakcode en niet een grote lijst met een
      zaakveld erin: een zaak leest en schrijft alleen zijn eigen doos. */
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/horeca', bezit: { horeca: 'kaart' } });
   function H(code) {
-    if (!db.data.horeca) db.data.horeca = {};
+    const alles = eigen.bak('horeca');
     const c = String(code || '');
-    if (!db.data.horeca[c]) db.data.horeca[c] = { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
-    const h = db.data.horeca[c];
+    if (!alles[c]) alles[c] = { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
+    const h = alles[c];
     if (!h.rekeningen) h.rekeningen = {};
     if (!h.bonnen) h.bonnen = {};
     if (!h.instel) h.instel = {};
@@ -59,24 +65,25 @@ module.exports = ({ db, save, crypto, schoon }) => {
      die nergens aan vast zit. */
   function Hlees(code) {
     const c = String(code || '');
-    return (db.data.horeca && db.data.horeca[c]) ? H(c)
+    // bak() maakt hooguit de lege wortel aan; de doos van een zaak nooit
+    return eigen.bak('horeca')[c] ? H(c)
       : { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
   }
 
   // de som van een regel en van een hele rekening, altijd op dezelfde manier
-  const regelSom = (r) => centen(r.centen * r.aantal);
+  const regelSom = (r) => heleCenten(r.centen * r.aantal);
   function kortingCenten(rek) {
     const bruto = (rek.regels || []).reduce((t, r) => t + regelSom(r), 0);
     let af = 0;
-    for (const k of (rek.kortingen || [])) af += k.procent ? Math.round(bruto * k.procent / 100) : centen(k.centen);
+    for (const k of (rek.kortingen || [])) af += k.procent ? Math.round(bruto * k.procent / 100) : heleCenten(k.centen);
     return Math.min(bruto, af);
   }
   function totaal(rek) {
     const bruto = (rek.regels || []).reduce((t, r) => t + regelSom(r), 0);
     const korting = kortingCenten(rek);
-    return { bruto, korting, netto: bruto - korting, fooi: centen(rek.fooiCenten || 0),
-      teBetalen: bruto - korting + centen(rek.fooiCenten || 0),
-      betaald: (rek.betalingen || []).reduce((t, b) => t + centen(b.centen), 0) };
+    return { bruto, korting, netto: bruto - korting, fooi: heleCenten(rek.fooiCenten || 0),
+      teBetalen: bruto - korting + heleCenten(rek.fooiCenten || 0),
+      betaald: (rek.betalingen || []).reduce((t, b) => t + heleCenten(b.centen), 0) };
   }
   const openstaand = (rek) => { const t = totaal(rek); return t.teBetalen - t.betaald; };
 
@@ -122,7 +129,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
     let bonCode;
     do { bonCode = crypto.randomBytes(4).toString('hex').toUpperCase(); } while (h.bonnen[bonCode]);
     h.bonnen[bonCode] = { code: bonCode, soort: soort === 'tegoed' ? 'tegoed' : 'cadeaubon',
-      uitgegeven: centen(waarde), saldo: centen(waarde), naam: schoon(naam, 60) || null,
+      uitgegeven: heleCenten(waarde), saldo: heleCenten(waarde), naam: schoon(naam, 60) || null,
       geldigTot: schoon(geldigTot, 10) || null, at: nu(), mutaties: [] };
     save();
     return h.bonnen[bonCode];
@@ -132,7 +139,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
     const b = Object.prototype.hasOwnProperty.call(h.bonnen, String(bonCode || '')) ? h.bonnen[String(bonCode)] : null;
     if (!b) return { status: 404, error: 'Deze bon kennen we niet.' };
     if (b.geldigTot && b.geldigTot < nu().slice(0, 10)) return { status: 409, error: 'Deze bon is verlopen op ' + b.geldigTot + '.' };
-    const wil = centen(bedrag);
+    const wil = heleCenten(bedrag);
     if (!wil) return { status: 400, error: 'Vul het bedrag in.' };
     const echt = Math.min(wil, b.saldo);
     if (!echt) return { status: 409, error: 'Deze bon heeft geen saldo meer.' };
@@ -143,6 +150,6 @@ module.exports = ({ db, save, crypto, schoon }) => {
     return { ok: true, geboekt: echt, restVraag: wil - echt, saldo: b.saldo, bon: b.code };
   }
 
-  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen, uitEuro, regelSom, kortingCenten, waarde,
+  return { KANALEN, REGELSTANDEN, H, Hlees, nu, id, centen: heleCenten, heleCenten, uitEuro, regelSom, kortingCenten, waarde,
     totaal, openstaand, controleerSom, happyKorting, bonMaak, bonBoek };
 };

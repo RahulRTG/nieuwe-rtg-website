@@ -12,6 +12,7 @@
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/workos-premium.css" rel="stylesheet">
 <style>
   :root{
     --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
@@ -39,7 +40,7 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-workos-premium data-workos-home="/apps/leverancier.html">
 <!-- DIT SCHERM IS DUN GEWORDEN, EN DAT IS DE HELE WINST. De drie bureau-PDA's
      (studio, hardware, architect) waren drie kopieën van hetzelfde ontwerp die
      uit elkaar waren gelopen: andere chip-stijl, andere uitvoerkolommen, de
@@ -56,11 +57,11 @@
 <main id="main">
   <div class="kaart" id="briefKaart">
     <div class="sec">Snel briefen</div>
-    <div class="rij" style="margin-bottom:.5rem;">
+    <div class="rij" style="margin-bottom:0.5rem;">
       <select class="veld" id="pCat" style="flex:1;min-width:9rem;" aria-label="Discipline"></select>
     </div>
-    <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:.5rem;">
-    <input class="veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600" style="margin-bottom:.5rem;">
+    <input class="veld" id="pNaam" placeholder="Naam van het concept" maxlength="100" style="margin-bottom:0.5rem;">
+    <input class="veld" id="pBrief" placeholder="Brief: ligging, sfeer, gebruik" maxlength="600" style="margin-bottom:0.5rem;">
     <button class="knop prim" id="pMaak" style="width:100%;">Concept + AI</button>
   </div>
   <div class="chips" id="pFilters"></div>
@@ -79,5 +80,6 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/workos-premium.js"></script>
 </body>
 </html>

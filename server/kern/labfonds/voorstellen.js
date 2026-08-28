@@ -2,7 +2,7 @@
    de gezamenlijke beslissing. Draait op de gedeelde context die kern/labfonds.js
    opbouwt (de locaties, de pot, de helpers). */
 module.exports = (ctx) => {
-  const { F, loc, vindV, locBeeld, voorstelBeeld, schoon, centen, eur, nu, rid, save, PRIVAAT } = ctx;
+  const { F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT } = ctx;
 
   // een voorstel om uit de pot van een locatie in de omgeving te investeren
   function voorstelMaak(lidKey, lidNaam, locId, titel, doel, euro) {
@@ -11,7 +11,7 @@ module.exports = (ctx) => {
     const t = schoon(titel, 100), d = schoon(doel, 500);
     if (t.length < 4) return { status: 400, error: 'Geef het voorstel een duidelijke titel.' };
     if (d.length < 10) return { status: 400, error: 'Leg kort uit wat het voor de omgeving oplevert.' };
-    const c = centen(euro);
+    const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Noem een bedrag van minimaal EUR 1.' };
     const v = { id: rid(), locId: l.id, doorKey: lidKey, doorNaam: schoon(lidNaam, 40) || 'Lid',
       titel: t, doel: d, centen: c, status: 'open',

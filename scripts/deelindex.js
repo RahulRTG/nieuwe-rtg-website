@@ -84,7 +84,10 @@ function bouw() {
     uit.push('');
   }
   uit.splice(kop, 0, '**' + namen.length + ' bundels, ' + totaal + ' delen, ' + zonder + ' zonder onderwerp.**', '');
-  return uit.join('\n') + '\n';
+  /* De laatste invoerregel is al leeg; join() levert daardoor precies één
+     afsluitende regelovergang. Nog een `\n` erachter maakte een lege eindregel,
+     waarna de voortgebrachte index meteen op `git diff --check` zakte. */
+  return uit.join('\n');
 }
 
 function main() {

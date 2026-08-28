@@ -33,7 +33,7 @@
 
    Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { boekAsync, rekMeta, saldoVan, pay, seintje } = ctx;
+  const { boekAsync, rekMeta, saldoVan, pay, seintje, metIdem } = ctx;
 
   /* De dichte kant. Hij blijft BESTAAN in plaats van te verdwijnen, en de route
      erboven blijft hangen: een oude app hoort te lezen waarom het niet meer kan,
@@ -43,18 +43,20 @@ module.exports = (ctx) => {
       error: 'Saldo in RTG Pay besteedt u binnen RTG; het gaat niet naar een bankrekening. ' +
         'Andersom kan wel: geld van uw rekening naar uw wallet.' };
   }
-  async function bankNaarWallet({ iban, codenaam, centen }) {
+  async function bankNaarWallet({ iban, codenaam, centen, idem }) {
     const c = String(codenaam || '').trim();
     const m = rekMeta(iban);
     if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
     const bedrag = Math.round(Number(centen));
     if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    const uit = await boekAsync({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
-    if (uit.error) return uit;
-    const in_ = await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
-    if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
-    seintje(c);
-    return { ok: true, saldoCenten: saldoVan(iban) };
+    return metIdem(idem ? 'naarwallet:' + iban + ':' + idem : null, 'naarwallet|' + iban + '|' + bedrag, async () => {
+      const uit = await boekAsync({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
+      if (uit.error) return uit;
+      const in_ = await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
+      if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
+      seintje(c);
+      return { ok: true, saldoCenten: saldoVan(iban) };
+    });
   }
 
   /* De wallet-dekking: RTG Pay komt saldo tekort en vraagt de eigen bank om

@@ -30,6 +30,45 @@ const WORTEL = path.join(__dirname, '..');
 // Los gestart pakt deze bronmuterende ijking zelf het afbouwslot. Via de
 // testrunner bezit de ouder dat slot al en geeft hij dit expliciet door.
 if (process.env.RTG_AFBOUW_SLOT_ACTIEF !== '1') require('../scripts/afbouw-slot').pak('meterijking');
+
+/* EERST DE RESTEN VAN EEN AFGEBROKEN IJKING OPRUIMEN.
+
+   Het opruimen hieronder staat in een `finally`, en dat is genoeg voor een
+   proef die zakt. Het is NIET genoeg voor een proces dat wordt afgeschoten:
+   SIGKILL slaat elke finally over, en dan blijft er een bestand liggen.
+
+   Waarom dat erger is dan het klinkt. Deze bestanden staan in .gitignore, dus
+   `git status` zwijgt erover en ze overleven elke checkout. Een achtergebleven
+   public/apps/zz-ijk-tijdelijk.html is voor de rest van de suite gewoon een
+   NIEUW scherm: bereikbaar, i18n-auto en de app-gids gaan er alle drie op
+   zakken, en de meterijking zelf weigert met "overschrijft nooit een bestaand
+   bestand". Vier rode toetsen die niets met de code te maken hebben -- en die
+   op ELKE branch even rood zijn, dus ook een meting "stond dit al rood op
+   main?" komt verkeerd uit. Precies dat is hier gebeurd.
+
+   Wegruimen kan hier zonder risico, en alleen hier: `zz-ijk-tijdelijk` is een
+   GERESERVEERD voorvoegsel. Er kan per definitie niets echts onder liggen, en
+   wat er wel ligt is per definitie afval van een eerdere ijking. De weigering
+   hieronder blijft staan voor alles wat die naam niet draagt. */
+(function ruimResten() {
+  const MAPPEN = ['', 'public/apps', 'server/kern', 'server/routes', 'test'];
+  const resten = [];
+  for (const map of MAPPEN) {
+    const vol = path.join(WORTEL, map);
+    let namen = [];
+    try { namen = fs.readdirSync(vol); } catch (e) { continue; }
+    for (const naam of namen) {
+      if (!naam.startsWith('zz-ijk-tijdelijk')) continue;
+      try { fs.rmSync(path.join(vol, naam), { recursive: true, force: true }); resten.push(path.join(map, naam)); }
+      catch (e) { /* niet te verwijderen: dan zakt de proef zo meteen alsnog, met de naam erbij */ }
+    }
+  }
+  /* Hardop, en niet stil. Een opruiming die niemand ziet, verbergt dat er een
+     ijking is afgebroken -- en dat is zelf informatie (LAT-regel 5). */
+  if (resten.length) {
+    process.stderr.write('[meterijk] resten van een afgebroken ijking opgeruimd: ' + resten.join(', ') + '\n');
+  }
+})();
 const norm = require('../scripts/norm.js');
 const deuren = require('../scripts/deuren');
 const VERBOSE = process.env.RTG_METERIJK_VERBOSE === '1';

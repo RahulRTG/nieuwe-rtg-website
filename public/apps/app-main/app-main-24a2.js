@@ -60,6 +60,13 @@
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
       'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+    /* CONTACT MET IEMAND HOORT HIER, en het stond nergens: deze drie bestonden
+       in LINKS/OSAPPS maar werden door geen enkele map genoemd, en dat bleef
+       stil omdat scripts/wereldlijst.js alleen tabs op dakloosheid controleerde
+       (die kijkt nu naar alle drie de soorten). Wie belt denkt niet dat hij in
+       zijn werk of op reis is; en niet Core, want dat is een laag die meereist
+       en een gesprek is een handeling. */
+      'link:berichten', 'os:bellen', 'os:videobellen',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
@@ -69,7 +76,7 @@
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
@@ -122,25 +129,3 @@
        app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
-    /* De zelfstandige Foundation-wereld. De stichting stond als EEN tegel binnen Het Huis
-       ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
-       een eigen huis heeft. Een wereld die als tegel in een andere wereld
-       hangt, is geen wereld. */
-    /* De wereldtegel NAVIGEERT naar het huis; een tweede item in deze lijst zou
-       nooit in beeld komen (openMap navigeert, zie 26.js). Het
-       levens-command-center staat daarom als tegel OP de hub zelf, in de
-       oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
-    /* FOUNDATIONOS IS DE WERELD, RTFOUNDATION IS HET MERK ERIN. Van de 71
-       schermen onder /apps/foundation/ gaan er acht over de stichting; de rest
-       is het leven van een kind en hoort in LivingOS. Want de bouwer van een
-       capability bepaalt niet in welke wereld hij hoort, de gebruikerscontext
-       doet dat (WERELDEN.md). Die verhuizing staat daar als genoemde stap. */
-    /* HET HUIS IS os-publiek EN NIET os-portaal, en dat scheelde een deur die naar
-       het verkeerde publiek leidt. os.html is een kantoorconsole achter een
-       kantoortoken ("KANTOORCODE"), os-portaal.html heet met zoveel woorden
-       "Portaal voor partners, gemeenten en ondernemers", en os-publiek.html zegt
-       "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
-       een lid; de andere twee zijn deuren BINNEN de wereld. */
-    { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
-      'link:rtfbuurt', 'link:rtfportaal'] }
-  ];

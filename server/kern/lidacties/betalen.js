@@ -74,6 +74,9 @@ async function betaalOrderVoor(session, body) {
   o.payBijgelegdCenten = geld.bijgelegdCenten;
   o.paid = true;
   o.paidAt = new Date().toISOString();
+  // WAARMEE er is betaald, en niet alleen DAT. De dagafsluiting zet elke euro
+  // omzet onder zijn werkelijke betaalwijze (TAKEN.md 4.59); hier is dat de app.
+  o.betaaldMet = 'app';
   if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
   verdienPunten(session.key, o.total - korting - voordeel, o.supplierName);
   save();

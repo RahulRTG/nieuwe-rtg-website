@@ -41,7 +41,7 @@ const KETEN = {
 const RISICO = ['laag', 'middel', 'hoog'];
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, rolIn, poort, limietVan, save } = ctx;
   const { bronUitSubsidie } = eigen;
 
   const vind = id => S().subsidies.find(s => s.id === String(id || '')) || null;
@@ -83,7 +83,7 @@ module.exports = (ctx, eigen) => {
     if (naam.length < 3) return { status: 400, error: 'Hoe heet deze subsidie of regeling?' };
     const soort = String(b.soort || '');
     if (!SOORTEN.includes(soort)) return { status: 400, error: 'Kies een soort (' + SOORTEN.join(', ') + ').' };
-    const bedrag = centen(b.bedrag === undefined ? 0 : b.bedrag);
+    const bedrag = naarCenten(b.bedrag === undefined ? 0 : b.bedrag);
     if (bedrag === null) return { status: 400, error: 'Welk bedrag vraagt u aan? Nul mag ook.' };
     const deadline = schoon(b.deadline, 10);
     if (deadline && Number.isNaN(Date.parse(deadline))) return { status: 400, error: 'Gebruik een datum als 2027-02-01.' };
@@ -120,7 +120,7 @@ module.exports = (ctx, eigen) => {
       s.deadline = d || null;
     }
     if (b.bedrag !== undefined && s.status !== 'toegekend') {
-      const c = centen(b.bedrag);
+      const c = naarCenten(b.bedrag);
       if (c === null) return { status: 400, error: 'Welk bedrag vraagt u aan?' };
       s.aangevraagdCenten = c;
     }

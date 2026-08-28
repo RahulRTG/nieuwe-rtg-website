@@ -1,7 +1,11 @@
-/* Kassa (deelmodule): de verkoop: de losse kassaverkoop (contant of RTG
-   Pay, met keukenafboeking) en het innen of uitgeven op RTG-code. Krijgt
-   de gedeelde kern een keer bij het opstarten vanuit
-   routes/supplier/kassa.js. */
+/* Kassa (deelmodule): de verkoop -- de losse kassaverkoop (contant, pin, RTG
+   Pay of cadeaukaart, met keukenafboeking). Krijgt de gedeelde kern en de
+   herhalingslaag van de hele kassa een keer bij het opstarten vanuit
+   routes/supplier/kassa.js.
+
+   Het INNEN op een RTG-ophaalcode stond hier ook en staat nu in ./innen.js:
+   daar bestaat de bestelling al, hier ontstaat de bon op dat moment. Dit
+   bestand kwam op 10,4 kB en daarmee over keuringsregel 13. */
 module.exports = (kern, herhaling) => {
   const { POS_METHODS, app, crypto, db, facturatie, logActivity, pickupCode, save, sseToSupplier, supplierAuth } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
@@ -66,7 +70,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const bonId = crypto.randomBytes(4).toString('hex');
   let kaartCode = null;
   if (method === 'cadeaukaart') {
-    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.payCode,
+    const k = verzilverKaart(db, req.supplier.code, req.body.giftcardCode || req.body.gcCode || req.body.payCode,
       total, req.actor.name, bonId);
     /* EEN OBJECT EN GEEN res.status(), net als elke andere uitgang hierboven.
        Deze tak is ouder dan de idempotentiewikkel van main: binnen eenmalig()
@@ -77,6 +81,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
        res-object terug in plaats van de fout. */
     if (k.error) return { status: k.status, error: k.error };
     kaartCode = k.kaart.code;
+    req.body.gcRest = k.kaart.saldo;
   }
   const sale = {
     id: bonId,
@@ -90,6 +95,7 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde, kaartCode,
+    gcCode: kaartCode, gcRest: method === 'cadeaukaart' ? req.body.gcRest : null,
     betaaldienstKosten: betaaldienstKosten || null,
     /* EEN BON UIT DE OFFLINE-WACHTRIJ DRAAGT ZIJN EIGEN MOMENT, maar bepaalt er
        niets mee. `at` blijft de tijd van AANKOMST, want dat is de tijd die de
@@ -123,7 +129,4 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
  res.json(antwoord);
 });
 
-/* De inwisselroute woont in ./inwissel.js -- dit bestand ging met main's
-     idempotentieronde en onze kaartimport samen door de 10 kB-maat. */
-  require('./inwissel')(kern);
 };

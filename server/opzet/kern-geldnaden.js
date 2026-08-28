@@ -53,4 +53,18 @@ fonds.koppelBank(async ({ centen, referentie, oms }) => {
   if (c.modus !== 'eigen') return null;
   return kern.bank.boekAsync({ van: 'rtg:reserve', naar: 'extern:foundation', centen, soort: 'afdracht', oms, ref: referentie });
 });
+
+  /* DE RETOURSTROOM AAN DE GELDLAAG. kern/commerce wordt in kernlaag2b gebouwd,
+     ver voor RTG Pay; de teruggave wordt hier aangereikt. Dit hoort in dit
+     bestand en niet in kernlaag3: daar worden onderdelen GEMAAKT, hier worden ze
+     GEKNOOPT -- en dit is een knoop.
+
+     Er komt geen tweede geldweg bij. Dit is precies dezelfde terugGave die
+     kern/appstore gebruikt, met haar idempotentie en haar alles-of-niets (een
+     halve teruggave is een tweede probleem bovenop het eerste). Niet gekoppeld
+     betekent dat een uitvoering WEIGERT met de reden; er gebeurt nooit
+     stilletjes niets. */
+  if (kern.commerce && kern.commerce.koppelPay && kern.pay && kern.pay.terugGave) {
+    kern.commerce.koppelPay((o) => kern.pay.terugGave(o));
+  }
 };

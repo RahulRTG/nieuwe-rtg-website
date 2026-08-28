@@ -10,6 +10,7 @@
         '<button class="obtn primary js-pay" data-method="kamer">'+T('pos.toroom','Op de kamer')+'</button>'+
         '<button class="obtn js-pay" data-method="rtgpay">RTG Pay</button>'+
         '<button class="obtn js-pay" data-method="contant">'+T('pos.cash','Contant')+'</button>'+
+        '<button class="obtn js-pay" data-method="cadeaukaart">'+T('pos.gc','Cadeaukaart')+'</button>'+
       '</div></div>' + kassaOpenRooms();
   }
 
@@ -131,7 +132,7 @@
       await refresh(); openTab('kassa');
       $('#posRedeemResult').innerHTML = box.innerHTML;
     } catch(e){
-      box.innerHTML = '<div class="enroute" style="margin-top:0.8rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
+      box.innerHTML = '<div class="enroute" style="margin-top:0.75rem;border-color:rgba(194,58,94,0.4);color:var(--burgundy);">'+e.message+'</div>';
       toast(e.message);
     }
   }

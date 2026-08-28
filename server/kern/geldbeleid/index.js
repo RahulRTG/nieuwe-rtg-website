@@ -16,7 +16,7 @@
    totalen zouden uiteenlopen (LAT.md regel 4). Bedragen zijn rauwe hele
    centen; alleen het scherm maakt er een keer euro's van.
 
-   Opslag: db.data.geldbeleid.perLid[codenaam]. De sleutel is de CODENAAM die
+   Opslag: geldbeleid.perLid[codenaam]. De sleutel is de CODENAAM die
    de aanroeper meegeeft; echte namen wonen in de kluis en komen hier nooit.
    Lezers (regels, potten, log, evalueer) geven kale lijsten zodat de route ze
    samenstelt; schrijvers geven { status, ... } zoals het huispatroon. De
@@ -31,9 +31,9 @@ const MAX_CENTEN = 100000000; // 1 miljoen euro: grens op het doel (LAT.md regel
 
 function maakGeldbeleid({ db, save, klok }) {
   const nu = typeof klok === 'function' ? klok : () => new Date();
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/geldbeleid/index', bezit: { geldbeleid: 'kaart' } });
   function d() {
-    if (!db.data.geldbeleid || typeof db.data.geldbeleid !== 'object') db.data.geldbeleid = { perLid: {} };
-    const g = db.data.geldbeleid;
+    const g = eigen.bak('geldbeleid', (b) => { b.perLid = {}; });
     if (!g.perLid || typeof g.perLid !== 'object') g.perLid = {};
     return g;
   }

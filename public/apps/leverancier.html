@@ -689,8 +689,9 @@
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/workos-premium.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-workos-premium>
 <a class="skip" href="#content">Naar de inhoud</a>
 <div id="shell">
 
@@ -904,6 +905,12 @@
       <div class="view" data-view="facturen">
         <h2 data-i18n="sup.v.fact">Facturen</h2>
         <p class="sub" data-i18n="sup.v.fact.sub">Elke verkoop wordt automatisch gefactureerd. Download de PDF of maak er een met AI.</p>
+        <!-- DE ANDERE KANT VAN DE FACTUUR, en die hoort hier en niet ergens
+             anders: hierboven staat wat uw zaak aan anderen rekent, hierachter
+             wat het gebruik van uw zaak ONS kost en wie dat betaalt. Eigen
+             adres op dezelfde zaak-inlog, net als RTG Office, RTMAIL en RTG
+             Handel (KOSTEN.md). -->
+        <p class="sub"><a href="/apps/zaakkosten.html">Wat uw zaak ons kost &#8594;</a></p>
         <div id="factWrap"></div>
       </div>
       <div class="view" data-view="rtfmarkt">
@@ -1127,7 +1134,7 @@
 window.I18N = { en: {
   'gate.title':'The supplier <em>app</em>.',
   'gate.deck':'Your business, live-connected with your guests and the RTG back office.',
-  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a demo partner',
+  'gate.user':'Username', 'gate.pass':'Password', 'gate.signin':'Sign in', 'gate.or':'or choose a Magnaat Test partner',
   /* de poort is een gesprek met Rahul; dit is wat hij zegt */
   'gate.rp.groet':'Welcome back.', 'gate.rp.wacht':'One moment, let me check.',
   'gate.rp.wie':'Who do I have the pleasure of speaking to?', 'gate.rp.pass':'Thank you. And your password?',
@@ -1155,7 +1162,7 @@ window.I18N = { en: {
   'sup.fillprice':'Enter a service and a price.', 'sup.pricesent':'Price sent to RTG.',
   'sup.locunknown':'Location unknown',
   'sup.locinfo':'Your location is visible to RTG guests with an active ride or order with you. Guests share their location back when they are on their way.',
-  'sup.sharelive':'Share my live location', 'sup.locshared':'Live location shared with guests.', 'sup.locshareddemo':'Location shared (demo position).',
+  'sup.sharelive':'Share my live location', 'sup.locshared':'Live location shared with guests.', 'sup.locnotshared':'Location not shared. Allow location access to share your actual position.',
   'sup.nonotif':'No notifications yet. New orders and payments appear here live.',
   'sup.notifs':'Notifications', 'sup.close':'Close',
   'sup.v.orders':'Orders', 'sup.v.orders.sub':'Live from RTG guests. Update the status or issue a refund.',

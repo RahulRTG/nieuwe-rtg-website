@@ -9,18 +9,18 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 448 delen, 0 zonder onderwerp.**
+**58 bundels, 453 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 92 delen, 9498 regels in de delen
+`public/apps/app-main/` -- 94 delen, 9590 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `app-main-01.js` | de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw |
-| `app-main-01b.js` | de inhoud van de expliciete demostand |
+| `app-main-01b.js` | De synthetische inhoud woont uitsluitend in magnaat-data.js |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
-| `app-main-02a.js` | de demomelding: een demo is een toestand, geen terugval na een storing |
+| `app-main-02a.js` | de trainingsmelding: een proef is een toestand, geen terugval na een storing |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |
@@ -36,6 +36,7 @@ omlaag.
 | `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |
 | `app-main-09.js` | de storyrij bovenaan De Salon |
 | `app-main-09a.js` | de contactpin: je eigen code, als tekst en als QR |
+| `app-main-09a1.js` | jouw RTG PIN: stand, veiligheidsjournaal en vaste QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | de directe berichten: versturen en aan het gesprek toevoegen |
@@ -58,6 +59,7 @@ omlaag.
 | `app-main-23.js` | de lopende rekening bij een partner opvragen |
 | `app-main-24.js` | Veiligheid en verbinding |
 | `app-main-24a2.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging |
+| `app-main-24a2b.js` | Afgesplitst van app-main-24a2.js, dat over de 10 KB ging (keuringsregel 13) |
 | `app-main-24a3.js` | Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging |
 | `app-main-24b.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon" erbij kwam |
 | `app-main-25.js` | de algemene pin: zetten of vragen |
@@ -173,12 +175,13 @@ omlaag.
 
 ## `apps/foundation/gezin-rt.js`
 
-`public/apps/foundation/gezin-rt/` -- 2 delen, 169 regels in de delen
+`public/apps/foundation/gezin-rt/` -- 3 delen, 190 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `gezin-rt-01.js` | GezinRT: chatten en (beeld)bellen tussen gezinsleden, in de app |
 | `gezin-rt-02.js` | WebRTC bellen |
+| `gezin-rt-03.js` | Gezin-RT, deel 3: HET GESPREKSSCHERM zelf -- de stijl en de opbouw van de overlay, plus de tekstbaan erin (shared/mee... |
 
 ## `apps/foundation/samen.js`
 
@@ -191,7 +194,7 @@ omlaag.
 
 ## `apps/foundation/sessie.js`
 
-`public/apps/foundation/sessie/` -- 4 delen, 386 regels in de delen
+`public/apps/foundation/sessie/` -- 4 delen, 388 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -202,7 +205,7 @@ omlaag.
 
 ## `apps/leverancier.js`
 
-`public/apps/leverancier/` -- 111 delen, 9551 regels in de delen
+`public/apps/leverancier/` -- 112 delen, 9592 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -285,7 +288,8 @@ omlaag.
 | `leverancier-55c.js` | "Vooruit": wat er op de zaak afkomt |
 | `leverancier-55d.js` | De post-voorstellen van de zaak: datums die zichzelf aandienen |
 | `leverancier-56.js` | een cel op het zaakbord, en de samenvatting van schakelaars |
-| `leverancier-57.js` | de incidenten op het beveiligingsbord |
+| `leverancier-56a.js` | Vervolg van leverancier-56 (op de 10 kB-leesgrens geknipt toen het Meer-scherm er een knop bij kreeg -- RTG Commerce) |
+| `leverancier-57.js` | Vervolg van leverancier-56a |
 | `leverancier-58.js` | alles opnieuw tekenen, en het actieve tabblad zichtbaar maken |
 | `leverancier-59.js` | een bestelkaart opbouwen |
 | `leverancier-60.js` | een tafel afrekenen |
@@ -538,7 +542,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 562 regels in de delen
+`public/shared/basis/` -- 4 delen, 583 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -585,7 +589,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 184 regels in de delen
+`public/shared/cookie/` -- 2 delen, 179 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -637,7 +641,7 @@ omlaag.
 
 ## `shared/glyf.js`
 
-`public/shared/glyf/` -- 3 delen, 240 regels in de delen
+`public/shared/glyf/` -- 3 delen, 242 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -779,7 +783,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 771 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 808 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -815,11 +819,12 @@ omlaag.
 
 ## `shared/teamcall.js`
 
-`public/shared/teamcall/` -- 2 delen, 267 regels in de delen
+`public/shared/teamcall/` -- 3 delen, 312 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `teamcall-01.js` | De teamcall: echt (video)bellen op de werkvloer via WebRTC |
+| `teamcall-01b.js` | TeamCall, deel 1b: DE VORMGEVING van de gespreksoverlay |
 | `teamcall-02.js` | de publieke knoppen |
 
 ## `shared/uitvoer.js`
@@ -864,4 +869,3 @@ omlaag.
 | `zaakcommand-02.js` | De Regie van de zaak, deel 2: de werkplekken zelf |
 | `zaakcommand-03.js` | De Regie van de zaak, deel 3: zoeken en het objectdossier |
 | `zaakcommand-04.js` | De Regie van de zaak, deel 4: rechtzetten en de regels |
-

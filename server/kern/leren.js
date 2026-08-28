@@ -19,9 +19,9 @@ module.exports = ({ db, save, crypto, codenaamVan, zijnVrienden, socialZoek, isG
   const rid = n => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n);
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/leren', bezit: { leren: 'kaart' } });
   function L() {
-    if (!db.data.leren) db.data.leren = { lijsten: {}, sessies: {}, projecten: {}, schrijfsels: {} };
-    return db.data.leren;
+    return eigen.bak('leren', (b) => { b.lijsten = {}; b.sessies = {}; b.projecten = {}; b.schrijfsels = {}; });
   }
   const seintje = (naar, wat, id) => { try { sseToCustomer(naar, 'social', { kind: wat, id }); } catch (e) {} };
   function schud(arr) {

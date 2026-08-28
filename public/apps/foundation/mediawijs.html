@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Online wijs</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -40,6 +40,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -61,13 +62,13 @@
 
   <div class="deel">Als het misgaat</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Als het echt misgaat</h2>
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Als het echt misgaat</h2>
     <p class="hulp">Ben je afgeperst, bestolen of staat er iets van jou online dat er niet hoort te staan: <b>zeg het tegen een volwassene die je vertrouwt</b>, ook als je je schaamt en ook als je zelf iets stoms hebt gedaan. Bewaar de berichten en maak schermafbeeldingen voordat je iets blokkeert; dat is later je bewijs. Betaal nooit, want betalen stopt het bijna nooit. In Nederland kun je terecht bij de politie (aangifte kan ook online), bij de Kindertelefoon voor een gesprek, en bij Helpwanted voor hulp bij beeld dat verspreid wordt. Deze app geeft algemene uitleg, geen juridisch advies.</p>
   </div>
 
   <div class="deel">Sparren</div>
   <div class="kaart blok">
-    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:.35rem;">Even sparren over schermen?</h2>
+    <h2 style="font-family:var(--serif);font-weight:500;font-size:1.05rem;margin-bottom:0.25rem;">Even sparren over schermen?</h2>
     <div class="chat" id="chat"><div class="b ai">Vragen over schermen, games of appgroepen? Vertel maar, ik denk zonder preken mee.</div></div>
     <div class="rijveld">
       <textarea class="veld" id="vraag" rows="1" placeholder="Waar loop je tegenaan?" maxlength="1000"></textarea>
@@ -245,5 +246,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

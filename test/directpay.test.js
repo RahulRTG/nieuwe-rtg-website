@@ -143,3 +143,41 @@ test('7. tempolimiet: hooguit 12 betaalpogingen per minuut, maar een idempotente
   assert.equal(retry.status, 200, 'een nette retry wordt nooit geblokkeerd');
   assert.equal(retry.body.betaling.ref, eerste.body.betaling.ref, 'zelfde betaling, niet nog een keer afgeschreven');
 });
+
+/* HET MAKEN VAN EEN BETAALVERZOEK WAS NIET IDEMPOTENT (TAKEN.md 4.60).
+
+   Het AFREKENEN had die bescherming al (toets 5 en 7 hierboven); het AANMAKEN
+   niet. Elke oproep gaf een nieuw verzoek met een eigen ref, en twee verzoeken
+   van hetzelfde bedrag kan de gast allebei afrekenen -- dus een hapering of een
+   retry na een timeout kostte de gast echt geld.
+
+   Gevonden bij het opschrijven van de idempotentie-besluiten: van de twaalf
+   routes waar nog geen besluit over genomen was, raakten er twee geld. */
+test('8. een herhaald betaalverzoek met dezelfde sleutel geeft EEN verzoek, geen twee', async () => {
+  const eerste = await api(base, '/api/supplier/betaalverzoek',
+    { codename, bedrag: 42, omschrijving: 'Tweemaal geklikt', idem: 'bv-vast-1' }, winkel);
+  assert.equal(eerste.status, 200);
+  const ref = eerste.body.verzoek.ref;
+
+  const herhaald = await api(base, '/api/supplier/betaalverzoek',
+    { codename, bedrag: 42, omschrijving: 'Tweemaal geklikt', idem: 'bv-vast-1' }, winkel);
+  assert.equal(herhaald.status, 200);
+  assert.equal(herhaald.body.verzoek.ref, ref, 'hetzelfde verzoek terug, geen tweede');
+  assert.equal(herhaald.body.herhaald, true, 'en de server zegt er zelf bij dat het een herhaling was');
+
+  // het lid ziet er ook maar EEN openstaan
+  const open = (await api(base, '/api/betaal/verzoeken', {}, lid)).body;
+  const mijne = (open.verzoeken || []).filter(v => v.ref === ref);
+  assert.equal(mijne.length, 1, 'het lid krijgt niet twee keer dezelfde rekening');
+
+  // een VERSE sleutel is wel degelijk een nieuw verzoek: twee ronden aan tafel mag
+  const nieuw = await api(base, '/api/supplier/betaalverzoek',
+    { codename, bedrag: 42, omschrijving: 'Tweede rondje', idem: 'bv-vast-2' }, winkel);
+  assert.equal(nieuw.status, 200);
+  assert.notEqual(nieuw.body.verzoek.ref, ref, 'met een andere sleutel is het een echt tweede verzoek');
+
+  // en dezelfde sleutel met een ANDER bedrag is een fout, geen stille echo
+  const ander = await api(base, '/api/supplier/betaalverzoek',
+    { codename, bedrag: 99, idem: 'bv-vast-1' }, winkel);
+  assert.equal(ander.status, 409, 'dezelfde sleutel voor een ander bedrag wordt geweigerd');
+});

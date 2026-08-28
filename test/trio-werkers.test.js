@@ -15,7 +15,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { koppelWerkers, staatVan, autoAantal } = require('../server/trio-werkers.js');
+const { koppelWerkers, staatVan, autoAantal, reusePortBeschikbaar } = require('../server/trio-werkers.js');
 const { maakSchaduw } = require('../server/trio-schaduw.js');
 const { maakSpreiding } = require('../server/trio-spreiding.js');
 
@@ -77,16 +77,20 @@ test('4. anders komen er precies zoveel voordeuren als gevraagd, met een plafond
     koppelWerkers({ WERKER: false, wacht: nepWacht(servers, 0, true), servers, log: () => {}, LOKAAL_TLS: false }));
   const r = bouw('4');
   assert.equal(r.VOORDEUREN, 4);
-  assert.ok(r.werkers && typeof r.werkers.startAlle === 'function');
-  assert.equal(r.werkers.aantal, 4);
-  r.werkers.stop();   // er is er nog geen gestart; dit hoort niet te klagen
+  if (reusePortBeschikbaar()) {
+    assert.ok(r.werkers && typeof r.werkers.startAlle === 'function');
+    assert.equal(r.werkers.aantal, 4);
+    r.werkers.stop();   // er is er nog geen gestart; dit hoort niet te klagen
+  } else {
+    assert.equal(r.werkers, null, 'zonder SO_REUSEPORT luistert de hoofd zelf');
+  }
 
   assert.equal(bouw('2.7').VOORDEUREN, 2, 'een gebroken getal wordt naar beneden afgerond');
   /* Het plafond is er tegen een typefout. Een nul te veel mag geen duizend
      processen forken op een machine met vier kernen. */
   const veel = bouw('1000');
   assert.equal(veel.VOORDEUREN, 64, 'meer dan het plafond wordt het plafond');
-  veel.werkers.stop();
+  if (veel.werkers) veel.werkers.stop();
 });
 
 /* ---------- de schaduw ---------- */

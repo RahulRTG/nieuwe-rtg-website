@@ -1,19 +1,19 @@
 /* de huisletters, zelf gehost (CSP staat geen vreemde servers toe) */
 @import url('/fonts/fonts.css');
 :root{
-  --bg:#0C0C0B; --paneel:#151412; --paneel2:#100F0E; --lijn:#2A2724;
-  --txt:#F7F5F1; --zacht:var(--rtg-leeszacht,#A79F92); --goud:#C9A24B; --goud2:#e0bd6b;
-  --groen:#5FA56A; --rood:#B4574E; --bord:#12110F;
+  --bg:#08090C; --paneel:#10141B; --paneel2:#0B0E14; --lijn:rgba(220,226,235,.15);
+  --txt:#F4F0E7; --zacht:var(--rtg-leeszacht,#9EA7B6); --goud:#C39B4A; --goud2:#E0C487;
+  --groen:#63D587; --rood:#A6002F; --bord:#0B0E13;
   /* TWEE ROLLEN, TWEE TOKENS. --goud is het ACCENT: randen, vlakken, actieve
      staten, grote tekst. --accent-tekst is wat het accent mag zijn zodra het
      KLEINE TEKST wordt. Bij goud (#C9A24B op zwart, ~7:1) is dat hetzelfde
      ding; bij de bordeaux hieronder niet, en juist daar ging het mis. */
-  --accent-tekst:#C9A24B;
+  --accent-tekst:#E0C487;
   /* En dezelfde splitsing voor rood. --rood (#B4574E) is de kleur van een
      waarschuwing op een vlak; als TEKST haalt hij op zwart 4,11 en dat is net
      te weinig. Deze tint is dezelfde kleur, alleen licht genoeg om te lezen
      (4,99) -- geen nieuwe merkkleur maar een leesbare stand van dezelfde. */
-  --rood-tekst:#C2665C;
+  --rood-tekst:#E47A98;
   --radius:16px; --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
   --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
 }
@@ -106,7 +106,7 @@ input,textarea,select{font-family:inherit;}
    De letters (Bodoni Moda/Inter) zijn voor iedereen dezelfde: premium is
    geen leeftijd. */
 :root[data-rtf-groep="tiener"], :root[data-rtf-groep="jong"], :root[data-rtf-groep="volw"]{
-  --goud:#C23A5E; --goud2:#C23A5E;
+  --goud:#C39B4A; --goud2:#E0C487;
   /* En hier de reden dat --accent-tekst bestaat. CLAUDE.md is er expliciet
      over: #C23A5E haalt op --black 3,78:1. Genoeg voor grote tekst (WCAG AA
      vraagt 3,0 vanaf 24px), te weinig voor lopende tekst en kleine labels

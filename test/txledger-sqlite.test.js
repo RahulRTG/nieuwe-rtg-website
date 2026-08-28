@@ -68,6 +68,24 @@ test('grootboek op sqlite: RAM-venster, verlies-vrij vegen, historie en doorstro
      beweringen staan er juist samen, zodat die keuze niet stil kan verschuiven. */
   assert.equal(r.inhoudLeesbaar, false, 'met RTG_ENC_KEY is de inhoud van een order niet leesbaar op schijf');
   assert.equal(r.sleutelLeesbaar, true, 'de sleutelkolommen staan bewust leesbaar op schijf (anders geen index)');
+
+  /* ---- RTG Pay in het grootboek, en het venster voorbij een bladzijde
+         (TAKEN.md 4.39) ----
+
+     Dezelfde ronde als in test/txledger.pg.test.js, maar op de STANDAARDopslag:
+     wat daar de timestamptz bewaakt, bewaakt hier dat de bijvulronde ook in
+     sqlite het hele venster terughaalt. */
+  assert.equal(r.payLedger, 700, 'alle 700 pay-regels staan in het grootboek');
+  assert.equal(r.payTopUp, 700, 'na een verloren blob komt het HELE venster terug, niet de eerste bladzijde van 500');
+  assert.equal(r.payNieuwsteEerst, true, 'en in de goede volgorde: nieuwste eerst, ook met een tijdstip in milliseconden');
+  assert.equal(r.payTweedeRondeRaakteNiets, true, 'een tweede bijvulronde op een kloppend venster raakt niets aan: geen dubbele regels, geen nieuwe array');
+  assert.equal(r.payTweedeRondeLas, 500, 'en hij leest daarvoor EEN bladzijde, niet het hele grootboek');
+  /* Het gat aan de ACHTERKANT: de blob draagt de 200 nieuwste, de rest ontbreekt.
+     Wat er dan bijkomt is ouder dan wat er staat, en alleen de sortering na het
+     samenvoegen zet het venster weer op volgorde. */
+  assert.equal(r.payGatAchteraanN, 700, 'ook een gat achteraan wordt helemaal gedicht');
+  assert.equal(r.payGatAchteraanOpVolgorde, true, 'en het venster staat daarna op volgorde, nieuwste eerst');
+  assert.equal(r.payGatAchteraanEerste, 'PB-SQ699', 'met de allernieuwste vooraan');
 });
 
 test('uit te zetten met TX_LEDGER_SQLITE=0: dan blijft alles in de blob', () => {

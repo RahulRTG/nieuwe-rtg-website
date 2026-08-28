@@ -11,6 +11,8 @@ module.exports = (wctx) => {
      staat in ./uitnodiging.js. Hier staan de routes eromheen. */
   const uitnodiging = require('./uitnodiging')({ kern });
   const { invitesVan, findSupplierByName, maakInvite, wervingsLink, verbindLid } = uitnodiging;
+  // eigen sleutelruimte, net als kassaIdem en dpIdem; zie server/lib/idem.js
+  const metIdem = require('../../../lib/idem')({ d: () => kern.db.data, save, naam: 'wervingIdem', bijeen: kern.db.bijeen });
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
@@ -39,13 +41,23 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
 });
 
 // Manager nodigt een medewerker uit: geeft een eenmalige kassacode terug.
-app.post('/api/supplier/staff/invite', supplierAuth, (req, res) => {
+/* EEN VERGETEN TWEEDE CODE IS EEN OPEN DEUR NAAR PERSONEELSTOEGANG, en dat
+   weegt zwaarder dan bij een gewone creatie-route (TAKEN.md 4.61). Twee keer
+   klikken gaf twee geldige kassacodes voor dezelfde persoon; de manager moest er
+   dan zelf een intrekken en zag de tweede meestal niet. Dezelfde sleutel geeft
+   nu dezelfde uitnodiging terug. Een VERSE sleutel is wel een echte tweede
+   uitnodiging -- twee mensen met dezelfde voornaam mag gewoon. */
+app.post('/api/supplier/staff/invite', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan medewerkers uitnodigen.' });
-  const inv = maakInvite(req.supplier, req.actor, {
-    naam: schoon(req.body.name, 60), role: req.body.role, func: String(req.body.func || '').slice(0, 40)
+  const naam = schoon(req.body.name, 60), role = req.body.role, func = String(req.body.func || '').slice(0, 40);
+  const sleutel = req.body.idem ? 'inv:' + req.supplier.code + ':' + String(req.body.idem).slice(0, 60) : null;
+  const r = await metIdem(sleutel, 'inv|' + req.supplier.code + '|' + naam + '|' + role, () => {
+    const inv = maakInvite(req.supplier, req.actor, { naam, role, func });
+    return { ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires },
+      link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name };
   });
-  res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires },
-    link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name });
+  if (r && r.error) return res.status(r.status || 409).json({ error: r.error });
+  res.json(r);
 });
 
 // Manager trekt een open uitnodiging in (kassacode wordt onbruikbaar).

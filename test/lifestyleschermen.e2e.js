@@ -206,7 +206,11 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
       /* Waar de lijst achter een tabblad zit: erop tikken, zoals een gebruiker
          ook doet. Een tab die niet te vinden is, is zelf een bevinding. */
       if (a.tab) {
-        const knop = page.locator('text=' + a.tab).first();
+        /* Zoek expliciet naar een knop. De Hangar-voorpagina gebruikt "VLOOT"
+           ook als kop in de servicelijn; een vrije tekstzoeker tikte daardoor
+           het eerste, niet-interactieve woord aan en liet het tabblad dicht. */
+        const naam = new RegExp('^' + a.tab.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:\\s|$)', 'i');
+        const knop = page.getByRole('button', { name: naam }).first();
         if (!await knop.count()) { stuk.push(a.app + ': tabblad "' + a.tab + '" staat er niet'); continue; }
         try { await knop.click({ timeout: 4000 }); } catch (e) { stuk.push(a.app + ': tabblad "' + a.tab + '" is niet aan te tikken'); continue; }
         await wachtOpRust(page);
@@ -214,7 +218,14 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
 
       const tekst = await schermtekst(page);
       if (!tekst.includes(a.toont)) {
-        stuk.push(a.app + ': "' + a.toont + '" staat niet op het scherm -- ' + tekst.slice(0, 160));
+        const stand = await page.evaluate(() => {
+          const m = document.getElementById('main');
+          return m ? { zichtbaar: m.innerText.replace(/\s+/g, ' ').slice(0, 180),
+            bron: m.textContent.replace(/\s+/g, ' ').slice(0, 180),
+            display: getComputedStyle(m).display } : null;
+        });
+        stuk.push(a.app + ': "' + a.toont + '" staat niet op het scherm -- ' + tekst.slice(0, 160) +
+          ' | hoofdvlak: ' + JSON.stringify(stand));
         continue;
       }
       /* Waar het scherm zelf rekent, toetsen we ook de uitkomst: 6 flessen van

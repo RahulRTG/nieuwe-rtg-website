@@ -31,7 +31,9 @@ module.exports = (kern) => {
     if (!wie) return res.status(401).json({ error: 'Niet ingelogd.' });
     const r = await linkLos(wie, req.body && req.body.tekst);
     if (r.error) return res.status(r.status || 400).json({ error: r.error, soort: r.soort || undefined });
-    res.json({ type: r.type, wat: r.wat, vorm: r.vorm, onderwerp: r.onderwerp, intenties: r.intenties });
+    res.json({ type: r.type, wat: r.wat, vorm: r.vorm, onderwerp: r.onderwerp,
+      bevestiging: r.bevestiging, bevestigingVervalt: r.bevestigingVervalt,
+      intenties: r.intenties });
   });
 
   /* MIJN KOPPELINGEN (LINK.md par. 4, stap 6). Alleen van jezelf: er gaat geen

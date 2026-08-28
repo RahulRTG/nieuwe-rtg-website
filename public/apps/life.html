@@ -235,12 +235,12 @@
     html += '<div class="kaartje"><b>Wilt u er iets bij schrijven?</b>' +
       '<span class="m">Hoeft niet. Het is voor uzelf.</span>' +
       '<textarea id="gNotitie" rows="3" maxlength="1000" aria-label="Voor uzelf"' +
-      ' style="width:100%;margin-top:.5rem;">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
+      ' style="width:100%;margin-top:0.5rem;">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
       '<div class="rij"><button class="knop mini" id="gBewaar">Bewaren</button>' +
       (d.vandaagIngevuld ? '<button class="knop mini" id="gWeg">Wissen</button>' : '') + '</div></div>';
 
     const esc2 = x => '<div class="kaartje"><b>' + esc(x.kop) + '</b><span class="m">' + esc(x.tekst) + '</span>' +
-      '<ul style="margin:.5rem 0 0 1rem;padding:0;">' + (x.wegen || []).map(w =>
+      '<ul style="margin:0.5rem 0 0 1.25rem;padding:0;">' + (x.wegen || []).map(w =>
         '<li style="font-size:.85rem;line-height:1.6;"><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') +
       '</ul></div>';
 
@@ -251,7 +251,7 @@
       if (aanhoudend) html += esc2(aanhoudend);
       const doen = (antwoord && antwoord.doen) || d.doen || [];
       if (doen.length) {
-        html += '<div style="font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1rem 0 .3rem;">' +
+        html += '<div style="font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.25rem;">' +
           'Of doe gewoon iets</div>' + doen.map(x =>
           '<div class="kaartje"><b>' + esc(x.naam) + '</b><span class="m">' + esc(x.hoe) + '</span></div>').join('');
       }
@@ -464,7 +464,7 @@
         '</div>' +
         '<textarea id="nNodig" rows="2" maxlength="200" aria-label="Wat moet iemand meteen weten"' +
           ' placeholder="Wat moet iemand meteen weten? Houd het kort."' +
-          ' style="width:100%;margin-top:.5rem;">' + esc(k.watNodig) + '</textarea>' +
+          ' style="width:100%;margin-top:0.5rem;">' + esc(k.watNodig) + '</textarea>' +
         '<label class="keus"><input type="checkbox" id="nZorg"' + (k.zorgErbij ? ' checked' : '') +
           '> Zet mijn allergenen en aandachtspunten uit mijn zorgprofiel erbij</label>' +
         '<label class="keus"><input type="checkbox" id="nMeds"' + (k.medicijnenErbij ? ' checked' : '') +

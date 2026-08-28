@@ -280,6 +280,10 @@ test('roomservice komt op de gastrekening, de nachtrun boekt geen twee nachten, 
     await wachtOpTekst(page, /kamer\(s\) geboekt/, { in: '#hNachtUit' });
     let nacht = await page.evaluate(() => document.getElementById('hNachtUit').textContent);
     assert.match(nacht, /1 kamer\(s\) geboekt/, 'de nachtrun boekt de kamer: ' + nacht);
+    /* Het nachtrunbericht en het rekeningpaneel komen uit twee losse verzoeken.
+       Het bericht staat eerst; wacht daarom op de afzonderlijke hertekening van
+       het folio voordat we de geboekte regels lezen. */
+    await wachtOpTekst(page, /Overnachting/, { in: '#hDetail' });
     let tekst = await lees(page);
     assert.match(tekst, /Overnachting/, 'de kamernacht staat als eigen regel');
     assert.match(tekst, /Toeristenbelasting/, 'en de toeristenbelasting apart, niet verstopt in de kamerprijs');

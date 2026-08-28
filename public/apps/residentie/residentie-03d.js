@@ -34,7 +34,7 @@
     if (!anderen.length) return meld('U bent hier nog alleen.');
     $('#spelKeuze').innerHTML = '<h2>Samen wandelen</h2><div class="sub">vast aan elkaar door het huis, zolang u allebei hier bent</div>' +
       anderen.map(l => '<button class="rij-item" data-paar="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">vraag</span></button>').join('') +
-      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#spelLaag').classList.add('open');
     $('#paarKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     $('#spelKeuze').querySelectorAll('[data-paar]').forEach(b => b.addEventListener('click', async () => {
@@ -58,7 +58,7 @@
     if (d.kind === 'paar-verzoek') {
       $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
         '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
         '<button class="knop2 h-flex1" id="paarJa" type="button">Graag</button>' +
         '<button class="knop2 stil2 h-flex1" id="paarNee" type="button">Liever niet</button></div>';
       $('#spelLaag').classList.add('open');
@@ -78,7 +78,7 @@
         S.paar = d.a === S.ik ? d.b : d.a; zetKnopPaar();
         $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
           '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
-          '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+          '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
           '<button class="knop2 h-flex1" id="paarVriend" type="button">Word ook vrienden</button>' +
           '<button class="knop2 stil2 h-flex1" id="paarKlaar" type="button">Verder</button></div>';
         $('#spelLaag').classList.add('open');

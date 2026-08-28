@@ -33,6 +33,7 @@
 const klok = require('../../lib/klok');
 
 const { VERMOGENS, OP_ID, ketenVan, vermogenVanAlarm } = require('./vermogens');
+const { NIVEAUS } = require('./risico');
 const { maakBronnen } = require('./gezondheid-bronnen');
 const { draaiProef, PROEVEN, vanProef } = require('./gezondheid-proef');
 const { taal, NIET } = require('./gezondheid-taal');
@@ -162,7 +163,7 @@ function maakGezondheid(o) {
       bewijzend: uit.bewijzend, uitslag: uit.uitslag };
     vak()[v.id] = rij;
     save();
-    journaal.noteer({ actie: 'gezondheid controleren', actor: rij.door, niveau: 'hand',
+    journaal.noteer({ actie: 'gezondheid controleren', actor: rij.door, niveau: NIVEAUS.hand,
       objectType: 'vermogen', objectId: v.id,
       reden: rij.uitslag + (uit.bewijzend ? '' : ' -- geen bewijzende proef beschikbaar') });
     return Object.assign({ vermogen: v.id, naam: v.naam }, rij);

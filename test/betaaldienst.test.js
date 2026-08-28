@@ -36,6 +36,15 @@ test.after(() => stop(srv && srv.child));
 
 const kascode = async () => (await api(base, '/api/pay/kascode', { maxCenten: 10000 }, lid)).body.code;
 
+test('0. het publieke partnertarief komt uit dezelfde bron als de afrekening', async () => {
+  const r = await fetch(base + '/api/betaaldiensttarief');
+  assert.equal(r.status, 200);
+  const b = await r.json();
+  assert.equal(b.betaaldienst.vastCenten, 10);
+  assert.equal(b.betaaldienst.pct, 1);
+  assert.equal(b.betaaldienst.overOmzet, false);
+});
+
 test('1. het standaardtarief: 10 centen + 1%, per transactie DIRECT verrekend met de zaak', async () => {
   const t = await api(base, '/api/office/geld/betaaldienst', {}, office);
   assert.equal(t.status, 200);

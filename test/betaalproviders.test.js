@@ -43,7 +43,7 @@ test('bewust uit betekent geen rails en elke geldbeweging weigert fail-closed', 
     set: (k, v) => opslag.set(k, v), env: {} });
   assert.deepEqual(rail.mogelijkheden(), {
     standaard: 'uit', rails: [], uit: true,
-    uitleg: 'Betalen staat bewust uitgeschakeld; er is geen demo- of echte betaalrail actief.'
+    uitleg: 'Betalen staat bewust uitgeschakeld; er is geen betaalrail actief.'
   });
   await assert.rejects(() => rail.maakBetaling({ bedrag: 1895 }), /bewust uitgeschakeld/i);
   await assert.rejects(() => rail.haalBetaling('demo', 'demo-1'), /bewust uitgeschakeld/i);
@@ -80,7 +80,9 @@ test('ook een interne taak kan het pay-grootboek in de uit-stand niet bewegen', 
     const { pay } = require('../server/kern/pay')({
       db, save() {}, bijeen: async werk => werk(), crypto, betaal: {},
       keyVanCodenaam: () => null, sseToCustomer() {}, schoon: x => String(x || ''),
-      betaaldienstKosten: () => 0, betaalOpdrachten: opdrachten
+      betaaldienstKosten: () => 0, betaalOpdrachten: opdrachten,
+      // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+      payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db)
     });
     const r = await pay.boekAsync({ van: 'extern:test', naar: 'lid:test', centen: 100 });
     assert.equal(r.status, 503);

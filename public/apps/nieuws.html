@@ -96,7 +96,7 @@ async function lees(id){
   $('#main').innerHTML='<button class="knop stil" id="terug">← alle artikelen</button>'
     +'<article class="lees h-mt80"><div class="rlbl" style="font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);">'+esc(a.rubriek)+'</div>'
     +'<h2>'+esc(a.kop)+'</h2><div style="font-size:.75rem;color:var(--soft);">door '+esc(a.auteur)+' · '+tijd(a.at)+'</div>'
-    +(a.intro?'<div style="font-size:.98rem;color:var(--muted);line-height:1.6;margin-top:.6rem;font-style:italic;">'+esc(a.intro)+'</div>':'')
+    +(a.intro?'<div style="font-size:.98rem;color:var(--muted);line-height:1.6;margin-top:0.5rem;font-style:italic;">'+esc(a.intro)+'</div>':'')
     +'<div class="tekst">'+esc(a.tekst)+'</div>'
     +'<div class="ai"><div class="rij"><input id="aiV" placeholder="Vraag Rahul iets over dit stuk, of laat het samenvatten"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA"></div></div></article>';
   $('#terug').onclick=()=>{ OPEN=null; laad(); };

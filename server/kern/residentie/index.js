@@ -3,17 +3,18 @@
    gaan zitten en praten, en een eigen suite inrichten met RTG Maison-meubels.
    Alles op codenaam (nooit echte namen), live via het bestaande per-lid
    SSE-kanaal (sseToCustomer, event 'residentie'), naar het Samen-patroon:
-   toestand in db.data + save, seintjes naar de kamerleden. Rustig van aard:
+   toestand in de eigen collectie + save, seintjes naar de kamerleden. Rustig van aard:
    geen scores, geen streaks, geen koop-lussen -- de catalogus is inbegrepen.
    Volgt het vaste kern-patroon maakResidentie(state). */
 const { MEUBELS, ZALEN, SUITE, DELUXE } = require('./zalen');
 const TTL = 90000; // wie 90s niets laat horen, is de kamer uit
 
 function maakResidentie({ db, save, schoon, sseToCustomer }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/residentie/index', bezit: { residentie: 'kaart' } });
   const R = () => {
-    if (!db.data.residentie || typeof db.data.residentie !== 'object') db.data.residentie = { kamers: {}, suites: {}, wie: {} };
-    if (!db.data.residentie.wie) db.data.residentie.wie = {};
-    return db.data.residentie;
+    const r = eigen.bak('residentie', (b) => Object.assign(b, { kamers: {}, suites: {}, wie: {} }));
+    if (!r.wie) r.wie = {};
+    return r;
   };
   const kamer = id => (R().kamers[id] = R().kamers[id] || { leden: {}, chat: [] });
 

@@ -59,5 +59,24 @@ module.exports = ({ store, save, scho, spoor }) => {
     return store().lijst.find(x => x.domein === h && x.online && x.adres) || null;
   }
 
-  return { koppel, siteVoorHost, norm };
+  /* De omgekeerde vraag: heeft DEZE zaak een eigen adres, en staat dat aan?
+     `siteVoorHost` gaat van adres naar site; deze gaat van zaak naar adres, en
+     hij hoort hier en niet bij de vrager -- anders staat er straks een tweede
+     plek die weet wanneer een adres "echt aan" is (online én gekoppeld), en die
+     twee lopen uiteen. kern/commerce/publiekslot.js leest hem om te bepalen of
+     een verkoopweg publiek mag; die laag opent niets, hij kijkt hier.
+
+     Meerdere sites per zaak kan: dan wint de eerste die online staat MET een
+     adres. Een zaak die er twee heeft, verkoopt langs allebei hetzelfde aanbod. */
+  function siteVanZaak(zaakCode) {
+    const c = String(zaakCode == null ? '' : zaakCode).trim();
+    if (!c) return null;
+    const van = store().lijst.filter(x => x && x.zaakCode === c);
+    const aan = van.find(x => x.domein && x.online && x.adres);
+    const d = aan || van[0];
+    if (!d) return null;
+    return { id: d.id, titel: d.titel || '', adres: d.adres || '', online: !!d.online, domein: d.domein || '' };
+  }
+
+  return { koppel, siteVoorHost, siteVanZaak, norm };
 };

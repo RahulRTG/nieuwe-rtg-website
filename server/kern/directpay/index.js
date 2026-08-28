@@ -53,13 +53,19 @@ function maakDirectpay(ctxIn) {
   const id = (p) => (p || 'x') + crypto.randomBytes(5).toString('hex').toUpperCase();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/directpay',
+    bezit: { directBetalingen: 'lijst', betaalVerzoeken: 'lijst', directOntvangsten: 'kaart' } });
   function ensure() {
-    if (!Array.isArray(db.data.directBetalingen)) db.data.directBetalingen = [];
-    if (!Array.isArray(db.data.betaalVerzoeken)) db.data.betaalVerzoeken = [];
-    if (!db.data.directOntvangsten || typeof db.data.directOntvangsten !== 'object') db.data.directOntvangsten = {};
-    return db.data;
+    eigen.bak('directBetalingen'); eigen.bak('betaalVerzoeken'); eigen.bak('directOntvangsten');
   }
   const centenVan = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : NaN; };
+
+  /* Idempotentie voor het MAKEN van een betaalverzoek (TAKEN.md 4.60). Het
+     AFREKENEN had het al, via idemZoek/idemBewaar hieronder; het aanmaken niet,
+     en daar kost een dubbeltik echt geld: twee verzoeken van hetzelfde bedrag
+     kan de gast allebei betalen. Dezelfde module als RTG Pay en RTG Bank, met
+     een eigen store zodat de sleutelruimtes gescheiden blijven. */
+  const metIdem = require('../../lib/idem')({ d: () => db.data, save, naam: 'dpIdem', bijeen: db.bijeen });
 
   /* O(1)-index op de idempotentiesleutel: het dubbeltik-antwoord hoeft niet
      door tweehonderdduizend betalingen te scannen. Lui opgebouwd uit de
@@ -68,7 +74,7 @@ function maakDirectpay(ctxIn) {
   function idemZoek(sleutel) {
     if (!idemIndex) {
       idemIndex = new Map();
-      for (const b of ensure().directBetalingen) if (b.idem) idemIndex.set(b.idem, b);
+      for (const b of eigen.bak('directBetalingen')) if (b.idem) idemIndex.set(b.idem, b);
     }
     return sleutel ? (idemIndex.get(sleutel) || null) : null;
   }
@@ -81,7 +87,7 @@ function maakDirectpay(ctxIn) {
   function verzoekIdemZoek(sleutel) {
     if (!verzoekIdemIndex) {
       verzoekIdemIndex = new Map();
-      for (const v of ensure().betaalVerzoeken) if (v.idem) verzoekIdemIndex.set(v.idem, v);
+      for (const v of eigen.bak('betaalVerzoeken')) if (v.idem) verzoekIdemIndex.set(v.idem, v);
     }
     return sleutel ? (verzoekIdemIndex.get(sleutel) || null) : null;
   }
@@ -117,8 +123,9 @@ function maakDirectpay(ctxIn) {
   // de payout-teller van een leverancier: wat er rechtstreeks binnenkwam
   function ledger(code) {
     ensure();
-    if (!db.data.directOntvangsten[code]) db.data.directOntvangsten[code] = { som: 0, aantal: 0, uitbetaald: 0 };
-    return db.data.directOntvangsten[code];
+    const o = eigen.bak('directOntvangsten');
+    if (!o[code]) o[code] = { som: 0, aantal: 0, uitbetaald: 0 };
+    return o[code];
   }
 
   function publiek(b) {
@@ -126,7 +133,7 @@ function maakDirectpay(ctxIn) {
       omschrijving: b.omschrijving, bron: b.bron, codename: b.codename, betaalwijze: b.betaalwijze || 'kaart', at: b.at };
   }
 
-  /* HIER STOND EEN SCAN. `verzamel(db.data.directBetalingen, b => b.key === key,
+  /* HIER STOND EEN SCAN. `verzamel(directBetalingen, b => b.key === key,
      100, publiek)` loopt de array van voren af aan door tot hij honderd treffers
      heeft. Voor een lid met veel betalingen valt dat mee; voor een lid met twee
      betalingen tussen tweehonderdduizend andere loopt hij de hele collectie

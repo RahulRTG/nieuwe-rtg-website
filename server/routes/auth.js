@@ -2,17 +2,17 @@
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog, automatisering } = kern;
-  /* Demo-inlog (snelle pas-login zonder wachtwoord, en het demo-account): UIT,
-     tenzij RTG_DEMO=1 uitdrukkelijk aanstaat. Echte leden loggen in via
+  /* Snelle testinlog zonder wachtwoord: UIT, behalve in Magnaat Test.
+     Echte leden loggen in via
      /api/auth/login.
 
      TWEE VLAGGEN MET DEZELFDE NAAM, EN DAT WAS DE VAL. In server/server.js
      stond dezelfde `DEMO` en die is hier gerepareerd; deze tweede bleef op
-     `!PRODUCTION` staan. Een toets vond het meteen: met de demo-stand uit gaf
+     `!PRODUCTION` staan. Een toets vond het meteen: met de teststand uit gaf
      POST /api/login {"tier":"business"} nog steeds een volledige sessie op naam
      van de eigenaar. Twee bronnen voor dezelfde waarheid betekent dat je er een
      kunt repareren en denken dat je klaar bent. */
-  const DEMO = process.env.RTG_DEMO === '1';
+  const DEMO = require('../testomgeving').actief(process.env);
 
   /* Elke pas heeft zijn eigen app (app.html?pas=...). De inloggegevens werken
      echt alleen in de app van de eigen pas: een Business-account komt de
@@ -75,9 +75,7 @@ module.exports = (kern) => {
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
   const actx = { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, isBaas, antivirus: kern.antivirus,
-    webauthnRegOpties: kern.webauthnRegOpties, webauthnRegMaak: kern.webauthnRegMaak,
-    webauthnLoginOpties: kern.webauthnLoginOpties, webauthnLoginMaak: kern.webauthnLoginMaak,
-    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg, automatisering,
+    webauthn: kern.webauthn, automatisering,
     /* De kern zelf reist mee voor de wervingslink. Die helpers (zoekInvite,
        verbindLid) worden PAS aan de kern gehangen als routes/werving.js is
        gemount, en dat gebeurt na deze module -- dus uitpakken bij het opstarten

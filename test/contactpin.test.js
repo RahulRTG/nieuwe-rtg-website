@@ -15,6 +15,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const maakSociaal = require('../server/kern/sociaal');
+const maakPinIntent = require('../server/kern/sociaal/pin-intent');
 const { startServer, stop } = require('./helper');
 
 /* ---------- 1. de kern, op een nepdatabase ---------- */
@@ -22,13 +23,13 @@ function maak(opties = {}) {
   const beschermd = new Set(opties.beschermd || []);
   /* Een gestuurde toevalsbron, alleen waar een toets een BOTSING moet forceren.
      Zonder dit is de botsingscontrole in verzinPin niet te toetsen: hij treedt
-     op bij 1 op 1,1 biljoen, en een toets die daarop wacht meet nooit iets. De
-     rij geldt alleen voor trekkingen van acht bytes (de pin); al het andere --
+     op bij 1 op ruim 1 biljard, en een toets die daarop wacht meet nooit iets. De
+     rij geldt alleen voor trekkingen van tien bytes (de v2-pin); al het andere --
      de sleutel en de nonce van de codelaag -- blijft echt toeval. */
   const echt = require('node:crypto');
   const rij = (opties.pinBytes || []).slice();
   const crypto = Object.create(echt);
-  crypto.randomBytes = (n) => (n === 8 && rij.length) ? Buffer.from(rij.shift()) : echt.randomBytes(n);
+  crypto.randomBytes = (n) => (n === 10 && rij.length) ? Buffer.from(rij.shift()) : echt.randomBytes(n);
   const db = { data: { connections: [], blocks: [], reports: [], memberChats: {}, contactPins: {} } };
   const rtf = {
     profielInfoVanHandle(h) {
@@ -52,34 +53,45 @@ function maak(opties = {}) {
 test('een pin heeft de afgesproken vorm, blijft gelijk en is per lid uniek', () => {
   const { sociaal } = maak();
   const a = sociaal.pinVan('A');
-  assert.match(a, /^[0-9A-HJKMNP-TV-Z]{8}$/, 'acht tekens uit Crockford base32 (geen I, L, O of U)');
+  assert.match(a, /^[0-9A-HJKMNP-TV-Z]{10}$/, 'tien tekens uit Crockford base32 (geen I, L, O of U)');
   assert.equal(sociaal.pinVan('A'), a, 'dezelfde vraag geeft dezelfde pin');
   const pins = new Set();
   for (let i = 0; i < 200; i++) pins.add(sociaal.pinVan('lid' + i));
   assert.equal(pins.size, 200, 'tweehonderd leden, tweehonderd verschillende pins');
-  assert.equal(sociaal.pinKaart('A').toon, a.slice(0, 4) + '-' + a.slice(4), 'het scherm krijgt hem in twee groepjes');
+  assert.equal(sociaal.pinKaart('A').toon, a.slice(0, 5) + '-' + a.slice(5), 'het scherm krijgt hem in twee groepjes');
 });
 
 test('invoer wordt gelezen zoals een mens hem voorleest', () => {
   const { sociaal } = maak();
   const pin = sociaal.pinVan('A');
-  const uitgesproken = pin.slice(0, 4) + ' - ' + pin.slice(4).toLowerCase();
+  const uitgesproken = pin.slice(0, 5) + ' - ' + pin.slice(5).toLowerCase();
   assert.equal(sociaal.pinNormaliseer(uitgesproken), pin, 'streepjes, spaties en kleine letters mogen');
   // de Crockford-lezing: wie 'O' zegt bedoelt 0, wie 'I' of 'L' zegt bedoelt 1
   assert.equal(sociaal.pinNormaliseer('O1234567'), '01234567');
   assert.equal(sociaal.pinNormaliseer('I1234567'), '11234567');
   assert.equal(sociaal.pinNormaliseer('L1234567'), '11234567');
   assert.equal(sociaal.pinNormaliseer('U1234567'), 'V1234567');
+  assert.equal(sociaal.pinNormaliseer('7K2M9-XPQH3'), '7K2M9XPQH3', 'de nieuwe tien tekens worden gelezen');
   assert.equal(sociaal.pinNormaliseer('1234567'), null, 'zeven tekens is geen pin');
   assert.equal(sociaal.pinNormaliseer('123456789'), null, 'negen ook niet');
   assert.equal(sociaal.pinNormaliseer(''), null);
   assert.equal(sociaal.pinNormaliseer(null), null);
 });
 
+test('bestaande achttekencodes blijven geldig tijdens de veilige migratie', () => {
+  const { db, sociaal } = maak();
+  db.data.contactPins.A = { pin: '7K2M9XPQ', at: '2025-01-01T00:00:00.000Z' };
+  const kaart = sociaal.pinKaart('A');
+  assert.equal(kaart.toon, '7K2M-9XPQ');
+  assert.equal(kaart.versie, 1);
+  assert.equal(sociaal.pinZoek('B', '7k2m-9xpq').key, 'A');
+});
+
 test('een nieuwe pin trekt de oude in en laat de vriendschappen staan', async () => {
   const { db, sociaal } = maak();
   const oud = sociaal.pinVan('A');
-  await sociaal.pinVerbind('B', oud);
+  const gezien = sociaal.pinZoek('B', oud);
+  await sociaal.pinVerbind('B', oud, gezien.bevestiging);
   assert.equal(db.data.connections.length, 1, 'B heeft een verzoek aan A gestuurd');
   const nieuw = sociaal.pinVernieuw('A').pin;
   assert.notEqual(nieuw, oud);
@@ -114,12 +126,49 @@ test('onbekend, beschermd en geblokkeerd geven alle drie hetzelfde antwoord', ()
 test('verbinden op pin laat elke controle bij socialVerbind', async () => {
   const { db, sociaal } = maak({ beschermd: ['rtf:kind'] });
   const kindPin = sociaal.pinVan('rtf:kind');
-  assert.equal((await sociaal.pinVerbind('A', kindPin)).status, 404, 'een vreemde bereikt een kind ook via de pin niet');
+  assert.equal(sociaal.pinZoek('A', kindPin).status, 404, 'een vreemde bereikt een kind ook via de pin niet');
   assert.equal(db.data.connections.length, 0);
-  const r = await sociaal.pinVerbind('A', sociaal.pinVan('B'));
+  const pin = sociaal.pinVan('B'), gezien = sociaal.pinZoek('A', pin);
+  const r = await sociaal.pinVerbind('A', pin, gezien.bevestiging);
   assert.equal(r.st, 'aangevraagd');
   assert.equal(r.codename, 'Lid B', 'het scherm weet wie het geworden is');
   assert.equal(db.data.connections.length, 1);
+});
+
+test('de server dwingt kijken en een eenmalige bevestiging af', async () => {
+  const { db, sociaal } = maak();
+  const pin = sociaal.pinVan('B');
+  assert.equal((await sociaal.pinVerbind('A', pin, null)).status, 409,
+    'rechtstreeks verbinden zonder de getoonde ontvanger wordt geweigerd');
+  const gezien = sociaal.pinZoek('A', pin);
+  assert.ok(gezien.bevestiging && gezien.bevestigingVervalt > Date.now());
+  assert.equal((await sociaal.pinVerbind('A', pin, gezien.bevestiging)).st, 'aangevraagd');
+  assert.equal((await sociaal.pinVerbind('A', pin, gezien.bevestiging)).status, 409,
+    'hetzelfde bewijs werkt nooit twee keer');
+  assert.equal(db.data.connections.length, 1);
+});
+
+test('de verzegelde bevestiging werkt op een andere instance en blijft onleesbaar', async () => {
+  const oudCluster = process.env.RTG_CLUSTER_KEY, oudRedis = process.env.REDIS_URL;
+  let a, b;
+  try {
+    process.env.RTG_CLUSTER_KEY = 'contactpin-test-clustersleutel-32';
+    delete process.env.REDIS_URL;
+    a = maakPinIntent({ crypto: require('node:crypto') });
+    b = maakPinIntent({ crypto: require('node:crypto') });
+  } finally {
+    if (oudCluster == null) delete process.env.RTG_CLUSTER_KEY; else process.env.RTG_CLUSTER_KEY = oudCluster;
+    if (oudRedis == null) delete process.env.REDIS_URL; else process.env.REDIS_URL = oudRedis;
+  }
+  const gemaakt = a.pinIntentMaak({ actor: 'actor-alpha', doel: 'target-beta', bron: 'vast', referentie: '7K2M9XPQH3' });
+  assert.match(gemaakt.token, /^PI2\./, 'de token draagt de versie van het verzegelde formaat');
+  assert.equal(gemaakt.token.includes('actor-alpha'), false, 'de interne actor staat niet leesbaar in de browsertoken');
+  assert.equal(gemaakt.token.includes('target-beta'), false, 'ook het doel staat niet leesbaar in de browsertoken');
+  const gebruikt = await b.pinIntentGebruik(gemaakt.token,
+    { actor: 'actor-alpha', bron: 'vast', referentie: '7K2M9XPQH3' });
+  assert.equal(gebruikt.doel, 'target-beta', 'een andere instance met dezelfde clustersleutel kan stap twee controleren');
+  assert.equal(await b.pinIntentGebruik(gemaakt.token,
+    { actor: 'actor-alpha', bron: 'vast', referentie: '7K2M9XPQH3' }), null, 'dezelfde instance accepteert geen replay');
 });
 
 test('raden loopt vast op de snelheidsrem', () => {
@@ -191,20 +240,30 @@ test('de pin uitzetten maakt je onvindbaar, met dezelfde woorden als "bestaat ni
 /* De valkuil die deze toets bewaakt: verzinPin controleert of een pin al bezet
    is. Zou die controle de uit-stand meewegen, dan krijgt een nieuw lid de pin
    van iemand die hem tijdelijk uit had staan -- en zijn er twee zodra die ander
-   hem weer aanzet. Dat gebeurt bij 1 op 1,1 biljoen vanzelf nooit, dus dwingen
+   hem weer aanzet. Dat gebeurt bij 1 op ruim 1 biljard vanzelf nooit, dus dwingen
    we de botsing af met een gestuurde toevalsbron (zie maak()). */
 test('een uitgezette pin blijft bezet en wordt niet opnieuw uitgedeeld', () => {
-  const tien = new Array(8).fill(10);          // byte 10 -> 'A' in het alfabet
-  const elf = new Array(8).fill(11);           // byte 11 -> 'B'
+  const tien = new Array(10).fill(10);          // byte 10 -> 'A' in het alfabet
+  const elf = new Array(10).fill(11);           // byte 11 -> 'B'
   const { sociaal } = maak({ pinBytes: [tien, tien, elf] });
-  assert.equal(sociaal.pinVan('B'), 'AAAAAAAA', 'de eerste trekking, gestuurd');
+  assert.equal(sociaal.pinVan('B'), 'AAAAAAAAAA', 'de eerste trekking, gestuurd');
   sociaal.pinUit('B', true);
-  assert.equal(sociaal.pinNaarHandle('AAAAAAAA'), null, 'hij wijst niemand meer aan...');
+  assert.equal(sociaal.pinNaarHandle('AAAAAAAAAA'), null, 'hij wijst niemand meer aan...');
   // ...en de VOLGENDE trekking is precies diezelfde pin. Ziet verzinPin hem niet
   // meer als bezet, dan krijgt C hem gewoon -- en dat is de bug.
-  assert.equal(sociaal.pinVan('C'), 'BBBBBBBB', 'de botsing is overgeslagen, niet uitgedeeld');
+  assert.equal(sociaal.pinVan('C'), 'BBBBBBBBBB', 'de botsing is overgeslagen, niet uitgedeeld');
   sociaal.pinUit('B', false);
-  assert.equal(sociaal.pinNaarHandle('AAAAAAAA'), 'B', 'en B heeft zijn eigen pin nog');
+  assert.equal(sociaal.pinNaarHandle('AAAAAAAAAA'), 'B', 'en B heeft zijn eigen pin nog');
+});
+
+test('een ingetrokken pin blijft voor altijd bezet en wordt nooit aan een ander gegeven', () => {
+  const a = new Array(10).fill(10), b = new Array(10).fill(11), c = new Array(10).fill(12);
+  const { db, sociaal } = maak({ pinBytes: [a, b, a, c] });
+  assert.equal(sociaal.pinVan('A'), 'AAAAAAAAAA');
+  assert.equal(sociaal.pinVernieuw('A').pin, 'BBBBBBBBBB');
+  assert.equal(sociaal.pinVan('B'), 'CCCCCCCCCC', 'de ingetrokken A-code wordt als botsing overgeslagen');
+  assert.equal(Object.keys(db.data.contactPinRetired || {}).length, 1, 'alleen een anonieme hash-tombstone blijft staan');
+  assert.ok(!JSON.stringify(db.data.contactPinRetired).includes('AAAAAAAAAA'), 'de oude PIN staat niet leesbaar in het register');
 });
 
 test('de index blijft eerlijk als een lid buiten deze laag om wordt gewist', () => {
@@ -253,13 +312,14 @@ test('een levende code wijst een mens aan, gaat pas op bij verbinden en verdraag
   const c = sociaal.liveMaak('A');
   // kijken mag twee keer: een blik verbrandt de code van een ander niet
   assert.equal(sociaal.liveKijk('B', c.token).codename, 'Lid A');
-  assert.equal(sociaal.liveKijk('B', c.token).codename, 'Lid A');
+  const gezien = sociaal.liveKijk('B', c.token);
+  assert.equal(gezien.codename, 'Lid A');
   assert.equal(db.data.connections.length, 0, 'kijken is geen verzoek');
   // een gemanipuleerd token komt er niet door
   const rommel = c.token.slice(0, -2) + (c.token.slice(-2) === 'AA' ? 'BB' : 'AA');
   assert.equal(sociaal.liveKijk('B', rommel).status, 404);
   // verbinden lukt een keer, en daarna is de code op
-  const r = await sociaal.liveVerbind('B', c.token);
+  const r = await sociaal.liveVerbind('B', c.token, gezien.bevestiging);
   assert.equal(r.st, 'aangevraagd');
   assert.equal(db.data.connections[0].via, 'code', 'de ontvanger ziet waarlangs dit kwam');
   assert.equal(sociaal.liveKijk('B', c.token).status, 404, 'de code is op');
@@ -289,6 +349,21 @@ test('de levende code werkt door als de vaste pin uit staat, en dat is het versc
   sociaal.pinDeurReset();
 });
 
+test('het noodslot blokkeert vaste en tijdelijke PIN-handelingen zonder relaties te wissen', async () => {
+  const { db, sociaal } = maak();
+  const pin = sociaal.pinVan('A'), gezien = sociaal.pinZoek('B', pin);
+  await sociaal.pinVerbind('B', pin, gezien.bevestiging);
+  assert.equal(db.data.connections.length, 1);
+  const dicht = sociaal.pinUit('A', true, { bevroren: true });
+  assert.equal(dicht.bevroren, true);
+  assert.equal(sociaal.pinZoek('C', pin).status, 404, 'voor een ander is noodslot dezelfde stilte als onbekend');
+  assert.equal(sociaal.liveMaak('A').status, 423, 'ook de tijdelijke ingang is dicht');
+  assert.equal(db.data.connections.length, 1, 'bestaande relaties blijven staan');
+  const open = sociaal.pinUit('A', true, { bevroren: false });
+  assert.equal(open.bevroren, false);
+  assert.equal(sociaal.liveMaak('A').status, 200);
+});
+
 test('een beschermd kind blijft ook achter een levende code onzichtbaar', () => {
   const { sociaal } = maak({ beschermd: ['rtf:kind'] });
   const c = sociaal.liveMaak('rtf:kind');
@@ -298,7 +373,8 @@ test('een beschermd kind blijft ook achter een levende code onzichtbaar', () => 
 test('verbinden op pin draagt de herkomst mee, zodat je merkt dat je pin rondgaat', async () => {
   const { db, sociaal } = maak();
   sociaal.pinDeurReset();
-  await sociaal.pinVerbind('B', sociaal.pinVan('A'));
+  const pin = sociaal.pinVan('A'), gezien = sociaal.pinZoek('B', pin);
+  await sociaal.pinVerbind('B', pin, gezien.bevestiging);
   assert.equal(db.data.connections[0].via, 'pin');
   // en zoeken op codenaam blijft gewoon "geen herkomst"
   await sociaal.socialVerbind('C', 'A');
@@ -332,19 +408,23 @@ test('twee leden voegen elkaar toe op pin, in twee stappen', async () => {
   const anna = await lid('Anna Pin');
   const boris = await lid('Boris Pin');
   const mijn = await json(await api('/api/member/pin', {}, anna.token));
-  assert.match(mijn.pin, /^[0-9A-HJKMNP-TV-Z]{8}$/);
-  assert.equal(mijn.toon, mijn.pin.slice(0, 4) + '-' + mijn.pin.slice(4));
+  assert.match(mijn.pin, /^[0-9A-HJKMNP-TV-Z]{10}$/);
+  assert.equal(mijn.toon, mijn.pin.slice(0, 5) + '-' + mijn.pin.slice(5));
 
   // stap 1: kijken wie het is -- dit verstuurt nog niets
   const kijk = await json(await api('/api/member/pin/zoek', { pin: mijn.toon }, boris.token));
   assert.equal(kijk.codename, anna.codenaam, 'de codenaam, nooit de echte naam');
+  assert.equal(kijk.key, undefined, 'het interne handle lekt niet naar de PIN-client');
+  assert.ok(kijk.bevestiging, 'de tweede stap is aan precies deze getoonde ontvanger gebonden');
   assert.ok(!JSON.stringify(kijk).includes('Anna Pin'), 'de echte naam blijft in de kluis');
   assert.equal(kijk.status, 'geen');
   const nietsGebeurd = await json(await api('/api/member/connections', {}, anna.token));
   assert.equal((nietsGebeurd.requests || []).length, 0, 'kijken is geen verzoek');
 
   // stap 2: en nu pas versturen
-  const stuur = await json(await api('/api/member/pin/connect', { pin: mijn.toon }, boris.token));
+  assert.equal((await api('/api/member/pin/connect', { pin: mijn.toon }, boris.token)).status, 409,
+    'de route kan de menselijke kijkstap niet overslaan');
+  const stuur = await json(await api('/api/member/pin/connect', { pin: mijn.toon, bevestiging: kijk.bevestiging }, boris.token));
   assert.equal(stuur.status, 'aangevraagd');
   const bij = await json(await api('/api/member/connections', {}, anna.token));
   assert.equal((bij.requests || []).length, 1);
@@ -373,7 +453,7 @@ test('een onzinnige pin komt niet als 404 maar als "dat is geen pin" terug', asy
   const eva = await lid('Eva Pin');
   const r = await api('/api/member/pin/zoek', { pin: 'hallo' }, eva.token);
   assert.equal(r.status, 400);
-  assert.match((await json(r)).error, /acht tekens/i);
+  assert.match((await json(r)).error, /acht of tien tekens/i);
 });
 
 /* ---------- 2b. de loketten zelf, elk met zijn volledige pad ----------
@@ -403,7 +483,9 @@ test('de schakelaar en de levende code werken over hun eigen routes', async () =
   assert.equal(kijk.codename, gerda.codenaam);
   assert.equal((await json(await api('/api/member/connections', {}, gerda.token))).requests.length, 0,
     'kijken langs de live-route stuurt ook niets');
-  assert.equal((await json(await api('/api/member/pin/live/verbind', { livecode: live.token }, hans.token))).status, 'aangevraagd');
+  assert.equal((await api('/api/member/pin/live/verbind', { livecode: live.token }, hans.token)).status, 409,
+    'ook de tijdelijke route weigert een directe actie zonder bevestiging');
+  assert.equal((await json(await api('/api/member/pin/live/verbind', { livecode: live.token, bevestiging: kijk.bevestiging }, hans.token))).status, 'aangevraagd');
   const bij = await json(await api('/api/member/connections', {}, gerda.token));
   assert.equal(bij.requests.length, 1);
   assert.equal(bij.requests[0].via, 'code', 'de ontvanger ziet langs welke weg dit kwam');
@@ -438,7 +520,7 @@ test('een beschermd kind krijgt geen eigen pinloket, zijn ouder wel', async () =
   const ouder = await json(await soc('/connections', { code: fam.g.code, token: fam.g.token }));
   assert.equal(ouder.beheerder, true);
   assert.equal(ouder.kinderen.length, 1);
-  assert.match(ouder.kinderen[0].toon, /^[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$/,
+  assert.match(ouder.kinderen[0].toon, /^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$/,
     'de ouder krijgt de pin van zijn kind, om af te geven aan de andere ouder');
 });
 
@@ -468,7 +550,7 @@ test('de gezinskant heeft dezelfde loketten, met dezelfde poort ervoor', async (
 
   // de ouder mag overal bij
   const mijn = await json(await rtf('/api/rtf/social/pin', ouder));
-  assert.match(mijn.toon, /^[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$/);
+  assert.match(mijn.toon, /^[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$/);
   assert.notEqual((await json(await rtf('/api/rtf/social/pin/nieuw', ouder))).pin, mijn.pin);
   assert.equal((await json(await rtf('/api/rtf/social/pin/uit', { ...ouder, uit: true }))).uit, true);
   assert.equal((await json(await rtf('/api/rtf/social/pin/uit', { ...ouder, uit: false }))).uit, false);
@@ -476,8 +558,9 @@ test('de gezinskant heeft dezelfde loketten, met dezelfde poort ervoor', async (
   // en verbindt met een RTG-lid op diens pin
   const ilse = await lid('Ilse Pin');
   const haarPin = (await json(await api('/api/member/pin', {}, ilse.token))).toon;
-  assert.equal((await json(await rtf('/api/rtf/social/pin/zoek', { ...ouder, pin: haarPin }))).codename, ilse.codenaam);
-  assert.equal((await json(await rtf('/api/rtf/social/pin/connect', { ...ouder, pin: haarPin }))).status, 'aangevraagd');
+  const gevonden = await json(await rtf('/api/rtf/social/pin/zoek', { ...ouder, pin: haarPin }));
+  assert.equal(gevonden.codename, ilse.codenaam);
+  assert.equal((await json(await rtf('/api/rtf/social/pin/connect', { ...ouder, pin: haarPin, bevestiging: gevonden.bevestiging }))).status, 'aangevraagd');
 
   // de levende code, dezelfde drie stappen
   const live = await json(await rtf('/api/rtf/social/pin/live', ouder));

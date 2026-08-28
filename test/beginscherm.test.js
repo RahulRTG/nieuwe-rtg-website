@@ -19,6 +19,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const wereldregister = require('../scripts/lib/wereldregister');
 
 const lees = (...d) => fs.readFileSync(path.join(__dirname, '..', ...d), 'utf8');
 
@@ -38,8 +39,10 @@ test('en het zijn er VIER, elk met een eigen wereldpagina die bestaat', () => {
      Het getal staat hier hard, en dat is de bedoeling: een vijfde wereld hoort
      een besluit te zijn dat je in dit bestand komt opschrijven, niet iets dat
      erbij sluipt. */
-  const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
-  const werelden = [...bron.matchAll(/wereld:\s*'([^']+)'/g)].map((m) => m[1]);
+  /* MAPPEN loopt inmiddels over meerdere bundelsnedes. Gebruik daarom dezelfde
+     lezer als de wereldlijst en de algemene registertoets; een losse snede is
+     geen volledige bron meer. */
+  const werelden = wereldregister.WERELDEN.map((m) => m.wereld);
   assert.equal(werelden.length, 4,
     'er horen vier werelden te staan, gevonden: ' + werelden.join(', '));
   for (const w of werelden) {
@@ -80,8 +83,7 @@ test('wat uit de functierij verdween, heeft een ingang in zijn wereld', () => {
    De regel: staat een app in de items van een wereld, dan moet die wereld ook
    een weg ernaartoe hebben. */
 test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', () => {
-  const bron = lees('public', 'apps', 'app-main', 'app-main-24a2.js');
-  const mappen = [...bron.matchAll(/wereld:\s*'([^']+)'[\s\S]*?items:\s*\[([^\]]*)\]/g)];
+  const mappen = wereldregister.WERELDEN;
   assert.equal(mappen.length, 4, 'de vier productindelingen zijn niet allemaal te lezen');
 
   /* DE SCHULD DIE ER AL LAG, met naam en toenaam -- zelfde afspraak als de
@@ -96,19 +98,11 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
      groeit. Een nieuwe app zonder ingang zakt meteen. RTG Media is de eerste
      wereld die af is (zie de rij specialisten in apps/media.html); de rest
      hoort te volgen. */
-  /* DE BLINDE VLEK VAN DEZE REGEL, en hij hoort hier te staan omdat hij niet is
-     opgelost. De bestemming wordt afgeleid uit de SLEUTEL (`link:vluchten` ->
-     /apps/vluchten.html) en niet uit de url in LINKS. Waar die twee uiteenlopen
-     meet deze toets niets: `link:reizen` wijst in werkelijkheid naar
-     /apps/reizen-veilig.html en `link:wallet` naar /apps/geld.html#wallet.
-
-     Gemeten wat een url-versie zou opleveren: zestien ontbrekende ingangen, en
-     de meeste daarvan zijn geen echte gaten maar het samenvoegpatroon van
-     PLATFORM.md -- tien pagina's die tien STANDEN van /apps/geld.html werden,
-     elk op hun eigen hash, terwijl het huis nog naar de oude losse adressen
-     wijst. Een url-versie vraagt dus eerst hash-besef en daarna een ronde per
-     wereld. Dat is een eigen stuk werk; tot die tijd staat hier wat hij NIET
-     ziet, in plaats van dat het stil blijft. */
+  /* EEN SLEUTEL EN ZIJN BESTEMMING KUNNEN UITEENLOPEN. `link:berichten` wijst
+     bijvoorbeeld naar comm.html, omdat berichten, bellen en videobellen daar
+     één gesprek zijn. Als het sleutelpad zelf bestaat, accepteer dan zowel dat
+     pad als de geregistreerde bestemming. Niet-bestaande sleutelpaden blijven
+     buiten deze bestaande afspraak; die bredere route-audit is ander werk. */
   /* DE LIJST IS LEEG, en dat is nieuws. Er stonden vier apps op -- Onderneming,
      Loonstrook, Browser en Sitemaker -- die in WorkOS hingen terwijl
      /apps/kantoor.html er nergens naar wees. Ze staan er nu in de rij "Werk".
@@ -119,20 +113,24 @@ test('elke app in een wereld-lijst heeft ook een ingang op die wereldpagina', ()
 
   const gemist = [], nogOpen = new Set();
   for (const m of mappen) {
-    const wereldPad = m[1];
+    const wereldPad = m.wereld;
     const pagina = path.join(__dirname, '..', 'public', wereldPad.replace(/^\//, ''));
     if (!fs.existsSync(pagina)) continue;
     const html = fs.readFileSync(pagina, 'utf8');
-    for (const item of [...m[2].matchAll(/'link:([a-z0-9-]+)'/g)].map((x) => x[1])) {
-      const doel = path.join(__dirname, '..', 'public', 'apps', item + '.html');
-      if (!fs.existsSync(doel)) continue;              // geen eigen pagina: niets te linken
+    for (const item of m.items.filter((x) => x.startsWith('link:')).map((x) => x.slice(5))) {
+      const geregistreerd = String((wereldregister.LINKS[item] || {}).url || '').split('?')[0].split('#')[0];
+      const afgeleid = '/apps/' + item + '.html';
+      const afgeleidPad = path.join(__dirname, '..', 'public', afgeleid.replace(/^\//, ''));
+      if (!fs.existsSync(afgeleidPad)) continue;        // geen eigen sleutelpagina: niets te linken
+      const bestaandeDoelen = [...new Set([afgeleid, geregistreerd].filter((x) => x.startsWith('/') &&
+        fs.existsSync(path.join(__dirname, '..', 'public', x.replace(/^\//, '')))))];
       /* EEN WERELD HOEFT NIET NAAR ZICHZELF TE WIJZEN. TravelOS heeft
          /apps/reizen.html als huis en draagt `link:reizen` als onderdeel; die
          twee vielen hier samen en leverden de eis op dat de pagina naar zichzelf
          moet linken. Dat is geen ingang maar een cirkel. */
-      if ('/apps/' + item + '.html' === wereldPad) continue;
+      if (bestaandeDoelen.includes(wereldPad)) continue;
       const regel = wereldPad + ' mist ' + item;
-      if (html.includes('/apps/' + item + '.html')) continue;   // bereikbaar, klaar
+      if (bestaandeDoelen.some((x) => html.includes(x))) continue; // bereikbaar, klaar
       if (SCHULD.has(regel)) nogOpen.add(regel); else gemist.push(regel);
     }
   }

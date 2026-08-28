@@ -422,7 +422,7 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
 });
 
 /* DE STARTDATA. Twee dingen die allebei moeten kloppen, en het tweede is het
-   belangrijkste: de demostand geeft een BRUIKBAAR lab (met tekenbevoegden,
+   belangrijkste: Magnaat Test geeft een BRUIKBAAR lab (met tekenbevoegden,
    want zonder die kan er niets ondertekend worden), en er staat GEEN enkel
    verzonnen onderzoeksresultaat in. Een lab dat opstart met nepbevindingen
    leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
@@ -435,16 +435,17 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
    demostand af aan `NODE_ENV !== 'production'`: dat wás de regel van de seed, en
    het was dezelfde regel die voor de demo-INLOG al was afgekeurd (server.js bij
    `const DEMO`). Op een echte server die geen NODE_ENV had gezet stond de demo
-   dus aan. De seed volgt nu dezelfde schakelaar als de inlog -- RTG_DEMO=1 -- en
+   dus aan. De seed volgt nu dezelfde schakelaar als de inlog --
+   RTG_MAGNAAT_TEST=1 -- en
    deze toets meet dat voortaan ook. Wat hij TOETST is niet veranderd. */
 test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
   const laad = (demoAan) => {
-    const oudDemo = process.env.RTG_DEMO;
-    if (demoAan) process.env.RTG_DEMO = '1'; else delete process.env.RTG_DEMO;
+    const oudDemo = process.env.RTG_MAGNAAT_TEST;
+    if (demoAan) process.env.RTG_MAGNAAT_TEST = '1'; else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     delete require.cache[require.resolve('../server/seed/livinglab')];
     const uit = require('../server/seed')();
-    if (oudDemo != null) process.env.RTG_DEMO = oudDemo; else delete process.env.RTG_DEMO;
+    if (oudDemo != null) process.env.RTG_MAGNAAT_TEST = oudDemo; else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     return uit;
   };
@@ -471,7 +472,7 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
   }
 
   const schoon = laad(false).livingLab;
-  assert.deepEqual(schoon.labs, [], 'zonder RTG_DEMO start het Living Lab leeg');
+  assert.deepEqual(schoon.labs, [], 'zonder RTG_MAGNAAT_TEST start het Living Lab leeg');
   assert.deepEqual(schoon.studies, [], 'en zonder studies');
 });
 

@@ -67,5 +67,14 @@ module.exports = ({ db, save, bijeen }) => {
     return metIdem('bon:' + soort + ':' + code + ':' + s, afdruk(soort, code, body), werk);
   }
 
-  return { eenmalig, afdruk, sleutelVan };
+  /* EEN DEUR DIE GEEN BON IS, maar wel dezelfde instantie nodig heeft.
+     `eenmalig` bouwt zijn afdruk uit bonvelden (totaal, betaalwijze, kamer,
+     regels). Een cadeaukaart verkopen heeft die velden niet -- daar bepaalt de
+     ZAAK plus het BEDRAG wat het verzoek is. Die deur mag daarom zijn eigen
+     sleutel en afdruk meegeven, maar hij hoort dat te doen op DEZE metIdem en
+     niet op een tweede exemplaar: de vlucht-tabel voor twee verzoeken die
+     tegelijk binnenkomen leeft per instantie, dus twee exemplaren op dezelfde
+     store delen wel de bewaarde sleutels en niet de lopende. Precies dat stond
+     er even: routes/supplier/kassa/cadeaukaart.js bouwde er zelf een. */
+  return { eenmalig, afdruk, sleutelVan, metEigenAfdruk: metIdem };
 };

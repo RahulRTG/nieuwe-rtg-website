@@ -216,6 +216,235 @@ function tabel() {
         const blok = tekst.slice(start, eind < 0 ? undefined : eind);
         return /\*\*Handhaver:\*\*/.test(blok);
       }
+    },
+    {
+      /* WIE MAG WAT ZELF. Tot deze soort erbij kwam keek er niemand naar de
+         vraag die in RTG op vijf plekken los van elkaar wordt beantwoord --
+         stuur/beleid.js, command/risico.js, geldbeleid/regels.js,
+         stadsweefsel/ainiveau.js en bureau/delegatie.js hebben elk een eigen
+         schaal, en geen van de vijf kan de andere vier lezen. Dat is precies
+         het soort ding waar deze census voor is: niet "zakt er iets" maar
+         "kijkt er iemand".
+
+         BEWAAKT betekent hier: de schaal staat nog letterlijk in zijn bestand,
+         zodat scripts/gezag.js er iets over kan zeggen. Het betekent NIET dat
+         de vijf schalen met elkaar kloppen -- dat kan geen enkele machine
+         vaststellen zolang ze geen gedeelde noemer hebben, en dat is nu juist
+         de openstaande post die GEZAG.json met naam vasthoudt. */
+      soort: 'gezagsvocabulaires (mag de machine dit zelf)',
+      bewaker: ['scripts/gezag.js', 'test/gezag.test.js'],
+      wat: 'elke schaal die autonomie verdeelt staat in GEZAG.json en wordt daar tegen de code nagetrokken',
+      dingen: () => {
+        const g = JSON.parse(lees('GEZAG.json') || '{}');
+        return (g.vocabulaires || []).map(v => v.bestand);
+      },
+      bewaakt: p => {
+        const g = JSON.parse(lees('GEZAG.json') || '{}');
+        const v = (g.vocabulaires || []).find(x => x.bestand === p);
+        if (!v) return false;
+        const bron = lees(p);
+        return !!bron && v.schaal.every(trede => bron.includes("'" + trede + "'"));
+      },
+      kanttekening: 'bewaakt = de schaal is te vinden; het zegt niets over of de vijf schalen elkaar tegenspreken -- GEZAG.json houdt de bekende tegenspraak apart bij'
+    },
+    {
+      /* WAT LIGT ER OP TAFEL ALS DE POORT OPENGAAT. De vorige soort telt de
+         plekken die beslissen OF iets mag; deze kijkt naar de elf poortwachters
+         waar bijna elke route doorheen loopt en vraagt welke FEITEN zij
+         achterlaten. Zonder die feiten op een plek is er geen risicobudget en
+         geen blast radius te bouwen, hoe de rest ook wordt ingericht.
+
+         BEWAAKT betekent hier: de poortwachter staat in ENVELOP.json en zet daar
+         ook echt wat het register belooft. Het zegt niets over of het veld KLOPT
+         -- het scherpste geval (een kantoortoken zonder persoon, waardoor de
+         ondertekenaar uit de body komt) staat als bevinding apart. */
+      soort: 'poortwachters (wat weet RTG bij het verlenen van gezag)',
+      bewaker: ['scripts/envelop.js', 'test/envelop.test.js'],
+      wat: 'elke poortwachter staat in ENVELOP.json en zet daar ook echt de eigenschappen die het register noemt',
+      dingen: () => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        return (e.poortwachters || []).map(p => p.naam + ' (' + p.bestand + ')');
+      },
+      bewaakt: naam => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        const p = (e.poortwachters || []).find(x => naam.startsWith(x.naam + ' ('));
+        if (!p) return false;
+        const bron = lees(p.bestand);
+        if (!bron || !new RegExp('function\\s+' + p.naam + '\\s*\\(').test(bron)) return false;
+        return (p.zet || []).every(z => {
+          const via = String(z).split(' <- ')[1] || '';
+          return !via.startsWith('req.') || new RegExp(via.replace('.', '\\.') + '\\s*=').test(bron);
+        });
+      },
+      /* HET GETAL KOMT UIT HET REGISTER en staat hier niet uitgeschreven. Dat is
+         geen netheid: er stond "zeven van de elf" toen het er nog zeven waren,
+         en na de enveloprone waren het er vijf terwijl de zin bleef staan --
+         een belofte in tekst die niet meer waar was (LAT.md regel 6), in het
+         gereedschap dat over samenhang gaat. */
+      kanttekening: (() => {
+        const e = JSON.parse(lees('ENVELOP.json') || '{}');
+        const zonder = (e.veldenZonderHuis || []).map(v => v.veld);
+        if (!zonder.length) return 'elk envelopveld heeft een drager -- controleer of dat klopt voor je het gelooft';
+        return zonder.length + ' van de ' + ((e.poortwachters || []).length ? 11 : '?') +
+          ' envelopvelden hebben GEEN enkele drager (' + zonder.join(', ') +
+          ') -- dat getal staat in ENVELOP.json en mag alleen omlaag';
+      })()
+    },
+    {
+      /* WAT EEN VERZOEK WERKELIJK VERANDERT. De vorige twee soorten gaan over
+         gezag en over wat er bij de poort bekend is; deze gaat over de andere
+         kant van de brug. Zonder een laag die telt wat er beweegt, is "1 boeking
+         erbij" technisch hetzelfde verzoek als "4280 medewerkers weg".
+
+         BEWAAKT betekent hier: de laag hangt echt in de verzoekketen EN er staat
+         een toets op die hem heeft zien uitslaan -- inclusief een die een ECHTE
+         server start, want een laag die db.data niet kan ophalen meet voor eeuwig
+         nul en ziet er dan precies zo uit als een rustig systeem. */
+      soort: 'handelingsmeting (wat verandert dit verzoek)',
+      bewaker: ['server/opzet/handeling.js', 'test/handeling.test.js'],
+      wat: 'elk verzoek telt de rijen per collectie voor en na; boven een grens komt er een melding',
+      dingen: () => ['server/opzet/handeling.js'],
+      bewaakt: () => {
+        const laag = lees('server/opzet/handeling.js');
+        const keten = lees('server/opzet/verzoekketen.js');
+        const toets = lees('test/handeling.test.js');
+        /* Het pad is relatief aan verzoekketen.js zelf ('./handeling'), niet
+           'opzet/handeling' -- die eerste versie van deze controle sloeg meteen
+           aan toen de mount verhuisde, en dat is precies waar deze census voor is. */
+        /* DE HERSTELPOORT TELT MEE, en dat is geen extra eis maar de kern. Zonder
+           hem is de context na het lezen van de body weg, en dan is de begroting
+           blind voor elke POST met een body -- precies de verzoeken die iets
+           veranderen. Deze census zei toen "bewaakt" over een laag die niets zag. */
+        return !!laag && /require\(['"]\.\/handeling['"]\)/.test(keten) &&
+          /handeling'\)\.hervat\(\)/.test(keten) && /ECHTE SERVER/.test(toets) &&
+          /function hervat\(/.test(laag);
+      },
+      kanttekening: 'ziet GEEN wijziging binnen een rij (4000 mensen op non-actief beweegt geen rij-aantal); ' +
+        'de meting is ACHTERAF -- tegenhouden doet server/opzet/begroting.js, en die staat op melden'
+    },
+    {
+      /* DE ENIGE LAAG DIE IETS KAN WEIGEREN. De handelingsmeting ziet een
+         massamutatie nadat hij gebeurd is; deze houdt hem tegen op de drempel.
+         BEWAAKT betekent hier: de val hangt echt aan db.data (de accessor in
+         server/db/state.js is het enige punt waar alle elf toekenningen
+         doorheen gaan) EN er staat een toets op die hem heeft zien WEIGEREN --
+         met de oude collectie aantoonbaar nog intact na de poging. Een poort
+         waarvan alleen bewezen is dat hij meldt, is geen poort. */
+      soort: 'begroting (kan een massamutatie weigeren)',
+      bewaker: ['server/opzet/begroting.js', 'test/begroting.test.js', 'test/begrotingroute.test.js'],
+      wat: 'een hervulling die te veel rijen wegneemt wordt gewogen voordat hij landt',
+      dingen: () => ['server/opzet/begroting.js'],
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const staat = lees('server/db/state.js');
+        const toets = lees('test/begroting.test.js');
+        /* BEWEZEN WEIGEREND IS NIET BEWEZEN BEREIKBAAR. De dertien in
+           test/begroting.test.js voeden de laag rechtstreeks; test/begrotingroute.js
+           loopt een ECHTE route met een echte server, en die vond dat de laag daar
+           niets zag. Zonder die tweede toets stond hier "bewaakt" over een poort
+           waar in het echt nooit iemand langs kwam. */
+        const route = lees('test/begrotingroute.test.js');
+        return !!laag && /begroting'\)\.bewaak/.test(staat) && /onaangeroerd/.test(toets) &&
+          /TEGENPROEF/.test(route);
+      },
+      kanttekening: 'staat standaard op MELDEN; met RTG_BEGROTING=weigeren bijten de grenzen uit ' +
+        'BEGROTING.json -- behalve de zes collecties van het vergeetpad, die daar uitgezonderd staan'
+    },
+    {
+      /* DE GRENS PER COLLECTIE, EN VOORAL WAAR HIJ NIET MAG STAAN. De laag kon
+         alleen een globaal getal; nu staat er per collectie een grens met de
+         reden ernaast. Het gevaarlijke deel zijn de UITZONDERINGEN: zes
+         collecties worden door het vergeetpad herschreven, waar een handeling
+         alles van een lid weghaalt. BEWAAKT betekent hier dat die lijst tegen de
+         BRON aan ligt -- komt er morgen een collectie bij in server/kern/
+         vergeten/, dan zakt de toets en niet de belofte. */
+      soort: 'grens per collectie (en waar er geen mag staan)',
+      bewaker: ['BEGROTING.json', 'server/opzet/begrotingsgrenzen.js', 'test/begrotingsgrenzen.test.js'],
+      wat: 'elke gemeten collectie heeft een grens met een reden; het vergeetpad is uitgezonderd',
+      dingen: () => {
+        try {
+          const r = JSON.parse(lees('BEGROTING.json'));
+          const namen = Object.keys(r.collecties || {});
+          return namen.map(n => n + (r.collecties[n].handhaaf === false ? ' (uitgezonderd)' : ': ' + r.collecties[n].grens));
+        } catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const leest = lees('server/opzet/begrotingsgrenzen.js');
+        return bestaat('BEGROTING.json') && /grenzen\.handhaaft\(collectie\)/.test(laag) &&
+          /grenzen\.grensVoor\(collectie\)/.test(laag) && /handhaaf === false/.test(leest) &&
+          bestaat('test/begrotingsgrenzen.test.js');
+      },
+      kanttekening: 'een collectie die de meting niet heeft gezien staat er NIET in en valt op de ' +
+        'standaardgrens van 1000 -- dat is een noodrem en geen fijnregeling'
+    },
+    {
+      /* AFKAPPEN IS HUISHOUDEN. Een kap in een schrijfroute kan in een keer
+         duizenden rijen willen weghalen; een grens die dat weigert, houdt
+         zichzelf in stand. De drie die KRIMP.json aanwees, draaien nu in de
+         onderhoudsronde. */
+      soort: 'kappen (bovengrenzen, buiten het verzoek)',
+      bewaker: ['server/kern/kappen.js', 'test/kappen.test.js'],
+      wat: 'de bovengrens van een collectie wordt in de onderhoudsronde toegepast, niet in de route',
+      dingen: () => {
+        try { return require('../server/kern/kappen').KAPPEN.map(k => k.collectie + ': ' + k.houd); }
+        catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const ronde = lees('server/opzet/onderhoud.js');
+        return /kappen\.ronde\(\)/.test(ronde) && bestaat('test/kappen.test.js');
+      },
+      kanttekening: 'dit zijn de drie kappen die KRIMP.json aanwees, niet alle kappen van dit huis ' +
+        '(een scan telt er ruim zestig); de rest staat nog in zijn eigen schrijfpad'
+    },
+    {
+      /* DE CATALOGUS, EN VOORAL: HET BEWIJS DAT ER GEMETEN IS. De ronde draait
+         de suite met de grens op 1 en telt wat er dan zou zijn geweigerd. Zijn
+         gevaarlijkste uitslag is een LEEG getal dat op een uitslag lijkt -- nul
+         meldingen betekent er kromp niets OF de val stond niet aan. Daarom
+         schrijft de begroting bij haar eerste installatie een levensteken, en
+         weigert de ronde een uitslag te geven als dat teken ontbreekt of op de
+         standaardgrens staat. BEWAAKT betekent hier: die twee bestanden dragen
+         diezelfde regel nog steeds, en er is een toets die dat vastprikt aan de
+         ECHTE regel in plaats van aan een nagetypte. */
+      soort: 'krimpcatalogus (welke grote krimpen zijn legitiem)',
+      bewaker: ['scripts/krimpronde.js', 'test/krimpronde.test.js'],
+      wat: 'de suite draait met een verlaagde grens; wat er dan zou zijn geweigerd, staat in KRIMP.json',
+      dingen: () => {
+        /* Per gemeten grens een ronde: 1 zegt welke collecties GROOT krimpen,
+           0,5 zegt welke er uberhaupt krimpen en waar. Twee vragen, twee
+           uitslagen -- ze horen niet over elkaar heen geschreven te worden. */
+        try {
+          const r = JSON.parse(lees('KRIMP.json')).rondes || {};
+          return Object.keys(r).sort().map(k => k + ': gewaakt=' + r[k].gemeten.processenGewaakt +
+            ' krimpen=' + r[k].gemeten.hervullingen + ' collecties=' + r[k].gemeten.collecties);
+        } catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const laag = lees('server/opzet/begroting.js');
+        const ronde = lees('scripts/krimpronde.js');
+        return /'begroting: waakt'/.test(laag) && /begroting: waakt/.test(ronde) &&
+          bestaat('KRIMP.json') && bestaat('test/krimpronde.test.js');
+      },
+      kanttekening: 'de catalogus is een ONDERGRENS: de suite doet wat de toetsen doen en niet wat ' +
+        'gebruikers doen, dus een legitieme grote krimp die geen toets uitlokt staat er niet in'
+    },
+    {
+      /* WIE ER AAN DE ECHTE BRON ZIT, DRAAIT ALLEEN. Een toets die een echt
+         bronbestand hernoemt om zijn meter te ijken, laat een ANDERE toets
+         omvallen die op dat moment een server start -- met een fout die naar
+         een onschuldig bestand wijst. Dat is hier echt gebeurd. */
+      soort: 'bronmuterende toetsen (draaien alleen)',
+      bewaker: ['scripts/lib/geisoleerd.js', 'test/bronmutanten.test.js'],
+      wat: 'elke toets die server/, scripts/ of public/ overschrijft, staat in de isolatielijst van de draaier',
+      dingen: () => {
+        try { return require('./lib/geisoleerd').GEISOLEERD.slice(); } catch (e) { return null; }
+      },
+      bewaakt: () => {
+        const draaier = lees('scripts/test-runner.js');
+        return /require\('\.\/lib\/geisoleerd'\)/.test(draaier) && bestaat('test/bronmutanten.test.js');
+      },
+      kanttekening: 'ziet alleen de schrijfvormen die dit huis vandaag gebruikt; een toets die via een SCRIPT schrijft valt erbuiten'
     }
   ];
 }

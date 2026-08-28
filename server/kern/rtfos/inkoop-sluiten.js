@@ -27,7 +27,7 @@
    Afgesplitst uit inkoop.js op de 10 KB van keuringsregel 13. */
 
 module.exports = (ctx, eigen) => {
-  const { centen, euro, S, audit, wie, poort, stadVan, save } = ctx;
+  const { naarCenten, euro, S, audit, wie, poort, stadVan, save } = ctx;
   const { vind, beeld, totaalStuks, boekAanvraag } = eigen;
 
   /* Sluiten. Hier wordt de definitieve stukprijs vastgelegd en het totaal
@@ -44,12 +44,12 @@ module.exports = (ctx, eigen) => {
     if ((i.deelnames || []).length < 2) {
       return { status: 400, error: 'Er doet maar een stad mee. Dat is geen gezamenlijke inkoop; bestel het via de eigen uitgaven van die stad.' };
     }
-    const perStuk = centen(b.perStuk === undefined ? euro(i.indicatieCenten) : b.perStuk);
+    const perStuk = naarCenten(b.perStuk === undefined ? euro(i.indicatieCenten) : b.perStuk);
     if (perStuk === null || perStuk === 0) return { status: 400, error: 'Wat is de definitieve prijs per stuk?' };
     /* De bijkomende kosten: transport, handling, een eenmalige opstartfee. Die
        horen bij de order en niet bij een stuk, en ZIJ zijn de reden dat er
        uberhaupt een restverdeling nodig is -- zie hieronder. */
-    const extra = centen(b.extra === undefined ? 0 : b.extra);
+    const extra = naarCenten(b.extra === undefined ? 0 : b.extra);
     if (extra === null) return { status: 400, error: 'Wat zijn de bijkomende kosten? Nul mag ook.' };
     const stuks = totaalStuks(i);
     const totaal = perStuk * stuks + extra;

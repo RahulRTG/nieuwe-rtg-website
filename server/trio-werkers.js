@@ -116,6 +116,12 @@ function maakWerkers({ aantal, servers, actieve, spreidingAan, log, gevallen }) 
    in RTG_POORTWACHTERS; 0 (de standaard) betekent geen, en dan luistert de hoofd
    gewoon zelf zoals altijd. Een werker start er nooit zelf nog eens een. */
 const MAX_VOORDEUREN = 64;
+/* Node ondersteunt SO_REUSEPORT niet op ieder besturingssysteem. Op macOS geeft
+   listen({reusePort:true}) bijvoorbeeld ENOTSUP; als de hoofd dan zelf niet
+   luistert, is de hele site onbereikbaar. Val daar terug op de gewone ene
+   voordeur. Linux (de productie- en CI-omgeving) houdt de gespreide voordeur. */
+const REUSE_PORT_PLATFORMS = new Set(['linux', 'freebsd', 'dragonfly', 'sunos', 'aix']);
+const reusePortBeschikbaar = (platform) => REUSE_PORT_PLATFORMS.has(platform || process.platform);
 
 /* RTG_POORTWACHTERS=auto. Een beheerder hoeft geen getal te verzinnen dat van de
    machine afhangt, en een getal dat op de ene machine goed is, is dat op de
@@ -139,11 +145,13 @@ function koppelWerkers({ WERKER, wacht, servers, log, LOKAAL_TLS }) {
   const gevraagd = rauw === 'auto' ? autoAantal(require('os').cpus().length) : Number(rauw);
   const VOORDEUREN = WERKER || !Number.isFinite(gevraagd) || gevraagd <= 0
     ? 0 : Math.min(MAX_VOORDEUREN, Math.floor(gevraagd));
+  if (!WERKER && VOORDEUREN > 0 && !reusePortBeschikbaar())
+    log('meerdere voordeurprocessen zijn niet beschikbaar op ' + process.platform + '; de hoofd luistert zelf');
   /* Met lokale TLS gaat het NIET, en dat weigeren we hardop in plaats van het
      stilletjes te doen: elk proces geeft bij het starten zijn eigen certificaat
      uit, dus dan ziet een telefoon per verbinding een ander certificaat van
      dezelfde site. De melding staat in trio.js, bij het starten. */
-  if (!(VOORDEUREN > 0) || LOKAAL_TLS) return { VOORDEUREN, werkers: null };
+  if (!(VOORDEUREN > 0) || LOKAAL_TLS || !reusePortBeschikbaar()) return { VOORDEUREN, werkers: null };
   const werkers = maakWerkers({
     aantal: VOORDEUREN, servers, log,
     actieve: () => wacht.actieve(),
@@ -159,4 +167,4 @@ function koppelWerkers({ WERKER, wacht, servers, log, LOKAAL_TLS }) {
   return { VOORDEUREN, werkers };
 }
 
-module.exports = { maakWerkers, koppelWerkers, staatVan, autoAantal };
+module.exports = { maakWerkers, koppelWerkers, staatVan, autoAantal, reusePortBeschikbaar };

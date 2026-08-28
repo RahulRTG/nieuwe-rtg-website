@@ -8,7 +8,7 @@
 
    De poort staat VOOR de gesprekslaag (/api/fluister): poort(key, tekst)
    geeft null (doorlaten) of een antwoord dat het gesprek overneemt.
-   Opslag: db.data.rahulRespect per sessiesleutel. */
+   Opslag: collectie rahulRespect per sessiesleutel. */
 
 const WEG_MS = 24 * 3600000;
 const PEST = ['klootzak', 'sukkel', 'loser', 'idioot', 'achterlijk', 'mongool', 'debiel', 'eikel',
@@ -35,10 +35,12 @@ module.exports = ({ db, save }) => {
   const heeft = (t, lijst) => { const l = laag(t); return lijst.some(w => l.includes(w)); };
   const uren = ms => Math.max(1, Math.ceil(ms / 3600000));
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/pestgrens', bezit: { rahulRespect: 'kaart' } });
+
   function S(key) {
-    if (!db.data.rahulRespect) db.data.rahulRespect = {};
-    if (!db.data.rahulRespect[key]) db.data.rahulRespect[key] = { n: 0, wegTot: 0, wachtExcuus: false };
-    return db.data.rahulRespect[key];
+    const b = eigen.bak('rahulRespect');
+    if (!b[key]) b[key] = { n: 0, wegTot: 0, wachtExcuus: false };
+    return b[key];
   }
 
   const isPest = t => heeft(t, PEST);

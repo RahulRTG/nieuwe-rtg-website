@@ -141,7 +141,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
      zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
      aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
      plek en breken we het schrijven niet. */
-  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, domein, publiekeStand: publiek, siteVoorHost: domeinlaag.siteVoorHost, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
+  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, domein, publiekeStand: publiek, siteVoorHost: domeinlaag.siteVoorHost, siteVanZaak: domeinlaag.siteVanZaak, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
            publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
            gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres, idVanAdres: blader.idVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };

@@ -1,0 +1,144 @@
+{
+  "uitleg": "Wat weet RTG op het moment dat een poortwachter JA zegt, en wat is er daarna werkelijk veranderd? `veldenZonderHuis` telt de envelopvelden die door NIEMAND worden gevuld; `actorVormen` telt onder hoeveel verschillende namen \"wie handelt hier\" op het verzoek wordt gezet; `routesZonderEnvelop` telt de routes zonder canonieke vorm. ALLE DRIE MOGEN ALLEEN OMLAAG. EEN GRENS DIE ER NOG NIET IS: `doel` en `wijzigingen` worden ACHTERAF gemeten (server/opzet/handeling.js). Daarmee is een massamutatie te ZIEN en te melden, maar niet te WEIGEREN -- daarvoor zou de omvang voor de uitvoering bekend moeten zijn, en dat vraagt een simulatie die hier niet bestaat. Detecteren is niet tegenhouden, en dat verschil hoort in het register te staan in plaats van in iemands hoofd.",
+  "hoe": "node scripts/envelop.js --velden",
+  "gemeten": {
+    "veldenZonderHuis": 3,
+    "actorVormen": 7,
+    "routesZonderEnvelop": 382,
+    "routesMetEnvelop": 3421,
+    "routesMetPoortwachter": 3424,
+    "routesTotaal": 3803
+  },
+  "veldenZonderHuis": [
+    {
+      "veld": "intent",
+      "wat": "wat de actor probeert te bereiken"
+    },
+    {
+      "veld": "risicoklasse",
+      "wat": "hoe zwaar deze handeling weegt"
+    },
+    {
+      "veld": "omkeerbaarheid",
+      "wat": "is dit terug te draaien, en hoe"
+    }
+  ],
+  "actorVormen": [
+    "req.actor",
+    "req.boardroomKey",
+    "req.drive",
+    "req.gast",
+    "req.gezinslid",
+    "req.session",
+    "req.techUser"
+  ],
+  "poortwachters": [
+    {
+      "naam": "auth",
+      "bestand": "server/opzet/diensten2.js",
+      "routes": 1375,
+      "zet": [
+        "actor <- req.session",
+        "capability <- lidBoardUit"
+      ],
+      "opmerking": "de enige die al beleid droeg: 403 als het lid de functie in zijn boardroom heeft uitgezet. De capability is een aan/uit-schakelaar per functie, geen begrensd recht (geen bedrag, geen bereik)"
+    },
+    {
+      "naam": "supplierAuth",
+      "bestand": "server/opzet/leverancierpoort.js",
+      "routes": 969,
+      "zet": [
+        "actor <- req.actor",
+        "tenant <- req.supplier"
+      ],
+      "opmerking": "de rijkste van de elf: persoon EN huis, met rol, staffId en of hij manager is -- de maat waar de andere tien naartoe groeien"
+    },
+    {
+      "naam": "officeAuth",
+      "bestand": "server/kern/kantoor/index.js",
+      "routes": 713,
+      "zet": [],
+      "opmerking": "liet tot deze ronde NIETS achter. Zet nu een envelop die eerlijk zegt wat hij is: identiteit 'bewezen' als de sessie een lidKey draagt, anders 'anoniem'. Zie de bevinding kantoortoken-kent-geen-personen -- die is hiermee ZICHTBAAR, niet opgelost"
+    },
+    {
+      "naam": "boardroomAuth",
+      "bestand": "server/kern/kantoor/index.js",
+      "routes": 58,
+      "zet": [
+        "actor <- req.boardroomKey",
+        "gezag <- req.boardroomBaas"
+      ],
+      "opmerking": "weigert het anonieme kantoortoken met zoveel woorden -- het precedent voor de reparatie van officeAuth"
+    },
+    {
+      "naam": "techAuth",
+      "bestand": "server/routes/techniek.js",
+      "routes": 56,
+      "zet": [
+        "actor <- req.techUser"
+      ],
+      "opmerking": "meldt een geldig account dat hier niets te zoeken heeft als kritiek: rechten-escalatie"
+    },
+    {
+      "naam": "gastAuth",
+      "bestand": "server/routes/gast.js",
+      "routes": 16,
+      "zet": [
+        "actor <- req.gast"
+      ],
+      "opmerking": "de actor is een TAFEL en geen persoon; de envelop zegt dat met 'anoniem' in plaats van er een aan te nemen"
+    },
+    {
+      "naam": "huisAuth",
+      "bestand": "server/routes/werkplek.js",
+      "routes": 62,
+      "zet": [
+        "tenant <- req.werkplekCode",
+        "gezag <- req.werkplekBaas"
+      ],
+      "opmerking": "de tenant komt uit req.body.bedrijf en wordt daarna gecontroleerd met werkplek.magIn -- de volgorde klopt; de envelop draagt sinds deze ronde ook de sleutelhouder als actor"
+    },
+    {
+      "naam": "baasAuth",
+      "bestand": "server/routes/werkplek.js",
+      "routes": 3,
+      "zet": [],
+      "opmerking": "controleert alleen en staat altijd NA huisAuth, die de envelop al heeft gezet; er zelf een tweede zetten zou de eerste overschrijven met minder"
+    },
+    {
+      "naam": "huisPoort",
+      "bestand": "server/routes/kantoorpakket-huis.js",
+      "routes": 44,
+      "zet": [
+        "actor <- req.drive"
+      ],
+      "opmerking": "req.drive draagt sleutel en kring in een eigen vorm; de envelop staat er nu naast"
+    },
+    {
+      "naam": "gezinsPoort",
+      "bestand": "server/routes/tiener.js",
+      "routes": 36,
+      "zet": [
+        "actor <- req.gezinslid"
+      ],
+      "opmerking": "weigert gasten; de rol zit sinds deze ronde ook in de envelop"
+    },
+    {
+      "naam": "rtfPoort",
+      "bestand": "server/routes/kantoorpakket-huis.js",
+      "routes": 17,
+      "zet": [
+        "actor <- req.drive"
+      ],
+      "opmerking": "zelfde vorm als huisPoort, andere herkomst; een oppas is bekend maar mag niet bewerken"
+    }
+  ],
+  "bevindingen": [
+    {
+      "naam": "kantoortoken-kent-geen-personen",
+      "wat": "Het kantoortoken is anoniem: officeAuth laat in de kantoor-tak niets op het verzoek achter. Bij de documentenuitgifte MET vier-ogenprincipe wordt de ondertekenaar daarom uit de body gelezen (req.body.wie), dus de identiteit onder een handtekening is een tekenreeks die de aanroeper zelf typt.",
+      "ernst": "Dit is een gedocumenteerd ONTWERPGEVOLG en geen slordigheid -- de kop van routes/uitgifte.js zegt het zelf. RTG heeft hetzelfde gat elders al herkend en dichtgezet: boardroomAuth weigert het anonieme kantoortoken juist omdat het geen identiteit draagt. SINDS DE ENVELOPRONDE IS HIJ ZICHTBAAR EN NIET OPGELOST: officeAuth zet nu wel een envelop, maar die draagt identiteit 'anoniem' zodra de sessie geen lidKey heeft -- precies wat het is. Wat nog niet gebeurt is dat de vier-ogen-uitgifte daar iets mee DOET; hij leest nog steeds req.body.wie. De reparatie is een besluit en geen code: of het kantoor krijgt een sessie met een persoon (zoals de leverancierskant met req.actor), of de uitgifte weigert een anonieme envelop zoals de boardroom dat doet."
+    }
+  ],
+  "reden": "routesZonderEnvelop met de hand van 360 naar 373 bij het binnenhalen van main (24 augustus). Die dertien komen NIET uit deze tak: main voegde 33 routes toe, waarvan er twintig via een bestaande poortwachter al een envelop dragen en dertien buiten de elf geregistreerde poortwachters vallen. Ze een envelop geven betekent routes aanraken die in deze tak nooit zijn gezien, en dat hoort niet in een merge-commit -- dezelfde afweging die in NORM.json staat bij schermenZonderVormtaal. De ratel blijft doen waar hij voor is: dit getal mag hierna alleen omlaag, en de dertien horen bij de eerstvolgende ronde over die routes een envelop te krijgen.\n\nEN NOG EEN KEER, van 373 naar 380, bij het binnenhalen van #113 (24 augustus). Main voegde 29 routes toe; 22 daarvan landden op een bestaande poortwachter en dragen dus al een envelop. De zeven die overblijven zijn met naam en toenaam: /api/tenant/bijstand, /api/tenant/bijstand/besluit, /api/tenant/bijstand/dossier, /api/tenant/bijstand/inhoud, /api/tenant/bijstand/intrekken, /api/tenant/bijstand/niveaus en /api/tenant/bijstand/vraag. DIT IS GEEN GAT IN DE TOEGANGSCONTROLE. Alle zeven dragen een poort -- viaBeheerOfDirectie() -- en npm run check regel 28 controleert per route of die er staat en is groen. De poort staat daar bewust BINNEN de handler; het bestand legt zelf uit waarom (\"een deur die achter een eigen wrapper verdwijnt, is een deur die niemand bij het lezen ziet\"). Deze meter leest de middleware-positie van de route, en een poort in de handler kan hij per constructie niet zien. Het is dus een blinde vlek van de meter en geen ontbrekende deur -- en dat verschil hoort hier te staan, want anders leest een volgende lezer dit getal als zeven onbewaakte routes. Wat er wel ontbreekt is de canonieke VORM: wie handelt, waarop, met welk gezag. Die zeven horen bij dezelfde eerstvolgende ronde als de dertien hierboven.\n\nEN TWEE ERBIJ, van 380 naar 382, bij de vierde keer main binnenhalen. /api/rtf/talent/interesse en /api/rtf/talent/mijn, allebei in server/routes/member/werk/talent.js. Zelfde soort als de zeven hierboven en om dezelfde reden geen gat: ze controleren zelf met rtf.verifieerProfiel(code, token) en geven 403 als dat mislukt, en /interesse eist daarbovenop rtf.magSolliciteren() -- werkmatches vanaf zestien. Die controles staan in de handler en niet in de middlewarelijst, en dat is precies wat deze meter leest. Dit getal telt dus inmiddels negen routes die een eigen poort dragen. Dat is een patroon en geen toeval, en het hoort de eerstvolgende envelop-ronde te sturen: niet negen routes een van de elf poortwachters opdringen, maar de meter leren dat een poort in de handler ook een poort is -- of anders vaststellen dat een eigen poort per definitie geen envelop kan dragen en dat dus als aparte categorie tellen in plaats van als schuld."
+}

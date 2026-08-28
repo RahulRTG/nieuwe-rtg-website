@@ -34,10 +34,10 @@ const MAX_PER_ZAAK = 200;
 
 module.exports = (ctx) => {
   const { db, save, nu, id, lijsten, kanaalMet, videoMet, zakenVan, personeelVan } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/theater/kijkplicht', bezit: { theaterKijkplicht: 'lijst' } });
 
   function tabel() {
-    if (!Array.isArray(db.data.theaterKijkplicht)) db.data.theaterKijkplicht = [];
-    return db.data.theaterKijkplicht;
+    return eigen.bak('theaterKijkplicht');
   }
   const leidtBij = (key, code) => zakenVan(key).some(z => z.code === code && z.leiding);
   const werktBij = (key, code) => zakenVan(key).some(z => z.code === code);
@@ -63,7 +63,7 @@ module.exports = (ctx) => {
     if (o.weg === true) {
       const r = regelMet(o.id);
       if (!r || r.zaakCode !== code) return { status: 404, error: 'Deze regel bestaat niet.' };
-      db.data.theaterKijkplicht = tabel().filter(x => x !== r); save();
+      eigen.zetBak('theaterKijkplicht', tabel().filter(x => x !== r)); save();
       return { status: 200, ok: true, lijst: stand(key, code).lijst };
     }
     const v = internVan(code, o.videoId);

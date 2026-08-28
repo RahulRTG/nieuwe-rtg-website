@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Overhoren</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -39,6 +39,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div id="balk"></div>
@@ -83,9 +84,9 @@
     <div class="kaart kaartgroot" id="hSpeel">
       <div style="color:var(--zacht);font-size:.82rem;" id="hTeller"></div>
       <div class="vraag" id="hVraag"></div>
-      <div style="color:var(--zacht);font-size:.78rem;margin:.2rem 0;" id="hBron"></div>
+      <div style="color:var(--zacht);font-size:.78rem;margin:0.25rem 0;" id="hBron"></div>
       <input class="veld" id="hAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="hCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <button class="knop" id="hCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
       <div class="uitslag" id="hUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="hKlaar" hidden>
@@ -102,13 +103,13 @@
       <div style="color:var(--zacht);font-size:.82rem;" id="oTeller"></div>
       <div class="vraag" id="oVraag"></div>
       <input class="veld" id="oAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="oCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <button class="knop" id="oCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
       <div class="uitslag" id="oUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="oKlaar" hidden>
       <div class="vraag" id="oScore"></div>
       <button class="knop" id="oFouten" style="width:100%;" hidden>De foutjes nog eens</button>
-      <button class="knop grijs" id="oTerug" style="width:100%;margin-top:.5rem;">Klaar</button>
+      <button class="knop grijs" id="oTerug" style="width:100%;margin-top:0.5rem;">Klaar</button>
     </div>
   </section>
 
@@ -120,7 +121,7 @@
       <div class="keuzerij" id="sVrienden"><span class="leeg">Vrienden laden…</span></div>
       <input class="veld h-mt30" id="sCodenaam" placeholder="Of daag uit op codenaam">
       <div class="leeg" style="padding:.3rem 0 0;">Samen leren maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
-      <button class="knop" id="sStart" style="width:100%;margin-top:.4rem;">Daag uit</button>
+      <button class="knop" id="sStart" style="width:100%;margin-top:0.5rem;">Daag uit</button>
       <div class="fout" id="sFout"></div>
     </div>
     <button class="knop grijs" id="sTerug" style="width:100%;">← terug</button>
@@ -134,7 +135,7 @@
       <div style="color:var(--zacht);font-size:.82rem;" id="dTeller"></div>
       <div class="vraag" id="dVraag"></div>
       <input class="veld" id="dAntwoord" placeholder="Typ je antwoord" autocomplete="off" style="text-align:center;">
-      <button class="knop" id="dCheck" style="width:100%;margin-top:.6rem;">Controleer</button>
+      <button class="knop" id="dCheck" style="width:100%;margin-top:0.5rem;">Controleer</button>
       <div class="uitslag" id="dUitslag"></div>
     </div>
     <div class="kaart kaartgroot" id="dKlaar" hidden>
@@ -210,7 +211,7 @@ $('#mMaak').addEventListener('click', async () => {
 $('#mAi').addEventListener('click', async () => {
   $('#mFout').textContent = '';
   $('#mAi').disabled = true; $('#mAi').textContent = '…';
-  try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een kant-en-klaar setje (demo).'; laadLijsten(); }
+  try { const d = await api('lijst-ai', { onderwerp: $('#mOnderwerp').value, groep }); $('#mOnderwerp').value=''; if (d.demo) $('#mFout').textContent = 'De buddy koos een gecontroleerd setje uit de vaste basis.'; laadLijsten(); }
   catch (e) { $('#mFout').textContent = e.message; }
   $('#mAi').disabled = false; $('#mAi').textContent = 'Maak';
 });
@@ -400,5 +401,6 @@ if (s) {
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

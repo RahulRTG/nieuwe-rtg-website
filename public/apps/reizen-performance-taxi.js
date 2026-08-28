@@ -13,7 +13,7 @@
     if (S.vertrek && Number.isFinite(S.vertrek.lat)) return { lat: S.vertrek.lat, lng: S.vertrek.lng, label: S.vertrek.label || 'Huidige locatie' };
     var tekst = $('#vanVeld').value.trim(), bekend = R.plekken.find(function (p) { return p.naam.toLowerCase() === tekst.toLowerCase(); });
     if (bekend) return R.plekSpec(bekend);
-    if (tekst.toLowerCase() === 'huidige locatie') return R.token ? { hier: true } : { lat: 52.3676, lng: 4.9041, label: 'Huidige locatie' };
+    if (tekst.toLowerCase() === 'huidige locatie') return R.token ? { hier: true } : null;
     return null;
   };
   R.gekozenBestemming = function () {
@@ -49,15 +49,14 @@
     }, 180);
   }
   function updateRouteIndicatie() {
-    var ibiza = $('#naarVeld').value.toLowerCase().includes('ibiza');
-    $('#ritDuur').firstChild.nodeValue = ibiza ? '18 ' : '34 ';
-    $('#ritAfstand').firstChild.nodeValue = ibiza ? '14 ' : '42 ';
+    $('#ritDuur').firstChild.nodeValue = '- ';
+    $('#ritAfstand').firstChild.nodeValue = '- ';
   }
   R.kiesVoertuig = function (knop) {
     if (!knop || knop.disabled) return;
     $$('.voertuig').forEach(function (b) { var aan = b === knop; b.classList.toggle('actief', aan); b.setAttribute('aria-pressed', String(aan)); });
-    S.voertuig = knop.dataset.voertuig; S.voertuigLabel = knop.dataset.label; S.indicatie = Number(knop.dataset.prijs);
-    $('#boekRit span').textContent = 'VRAAG ' + S.voertuigLabel + ' AAN · ± €' + S.indicatie;
+    S.voertuig = knop.dataset.voertuig; S.voertuigLabel = knop.dataset.label; S.indicatie = null;
+    $('#boekRit span').textContent = 'VRAAG ' + S.voertuigLabel + ' AAN · PRIJS VOLGT';
   };
   function laadAanbod() {
     if (!R.token) return Promise.resolve();
@@ -69,17 +68,17 @@
       if (huidig && huidig.disabled) { var eerste = $$('.voertuig').find(function (b) { return !b.disabled; }); if (eerste) R.kiesVoertuig(eerste); }
     }).catch(function () {});
   }
-  R.toonLopendeRit = function (opdracht, demo) {
+  R.toonLopendeRit = function (opdracht) {
     if (!opdracht) return;
     var vak = $('#lopendeRit'); vak.textContent = ''; vak.hidden = false;
-    vak.appendChild(maak('p', 'micro', demo ? 'DEMO · LOPENDE RIT' : 'LOPENDE RIT'));
+    vak.appendChild(maak('p', 'micro', 'LOPENDE RIT'));
     vak.appendChild(maak('h3', '', (opdracht.van && opdracht.van.label ? opdracht.van.label : 'Vertrek') + ' → ' + (opdracht.naar && opdracht.naar.label ? opdracht.naar.label : 'Bestemming')));
     vak.appendChild(maak('p', '', [opdracht.status, opdracht.ref, Number.isFinite(opdracht.prijs) ? R.eur(opdracht.prijs) : ''].filter(Boolean).join(' · ')));
-    if (!demo && opdracht.ref) { var a = maak('a', '', 'VOLG DEZE RIT →'); a.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(a); }
+    if (opdracht.ref) { var a = maak('a', '', 'VOLG DEZE RIT →'); a.href = '/apps/rit.html?rit=' + encodeURIComponent(opdracht.ref); vak.appendChild(a); }
   };
   R.laadLopendeRit = function () {
-    if (!R.token) { try { var demo = JSON.parse(localStorage.getItem('rtg_reizen_demo_rit') || 'null'); if (demo) R.toonLopendeRit(demo, true); } catch (e) {} return Promise.resolve(); }
-    return R.api('/api/mob/mijn', {}).then(function (d) { if (d.lopend) R.toonLopendeRit(d.lopend, false); }).catch(function () {});
+    if (!R.token) return Promise.resolve();
+    return R.api('/api/mob/mijn', {}).then(function (d) { if (d.lopend) R.toonLopendeRit(d.lopend); }).catch(function () {});
   };
   R.laadMobiliteit = function () { laadAanbod(); R.laadLopendeRit(); };
   function gebruikLocatie() {

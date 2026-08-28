@@ -50,7 +50,7 @@
         $('#uitPaneel').textContent += '\n';
         var n = document.createElement('span');
         n.className = 'leeg';
-        n.textContent = '(deze taal lukt nu even niet volledig; dit is het eerlijke antwoord van de demo)';
+        n.textContent = '(deze taal lukt nu even niet volledig; de vaste taalhulp toont alleen wat zij zeker weet)';
         $('#uitPaneel').appendChild(n);
       }
       histBij(tekst, r.body.tekst);

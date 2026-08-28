@@ -29,7 +29,7 @@ const OVERGANGEN = {
 function providerStatus(aanbieder, stand, gebeurtenis) {
   const s = String(stand || '').toLowerCase();
   const g = String(gebeurtenis || '').toLowerCase();
-  if (aanbieder === 'demo') return s === 'betaald' ? STATUS.BEVESTIGD : STATUS.WACHT_OP_KLANT;
+  if (aanbieder === 'magnaat-test' || aanbieder === 'demo') return s === 'betaald' ? STATUS.BEVESTIGD : STATUS.WACHT_OP_KLANT;
   if (aanbieder === 'mollie') {
     if (s === 'paid') return STATUS.BEVESTIGD;
     if (s === 'authorized' || s === 'pending') return STATUS.IN_BEHANDELING;

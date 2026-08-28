@@ -9,7 +9,6 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-
 const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
 const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
 const BASE = 'http://127.0.0.1:' + POORT;
@@ -57,7 +56,7 @@ async function wachtTot(fn, ms = 20000) {
    De grens gaat daarom terug naar twee minuten: hij hoort een hanger te vangen,
    niet een fout toe te dekken. Zakt hij weer, dan is dat een echt signaal en
    geen reden om er nog een minuut bij te doen -- lees dan eerst het log op
-   "locked". Zie ook LAT-regel 1: repareer de oorzaak, niet het symptoom. */
+     "locked". Zie ook LAT-regel 1: repareer de oorzaak, niet het symptoom. */
 const OPKOMST = 120000;
 
 test.before(async () => {

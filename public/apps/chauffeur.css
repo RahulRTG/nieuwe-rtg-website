@@ -1,5 +1,5 @@
 :root{
-  --bg:#080909;
+  --bg:#0c0c0b;
   --paneel:#0d0f0f;
   --paneel-2:#111313;
   --lijn:#343737;
@@ -40,13 +40,16 @@ main{position:relative;z-index:2;padding-bottom:calc(94px + env(safe-area-inset-
 .pda-blad{padding:2.25rem 1.65rem 2rem;animation:blad-in .22s ease-out}
 @keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .bovenregel,.bladkop p,.kaartlabel,.ritstatus,.systeemkaart>p{margin:0;color:#c8c8c4;font-size:.7rem;line-height:1.2;font-weight:570;letter-spacing:.19em}
+.chauffeur-hero{position:relative;isolation:isolate;min-height:490px;display:grid;grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);grid-template-rows:auto 1fr;align-items:end;margin:-2.25rem -1.65rem 1.25rem;padding:2.5rem 1.65rem 1.35rem;overflow:hidden;border-bottom:1px solid #383a39;background-image:linear-gradient(90deg,rgba(4,5,5,.94) 0,rgba(4,5,5,.68) 38%,rgba(4,5,5,.08) 78%),linear-gradient(0deg,rgba(4,5,5,.92),transparent 66%),url('/images/travelos/ibiza-chauffeur.jpg');background-size:cover;background-position:62% center;box-shadow:0 30px 85px rgba(0,0,0,.28)}
+.chauffeur-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(120deg,transparent 58%,rgba(203,166,95,.08));pointer-events:none}
+.beschikbaarheid{position:relative;z-index:2;grid-column:1/-1;align-self:start}
 .beschikbaar-kop{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-top:.7rem}
 .beschikbaar-kop h1{max-width:88%;margin:0;font-size:clamp(2rem,7.8vw,3.65rem);line-height:.98;font-weight:790;letter-spacing:.015em;text-transform:uppercase}
 .verbinding{display:flex;align-items:center;gap:.45rem;padding-bottom:.28rem;color:var(--zacht);font-size:.5rem;letter-spacing:.14em;white-space:nowrap}
 
-.klokpodium{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:310px;padding:1.7rem 0 1.45rem;text-align:center}
+.klokpodium{position:relative;z-index:2;grid-column:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%;min-height:285px;padding:1.1rem 0 0;text-align:center}
 .klokpodium>p{margin:0 0 .6rem;font-size:.76rem;letter-spacing:.22em;color:#c8c8c4}
-.klokhouder{--rtg-klok-maat:clamp(13.5rem,40vw,18rem);display:grid;place-items:center;width:100%}
+.klokhouder{--rtg-klok-maat:clamp(12.5rem,31vw,15rem);display:grid;place-items:center;width:100%;filter:drop-shadow(0 14px 34px rgba(0,0,0,.52))}
 
 .werkstapel{display:grid;gap:1rem}
 .ritkaart,.reservering,.lijstvak,.navigatiekaart,.systeemkaart{border:1px solid var(--lijn);background:linear-gradient(125deg,rgba(17,19,19,.98),rgba(10,11,11,.98));box-shadow:inset 0 1px rgba(255,255,255,.02)}
@@ -80,6 +83,16 @@ main{position:relative;z-index:2;padding-bottom:calc(94px + env(safe-area-inset-
 .fasebalk{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:1.25rem 0}
 .fasebalk i{height:3px;background:#353838}
 .fasebalk i.gedaan{background:var(--goud)}
+.faselabels{display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem;margin:-.75rem 0 1.2rem;color:#777a77;font-size:.43rem;letter-spacing:.09em;text-align:center}
+.faselabels span:first-child{text-align:left}.faselabels span:last-child{text-align:right}.faselabels span.gedaan{color:#d2b979}
+.ritbeeld{position:relative;min-height:270px;margin:-1.6rem -1.55rem 1.4rem;overflow:hidden;border-bottom:1px solid #3b3e3d;background-image:linear-gradient(0deg,rgba(4,5,5,.94),transparent 68%),linear-gradient(90deg,rgba(4,5,5,.68),transparent 62%),url('/images/travelos/ibiza-airport.jpg');background-size:cover;background-position:center 57%}
+.ritbeeld>div{position:absolute;left:1.55rem;right:1.55rem;bottom:1.35rem;display:flex;flex-direction:column;gap:.35rem}
+.ritbeeld small,.passagierkaart small{color:var(--goud);font-size:.56rem;font-weight:650;letter-spacing:.17em}
+.ritbeeld strong{font-size:clamp(1.35rem,5vw,2rem);line-height:1;text-transform:uppercase}
+.ritbeeld span{max-width:26rem;color:#cfcec8;font-size:.68rem;line-height:1.5;letter-spacing:.04em}
+.passagierkaart{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;margin:1rem 0;padding:1rem 0;border-top:1px solid var(--lijn);border-bottom:1px solid var(--lijn)}
+.passagierkaart>div{display:flex;flex-direction:column;gap:.3rem}.passagierkaart strong{font-size:1rem;text-transform:uppercase;letter-spacing:.08em}.passagierkaart span{color:var(--zacht);font-size:.65rem;letter-spacing:.08em}
+.ophaalcode{align-items:flex-end;padding-left:1rem;border-left:1px solid var(--lijn)}.ophaalcode b{font-size:1.75rem;line-height:1;letter-spacing:.12em}
 .ritkaart.leeg h2,.laadkaart h2{margin:.7rem 0 .45rem;font-size:1.45rem;text-transform:uppercase}
 .ritkaart.leeg p:last-child{margin:.3rem 0 0;color:var(--zacht);font-size:.82rem;line-height:1.6}
 .laadlijn{height:2px;margin-top:1.2rem;overflow:hidden;background:#292b2b}
@@ -192,11 +205,14 @@ dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
   .pda-identiteit small{display:none}
   .veilig span{display:none}
   .pda-blad{padding:1.65rem 1rem 1.5rem}
+  .chauffeur-hero{min-height:420px;grid-template-columns:minmax(155px,.7fr) 1.3fr;margin:-1.65rem -1rem 1rem;padding:1.75rem 1rem 1.1rem;background-position:64% center}
   .beschikbaar-kop{display:block}
   .verbinding{margin-top:.7rem;padding:0}
-  .klokpodium{min-height:262px;padding:1.15rem 0 1.3rem}
-  .klokhouder{--rtg-klok-maat:min(13.7rem,63vw)}
+  .klokpodium{min-height:245px;padding:1rem 0 0}
+  .klokpodium>p{font-size:.52rem;letter-spacing:.14em}
+  .klokhouder{--rtg-klok-maat:min(11rem,43vw)}
   .ritkaart{padding:1.3rem 1.15rem}
+  .ritbeeld{min-height:235px;margin:-1.3rem -1.15rem 1.2rem}.ritbeeld>div{left:1.15rem;right:1.15rem;bottom:1rem}
   .ritroute{gap:.48rem}
   .hoofdactie{min-height:58px}
   .cijferraster article{padding:1rem .55rem}
@@ -205,8 +221,9 @@ dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
 
 @media (max-width:370px){
   .beschikbaar-kop h1{font-size:1.82rem}
-  .klokpodium{min-height:238px}
-  .klokhouder{--rtg-klok-maat:12.2rem}
+  .chauffeur-hero{min-height:390px;grid-template-columns:140px 1fr}
+  .klokpodium{min-height:222px}
+  .klokhouder{--rtg-klok-maat:9.4rem}
   .ritroute{font-size:1.05rem}
   .ritfeiten{font-size:.85rem}
   .cijferraster{grid-template-columns:1fr}

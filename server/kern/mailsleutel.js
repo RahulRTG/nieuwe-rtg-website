@@ -36,10 +36,11 @@ module.exports = ({ db, save, crypto }) => {
   };
   const hash = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/mailsleutel', bezit: { mailSleutels: 'kaart' } });
   function S() {
-    if (!db.data.mailSleutels || typeof db.data.mailSleutels !== 'object') db.data.mailSleutels = { rijen: [] };
-    if (!Array.isArray(db.data.mailSleutels.rijen)) db.data.mailSleutels.rijen = [];
-    return db.data.mailSleutels;
+    const s = eigen.bak('mailSleutels');
+    if (!Array.isArray(s.rijen)) s.rijen = [];
+    return s;
   }
 
   /* Aanmaken. De sleutel komt EEN keer terug in het antwoord en wordt daarna

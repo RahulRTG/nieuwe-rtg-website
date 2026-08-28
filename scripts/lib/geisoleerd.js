@@ -13,13 +13,16 @@
    scripts/draai.js precies zo misgegaan. Een lijst met twee lezers hoort in een
    bestand dat niets doet als je het opent.
    ========================================================================== */
-const GEISOLEERD = new Set([
+const GEISOLEERD = [
   'boot-smoke.test.js',
   'grens-sweep.test.js',
   'klok.test.js',
   'zaakdoos.test.js',
+  'vloot.test.js',
   'keuring.test.js',
   'meterijk.test.js',
+  'gezag.test.js',
+  'envelop.test.js',
   /* ERBIJ OP 22 AUGUSTUS 2026, en met een eerlijke slag om de arm. Deze toets
      slaagt drie van de drie keer alleen en zakte in CI binnen een scherf van 272
      bestanden op 'de zaak laat achteraf betalen' -- een betaalinstelling van een
@@ -30,6 +33,12 @@ const GEISOLEERD = new Set([
      afhangt meet niet wat hij beweert. Wie de echte botsing vindt, haalt hem
      hier weg. */
   'lidfactuur.test.js'
-]);
+];
 
-module.exports = { GEISOLEERD };
+function isGeisoleerd(naam) {
+  const n = String(naam || '');
+  for (const item of GEISOLEERD) if (item === n) return true;
+  return false;
+}
+
+module.exports = { GEISOLEERD, isGeisoleerd };

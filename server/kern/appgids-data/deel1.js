@@ -85,4 +85,4 @@ module.exports = Object.assign({
   '/apps/pay.html': G('RTG Pay: betalen en tikken tussen vrienden, veilig en direct.',
     ['Stuur of vraag een tik', 'Bekijk je saldo en geschiedenis', 'Splits een rekening met je gezelschap'],
     'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
-}, require('./deel1b'));
+}, require('./deel1c'), require('./deel1b'));

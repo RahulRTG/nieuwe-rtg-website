@@ -92,14 +92,42 @@ async function minifyGedeeld() {
 function stempelBouw() {
   const html = path.join(PUB, 'apps', 'app.html');
   const js = path.join(PUB, 'apps', 'app-main.js');
+  const sandbox = path.join(PUB, 'apps', 'magnaat-sandbox.js');
+  const magnaatData = path.join(PUB, 'apps', 'magnaat-data.js');
+  const commandDelen = ['shared/command/werktafel.js', 'shared/command/console.js', 'shared/rtg-schil.js']
+    .map(p => path.join(PUB, p));
   if (!fs.existsSync(html) || !fs.existsSync(js)) return;
   let s = fs.readFileSync(js, 'utf8');
-  const hash = crypto.createHash('sha256').update(s.replace(/var RTG_BOUW = '[^']*';/, '')).digest('hex').slice(0, 8);
+  const proeflaag = Buffer.concat([sandbox, magnaatData].filter(fs.existsSync).map(p => fs.readFileSync(p)));
+  const hash = crypto.createHash('sha256')
+    .update(s.replace(/var RTG_BOUW = '[^']*';/, ''))
+    .update(proeflaag)
+    .update(Buffer.concat(commandDelen.filter(fs.existsSync).map(p => fs.readFileSync(p))))
+    .digest('hex').slice(0, 8);
   let h = fs.readFileSync(html, 'utf8');
   const nieuwJs = s.replace(/var RTG_BOUW = '[^']*';/, "var RTG_BOUW = '" + hash + "';");
-  const nieuwH = h.replace(/<meta name="rtg-bouw" content="[^"]*">/, '<meta name="rtg-bouw" content="' + hash + '">');
+  const nieuwH = h.replace(/<meta name="rtg-bouw" content="[^"]*">/, '<meta name="rtg-bouw" content="' + hash + '">')
+    /* De Magnaat-sandbox draait vóór app-main en bepaalt of synthetische data
+       überhaupt mag bestaan. Een oude browsercache van juist dit bestand liet
+       de nieuwe app-code zonder testdata starten. Koppel hem daarom aan exact
+       dezelfde bouwstempel als HTML en app-main. */
+    .replace(/\/apps\/magnaat-sandbox\.js(?:\?v=[^"]*)?/, '/apps/magnaat-sandbox.js?v=' + hash);
+  const nieuwHMetTestdata = nieuwH.replace(
+    /\/apps\/magnaat-data\.js(?:\?v=[^"]*)?/,
+    '/apps/magnaat-data.js?v=' + hash
+  );
+  const nieuwHMetCommand = nieuwHMetTestdata.replace(
+    /(\/shared\/command(?:\/[^"?]+)?\.js)(?:\?v=[^"]*)?/g,
+    '$1?v=' + hash
+  );
   if (nieuwJs !== s) fs.writeFileSync(js, nieuwJs);
-  if (nieuwH !== h) fs.writeFileSync(html, nieuwH);
+  if (nieuwHMetCommand !== h) fs.writeFileSync(html, nieuwHMetCommand);
+  const werkruimte = path.join(PUB, 'apps', 'werkruimte.html');
+  if (fs.existsSync(werkruimte)) {
+    const wr = fs.readFileSync(werkruimte, 'utf8');
+    const nwr = wr.replace(/\/shared\/rtg-schil\.js(?:\?v=[^"]*)?/, '/shared/rtg-schil.js?v=' + hash);
+    if (nwr !== wr) fs.writeFileSync(werkruimte, nwr);
+  }
   // ook het deel bijwerken, anders draait de volgende build de bundel terug
   const deel = path.join(PUB, 'apps', 'app-main', 'app-main-01.js');
   if (fs.existsSync(deel)) {

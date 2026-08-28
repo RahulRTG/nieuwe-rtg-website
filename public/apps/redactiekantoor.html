@@ -172,7 +172,7 @@ function drukkerij(){
 async function tips(){
   $('#p-tips').innerHTML='<div class="leeg">De nieuwstips-wand laadt…</div>';
   try{ const r=await api('redactie/nieuwstips');
-    $('#p-tips').innerHTML='<div class="meta" style="margin-bottom:.6rem;color:var(--muted);">Verhaal-ideeen uit het hele platform: wat leeft er bij de leden (Pulse), wat kondigt het Rijk aan, en wat hebben de ontwerpbureaus uitgewerkt (de Ideeenkamer).</div>'
+    $('#p-tips').innerHTML='<div class="meta" style="margin-bottom:0.5rem;color:var(--muted);">Verhaal-ideeen uit het hele platform: wat leeft er bij de leden (Pulse), wat kondigt het Rijk aan, en wat hebben de ontwerpbureaus uitgewerkt (de Ideeenkamer).</div>'
       +(r.tips.length?r.tips.map(t=>'<div class="item tip"><h4>'+esc(t.icoon)+' '+esc(t.bron)+'</h4><div class="meta">'+esc(t.tip)+'</div></div>').join(''):'<div class="leeg">Nog geen tips; het platform is stil.</div>');
   }catch(e){ $('#p-tips').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; }
 }

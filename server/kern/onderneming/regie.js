@@ -65,9 +65,10 @@ const MAX_PROMILLE = 50;   // ten hoogste 5,0% -- in promille, zodat 2,5% exact 
 
 module.exports = ({ db, save }) => {
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/onderneming/regie', bezit: { ondernemersregie: 'kaart' } });
+
   function d() {
-    if (!db.data.ondernemersregie || typeof db.data.ondernemersregie !== 'object') db.data.ondernemersregie = {};
-    const r = db.data.ondernemersregie;
+    const r = eigen.bak('ondernemersregie');
     if (!STANDEN.includes(r.provisioning)) r.provisioning = 'mens';
     if (!r.bijdrage || typeof r.bijdrage !== 'object') r.bijdrage = {};
     const b = r.bijdrage;

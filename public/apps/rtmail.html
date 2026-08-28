@@ -206,7 +206,7 @@ async function laadInbox(){
     '</div>'+
     '<div class="zoekrij"><input class="vld" id="zoekVeld" placeholder="Zoek in je eigen postvak" maxlength="120" value="'+esc(ZOEK)+'">'+
     '<button class="knp" id="zoekKnp">Zoek</button>'+(ZOEK?'<button class="knp" id="zoekAf">Wissen</button>':'')+'</div>'+
-    (ZOEK?'<div class="noot" style="margin:0 0 .8rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
+    (ZOEK?'<div class="noot" style="margin:0 0 0.75rem;text-align:left;">'+(d.aantal||0)+' resultaat/resultaten voor "'+esc(ZOEK)+'". Zoeken blijft binnen je eigen postvak.</div>':'');
   $('#main').innerHTML = kaart + balk + (LIJST.length ? (
     '<button class="ai-knop" id="vatSamen">Rahul vat je postvak samen</button>'+
     LIJST.map((m,i)=>
@@ -235,7 +235,7 @@ async function teamsErbij(){
       '<button class="rij" data-team="'+esc(t.id)+'"><span class="ic">'+esc((t.naam||'?').slice(0,1).toUpperCase())+'</span>'+
       '<span class="b"><span class="nm">'+esc(t.naam)+'</span><span class="lt adr">'+esc(t.adres)+'</span></span>'+
       '<span class="tijd">'+t.aantalLeden+(t.aantalLeden===1?' persoon':' mensen')+'</span></button>').join('')
-      || '<div class="noot" style="margin:0 0 .6rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
+      || '<div class="noot" style="margin:0 0 0.5rem;text-align:left;">Nog geen team. Een team is handig zodra post niet aan jou is maar aan een functie - de receptie, de boekhouding.</div>')+
     '<button class="ai-knop" id="tNieuw" style="margin-bottom:0;">Team oprichten</button>';
   $('#main').appendChild(wrap);
   wrap.querySelectorAll('[data-team]').forEach(b=>b.addEventListener('click',()=>openTeam(b.dataset.team)));

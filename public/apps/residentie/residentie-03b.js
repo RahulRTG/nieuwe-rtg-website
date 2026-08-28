@@ -31,7 +31,7 @@
     $('#spelKeuze').innerHTML = '<h2>Wie daagt u uit?</h2><div class="sub">' +
       esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</div>' +
       anderen.map(l => '<button class="rij-item" data-daag="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">daag uit</span></button>').join('') +
-      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#spelLaag').classList.add('open');
     $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', () => kiesSpel(b.dataset.daag)));
@@ -117,7 +117,7 @@
         '<div class="sub">' + (d.uitslag.samen
           ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
           : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
-        '<p style="margin:.6rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
+        '<p style="margin:0.5rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
         (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
@@ -133,7 +133,7 @@
     if (d.kind === 'spel-uitnodiging') {
       $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
         '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
         '<button class="knop2 h-flex1" id="spelJa" type="button">Graag</button>' +
         '<button class="knop2 stil2 h-flex1" id="spelNee" type="button">Nu even niet</button></div>';
       $('#spelLaag').classList.add('open');

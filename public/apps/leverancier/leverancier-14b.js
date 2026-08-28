@@ -9,7 +9,7 @@
                 : (d.status !== 'gestopt' ? '<button class="obtn ghost" data-synstop="'+d.id+'">'+T('sy.stop','Stop')+'</button>' : ''))+
               '</div>';
           }).join('')+
-          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.6rem;align-items:center;">'+
+          '<div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">'+
             '<input id="synNaam" placeholder="'+T('sy.naam','Naam van de deal')+'" style="flex:2;min-width:9rem;">'+
             '<input id="synPartner" placeholder="'+T('sy.partner','Partnercode (bijv. SAKURA)')+'" style="flex:1;min-width:7rem;">'+
             '<input id="synPrijs" inputmode="decimal" placeholder="'+T('sy.prijs','Totaal EUR')+'" style="width:6.5rem;">'+
@@ -41,7 +41,7 @@
         html += werkvensterBlokHtml(inst);
         const maxD = Math.max.apply(null, b.week.map(d => d.omzet).concat([1]));
         html += '<div class="tkc"><h3>'+T('bz.weekh','Omzet per dag')+'</h3>'+
-          '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.4rem;">'+
+          '<div style="display:flex;align-items:flex-end;gap:0.45rem;height:120px;margin-top:0.5rem;">'+
           b.week.map((d, i) =>
             '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0.2rem;height:100%;min-width:0;">'+
             '<span style="font-size:0.54rem;color:var(--soft);white-space:nowrap;">'+(d.omzet?eur(d.omzet):'·')+'</span>'+

@@ -52,6 +52,8 @@
 
     /* --- huis, tafel & goede leven --- */
     ontdek: '<path d="M12 6.6C10.4 5.4 7.9 4.9 5 5.1v11.8c2.9-.2 5.4.3 7 1.5 1.6-1.2 4.1-1.7 7-1.5V5.1c-2.9-.2-5.4.3-7 1.5z"/><path d="M12 6.6v11.8"/>',
+    /* RTG Commerce: een draagtas -- wat je bij elkaar hebt staan, over verkopers heen. */
+    commerce: '<path d="M4.6 7.4h14.8l-1.6 12.2H6.2z"/><path d="M9.2 7.4V5.6a2.8 2.8 0 0 1 5.6 0v1.8"/>',
     vrienden: '<path d="M4 6.6A2 2 0 0 1 6 4.6h9.5a2 2 0 0 1 2 2v4.6a2 2 0 0 1-2 2H8.6L4 16.8z"/>',
     entourage: '<circle cx="9" cy="8.8" r="3"/><path d="M3.6 18.6a5.4 5.4 0 0 1 10.8 0M16 6.4a3 3 0 0 1 0 5.8M15.6 18.6a5.4 5.4 0 0 0-.9-3"/>',
     office: '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.6 14.5v3M12 11v6.5M15.4 8.5v9"/>',

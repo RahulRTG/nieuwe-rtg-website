@@ -16,22 +16,28 @@
     const el = $('#scPin'); if (!el) return;
     el.innerHTML =
       '<div class="sc-pin-mijn">' +
-        '<div class="sc-pin-kop"><span>' + T('pin.mijn','Jouw pin') + '</span>' +
-          '<b id="scPinCode">' + (mijnPin ? escT(mijnPin.toon) : '····-····') + '</b></div>' +
+        '<div class="sc-pin-kop"><span>' + T('pin.mijn','Jouw RTG PIN') + '</span>' +
+          '<b id="scPinCode">' + (mijnPin ? escT(mijnPin.toon) : '·····-·····') + '</b>' +
+          '<em id="scPinStatus" class="sc-pin-status">' + T('pin.veilig','beveiligd adres') + '</em></div>' +
+        '<div class="sc-pin-belofte">' + T('pin.belofte','Je RTG PIN wijst je aan, maar geeft nooit toegang tot je account, geld of documenten.') + '</div>' +
         '<div class="sc-pin-akt">' +
+          '<button id="scPinLive" class="aanbevolen">' + T('pin.live','Tijdelijke QR') + ' · ' + T('pin.aanbev','aanbevolen') + '</button>' +
           '<button id="scPinKopie">' + T('pin.kopieer','Kopieer') + '</button>' +
-          '<button id="scPinQr">' + T('pin.qr','Toon QR') + '</button>' +
+          '<button id="scPinQr">' + T('pin.qr','Vaste QR') + '</button>' +
           '<button id="scPinNieuw">' + T('pin.nieuw','Nieuwe pin') + '</button>' +
-          '<button id="scPinLive">' + T('pin.live','Live code') + '</button>' +
           '<button id="scPinUit">' + (mijnPin && mijnPin.uit ? T('pin.aan','Pin aanzetten') : T('pin.uit','Pin uitzetten')) + '</button>' +
+          '<button id="scPinNood" class="gevaar">' + T('pin.nood','Noodslot') + '</button>' +
         '</div>' +
         '<img id="scPinQrBeeld" alt="' + T('pin.qralt','QR-code met jouw pin') + '" hidden>' +
         '<div id="scPinLiveDoek" hidden></div>' +
         '<div id="scPinUitNoot" class="sc-pin-noot"' + (mijnPin && mijnPin.uit ? '' : ' hidden') + '>' +
           T('pin.uitnoot','Je vaste pin staat uit: niemand kan je er nog mee toevoegen. Een live code werkt wel: die houd je bewust op.') + '</div>' +
+        '<div id="scPinNoodNoot" class="sc-pin-noot alarm" hidden>' +
+          T('pin.noodnoot','Noodslot actief: vaste én tijdelijke PIN-handelingen zijn geblokkeerd. Bestaande vrienden blijven behouden.') + '</div>' +
+        '<div id="scPinHistorie" class="sc-pin-historie"></div>' +
       '</div>' +
       '<div class="sc-zoek open">' +
-        '<input id="scPinIn" maxlength="12" autocapitalize="characters" spellcheck="false" placeholder="' + T('pin.ph','Pin van de ander, bijv. 7K2M-9XPQ') + '">' +
+        '<input id="scPinIn" maxlength="13" autocapitalize="characters" spellcheck="false" placeholder="' + T('pin.ph','RTG PIN, bijv. 7K2M9-XPQH3') + '">' +
         '<button id="scPinGo">' + T('pin.zoek','Zoek') + '</button>' +
         '<button id="scPinScan" class="grijs">' + T('pin.scan','Scan') + '</button>' +
       '</div>' +
@@ -41,6 +47,7 @@
     $('#scPinNieuw').addEventListener('click', pinNieuw);
     $('#scPinLive').addEventListener('click', pinLiveWissel);
     $('#scPinUit').addEventListener('click', pinUitWissel);
+    $('#scPinNood').addEventListener('click', pinNoodslotWissel);
     $('#scPinGo').addEventListener('click', () => pinOpzoeken($('#scPinIn').value));
     $('#scPinScan').addEventListener('click', pinScanOpen);
     $('#scPinIn').addEventListener('keydown', e => { if (e.key === 'Enter') pinOpzoeken($('#scPinIn').value); });
@@ -160,9 +167,9 @@
     try { d = await API.call('/member/pin/zoek', { pin }); }
     catch(e){ res.innerHTML = pinMelding(e.message); return; }
     res.innerHTML = pinRegel(d.codename, d.status,
-      '<button data-pinvz="' + escT(pin) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>');
+      '<button data-pinvz="' + escT(pin) + '" data-pinbevestig="' + escT(d.bevestiging) + '">' + T('sal.verzoek','Verzoek sturen') + '</button>');
     const b = res.querySelector('[data-pinvz]');
-    if (b) b.addEventListener('click', () => pinVerbinden(b.dataset.pinvz));
+    if (b) b.addEventListener('click', () => pinVerbinden(b.dataset.pinvz, b.dataset.pinbevestig));
   }
   /* stap 2: en nu pas versturen -- omdat een mens erop drukte.
 
@@ -172,10 +179,9 @@
      is dan al weg. De regel zelf werken we hieronder bij; een verstuurd verzoek
      verandert aan de vriendenlijst nog niets, dus er valt ook niets te
      verversen. Zoeken op codenaam doet het om dezelfde reden zo. */
-  async function pinVerbinden(pin){
-    try { await API.call('/member/pin/connect', { pin }); }
+  async function pinVerbinden(pin, bevestiging){
+    try { await API.call('/member/pin/connect', { pin, bevestiging }); }
     catch(e){ toast(e.message); return; }
     toast(T('sal.verzonden','Verzoek verstuurd.'));
     await pinOpzoeken(pin);
   }
-

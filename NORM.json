@@ -1,36 +1,36 @@
 {
-  "vastgelegd": "2026-08-27",
+  "vastgelegd": "2026-08-28",
   "meters": {
-    "endpointsZonderTest": 1173,
-    "dekkingPct": 73,
+    "endpointsZonderTest": 1038,
+    "dekkingPct": 78,
     "keuringStuk": 0,
-    "keuringScheef": 34,
+    "keuringScheef": 19,
     "dependencies": 0,
-    "testbestanden": 982,
+    "testbestanden": 1235,
     "dekkingWaargenomenPct": 100,
-    "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 139,
-    "keuringOmvang": 378,
-    "keuringDubbeling": 383,
-    "keuringDekkingAdvies": 56,
+    "zelfpoortendeToetsen": 18,
+    "e2eBestanden": 174,
+    "keuringOmvang": 233,
+    "keuringDubbeling": 145,
+    "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
-    "keuringTeGroot": 26,
-    "inlineStijlAttributen": 4954,
-    "browserpoortToetsen": 211,
-    "kernBreedte": 1494,
-    "kernGedeeld": 209,
+    "keuringTeGroot": 17,
+    "inlineStijlAttributen": 4973,
+    "browserpoortToetsen": 265,
+    "kernBreedte": 1501,
+    "kernGedeeld": 212,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 386,
-    "toetsenOngevoeligPct": 1.8,
+    "toetsenNietGemeten": 426,
+    "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 43,
-    "metingenZonderRatel": 23,
+    "ratelTanden": 51,
+    "metingenZonderRatel": 31,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
@@ -43,11 +43,144 @@
     "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 16475,
     "bewijsAchterstand": 989,
-    "schermenZonderVormtaal": 184,
-    "dbDeuren": 600,
-    "dbDeurenSchrijvend": 370
+    "schermenZonderVormtaal": 181,
+    "dbDeuren": 507,
+    "dbDeurenSchrijvend": 269
   },
   "notities": [
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "endpointsZonderTest",
+      "van": 1019,
+      "vervalt": "2026-11-30",
+      "meter": "endpointsZonderTest 1019 -> 1043",
+      "reden": "Twintig gelijktijdig geopende feature-PRs zijn als een verzameling geïntegreerd. Samen voegen ze meer routes dan routedekking toe, hoewel het aantal testbestanden tegelijk van 1178 naar 1235 stijgt. De nieuwe grondwaarde maakt de gezamenlijke branch mergeerbaar zonder te doen alsof de oude hoofdbranch al deze routes bevatte; aflossen is de ontbrekende routes in bestaande of nieuwe integratietests opnemen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 13,
+      "vervalt": "2026-11-30",
+      "meter": "keuringScheef 13 -> 19",
+      "reden": "De verzameling van twintig PRs brengt zes extra scheve keuringsbevindingen mee die afzonderlijk niet tegen deze gezamenlijke stand zijn gemeten. De volledige harde check blijft groen; deze adviesschuld wordt afgelost door de zes vindplaatsen uit npm run keuring te herstellen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 220,
+      "vervalt": "2026-11-30",
+      "meter": "keuringOmvang 220 -> 233",
+      "reden": "Dertien bestanden uit de samengevoegde featurelagen zijn in de waarschuwingsband onder 10 kB beland. Het onverwacht grote idempotentiebestand is in deze integratie al teruggebracht tot 9918 bytes; de resterende band vraagt knippen op inhoudelijke naden in een aparte onderhoudsronde."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "keuringTeGroot",
+      "van": 10,
+      "vervalt": "2026-11-30",
+      "meter": "keuringTeGroot 10 -> 17",
+      "reden": "Zeven modules uit de twintig feature-PRs overschrijden in de gezamenlijke meting de 10 kB-grens. De projectcheck benoemt de actuele uitzonderingen en geen onverwacht bestand; aflossen is elk bestand op zijn bestaande domeinnaad splitsen, niet code verwijderen om de teller te sparen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "keuringDubbeling",
+      "van": 142,
+      "vervalt": "2026-11-30",
+      "meter": "keuringDubbeling 142 -> 145",
+      "reden": "Drie functienamen uit onafhankelijk gebouwde PRs komen na de gezamenlijke merge in meer dan twee kernmodules voor. De eerstvolgende onderhoudsronde moet per naam bepalen of hernoemen of één gedeelde implementatie de juiste oplossing is."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "keuringDekkingAdvies",
+      "van": 52,
+      "vervalt": "2026-11-30",
+      "meter": "keuringDekkingAdvies 52 -> 54",
+      "reden": "Twee nieuwe domeinen uit de geïntegreerde PRs hebben nog endpoints zonder domeingerichte toets. De generieke route-, poort- en compilecontroles zijn groen; aflossen is voor beide domeinen een gedragstest toevoegen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 489,
+      "vervalt": "2026-11-30",
+      "meter": "dbDeuren 489 -> 507",
+      "reden": "De nieuwe kantoor-, commerce-, kosten- en wereldlagen uit de twintig PRs voegen achttien rechtstreekse lezers van db.data toe. De eigenaarscontrole over 177 collecties is groen; aflossen is deze lezers via hun bestaande opslagdeuren laten lopen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 259,
+      "vervalt": "2026-11-30",
+      "meter": "dbDeurenSchrijvend 259 -> 269",
+      "reden": "Tien van de nieuwe rechtstreekse datadeuren schrijven. De collectie-eigenaarscheck bewijst dat ze niet in andermans collectie schrijven, maar de opslagcontracten horen deze mutaties uiteindelijk zelf te dragen."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "meter": "kernBreedte 1494 -> 1501; kernGedeeld 209 -> 212",
+      "waarheen": "GRENZEN.json en de groene bedradingscontrole in npm run check, waar alle nieuwe kernnamen per domein begrensd en tegen echte exports gecontroleerd worden",
+      "reden": "De twintig feature-PRs voegen zeven routezichtbare kernnamen toe; drie bestaande namen worden nu door een extra domein gedeeld. Dit is de gemeten functieprijs van de nieuwe kantoor-, kosten-, commerce- en wereldlagen. De integratie heeft ontbrekende grensnamen aangevuld en de controle bevestigt 1501 gebruikte kernnamen zonder ongebruikte destructurering."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 386,
+      "vervalt": "2026-11-30",
+      "meter": "toetsenNietGemeten 386 -> 426",
+      "reden": "Veertig nieuwe toetsbestanden uit de samengevoegde PRs zijn nog niet door de urenlange mutatiemotor gehaald. De gewone en gerichte integratietests zijn groen; aflossen is een volledige npm run mutatie over deze hoofdbranchstand."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "zelfpoortendeToetsen",
+      "van": 17,
+      "vervalt": "2026-11-30",
+      "meter": "zelfpoortendeToetsen 17 -> 18",
+      "reden": "Eén nieuwe integratietest vraagt een externe dienst en slaat zichzelf zonder die dienst over. Hij staat in de gespecialiseerde draaier; aflossen is de benodigde dienst standaard in de relevante CI-scherf aanbieden."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "schermenZonderVormtaal",
+      "van": 179,
+      "vervalt": "2026-11-30",
+      "meter": "schermenZonderVormtaal 179 -> 181",
+      "reden": "Twee nieuwe schermen uit de feature-PRs sluiten de tokenlaag nog niet in. Alle 276 schermen halen de statische 9+-basis en toegankelijkheidscontrole; aflossen is deze twee schermen op de gedeelde vormtaal aansluiten."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "inlineStijlAttributen",
+      "van": 4954,
+      "vervalt": "2026-11-30",
+      "meter": "inlineStijlAttributen 4954 -> 4973",
+      "reden": "De nieuwe premium schermen brengen netto negentien inline stijlattributen mee. Aflossen is herhaalde maten naar de bestaande hulpklassen verplaatsen en eenmalige componentvormen in lokale stijlblokken zetten."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 23,
+      "vervalt": "2026-11-30",
+      "meter": "metingenZonderRatel 23 -> 31",
+      "reden": "Acht nieuwe meetregisters uit de geïntegreerde PRs hebben nog geen ratel die verslechtering blokkeert. Aflossen is per register een richting, grondwaarde en ijkproef toevoegen via scripts/lib/metingen.js."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "waarheen": "GRENZEN.json, waar de twee nieuwe domeinen (kosten, economie) hun kern-namen opgeschreven hebben staan",
+      "meter": "kernBreedte 1494 -> 1496, kernGedeeld 209 -> 210, dbDeuren 600 -> 605, dbDeurenSchrijvend 370 -> 372 (de kostprijslaag erbij, gemeten)",
+      "reden": "Twee kern-eigenschappen erbij en geen negentien: kern.kosten en kern.economie, allebei EEN ingang voor een hele laag. De vijf deuren naar db zijn de huisrekening, de tellerstand, de tarieven, de periodes en het relatieregister van de firewall -- van die vijf schrijven er twee (de nota en de vrijgave), en dat is precies de scheiding die KOSTEN.md eist: de meter houdt tellers, een mens boekt. Geen erosie maar de prijs van een laag die er niet was; wie hem terugdraait, draait de vraag \"wat kost deze gebruiker ons\" terug."
+    },
     {
       "datum": "2026-08-21",
       "soort": "schuld",
@@ -1123,25 +1256,36 @@
     "doorvoerPerSec": 336,
     "eventLoopP99Ms": 97.9,
     "herstelSeconden": 1,
-    "verhalenSlaagPctStorm": 76.4,
+    "verhalenSlaagPctStorm": 100,
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-05T14:32:44.570Z",
+  "prestatieGemeten": "2026-08-18T13:48:25.300Z",
   "prestatieKalibratie": 13.3,
   "vervalregel": {
     "vanaf": "2026-08-21",
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-08-18",
-    "testbestanden": "2026-08-18",
+    "keuringOmvang": "2026-08-28",
+    "testbestanden": "2026-08-28",
     "toetsenNietGemeten": "2026-08-18",
     "inlineStijlAttributen": "2026-08-18",
-    "ratelTanden": "2026-08-18",
+    "ratelTanden": "2026-08-28",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-08-22",
-    "toetsenOngevoeligPct": "2026-08-22"
+    "toetsenOngevoeligPct": "2026-08-28",
+    "endpointsZonderTest": "2026-08-28",
+    "dekkingPct": "2026-08-28",
+    "keuringScheef": "2026-08-28",
+    "keuringTeGroot": "2026-08-28",
+    "keuringDubbeling": "2026-08-28",
+    "keuringDekkingAdvies": "2026-08-28",
+    "dbDeuren": "2026-08-28",
+    "dbDeurenSchrijvend": "2026-08-28",
+    "browserpoortToetsen": "2026-08-28",
+    "e2eBestanden": "2026-08-28",
+    "schermenZonderVormtaal": "2026-08-28"
   },
   "uitzonderingen": [
     {
@@ -1389,6 +1533,84 @@
       "pad": "public/shared/linkkaart.js",
       "vervalt": "2026-10-01",
       "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/commerce.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de 13 eenmalige stijlattributen gaan naar componentklassen bij het aflossen van COMMERCE.md"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/kosten.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; het ene attribuut verhuist naar de gedeelde kostprijs-tekenlaag"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier-commerce.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes eenmalige stijlattributen gaan naar de commerce-stijlkop"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier/leverancier-56a.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes schermspecifieke attributen worden bij de volgende leveranciersbundelknip klassen"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/accounts/users.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #123/#131; de wachtwoordzaaiing wordt als eigen accountmodule afgesplitst"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/fiscaal/index.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #120/#129; de commerce-fiscale regels krijgen een eigen fiscaal deelbestand"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/magnaatwereld.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de al te grote Magnaatwereld groeide 41 bytes en wordt langs de bestaande wereldkamers verder gesplitst"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/vergeten.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #106/#132; duurzame privacywissing verhuist naar een eigen vergeetregister"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/diensten2.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijsdiensten worden in een derde dienstenkamer aangesloten"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/kernlaag4.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; de economische besturingslaag krijgt een eigen kernlaagdeel"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/leverancierpoort.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijs- en gezagsroutes worden naar een leverancierspoortdeel verplaatst"
+    },
+    {
+      "regel": "nieuw-endpoint-zonder-toets",
+      "pad": "server/routes/appstore/persoon.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere makerstak van PR #126; de vier lees- en intrekpaden krijgen expliciete HTTP-contracttoetsen naast de bestaande kern- en schermtoetsen"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/grafsteen.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de proef vereist bewust PostgreSQL, draait in CI met die dienst en blijft lokaal expliciet overgeslagen tot de standaarddraaier PostgreSQL start"
     }
   ]
 }

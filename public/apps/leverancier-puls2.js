@@ -23,7 +23,7 @@
   function teken(w, plan, blik, ctx) {
     var esc = ctx.esc, T = ctx.T;
     var h = '<div class="st-sec h-mt120">' + T('dp.kop', 'Het draaiboek van vandaag') + '</div>';
-    h += '<div class="sub" style="border-left:2px solid var(--gold);padding:0.3rem 0 0.3rem 0.7rem;margin-bottom:0.55rem;">' + esc(plan.advies) + '</div>';
+    h += '<div class="sub" style="border-left:2px solid var(--gold);padding:0.3rem 0 0.3rem 0.7rem;margin-bottom:0.5rem;">' + esc(plan.advies) + '</div>';
     h += plan.taken.map(function (t2) {
       var p = PRIO[t2.prio] || PRIO[3];
       return '<div style="display:flex;align-items:center;gap:0.55rem;border:1px solid var(--line);border-radius:0;padding:0.45rem 0.6rem;margin-top:0.4rem;' + (t2.klaar ? 'opacity:0.45;' : '') + '">' +
@@ -39,7 +39,7 @@
           '<b style="display:block;font-size:0.95rem;">' + d2.n + '</b></div>';
       }).join('') + '</div>';
       var druk = blik.dagen.filter(function (d2) { return d2.n; });
-      if (druk.length) h += '<div class="sub" style="margin-top:0.45rem;line-height:1.5;">' + druk.map(function (d2) {
+      if (druk.length) h += '<div class="sub" style="margin-top:0.5rem;line-height:1.5;">' + druk.map(function (d2) {
         return '<b>' + esc(d2.dag) + '</b> ' + esc(d2.items.join(' · '));
       }).join('<br>') + '</div>';
     }
@@ -76,12 +76,12 @@
 
   function rapport(plan, blik, ctx) {
     var esc = ctx.esc, naam = (ctx.S && ctx.S.name) || 'De zaak';
-    var kop = function (s) { return '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.6rem 0 0.5rem;">' + s + '</h2>'; };
+    var kop = function (s) { return '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">' + s + '</h2>'; };
     var h = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc(naam) + '</title></head>' +
       '<body style="font-family:Georgia,serif;color:#0C0C0B;max-width:46em;margin:2.5em auto;line-height:1.6;">' +
       '<div id="pwrap" style="text-align:right;"><button id="pbtn" type="button" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +
       '<style>@media print { #pwrap { display:none; } }</style>' +
-      '<h1 style="font-size:1.6rem;margin-bottom:0.2rem;">' + esc(naam) + '</h1>' +
+      '<h1 style="font-size:1.6rem;margin-bottom:0.25rem;">' + esc(naam) + '</h1>' +
       '<p style="color:#8A8680;margin-top:0;">Draaiboek · ' + new Date().toLocaleDateString('nl-NL') + '</p>' +
       '<p style="border-left:3px solid #857007;padding-left:0.8em;color:#4D4A45;">' + esc(plan.advies) + '</p>' +
       kop('De taken van vandaag') +

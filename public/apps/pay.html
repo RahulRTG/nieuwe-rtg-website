@@ -342,7 +342,7 @@ $('#tStuur').addEventListener('click', async () => {
   const los = $('#tAan').value.split(',').map(x => x.trim()).filter(Boolean);
   const aan = [...new Set([...gekozen, ...los])];
   try {
-    const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked });
+    const r = await api('pay/verzoek', { aan, totaalCenten: totaal, oms: $('#tOms').value, splitsMetMij: $('#tSplits').checked, idem: idem() });
     meld('Klompje staat uit: ' + euro(r.perPersoon) + ' eur per persoon.');
     $('#tBedrag').value = ''; $('#tOms').value = ''; $('#tAan').value = '';
     gekozen.clear();

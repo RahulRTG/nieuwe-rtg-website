@@ -29,6 +29,7 @@ const os = require('os');
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const { vrijePoort } = require('./helper');
+const { reusePortBeschikbaar } = require('../server/trio-werkers');
 
 const WORTEL = path.join(__dirname, '..');
 const slaap = (ms) => new Promise(r => setTimeout(r, ms));
@@ -136,10 +137,12 @@ test('1. een hard omgelegde poortwachter laat geen enkele server achter', async 
     ' (die houden hun poort vast en laten /api/health 200 geven terwijl de nieuwe poortwachter niets kan starten)');
 });
 
-test('2. ook de voordeurprocessen blijven niet achter', async () => {
+test('2. ook de voordeurprocessen blijven niet achter of vallen draagbaar terug', async () => {
   const t = await trioOp({ voordeuren: 2 });
-  assert.ok(await gezond(t.poort), 'het trio met voordeurprocessen komt op');
-  assert.equal(t.pids.length, 6, 'een hoofd, twee voordeuren en drie servers, gemeten: ' + t.pids.length);
+  assert.ok(await gezond(t.poort), 'het trio met de gevraagde voordeurprocessen komt op');
+  const verwacht = reusePortBeschikbaar() ? 6 : 4;
+  assert.equal(t.pids.length, verwacht,
+    'voordeurprocessen waar SO_REUSEPORT bestaat, anders de draagbare hoofdpoort: ' + t.pids.length);
 
   process.kill(t.kind.pid, 'SIGKILL');
 
@@ -153,7 +156,8 @@ test('3. bij een NETTE afsluiting gaat alles ook weg, en dan hoort het al langer
      opkomt, dan slaagt deze ook -- maar alle drie eisen eerst dat de processen er
      STONDEN. Zo kan "alles is weg" niet groen worden door "er was niets". */
   const t = await trioOp({ voordeuren: 2 });
-  assert.equal(t.pids.length, 6, 'er stonden er echt zes');
+  const verwacht = reusePortBeschikbaar() ? 6 : 4;
+  assert.equal(t.pids.length, verwacht, 'alle ondersteunde processen stonden er echt (' + verwacht + ')');
   t.kind.kill('SIGTERM');
   let over = t.pids;
   for (let i = 0; i < 50; i++) { await slaap(500); over = nogInLeven(t.pids); if (!over.length) break; }

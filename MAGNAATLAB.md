@@ -78,18 +78,18 @@ eigen invariantcontrole — maar die controleert het spel, niet RTG.
 ### De uitkomst
 
 ```
-66 simulatiemodules tegenover 1400 kernmodules in 412 domeinen
+66 simulatiemodules tegenover 1426 kernmodules in 415 domeinen
    magnaat        63 modules
    hospitality     3 modules
 
 1. HET BEREIK
    116 requires in de simulatielaag
-     2 kernmodules geraakt, in 2 van 412 domeinen       (0%)
+     2 kernmodules geraakt, in 2 van 415 domeinen       (0%)
      0 modules doen een netwerkaanroep                  (de ontsnapping wordt niet gebruikt)
      3 aanroepen van de ene synthetische wereld naar de andere
 
 2. DE DUBBELING
-    10 onderwerpen komen aan beide kanten voor (29 paren)
+    12 onderwerpen komen aan beide kanten voor (34 paren)
      0 daarvan delen ook werkelijk een VORM
 ```
 
@@ -102,19 +102,19 @@ niet `kern/facturatie`, niet `kern/appstore`, niet `kern/tenant`.
 
 **En het percentage bewoog niet, wat eerlijker is dan het klinkt.** Dit document
 schreef bij fase 2 op: *"Slaagt dat, dan is de meting hierboven niet meer 0%."*
-Dat klopte niet. Twee van 412 domeinen rondt af op 0%, en één capability is nu
+Dat klopte niet. Twee van 415 domeinen rondt af op 0%, en één capability is nu
 eenmaal geen percentage. Wat er wél veranderde is de **lijst**: `kern/pay` staat
 erin, bij naam, en dat is de bewering die iemand kan natrekken. Een
-verhoudingsgetal over 412 domeinen is te grof om één verbinding te registreren —
+verhoudingsgetal over 415 domeinen is te grof om één verbinding te registreren —
 dat is een eigenschap van de meter en geen tegenvaller, en het staat hier zodat de volgende
 lezer niet naar een bewegend percentage zoekt dat er niet komt.
 
 ### En de tweede helft zegt iets anders dan verwacht
 
 Punt 4 waarschuwt voor `MagnaatPaymentEngine` naast RTG Payment Engine. Die
-zorg is gemeten en **er is geen enkel geval van**. Tien onderwerpen komen aan
+zorg is gemeten en **er is geen enkel geval van**. Twaalf onderwerpen komen aan
 beide kanten voor — `bank`, `handel`, `kaart`, `acties`, `economie` — maar geen
-van de 29 paren deelt een vorm. `magnaat/bank.js` gaat over rente, termijn en
+van de 34 paren deelt een vorm. `magnaat/bank.js` gaat over rente, termijn en
 onderpand van een speler; `kern/bank/` gaat over IBAN, saldo en tenaamstelling.
 
 Dat is precies de uitslag die `PLATFORM.md` bij Cercle en Entourage ook kreeg,
@@ -533,5 +533,5 @@ toevoeging is hij vandaag niet waar:
 > Nothing critical reaches RTG production without first surviving RTG itself —
 > **en wat Magnaat niet aanroept, heeft Magnaat niet overleefd.**
 
-Vandaag is dat 0% van 412 domeinen. Dat getal is de opgave, en het is ook de
+Vandaag is dat 0% van 415 domeinen. Dat getal is de opgave, en het is ook de
 enige eerlijke maat voor de voortgang.

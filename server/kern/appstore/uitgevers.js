@@ -21,6 +21,14 @@
 
 const STATUS_UITGEVER = ['aangevraagd', 'toegelaten', 'geweigerd', 'geschorst'];
 
+/* WAT een uitgever mag staat in een eigen bestand, en dat is geen opdeling om
+   de omvang. Dit bestand beantwoordt "wie mag hier publiceren" -- een vraag over
+   TOELATING, die een mens van RTG beslist. ./uitgevers-bevoegdheid.js
+   beantwoordt "en wat mag hij dan" -- een vraag over BEVOEGDHEID, die uit de
+   soort volgt en die niemand per geval beslist. Twee vragen, twee bestanden. */
+const B = require('./uitgevers-bevoegdheid');
+const { SOORTEN, mensMagUitgeven } = B;
+
 module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
   /* ---------------------------------------------------------------- uitgevers */
 
@@ -32,8 +40,9 @@ module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
      achter een app komt te staan. Een aanvraag die al bestaat, wordt bijgewerkt
      zolang er nog niet over besloten is -- twee aanvragen van dezelfde org zou
      betekenen dat "de uitgever" op twee plekken staat (LAT-regel 4). */
-  function uitgeverAanvragen({ org, naam, contact, leverancier }) {
+  function uitgeverAanvragen({ org, naam, contact, leverancier, soort, persoonKey }) {
     const o = norm(org);
+    const srt = SOORTEN.includes(soort) ? soort : 'rechtspersoon';
     if (!/^[A-Z0-9][A-Z0-9-]{1,30}$/.test(o)) return { status: 400, error: 'Een organisatiecode bestaat uit hoofdletters, cijfers en streepjes.' };
     const nm = String(naam || '').trim().slice(0, 120);
     const ct = String(contact || '').trim().slice(0, 160);
@@ -42,9 +51,15 @@ module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
     const bestaand = uitgever(o);
     if (bestaand && bestaand.status === 'toegelaten') return { status: 200, ok: true, uitgever: publiekU(bestaand), al: true };
     if (bestaand && bestaand.status === 'geschorst') return { status: 403, error: 'Deze uitgever is geschorst. Reden: ' + (bestaand.reden || 'niet vastgelegd') + '.' };
+    /* De SOORT wordt bij het aanmaken gezet en daarna nooit meer, ook niet door
+       een tweede aanvraag: hij bepaalt wat deze uitgever mag (zie
+       magPrijsVragen), en een bevoegdheid die je met een volgend verzoek kunt
+       omzetten is geen bevoegdheid. */
     const u = bestaand && bestaand.status === 'aangevraagd'
       ? Object.assign(bestaand, { naam: nm, contact: ct, leverancier: leverancier || bestaand.leverancier || null, at: nu() })
-      : { org: o, naam: nm, contact: ct, leverancier: leverancier || null, status: 'aangevraagd', reden: null, at: nu(), besloten: null };
+      : { org: o, naam: nm, contact: ct, leverancier: leverancier || null, soort: srt,
+          persoonKey: srt === 'persoon' ? String(persoonKey || '') || null : null,
+          status: 'aangevraagd', reden: null, at: nu(), besloten: null };
     S().uitgevers[o] = u;
     boek('uitgever-aangevraagd', o, leverancier || null, { naam: nm });
     save();
@@ -81,8 +96,74 @@ module.exports = function maakUitgevers({ S, save, nu, boek, eigen, norm }) {
     return { status: 200, ok: true, uitgever: publiekU(u), appsGevallen: gevallen };
   }
 
-  const publiekU = (u) => ({ org: u.org, naam: u.naam, contact: u.contact, status: u.status, reden: u.reden || null, at: u.at, besloten: u.besloten || null });
+  /* DE UITGEVERSPLEK VAN EEN MENS AANVRAGEN. Hij komt hier binnen en niet via
+     uitgeverAanvragen(), om een reden: bij een ZAAK bestaat de organisatiecode
+     al (het tenantregister kent hem), bij een MENS niet -- en hij mag ook niet
+     uit de mens worden afgeleid. Zie uitgeverVanPersoon hieronder.
+
+     Twee keer aanvragen levert dus geen tweede plek: er wordt eerst gekeken of
+     deze mens er al een heeft, en anders wordt er een code gemaakt. */
+  function uitgeverAanvragenPersoon({ persoonKey, naam, contact }) {
+    const k = String(persoonKey || '');
+    if (!k) return { status: 400, error: 'Er is geen sessie om deze uitgeversplek aan te hangen.' };
+    const al = uitgeverVanPersoon(k);
+    return uitgeverAanvragen({ org: al ? al.org : nieuweOrgcode(), naam, contact,
+      soort: 'persoon', persoonKey: k });
+  }
+
+  /* Een WILLEKEURIGE code, en dat is de hele afweging. `publiekU.org` staat in
+     de catalogus bij elke app; zou hij uit het account of de codenaam zijn
+     gebouwd, dan is die publiek. Botsen kan in theorie: dan nog een keer. */
+  function nieuweOrgcode() {
+    for (let poging = 0; poging < 8; poging++) {
+      const code = 'P-' + require('crypto').randomBytes(5).toString('hex').toUpperCase();
+      if (!eigen(S().uitgevers, code)) return code;
+    }
+    /* Acht botsingen op tien willekeurige bytes gebeurt niet; als het toch
+       gebeurt, is er iets anders stuk en dan is stil doorgaan het slechtste
+       antwoord (LAT-regel 5). */
+    throw new Error('Er kon geen vrije organisatiecode worden gemaakt.');
+  }
+
+  /* MAG DEZE UITGEVER GELD VRAGEN? Dit is de ENIGE plek waar die grens staat.
+     Zou hij ook in een route staan, dan is er een tweede plek die op een dag
+     iets anders zegt (LAT-regel 4). De inzendkant roept hem aan; een tweede
+     moment is er niet, want de soort verandert nooit meer. */
+  function magPrijsVragen(org) {
+    const u = uitgever(org);
+    if (!u) return { mag: false, reden: 'Deze organisatie is geen uitgever.' };
+    if (u.soort === 'persoon') {
+      return { mag: false, reden: 'Je publiceert als geverifieerd persoon, en dan is een app gratis. '
+        + 'Een betaalde app vraagt een rechtspersoon: daar hangen de btw, de afdracht en een aanspreekbare partij aan. '
+        + 'Zet prijsCenten op 0, of vraag een uitgeversplek aan vanuit een zaak.' };
+    }
+    return { mag: true };
+  }
+
+  /* De uitgeversplek van een MENS, gezocht op de sleutel van zijn sessie. Niet
+     op een afgeleide code: `publiekU.org` staat in de catalogus bij elke app, en
+     een code die uit het account is gebouwd maakt dat account publiek -- dat is
+     het codenaamontwerp omzeilen (CLAUDE.md). De orgcode is dus willekeurig, en
+     de sleutel staat ernaast in de opslag. */
+  function uitgeverVanPersoon(persoonKey) {
+    const k = String(persoonKey || '');
+    if (!k) return null;
+    return Object.values(S().uitgevers).find(u => u.soort === 'persoon' && u.persoonKey === k) || null;
+  }
+
+  /* `soort` staat er wel in: een lid mag weten of er een bedrijf of een mens
+     achter een app staat. `persoonKey` staat er met opzet NIET in -- dat is de
+     sessiesleutel van een lid, en die hoort nergens publiek te worden. */
+  const publiekU = (u) => ({ org: u.org, naam: u.naam, contact: u.contact, soort: u.soort || 'rechtspersoon',
+    status: u.status, reden: u.reden || null, at: u.at, besloten: u.besloten || null });
   const uitgevers = () => Object.values(S().uitgevers).map(publiekU);
 
-  return { uitgever, magInzenden, uitgeverAanvragen, uitgeverBesluit, publiekU, uitgevers, STATUS_UITGEVER };
+  return { uitgever, magInzenden, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit,
+    publiekU, uitgevers, magPrijsVragen, uitgeverVanPersoon, STATUS_UITGEVER, SOORTEN };
 };
+/* De bevoegdheidskant reist mee naar buiten, zodat een aanroeper maar EEN
+   bestand hoeft te kennen. De regels zelf wonen in ./uitgevers-bevoegdheid.js;
+   dit bestand gaat over TOELATEN en dat is een andere vraag. */
+module.exports.mensMagUitgeven = B.mensMagUitgeven;
+module.exports.SOORTEN = B.SOORTEN;
+module.exports.UITGEVER_LEEFTIJD = B.UITGEVER_LEEFTIJD;

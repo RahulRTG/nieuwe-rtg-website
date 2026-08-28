@@ -23,7 +23,6 @@
    ./sync; hier de pool, het schema, het laden, het luisteren en het afsluiten. */
 
 const { KANAAL } = require('./schrijflanen');
-const klok = require('../lib/klok');
 
 function maakPg({ merge3, kluis, log, url }) {
   const { Pool } = require('../pgwire');
@@ -71,20 +70,52 @@ function maakPg({ merge3, kluis, log, url }) {
     )`);
     await pool.query('CREATE SEQUENCE IF NOT EXISTS kv_ver_seq');
     await pool.query('CREATE INDEX IF NOT EXISTS idx_kv_ver ON kv(ver)');
+    /* DE GRAFSTEEN. Een rij die uit kv VERDWIJNT laat geen spoor na, en dan wint
+       bij de volgende start de verouderde lokale snapshot: de gewiste collectie
+       herrijst en wordt zelfs teruggeschreven. Gemeten en gereproduceerd
+       (TAKEN.md 4.38). Een gewiste collectie blijft daarom als rij STAAN met
+       `weg = true`; elke node die opstart past dat verwijderen dan alsnog toe,
+       ook maanden later en ook als hij die wis nooit heeft gezien. */
+    await pool.query('ALTER TABLE kv ADD COLUMN IF NOT EXISTS weg BOOLEAN NOT NULL DEFAULT false');
   }
 
-  // Laad alle collecties uit Postgres in een gewoon object (of null als leeg).
+  /* Laad alle collecties uit Postgres (of null als de tabel leeg is). Naast de
+     data komen de GRAFSTENEN mee: collecties die bewust zijn gewist. De beller
+     hoort die uit zijn eigen werkkopie te verwijderen -- ze staan hier apart
+     omdat `data` alleen dingen bevat die er WEL zijn, en een lezer die de
+     grafstenen negeert daardoor niets stuk maakt, alleen minder weet. */
   async function laadAlles() {
-    const { rows } = await pool.query('SELECT key, val, ver FROM kv');
+    const { rows } = await pool.query('SELECT key, val, ver, weg FROM kv');
     if (!rows.length) return null;
-    const data = {};
+    const data = {}, grafstenen = [];
     for (const r of rows) {
+      toegepast.set(r.key, Number(r.ver));
+      if (r.weg) { grafstenen.push(r.key); laatsteJson.delete(r.key); continue; }
       const j = uitStore(r.val);
       data[r.key] = JSON.parse(j);
       laatsteJson.set(r.key, j);
-      toegepast.set(r.key, Number(r.ver));
     }
+    Object.defineProperty(data, '__grafstenen', { value: grafstenen, enumerable: false });
     return data;
+  }
+
+  /* Een collectie wissen ZOALS HET HOORT: de rij blijft staan als grafsteen, met
+     een nieuw versienummer zodat de andere instances het via NOTIFY oppikken.
+     `DELETE FROM kv` met de hand doet dit niet -- daarom schrijft RUNBOOK.md die
+     weg af en wijst hij `npm run kvwis` aan. */
+  async function wisCollectie(sleutel) {
+    const { rows } = await pool.query(
+      `UPDATE kv SET val = '', weg = true, ver = nextval('kv_ver_seq'), bijgewerkt = now()
+       WHERE key = $1 AND weg = false RETURNING ver`, [sleutel]);
+    if (!rows.length) return false;
+    /* Wij hebben deze grafsteen per definitie TOEGEPAST -- wij zetten hem. Zonder
+       dit zou onze eigen volgende flush hem als "verse grafsteen van een ander"
+       lezen en elke poging om de naam opnieuw te vullen overslaan. */
+    toegepast.set(sleutel, Number(rows[0].ver));
+    laatsteJson.delete(sleutel); laatsteGrootte.delete(sleutel);
+    laatsteLengte.delete(sleutel); laatsteCheck.delete(sleutel);
+    try { await pool.query('SELECT pg_notify($1, $2)', [KANAAL, sleutel]); } catch (e) {}
+    return true;
   }
 
   // de write-behind flush en het inlezen van andermans wijzigingen (zie ./sync)
@@ -95,58 +126,8 @@ function maakPg({ merge3, kluis, log, url }) {
   // de snelle rijstrook voor de idempotentie-boeken (zie ./sync.js)
   const flushVoorrang = (dataNu) => flush(dataNu, false, VOORRANG);
 
-  /* Eén autoritatieve read-modify-write op een top-level collectie. Dit pad is
-     bedoeld voor gedeelde toestand met een revisiecontract (zoals Magnaat-
-     teamkamers): de gewone write-behind merge kan twee gelijktijdige mutaties
-     wel samenvoegen, maar kan niet voorkomen dat twee instances dezelfde
-     revisie allebei accepteren. Het advisory slot en de rijvergrendeling maken
-     lezen, controleren en schrijven hier één database-transactie.
-
-     `werk` is bewust synchroon. Geen await binnen het slot betekent dat de
-     kritieke sectie klein en controleerbaar blijft. De lokale werkkopie wordt
-     pas NA COMMIT vervangen; bij een fout of rollback lekt dus geen half
-     uitgevoerde mutatie naar db.data of naar een volgende save(). */
-  async function bewerkCollectie(sleutel, dataNu, werk) {
-    if (!sleutel || typeof werk !== 'function') throw new Error('Collectietransactie vereist een sleutel en bewerker.');
-    const client = await pool.connect();
-    let waarde, resultaat, jsonNa, versie = null;
-    try {
-      await client.query('BEGIN');
-      await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [sleutel]);
-      const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [sleutel]);
-      const jsonVoor = huidig.rows.length
-        ? uitStore(huidig.rows[0].val)
-        : JSON.stringify(dataNu[sleutel] == null ? {} : dataNu[sleutel]);
-      waarde = JSON.parse(jsonVoor);
-      resultaat = werk(waarde);
-      if (resultaat && typeof resultaat.then === 'function')
-        throw new Error('De bewerker van een collectietransactie mag niet asynchroon zijn.');
-      jsonNa = JSON.stringify(waarde);
-      if (jsonNa !== jsonVoor) {
-        const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
-        versie = Number(nv.rows[0].v);
-        await client.query(
-          `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
-           ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
-          [sleutel, naarStore(jsonNa), versie]
-        );
-        await client.query('SELECT pg_notify($1, $2)', [KANAAL, sleutel]);
-      } else if (huidig.rows.length) versie = Number(huidig.rows[0].ver);
-      await client.query('COMMIT');
-    } catch (e) {
-      try { await client.query('ROLLBACK'); } catch (x) {}
-      throw e;
-    } finally {
-      client.release();
-    }
-    dataNu[sleutel] = waarde;
-    laatsteJson.set(sleutel, jsonNa);
-    laatsteGrootte.set(sleutel, jsonNa.length);
-    laatsteLengte.set(sleutel, Array.isArray(waarde) ? waarde.length : (waarde && typeof waarde === 'object' ? Object.keys(waarde).length : 0));
-    laatsteCheck.set(sleutel, klok.nu());
-    if (versie != null) toegepast.set(sleutel, versie);
-    return resultaat;
-  }
+  // een autoritatieve read-modify-write op een collectie; zie ./collectietransactie.js
+  const { bewerkCollectie } = require('./collectietransactie')(ctx);
 
   // Luister op NOTIFY zodat wijzigingen van andere instances vrijwel direct
   // binnenkomen (geen puur pollen). De aparte client blijft open staan.
@@ -168,7 +149,7 @@ function maakPg({ merge3, kluis, log, url }) {
   function poolStatus() {
     return { totaal: pool.totalCount, inactief: pool.idleCount, wachtend: pool.waitingCount, max: pool.options.max };
   }
-  return { schema, laadAlles, flush, flushVoorrang, bewerkCollectie, haalNieuwer, luister, sluit, pool, poolStatus,
+  return { schema, laadAlles, wisCollectie, flush, flushVoorrang, bewerkCollectie, haalNieuwer, luister, sluit, pool, poolStatus,
     heeftUitgesteld: () => vlag.uitgesteld,
     _staat: { toegepast, laatsteJson } };
 }

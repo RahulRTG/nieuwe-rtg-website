@@ -5,8 +5,8 @@
    verdwijnen); het lid voegt zelf klantenkaarten, tickets en sleutels
    toe en beheert de eigen portemonnee. Munten zijn een saldo-item per
    zaak: kopen verhoogt, inwisselen verlaagt, en onder nul kan nooit.
-   Opslag per lid in db.data.wallet[key]; maakWallet(state) volgt het
-   vaste kern-patroon.
+   Opslag per lid in de wallet-collectie onder [key]; maakWallet(state) volgt
+   het vaste kern-patroon.
 
    DE FEESTMUNT WERD NIET BETAALD. muntKoop() verhoogde het saldo en gaf een
    `prijs` terug -- en dat was alles: er ging geen boeking langs RTG Pay, er
@@ -29,11 +29,12 @@ const MUNT_PRIJS = 3.5;
 function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
   const nu = () => new Date().toISOString();
   const id = () => 'w' + crypto.randomBytes(5).toString('hex');
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/wallet', bezit: { wallet: 'kaart' } });
 
   function bak(key) {
-    if (!db.data.wallet || typeof db.data.wallet !== 'object') db.data.wallet = {};
-    if (!Array.isArray(db.data.wallet[key])) db.data.wallet[key] = [];
-    return db.data.wallet[key];
+    const w = eigen.bak('wallet');
+    if (!Array.isArray(w[key])) w[key] = [];
+    return w[key];
   }
 
   /* ---- de systeem-kant: een pas erin leggen of weer weghalen ---- */
@@ -52,9 +53,10 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
   function wegBron(key, bron, code) {
     const items = bak(key);
     const voor = items.length;
-    db.data.wallet[key] = items.filter(x => !(x.bron === bron && (!code || x.code === code)));
-    if (db.data.wallet[key].length !== voor) save();
-    return voor - db.data.wallet[key].length;
+    const w = eigen.bak('wallet');
+    w[key] = items.filter(x => !(x.bron === bron && (!code || x.code === code)));
+    if (w[key].length !== voor) save();
+    return voor - w[key].length;
   }
 
   /* ---- de leden-kant ---- */
@@ -76,8 +78,9 @@ function maakWallet({ db, save, crypto, schoon, pay, codenaamVan }) {
   function weg(key, itemId) {
     const items = bak(key);
     const voor = items.length;
-    db.data.wallet[key] = items.filter(x => x.id !== String(itemId || ''));
-    if (db.data.wallet[key].length === voor) return { status: 404, error: 'Dit zit niet in uw wallet.' };
+    const w = eigen.bak('wallet');
+    w[key] = items.filter(x => x.id !== String(itemId || ''));
+    if (w[key].length === voor) return { status: 404, error: 'Dit zit niet in uw wallet.' };
     save();
     return { status: 200, ok: true };
   }

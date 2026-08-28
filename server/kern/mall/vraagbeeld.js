@@ -64,10 +64,11 @@ module.exports = (ctx) => {
   const { db, save } = ctx;
   const { VERDIEPINGEN } = require('./aanbodvorm');
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mall/vraagbeeld', bezit: { mallVraag: 'kaart' } });
   function bak() {
-    if (!db.data.mallVraag || typeof db.data.mallVraag !== 'object') db.data.mallVraag = { weken: {} };
-    if (!db.data.mallVraag.weken) db.data.mallVraag.weken = {};
-    return db.data.mallVraag;
+    const v = eigen.bak('mallVraag');
+    if (!v.weken) v.weken = {};
+    return v;
   }
   // oude weken opruimen; een vraagbeeld is om op te handelen, niet om te bewaren
   function veeg(v) {

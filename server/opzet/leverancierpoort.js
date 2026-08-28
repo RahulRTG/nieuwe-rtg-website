@@ -37,6 +37,9 @@
    ========================================================================== */
 'use strict';
 
+const envelop = require('./envelop');
+const kostenhaak = require('../kern/kosten/haak');
+
 module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
   grootSupplierSync, busGeef, kernGeef }) => {
   const routepoort = require('../kern/commercie/routepoort');
@@ -92,6 +95,10 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
       return res.status(401).json({ error: 'Deze partnerwerkplek is door RTG gesloten.' });
     // Wie is er aan het werk (voor toeschrijving van activiteiten).
     req.actor = { name: sess.actor || 'Beheer', role: sess.staffRole || 'manager', staffId: sess.staffId || null, manager: !!sess.manager, lid: sess.lid || null, lidKey: sess.lidKey || null };
+    envelop.zet(req, { soort: 'medewerker', id: sess.staffId || sess.lidKey || null,
+      naam: sess.actor || null, rol: sess.staffRole || 'manager',
+      tenantSoort: 'zaak', tenantId: req.supplier.code || null,
+      gezagBron: 'zaakrol', gezagBaas: !!sess.manager });
     /* DE PERSOONSEIS. Hier en niet bij de inlog, want dit is het enige keelgat
        waar ELKE supplier-route doorheen moet -- een tweede poort bij /login zou
        de route missen die iemand er later naast bouwt (LAT-regel 5: niets slaat
@@ -113,7 +120,11 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
        DICHTVALT, staat in kern/commercie/routepoort.js. */
     const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path, kern.handhavingSchaduw);
     if (!abo.ok) return res.status(402).json({ error: abo.error, capability: abo.cap, nodig: abo.nodig || null });
-    next();
+
+    // Kostencontext op de ZAAKCODE en NA de abonnementspoort (KOSTEN.md par. 6).
+    const drager = kostenhaak.drager('zaak', req.supplier.code);
+    kostenhaak.meld('verzoek', 1, { drager, pas: 'zaak' });
+    kostenhaak.binnen(drager, next, 'zaak');
   }
 
   /* Mag deze mens werken in een zaak van dit genre? Late binding: de kernlaag

@@ -21,7 +21,7 @@
     d.school.forEach(function (x) {
       // de taalkiezer per kind (taalcode, bijv. en, uk, ar, tr; leeg = alleen NL)
       uit += '<div class="sec">Thuistaal · ' + esc(x.kind.naam) + ' · klas ' + esc(x.klas.code) + '</div><div class="kaart blok">' +
-        '<div class="mini" style="margin-bottom:.4rem;">Kom je uit het buitenland? Zet je eigen taal erbij: je ziet alles dan in twee talen, en het Nederlands leer je er vanzelf bij.</div>' +
+        '<div class="mini" style="margin-bottom:0.5rem;">Kom je uit het buitenland? Zet je eigen taal erbij: je ziet alles dan in twee talen, en het Nederlands leer je er vanzelf bij.</div>' +
         '<div style="display:flex;gap:.4rem;">' +
         '<input class="veld h-flex1" data-taalin="' + esc(x.klas.code) + ':' + esc(x.kind.profielId) + '" value="' + esc(x.taal || '') + '" placeholder="Taalcode (en, uk, ar, tr, ...)" maxlength="5">' +
         '<button class="knop mini" data-taalzet="' + esc(x.klas.code) + ':' + esc(x.kind.profielId) + '">Bewaar</button></div></div>';
@@ -30,10 +30,10 @@
         var v = x.vertaling, blok = '';
         (x.huiswerk || []).forEach(function (h) {
           var t = v.huiswerk[h.id];
-          if (t) blok += '<div style="margin:.3rem 0;"><b>' + esc(h.titel) + '</b><div class="mini">' + esc(v.taal) + ': ' + esc(t.titel) + '</div></div>';
+          if (t) blok += '<div style="margin:0.25rem 0;"><b>' + esc(h.titel) + '</b><div class="mini">' + esc(v.taal) + ': ' + esc(t.titel) + '</div></div>';
         });
         (x.mededelingen || []).forEach(function (m) {
-          if (v.mededelingen[m.id]) blok += '<div style="margin:.3rem 0;">' + esc(m.tekst) + '<div class="mini">' + esc(v.taal) + ': ' + esc(v.mededelingen[m.id]) + '</div></div>';
+          if (v.mededelingen[m.id]) blok += '<div style="margin:0.25rem 0;">' + esc(m.tekst) + '<div class="mini">' + esc(v.taal) + ': ' + esc(v.mededelingen[m.id]) + '</div></div>';
         });
         if (blok) uit += '<div class="sec">In twee talen · ' + esc(x.kind.naam) + '</div><div class="kaart blok">' + blok +
           '<div class="mini">Het Nederlands blijft altijd staan: naast elkaar lezen is hoe je het erbij leert.</div></div>';

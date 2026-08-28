@@ -69,8 +69,9 @@
 const VENSTER_MS = 5000;
 
 /* De wereld-routes van de samenvoegronde staan in ./idemsleutels-werelden.js
-   (zelfde register, eigen bestand -- zie de kop daar); hieronder komen ze er
-   via Object.assign bij, zodat er maar EEN opzoekweg bestaat. */
+   en de kostprijslaag in ./idemsleutels-kosten.js (zelfde register, eigen
+   bestand -- zie de kop daar); hieronder komen ze er via Object.assign bij,
+   zodat er maar EEN opzoekweg bestaat. */
 const SLEUTELS = {
   /* ---- geverifieerd: de body draagt de identiteit van wat er gemaakt wordt ----
 
@@ -150,7 +151,9 @@ function sleutelVoor(methode, pad) {
    loopt is geen controle. */
 Object.assign(SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
-  require('./idemsleutels-geld').SLEUTELS);
+  require('./idemsleutels-geld').SLEUTELS,
+  require('./idemsleutels-kosten').SLEUTELS,
+  require('./idemsleutels-commerce').SLEUTELS);
 
 /* De verklaring nakijken bij het laden: een `nietIdempotent` zonder reden is
    geen verklaring maar een ontsnapping, en een lege veldenlijst zegt niets. */

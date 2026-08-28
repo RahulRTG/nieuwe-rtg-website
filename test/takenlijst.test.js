@@ -30,7 +30,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { definities, dubbelingen, losseVerwijzingen } = require('../scripts/lib/takenlijst.js');
+const { definities, dubbelingen, losseVerwijzingen, openPerParagraaf, gemeldeTelling } = require('../scripts/lib/takenlijst.js');
 
 const WORTEL = path.join(__dirname, '..');
 const LIJST = path.join(WORTEL, 'TAKEN.md');
@@ -69,6 +69,30 @@ test('de lijst zegt wanneer hij is bijgewerkt', () => {
   assert.ok(!Number.isNaN(Date.parse(m[1])), 'de datum is geen datum: ' + m[1]);
 });
 
+/* DE TELLING IN DE KOP KLOPT MET DE LIJST ZELF.
+
+   Bovenaan TAKEN.md staat hoeveel regels er openstaan, per paragraaf. Dat is de
+   eerste zin die een lezer gebruikt om te beslissen waar hij begint, en tot 23
+   augustus 2026 was hij fout: er stond "zesentachtig" terwijl het er
+   vierennegentig waren, en zes daarvan waren al af maar niet doorgestreept. Geen
+   van beide fouten viel op, want niemand telde na.
+
+   Deze toets telt na. Hij dwingt niets af over de INHOUD van de lijst -- alleen
+   dat het getal in de kop hetzelfde zegt als de tabellen eronder. */
+test('de telling in de kop klopt met wat er in de lijst staat', () => {
+  const bron = lees();
+  const gemeld = gemeldeTelling(bron);
+  assert.ok(gemeld, 'TAKEN.md draagt geen telling in de vorm "**Open: 78** -- §1 11, §2 9, ..."');
+
+  const werk = [...openPerParagraaf(bron)].filter(([sectie]) => sectie !== '6');
+  assert.deepEqual([...gemeld.per], werk,
+    'de telling bovenaan loopt uit de pas met de tabellen eronder. Tel opnieuw, ' +
+    'of streep de regels door die af zijn -- een afgeronde regel die zijn ' +
+    'doorstreping mist, telt mee als werk dat er niet meer is.');
+  assert.equal(gemeld.totaal, werk.reduce((som, [, n]) => som + n, 0),
+    'het totaal is niet de som van de paragrafen');
+});
+
 /* DE TEGENPROEVEN. Zonder deze zou de eerste toets ook slagen op een zeef die
    niets vindt -- een lege verzameling heeft nooit een dubbeling. */
 test('DE TEGENPROEF: de zeef ziet echt regels, in beide vormen', () => {
@@ -99,4 +123,29 @@ test('DE TWEEDE TEGENPROEF: een tabel buiten een genummerde paragraaf telt niet 
   ].join('\n');
   assert.deepEqual(dubbelingen(namaak), [], 'de aanhaling bovenaan telt niet als tweede definitie');
   assert.equal(definities(namaak).get('4.1').length, 1);
+});
+
+test('DE DERDE TEGENPROEF: de telling ziet het verschil tussen open en doorgestreept', () => {
+  /* Zonder deze zou de telling-toets ook slagen op een teller die alles telt,
+     of op een die niets telt: in beide gevallen zijn kop en lijst het eens. */
+  const namaak = [
+    '## 4. Verzonnen',
+    '| 4.1 | open |',
+    '| 4.2 | ook open |',
+    '| ~~4.3~~ | ~~af, telt niet als werk~~ |',
+    '## Tussenkop zonder nummer',
+    '| 4.1 | een aanhaling, geen regel |',
+    '## 6. Eerlijkheidspunten',
+    '| 6.1 | een paragraaf zonder open regels mag ook bestaan |'
+  ].join('\n');
+  assert.deepEqual([...openPerParagraaf(namaak)], [['4', 2], ['6', 1]],
+    'twee open in 4 (de doorgestreepte niet), en de aanhaling buiten een genummerde paragraaf telt niet mee');
+});
+
+test('DE VIERDE TEGENPROEF: de gemelde telling wordt echt gelezen', () => {
+  const gelezen = gemeldeTelling('wat tekst\n**Open: 78** -- §1 11, §2 9, §3 4, §4 23, §5 31. En verder\n');
+  assert.equal(gelezen.totaal, 78);
+  assert.deepEqual([...gelezen.per], [['1', 11], ['2', 9], ['3', 4], ['4', 23], ['5', 31]]);
+  assert.equal(gemeldeTelling('een lijst zonder telling'), null,
+    'geen telling is null, zodat de toets zakt in plaats van stil nul te tellen');
 });

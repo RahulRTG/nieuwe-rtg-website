@@ -40,7 +40,7 @@
       var isOpen = open && open.kaartId === k.id;
       var h = '<div class="bordkaart" data-bkaart="' + l.id + ':' + k.id + '" style="border:1px solid var(--line);border-left:3px solid ' + kleur + ';border-radius:0;padding:0.5rem 0.65rem;margin-top:0.45rem;cursor:pointer;' + (k.klaar ? 'opacity:0.55;' : '') + '">' +
         '<div style="font-size:0.84rem;line-height:1.4;' + (k.klaar ? 'text-decoration:line-through;' : '') + '">' + (k.klaar ? '✓ ' : '') + esc(k.titel || '(zonder titel)') + '</div>' +
-        ((k.wie || k.voor) ? '<div style="font-size:0.68rem;color:var(--soft,#8A8680);margin-top:0.2rem;">' + esc(k.wie) + (k.wie && k.voor ? ' · ' : '') + esc(k.voor) + '</div>' : '');
+        ((k.wie || k.voor) ? '<div style="font-size:0.68rem;color:var(--soft,#8A8680);margin-top:0.25rem;">' + esc(k.wie) + (k.wie && k.voor ? ' · ' : '') + esc(k.voor) + '</div>' : '');
       if (isOpen && window.RTGOfficeBordPaneel) h += RTGOfficeBordPaneel.html(k, LABELS);
       return h + '</div>';
     }

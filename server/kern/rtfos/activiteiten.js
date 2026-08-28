@@ -36,7 +36,7 @@ const JEUGD = ['sportdag', 'jongerenavond', 'workshop'];
 const STATUS = ['gepland', 'open', 'vol', 'bezig', 'afgerond', 'afgelast'];
 
 module.exports = (ctx, eigen) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, poort, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, poort, save } = ctx;
   const { vogGeldig } = eigen;
 
   const A = () => S().activiteiten;
@@ -81,7 +81,7 @@ module.exports = (ctx, eigen) => {
     if (!Number.isFinite(cap) || cap <= 0) return { status: 400, error: 'Hoeveel mensen kunnen er mee? Zonder capaciteit is een wachtlijst onmogelijk.' };
     const wanneer = schoon(b.wanneer, 10);
     if (wanneer && Number.isNaN(Date.parse(wanneer))) return { status: 400, error: 'Gebruik een datum als 2026-09-12.' };
-    const kosten = centen(b.kosten === undefined ? 0 : b.kosten);
+    const kosten = naarCenten(b.kosten === undefined ? 0 : b.kosten);
     if (kosten === null) return { status: 400, error: 'Wat kost de activiteit? Nul mag ook.' };
     let projectId = schoon(b.projectId, 20) || null;
     if (projectId) {

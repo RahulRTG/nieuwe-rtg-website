@@ -23,8 +23,8 @@ const { nu: klokNu, datum: klokDatum } = require('../../lib/klok');
 module.exports = ctx => {
   const { db, save, crypto, schoon } = ctx;
   const nu = () => klokDatum().toISOString();
-  function ensure() { if (!Array.isArray(db.data.ovOperaties)) db.data.ovOperaties = []; }
-  const voor = key => (ensure(), db.data.ovOperaties.filter(o => o.key === key));
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/ov/operatie', bezit: { ovOperaties: 'lijst' } });
+  const voor = key => eigen.bak('ovOperaties').filter(o => o.key === key);
   const beeld = o => ({ id: o.id, naam: o.naam, status: o.status, van: o.van, naar: o.naar, vertrek: o.vertrek,
     aangemaakt: o.aangemaakt, geactiveerd: o.geactiveerd || null, personen: o.personen, rollen: o.rollen,
     segmenten: o.segmenten, privacy: o.privacy, veiligheid: o.veiligheid });
@@ -45,7 +45,6 @@ module.exports = ctx => {
   }
   function concept(key, tier, data) {
     if (tier !== 'business') return { status: 403, error: 'Private operaties horen bij Business.' };
-    ensure();
     const van = schoon(data.van, 80), naar = schoon(data.naar, 80);
     if (!van || !naar) return { status: 400, error: 'Geef vertrek en bestemming.' };
     const personen = Math.min(120, Math.max(1, Math.round(Number(data.personen) || 1)));
@@ -64,7 +63,8 @@ module.exports = ctx => {
       privacy: { codenaam: true, discreteMeldingen: true, locatieNaRitWissen: true, needToKnow: true },
       veiligheid: { menselijkeRegie: true, reserveplan: data.reserveplan !== false, betalingBevestigen: true },
       bevestigHash: crypto.createHash('sha256').update(code).digest('hex'), codeTot: klokNu() + 10 * 60 * 1000 };
-    db.data.ovOperaties.push(o); if (db.data.ovOperaties.length > 2000) db.data.ovOperaties = db.data.ovOperaties.slice(-2000);
+    const alle = eigen.bak('ovOperaties');
+    alle.push(o); if (alle.length > 2000) eigen.zetBak('ovOperaties', alle.slice(-2000));
     save();
     return { status: 200, ok: true, operatie: beeld(o), bevestigCode: code, geldigS: 600,
       melding: 'Concept gereed. Er is nog niets geboekt of betaald.' };

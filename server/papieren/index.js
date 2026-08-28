@@ -185,7 +185,20 @@ function document(naam) {
   try { bron = fs.readFileSync(path.join(__dirname, '..', '..', d.bestand), 'utf8'); }
   catch (e) { return { fout: d.bestand + ' staat niet op zijn plek.' }; }
   const tekst = vulIn(bron);
-  const gaten = (tekst.match(/_\(Rahul heeft dit nog niet|_\(nog niet bekend/g) || []).length;
+  /* DRIE SOORTEN GAT, en het derde is er bij gekomen doordat een mutatie er
+     ongestraft doorheen kwam. De eerste twee zijn de nette: een vraag die nog
+     niet gesteld is, en een die geparkeerd staat. Het derde is een MERKTEKEN
+     ZONDER VRAAG -- `{{verantwoordelijke}}` dat na een hernoeming
+     `{{verantwoordelijke_nieuw}}` heet, of een merkteken dat iemand in het
+     document zet zonder er een vraag bij te maken. `vulIn()` laat zo'n
+     merkteken met opzet staan (het weet niet waar het antwoord vandaan moet
+     komen), maar het telde niet als gat -- en dan meldt dit document zich als
+     INGEVULD terwijl er letterlijk `{{...}}` in staat, en laat de
+     go-live-keuring los op een register met een gat erin. Precies wat de kop van
+     deze module verbiedt: een register dat zijn eigen gaten verbergt is
+     gevaarlijker dan een register met gaten. */
+  const gaten = (tekst.match(/_\(Rahul heeft dit nog niet|_\(nog niet bekend/g) || []).length +
+    (tekst.match(/\{\{\w+\}\}/g) || []).length;
   return { bestand: d.bestand, waarvoor: d.waarvoor, tekst, gaten };
 }
 

@@ -102,13 +102,9 @@ module.exports = function bouwKernAanTwee(kern, grens) {
     codenaamVan: (sleutel) => kern.codenaamVan(sleutel),
     // dezelfde teller als de rest van deze laag gebruikt, per lid per onderwerp
     rate: (wie, wat, max, perMs) => kern.sociaalRate(wie, wat, max, perMs),
-    handleVanPin: (pin) => kern.handleVanPin(pin),
     pinNormaliseer: (ruw) => kern.pinNormaliseer(ruw),
-    pinKijk: (mij, doel) => kern.pinKijk(mij, doel),
+    pinZoek: (mij, pin) => kern.pinZoek(mij, pin),
     liveKijk: (mij, token) => kern.liveKijk(mij, token),
-    /* Dezelfde teller als de pindeur, met dezelfde sleutel: dertig pogingen per
-       uur per lid, hoe je ze ook verdeelt over de twee loketten. */
-    persoonRate: (mij) => kern.sociaalRate(mij, 'pinzoek', 30, 60 * 60 * 1000),
     /* De stand van een band, voor "wat kan ik hier nog aan doen" in mijn
        koppelingen. Uit de sociale kern gehaald en niet nagerekend: of een
        verzoek nog openstaat is daar de waarheid. */

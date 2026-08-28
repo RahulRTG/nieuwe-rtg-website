@@ -39,7 +39,7 @@ module.exports = (ctx) => {
     return e.boekingen;
   };
   const nuIso = () => new Date().toISOString();
-  const centen = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
+  const heelBedrag = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
 
   /* Twee vensters op dezelfde dag, met de changeover van het podium erbij
      geteld. In minuten na opening, zodat het over middernacht heen klopt. */
@@ -92,7 +92,7 @@ module.exports = (ctx) => {
     const velden = { ...nieuw, artiest, zaak: schoon(d.zaak, 40) || null,
       soundcheck: d.soundcheck ? String(d.soundcheck) : null,
       contact: schoon(d.contact, 80) || null,
-      gage: centen(d.gage), voorschot: centen(d.voorschot) };
+      gage: heelBedrag(d.gage), voorschot: heelBedrag(d.voorschot) };
     if (d.id) {
       const x = b[String(d.id)];
       if (!x) return { status: 404, error: 'Deze boeking bestaat niet.' };

@@ -20,6 +20,7 @@
 
 module.exports = (kern, hulp) => {
   const { db, save, notify, capGezondheid } = hulp;
+  const eigen = require('../kern/eigencollectie')({ db, domein: 'opzet/kernlaag3c', bezit: { kernjournaal: 'lijst' } });
 
 /* DE COMMERCIELE RONDE (kern/commercie/ronde.js): het werk dat wel gebouwd was
    en nooit werd gedaan. Vier lagen legden verplichtingen vast -- mislukte
@@ -120,9 +121,9 @@ Object.assign(kern, (() => {
      gebeurd en welk besluit eronder lag. */
   const veiligheidskern = require('../kern/commercie/veiligheidskern').maakVeiligheidskern({
     journaal: (rij) => {
-      if (!Array.isArray(db.data.kernjournaal)) db.data.kernjournaal = [];
-      db.data.kernjournaal.push(rij);
-      if (db.data.kernjournaal.length > 20000) db.data.kernjournaal.splice(0, db.data.kernjournaal.length - 20000);
+      const j = eigen.bak('kernjournaal');
+      j.push(rij);
+      if (j.length > 20000) j.splice(0, j.length - 20000);
       save();
     }
   });

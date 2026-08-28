@@ -21,7 +21,30 @@ module.exports = (kern) => {
   app.post('/api/appstore/kantoor/uitgever', officeAuth, (req, res) => antwoord(res, appstore.uitgeverBesluit({
     org: req.body.org, besluit: String(req.body.besluit || ''), reden: req.body.reden, door: naam(req) })));
 
+  /* De toegankelijkheidsuitslag noteren. Achter officeAuth en NIET achter de
+     uitgeverspoort, en dat is de kern: een ingediend stuk is geen bewijs
+     (CLAUDE.md). RTG draait de keuring op de bundel die er ligt; de uitgever
+     levert geen uitslag aan. De keurloper (scripts/appstore-a11y.js) logt hier
+     als kantoor in en zet zijn uitslag neer.
+
+     Zonder deze uitslag gaat een versie niet live -- zie kern/appstore/besluit.js. */
+  /* mutatie: idempotent -- dezelfde uitslag twee keer noteren laat dezelfde stand */
+  app.post('/api/appstore/kantoor/toegankelijk', officeAuth, (req, res) => antwoord(res, appstore.toegankelijk.noteer({
+    versieId: req.body.versieId, stand: String(req.body.stand || ''), fouten: req.body.fouten,
+    bevindingen: req.body.bevindingen,
+    /* `door` is hier GEEN handtekening maar een herkomst: dit is een meting en
+       geen besluit. Een mens die aftekent moet zijn naam noemen (zie
+       kantoor/besluit hieronder); een keurloper die rendert hoeft dat niet, en
+       zonder deze standaard zou een machine een mensennaam moeten verzinnen. */
+    door: naam(req) || 'de keurloper' })));
+
+  /* Wat er nog gekeurd moet worden. De keurloper vraagt dit op. */
+  /* mutatie: idempotent -- lezen */
+  app.post('/api/appstore/kantoor/toegankelijk/wachtrij', officeAuth, (req, res) =>
+    res.json({ lijst: appstore.toegankelijk.wachtOpKeuring() }));
+
   // een inzending publiceren of weigeren
+  /* mutatie: nietHerhaalbaar -- een besluit is een handeling van een mens en telt op in het journaal */
   app.post('/api/appstore/kantoor/besluit', officeAuth, (req, res) => antwoord(res, appstore.besluit({
     versieId: req.body.versieId, besluit: String(req.body.besluit || ''), reden: req.body.reden, door: naam(req) })));
 

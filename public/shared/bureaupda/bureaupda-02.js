@@ -103,17 +103,17 @@
       var lijst = DATA.ontwerpen.filter(function (o) { return !filter || o.discipline === filter; });
       $('#pLijst').innerHTML = lijst.length ? lijst.map(function (o) {
         var c = o.concept, nx = volgende(o.status);
-        return '<div class="kaart" style="margin-bottom:.7rem;">' +
+        return '<div class="kaart" style="margin-bottom:0.75rem;">' +
           '<div class="rij" style="justify-content:space-between;">' +
             '<h2 style="font-size:1.02rem;">' + glyf(o.icon) + ' ' + esc(o.naam) + '</h2>' + statusPil(o.status) + '</div>' +
-          '<div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">' +
+          '<div style="font-size:.72rem;color:var(--muted);margin-bottom:0.5rem;">' +
             esc(o.disciplineLabel) + (o.huis ? ' · ' + esc(o.huis) : '') + '</div>' +
           (c
-            ? (c.kleuren && c.kleuren.length ? '<div class="rij" style="margin-bottom:.4rem;">' +
+            ? (c.kleuren && c.kleuren.length ? '<div class="rij" style="margin-bottom:0.5rem;">' +
                 c.kleuren.map(function (k) { return '<span class="bp-swatch" title="' + esc(k.naam) + '" style="background:' + esc(k.hex) + ';"></span>'; }).join('') + '</div>' : '') +
               '<div style="font-size:.82rem;line-height:1.55;"><b>' + esc(c[B.velden[0]]) + '</b> · ' + esc(c[B.velden[1]]) + '</div>'
             : '<div class="leeg">Nog geen concept.</div>') +
-          (o.kritiek ? '<div style="margin-top:.45rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">' + esc(o.kritiek) + '</div>' : '') +
+          (o.kritiek ? '<div style="margin-top:0.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">' + esc(o.kritiek) + '</div>' : '') +
           '<div class="rij h-mt60">' +
             '<button class="knop stil" data-concept="' + esc(o.id) + '">' + (c ? 'Herteken' : 'Teken') + '</button>' +
             '<button class="knop stil" data-kritiek="' + esc(o.id) + '">Kritiek</button>' +

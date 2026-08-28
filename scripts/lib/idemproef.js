@@ -65,9 +65,64 @@ function normaliseer(waarde) {
 const gelijk = (a, b) => normaliseer(a) === normaliseer(b);
 const isOk = (st) => st && st.status >= 200 && st.status < 300;
 
+/* HET TWEEDE MEETPUNT: DE OPSLAG (TAKEN.md 4.30).
+
+   Een route die bij elke oproep hetzelfde antwoord geeft, verraadt van buitenaf
+   niet of hij twee keer heeft gewerkt -- en dat gold voor 768 routes. Maar de
+   OPSLAG verraadt het wel. Met RTG_STAATLOG draagt elk antwoord een kop met de
+   stand per collectie (server/staatlog.js): stand 1 de lengte, stand 2 ook een
+   inhoudsafdruk, zodat ook een wijziging OP ZIJN PLAATS te zien is. `staat` is
+   het VERSCHIL dat elk van de drie oproepen achterliet, met de ruis er al uit
+   geijkt.
+
+   Drie uitkomsten, en de derde is een weigering:
+     - de eerste oproep veranderde niets -> null. Dan is er geen tweede effect om
+       te zien: een leesroute, of een die zijn verandering meteen terugdraait.
+       Daar doet dit meetpunt geen uitspraak over.
+     - de eerste veranderde iets en de herhaling niets -> beschermd.
+     - allebei veranderden iets -> onbeschermd. */
+
+/* Een getal is een verandering in de LENGTE; 'gewijzigd' is een verandering in
+   de inhoud bij gelijke lengte (server/staatlog.js stand 2). Die twee lezen
+   anders en horen anders te klinken -- "+1 in orders" tegenover "een wijziging
+   in bankPassen" -- want alleen het eerste is iets dat erbij is gekomen. */
+function beschrijfDelta(d) {
+  return Object.entries(d).map(([k, n]) => typeof n === 'number'
+    ? (n > 0 ? '+' : '') + n + ' in ' + k
+    : 'een wijziging in ' + k).join(', ');
+}
+/* WAAROM DIT PER GROND VERSCHILT, en niet een zin voor alles.
+
+   Hier stond een vaste tekst: "het antwoord meldt een herkende herhaling, maar
+   de opslag groeide". Over de eerste echte ronde met inhoudsafdrukken kwamen er
+   drie tegenspraken uit, en bij ALLE DRIE was de grond niet dat de server de
+   herhaling merkte maar dat hij hem WEIGERDE (409, 404). De melding beweerde dus
+   iets wat de proef niet had gemeten -- precies wat deze proef bij anderen komt
+   vinden. Vandaar een tekst per grond, uit `o.grond` en niet uit een aanname. */
+const TEGENSPRAAK = {
+  gemerkt: 'het antwoord meldt een herkende herhaling, maar de opslag veranderde toch: ',
+  geweigerd: 'de herhaling werd geweigerd, maar de opslag veranderde toch: ',
+  gelijk: 'de herhaling gaf hetzelfde antwoord, maar de opslag veranderde toch: ',
+  onbekend: 'de herhaling zou niets gedaan hebben, maar de opslag veranderde toch: '
+};
+const tegenspraakTekst = (grond, d) => (TEGENSPRAAK[grond] || TEGENSPRAAK.onbekend) + beschrijfDelta(d);
+function staatOordeel(staat) {
+  if (!staat || !staat.a || !staat.b) return null;
+  if (!Object.keys(staat.a).length) return null;
+  if (!Object.keys(staat.b).length) {
+    return { stand: 'beschermd', bron: 'opslag',
+      reden: 'het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: ' +
+      'de eerste oproep gaf ' + beschrijfDelta(staat.a) + ' en de herhaling niets' };
+  }
+  return { stand: 'onbeschermd', bron: 'opslag',
+    reden: 'gezien aan de opslag: de eerste oproep gaf ' + beschrijfDelta(staat.a) +
+    ' en de herhaling opnieuw ' + beschrijfDelta(staat.b) };
+}
+
 /* HET OORDEEL, apart en puur -- los toetsbaar in test/idemproef.test.js.
-   `a`, `b` en `c` zijn de drie antwoorden uit de kop. */
-function weegHerhaling(a, b, c) {
+   `a`, `b` en `c` zijn de drie antwoorden uit de kop; `staat` is optioneel en
+   draagt het per-oproep verschil in de opslag (zie hierboven). */
+function weegHerhaling(a, b, c, staat) {
   if (!isOk(a)) {
     return { stand: 'ongemeten', reden: 'de eerste oproep deed geen werk (status ' + ((a && a.status) || 0) + ')' };
   }
@@ -76,35 +131,43 @@ function weegHerhaling(a, b, c) {
      maar een mededeling van de server zelf, en dus het sterkste bewijs dat er
      is -- sterker dan welke vergelijking ook. */
   if (b && b.data && b.data.herhaald === true) {
-    return { stand: 'beschermd', reden: 'de server merkte de herhaling zelf (herhaald: true)' };
+    return { stand: 'beschermd', grond: 'gemerkt', reden: 'de server merkte de herhaling zelf (herhaald: true)' };
   }
   if (!isOk(b)) {
     /* Een herhaling die wordt GEWEIGERD is ook geen tweede effect. Maar het is
        een ander mechanisme dan herkennen, en dat verschil hoort zichtbaar. */
-    return { stand: 'beschermd', reden: 'de herhaling werd geweigerd (status ' + b.status + ')' };
+    return { stand: 'beschermd', grond: 'geweigerd', reden: 'de herhaling werd geweigerd (status ' + b.status + ')' };
   }
   if (!isOk(c)) {
     return { stand: 'ongemeten', reden: 'de ijkoproep met een verse sleutel kwam niet door; ' +
       'zonder die vergelijking zegt een gelijk antwoord niets' };
   }
   if (gelijk(a.data, c.data)) {
-    return { stand: 'ongemeten', reden: 'het antwoord verandert niet per oproep; een tweede effect ' +
-      'zou hier niet te zien zijn' };
+    /* Hier hield deze proef op. Nu kijkt hij eerst naar de opslag -- en pas als
+       die ook niets kan zeggen, blijft het ongemeten. */
+    const s = staatOordeel(staat);
+    if (s) return s;
+    return { stand: 'ongemeten', reden: staat
+      ? 'het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: ' +
+        'een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet'
+      : 'het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn' };
   }
   if (gelijk(a.data, b.data)) {
-    return { stand: 'beschermd', reden: 'de herhaling gaf hetzelfde antwoord terwijl een verse sleutel ' +
+    return { stand: 'beschermd', grond: 'gelijk', reden: 'de herhaling gaf hetzelfde antwoord terwijl een verse sleutel ' +
       'een ander gaf' };
   }
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging }) {
   const perRoute = {};
-  let gedaan = 0, hernieuwd = 0;
+  let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
+  const tegenspraken = [];
 
   for (const r of routes) {
     if (maxRoutes && Object.keys(perRoute).length >= maxRoutes) break;
+    const methode = r.methode || r.method;
     const k1 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-1';
     const k2 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-2';
     const lijf = lijfVoor(r);
@@ -121,13 +184,128 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
       return st;
     };
 
-    const a = await doe(k1);
-    const b = await doe(k1);
-    const c = await doe(k2);
-    const o = weegHerhaling(a, b, c);
+    /* De opslagstand tussen de oproepen door. `staatVan` geeft het verschil dat
+       DIE oproep achterliet, met de geijkte ruis er al uit. Zonder de vlag is
+       hij er niet en werkt de proef als vanouds op alleen het antwoord. */
+    const a = await doe(k1); const dA = staatVan ? staatVan(a) : null;
+    const b = await doe(k1); const dB = staatVan ? staatVan(b) : null;
+    const c = await doe(k2); const dC = staatVan ? staatVan(c) : null;
+    const staat = staatVan ? { a: dA, b: dB, c: dC } : null;
+    const o = weegHerhaling(a, b, c, staat);
+    if (o.bron === 'opslag') uitOpslag++;
     tel[o.stand]++;
-    perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
+    const rij = { methode, pad: r.pad, rol: r.rol,
       idempotentie: o.stand, reden: o.reden, statussen: [a.status, b.status, c.status] };
+    if (o.bron) rij.bron = o.bron;
+    if (staat) rij.opslag = { a: dA, b: dB, c: dC };
+
+    /* DE TEGENSPRAAK, EN WAAROM ER EEN VIERDE OPROEP BIJ HOORT.
+
+       Het antwoord kan zeggen dat de herhaling niets deed terwijl de opslag laat
+       zien dat er tóch iets veranderde. Dat is een sterker signaal dan beide
+       meetpunten apart: een route die "herhaald: true" meldt en ondertussen
+       doorwerkt, haal je nooit uit een antwoord alleen.
+
+       MAAR DE TOEWIJZING PER OPROEP IS EEN AANNAME. Het verschil dat aan B wordt
+       toegeschreven is alles wat er tussen het antwoord van A en dat van B is
+       veranderd -- en dit huis heeft achtergrondwerk. Gemeten op 24 augustus:
+       een route waarvan de herhaling met 404 werd geweigerd en die op dat pad
+       aantoonbaar NIETS schrijft, kreeg toch een verschil toegewezen; er landde
+       op dat moment een seed-ronde die negenendertig collecties tegelijk vulde.
+       De melding klopte niet, en dat is precies het soort onnagetrokken
+       bewering waar deze proef bij anderen op jaagt.
+
+       Dus wordt een vermoeden nu NAGETROKKEN in plaats van gemeld: nog een keer
+       dezelfde sleutel, en alleen als de opslag dan wéér beweegt is het van deze
+       route. Dat kost een oproep per vermoeden en er zijn er een handvol. */
+    if (staat && o.stand === 'beschermd' && dB && Object.keys(dB).length) {
+      const nog = await doe(k1);
+      const dD = staatVan(nog);
+      const samen = {};
+      for (const k of Object.keys(dB)) if (dD && dD[k] !== undefined) samen[k] = dD[k];
+      if (Object.keys(samen).length) {
+        rij.tegenspraak = tegenspraakTekst(o.grond, samen);
+        rij.grond = o.grond || 'onbekend';
+        rij.nagetrokken = true;
+        tegenspraken.push(methode + ' ' + r.pad);
+      } else {
+        /* Niet herhaalbaar: wat er bij B bewoog kwam ergens anders vandaan. Dat
+           hoort in het register te staan, want een vermoeden dat spoorloos
+           verdwijnt is niet hetzelfde als een vermoeden dat er nooit was. */
+        rij.vermoedenVerworpen = 'bij B bewoog ' + beschrijfDelta(dB) +
+          ', maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route';
+        verworpen++;
+      }
+    }
+    perRoute[methode + ' ' + r.pad] = rij;
+  }
+
+  /* ============================================================================
+     DE VASTLEGGING IS GEEN WERK -- en dat is een BESLUIT, geen slimmigheid.
+
+     Sommige collecties krijgen een regel bij elke HANDELING: `kantoorAudit`
+     (wie deed wat aan het kantoor), `commandJournaal`, `securityLog`. Die
+     groeien +1 bij de eerste oproep EN bij de herhaling, en dan meldt het
+     opslag-meetpunt "onbeschermd" terwijl het alleen de VASTLEGGING heeft
+     gezien en niet het werk. Twee keer een schakelaar op AAN zetten hoort twee
+     auditregels te geven; de eindstand is toch dezelfde.
+
+     HIER STOND EERST EEN HEURISTIEK, en die is gemeten en weggegooid: "een
+     collectie die meebeweegt bij vier van de vijf oproepen die iets deden".
+     Over de echte ronde vond die er NUL. `kantoorAudit` groeide bij elf van de
+     zestig werkende oproepen (18%), `commandJournaal` bij zes (10%) -- want een
+     auditlog van het kantoor groeit alleen bij kantoorroutes. Een drempel die
+     daar wel op past, pakt `payBoekingen` mee, en dan verdwijnt er bewijs over
+     GELD achter een slimmigheid. LAT.md: een zeef die te veel wegvangt is erger
+     dan een die niets doet, want hij ziet eruit als bescherming.
+
+     Dus staat het in IDEMBESLUIT.json, met per collectie de reden -- naast de
+     besluiten per route, waar de rest van dit oordeel ook woont. Een lijst
+     veroudert, ja: komt er een journaal bij, dan meldt deze proef die route
+     onbeschermd. Dat is de VEILIGE kant van verouderen -- te veel melden, niet
+     te weinig.
+
+     EN DE LIJST WORDT GECONTROLEERD, want een handgeschreven lijst kan worden
+     opgerekt om een bevinding te laten verdwijnen. Een vastlegging groeit onder
+     routes die verder niets met elkaar te maken hebben; domeinwerk groeit onder
+     zijn eigen handvol. Gemeten in dezelfde ronde: kantoorAudit onder drie
+     routefamilies, commandJournaal onder vier, securityLog onder zes -- en elke
+     echte werkcollectie onder een of twee. Staat er een collectie in de lijst
+     die maar onder EEN familie groeit, dan is dat geen vastlegging maar
+     domeinwerk, en dat zegt deze proef hardop (`vastleggingVerdacht`). */
+  const vastNamen = Object.keys(vastlegging || {});
+  const familiesVan = {};
+  for (const rij of Object.values(perRoute)) {
+    const fam = String(rij.pad || '').split('/').slice(2, 4).join('/');
+    for (const k of Object.keys((rij.opslag && rij.opslag.a) || {})) (familiesVan[k] = familiesVan[k] || new Set()).add(fam);
+  }
+  const vastleggingGemeten = vastNamen.map(k => ({ collectie: k, families: (familiesVan[k] || new Set()).size }));
+  /* Nul families = deze ronde niet gezien (een korte ronde met --max); dat zegt
+     niets. EEN familie is het signaal: dan is dit de eigen collectie van een
+     route en geen doorlopende vastlegging. */
+  const vastleggingVerdacht = vastleggingGemeten.filter(v => v.families === 1).map(v => v.collectie);
+  if (vastNamen.length) {
+    const weg = new Set(vastNamen);
+    const zonder = (d) => { const u = {}; for (const k of Object.keys(d || {})) if (!weg.has(k)) u[k] = d[k]; return u; };
+    for (const rij of Object.values(perRoute)) {
+      if (!rij.opslag) continue;
+      const opnieuw = { a: zonder(rij.opslag.a), b: zonder(rij.opslag.b), c: zonder(rij.opslag.c) };
+      rij.opslag = opnieuw;
+      /* De tegenspraak weegt hier mee: een route die "herhaald: true" meldt
+         terwijl alleen het auditlog groeide, spreekt zichzelf niet tegen. */
+      if (rij.tegenspraak) {
+        const i = tegenspraken.indexOf(rij.methode + ' ' + rij.pad);
+        if (Object.keys(opnieuw.b).length) rij.tegenspraak = tegenspraakTekst(rij.grond, opnieuw.b);
+        else { delete rij.tegenspraak; delete rij.grond; if (i >= 0) tegenspraken.splice(i, 1); }
+      }
+      if (rij.bron !== 'opslag') continue;   // alleen een opslag-oordeel kan kantelen
+      tel[rij.idempotentie]--; uitOpslag--;
+      const o = staatOordeel(opnieuw) || { stand: 'ongemeten',
+        reden: 'het antwoord verandert niet per oproep, en wat er in de opslag bewoog was alleen een ' +
+          'vastlegging (' + vastNamen.join(', ') + ') -- de aantekening van de handeling en niet het werk zelf' };
+      rij.idempotentie = o.stand; rij.reden = o.reden; rij.bron = o.bron || 'opslag-zonder-vastlegging';
+      tel[o.stand]++; if (o.bron === 'opslag') uitOpslag++;
+    }
   }
 
   /* DE BLINDHEIDSCONTROLE VAN DE RONDE. Per route ijkt de derde oproep, maar als
@@ -138,7 +316,8 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
       'deze ronde kon een tweede effect nergens zien'
     : null;
 
-  return { perRoute, telling: tel, oproepen: gedaan, hernieuwd, meterStuk };
+  return { perRoute, telling: tel, oproepen: gedaan, hernieuwd, meterStuk, uitOpslag, tegenspraken,
+    vermoedensVerworpen: verworpen, vastleggingGemeten, vastleggingVerdacht };
 }
 
 const CONTROL = {
@@ -149,14 +328,15 @@ const CONTROL = {
   bewijsstuk: 'IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam',
   dekking: { register: 'IDEMPROEF.json', beproefd: 'gemeten.beschermd',
     totaal: 'gemeten.beoordeeld', eenheid: 'routes waar een tweede effect zichtbaar zou zijn',
-    tellers: { onbeschermd: 'gemeten.onbeschermd', ongemeten: 'gemeten.ongemeten',
+    tellers: { onbeschermd: 'gemeten.onbeschermd', ongemeten: 'gemeten.ongemeten', uitOpslag: 'gemeten.uitOpslag',
       blindeRondes: 'gemeten.blindeRondes', tokensHernieuwd: 'gemeten.tokensHernieuwd' } },
-  grens: 'kijkt van BUITEN naar het antwoord, niet naar de database. Een route die zijn tweede ' +
-    'effect niet in het antwoord laat zien (een stille toevoeging aan een lijst die niet wordt ' +
-    'teruggegeven) telt hier als ongemeten en niet als beschermd -- daarvoor is de per-route ' +
-    'vingerafdruk nodig die er nog niet is. En "onbeschermd" is geen defect-oordeel: twee keer ' +
-    'op bewaren drukken hoort twee notities op te leveren. Het is een TELLING van waar de belofte ' +
-    'uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.'
+  grens: 'kijkt van BUITEN, op twee meetpunten: het ANTWOORD, en met RTG_STAATLOG=1 ook de LENGTE ' +
+    'per collectie in de opslag (server/staatlog.js). Dat tweede meetpunt ziet een stille toevoeging ' +
+    'aan een lijst wel -- daarop hield deze proef eerder op -- maar een WIJZIGING OP ZIJN PLAATS niet: ' +
+    'een status van open naar betaald zetten verandert geen enkele lengte. Een route die alleen ' +
+    'bijwerkt telt hier dus nog altijd als ongemeten en niet als beschermd. En "onbeschermd" is geen ' +
+    'defect-oordeel: twee keer op bewaren drukken hoort twee notities op te leveren. Het is een ' +
+    'TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.'
 };
 
 module.exports = { draaiIdemproef, weegHerhaling, normaliseer, gelijk, CONTROL };

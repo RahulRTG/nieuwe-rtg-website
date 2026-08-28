@@ -107,7 +107,7 @@ const api = (pad, body) => fetch(pad, {
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Uitgaan regel je als lid. Open de app en log in met je RTG-account.</p>'+
+    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Uitgaan regel je als lid. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
@@ -147,7 +147,7 @@ async function laadMijn(){
   let d; try { d = await api('/api/uitgaan/mijn'); } catch(e){ return; }
   const av = d.avonden||[];
   if (!av.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn avonden</h2>'+
+  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 0.75rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn avonden</h2>'+
     av.map(a => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
       '<div><h3 style="font-size:1rem;">'+esc(a.naam)+'</h3><span class="meta">'+esc(a.zaak)+' · '+[a.datum,a.tijd].filter(Boolean).map(esc).join(' · ')+' · '+a.qty+' pers'+(a.ingecheckt?' · ingecheckt':'')+'</span></div>'+
       (a.ingecheckt?'':'<button class="knop" data-code="'+esc(a.supplierCode)+'" data-ev="'+esc(a.eventId)+'" style="width:auto;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Afmelden</button>')+

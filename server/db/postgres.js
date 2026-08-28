@@ -16,6 +16,7 @@ const { STORE, DATABASE_URL, schrijfLokaleSnapshotStil } = opslag;
 
 let pg = null, pgKlaar = false, pgVuil = false, pgFlushBezig = false, pgFlushTimer = null, pgPoll = null, pgVeilig = null;
 const pgLog = { warn: (m, v) => console.warn('[pg]', m, v || '') };
+const grafsteen = require('./grafsteen');
 
 /* De snelle rijstrook. De idempotentie-boeken van RTG Pay en RTG Bank hebben
    geen rij-voor-rij grootboek achter zich (anders dan orders en boekingen) en
@@ -141,7 +142,7 @@ async function startPostgres() {
     // db.data dan een collectie (bijv. live) missen en zouden lezers crashen op
     // Object.keys(undefined). Daarom vullen we ontbrekende collecties aan met de
     // al geseede defaults; zodra de flush rond is, synchroniseert de rest vanzelf.
-    db.data = Object.assign(db.data || {}, pgData);
+    db.data = grafsteen.samenvoegen(db.data, pgData, pgLog).dbData;
     if (db.data.__schema == null) db.data.__schema = 1;
     schrijfLokaleSnapshotStil();
     const ext = state.getExternCb(); if (ext) ext();

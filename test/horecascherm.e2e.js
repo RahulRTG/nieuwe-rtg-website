@@ -364,16 +364,17 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       const o = [...s.options].find(x => x.text.indexOf('Tafel 12') === 0);
       if (!o) return null;
       s.value = o.value;
+      /* Kiezen en klikken in dezelfde browsertik. Een vertraagde hertekening
+         kan de keuzelijst opnieuw vullen; tussen twee losse Playwright-calls
+         kon die daardoor de waarde wissen voordat de klik aankwam. */
+      document.getElementById('zVoegSamen').click();
       return o.value;
     });
     assert.equal(gekozen, rek4.rekening.id, 'Tafel 12 staat in de samenvoeglijst');
-    /* De stand van de meldbalk VOOR de klik, want daar zegt het scherm het
-       samengevoegde bedrag hardop terug -- en dat gebeurt pas als de server
-       heeft geantwoord. De assertie op die tekst staat hieronder en blijft zo
-       zelf iets bewijzen. */
-    const voorSamen = await tekstVan(page, '#melding');
-    await page.click('#zVoegSamen');
-    await wachtOpVerandering(page, '#melding', voorSamen);
+    /* Wacht op het UNIEKE eindbericht van deze handeling. Alleen "de melding
+       veranderde" is te breed: onder runnerbelasting kan een vertraagde
+       hertekening van de korting hierboven die voorwaarde al waar maken. */
+    await wachtOpTekst(page, /Samengevoegd/, { in: '#melding' });
     stand = (await api('/rekening', { rekeningId: rek3.rekening.id })).rekening;
     assert.equal(stand.totalen.netto, voor + ander, 'samenvoegen brengt geen cent bij of af');
     melding = await page.evaluate(() => document.getElementById('melding').innerText);

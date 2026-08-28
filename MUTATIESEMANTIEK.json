@@ -1,0 +1,426 @@
+{
+  "uitleg": "Gemeten met scripts/mutatiesemantiek.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 10. Dit script plakt geen etiketten: het legt VERKLAARD naast GEMETEN en meldt de tegenspraak.",
+  "vastgelegd": "2026-08-28",
+  "gemeten": {
+    "routesMetRol": 3092,
+    "routesGevonden": 4144,
+    "verklaard": 34,
+    "onverklaard": 4110,
+    "beproefd": 845,
+    "onbereikbaarVoorDeProef": 2247,
+    "verklaardEnBeproefd": 0,
+    "tegenspraken": 0,
+    "onbekendeKlassen": 0,
+    "randVerklaard": 6
+  },
+  "rand": [
+    {
+      "naam": "bericht.zet",
+      "klasse": "nietHerhaalbaar",
+      "herhaalbaar": false
+    },
+    {
+      "naam": "opslag.lees",
+      "klasse": "idempotent",
+      "herhaalbaar": true
+    },
+    {
+      "naam": "opslag.lijst",
+      "klasse": "idempotent",
+      "herhaalbaar": true
+    },
+    {
+      "naam": "opslag.wis",
+      "klasse": "idempotent",
+      "herhaalbaar": true
+    },
+    {
+      "naam": "opslag.zet",
+      "klasse": "idempotent",
+      "herhaalbaar": true
+    },
+    {
+      "naam": "profiel.wieBenIk",
+      "klasse": "idempotent",
+      "herhaalbaar": true
+    }
+  ],
+  "tegenspraken": [],
+  "onbekendeKlassen": [],
+  "verklaard": [
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/toegankelijk",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 32,
+      "klasse": "idempotent",
+      "waarom": "dezelfde uitslag twee keer noteren laat dezelfde stand */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/toegankelijk/wachtrij",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 43,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kantoor/besluit",
+      "bestand": "server/routes/appstore/kantoor.js",
+      "regel": 48,
+      "klasse": "nietHerhaalbaar",
+      "waarom": "een besluit is een handeling van een mens en telt op in het journaal */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/catalogus",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 21,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/mijn",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 25,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/installeer",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 32,
+      "klasse": "idempotent",
+      "waarom": "twee keer installeren laat dezelfde app op het startscherm */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/verleen",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 37,
+      "klasse": "idempotent",
+      "waarom": "de verlening wordt GEZET en niet opgeteld */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/weg",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 41,
+      "klasse": "idempotent",
+      "waarom": "twee keer verwijderen laat dezelfde stand achter */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/wis-opslag",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 42,
+      "klasse": "idempotent",
+      "waarom": "twee keer wissen laat dezelfde lege opslag */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/open",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 46,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/dossier",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 83,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/kanaal",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 85,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/tijdlijn",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 91,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/berichten",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 99,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/berichten/gelezen",
+      "bestand": "server/routes/appstore/lid.js",
+      "regel": 102,
+      "klasse": "idempotent",
+      "waarom": "twee keer gelezen melden laat dezelfde stand */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 64,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/aanvraag",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 72,
+      "klasse": "idempotent",
+      "waarom": "een tweede aanvraag werkt de eerste bij of zegt dat hij er al is */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/inzenden",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 76,
+      "klasse": "idempotent",
+      "waarom": "dezelfde bundel levert dezelfde hash en dus geen tweede versie */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/intrekken",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 80,
+      "klasse": "idempotent",
+      "waarom": "twee keer intrekken laat dezelfde stand achter */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/journaal",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 84,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/cijfers",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 88,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/proef",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 97,
+      "klasse": "idempotent",
+      "waarom": "de proefkeuring bewaart niets */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/naslag",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 104,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/dossier",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 112,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/persoon/omzet",
+      "bestand": "server/routes/appstore/persoon.js",
+      "regel": 128,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 37,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/aanvraag",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 42,
+      "klasse": "idempotent",
+      "waarom": "een tweede aanvraag werkt de eerste bij of zegt dat hij er al is */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/inzenden",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 49,
+      "klasse": "idempotent",
+      "waarom": "dezelfde bundel levert dezelfde hash en dus geen tweede versie */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/intrekken",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 54,
+      "klasse": "idempotent",
+      "waarom": "twee keer intrekken laat dezelfde stand achter */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/journaal",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 62,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/cijfers",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 70,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/naslag",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 80,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/proef",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 87,
+      "klasse": "idempotent",
+      "waarom": "de proefkeuring bewaart niets */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/appstore/uitgever/omzet",
+      "bestand": "server/routes/appstore/uitgever.js",
+      "regel": 96,
+      "klasse": "idempotent",
+      "waarom": "lezen */",
+      "gemeten": null,
+      "reden": null,
+      "tegenspraak": null
+    }
+  ]
+}

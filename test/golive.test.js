@@ -173,3 +173,47 @@ test('de go-live-keuring keurt af zonder geheimen, en met alle geheimen blijft h
   assert.match(goed.stdout, /open plek\(ken\)/, 'de blokkade telt de open plekken in de AVG-documenten');
   assert.match(goed.stdout, /vragen staan nog open/, 'en wijst naar de vragen die Rahul nog moet stellen');
 });
+
+test('EN DE ANDERE KANT OP: alles ingevuld en de AVG-poort laat los', () => {
+  /* De toets hierboven bewijst dat het papierwerk BLOKKEERT. Dat is de helft die
+     iemand vanzelf schrijft. De andere helft is de helft die stil kapot gaat:
+     laat de keuring ook echt LOS als de achttien vragen beantwoord zijn?
+
+     Zou een vraag-id hernoemd worden, of zou er een {{merkteken}} in een
+     document staan waar geen vraag bij hoort, dan blijft golive blokkeren op
+     iets wat niemand kan invullen -- en dat merk je pas op de dag dat je met de
+     echte antwoorden gaat zitten. Precies de vorm van LAT.md regel 10: een poort
+     die je nooit hebt zien OPENgaan, weet je niet of hij opengaat.
+
+     De antwoorden hier zijn onmiskenbaar nep en staan in een wegwerpmap
+     (RTG_DATA_DIR); er komt nooit een verzonnen KvK-nummer in de repository. */
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-golive-papier-'));
+  try {
+    const vul = spawnSync(process.execPath, ['-e', `
+      process.env.RTG_DATA_DIR = ${JSON.stringify(map)};
+      const p = require(${JSON.stringify(path.join(__dirname, '..', 'server', 'papieren'))});
+      for (const v of p.openVragen()) p.antwoord(v.id, 'PROEFWAARDE -- niet echt (' + v.id + ')', { door: 'de toets' });
+      console.log(JSON.stringify({ klaar: p.klaar(), open: p.openVragen().length }));
+    `], { env: { ...process.env, RTG_DATA_DIR: map }, timeout: 20000, encoding: 'utf8' });
+    assert.equal(vul.status, 0, 'de achttien vragen laten zich beantwoorden: ' + (vul.stderr || '').slice(0, 300));
+    const stand = JSON.parse(vul.stdout.trim().split('\n').pop());
+    assert.equal(stand.open, 0, 'geen enkele vraag blijft achter');
+    assert.equal(stand.klaar, true);
+
+    const na = spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'golive.js')],
+      { env: { ...PROD_ENV, RTG_DATA_DIR: map }, timeout: 20000, encoding: 'utf8' });
+    /* De drie AVG-blokkades horen weg te zijn. De keuring mag nog wel over
+       andere dingen vallen (dat hangt van de omgeving af), maar NIET meer over
+       deze drie -- en dat is wat hier wordt vastgehouden. */
+    assert.doesNotMatch(na.stdout, /open plek\(ken\)/, 'geen open plekken meer in de AVG-documenten');
+    assert.doesNotMatch(na.stdout, /vragen staan nog open/, 'en geen openstaande vragen meer');
+    assert.match(na.stdout, /Papierwerk: alle \d+ vragen zijn beantwoord/, 'de keuring zegt het zelf');
+    assert.match(na.stdout, /DATALEK\.md is ingevuld/, 'het datalek-draaiboek meldt zichzelf als ingevuld');
+    /* Het verwerkingsregister houdt na het invullen nog EEN punt over dat een
+       jurist moet nakijken ([CONTROLEER ...] in het document). Dat is een
+       waarschuwing en geen gat, en het hoort te blijven staan: deze keuring kan
+       niet beoordelen of wat er staat juridisch klopt, en doet ook niet alsof. */
+    assert.match(na.stdout, /VERWERKINGSREGISTER\.md: (is ingevuld|\d+ punt\(en\) die een jurist)/,
+      'het verwerkingsregister is ingevuld, met hooguit een jurist-punt erover');
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});

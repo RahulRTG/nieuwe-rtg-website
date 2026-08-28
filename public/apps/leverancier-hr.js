@@ -36,7 +36,7 @@
       for (const fase of ['dag1', 'week1', 'maand1']){
         const st2 = t.stappen.filter(s => s.fase === fase);
         if (!st2.length) continue;
-        h += '<div class="sub" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.58rem;margin-top:0.45rem;">' + T(FASEN[fase][0], FASEN[fase][1]) + '</div>' +
+        h += '<div class="sub" style="text-transform:uppercase;letter-spacing:0.1em;font-size:0.58rem;margin-top:0.5rem;">' + T(FASEN[fase][0], FASEN[fase][1]) + '</div>' +
           st2.map(s => '<button class="obtn' + (s.klaar ? '' : ' ghost') + '" data-hrvink="' + t.id + '" data-stap="' + s.id + '" style="display:block;width:100%;text-align:left;margin-top:0.25rem;font-size:0.76rem;">' + (s.klaar ? '✓ ' : '○ ') + esc(s.tekst) + '</button>').join('');
       }
       h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input class="st-in h-flex1" data-hrstapin="' + t.id + '" placeholder="' + T('hr2.stap', 'Eigen stap toevoegen') + '">' +
@@ -44,7 +44,7 @@
     }
     const zonder = (ctx.staff || []).filter(s => !open.some(t => t.staffId === s.id));
     if (zonder.length){
-      h += '<div style="display:flex;gap:0.4rem;margin-top:0.6rem;"><select class="st-in h-flex1" id="hrStartWie">' +
+      h += '<div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><select class="st-in h-flex1" id="hrStartWie">' +
         zonder.map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('') + '</select>' +
         '<button class="obtn primary" id="hrStart">' + T('hr2.start', 'Start traject') + '</button></div>';
     }

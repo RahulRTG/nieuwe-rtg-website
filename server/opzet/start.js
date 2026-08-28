@@ -38,7 +38,7 @@ module.exports = function start(deps) {
     log, db, accounts, save, eigenaar, webpush, kern,
     checkpointSqlite, checkpointGrootboek,
     initRealtime, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten,
-    DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer
+    DEMO, PRODUCTION, zetEigenaarsAccount, loginFails, pinSlot, ruimBuffer, media
   } = deps;
 
   require('./afsluiters')({ app, path, PUBLIC_DIR, log });
@@ -59,7 +59,11 @@ module.exports = function start(deps) {
      `setInterval` van vijf minuten kan geen enkele toets erbij -- en juist deze
      veger heeft twee keer de inlogrem gelost. Hier blijft alleen de klok. */
   const { onderhoudsronde, RONDE_MS } = require('./onderhoud');
-  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer }), RONDE_MS).unref();
+  /* De kappen horen bij het onderhoud en niet bij de schrijfroutes: een kap die
+     in een verzoek duizenden rijen wil weghalen, botst op de begroting -- en
+     die weigering houdt zichzelf in stand. Zie kern/kappen.js. */
+  const kappen = require('../kern/kappen').maakKappen({ db, save, media, log });
+  setInterval(() => onderhoudsronde({ loginFails, pinSlot, ruimBuffer, kappen }), RONDE_MS).unref();
 
   backupData();
   setInterval(backupData, 24 * 60 * 60 * 1000);

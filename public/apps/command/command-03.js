@@ -31,7 +31,7 @@
 
   function zoekuit(d) {
     if (d.kort) return '<div class="leeg">Een zoekterm van minstens twee tekens, graag.</div>';
-    var u = '<p class="meta" style="margin-bottom:.9rem;">' + d.totaal + ' treffer(s) in ' +
+    var u = '<p class="meta" style="margin-bottom:0.75rem;">' + d.totaal + ' treffer(s) in ' +
       d.groepen.length + ' soort(en)' + (d.domeinen && d.domeinen.length ? ' over ' + d.domeinen.length + ' domein(en)' : '') + '.</p>';
     if (!d.groepen.length) {
       u += '<div class="kaart"><h3>Niets gevonden</h3><p>Er is gekeken in ' + d.bereik.length + ' objectsoorten:</p>' +

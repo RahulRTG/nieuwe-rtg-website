@@ -16,7 +16,7 @@
       lade. Een bon die op -3,40 uitkomt, klopt nooit meer met de kas. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { nu, id, centen, uitEuro, openstaand, bonBoek } = horeca;
+  const { nu, id, heleCenten, uitEuro, openstaand, bonBoek } = horeca;
   const rekVan = kern.horecaRekVan;
   const publiek = kern.horecaPubliek;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
@@ -28,7 +28,7 @@ module.exports = (kern) => {
     const reden = schoon(req.body.reden, 80);
     if (!reden) return res.status(400).json({ error: 'Waarom wordt er korting gegeven? Dat hoort bij het bedrag te staan.' });
     const procent = Math.max(0, Math.min(100, Number(req.body.procent) || 0));
-    const bedrag = req.body.centen != null ? centen(req.body.centen) : uitEuro(req.body.bedrag);
+    const bedrag = req.body.centen != null ? heleCenten(req.body.centen) : uitEuro(req.body.bedrag);
     if (!procent && !bedrag) return res.status(400).json({ error: 'Geef een percentage of een bedrag.' });
     r.kortingen.push({ id: id(3), reden, procent: procent || null, centen: procent ? null : bedrag,
       at: nu(), door: req.actor.name });
@@ -40,7 +40,7 @@ module.exports = (kern) => {
   /* ---------- fooi ---------- */
   app.post('/api/supplier/horeca/fooi', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
-    const bedrag = req.body.centen != null ? centen(req.body.centen) : uitEuro(req.body.bedrag);
+    const bedrag = req.body.centen != null ? heleCenten(req.body.centen) : uitEuro(req.body.bedrag);
     r.fooiCenten = bedrag;
     save();
     res.json({ ok: true, fooi: r.fooiCenten, rekening: publiek(r),
@@ -55,7 +55,7 @@ module.exports = (kern) => {
     if (!WIJZEN.includes(wijze)) return res.status(400).json({ error: 'Onbekende betaalwijze. Kies uit: ' + WIJZEN.join(', ') + '.' });
     const open = openstaand(r);
     if (open <= 0) return res.status(409).json({ error: 'Er staat niets meer open op deze rekening.' });
-    let bedrag = req.body.centen != null ? centen(req.body.centen) : (req.body.bedrag != null ? uitEuro(req.body.bedrag) : open);
+    let bedrag = req.body.centen != null ? heleCenten(req.body.centen) : (req.body.bedrag != null ? uitEuro(req.body.bedrag) : open);
     if (!bedrag) return res.status(400).json({ error: 'Vul het bedrag in.' });
 
     // bon of tegoed: eerst afboeken op de bon, dan pas noteren als betaling

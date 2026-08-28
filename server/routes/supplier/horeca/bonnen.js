@@ -12,12 +12,12 @@ module.exports = (kern) => {
   /* Samenvoegen is iets anders dan herhalen; zie de kop van dit bestand bij
      /offline/handelingen en kern/horeca/samenvoegen.js. */
   const samenvoegen = require('../../../kern/horeca/samenvoegen')({ horeca, schoon });
-  const { H, nu, id, centen, uitEuro, totaal, bonMaak } = horeca;
+  const { H, nu, id, heleCenten, uitEuro, totaal, bonMaak } = horeca;
   const WIJZEN = ['contant', 'pin', 'online', 'rekening', 'kamer', 'bon', 'tegoed', 'munt'];
 
   /* ---------- bonnen ---------- */
   app.post('/api/supplier/horeca/bon/maak', supplierAuth, (req, res) => {
-    const bedrag = req.body.centen != null ? centen(req.body.centen) : uitEuro(req.body.bedrag);
+    const bedrag = req.body.centen != null ? heleCenten(req.body.centen) : uitEuro(req.body.bedrag);
     if (!bedrag) return res.status(400).json({ error: 'Voor welk bedrag?' });
     const b = bonMaak(req.supplier.code, { soort: req.body.soort, centen: bedrag,
       naam: req.body.naam, geldigTot: req.body.geldigTot });
@@ -70,7 +70,7 @@ module.exports = (kern) => {
       const regels = (Array.isArray(b.regels) ? b.regels : []).slice(0, 60).map(x => ({
         id: id(3), naam: schoon(x && x.naam, 80) || 'Artikel',
         aantal: Math.max(1, Math.min(99, parseInt(x && x.aantal, 10) || 1)),
-        centen: x && x.centen != null ? centen(x.centen) : uitEuro(x && x.prijs),
+        centen: x && x.centen != null ? heleCenten(x.centen) : uitEuro(x && x.prijs),
         lijstprijs: null, groep: null,
         /* Bij een OPGENOMEN bestelling reizen gang, station en allergie mee: de
            keuken moet hem nog maken. Bij een VERKOCHTE niet -- daar valt niets
@@ -89,7 +89,7 @@ module.exports = (kern) => {
         tafel: schoon(b.tafel, 30) || null,
         naam: opgenomen ? 'Offline opgenomen' : 'Offline bon',
         gasten: Math.max(1, Math.min(99, parseInt(b.gasten, 10) || 1)),
-        status: 'open', regels, kortingen: [], betalingen: [], fooiCenten: centen(b.fooiCenten),
+        status: 'open', regels, kortingen: [], betalingen: [], fooiCenten: heleCenten(b.fooiCenten),
         offline: true, offlineSoort: opgenomen ? 'opgenomen' : 'verkocht',
         geopendAt: schoon(b.at, 30) || nu(), door: req.actor.name, at: nu() };
       /* Een offline VERKOCHTE bon is meestal al betaald aan de bar; die
@@ -158,7 +158,7 @@ module.exports = (kern) => {
     if (Array.isArray(req.body.arrangementen)) {
       h.instel.arrangementen = req.body.arrangementen.slice(0, 30).map(a => ({
         id: schoon(a && a.id, 20) || id(3), naam: schoon(a && a.naam, 60) || 'Arrangement',
-        centen: a && a.centen != null ? centen(a.centen) : uitEuro(a && a.prijs),
+        centen: a && a.centen != null ? heleCenten(a.centen) : uitEuro(a && a.prijs),
         perPersoon: (a && a.perPersoon) !== false,
         bevat: Array.isArray(a && a.bevat) ? a.bevat.slice(0, 20).map(x => schoon(x, 60)).filter(Boolean) : [] }));
     }

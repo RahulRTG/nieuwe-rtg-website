@@ -6,7 +6,7 @@
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Schrift</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -64,14 +64,15 @@
   .tip b{color:var(--rtg-leesgoud,var(--goud));}
   .chatrij{display:flex;gap:.5rem;}
   .chatrij input{flex:1;}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}.merkvlak b{color:#F4E9C8;}
+.merkvlak{display:inline-block;background:transparent;color:#C39B4A;padding:0;border-radius:0;}.merkvlak b{color:#F4F0E7;font-weight:500;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div class="kop">
-  <div class="brand"><span class="merkvlak">RT<b>Foundation</b></span></div>
+  <div class="brand"><span class="merkvlak">Rahul Travel <b>Foundation</b></span></div>
   <div><div id="mVak" style="font-weight:600;font-size:.9rem;">Les</div><div class="mini" id="mNaam"></div></div>
   <div class="status"><span class="dot" id="liveDot"></span><span id="liveTxt">verbinden…</span> · <span id="bewaard">opgeslagen</span></div>
 </div>
@@ -93,7 +94,7 @@
       <span class="kleur" data-kleur="#5FA56A" style="background:#5FA56A"></span>
       <button class="tbtn" id="tUndo">↶</button>
     </div>
-    <input class="titelinp" id="pgTitel" placeholder="Titel van deze bladzijde" style="margin:.2rem 0;">
+    <input class="titelinp" id="pgTitel" placeholder="Titel van deze bladzijde" style="margin:0.25rem 0;">
     <div class="paginabox" id="paginabox"></div>
   </div>
 
@@ -264,5 +265,6 @@ window.addEventListener('beforeunload', ()=>{ try{ vangHuidigeTekening(); naviga
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

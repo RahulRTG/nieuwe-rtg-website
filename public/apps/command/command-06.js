@@ -54,7 +54,7 @@
         '<p class="meta">' + esc(g.id) + ' · versie ' + g.versie + ' van ' + g.versies +
         (g.sinds ? ' · sinds ' + esc(C.tijd(g.sinds)) + ' door ' + esc(g.door) : ' · startwaarde') +
         (g.vierOgen ? ' · vier ogen vereist' : '') + '</p>' +
-        '<div class="crij" style="margin-top:.6rem;align-items:baseline;">' +
+        '<div class="crij" style="margin-top:0.5rem;align-items:baseline;">' +
         '<b style="font-family:\'Bodoni Moda\',Georgia,serif;font-size:1.4rem;">' + esc(String(g.waarde)) + '</b>' +
         '<span class="meta">' + esc(g.eenheid) + '</span>' +
         '<input class="veld" data-nw="' + esc(g.id) + '" placeholder="nieuwe waarde" style="width:8rem;">' +
@@ -76,7 +76,7 @@
         var w = document.querySelector('[data-nw="' + id + '"]').value;
         if (w === '') { C.meld('Vul eerst een nieuwe waarde in.'); return; }
         api('simulatie/beleid', { id: id, waarde: isNaN(Number(w)) ? w : Number(w) }).then(function (d) {
-          proefvak(id).innerHTML = '<div style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
+          proefvak(id).innerHTML = '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
             '<b>Proef zonder te zetten:</b> ' + esc(d.gevolg) +
             (d.risicoWaarschuwing ? '<br><span style="color:var(--acc);">' + esc(d.risicoWaarschuwing) + '</span>' : '') +
             (d.wijzigingen.length ? '<br>' + d.wijzigingen.map(function (x) {

@@ -72,10 +72,8 @@ module.exports = (ctx) => {
 
   const id = (p) => p + crypto.randomBytes(4).toString('hex');
 
-  function bak() {
-    if (!db.data.festivals || typeof db.data.festivals !== 'object') db.data.festivals = {};
-    return db.data.festivals;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/festival/model', bezit: { festivals: 'kaart' } });
+  const bak = () => eigen.bak('festivals');
 
   const festivalVind = (fid) => bak()[String(fid || '')] || null;
 

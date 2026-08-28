@@ -46,7 +46,7 @@ const SOORTEN = {
 };
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, centen, euro, S, audit, wie, rolIn, magRecht, poort, stadVan, limietVan, save } = ctx;
+  const { nu, rid, schoon, naarCenten, euro, S, audit, wie, rolIn, magRecht, poort, stadVan, limietVan, save } = ctx;
 
   const vind = id => S().projecten.find(p => p.id === String(id || '')) || null;
   const beeld = p => ({ id: p.id, stad: p.stad, stadNaam: (stadVan(p.stad) || {}).naam || null,
@@ -76,7 +76,7 @@ module.exports = (ctx) => {
     if (!g.ok) return g;
     const naam = schoon(b.naam, 120);
     if (naam.length < 3) return { status: 400, error: 'Hoe heet dit project?' };
-    const budget = centen(b.budget === undefined ? 0 : b.budget);
+    const budget = naarCenten(b.budget === undefined ? 0 : b.budget);
     if (budget === null) return { status: 400, error: 'Wat is het budget? Nul mag ook.' };
     if (S().projecten.length >= 20000) return { status: 400, error: 'Het projectregister zit vol.' };
     let partnerId = schoon(b.partnerId, 20) || null;
@@ -113,7 +113,7 @@ module.exports = (ctx) => {
     if (b.leider !== undefined) p.leiderNaam = schoon(b.leider, 60);
     for (const d of ['van', 'tot']) if (b[d] !== undefined) p[d] = schoon(b[d], 10) || null;
     if (b.budget !== undefined) {
-      const c = centen(b.budget);
+      const c = naarCenten(b.budget);
       if (c === null) return { status: 400, error: 'Wat is het budget?' };
       /* Een budgetverhoging na goedkeuring is een nieuw besluit, geen wijziging:
          anders keurt de stad 2.000 euro goed en staat er de volgende dag 40.000.

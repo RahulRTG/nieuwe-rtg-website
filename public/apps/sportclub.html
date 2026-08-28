@@ -72,7 +72,7 @@
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">Het clubkantoor: van de jeugdteams tot marketing, van het veldbeheer tot de financiën. De kantine draait op de gewone kassa, het personeel op het rooster. Log in met je persoonlijke pincode.</p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">Het clubkantoor: van de jeugdteams tot marketing, van het veldbeheer tot de financiën. De kantine draait op de gewone kassa, het personeel op het rooster. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="hoofd knop" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -150,7 +150,7 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.sponsorsOpen+'</b><span>Sponsorpakketten open</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw afdeling</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Jouw afdeling</h3>'+
     '<div class="keuze">'+
       '<button data-rol="wedstrijden"><span class="ic"></span>Wedstrijden &amp; tickets<span class="sub">programma, uitslagen, de stand en de scan bij de poort</span></button>'+
       '<button data-rol="plattegrond"><span class="ic"></span>Plattegrond<span class="sub">het eigen stadion: vakken, prijzen, horeca en wc’s</span></button>'+
@@ -166,7 +166,7 @@ async function kiesScherm(){
        velden: schermVelden, zakelijk: schermZakelijk, momenten: schermMomenten, financien: schermFinancien })[b.dataset.rol]();
   }));
 }
-function kopStuk(titel){ return '<button class="terug" id="terug">← het clubkantoor</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>'; }
+function kopStuk(titel){ return '<button class="terug" id="terug">← het clubkantoor</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>'; }
 function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-clubmanager adviseert; beslissen doet de club zelf.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);
@@ -239,9 +239,9 @@ async function schermPlattegrond(){
   let p; try { p = await api('/api/sport/plattegrond'); } catch(e){ meld(e.message); return; }
   $('#app').innerHTML = kopStuk('Plattegrond')+
     '<div class="item" style="background:var(--card2);"><div class="meta">De club tekent zijn eigen stadion: tribunevakken met capaciteit en prijs, en de voorzieningen (horeca, wc, entree, ehbo) per vak. Leden kopen hun ticket precies op deze kaart.</div></div>'+
-    '<h3 style="font-size:.95rem;margin:.6rem 0 .3rem;">Tribunevakken</h3><div id="pgVakken"></div>'+
+    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Tribunevakken</h3><div id="pgVakken"></div>'+
     '<div class="item"><h4>Vak erbij</h4><div class="rij"><input class="veld" id="nVak" placeholder="Naam (bijv. Tribune Oost)" maxlength="60" style="flex:1;min-width:8rem;"><input class="veld" id="nCap" type="number" min="1" placeholder="Plaatsen" style="width:6rem;"><input class="veld" id="nPrijs" type="number" min="0" step="0.5" placeholder="€" style="width:5rem;"><button class="knop" id="nVakGo">Voeg toe</button></div></div>'+
-    '<h3 style="font-size:.95rem;margin:.6rem 0 .3rem;">Voorzieningen</h3><div id="pgVz"></div>'+
+    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Voorzieningen</h3><div id="pgVz"></div>'+
     '<div class="item"><h4>Voorziening erbij</h4><div class="rij"><select class="veld" id="vzSoort">'+p.soorten.map(s=>'<option>'+esc(s)+'</option>').join('')+'</select><input class="veld" id="vzNaam" placeholder="Naam" maxlength="60" style="flex:1;min-width:7rem;"><select class="veld" id="vzBij">'+p.vakken.map(v=>'<option value="'+esc(v.id)+'">bij '+esc(v.naam)+'</option>').join('')+'</select><button class="knop" id="vzGo">Voeg toe</button></div></div>'+
     aiBlok('Bijv. klopt mijn prijsopbouw per vak?');
   koppelBasis();
@@ -333,7 +333,7 @@ async function schermZakelijk(){
   let sp, km, tms;
   try { sp = await api('/api/sport/sponsors'); km = await api('/api/sport/kampen'); tms = await api('/api/sport/teams'); } catch(e){ meld(e.message); return; }
   $('#app').innerHTML = kopStuk('Sponsors & kampen')+
-    '<h3 style="font-size:.95rem;margin:.2rem 0 .3rem;">Sponsorpakketten</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.25rem 0 0.25rem;">Sponsorpakketten</h3>'+
     sp.sponsors.map(s =>
       '<div class="item"><h4>'+esc(s.pakket)+' <span class="status '+(s.status==='open'?'goud':'ok')+'">'+esc(s.status)+(s.sponsor?' · '+esc(s.sponsor):'')+'</span></h4>'+
       '<div class="meta">'+eur(s.prijsCenten)+(s.tekst?' · '+esc(s.tekst):'')+'</div>'+
@@ -343,7 +343,7 @@ async function schermZakelijk(){
     '<div class="item" style="background:var(--card2);"><h4>Nieuw pakket</h4>'+
     '<div class="rij"><input class="veld" id="spPak" placeholder="Bijv. Bordreclame Zuid" maxlength="80" style="flex:1;min-width:8rem;"><input class="veld" id="spPrijs" type="number" min="0" placeholder="€" style="width:6.5rem;"></div>'+
     '<div class="rij"><input class="veld" id="spTekst" placeholder="Korte omschrijving" maxlength="300" style="flex:1;min-width:10rem;"><button class="knop" id="spGo">Plaats</button></div></div>'+
-    '<h3 style="font-size:.95rem;margin:.8rem 0 .3rem;">Trainingskampen (via RTG)</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.75rem 0 0.25rem;">Trainingskampen (via RTG)</h3>'+
     km.kampen.map(k =>
       '<div class="item"><h4><span class="nr">'+esc(k.code)+'</span> · '+esc(k.team)+' naar '+esc(k.bestemming)+' <span class="status '+(k.status==='bevestigd'?'ok':k.status==='afgewezen'?'open':'goud')+'">'+esc(k.status)+'</span></h4>'+
       '<div class="meta">'+esc(k.periode)+' · '+k.personen+' personen'+(k.verblijf?' · '+esc(k.verblijf)+' · '+eur(k.kostenCenten):'')+(k.door?' · bevestigd door '+esc(k.door):'')+'</div></div>').join('')+

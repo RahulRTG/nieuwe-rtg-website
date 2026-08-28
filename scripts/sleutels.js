@@ -75,11 +75,12 @@ const regels = [
 ];
 
 if (priveBeta) {
-  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox en betalingen zijn demo']);
+  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox']);
 } else {
   regels.push(
     ['DATABASE_URL', docker ? '' : 'postgresql://VUL-IN', docker ? 'Docker bouwt deze veilig uit het aparte PostgreSQL-geheim' : 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],
-    ['REDIS_URL', docker ? 'redis://redis:6379' : 'redis://VUL-IN', 'HANDMATIG: realtime over meerdere instances'],
+    ['REDIS_URL', docker ? 'redis://redis:6379' : 'redis://VUL-IN', 'HANDMATIG: realtime en gedeelde PIN-antifraude over meerdere instances'],
+    ['RTG_PIN_ENTERPRISE', '1', 'productie start alleen met een gedeelde Redis-PIN-fraudeteller'],
     ['SMTP_URL', smtpUrl, 'HANDMATIG: anders worden e-mails niet echt verstuurd']
   );
 }
@@ -98,7 +99,7 @@ if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmati
    Per proces en in het geheugen, dus na een herstart begint de dag opnieuw --
    het is een noodrem, geen boekhouding. */
 regels.push(['RTG_AI_DAGPLAFOND', '50', 'noodrem: dagbedrag in dollar voor ALLE externe modellen samen']);
-if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
+if (zonderBetalen || priveBeta) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of fictieve betaalrail; elke betaalactie weigert fail-closed']);
 if (zonderSms) regels.push(['RTG_HERSTEL_SMS_UIT_BEWUST', '1', 'BEWUST: telefoonherstel weigert fail-closed zolang geen echte SMS-provider is gekoppeld']);
 if (nativeTls) regels.push(
   ['RTG_TLS', '1', 'native TLS/HTTP2 in RTG zelf'],

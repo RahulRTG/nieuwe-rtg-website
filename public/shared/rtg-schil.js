@@ -37,6 +37,19 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   };
+
+  /* Een Magnaat-scherm mag bij het openen van een tweede oppervlak nooit
+     ongemerkt terugvallen naar de echte omgeving. Alleen lokale app-URL's
+     erven de testmarkering; externe adressen worden bewust niet herschreven. */
+  function oppervlakUrl(url) {
+    if (!url || new URLSearchParams(location.search).get('magnaat') !== '1') return url;
+    try {
+      var doel = new URL(url, location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return url;
+      doel.searchParams.set('magnaat', '1');
+      return doel.pathname + doel.search + doel.hash;
+    } catch (e) { return url; }
+  }
 /* ---------------------------------------------------------- de indeling --
      De console is het ANKER en schuift naar waar hij het minst stoort
      (WERKRUIMTE.md par. 2): bij een lege ruimte staat hij midden, zodra er
@@ -56,23 +69,26 @@
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
     if (standaard()) {
-      /* De vaste Work OS-kamer heeft op ELK formaat dezelfde drie ankers:
-         links de software, boven het open werk en onder de korte route. Een
-         actieve app krijgt altijd het volledige vlak ertussen. Voorheen werd
-         dit vlak nog als een raster verdeeld terwijl CSS de overige apps
-         verborg; daardoor kon de zichtbare app letterlijk een half scherm
-         krijgen. */
-      var bank = m.b < 700 ? 56 : (m.b < 1100 ? 68 : 178);
-      var tabhoog = m.b < 700 ? 52 : 50;
-      var onderhoog = m.b < 700 ? 62 : 58;
-      zet(schil.console, 0, 0, bank, m.h);
-      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
-      if (schil.onderbalk) zet(schil.onderbalk, bank, m.h - onderhoog, m.b - bank, onderhoog);
+      /* De Edge System-randen zijn de enige navigator. In het vlak liggen
+         maximaal vier echte apps: 1, 2 of 2 x 2. Op een telefoon is het altijd
+         precies de actieve app. */
+      zet(schil.console, 0, 0, 0, 0);
+      if (schil.tabs) zet(schil.tabs, 0, 0, 0, 0);
+      if (schil.onderbalk) zet(schil.onderbalk, 0, 0, 0, 0);
       if (!n) return;
-      var werkbreed = m.b - bank;
-      var werkhoog = m.h - tabhoog - onderhoog;
-      schil.surfaces.forEach(function (s) {
-        zet(s.el, bank, tabhoog, werkbreed, werkhoog);
+      var limiet = m.b < 720 ? 1 : parseInt(d.body.dataset.rtgLayout || '2', 10);
+      if ([1, 2, 4].indexOf(limiet) < 0) limiet = 1;
+      var zichtbaar = schil.surfaces.slice(0, limiet);
+      if (schil.actief && zichtbaar.indexOf(schil.actief) < 0) zichtbaar[zichtbaar.length - 1] = schil.actief;
+      schil.surfaces.forEach(function (s) { s.el.toggleAttribute('data-edge-visible', zichtbaar.indexOf(s) >= 0); });
+      var k = zichtbaar.length;
+      var sk = k === 4 ? 2 : (k === 2 && m.b >= 760 ? 2 : 1);
+      var sr = Math.ceil(k / sk), sw = Math.floor(m.b / sk), sh = Math.floor(m.h / sr);
+      zichtbaar.forEach(function (s, i) {
+        var c = i % sk, r = Math.floor(i / sk);
+        zet(s.el, c * sw, r * sh,
+          c === sk - 1 ? m.b - c * sw : sw,
+          r === sr - 1 ? m.h - r * sh : sh);
       });
       return;
     }
@@ -131,6 +147,12 @@
     opties = opties || {};
     var bestaand = vind(id);
     if (bestaand) { maakActief(bestaand); return bestaand; }
+    /* Vier is een systeemgrens, geen aanbeveling. Een vijfde app vervangt de
+       oudste niet-actieve app zodat de werktafel nooit buiten 2 x 2 groeit. */
+    if (standaard() && schil.surfaces.length >= 4) {
+      var oud = schil.surfaces.filter(function (x) { return x !== schil.actief; })[0] || schil.surfaces[0];
+      if (oud) sluit(oud.id);
+    }
 
     var e = el('article', 'rtg-surface', schil.vak);
     e.dataset.id = id;
@@ -145,7 +167,8 @@
 
     el('div', 'kort', e).innerHTML = opties.kort || '';
     var vlak = el('div', 'vlak', e);
-    if (opties.url) {
+    var veiligeUrl = oppervlakUrl(opties.url || '');
+    if (veiligeUrl) {
       var f = d.createElement('iframe');
       f.setAttribute('title', opties.naam || id);
       /* Het recht op camera en microfoon doorgeven VOOR de src wordt gezet.
@@ -156,7 +179,7 @@
       /* De app draait als eigen pagina in de surface. Dat is met opzet: een app
          houdt zijn eigen diepte en zijn eigen sessie, en de shell hoeft niets
          van zijn binnenkant te weten (PLATFORM.md). */
-      f.src = opties.url;
+      f.src = veiligeUrl;
       vlak.appendChild(f);
     }
 
@@ -164,8 +187,17 @@
        (naam, adres, zoom) en moet dat adres dus kunnen teruglezen; stond het
        alleen in de opties, dan wist de shell na het openen niet meer wat er in
        een surface draaide. */
-    var s = { id: id, naam: opties.naam || id, url: opties.url || '', el: e, zoom: e.dataset.zoom, eigen: false };
+    var s = { id: id, naam: opties.naam || id, url: veiligeUrl, el: e, zoom: e.dataset.zoom, eigen: false };
     schil.surfaces.push(s);
+    /* Een pointer in een iframe borrelt niet door naar het bovenliggende
+       article. De apps zijn same-origin, dus koppelen we hun eerste aanraking
+       expliciet terug: werken in een vak maakt precies dat vak actief en laat
+       breadcrumb, functies, hoofdactie en Rahul-context meteen meeschakelen. */
+    var kader = e.querySelector('iframe');
+    if (kader) kader.addEventListener('load', function () {
+      try { kader.contentDocument.addEventListener('pointerdown', function () { maakActief(s); }, true); }
+      catch (fout) { /* een niet-lokaal kader blijft via de eigen kop selecteerbaar */ }
+    });
 
     h.addEventListener('pointerdown', function (ev) {
       if (ev.target.closest('button')) return;
@@ -222,6 +254,10 @@
     // de actieve surface bovenop, zodat zweven ook echt zweeft
     schil.surfaces.forEach(function (x, i) { x.el.style.zIndex = String(10 + i); });
     s.el.style.zIndex = '40';
+    if (w.RTGEdge) w.RTGEdge.setContext({
+      title: s.naam, tool: s.id, actie: (schil.actionPrefix || 'Open') + ' ' + s.naam
+    });
+    schik();
     tekenConsole(); tekenTabs();
   }
 
@@ -735,6 +771,7 @@
     schil.apps = (opties.apps || []).slice();
     schil.dockApps = (opties.dock || []).slice();
     w.addEventListener('resize', schik);
+    w.addEventListener('rtg-edge-layout', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {

@@ -40,6 +40,18 @@ async function nieuwLid(naam) {
   return { token: reg.token, codenaam: st.state.user.codename };
 }
 const koppelingen = async (t) => json(await api('/api/link/koppelingen', {}, t));
+async function verbindVast(van, naar) {
+  const pin = (await json(await api('/api/member/pin', {}, naar.token))).toon;
+  const kaart = await json(await api('/api/member/pin/zoek', { pin }, van.token));
+  return api('/api/member/pin/connect', { pin, bevestiging: kaart.bevestiging }, van.token);
+}
+async function verbindLevend(van, naar) {
+  const live = await json(await api('/api/member/pin/live', {}, naar.token));
+  const kaart = await json(await api('/api/member/pin/live/kijk', { livecode: live.token }, van.token));
+  return api('/api/member/pin/live/verbind', {
+    livecode: live.token, bevestiging: kaart.bevestiging
+  }, van.token);
+}
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -93,8 +105,7 @@ test('intrekken op id werkt een keer, en alleen voor wie hem afgaf', async () =>
 test('een verstuurd verzoek draagt zijn eigen weg terug, en die werkt precies een keer', async () => {
   const dirk = await nieuwLid('Koppel Dirk');
   const eva = await nieuwLid('Koppel Eva');
-  const pin = (await json(await api('/api/member/pin', {}, eva.token))).toon;
-  await api('/api/member/pin/connect', { pin }, dirk.token);
+  await verbindVast(dirk, eva);
 
   const k = await koppelingen(dirk.token);
   assert.equal(k.bonnen.length, 1);
@@ -119,8 +130,7 @@ test('de ONTVANGER trekt jouw verzoek niet in -- hij weigert het, en dat is iets
      weigeren -- zonder dat de verzender het ooit als weigering ziet staan. */
   const paul = await nieuwLid('Koppel Paul');
   const roos = await nieuwLid('Koppel Roos');
-  const pin = (await json(await api('/api/member/pin', {}, roos.token))).toon;
-  await api('/api/member/pin/connect', { pin }, paul.token);
+  await verbindVast(paul, roos);
   const naarRoos = (await koppelingen(paul.token)).bonnen[0].naar;
 
   const mij = (await json(await api('/api/member/connections', {}, roos.token))).me;
@@ -139,8 +149,7 @@ test('intrekken sluit een deur, maar wist niet dat hij open is geweest', async (
      tussen een logboek en een schoonmaakknop. */
   const finn = await nieuwLid('Koppel Finn');
   const gwen = await nieuwLid('Koppel Gwen');
-  const pin = (await json(await api('/api/member/pin', {}, gwen.token))).toon;
-  await api('/api/member/pin/connect', { pin }, finn.token);
+  await verbindVast(finn, gwen);
   const voor = await koppelingen(finn.token);
   await api('/api/member/connect/intrek', { key: voor.bonnen[0].naar }, finn.token);
 
@@ -173,8 +182,7 @@ test('per partij: hoe vaak, wanneer, en langs welke weg -- het antwoord op "waar
   const kim = await nieuwLid('Koppel Kim');
   const lou = await nieuwLid('Koppel Lou');
   for (const ander of [kim, lou]) {
-    const pin = (await json(await api('/api/member/pin', {}, ander.token))).toon;
-    await api('/api/member/pin/connect', { pin }, jan.token);
+    await verbindVast(jan, ander);
   }
   const k = await koppelingen(jan.token);
   assert.equal(k.partijen.length, 2, 'twee partijen, niet vier regels');
@@ -193,8 +201,7 @@ test('een levende code levert een bon zonder partij, en dat wordt niet weggemoff
      partij "onbekend" verzonnen te worden die over niemand gaat. */
   const mees = await nieuwLid('Koppel Mees');
   const nina = await nieuwLid('Koppel Nina');
-  const live = await json(await api('/api/member/pin/live', {}, nina.token));
-  await api('/api/member/pin/live/verbind', { livecode: live.token }, mees.token);
+  await verbindLevend(mees, nina);
 
   const k = await koppelingen(mees.token);
   assert.equal(k.bonnen.length, 1);

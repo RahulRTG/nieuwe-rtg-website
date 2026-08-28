@@ -1,12 +1,29 @@
-/* Kassa (deelmodule): het inwisselen aan de kassa. Afgesplitst uit
-   ./verkoop.js toen die met main's idempotentieronde en de kaartimport samen
-   door de 10 kB-maat ging; zie daar voor de verkoopstroom. */
-'use strict';
+/* Kassa (deelmodule): INNEN op een RTG-ophaalcode -- een bestelling die online
+   is geplaatst uitgeven, en hem afrekenen als dat nog niet was gebeurd.
+
+   Waarom dit naast ./verkoop.js staat en er niet in. Dat bestand gaat over de
+   losse kassaverkoop: iemand staat aan de balie, er is nog geen bestelling, en
+   de bon ontstaat op dat moment. Hier bestaat de bestelling al -- met een ref,
+   een codenaam en misschien een betaling -- en het enige dat gebeurt is: hem
+   vinden, eventueel afrekenen, en uitgeven. Twee verschillende beginsituaties.
+
+   De aanleiding was de omvangsgrens van keuringsregel 13: verkoop.js kwam op
+   10,4 kB doordat de verkoop de herhalingslaag kreeg (kern/kassa/herhaling.js)
+   en de cadeaukaart een betaalwijze werd. Beide horen bij de VERKOOP; het innen
+   stond er alleen naast. Dit is dus de naad die er al lag.
+
+   GEEN HERHALINGSLAAG HIER, en dat is geen vergeten regel. Deze route is uit
+   zichzelf al eenmalig: hij weigert een code die al is uitgegeven met een 409
+   ("Code X is al uitgegeven"), en de tweede oproep komt dus nooit bij het
+   afrekenen. Een idem-sleutel zou daar niets aan toevoegen. */
 module.exports = (kern) => {
+  const { app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
+          sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, ordersVanZaak } = kern;
+  // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
-  const factuurVoorLid = maakFactuurVoorLid(kern.facturatie);
-  const { app, broadcastSync, crypto, db, logActivity, notify, ordersVanZaak, pickupCode, save, sseToCustomer, sseToOffice, sseToSupplier, supplierAuth } = kern;
-  app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
+  const factuurVoorLid = maakFactuurVoorLid(facturatie);
+
+app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   const code = String(req.body.code || '').trim().toUpperCase();
   if (!code) return res.status(400).json({ error: 'Voer een ophaalcode in.' });
   const o = ordersVanZaak(req.supplier.code).find(x => x.pickup === code);
@@ -18,6 +35,7 @@ module.exports = (kern) => {
   if (!o.paid) {
     // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
     o.paid = true;
+    o.betaaldMet = 'rtg'; // de werkelijke betaalwijze, voor de dagafsluiting (TAKEN.md 4.59)
     /* HET MOMENT VAN BETALEN, en dat stond hier als enige betaalweg niet bij.
        Elke andere weg zet paidAt (bestellen.js, rekening.js, tafelticket), en de
        hele verslaglegging valt daarop terug: het dagrapport, de maandboekhouding
@@ -58,4 +76,5 @@ module.exports = (kern) => {
   notify(o.customerTier, { icon: 'ster', title: req.supplier.name, body: 'Uw bestelling is uitgegeven. Veel plezier.', scope: 'orders' });
   res.json({ ok: true, order: { ref: o.ref, codename: o.customerCodename, items: o.items, total: o.total, wasPaid }, sale });
 });
+
 };

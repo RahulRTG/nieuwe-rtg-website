@@ -74,23 +74,37 @@ function loadRing(file, vault) {
   return uit;
 }
 
-function init() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const db = new DatabaseSync(DB_FILE);
-  S.db = db;
+/* De gelijktijdigheidsstand van een verbinding. Staat apart zodat de VOLGORDE
+   beproefbaar is (test/pragmavolgorde.test.js) in plaats van alleen bedoeld. */
+function zetGelijktijdigheid(db) {
   /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
      herstart die de oude instance een tel overlapt, parallelle testservers)
      wacht de tweede even in plaats van hard te crashen op "database is
      locked". Dit was de bron van de sporadische testflake.
 
-     DE VOLGORDE DOET ERTOE, en dat stond hier nog verkeerd om: journal_mode=WAL
-     neemt zelf even een exclusief slot, dus een busy_timeout die ERNA komt geldt
-     niet voor de PRAGMA die hem het hardst nodig heeft. Precies de fout die
-     ../db/sqlite.js al had opgelost en die ../db/tx/sqliteachter.js de vloot
-     twee keer liet zakken. */
+     DE VOLGORDE IS DE HELFT VAN DIE REPARATIE, en die stond hier fout. Het
+     aanzetten van WAL neemt zelf een exclusief slot; zonder wachttijd DAARVOOR
+     krijgt het tweede proces meteen "database is locked" en valt het om --
+     precies de crash die deze regels moesten voorkomen. server/db/sqlite.js
+     had dat al door en zette de wachttijd vooraan; deze plek en
+     server/db/tx/sqliteachter.js waren nooit meegegaan. Gemeten met zes
+     processen die tegelijk migreren (test/migratierace.test.js): met de oude
+     volgorde vielen er een tot drie om, met deze geen. */
   db.exec('PRAGMA busy_timeout=5000');
-  db.exec('PRAGMA journal_mode=WAL');
+  const staatIn = () => String((db.prepare('PRAGMA journal_mode').get() || {}).journal_mode || '').toLowerCase();
+  const tot = Date.now() + 5000;
+  for (;;) {
+    if (staatIn() === 'wal') break;
+    try { db.exec('PRAGMA journal_mode=WAL'); break; }
+    catch (e) {
+      const bezet = /lock|busy/i.test(String((e && e.message) || e));
+      if (!bezet || Date.now() >= tot) throw e;
+      // De server luistert hier nog niet; synchroon wachten voorkomt dat de
+      // rest van de opstart op een half ingestelde verbinding doorgaat.
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
+    }
+  }
   db.exec('PRAGMA synchronous=NORMAL');
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een
@@ -105,6 +119,13 @@ function init() {
   S.SECRET = loadKey(SECRET_FILE, 'RTG_SECRET_KEY');
   S.VAULT = loadKey(VAULT_FILE, 'RTG_VAULT_KEY');
   S.RING = loadRing(RING_FILE, S.VAULT);
+}
+
+function init() {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  const db = new DatabaseSync(DB_FILE);
+  S.db = db;
+  zetGelijktijdigheid(db);
 }
 
 /* De WAL van rtg.db leegdrukken in het hoofdbestand.
@@ -136,7 +157,7 @@ function schrijfKluisRing(ring) {
 }
 
 module.exports = {
-  init, checkpoint, schrijfKluisRing, RING_FILE,
+  init, zetGelijktijdigheid, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,

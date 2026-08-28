@@ -115,12 +115,12 @@ test('de lege stand legt uit wat er komt te staan', () => {
   assert.doesNotMatch(start, /Ibiza/,
     'en draagt geen demo-inhoud meer die als eigen gegevens doorgaat');
 
-  // de demo bestaat nog, maar apart, en wordt alleen in de demostand geladen
-  const demo = lees('app-main-01b.js');
-  assert.match(demo, /const DEMO_DATA = \{/, 'de demo-inhoud staat in zijn eigen deel');
-  assert.match(demo, /Ibiza/, 'en bevat nog gewoon de demo-reis');
-  assert.match(lees('app-main-03.js'), /function laadDemoData\(/,
-    'die alleen in de expliciete demostand geladen wordt');
+  // de training bestaat nog, maar uitsluitend in Magnaats losse gegevensbestand
+  const scheiding = lees('app-main-01b.js');
+  assert.match(scheiding, /magnaat-data\.js/, 'de app verwijst voor trainingsinhoud naar Magnaats losse bestand');
+  assert.doesNotMatch(scheiding, /Ibiza|TEST-0158/, 'de echte app-bundel draagt zelf geen trainingsdossiers');
+  assert.match(lees('app-main-03.js'), /function laadMagnaatData\(/,
+    'die alleen in de afgeschermde Magnaat-kopie geladen wordt');
 });
 
 /* EN DE ANDERE KANT VAN DEZELFDE MEDAILLE: HOE HET DOSSIER ZICH WEL VULT.

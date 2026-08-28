@@ -32,6 +32,7 @@ const VELDEN = ['van', 'onderwerp', 'tekst', 'soort'];
 const MAX_REGELS = 30;
 
 module.exports = ({ db, save, crypto, rtmail, vak, schrijf }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtmail-regels', bezit: { rtmailRegels: 'kaart' } });
   const nu = () => new Date().toISOString();
   const busVan = (adres) => {
     const o = adresLaag.ontleed(adres);
@@ -40,8 +41,7 @@ module.exports = ({ db, save, crypto, rtmail, vak, schrijf }) => {
   const kap = (s, n) => String(s == null ? '' : s).replace(/[<>]/g, '').trim().slice(0, n);
 
   function R() {
-    if (!db.data.rtmailRegels || typeof db.data.rtmailRegels !== 'object') db.data.rtmailRegels = { regels: [] };
-    const r = db.data.rtmailRegels;
+    const r = eigen.bak('rtmailRegels', (b) => { b.regels = []; });
     if (!Array.isArray(r.regels)) r.regels = [];
     return r;
   }

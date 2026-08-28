@@ -76,7 +76,7 @@
 
   <div class="deel">Merken</div>
   <div class="kop2"><h2>Merken</h2><span class="n">werkt met RTG Home Kit · elk merk kan aansluiten</span></div>
-  <p class="stil" style="margin-bottom:.6rem;">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
+  <p class="stil" style="margin-bottom:0.5rem;">Verbind een merk en zijn apparaten verschijnen meteen in uw kamers en scènes. Ontkoppelen haalt ze net zo netjes weer weg. Elk RTG-partnermerk kan zich via de open koppelstandaard aanmelden.</p>
   <div class="scenes" id="merken"><span class="stil">Laden…</span></div>
 
   <div class="deel">Kamers</div>
@@ -218,7 +218,7 @@ $('#maak').addEventListener('click', async () => {
     VOORSTEL = r.voorstel;
     const alle = HUIS.kamers.flatMap(k => k.apparaten);
     $('#voorstel').hidden = false;
-    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(demo-voorstel; met AI-sleutel bouwt Rahul hem zelf)</small>':'')+
+    $('#voorstel').innerHTML = '<b>✶ '+esc(VOORSTEL.naam)+'</b>'+(r.demo?' <small style="color:var(--soft);">(lokaal basisvoorstel; met AI-koppeling bouwt Rahul het persoonlijk)</small>':'')+
       '<p class="stil h-mt20">'+esc(VOORSTEL.uitleg)+'</p>'+
       '<ul>'+Object.entries(VOORSTEL.standen).map(([id,s]) => { const a = alle.find(x => x.id === id); return '<li>'+esc(a?a.naam:id)+': '+esc(JSON.stringify(s).replace(/[{}"]/g,'').replace(/,/g,', ').replace(/aan:true/,'aan').replace(/aan:false/,'uit'))+'</li>'; }).join('')+'</ul>'+
       '<div class="rij h-mt60"><button class="knop" id="vBewaar">Bewaar als scène</button><span class="stil">Sloten doet u altijd zelf; die zitten er nooit in.</span></div>';

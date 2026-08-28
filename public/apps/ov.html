@@ -136,6 +136,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<link href="/shared/rtg-edge-system.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl travel-os" data-rtg-eigenvlak="onyx">
 <header class="kop">
@@ -170,7 +171,7 @@
       <div class="keten" id="lopendKeten" aria-hidden="true"></div>
       <div id="lopendEtappes"></div>
       <p class="stil" id="lopendVoertuig"></p>
-      <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
         <button class="knop" id="lopendAnnuleer" type="button">Annuleren</button>
         <button class="knop" id="lopendDeel" type="button">Deel deze rit</button>
       </div>
@@ -187,7 +188,7 @@
              bij hetzelfde label "Bestemming", maar een select kan geen tweede
              `for` delen en heeft geen placeholder om op terug te vallen; zonder
              eigen naam is hij voor een schermlezer een naamloos veld. -->
-        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" style="margin-top:0.5rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
@@ -201,7 +202,7 @@
           <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
           <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
         </div>
-        <div id="beleidKaart" class="weg" style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
+        <div id="beleidKaart" class="weg" style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">
           <p class="stil" id="beleidUit"></p>
         </div>
         <div style="margin-top:0.9rem;">
@@ -215,7 +216,7 @@
         <h2>Hoe wilt u reizen?</h2>
         <div id="opties"></div>
         <div class="kaart weg" id="afvalKaart">
-          <p class="stil" style="margin-bottom:0.4rem;">Wat er niet bij staat, en waarom:</p>
+          <p class="stil" style="margin-bottom:0.5rem;">Wat er niet bij staat, en waarom:</p>
           <div id="afgevallen"></div>
         </div>
       </div>
@@ -242,7 +243,7 @@
     <div class="kaart rit weg" id="ritKaart">
       <p style="font-size:0.95rem;"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
       <p class="stil" id="ritSub"></p>
-      <div style="margin-top:0.7rem;"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
+      <div style="margin-top:0.75rem;"><button class="knop vol" id="uitKnop" type="button">Check uit</button></div>
     </div>
 
     <!-- twee snelle opties -->
@@ -274,7 +275,7 @@
           <div><label for="kaartVan">Instappen</label><select id="kaartVan"></select></div>
           <div><label for="kaartNaar">Uitstappen</label><select id="kaartNaar"></select></div>
         </div>
-        <div style="margin-top:0.8rem;"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
+        <div style="margin-top:0.75rem;"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
       </div>
       <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
     </div>
@@ -283,7 +284,7 @@
     <div class="kaart">
       <div id="aboVorm" class="weg">
         <p class="stil" id="aboUitleg"></p>
-        <div style="margin-top:0.7rem;"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
+        <div style="margin-top:0.75rem;"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
       </div>
       <p class="stil" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
       <div id="aboLijst"></div>
@@ -1013,6 +1014,7 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
 </body>
 </html>

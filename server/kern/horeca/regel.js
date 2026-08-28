@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = ({ schoon, horeca }) => {
-  const { id, nu, centen, uitEuro, happyKorting } = horeca;
+  const { id, nu, heleCenten, uitEuro, happyKorting } = horeca;
 
   /* Bouwt een bestelregel of geeft een fout terug in dezelfde vorm als de rest
      van het huis ({ status, error }). Geeft nooit een half gevulde regel: bij
@@ -31,13 +31,13 @@ module.exports = ({ schoon, horeca }) => {
        vergelijking met null en niet de valstrik `if (!prijs)`.
 
        WAT DEZE CONTROLE NIET DOET, en dat was in de oude code net zo: een
-       ONTBREKENDE prijs komt hier als 0 binnen, want `centen()` maakt van
+       ONTBREKENDE prijs komt hier als 0 binnen, want `heleCenten()` maakt van
        undefined een nul. Er is dus geen verschil tussen "gratis" en "vergeten
        in te vullen". Voor de gastkant maakt dat niet uit -- daar komt de prijs
        altijd van de kaart van de zaak -- maar de bediening kan zo een regel van
        nul euro aanslaan. Bewust hier gelaten en niet stilletjes veranderd: het
        strenger maken raakt de kassa en hoort een eigen besluit te zijn. */
-    const prijs = b.centen != null ? centen(b.centen) : uitEuro(b.prijs);
+    const prijs = b.centen != null ? heleCenten(b.centen) : uitEuro(b.prijs);
     if (prijs == null || Number.isNaN(prijs)) return { status: 400, error: 'Vul de prijs in.' };
 
     const groep = schoon(b.groep, 30) || null;

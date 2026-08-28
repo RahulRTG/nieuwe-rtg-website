@@ -12,7 +12,7 @@
    kennen: beslis() met een menselijke naam. Er is geen automatische toekenning.
    RTG Pass mag door iedereen worden aangevraagd (na de AI-intake), maar ook die
    aanvraag legt de app netjes op de stapel; het personeel zet de definitieve
-   ja of nee. Opslag: db.data.aanmeldingen. */
+   ja of nee. Opslag: de collectie aanmeldingen. */
 
 const PASSEN = {
   rtg: {
@@ -67,8 +67,9 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   const kap = (t, n) => schoon(String(t == null ? '' : t), n || 200);
   const eur = c => Math.round(c) / 100;
 
-  function A() { if (!Array.isArray(db.data.aanmeldingen)) db.data.aanmeldingen = []; return db.data.aanmeldingen; }
-  function B() { if (!Array.isArray(db.data.lidmaatschapBetalingen)) db.data.lidmaatschapBetalingen = []; return db.data.lidmaatschapBetalingen; }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/aanmeldingen', bezit: { aanmeldingen: 'lijst', lidmaatschapBetalingen: 'lijst' } });
+  function A() { return eigen.bak('aanmeldingen'); }
+  function B() { return eigen.bak('lidmaatschapBetalingen'); }
 
   /* Het betaalschema (de 12 maandtermijnen met de 30%-foundation-split en het
      kantooroverzicht) draait als submodule op dezelfde context; zie

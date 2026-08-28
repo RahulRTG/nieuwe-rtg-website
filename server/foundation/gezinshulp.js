@@ -87,7 +87,14 @@ async function checkPin(rec, pin) {
   return h.length === b.length && crypto.timingSafeEqual(h, b);
 }
 const geldigePin = p => /^\d{4,6}$/.test(String(p || ''));
-function schoonAvatar(v) { const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim(); return s ? Array.from(s).slice(0, 2).join('') : 'emo-blij'; }
+function schoonAvatar(v) {
+  const s = String(v == null ? '' : v).replace(/[<>]/g, '').trim();
+  if (!s) return 'ster';
+  // Nieuwe profielen bewaren een stabiele illustratie-id. Oude emoji-profielen
+  // blijven geldig, zodat bestaande gezinnen niets verliezen.
+  if (/^[a-z0-9-]{1,24}$/i.test(s)) return s.toLowerCase();
+  return Array.from(s).slice(0, 2).join('');
+}
 function schoonKleur(v) { return /^#[0-9a-fA-F]{6}$/.test(String(v || '')) ? v : KLEUREN[0]; }
 
 /* Elk gezinslid krijgt een codenaam, net als een RTG-lid, zodat RTF- en

@@ -200,3 +200,59 @@ test('8. een scherm dat wordt VOOROPGEHAALD telt niet als een bezoek', async () 
   assert.equal(soortVan('/apps/foundation/leren.html'), 'nevenverzoek',
     'een fetch uit een service worker is geen bezoek: ' + regels.join(' | '));
 });
+
+test('de testdraaier gooit een meegegeven RTG_ROUTELOG niet weg', () => {
+  /* DE KEURING ZET DIT PAD ZELF, en een latere stap leest het.
+
+     scripts/test-runner.js zette onvoorwaardelijk zijn eigen `.routejournaal`
+     in de omgeving van elk kindproces -- ook als de aanroeper er al een had
+     gekozen. Zolang test:gate een kaal `node --test` was, viel dat niet op:
+     die gaf de variabele gewoon door. Sinds test:gate via de draaier loopt,
+     schreef de suite naar het ene pad terwijl `scripts/dekking.js --lees` het
+     andere las, en zakte de keuring met "Het routejournaal bestaat niet.
+     Draaide de suite met RTG_ROUTELOG gezet?" -- terwijl het antwoord ja was.
+
+     Een melding die een goede vraag stelt en een fout antwoord suggereert,
+     kost meer tijd dan geen melding. Vandaar deze twee beweringen: het
+     meegegeven pad WINT, en zonder pad blijft er een eigen terugval. */
+  const { execFileSync } = require('child_process');
+  const draaier = path.join(__dirname, '..', 'scripts', 'test-runner.js');
+  const vraag = (extra) => JSON.parse(execFileSync(process.execPath,
+    [draaier, '--toon', '--bestanden=kappen.test.js'],
+    { cwd: path.join(__dirname, '..'), encoding: 'utf8',
+      env: { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1', ...extra } }));
+
+  const eigen = path.join(TMP, 'meegegeven-journaal.log');
+  assert.equal(vraag({ RTG_ROUTELOG: eigen }).journaal, eigen,
+    'de draaier vervangt een meegegeven RTG_ROUTELOG door zijn eigen pad; dan schrijft de suite ergens ' +
+    'anders dan waar de volgende stap leest');
+
+  const zonder = { ...process.env };
+  delete zonder.RTG_ROUTELOG;
+  /* EN --toon RAAKT HET JOURNAAL NIET AAN. Deze toets vraagt de draaier wat hij
+     zou doen, en dat gebeurt MIDDEN IN DE SUITE -- deze toets draait zelf mee.
+     Wiste die aanroep het journaal, dan gooide hij het bewijs weg van alles wat
+     de suite tot dan toe had aangeroepen, en meldde `scripts/dekking.js --lees`
+     daarna endpoints als "nooit aangeraakt" die wel degelijk geraakt waren.
+
+     Zo is het ook echt gegaan: CI telde er 493 tegen een norm van 0, terwijl
+     main op 4292 van 4292 stond. Niet omdat er minder werd aangeroepen, maar
+     omdat het logboek halverwege leeg was gemaakt. */
+  const bestaand = path.join(TMP, 'journaal-blijft-staan.log');
+  fs.writeFileSync(bestaand, 'GET /api/vooraf\n');
+  execFileSync(process.execPath, [draaier, '--toon', '--bestanden=kappen.test.js'],
+    { cwd: path.join(__dirname, '..'), encoding: 'utf8',
+      env: { ...process.env, RTG_AFBOUW_SLOT_ACTIEF: '1', RTG_ROUTELOG: bestaand } });
+  assert.equal(fs.existsSync(bestaand), true,
+    'de draaier gooit het journaal weg terwijl hij alleen zijn plan afdrukt; midden in de suite ' +
+    'wist dat het bewijs van alles wat er tot dan toe is aangeroepen');
+  assert.match(fs.readFileSync(bestaand, 'utf8'), /vooraf/,
+    'het journaal is leeggemaakt in plaats van met rust gelaten');
+
+  const terugval = JSON.parse(execFileSync(process.execPath,
+    [draaier, '--toon', '--bestanden=kappen.test.js'],
+    { cwd: path.join(__dirname, '..'), encoding: 'utf8',
+      env: { ...zonder, RTG_AFBOUW_SLOT_ACTIEF: '1' } })).journaal;
+  assert.match(terugval, /\.routejournaal$/,
+    'zonder RTG_ROUTELOG hoort de draaier zijn eigen journaal te kiezen en niet niets');
+});

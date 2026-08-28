@@ -79,6 +79,7 @@ module.exports = function rtgKeten({ betaal, crypto }) {
          die er niet is. Een pijlfunctie als waarde heeft die dubbelzinnigheid niet. */
       save: () => {},
       bijeen: async (werk) => werk(),
+      payBoekingenVoegToe: require('../../pay/loshistorie')(db),
       crypto: crypto || require('crypto'),
       betaal,
       /* DE SPELERS MOETEN BESTAAN, anders weigert kern/pay elke tik met "Die

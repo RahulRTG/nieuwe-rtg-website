@@ -1,15 +1,17 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="champagne">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTFoundation in uw buurt</title>
+<meta name="theme-color" content="#F4F0E9">
+<title>FoundationOS · RTFoundation in uw buurt</title>
 <link rel="icon" href="/icons/foundation.svg">
 <link rel="manifest" href="/manifests/rtf-buurt.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
 <style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#A6002F;--gold:#C39B4A;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
@@ -39,11 +41,22 @@
   .ruimte{margin-top:.6rem;}
   .verborgen{display:none;}
 </style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-rtg-world="foundation">
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html" aria-current="page"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Publieke wereld</span>
+</div>
 <header>
-  <div class="ey">RTFoundation</div>
-  <h1>Wat wij doen, bij u in de buurt</h1>
+  <div class="ey">FOUNDATIONOS · RTFOUNDATION</div>
+  <h1>Iedere buurt heeft een toekomst.</h1>
   <p id="wat">De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.</p>
 </header>
 <main id="main">
@@ -149,5 +162,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
      door deze laag binnengehaald). -->
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

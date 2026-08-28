@@ -1,0 +1,72 @@
+{
+  "uitleg": "Hoeveel losse schalen beantwoorden in RTG de vraag \"mag de machine dit zelf\". MAG ALLEEN KRIMPEN. Vijf vocabulaires voor een vraag is LAT.md regel 4 in het hart van de veiligheid: twee plekken die dezelfde waarheid vasthouden lopen uiteen, en meestal zonder dat iets klaagt. Er is geen gedeelde noemer: geen van de vijf drukt zijn handelingen uit in een namespace die een van de andere vier kan lezen, dus geen mens en geen machine kan ze naast elkaar leggen.",
+  "hoe": "node scripts/gezag.js --lijst",
+  "gemeten": {
+    "vocabulaires": 5,
+    "losseNiveaunamen": 22
+  },
+  "vocabulaires": [
+    {
+      "bestand": "server/kern/stuur/beleid.js",
+      "schaal": [
+        "verboden",
+        "voorstel",
+        "direct"
+      ],
+      "beslisser": "beleidVoor",
+      "bestuurt": "de AI over HTTP-routes, per rol (member/supplier/staff)"
+    },
+    {
+      "bestand": "server/kern/command/risico.js",
+      "schaal": [
+        "hand",
+        "assist",
+        "auto"
+      ],
+      "beslisser": "beoordeel",
+      "bestuurt": "handelingen in RTG Command, met een risicoscore per geval"
+    },
+    {
+      "bestand": "server/kern/geldbeleid/regels.js",
+      "schaal": [
+        "kijken",
+        "voorstellen",
+        "klaarzetten",
+        "automatisch"
+      ],
+      "beslisser": "regelZet",
+      "bestuurt": "geldregels van een lid (GELD.md par. 3/4)"
+    },
+    {
+      "bestand": "server/kern/stadsweefsel/ainiveau.js",
+      "schaal": [
+        "waarnemen",
+        "adviseren",
+        "voorbereiden",
+        "begrensd",
+        "verboden"
+      ],
+      "beslisser": "magAutomatisch",
+      "bestuurt": "handelingen van het stadsweefsel"
+    },
+    {
+      "bestand": "server/kern/bureau/delegatie.js",
+      "schaal": [
+        "informeren",
+        "aanbevelen",
+        "voorbereiden",
+        "uitvoeren",
+        "autonoom"
+      ],
+      "beslisser": "DOMEINEN",
+      "bestuurt": "wat het concierge-bureau namens een lid uit handen krijgt"
+    }
+  ],
+  "tegenspraken": [
+    {
+      "naam": "vergunning-of-aanvraag-afwijzen",
+      "wat": "ainiveau.js verbiedt de machine een aanvraag af te wijzen (niveau 4); stuur/beleid.js laat de AI precies dat als voorstel samenstellen, en magAutomatisch() wordt op die weg nooit aangeroepen.",
+      "ernst": "gesimuleerde wereld (server/kern/overheid + gemeente zijn demo, geen echte instantie), dus geen mens raakt vandaag een echte uitkering kwijt. De VORM is het bezwaar: de AI kiest bij \"wijs de volgende af\" zelf welk dossier het wordt, en de mens bevestigt een al ingevulde beslissing met een tik."
+    }
+  ]
+}

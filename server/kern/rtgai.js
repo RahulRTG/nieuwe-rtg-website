@@ -24,13 +24,14 @@ const DREMPEL_DOMEINEN = Number(process.env.RTGAI_DREMPEL_DOMEINEN || 12);
 const TRAIN_MS = Number(process.env.RTGAI_MS || 60000);
 
 module.exports = ({ db, save, zelfzorgVan }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgai', bezit: { rtgai: 'kaart' } });
   const S = () => {
-    if (!db.data.rtgai || typeof db.data.rtgai !== 'object') {
-      db.data.rtgai = { fase: 'meelezen', gestart: Date.now(), waarnemingen: 0, domeinen: {},
-        fouten: 0, rondes: 0, roerSinds: null, roerRondes: 0, journaal: [] };
-    }
-    if (!Array.isArray(db.data.rtgai.journaal)) db.data.rtgai.journaal = [];
-    return db.data.rtgai;
+    const s = eigen.bak('rtgai', (b) => {
+      Object.assign(b, { fase: 'meelezen', gestart: Date.now(), waarnemingen: 0, domeinen: {},
+        fouten: 0, rondes: 0, roerSinds: null, roerRondes: 0, journaal: [] });
+    });
+    if (!Array.isArray(s.journaal)) s.journaal = [];
+    return s;
   };
   const schrijf = (tekst, soort) => {
     const s = S();

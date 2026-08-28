@@ -37,7 +37,7 @@
         var toon = 'vertaling';
         function teken() {
           el.innerHTML = '<span class="vt-txt">' + emo(toon === 'vertaling' ? r.text : origineel) + '</span>' +
-            ' <button type="button" class="vt-knop" style="background:none;border:none;padding:0;margin-left:.3rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold,#C9A24B);cursor:pointer;opacity:.75;">' +
+            ' <button type="button" class="vt-knop" style="background:none;border:none;padding:0;margin-left:0.25rem;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--gold,#C9A24B);cursor:pointer;opacity:.75;">' +
             (toon === 'vertaling' ? (to === 'en' ? 'original' : 'origineel') : (to === 'en' ? 'translation' : 'vertaling')) + '</button>';
           var b = el.querySelector('.vt-knop');
           if (b) b.addEventListener('click', function () { toon = (toon === 'vertaling' ? 'origineel' : 'vertaling'); teken(); });

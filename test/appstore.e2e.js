@@ -120,6 +120,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }]
     }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+    await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     assert.equal((await api(base, '/api/appstore/kantoor/besluit',
       { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office)).status, 200);
 
@@ -202,6 +203,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
         machtigingen: [{ id: 'opslag.eigen', doel: 'voortgang-onthouden' }, { id: 'profiel.basis', doel: 'aanspreken' }] },
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
+    await api(base, '/api/appstore/kantoor/toegankelijk', { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
     await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
 
     browser = await pw.chromium.launch(browserOpties(pw));
@@ -369,8 +371,20 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
       null, { timeout: 15000 });
     assert.match(await kp.textContent('#hcUit'), /0 nagelopen/, 'er staat nog niets live, en dat zegt hij ook');
     assert.match(await kp.textContent('#hcUit'), /byte voor byte/, 'met wat de ronde eigenlijk heeft gedaan erbij');
-    assert.match(await kp.textContent('body'), /Bonproef/, 'de inzending staat in de wachtrij');
-    assert.match(await kp.textContent('body'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
+    assert.match(await kp.textContent('#main'), /Bonproef/, 'de inzending staat in de wachtrij');
+    assert.match(await kp.textContent('#main'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
+    /* DE TOEGANKELIJKHEIDSPOORT, van scherm tot server (besluit 27 augustus
+       2026). Hier komt hij aan zijn eind toe: er is nog geen keuring gedraaid,
+       dus deze versie gaat niet live -- ook niet als er een naam onder staat.
+       Dat het scherm dat zegt is geen luxe: zonder die regel drukt wie hier zit
+       op Publiceren en moet hij raden waarom er niets gebeurt. */
+    /* Op #main kijken en niet op body: het script staat IN de body, dus
+       body.textContent bevat ook de bron van dit scherm. Een toets die daarop
+       kijkt, blijft groen als het blok nooit wordt getekend -- dat is hier eerst
+       gebeurd. */
+    assert.match(await kp.textContent('#main'), /Toegankelijkheid: nog niet gekeurd/,
+      'het keuringsscherm zegt dat de toegankelijkheidskeuring nog moet draaien');
+
     // zonder naam gaat het niet
     await kp.click('[data-v] .pub');
     /* WAAROM OP DE WEIGERING EN NIET OP RUST. Dit is een NEGATIEVE bewering: er
@@ -383,10 +397,36 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
        dus het bewijs dat de heenreis ECHT is gemaakt en ECHT is afgewezen. */
     await wachtOpTekst(kp, /Zet je naam erbij/, { in: '#melding' });
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
+
+    // en met een naam ook niet, zolang de keuring niet is gedraaid
     await kp.fill('#wie', 'Sam van RTG');
     await kp.click('[data-v] .pub');
+    /* Op de TEKST van deze weigering wachten en niet op "er staat iets": de
+       melding van de vorige klik ("zet je naam erbij") staat er nog even, en
+       daar zit het woord keuring ook in. */
+    await kp.waitForFunction(() => /nog niet over deze bundel gedraaid/.test(document.getElementById('melding').textContent),
+      null, { timeout: 15000 });
+    assert.match(await kp.textContent('#melding'), /nog niet over deze bundel gedraaid/,
+      'de server weigert, en zegt waarom');
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0,
+      'een naam alleen publiceert niets: de keuring moet eerst gedraaid zijn');
+
+    /* De keurloper doet dit in het echt (scripts/appstore-a11y.js: hij rendert
+       de bundel in de cel en noteert wat hij vindt). Hier zetten we de uitslag
+       zelf neer -- deze toets gaat over de POORT, niet over de meting. */
+    const keur = await api(base, '/api/appstore/kantoor/toegankelijk',
+      { versieId: inz.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
+    assert.equal(keur.status, 200, JSON.stringify(keur.body));
+
+    await kp.reload();
+    await kp.waitForSelector('[data-v] .pub', { timeout: 20000 });
+    assert.match(await kp.textContent('#main'), /Toegankelijkheid: geen fouten gevonden/,
+      'en de uitslag komt op het scherm terecht');
+    assert.match(await kp.textContent('#main'), /geen goedkeuring|blokkade weg/,
+      'met erbij dat een geslaagde keuring nog steeds niets goedkeurt');
+    await kp.click('[data-v] .pub');
     await kp.waitForFunction(() => !document.querySelector('[data-v] .pub'), null, { timeout: 15000 });
-    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 1, 'met een naam wel');
+    assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 1, 'daarna wel');
 
     /* ---- en dan de winkel: de bon voordat er wordt betaald ---- */
     const page = await browser.newPage();

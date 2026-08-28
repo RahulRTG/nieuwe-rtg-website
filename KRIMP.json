@@ -1,0 +1,299 @@
+{
+  "uitleg": "Welke collecties krimpen tijdens de TOETSEN, en via welke route. Bouwt de catalogus die TAKEN.md 4.62 nodig heeft voordat RTG_BEGROTING=weigeren aan kan. PER GEMETEN GRENS EEN RONDE, want dat zijn twee vragen: op 1 staat er welke collecties GROOT krimpen (de begroting vergelijkt met krimp <= grens, dus een verwijdering van EEN rij komt er ongemeld doorheen), op 0,5 staat er welke er uberhaupt krimpen en waar. De tweede omvat de eerste. ZES DINGEN DIE ERBIJ HOREN. (1) DE EERSTE RONDE TELDE NIETS, EN DAT WAS EEN DEFECT. Hij gaf nul over 6806 toetsen, en dat leek een uitslag. Het was er geen: de handelingscontext van server/opzet/handeling.js overleeft het LEZEN VAN DE BODY niet (server/web/body.js leest met req.on(end), en die luisteraar hangt aan een async-bron van voor context.run), dus stapte de begroting op elke POST met een body meteen uit -- en dat is elke mutatie. hervat() zet de keten na de lijfpoort terug; test/begrotingroute.test.js vond het en houdt het tegen. Alles hieronder komt uit een ronde NA die reparatie. (2) ONDERGRENS: de suite doet wat de toetsen doen, niet wat gebruikers doen -- een legitieme grote krimp die geen toets uitlokt, staat hier niet in. (3) DE SUITE-STAND STAAT ERBIJ, per ronde, onder \"suite\". Een ronde waarin toetsen omvielen levert een catalogus die er precies zo uitziet als elke andere: wat erin staat is echt, maar wat een omgevallen toets niet meer deed kon ook niet krimpen. Zo een ronde is ONVOLLEDIG en de ronde eindigt dan met uitgang 3. (4) PER COLLECTIE STAAT ER OF ER EEN KAP OP ZIT (\"kap\"), gescand op de bron. Ruim zestig plekken doen push-dan-afkappen (db.data.X = X.slice(0, N)). In rust is dat een rij per verzoek, maar staat de collectie ooit ver boven zijn kap, dan wil hij er duizenden weghalen -- en een weigering daarop houdt zichzelf in stand: de collectie blijft te groot, dus het volgende verzoek wordt opnieuw geweigerd. Dat is de eerste van de twee vragen die een grens per collectie mogelijk maken; de tweede (begrenst de VORM van de route hoeveel er weg kan?) staat niet in de code en hoort met de hand in TAKEN.md 4.62. (5) WAT DE VAL SOWIESO NIET ZIET: een splice, een wijziging binnen een rij, en routes die de body zelf rauw lezen (de twee betaal-webhooks en de theater-upload). (6) GEEN OORDEEL: welke grens bij een collectie hoort, is een besluit van een mens.",
+  "hoe": "node scripts/krimpronde.js  (RTG_BEGROTING_KRIMP zet de grens)",
+  "rondes": {
+    "grens-0.5": {
+      "suite": {
+        "toetsen": 6825,
+        "gezakt": 0,
+        "rood": 0
+      },
+      "gemeten": {
+        "hervullingen": 38,
+        "collecties": 19,
+        "grootste": 2,
+        "processenGewaakt": 706,
+        "gemetenGrens": 0.5
+      },
+      "collecties": [
+        {
+          "collectie": "posts",
+          "keer": 4,
+          "grootste": 2,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/privacy/delete",
+              "rijen": 2
+            }
+          ]
+        },
+        {
+          "collectie": "contacts",
+          "keer": 1,
+          "grootste": 2,
+          "gemiddeld": 2,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/privacy/delete",
+              "rijen": 2
+            }
+          ]
+        },
+        {
+          "collectie": "orders",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/techniek/archief",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "muziek",
+          "keer": 2,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/muziek/weg",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "boardroomToegang",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/office/boardroom/toegang/weg",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "clips",
+          "keer": 6,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/office/clips/verwijder",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/clips/weg",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "clipsMeldingen",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [
+            "server/kern/clips.js"
+          ],
+          "paden": [
+            {
+              "pad": "/api/office/clips/verwijder",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "flitsMeldingen",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/flits/rond",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "snaps",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [
+            "server/kern/sociaal/snaps.js"
+          ],
+          "paden": [
+            {
+              "pad": "/api/rtf/social/snap/view",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "stories",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [
+            "server/kern/sociaal/snaps.js"
+          ],
+          "paden": [
+            {
+              "pad": "/api/rtf/social/story/post",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "connections",
+          "keer": 3,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/member/block",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/rtf/social/kind/verwijder",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/rtf/social/block",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "blocks",
+          "keer": 4,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/member/unblock",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/rtf/social/unblock",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "theaterKijkplicht",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/theater/kijkplicht/zet",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "balieZetels",
+          "keer": 2,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/office/balie/zetel",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "theaterVideos",
+          "keer": 3,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/theater/verwijder",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/office/theater/verwijder",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "meetKamers",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/meet/weg",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "ovVoertuigen",
+          "keer": 3,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/staff/ov/dienst",
+              "rijen": 1
+            },
+            {
+              "pad": "/api/staff/ov/lijn/zet",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "spelTeams",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/member/spel/team-verlaat",
+              "rijen": 1
+            }
+          ]
+        },
+        {
+          "collectie": "vakbewijzen",
+          "keer": 1,
+          "grootste": 1,
+          "gemiddeld": 1,
+          "kap": [],
+          "paden": [
+            {
+              "pad": "/api/privacy/delete",
+              "rijen": 1
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

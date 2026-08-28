@@ -93,7 +93,7 @@ over mogen-en-kunnen gaat, en kijkt of de leden elkaar kennen.
 ### De uitkomst
 
 ```
-2363 bestanden, 835 woordenlijsten gevonden, 20 gaan over mogen-en-kunnen
+2395 bestanden, 843 woordenlijsten gevonden, 20 gaan over mogen-en-kunnen
  241 verschillende leden in die 20 lijsten
  220 van 241 leden (91%) staan in PRECIES EEN lijst
    0 lijstparen lijken op elkaar   (hoogste gelijkenis tussen twee lijsten: 0,22)

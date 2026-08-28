@@ -76,6 +76,7 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
+<link href="/shared/rtg-edge-system.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl travel-os" data-rtg-eigenvlak="onyx">
 <header>
@@ -97,12 +98,12 @@
   <div class="paneel">
     <div class="sec">Kies een kamer</div>
     <div id="kamers"></div>
-    <div class="rij" style="margin-top:.6rem;gap:1rem;align-items:flex-end;">
+    <div class="rij" style="margin-top:0.5rem;gap:1rem;align-items:flex-end;">
       <div><div class="lbl">Aankomst</div><input class="veld" id="rAan" type="date"></div>
       <div><div class="lbl">Vertrek</div><input class="veld" id="rVer" type="date"></div>
       <div><div class="lbl">Gasten</div><div class="step"><button type="button" id="rMin">−</button><span id="rAantal" style="min-width:2.5rem;text-align:center;font-size:1.05rem;">2</span><button type="button" id="rPlus">+</button></div></div>
     </div>
-    <div id="rTotaal" style="margin-top:.8rem;font-size:.86rem;color:var(--muted);"></div>
+    <div id="rTotaal" style="margin-top:0.75rem;font-size:.86rem;color:var(--muted);"></div>
     <button class="knop" id="rBoek" disabled>Kies eerst een kamer</button>
   </div>
 </section>
@@ -126,7 +127,7 @@ const api = (pad, body, herkans) => fetch(pad, {
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
-    '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Verblijven boek je als lid. Open de app en log in met je RTG-account.</p>'+
+    '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Verblijven boek je als lid. Open de app en log in met je RTG-account.</p>'+
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
@@ -160,7 +161,7 @@ async function laadMijn(){
   const open = (d.verblijven||[]).filter(v => ['aangevraagd','bevestigd'].includes(v.status));
   MIJN = open;
   if (!open.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn verblijven</h2>'+
+  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 0.75rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn verblijven</h2>'+
     open.map(v => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
       '<div><h3 style="font-size:1rem;">'+esc(v.supplierName)+'</h3><span class="meta">'+esc(v.roomName)+' · '+esc(v.aankomst)+' tot '+esc(v.vertrek)+' · '+esc(v.status)+'</span></div>'+
       '<button class="knop" data-id="'+esc(v.id)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Annuleer</button>'+
@@ -268,6 +269,7 @@ $('#rBoek').addEventListener('click', boek);
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/travel-os-config.js" defer></script>
 <script src="/shared/travel-os.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Commerce</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<!-- RTG Commerce: de verkooplaag boven de domeinen (COMMERCE.md).
+
+     WAT DIT SCHERM LAAT ZIEN EN WAAROM DAT ANDERS IS DAN EEN WINKEL. Een
+     etalage toont wat er te koop staat. Dit toont daarnaast wat er NIET te koop
+     staat en waarom -- en dat tweede is het hele punt van deze laag. Een
+     ondernemer met tachtig artikelen weet niet welke er stilletjes buiten
+     vallen; hier staat het met de reden erbij, en met wat hij eraan kan doen.
+
+     ER WORDT HIER NIETS BESTELD. De mand rekent door en stopt bij de deur:
+     bevestigen gebeurt in het domein dat er al over gaat. De regel "RTG
+     bevestigt niets namens een verkoper" staat met zoveel woorden op het scherm,
+     want een knop die er niet is, hoort te worden uitgelegd. -->
+<style>
+  :root{
+    --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  a{color:inherit;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.4rem;margin-top:.05rem;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:1000px;margin:0 auto;}
+  section{margin-top:2rem;}
+  .kop{display:flex;align-items:baseline;gap:.6rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .kop h2{font-size:1.15rem;}
+  .kop .n{font-size:.72rem;color:var(--soft);letter-spacing:.1em;text-transform:uppercase;}
+  .uitleg{color:var(--muted);font-size:.86rem;line-height:1.6;margin-bottom:1rem;max-width:62ch;}
+
+  /* de werkwoordbalk: de meting, live */
+  .meters{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.55rem;}
+  .meter{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;}
+  .meter .v{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .meter .n{font-family:'Bodoni Moda',serif;font-size:1.3rem;margin-top:.1rem;}
+  .meter .bar{height:3px;background:var(--line);border-radius:0;margin-top:.45rem;overflow:hidden;}
+  .meter .bar i{display:block;height:100%;background:var(--gold);}
+
+  select,button{font:inherit;}
+  select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:.5rem .7rem;max-width:100%;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.45rem .8rem;cursor:pointer;font-size:.84rem;}
+  .knop:hover{border-color:var(--gold);}
+  .knop.stil{opacity:.45;cursor:not-allowed;}
+
+  .rij{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem 1rem;margin-bottom:.6rem;}
+  .rij h3{font-size:1rem;}
+  .rij .meta{font-size:.76rem;color:var(--soft);margin-top:.2rem;}
+  .rij .acties{margin-top:.6rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .retourvorm input,.retourvorm select{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:.38rem .6rem;font:inherit;font-size:.8rem;}
+  .chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;}
+  .chip{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--line);border-radius:0;color:var(--muted);}
+  .chip.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .chip.uit{opacity:.4;text-decoration:line-through;}
+
+  .waarom{border-left:2px solid var(--burgundy);padding-left:.8rem;margin-top:.5rem;color:var(--muted);font-size:.84rem;line-height:1.55;}
+  .prima{border-left-color:var(--soft);}
+
+  .afrek{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-bottom:.8rem;}
+  .afrek .top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;border-bottom:1px solid var(--line);padding-bottom:.5rem;margin-bottom:.6rem;}
+  .afrek .top h3{font-size:1.05rem;}
+  .afrek .bedrag{font-family:'Bodoni Moda',serif;font-size:1.3rem;}
+  .afrek .regel{display:flex;justify-content:space-between;gap:1rem;font-size:.88rem;padding:.25rem 0;}
+  .afrek .regel .l{color:var(--muted);}
+  .afrek .btwr{font-size:.76rem;color:var(--soft);margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;}
+  .blok{color:var(--burgundy);font-size:.82rem;margin-top:.4rem;}
+  .deur{font-size:.8rem;color:var(--soft);margin-top:.55rem;}
+  .stap{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
+  .stap span{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);border:1px solid var(--line);border-radius:0;padding:.15rem .5rem;}
+  .stap span.nu{border-color:var(--gold);color:var(--gold);}
+  .klaar{border:1px dashed var(--gold);border-radius:0;padding:.6rem .8rem;margin-top:.6rem;font-size:.84rem;color:var(--muted);}
+  .klaar b{color:var(--txt);}
+  .deur a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--line);}
+  .ga{font:inherit;font-size:.8rem;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:0;padding:.3rem .9rem;cursor:pointer;margin-right:.35rem;}
+  .ga:hover:not(:disabled){background:var(--gold);color:var(--bg);}
+  .ga:focus-visible{outline:2px solid var(--txt);outline-offset:2px;}
+  .ga:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line);color:var(--soft);}
+  .gaf{display:block;font-size:.74rem;color:var(--soft);margin-top:.1rem;}
+  .vraag{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.6rem;padding-top:.55rem;border-top:1px solid var(--line);}
+  .vraag label{display:flex;flex-direction:column;gap:.2rem;font-size:.74rem;color:var(--soft);}
+  .vraag select,.vraag input{font:inherit;font-size:.84rem;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:.3rem .5rem;}
+  .vraag input{width:5.5rem;}
+  .vraag select:focus-visible,.vraag input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  .samen{border:1px dashed var(--line);border-radius:0;padding:.9rem 1rem;color:var(--muted);font-size:.86rem;line-height:1.6;}
+  .samen b{color:var(--txt);font-weight:600;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:1.5rem 0;}
+  .stuk{border:1px solid var(--burgundy);border-radius:0;padding:.7rem .9rem;color:var(--burgundy);font-size:.84rem;margin-bottom:1rem;}
+  #melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9;}
+</style>
+</head>
+<body>
+<header>
+  <button class="terug" id="terug" type="button">Terug</button>
+  <div><div class="ey">RTG Commerce</div><h1>Wat er te koop staat</h1></div>
+</header>
+<main id="main">
+  <p class="uitleg">Deze laag legt de domeinen naast elkaar en zegt per ding wat je ermee kunt:
+  tonen, prijzen, reserveren, bevestigen, leveren, annuleren, terugsturen. Wat een aanbieder
+  niet heeft ingericht, staat er niet als lege knop maar met de reden erbij.</p>
+
+  <section id="meting">
+    <div class="kop"><h2>De werkwoorden, nu gemeten</h2><span class="n" id="meting-n"></span></div>
+    <div class="meters" id="meters"></div>
+  </section>
+
+  <section id="etalage-sec">
+    <div class="kop"><h2>Etalage van een verkoper</h2><span class="n">te koop, en wat er niet bij staat</span></div>
+    <div style="margin-bottom:1rem;"><select id="kies" aria-label="Verkoper"><option>Laden…</option></select></div>
+    <div id="etalage"></div>
+  </section>
+
+  <section id="retour-sec">
+    <div class="kop"><h2>Terugsturen</h2><span class="n">de weg terug</span></div>
+    <div id="retour"></div>
+  </section>
+
+  <section id="mand-sec">
+    <div class="kop"><h2>De mand</h2><span class="n">een afrekening per verkoper</span>
+      <button class="knop" id="leeg" type="button" style="margin-left:auto;">Leegmaken</button></div>
+    <div id="mand"></div>
+  </section>
+</main>
+<div id="melding"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* Centen, en met de centen erbij -- een bon waarop btw en netto moeten optellen
+   tot precies het bedrag dat je betaalt, verdraagt geen afronding op hele
+   euro's. Zelfde reden als euroC() in mall.html. */
+const euroC = c => (c==null) ? '' : new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(c)/100);
+const tijd = ms => { try { return new Date(ms).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); } catch(e){ return ''; } };
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity='1'; clearTimeout(m._t); m._t = setTimeout(()=>m.style.opacity='0',2400); }
+const api = (pad, body) => fetch(pad, {
+  method:'POST', headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
+  body: JSON.stringify(body||{})
+}).then(async r => { const d = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
+
+$('#terug').onclick = () => history.length > 1 ? history.back() : location.assign('/apps/app.html');
+
+if (!TOKEN) {
+  $('#main').innerHTML = '<p class="leeg">Log eerst in om je aanbod en je mand te zien.</p>';
+} else { start(); }
+
+/* De acht werkwoorden in de volgorde van een koop -- dezelfde volgorde als
+   kern/commerce/werkwoordlijst.js, zodat het scherm en de kern hetzelfde verhaal
+   vertellen. */
+const VERM = ['toon','prijs','beschikbaarheid','reserveer','bevestig','lever','annuleer','retour'];
+const VERM_LABEL = { toon:'te zien', prijs:'kost iets', beschikbaarheid:'is er', reserveer:'reserveren',
+  bevestig:'kopen', lever:'leveren', annuleer:'annuleren', retour:'retour' };
+
+let ALLES = [];
+
+async function start(){
+  /* DE KNOP WORDT HIER GEBONDEN EN NIET ONDERAAN HET SCRIPT. Zonder token wordt
+     #main vervangen door een inlogzin, en dan bestaat #leeg niet meer -- een
+     binding onderaan gooide daar "Cannot set properties of null". De pagina zag
+     er goed uit en het script stond stil: precies het stille soort fout. */
+  const leeg = $('#leeg');
+  if (leeg) leeg.onclick = async () => {
+    try { toonMand(await api('/api/commerce/mand/leeg', {})); meld('Mand leeg.'); }
+    catch (e) { meld(e.message); }
+  };
+  try {
+    const r = await api('/api/commerce/aanbod', {});
+    ALLES = r.koopbaren || [];
+    tekenMeting(r);
+    vulKiezer();
+    await tekenMand();
+    await tekenRetouren();
+  } catch (e) { $('#main').insertAdjacentHTML('afterbegin', '<div class="stuk">'+esc(e.message)+'</div>'); }
+}
+
+/* De meting op het scherm is dezelfde als die van scripts/commerce.js, alleen
+   dan over de LEVENDE data in plaats van over de broncode. Dat is met opzet: een
+   scherm dat "alles kan alles" suggereert, is precies wat COMMERCE.md
+   tegenspreekt. */
+function tekenMeting(r){
+  const n = ALLES.length;
+  $('#meting-n').textContent = n + ' koopbaren' + (r.volledig ? '' : ', niet alle bronnen bereikbaar');
+  if (!r.volledig && (r.stuk||[]).length) {
+    $('#meters').insertAdjacentHTML('beforebegin',
+      '<div class="stuk">Deze bronnen konden niet worden opgehaald: ' +
+      esc(r.stuk.map(s=>s.bron).join(', ')) + '. De lijst hieronder is dus niet compleet.</div>');
+  }
+  const tel = {}; for (const v of VERM) tel[v] = 0;
+  for (const k of ALLES) for (const v of (k.werkwoorden||[])) if (tel[v] != null) tel[v]++;
+  $('#meters').innerHTML = VERM.map(v => {
+    const pct = n ? Math.round(tel[v]/n*100) : 0;
+    return '<div class="meter"><div class="v">'+esc(VERM_LABEL[v])+'</div>'+
+      '<div class="n">'+tel[v]+' <span style="font-size:.8rem;color:var(--soft);">van '+n+'</span></div>'+
+      '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+  }).join('');
+}
+
+function vulKiezer(){
+  const per = new Map();
+  for (const k of ALLES) {
+    const c = k.aanbieder && k.aanbieder.code; if (!c) continue;
+    if (!per.has(c)) per.set(c, { naam: k.aanbieder.naam || c, n: 0, niet: 0 });
+    const p = per.get(c); p.n++; if (!(k.werkwoorden||[]).includes('bevestig')) p.niet++;
+  }
+  const lijst = [...per.entries()].sort((a,b)=> b[1].niet - a[1].niet || b[1].n - a[1].n);
+  $('#kies').innerHTML = lijst.map(([c,p]) =>
+    '<option value="'+esc(c)+'">'+esc(p.naam)+': '+p.n+' regels'+(p.niet?', '+p.niet+' niet te koop':'')+'</option>').join('')
+    || '<option value="">Geen verkopers gevonden</option>';
+  $('#kies').onchange = () => tekenEtalage($('#kies').value);
+  if (lijst.length) tekenEtalage(lijst[0][0]);
+}
+
+function chips(k){
+  return '<div class="chips">' + VERM.map(v => {
+    const aan = (k.werkwoorden||[]).includes(v);
+    return '<span class="chip '+(aan?'aan':'uit')+'">'+esc(VERM_LABEL[v])+'</span>';
+  }).join('') + '</div>';
+}
+
+async function tekenEtalage(code){
+  if (!code) return;
+  const el = $('#etalage'); el.innerHTML = '<p class="leeg">Laden…</p>';
+  try {
+    const r = await api('/api/commerce/etalage', { verkoper: code });
+    const teKoop = r.teKoop || [], niet = r.nietTeKoop || [];
+    let h = '';
+    h += '<h3 style="font-size:.95rem;margin:.4rem 0 .7rem;">Te koop <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+teKoop.length+'</span></h3>';
+    h += teKoop.length ? teKoop.map(k =>
+      '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
+      /* "VANAF" HOORT ERBIJ TE STAAN. Zonder dat woord leest 520,00 als de prijs,
+         terwijl het de laagste van een reeks is -- en de kamer eronder kost 780.
+         Een prijsNIVEAU (een restaurant) krijgt zijn eigen woord: dat is geen
+         prijs maar een indicatie, en "vanaf" zou suggereren dat je het kunt
+         kopen. Zie prijsAard in kern/mall/aanbod.js. */
+      '<div class="meta">'+esc(k.typeLabel||k.type)+(k.prijs&&k.prijs.bedrag!=null
+        ? ' · '+(k.prijsAard==='niveau' ? 'gerechten vanaf ' : (k.prijs.vanaf ? 'vanaf ' : ''))+
+          esc(new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(k.prijs.bedrag))+
+          (k.prijs.eenheid?' '+esc(k.prijs.eenheid):'') : '')+'</div>'+
+      chips(k)+
+      /* DE PRIJSVRAAG. Een verblijf of een reis draagt geen vast bedrag maar een
+         keuze met exacte bedragen erachter (welke kamer, hoeveel nachten). Die
+         staat hier als twee velden; het BEDRAG komt uit de server zodra ze zijn
+         ingevuld. Wij tonen wat de opties kosten, wij rekenen niets uit. */
+      vraagBlok(k)+
+      '<div class="acties"><button class="knop" data-in="'+esc(k.id)+'">In de mand</button>'+
+      /* Terugsturen kan alleen wat de verkoper heeft ingericht. Geen grijze knop
+         bij de rest: een knop die nooit van jou is, hoort er niet te staan. */
+      ((k.werkwoorden||[]).includes('retour')
+        ? '<button class="knop" data-retour="'+esc(k.id)+'">Terugsturen</button>' : '')+
+      '</div><div class="retourvorm" hidden></div></div>').join('')
+      : '<p class="leeg">Bij deze verkoper staat nu niets te koop.</p>';
+
+    h += '<h3 style="font-size:.95rem;margin:1.6rem 0 .7rem;">Staat er niet bij <span class="n" style="color:var(--soft);font-family:Inter,sans-serif;font-size:.72rem;">'+niet.length+'</span></h3>';
+    h += niet.length ? niet.map(k => {
+      /* Twee heel verschillende gevallen, en ze krijgen een andere kleur: iets
+         waar de ondernemer iets aan kan doen (bordeaux) tegenover iets dat
+         gewoon zo hoort (grijs). Zie waaromNietTeKoop() in de kern. */
+      const prima = /niets aan mis/.test(k.waarom || '');
+      return '<div class="rij"><h3>'+esc(k.titel)+'</h3>'+
+        '<div class="meta">'+esc(k.type)+'</div>'+
+        '<div class="waarom'+(prima?' prima':'')+'">'+esc(k.waarom||'')+'</div></div>';
+    }).join('') : '<p class="leeg">Alles van deze verkoper staat te koop.</p>';
+    el.innerHTML = h;
+    el.querySelectorAll('[data-in]').forEach(b => b.onclick = () => inMand(b.getAttribute('data-in'), b));
+    el.querySelectorAll('[data-retour]').forEach(b => b.onclick = () => retourVorm(b, b.getAttribute('data-retour')));
+  } catch (e) { el.innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+}
+
+/* Het blok waarin een koper de prijsvraag beantwoordt. Bij een vast bedrag
+   staat er niets -- dan valt er niets te vragen. De bedragen bij de opties
+   komen in CENTEN van de server; wij delen door honderd om ze te TONEN en
+   rekenen verder niets uit. */
+function vraagBlok(k){
+  const v = k.prijsvraag; if (!v) return '';
+  return '<div class="vraag" data-vraag="'+esc(k.id)+'">'+
+    '<label>'+esc(v.basis.vraag || v.basis.label)+
+      '<select data-veld="'+esc(v.basis.id)+'">'+
+        v.basis.opties.map(o => '<option value="'+esc(o.id)+'">'+esc(o.label)+' &middot; '+euroC(o.centen)+(v.eenheid?' '+esc(v.eenheid):'')+'</option>').join('')+
+      '</select></label>'+
+    '<label>'+esc(v.maal.vraag || v.maal.label)+
+      '<input type="number" data-veld="'+esc(v.maal.id)+'" min="'+v.maal.min+'" max="'+v.maal.max+'" value="'+v.maal.min+'"></label>'+
+    '</div>';
+}
+
+/* De antwoorden van EEN rij, of null als die rij geen vraag heeft. Ze worden
+   uit het blok van de knop zelf gelezen (closest) en niet via een id: een
+   koopbaar-id bevat dubbele punten, en die breken een querySelector. Dezelfde
+   les als bij het retourformulier. */
+function antwoordenVan(knop){
+  const rij = knop.closest('.rij'); if (!rij) return null;
+  const blok = rij.querySelector('[data-vraag]'); if (!blok) return null;
+  const uit = {};
+  blok.querySelectorAll('[data-veld]').forEach(v => { uit[v.getAttribute('data-veld')] = v.value; });
+  return uit;
+}
+
+async function inMand(id, knop){
+  try {
+    const antwoorden = knop ? antwoordenVan(knop) : null;
+    const r = await api('/api/commerce/mand/zet',
+      { koopbaarId: id, aantal: 1, antwoorden: antwoorden || undefined });
+    toonMand(r); meld('In de mand.');
+  } catch (e) { meld(e.message); }
+}
+
+async function tekenMand(){
+  try { toonMand(await api('/api/commerce/mand', {})); } catch (e) { $('#mand').innerHTML = '<div class="stuk">'+esc(e.message)+'</div>'; }
+}
+
+function toonMand(m){
+  const el = $('#mand');
+  if (m.leeg || !(m.afrekeningen||[]).length) {
+    el.innerHTML = '<p class="leeg">Je mand is leeg.</p>' +
+      ((m.geweigerd||[]).length ? geweigerdBlok(m.geweigerd) : '');
+    return;
+  }
+  let h = '';
+  if (m.volledig === false) h += '<div class="stuk">Niet alle bronnen waren bereikbaar toen dit bedrag werd uitgerekend. Er kan een regel ontbreken.</div>';
+  h += (m.afrekeningen||[]).map(a =>
+    '<div class="afrek"><div class="top"><h3>'+esc(a.aanbiederNaam)+'</h3><span class="bedrag">'+euroC(a.totaalCenten)+'</span></div>'+
+    (a.regels||[]).map(r => '<div class="regel"><span class="l">'+r.aantal+'× '+esc(r.titel)+
+      /* Hoe dit bedrag is opgebouwd, als het uit een keuze kwam. Een koper die
+         "Sea-view suite x 3 nachten" leest, hoeft niet te rekenen. */
+      (r.keuze && r.keuze.uitleg ? '<span class="gaf">'+esc(r.keuze.uitleg)+'</span>' : '')+
+      /* HET MERKJE: aan wie is deze regel doorgegeven, en wanneer. Er staat met
+         opzet niet "besteld" -- RTG hoort niet van het domein of de koper heeft
+         doorgezet, en dat zou een bewering zijn zonder meting. Weghalen doet de
+         koper zelf. */
+      (r.overdracht ? '<span class="gaf">Doorgegeven aan '+esc(r.overdracht.naar)+' om '+tijd(r.overdracht.at)+'. Of het is bevestigd, weet RTG niet.</span>' : '')+
+      '</span><span>'+(r.gratis?'gratis':euroC(r.totaalCenten))+'</span></div>').join('')+
+    '<div class="btwr">'+(a.btw
+      ? 'Inclusief '+a.btw.tariefProcent+'% btw ('+euroC(a.btw.btwCenten)+') over '+euroC(a.btw.nettoCenten)+' netto.'
+      : esc(a.btwOnbekend||''))+'</div>'+
+    ((a.blokkades||[]).length ? '<div class="blok">'+a.blokkades.map(b=>esc(b.titel)+': '+esc(b.reden)).join('<br>')+'</div>' : '')+
+    /* WAAR JE HET BEVESTIGT, EN JE KEUZE GAAT MEE. Deze laag bevestigt met opzet
+       niet zelf; zonder deze knop eindigt het scherm in het niets en begint de
+       koper in het domein opnieuw. De knop maakt een OVERDRACHT: een briefje met
+       wat je koos en wat RTG rekende, dat op het scherm van het domein bovenaan
+       verschijnt (shared/overdracht.js). Bevestigen doet het domein.
+
+       Meerdere deuren bij een verkoper worden ook als meerdere knoppen getoond --
+       een tafel en een artikel worden op verschillende plekken bevestigd, en dat
+       samentrekken zou hier een belofte maken die de kern juist weigert. */
+    ((a.bevestigBij||[]).length
+      ? '<div class="deur">Bevestigen doe je bij de verkoper zelf. Je keuze gaat mee: ' +
+        a.bevestigBij.map(p => '<button type="button" class="ga" data-ga="'+esc(a.aanbiederCode||'__rtg')+'" data-pagina="'+esc(p)+'"'+
+          (a.bevestigbaar ? '' : ' disabled')+'>Naar '+
+          esc((p.replace('/apps/','').replace('.html','')||'').replace(/^./, c => c.toUpperCase()))+'</button>').join(' ') + '</div>'
+      : '<div class="deur">Voor deze verkoper is geen plek bekend waar dit wordt bevestigd. RTG stuurt je niet naar een deur die hij niet kent.</div>')+
+    '</div>').join('');
+
+  /* De belangrijkste zin van dit scherm. Er is geen knop "betaal alles", en dat
+     is geen ontbrekende functie maar een grens: achter deze regels zitten
+     verschillende partijen met verschillende bevestigingen. */
+  h += '<div class="samen"><b>'+euroC(m.toonTotaalCenten)+'</b> in totaal, maar dat is een optelsom om te tonen, geen bedrag dat je in één keer bevestigt.' +
+    (m.samenReden ? ' ' + esc(m.samenReden) : '') + '</div>';
+  if (m.genegeerd) h += '<div class="stuk" style="margin-top:.8rem;">'+esc(m.genegeerd)+'</div>';
+  if ((m.geweigerd||[]).length) h += geweigerdBlok(m.geweigerd);
+  el.innerHTML = h;
+
+  /* De knoppen worden NA het tekenen gebonden en niet met een inline-handler:
+     de nonce-CSP van dit huis staat die niet toe. Zelfde patroon als de rest
+     van dit scherm. */
+  el.querySelectorAll('[data-ga]').forEach(b => b.onclick = () => overdragen(b));
+}
+
+/* DE OVERDRACHT AANVRAGEN EN DE DEUR OPENEN. Wat er meegaat, bepaalt de server
+   uit de mand van deze sessie -- deze knop stuurt alleen mee WELKE verkoper en
+   WELKE deur. Een knop die zijn eigen regels meestuurt, is een prijslijst die de
+   browser mag invullen. */
+async function overdragen(knop){
+  const oud = knop.textContent;
+  knop.disabled = true; knop.textContent = 'Momentje';
+  try {
+    const r = await api('/api/commerce/overdracht/maak',
+      { verkoper: knop.getAttribute('data-ga'), pagina: knop.getAttribute('data-pagina') });
+    const p = r.overdracht.pagina;
+    location.assign(p + (p.indexOf('?') >= 0 ? '&' : '?') + 'overdracht=' + encodeURIComponent(r.overdracht.id));
+  } catch (e) {
+    /* Niet stil: een mislukte overdracht die je toch naar de pagina stuurt, laat
+       de koper daar zoeken naar een briefje dat er niet is. Eén melding per
+       deur en niet een stapel: twee keer drukken is niet twee problemen. */
+    knop.disabled = false; knop.textContent = oud;
+    const bak = knop.parentNode;
+    let p = bak.querySelector(':scope > .stuk');
+    if (!p) { p = document.createElement('div'); p.className = 'stuk'; bak.appendChild(p); }
+    p.textContent = e.message;
+  }
+}
+
+/* HET AANVRAAGFORMULIER. Drie dingen worden gevraagd en geen vierde: welke
+   bestelling (het kenmerk dat de verkoper gaf -- RTG kan dat niet nakijken en
+   doet niet alsof), waarom (een keuze uit de lijst, geen vrij tekstveld), en wat
+   het kostte. Een toelichting mag erbij en is niet verplicht.
+
+   DE GRONDEN KOMEN VAN DE SERVER en staan niet hier: een tweede lijst in het
+   scherm loopt binnen een maand uiteen met kern/commerce/retourlijst.js. */
+const GRONDEN = [
+  ['bedenktijd', 'Op andere gedachten'],
+  ['niet-zoals-beschreven', 'Niet zoals beschreven'],
+  ['defect', 'Kapot of werkt niet'],
+  ['beschadigd-aangekomen', 'Beschadigd aangekomen'],
+  ['verkeerd-geleverd', 'Verkeerd geleverd'],
+  ['te-laat', 'Te laat gekomen']
+];
+/* ER ZIT GEEN KOOPBAAR-ID IN EEN SELECTOR, en dat is geen stijl maar een bug
+   die hier zat. Een koopbaar-id komt uit een domein en ziet eruit als
+   `artikel:MAISON:d4af0347`. Als DOM-id mag dat, maar elke querySelector erop
+   klapt eruit -- `#rq-ref-artikel:MAISON:...` is geen geldige selector, en
+   CSS.escape helpt niet in een quoted attribuutselector (die voegt backslashes
+   toe die juist niet matchen).
+
+   Daarom wordt er niets opgezocht op id: de knop geeft zijn eigen blok mee, en
+   de velden worden BINNEN dat blok gevonden op een data-attribuut. Dan maakt het
+   niet uit wat een domein in zijn id's zet. */
+function retourVorm(knop, id){
+  const rij = knop.closest('.rij');
+  const el = rij && rij.querySelector('.retourvorm');
+  if (!el) return;
+  if (!el.hidden) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML =
+    '<div class="acties"><input placeholder="Bestelkenmerk van de verkoper" data-veld="ref" style="min-width:13rem;">' +
+    '<select data-veld="grond">' + GRONDEN.map(g => '<option value="'+g[0]+'">'+esc(g[1])+'</option>').join('') + '</select>' +
+    '<input placeholder="Bedrag in euro" data-veld="bedrag" style="width:8rem;">' +
+    '<button class="knop" data-veld="doe">Aanvragen</button></div>' +
+    '<input placeholder="Toelichting (mag leeg)" data-veld="tel" style="width:100%;margin-top:.4rem;">';
+  el.querySelector('[data-veld="doe"]').onclick = async () => {
+    const v = (w) => { const e = el.querySelector('[data-veld="'+w+'"]'); return e ? e.value : ''; };
+    const euro = v('bedrag');
+    try {
+      await api('/api/commerce/retour/vraag', { koopbaarId: id, orderRef: v('ref'), grond: v('grond'),
+        toelichting: v('tel'),
+        /* Euro's op het scherm, centen naar de server. */
+        centen: euro ? Math.round(Number(String(euro).replace(',', '.')) * 100) : 0 });
+      el.hidden = true; el.innerHTML = '';
+      meld('Aangevraagd.'); tekenRetouren();
+    } catch (e) { meld(e.message); }
+  };
+}
+
+/* DE WEG TERUG. Het lid ziet zijn aanvragen en kan er precies EEN stand zetten:
+   "verstuurd". Aanvaarden, beoordelen en afhandelen zijn handelingen van de
+   verkoper; die knoppen staan hier niet, ook niet grijs -- een knop die nooit
+   van jou is, hoort niet op jouw scherm.
+
+   `besluit.uitgevoerd` wordt UITDRUKKELIJK getoond. Een klaargezet bedrag dat
+   eruitziet als een betaald bedrag is precies de stilte die deze laag hoort te
+   vermijden (GELD.md par. 3: geld verlaat het huis nooit vanzelf). */
+const STAPPEN = ['gevraagd','aanvaard','onderweg','beoordeeld','afgehandeld'];
+async function tekenRetouren(){
+  const el = $('#retour'); if (!el) return;
+  try {
+    const r = await api('/api/commerce/retour/mijn', {});
+    const lijst = r.retouren || [];
+    if (!lijst.length) {
+      el.innerHTML = '<p class="leeg">Je hebt niets teruggestuurd. Bij een aanbod dat terug kan, staat hierboven de knop Terugsturen; ' +
+        'die vraagt om het bestelkenmerk dat je van de verkoper kreeg.</p>';
+      return;
+    }
+    el.innerHTML = lijst.map(x => {
+      const eind = ['afgewezen','vervallen'].includes(x.stand);
+      const stappen = eind
+        ? '<div class="stap"><span class="nu">' + esc(x.standLabel) + '</span></div>'
+        : '<div class="stap">' + STAPPEN.map(id =>
+            '<span class="' + (id === x.stand ? 'nu' : '') + '">' + esc(id) + '</span>').join('') + '</div>';
+      const b = x.besluit;
+      const besluit = !b ? '' :
+        '<div class="klaar">' + (b.geldTerug
+          ? '<b>' + euroC(b.centen) + '</b> staat klaar om terug te gaan' +
+            (b.btwCenten ? ' (waarvan ' + euroC(b.btwCenten) + ' btw tegen ' + b.tariefProcent + '%)' : '') +
+            '. ' + (b.uitgevoerd ? 'Uitgevoerd.' : 'Nog niet uitgevoerd: een mens bij de verkoper doet dat, RTG stuurt geen geld uit zichzelf.')
+          : esc(b.reden || b.soort)) + '</div>';
+      const knop = x.stand === 'aanvaard'
+        ? '<div class="acties"><button class="knop" data-verstuurd="' + esc(x.id) + '">Ik heb het verstuurd</button></div>' : '';
+      return '<div class="rij"><h3>' + esc(x.titel) + '</h3>' +
+        '<div class="meta">' + esc(x.verkoperNaam || '') + ' &middot; ' + esc(x.grondLabel) +
+        ' &middot; bestelling ' + esc(x.orderRef) +
+        (x.orderGecontroleerd ? '' : ' (nog niet door de verkoper nagekeken)') + '</div>' +
+        stappen + besluit + knop + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-verstuurd]').forEach(btn => btn.onclick = async () => {
+      try { await api('/api/commerce/retour/verstuurd', { id: btn.getAttribute('data-verstuurd') });
+        meld('Genoteerd.'); tekenRetouren(); } catch (e) { meld(e.message); }
+    });
+  } catch (e) { el.innerHTML = '<div class="stuk">' + esc(e.message) + '</div>'; }
+}
+
+function geweigerdBlok(g){
+  return '<div class="samen" style="margin-top:.8rem;"><b>Niet meegerekend</b><br>' +
+    g.map(x => esc(x.titel || x.koopbaarId) + ': ' + esc(x.reden)).join('<br>') + '</div>';
+}
+</script>
+</body>
+</html>

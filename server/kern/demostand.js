@@ -25,7 +25,11 @@
 'use strict';
 
 function demoAan() {
-  return process.env.RTG_DEMO === '1';
+  /* De synthetische wereldmodules moeten exact dezelfde poort gebruiken als
+     server.js. Sinds de afgescheiden Magnaat-testomgeving heet die vlag
+     RTG_MAGNAAT_TEST; alleen de oude RTG_DEMO-vlag lezen liet de accounts wel
+     ontstaan, maar niet hun gemeente, luchthaven, rijk en andere instellingen. */
+  return require('../testomgeving').actief(process.env);
 }
 
 module.exports = { demoAan };

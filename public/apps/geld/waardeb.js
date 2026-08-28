@@ -114,7 +114,7 @@
   }
 
   async function terugstorten() {
-    var centen = G.centen(($('#wdBedrag') || {}).value);
+    var centen = G.naarCenten(($('#wdBedrag') || {}).value);
     if (centen == null) { G.melding('Vul een bedrag in.'); return; }
     try {
       var r = await G.api('/api/pay/terug', { centen: centen, idem: w.RTGId ? w.RTGId('terug') : 'terug-' + Date.now() });

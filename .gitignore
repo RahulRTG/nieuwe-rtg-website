@@ -50,6 +50,13 @@ public/dist/
 zz-ijk-tijdelijk.*
 **/zz-ijk-tijdelijk.*
 
+# de uitvoer van een gedeelde ronde (npm run test:deel --dekking=..., en de
+# journalen die de CI per deel wegschrijft). Meetgegevens van EEN run, geen bron;
+# de meters lezen ze en daarna zijn ze klaar.
+dekking/
+routejournaal.log
+schermjournaal.log
+
 # dekkingsdata van de laatste run: invoer voor scripts/samenhang.js, geen bron.
 # Twintig minuten om te maken, dus niet in de repo -- de census meldt netjes
 # NIET GEMETEN als hij er niet is.

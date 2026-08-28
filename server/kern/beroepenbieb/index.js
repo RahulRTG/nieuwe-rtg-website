@@ -42,10 +42,11 @@ function appVan(wereld, i) {
 }
 
 function maakBeroepenBieb({ db, save }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/beroepenbieb', bezit: { beroepenInstallaties: 'kaart' } });
   const rij = (handle) => {
-    if (!db.data.beroepenInstallaties) db.data.beroepenInstallaties = {};
-    if (!Array.isArray(db.data.beroepenInstallaties[handle])) db.data.beroepenInstallaties[handle] = [];
-    return db.data.beroepenInstallaties[handle];
+    const b = eigen.bak('beroepenInstallaties');
+    if (!Array.isArray(b[handle])) b[handle] = [];
+    return b[handle];
   };
 
   function overzicht() {

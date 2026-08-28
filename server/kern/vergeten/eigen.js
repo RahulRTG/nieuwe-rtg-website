@@ -20,6 +20,9 @@
    rekent af wat er nog van het lid in staat; die bewaakt dat deze lijst
    compleet blijft. */
 'use strict';
+const crypto = require('crypto');
+const { vingerafdruk: pinVingerafdruk } = require('../sociaal/pin-tombstone');
+const klok = require('../../lib/klok');
 
 /* Elke naam hier is een tak die ALLEEN over dit lid gaat. Als lijst en niet als
    losse regels: zo is in een oogopslag te zien wat er meegaat, en is er een
@@ -38,7 +41,8 @@ const EIGEN_TAKKEN = [
   'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
   'accountRollen',      // uw koppelingen aan werkplekken
   'ledenBoard',         // uw eigen boardroom: wat u wel en niet deelt
-  'contactPins'         // uw contactpin: het adres waarmee anderen u toevoegden
+  'contactPins',        // uw contactpin: het adres waarmee anderen u toevoegden
+  'contactPinSecurity'  // uw noodslot en eigen PIN-veiligheidsjournaal
 ];
 
 module.exports = ({ db, lidBoardLogWis }) => {

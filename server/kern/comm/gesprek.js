@@ -17,18 +17,11 @@ const MAX_DEELNEMERS = 256;
 
 function maakGesprek({ db, save, nu, id, SOORTEN }) {
   /* ---------------------------------------------------------- opslag */
-  function G() {
-    if (!Array.isArray(db.data.commGesprekken)) db.data.commGesprekken = [];
-    return db.data.commGesprekken;
-  }
-  function B() {
-    if (!db.data.commBerichten || typeof db.data.commBerichten !== 'object') db.data.commBerichten = {};
-    return db.data.commBerichten;
-  }
-  function S() {
-    if (!db.data.commStand || typeof db.data.commStand !== 'object') db.data.commStand = {};
-    return db.data.commStand;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/comm/gesprek',
+    bezit: { commGesprekken: 'lijst', commBerichten: 'kaart', commStand: 'kaart' } });
+  function G() { return eigen.bak('commGesprekken'); }
+  function B() { return eigen.bak('commBerichten'); }
+  function S() { return eigen.bak('commStand'); }
   const standVan = (key, gid) => ((S()[key] || {})[gid] || {});
   function standZet(key, gid, veld, waarde) {
     const s = S();

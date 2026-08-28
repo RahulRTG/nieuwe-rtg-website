@@ -46,7 +46,7 @@
     if ((d.certificaten || []).length) {
       h += '<div style="' + kaartStijl + '"><div style="' + kopStijl + '">Mijn certificaten</div>' +
         d.certificaten.map(function (c) {
-          return '<div style="margin-top:0.4rem;font-size:0.8rem;">' + esc(c.soort) + (c.verlooptOp ? ' <span style="' + subStijl + '">t/m ' + esc(c.verlooptOp) + '</span>' : '') + '</div>';
+          return '<div style="margin-top:0.5rem;font-size:0.8rem;">' + esc(c.soort) + (c.verlooptOp ? ' <span style="' + subStijl + '">t/m ' + esc(c.verlooptOp) + '</span>' : '') + '</div>';
         }).join('') + '</div>';
     }
     el.innerHTML = h;
@@ -64,14 +64,14 @@
     if (!el) { el = document.createElement('div'); el.id = 'pdLoon'; w.parentNode.insertBefore(el, w.nextSibling); }
     var h = '<div style="' + kaartStijl + '"><div style="' + kopStijl + '">Mijn loon & kansen (RTG Payroll)</div>';
     h += (stroken || []).slice(0, 3).map(function (s) {
-      return '<div style="margin-top:0.45rem;font-size:0.8rem;"><b>' + esc(s.periode) + '</b> · netto € ' + s.regel.netto.toFixed(2).replace('.', ',') +
+      return '<div style="margin-top:0.5rem;font-size:0.8rem;"><b>' + esc(s.periode) + '</b> · netto € ' + s.regel.netto.toFixed(2).replace('.', ',') +
         ' <span style="' + subStijl + '">' + s.regel.uren + ' u · bruto € ' + s.regel.bruto.toFixed(2).replace('.', ',') + ' · ' + esc(s.status) + '</span></div>';
     }).join('') || '<div style="' + subStijl + 'margin-top:0.3rem;">Nog geen loonstrook; die verschijnt hier na de eerste loonrun.</div>';
     h += '<button id="pdLoonOpen" style="display:block;width:100%;text-align:left;margin-top:0.55rem;padding:0.5rem 0.7rem;border-radius:0;border:1px solid var(--line,rgba(255,255,255,0.1));background:none;color:inherit;font:inherit;font-size:0.78rem;cursor:pointer;">' +
       (kans.open ? '✓ Ik sta open voor werk -- tik om dit uit te zetten' : '○ Zet "open voor werk" aan: passende bedrijven vinden jou') + '</button>';
     if (kans.open) {
       h += (kans.kansen || []).slice(0, 4).map(function (k) {
-        return '<div style="margin-top:0.4rem;font-size:0.78rem;"><b>' + esc(k.bedrijf) + '</b> -- ' + esc(k.func) +
+        return '<div style="margin-top:0.5rem;font-size:0.78rem;"><b>' + esc(k.bedrijf) + '</b> -- ' + esc(k.func) +
           ' <span style="' + subStijl + '">' + esc(k.plaats || '') + ' · ' + esc(k.soort || '') + '</span></div>';
       }).join('') || '<div style="' + subStijl + 'margin-top:0.35rem;">Nog geen passende vacature; zodra er een is, staat hij hier.</div>';
     } else {

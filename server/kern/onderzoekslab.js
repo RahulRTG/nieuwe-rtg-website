@@ -11,7 +11,7 @@
      en die toets zet ALTIJD een mens op akkoord, met naam; de AI adviseert
    - schadelijke richtingen (wapens en verwanten) weigert het lab hard
    - afgeronde kennis verdwijnt nooit: bevindingen stromen naar de kennisbank
-   Opslag: db.data.labProjecten. De AI-onderzoekscoach staat in ./onderzoekslab-ai.js. */
+   Opslag: collectie labProjecten. De AI-onderzoekscoach staat in ./onderzoekslab-ai.js. */
 
 const VELDEN = {
   hardware: { naam: 'Hardware', emoji: 'gear' }, software: { naam: 'Software', emoji: 'paneel' },
@@ -27,7 +27,8 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => new Date().toISOString();
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const rid = () => crypto.randomBytes(4).toString('hex');
-  const P = () => { if (!Array.isArray(db.data.labProjecten)) db.data.labProjecten = []; return db.data.labProjecten; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/onderzoekslab', bezit: { labProjecten: 'lijst' } });
+  const P = () => eigen.bak('labProjecten');
   const vind = id => P().find(p => p.id === String(id || ''));
   const fout = tekst => { const laag = tekst.toLowerCase(); return VERBODEN.some(w => laag.includes(w)); };
 

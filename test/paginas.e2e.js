@@ -102,9 +102,15 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
     paginas.forEach((p, i) => werk[i % banen].push(p));
 
     await Promise.all(werk.map(async (lijst) => {
-      const page = await browser.newPage();
-      const fouten = [];
-      letOpFouten(page, fouten);
+      for (const p of lijst) {
+        /* EEN PAGINA PER DOCUMENT. Met één hergebruikt tabblad kon een late
+           omleiding van het vorige document de volgende page.goto onderbreken.
+           Dan meldde de scan tientallen kapotte pagina's die alleen het
+           slachtoffer waren van één achtergebleven navigatie. Sluiten is het
+           harde einde van alle timers en omleidingen van dat document. */
+        const page = await browser.newPage();
+        const fouten = [];
+        letOpFouten(page, fouten);
       /* EEN 404 OP EEN EIGEN BESTAND GEEFT GEEN JS-FOUT.
 
          Een vergeten <script> of stylesheet levert geen uitzondering op: de
@@ -113,19 +119,16 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
          voor bestaat, alleen een verdieping lager. /api/ blijft erbuiten (een
          401 op een uitgelogde pagina is normaal) en favicons ook. Vandaag
          staat de teller op nul; deze regel houdt dat zo. */
-      const missend = [];
-      page.on('response', r => {
-        try {
-          const u = new URL(r.url());
-          if (r.status() >= 400 && u.origin === new URL(base).origin
-              && !/^\/api\//.test(u.pathname) && !/favicon|apple-touch/.test(u.pathname)) {
-            missend.push(r.status() + ' ' + u.pathname);
-          }
-        } catch (e) { /* geen bruikbare url */ }
-      });
-      for (const p of lijst) {
-        fouten.length = 0;
-        missend.length = 0;
+        const missend = [];
+        page.on('response', r => {
+          try {
+            const u = new URL(r.url());
+            if (r.status() >= 400 && u.origin === new URL(base).origin
+                && !/^\/api\//.test(u.pathname) && !/favicon|apple-touch/.test(u.pathname)) {
+              missend.push(r.status() + ' ' + u.pathname);
+            }
+          } catch (e) { /* geen bruikbare url */ }
+        });
         let probe = null;
         try {
           /* `domcontentloaded` en niet `load`: `load` wacht tot ELK subverzoek
@@ -192,6 +195,8 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
           }
         } catch (e) {
           fouten.push('LAADFOUT: ' + e.message);
+        } finally {
+          await page.close().catch(() => {});
         }
         const echt = fouten.filter(m => !BEWUSTE_STOP.test(String(m)));
         const bekend = Object.prototype.hasOwnProperty.call(MAG_STUK, p);

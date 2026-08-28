@@ -6,7 +6,7 @@
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation · Bord</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
@@ -76,15 +76,16 @@
     .code{flex-wrap:wrap;max-width:100%;margin-left:0;}
     .code b{letter-spacing:.2em;}
   }
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}.merkvlak b{color:#F4E9C8;}
+.merkvlak{display:inline-block;background:transparent;color:#C39B4A;padding:0;border-radius:0;}.merkvlak b{color:#F4F0E7;font-weight:500;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl">
 <div class="app" id="app" role="main">
   <div class="top">
-    <div class="brand"><span class="merkvlak">RT<b>Foundation</b></span></div>
+    <div class="brand"><span class="merkvlak">Rahul Travel <b>Foundation</b></span></div>
     <button class="knop grijs klein" id="btnZij">Paneel</button>
     <div class="code">
       <span class="mini">Lescode</span><b id="lesCode">------</b>
@@ -125,7 +126,7 @@
     </div>
     <div class="kaart paneel">
       <h3>Agenda / huiswerk</h3>
-      <input class="veld" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8" style="margin-bottom:.4rem;">
+      <input class="veld" id="agTekst" placeholder="Bijv. Maak §3.2, opgave 1 t/m 8" style="margin-bottom:0.5rem;">
       <div style="display:flex;gap:.4rem;">
         <input class="veld h-flex1" id="agDatum" type="date">
         <button class="knop klein" id="agAdd">+</button>
@@ -136,7 +137,7 @@
 </div>
 
 <dialog id="dlgSchrift"><div class="kaart modal">
-  <div style="display:flex;align-items:center;margin-bottom:.6rem;">
+  <div style="display:flex;align-items:center;margin-bottom:0.5rem;">
     <h3 id="svNaam" style="font-size:1.1rem;">Schrift</h3>
     <button class="knop grijs klein" style="margin-left:auto;" data-sluit="dlgSchrift">Sluiten</button>
   </div>
@@ -254,5 +255,6 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigat
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

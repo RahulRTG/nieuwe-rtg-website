@@ -105,10 +105,7 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
        laatste letter er geschaafd uit. Daarom staat .gb-lade op content-box. */
     const eerste = page.locator('#lijst .item').first();
     const d0 = await eerste.boundingBox();
-    await page.mouse.move(d0.x + d0.width * 0.8, d0.y + d0.height / 2);
-    await page.mouse.down();
-    for (let i = 1; i <= 16; i++) await page.mouse.move(d0.x + d0.width * 0.8 - i * 7, d0.y + d0.height / 2);
-    await page.mouse.up();
+    await veegDoor(page, d0, { afstand: -112, stappen: 16 });
     /* Wachten tot de lade ER IS, niet tot het scherm stil is. wachtOpRust telt
        stilte, en vlak na een veeg is het nog stil omdat de lade nog moet
        opengaan -- dan meet de regel hieronder een lade die er niet staat. */
@@ -146,13 +143,10 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
     const weer = page.locator('#lijst .item').first();
     const naam2 = (await weer.locator('b').textContent()).trim();
     const d2 = await weer.boundingBox();
-    await page.mouse.move(d2.x + d2.width * 0.15, d2.y + d2.height / 2);
-    await page.mouse.down();
-    for (let i = 1; i <= 16; i++) await page.mouse.move(d2.x + d2.width * 0.15 + i * 11, d2.y + d2.height / 2);
+    await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16 });
     assert.deepEqual(await page.evaluate(() =>
       [...document.querySelectorAll('#lijst .gb-lade .gb-doe > span')].map((s) => s.textContent)),
       ['Ster', 'Overnemen'], 'naar rechts horen de ster en overnemen te liggen');
-    await page.mouse.up();
     await page.keyboard.press('Escape');
 
     // 4. wat de server weigert, komt TERUG op het scherm -- stil falen is hier het ergst

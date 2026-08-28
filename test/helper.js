@@ -1035,12 +1035,17 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
-  const x0 = doos.x + doos.width * 0.8;
-  const px = -(doos.width * 0.62 + 90);
+  const x0 = doos.x + doos.width * (Number.isFinite(o.startFractie) ? o.startFractie : 0.8);
+  /* Dezelfde racevrije aanzet is ook nodig voor een halve veeg die alleen een
+     lade opent. `afstand` en `stappen` veranderen daarom uitsluitend de maat;
+     zonder opties blijft dit de volledige doorveeg die de naam belooft. */
+  const px = Number.isFinite(o.afstand) ? o.afstand : -(doos.width * 0.62 + 90);
+  const stappen = Number.isFinite(o.stappen) ? Math.max(2, Math.round(o.stappen)) : 22;
+  const eerste = Math.sign(px || 1) * Math.max(10, Math.abs(px / stappen));
   for (let poging = 1; poging <= 2; poging++) {
     await page.mouse.move(x0, y);
     await page.mouse.down();
-    await page.mouse.move(x0 + px / 22, y);
+    await page.mouse.move(x0 + eerste, y);
     const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
     if (!begonnen) {
       await page.mouse.up();
@@ -1052,7 +1057,7 @@ async function veegDoor(page, doos, opties) {
       }
       continue;
     }
-    for (let i = 2; i <= 22; i++) await page.mouse.move(x0 + (px * i) / 22, y);
+    for (let i = 2; i <= stappen; i++) await page.mouse.move(x0 + (px * i) / stappen, y);
     await page.mouse.up();
     return;
   }

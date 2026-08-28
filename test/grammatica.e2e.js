@@ -333,7 +333,14 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
        DE MUTATIE: filter in orb.js de verhinderde handelingen weg. */
     await metLid(async (page) => {
       await zetProef(page, 'dicht');
-      const orb = await page.locator('#rtgCommand .cmd-mondknop').boundingBox();
+      const selector = '#rtgCommand .cmd-mondknop';
+      /* De orb staat in dezelfde inschuivende balk als de actieknoppen. Onder
+         runnerbelasting kon hij tussen boundingBox() en pointerdown nog een
+         paar pixels opschuiven, waardoor de lange druk naast de knop begon en
+         de lade vanzelfsprekend niet openging. Meet pas nadat het raakvlak net
+         als bij de handeling hierboven echt stil ligt. */
+      await wachtOpStilVak(page, selector);
+      const orb = await page.locator(selector).boundingBox();
       await page.mouse.move(orb.x + orb.width / 2, orb.y + orb.height / 2);
       await page.mouse.down();
       // ook hier is de tijd het gebaar: vasthouden tot de orb zijn voorstel opent

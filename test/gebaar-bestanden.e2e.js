@@ -139,10 +139,11 @@ test('een veeg zet een bestand in de prullenbak, en de weg terug haalt het eruit
       'Terugdraaien hoort het bestand terug in de kluis te zetten');
 
     // 3. de andere kant draagt andere acties, en de ster is ook echt omkeerbaar
-    await page.waitForSelector('#lijst .item.gb-rij');
-    const weer = page.locator('#lijst .item').first();
+    const weer = page.locator('#lijst .item.gb-rij').filter({ hasText: naam }).first();
+    await weer.waitFor({ state: 'visible', timeout: 15000 });
     const naam2 = (await weer.locator('b').textContent()).trim();
     const d2 = await weer.boundingBox();
+    assert.ok(d2, 'het teruggezette bestand hoort weer een meetbare regel te zijn');
     await veegDoor(page, d2, { startFractie: 0.15, afstand: 176, stappen: 16 });
     assert.deepEqual(await page.evaluate(() =>
       [...document.querySelectorAll('#lijst .gb-lade .gb-doe > span')].map((s) => s.textContent)),

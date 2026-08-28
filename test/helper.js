@@ -1018,9 +1018,11 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
    2026 nagerekend en het is geen fout in de laag maar een RACE MET EEN TIMER DIE
    ER HOORT TE ZIJN: shared/gebaar/gebaar-03b.js opent na 520 ms de actielade
    (lang drukken), en zet daarbij het lopende gebaar op nul. Tussen mouse.down()
-   en de eerste mouse.move() zit een aparte CDP-ronde; op een pagina die nog
+   en de eerste mouse.move() zat een aparte CDP-ronde; op een pagina die nog
    bezig is met opstarten kan die de 520 ms overschrijden. Dan heeft de toets in
-   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden.
+   de ogen van de laag een halve seconde stilgestaan, en dat IS vasthouden. De
+   twee opdrachten gaan daarom in dezelfde protocolvlucht naar Chromium: `down`
+   eerst, de beweging meteen erachter, zonder een bevestigingsronde ertussen.
 
    Bewezen door het met opzet te forceren: 600 ms wachten na down() geeft precies
    dezelfde eindstand, plus een open dialog.gb-blad die de oude aantekening nooit
@@ -1042,24 +1044,40 @@ async function veegDoor(page, doos, opties) {
   const px = Number.isFinite(o.afstand) ? o.afstand : -(doos.width * 0.62 + 90);
   const stappen = Number.isFinite(o.stappen) ? Math.max(2, Math.round(o.stappen)) : 22;
   const eerste = Math.sign(px || 1) * Math.max(10, Math.abs(px / stappen));
-  for (let poging = 1; poging <= 2; poging++) {
-    await page.mouse.move(x0, y);
-    await page.mouse.down();
-    await page.mouse.move(x0 + eerste, y);
-    const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
-    if (!begonnen) {
-      await page.mouse.up();
-      await page.keyboard.press('Escape');
-      await page.waitForTimeout(250);
-      if (poging === 2) {
-        throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
-          'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
+  const cdp = await page.context().newCDPSession(page);
+  const beweeg = (x, ingedrukt) => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved', button: ingedrukt ? 'left' : 'none', buttons: ingedrukt ? 1 : 0,
+    x, y, force: ingedrukt ? 0.5 : 0
+  });
+  const druk = () => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed', button: 'left', buttons: 1, x: x0, y, clickCount: 1, force: 0.5
+  });
+  const los = (x) => cdp.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased', button: 'left', buttons: 0, x, y, clickCount: 1
+  });
+  try {
+    for (let poging = 1; poging <= 2; poging++) {
+      await beweeg(x0, false);
+      const omlaag = druk();
+      const aanzet = beweeg(x0 + eerste, true);
+      await Promise.all([omlaag, aanzet]);
+      const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
+      if (!begonnen) {
+        await los(x0 + eerste);
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(250);
+        if (poging === 2) {
+          throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
+            'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
+        }
+        continue;
       }
-      continue;
+      for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
+      await los(x0 + px);
+      return;
     }
-    for (let i = 2; i <= stappen; i++) await page.mouse.move(x0 + (px * i) / stappen, y);
-    await page.mouse.up();
-    return;
+  } finally {
+    await cdp.detach();
   }
 }
 

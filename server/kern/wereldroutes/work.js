@@ -45,6 +45,7 @@ module.exports = [
   '/apps/kosten.html',
   '/apps/lesmaker.html',
   '/apps/leverancier-aanvragen.html',
+  '/apps/leverancier-commerce.html',
   '/apps/leverancier-rtmail.html',
   '/apps/leverancier.html',
   '/apps/loonstrook.html',

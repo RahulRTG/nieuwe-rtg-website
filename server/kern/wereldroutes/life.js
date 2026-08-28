@@ -21,6 +21,7 @@ module.exports = [
   '/apps/clips.html',
   '/apps/codewoord.html',
   '/apps/comm.html',
+  '/apps/commerce.html',
   '/apps/concierge.html',
   '/apps/doelen.html',
   '/apps/entourage.html',

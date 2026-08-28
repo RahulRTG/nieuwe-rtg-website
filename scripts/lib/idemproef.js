@@ -167,6 +167,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
 
   for (const r of routes) {
     if (maxRoutes && Object.keys(perRoute).length >= maxRoutes) break;
+    const methode = r.methode || r.method;
     const k1 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-1';
     const k2 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-2';
     const lijf = lijfVoor(r);
@@ -193,7 +194,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const o = weegHerhaling(a, b, c, staat);
     if (o.bron === 'opslag') uitOpslag++;
     tel[o.stand]++;
-    perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
+    const rij = { methode, pad: r.pad, rol: r.rol,
       idempotentie: o.stand, reden: o.reden, statussen: [a.status, b.status, c.status] };
     if (o.bron) rij.bron = o.bron;
     if (staat) rij.opslag = { a: dA, b: dB, c: dC };
@@ -226,7 +227,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
         rij.tegenspraak = tegenspraakTekst(o.grond, samen);
         rij.grond = o.grond || 'onbekend';
         rij.nagetrokken = true;
-        tegenspraken.push(r.method + ' ' + r.pad);
+        tegenspraken.push(methode + ' ' + r.pad);
       } else {
         /* Niet herhaalbaar: wat er bij B bewoog kwam ergens anders vandaan. Dat
            hoort in het register te staan, want een vermoeden dat spoorloos
@@ -236,7 +237,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
         verworpen++;
       }
     }
-    perRoute[r.method + ' ' + r.pad] = rij;
+    perRoute[methode + ' ' + r.pad] = rij;
   }
 
   /* ============================================================================

@@ -1,0 +1,201 @@
+{
+  "simulatiemodules": 66,
+  "kernmodules": 1400,
+  "kernDomeinen": 412,
+  "perWereld": {
+    "magnaat": {
+      "modules": 63,
+      "regels": 0,
+      "raaktKern": 2
+    },
+    "hospitality": {
+      "modules": 3,
+      "regels": 0,
+      "raaktKern": 0
+    }
+  },
+  "requiresTotaal": 116,
+  "geraakteKernmodules": 2,
+  "geraakteKernDomeinen": 2,
+  "bereikPct": 0,
+  "modulesDiePratenNaarBuiten": 0,
+  "kruisWereldAanroepen": 3,
+  "kruisWereld": [
+    {
+      "van": "server/kern/spellen/magnaat/economie.js",
+      "naar": "server/kern/hospitality-universe/world-model",
+      "wereld": "hospitality"
+    },
+    {
+      "van": "server/kern/spellen/magnaat/economie.js",
+      "naar": "server/kern/hospitality-universe/director",
+      "wereld": "hospitality"
+    },
+    {
+      "van": "server/kern/spellen/magnaat/economie.js",
+      "naar": "server/kern/hospitality-universe/human-reality",
+      "wereld": "hospitality"
+    }
+  ],
+  "bereik": [
+    {
+      "doel": "server/kern/bestuursroutes",
+      "door": [
+        "server/kern/magnaat-dekkingsmatrix.js"
+      ],
+      "aantal": 1
+    },
+    {
+      "doel": "server/kern/pay",
+      "door": [
+        "server/kern/spellen/magnaat/rtg-keten.js"
+      ],
+      "aantal": 1
+    }
+  ],
+  "gedeeldeOnderwerpen": 11,
+  "kandidaatparen": 32,
+  "parenMetGedeeldeVorm": 0,
+  "paren": [
+    {
+      "onderwerp": "handel",
+      "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
+      "rtg": "server/kern/podium/handel.js",
+      "vormgelijkenis": 0.1,
+      "meetbaar": true
+    },
+    {
+      "onderwerp": "kaart",
+      "simulatie": "server/kern/spellen/magnaat/kaart.js",
+      "rtg": "server/kern/mall/kaart.js",
+      "vormgelijkenis": 0.08,
+      "meetbaar": true
+    },
+    {
+      "onderwerp": "acties",
+      "simulatie": "server/kern/spellen/magnaat/acties.js",
+      "rtg": "server/kern/fluister/acties.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank-acties.js",
+      "rtg": "server/kern/architect/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank-acties.js",
+      "rtg": "server/kern/atelier/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank-acties.js",
+      "rtg": "server/kern/bank/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank-acties.js",
+      "rtg": "server/kern/hardwarelab/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank-acties.js",
+      "rtg": "server/kern/studio/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank.js",
+      "rtg": "server/kern/architect/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank.js",
+      "rtg": "server/kern/atelier/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank.js",
+      "rtg": "server/kern/bank/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank.js",
+      "rtg": "server/kern/hardwarelab/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bank",
+      "simulatie": "server/kern/spellen/magnaat/bank.js",
+      "rtg": "server/kern/studio/bank.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bord",
+      "simulatie": "server/kern/spellen/magnaat/bord.js",
+      "rtg": "server/kern/bank/bord.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bord",
+      "simulatie": "server/kern/spellen/magnaat/bord.js",
+      "rtg": "server/kern/bevoegdheid/bord.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bord",
+      "simulatie": "server/kern/spellen/magnaat/bord.js",
+      "rtg": "server/kern/lidboard/bord.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "bord",
+      "simulatie": "server/kern/spellen/magnaat/bord.js",
+      "rtg": "server/kern/stadsweefsel/bord.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "handel",
+      "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
+      "rtg": "server/kern/markt/handel.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "handel",
+      "simulatie": "server/kern/spellen/magnaat/handel.js",
+      "rtg": "server/kern/markt/handel.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "handel",
+      "simulatie": "server/kern/spellen/magnaat/handel.js",
+      "rtg": "server/kern/podium/handel.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    }
+  ]
+}

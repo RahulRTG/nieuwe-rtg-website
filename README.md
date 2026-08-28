@@ -817,7 +817,7 @@ De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*
 een over, en dat is de duurste:
 
 ```bash
-npm run wetten        # 41 systeemwetten met hun bewijsstand
+npm run wetten        # 46 systeemwetten met hun bewijsstand
 npm run sabotage      # zet elke handhaver echt uit, kijk wie rood wordt
 npm run zekerheid     # wat we weten, en vooral wat we niet weten
 ```

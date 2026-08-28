@@ -2,6 +2,7 @@
    van een zaak. Krijgt de gedeelde context een keer bij het opstarten vanuit
    maakFiscaal in kern/fiscaal.js. */
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
+const tarief = require('./tarief');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
   const ordersVoor = typeof ctx.ordersVanZaak === 'function'
@@ -12,10 +13,13 @@ module.exports = (ctx) => {
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
     const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
     const L = LANDEN[landCode];
-    const caps = db.capsVan(s);
-    const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
-    const menuStations = new Map((s.menu || []).map(m => [m.name, m.station]));
-    const catVan = naam => menuStations.get(naam) === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat;
+    /* DE DERDE KOPIE VAN DEZELFDE BESLISSING, en hij was de laatste die nog
+       naar de niet-bestaande cap `rooms` keek. ./tarief.js is er juist gekomen
+       omdat de boekhouding en de factuur uiteenliepen (zie de kop daar); dit
+       Z-rapport stond er met de hand naast en liep dus mee de mist in. Nu vraagt
+       ook het dagrapport het daar, en kan het niet meer afwijken. */
+    const basisCat = tarief.basisCat(s, db.capsVan(s));
+    const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const potten = {};
     const betaalwijzen = {};
     let bonnen = 0, fooien = 0, omzet = 0;

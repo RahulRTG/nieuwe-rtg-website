@@ -12,7 +12,7 @@
    moodboard kan tonen. Volgt het vaste kern-patroon maakAtelier(state). Dit
    is de orkestrator: de data en het sjabloon wonen in ./bank, de AI-acties
    in ./aiwerk. */
-const { CATEGORIEEN, STATUS, PALET, maakConcept } = require('./bank');
+const { DISCIPLINES, STATUS, PALET, maakConcept } = require('./bank');
 
 function maakAtelier({ db, save, crypto, anthropic, schoon }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
@@ -41,8 +41,8 @@ function maakAtelier({ db, save, crypto, anthropic, schoon }) {
 
   function publiek(o) {
     return {
-      id: o.id, categorie: o.categorie, categorieLabel: (CATEGORIEEN[o.categorie] || {}).label || o.categorie,
-      icon: (CATEGORIEEN[o.categorie] || {}).icon || '✎',
+      id: o.id, categorie: o.categorie, categorieLabel: (DISCIPLINES[o.categorie] || {}).label || o.categorie,
+      icon: (DISCIPLINES[o.categorie] || {}).icon || '✎',
       naam: o.naam, brief: o.brief, huis: o.huis || null, collectie: o.collectie || null,
       status: o.status, concept: o.concept || null, techpack: o.techpack || null,
       kritiek: o.kritiek || null, at: o.at, updatedAt: o.updatedAt || o.at, door: o.door || null
@@ -50,7 +50,7 @@ function maakAtelier({ db, save, crypto, anthropic, schoon }) {
   }
 
   function _maak(data) {
-    const categorie = CATEGORIEEN[data.categorie] ? data.categorie : 'tassen';
+    const categorie = DISCIPLINES[data.categorie] ? data.categorie : 'tassen';
     const o = {
       id: id(), categorie, naam: scho(data.naam, 100) || 'Naamloos ontwerp',
       brief: scho(data.brief, 600), huis: scho(data.huis, 80) || null,
@@ -70,7 +70,7 @@ function maakAtelier({ db, save, crypto, anthropic, schoon }) {
     for (const o of on) { perStatus[o.status] = (perStatus[o.status] || 0) + 1; perCategorie[o.categorie] = (perCategorie[o.categorie] || 0) + 1; }
     return {
       ok: true,
-      categorieen: Object.entries(CATEGORIEEN).map(([k, v]) => ({ id: k, label: v.label, icon: v.icon, aantal: perCategorie[k] || 0 })),
+      categorieen: Object.entries(DISCIPLINES).map(([k, v]) => ({ id: k, label: v.label, icon: v.icon, aantal: perCategorie[k] || 0 })),
       statussen: STATUS,
       ontwerpen: on.map(publiek),
       collecties: store().collecties.slice().reverse(),
@@ -110,11 +110,11 @@ function maakAtelier({ db, save, crypto, anthropic, schoon }) {
   // de gedeelde ctx voor de deelbestanden
   const ctx = { anthropic, save, scho, nu, vind, publiek };
   const api = {
-    CATEGORIEEN, STATUS, PALET,
+    DISCIPLINES, STATUS, PALET,
     overzicht, ontwerpMaak, ontwerpZet, ontwerpVerwijder, collectieMaak
   };
   Object.assign(api, require('./aiwerk')(ctx));
   return { atelier: api };
 }
 
-module.exports = { maakAtelier, CATEGORIEEN, STATUS };
+module.exports = { maakAtelier, DISCIPLINES, STATUS };

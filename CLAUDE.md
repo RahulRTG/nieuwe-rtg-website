@@ -181,6 +181,140 @@ zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**
 gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
 niet uit die meting komt.
 
+**`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet "RTG
+heeft veel operating layers" maar "RTG is één besturingssysteem van
+gestandaardiseerde capabilities". Lees die vóór je een capability, een woordenlijst
+met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
+is a Capability* — is er eerst **gemeten** in plaats van aangenomen
+(`scripts/capabilities.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
+geen capabilitylaag in deze code, er zijn er **twintig**, 91% van de leden woont in
+precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
+allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
+routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
+toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
+(`betalen`, `binnenkomen`, `SEPA_UIT` — allemaal "mag deze aanroep, en doet hij
+het?"), en nooit over het **domeinvermogen** (`bookings`, `rides`, `menu` — wat voor
+zaak is dit), want dat is dezelfde fout als `Asset`. Het contract van punt 7 bestaat al en staat in het kleinste hoekje van
+het huis: `kern/appstore/machtigingen.js` draagt als enige een doel én een grens.
+**De eventenvelop staat** (27 augustus 2026): `kern/envelop.js` geeft elk bericht
+op de bus acht velden — id, tijd, versie, kanaal, actor, correlatie, oorzaak,
+classificatie — en de keten loopt vanzelf door, zodat een gevolg-gebeurtenis weet
+waardoor zij ontstond. Drie grenzen daar: **de actor is een codenaam** (de envelop
+weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
+netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
+niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
+houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
+staat er met de meting erbij: van de 115 beproefde muterende routes zijn er 15
+retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
+**Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
+lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
+par. 2 heet nu **genre-cap** (domeinvermogen), en *capability* blijft over voor de
+herbruikbare bedrijfsfunctie (platformvermogen). `scripts/lagen.js` leidt de
+lagenmodellen af uit de documenten zelf en `test/genrecap.test.js` zakt zodra twee
+modellen weer een naam delen of een citatie achterloopt op zijn bron. Wat níét
+opgelost is: er liggen nog steeds twee lagenmodellen en de opzet stelt een derde
+voor. Die keuze staat nog open; alleen de naambotsing is weg.
+
+Die hernoeming legde meteen bloot waarom hij nodig was: `PLATFORM.md` noemde
+`rooms` als voorbeeld-cap, en **die cap bestaat niet** — geen van de 73 genres
+draagt hem en `kern/werkvormen.js` maakt hem nergens aan. `kern/fiscaal/tarief.js`
+besliste er wel op of een verkoop 'logies' is, dus die tak was dood en een
+verblijfszaak rekende te veel btw (appartement NL 21% in plaats van 9%, hotel DE
+19% in plaats van 7%). De tak keek de hele tijd groen omdat een toets hem met
+verzonnen invoer voedde. Een cap die een document noemt, wordt sindsdien tegen de
+code gehouden.
+
+**`MAGNAATLAB.md` is Magnaat als testhal** — de rol bovenop het spel dat
+`GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
+hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
+simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
+113 requires, en raakt daarmee **1 van 412 kerndomeinen** aan — 0%. Als testhal
+bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
+van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
+afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
+tenant-isolatie, doelschending, canary met automatische terugrol, shadow
+execution op echt verkeer, de bewijsmatrix), maar ze draaien allemaal tegen de
+echte server met testdata en geen van hen in een wereld. De pijp tussen spel en
+platform bestaat trouwens wel en loopt de verkeerde kant op: `magnaat-capabilities.js`
+leest RTG's echte routes en maakt er gameplay van, mét risicoclassificatie — wat
+ontbreekt is de retourrichting. **De scherpste bevinding
+staat in par. 3:** `kern/pay/poort.js` kent geen enkele demo-, test- of spelstand,
+en dat is precies waarom Magnaat er niet bij kan — een spelbank moet geld uit
+niets maken. De uitweg is dus géén vlag in de poort maar een vierde provider naast
+de bestaande demo-provider in `server/betaal.js`; de regel die daaruit volgt is
+**een simulatie-adapter vervangt de rail, nooit de poort**. **Die rail staat**
+(27 augustus 2026): `server/betaal/synthetisch.js`, en de poort is er geen letter
+voor veranderd. Wat hij toevoegt boven de demo is dat hij **stuk kan** — vier
+afloopen (`betaald`, `geweigerd`, `traag`, `terugboeking`), reproduceerbaar
+gekozen uit de idempotentiesleutel. Drie grendels, alle drie fail-closed en elk
+met de reden erbij: alleen met `RTG_SIMULATIEBANK=1`, nooit naast een échte
+provider, nooit in productie. En geen knop in de productieweg: geen enkele
+HTTP-route geeft een scenario door, want dan kan iemand een betaling laten slagen
+die niet geslaagd is. **En Magnaat rijdt er inmiddels op**:
+`kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay
+(`npm run magnaat:pomp:rtg`) — vijf perverse volgordes, exact nul verschil, en de
+idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels). Het
+bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules; het
+percentage bleef 0% en dat is geen tegenvaller maar te grof gemeten — één
+capability is geen percentage. Het is een **proefstuk en geen koppeling**: geen
+speelbeurt komt langs RTG Pay, en `test/magnaat-rtgketen.test.js` zakt zodra een
+spelmodule `kern/pay` laadt. Twee dingen om niet
+te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis
+buiten Magnaat niet toestaat, staat een groene simulatie niet toe), en scores
+mogen op apps en capabilities maar niet op mensen. En er staan al **twee**
+synthetische werelden (Magnaat en `kern/hospitality-universe/`) die elkaar
+aanroepen — die vraag hoort beantwoord vóór er een derde bij komt.
+
+**Punt 22 is ook gemeten** (par. 4.6): kunnen twee plekken die elk niets fout doen
+samen een codenaam terugvoeren naar een mens? `scripts/afleidbaar.js` leest elk
+objectliteraal in `server/` als een stel velden dat samen reist, en maakt daar een
+graaf van; de afstand van `codenaam` naar een harde identificator ís de bevinding.
+Zes staan er **rechtstreeks** naast een codenaam, twee op twee stappen, en het
+**bsn nergens**. Het handwerk erna verwierp de helft — twee treffers zijn de
+identiteitskluis zelf (waar de koppeling hóórt, met een auditregel), twee zijn
+verklaarbare valse treffers, één zit achter een vlag, en één verdient een besluit:
+codenaam plus bezorgadres blijft staan in de operationele data zonder
+bewaartermijn. De meter meet **structuur en geen bevoegdheid** — een lid dat naar
+zijn eigen gegevens kijkt ziet er hetzelfde uit, en een pad door een knooppunt als
+`code` is vrijwel zeker geen koppeling. Zulke paden worden apart gemeld en niet
+weggelaten.
+
+**`BEWIJSMACHINE.md` is de lat boven de testhal** — niet of Magnaat kan bewijzen
+dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
+mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
+of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
+van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
+`SEMANTIEK.json`) en het was **geen incident**: van de 95 namen die in meer dan
+één domein staan, dragen er **77 meer dan één betekenis** — samen 279
+betekenissen, met `SOORTEN` op **38**. Daarnaast **28** betekenissen die op meer
+dan één plek wonen én **101** paren die dezelfde waarheid onder een ándere naam
+dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
+dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
+tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
+metingen wijzen naar dezelfde vier domeinen** (`architect`, `atelier`,
+`hardwarelab`, `studio`): `OBJECTMODEL.json` via gedeelde vormen, `SEMANTIEK.json`
+via `PALET` en `STATUS` op vier plekken. Dat is het sterkste bewijs voor een
+gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
+"welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
+en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
+overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
+meter bewoog mee: 111 → 101. De 77 zijn geen foutenlijst
+maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
+kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
+en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies
+wat LAT-regel 11 en `check.js` regel 48 verbieden (bewijsgroen is geen
+go-live-groen, en `scripts/zekerheid.js` bestaat juist omdat losse eerlijke
+getallen samen een gevaarlijk gevoel geven); één samengesteld entropiecijfer
+verbergt welke van de 31 geratelde meters bewoog; en een register dat naast de
+code leeft, wordt binnen een jaar zelf de 78ste botsing — het hoort te worden
+afgeleid, met bron én handhaver zoals `WETTEN.json`. Wat er nagemeten **niet** is:
+release-provenance (geen SLSA, geen SBOM, geen build-attestatie) en een zoeker
+die zelf tegenvoorbeelden genereert — `scripts/sabotage.js` overtreedt elke wet
+één keer met opzet, en dat is iets anders dan zoeken.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
@@ -216,7 +350,7 @@ centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
 
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
 
-**`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
+**`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 

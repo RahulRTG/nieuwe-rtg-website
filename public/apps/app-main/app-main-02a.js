@@ -1,5 +1,16 @@
-/* De trainingsmelding bestaat uitsluitend in Magnaat. De echte app kent geen
-   queryparameter, health-status of netwerkfout die voorbeelddata kan openen. */
+/* de demomelding: een demo is een toestand, geen terugval na een storing */
+  /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `|| zoekParams.get('demo')
+     === '1'`, en daarmee kon iedereen met ?demo=1 een RTG-portaal openen dat
+     met verzonnen leden, reizen en Salon-berichten gevuld werd. Dat is precies
+     wat RTG niet mag zijn: wat hier staat is echt, of het staat er niet.
+     Magnaat is de plek waar gesimuleerd wordt (MAGNAATLAB.md), en die houdt
+     zijn eigen ingang. */
+  const explicieteDemo = magnaatProef;
+
+  /* Een demo is een toestand, geen terugval na een storing. De melding stond
+     altijd op het homescreen en daardoor leek ook een echte installatie een
+     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
+     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
   function zetDemoMelding(aan, tekst) {
     const el = document.getElementById('osDemoWet');
     if (!el) return;

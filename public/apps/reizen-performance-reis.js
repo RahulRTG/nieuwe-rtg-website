@@ -53,13 +53,11 @@
     tekenCanvasVandaag(data.komend || []); updateVandaag(data);
   }
   R.laadReizen = function (melding) {
-    if (!R.token) {
-      renderReizen({ stand: { niveau: 'onbekend', woord: 'Inlog nodig' }, telling: {}, stil: ['ledensessie'], komend: [] });
-      $('#komend').textContent = '';
-      $('#komend').appendChild(maak('p', 'leegtekst', 'Log in om uw echte reizen op te halen. Er worden geen voorbeeldreizen getoond.'));
-      if (melding) R.toast('Log eerst in via de leden-app.');
-      return Promise.resolve();
-    }
+    /* GEEN VERZONNEN REIS VOOR WIE NIET IS AANGEMELD. Hier stond een
+       demowereld met drie komende reizen en een gezonde stand; wie de app
+       zonder token opende zag dus een reisoverzicht dat niet van hem was.
+       RTG toont wat er echt is, of het zegt dat het niets kan tonen. */
+    if (!R.token) { if (melding) R.toast('Log in om uw reizen te zien.'); return; }
     return R.api('/api/reis/wereld', {}).then(function (data) { renderReizen(data); if (melding) R.toast('Uw reizen zijn bijgewerkt.'); })
       /* Ook bij een storing NIET in #komend schrijven: dat register is van
          reizen.html, en die zegt zelf wat er misging. Twee foutmeldingen over

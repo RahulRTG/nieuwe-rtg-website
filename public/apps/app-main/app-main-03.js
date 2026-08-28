@@ -92,11 +92,13 @@
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!magnaatProef){
-          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
-        }
-        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
-          toast('Onjuiste inloggegevens.'); return;
+        /* HIER STOND EEN WACHTWOORD IN DE CLIENT. De tak controleerde
+           letterlijk op een naam en een wachtwoord en gaf daarna de
+           business-pas -- leesbaar voor iedereen die de bron opent, en de
+           naam van een echt mens. Weg. Zonder server valt er niets in te
+           loggen, en dat hoort een lege deur te zijn en geen achterdeur. */
+        if (!explicieteDemo){
+          toast('Geen serververbinding. Start RTG via de server.'); return;
         }
         tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
       }
@@ -110,7 +112,7 @@
       } else if (explicieteDemo) {
         user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
-        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
+        toast('Geen serververbinding. Start RTG via de server.'); return;
       }
     }
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}

@@ -28,7 +28,13 @@
   };
 
   var staat = {
-    demo: window.RTG_MAGNAAT_PROEF === true,
+    /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `!token ||
+       ?demo=1`: wie niet was aangemeld kreeg dus vanzelf een verzonnen
+       ritaanvraag te zien, met een codenaam en een bedrag erbij. Een chauffeur
+       die de app opent hoort te zien wat er echt voor hem klaarstaat, of dat
+       hij niet is aangemeld -- die tekst stond er al ("Niet aangemeld").
+       Simuleren doet Magnaat, en die houdt zijn eigen ingang. */
+    demo: new URLSearchParams(location.search).get('magnaat') === '1',
     gegevens: null, fout: null, bezig: false, gekozen: null, blad: 'ritten',
     genegeerd: new Set(), laatsteOpen: null, eersteLading: true, poll: null,
     positieWatch: null, laatstePositieAt: 0, laatstePositie: null,

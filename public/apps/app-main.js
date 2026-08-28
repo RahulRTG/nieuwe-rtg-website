@@ -340,8 +340,19 @@ var RTG_BOUW = '0c7df0d9';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
-/* De trainingsmelding bestaat uitsluitend in Magnaat. De echte app kent geen
-   queryparameter, health-status of netwerkfout die voorbeelddata kan openen. */
+/* de demomelding: een demo is een toestand, geen terugval na een storing */
+  /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `|| zoekParams.get('demo')
+     === '1'`, en daarmee kon iedereen met ?demo=1 een RTG-portaal openen dat
+     met verzonnen leden, reizen en Salon-berichten gevuld werd. Dat is precies
+     wat RTG niet mag zijn: wat hier staat is echt, of het staat er niet.
+     Magnaat is de plek waar gesimuleerd wordt (MAGNAATLAB.md), en die houdt
+     zijn eigen ingang. */
+  const explicieteDemo = magnaatProef;
+
+  /* Een demo is een toestand, geen terugval na een storing. De melding stond
+     altijd op het homescreen en daardoor leek ook een echte installatie een
+     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
+     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
   function zetDemoMelding(aan, tekst) {
     const el = document.getElementById('osDemoWet');
     if (!el) return;
@@ -494,11 +505,13 @@ var RTG_BOUW = '0c7df0d9';
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!magnaatProef){
-          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
-        }
-        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
-          toast('Onjuiste inloggegevens.'); return;
+        /* HIER STOND EEN WACHTWOORD IN DE CLIENT. De tak controleerde
+           letterlijk op een naam en een wachtwoord en gaf daarna de
+           business-pas -- leesbaar voor iedereen die de bron opent, en de
+           naam van een echt mens. Weg. Zonder server valt er niets in te
+           loggen, en dat hoort een lege deur te zijn en geen achterdeur. */
+        if (!explicieteDemo){
+          toast('Geen serververbinding. Start RTG via de server.'); return;
         }
         tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
       }
@@ -512,7 +525,7 @@ var RTG_BOUW = '0c7df0d9';
       } else if (explicieteDemo) {
         user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
-        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
+        toast('Geen serververbinding. Start RTG via de server.'); return;
       }
     }
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
@@ -9451,8 +9464,25 @@ var RTG_BOUW = '0c7df0d9';
 
   /* ---------- PWA ---------- */
 
+  /* EEN UITROL KOMT BIJ DE EERSTE OPENING BINNEN, NIET BIJ DE TWEEDE.
+
+     De nieuwe worker neemt over, maar wat je dan ziet is al door de OUDE
+     geserveerd -- bij een PWA die je nooit afsluit duurde dat een dag. De
+     bouwstempelwacht ving het niet: komen html EN script uit dezelfde oude
+     cache, dan kloppen de stempels met elkaar. Het slot is geen versiering:
+     zonder `hadWorker` herlaadt ook de eerste installatie, en zonder
+     `herlaadtAl` kan een hernieuwde claim een lus maken. */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    var hadWorker = !!navigator.serviceWorker.controller;
+    var herlaadtAl = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadWorker || herlaadtAl) return;
+      herlaadtAl = true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('/sw.js')
+      .then(function (reg) { if (reg && reg.update) { try { reg.update(); } catch (e) {} } })
+      .catch(() => {});
   }
 
   const logoutBtn = document.getElementById('logoutBtn');

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>School · RTFoundation</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta name="theme-color" content="#08090C">
 <link rel="manifest" href="/manifests/foundation.webmanifest">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="stijl.css">
@@ -60,6 +60,7 @@
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link rel="stylesheet" href="premium.css">
 </head>
 <body class="rtg-stijl school-shell">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -92,7 +93,7 @@
   <!-- gezinsweergave -->
   <section id="vGezin" hidden>
     <section class="enterprise-hero">
-      <div><span class="ey">Gezin &amp; leerling</span><h2 id="schoolWelkom">Jouw schooldag in één rustig beeld.</h2><p>Rooster, huiswerk, toetsen, cijfers en contact horen bij elkaar. Je ziet alleen jouw eigen klas en gezin.</p>
+      <div><span class="ey">Gezin &amp; leerling</span><h2 id="schoolWelkom">Jouw schooldag. Op wereldniveau.</h2><p>Rooster, huiswerk, toetsen, cijfers en contact horen bij elkaar. Hoogwaardige begeleiding, met alleen zicht op jouw eigen klas en gezin.</p>
         <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Vandaag</span><span class="enterprise-chip"><i></i>Mijn werk</span><span class="enterprise-chip"><i></i>Berichten</span></div>
       </div>
       <div class="enterprise-belofte"><b>Jij houdt de regie</b>Een kind accepteert zelf een klasuitnodiging. Schoolberichten lopen via het gezin en gevoelige gegevens blijven afgeschermd.</div>
@@ -687,5 +688,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="premium.js" defer></script>
 </body>
 </html>

@@ -46,16 +46,16 @@
     }
     if (!el) {
       el = document.createElement('dialog'); el.id = id; el.setAttribute('role', 'alertdialog'); el.setAttribute('aria-modal', 'true');
-      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:#0c0c0b;color:#f6f1e7;font-family:Inter,system-ui,sans-serif';
+      el.style.cssText = 'position:fixed;inset:0;z-index:2147483000;width:100%;height:100%;max-width:none;max-height:none;margin:0;border:0;display:grid;place-items:center;padding:1rem;background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%);color:#f4f0e7;font-family:Inter,system-ui,sans-serif';
       (document.body || document.documentElement).appendChild(el);
     }
     var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:0;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
-      '<div style="font:600 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#c9a24b">RTF veilige toegang</div>' +
-      '<h1 style="font:500 1.75rem/1.15 Georgia,serif;margin:.55rem 0">' + (laden ? 'Jouw passen worden gecontroleerd…' : 'Deze ruimte blijft nog dicht') + '</h1>' +
+    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.5rem;border:1px solid rgba(195,155,74,.38);border-radius:0;background:linear-gradient(145deg,#121923,#0b0e14);box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
+      '<div style="font:800 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#e0c487">RTF · veilige toegang</div>' +
+      '<h1 style="font:900 1.75rem/1.08 Inter,sans-serif;letter-spacing:-.035em;text-transform:uppercase;margin:.65rem 0">' + (laden ? 'Jouw veilige wereld wacht op je' : 'Deze ruimte blijft nog dicht') + '</h1>' +
       '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
+      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#2874d0,#c39b4a,#63d587)"></div>' :
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#a6002f;color:#fff;text-decoration:none;font-weight:800">Kies een profiel →</a>' +
         '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
         (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');

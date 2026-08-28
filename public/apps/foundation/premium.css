@@ -1,0 +1,399 @@
+/*
+ * RTFoundation premium system
+ * Elite in kwaliteit. Open voor iedereen.
+ * Dit blad wordt als laatste geladen en verbindt alle Foundation-schermen,
+ * ook de oudere losse werelden, zonder hun werking over te nemen.
+ */
+@import url('/fonts/fonts.css');
+
+:root{
+  --rtf-ink:#08090c;
+  --rtf-navy:#071a32;
+  --rtf-blue:#164a98;
+  --rtf-blue-bright:#2874d0;
+  --rtf-gold:#c39b4a;
+  --rtf-gold-soft:#e0c487;
+  --rtf-paper:#f4f0e7;
+  --rtf-crimson:#a6002f;
+  --rtf-crimson-bright:#c20b43;
+  --rtf-safe:#63d587;
+  --rtf-muted:#9ea7b6;
+  --rtf-panel:#10141b;
+  --rtf-panel-2:#0b0e14;
+  --rtf-line:rgba(220,226,235,.15);
+  --rtf-line-gold:rgba(195,155,74,.38);
+  --rtf-radius:18px;
+  --rtf-radius-sm:12px;
+  --rtf-shadow:0 22px 60px rgba(0,0,0,.34);
+  --bg:var(--rtf-ink);
+  --paneel:var(--rtf-panel);
+  --paneel2:var(--rtf-panel-2);
+  --bord:#0b0e13;
+  --lijn:var(--rtf-line);
+  --txt:var(--rtf-paper);
+  --zacht:var(--rtf-muted);
+  --goud:var(--rtf-gold);
+  --goud2:var(--rtf-gold-soft);
+  --groen:var(--rtf-safe);
+  --rood:var(--rtf-crimson-bright);
+  --radius:var(--rtf-radius);
+  --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
+  --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  color-scheme:dark;
+}
+
+html{background:var(--rtf-ink);overflow-x:hidden;scroll-behavior:smooth}
+body.rtg-stijl,
+body{
+  min-width:0;
+  max-width:100%;
+  overflow-x:hidden;
+  background:
+    radial-gradient(900px 520px at 80% -14%,rgba(22,74,152,.18),transparent 62%),
+    radial-gradient(680px 420px at -8% 42%,rgba(166,0,47,.06),transparent 68%),
+    var(--rtf-ink);
+  color:var(--rtf-paper);
+  font-family:var(--sans);
+  letter-spacing:.005em;
+}
+body::selection{background:rgba(195,155,74,.35);color:#fff}
+a,button,input,textarea,select{font:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--rtf-gold-soft)!important;outline-offset:3px}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+
+/* Typografie: redactioneel woordmerk, vlotte interfacekoppen. */
+.logo,.serif,.sb-brand,.topnav .brand,.merk strong,.school-merk strong{
+  font-family:var(--serif)!important;
+}
+h1,h2,h3,.enterprise-hero h2,.hero h1,.wereld h3,.eco-app strong,
+.campus-ingang strong,.ronb-card h1,.modal h3{
+  text-wrap:balance;
+}
+body.rtf-premium main h1,body.rtf-premium .wrap>h1{
+  font-family:var(--sans)!important;
+  font-weight:900!important;
+  letter-spacing:-.035em!important;
+  line-height:1.02!important;
+  text-transform:uppercase;
+}
+.kick,.sec,.ey,.navkop,.school-navkop,.buddy-t,.ronb-lab{
+  color:var(--rtf-gold-soft)!important;
+  font-family:var(--sans)!important;
+  font-weight:800!important;
+  letter-spacing:.17em!important;
+  text-transform:uppercase;
+}
+.zacht,.stil,.sub,.deck{color:var(--rtf-muted)!important}
+
+/* Matte, precieze oppervlakken. */
+body.rtg-stijl .kaart,
+.kaart{
+  min-width:0;
+  max-width:100%;
+  background:linear-gradient(145deg,rgba(20,25,34,.96),rgba(11,14,20,.98));
+  border:1px solid var(--rtf-line);
+  border-radius:0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.knop,.doorgaan{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.55rem;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:0!important;
+  background:linear-gradient(135deg,var(--rtf-crimson),var(--rtf-crimson-bright))!important;
+  color:#fff!important;
+  box-shadow:0 9px 24px rgba(166,0,47,.2)!important;
+  font-weight:800!important;
+  letter-spacing:.04em;
+  text-decoration:none;
+  transition:transform .16s ease,filter .16s ease,border-color .16s ease;
+}
+.knop:hover,.doorgaan:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.knop:active,.doorgaan:active{transform:translateY(0)}
+.knop.grijs,.knop.neutraal{
+  background:#151a22!important;
+  color:var(--rtf-paper)!important;
+  border-color:var(--rtf-line)!important;
+  box-shadow:none!important;
+}
+.knop.groen{background:#1d6b3c!important;box-shadow:none!important}
+.knop.rood{background:var(--rtf-crimson)!important}
+.knop.klein:not(.rood):not(.groen){background:#151a22!important;color:var(--rtf-gold-soft)!important;border-color:var(--rtf-line)!important;box-shadow:none!important}
+.veld,input.veld,textarea.veld,select.veld,.eco-zoek{
+  min-width:0;
+  max-width:100%;
+  background:#0a0d12!important;
+  color:var(--rtf-paper)!important;
+  border:1px solid var(--rtf-line)!important;
+  border-radius:0!important;
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.22);
+}
+.veld:focus,input.veld:focus,textarea.veld:focus,select.veld:focus,.eco-zoek:focus{
+  border-color:var(--rtf-gold)!important;
+  box-shadow:0 0 0 3px rgba(195,155,74,.11);
+}
+.badge,.grpbadge,.passband{
+  background:rgba(195,155,74,.09)!important;
+  border:1px solid var(--rtf-line-gold)!important;
+  color:var(--rtf-gold-soft)!important;
+  border-radius:0!important;
+}
+.dot.aan{background:var(--rtf-safe);box-shadow:0 0 0 4px rgba(99,213,135,.13)}
+
+/* Bovenbalk: één herkenbare Foundation-signatuur. */
+#balk,.topnav,.top,.school-boven{
+  border-bottom-color:var(--rtf-line)!important;
+  background:rgba(8,9,12,.86)!important;
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+.sb-balk{min-width:0!important;max-width:100%;padding:.66rem clamp(.75rem,3vw,1.25rem)!important}
+.sb-brand{
+  padding:0!important;
+  border-radius:0!important;
+  background:none!important;
+  color:var(--rtf-gold)!important;
+  font-size:1.05rem!important;
+  white-space:nowrap;
+}
+.sb-brand b{color:var(--rtf-paper)!important;font-weight:500}
+.sb-terug,.sb-prof,.sb-bel{
+  border-color:var(--rtf-line)!important;
+  background:#11151d!important;
+  color:var(--rtf-paper)!important;
+}
+.sb-safe{color:var(--rtf-muted)!important}.sb-safe i{background:var(--rtf-safe)!important}
+.wereldapps{
+  display:flex;
+  gap:.3rem;
+  overflow-x:auto;
+  width:100%;
+  padding:.48rem max(.75rem,calc((100vw - 68rem)/2));
+  border-bottom:1px solid var(--rtf-line);
+  background:#090b0f;
+  scrollbar-width:none;
+}
+.wereldapps::-webkit-scrollbar{display:none}
+.wereldapps a{
+  flex:0 0 auto;
+  min-height:34px;
+  display:inline-flex;
+  align-items:center;
+  padding:.35rem .72rem;
+  border-radius:0;
+  color:var(--rtf-muted);
+  font-size:.67rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-decoration:none;
+  text-transform:uppercase;
+}
+.wereldapps a:hover{background:#151a22;color:var(--rtf-paper)}
+
+/* Foundation-entree en profielkeuze. */
+#vWelkom,#vProfielen{min-height:calc(100svh - 5rem);display:grid;align-content:center}
+#vWelkom[hidden],#vProfielen[hidden]{display:none}
+#vWelkom .hero,#vProfielen{position:relative}
+#vWelkom .hero::before{
+  content:'EMPOWERING JOURNEYS · BUILDING FUTURES';
+  display:inline-block;
+  margin-bottom:1rem;
+  color:var(--rtf-gold-soft);
+  font-size:.62rem;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+#vWelkom .logo{max-width:13ch;margin:auto;font-size:clamp(2.5rem,8vw,5rem)!important;line-height:.93!important}
+#vWelkom .deck{font-size:clamp(.95rem,2vw,1.08rem)}
+.profgrid{grid-template-columns:repeat(auto-fit,minmax(7.2rem,1fr))!important;gap:1rem!important}
+.prof{
+  min-width:0;
+  padding:1rem .55rem;
+  border:1px solid transparent;
+  border-radius:0;
+  transition:background .16s,border-color .16s,transform .16s;
+}
+.prof:hover{background:rgba(255,255,255,.025);border-color:var(--rtf-line);transform:translateY(-2px)}
+.prof .av{
+  width:4.75rem!important;height:4.75rem!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,var(--avatar-color,var(--rtf-blue)),#0a1525)!important;
+  color:#fff!important;
+  font-family:var(--serif);
+  font-size:1.15rem!important;
+  font-weight:700;
+  letter-spacing:.06em;
+  box-shadow:0 10px 28px rgba(0,0,0,.28);
+}
+.prof .av[data-avatar]::before,.avkies button[data-avatar]::before{content:attr(data-mark)}
+.prof .slot-pin{border-color:var(--rtf-line-gold)!important;background:#0c1016!important;color:var(--rtf-gold-soft)!important}
+.prof .nm{font-weight:800;letter-spacing:.02em}.prof .slot{text-transform:uppercase;letter-spacing:.08em}
+.avkies button{
+  width:2.8rem!important;height:2.8rem!important;
+  background:#10151d!important;
+  color:var(--rtf-paper)!important;
+  font-family:var(--serif);
+  font-size:.85rem!important;
+}
+
+/* Hub: een rustig dashboard, geen uitwaaierende tegelwand. */
+#vHub{max-width:68rem!important}
+#vHub>.hero{text-align:left!important;padding:.9rem 0 1rem!important}
+#vHub>.hero::before{
+  content:'VANDAAG';display:block;margin-bottom:.45rem;color:var(--rtf-gold-soft);
+  font-size:.61rem;font-weight:800;letter-spacing:.18em;
+}
+#vHub>.hero .logo{font-family:var(--sans)!important;font-size:clamp(2rem,6vw,4rem)!important;font-weight:900!important;letter-spacing:-.04em!important;text-transform:uppercase}
+#vHub>.hero .deck{margin:.45rem 0 0!important}
+.rtf-hubgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(15rem,.7fr);gap:.75rem;margin-bottom:.85rem}
+.rtf-focus{position:relative;overflow:hidden;padding:1.15rem 1.2rem;border-color:var(--rtf-line-gold)!important;text-decoration:none;color:var(--rtf-paper)}
+.rtf-focus::after{content:'';position:absolute;right:-3rem;bottom:-5rem;width:12rem;height:12rem;border-radius:50%;border:1px solid rgba(195,155,74,.27)}
+.rtf-focus small{display:block;color:var(--rtf-gold-soft);font-size:.6rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.rtf-focus strong{display:block;max-width:18ch;margin:.5rem 0;font-size:clamp(1.25rem,3vw,2rem);line-height:1.05;text-transform:uppercase}
+.rtf-focus span{color:var(--rtf-muted);font-size:.78rem;line-height:1.5}
+.rtf-focus b{display:inline-flex;margin-top:1rem;color:var(--rtf-paper);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.rtf-impact{padding:1.05rem;display:flex;flex-direction:column;justify-content:center}
+.rtf-impact small{color:var(--rtf-gold-soft);font-size:.6rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.rtf-impact strong{font-size:2.2rem;margin:.25rem 0}.rtf-impact span{color:var(--rtf-muted);font-size:.72rem;line-height:1.45}
+.rtf-search{position:relative;margin:1rem 0}
+.rtf-search input{width:100%;min-height:48px;padding:.75rem 1rem .75rem 2.75rem}
+.rtf-search::before{content:'⌕';position:absolute;left:1rem;top:.55rem;z-index:1;color:var(--rtf-gold);font-size:1.35rem}
+.rtf-search-status{display:block;margin:.35rem 0 0;color:var(--rtf-muted);font-size:.66rem}
+.rtf-zoek-weg{display:none!important}
+.campus-ingang{display:none!important}
+.buddy{padding:.85rem 1rem!important;border-radius:0!important}
+.buddy-b{min-width:0!important;background:#0c1016!important;border:1px solid var(--rtf-line)!important;color:var(--rtf-paper)!important}
+h3.sec{margin-top:2.1rem!important;padding-top:.85rem;border-top:1px solid var(--rtf-line);font-size:.66rem!important}
+.tiles{
+  min-width:0!important;width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:.7rem!important;
+}
+body.rtg-stijl .tile,.tile{
+  min-width:0!important;
+  width:auto!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:.68rem .3rem!important;
+  overflow:hidden!important;
+  background:none!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.tile .ic{
+  width:58px!important;height:58px!important;flex:0 0 58px;
+  border:1px solid var(--rtf-line)!important;
+  border-radius:0!important;
+  background:
+    linear-gradient(145deg,rgba(31,53,83,.72),rgba(10,13,19,.98))!important;
+  box-shadow:0 9px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;
+  color:var(--rtf-gold-soft)!important;
+  font-family:var(--sans);
+  font-size:.66rem!important;
+  font-weight:900;
+  letter-spacing:.09em;
+}
+.tile .ic[data-code]::before{content:attr(data-code)}
+.tile:nth-of-type(4n+2) .ic{background:linear-gradient(145deg,rgba(195,155,74,.23),rgba(10,13,19,.98))!important}
+.tile:nth-of-type(4n+3) .ic{background:linear-gradient(145deg,rgba(34,110,75,.45),rgba(10,13,19,.98))!important}
+.tile:nth-of-type(4n+4) .ic{background:linear-gradient(145deg,rgba(166,0,47,.35),rgba(10,13,19,.98))!important}
+.tile h2{
+  width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  color:#c6ccd5!important;font-size:.58rem!important;letter-spacing:.09em!important;white-space:nowrap;
+}
+.tile:hover .ic{border-color:var(--rtf-gold)!important;transform:translateY(-2px)}
+.gratis{border-top-color:var(--rtf-line)!important}.gratis b{color:var(--rtf-gold-soft)!important}
+
+/* Modals en onboarding: korte stappen, leesbare overeenkomst. */
+dialog::backdrop{background:rgba(2,4,8,.86)!important;backdrop-filter:blur(6px)}
+.modal{background:linear-gradient(145deg,#151a23,#0b0e14)!important;box-shadow:var(--rtf-shadow)}
+#rtfOnb{background:rgba(5,8,13,.97)!important;display:grid;align-items:start}
+#rtfOnb[hidden]{display:none!important}
+.ronb-card{width:min(100%,38rem);padding:clamp(1rem,4vw,2rem);border:1px solid var(--rtf-line);border-radius:0;background:linear-gradient(145deg,#121721,#090c11);box-shadow:var(--rtf-shadow)}
+.ronb-card::before{content:'RTFOUNDATION · VEILIGE START';display:block;margin-bottom:.8rem;color:var(--rtf-gold-soft);font-size:.6rem;font-weight:800;letter-spacing:.17em}
+.ronb-card h1{font-family:var(--sans)!important;font-size:clamp(1.7rem,5vw,2.5rem)!important;font-weight:900!important;letter-spacing:-.035em;text-transform:uppercase}
+.ronb-contract{background:#090c11!important;border-color:var(--rtf-line)!important}.ronb-tekst{max-height:10rem!important}
+.ronb-card #rtfOnbDoe{position:sticky;bottom:.35rem;z-index:2;margin-top:.65rem}
+
+/* Campus, School en Klas: dezelfde architectuur en statussignalen. */
+.app,.school-kader{background:var(--rtf-ink)}
+.zij,.school-zij{background:#090c11!important;border-right-color:var(--rtf-line)!important}
+.merkbeeld,.school-merkbeeld{
+  border:1px solid var(--rtf-line-gold);
+  border-radius:0!important;
+  background:linear-gradient(145deg,#143867,#08101d)!important;
+  color:var(--rtf-gold-soft)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.navknop,.school-nav{border-radius:0!important}
+.navknop:hover,.navknop.aan,.school-nav:hover,.school-nav.aan{background:#111722!important;color:var(--rtf-paper)!important}
+.navknop.aan,.school-nav.aan{box-shadow:inset 3px 0 var(--rtf-gold)!important}
+.navico,.school-nav i{color:var(--rtf-gold-soft)!important;border-color:var(--rtf-line)!important}
+.veilig,.school-veilig{border-color:rgba(99,213,135,.32)!important;background:rgba(99,213,135,.035)!important}
+.veilig b,.school-veilig b,.enterprise-belofte b{color:var(--rtf-safe)!important}
+.hero,.enterprise-hero{
+  background:
+    radial-gradient(circle at 88% 5%,rgba(22,74,152,.25),transparent 45%),
+    linear-gradient(145deg,#121923,#0b0e14)!important;
+  border-color:var(--rtf-line)!important;
+}
+.hero .kick,.toptekst small,.enterprise-hero .ey,.school-ey{color:var(--rtf-gold-soft)!important}
+.hero h1,.enterprise-hero h2{font-family:var(--sans)!important;font-weight:900!important;letter-spacing:-.04em;text-transform:uppercase}
+.daglijn i{background:linear-gradient(90deg,var(--rtf-blue-bright),var(--rtf-gold))!important}
+.werktool:hover,.wereld:hover,.eco-app:hover{border-color:var(--rtf-gold)!important}
+.werktool small,.wereld small,.eco-app small,.route button{color:var(--rtf-gold-soft)!important}
+.wereld,.werktool,.eco-app,.route,.passtatus{background:linear-gradient(145deg,#121720,#0b0e14)!important;border-color:var(--rtf-line)!important}
+.eco-tab.aan{background:var(--rtf-blue)!important;border-color:var(--rtf-blue-bright)!important;color:#fff!important}
+.school-merkbeeld::first-letter{color:var(--rtf-gold-soft)}
+.school-boven h1,.toptekst strong{font-family:var(--sans)!important;font-weight:900!important;text-transform:uppercase;letter-spacing:.02em}
+.enterprise-chip{border-color:var(--rtf-line)!important}.enterprise-chip i,.school-context-dot{background:var(--rtf-safe)!important}
+.school-rolkop .school-avatar{background:linear-gradient(145deg,var(--rtf-blue),#071426)!important}
+
+/* Losse portalen (Klas, Club, OS) volgen dezelfde rustige header. */
+.topnav{min-height:4.2rem;padding:.75rem clamp(.8rem,3vw,1.3rem)!important}
+.topnav .brand{color:var(--rtf-paper);font-size:1.05rem!important}.topnav .brand b{color:var(--rtf-gold-soft);font-weight:500}
+.merkvlak{padding:0!important;border-radius:0!important;background:none!important;color:var(--rtf-gold)!important}.merkvlak b{color:var(--rtf-paper)!important;font-weight:500}
+.topnav a{min-height:36px;display:inline-flex;align-items:center;padding:.35rem .65rem;border:1px solid var(--rtf-line);border-radius:0;background:#10141b;color:var(--rtf-paper)!important}
+.rtf-inline-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.36rem;color:var(--rtf-muted);font-size:.6rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.rtf-inline-safe i{width:.42rem;height:.42rem;border-radius:50%;background:var(--rtf-safe);box-shadow:0 0 0 3px rgba(99,213,135,.12)}
+.topnav .rtf-inline-safe+ a{margin-left:0}
+.rtf-ios-brand{color:var(--rtf-gold-soft);font-family:var(--serif);font-size:.8rem;font-weight:700;letter-spacing:.08em}
+#rtf-toegang-slot{background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%)!important}
+#rtf-toegang-slot>div{border-color:var(--rtf-line-gold)!important;background:linear-gradient(145deg,#121923,#0b0e14)!important}
+#rtf-toegang-slot h1{font-family:var(--sans)!important;font-weight:900!important;letter-spacing:-.035em!important;text-transform:uppercase}
+#rtf-toegang-slot [data-rtf-wissel]{background:linear-gradient(135deg,var(--rtf-crimson),var(--rtf-crimson-bright))!important;color:#fff!important;box-shadow:0 9px 24px rgba(166,0,47,.2)}
+#rtf-toegang-slot [data-rtf-uitweg]{background:#11151d!important;border-color:var(--rtf-line)!important;color:var(--rtf-paper)!important}
+body[data-rtf-page="klas"] #vCode{padding-top:clamp(2rem,10vh,6rem)}
+body[data-rtf-page="klas"] #vCode::before{content:'LIVE · VEILIGE KLASOMGEVING';display:block;margin-bottom:.65rem;color:var(--rtf-safe);font-size:.62rem;font-weight:800;letter-spacing:.15em}
+body[data-rtf-page="klas"] #vCode h1{font-family:var(--sans)!important;font-size:clamp(2rem,8vw,3.5rem)!important;font-weight:900!important;letter-spacing:-.04em;text-transform:uppercase}
+body[data-rtf-page="klas"] #cGo{background:linear-gradient(135deg,var(--rtf-crimson),var(--rtf-crimson-bright))!important;color:#fff!important}
+
+@media(max-width:900px){
+  .tiles{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .rtf-hubgrid{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .wrap{width:100%;max-width:100%;padding-left:.9rem!important;padding-right:.9rem!important}
+  .tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.7rem .22rem!important}
+  .tile .ic{width:54px!important;height:54px!important;flex-basis:54px}
+  .tile h2{font-size:.54rem!important}
+  .buddy-keuze{flex-direction:column}
+  #vHub>.hero .logo{font-size:2.15rem!important}
+  .profgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .rtf-focus{padding:1rem}.rtf-impact{min-height:8rem}
+  .rtf-inline-safe{font-size:0}.rtf-inline-safe i{display:block}
+}
+@media(max-width:360px){
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .profgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}

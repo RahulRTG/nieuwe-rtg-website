@@ -56,7 +56,7 @@
     var lijst = (m.meldingen || []).map(function (x) {
       return '<div class="mini" style="margin:0.25rem 0;">' + esc(String(x.at).slice(0, 10)) + ' · ' + esc(x.naam) + ': ' + esc(x.tekst) +
         (x.vertrouwelijk ? ' <b>(vertrouwelijk: alleen de mentor)</b>' : '') +
-        ' · <span style="color:var(--goud,#A98F1C);">' + (x.status === 'opgepakt' ? 'je mentor heeft het gezien' : 'staat klaar voor je mentor') + '</span></div>';
+        ' · <span style="color:var(--goud,#C39B4A);">' + (x.status === 'opgepakt' ? 'je mentor heeft het gezien' : 'staat klaar voor je mentor') + '</span></div>';
     }).join('') || '<div class="mini">' + (ouder ? 'Geen meldingen die jij mag zien; vertrouwelijke meldingen blijven tussen kind en mentor.' : 'Nog geen meldingen. De knop is er altijd, ook voor iets kleins.') + '</div>';
     var knop = ouder ? '<div class="mini h-mt40">De hulplijn-knop is van het kind zelf; die staat op het scherm van je kind.</div>'
       : '<div class="h-mt50">' +

@@ -32,12 +32,13 @@
   function injectCss() {
     if (cssGedaan) return; cssGedaan = true;
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:0;}.sb-brand b{color:#F4E9C8;}' +
+      '.sb-brand{font-family:var(--serif);font-weight:600;background:transparent;color:#C39B4A;padding:0;white-space:nowrap;}.sb-brand b{color:#F4F0E7;font-weight:500;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
+      '.sb-safe{margin-left:auto;display:inline-flex;align-items:center;gap:.35rem;color:var(--zacht);font-size:.62rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;}.sb-safe i{width:.42rem;height:.42rem;border-radius:50%;background:#63D587;box-shadow:0 0 0 3px rgba(99,213,135,.12);}' +
       /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
          envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
          component en niet bij het toeval van zijn inhoud. */
-      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
+      '.sb-bel{background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
         'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
       '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
       '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
@@ -49,7 +50,7 @@
          maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
          duwde daarmee een andere actie naar de tweede rij. De avatar zegt
          hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
-      '@media (max-width:640px){.sb-nm{display:none;}}' +
+      '@media (max-width:640px){.sb-nm{display:none;}.sb-brand{font-size:.82rem}.sb-safe{font-size:0}.sb-safe i{display:block}}' +
       '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
       '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--rtg-leesgoud,var(--goud));}' +
@@ -61,7 +62,7 @@
       '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
       '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
       '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:0;}';
+      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:#A6002F;color:#fff;font-weight:800;font-size:.82rem;text-decoration:none;padding:.4rem .75rem;border-radius:0;}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   }
   w.Sessie = Sessie;

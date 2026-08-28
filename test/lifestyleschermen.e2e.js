@@ -38,13 +38,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, elevateTier } = require('./helper');
+const { startServer, letOpFouten, elevateTier, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-lsscherm-'));
 
 /* Per app: het scherm, wat we er via de API in zetten, op welk tabblad de lijst
@@ -94,17 +90,18 @@ async function open(page, base, app, token) {
     localStorage.setItem('rtg_cookieinfo_v1', '1');
   }, token);
   await page.goto(base + '/apps/' + app + '.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(900);   // de pagina haalt zijn gegevens na het laden op
+  // de pagina haalt zijn gegevens na het laden op: wachten tot dat klaar is
+  await wachtOpRust(page);
 }
 const schermtekst = (page) => page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
 test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en geen invoerveld',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;
   try {
     const token = await nieuwLid(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -114,6 +111,7 @@ test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en gee
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -161,7 +159,7 @@ test('zonder pas staat er een poort op alle ' + APPS.length + ' schermen, en gee
 });
 
 test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet alleen een lege huls',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'KANTOOR-LSSCHERM' } });
   let browser;
   try {
@@ -182,7 +180,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
       assert.ok(!r.error, a.app + ' is gevuld via de API: ' + JSON.stringify(r).slice(0, 140));
     }
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -192,6 +190,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -210,7 +209,7 @@ test('met de pas tonen alle ' + APPS.length + ' schermen de eigen gegevens, niet
         const knop = page.locator('text=' + a.tab).first();
         if (!await knop.count()) { stuk.push(a.app + ': tabblad "' + a.tab + '" staat er niet'); continue; }
         try { await knop.click({ timeout: 4000 }); } catch (e) { stuk.push(a.app + ': tabblad "' + a.tab + '" is niet aan te tikken'); continue; }
-        await page.waitForTimeout(400);
+        await wachtOpRust(page);
       }
 
       const tekst = await schermtekst(page);

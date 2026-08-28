@@ -18,7 +18,7 @@
    agenda nog niet duurzaam is, zou de volgende stap tegenhouden in plaats van
    bewaken -- dat is precies de val waar VERVOLG.md voor waarschuwt.
 
-   Draai los: node --experimental-sqlite --test test/notitiesduurzaam.test.js */
+   Draai los: node --test test/notitiesduurzaam.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

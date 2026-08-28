@@ -38,13 +38,13 @@
     var st = d.createElement('style');
     st.id = 'wdStijl';
     st.textContent =
-      '#paneel .wd-pos{border:1px solid var(--rtg-line);border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;}' +
+      '#paneel .wd-pos{border:1px solid var(--rtg-line);border-radius:0;padding:.9rem 1rem;margin:.6rem 0;}' +
       '#paneel .wd-pos.gebonden{border-left:3px solid var(--gold-rand);}' +
       '#paneel .wd-kop{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;}' +
       '#paneel .wd-bedrag{font-variant-numeric:var(--rtg-cijfers);font-weight:600;}' +
       '#paneel .wd-meta{font-size:.78rem;color:var(--rtg-soft);margin-top:.35rem;}' +
       '#paneel .wd-merk{display:inline-block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;' +
-        'border:1px solid var(--rtg-line);border-radius:999px;padding:.12rem .5rem;color:var(--rtg-soft);}' +
+        'border:1px solid var(--rtg-line);border-radius:0;padding:.12rem .5rem;color:var(--rtg-soft);}' +
       '#paneel .wd-rij{display:flex;justify-content:space-between;gap:1rem;padding:.4rem 0;' +
         'border-bottom:1px solid var(--rtg-line);font-variant-numeric:var(--rtg-cijfers);}' +
       '#paneel .wd-rij:last-child{border-bottom:0;}' +

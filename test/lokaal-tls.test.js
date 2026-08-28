@@ -8,7 +8,7 @@
    die telefoon binnenkomt (en niet alleen op 'localhost').
 
    Volledig offline; er gaat geen verkeer het netwerk op.
-   Draai los: node --experimental-sqlite --test test/lokaal-tls.test.js */
+   Draai los: node --test test/lokaal-tls.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -68,8 +68,17 @@ test('3. een echte TLS-handshake lukt voor wie de CA vertrouwt, en faalt zonder'
 
   // en op het IP-adres zelf, want zo komt een telefoon binnen
   if (c.netwerk.length) {
+    /* GEEN servername MET EEN IP -- de sni-regel van dit huis (server/lib/sni.js).
+       Hier stond `servername: c.netwerk[0]`, en dat is een IP-adres. Node 24
+       negeerde dat stil; Node 26 werpt ERR_INVALID_ARG_VALUE, en die worp liet
+       het kindproces van deze toets HANGEN -- scherf 1 is er in CI vijf rondes
+       op vastgelopen, tot force-exit hem eindelijk zijn naam gaf. Wie op een IP
+       verbindt, stuurt geen SNI (RFC 6066); de controle of het certificaat het
+       adres draagt loopt hier via checkServerIdentity, precies zoals een
+       telefoon dat doet. sniVan() geeft voor een IP een leeg object. */
+    const { sniVan } = require('../server/lib/sni');
     const opIp = await new Promise((klaar) => {
-      const s = tls.connect({ host: '127.0.0.1', port: poort, servername: c.netwerk[0], ca: c.caPem,
+      const s = tls.connect({ host: '127.0.0.1', port: poort, ...sniVan(c.netwerk[0]), ca: c.caPem,
         checkServerIdentity: () => undefined }, () => { klaar(s.authorized); s.end(); });
       s.on('error', () => klaar(false));
     });
@@ -118,7 +127,14 @@ test('5. het loketje geeft de CA en stuurt de rest naar de beveiligde site', asy
   const poort = loket.address().port;
 
   const haal = pad => new Promise(klaar => {
-    http.get({ host: '127.0.0.1', port: poort, path: pad }, r => {
+    /* agent:false, en dat is de reparatie van de CI-hanger. Sinds Node 19 is
+       de standaardagent keep-alive: de socket blijft na het antwoord open in de
+       pool, en server.close() hieronder wacht daarop. Lokaal redt de
+       keepAliveTimeout van de server dat na vijf seconden; op de runner bleef
+       het kindproces ermee leven -- alle toetsen groen, nooit afgesloten, en
+       scherf 1 wachtte er twee keer honderd minuten op. Een eigen socket per
+       verzoek sluit bij het einde van het antwoord. */
+    http.get({ host: '127.0.0.1', port: poort, path: pad, agent: false }, r => {
       const d = []; r.on('data', x => d.push(x));
       r.on('end', () => klaar({ status: r.statusCode, kop: r.headers, body: Buffer.concat(d).toString() }));
     });
@@ -195,7 +211,7 @@ test('8. het loket hangt ook aan de beveiligde kant, voor telefoons die http wei
   const poort = server.address().port;
 
   const haal = pad => new Promise((klaar, stuk) => {
-    https.get({ host: '127.0.0.1', port: poort, path: pad, servername: 'localhost', ca: c.caPem }, r => {
+    https.get({ host: '127.0.0.1', port: poort, path: pad, servername: 'localhost', ca: c.caPem, agent: false }, r => {
       const d = []; r.on('data', x => d.push(x));
       r.on('end', () => klaar({ status: r.statusCode, body: Buffer.concat(d).toString() }));
     }).on('error', stuk);

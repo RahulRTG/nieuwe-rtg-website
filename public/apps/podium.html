@@ -26,7 +26,7 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;letter-spacing:0.02em;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
   .badge.plus{color:var(--rood);border-color:rgba(194,58,94,0.5);}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
@@ -40,19 +40,19 @@
   .zones button.dicht{opacity:0.5;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.6rem 0.95rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop.rood{border-color:rgba(194,58,94,0.55);color:var(--rood);}
   .knop:focus-visible,.kan:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  input,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
   label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
   /* de zaal */
   .kan{display:flex;align-items:center;gap:0.8rem;width:100%;text-align:left;background:var(--card);
-    border:1px solid var(--line);border-radius:14px;padding:0.85rem 1rem;margin:0.55rem 0;color:var(--txt);}
-  .kan .hoes{width:46px;height:46px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);border-radius:0;padding:0.85rem 1rem;margin:0.55rem 0;color:var(--txt);}
+  .kan .hoes{width:46px;height:46px;border-radius:0;flex:none;display:flex;align-items:center;justify-content:center;
     font-family:'Bodoni Moda',serif;font-size:1.25rem;background:linear-gradient(150deg,#241B2E,#7F1634 90%);}
   .kan .wie{flex:1;min-width:0;}
   .kan .naam{font-weight:600;font-size:0.92rem;}
@@ -61,15 +61,15 @@
     text-transform:uppercase;color:var(--rood);font-weight:600;}
   .liveDot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--rood-diep);}
   /* de uitzending */
-  .scherm{position:relative;background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;aspect-ratio:16/10;}
+  .scherm{position:relative;background:#000;border:1px solid var(--line);border-radius:0;overflow:hidden;aspect-ratio:16/10;}
   .scherm video{width:100%;height:100%;object-fit:cover;display:block;}
   .scherm .over{position:absolute;left:0.7rem;top:0.7rem;display:flex;gap:0.5rem;align-items:center;}
   .scherm .tel{position:absolute;right:0.7rem;top:0.7rem;font-size:0.72rem;background:rgba(12,12,11,0.7);
-    border-radius:999px;padding:0.25rem 0.6rem;}
-  .chat{height:200px;overflow-y:auto;background:var(--card2);border:1px solid var(--line);border-radius:12px;
+    border-radius:0;padding:0.25rem 0.6rem;}
+  .chat{height:200px;overflow-y:auto;background:var(--card2);border:1px solid var(--line);border-radius:0;
     padding:0.7rem;margin-top:0.7rem;font-size:0.82rem;line-height:1.5;}
   .chat .r{margin:0.2rem 0;overflow-wrap:anywhere;}
-  .chat .wie{color:var(--gold);font-weight:600;}
+  .chat .wie{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
   .chat .wie.abb::after{content:" ";color:var(--rood);}
   .chat .cad{color:var(--rood);}
   .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
@@ -78,7 +78,7 @@
   .cadeaus .knop{display:flex;flex-direction:column;align-items:center;gap:0.15rem;min-width:4.6rem;}
   .cadeaus .prijs{font-size:0.68rem;color:var(--soft);}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
@@ -291,7 +291,7 @@
            geen keuze en krijgt van de server hetzelfde antwoord terug. */
         (zone === 'zaak' ? '<label for="mZaak">Namens welke zaak?</label><select id="mZaak">' +
           (zaal.zaken || []).map(z => '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('') + '</select>' : '') +
-        '<div class="rij"><button class="knop vol" id="mStart" type="button">Kanaal aanmelden</button></div>';
+        '<div class="rij"><button class="knop vol hoofd" id="mStart" type="button" data-hoofdactie>Kanaal aanmelden</button></div>';
       el.appendChild(kaart);
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
       kaart.querySelector('#mStart').addEventListener('click', async () => {

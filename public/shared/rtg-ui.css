@@ -21,6 +21,8 @@
    omzetting elders zou de marge weghalen en er niets voor terugzetten. Via
    deze import liggen ze op de 231 pagina's die rtg-ui.css laden. */
 @import url('/shared/rtg-hulpklassen.css');
+/* De handzijde: wat er voor een linkshandige spiegelt (shared/hand.js). */
+@import url('/shared/hand.css');
 
 /* ====================== DE RTG UI-KIT ======================================
 
@@ -82,11 +84,20 @@
   /* het accent ademt mee met de levende dagkleur (shared/dagkleur.css); staat
      die niet aan, dan is het gewoon het bordeaux van het huis */
   --rtg-acc:var(--dag-kleur, #C23A5E);
+  /* HETZELFDE ACCENT, MAAR DAN LEESBAAR. --rtg-acc hierboven is de dagkleur:
+     die wast door vlakken, randen en actieve staten, en dat is precies wat een
+     accent hoort te doen. Als TEKSTKLEUR deugt hij niet -- hij verandert met
+     dag en seizoen, dus je weet nooit welk contrast je hebt, en in de
+     RTFoundation landde hij op #C23A5E dat op zwart 3,78 haalt waar 4,5 moet.
+     Een terug-link is geen decoratie; die moet je kunnen lezen, ook in
+     november. Goud is van dit merk en haalt ruim 7:1, het hele jaar door.
+     Zelfde splitsing als --ios-accent in shared/ios.css en --accent-tekst in
+     apps/foundation/stijl.css: het accent kleurt, de tekst leest. */
   /* De inkt die OP het accent leesbaar is; zie shared/dagkleur.css. Zonder
      dagkleur valt hij terug op wit, dat op de bordeaux-terugval 5,17:1 haalt. */
   --rtg-acc-inkt:var(--dag-inkt, #FFFFFF);
-  --rtg-rond:18px;      /* kaarten */
-  --rtg-rond-klein:12px; /* velden en meldingen */
+  --rtg-rond:0;      /* kaarten */
+  --rtg-rond-klein:0; /* velden en meldingen */
 }
 
 /* ------------------------------------------------------------ de pagina ---*/
@@ -94,8 +105,24 @@
 .rtg-intro{margin:0 0 1.4rem;}
 .rtg-intro h1{font-family:'Bodoni Moda',Georgia,serif;font-size:1.7rem;font-weight:600;letter-spacing:-.01em;}
 .rtg-intro p{color:var(--rtg-soft);font-size:.9rem;margin-top:.3rem;max-width:52ch;}
-/* de weg terug staat linksboven, in het accent, en is een gewone link */
-.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);text-decoration:none;font-size:.85rem;
+/* DE WEG TERUG STAAT LINKSBOVEN, EN NIET MEER IN HET ACCENT.
+
+   --rtg-acc is de DAGKLEUR (zie boven), en die verandert met het seizoen en het
+   uur. Als tekst nagerekend over alle zestien ankertinten, op de grond van elk
+   van de vier thema's: op onyx zakken er 3 onder 4,5:1, op bordeaux 4, op royal
+   3 -- en op champagne, waar de grond parel is, 15 van de 16. GEEN ENKELE tint
+   haalt het op alle vier. De contrastpoort zag dit niet omdat een verloop als
+   grond bewust wordt overgeslagen (scripts/a11ykeuring.js).
+
+   Dit geldt voor alle vier de plekken waar het accent hieronder TEKST was: deze
+   weg terug, dezelfde in de stijl-schil, het merk-plaatje en de hover van een
+   knoprij. Ze dragen nu --rtg-txt, de inkt die het thema zelf al meebrengt:
+   17,23 op onyx, 13,57 op bordeaux, 14,65 op royal, 15,72 op champagne.
+
+   Het accent blijft waar het GEEN tekst is: als vlak, als rand, als schakelaar.
+   Daar is de inkt al per tint uitgerekend (shared/dagkleur.css) en klopt het.
+   test/balkkleur.test.js zakt zodra de dagkleur hier weer tekst wordt. */
+.rtg-terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);text-decoration:none;font-size:.85rem;
   /* Een terugweg is een knop en geen zin, dus 24x24 (WCAG 2.5.8) -- de breedte
      telt mee, want vaak is het alleen een pijl. Bewust min-* en geen padding:
      deze selector is specifieker dan de .terug van een pagina zelf, en met een
@@ -133,7 +160,7 @@ body.rtg-stijl p>a:only-child{display:inline-flex;align-items:center;min-height:
 /* ------------------------------------------------------- de sectiekaart ---*/
 .rtg-groep{
   background:var(--rtg-card);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;
+  border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;
 }
 .rtg-groep > h2{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
@@ -150,14 +177,27 @@ body.rtg-stijl p>a:only-child{display:inline-flex;align-items:center;min-height:
 .rtg-rij .rtg-tekst{flex:1;min-width:0;}
 .rtg-naam{font-weight:600;font-size:.95rem;}
 .rtg-sub{font-size:.8rem;color:var(--rtg-soft);margin-top:.1rem;}
+/* EEN LINK ZONDER KLASSE VALT TERUG OP DE BROWSERSTANDAARD, en dat is een
+   blauwpaars (rgb(158,158,255)) dat niemand hier heeft gekozen. Op
+   /apps/reisuitnodiging.html staat zo'n link midden in een .rtg-sub op een
+   accentvlak, en dan haalt hij 1,9:1 op bordeaux en 2,2:1 op royal. Hij erft nu
+   de inkt van de tekst waar hij in staat -- die is per definitie leesbaar op de
+   grond waar zij zelf staat -- en houdt zijn onderstreping, zodat hij nog steeds
+   als link leest. Alleen voor een link ZONDER eigen klasse: wie een knop of een
+   eigen kleur meebrengt, houdt die. */
+.rtg-sub a:not([class]){color:inherit;text-decoration:underline;}
 /* een rij die je kunt aantikken blijft een knop, geen div met een klikhandler */
 button.rtg-rij{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;
   color:inherit;font:inherit;text-align:left;cursor:pointer;}
-button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
+/* De hover was ALLEEN een kleurverschil, en dan nog in de dagkleur -- dubbel
+   mis: ONTWERP.md par. 5 zegt dat een toestand nooit op kleur alleen leunt, en
+   die kleur was ook nog eens niet altijd leesbaar. Een streep werkt in elk
+   thema, elk seizoen en voor wie kleur niet ziet. */
+button.rtg-rij:hover .rtg-naam{text-decoration:underline;text-underline-offset:.18em;}
 
 /* ------------------------------------------------------------- knoppen ----*/
 .rtg-knop{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
   transition:border-color .15s, background .15s;
 }
@@ -172,12 +212,34 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
 
 /* --------------------------------------------------------------- velden ---*/
 .rtg-veld{
-  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;width:100%;
   transition:border-color .15s;
 }
 .rtg-veld:focus{outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
 .rtg-veld:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:1px;}
+
+/* HET VINKJE STOND IN SYSTEEMBLAUW, en dat is geen kleur van dit huis.
+   Een aanvinkvakje, een keuzerondje, een schuif en een voortgangsbalk krijgen
+   zonder `accent-color` de kleur van het BESTURINGSSYSTEEM -- op de meeste
+   toestellen #0075FF. Op een notitiebord in onyx staat dat als een postzegel op
+   een fluwelen envelop; gezien op apps/notities.html naast een gebarenlade.
+   CLAUDE.md zegt: geen nieuwe kleuren. Een kleur die je niet zelf zet, zet de
+   browser -- dezelfde les als bij de standaard-linkkleur (apps/media.html).
+
+   HET WORDT --rtg-goud EN NIET --rtg-acc, en dat is met kijken beslist. De
+   dagkleur was de eerste keuze -- die draagt hier immers de focusring -- maar de
+   dagkleur is er zestien, en vandaag was hij toevallig hsl(202 61% 57%): een
+   lucht-blauw dat op het scherm niet van systeemblauw te onderscheiden was. Een
+   kleur die soms hetzelfde is als de kleur die je wegneemt, neemt niets weg.
+   --rtg-goud is bovendien precies wat hier nodig is: de opmerking bij dat token
+   zegt met zoveel woorden dat het een VULKLEUR is en geen tekstkleur, en een
+   aangevinkt vakje is een vlak. Het vinkje zelf tekent de browser, met
+   gegarandeerd contrast op de accentkleur. */
+body.rtg-stijl input[type="checkbox"],
+body.rtg-stijl input[type="radio"],
+body.rtg-stijl input[type="range"],
+body.rtg-stijl progress{accent-color:var(--rtg-goud);}
 .rtg-veld::placeholder{color:var(--rtg-soft);}
 .rtg-label{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
@@ -187,12 +249,12 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    dan kondigt een schermlezer hem als schakelaar aan en leest hij de stand. */
 .rtg-sw{position:relative;flex:none;width:3.1rem;height:1.8rem;background:none;border:none;padding:0;cursor:pointer;}
 .rtg-sw .track{position:absolute;inset:0;background:var(--rtg-card2);border:1px solid var(--rtg-line);
-  border-radius:999px;transition:background .15s,border-color .15s;}
+  border-radius:0;transition:background .15s,border-color .15s;}
 .rtg-sw .dot{position:absolute;top:.22rem;left:.24rem;width:1.28rem;height:1.28rem;border-radius:50%;
   background:var(--rtg-soft);transition:transform .15s,background .15s;}
 .rtg-sw[aria-checked="true"] .track{background:color-mix(in srgb,var(--rtg-acc) 34%,transparent);border-color:var(--rtg-acc);}
 .rtg-sw[aria-checked="true"] .dot{transform:translateX(1.28rem);background:var(--rtg-acc);}
-.rtg-sw:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;border-radius:999px;}
+.rtg-sw:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;border-radius:0;}
 .rtg-sw:disabled{cursor:not-allowed;opacity:.45;}
 
 /* ---------------------------------------------------------------- merk -----
@@ -200,8 +262,8 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    "altijd aan". Klein en in het accent, zodat het opvalt zonder te schreeuwen. */
 .rtg-merk{
   display:inline-block;margin-left:.5rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  font-weight:700;color:var(--rtg-acc);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
-  border-radius:999px;padding:.08rem .45rem;vertical-align:middle;
+  font-weight:700;color:var(--rtg-txt);border:1px solid color-mix(in srgb,var(--rtg-acc) 45%,transparent);
+  border-radius:0;padding:.08rem .45rem;vertical-align:middle;
 }
 .rtg-merk.stil{color:var(--rtg-soft);border-color:var(--rtg-line);}
 .rtg-merk.goed{color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
@@ -211,13 +273,13 @@ button.rtg-rij:hover .rtg-naam{color:var(--rtg-acc);}
    niet, dan hoort daar een zin te staan: een knop die stil terugspringt is
    erger dan een foutmelding. */
 .rtg-melder{
-  min-height:0;overflow:hidden;font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+  min-height:0;overflow:hidden;font-size:.85rem;line-height:1.5;border-radius:0;
   padding:0 .9rem;margin-bottom:0;border:1px solid transparent;transition:opacity .2s;opacity:0;
 }
 .rtg-melder.zien{min-height:auto;padding:.65rem .9rem;margin-bottom:1rem;opacity:1;}
 .rtg-melder.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
 .rtg-melder.let{background:color-mix(in srgb,var(--rtg-acc) 14%,transparent);border-color:var(--rtg-acc);}
-.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+.rtg-melder.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* --------------------------------------------------------- rest & rust -----*/
 .rtg-leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
@@ -268,7 +330,7 @@ body.rtg-stijl h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:600;letter
 body.rtg-stijl .kop h1{font-size:1.7rem;}
 body.rtg-stijl .ey{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;display:block;margin-bottom:.15rem;}
-body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-acc);
+body.rtg-stijl .terug{display:inline-block;margin-bottom:1rem;color:var(--rtg-txt);
   text-decoration:none;font-size:.85rem;min-height:24px;min-width:24px;}
 
 /* de sectiekaart: alles wat een blok inhoud omvat, krijgt dezelfde kaart */
@@ -276,7 +338,7 @@ body.rtg-stijl .kaart,body.rtg-stijl .sec,body.rtg-stijl .item,
 body.rtg-stijl .paneel,body.rtg-stijl .groep,body.rtg-stijl .art,
 body.rtg-stijl .doc,body.rtg-stijl .blok,body.rtg-stijl .vak{
   background:var(--rtg-card);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond);padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;}
 body.rtg-stijl .kaart > h2,body.rtg-stijl .sec > h2,body.rtg-stijl .groep > h2,
 body.rtg-stijl main > h2{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
@@ -294,12 +356,188 @@ body.rtg-stijl .lbl{display:block;font-size:.72rem;letter-spacing:.1em;text-tran
   color:var(--rtg-soft);font-weight:700;margin-bottom:.3rem;}
 
 /* knoppen: pillen, met goud voor de primaire actie */
-body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+body.rtg-stijl .knop{background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.8rem;padding:.5rem 1rem;cursor:pointer;
   transition:border-color .15s, background .15s;}
 body.rtg-stijl .knop:hover{border-color:color-mix(in srgb,var(--rtg-acc) 55%,var(--rtg-line));}
 body.rtg-stijl .knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
 body.rtg-stijl .knop[disabled]{opacity:.45;cursor:not-allowed;}
+
+/* DE HOOFDHANDELING HEEFT DUIMMAAT (GRAMMATICA.md).
+
+   `.knop` levert 12,8px tekst met 8px lucht: samen 37 tot 40 pixels hoog. Dat
+   haalt WCAG 2.5.8 ruim (24) en is dus te RAKEN met een hand die trilt -- maar
+   de grammatica belooft iets sterkers voor de belangrijkste handeling van een
+   scherm: "mijn duim vindt het onderaan". Een duim in beweging, in een trein of
+   lopend, heeft 44 nodig.
+
+   Waarom dit alleen de hoofdhandeling raakt en niet elke knop: dat is een
+   besluit. De Command-modus van ONTWERP.md staat met opzet dicht en klein, en
+   alles op 44 zetten zou die vormtaal slopen voor een winst die nergens
+   gemeten is. 44 voor de ene knop die ertoe doet, 24 voor de rest.
+
+   Gemeten op 19 augustus 2026: veertien schermen droegen een hoofdhandeling van
+   24 tot 43 pixels. Deze regel tilt ze alle veertien in een keer. */
+/* WAAROM [data-hoofdactie] HIER GEEN body.rtg-stijl DRAAGT EN .hoofd WEL.
+
+   Dat scheelde drie schermen. `.rtg-stijl` zegt "deze pagina doet mee met de
+   UI-kit", en dat is een keuze per pagina; `data-hoofdactie` is een AFSPRAAK VAN
+   HET HUIS (GRAMMATICA.md) en staat er alleen waar ik hem zelf heb gezet. Met
+   de kitklasse ervoor sloegen /apps/avond.html, /apps/media.html en
+   /apps/bestellen.html over -- die laden rtg-ui.css wel maar dragen de klasse
+   niet -- en stond de aangewezen hoofdhandeling daar op 39,6 hoog.
+
+   Bij `.hoofd` blijft de klasse er wel staan, en met reden: die naam is in dit
+   huis overbelast. Op /apps/geld-command.html is .hoofd een kaart van 350x236.
+   Zonder de kitklasse zou deze regel die kaart gaan opmaken. */
+[data-hoofdactie],
+body.rtg-stijl button.hoofd,
+body.rtg-stijl a.hoofd,
+body.rtg-stijl [role="button"].hoofd{
+  /* min-WIDTH ook, en dat had er vanaf het begin moeten staan: GRAMMATICA.md
+     zegt 44x44 en deze regel deed alleen de hoogte. Een "+" naast een zoekveld
+     is 12,3 breed en 44 hoog -- gemeten op /apps/comm.html, waar de knop door
+     de veld-uitzondering hierboven terecht zijn eigen maat houdt en die maat
+     dus te klein is. */
+  min-height:44px;min-width:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+
+/* EN OP EEN TELEFOON PAKT HIJ DE VOLLE BREEDTE.
+
+   Dit lost het bereik op, en het is de enige manier die voor BEIDE handen
+   tegelijk werkt. Een smalle knop die rechts in een rij staat is voor een
+   rechtshandige prima en voor een linkshandige net buiten bereik; hem naar
+   links schuiven draait het probleem alleen om. Volle breedte kent geen kant.
+
+   Gemeten op 19 augustus 2026: acht van de negentien schermen met een
+   aangewezen hoofdhandeling hadden hem in het kwart waar de duim van die mens
+   niet komt -- en welke acht dat waren, verschilde per hand.
+
+   Niet in een vaste balk onderaan: daar staat hij al binnen bereik, en daar is
+   de breedte een ontwerpkeuze van die balk (ADAPTIEF.md). */
+@media(max-width:760px){
+  [data-hoofdactie],
+  body.rtg-stijl button.hoofd,
+  body.rtg-stijl a.hoofd,
+  body.rtg-stijl [role="button"].hoofd{
+    width:100%;max-width:100%;flex:1 1 100%;
+  }
+  /* EN DE RIJ MOET DAN OOK KUNNEN WRAPPEN, anders is de zin hierboven niet waar.
+     De uitzondering verderop zegt van de smalle schermen: "de rij wrapt, het
+     veld pakt de volle breedte en de knop valt eronder". Dat is precies het
+     goede gedrag -- maar het gebeurt alleen als de rij het MAG. Op
+     /apps/comm.html staat `.zoekrij` op nowrap, en daar werd de "+"-knop 337
+     breed naast een zoekveld van 28: de rij liep buiten haar eigen vak en de
+     knop stond op x 391 van 375, zonder schuifbalk en zonder foutmelding.
+     Gemeten in de browser: met wrap staat diezelfde knop op 356 en krijgt het
+     veld zijn volle breedte terug. De regel die de knop breed maakt, hoort dus
+     zelf te zorgen dat er plek voor is. */
+  .rtg-duimeind{flex-wrap:wrap;}
+
+  /* TWEE UITZONDERINGEN, EN ALLEBEI MET EEN NAAM ERBIJ IN PLAATS VAN EEN GOK.
+
+     Hier stond `*:has(> input, > textarea, > select) > [data-hoofdactie]`: "als
+     er een veld in hetzelfde blok zit, laat de knop dan smal". Dat leek een
+     structuurtoets en was een gok naar OPMAAK. Op /apps/foundation/klas.html
+     staan twee velden van width:100% ONDER elkaar met de knop eronder, ook
+     width:100%; die :has() zag "een veld en de knop in hetzelfde blok", maakte
+     er width:auto van en zette een knop van 65 pixels in de linkerhoek van een
+     scherm voor kinderen. Mijn eigen uitzondering brak een scherm dat al klopte.
+
+     CSS kan niet zien of iets op DEZELFDE REGEL staat, dus wordt het gezegd.
+     Gemeten over alle schermen: tweeentwintig hoofdhandelingen delen echt hun
+     regel met een veld, en die dragen nu `.rtg-duimeind` op hun rij -- dezelfde
+     klasse waarmee shared/hand.css die rij voor een linkshandige omklapt, want
+     het is dezelfde afspraak: DEZE RIJ DRAAGT DE HOOFDHANDELING.
+
+     Vergeten te merken is ongevaarlijk: dan wordt de knop volle breedte, en dat
+     is nooit een duimgebrek -- alleen een andere vorm. Dat is het goede
+     faalgedrag voor een regel als deze.
+
+     `data-inbalk` stond hier als ontsnappingsluik en werd door niets gezet
+     (LAT.md regel 3: wat niets meet, hoort weg). De werkbalken staan er nu bij
+     naam. */
+  .cmd-balk [data-hoofdactie],
+  body.rtg-stijl .cmd-balk .hoofd,
+  /* .ios-nav-acties scrolt in zichzelf en heeft dus min-width:0; `width:100%`
+     van een gekrompen vak is 24 pixels. Op /apps/bestanden.html en
+     /apps/galerij.html werd de hoofdhandeling daardoor 24 breed -- de regel
+     maakte de knop kleiner in plaats van bereikbaarder. */
+  .ios-nav-acties [data-hoofdactie]{
+    width:auto;max-width:none;flex:0 0 auto;
+  }
+  /* .rtg-duimeind STAAT HIERONDER EN NIET HIER, en dat is een reparatie van
+     22 augustus 2026. De uitzondering rust op een AANNAME: deze knop deelt zijn
+     regel met een veld, dus volle breedte zou die regel uit elkaar trekken. Op
+     390 pixels is die aanname onwaar -- de rij wrapt, het veld pakt de volle
+     breedte en de knop valt eronder, smal en links. Dertien schermen zetten hun
+     hoofdhandeling daarmee precies in het kwart waar de duim van een
+     rechtshandige niet komt (bieb, club, dromen, geloofbieb, hulpwijzer,
+     ochtend, studie, home, labpas, mall, pulse, rtgschool) en bestellen deed
+     hetzelfde voor een linkshandige.
+     De uitzondering geldt dus alleen waar zijn premisse geldt: vanaf 431, boven
+     de breedste telefoon. Daaronder wint de volle-breedteregel weer, en dat is
+     volgens dezelfde afspraak nooit een duimgebrek maar een andere vorm. */
+
+  /* De hoofdhandeling in de kopbalk: zie .rtg-duimbalk hieronder. Met opmaak
+     alleen lukte dit niet -- .ios-nav en de kopbalken van deze schermen dragen
+     backdrop-filter, en dat maakt een eigen containing block, dus een
+     position:fixed kind blijft gewoon bovenin hangen. Het moest dus in de DOM,
+     en dat is ook eerlijker: de grammatica zegt dat de handeling onderaan
+     HOORT, niet dat hij er met een truc naartoe geschoven wordt. */
+  /* OUD, VERVALLEN:
+
+     Besloten op 19 augustus 2026, en het was een botsing tussen twee
+     huisdocumenten. De iOS-schil zet de maak-actie bovenaan -- dat is de
+     conventie die shared/ios.css met opzet bouwt -- en GRAMMATICA.md opent met
+     "ik wil iets doen -> mijn duim vindt het onderaan". Gemeten stonden vier
+     lijstschermen (agenda, notities, galerij, bestanden) met hun + op y=25 van
+     844, met tot duizend pixels pagina eronder. De grammatica wint.
+
+     ALLEEN wat in de kopbalk zit, en alleen op telefoonmaat. Een knop die al
+     ergens in de stroom staat blijft staan waar hij staat: die willekeurig naar
+     onderen trekken zou 45 schermen verbouwen voor een probleem dat er op vier
+     was. */
+}
+
+/* ---- DE DUIMBALK: waar de hoofdhandeling van een lijstscherm woont ---------
+
+   Besloten op 19 augustus 2026 na een botsing tussen twee huisdocumenten. De
+   iOS-schil zet de maak-actie in de kopbalk -- de conventie die shared/ios.css
+   met opzet bouwt -- en GRAMMATICA.md opent met "ik wil iets doen -> mijn duim
+   vindt het onderaan". Gemeten stonden vier lijstschermen met hun + op y=25 van
+   844, met tot duizend pixels pagina eronder. De grammatica wint.
+
+   Op TELEFOONMAAT is dit een vaste strook onderaan; daarboven is het gewoon een
+   rij onder de kop, rechts uitgelijnd zoals hij in de kopbalk stond. Zo verhuist
+   de knop waar het uitmaakt en verandert er op een bureau niets aan de
+   leesvolgorde. */
+.rtg-duimbalk{ display:flex; gap:.5rem; justify-content:flex-end;
+  padding:0 max(1rem, env(safe-area-inset-left,0px)) .6rem; }
+@media(max-width:760px){
+  .rtg-duimbalk{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    /* --ios-thuis-ruimte is de strook die de iOS-schil voor zijn home-indicator
+       vrijhoudt (shared/ios.css). Zonder die marge legt deze balk zich over dat
+       streepje heen -- gemeten op /apps/notities.html. Schermen zonder de schil
+       kennen de variabele niet en vallen terug op de veilige zone alleen. */
+    padding:.7rem max(1rem, env(safe-area-inset-left,0px))
+            calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + .7rem);
+    background:color-mix(in srgb, var(--rtg-bg) 92%, transparent);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--rtg-line);
+  }
+  .rtg-duimbalk > *{ flex:1 1 auto; }
+  /* Ruimte eronder, anders legt de balk zich over de laatste regel van de lijst.
+
+     De :not([hidden] *) is er sinds /apps/foundation/index.html: dat scherm
+     wisselt van blad met het hidden-attribuut op een <section>, en de duimbalk
+     hangt in het welkomblad. Een balk in een verborgen blad wordt niet getekend,
+     maar :has() ziet hem wel -- zonder deze uitzondering kregen de andere drie
+     bladen van dat scherm 5,5rem lucht onderaan waar niets stond. */
+  body:has(.rtg-duimbalk:not([hidden] *)){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
+}
 body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de
    handeling waar het om gaat": publiceren, versturen, vastleggen. Die eigen
@@ -313,7 +551,7 @@ body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud)
 body.rtg-stijl .knop.prim{background:var(--rtg-acc);border-color:var(--rtg-acc);color:var(--rtg-acc-inkt);font-weight:700;}
 body.rtg-stijl .knop.prim:hover{filter:brightness(1.07);}
 body.rtg-stijl .knop.vol:hover{filter:brightness(1.07);}
-body.rtg-stijl .knop.weg{color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
+body.rtg-stijl .knop.weg{color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 35%,var(--rtg-line));}
 /* .klein is de derde maat uit de woordenschat van het huis, naast .vol en .weg:
    een knopje dat in een regel of een chip meeloopt. Zonder deze regel kreeg zo'n
    knopje de volle maat en liep de regel eromheen het scherm af. */
@@ -322,7 +560,7 @@ body.rtg-stijl .knop.klein{font-size:.72rem;padding:.28rem .7rem;}
 /* velden */
 body.rtg-stijl .veld,body.rtg-stijl input:not([type=range]):not([type=checkbox]):not([type=radio]),
 body.rtg-stijl select,body.rtg-stijl textarea{
-  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond-klein);
+  background:var(--rtg-card2);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.9rem;padding:.6rem .8rem;transition:border-color .15s;}
 body.rtg-stijl .veld:focus,body.rtg-stijl input:focus,body.rtg-stijl select:focus,body.rtg-stijl textarea:focus{
   outline:none;border-color:color-mix(in srgb,var(--rtg-acc) 60%,var(--rtg-line));}
@@ -330,10 +568,10 @@ body.rtg-stijl input::placeholder,body.rtg-stijl textarea::placeholder{color:var
 
 /* leegte en meldingen */
 body.rtg-stijl .leeg{color:var(--rtg-soft);font-size:.9rem;padding:2.2rem 0;text-align:center;}
-body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:var(--rtg-rond-klein);
+body.rtg-stijl .melding{font-size:.85rem;line-height:1.5;border-radius:0;
   border:1px solid var(--rtg-line);background:var(--rtg-card2);padding:.65rem .9rem;margin-bottom:1rem;}
 body.rtg-stijl .melding.goed{background:color-mix(in srgb,var(--rtg-groen) 16%,transparent);border-color:var(--rtg-groen);}
-body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-rood);}
+body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,transparent);border-color:var(--rtg-leesrood,var(--rtg-rood));}
 
 /* ---- de overstap-laag, deel 2: de rest van de gedeelde woordenschat ----
    Na de eerste ronde bleek welke namen er nog meer overal terugkomen: statistiek-
@@ -346,10 +584,21 @@ body.rtg-stijl .melding.fout{background:color-mix(in srgb,var(--rtg-rood) 16%,tr
 body.rtg-stijl .kpis{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
 body.rtg-stijl .kpi{
   flex:1;min-width:4.5rem;background:var(--rtg-card2);border:1px solid var(--rtg-line);
-  border-radius:var(--rtg-rond-klein);padding:.7rem .8rem;
+  border-radius:0;padding:.7rem .8rem;
 }
+/* HET CIJFER STAAT IN INTER, NIET IN BODONI, en dat is geen smaakkwestie.
+   Bodoni is een didone: dikke stammen, haarfijne verbindingen. Op een
+   ceremoniële titel van 40px is dat de handtekening van het merk; op een
+   getal van 21px verdwijnen de haarlijnen en leest een 0 als "()" -- wat op
+   foundation/school.html vier keer naast elkaar stond, in tegels die
+   Klassen, Lessen vandaag, Open werk en Cijfers heten. ONTWERP.md zegt het
+   al: Bodoni mag op EEN dominante KPI, en Inter draagt het werk met
+   tabulaire cijfers. Vier statistiektegels zijn geen dominante KPI.
+   tabular-nums erbij, zodat een rij getallen onder elkaar uitlijnt. */
 body.rtg-stijl .kpi .v,body.rtg-stijl .kpi b{
-  display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.35rem;font-weight:500;line-height:1.1;}
+  display:block;font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;font-size:1.35rem;font-weight:600;
+  letter-spacing:-.01em;line-height:1.1;}
 body.rtg-stijl .kpi .l,body.rtg-stijl .kpi small{
   display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rtg-soft);margin-top:.25rem;}
 
@@ -359,7 +608,7 @@ body.rtg-stijl .tabs,body.rtg-stijl .chips{display:flex;gap:.45rem;flex-wrap:wra
    dezelfde rij en hoort er dus ook hetzelfde uit te zien */
 body.rtg-stijl .tab,body.rtg-stijl .chip,body.rtg-stijl .pil,
 body.rtg-stijl .tabs > button,body.rtg-stijl .chips > button{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:999px;
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   color:var(--rtg-txt);font:inherit;font-size:.78rem;padding:.42rem .95rem;cursor:pointer;
   transition:border-color .15s, background .15s;
 }
@@ -372,19 +621,19 @@ body.rtg-stijl .tabs > button.aan,body.rtg-stijl .chips > button.aan{
 /* een klein statuslabel achter een naam */
 body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
   display:inline-block;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
-  color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:999px;padding:.08rem .45rem;
+  color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:0;padding:.08rem .45rem;
   vertical-align:middle;}
 body.rtg-stijl .status.ok,body.rtg-stijl .status.goed,body.rtg-stijl .badge.ok{
   color:var(--rtg-groen);border-color:color-mix(in srgb,var(--rtg-groen) 45%,transparent);}
 body.rtg-stijl .status.rood,body.rtg-stijl .status.fout,body.rtg-stijl .badge.rood{
-  color:var(--rtg-rood);border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
+  color:var(--rtg-leesrood,var(--rtg-rood));border-color:color-mix(in srgb,var(--rtg-rood) 45%,transparent);}
 
 /* de sectietitel binnen een kaart, en de inlogkaart van een werkplek */
 body.rtg-stijl .titel,body.rtg-stijl .sectiekop,body.rtg-stijl .st-sec{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--rtg-soft);font-weight:700;margin:1.2rem 0 .4rem;}
 body.rtg-stijl .inlog,body.rtg-stijl .login{
-  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:var(--rtg-rond);
+  background:var(--rtg-card);border:1px solid var(--rtg-line);border-radius:0;
   padding:1.4rem 1.3rem;max-width:26rem;margin:2.5rem auto;}
 body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-bottom:.4rem;}
 
@@ -397,7 +646,7 @@ body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-botto
 body.rtg-stijl .skip{
   position:absolute;left:.6rem;top:-3rem;z-index:120;
   background:var(--rtg-goud);color:#1C1608;padding:.5rem .9rem;
-  border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;
+  border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;
   transition:top .15s;}
 body.rtg-stijl .skip:focus{top:0;}
 
@@ -467,4 +716,12 @@ body.rtg-stijl .kpi{
 @media (prefers-reduced-transparency:reduce){
   .rtg-groep,body.rtg-stijl .kaart,body.rtg-stijl .sec,
   body.rtg-stijl .paneel,body.rtg-stijl .groep{background:var(--rtg-card);}
+}
+
+/* De veldrij-uitzondering, alleen boven telefoonbreedte -- zie de toelichting
+   bij .ios-nav-acties hierboven. */
+@media(min-width:431px) and (max-width:760px){
+  .rtg-duimeind > [data-hoofdactie]{
+    width:auto;max-width:none;flex:0 0 auto;
+  }
 }

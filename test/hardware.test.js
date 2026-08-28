@@ -3,7 +3,7 @@
    tekent het concept uit (behuizing, chip, materialen, gedempt palet,
    poorten, verhaal), levert een stuklijst en de blik van de chef-engineer,
    en per serie een productblad.
-   Draai los: node --experimental-sqlite --test test/hardware.test.js */
+   Draai los: node --test test/hardware.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

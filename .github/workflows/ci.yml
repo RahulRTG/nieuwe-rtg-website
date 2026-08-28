@@ -34,10 +34,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Tests, checks en build
+  # ==========================================================================
+  # DE TOETSSCHERVEN.
+  #
+  # De suite draaide in EEN stap: 1083 bestanden, en op 22 augustus 2026 werd de
+  # job na 240 minuten afgekapt terwijl de toetsstap alleen al 3 uur 57 liep.
+  # Verdelen kon tot nu toe niet, want `--test-coverage-lines` rekent per
+  # PROCES: elke scherf meet dan alleen wat hij zelf aanraakt en zakt op de
+  # vloer terwijl het geheel er ruim overheen zit.
+  #
+  # Dat is nu opgelost. Elke scherf schrijft zijn dekking als lcov weg; de job
+  # `test` hieronder telt ze op (scripts/lib/lcov.js) en handhaaft de vloer EEN
+  # keer over het totaal -- precies wat het ene proces ook deed.
+  #
+  # DE VERDELING GAAT OP KOSTEN EN NIET OP AANTAL (scripts/scherf.js), en de
+  # zes bronmuterende bestanden uit scripts/lib/geisoleerd.js draaien serieel op
+  # scherf 1. Dat laatste is geen extraatje maar een REPARATIE: `npm run
+  # test:gate` draaide `node --test test/*.test.js` rechtstreeks en negeerde die
+  # lijst, dus de poort die telt draaide anders dan de loper die het huis lokaal
+  # gebruikt.
+  #
+  # fail-fast staat uit: bij drie zakkende scherven wil je alle drie zien, niet
+  # de eerste.
+  # ==========================================================================
+  toetsscherf:
+    name: Toetsscherf ${{ matrix.scherf }} van 4
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        scherf: [1, 2, 3, 4]
     services:
       postgres:
         image: postgres:16-alpine
@@ -61,10 +88,159 @@ jobs:
           --health-cmd "redis-cli ping" --health-interval 10s
           --health-timeout 5s --health-retries 5
     steps:
+      # fetch-depth: 0 is hier geen gemak maar de invoer van scripts/lib/semdiff.js:
+      # die vergelijkt met het punt waar de tak van de hoofdlijn afweek, en in een
+      # ondiepe kloon bestaat origin/main niet. Zonder dit geeft de diff nul
+      # bestanden en zakt test/semdiff.test.js op iets dat niets met de code te
+      # maken heeft. Zelfde reden als bij de deltapoort in de job hieronder.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version: '26'
+          cache: 'npm'
+      - run: npm ci
+      # DE RUST-MOTOR, want zonder hem is de pariteitstoets een belofte zonder
+      # dekking. test/magnaat-capabilities.test.js eist `motor.bron === 'rust'`:
+      # de Capability Graph wordt door twee onafhankelijke motoren gescand en de
+      # toets legt hun uitkomst byte voor byte naast elkaar. Ontbreekt de binary,
+      # dan valt de scanner veilig terug op JavaScript -- en dan MEET die toets
+      # niets meer, maar zakt hij wel. Zo stond het: de binary staat niet in git,
+      # werd door geen enkele werkstroom gebouwd, en die twee beweringen zakten
+      # overal waar scherf 4 toevallig afliep. Nagemeten op 25 augustus 2026 in
+      # een losse werkboom van origin/main: daar zakken ze precies zo, dus het
+      # was geen regressie van deze tak maar een gat dat al die tijd door
+      # afgebroken scherven werd gemaskeerd.
+      #
+      # De bouw is goedkoop: motor/Cargo.toml heeft NUL afhankelijkheden (alleen
+      # de standaardbibliotheek, ook voor de AEAD), dus er wordt niets van een
+      # registry gehaald. `working-directory: motor` staat er omdat rustup de
+      # toolchain uit de WERKMAP leest, en motor/rust-toolchain.toml pint 1.97.1.
+      # LIBXML2 HOORT HIER OOK, en stond alleen in de check-job hieronder.
+      # test/samlc14n.test.js legt onze canonicalisatie naast die van xmllint en
+      # slaat zichzelf bewust NIET over als die ontbreekt -- maar die toets valt
+      # in een SCHERF, niet in de check-job. De scheidsrechter stond dus in een
+      # andere machine dan de toets: drie beweringen zakten op ENOENT terwijl ze
+      # los groen zijn. Een aanname over de omgeving is geen omgeving, en die
+      # zin gold hier net zo goed.
+      - name: libxml2 (de scheidsrechter van de c14n-toets)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
+      - name: De Rust-motor bouwen (de pariteitstoetsen hebben hem nodig)
+        working-directory: motor
+        run: cargo build --release --locked
+      - name: Deze scherf, met dekking als lcov
+        run: |
+          set -o pipefail
+          mkdir -p dekking
+          uitslag=0
+          # De geisoleerde bestanden eerst, serieel, en alleen op scherf 1.
+          #
+          # --test-timeout STAAT ER MET EEN REDEN, en hij ontbrak. Scherf 1 is
+          # vier rondes op rij nooit afgelopen; de vijfde keer bleef hij staan
+          # tot het jobplafond van 120 minuten hem afkapte. Het log liet zien
+          # wat er echt gebeurde: om 11:00 de laatste uitslag, daarna HONDERD
+          # minuten niets -- een toets hing, en zonder tijdslimiet per toets
+          # heeft een hanger geen naam. De spec-reporter drukt bestanden in
+          # volgorde af, dus ook alles na de hanger bleef onzichtbaar. Tien
+          # minuten is ruim boven de traagste echte toets (de meterijking, 6,7
+          # minuten); wat daaroverheen gaat is geen trage toets maar een hanger,
+          # en die hoort te zakken met zijn naam erbij.
+          #
+          # EN --test-force-exit VOOR DE TWEEDE SOORT HANGER. De tijdslimiet
+          # doodt een toets die niet afkomt -- maar de ronde erna hing scherf 1
+          # ALSNOG, op precies hetzelfde punt, met alle toetsen van het kind
+          # allang groen. Een kindproces dat na afloop een handvat vasthoudt
+          # (een keep-alive-socket, een interval) sluit nooit af, en daar geldt
+          # geen toets-tijdslimiet voor: er draait geen toets meer. De reporter
+          # drukt bestanden in volgorde af, dus alles na zo'n kind bleef ook nog
+          # onzichtbaar. force-exit zegt: de toetsen zijn klaar en gemeld, het
+          # proces eindigt -- een gelekt handvat is dan een hygiënepunt en geen
+          # verstopping van de hele band.
+          solo=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4 --solo)
+          if [ -n "$solo" ]; then
+            node --experimental-test-coverage \
+                 --test-reporter=lcov --test-reporter-destination=dekking/solo-${{ matrix.scherf }}.info \
+                 --test-reporter=spec --test-reporter-destination=stdout \
+                 --test --test-concurrency=1 --test-timeout=600000 --test-force-exit $solo 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+          fi
+          mijn=$(node scripts/scherf.js --van ${{ matrix.scherf }} --totaal 4)
+          node --experimental-test-coverage \
+               --test-reporter=lcov --test-reporter-destination=dekking/scherf-${{ matrix.scherf }}.info \
+               --test-reporter=spec --test-reporter-destination=stdout \
+               --test --test-concurrency=${RTG_GATE_CONCURRENCY:-6} --test-timeout=600000 --test-force-exit $mijn 2>&1 | tee -a /tmp/scherf.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/scherf.log; fi
+          exit "$uitslag"
+        env:
+          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      - name: De dekking van deze scherf bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dekking-scherf-${{ matrix.scherf }}
+          path: dekking/*.info
+          if-no-files-found: error
+
+  test:
+    name: Tests, checks en build
+    # DEZE NAAM STAAT IN DE TAKBESCHERMING VAN main en verandert dus niet.
+    # Wat eronder gebeurt is wel veranderd: de zware toetsstap is naar
+    # `toetsscherf` hierboven verhuisd en deze job telt hun dekking op en
+    # handhaaft de vloer. De snelle keuringen (check.js, de deltapoort, de
+    # AST-scan, de norm, de bouw) blijven hier, want die zijn samen twee
+    # minuten en horen bij het oordeel over de tak als geheel.
+    needs: [toetsscherf]
+    runs-on: ubuntu-latest
+    # 1h08 op 18 aug, gecanceld op 90 min op 20 aug, en op 21 aug liep hij op
+    # 150 min NOG. Gemeten in die afgebroken ronde: de unit-stap draaide toen al
+    # 117 minuten en was nog bezig -- geen vastloper, gewoon een suite die met
+    # deze samenvoeging van ~897 naar 1058 toetsbestanden ging. De concurrency
+    # staat al op 4 (het maximum voor een standaard runner; hoger laat servers
+    # elkaars healthcheck verdringen, zie scripts/test-runner.js), dus er valt
+    # geen tijd te winnen zonder de suite te splitsen. Ruimte voor de groei en
+    # voor een trage runner, en niet zo hoog dat een echte vastloper er een uur
+    # onder wegzakt.
+    # VEERTIG MINUTEN, want het zware werk staat niet meer in deze job. Op
+    # 22 augustus 2026 werd hij nog na 240 minuten afgekapt met de toetsstap op
+    # 3 uur 57; die stap is nu verdeeld over vier scherven die parallel lopen.
+    # Wat hier overblijft zijn de snelle keuringen, het optellen van de dekking
+    # en de bouw -- samen een paar minuten. Blijft hij hier hangen, dan is er
+    # iets anders aan de hand dan een groeiende suite, en dan hoort hij snel
+    # rood te staan in plaats van een uur te wachten.
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rtgtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+      # Redis is geen luxe: twee toetsbestanden (grand-integratie, sloophamer)
+      # slaan ZICHZELF over zonder REDIS_URL. Ze stonden er dus wel, maar
+      # draaiden nooit -- vijftien toetsen die eruitzagen als dekking.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    steps:
+      # fetch-depth: 0 is GEEN gemak maar de invoer van de deltapoort hieronder.
+      # Die poort vergelijkt deze wijziging met het punt waar de tak van de
+      # hoofdlijn afweek; in een ondiepe kloon bestaat dat punt niet, en dan
+      # zakt hij met exitcode 2 in plaats van stil groen te melden.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '26'
           cache: 'npm'
       - run: npm ci
       # LIBXML2 IS DE SCHEIDSRECHTER van test/samlc14n.test.js. Onze eigen
@@ -81,6 +257,30 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils
       - name: Codeafspraken (check.js)
         run: npm run check
+      # DE DELTAPOORT. De norm hieronder is een som over de hele codebase, en een
+      # som verrekent: vijf inline stijlattributen erbij in het ene bestand en zes
+      # eruit in het andere is een DALING, dus de ratel juicht terwijl het nieuwe
+      # bestand zijn vijf houdt. Deze stap weigert die verrekening en keurt per
+      # bestand: een nieuw bestand staat op de norm, een aangeraakt bestand zakt
+      # er niet onder. Hij draait vroeg omdat hij seconden kost en een fout hier
+      # niets met de rest van de baan te maken heeft.
+      #
+      # RTG_BASIS staat alleen bij een pull request gevuld; dan is het
+      # exacte punt bekend waar de tak vandaan komt. Bij een push naar een tak is
+      # de variabele leeg en zoekt de poort het aftakpunt zelf.
+      - name: De deltapoort (nieuw werk staat op de norm)
+        run: node scripts/deltapoort.js --toon
+        env:
+          RTG_BASIS: ${{ github.event.pull_request.base.sha }}
+      # HET VERVAL. De ratel bewaakt de code; dit bewaakt de ratel. NORM.json kan
+      # alleen met de hand losser worden gezet, en dat mag -- een poort zonder
+      # uitweg wordt uitgezet -- maar niet in stilte en niet voor altijd. Deze
+      # stap zakt op een verlaging zonder notitie, op een notitie zonder soort,
+      # en op een schuld die over zijn vervaldatum is. Zie scripts/normverval.js.
+      - name: Het verval (een verlaging heeft een reden en een einde)
+        run: node scripts/normverval.js
+        env:
+          RTG_BASIS: ${{ github.event.pull_request.base.sha }}
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
       - name: CI-keten gebruikt alleen exact vastgezette Actions
@@ -127,15 +327,18 @@ jobs:
       # de hele suite; op 18 augustus 2026 kostte dat een ochtend. Sindsdien komt
       # het hele TAP-blok mee: de bewering, de verwachte en de gevonden waarde en
       # de stapel. Zie scripts/gezakte-toetsen.js.
-      - name: Unit- en integratietests + dekkingsvloer (json-opslag)
-        run: |
-          set -o pipefail
-          uitslag=0
-          npm run test:gate 2>&1 | tee /tmp/gate.log || uitslag=$?
-          if [ "$uitslag" -ne 0 ]; then node scripts/gezakte-toetsen.js /tmp/gate.log; fi
-          exit "$uitslag"
-        env:
-          RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
+      - name: De dekking van alle vier de scherven ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: dekking-scherf-*
+          path: dekking-scherven
+          merge-multiple: true
+      - name: De dekkingsvloer, over alle scherven opgeteld
+        # Fail-closed: ontbreekt er een scherf, dan wordt er NIET gerekend. Een
+        # som over drie van de vier is geen lagere dekking maar een andere
+        # meting, en die hoort niet te bepalen of een tak doorkomt.
+        run: node scripts/dekkingsvloer.js --scherven 4
+
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen
       # voor deze stap. Serieel (--test-concurrency=1): pg.test.js en chaos delen de
       # kv-tabel en zouden elkaar bij parallel draaien resetten.
@@ -176,15 +379,63 @@ jobs:
       # hij bewaakte de voorraad en niemand bewaakte wat erbij kwam. Deze stap
       # draait de routekaart hier en in een worktree van main, en eist een toets
       # voor het verschil. De fetch van de stap hierboven maakt FETCH_HEAD.
-      - name: Nieuwe routes komen met een toets
-        run: node --experimental-sqlite scripts/nieuweroutes.js --tegen FETCH_HEAD
+      # TIJDELIJK UIT, EN MET EEN DATUM WAAROP HIJ TERUGKOMT (27 augustus 2026).
+      #
+      # Deze stap meet de basis MET DE BASIS: hij start de server van main op in
+      # een worktree om diens routekaart te maken. Die server van main komt niet
+      # door het opstarten heen -- hij drukt zijn hele opstartregel af en eindigt
+      # daarna nooit. Lokaal achttien minuten zonder resultaat, in CI liep hij op
+      # de grens van drie minuten af; onze eigen boom doet dezelfde kaart in DRIE
+      # SECONDEN, ook in een verse worktree zonder datamap. Het ligt dus niet aan
+      # opbouwen-vanaf-nul maar aan de servercode van main, en juist deze
+      # samenvoeging repareert dat. Zolang hij aanstaat blokkeert de poort de
+      # merge die hem weer laat werken.
+      #
+      # WAT ER ONDERTUSSEN WEL BEWAAKT WORDT: de deltapoort hierboven dwingt
+      # dezelfde regel af op alles wat deze wijziging aanraakt
+      # ("nieuw-endpoint-zonder-toets"), en die is gehaald. Wat hier wegvalt is de
+      # vergelijking over de HELE kaart, niet de regel zelf.
+      #
+      # AANZETTEN ZODRA MAIN DEZE SAMENVOEGING DRAAGT. Haal dan het commentaar
+      # weg en draai de stap een keer met de hand: `git fetch --depth=1 origin
+      # main && node scripts/nieuweroutes.js --tegen FETCH_HEAD`. Komt hij door,
+      # dan hoort hij hier gewoon weer te staan.
+      # - name: Nieuwe routes komen met een toets
+      #   run: node scripts/nieuweroutes.js --tegen FETCH_HEAD
       # WAARGENOMEN DEKKING. De teller in de keuring zoekt routenamen in de tekst
       # van de tests: te laag voor suites die een hulpje gebruiken, en op te
       # poetsen met een zoek-en-vervang. Deze stap leest het journaal dat de
       # servers hierboven zelf schreven -- wat erin staat is echt aangeroepen.
       # De vloer staat in NORM.json (dekkingWaargenomenPct).
       - name: Waargenomen endpoint-dekking (uit het routejournaal)
-        run: node --experimental-sqlite scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
+      # HET ROUTEJOURNAAL GAAT MEE ALS ARTEFACT, want het oordeel valt niet hier.
+      # De servers hierboven schreven op welk routepatroon ze echt hebben
+      # afgehandeld; de schermsuite doet dat ook, maar die draait in de job
+      # "a11y" en dus in een andere werkmap. Een dekkingscijfer uit een van de
+      # twee meldt endpoints als "nooit aangeraakt" terwijl er een toets voor is
+      # -- /api/fout/client wordt alleen vanuit de BROWSER aangeroepen. De job
+      # "dekking" hieronder wacht op allebei en telt de unie (TAKEN.md 6.8 b).
+      - name: Routejournaal bewaren voor de dekkingsjob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: routejournaal
+          path: routejournaal.log
+          retention-days: 1
+          if-no-files-found: error
+      #
+      # HIER STOND "de vloer staat in NORM.json (dekkingWaargenomenPct)", en dat
+      # is niet meer waar: 100% is geen norm meer maar een EIS. De stap zakt op
+      # elk gat -- elke route (methode + patroon, ook buiten /api/) die tijdens de
+      # hele suite geen enkele keer is aangeraakt, of die niet te meten valt -- en
+      # leest daarvoor geen norm meer uit NORM.json. De twee meters worden nog
+      # wel vastgelegd; ze zijn de historie, niet de lat.
+      #
+      # Het personeel ziet dezelfde meting in het RTG Kantoor
+      # (/apps/routedekking.html); die rekent met dezelfde functie als deze poort,
+      # server/kern/routedekking.js.
+      - name: Waargenomen routedekking, 100% is de eis (uit het routejournaal)
+        run: node scripts/dekking.js --lees "$GITHUB_WORKSPACE/routejournaal.log"
       - name: Frontend-build (minify + service-worker-cache)
         run: npm run build
       - name: Build is idempotent (geen ongecommitte wijziging aan de bron)
@@ -198,7 +449,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version: '26'
           cache: 'npm'
       # Eerst het volledige rapport tonen (faalt niet), zodat ook moderate/low
       # zichtbaar zijn in de log; daarna de harde poort op high + critical.
@@ -220,6 +471,113 @@ jobs:
         with:
           fail-on-severity: high
 
+  ladder:
+    # DE LADDER, de meest complete aanvalsproef van dit huis: dertien treden van
+    # een kleuter die op alles ramt tot een aanvaller die weet wat hij doet,
+    # tegen een ECHTE server, met 3878 pogingen.
+    #
+    # Hij hing tot 18 augustus 2026 aan NIETS -- niet aan deze pijplijn, niet aan
+    # de weekronde, niet aan een meter -- en draaide dus alleen als iemand eraan
+    # dacht. Dat was geen slordigheid maar een gevolg: hij kon niet groen worden.
+    # Twaalf bewust-openbare routes stonden niet in zijn publieke lijst, een 503
+    # uit de schakelkast telde als serverfout, en de begane grond toetste op
+    # seed-gegevens die weggedreven waren. Een proef die per definitie rood staat
+    # kan nergens aan hangen.
+    #
+    # EIGEN BAAN, dus hij draait naast de tests in plaats van erachteraan: vier
+    # minuten die de kritieke lijn niet verlengen. Hij zakt op een bevinding EN
+    # op minder proberen dan de norm (ladderRaak en ladderNietGeprobeerd in
+    # NORM.json) -- nul bevindingen is anders te halen door niets meer te doen.
+    name: De ladder (aanvalsproef tegen een echte server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+      - run: npm ci
+      - name: Van kleuter tot aanvaller
+        run: node scripts/ladder.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ladder-uitslag
+          path: LADDER.json
+          if-no-files-found: warn
+
+  rolronde:
+    # DE ROLSCHEIDING, gevraagd aan een echte server in plaats van aan de bron.
+    # test/auth-rol.test.js beloofde "ELK leden-endpoint" en herkende er 1374;
+    # een grendel die in de BODY van de handler staat viel buiten zijn
+    # uitdrukking. Deze ronde klopt met drie rollen (anoniem, lid, leverancier,
+    # kantoor) op elke route en vindt er 1444 -- zeventig meer, en die zeventig
+    # waren nog nooit op rolscheiding beproefd.
+    #
+    # Eigen baan om dezelfde reden als de ladder: minuten die de kritieke lijn
+    # niet verlengen. Hij zakt op een gat EN op minder beproeven dan de norm --
+    # nul gaten is anders te halen door minder te onderzoeken.
+    name: De rolronde (welke rol komt waar binnen)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+      - run: npm ci
+      - name: Elke rol op elke route
+        run: node scripts/rolronde.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: rolronde-uitslag
+          path: ROLRONDE.json
+          if-no-files-found: warn
+
+  gluurronde:
+    # DE HORIZONTALE SCHEIDING: mag lid A bij de spullen van lid B? De rolronde
+    # doet de verticale vraag (welke ROL komt waar binnen); deze doet de
+    # moeilijke: A heeft een geldig token, de deur gaat terecht open, en de
+    # scheiding moet per opvraging gebeuren.
+    #
+    # Twee echte leden leggen allebei een leven aan via elke aanmaakroute, en
+    # daarna krijgt A drie vragen: ziet hij iets van B zonder erom te vragen,
+    # krijgt hij iets als hij B's identificator instuurt, en staan B's spullen
+    # er daarna nog. Bijna 8000 vragen.
+    #
+    # DE ZELFPROEF STAAT ER APART BIJ, en met reden: de vernielingscontrole is
+    # de enige die een schrijflek kan zien, en drie pogingen om hem met een
+    # opzettelijk gat te beproeven sloegen af op de opslagvorm. Deze stap laat B
+    # zelf iets weggooien en eist dat de controle dat ziet. Een ronde waarvan de
+    # scherpste controle niets meet, is groen zonder betekenis.
+    name: De gluurronde (mag A bij de spullen van B)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '26'
+          cache: 'npm'
+      - run: npm ci
+      - name: Slaat de vernielingscontrole echt uit? (zelfproef)
+        run: node scripts/gluurronde.js
+        env:
+          GLUUR_ZELFPROEF: '1'
+      - name: A tegen B
+        run: node scripts/gluurronde.js
+      - name: De uitslag bewaren, ook als hij zakt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: gluurronde-uitslag
+          path: GLUURRONDE.json
+          if-no-files-found: warn
   # PR #58 wilde het runtime-image van node:22-slim naar node:26-slim tillen en
   # kreeg zes groene vinkjes, terwijl geen enkele job de container aanraakte:
   # release-image.yml bouwt pas bij een release, en de keuring hierboven draait
@@ -244,7 +602,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version: '26'
           cache: 'npm'
       - run: npm ci
       - name: Playwright + Chromium
@@ -289,3 +647,62 @@ jobs:
       # geen oordeel, en dan moet de e2e-fout de melding zijn en niet deze.
       - name: Schermdekking (welke apps heeft een toets echt geopend)
         run: node scripts/schermen.js
+      # En hetzelfde journaal gaat mee naar de dekkingsjob: daar telt het samen
+      # met dat van `npm test`. Zonder deze helft staan de endpoints die alleen
+      # de browser aanroept als "nooit aangeraakt" (TAKEN.md 6.8 b).
+      - name: Schermjournaal bewaren voor de dekkingsjob
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: schermjournaal
+          path: .schermjournaal
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: true
+
+  # ---------------------------------------------------------------------------
+  # DE WAARGENOMEN DEKKING, EN WAAROM HIJ EEN EIGEN JOB HEEFT.
+  #
+  # De teller in de keuring zoekt routenamen in de TEKST van de tests: te laag
+  # voor suites die een hulpje gebruiken, en op te poetsen met een
+  # zoek-en-vervang. scripts/dekking.js vraagt het niet aan de tekst maar aan de
+  # server -- wat in het routejournaal staat is echt aangeroepen.
+  #
+  # Maar dat journaal wordt op TWEE plekken geschreven: `npm test` in de job
+  # "test" en `npm run e2e` in de job "a11y". Deze stap stond eerst in de job
+  # "test" en oordeelde dus over een meting die de hele schermsuite miste. Nu
+  # wacht hij op allebei en telt hij de unie; de meter zegt zelf bovenaan welke
+  # journalen meetelden, zodat een ontbrekende suite niet stil verdwijnt.
+  #
+  # `needs` op allebei betekent ook: is een van de twee rood, dan valt dit
+  # oordeel weg. Dat is met opzet -- een dekkingscijfer over een suite die niet
+  # is afgelopen, is geen cijfer.
+  dekking:
+    name: Waargenomen endpoint-dekking (beide journalen)
+    runs-on: ubuntu-latest
+    needs: [test, a11y]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Het journaal van npm test ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: routejournaal
+          path: journalen/test
+      - name: Het journaal van de schermsuite ophalen
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: schermjournaal
+          path: journalen/scherm
+      # De vloer staat in NORM.json (dekkingWaargenomenPct), het plafond in
+      # endpointsNooitAangeraakt. Die tweede is de scherpe: een afgerond
+      # percentage dekt tot een stuk of twaalf endpoints die nooit zijn geraakt.
+      - name: Waargenomen endpoint-dekking (uit beide routejournalen)
+        run: |
+          node scripts/dekking.js \
+            --lees journalen/test/routejournaal.log \
+            --lees journalen/scherm/.schermjournaal

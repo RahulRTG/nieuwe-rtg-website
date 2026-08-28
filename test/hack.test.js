@@ -2,7 +2,7 @@
    aanvallen afslaat. Geen exploit die MOET slagen -- juist een regressie-hek dat
    de bestaande verdediging vastlegt: auth-dwang, rol-scheiding, cross-tenant (IDOR),
    injectie, prototype-pollution, security-headers, path-traversal en brute-force.
-   Draai: node --experimental-sqlite --test test/hack.test.js */
+   Draai: node --test test/hack.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -126,7 +126,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const c = await doe(k2);
     const o = weegHerhaling(a, b, c);
     tel[o.stand]++;
-    perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
+    perRoute[r.methode + ' ' + r.pad] = { methode: r.methode, pad: r.pad, rol: r.rol,
       idempotentie: o.stand, reden: o.reden, statussen: [a.status, b.status, c.status] };
   }
 

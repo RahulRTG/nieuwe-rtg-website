@@ -19,7 +19,7 @@
    7. EEN EVALUATIEDATUM ZONDER UITKOMST IS EEN AGENDAPUNT. De uitkomst is op
       te schrijven, stapelt, en vraagt een onderbouwing.
 
-   Draai los: node --experimental-sqlite --test test/werkgeheugen.test.js */
+   Draai los: node --test test/werkgeheugen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -48,11 +48,11 @@
          alleen de koppen die te klein zijn -- padding zou elke kaart in dit huis
          verschuiven om er vier te repareren. */
       '.fx-kop{cursor:pointer;user-select:none;min-height:24px;}' +
-      '.fx-kop:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:6px;}' +
+      '.fx-kop:focus-visible{outline:2px solid currentColor;outline-offset:2px;border-radius:0;}' +
       '.fx-pijl{float:right;margin-left:0.5rem;opacity:0.55;font-size:0.8em;transition:transform 0.15s;}' +
       '.fx-dicht .fx-pijl{transform:rotate(-90deg);}' +
       // dicht maar niet doof: bij meldingen kleurt de balk en telt de badge
-      '.fx-badge{display:none;margin-left:0.5rem;background:#C23A5E;color:#fff;border-radius:999px;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;font-size:0.68em;font-weight:700;padding:0 0.35em;vertical-align:middle;}' +
+      '.fx-badge{display:none;margin-left:0.5rem;background:#C23A5E;color:#fff;border-radius:0;min-width:1.5em;height:1.5em;line-height:1.5em;text-align:center;font-size:0.68em;font-weight:700;padding:0 0.35em;vertical-align:middle;}' +
       '.fx-kaart.fx-dicht.fx-melding > .fx-kop .fx-badge{display:inline-block;}' +
       '.fx-kaart.fx-dicht.fx-melding{background-image:linear-gradient(rgba(194,58,94,0.16),rgba(194,58,94,0.16));border-color:rgba(194,58,94,0.55);}';
     document.head.appendChild(s);

@@ -10,7 +10,7 @@
 
    Zuivere functietoetsen op een nagebouwde db; er is geen server nodig, want
    de hele module draait op meegegeven lezers. Draai los:
-   node --experimental-sqlite --test test/klets.test.js */
+   node --test test/klets.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');

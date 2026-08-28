@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { db, save, DATA_DIR } = require('./../db');
 const { eigenVeld } = require('./../kern/util'); // veilige objecttoegang (geen prototype-pollution)
+const foutisolatie = require('../lib/foutisolatie');
 
 module.exports = function maakBasis() {
   /* ---------- versleuteling van gevoelige gezinsdata ----------
@@ -45,39 +46,7 @@ module.exports = function maakBasis() {
     } catch (e) { return ''; }
   }
 
-  /* ---------- rate-limiting: bescherming tegen het raden van gezinscodes en pincodes ---------- */
-  const pogingen = new Map(); // bucket -> { n, until }
-  const GEEN_LIMIET = process.env.NODE_ENV === 'test'; // in de testsuite delen alle gezinnen een IP; daar geen limiet
-  function teVaak(res, bucket) {
-    if (GEEN_LIMIET) return false;
-    const f = pogingen.get(bucket);
-    if (f && f.until > Date.now()) { res.status(429).json({ error: 'Te veel pogingen. Wacht een paar minuten en probeer het opnieuw.' }); return true; }
-    return false;
-  }
-  function misluktePoging(bucket, max = 10, minuten = 5) {
-    if (GEEN_LIMIET) return;
-    const f = pogingen.get(bucket) || { n: 0, until: 0 };
-    f.n += 1;
-    if (f.n >= max) { f.until = Date.now() + minuten * 60000; f.n = 0; }
-    pogingen.set(bucket, f);
-  }
-  function goedePoging(bucket) { pogingen.delete(bucket); }
-  /* HET ADRES VAN DE AANROEPER -- EN NIET HET ADRES DAT HIJ ZELF OPGEEFT.
-
-     Hier stond een eigen lezer die x-forwarded-for van LINKS pakte. Dat is
-     precies de kant die de client zelf vult: wie bij elke poging een ander
-     adres meestuurt, krijgt telkens een verse teller en raakt de grens nooit.
-     De rem op het RADEN van een gezinscode was daarmee met een enkele kop uit
-     te zetten -- en achter zo'n code van zes tekens liggen kinderprofielen
-     zonder pincode, met hun locatie en hun gezondheidsgegevens.
-
-     De server leidt het echte adres al zorgvuldig af in server/web/verrijk.js:
-     van RECHTS, en alleen bij een vertrouwde proxy, juist om deze vervalsing
-     tegen te houden. server/trio.js plakt het echte adres ook rechts aan. Er
-     was dus al een goed antwoord; deze regel was een tweede, slechter antwoord
-     op dezelfde vraag. Twee bronnen voor een waarheid betekent dat de zwakste
-     wint zodra iemand hem gebruikt. */
-  const ipVan = req => String(req.ip || (req.socket && req.socket.remoteAddress) || 'onbekend');
+  const { teVaak, misluktePoging, goedePoging, ipVan } = require('./rem');
 
   /* Foundation wordt vóór de hoofdkern gemount en kan diens client daarom niet
      lenen. Wel gebruikt hij exact dezelfde fabriek: lokaal eerst, dezelfde
@@ -87,20 +56,16 @@ module.exports = function maakBasis() {
   catch (e) { /* regelantwoorden blijven volledig bruikbaar */ }
 
   const router = express.Router();
-  /* Zelfde foutisolatie als in server.js: de app-omhulling dekt alleen app.get/post,
-     niet deze router. Een (async) fout in een handler wordt netjes next(err). */
-  for (const metode of ['get', 'post', 'put', 'delete', 'patch', 'all']) {
-    const orig = router[metode].bind(router);
-    router[metode] = (...args) => orig(...args.map(f => {
-      if (typeof f !== 'function') return f;
-      return (req, res, next) => {
-        try {
-          const r = f(req, res, next);
-          if (r && typeof r.catch === 'function') r.catch(next);
-        } catch (e) { next(e); }
-      };
-    }));
-  }
+  /* Zelfde foutisolatie als voor de app: die omhulling dekt alleen app.get/post,
+     niet deze router -- foundation wordt voor de hoofdkern gemount.
+
+     De wikkel stond hier woordelijk overgeschreven uit opzet/verzoekketen.js, en
+     dat was precies een plek te veel. Toen de wikkel de NAAM van zijn functie
+     moest gaan doorgeven (zodat uit de router te lezen is welke bewaker voor een
+     route hangt), moest die reparatie op twee plekken -- en de tweede vergeten is
+     hoe de RTFoundation al eens buiten een meting viel. Nu een aanroep naar de
+     ene plek waar hij woont: lib/foutisolatie.js. */
+  foutisolatie.isoleer(router);
   router.use(express.json({ limit: '4mb' }));
 
   function F() {

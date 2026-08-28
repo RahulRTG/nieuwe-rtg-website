@@ -1,0 +1,124 @@
+### DE WACHT -- de grond bewaken waar de code op staat.
+#
+# CI (ci.yml) wordt rood als de CODE verandert en iets breekt. Maar de grond
+# eronder verschuift zonder commit: Node gaat end-of-life, een experimentele
+# vlag verdwijnt, Chromium wijzigt gedrag, een wettekst wordt herzien. Voor
+# geen van die vier bestond er een rood licht -- ze werden pas zichtbaar als
+# er toevallig iemand pushte, of erger, als een gebruiker ze vond.
+#
+# Twee ritmes in een workflow, uit elkaar gehouden op github.event.schedule:
+#
+#   WEKELIJKS  de runtimewacht (Node-EOL, versie-eenheid, vlaggen) en de
+#              browsercanary (de volledige scherm- en a11y-ronde op de
+#              nieuwste runner-toolchain, juist ZONDER dat er gepusht is).
+#   MAANDELIJKS  de wetwacht (zijn de gevolgde wetteksten veranderd, en welk
+#              document hier hangt eraan). Die meldt alleen; het oordeel
+#              over een wetswijziging blijft mensenwerk (CONCERN.md).
+#
+# Wordt hier iets rood, dan pakt herstel.yml het op en komt er een fix-issue
+# met de diagnose erin. Zie ONDERHOUD.md voor de hele lus.
+
+name: De wacht
+
+on:
+  schedule:
+    # dinsdagochtend 06:23 UTC: na het maandag-ritme van Dependabot, zodat de
+    # canary meteen op de verse lockfile draait. Oneven minuut met opzet
+    # (zie ronde.yml: op het hele uur staat de GitHub-wachtrij vol).
+    - cron: '23 6 * * 2'
+    # de eerste van de maand, 07:41 UTC: de wetwacht.
+    - cron: '41 7 1 * *'
+  workflow_dispatch:
+    inputs:
+      onderdeel:
+        description: 'Welke wacht (runtime, browser, wet, alles)'
+        default: 'alles'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wacht
+  cancel-in-progress: false
+
+jobs:
+  runtime:
+    name: Grondwacht (Node-EOL, versie-eenheid, vlaggen)
+    if: github.event.schedule != '41 7 1 * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+      # Exitcode 1 is een harde bevinding en zakt. Exitcode 2 betekent dat de
+      # wacht NIET KON METEN (kalender onbereikbaar) en zakt daarom OOK: een
+      # wacht die groen wordt omdat hij niets zag is geen wacht (LAT.md r.3).
+      - name: De grondwacht
+        run: node scripts/grondwacht.js 2>&1 | tee grondwacht.log
+      - name: Uitslag in beeld
+        if: always()
+        run: |
+          { echo '## De grondwacht'; echo '```'; cat grondwacht.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: grondwacht
+          path: |
+            grondwacht.log
+            GRONDWACHT.json
+          retention-days: 90
+
+  browser:
+    name: Browsercanary (schermronde zonder dat er gepusht is)
+    if: github.event.schedule != '41 7 1 * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - name: Playwright + Chromium
+        run: npx playwright install --with-deps chromium
+      # Dezelfde rondes als in de CI, maar het moment is het punt: tussen twee
+      # pushes door verandert de runner-toolchain gewoon verder. Een breuk die
+      # HIER opduikt en in de laatste CI-run niet, is per definitie de grond
+      # en niet de code -- precies wat een canary moet scheiden.
+      - name: Scherm-tests (PWA in de browser)
+        run: npm run e2e
+      - name: Eigen a11y-scan van de vlaggenschip-schermen
+        if: always()
+        run: node scripts/a11y.js
+
+  wet:
+    name: Wetwacht (meldt, oordeelt niet)
+    if: github.event.schedule == '41 7 1 * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+      # Exitcode 1 = een bron is veranderd: een mens moet kijken, dus rood.
+      # Exitcode 2 = niet kunnen meten: ook rood, en de melding zegt waarom.
+      - name: De wetwacht
+        run: node scripts/wetwacht.js 2>&1 | tee wetgrondwacht.log
+      - name: Uitslag in beeld
+        if: always()
+        run: |
+          { echo '## De wetwacht'; echo '```'; cat wetgrondwacht.log; echo '```';
+            echo ''; echo '> De wacht meldt alleen DAT een bron veranderd is.';
+            echo '> Wat dat betekent beoordeelt een mens; zie WETBRONNEN.json voor wat waaraan hangt.'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: wetwacht
+          path: |
+            wetgrondwacht.log
+            WETWACHT.json
+          retention-days: 400

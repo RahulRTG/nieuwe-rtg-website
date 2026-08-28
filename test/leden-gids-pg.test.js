@@ -6,7 +6,7 @@
    Draait alleen als DATABASE_URL is gezet (zoals test/pg.test.js); anders
    overgeslagen. Draai:
      DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtg \
-     node --experimental-sqlite --test test/leden-gids-pg.test.js */
+     node --test test/leden-gids-pg.test.js */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
@@ -56,7 +56,10 @@ test('Postgres-ledengids: een nieuw lid landt in de gids en telt mee in de kanto
       if (!(st && st.state && st.state.user)) await wacht(200);
     }
     assert.ok(st && st.state && st.state.user, 'het lid is ingelogd');
-    await wacht(400); // de gids-telling ververst kort na de upsert
+    /* GEEN 400 ms MEER. De opmerking hier was "de gids-telling ververst kort na
+       de upsert" -- en dat is precies wat de lus hieronder al opvangt: die
+       vraagt de telling twintig keer opnieuw tot hij gestegen is. De vier
+       tienden ervoor maakten de toets alleen trager, niet zekerder. */
 
     let na = voor;
     for (let i = 0; i < 20 && na < voor + 1; i++) {

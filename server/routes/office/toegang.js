@@ -3,13 +3,14 @@
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
   const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
-          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog } = kern;
+          rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
+          handelingsspoor, ankerdienst } = kern;
 app.post('/api/office/login', (req, res) => {
   const bucket = 'office:' + req.ip;
   if (tooManyTries(res, bucket)) return;
   // tijd-veilig vergeleken: de reactietijd verraadt niets over de code
   if (!veiligGelijk(String(req.body.code || '').trim().toUpperCase(), OFFICE_CODE)) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     logInlog('office', false, null, req);
     return res.status(401).json({ error: 'Onjuiste backoffice-code.' });
   }
@@ -17,7 +18,7 @@ app.post('/api/office/login', (req, res) => {
      de omgeving, dan is de code alleen niet genoeg; er moet ook een geldige
      zescijferige authenticator-code bij */
   if (process.env.OFFICE_TOTP_SECRET && !totpOk(process.env.OFFICE_TOTP_SECRET, req.body.totp)) {
-    noteFailedTry(bucket);
+    noteFailedTry(bucket, req.ip);
     logInlog('office-2fa', false, null, req);
     return res.status(401).json({ error: 'Tweede factor vereist: voer de zescijferige code uit uw authenticator-app in.' });
   }
@@ -28,9 +29,56 @@ app.post('/api/office/login', (req, res) => {
   res.json({ token, state: officeState() });
 });
 
-/* het inlog-auditlog: elke poging op elk kanaal, alleen voor het kantoor */
+/* het inlog-auditlog: elke poging op elk kanaal, alleen voor het kantoor.
+
+   `keten` erbij, want een auditlog zonder zichtbare ketenstand vraagt van de
+   lezer dat hij aanneemt dat er niet aan gesleuteld is. Nu staat het er:
+   `ok` als het spoor met zichzelf klopt, `gebroken` waar niet, `afgekapt` als
+   de oudste regels eruit gelopen zijn (normaal bij 5000) en `zonderKeten` voor
+   de regels van vóór deze voorziening. */
 app.post('/api/office/securitylog', officeAuth, (req, res) => {
-  res.json({ log: (db.data.securityLog || []).slice(0, 200) });
+  res.json({ log: (db.data.securityLog || []).slice(0, 200), keten: securityLogKeten() });
+});
+
+/* Het handelingsspoor: wie deed wat, over het hele platform. Alleen voor het
+   kantoor -- dit is het spoor van alle leden samen, en dat is geen scherm voor
+   een lid. Zijn EIGEN handelingen kan hij wel opvragen; die route staat bij de
+   AVG-rechten in routes/member/privacy.js, want daar hoort ze thuis.
+
+   Het veld "over" filtert op sleutel. De ketenstand gaat over het HELE spoor en
+   niet over de selectie: een filter mag nooit bepalen of het bewijs klopt. */
+/* HET ANKER: het ene getal dat naar buiten moet.
+
+   De hashketen onder de auditjournalen ziet gesleutel MIDDEN in een spoor.
+   Kopafknipping ziet hij NIET -- wie de nieuwste regels weggooit, houdt een
+   keten over die van voor naar achter perfect klopt. Dat is precies wat iemand
+   doet die zijn eigen bezoek uitwist.
+
+   Daarvoor moet er een blok naar een GESCHEIDEN plek: een andere machine, een
+   andere partij, desnoods een uitdraai in een kluis. Deze route levert dat
+   blok; de tweede rekent ermee af zodra u het terugvoert.
+
+   Let op wat er NIET is: een route die het blok zelf ergens wegschrijft. Een
+   anker dat deze software op dezelfde schijf zet, is geen anker maar een tweede
+   regel om te wijzigen. Waar het blok heen gaat is een besluit over uw
+   infrastructuur, en dat hoort bij een mens. Zie server/lib/ankerdienst.js. */
+app.post('/api/office/anker', officeAuth, (req, res) => {
+  res.json(Object.assign({ ok: true }, ankerdienst.stand(req.body && req.body.blok ? req.body.blok : null)));
+});
+
+/* Afrekenen met een eerder naar buiten gebracht blok. Per journaal het oordeel:
+   is er iets van de kop verdwenen, en zo ja hoeveel. */
+app.post('/api/office/anker/reken', officeAuth, (req, res) => {
+  const blok = req.body && req.body.blok;
+  if (!blok) return res.status(400).json({ error: 'Geef het eerder weggezette blok mee onder de sleutel blok.' });
+  res.json(Object.assign({ ok: true }, ankerdienst.reken(blok)));
+});
+
+app.post('/api/office/handelingen', officeAuth, (req, res) => {
+  res.json(Object.assign({ ok: true }, handelingsspoor.lijst({
+    over: req.body && req.body.over ? String(req.body.over).slice(0, 60) : null,
+    max: req.body && req.body.max
+  })));
 });
 
 app.post('/api/office/timeline', officeAuth, (req, res) => {

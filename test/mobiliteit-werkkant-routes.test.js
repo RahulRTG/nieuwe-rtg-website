@@ -15,7 +15,7 @@
    - de naam-eis uit dispatchTelefoonboeking() gehaald
      -> "een telefonische rit draagt een naam" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/mobiliteit-werkkant-routes.test.js
+   Draai los: node --test test/mobiliteit-werkkant-routes.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');

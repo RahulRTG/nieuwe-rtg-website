@@ -11,7 +11,7 @@
       levert een LEGE actielijst op met die reden erbij -- geen bedachte taken.
    3. RISICO IS EEN REDEN, GEEN CIJFER. En "niets gevonden" wordt nooit als
       garantie gepresenteerd.
-   Draai: node --experimental-sqlite --test test/rtmail-ai.test.js */
+   Draai: node --test test/rtmail-ai.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

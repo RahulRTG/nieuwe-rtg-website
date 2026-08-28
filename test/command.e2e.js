@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -29,7 +29,7 @@ const { laadBrowser } = require('./browser');
 const pw = laadBrowser();
 
 test('RTG Command: het Command Center, de operator en een objectdossier komen op',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-cmd-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: 'RTG-OFFICE' } });
   let browser;
@@ -40,7 +40,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
     })).json();
     assert.ok(login.token, 'de kantoorinlog geeft een token');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const paginaFouten = [];
     letOpFouten(page, paginaFouten);
@@ -49,7 +49,11 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, login.token);
 
-    await page.goto(base + '/apps/command.html', { waitUntil: 'load' });
+    /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+       plaatje, elk lettertype -- terwijl de twee regels eronder al op het echte
+       teken wachten. Onder belasting valt `load` om op zijn eigen tijdslimiet,
+       en dan is de uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+    await page.goto(base + '/apps/command.html', { waitUntil: 'domcontentloaded' });
 
     /* Het Command Center is er als de rail is getekend en de stand niet meer
        "laden" zegt. Dat laatste is het bewijs dat /api/command/start echt is

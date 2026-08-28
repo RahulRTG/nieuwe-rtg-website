@@ -17,14 +17,15 @@
    Geen enkele check raadt. Wat de Keuring niet zeker weet, meldt zij als
    vermoeden met de reden erbij, zodat een mens het kan wegen.
 
-   Draai los: node --experimental-sqlite scripts/keuring.js
-              node --experimental-sqlite scripts/keuring.js --json  */
+   Draai los: node scripts/keuring.js
+              node scripts/keuring.js --json  */
 'use strict';
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { zonderCommentaar } = require('./lib/bron');
-const { gedektIn } = require('./lib/routedekking');
+const { maakZoeker } = require('./lib/routedekking');
+const { maakDekkingsIndex, DEKKING_KAP } = require('./lib/dekkingsindex');
 
 const WORTEL = path.join(__dirname, '..');
 const bevindingen = [];
@@ -95,7 +96,7 @@ function zinnen(tekst) {
 function dekking() {
   let routes = [];
   try {
-    const uit = execFileSync(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+    const uit = execFileSync(process.execPath, [path.join(__dirname, 'routekaart.js'), '--json'],
       { cwd: WORTEL, encoding: 'utf8', timeout: 120000, maxBuffer: 32 * 1024 * 1024 });
     const d = JSON.parse(uit);
     routes = (d.routes || d || []).map(r => (typeof r === 'string' ? r : r.pad || r.path)).filter(Boolean);
@@ -149,10 +150,17 @@ function dekking() {
      journaal dat de server tijdens de testrun zelf schrijft (server/routelog.js).
      Wat daar in staat is aangeroepen. Deze teller blijft staan omdat hij snel is
      en geen suite hoeft te draaien -- maar hij is de indicatie, niet het bewijs. */
-  /* De vorm zelf woont in ./lib/routedekking.js: scripts/nieuweroutes.js stelt
-     dezelfde vraag over de routes die in een tak NIEUW zijn, en twee kopieen van
-     deze zeef zouden binnen een week uiteenlopen (LAT.md regel 4). */
-  const gedekt = (route) => gedektIn(route, testTekst);
+  /* De vormen waarin een test een route kan noemen staan in
+     scripts/lib/routedekking.js, want scripts/deltapoort.js stelt dezelfde
+     vraag over de routes die NIEUW zijn in een wijziging. Twee kopieen van
+     deze regels lopen uiteen -- ze zijn hier al drie keer bijgesteld -- en dan
+     meet de poort iets anders dan de ratel die hij moet dienen (regel 4).
+
+     De SNELHEID komt uit scripts/lib/dekkingsindex.js: die zoeker liep zeven
+     keer per route over tientallen megabytes testtekst, en dat was 64% van de
+     hele keuring. routedekking.js draagt nog steeds de regel, maar rekent hem
+     via dat register uit -- een plek voor de regel, en toch de snelle weg. */
+  const gedekt = maakZoeker(testTekst);
   const ongedekt = apiRoutes.filter(r => !gedekt(r));
   const pct = apiRoutes.length ? Math.round((apiRoutes.length - ongedekt.length) / apiRoutes.length * 100) : 100;
   if (pct < 60) meld('scheef', 'dekking', 'Minder dan zestig procent van de endpoints komt in een test voor (' + pct + '%).',
@@ -210,7 +218,7 @@ const GEWOGEN = new Map([
   ['server/kern/fluister/acties.js | is betaald;',
     'staat pas in de zin nadat betaalRit() zonder fout is teruggekomen'],
   ['server/kern/mobiliteit/reis.js | De vervoerbewijzen zijn betaald.',
-    'hangt aan nuBetaald: de zin valt alleen als de boeking in het grootboek van dit huis echt is afgerekend, en anders staat er null']
+    'staat achter nuBetaald > 0: de som van etappes die e.betaald dragen -- een stand melden mag, zie de kop van dit blok']
 ]);
 
 function beloftes() {
@@ -457,7 +465,9 @@ function i18n() {
      - bijna     : de waarschuwingsband eronder. Dat is de vroege waarschuwing.
    Ze staan als twee meters in NORM.json, want ze zeggen iets anders en een
    optelling zou de ene achter de andere kunnen verbergen. */
-const GRENS = 10240;
+/* De grens woont in scripts/lib/omvang.js: scripts/deltapoort.js houdt tegen
+   dat er nieuwe overtreders bijkomen en moet daarvoor DEZELFDE grens kennen. */
+const { GRENS } = require('./lib/omvang');
 
 /* EEN BESTAND KAN TUSSEN LISTEN EN METEN VERDWIJNEN, en dan viel deze keuring
    om met een ENOENT in plaats van een oordeel te vellen.
@@ -532,4 +542,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur };
+module.exports = { keur, maakDekkingsIndex, DEKKING_KAP };

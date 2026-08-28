@@ -13,7 +13,7 @@
    productie. De weigering met de gedeelde code staat als eigen bewering in
    test/aanmeldbesluit.test.js.
 
-   Draai los: node --experimental-sqlite --test test/pas-escalatie.test.js */
+   Draai los: node --test test/pas-escalatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -79,7 +79,10 @@ test('4. het menselijke akkoord tilt het gekoppelde account op naar Business', a
   assert.equal(aanvraag.body.aanmelding.gekoppeld, true, 'de aanvraag is aan het account gekoppeld');
 
   // het menselijke besluit: RTG-personeel accepteert
-  const besluit = await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', notitie: 'akkoord' }, kantoor);
+  /* `contractEuro` hoort erbij sinds de ladder: de Business Pass heeft geen
+     lijstprijs. Deze toets gaat over het OPTILLEN van een account, niet over de
+     prijs -- maar hij loopt langs dezelfde poort. */
+  const besluit = await api('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', notitie: 'akkoord', contractEuro: 5000 }, kantoor);
   assert.equal(besluit.status, 200);
   assert.equal(besluit.body.aanmelding.status, 'geaccepteerd');
   /* En het spoor wijst een mens aan. Zonder deze regel zou deze toets ook groen
@@ -98,6 +101,6 @@ test('5. een aanvraag zonder ingelogd account kan niets optillen', async () => {
   assert.equal(aanvraag.status, 200);
   assert.equal(aanvraag.body.aanmelding.gekoppeld, false, 'geen account gekoppeld');
   // accepteren mag, maar er is geen account om op te tillen (geen crash)
-  const besluit = await api('/api/aanmelding/beslis', { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd' }, kantoor);
+  const besluit = await api('/api/aanmelding/beslis', { id: aanvraag.body.aanmelding.id, besluit: 'geaccepteerd', contractEuro: 5000 }, kantoor);
   assert.equal(besluit.status, 200);
 });

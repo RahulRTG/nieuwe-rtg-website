@@ -17,7 +17,7 @@
    hoort er vanzelf bovenop te komen -- zonder herstart.
 
    Draai:  DATABASE_URL=postgresql://postgres@127.0.0.1:5433/rtgtest \
-           node --experimental-sqlite --test test/pg-wachten.test.js
+           node --test test/pg-wachten.test.js
    ========================================================================== */
 /* LET OP -- deze toets maakt en dropt een EIGEN database (naam met achtervoegsel
    -wacht) en raakt de database uit DATABASE_URL alleen om die aan te maken. */
@@ -26,7 +26,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, stopNet } = require('./helper');
 
 const BRON = process.env.DATABASE_URL || process.env.PG_URL || '';
 const OVERSLAAN = BRON ? false : 'geen DATABASE_URL: het wachten op Postgres bestaat alleen in de Postgres-stand';
@@ -58,7 +58,12 @@ test('een onbereikbare database bij de start is tijdelijk, geen dode instance',
     const api = await fetch(srv.base + '/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
     assert.equal(api.status, 503, 'ook de gewone API blijft dicht -- geen halve waarheid uit een lege kast');
 
-    // 2. laat hem een paar herkansingen doen; hij hoort niet op te geven
+    /* 2. laat hem een paar herkansingen doen; hij hoort niet op te geven.
+
+       HIER BLIJFT EEN WACHT STAAN, en dat is een besluit. De bewering is dat de
+       server NIET afsluit, en op een afwezigheid kun je niet wachten. Het getal
+       is bovendien gekoppeld aan het product: PG_HERKANS_MS staat hierboven op
+       300, dus 1500 ms is een stuk of vijf herkansingen. Zie KLOKWACHT.json. */
     await wacht(1500);
     assert.equal(srv.child.exitCode, null, 'de server heeft zichzelf niet beeindigd');
 
@@ -84,8 +89,11 @@ test('een onbereikbare database bij de start is tijdelijk, geen dode instance',
     });
     assert.equal(reg.status, 200, 'en bedient daarna gewoon verkeer');
   } finally {
-    stop(srv && srv.child);
-    await wacht(300);
+    /* WACHTEN TOT DE SERVER ECHT WEG IS voor we de database laten vallen.
+       DROP DATABASE weigert zolang er nog een verbinding op staat, en die
+       verbinding hangt aan dit proces. Hier stond `wacht(300)`; `exit` is het
+       teken. */
+    await stopNet(srv && srv.child);
     try { await beheer.pool.query('DROP DATABASE IF EXISTS ' + NAAM); } catch (e) {}
     try { await beheer.pool.end(); } catch (e) {}
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

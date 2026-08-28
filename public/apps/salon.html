@@ -18,12 +18,12 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
   .kop{display:flex;align-items:flex-end;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.35rem;}
   input,textarea,select,button{font:inherit;}
-  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
+  input,textarea,select{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);font-size:.85rem;padding:.5rem .7rem;width:100%;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* De Salon houdt haar eigen tabbladen (Feed / Ontdekken / Plaatsen / Bewaard /
      Inzicht / Mijn profiel): een scherm tegelijk, precies wat het deelmenu
@@ -42,31 +42,31 @@
   body.rtg-stijl .tabs > button:hover{color:var(--txt);border-bottom-color:transparent;}
   body.rtg-stijl .tabs > button[aria-pressed="true"]{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
-  .post{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:1rem;overflow:hidden;}
+  .post{background:var(--card);border:1px solid var(--line);border-radius:0;margin-bottom:1rem;overflow:hidden;}
   .post .top{display:flex;align-items:center;gap:.6rem;padding:.8rem .9rem .5rem;}
   .post .naam{font-weight:600;font-size:.9rem;cursor:pointer;background:none;border:none;color:inherit;padding:0;text-align:left;min-height:24px;}
   .post .plek{font-size:.72rem;color:var(--soft);}
-  .post .merk{font-size:.6rem;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.02rem .4rem;margin-left:auto;}
+  .post .merk{font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem;margin-left:auto;}
   .kar{position:relative;background:#000;}
   .kar .strip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;}
   .kar img{width:100%;flex:0 0 100%;scroll-snap-align:center;display:block;object-fit:cover;max-height:26rem;}
-  .kar .tel{position:absolute;top:.5rem;right:.6rem;background:rgba(0,0,0,.6);border-radius:999px;font-size:.68rem;padding:.1rem .5rem;}
+  .kar .tel{position:absolute;top:.5rem;right:.6rem;background:rgba(0,0,0,.6);border-radius:0;font-size:.68rem;padding:.1rem .5rem;}
   .post .tekst{padding:.7rem .9rem;font-size:.9rem;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
   .post .onderw{padding:0 .9rem .5rem;display:flex;gap:.35rem;flex-wrap:wrap;}
-  .post .onderw button{background:none;border:1px solid var(--line);color:var(--gold);border-radius:999px;padding:.1rem .5rem;font-size:.7rem;cursor:pointer;}
+  .post .onderw button{background:none;border:1px solid var(--line);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:.1rem .5rem;font-size:.7rem;cursor:pointer;}
   .rij{display:flex;gap:.4rem;align-items:center;padding:.5rem .9rem .8rem;flex-wrap:wrap;}
-  .rij button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.28rem .7rem;font-size:.76rem;cursor:pointer;}
+  .rij button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:.28rem .7rem;font-size:.76rem;cursor:pointer;}
   .rij button[aria-pressed="true"]{color:var(--burgundy);border-color:var(--burgundy);}
   .rij .tijd{margin-left:auto;font-size:.68rem;color:var(--soft);}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;margin-bottom:1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-bottom:1rem;}
   .kaart h2{font-size:1.05rem;margin-bottom:.5rem;}
   .kaart label{display:block;font-size:.74rem;color:var(--soft);margin:.6rem 0 .25rem;}
-  .knop{background:var(--burgundy);border:none;color:#fff;border-radius:10px;padding:.55rem 1rem;font-size:.85rem;cursor:pointer;}
-  .knop.stil{background:none;border:1px solid var(--gold);color:var(--gold);}
+  .knop{background:var(--burgundy);border:none;color:#fff;border-radius:0;padding:.55rem 1rem;font-size:.85rem;cursor:pointer;}
+  .knop.stil{background:none;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knoppen{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;}
   .miniatuur{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;}
   .miniatuur figure{width:4.5rem;}
-  .miniatuur img{width:4.5rem;height:4.5rem;object-fit:cover;border-radius:8px;display:block;}
+  .miniatuur img{width:4.5rem;height:4.5rem;object-fit:cover;border-radius:0;display:block;}
   .miniatuur input{font-size:.66rem;padding:.2rem .3rem;margin-top:.2rem;}
   .profiel{display:flex;gap:1rem;align-items:center;margin-bottom:.8rem;}
   .profiel .cijfers{display:flex;gap:1.1rem;font-size:.76rem;color:var(--muted);}
@@ -76,16 +76,16 @@
   .raster img{width:100%;height:100%;object-fit:cover;display:block;}
   .raster .geen{display:grid;place-items:center;font-size:.62rem;color:var(--soft);padding:.3rem;text-align:center;}
   .leeg{color:var(--soft);font-size:.9rem;text-align:center;padding:2.5rem 1rem;line-height:1.6;}
-  .meer{width:100%;background:none;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:.7rem;font-size:.82rem;cursor:pointer;}
-  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,rgba(12,12,11,.7));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
+  .meer{width:100%;background:none;border:1px solid var(--line);color:var(--muted);border-radius:0;padding:.7rem;font-size:.82rem;cursor:pointer;}
+  .aibalk{position:fixed;left:0;right:0;bottom:0;z-index:6;background:linear-gradient(0deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 70%,transparent));border-top:1px solid var(--line);padding:.6rem 1.1rem calc(env(safe-area-inset-bottom) + .6rem);}
   .aibalk form{display:flex;gap:.5rem;max-width:640px;margin:0 auto;}
-  .aibalk button{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:.5rem .9rem;font-size:.82rem;cursor:pointer;white-space:nowrap;}
+  .aibalk button{background:none;border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:.5rem .9rem;font-size:.82rem;cursor:pointer;white-space:nowrap;}
   .aibalk .uit{max-width:640px;margin:0 auto .5rem;font-size:.82rem;color:var(--muted);line-height:1.5;max-height:8rem;overflow:auto;}
   .wacht{opacity:.55;pointer-events:none;}
   .reactie{border-top:1px solid var(--line);padding:.5rem .9rem;font-size:.84rem;line-height:1.5;}
   .reactie.antwoord{padding-left:2rem;color:var(--muted);}
   .reactie .wie{font-weight:600;}
-  .reactie .mini{background:none;border:none;color:var(--gold);font-size:.7rem;cursor:pointer;padding:0 .3rem;}
+  .reactie .mini{background:none;border:none;color:var(--rtg-leesgoud,var(--gold));font-size:.7rem;cursor:pointer;padding:0 .3rem;}
 </style>
 <link href="/shared/social-elite.css" rel="stylesheet">
 <link href="/shared/salon-elite.css" rel="stylesheet">
@@ -278,7 +278,7 @@ async function tekenFeed(){
   const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Je archief</h2>'
     : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
     : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>“'+esc(ZOEK)+'”</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
-    : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--gold);cursor:pointer;">wissen</button></div>' : '';
+    : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
   toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
     + (d.meer ? '<button class="meer" id="meer">Meer laden</button>'
               : (POSTS.length?'<div class="leeg" style="padding:1.2rem;">Je bent bij.</div>':'')));
@@ -371,7 +371,7 @@ async function tekenInzicht(){
     '<div class="kaart"><h2>Per post</h2>'+
       ((d.posts||[]).length? d.posts.map(p=>
         '<div class="reactie"><span class="wie">'+esc(p.tekst||'(zonder tekst)')+'</span>'+
-        (p.gearchiveerd?' <span style="font-size:.6rem;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.02rem .4rem;">archief</span>':'')+
+        (p.gearchiveerd?' <span style="font-size:.6rem;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--line);border-radius:0;padding:.02rem .4rem;">archief</span>':'')+
         '<div style="color:var(--soft);font-size:.74rem;margin-top:.2rem;">'+
           p.mooi+' mooi · '+p.reacties+' reacties · '+p.bewaard+' bewaard'+
           '<button class="mini" data-arch="'+p.id+'" data-aan="'+(p.gearchiveerd?'0':'1')+'">'+(p.gearchiveerd?'terugzetten':'archiveren')+'</button>'+
@@ -488,11 +488,21 @@ if(!TOKEN){
   }
   teken();
 }
+
+/* De handgreep voor de gebarenlaag (apps/salon/gebaren.js). De Salon houdt zijn
+   eigen model -- welke posts er staan, of het archief open is en of een post van
+   jou is -- en de veeg heeft alle drie nodig. Apart bestand, zelfde reden als bij
+   de kluis, de post en het notitiebord. */
+window.RTGSalon = { api: api, herlaad: herlaad,
+  archief: () => ARCHIEF,
+  post: (id) => POSTS.filter((p) => String(p.id) === String(id))[0] || null };
+
 document.querySelectorAll('[data-salon-jump]').forEach(b=>b.addEventListener('click',()=>{
   TAB=b.dataset.salonJump; ONDERWERP=''; ZOEK=''; NA=null; ARCHIEF=false; TERUG_PROFIEL=''; teken();
   document.querySelector('.salon-werkveld')?.scrollIntoView({behavior:'smooth',block:'start'});
 }));
 </script>
+<script src="/apps/salon/gebaren.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

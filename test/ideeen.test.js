@@ -1,7 +1,7 @@
 /* De Ideeenkamer (kern/ideeen.js): de gedeelde werkbank van de vier
    ontwerpbureaus. Een idee met bureau-tags, reacties, AI-uitwerking per bureau
    en een spin-off die echt een concept in het gekozen bureau aanmaakt.
-   Draai los: node --experimental-sqlite --test test/ideeen.test.js */
+   Draai los: node --test test/ideeen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

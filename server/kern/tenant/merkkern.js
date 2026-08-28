@@ -39,7 +39,15 @@
 'use strict';
 
 const crypto = require('crypto');
-const S = require('../../accounts/state');
+/* VIA DE GEVEL EN NIET LANGS accounts/state. Hier stond een rechtstreekse greep
+   in S.SECRET met een eigen HMAC-afleiding -- precies wat de verboden graaf
+   (kluis-binnenwerk) tegenhoudt: ook de kern gaat via de gevel. De gevel biedt
+   hetzelfde al aan als sleutelVoor(doel): een HKDF-afgeleide sleutel waarbij de
+   ruwe sessiesleutel de kluis nooit verlaat. De afleiding verschilt van de oude
+   (HKDF in plaats van HMAC), dus eerder getekende manifesten verifiëren niet
+   meer -- dat kan, want dit merk draait nog nergens live en een manifest wordt
+   bij de eerstvolgende wijziging opnieuw getekend. */
+const accounts = require('../../accounts');
 
 const STANDAARD_ACCENT = '#7F1634';        // de bordeaux van RTG, tot een klant iets anders kiest
 const MAX_LOGO = 60000;                    // een klein beeld; dit is geen mediabibliotheek
@@ -54,8 +62,9 @@ const GRENS =
    nabouwen. Lui geladen, want de sleutel staat er pas nadat de accountlaag bij
    het opstarten is geopend. */
 function sleutel() {
-  if (!S.SECRET) throw new Error('De ondertekensleutel is nog niet geladen.');
-  return crypto.createHmac('sha256', S.SECRET).update('merkmanifest-v1').digest();
+  const k = accounts.sleutelVoor('merkmanifest-v1');
+  if (!k) throw new Error('De ondertekensleutel is nog niet geladen.');
+  return k;
 }
 
 /* De velden van een merk, op één plek. Wie er een bijzet, ziet hier meteen wat

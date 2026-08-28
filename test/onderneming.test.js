@@ -9,7 +9,7 @@
       AANWIJST, met de naam op precies één plek (lat-regel 4).
    4. De eigendomspoort op de routes.
 
-   Draai los: node --experimental-sqlite --test test/onderneming.test.js */
+   Draai los: node --test test/onderneming.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

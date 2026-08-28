@@ -151,8 +151,15 @@ test('publish/subscribe binnen de eigen client', { skip: !HEEFT_REDIS }, async (
     await metDeadline(sub.connect(), 8000, 'sub connect');
     await metDeadline(pub.connect(), 8000, 'pub connect');
     const ontvangen = [];
+    /* GEEN wacht(50) MEER TUSSEN SUBSCRIBE EN PUBLISH, en dat is nagelopen.
+
+       Op alle drie de plekken in dit bestand stond hier `await wacht(50)` "om
+       het abonnement te laten landen". Maar `subscribe()` geeft zijn belofte
+       pas terug als redis het SUBSCRIBE-commando heeft BEVESTIGD -- dat is het
+       teken, en het staat er al. Wat er daarna nog tussen zit is de reistijd
+       van het bericht, en daar staat de poll onder deze regel voor. De 50 ms
+       dekten dus niets af wat niet al gedekt was. */
     await metDeadline(sub.subscribe('rtg:kanaal', m => ontvangen.push(m)), 8000, 'subscribe');
-    await wacht(50);
     await pub.publish('rtg:kanaal', JSON.stringify({ hoi: 1 }));
     for (let i = 0; i < 50 && ontvangen.length === 0; i++) await wacht(20);
     assert.strictEqual(ontvangen.length, 1);
@@ -170,8 +177,7 @@ test('kruisvalidatie met de npm-client: beide kanten op', { skip: !HEEFT_REDIS }
   await metDeadline(npmSub.connect(), 8000, 'npmSub connect');
   await metDeadline(mijnPub.connect(), 8000, 'mijnPub connect');
   const naarNpm = [];
-  await npmSub.subscribe('kruis:a', m => naarNpm.push(m));
-  await wacht(50);
+  await npmSub.subscribe('kruis:a', m => naarNpm.push(m));   // bevestigd, zie hierboven
   await mijnPub.publish('kruis:a', 'van-mij');
   for (let i = 0; i < 50 && naarNpm.length === 0; i++) await wacht(20);
   assert.deepStrictEqual(naarNpm, ['van-mij'], 'npm-client ontvangt wat mijn client publiceert');
@@ -182,8 +188,7 @@ test('kruisvalidatie met de npm-client: beide kanten op', { skip: !HEEFT_REDIS }
   await metDeadline(mijnSub.connect(), 8000, 'mijnSub connect');
   await metDeadline(npmPub.connect(), 8000, 'npmPub connect');
   const naarMij = [];
-  await mijnSub.subscribe('kruis:b', m => naarMij.push(m));
-  await wacht(50);
+  await mijnSub.subscribe('kruis:b', m => naarMij.push(m));   // bevestigd, zie hierboven
   await npmPub.publish('kruis:b', 'van-npm');
   for (let i = 0; i < 50 && naarMij.length === 0; i++) await wacht(20);
   assert.deepStrictEqual(naarMij, ['van-npm'], 'mijn client ontvangt wat de npm-client publiceert');
@@ -193,7 +198,11 @@ test('kruisvalidatie met de npm-client: beide kanten op', { skip: !HEEFT_REDIS }
   assert.strictEqual(await metDeadline(mijnPub.get('kruis:sleutel'), 8000, 'mijn get'), 'gedeeld');
 
   } finally {
+    /* GEEN wacht(100) MEER NA HET SLUITEN. sluit() doet `await c.quit()` per
+       client, en quit() geeft zijn belofte pas terug als de verbinding echt
+       dicht is -- dat is het teken. De 100 ms erna waren een vangnet voor een
+       lek dat er niet is; als het er wel was, zou 100 ms het ook niet redden,
+       en dan hoort de toets te hangen zodat iemand het ziet (TAKEN.md 6.10). */
     await sluit(open);
-    await wacht(100); // sockets rustig laten sluiten voor de test eindigt
   }
 });

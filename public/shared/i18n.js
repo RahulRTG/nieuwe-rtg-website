@@ -591,7 +591,7 @@
       .rtg-lang-scrim.open{display:flex;}
       .rtg-lang-card{width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;
         background:linear-gradient(180deg,#141110,#0C0C0B);color:#F5F3EF;border:1px solid rgba(201,162,75,0.22);
-        border-radius:22px;padding:1.2rem 1.3rem 1rem;text-align:center;box-shadow:0 40px 120px rgba(0,0,0,0.6);
+        border-radius:0;padding:1.2rem 1.3rem 1rem;text-align:center;box-shadow:0 40px 120px rgba(0,0,0,0.6);
         font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         animation:rtgLangIn .4s cubic-bezier(.2,.8,.2,1);}
       @keyframes rtgLangIn{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:none;}}
@@ -599,14 +599,14 @@
       .rtg-lang-card h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.55rem;margin:0.1rem 0 0.1rem;letter-spacing:-0.01em;color:#F7F3EC;}
       .rtg-lang-card p{color:#B8B2A8;font-size:0.8rem;margin:0 0 0.85rem;}
       .rtg-lang-ai{display:flex;align-items:center;gap:0.45rem;background:rgba(255,255,255,0.05);
-        border:1px solid rgba(222,219,213,0.16);border-radius:13px;padding:0.1rem 0.1rem 0.1rem 0.9rem;
+        border:1px solid rgba(222,219,213,0.16);border-radius:0;padding:0.1rem 0.1rem 0.1rem 0.9rem;
         margin:0 auto 0.5rem;max-width:520px;width:100%;transition:border-color .18s;}
       .rtg-lang-ai:focus-within{border-color:#C9A24B;}
       .rtg-lang-ai input{flex:1;min-width:0;background:none;border:none;outline:none;color:#F5F3EF;
         font-family:inherit;font-size:0.92rem;padding:0.7rem 0;}
       .rtg-lang-ai input::placeholder{color:#8A8680;}
       .rtg-lang-ai button{flex:none;background:linear-gradient(180deg,#9E1C40,#7F1634);color:#fff;border:none;cursor:pointer;
-        border-radius:10px;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
+        border-radius:0;padding:0.55rem 0.72rem;font-size:1rem;line-height:1;transition:filter .18s,transform .12s;}
       .rtg-lang-ai button:hover{filter:brightness(1.14);}
       .rtg-lang-ai button:active{transform:scale(0.95);}
       #rtg-lang-mic{background:rgba(255,255,255,0.08);}
@@ -614,7 +614,7 @@
       @keyframes rtgMic{0%,100%{box-shadow:0 0 0 0 rgba(194,58,94,0.5);}50%{box-shadow:0 0 0 6px rgba(194,58,94,0);}}
       /* Rahuls voorstel: geen knoppenlijst, maar een enkele aantikbare regel */
       .rtg-lang-hint{display:flex;align-items:center;gap:0.7rem;width:100%;max-width:520px;margin:0.1rem auto 0.2rem;
-        background:rgba(201,162,75,0.08);border:1px solid rgba(201,162,75,0.3);border-radius:13px;
+        background:rgba(201,162,75,0.08);border:1px solid rgba(201,162,75,0.3);border-radius:0;
         padding:0.55rem 0.9rem;cursor:pointer;text-align:left;font-family:inherit;color:#EDE9E2;
         transition:border-color .16s,background .16s,transform .12s;}
       .rtg-lang-hint:hover{border-color:#F5E6B8;background:rgba(201,162,75,0.14);}
@@ -626,9 +626,9 @@
       .rtg-lang-go{font-size:0.66rem;letter-spacing:0.04em;color:#C9A24B;}
       .rtg-lang-mis{color:#8A8680;font-size:0.82rem;}
       .rtg-lang-code{display:inline-block;min-width:1.7rem;font-size:0.6rem;font-weight:700;letter-spacing:0.05em;
-        color:#C9A24B;border:1px solid rgba(201,162,75,0.4);border-radius:6px;padding:0.3rem 0.2rem;text-align:center;}
+        color:#C9A24B;border:1px solid rgba(201,162,75,0.4);border-radius:0;padding:0.3rem 0.2rem;text-align:center;}
       .rtg-lang-switch{position:fixed;left:14px;bottom:14px;z-index:9990;display:inline-flex;align-items:center;gap:0.35rem;
-        background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:999px;
+        background:rgba(12,12,11,0.82);color:#fff;border:1px solid rgba(255,255,255,0.16);border-radius:0;
         padding:0.42rem 0.8rem;font-family:'Inter',-apple-system,sans-serif;font-size:0.72rem;font-weight:600;
         letter-spacing:0.04em;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(0,0,0,0.25);
         transition:background .18s;padding-bottom:calc(0.42rem + env(safe-area-inset-bottom,0));}

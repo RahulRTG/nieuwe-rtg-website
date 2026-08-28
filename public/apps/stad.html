@@ -17,27 +17,27 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:760px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem;margin-top:1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem;margin-top:1rem;}
   .sec{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:1.6rem 0 .3rem;}
-  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#0C0C0B;border:none;border-radius:0;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.85rem;cursor:pointer;}
   .knop:active{transform:scale(.98);}
-  input,select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .6rem;font:inherit;font-size:.9rem;}
+  input,select{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.5rem .6rem;font:inherit;font-size:.9rem;}
   label{font-size:.72rem;color:var(--soft);display:block;margin-bottom:.3rem;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-end;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1rem 0;text-align:center;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.6rem;margin-top:.8rem;}
-  .dom{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .dom{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
   .dom .l{font-size:.68rem;color:var(--soft);text-transform:uppercase;letter-spacing:.1em;}
   .dom .w{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin-top:.2rem;}
   .melding-rij{padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.86rem;line-height:1.5;}
   .melding-rij:last-child{border-bottom:none;}
-  .pil{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;}
-  .toast{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
+  .pil{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.12rem .5rem;}
+  .toast{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
@@ -74,7 +74,11 @@ function toast(t){ const m = $('#toast'); m.textContent = t; m.style.opacity = '
    hij er niet en leek stad.html schoon. De volle scan ving hem alsnog. Dat is
    precies waarom de scan over de ingelogde staat gaat en niet over een
    steekproef. */
-const STAND = { rustig: 'var(--green)', normaal: '#F4F1EC', druk: 'var(--rtg-rood)', stil: 'var(--soft)' };
+/* DE KLEUR STAAT HIER IN EEN INLINE STYLE, en daarmee viel deze kaart buiten
+   elke zoek-vervang op `color:var(--...)`. De tonen zijn nu dezelfde leestokens
+   als overal: ze kiezen per thema een waarde die op die grond leest. */
+const STAND = { rustig: 'var(--rtg-leesgroen,var(--green))', normaal: 'var(--txt)',
+  druk: 'var(--rtg-leesrood,var(--rtg-rood))', stil: 'var(--rtg-leeszacht,var(--soft))' };
 const tijd = ms => { const m = Math.round((Date.now() - ms) / 60000); return m < 1 ? 'zojuist' : m < 60 ? m + ' min geleden' : Math.round(m / 60) + ' u geleden'; };
 
 let B = null;
@@ -96,12 +100,12 @@ function render(){
   $('#app').innerHTML =
     '<div class="kaart"><h2 style="font-size:1.1rem;">' + esc(B.scenario.label) + '</h2>' +
       '<p style="color:var(--muted);font-size:.85rem;margin-top:.3rem;line-height:1.55;">' + esc(B.scenario.uitleg) + '</p>' +
-      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:10px;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
+      (B.alerts.length ? '<div style="margin-top:.7rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.83rem;line-height:1.55;">' + B.alerts.map(a => '' + esc(a.tekst)).join('<br>') + '</div>' : '') +
     '</div>' +
     '<div class="sec">Hoe de stad er nu bij staat</div>' +
     '<div class="grid">' + B.domeinen.map(d =>
       '<div class="dom"><div class="l">' + esc(d.label) + '</div>' +
-      '<div class="w" style="color:' + (STAND[d.stand] || '#F4F1EC') + ';">' +
+      '<div class="w" style="color:' + (STAND[d.stand] || 'var(--txt)') + ';">' +
         (d.waarde == null ? 'stil' : esc(String(d.waarde)) + ' <span style="font-size:.65rem;color:var(--soft);">' + esc(d.eenheid) + '</span>') + '</div>' +
       '<div style="font-size:.72rem;color:var(--soft);margin-top:.15rem;">' + esc(d.stand) +
         (d.ovOnderweg != null ? ' ·  ' + d.ovOnderweg + ' OV onderweg' : '') + '</div></div>').join('') + '</div>' +

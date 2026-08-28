@@ -34,8 +34,8 @@
    over de kern zou die twee wel zien en verandert het gedrag van de opstart, dus
    dat is bewust niet gedaan.
 
-   Draai:  node --experimental-sqlite scripts/kernbron.js
-           RTG_KERNBRON_UIT=/pad/naar.json node --experimental-sqlite scripts/kernbron.js
+   Draai:  node scripts/kernbron.js
+           RTG_KERNBRON_UIT=/pad/naar.json node scripts/kernbron.js
    ========================================================================== */
 'use strict';
 const fs = require('fs');

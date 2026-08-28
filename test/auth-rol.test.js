@@ -1,13 +1,32 @@
-/* Uitputtende auth-scoping-test. Niet een steekproef en geen mooipraterij:
-   deze test leest ELKE leden-route (auth-middleware) rechtstreeks uit de bron
-   en eist dat een leverancier- EN een kantoor-token daar 401 krijgen -- nooit
-   2xx (ongewenste toegang) en nooit 5xx (crash). Zo kan geen enkel nieuw
-   leden-endpoint ongemerkt de rol-scheiding omzeilen.
+/* Auth-scoping over elke leden-route die AAN ZIJN VORM te herkennen is: deze
+   test leest de bron en eist dat een leverancier- EN een kantoor-token 401
+   krijgen -- nooit 2xx (ongewenste toegang) en nooit 5xx (crash).
+
+   HIER STOND "UITPUTTEND", EN DAT WAS HET NIET. De zoektocht herkent een
+   leden-endpoint aan het eerste WOORD na het pad, en dat werkt alleen bij
+   `app.post('/api/x', auth, ...)`. Staat de grendel in de BODY van de handler
+   -- `app.post('/api/bedrijf/rollen', (req, res) => { const g = werkPoort(req,
+   res); if (!g) return; ... })` -- dan valt de route buiten de uitdrukking en
+   dus stilzwijgend buiten deze toets. Gemeten op 18 augustus 2026: 511 van de
+   1885 registraties vielen erbuiten, en zeventig daarvan zijn echte
+   leden-endpoints die hier nooit langs zijn gekomen. Een uitputtende toets die
+   5% mist en dat niet zegt, is geen uitputtende toets maar een geruststelling.
+
+   HET UITPUTTENDE WERK STAAT NU IN scripts/rolronde.js. Die vraagt het niet aan
+   de bron maar aan de SERVER: krijgt een anonieme beller 401 en een echt lid
+   niet, dan IS het een leden-endpoint, hoe zijn grendel er ook uitziet. 1444
+   stuks, met twee ratels eronder (`rolscheidingGaten` en `rolscheidingGemeten`)
+   en een eigen CI-baan, want zo'n ronde duurt minuten.
+
+   DEZE TOETS BLIJFT STAAN, en niet uit sentiment: hij draait in de hoofdsuite
+   bij elke push en is binnen een minuut rond, terwijl de rolronde parallel in
+   een eigen baan zit. Twee snelheden, en de snelle vangt de meeste fouten het
+   eerst. Wat hij NIET meer doet is beweren dat hij alles ziet.
 
    Achtergrond: de chaos-soak (scripts/mega65-storm.js) vond dat de leden-auth
    een niet-leden-sessie (leverancier/kantoor, zonder persona-tier) accepteerde,
    waarna de ledengids crashte -> 500. Deze test dekt die klasse fouten af voor
-   het hele oppervlak. Draai: node --experimental-sqlite --test test/auth-rol.test.js */
+   het hele oppervlak. Draai: node --test test/auth-rol.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

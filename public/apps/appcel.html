@@ -25,7 +25,7 @@
   header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.1rem;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;}
-  .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;
+  .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;
     padding:.42rem .75rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;white-space:nowrap;min-height:2.5rem;
     display:inline-flex;align-items:center;justify-content:center;}
   .knop.aan{background:var(--txt);color:#000;border-color:var(--txt);font-weight:600;}
@@ -37,7 +37,7 @@
   .paneel .binnen{max-width:640px;margin:0 auto;}
   .paneel h2{font-size:1.2rem;margin-bottom:.2rem;}
   .paneel .sub{font-size:.8rem;color:var(--soft);line-height:1.6;margin-bottom:1rem;}
-  .m{border:1px solid var(--line);border-radius:14px;padding:.85rem 1rem;margin-bottom:.6rem;background:var(--card);}
+  .m{border:1px solid var(--line);border-radius:0;padding:.85rem 1rem;margin-bottom:.6rem;background:var(--card);}
   .m label{display:flex;gap:.7rem;align-items:flex-start;cursor:pointer;}
   .m input{margin-top:.25rem;width:1.1rem;height:1.1rem;flex:0 0 auto;accent-color:#C23A5E;}
   .m b{display:block;font-size:.92rem;}
@@ -45,7 +45,7 @@
   .m .nooit{font-size:.76rem;color:var(--soft);line-height:1.55;display:block;margin-top:.3rem;}
   .m .nooit b{display:inline;color:var(--gold);font-weight:600;}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+    border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
   .leeg{color:var(--soft);font-size:.85rem;line-height:1.6;padding:2rem 1.2rem;text-align:center;}
   /* Uit de inline stijlattributen gehaald: die houden style-src-attr in
      de CSP open, en de norm telt ze (scripts/norm.js, inlineStijlAttributen).

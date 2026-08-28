@@ -31,7 +31,7 @@
      dan zegt hij dat -- en verzint hij het niet. */
 module.exports = (kern) => {
   const { app, auth, schoon, anthropic } = kern;
-  const { tekst } = require('../ai');
+  const { tekst } = require('../ai-kort');
 
   const GRENZEN =
     'U OPENT en u stuurt nooit. U mag mogelijkheden toevoegen, nooit afraden, ' +

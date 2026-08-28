@@ -22,7 +22,7 @@
    6. een geparkeerd antwoord blijft OPEN staan, zodat de go-live-keuring erop
       blijft blokkeren. "Ik weet het nog niet" hoort zichtbaar te blijven.
 
-   Draai los: node --experimental-sqlite --test test/papieren-boardroom.test.js
+   Draai los: node --test test/papieren-boardroom.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -169,4 +169,59 @@ test('8. het document toont zijn eigen gaten in plaats van ze te verbergen', asy
   assert.ok(d.body.tekst && d.body.tekst.length > 100, 'er komt echte tekst terug');
   assert.ok(typeof d.body.gaten === 'number' && d.body.gaten > 0,
     'en het telt zijn eigen openstaande plekken -- een register dat zijn gaten verbergt is gevaarlijker dan een register met gaten');
+});
+
+test('9. beide werkwoorden geven hetzelfde papier: vier methoden die nog nooit waren aangeraakt', async () => {
+  /* WAAROM DEZE TOETS ERBIJ MOEST. Op deze vier paden hangen GET én POST, en
+     routes/papieren-deur.js zegt met zoveel woorden waarom: "Dezelfde stand via
+     POST. De boardroom praat overal met POST + Bearer; een GET zou daar de enige
+     uitzondering zijn." Dat is een belofte over twee werkwoorden, en tot deze
+     ronde was er per pad maar één van de twee ooit aangeroepen -- de
+     dekkingsmeting telde per PAD, dus de andere lifte gratis mee:
+
+       GET  /api/office/papieren            (alleen de POST was beproefd)
+       GET  /api/office/papieren/document   (idem)
+       POST /api/techniek/papieren          (alleen de GET was beproefd)
+       POST /api/techniek/papieren/document (idem)
+
+     Haal een van de acht registratieregels weg en er verandert niets zichtbaars
+     -- behalve dat de helft van de bellers een 404 krijgt. Deze toets legt de
+     belofte vast in plaats van de statuscode: de twee werkwoorden horen HETZELFDE
+     antwoord te geven. */
+  const tech = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body.token;
+  assert.ok(tech, 'de eigenaar komt op het techniekbord');
+  const viaGet = (pad, token) => fetch(base + pad, { headers: { Authorization: 'Bearer ' + token } })
+    .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+  /* De stand wisselt niet tussen twee aanroepen (papieren.overzicht() leest de
+     database), dus mogen de twee antwoorden echt vergeleken worden. `volgende`
+     hoort er bij te zitten: dat is het veld waar het bord op leunt. */
+  const kantoorPost = await api('/api/office/papieren', {}, baas);
+  const kantoorGet = await viaGet('/api/office/papieren', baas);
+  assert.equal(kantoorGet.status, 200, 'GET op het kantoorpapierwerk: ' + kantoorGet.status);
+  assert.deepEqual(kantoorGet.body, kantoorPost.body, 'GET en POST geven dezelfde stand');
+  assert.ok(kantoorGet.body.regels && kantoorGet.body.regels.length, 'en het is een echte stand, geen leeg object');
+
+  const bordPost = await api('/api/techniek/papieren', {}, tech);
+  const bordGet = await viaGet('/api/techniek/papieren', tech);
+  assert.equal(bordPost.status, 200, 'POST op het techniekbord: ' + bordPost.status);
+  assert.deepEqual(bordPost.body, bordGet.body, 'ook daar geven beide werkwoorden hetzelfde');
+  assert.deepEqual(bordPost.body.regels, kantoorPost.body.regels,
+    'en het blijft EEN administratie, langs welk werkwoord en welke deur je ook binnenkomt');
+
+  /* Het document langs alle vier de ingangen. De naam komt uit de lijst en niet
+     uit een verzonnen string: een typefout zou hier vier keer 404 geven en dan
+     zou de toets alleen bewijzen dat 404 bestaat. */
+  const naam = (await api('/api/office/papieren/documenten', {}, baas)).body.documenten[0].naam;
+  const docs = [
+    ['office POST', await api('/api/office/papieren/document', { naam }, baas)],
+    ['office GET', await viaGet('/api/office/papieren/document?naam=' + encodeURIComponent(naam), baas)],
+    ['techniek POST', await api('/api/techniek/papieren/document', { naam }, tech)],
+    ['techniek GET', await viaGet('/api/techniek/papieren/document?naam=' + encodeURIComponent(naam), tech)]
+  ];
+  for (const [wie, r] of docs) {
+    assert.equal(r.status, 200, wie + ' geeft het document: ' + r.status);
+    assert.deepEqual(r.body, docs[0][1].body, wie + ' geeft hetzelfde document als de eerste ingang');
+  }
+  assert.ok(docs[0][1].body.tekst.length > 100, 'en er staat echt tekst in');
 });

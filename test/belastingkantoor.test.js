@@ -1,7 +1,7 @@
 /* Het Belastingkantoor (kern/overheid/kantoor.js): de inspecteurscockpit met
    invordering via de Berichtenbox, het btw-beeld uit de facturatiemotor + KVK,
    de slimme signalen en de AI-chef-inspecteur. Alleen voor het rijk. Draai los:
-   node --experimental-sqlite --test test/belastingkantoor.test.js */
+   node --test test/belastingkantoor.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

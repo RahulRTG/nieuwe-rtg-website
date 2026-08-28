@@ -87,11 +87,13 @@ module.exports = ({ save }) => {
     }
 
     const voor = persistentieStand();
+    let alGelijk = false;
     if (STORE === 'sqlite') {
       /* force: sla de goedkope voorcheck over, die kan een gelijk gebleven
          collectiegrootte overslaan. Daarna de WAL dichtvouwen, zodat de
          wijziging niet alleen in het journaal staat. */
-      sqlite.saveSqlite(true);
+      const uit = sqlite.saveSqlite(true);
+      alGelijk = !!(uit && uit.alGelijk);
       sqlite.checkpointSqlite();
     } else if (STORE === 'json') {
       schrijfSnapshotNu();               // schrijft via schrijfDuurzaam(): fsync + rename
@@ -105,7 +107,14 @@ module.exports = ({ save }) => {
        transactie laten mislukken -- dat brak eerder vier geldtoetsen -- maar mag
        evenmin doorgaan voor bewijs. */
     const bevestigbaar = voor !== null && na !== null;
-    const bevestigd = bevestigbaar && na > voor;
+    /* `alGelijk` is de derde stand naast opgelopen en blijven staan: de opslag
+       had niets te schrijven omdat wat in het geheugen staat er al stond. Dat
+       IS duurzaam -- geheugen en schijf zijn gelijk -- maar het laat de teller
+       staan en las daardoor als verlies. Een weigering die eerst iets vastzette
+       en het weer losliet, kwam zo als 500 terug in plaats van als haar eigen
+       402. Alleen de opslag zelf mag dit zeggen; afleiden uit een gelijke
+       teller zou echt verlies meedekken. */
+    const bevestigd = bevestigbaar && (na > voor || alGelijk);
 
     /* STERF-NA-COMMIT. Het gemeenste moment dat er bestaat, en het is hier
        eenduidig aan te wijzen: de schrijfactie is duurzaam, de aanroeper heeft

@@ -1,7 +1,7 @@
 /* Integratietests voor de eigen app per pas: inloggegevens werken echt alleen
    in de app van de eigen pas (pasApp). De gratis laag heeft geen eigen app en
    speelt mee in de RTG-app; de brede leden-app (zonder pasApp) laat elke pas
-   toe. Draai los: node --experimental-sqlite --test test/pas-apps.test.js */
+   toe. Draai los: node --test test/pas-apps.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

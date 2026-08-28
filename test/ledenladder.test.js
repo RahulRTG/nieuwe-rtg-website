@@ -129,7 +129,9 @@ test('de pas wordt door een MENS verleend, en dan gaan alle twaalf apps echt ope
   /* ---- 3. HET BESLUIT, door een herleidbaar mens. ---- */
   const mens = await kantoorAlsPersoon(BASE);
   assert.ok(mens, 'er is een herleidbaar mens in de backoffice');
-  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, mens);
+  /* `contractEuro` hoort erbij sinds de ladder: een contractuele pas heeft geen
+     lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd. */
+  const besluit = await post('/api/aanmelding/beslis', { id, besluit: 'geaccepteerd', contractEuro: 20000 }, mens);
   assert.equal(besluit.status, 200, 'het mens beslist: ' + JSON.stringify(besluit.body).slice(0, 200));
   assert.equal(besluit.body.aanmelding.status, 'geaccepteerd', 'de aanmelding staat op geaccepteerd');
 

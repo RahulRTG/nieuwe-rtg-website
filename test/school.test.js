@@ -2,7 +2,7 @@
    klas maken en koppelen, rooster, huiswerk (afvinken), cijfers (afgeschermd per
    gezin), mededelingen, ziekmelden in één tik en de gezinsbrede berichtendraad
    met de leraar. Draait tegen een echte server in een tijdelijke datamap.
-   Draai los: node --experimental-sqlite --test test/school.test.js */
+   Draai los: node --test test/school.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -38,7 +38,21 @@ async function keurSchoolGoed(schoolCode) {
 }
 
 test.before(async () => {
-  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' }, wachtPad: '/api/foundation/health' }));
+  /* RTG_GEZIN_REM_UIT: opzet() hierboven bouwt per toets een complete keten
+     school -> leraar -> klas -> gezin, en wordt elf keer aangeroepen. /gezin/maak
+     staat acht nieuwe gezinnen per adres per half uur toe ('hooguit 8 nieuwe
+     gezinnen per adres per half uur', server/foundation/gezin.js) -- een
+     misbruikgrens, geen storing: een echt huishouden maakt er geen negen in
+     dertig minuten. Vanaf de negende kreeg deze toets 429.
+
+     Die rem stond vroeger uit zodra NODE_ENV=test, dus voor ELKE toets en ook
+     voor de rem op het RADEN van een gezinscode -- die daardoor nergens bewezen
+     werd (server/foundation/rem.js legt uit waarom dat erger is dan het klinkt).
+     Nu staat hij standaard aan en zet een toets hem uitdrukkelijk uit als hij
+     hem in de weg zit. Dit is zo'n toets, en dit is de reden. */
+  ({ child, base: BASE } = await startServer({
+    env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_GEZIN_REM_UIT: '1' },
+    wachtPad: '/api/foundation/health' }));
 });
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}

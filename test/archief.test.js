@@ -2,7 +2,7 @@
    naar append-only maandbestanden. De levende kast blijft klein, maar niets
    raakt zoek: de backoffice-totalen tellen het archief mee en de boekhoud-
    export leest het gewoon terug. Open of recente tickets blijven levend.
-   Draai: node --experimental-sqlite --test test/archief.test.js */
+   Draai: node --test test/archief.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -27,7 +27,7 @@ const ORDER = (ref, at, status) => ({
 });
 
 function boot() {
-  child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  child = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     // deze test seedt en leest het rauwe db.json en test dus bewust de JSON-opslag
     env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, RTG_STORE: 'json', NODE_ENV: 'test', RTG_DEMO: '1', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
     stdio: ['ignore', 'ignore', 'inherit']
@@ -62,7 +62,11 @@ test.before(async () => {
   BASE = 'http://127.0.0.1:' + PORT;
   // 1) een verse kast maken, dan drie soorten tickets erin leggen
   await boot();
-  await new Promise(r => setTimeout(r, 500));
+  /* GEEN 500 ms MEER VOOR HET STOPPEN. stop() is `child.kill('SIGTERM')` met
+     `child.once('exit', ...)` erbij (zie boven), en op SIGTERM spoelt de server
+     zijn snapshot voordat hij afsluit (server/db/snapshot.js). Wachten tot het
+     proces weg is IS dus wachten tot alles op schijf staat; de halve seconde
+     ervoor voegde daar niets aan toe. */
   await stop();
   const DB = path.join(TMP, 'db.json');
   const data = JSON.parse(fs.readFileSync(DB, 'utf8'));

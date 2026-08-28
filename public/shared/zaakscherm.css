@@ -15,20 +15,36 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
 h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
+/* DE TWEEDE STOP VAN DIT VERLOOP WAS HARD BIJNA-ZWART, en dat is dezelfde fout
+   als hierboven, alleen in een verloop: `var(--bg)` themaat mee en
+   `rgba(12,12,11,.92)` niet. Onder champagne loopt deze kopbalk dus van
+   parelmoer naar bijna-zwart, terwijl de tekst erin de champagne-inkt houdt.
+   color-mix zegt precies wat er stond -- de eigen grond op 92% dekking -- maar
+   dan in welk materiaal de grond ook is. Op onyx komt er exact dezelfde kleur
+   uit -- rgb(12,12,11) op 86% -- alleen schrijft de browser hem als
+   color(srgb ...) in plaats van rgba(). Nagerekend in een browser, want een
+   vertaling die je niet naleest is een aanname. Dezelfde vertaling staat op 89
+   plekken in het huis; twee daarvan vond test/thema.test.js nadat ik ze met de
+   hand had gemist. */
+header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 92%,transparent));
   backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
   border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
 header h1{font-size:1.15rem;}
 header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
 main{padding:1rem 1.1rem;max-width:920px;margin:0 auto;}
-.kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem;margin-bottom:.8rem;}
-.kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .5rem;}
-.stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
+.kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
+.kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:0 0 .5rem;}
+/* 4,85:1 EN NIET var(--soft). Deze regel draagt op een zaakscherm de bedragen
+   en de toelichting ernaast, en stond op de kaartgrond (rgb(42,40,39)) op
+   4,14:1 -- 41 van de 43 bevindingen van de zaakronde kwamen hieruit. De
+   gedempte huistoon is berekend tegen de ERGSTE grond van het materiaal, en
+   een kaart is lichter dan die grond; daar houdt de garantie op. */
+.stil{color:#9B938C;font-size:.82rem;line-height:1.55;}
 .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
-.veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+.veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.86rem;padding:.55rem .7rem;min-width:0;flex:1;}
-.knop{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+.knop{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
   font:inherit;font-size:.8rem;font-weight:600;padding:.5rem .85rem;cursor:pointer;}
 .knop.p{background:var(--burgundy);border-color:transparent;color:#fff;}
 a.knop{display:inline-block;text-decoration:none;}
@@ -39,7 +55,7 @@ a.knop{display:inline-block;text-decoration:none;}
 .tabs button[aria-selected="true"]{border-color:var(--gold);color:#fff;}
 .item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:.55rem 0;flex-wrap:wrap;}
 .item:first-of-type{border-top:0;}
-.tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
+.tag{font-size:.66rem;border:1px solid var(--line);border-radius:0;padding:.12rem .5rem;color:var(--muted);}
 .tag.aan{color:var(--goed);border-color:var(--goed);}
 .tag.laat{color:var(--laat);border-color:var(--laat);}
 /* Een verzoek dat te lang open staat. Het accent staat links en niet als
@@ -76,16 +92,16 @@ a.knop{display:inline-block;text-decoration:none;}
 /* En twee die juist WEL groeien. */
 .z-g11{flex:1 1 11rem;}
 .z-g14{flex:1 1 14rem;}
-.bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
+.bon{background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;margin-bottom:.5rem;}
 .bon b{font-size:.95rem;}
-.allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;
+.allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:0;
   padding:.05rem .4rem;font-size:.72rem;font-weight:700;margin-left:.3rem;}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.55rem;margin-bottom:.8rem;}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.7rem .8rem;}
 .kpi b{display:block;font-family:'Bodoni Moda',serif;font-size:1.5rem;font-weight:500;}
 .kpi span{font-size:.68rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
 .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-  border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+  border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
   opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;max-width:90vw;}
 .melding.zie{opacity:1;}
 [hidden]{display:none !important;}

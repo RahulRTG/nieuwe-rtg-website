@@ -130,7 +130,7 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
     if (!datum && aiAan && anthropic) {
       try {
         const sys = 'Je zet een afspraak om in JSON. Antwoord ALLEEN met een JSON-object {"titel":"...","datum":"YYYY-MM-DD","tijd":"HH:MM of null"}. Vandaag is ' + vandaagStr() + '. Reken relatieve dagen (morgen, volgende week) uit naar een datum.';
-        const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 200, system: sys, messages: [{ role: 'user', content: opdracht }] });
+        const r = await anthropic.messages.create({ model: 'claude-haiku-4-5', max_tokens: 200, system: sys, messages: [{ role: 'user', content: opdracht }] });
         const tekst = (r && r.content && r.content[0] && r.content[0].text || '');
         const jm = tekst.match(/\{[\s\S]*\}/);
         if (jm) {

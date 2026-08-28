@@ -19,10 +19,10 @@
      pestgrens
      foodcourt
      reisbureau
+     reisaanbod
      logies
      uitgaan
-     gemeente
-     overheid */
+     (./kernlaag2b: instelling, gemeente, overheid) */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -133,31 +133,18 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
    bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
    kernlaag7) en optioneel. */
-Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic,
+Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
   visumtaakVan: () => kern.visumtaak }));
+/* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de
+   bak die het reisbureau hierboven leest. Waarom die schrijver moest bestaan
+   staat in de kop daar; de balie zit in routes/kantoren/reizen.js. */
+Object.assign(kern, require('../kern/reisaanbod').maakReisaanbod({ db, save, crypto }));
 /* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
    op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */
 Object.assign(kern, require('../kern/logies').maakLogies({ db }));
 /* De losse uitgaan-pagina (kern/uitgaan.js): bars, clubs en beachclubs met hun
    avonden; aanmelden loopt via /api/event/rsvp. */
 Object.assign(kern, require('../kern/uitgaan').maakUitgaan({ db, save, crypto }));
-/* RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre.
-   Vier pijlers (meldingen openbare ruimte, burgerzaken/afspraken, vergunningen,
-   afval/belasting/bestuur) voor inwoners, gemeente-medewerkers en partners. */
-Object.assign(kern, require('../kern/gemeente').maakGemeente({ db, save, crypto, anthropic,
-  findSupplier, notify, notifySupplier, sseToSupplier, weefsel: kern.weefsel }));
-// de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
-// medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
-kern.gemeente.seed();
-/* De Overheid (kern/overheid/): Berichtenbox, Belastingdienst, RDW, KVK,
-   sociale zekerheid en een referendum. */
-// de bank gaat LAAT (komt pas in kernlaag4b); zie kern/overheid/naheffing-betalen.js
-Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto, anthropic,
-  findSupplier, notify, notifySupplier, sseToSupplier,
-  bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
-  bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i) }));
-kern.overheid.seed();
-// de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
-// kenteken-check op een huurauto de APK-status teruggeeft
-kern.overheid.registreerVloot();
+// De instellingen en hun werelden staan in ./kernlaag2b.js -- zie de kop daar.
+require('./kernlaag2b')(kern, hulp);
 };

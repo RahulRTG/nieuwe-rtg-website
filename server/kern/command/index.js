@@ -69,7 +69,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
      de naad lag er al, want dit zijn allemaal dingen die de ruggengraat
      GEBRUIKEN en die de ruggengraat zelf niet nodig heeft. */
   const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern, opslag });
-  const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
+  const { mdm, landpakket, apipoort, overname, zandbak, canary, uitrolregie, stadstart } = lagen;
 
   /* DE MEETKANT VAN NIVEAU 5, sinds de gezondheidskaart een eigen bestand: de
      sonde, de servicedoelen, het alarm, de kaart die ze naast elkaar legt en
@@ -121,7 +121,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
     gezondheid, incident, bijstand }).start;
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid, transactie, incident, tijdlijn, bijstand, vlootbeeld,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, uitrolregie, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm, gezondheid, transactie, incident, tijdlijn, bijstand, vlootbeeld,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

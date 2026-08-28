@@ -18,8 +18,16 @@
     return (s.items || []).concat(s.gedeeld || []).find(function (x) { return x.id === id; }) || null;
   }
   function toon(id) {
-    open = vind(id);
-    if (!open) return;
+    /* EERST ZOEKEN, DAN PAS ZETTEN. Hier stond `open = vind(id); if (!open) return;`
+       -- en dat wist de staat van een paneel dat gewoon openstond zodra vind()
+       even niets vond (de lijst wordt herladen, en dan is stand().items een tel
+       lang leeg). Het scherm bleef open, `open` werd null, en de voorvertoning
+       die onderweg was zag `!open` en hield op: een tekstbestand opende zonder
+       ooit zijn inhoud te tonen. Een mislukte opzoeking hoort niets kapot te
+       maken; hij hoort niets te doen. */
+    var gevonden = vind(id);
+    if (!gevonden) return;
+    open = gevonden;
     $('#bkNaam').value = open.naam;
     $('#bkNaam').readOnly = !open.vanMij;
     $('#bkMeta').textContent = (open.mime || '') + ' · ' + B().maat(open.bytes) +
@@ -149,6 +157,15 @@
     });
   });
   function dicht() { $('#bkScrim').classList.remove('open'); open = null; }
+  /* WIE ER OPENSTAAT, LEESBAAR VAN BUITEN. De adaptieve laag (apps/bestanden/
+     adaptief.js) heeft het bestand zelf nodig -- niet om er iets mee te doen,
+     maar om te weten welk gewicht de handelingen hier hebben: een bestand naar
+     de prullenbak is terug te draaien, een bestand dat er al in ligt niet.
+
+     Alleen LEZEN. Wie hier ooit een setter bijzet, geeft twee lagen de
+     mogelijkheid te bepalen welk bestand openstaat, en dan is de vraag welke van
+     de twee gelijk heeft. */
+  window.RTGBestandenPaneel = { open: function () { return open; } };
   $('#bkDicht').addEventListener('click', dicht);
 
   /* Meenemen: de kluis geeft zijn EIGEN model mee (naam, map, grootte, soort,

@@ -1,7 +1,7 @@
 /* Het clubdorp: bars, clubs en beachclubs krijgen dezelfde afdelingen-motor
    als het hotel, maar met de eigen afdelingen van de nachtzaak: van de deur
    en de garderobe tot promo, inkoop en het kantoor. Draai los:
-   node --experimental-sqlite --test test/clubdorp.test.js */
+   node --test test/clubdorp.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

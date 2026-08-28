@@ -9,11 +9,42 @@ const { DOELEN } = require('../kern/leerstof');
 const { opgave } = require('../kern/leerstof-gen');
 
 const SOORTEN = { so: 'SO', mo: 'MO (mondeling)', proefwerk: 'Proefwerk', examen: 'Examen' };
-const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 const voorstel = (goed, totaal) => Math.round((1 + 9 * (goed / Math.max(1, totaal))) * 10) / 10;
 
 module.exports = (sctx) => {
-  const { router, save, rid, nu, schoon, eigenVeld, K, klasVan, gezinSessie, leerlingVan } = sctx;
+  const { router, save, rid, nu, schoon, eigenVeld, K, klasVan, onderwijs, rtfHandle } = sctx;
+
+  /* PROOF OF LEARNING, de brug tussen school en leerpaspoort.
+
+     Tot nu toe landde een becijferde toets alleen in het cijferboek van de
+     klas. Het leerpaspoort van het kind -- het ding dat een leven meegaat --
+     wist er niets van, terwijl een toets op een leerdoel juist het sterkste
+     bewijs is dat er bestaat: iemand anders heeft het gezien.
+
+     Drie voorwaarden, en bij elke die niet klopt gebeurt er niets:
+     - de leerling hangt aan een gezinsprofiel (een administratief geplaatste
+       leerling zonder profiel heeft geen paspoort);
+     - de onderwijskern is er (bij het opstarten nog niet: dan overslaan);
+     - de leerling heeft dat leerdoel in de toets ook echt goed gemaakt. Een
+       toets die je fout maakt, is geen bewijs dat je het kunt. */
+  function bewijsNaarPaspoort(k, sleutel, t, w, door) {
+    const kern = typeof onderwijs === 'function' ? onderwijs() : null;
+    if (!kern || !rtfHandle) return 0;
+    const l = (k.leerlingen || []).find(x => x.sleutel === sleutel);
+    if (!l || !l.gezinCode || !l.profielId) return 0;
+    const handle = rtfHandle(l.gezinCode, l.profielId);
+    let n = 0;
+    for (const doel of t.doelen) {
+      const goed = (w.perDoel || {})[doel] || 0;
+      // per leerdoel staan er t.perDoel vragen; de helft goed is te weinig bewijs
+      if (goed < Math.ceil(t.perDoel * 0.6)) continue;
+      const uit = kern.doelBehaald(handle, { doel, fase: k.fase || null,
+        bewijs: { soort: 'toets', detail: SOORTEN[t.soort] + ' "' + t.naam + '": ' + goed + ' van ' + t.perDoel + ' goed', door } },
+        { vanSchool: true });
+      if (uit && uit.ok) n++;
+    }
+    return n;
+  }
 
   const toetsenVan = k => { if (!Array.isArray(k.toetsen)) k.toetsen = []; return k.toetsen; };
   const maakWerk = (t) => {
@@ -37,11 +68,15 @@ module.exports = (sctx) => {
     const t = { id: rid(5), soort, naam: schoon(req.body.naam, 80) || (SOORTEN[soort] + ' ' + DOELEN[doelen[0]].naam),
       vak: schoon(req.body.vak, 40) || DOELEN[doelen[0]].vak, doelen, perDoel,
       weging: Math.min(10, Math.max(1, Number(req.body.weging) || (soort === 'examen' ? 3 : soort === 'proefwerk' ? 2 : 1))),
+      /* De dag waarop hij wordt afgenomen. Optioneel, want een SO kan ook
+         "gewoon een keer" zijn -- maar zonder dag telt hij niet mee in de week
+         van de leerling, en juist daar hoort een proefwerk te wegen. */
+      datum: schoon(req.body.datum, 10) || null,
       status: 'open', werk: {}, at: nu() };
     toetsenVan(k).unshift(t); k.toetsen = k.toetsen.slice(0, 200);
     save();
     res.json({ ok: true, toets: { id: t.id, soort: t.soort, naam: t.naam, vak: t.vak, weging: t.weging,
-      doelen: doelen.map(d => ({ id: d, naam: DOELEN[d].naam })), vragen: doelen.length * perDoel } });
+      datum: t.datum, doelen: doelen.map(d => ({ id: d, naam: DOELEN[d].naam })), vragen: doelen.length * perDoel } });
   });
 
   router.post('/school/toets/lijst', (req, res) => {
@@ -100,62 +135,18 @@ module.exports = (sctx) => {
       weging: t.weging, omschrijving: t.naam + ' (' + SOORTEN[t.soort] + ')', at: nu() };
     k.cijfers.unshift(c); k.cijfers = k.cijfers.slice(0, 2000);
     w.becijferd = true; save();
-    res.json({ ok: true, cijfer: c, voorstelWas: voorstel(w.goed, w.vragen.length) });
+    const naarPaspoort = bewijsNaarPaspoort(k, String(req.body.leerling), t, w, k.leraar || 'de leraar');
+    res.json({ ok: true, cijfer: c, voorstelWas: voorstel(w.goed, w.vragen.length),
+      bewijs: naarPaspoort
+        ? naarPaspoort + ' leerdoel(en) kregen bewijs in het leerpaspoort van deze leerling.'
+        : 'Geen bewijs naar het leerpaspoort: de leerdoelen zijn onvoldoende gemaakt, of deze leerling heeft geen eigen profiel.' });
   });
 
-  /* ---------- leerling: toetsen zien, maken, nagekeken worden ---------- */
-  router.post('/school/toets/voor-mij', (req, res) => {
-    const s = gezinSessie(req, res); if (!s) return;
-    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
-    if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
-    const profielId = s.beheerder && req.body.profielId ? String(req.body.profielId) : s.p.id;
-    const l = leerlingVan(k, s.g, profielId);
-    if (!l) return res.status(403).json({ error: 'Dit kind zit niet in deze klas.' });
-    res.json({ ok: true, toetsen: toetsenVan(k).filter(t => t.soort !== 'mo').map(t => {
-      const w = t.werk[l.sleutel];
-      return { id: t.id, soort: t.soort, naam: t.naam, vak: t.vak, status: t.status,
-        vragen: t.doelen.length * t.perDoel, bezig: !!(w && !w.klaar), klaar: !!(w && w.klaar),
-        uitslag: w && w.klaar ? { goed: w.goed, totaal: w.vragen.length } : null };
-    }) });
-  });
-
-  router.post('/school/toets/start', (req, res) => {
-    const s = gezinSessie(req, res); if (!s) return;
-    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
-    if (!k) return res.status(404).json({ error: 'Klas niet gevonden.' });
-    const l = leerlingVan(k, s.g, s.p.id);
-    if (!l) return res.status(403).json({ error: 'Je zit niet in deze klas.' });
-    const t = toetsenVan(k).find(x => x.id === String(req.body.toetsId || ''));
-    if (!t || t.soort === 'mo') return res.status(404).json({ error: 'Toets niet gevonden.' });
-    if (t.status !== 'open') return res.status(400).json({ error: 'Deze toets is gesloten.' });
-    if (t.werk[l.sleutel] && t.werk[l.sleutel].klaar) return res.status(409).json({ error: 'Je hebt deze toets al gemaakt.' });
-    if (!t.werk[l.sleutel]) t.werk[l.sleutel] = maakWerk(t);
-    const w = t.werk[l.sleutel]; save();
-    const v = w.vragen[w.ix];
-    res.json({ ok: true, naam: t.naam, nr: w.ix + 1, totaal: w.vragen.length, vraag: v.v, opties: v.opties });
-  });
-
-  router.post('/school/toets/antwoord', (req, res) => {
-    const s = gezinSessie(req, res); if (!s) return;
-    const k = eigenVeld(K(), String(req.body.klasCode || '').trim().toUpperCase());
-    const l = k && leerlingVan(k, s.g, s.p.id);
-    const t = k && toetsenVan(k).find(x => x.id === String(req.body.toetsId || ''));
-    const w = t && l && t.werk[l.sleutel];
-    if (!w || w.klaar) return res.status(400).json({ error: 'Start deze toets eerst.' });
-    const vraag = w.vragen[w.ix];
-    const goed = norm(req.body.antwoord) === norm(vraag.a);
-    if (goed) { w.goed += 1; w.perDoel[vraag.doel] = (w.perDoel[vraag.doel] || 0) + 1; }
-    w.ix += 1;
-    const klaar = w.ix >= w.vragen.length;
-    if (klaar) w.klaar = true;
-    save();
-    // anders dan bij het oefenen GEEN goed/fout per vraag: een toets kijk je
-    // na het inleveren na, niet halverwege
-    const uit = { ok: true, nr: w.ix, totaal: w.vragen.length, klaar };
-    if (klaar) { uit.aantalGoed = w.goed; uit.bericht = 'Ingeleverd. Je leraar kijkt naar de uitslag en geeft het cijfer.'; }
-    else { const vv = w.vragen[w.ix]; uit.vraag = vv.v; uit.opties = vv.opties; }
-    res.json(uit);
-  });
+  /* De kant van de LEERLING (toets zien, maken, inleveren) woont in
+     ./toets-leerling.js: dezelfde toetsen, maar een andere poort (gezins-
+     sessie in plaats van klasCode) en een andere belofte -- een leerling ziet
+     tijdens het maken nooit goed of fout. */
+  require('./toets-leerling')(sctx, { toetsenVan, maakWerk });
 
   // de leerdoelen-bibliotheek voor het maak-scherm woont in ./toetsbieb.js
 };

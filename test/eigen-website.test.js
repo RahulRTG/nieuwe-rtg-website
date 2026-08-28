@@ -27,7 +27,7 @@
    tekent en nooit met innerHTML is een eigenschap van het scherm, en die
    hoort in een schermtoets thuis, niet hier.
 
-   Draai los: node --experimental-sqlite --test test/eigen-website.test.js
+   Draai los: node --test test/eigen-website.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

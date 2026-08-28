@@ -1,23 +1,48 @@
 /* Fiscaal (deelmodule): het dagrapport (Z-rapport) en de shift-samenvatting
    van een zaak. Krijgt de gedeelde context een keer bij het opstarten vanuit
-   maakFiscaal in kern/fiscaal.js. */
+   maakFiscaal in kern/fiscaal.js.
+
+   TWEE DINGEN ZIJN HIER RECHTGEZET, en ze hangen samen.
+
+   1. DE CATEGORIE KWAM UIT EEN EIGEN KOPIE. Dit bestand had zijn eigen
+      `basisCat`: alles zonder kamers of ritten werd 'eten'. Dat is precies de
+      regel die ./tarief.js kwam opheffen -- een kledingwinkel rekende daardoor
+      het verlaagde tarief over een jas, en zijn Z-rapport zei iets anders dan
+      zijn maandboekhouding en zijn factuur over dezelfde verkoop. Dat is
+      LAT.md regel 4, en het was de DERDE kopie. Nu vraagt hij het aan dezelfde
+      routine als de rest.
+
+      GEVOLG: voor een zaak zonder kaart, kamers of ritten verandert het
+      Z-rapport van het lage naar het standaardtarief. Dat cijfer hoort te
+      veranderen -- het stond fout.
+
+   2. HET TARIEF KWAM UIT DE LOPENDE TABEL. Een Z-rapport is de afsluiting van
+      EEN DAG, en die dag ligt vaak in het verleden. Het tarief van vandaag
+      erop loslaten laat een afgesloten dag zichzelf herschrijven zodra de
+      Regelwacht iets bijwerkt. Nu vraagt hij de regels van DIE DAG
+      (./regelbron.js) en stempelt erbij waar ze vandaan kwamen. */
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 const tarief = require('./tarief');
 module.exports = (ctx) => {
   const { db, centen, btwSplit, financeVoor } = ctx;
+  /* De regelbron komt uit maakFiscaal; zonder jaargangen valt hij netjes terug
+     op de lopende tabel en zegt dat ook in de stempel. */
+  const regelbron = ctx.regelbron || require('./regelbron')(null);
   const ordersVoor = typeof ctx.ordersVanZaak === 'function'
     ? ctx.ordersVanZaak
     : code => (db.data.orders || []).filter(o => o.supplierCode === code);
   function dagrapport(s, datum) {
     const dag = /^\d{4}-\d{2}-\d{2}$/.test(String(datum || '')) ? String(datum) : new Date().toISOString().slice(0, 10);
     const opDag = iso => String(iso || '').slice(0, 10) === dag;
-    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
-    const L = LANDEN[landCode];
     /* DE DERDE KOPIE VAN DEZELFDE BESLISSING, en hij was de laatste die nog
        naar de niet-bestaande cap `rooms` keek. ./tarief.js is er juist gekomen
        omdat de boekhouding en de factuur uiteenliepen (zie de kop daar); dit
-       Z-rapport stond er met de hand naast en liep dus mee de mist in. Nu vraagt
-       ook het dagrapport het daar, en kan het niet meer afwijken. */
+       Z-rapport stond er met de hand naast en liep dus mee de mist in. Twee
+       sessies repareerden dit dezelfde dag: de een liet ook het LAND door
+       tarief.js bepalen (landVan), de ander de categorie. Allebei gehouden --
+       er staat hier geen eigen kopie van een fiscale beslissing meer. */
+    const landCode = tarief.landVan(s);
+    // de categorie uit DEZELFDE routine als de boekhouding en de factuur
     const basisCat = tarief.basisCat(s, db.capsVan(s));
     const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const potten = {};
@@ -39,15 +64,16 @@ module.exports = (ctx) => {
       omzet += v.total || 0;
       const m = v.method || 'contant';
       betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
-      if (m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening: de btw loopt via de hoofdboeking
+      if (v.omzetElders || m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening (of een bundelbon): de btw loopt via de hoofdboeking
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }
-    const btw = Object.entries(potten).map(([cat, o2]) => {
-      const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
-      return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, t) };
-    }).sort((a, b) => b.omzet - a.omzet);
-    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw };
+    // het tarief van DIE DAG, niet dat van vandaag
+    const btw = Object.entries(potten).map(([cat, o2]) =>
+      ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(o2, regelbron.tariefOp(landCode, cat, dag)) }))
+      .sort((a, b) => b.omzet - a.omzet);
+    return { ok: true, datum: dag, land: landCode, bonnen, omzet: centen(omzet), fooien: centen(fooien), betaalwijzen, btw,
+      regelstand: regelbron.stempel(landCode, dag) };
   }
 
   /* De shift-samenvatting: het avondbriefing-moment in een kaart. De cijfers

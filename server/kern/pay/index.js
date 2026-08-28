@@ -24,7 +24,9 @@
    Connect / Adyen for Platforms): zij houden het geld, dit grootboek blijft
    de waarheid over wie wat heeft. De naad (server/betaal.js) is er al. Dit is
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
-   de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
+   de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa,
+   het tegoed dat een lid voor een ander koopt in ./tegoed, en het afrekenen
+   met een zaak in ./zaakbetaling. */
 
 module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde, accounts }) => {
   /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
@@ -44,7 +46,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      bedragen -- staat in ./stand.js. Een keer bepaald bij het opstarten, en
      daarna onveranderlijk; alles hieronder werkt per boeking. */
   const { betalingenUit, uitFout, schaduw, motorklant, geldModus,
-    MIN_CENTEN, MAX_CENTEN, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
+    MIN_CENTEN, MAX_CENTEN, WALLET_MAX, OPLAAD_MIN, AUTOLAAD_STAP, KASCODE_MS, KASCODE_MAX } = require('./stand')();
 
   /* Idempotentie die een herstart overleeft: dezelfde knop twee keer indrukken
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
@@ -62,6 +64,13 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      saldo-regel als bodem, daarbovenop klasse, beleid, reserveringen en plafond.
      Optioneel: zonder `waarde` is dit exact de regel die hier altijd stond. */
   const waardePoort = require('./poort')({ saldoVan, grootboek, waarde, nu });
+  /* Het walletplafond blijft bedraad: main verplaatste die toets naar de
+     waardepoort, maar onze ./opladen.js roept plafondFout nog rechtstreeks aan
+     en ./verzoeken.js toont ruimte en plafond. Zonder deze regel staan die namen
+     wel in de ctx en zijn ze undefined -- geen laadfout, wel een uitzondering bij
+     de eerste oplaadpoging. Twee poorten die hetzelfde weigeren is veilig. */
+  const { plafondFout, walletRuimte, koppelPlafond, walletMax } =
+    require('./plafond')({ saldoVan, rekLid, standaard: WALLET_MAX });
   /* DE SCHRIJFWEG van het grootboek -- pasToe, boek en boekAsync -- staat in
      ./boeking.js. Dat is een ander onderwerp dan dit bestand: wie daar iets
      verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
@@ -75,7 +84,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      raakt de boekingsregels zelf niet aan. */
   const { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam,
+    motorklant, geldModus, keyVanCodenaam, plafondFout,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
   });
 
@@ -93,18 +102,26 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
     rekLid, rekPartner, saldoVan, id, metIdem, boek, boekAsync, zorgSaldo, seintje, bestaatLid,
     betaaldienstKosten: betaaldienstKosten || (() => 0), waarde, accounts,
     opdrachten: betaalOpdrachten,
-    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
+    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX,
+    walletMax, walletRuimte, koppelPlafond
   };
   /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
      van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
      hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
      op dag een al drie keer bijna fout gegaan. */
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
+  /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
+     pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
+     undefined en weigerde de linklaag bij het opstarten. */
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
   api.schaduw = schaduwStand;
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);
   // late binding voor de eigen geldgrens van het lid (kern/geldbeleid, na pay gemount)
   api.koppelGrens = waardePoort.koppelGrens;
+  /* koppelPlafond blijft geexporteerd: kernlaag4b.js roept hem aan zodra
+     bankregie zijn grenzen kent, en zonder export viel het opstarten om.
+     koppelGrens is de uitgaafgrens, koppelPlafond het maximum dat er STAAT. */
+  api.koppelPlafond = koppelPlafond;
   /* De deelbestanden. ./samen en ./treasury gaan EERST in de ctx: kassa en
      vooraf betalen erlangs (een betaling kan sinds er budgetten bestaan uit
      meerdere potjes komen) en zetten via ./treasury meteen apart. ./vooraf
@@ -117,7 +134,10 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      en kassa.js daar met opzet anders mee omgaat. */
   // in de CTX: waar de rest op leunt. Op de API: wat naar buiten gaat.
   for (const naam of ['samen', 'treasury']) Object.assign(ctx, require('./' + naam)(ctx));
-  for (const naam of ['verzoeken', 'kassa', 'verkoop', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
+  /* 'tegoed' en 'zaakbetaling' staan erbij omdat main ze niet bedraadt: die
+     bestanden zijn van deze tak. Zonder deze regel bestaan ze wel en geven hun
+     routes 404 -- de stilste manier om een functie kwijt te raken. */
+  for (const naam of ['verzoeken', 'kassa', 'tegoed', 'zaakbetaling', 'verkoop', 'vooraf', 'budget', 'graaf', 'bewijs', 'terug']) Object.assign(api, require('./' + naam)(ctx));
   for (const k of ['treasuryBeleid', 'treasuryZet', 'treasuryStand', 'treasuryVrij', 'treasuryApart']) api[k] = ctx[k];
   return { pay: api };
 };

@@ -16,7 +16,7 @@
 <style>
   body{height:100vh;overflow:hidden;display:flex;flex-direction:column;}
   .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
-  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--rtg-leesgoud,var(--goud));}
   .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
   /* Even rust houdt zijn eigen schakelaar (Adem / Stiltemoment / Teken /
      Bemoediging) -- die toont al een deel tegelijk. Alleen de balk draagt de
@@ -37,7 +37,7 @@
     background:radial-gradient(circle at 50% 40%, rgba(201,162,75,.35), rgba(201,162,75,.05));
     border:2px solid rgba(201,162,75,.5);transition:transform 4s ease-in-out;transform:scale(.6);color:var(--txt);}
   .ademfase{font-family:var(--serif);font-size:1.3rem;}
-  .ademtel{color:var(--goud2);font-size:1rem;font-variant-numeric:tabular-nums;min-height:1.3rem;}
+  .ademtel{color:var(--accent-tekst);font-size:1rem;font-variant-numeric:tabular-nums;min-height:1.3rem;}
   .ademsub{color:var(--zacht);font-size:.85rem;max-width:24rem;text-align:center;}
   @media(prefers-reduced-motion:reduce){ .ademkring{transition:none;} .stilring circle{transition:none;} }
   /* stiltemoment: een cirkel die in een minuut rustig volloopt */
@@ -49,7 +49,7 @@
     font-family:var(--serif);font-size:1.15rem;color:var(--txt);text-align:center;padding:2rem;}
   .stilhoes{position:relative;width:220px;height:220px;}
   /* teken */
-  .tekenbox{width:100%;max-width:40rem;flex:1;position:relative;background:#12110F;border:1px solid var(--lijn);border-radius:16px;overflow:hidden;min-height:0;}
+  .tekenbox{width:100%;max-width:40rem;flex:1;position:relative;background:#12110F;border:1px solid var(--lijn);border-radius:0;overflow:hidden;min-height:0;}
   .tekenbox canvas{position:absolute;inset:0;width:100%;height:100%;}
   .tekentools{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap;}
   .kl{width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
@@ -74,7 +74,7 @@
   <div class="tab aan" id="tab-adem">
     <div class="ademkring" id="kring"><div><div class="ademfase" id="fase">Klaar?</div><div class="ademtel" id="tel"></div></div></div>
     <div class="ademsub" id="ademsub">Adem rustig mee met de cirkel. In als hij groter wordt, vasthouden, en uit als hij kleiner wordt. Een paar minuten helpt je hoofd tot rust.</div>
-    <button class="knop" id="ademStart">Begin</button>
+    <button class="knop" id="ademStart" data-hoofdactie>Begin</button>
   </div>
 
   <div class="tab" id="tab-stil">

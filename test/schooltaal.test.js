@@ -1,6 +1,6 @@
 /* RTF School, de tweetalige klasgenoot: een kind uit het buitenland ziet de
    klas in de eigen taal EN in het Nederlands (de taal die het erbij leert).
-   Draai los: node --experimental-sqlite --test test/schooltaal.test.js */
+   Draai los: node --test test/schooltaal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

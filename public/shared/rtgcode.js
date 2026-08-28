@@ -45,7 +45,21 @@
     return { soort: 'tekst', tekst: s };
   }
 
-  var api = { bouwTafel: bouwTafel, bouwKas: bouwKas, bouwEntree: bouwEntree, bouwPin: bouwPin, lees: lees };
+  /* Mag je deze gescande of getypte tekst in hoofdletters zetten?
+
+     Een kassacode van zes tekens is hex en leest prettiger in kapitalen; een pin
+     wordt door de server toch genormaliseerd. Maar een ondertekende RTG-code
+     (RTG1....) is base64url en dus HOOFDLETTERGEVOELIG -- die uppercasen maakt
+     de handtekening stuk, en het loket zegt dan "geen geldige code" over een code
+     die prima was. Dat is precies wat er bij de kassa gebeurde toen de
+     capability in de QR kwam (LINK.md).
+
+     Hij staat hier en niet in de kassa, omdat elke scanner deze vraag heeft en
+     een regel die je per app overtikt er per app een is. */
+  function hoofdlettersMogen(tekst) { return lees(tekst).soort !== 'rtg1'; }
+
+  var api = { bouwTafel: bouwTafel, bouwKas: bouwKas, bouwEntree: bouwEntree, bouwPin: bouwPin,
+    lees: lees, hoofdlettersMogen: hoofdlettersMogen };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.RTGCode = api;
 })(typeof self !== 'undefined' ? self : this);

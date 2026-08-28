@@ -1,8 +1,8 @@
-/* De RTG-kantoren en de boardroom: vijfentwintig afdelingskamers met echte cijfers,
+/* De RTG-kantoren en de boardroom: zesentwintig afdelingskamers met echte cijfers,
    taken per kamer, en de boardroom die alles ziet, elke platformfunctie kan
    schakelen (globaal en per doelgroep, en het werkt echt: het pad gaat dicht)
    en een verbeterkamer bijhoudt. Draai los:
-   node --experimental-sqlite --test test/kantoren.test.js */
+   node --test test/kantoren.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -37,13 +37,13 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('vijfentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
+test('zesentwintig kamers, elk met cijfers; zonder inlog blijft de deur dicht', async () => {
   const dicht = await fetch(base + '/api/office/kamers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   assert.equal(dicht.status, 401);
   const d = await api('kamers');
   assert.equal(d.status, 200);
-  assert.equal(d.body.kamers.length, 25, 'vijfentwintig afdelingen');
-  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang', 'integraties', 'controleregister']) {
+  assert.equal(d.body.kamers.length, 26, 'zesentwintig afdelingen');
+  for (const id of ['sales', 'marketing', 'pr', 'hr', 'financien', 'inkoop', 'verkoop', 'juridisch', 'creatief', 'intern', 'onderzoek', 'klantenservice', 'atelier', 'studio', 'hardware', 'architect', 'regering', 'opvang', 'integraties', 'controleregister', 'reisbureau']) {
     assert.ok(d.body.kamers.some(k => k.id === id), id + ' heeft een kamer');
   }
   const hr = await api('kamer', { id: 'hr' });
@@ -111,6 +111,64 @@ test('RTG Controleregister bewijst 100% en maakt geen spookwerk', async () => {
   assert.match(plan.body.waarschuwing, /trainingsomgeving/i);
 });
 
+/* De gatenplanner van het Controleregister. De toets hierboven belooft een huis
+   ZONDER werkprocesgaten en houdt op zodra dat niet klopt -- dan is de route
+   /api/office/magnaat/controle/gaten/plan nooit aangeroepen en staat hij als gat
+   in het routejournaal. Deze toets belooft niets over het aantal gaten maar over
+   het GEDRAG van de planner, en houdt daarom in beide werelden stand: hij kijkt
+   naar precies de gaten die het register toont, hij houdt zich aan de limiet uit
+   het lijf, en hij legt hetzelfde gat nooit twee keer op de stapel. */
+test('de gatenplanner kijkt naar dezelfde gaten als het register en legt er nooit dubbel werk op', async () => {
+  const dicht = await fetch(base + '/api/office/magnaat/controle/gaten/plan', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+  });
+  assert.equal(dicht.status, 401, 'de gatenplanner zit achter de kantoorpoort');
+
+  const register = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  assert.equal(register.status, 200);
+
+  const plan = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 5 });
+  assert.equal(plan.status, 200);
+  assert.equal(plan.body.ok, true);
+  assert.equal(plan.body.bekeken, register.body.paginering.totaal,
+    'de planner weegt precies de werkprocesgaten die het register laat zien');
+  assert.equal(plan.body.aangemaakt, plan.body.taken.length,
+    'het getal is de lijst zelf en geen losse schatting ernaast');
+  assert.ok(plan.body.aangemaakt <= 5, 'de limiet uit het lijf begrenst de werkvoorraad echt');
+  assert.match(plan.body.waarschuwing, /trainingsomgeving/i,
+    'een gatentaak belooft geen enkele productiebevoegdheid');
+  for (const taak of plan.body.taken) {
+    assert.equal(taak.autoDekking, true, 'een geplande taak is herkenbaar als automatisch');
+    assert.equal(taak.status, 'open');
+    assert.match(taak.titel, /^Dekkingsgat · /);
+    assert.ok(taak.kantoor && taak.kantoor.id, 'elk gat krijgt een kantoor dat het oppakt');
+  }
+
+  const staat = await api('magnaat/controle/overzicht', { soort: 'werkproces', gat: 'alle', limiet: 100 });
+  const open = staat.body.taken.find(t => t.autoDekking && t.status !== 'klaar');
+  if (!open) {
+    // geen enkel werkprocesgat: dan hoort de planner ook niets te verzinnen
+    assert.equal(plan.body.aangemaakt, 0, 'zonder gat maakt de planner geen spookwerk');
+    assert.equal(plan.body.bekeken, 0);
+    return;
+  }
+
+  const af = await api('magnaat/controle/taak/zet',
+    { taakId: open.id, status: 'klaar', bewijs: 'contracttest gatenplanner' });
+  assert.equal(af.status, 200);
+  assert.equal(af.body.taak.status, 'klaar', 'de dekkingstaak is afgerond en laat het gat weer vrij');
+
+  const opnieuw = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 50 });
+  assert.equal(opnieuw.status, 200);
+  assert.ok(opnieuw.body.taken.some(t => t.puntId === open.puntId),
+    'het vrijgekomen gat staat meteen weer als werkvoorraad klaar');
+
+  const derde = await api('/api/office/magnaat/controle/gaten/plan', { limiet: 50 });
+  assert.equal(derde.status, 200);
+  assert.ok(derde.body.taken.every(t => t.puntId !== open.puntId),
+    'een gat met een openstaande taak krijgt er geen tweede bij');
+});
+
 test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
   const m = await api('kamer/taak', { id: 'sales', tekst: 'Beachclub Sol nabellen over de Zaakdoos' });
   assert.equal(m.status, 200);
@@ -126,7 +184,7 @@ test('taken per kamer: maken, afvinken en terugzien in het grid', async () => {
 test('de boardroom ziet alles en schakelt echt: functie uit, pad dicht, weer aan', async () => {
   const b = await api('boardroom');
   assert.equal(b.status, 200);
-  assert.equal(b.body.kamers.length, 25, 'alle kamers in beeld');
+  assert.equal(b.body.kamers.length, 26, 'alle kamers in beeld');
   assert.ok(b.body.functies.length >= 5, 'het volledige schakelbord staat erop');
   assert.ok(b.body.verbeterkamer.voorstellen.length >= 1, 'de verbeterkamer heeft een dagronde');
   // pak een echte functie van het bord en zet hem uit

@@ -115,6 +115,45 @@ voelen.
 
 ---
 
+## Een scherm dat geen materiaal verdraagt, zegt dat
+
+Een zoeker, een kaart, een speler, een cockpit. Dat zijn schermen waar het
+materiaal geen keuze is maar een eigenschap van het onderwerp: een camerabeeld
+op parelmoer is geen ander materiaal, het is een ander scherm. Zulke schermen
+schilderen hun vlakken zelf, hard donker.
+
+Dat botst met de themalaag, en het botste stil. De laag verzet de INKT van elk
+scherm (`--rtg-txt` op de body) maar niet de vlakken die een scherm zelf
+schildert. Onder champagne — het enige lichte materiaal — gaf dat op 19 augustus
+2026 **116 stukken tekst die onzichtbaar waren**: bijna-zwart op bijna-zwart, tot
+1,01:1. Niet slecht leesbaar. Onzichtbaar. Bordeaux en royal hadden er nul van,
+want die zijn zelf donker; de fout leefde alleen in de stand die niemand mat.
+
+Er zijn twee vormen van hetzelfde, en beide staan in `shared/rtg-themas.css`:
+
+| verklaring op de body | wat het betekent |
+|---|---|
+| `data-rtg-eigenvlak` | ik schilder mijn eigen grond **en** mijn eigen inkt |
+| `data-rtg-eigenvlak="onyx"` | ik ben altijd onyx — draai mijn hele eiland terug naar de donkere set |
+
+De tweede staat nu op veertien schermen: de zoekers en kaarten (camera,
+navigatie), de spelers (media, muziek), de cockpits (living-os, geld-command,
+werkruimte, sociaal), de panelen (reizen-veilig, leven), en horloge, uitzicht,
+residentie en rtg.html. De
+themakeuze van het lid blijft overal elders staan; deze schermen doen er alleen
+niet aan mee, en zeggen dat in één woord in plaats van per ongeluk.
+
+**Half meedoen is de fout.** Een vlak dat zijn grond zelf schildert, schildert
+ook zijn inkt; een scherm dat zijn inkt zelf schildert, schildert ook zijn grond.
+Datzelfde geldt binnen een scherm: een donker eiland (de iOS-balk, de
+Command-schil) herdefinieert de huistokens erbinnen, zodat álles wat er
+binnenkomt klopt — en niet alleen wat er vandaag in staat.
+
+*Handhaving:* `npm run a11y` keurt sinds 19 augustus 2026 ook champagne,
+bordeaux en royal, over alle schermen, ingelogd.
+
+---
+
 ## Licht is een eigenschap, geen effect
 
 Elk materiaal draagt drie dingen, en daarom is een materiaal in code nooit één

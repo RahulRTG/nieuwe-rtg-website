@@ -57,8 +57,8 @@ app.post('/api/reservering/annuleer', auth, (req, res) => {
 });
 
 // annuleren door het lid: bestelling, rit of boeking (incl. tickets)
-app.post('/api/annuleer', auth, (req, res) => {
-  const r = annuleerItem(req.session, String(req.body.soort || ''), String(req.body.ref || ''));
+app.post('/api/annuleer', auth, async (req, res) => {
+  const r = await annuleerItem(req.session, String(req.body.soort || ''), String(req.body.ref || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });
@@ -116,8 +116,8 @@ app.post('/api/event/rsvp/annuleer', auth, (req, res) => {
 
 // RTG-punten: saldo en historie, verzilveren naar tegoed
 app.post('/api/punten', auth, (req, res) => res.json(puntenVan(req.session.key)));
-app.post('/api/punten/verzilver', auth, (req, res) => {
-  const r = verzilverPunten(req.session.key, req.body.punten);
+app.post('/api/punten/verzilver', auth, async (req, res) => {
+  const r = await verzilverPunten(req.session.key, req.body.punten);
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json(r);
 });

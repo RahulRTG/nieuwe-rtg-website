@@ -1,0 +1,191 @@
+/* ================= DE WERELDSCHIL: onderbalk, rail en panelen =================
+
+   Wat dit is: één vaste navigatie voor een hele wereld, die op een telefoon
+   onderaan staat en op een desktop langs de zijkant. Zelfde bestemmingen,
+   zelfde volgorde, andere plek -- want dat is waar je duim is en waar je muis
+   is, en dat is niet dezelfde hoek van het scherm.
+
+   WAAROM DIT EEN LAAG IS EN GEEN PAGINA-ONDERDEEL. De RTFoundation had 71
+   schermen en geen enkele vaste navigatie: elk scherm had een terugpijl naar
+   de hub, en verder moest je terug om ergens anders heen. Dat is een
+   documentenmap, geen app. Zou elk scherm zijn eigen balk krijgen, dan zijn
+   het over drie maanden 71 balken die net iets van elkaar verschillen -- zie
+   de kop van shared/ios.js, daar staat dezelfde les over kopbalken.
+
+   DE HANDIGHEID. De rail staat standaard links, want daar staat hij overal.
+   Maar wie zijn telefoon in zijn rechterhand houdt of zijn muis rechts heeft,
+   wil hem rechts. Dat is geen voorkeurtje: op een groot scherm is de afstand
+   van je hand naar de andere kant echt werk. Vandaar data-hand op <html>, en
+   een knop in de rail zelf om te wisselen. Links is de standaard omdat een
+   nieuwe gebruiker geen instelling heeft en de conventie links is.
+
+   DE PANELEN (desktop). Een wereld heeft schermen die je naast elkaar wilt:
+   de agenda naast het huiswerk, het spaarpotje naast de begroting. Op een
+   telefoon kan dat niet en hoort het ook niet; vanaf een breed scherm wel.
+   Het tweede paneel is een iframe -- dezelfde keus die shared/command.css al
+   maakt -- zodat een scherm zijn eigen toestand en scrollpositie houdt en er
+   geen tweede route-laag bij komt.
+
+   Hoort bij shared/wereldschil.js. De wereld levert zijn bestemmingen aan;
+   dit blad weet niet wat een bestemming betekent. */
+
+:root{
+  --ws-rail:74px;          /* breedte van de rail op desktop */
+  --ws-onder:58px;         /* hoogte van de balk op een telefoon */
+  --ws-lijn:rgba(244,241,236,.10);
+  --ws-vlak:rgba(12,12,11,.92);
+  --ws-inkt:#A79F92;
+  --ws-aan:var(--gold-tekst,#C0A544);
+}
+
+/* De ruimte die de balk opeist. Hij staat vast, dus zonder dit ligt hij over
+   de laatste regels van elke pagina -- exact de fout die de cookiemelding hier
+   al eens maakte. shared/ios.css telt deze variabele mee in zijn eigen som. */
+body[data-ws]{ padding-bottom:calc(var(--ws-ruimte,0px) + var(--ws-eigen,0px)); }
+
+/* ---------------------------------------------------------- de balk zelf -- */
+.ws-balk{
+  position:fixed; z-index:44;
+  left:0; right:0; bottom:0;
+  height:calc(var(--ws-onder) + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  display:flex; align-items:stretch;
+  background:var(--ws-vlak);
+  border-top:0.5px solid var(--ws-lijn);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  font-family:Inter,system-ui,sans-serif;
+}
+/* Matglas is geen matglas zonder blur: waar de filter niet draait, dicht. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .ws-balk{ background:#0C0C0B; }
+}
+
+.ws-doel{
+  flex:1 1 0; min-width:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.18rem; padding:.3rem .15rem;
+  color:var(--ws-inkt); text-decoration:none;
+  background:none; border:0; cursor:pointer;
+  transition:color .12s;
+}
+.ws-doel .rtg-glyf{ width:22px; height:22px; flex:none; }
+.ws-doel span{
+  font-size:.56rem; letter-spacing:.09em; text-transform:uppercase; font-weight:600;
+  line-height:1.15; text-align:center; max-width:100%; overflow-wrap:break-word;
+}
+.ws-doel:hover{ color:#F7F5F1; }
+/* De actieve bestemming draagt kleur EN een streep. Kleur alleen is niet
+   genoeg: wie kleur niet ziet, ziet dan geen actieve tab (ONTWERP.md). */
+.ws-doel[aria-current]{ color:var(--ws-aan); }
+.ws-doel[aria-current]::before{
+  content:""; position:absolute; top:0; left:22%; right:22%; height:2px;
+  background:currentColor; border-radius:0;
+}
+.ws-doel{ position:relative; }
+.ws-doel:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:0; }
+
+/* de wisselknop en de spleetknop horen niet op een telefoon */
+.ws-hand, .ws-splits{ display:none; }
+
+/* -------------------------------------------------- vanaf een breed scherm -- */
+@media (min-width:900px){
+  .ws-balk{
+    top:0; bottom:0; right:auto;
+    width:var(--ws-rail); height:auto;
+    flex-direction:column; justify-content:flex-start;
+    padding:.6rem 0 .5rem;
+    border-top:0; border-right:0.5px solid var(--ws-lijn);
+  }
+  :root[data-hand="rechts"] .ws-balk{
+    left:auto; right:0;
+    border-right:0; border-left:0.5px solid var(--ws-lijn);
+  }
+  .ws-doel{ flex:0 0 auto; padding:.62rem .2rem; gap:.3rem; }
+  .ws-doel[aria-current]::before{
+    top:8%; bottom:8%; left:0; right:auto; width:2px; height:auto; border-radius:0;
+  }
+  :root[data-hand="rechts"] .ws-doel[aria-current]::before{
+    left:auto; right:0; border-radius:0;
+  }
+
+  /* de pagina schuift op, aan de kant waar de rail staat */
+  body[data-ws]{ padding-left:var(--ws-rail); padding-bottom:var(--ws-eigen,0px); }
+  :root[data-hand="rechts"] body[data-ws]{ padding-left:0; padding-right:var(--ws-rail); }
+
+  /* onderin de rail: van hand wisselen, en een tweede paneel openen */
+  .ws-voet{ margin-top:auto; display:flex; flex-direction:column; gap:.1rem; padding-top:.4rem; }
+  .ws-hand, .ws-splits{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.25rem;
+    background:none; border:0; cursor:pointer; color:var(--ws-inkt); padding:.55rem .2rem;
+    font:600 .5rem/1.1 Inter,system-ui,sans-serif; letter-spacing:.09em; text-transform:uppercase;
+  }
+  .ws-hand .rtg-glyf, .ws-splits .rtg-glyf{ width:19px; height:19px; }
+  .ws-hand:hover, .ws-splits:hover{ color:#F7F5F1; }
+  .ws-hand:focus-visible, .ws-splits:focus-visible{ outline:2px solid var(--ws-aan); outline-offset:-3px; border-radius:0; }
+  .ws-splits[aria-pressed="true"]{ color:var(--ws-aan); }
+}
+
+/* ---------------------------------------------------- de kolom mag breder -- */
+/* rtg-ui.css zet `body.rtg-stijl main{max-width:840px}` voor het hele huis, en
+   dat is de goede maat voor een scherm zonder vaste navigatie: een kolom die je
+   leest. Maar zodra er een rail naast staat, is een wereld geen document meer
+   maar een werkvlak -- en dan is 840px van 1440 gewoon een halfleeg scherm.
+
+   Alleen de kolom gaat mee, niet de tekst. Een alinea van 1180px breed leest
+   niet; die blijft op leesbreedte staan. Zo krijgt het tegelraster de ruimte
+   (het rekent met auto-fill en vult vanzelf meer kolommen) zonder dat een
+   uitlegscherm een muur wordt. */
+@media (min-width:900px){
+  body[data-ws] main{ max-width:min(1180px, 100%); }
+  body[data-ws] main .wrap{ max-width:none; }
+  body[data-ws] main p,
+  body[data-ws] main .intro,
+  body[data-ws] main .deck,
+  body[data-ws] main .uitlegrij{ max-width:68ch; }
+}
+
+/* ------------------------------------------------------ het tweede paneel -- */
+/* Alleen waar het echt past. Onder de 1200 zou een tweede paneel twee halve
+   schermen maken en dat is slechter dan één hele. */
+.ws-paneel{ display:none; }
+@media (min-width:1200px){
+  body[data-ws-split] .ws-paneel{
+    display:block;
+    position:fixed; top:0; bottom:0; z-index:30;
+    width:clamp(360px, 42vw, 620px);
+    right:0; left:auto;
+    background:var(--bg,#0C0C0B);
+    border-left:1px solid var(--ws-lijn);
+    box-shadow:-24px 0 60px rgba(0,0,0,.45);
+  }
+  :root[data-hand="rechts"] body[data-ws-split] .ws-paneel{
+    right:auto; left:0;
+    border-left:0; border-right:1px solid var(--ws-lijn);
+    box-shadow:24px 0 60px rgba(0,0,0,.45);
+  }
+  /* de hoofdkolom maakt ruimte, zodat het paneel niets bedekt */
+  body[data-ws-split]{ padding-right:clamp(360px, 42vw, 620px); }
+  :root[data-hand="rechts"] body[data-ws-split]{
+    padding-right:0; padding-left:calc(clamp(360px, 42vw, 620px) + var(--ws-rail));
+  }
+  .ws-paneel-kop{
+    display:flex; align-items:center; gap:.5rem; height:44px; padding:0 .5rem 0 .9rem;
+    border-bottom:0.5px solid var(--ws-lijn); background:var(--ws-vlak);
+    font:600 .72rem/1 Inter,system-ui,sans-serif; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ws-inkt);
+  }
+  .ws-paneel-kop b{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-weight:600; color:#F7F5F1; letter-spacing:.02em; text-transform:none; font-size:.85rem; }
+  .ws-paneel-dicht{
+    background:none; border:0; cursor:pointer; color:var(--ws-inkt);
+    width:32px; height:32px; display:grid; place-items:center; border-radius:0; font-size:1.1rem;
+  }
+  .ws-paneel-dicht:hover{ color:#F7F5F1; background:rgba(244,241,236,.07); }
+  .ws-paneel iframe{ width:100%; height:calc(100% - 44px); border:0; display:block; background:var(--bg,#0C0C0B); }
+}
+
+/* Wie beweging uit heeft, krijgt geen overgangen. */
+@media (prefers-reduced-motion: reduce){
+  .ws-doel{ transition:none; }
+}

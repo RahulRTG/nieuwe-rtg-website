@@ -15,7 +15,7 @@
    - een ingediende aangifte die alsnog verandert;
    - een correctie die niet naar zijn oorspronkelijke aangifte verwijst.
 
-   Draai los: node --experimental-sqlite --test test/payroll-aangifte.test.js */
+   Draai los: node --test test/payroll-aangifte.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

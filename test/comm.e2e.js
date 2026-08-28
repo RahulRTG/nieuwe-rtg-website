@@ -33,18 +33,12 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+const pw = laadPlaywright({ eigenDriver: false });
 
 async function post(base, pad, body, tok) {
   const r = await fetch(base + pad, { method: 'POST',
@@ -192,11 +186,11 @@ test('de AI stelt op en verstuurt nooit zelf', async () => {
 });
 
 test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen staat niet meer los',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metServer(async (base) => {
     const A = await post(base, '/api/login', { tier: 'rtg', pasApp: 'rtg' });
     assert.ok(A.token, 'demo-inlog');
-    const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const browser = await pw.chromium.launch(browserOpties(pw));
     try {
       const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
       await ctx.addInitScript((t) => {
@@ -235,11 +229,11 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
         'de knop "nieuw gesprek" staat buiten beeld (' + maat.plusRechts + ' > ' + maat.venster + ')');
       assert.equal(maat.overloop, false, 'het scherm loopt horizontaal over');
 
-      /* HET BEGINSCHERM TOONT ALLEEN NOG DE DRIE HOOFDWERELDEN.
+      /* HET BEGINSCHERM TOONT ALLEEN NOG DE VIER HOOFDAPPS.
 
          Hier stond dat Bellen en Videobellen niet meer als eigen app in de
          functierij mochten staan, en dat Berichten er WEL in stond. Die rij
-         bestaat niet meer: het beginscherm draagt de drie hoofdwerelden en verder
+         bestaat niet meer: het beginscherm draagt de vier hoofdapps en verder
          geen losse apps. De oude bewering zou nu eisen dat er een rij is.
 
          Wat de bewering waard was, blijft: contact met iemand is EEN ding en
@@ -259,7 +253,7 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
          terug, dan zakt deze regel. */
       const bundel = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app-main.js'), 'utf8');
       assert.match(bundel, /const FUNCTIES = \[\s*\]/,
-        'het beginscherm draagt weer losse app-tegels naast de drie hoofdwerelden');
+        'het beginscherm draagt weer losse app-tegels naast de vier hoofdapps');
 
       // en Berichten is bereikbaar vanuit zijn wereld
       await page.goto(base + '/apps/sociaal.html', { waitUntil: 'domcontentloaded' });

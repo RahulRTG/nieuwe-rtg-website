@@ -42,7 +42,7 @@
         'border-bottom:1px solid var(--line,rgba(255,255,255,.1));background:var(--card,#151312);}' +
       '#rtgSplit .sp-balk .sp-titel{font-family:"Bodoni Moda",serif;font-size:.9rem;color:var(--txt,#F4F1EC);margin-right:auto;}' +
       '#rtgSplit .sp-balk button{font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;color:var(--txt,#F4F1EC);' +
-        'background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,.14));border-radius:999px;padding:.35rem .7rem;cursor:pointer;}' +
+        'background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,.14));border-radius:0;padding:.35rem .7rem;cursor:pointer;}' +
       '#rtgSplit .sp-balk button.sp-x{background:none;}' +
       '#rtgSplit .sp-vlak{flex:1 1 auto;display:flex;min-height:0;min-width:0;}' +
       '#rtgSplit .sp-vlak.boven{flex-direction:column;}' +
@@ -50,12 +50,12 @@
       '#rtgSplit .sp-kop{display:flex;align-items:center;gap:.4rem;padding:.3rem .5rem;flex:0 0 auto;background:var(--card,#151312);' +
         'border-bottom:1px solid var(--line,rgba(255,255,255,.08));}' +
       '#rtgSplit .sp-kop select{flex:1;min-width:0;font-family:Inter,system-ui,sans-serif;font-size:.74rem;color:var(--txt,#F4F1EC);' +
-        'background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,.14));border-radius:8px;padding:.3rem .4rem;}' +
+        'background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,.14));border-radius:0;padding:.3rem .4rem;}' +
       '#rtgSplit iframe{flex:1 1 auto;width:100%;height:100%;border:0;background:var(--bg,#0C0C0B);}' +
       '#rtgSplit .sp-greep{flex:0 0 auto;background:var(--line,rgba(255,255,255,.14));position:relative;touch-action:none;}' +
       '#rtgSplit .sp-vlak.naast > .sp-greep{width:10px;cursor:col-resize;}' +
       '#rtgSplit .sp-vlak.boven > .sp-greep{height:10px;cursor:row-resize;}' +
-      '#rtgSplit .sp-greep::after{content:"";position:absolute;inset:0;margin:auto;background:var(--soft,#8A8680);border-radius:999px;}' +
+      '#rtgSplit .sp-greep::after{content:"";position:absolute;inset:0;margin:auto;background:var(--soft,#8A8680);border-radius:0;}' +
       '#rtgSplit .sp-vlak.naast > .sp-greep::after{width:3px;height:34px;}' +
       '#rtgSplit .sp-vlak.boven > .sp-greep::after{height:3px;width:34px;}';
     d.head.appendChild(st);

@@ -60,7 +60,7 @@
     // halo weg, de dekking terug naar wat een echt horloge op een tafel doet.
     // Het zit op een pseudo-element (één keer berekend), niet op een filter.
     //
-    // LET OP, en dit was de echte oorzaak van het ei: border-radius:50% maakt
+    // LET OP, en dit was de echte oorzaak van het ei: border-radius:0
     // hier alleen een CIRKEL zolang het vak van .rtg-ring vierkant is. Wordt
     // dat vak uitgerekt, dan wordt deze schaduw een ellips die ver boven en
     // onder de wijzerplaat uitloopt -- en de wijzerplaat verraadt dat niet,

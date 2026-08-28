@@ -13,6 +13,10 @@ const herhaling = require('../../kern/kassa/herhaling')({
 /* De verkoop- en afrekenlaag draaien als submodules op de gedeelde kern. */
 require('./kassa/verkoop')(kern, herhaling);
 require('./kassa/afrekenen')(kern, herhaling);
+/* De cadeaukaarten (onze afsplitsing om de 10 kB-maat) zonder herhaling:
+   main's idempotentieronde wikkelde het uitchecken en de verkoop in, de
+   kaartroutes bewust niet. */
+require('./kassa/cadeaukaart')(kern);
 require('./kassa/modus')(kern);
 require('./kassa/premium')(kern);
 };

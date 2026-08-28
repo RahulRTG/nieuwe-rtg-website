@@ -16,10 +16,10 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
   body.rtg-stijl .chips{display:flex;flex-wrap:nowrap;gap:.15rem;overflow-x:auto;margin:0 0 1.1rem;
     padding:0 0 .1rem;border-bottom:1px solid var(--line);}
@@ -28,7 +28,7 @@
     font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;}
   body.rtg-stijl .chips > button.chip:hover{color:var(--txt);border-color:transparent;}
   body.rtg-stijl .chips > button.chip.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.1rem 1.2rem;margin-bottom:1rem;}
   .kaart h2{font-size:1.12rem;margin-bottom:.2rem;}
   .kaart h2 + .sub{color:var(--soft);font-size:.85rem;margin-bottom:.8rem;}
   /* ---- De kop van de Situation Room. Dit is het enige echt grote element op
@@ -41,20 +41,20 @@
   .kop .telling{color:var(--soft);font-size:.85rem;margin-top:.6rem;line-height:1.6;}
   .regel{display:flex;gap:.8rem;align-items:flex-start;border-top:1px solid var(--line);padding:.85rem 0;}
   .regel:first-child{border-top:0;}
-  .regel .streep{width:2px;align-self:stretch;background:var(--line);flex-shrink:0;border-radius:2px;}
+  .regel .streep{width:2px;align-self:stretch;background:var(--line);flex-shrink:0;border-radius:0;}
   .regel.e3 .streep{background:var(--burgundy);}
   .regel.e2 .streep{background:var(--gold);}
   .regel .body{flex:1;min-width:0;}
   .regel b{display:block;font-weight:600;font-size:.94rem;}
   .regel .meta{font-size:.8rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;margin-bottom:1rem;}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}
   .stat .n{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
   .stat .l{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:.15rem;}
-  .veld,select.veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
+  .veld,select.veld,textarea.veld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.55rem .7rem;}
   textarea.veld{min-height:4rem;resize:vertical;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.6rem 0 .25rem;display:block;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.88rem;padding:.55rem 1rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.88rem;padding:.55rem 1rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
   .knop.klein{padding:.3rem .6rem;font-size:.78rem;}
   .rij{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;}
@@ -64,34 +64,34 @@
   .item .body{flex:1;min-width:0;}
   .item .body b{display:block;}
   .item .meta{font-size:.78rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
-  .status{font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
-  .status.wacht{border-color:var(--gold);color:var(--gold);}
-  .status.loopt{border-color:var(--green);color:var(--green);}
+  .status{font-size:.72rem;padding:.15rem .55rem;border-radius:0;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
+  .status.wacht{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .status.loopt{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .status.klaar,.status.weg{opacity:.55;}
   .leeg{color:var(--soft);font-size:.88rem;padding:.4rem 0;}
   /* de plattegrond: twintig werelden, de nog-niet-gebouwde ingetogen maar zichtbaar */
   .kamers{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.7rem;}
-  .kamer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;display:block;text-decoration:none;}
+  .kamer{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;display:block;text-decoration:none;}
   .kamer h3{font-size:1rem;}
   .kamer .wat{font-size:.78rem;color:var(--soft);margin-top:.3rem;line-height:1.5;}
   .kamer .tel{font-size:.72rem;color:var(--muted);margin-top:.55rem;letter-spacing:.04em;}
   .kamer.aanbouw{opacity:.5;}
   .kamer .apps{margin-top:.5rem;display:flex;gap:.35rem;flex-wrap:wrap;}
-  .kamer .apps a{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem;color:var(--muted);text-decoration:none;}
+  .kamer .apps a{font-size:.72rem;border:1px solid var(--line);border-radius:0;padding:.14rem .5rem;color:var(--muted);text-decoration:none;}
   .kamer .apps a:hover{border-color:var(--gold);color:var(--txt);}
   /* de mandaatschuif */
   .niv{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem;}
-  .niv button{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font:inherit;font-size:.72rem;padding:.25rem .55rem;cursor:pointer;}
-  .niv button.aan{border-color:var(--gold);color:var(--gold);}
+  .niv button{background:none;border:1px solid var(--line);border-radius:0;color:var(--muted);font:inherit;font-size:.72rem;padding:.25rem .55rem;cursor:pointer;}
+  .niv button.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .niv button:disabled{opacity:.3;cursor:not-allowed;}
-  .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:0;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
   /* Kleine hulpklassen in plaats van style="..."-attributen: elk zo'n attribuut
      houdt style-src-attr open in de CSP, en de meter telt ze. Vandaar hier en
      niet in de opbouw van de HTML. */
   .knoprij{display:flex;gap:.4rem;margin-top:.5rem;}
-  .goud{color:var(--gold);}
+  .goud{color:var(--rtg-leesgoud,var(--gold));}
   .rood{color:var(--burgundy);}
   .zacht{opacity:.7;}
   .mt-s{margin-top:.5rem;}
@@ -100,7 +100,7 @@
   .fijn{font-size:.78rem;color:var(--soft);line-height:1.6;}
   .fijn.mt{margin-top:.55rem;}
   .fijner{font-size:.75rem;color:var(--soft);margin-top:.4rem;}
-  .fijner.goud{color:var(--gold);margin-top:.45rem;}
+  .fijner.goud{color:var(--rtg-leesgoud,var(--gold));margin-top:.45rem;}
   .briefkop{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin:.6rem 0 .2rem;}
   .kaart.let{border-color:var(--burgundy);}
   .verborgen{display:none;}
@@ -112,7 +112,7 @@
 </head>
 <body class="rtg-stijl">
 <header>
-  <div><div class="ey">Lifestyle Pass</div><h1>Het Privékantoor</h1></div>
+  <div><div class="ey">Lifestyle Pass · uw private office</div><h1>Het Privékantoor</h1></div>
   <a class="terug" href="/apps/app.html?pas=lifestyle">← app</a>
 </header>
 <!-- DE APPS VAN DEZE WERELD. Het Privekantoor toont wat er speelt; deze rij
@@ -223,6 +223,18 @@ async function vNu(){
   P(h);
   zetUit('Nu', ['Soort','Wat','Toelichting'], d.regels.map(r=>[r.soort, r.tekst, r.detail||'']));
 
+  /* DE RAAD. Dit is wat er van Private Office over is nadat dat scherm hierin
+     opging (WERELDEN.md, "de twee dubbele paren"). Daar stonden zes vaste
+     stemmen met een vast advies over een verzonnen reis -- decor. De gedachte
+     erachter was wel goed: voordat u iets tekent hoort u te zien wie eraan
+     gewerkt heeft, en waar zij van elkaar verschillen. Hier is dat geen decor
+     maar de werkelijke bezetting van uw zaak (server/kern/bureau/cases.js,
+     teamVoor). Zit er niemand op, dan staat er ook niets: een lege raad is
+     eerlijker dan een verzonnen unanimiteit. */
+  const raad = a => a.length ? '<div class="lbl">Wie er voor u aan werkt</div>'
+    + a.map(x=>'<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'
+      + x.team.map(r=>'<span class="goud">'+esc(r)+'</span>').join(' · ')+'</div></div></div>').join('') : '';
+
   async function brief(moment){
     const u = $('#brUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
     try{
@@ -235,7 +247,7 @@ async function vNu(){
             + lijst('Verder deze week', d.restVanDeWeek, punt)
             + lijst('Achterstallig', d.achterstallig, punt)
             + lijst('Wacht op u', d.beslissingen, x=>'<div class="meta">'+esc(x.titel)+' · '+esc(x.reden)+'</div>')
-            + lijst('Wij doen vandaag', d.wijDoen, x=>'<div class="meta">'+esc(x.titel)+' ('+esc(x.team.join(', '))+')</div>')
+            + raad(d.wijDoen)
           : lijst('Vandaag gebeurd', d.gebeurd, x=>'<div class="meta">'+esc(x.zaak)+' → '+esc(x.status)+'<br><span class="zacht">'+esc(x.notitie)+'</span></div>')
             + '<div class="meta mt-s">' + d.doorOns + ' door ons, ' + d.doorU + ' door u · ' + d.lopend + ' lopen er nog.</div>'
             + lijst('Morgen', d.morgen, punt)
@@ -660,6 +672,14 @@ async function vMandaat(){
         + '<button class="knop klein js-grensk" data-d="'+esc(x.domein)+'">Vastzetten</button></div>'
         + '<div class="meta fijner">Tot dit bedrag pakken wij het op zonder u te storen. Daarboven leggen wij het voor.</div>' : '')
     + '</div>').join('');
+  /* DE CONTINUITY VAULT, de tweede helft van wat Private Office hierheen
+     bracht. Daar was het een belofte in een kader; hier is het de lijst
+     eronder. Wat u ons gaf staat bij u vast en niet bij de mensen die het
+     uitvoeren: wisselt een partner, een medewerker of een leverancier, dan
+     wisselt uw mandaat niet mee. */
+  h += '<div class="kaart"><h2>Dit blijft van u</h2><div class="sub">Uw huisregels, uw grenzen en het bewijs van wat u ons gaf staan op uw naam, '
+    + 'niet op die van de mensen die het uitvoeren. Wisselt er een partner, een medewerker of een leverancier, dan verandert er hieraan niets. '
+    + 'Wat u ooit heeft vastgelegd is hieronder terug te lezen, met de oude stand erbij.</div></div>';
   if(d.log.length){
     h += '<div class="kaart"><h2>Wat u ons gaf</h2><div class="sub">Elke wijziging, met de oude stand erbij.</div>'
       + d.log.map(l=>'<div class="item"><div class="body"><b>'+esc(l.naam)+'</b><div class="meta">L'+l.van+' → L'+l.naar

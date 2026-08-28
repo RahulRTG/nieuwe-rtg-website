@@ -80,6 +80,7 @@ const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
 const JOURNAAL = path.join(WORTEL, '.schermjournaal');
 const METER = 'schermenZonderToets';
+const RICHTING = 'omlaag';           // een plafond: meer schermen zonder toets is slechter
 
 const jsonUit = process.argv.includes('--json');
 const vastleggen = process.argv.includes('--vastleggen');
@@ -166,6 +167,79 @@ function veegToetsen(geopend, totaalSchermen) {
   return new Set([...perToets].filter(([, n]) => n >= grens).map(([t]) => t));
 }
 
+/* ---- HEEFT DEZE RONDE WERKELIJK GEDRAAID? ----
+
+   DE FOUT DIE DIT AFVANGT, EN HIJ IS ECHT GEBEURD. De omgeving had chromium
+   1194 staan, playwright vroeg om 1234, en alle 123 browsertoetsen vielen om op
+   een installatiebanner. Het journaal van die ronde: 294 TOETS-regels, 296
+   AUDIT-regels, 0 SCHERM-regels. Precies hetzelfde bestand dat een GESLAAGDE
+   ronde oplevert waarin geen enkel scherm wordt geopend.
+
+   Zonder deze controle leest dat als "262 schermen nooit geopend" -- een
+   uitspraak over de schermen, terwijl er alleen iets over de meetopstelling te
+   zeggen viel. Dat is LAT.md regel 3 in zijn gemeenste vorm: niet een meter
+   zonder invoer die zwijgt, maar een meter zonder invoer die een NETJES
+   OPGEMAAKT SLECHT CIJFER geeft.
+
+   HOE. Het journaal noemt zichzelf. TOETS-regels dragen de naam van het
+   toetsbestand, SCHERM-regels ook. De inventaris van browsertoetsen komt van de
+   schijf. Drie getallen, en het verschil ertussen is de diagnose:
+
+     bestaat maar draaide niet   de ronde is afgebroken of overgeslagen
+     draaide maar zag niets      de browser startte niet (of opende niets)
+
+   GEEN AANNAME OVER DE UITSLAG. Een toets die zakt heeft wel degelijk schermen
+   geopend; die telt hier dus gewoon mee. De vraag is niet of de ronde GOED ging
+   maar of hij GEBEURD is. */
+function browsertoetsen() {
+  const map = path.join(WORTEL, 'test');
+  const uit = [];
+  for (const naam of fs.readdirSync(map)) {
+    if (!naam.endsWith('.e2e.js')) continue;
+    let bron = '';
+    try { bron = fs.readFileSync(path.join(map, naam), 'utf8'); } catch (e) { continue; }
+    if (/chromium\.launch\(/.test(bron)) uit.push(naam);
+  }
+  return uit.sort();
+}
+
+/* De namen die het journaal zelf noemt, per regelsoort. */
+function toetsenIn(tekst) {
+  const gedraaid = new Set(), metScherm = new Set();
+  for (const regel of tekst.split('\n')) {
+    const r = regel.trim();
+    if (r.startsWith('TOETS ')) {
+      const v = r.split(' ').filter(Boolean);
+      if (v.length >= 4) gedraaid.add(v[v.length - 1]);
+    } else if (r.startsWith('SCHERM ')) {
+      const v = r.slice(7).split(' ').filter(Boolean);
+      if (v.length >= 3) { const t = v.slice(1, -1).join(' '); gedraaid.add(t); metScherm.add(t); }
+    }
+  }
+  return { gedraaid, metScherm };
+}
+
+function rondeVerslag(pad) {
+  let tekst = '';
+  try { tekst = fs.readFileSync(pad, 'utf8'); } catch (e) { return null; }
+  const verwacht = browsertoetsen();
+  const { gedraaid, metScherm } = toetsenIn(tekst);
+  const nietGedraaid = verwacht.filter(n => !gedraaid.has(n));
+  const zonderScherm = verwacht.filter(n => gedraaid.has(n) && !metScherm.has(n));
+  /* DE GRENS. Nul schermen uit een ronde met browsertoetsen is geen uitslag maar
+     een storing. Draaide er geen enkele browsertoets, dan is er ook niets over
+     schermen gemeten. Verder is het een verslag en geen vonnis: welke toetsen
+     ontbreken staat erbij, zodat een mens ziet WAT er niet is gemeten. */
+  const af = verwacht.length > 0 && metScherm.size > 0 && nietGedraaid.length === 0;
+  const reden = !verwacht.length ? 'er zijn geen browsertoetsen om schermen mee te openen'
+    : !metScherm.size ? 'geen enkele browsertoets opende een scherm -- de browser startte hier niet'
+      : nietGedraaid.length ? nietGedraaid.length + ' van de ' + verwacht.length +
+        ' browsertoetsen komen niet in dit journaal voor; de ronde is niet afgemaakt'
+        : null;
+  return { af, reden, verwacht: verwacht.length, gedraaid: verwacht.length - nietGedraaid.length,
+    metScherm: metScherm.size, nietGedraaid, zonderScherm };
+}
+
 /* Een journaal van voor de laatste wijziging meet code die er niet meer zo
    staat, en dat leest als een meting. Dezelfde controle als in dekking.js,
    maar over de schermen: de pagina's zelf en de toetsen die ze openen. */
@@ -219,6 +293,18 @@ function main() {
     console.error('Dat journaal is van voor deze ronde. Draai `npm run e2e` opnieuw; er valt zo niets te tellen.');
     return 2;
   }
+  /* EERST: heeft deze ronde gedraaid. Een journaal zonder een enkel geopend
+     scherm is geen slechte uitslag maar een kapotte opstelling, en de twee zien
+     er in dit bestand identiek uit. */
+  const ronde = rondeVerslag(pad);
+  if (ronde && !ronde.af && !ronde.metScherm) {
+    console.error('Deze ronde heeft geen schermen gemeten: ' + ronde.reden + '.');
+    console.error(ronde.verwacht + ' toetsen starten een browser; ' + ronde.gedraaid +
+      ' daarvan draaiden en ' + ronde.metScherm + ' openden een scherm.');
+    console.error('Er valt hier niets te tellen. Repareer de ronde, tel daarna.');
+    return 2;
+  }
+
   const geopend = journaal.afgelegd;
   const vers = jongerDanDeSchermen(pad);
 
@@ -246,13 +332,15 @@ function main() {
     console.log(JSON.stringify({
       totaal: alle.length, eigenToets: alle.length - zonder.length,
       nooitGeopend: nooit, alleenVeegtoets: zonder.filter(s => !nooit.includes(s)),
-      alleenOpgehaald, veegtoetsen: [...vegers], vers
+      alleenOpgehaald, veegtoetsen: [...vegers], vers, ronde
     }, null, 2));
     return 0;
   }
 
   console.log('\nDE SCHERMDEKKING -- legt een toets de weg van deze app af?\n');
   if (!vers.ok) console.log('  LET OP: het journaal is niet vers (' + vers.reden + '). Draai `npm run e2e` opnieuw.\n');
+  if (ronde && !ronde.af) console.log('  LET OP: de ronde is niet af -- ' + ronde.reden + '.\n' +
+    '          Wat hieronder "nooit geopend" heet, kan ook "niet gemeten" zijn.\n');
   console.log('  schermen totaal          ' + String(alle.length).padStart(4));
   console.log('  met een eigen toets      ' + String(alle.length - zonder.length).padStart(4));
   console.log('  alleen door een veegtoets' + String(alleenVeeg).padStart(4));
@@ -274,6 +362,11 @@ function main() {
   }
 
   if (vastleggen) {
+    if (ronde && !ronde.af) {
+      console.error('\n  Weiger vast te leggen: ' + ronde.reden + '.');
+      console.error('  Een norm uit een halve ronde is een norm die de volgende ronde afkeurt.');
+      return 1;
+    }
     if (typeof grond === 'number' && zonder.length > grond) {
       console.error('\n  Weiger vast te leggen: ' + zonder.length + ' is slechter dan de norm ' + grond + '.');
       return 1;
@@ -295,4 +388,5 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { alleSchermen, geopendeSchermen, jongerDanDeSchermen, veegToetsen, zonderEigenToets };
+module.exports = { alleSchermen, geopendeSchermen, jongerDanDeSchermen, veegToetsen, zonderEigenToets,
+  browsertoetsen, toetsenIn, rondeVerslag };

@@ -3,7 +3,7 @@
    zegel.controleer). Getoetst: selectieve onthulling (alleen ware, gevraagde
    feiten; geen ruwe gegevens), onkoppelbare pseudoniemen per partner, en dat een
    feit dat niet klopt (onder 18) niet te bewijzen valt.
-   Draai los: node --experimental-sqlite --test test/zegelroute.test.js */
+   Draai los: node --test test/zegelroute.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, stop, elevateTier } = require('./helper');

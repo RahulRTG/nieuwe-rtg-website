@@ -54,7 +54,7 @@
                    lukt er tijdens de storm ook echt minstens een -- anders is
                    "nul gefaald" vanzelf waar zodra De Wacht alles afwijst.
 
-   Draai (standaard, overal):   node --experimental-sqlite scripts/beproeving.js
+   Draai (standaard, overal):   node scripts/beproeving.js
    Draai (mega, 100M Postgres):  DATABASE_URL=postgres://... \
                                 node --max-old-space-size=8192 scripts/beproeving.js
    Knoppen (env): MEGA_LEDEN, MEGA_CHUNK, SOAK_MIN, STORM_WERKERS, MEGA_SEED,
@@ -63,7 +63,8 @@
                   STRENG (=1: de lat 10x scherper -- dekking 30, lek-vloer 4,
                   latentie-SLO 200 ms, meer werkers, extra lek-ronde).
    ============================================================================ */
-const { spawn, execFileSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const { start: wegwerp } = require('./lib/wegwerpserver');
 const fs = require('fs'), os = require('os'), path = require('path');
 const http = require('http');
 /* De goede verhalen (scripts/verhalen.js). De gauntlet bewijst dat er niets
@@ -78,6 +79,8 @@ const belasting = require('./lib/belasting');
 /* De hardere rol-scheidingsproef: lekkende weigeringen en half uitgevoerde
    schrijfacties. Zie de kop daar waarom "geen 2xx" niet genoeg is. */
 const rolproef = require('./lib/rolproef');
+/* WANNEER en TEGEN WELKE CODE dit is gemeten; zie scripts/versheid.js. */
+const { stempel } = require('./lib/stempel');
 
 const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.MEGA_PORT || 4090);
@@ -261,31 +264,24 @@ async function poortVrij() {
     throw new Error('poort ' + PORT + ' is al bezet (waarschijnlijk een achtergebleven server van een eerdere run). Ruim die eerst op, bijv.: pkill -f "gc-hook.js"');
   }
 }
-function boot() {
-  return new Promise((resolve, reject) => {
-    const logfd = fs.openSync(SRVLOG, 'a');
-    /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
-       opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De
-       toetshelper (test/helper.js) kreeg de vlag toen wel; dit harnas heeft
-       zijn eigen boot en bleef achter. Gevolg: tokens() haalde nul sessies op,
-       de schakelkast bleef dicht, en elke fase draaide tegen de standaardstand
-       terwijl het rapport anders suggereerde. De personas en demozaken zijn de
-       meetinstrumenten van deze beproeving; zonder hen meet ze niets. */
-    const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
-      NODE_OPTIONS: '--max-old-space-size=8192' };
-    if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
-    child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
-      { cwd: ROOT, env, stdio: ['ignore', logfd, logfd] });
-    child.on('exit', c => { if (c) reject(new Error('server stopte, code ' + c)); });
-    (async () => {
-      // wachten op READINESS, niet op liveness: pas als de duurzame opslag echt
-      // geladen is (Postgres: gedeelde data + RAM-venster) mag de test erin --
-      // anders toets je de verouderde lokale snapshot in plaats van de waarheid
-      for (let i = 0; i < 300; i++) { const r = await verzoek('GET', '/api/ready', null, null, 3000); if (r.status === 200) return resolve(); await new Promise(r => setTimeout(r, 250)); }
-      reject(new Error('server niet gereed (opslag laadt niet)'));
-    })();
+async function boot() {
+  const logfd = fs.openSync(SRVLOG, 'a');
+  /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
+     opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De personas en
+     demozaken zijn de meetinstrumenten van deze beproeving; zonder hen meet ze
+     niets. RTG_STORE=postgres in de megamodus. De gedeelde wegwerpserver draait
+     met --expose-gc + gc-hook (heap lezen), wacht op READINESS (pas als de
+     duurzame opslag echt geladen is, niet op liveness), en schrijft naar de
+     log-fd waar nieuweFouten() uit leest. De datamap (TMP) is van dit script. */
+  const env = { NODE_ENV: 'test', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI',
+    RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT, NODE_OPTIONS: '--max-old-space-size=8192' };
+  if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
+  const bundel = await wegwerp({
+    naam: 'beproeving', poort: PORT, datamap: TMP, gereed: 'ready', logFd: logfd,
+    nodeArgs: ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js')], env, wachtMs: 90000
   });
+  child = bundel.kind;
+  child.on('exit', c => { if (c) console.error('[beproeving] server stopte, code ' + c); });
 }
 function stop() { return new Promise(r => { if (!child) return r(); child.removeAllListeners('exit'); child.on('exit', () => r()); child.kill('SIGKILL'); child = null; }); }
 // Nette (geplande) stop: SIGTERM laat de server zijn write-behind flushen
@@ -478,13 +474,27 @@ async function misbruikBeproeving(tok) {
     uit.push({ naam: 'AI raakt kluis/infra niet', ok: stuk.length === 0, detail: stuk.length ? stuk.join(', ') : 'accounts/techniek/boardroom/doos/auth geweigerd (403)' });
   }
 
-  // 2. De AI beweegt GEEN geld zonder bevestiging: een geld-pad zonder bevestigd
-  //    geeft 428 (bevestigNodig). Mét bevestiging is dat 428 in elk geval weg.
+  // 2. De AI beweegt GEEN geld zonder MENSELIJKE bevestiging. Het ontwerp is een
+  //    tweestapsstroom (server/routes/stuur.js): /doe geeft een eenmalig
+  //    servervoorstel (428 met een goedkeuring), en alleen /doe/bevestig met
+  //    precies dat voorstel voert uit. Een in-band vlaggetje (`bevestigd: true`)
+  //    werkt met opzet NIET meer -- anders kan de tool-lus zichzelf bevestigen,
+  //    en dan is de bevestiging theater. Deze sonde toetste dat oude vlaggetje
+  //    en zakte daardoor op een systeem dat het juist GOED deed: beide kloppen
+  //    gaven 428, en dat is hier de veiligheid en niet de fout.
   {
     const zonder = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 } }, lid);
-    const met = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
-    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true && met.status !== 428;
-    uit.push({ naam: 'AI vraagt bevestiging voor geld', ok, detail: 'zonder=' + zonder.status + (zonder.data && zonder.data.bevestigNodig ? ' (bevestigNodig)' : '') + ', met=' + met.status });
+    const voorstel = zonder.data && zonder.data.goedkeuring;
+    const inBand = await post('/api/member/doe', { pad: '/api/pay/tik', body: { code: 'x', centen: 500 }, bevestigd: true }, lid);
+    const met = voorstel
+      ? await post('/api/member/doe/bevestig', { goedkeuringId: voorstel.id, akkoord: true }, lid)
+      : { status: 0 };
+    const ok = zonder.status === 428 && zonder.data && zonder.data.bevestigNodig === true &&
+      !!voorstel && inBand.status === 428 && met.status !== 428;
+    uit.push({ naam: 'AI vraagt MENSELIJKE bevestiging voor geld', ok,
+      detail: 'zonder=' + zonder.status + (voorstel ? ' (voorstel)' : ' (GEEN voorstel)') +
+        ', zelfbevestigd=' + inBand.status + (inBand.status === 428 ? ' (geweigerd, goed)' : ' (LEK)') +
+        ', via /doe/bevestig=' + met.status });
   }
 
   // 3. Privacy by design: de identiteitskluis (echte naam bij een codenaam)
@@ -539,11 +549,20 @@ async function misbruikBeproeving(tok) {
 
 /* ============================================================================
    HOOFDLOOP
+
+   DE WACHT. Alles hieronder draait een echte beproeving en OVERSCHRIJFT
+   BEPROEVING.json. Zonder deze regel gebeurde dat ook bij een gewone
+   `require('./beproeving')` -- en dat is niet theoretisch: bij de vier
+   rolproeven zette een enkele laadcontrole (`node -e "require(...)"`)
+   ROLPROEF.json van 3377 beproefde routes terug op 292, zonder dat het register
+   er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
+   je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
+if (require.main !== module) { module.exports = {}; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
-  const dekking = new Map(routes.map(r => [r.method + ' ' + r.pad, 0]));
+  const dekking = new Map(routes.map(r => [r.methode + ' ' + r.pad, 0]));
   rij('endpoints uit de bron', nl(routes.length));
   if (MODE === 'postgres') rij('psql', PSQL);
   await poortVrij(); // nooit per ongeluk een oude, achtergebleven server toetsen
@@ -678,6 +697,33 @@ async function misbruikBeproeving(tok) {
   }
 
   // ---------- FASE E: GAUNTLET (vernietigende storm, komt NA de asserties) ----------
+  /* DE OMSTANDER. Voor de storm losgaat wordt een EIGEN lid geregistreerd dat
+     er niet aan meedoet. Niet alleen een apart token: een apart ACCOUNT --
+     want de demo-logins delen hun sessie, en de storm raakt /api/logout, dus
+     elk demo-token (ook een 'bewaard' exemplaar) is na de storm dood. Dat was
+     de les van de vorige ronde: de bewaarde demo-sessie mat alsnog 401 x60.
+     De noodrem-ladder zet na de storm bovendien de inlogpaden tien minuten
+     dicht (by design), dus vers inloggen kan dan ook niet. De belofte van de
+     ladder is dat een BESTAANDE sessie niets merkt; deze omstander is die
+     sessie, en E2/E3 vallen op hem terug als vers inloggen niet kan. */
+  const sessieVanVoorDeStorm = await (async () => {
+    const email = 'omstander-' + Math.random().toString(36).slice(2, 10) + '@proef.rtg';
+    const ww = 'Omstander!7-proef';
+    await post('/api/auth/register', { name: 'Omstander Proef', email, password: ww, geboortedatum: '1990-01-01' });
+    const inlog = await post('/api/auth/login', { login: email, password: ww, pasApp: 'rtg' });
+    const tok = (inlog.data && inlog.data.token) || null;
+    /* En zijn paspoort erbij: RTG Pay eist eenmalig KYC van een echt gratis
+       account (payGate accepteert 'pending'), en zonder die stap kan de
+       vingerafdruk-ijking van E3 zijn kalibratie-oplading niet doen -- dan
+       heet de meter blind terwijl alleen de meetgebruiker nog geen paspoort
+       had laten zien. Een pixel is genoeg: de poort toetst de indiening,
+       niet de foto. */
+    if (tok) {
+      const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+      await post('/api/verify/upload', { image: pixel }, tok);
+    }
+    return { member: tok ? [tok] : [], supplier: [], office: [] };
+  })();
   kop('FASE E: GAUNTLET - ~' + (SOAK_MS / 60000) + ' min - ' + WERKERS + ' werkers - elk endpoint, elke rol, rommel');
   const buckets = { ok: 0, herleid4xx: 0, r429: 0, r503: 0, s5xx: 0, stuk: 0 };
   const vijfxx = new Map(); const perEnd = new Map(); const rolLek = [];
@@ -703,14 +749,14 @@ async function misbruikBeproeving(tok) {
     const tk = rkeuze(tokVoor[rol].length ? tokVoor[rol] : tokVoor.member);
     // de platformbrede schakelkast krijgt een benigne body: fuzzen mag, maar niet
     // de hele kast uitzetten en zo elke andere endpoint-meting vergiftigen.
-    const body = r.method === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
-    const st = await verzoek(r.method, r.pad, tk, body);
+    const body = r.methode === 'GET' ? null : (r.schakel ? { aan: true } : chaosBody(0));
+    const st = await verzoek(r.methode, r.pad, tk, body);
     totaal++; noteerLat(st.ms);
     const pe = perEnd.get(r.pad) || { n: 0, som: 0, max: 0, ok: 0, c4xx: 0, c5xx: 0, r429: 0, r503: 0, stuk: 0 };
     pe.n++; pe.som += st.ms; if (st.ms > pe.max) pe.max = st.ms; perEnd.set(r.pad, pe);
     const pr = rolTel(kruis ? r.rol + ' (verkeerde rol)' : r.rol); pr.n++;
     pr.codes.set(st.status, (pr.codes.get(st.status) || 0) + 1);
-    if (rol === r.rol) dekking.set(r.method + ' ' + r.pad, (dekking.get(r.method + ' ' + r.pad) || 0) + 1);
+    if (rol === r.rol) dekking.set(r.methode + ' ' + r.pad, (dekking.get(r.methode + ' ' + r.pad) || 0) + 1);
     const s = st.status;
     if (s === 0) { buckets.stuk++; pe.stuk++; pr.stuk++; }
     else if (s === 503) { buckets.r503++; pe.r503++; pr.r503++; }
@@ -723,7 +769,7 @@ async function misbruikBeproeving(tok) {
          en verversen we niets -- dan zouden we de rol-scheiding wegpoetsen. */
       if (s === 401 && !kruis && rol !== 'open') versNu(rol);
     }
-    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.method + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
+    else { buckets.ok++; pe.ok++; pr.ok++; if (kruis && r.rol !== 'open') rolLek.push(r.methode + ' ' + r.pad + ' [' + rol + '->' + s + ']'); }
     await new Promise(res => setTimeout(res, 1 + rint(4)));
   }
   async function werker(ix) {
@@ -852,6 +898,17 @@ async function misbruikBeproeving(tok) {
      altijd 401 opleveren en nooit iets over herstel zeggen. */
   const versTok = await tokens();
   if (versTok.member && versTok.member.length) tokVoor.member = versTok.member;
+  /* Kon een rol niet vers inloggen (de inlogpauze van de noodrem-ladder doet
+     precies dat), dan meet de rest van deze fase met de sessie van voor de
+     storm -- de gebruiker die volgens de ladder niets hoort te merken. */
+  let viaBewaardeSessie = false;
+  for (const rol of ['member', 'supplier', 'office']) {
+    if ((!versTok[rol] || !versTok[rol].length) && sessieVanVoorDeStorm[rol] && sessieVanVoorDeStorm[rol].length) {
+      tokVoor[rol] = sessieVanVoorDeStorm[rol];
+      viaBewaardeSessie = true;
+    }
+  }
+  if (viaBewaardeSessie) rij('  meetsessie', 'vers inloggen kon niet (inlogpauze); gemeten met de sessie van voor de storm -- de ladderbelofte zelf');
   const gewoonToken = () => rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office);
   async function gewoneAanroep() {
     const st = await verzoek('POST', '/api/state', gewoonToken(), {});
@@ -910,7 +967,22 @@ async function misbruikBeproeving(tok) {
     { m: 'POST', p: '/api/pay/overzicht', rol: 'member' }, { m: 'POST', p: '/api/office/state', rol: 'office' },
     { m: 'POST', p: '/api/supplier/backoffice', rol: 'supplier' }
   ];
-  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (st.status >= 500) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } await new Promise(res => setTimeout(res, 1 + rint(4))); } }
+  /* DEZELFDE REGEL ALS DE GAUNTLET, EN DAT WAS HIER NIET ZO.
+
+     Hier stond `st.status >= 500`, en 503 is >= 500. De kop van dit bestand
+     belooft nadrukkelijk het tegendeel -- "nul onverwachte 5xx (503 feature-uit
+     en 429 tellen niet mee)" -- en de gauntlet hierboven houdt zich daar netjes
+     aan met een eigen tak per code. Deze lus telde ze wel mee, in dezelfde
+     buckets.s5xx.
+
+     Wat dat kostte: een ronde waarin De Wacht de app in onderhoud zette meldde
+     87.963 "onverwachte serverfouten" die allemaal 503 waren. Het cijfer wees
+     naar een kapotte server terwijl het een dichte deur was, en de echte
+     bevinding -- de app gaat in onderhoud en komt niet terug -- stond een regel
+     lager veel zachter opgeschreven. Een meter die zijn eigen regel niet volgt
+     wijst de verkeerde kant op precies wanneer het spannend is (LAT-regel 10). */
+  const echteServerfout = (s) => s >= 500 && s !== 503;
+  async function leesWerker() { while (Date.now() < stormEind) { const r = leesPaden[rint(leesPaden.length)]; const tk = rkeuze(tokVoor[r.rol].length ? tokVoor[r.rol] : tokVoor.member); const st = await verzoek(r.m, r.p, tk, r.m === 'GET' ? null : {}); if (echteServerfout(st.status)) { buckets.s5xx++; vijfxx.set(r.p, (vijfxx.get(r.p) || 0) + 1); } else if (st.status === 503) buckets.r503++; await new Promise(res => setTimeout(res, 1 + rint(4))); } }
   async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
   async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
   const lekMin = LEK_MS / 60000;
@@ -1126,8 +1198,26 @@ async function misbruikBeproeving(tok) {
      vraag welke stand er toevallig draaide. */
   const cijfers = {
     gedraaid: new Date().toISOString(),
+    stempel: stempel(),
+    uitleg: 'Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder ' +
+      'belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en ' +
+      'herstel (komt de gewone aanroep terug binnen zijn grens na de storm).',
+    /* DE GRENS. Zonder dit veld leest elk getal hier als een garantie, en dat is
+       het niet: dit is EEN machine, EEN seed en EEN duur. */
+    grens: 'Dit zegt niets over gedrag op andere hardware, over een langere duur dan ' +
+      'deze ronde, of over endpoints die niet zijn bestookt (zie meters.endpointsOnbereikt). ' +
+      '"0% verkeerde-rol-2xx" is een ondergrens en geen bewijs van rolscheiding -- daarvoor ' +
+      'is scripts/rolproef-route.js er. Een groene beproeving betekent: onder DEZE last, op ' +
+      'DEZE machine, is er niets omgevallen.',
     modus: MODE,
-    machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version },
+    machine: { kernen: os.cpus().length, geheugenGB: Math.round(os.totalmem() / 1e9), platform: process.platform, node: process.version,
+      /* DE GEMETEN SNELHEID VAN DEZE MACHINE, niet alleen zijn vorm. Twee cloud-
+         containers met dezelfde kernen en hetzelfde geheugen kunnen op ander
+         silicium draaien; "4k/17g/linux/sqlite" zag er identiek uit terwijl de
+         een een p99 van 144 haalde en de ander consistent 233. scripts/norm.js
+         vergelijkt latenties alleen tussen machines waarvan deze kalibratie
+         (dezelfde vaste spin-werklast, in rust gemeten) dicht bij elkaar ligt. */
+      kalibratieBasisMs: Number(kal.basis.toFixed(1)) },
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
     gezakteDrempels: gezakt,
     meters: {

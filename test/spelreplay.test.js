@@ -2,7 +2,7 @@
    dit zegt HOE. Aparte tak en aparte termijn -- een uitslag is een feit dat
    een jaar meegaat, een verloop is een geheugen van een maand.
 
-   Draai los: node --experimental-sqlite --test test/spelreplay.test.js */
+   Draai los: node --test test/spelreplay.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

@@ -23,12 +23,27 @@ const BLOK_START = 1000000; // reeks begint hoog, zodat losse seed-id's (1,2,3) 
 
 const USER_COLS = ['id', 'email_hash', 'username', 'password_hash', 'tier', 'codename',
   'enc_name', 'enc_email', 'enc_phone', 'phone_hash', 'created_at', 'verified', 'id_doc',
-  'member_state', 'email_verified', 'reset_hash', 'reset_expires'];
+  'member_state', 'email_verified', 'reset_hash', 'reset_expires', 'actief', 'sessies_vanaf',
+  'public_mail_hash'];
 // Houd de personeelsidentiteit ook in de gedeelde waarheid. Zonder member_id
 // werkte "een account voor alles" alleen op de lokale SQLite-cache en raakte de
 // koppeling kwijt zodra een volgende app-instance het verzoek afhandelde.
 const STAFF_COLS = ['id', 'supplier_code', 'name', 'pin_hash', 'role', 'active', 'created_at', 'func',
   'member_id', 'member_tier'];
+
+/* KOLOMMEN DIE GEEN NULL VERDRAGEN, met de waarde die de tabel zelf zou hebben
+   ingevuld. Een rij die zo'n kolom niet noemt, komt hier binnen als undefined,
+   en undefined werd hieronder een EXPLICIETE null -- dat is iets anders dan de
+   kolom weglaten: de default slaat niet meer aan en Postgres weigert de rij.
+   Op de JSON- en sqlite-opslag valt dat niemand op, want die kennen de eis niet;
+   in Postgres viel de hele spiegel om ("null value in column actief violates
+   not-null constraint") en daarmee alle tien de pg-toetsen tegelijk.
+   Deze waarden staan woordelijk in de DDL hieronder. Komt er een kolom bij met
+   NOT NULL DEFAULT, dan hoort hij hier ook. */
+const NIET_NULL = { actief: 1, sessies_vanaf: 0 };
+const waarde = (row, c) => (row[c] === undefined || row[c] === null
+  ? (c in NIET_NULL ? NIET_NULL[c] : null)
+  : row[c]);
 
 function maakPgAccounts({ url, log }) {
   const { Pool } = require('./pgwire');
@@ -43,7 +58,8 @@ function maakPgAccounts({ url, log }) {
       enc_name TEXT, enc_email TEXT, enc_phone TEXT, phone_hash TEXT,
       created_at TEXT NOT NULL, verified TEXT NOT NULL DEFAULT 'unverified', id_doc TEXT,
       member_state TEXT, email_verified INTEGER NOT NULL DEFAULT 0,
-      reset_hash TEXT, reset_expires BIGINT
+      reset_hash TEXT, reset_expires BIGINT, actief INTEGER NOT NULL DEFAULT 1,
+      sessies_vanaf BIGINT NOT NULL DEFAULT 0, public_mail_hash TEXT
     )`);
     await pool.query(`CREATE TABLE IF NOT EXISTS supplier_staff (
       id BIGINT PRIMARY KEY, supplier_code TEXT NOT NULL, name TEXT NOT NULL,
@@ -55,6 +71,10 @@ function maakPgAccounts({ url, log }) {
     // herhaalbaar bij iedere start en vraagt geen migratiepakket.
     await pool.query('ALTER TABLE supplier_staff ADD COLUMN IF NOT EXISTS member_id BIGINT');
     await pool.query('ALTER TABLE supplier_staff ADD COLUMN IF NOT EXISTS member_tier TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS actief INTEGER NOT NULL DEFAULT 1');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS sessies_vanaf BIGINT NOT NULL DEFAULT 0');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS public_mail_hash TEXT');
+    await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_public_mail_hash ON users(public_mail_hash) WHERE public_mail_hash IS NOT NULL');
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_code ON supplier_staff(supplier_code)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_staff_member ON supplier_staff(member_id)`);
     await pool.query(`CREATE SEQUENCE IF NOT EXISTS rtg_id_seq INCREMENT BY ${BLOK} START ${BLOK_START} MINVALUE ${BLOK_START}`);
@@ -107,7 +127,7 @@ function maakPgAccounts({ url, log }) {
   const BRON = require('crypto').randomBytes(6).toString('hex');
 
   async function upsertUser(row) {
-    await pool.query(upUserSQL(), USER_COLS.map(c => row[c] === undefined ? null : row[c]));
+    await pool.query(upUserSQL(), USER_COLS.map(c => waarde(row, c)));
     await pool.query('SELECT pg_notify($1, $2)', [KANAAL, 'user:' + row.id + ':' + BRON]);
   }
   async function upsertStaff(row) {

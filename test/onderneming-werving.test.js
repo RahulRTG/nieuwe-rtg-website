@@ -15,7 +15,7 @@
    4. ER WORDT NIETS NAAST GEBOUWD. Vacatures en sollicitaties bestaan al; deze
       laag telt en klokt ze.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-werving.test.js */
+   Draai los: node --test test/onderneming-werving.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

@@ -28,12 +28,12 @@
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.55rem 0.9rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
   .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   /* de feed: verticale snap, EINDIG (bewust geen oneindige scroll) */
@@ -48,7 +48,7 @@
   .laag .m{font-size:0.78rem;color:var(--soft);margin-top:0.2rem;}
   .laag .rij{display:flex;gap:0.5rem;margin-top:0.7rem;flex-wrap:wrap;}
   .status{position:absolute;top:calc(env(safe-area-inset-top,0px) + 4rem);left:50%;transform:translateX(-50%);
-    background:rgba(12,12,11,0.72);border:1px solid var(--line);border-radius:999px;
+    background:rgba(12,12,11,0.72);border:1px solid var(--line);border-radius:0;
     padding:0.35rem 0.85rem;font-size:0.75rem;color:var(--soft);}
   .einde{height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;gap:0.8rem;
     align-items:center;justify-content:center;text-align:center;padding:2rem;}
@@ -58,23 +58,23 @@
      eronder: witte tekst op willekeurig beeld leest anders soms niet. */
   .ondert{position:absolute;left:0;right:0;bottom:8.5rem;text-align:center;padding:0 1.2rem;pointer-events:none;}
   .ondert span{display:inline-block;background:rgba(12,12,11,0.78);color:#F4F1EC;font-size:0.95rem;
-    line-height:1.45;border-radius:8px;padding:0.3rem 0.7rem;max-width:34ch;}
+    line-height:1.45;border-radius:0;padding:0.3rem 0.7rem;max-width:34ch;}
   .merk{display:inline-block;font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;
-    border:1px solid var(--line);border-radius:999px;padding:0.1rem 0.5rem;margin-left:0.4rem;color:var(--soft);}
+    border:1px solid var(--line);border-radius:0;padding:0.1rem 0.5rem;margin-left:0.4rem;color:var(--soft);}
   .cue{display:grid;grid-template-columns:4rem 4rem 1fr auto;gap:0.4rem;margin-bottom:0.4rem;align-items:center;}
   .cue input{width:100%;}
   .sheet{position:fixed;inset:0;z-index:10;background:rgba(12,12,11,0.92);display:none;
     align-items:flex-end;justify-content:center;}
   .sheet.open{display:flex;}
-  .sheet .vlak{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;
+  .sheet .vlak{background:var(--card);border:1px solid var(--line);border-radius:0;
     width:min(560px,100vw);max-height:88dvh;overflow-y:auto;padding:1.1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);}
   .vlak h2{font-family:'Bodoni Moda',serif;font-size:1.2rem;margin-bottom:0.6rem;}
   .vlak label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
-  #studioDoek{width:100%;max-height:46dvh;background:#000;border-radius:12px;}
+  #studioDoek{width:100%;max-height:46dvh;background:#000;border-radius:0;}
   .reactieRij{border-top:1px solid var(--line);padding:0.55rem 0;font-size:0.82rem;}
-  .reactieRij b{color:var(--gold);font-weight:600;}
+  .reactieRij b{color:var(--rtg-leesgoud,var(--gold));font-weight:600;}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    z-index:20;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;
+    z-index:20;background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;
     font-size:0.8rem;max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
@@ -90,8 +90,12 @@
   <h1>Clips</h1>
   <span class="rek"></span>
   <button class="knop" id="volgbaar" type="button" aria-pressed="false">Alleen met ondertitel</button>
-  <button class="knop" id="studioOpen" type="button">Maak een clip</button>
 </header>
+<!-- "Maak een clip" stond in de kopbalk, op y 22 van 844. GRAMMATICA.md opent
+     met "ik wil iets doen -> mijn duim vindt het onderaan", dus staat hij nu in
+     de vaste strook (shared/rtg-ui.css, .rtg-duimbalk). Boven telefoonmaat is
+     dat gewoon een rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop" id="studioOpen" type="button" data-hoofdactie>Maak een clip</button></div>
 
 <main id="feed" aria-label="De dagselectie van vandaag"></main>
 

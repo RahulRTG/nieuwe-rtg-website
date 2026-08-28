@@ -23,7 +23,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, wachtOpRust, volgVerzoeken, browserOpties } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -53,7 +53,9 @@ const KANDIDATEN = kandidaten();
 async function start() {
   let laatste = null;
   for (const k of KANDIDATEN) {
-    try { return await k.chromium.launch({ args: ['--no-sandbox'] }); } catch (e) { laatste = e; }
+    // browserOpties krijgt DE KANDIDAAT waarop we starten, niet een `pw` die
+    // hier niet bestaat -- dat gaf ReferenceError zodra er een browser was.
+    try { return await k.chromium.launch(browserOpties(k)); } catch (e) { laatste = e; }
   }
   throw laatste || new Error('geen browser');
 }
@@ -76,6 +78,7 @@ async function open(base, token) {
     } catch (e) {}
   }, token);
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   return { browser, page };
 }
 
@@ -104,7 +107,9 @@ test('de banner vraagt om het stuk dat het werk vraagt, en alleen daar',
        wachten zou hier eeuwig duren en dan een timeout opleveren die eruitziet
        als een kapot scherm in plaats van als een goed scherm. */
     await page.waitForSelector('#vakbewijsBanner', { state: 'attached', timeout: 15000 });
-    await page.waitForTimeout(1500);
+    /* De bewering gaat over een LEGE banner; die valt niet af te wachten met
+       "verschijnt er iets", dus wachten tot het scherm stil is. */
+    await wachtOpRust(page, null, { rondes: 3 });
     const leeg = await page.evaluate(() => {
       const el = document.querySelector('#vakbewijsBanner');
       return el ? el.innerHTML.trim() : 'GEEN ELEMENT';
@@ -201,6 +206,7 @@ test('het kantoor ziet de stapel, met de codenaam en niet de echte naam',
       } catch (e) {}
     }, office);
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(base + '/apps/backoffice.html', { waitUntil: 'domcontentloaded' });

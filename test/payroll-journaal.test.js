@@ -13,7 +13,7 @@
    - en bij ziekte: er is geen veld voor wat iemand heeft, en een
      leidinggevende ziet "afwezig", niet "ziek".
 
-   Draai los: node --experimental-sqlite --test test/payroll-journaal.test.js */
+   Draai los: node --test test/payroll-journaal.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

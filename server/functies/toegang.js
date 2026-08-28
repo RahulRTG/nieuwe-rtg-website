@@ -150,27 +150,17 @@ function padGeblokkeerd(pad, staat, ctx) {
   return { id: f.id, naam: f.naam, categorie: f.categorie, paden: f.paden, doelgroepen: f.doelgroepen, reden };
 }
 
-/* De doelgroep van een verzoek. Expliciete app-paden bepalen de doelgroep,
-   ongeacht wie er inlogt (leveranciers, personeel, backoffice, foundation). Op
-   de gedeelde leden- en Salon-paden volgt de doelgroep de pas van het account. */
-function tierNaarDoelgroep(tier) {
-  if (tier === 'lifestyle') return 'lifestyle';
-  if (tier === 'business') return 'business';
-  if (tier === 'rtg') return 'rtg';
-  if (tier === 'guest') return 'gast'; // de gratis app is een eigen doelgroep
-  return null; // onbekend: alleen de globale schakelaar telt
-}
-function doelgroepVanVerzoek(pad, user) {
-  if (pad.startsWith('/api/supplier') || pad.startsWith('/api/partner')) return 'leverancier';
-  if (pad.startsWith('/api/staff')) return 'personeel';
-  if (pad.startsWith('/api/office')) return 'intern';
-  if (pad.startsWith('/api/foundation')) return 'foundation';
-  return user ? tierNaarDoelgroep(user.tier) : null;
-}
-
 // De volledige catalogus met de huidige stand, geordend per categorie (voor het
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
-module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
+/* WIE BELT ER STAAT IN ./doelgroep, en dat is geen willekeurige snede. Dit
+   bestand beantwoordt "mag dit pad" -- prefixen, schakelaars, redenen. Dat
+   andere beantwoordt "wie is de beller", en dat werd een eigen onderwerp toen
+   WorkOS zijn relatie tot een organisatie liet meetellen (WERELDEN.md). Ze
+   worden hier samen doorgegeven, zodat geen enkele beller iets hoeft te weten
+   van de opdeling. */
+const { doelgroepVanVerzoek, tierNaarDoelgroep, WERKPADEN } = require('./doelgroep');
+
+module.exports = { prefixLengte, functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
   heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd,
-  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, inCanary };
+  doelgroepVanVerzoek, tierNaarDoelgroep, WERKPADEN, volgKoppels, inCanary };

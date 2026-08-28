@@ -74,7 +74,7 @@
       return { element: d, sluit: b.sluit };
     }
     d.className = 'kaart';
-    d.style.cssText = 'position:fixed;inset:auto 0 0 0;max-height:88vh;overflow:auto;z-index:40;border-radius:16px 16px 0 0;';
+    d.style.cssText = 'position:fixed;inset:auto 0 0 0;max-height:88vh;overflow:auto;z-index:40;border-radius:0;';
     document.body.appendChild(d);
     return { element: d, sluit: function () { d.remove(); } };
   }

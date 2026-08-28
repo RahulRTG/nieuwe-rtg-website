@@ -20,7 +20,7 @@
    - de manager-eis bij niveau 'kopie' uit kern/payroll/identiteit.js gehaald
      -> "een kopie is voor de manager" ZAKT (RAAK)
 
-   Draai los: node --experimental-sqlite --test test/supplier-comm-routes.test.js
+   Draai los: node --test test/supplier-comm-routes.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');

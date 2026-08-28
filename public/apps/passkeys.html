@@ -18,30 +18,30 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.6rem 0.95rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
   .knop:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;font-size:0.85rem;padding:0.6rem 0.85rem;}
   label{display:block;font-size:0.72rem;color:var(--soft);margin:0.7rem 0 0.3rem;}
   .rij{display:flex;gap:0.5rem;margin-top:0.6rem;flex-wrap:wrap;align-items:center;}
   .rij input{flex:1;min-width:9rem;width:auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
   .sleutel{display:flex;align-items:baseline;gap:0.7rem;border-top:1px solid var(--line);padding:0.55rem 0;font-size:0.85rem;}
   .sleutel:first-child{border-top:none;}
   .sleutel .sub{font-size:0.7rem;color:var(--soft);}
   .sleutel .rek{flex:1;}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
@@ -67,7 +67,7 @@
     <h2>Inloggen met een passkey</h2>
     <div class="kaart">
       <div class="rij">
-        <button class="knop vol" id="lKnop" type="button">Log in met passkey</button>
+        <button class="knop vol" id="lKnop" type="button" data-hoofdactie>Log in met passkey</button>
       </div>
       <p class="stil h-mt50" id="lStatus"></p>
     </div>

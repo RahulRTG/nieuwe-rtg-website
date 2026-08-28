@@ -15,6 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { heeftVinger } = require('./versieadres');
 
 const GZIP_TYPE = {
   '.js': 'application/javascript; charset=utf-8',
@@ -70,11 +71,43 @@ function jsonGzip() {
       let s;
       try { s = JSON.stringify(data); } catch (e) { return gewoonJson(data); }
       if (typeof s !== 'string' || s.length < 1024 || res.headersSent) return gewoonJson(data);
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Content-Encoding', br ? 'br' : 'gzip');
-      res.setHeader('Vary', 'Accept-Encoding');
-      return res.send(br ? zlib.brotliCompressSync(Buffer.from(s), BR_ANTWOORD)
-                         : zlib.gzipSync(Buffer.from(s), { level: 6 }));
+      /* ASYNCHROON, EN DAT IS HIER GEEN SMAAKKWESTIE.
+
+         Dit stond op brotliCompressSync/gzipSync, en die doen hun rekenwerk OP
+         DE EVENT-LOOP: zolang zlib bezig is staat de hele server stil, ook voor
+         verzoeken die niets met dit antwoord te maken hebben. Gemeten met gzip-6
+         op een echt API-antwoord: 0,8 ms bij 164 kB, 4,2 ms bij 827 kB, 16,3 ms
+         bij 3320 kB (brotli-4 vergelijkbaar). Dat lijkt weinig tot je het maal
+         de doorvoer doet -- bij 300 van die verzoeken per seconde is het een
+         kwart seconde per seconde, en het slaat neer op de p99 van ELK verzoek,
+         ook de kleine die zelf niet eens gecomprimeerd worden.
+
+         De asynchrone vorm rekent in de threadpool en levert byte-voor-byte
+         dezelfde uitvoer (nagemeten met Buffer.equals). De statische laag
+         hieronder blijft synchroon: die comprimeert een bestand EEN keer en
+         bewaart het, dus daar valt geen herhaald werk weg te halen.
+
+         De koppen worden pas gezet als de compressie GELUKT is: zou
+         Content-Encoding er al staan en de compressie daarna falen, dan beloofde
+         het antwoord een verpakking die er niet is. */
+      const bron = Buffer.from(s);
+      const klaar = (err, uit) => {
+        if (res.headersSent) return;
+        if (err || !uit) {
+          /* Niets slaat stil over (LAT.md regel 5): onverpakt bezorgen is de
+             juiste uitwijk, maar hij hoort geteld te worden. De synchrone vorm
+             zou hier gegooid hebben en dus zichtbaar zijn geweest. */
+          try { require('../log').log.warn('compressie mislukt (' + (err && err.message) + '); onverpakt bezorgd.'); } catch (e) {}
+          return gewoonJson(data);
+        }
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Content-Encoding', br ? 'br' : 'gzip');
+        res.setHeader('Vary', 'Accept-Encoding');
+        res.send(uit);
+      };
+      if (br) zlib.brotliCompress(bron, BR_ANTWOORD, klaar);
+      else zlib.gzip(bron, { level: 6 }, klaar);
+      return res;
     };
     next();
   };
@@ -140,7 +173,13 @@ function statischGzip(publicDir) {
        niet genoeg gebleken in de praktijk. */
     const etag = 'W/"' + st.size.toString(16) + '-' + Math.round(st.mtimeMs).toString(16) + (minMtimeMs ? '-m' + Math.round(minMtimeMs).toString(16) : '') + '-' + (br ? 'b' : 'g') + '"';
     res.setHeader('ETag', etag);
-    res.setHeader('Cache-Control', 'no-cache');
+    /* ...TENZIJ het adres de vingerafdruk van het bestand draagt. Dan is
+       navragen zinloos: hetzelfde adres is per definitie dezelfde inhoud, en
+       verandert het bestand dan verwijst de nieuwe html naar een NIEUW adres.
+       Precies het bezwaar hierboven -- oud script naast nieuwe html -- kan dan
+       niet meer uitkomen. Zie ./versieadres.js; dat scheelt bij een
+       herhaalbezoek zevenenzestig keer navragen. */
+    res.setHeader('Cache-Control', heeftVinger(req) ? 'public, max-age=31536000, immutable' : 'no-cache');
     if (req.headers['if-none-match'] === etag) { res.statusCode = 304; return res.end(); }
     res.setHeader('Content-Type', type);
     res.setHeader('Content-Encoding', br ? 'br' : 'gzip');

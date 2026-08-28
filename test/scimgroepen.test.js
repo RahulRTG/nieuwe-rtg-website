@@ -169,3 +169,68 @@ test('5. een groep weghalen wist de groep en niet de mensen', async () => {
   const mensen = await scim('/api/scim/v2/Users', {}, sleutelA);
   assert.equal(mensen.status, 200, 'de gebruikerskant werkt gewoon door');
 });
+
+/* 6. PUT IS GEEN TWEEDE PATCH. Waar PATCH een wijziging beschrijft, zet PUT de
+   groep in zijn geheel terug: wat niet in het lijf staat, staat er daarna niet
+   meer. Dat is precies de vorm waar een IdP mensen mee VERWIJDERT -- Okta stuurt
+   bij "push groups" de hele ledenlijst en verwacht dat wie er niet in staat,
+   eruit is. Zou deze route de leden aanvullen in plaats van vervangen, dan blijft
+   iemand die vanochtend uit de groep is gehaald zijn rol houden, en dat is
+   precies het gat waarvoor deze hele laag bestaat.
+
+   Deze route werd door de hele toetssuite nooit aangeraakt (hij stond niet in
+   DEKKING.json), terwijl zijn vier buren op hetzelfde pad dat wel werden. */
+test('6. PUT vervangt de hele groep -- naam en leden -- en alleen binnen de eigen organisatie', async () => {
+  const gemaakt = await scim('/api/scim/v2/Groups', { methode: 'POST',
+    lijf: { displayName: 'Utrecht-Balie', members: [{ value: '4' }, { value: '5' }] } }, sleutelA);
+  assert.equal(gemaakt.status, 201, JSON.stringify(gemaakt.body).slice(0, 160));
+  const id = gemaakt.body.id;
+  const leden = async () => (await scim(groepPad(id), {}, sleutelA)).body.members.map(m => m.value);
+
+  /* De vervanging zelf: andere naam, andere leden, in één verzoek. */
+  const vervangen = await scim(groepPad(id), { methode: 'PUT',
+    lijf: { displayName: 'Utrecht-Receptie', members: [{ value: '6' }, { value: '7' }] } }, sleutelA);
+  assert.equal(vervangen.status, 200, JSON.stringify(vervangen.body).slice(0, 160));
+  assert.equal(vervangen.body.displayName, 'Utrecht-Receptie', 'de naam is meeverzet');
+  assert.deepEqual(vervangen.body.members.map(m => m.value), ['6', '7'],
+    'de oude leden zijn weg, niet aangevuld');
+  assert.equal(vervangen.body.id, id, 'en het is dezelfde groep gebleven');
+  assert.deepEqual(await leden(), ['6', '7'], 'en het staat er ook echt, niet alleen in het antwoord');
+
+  /* WAT NIET IN HET LIJF STAAT, STAAT ER DAARNA NIET MEER. Dit is het verschil
+     met PATCH en het is de helft waar toegang verdwijnt. */
+  const zonderLeden = await scim(groepPad(id), { methode: 'PUT',
+    lijf: { displayName: 'Utrecht-Receptie' } }, sleutelA);
+  assert.equal(zonderLeden.status, 200);
+  assert.deepEqual(await leden(), [], 'een PUT zonder members maakt de groep leeg');
+
+  /* EEN GEWEIGERDE VERVANGING VERANDERT NIETS. De naam botst met een tweede
+     groep, dus de hele PUT gaat niet door -- ook de leden niet. Half doorgevoerd
+     is hier erger dan geweigerd: dan is de groep leeg onder de oude naam. */
+  await scim(groepPad(id), { methode: 'PUT',
+    lijf: { displayName: 'Utrecht-Receptie', members: [{ value: '8' }] } }, sleutelA);
+  const tweede = await scim('/api/scim/v2/Groups', { methode: 'POST',
+    lijf: { displayName: 'Utrecht-Keuken', members: [] } }, sleutelA);
+  assert.equal(tweede.status, 201);
+  const botst = await scim(groepPad(id), { methode: 'PUT',
+    lijf: { displayName: 'Utrecht-Keuken', members: [] } }, sleutelA);
+  assert.equal(botst.status, 409, 'twee groepen met dezelfde naam is er een te veel');
+  assert.deepEqual(await leden(), ['8'], 'en de leden staan er nog precies zoals ze stonden');
+
+  /* DE POORT. Dezelfde drie weigeringen als bij de andere methoden op dit pad:
+     een onbekende groep, de sleutel van de buurorganisatie, en geen sleutel. */
+  const onbekend = await scim(groepPad('99999'), { methode: 'PUT',
+    lijf: { displayName: 'Bestaat-Niet', members: [] } }, sleutelA);
+  assert.equal(onbekend.status, 404, 'een groep die er niet is, wordt niet stilzwijgend gemaakt');
+
+  const buurman = await scim(groepPad(id), { methode: 'PUT',
+    lijf: { displayName: 'Overgenomen', members: [{ value: '1' }] } }, sleutelB);
+  assert.equal(buurman.status, 404, 'de sleutel van B vervangt de groep van A niet');
+  assert.deepEqual(await leden(), ['8'], 'en heeft er ook niets aan veranderd');
+
+  const zonderSleutel = await fetch(base + groepPad(id), {
+    method: 'PUT', headers: { 'Content-Type': 'application/scim+json' },
+    body: JSON.stringify({ displayName: 'Open', members: [] })
+  });
+  assert.equal(zonderSleutel.status, 401, 'zonder sleutel komt er niets doorheen');
+});

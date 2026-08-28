@@ -19,7 +19,7 @@
    5. Wat er niet in zit (APPEND) wordt DUIDELIJK geweigerd. Een client die
       denkt dat zijn concept is opgeslagen terwijl dat niet zo is, verliest
       werk.
-   Draai: node --experimental-sqlite --test test/imap.test.js */
+   Draai: node --test test/imap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');

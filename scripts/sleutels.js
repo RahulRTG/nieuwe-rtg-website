@@ -84,6 +84,20 @@ if (priveBeta) {
   );
 }
 if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmatige werkmodus blijft beschikbaar']);
+/* DE NOODREM OP DE MODELKRAAN, en die staat er ook als de AI vandaag uit is:
+   wie hem later aanzet, hoort hem niet zonder plafond aan te zetten.
+
+   Vijftig dollar per dag is ongeveer 5.000 aanroepen. Normaal gebruik komt daar
+   niet bij in de buurt -- er staat nog een budget PER PERSOON voor (zie
+   server/ai-budget.js), en dat is de grens die een lid raakt. Dit is de grens
+   voor wat daar niet onder valt: een uitgelekte sleutel, een lus die op hol
+   slaat, een lek verspreid over veel accounts.
+
+   Let op wat er boven dit bedrag gebeurt: externe modellen vallen terug op de
+   handmatige werkmodus. Dat is een stand die dit huis draagt, geen storing.
+   Per proces en in het geheugen, dus na een herstart begint de dag opnieuw --
+   het is een noodrem, geen boekhouding. */
+regels.push(['RTG_AI_DAGPLAFOND', '50', 'noodrem: dagbedrag in dollar voor ALLE externe modellen samen']);
 if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
 if (zonderSms) regels.push(['RTG_HERSTEL_SMS_UIT_BEWUST', '1', 'BEWUST: telefoonherstel weigert fail-closed zolang geen echte SMS-provider is gekoppeld']);
 if (nativeTls) regels.push(

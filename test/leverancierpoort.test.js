@@ -194,3 +194,133 @@ test('notifySupplier houdt veertig meldingen en zet ze ongelezen bovenaan', () =
   assert.match(lijst[0].id, /^[0-9a-f]{8}$/, 'een id uit de CSPRNG, niet uit de klok');
   assert.equal(geseind.at(-1).event, 'notify');
 });
+
+/* ============================================================================
+   DE ABONNEMENTSPOORT -- het onderdeel waar dit verzoek heen gaat, zit dat in
+   het abonnement van de zaak?
+
+   WAAROM HIER EN NIET IN DE KASSABESTANDEN. Om dezelfde reden als de
+   persoonseis hierboven: dit is het enige keelgat waar elke leveranciersroute
+   doorheen moet, dus een kassaroute die er morgen naast wordt gebouwd valt er
+   vanzelf onder. Een controle per bestand is de zevenenzeventigste
+   pas-id-controle in een ander jasje.
+
+   HET VERSCHIL MET DE PERSOONSEIS. Die valt DICHT als haar laag ontbreekt; deze
+   valt terug op de ruimste zakelijke trede. Dat verschil is een besluit en geen
+   slordigheid -- toets 3 hieronder houdt het vast.
+   ========================================================================== */
+
+/* De trede uit de tabel halen en niet overtypen: een vaste naam hier zou stil
+   verlopen zodra het productprofiel verandert. */
+const capsTabel = require('../server/kern/commercie/capaciteiten');
+const GOVERNANCE_WEL = capsTabel.tredenMet('can_use_enterprise_governance')[0];
+const GOVERNANCE_NIET = capsTabel.tredenMet('can_be_partner')
+  .find((t) => !capsTabel.mag(t, 'can_use_enterprise_governance'));
+
+function zaakOpTrede(trede, schaduw) {
+  const sessies = { g: { role: 'supplier', code: 'AAA', manager: true, lid: 7 } };
+  const kern = {
+    persoonseis: { isGedeeldeInlog: () => false, persoonVanActor: () => ({ lid: 7, sleutel: 'k' }),
+      magWerkenHier: () => ({ ok: true }) },
+    zaakAbonnement: trede === undefined ? undefined : { van: () => ({ pas: trede, herkomst: 'vastgelegd' }) },
+    handhavingSchaduw: schaduw || undefined
+  };
+  const o = opstelling({ kern, sessies });
+  o.db.data.suppliers.push({ code: 'AAA', type: VRIJ });
+  return o;
+}
+
+function verzoek(o, pad) {
+  const res = antwoord();
+  let door = false;
+  o.poort.supplierAuth({ get: () => 'Bearer g', path: pad }, res, () => { door = true; });
+  return { door, uit: res.uit };
+}
+
+test('de abonnementspoort houdt een onderdeel tegen dat niet in het abonnement zit', () => {
+  const lite = zaakOpTrede(GOVERNANCE_NIET);
+  const geweigerd = verzoek(lite, '/api/supplier/command/beleid/zet');
+  assert.equal(geweigerd.door, false, GOVERNANCE_NIET + ' bevat geen governance');
+  assert.equal(geweigerd.uit.status, 402, 'dit is een betaalgrens en geen verboden deur');
+  assert.equal(geweigerd.uit.body.capability, 'can_use_enterprise_governance');
+  assert.match(geweigerd.uit.body.error, /abonnement van deze zaak/);
+
+  // en de rest van dezelfde cockpit gaat gewoon open
+  assert.equal(verzoek(lite, '/api/supplier/command/graaf').door, true,
+    'alleen beleid en journaal zijn governance; de cockpit hoort bij elke zakelijke trede');
+  assert.equal(verzoek(lite, '/api/supplier/pos/sale').door, true, 'de kassa zit wel in deze trede');
+});
+
+test('een zaak op de hoogste trede komt overal langs', () => {
+  const groot = zaakOpTrede(GOVERNANCE_WEL);
+  for (const pad of ['/api/supplier/command/beleid', '/api/supplier/pos/sale',
+    '/api/supplier/payroll/runs', '/api/supplier/rooster/voorstel', '/api/supplier/mall'])
+    assert.equal(verzoek(groot, pad).door, true, pad + ' hoort open te zijn op ' + GOVERNANCE_WEL);
+});
+
+test('zonder de abonnementslaag valt de poort TERUG en niet dicht', () => {
+  /* Dit is het spiegelbeeld van de persoonseis erboven, en met opzet. Die
+     beschermt kinderen en hoort dicht te vallen; deze bewaakt een productgrens.
+     Een zaak die vandaag een kassa draait en morgen niet meer, omdat een laag
+     niet gemount was, is een storing met een nette naam. */
+  const kaal = zaakOpTrede(undefined);
+  assert.equal(verzoek(kaal, '/api/supplier/pos/sale').door, true);
+  assert.equal(verzoek(kaal, '/api/supplier/command/beleid').door, true,
+    'de terugval is de ruimste zakelijke trede, zodat er niemand iets kwijtraakt');
+});
+
+test('een pad dat nergens onder valt, wordt door de poort niet aangeraakt', () => {
+  const lite = zaakOpTrede(GOVERNANCE_NIET);
+  assert.equal(verzoek(lite, '/api/supplier/state').door, true);
+  assert.equal(verzoek(lite, undefined).door, true, 'geen pad is geen weigering');
+});
+
+/* ============================================================================
+   DE SCHADUWSTAND AAN DE DEUR ZELF.
+
+   kern/commercie/schaduw.js is met zes mutaties nagelopen en geen daarvan liet
+   deze poort zakken -- dus dat de deur de schaduwlaag werkelijk raadpleegt, was
+   nergens bewezen. Een laag die je alleen los toetst, is een laag waarvan je
+   hoopt dat hij is aangesloten.
+   ========================================================================== */
+const { maakSchaduw } = require('../server/kern/commercie/schaduw');
+
+function schaduwlaag(modus) {
+  const db = { data: {} };
+  const S = maakSchaduw({ db, save: () => {}, nu: () => 1000 });
+  const id = 'abonnementspoort.can_use_enterprise_governance';
+  S.meld(id, 'SCHADUW');
+  if (modus === 'AFDWINGEN') {
+    S.stelVrij(id, 'in deze toets gaat het om de deur en niet om de rijpheid', 'toets');
+    S.zetModus(id, 'AFDWINGEN', 'toets');
+  }
+  return { S, id };
+}
+
+test('een regel in de SCHADUW laat het verzoek door en telt wat hij zou doen', () => {
+  const { S, id } = schaduwlaag('SCHADUW');
+  const lite = zaakOpTrede(GOVERNANCE_NIET, S);
+
+  const r = verzoek(lite, '/api/supplier/command/beleid/zet');
+  assert.equal(r.door, true, 'een schaduwregel houdt niemand tegen -- ook niet aan de echte deur');
+
+  const st = S.stand(id);
+  assert.equal(st.waarnemingen, 1, 'maar de deur meldt hem wel');
+  assert.equal(st.zouTegenhouden, 1);
+  assert.equal(st.voorbeelden[0].wie, 'AAA');
+  assert.equal(st.voorbeelden[0].wat, '/api/supplier/command/beleid/zet');
+});
+
+test('dezelfde regel op AFDWINGEN houdt hetzelfde verzoek wel tegen', () => {
+  const { S } = schaduwlaag('AFDWINGEN');
+  const lite = zaakOpTrede(GOVERNANCE_NIET, S);
+  const r = verzoek(lite, '/api/supplier/command/beleid/zet');
+  assert.equal(r.door, false);
+  assert.equal(r.uit.status, 402);
+});
+
+test('zonder schaduwlaag doet de poort wat hij altijd deed, niet stilzwijgend minder', () => {
+  const lite = zaakOpTrede(GOVERNANCE_NIET);       // geen schaduwlaag gemount
+  assert.equal(verzoek(lite, '/api/supplier/command/beleid/zet').door, false,
+    'een ontbrekende schaduwlaag mag geen handhaving uitzetten');
+});

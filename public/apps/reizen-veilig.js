@@ -13,7 +13,22 @@
   }
   function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context()}
   function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.className='rv-tab'+(i===actief?' actief':'');b.textContent=p.titel;b.onclick=function(){kies(i)};t.appendChild(b)})}
-  function haak(el){el.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){open(b.dataset.action,innerWidth>760)}});el.querySelectorAll('[data-circle=maak]').forEach(function(b){b.onclick=function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}})}
+  function haak(el){el.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){open(b.dataset.action,innerWidth>760)}});el.querySelectorAll('[data-circle=maak]').forEach(function(b){b.onclick=function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}});gebaren(el)}
+  /* De regels van 'Uw eerstvolgende moment' dragen hun acties (shared/gebaar.js):
+     veeg naar links om te doen wat de regel voorstelt, naar rechts om hem over
+     te nemen. De veeg drukt de knop die de regel AL heeft -- geen tweede kopie
+     van wat die knop doet, want dan lopen ze uit elkaar (LAT.md regel 4). Heeft
+     de regel geen knop, dan is de handeling het Moment zelf. */
+  function gebaren(el){
+    if(!window.RTGGebaar){document.addEventListener('rtg-gebaar',function(){gebaren(el)},{once:true});return}
+    var K=window.RTGGebaar.klaar;
+    window.RTGGebaar.lijst(el,'.rv-lijn',function(rij){
+      var b=rij.querySelector('button'),kop=rij.querySelector('b');
+      var doen=b?K.eigenKnop(b.textContent.replace(/[^\wÀ-ÿ ]/g,'').trim()||'Openen','openen','button')
+               :{naam:'Moment starten',teken:'rahul',doe:function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}};
+      return {titel:kop?kop.textContent.trim():'',rechts:[doen],links:[K.overnemen()]};
+    });
+  }
   async function laadMomenten(el){var vak=el.querySelector('[data-momenten]');if(!vak)return;try{var d=await api('/api/veiligheid/moment'),m=d.momenten||[],voor=d.voorMij||[],regels=m.map(function(x){return '<div class="rv-momentchip"><i></i><span>'+esc(x.titel)+' · '+esc(x.status)+(x.eta?' · '+esc(x.eta):'')+(x.gepauzeerd?' · gepauzeerd':'')+'</span><button data-status="'+esc(x.id)+'">Aangekomen</button><button data-pauze="'+esc(x.id)+'" data-aan="'+(!x.gepauzeerd)+'">'+(x.gepauzeerd?'Hervat':'Pauze')+'</button><button data-stop="'+esc(x.id)+'">Stop</button></div>'});voor.forEach(function(x){regels.push('<div class="rv-momentchip ontvangen"><i></i><span>'+esc(x.eigenaar)+' deelt: '+esc(x.titel)+(x.status?' · '+esc(x.status):'')+(x.eta?' · '+esc(x.eta):'')+'</span></div>')});vak.innerHTML=regels.length?regels.join(''):'<div class="rv-momentchip"><i></i><span>Nog niets live gedeeld</span></div>';vak.querySelectorAll('[data-status]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/status',{id:b.dataset.status,status:'aangekomen'});laadMomenten(el)}});vak.querySelectorAll('[data-pauze]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/pauze',{id:b.dataset.pauze,aan:b.dataset.aan==='true'});laadMomenten(el)}});vak.querySelectorAll('[data-stop]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/stop',{id:b.dataset.stop});laadMomenten(el)}})}catch(e){vak.innerHTML='<div class="rv-momentchip"><span>Log in om uw Live Circle te beheren.</span></div>'}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function context(){var id=panes[actief]&&panes[actief].id,z={overzicht:'Ik bewaak uw reis en breng u waar u moet zijn.',vervoer:'Waar wilt u heen? Ik vergelijk de hele reis voor u.',reizen:'Ik zie uw reiswereld. Zal ik controleren wat nog aandacht vraagt?',veilig:'U bepaalt wie wat ziet en tot wanneer.',navigatie:'Ik blijf bij u tot u veilig bent aangekomen.'};$('#rvContext').textContent=z[id]||z.overzicht}

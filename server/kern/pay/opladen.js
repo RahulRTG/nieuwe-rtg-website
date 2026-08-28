@@ -6,13 +6,23 @@
    NIETS aan de boekingsregels. */
 function maakOpladen(basis) {
   const { betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
-    motorklant, geldModus, keyVanCodenaam,
+    motorklant, geldModus, keyVanCodenaam, plafondFout,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
   async function laadOp({ codenaam, centen, idem, oms, userId }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
+    /* HET PLAFOND VALT HIER, EN NIET PAS BIJ DE BOEKING.
+
+       Verderop wordt eerst de KAART BELAST en pas daarna bijgeschreven. Zou het
+       walletplafond alleen in boekAsync staan, dan is de volgorde: geld van de
+       kaart af, en dan een 409 omdat het er niet meer bij past -- afgeschreven
+       zonder bijgeschreven, precies de fout die de kop van oplaadAfronden
+       hieronder beschrijft voor de webhook. Een grens die je pas na de kassa
+       ontdekt, is geen grens maar een schadepost. */
+    const vol = plafondFout(rekLid(codenaam), c);
+    if (vol) return vol;
     return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {
       let betaling;
       try {
@@ -110,10 +120,17 @@ function maakOpladen(basis) {
       try { const b = await bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
       catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
     }
+    /* Afronden op tientjes is comfort, het plafond is een grens -- dus als de
+       afronding er niet meer bij past, laden we exact het tekort. Dat past
+       altijd: het tekort brengt de wallet op het bedrag van de boeking zelf, en
+       een boeking is nooit groter dan MAX_CENTEN, dat onder het plafond ligt.
+       Zonder deze regel zou een lid met een bijna volle wallet niets meer kunnen
+       betalen -- de duurste manier om een plafond te ontdekken. */
     const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
-    const r = await laadOp({ codenaam, centen: stap, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
+    const bedrag = plafondFout(rekLid(codenaam), stap) ? Math.max(tekort, OPLAAD_MIN) : stap;
+    const r = await laadOp({ codenaam, centen: bedrag, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
     if (r.error) return r;
-    return { ok: true, bijgeladen: stap, via: 'kaart' };
+    return { ok: true, bijgeladen: bedrag, via: 'kaart' };
   }
   async function bestaatLid(codenaam) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }

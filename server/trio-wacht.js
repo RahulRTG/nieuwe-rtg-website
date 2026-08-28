@@ -25,7 +25,7 @@ function maakWacht({ AANTAL, BASISPOORT, SLEUTEL, FAILBACK_MS, log }) {
 
   function startServer(i) {
     const s = servers[i];
-    const child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'server.js')], {
+    const child = spawn(process.execPath, [path.join(__dirname, 'server.js')], {
       env: { ...process.env, PORT: String(s.port), RTG_ROL: 'standby', RTG_SERVER: String(s.nr), RTG_CLUSTER_KEY: SLEUTEL },
       /* De vierde stroom is een IPC-lijn en er gaat geen enkel bericht overheen.
          Hij is er zodat een server MERKT dat de poortwachter weg is. Valt die

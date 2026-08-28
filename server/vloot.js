@@ -70,7 +70,7 @@ for (const g of GROEPEN) {
   const domeinen = g.domeinen === '-' ? '-' : g.domeinen; // '-' = alleen kern+foundation
   start('groep ' + g.naam, () => {
     console.log(`[vloot] groep ${g.naam} (${domeinen === '-' ? 'kern+foundation' : domeinen}) op poort ${g.poort}`);
-    return spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, 'server.js')], {
+    return spawn(process.execPath, [path.join(__dirname, 'server.js')], {
       env: { ...process.env, PORT: String(g.poort), RTG_DOMAINS: domeinen },
       stdio: ['ignore', 'inherit', 'inherit']
     });

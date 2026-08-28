@@ -11,7 +11,7 @@
      keukenbrein (geen tweede voorraadadministratie);
    - het dagbeeld noemt bij elk gemiddelde zijn noemer en houdt fooi en
      oninbaar apart.
-   Draai: node --experimental-sqlite --test test/horeca-vloer.test.js */
+   Draai: node --test test/horeca-vloer.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

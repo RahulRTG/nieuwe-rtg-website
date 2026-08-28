@@ -38,6 +38,14 @@
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');
+/* Hetzelfde plausibele lijf als de rolproef; twee versies van "geloofwaardige
+   invoer" lopen gegarandeerd uiteen (LAT.md regel 4). */
+const { plausibelLijf } = require('./lib/rolproef');
+/* WAT VOOR SOORT DEUR DIT IS. De routekaart draagt de bewakerslagen al mee; de
+   indeling ervan staat in scripts/lib/bewakers.js en hoort hier niet nog een
+   keer te worden bedacht (LAT.md regel 4). */
+const bewakerskaart = require('./lib/bewakers');
+const { stempel } = require('./lib/stempel');
 
 const args = process.argv.slice(2);
 const jsonUit = args.includes('--json');
@@ -65,6 +73,9 @@ const PUBLIEK = new Map([
   ['/api/auth/resend', 'bevestigingsmail opnieuw sturen'],
   ['/api/aanmeld/start', 'de ballotage-intake begint voor het account bestaat'],
   ['/api/aanmeld/zeg', 'idem: het gesprek loopt voor de inlog'],
+  ['/api/aanmelding/aanvraag', 'een lidmaatschapsaanvraag komt per definitie van buiten; het besluit erover zit achter officeAuth'],
+  ['/api/bedrijf/werkruimte/maak', 'de eerste deur van het Werk OS: de organisatie bestaat nog niet en het beheer-token ontstaat pas hier; rem per afzender in server/bedrijf/index.js'],
+  ['/api/foundation/school/school/maak', 'een school meldt zich aan voor er een login bestaat; hij start op "wacht" tot RTG goedkeurt, met een rem per afzender'],
   ['/api/account/start', 'accountherkenning aan de poort'],
   ['/api/zegel/sleutel', 'de PUBLIEKE sleutel; partners verifieren er offline mee'],
   ['/api/salon/promo', 'uitgelichte Salon-posts zijn het publieke campagnebeeld'],
@@ -91,6 +102,30 @@ const PUBLIEK = new Map([
   ['/api/stad/algoritmes', 'het transparantieregister: welke rekenregels meedraaien, met hun beslisruimte en hun bekende beperkingen'],
   ['/api/stad/besluiten', 'het besluitenregister; er zitten geen personen in -- fracties stemmen met zetels en een collegestem draagt een functie'],
   ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
+  /* NAGEMETEN OP 19 AUGUSTUS 2026, en dit was de enige open deur van de ronde.
+     Invisible Arrival is de gastenkant: een gast zonder account typt een wens
+     ("morgen om acht uur met z'n vieren") en krijgt terug hoe het systeem die
+     leest. De route doet niets anders: hij leest req.body.tekst, haalt er met
+     vaste patronen datum, tijd, personen en wensen uit, en geeft dat terug. Er
+     komt geen database aan te pas, er wordt niets bewaard, en er gaat niets
+     terug wat de beller niet zelf heeft ingetypt. De vervolgstap
+     (/api/arrival/request) is WEL dicht: die eist een aanvraagcode.
+
+     Achter een inlog zetten zou de functie kapotmaken -- een gast heeft per
+     definitie geen account -- en hem hier ongenoemd laten staan is erger: dan
+     staat deze ronde rood om een deur die met opzet openstaat, en dan leert
+     iedereen die uitslag wegkijken. Hij heeft een eigen rem per IP
+     (interpretRem) en een lijfgrens van 500 tekens. */
+  /* DE TWEE METERS, en waarom ze hier staan zonder dat ze publiek zijn. De
+     ronde klopt aan vanaf 127.0.0.1, en dat is precies het adres dat de
+     meetpoort (server/meetpoort.js) wél binnenlaat als er geen
+     RTG_METRICS_TOKEN is gezet -- de gewone opzet met Prometheus naast de app.
+     Van buiten geeft hij 404, en met een token gezet moet dat token mee. Deze
+     ronde meet dus zijn eigen adres en niet een open deur; zonder deze regel
+     staat er twee keer "open" waar niets opendoet. */
+  ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
+  ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
+  ['/api/arrival/interpret', 'de gastenkant van Invisible Arrival: een gast heeft per definitie geen account. Leest alleen de meegestuurde tekst met vaste patronen, raakt de database niet en bewaart niets; met een eigen rem per IP'],
   ['/api/pasprijzen', 'de prijzen staan op de website'],
   ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],
   ['/api/rtf/vacatures', 'vacatures zijn openbaar; daar solliciteer je op'],
@@ -115,10 +150,43 @@ const PUBLIEK = new Map([
      bewuste keuze (zie server/routes/doos.js), maar hij hangt hiermee wel aan
      de publieke kant van de server. Bedrijfstelemetrie, geen ledengegevens. */
   ['/api/doos/status', 'de zaakdoos meldt zijn status op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
-  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf']
+  ['/api/doos/rapport', 'idem: het dagrapport van de doos zelf'],
+  /* Gevonden door een verse ronde tegen een wegwerpserver: deze route bestond
+     nog niet toen POORTWACHT.json voor het laatst werd geschreven, en stond dus
+     nergens. Hij is bewust open -- hij zet vrije tekst om in een CONCEPT en zegt
+     dat er zelf bij ("Controleer dit plan; er is nog niets aangevraagd"). Er
+     wordt niets opgeslagen en niets aangevraagd; de aanvraag zelf
+     (/api/arrival/request) staat er los van en controleert wel. Wel een eigen
+     snelheidsrem (interpretRem). */
+  ['/api/arrival/interpret', 'zet vrije tekst om in een CONCEPTplan en slaat niets op; de aanvraag is een aparte route met eigen controle']
 ]);
 
-const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };
+/* ---- DE TWEE METRICS-DEUREN ZIJN CONFIGURATIE, GEEN CODE ----
+
+   Ze staan met opzet NIET in PUBLIEK hierboven, en dat verdient uitleg, want een
+   lokale ronde meldt ze altijd als open.
+
+   server/meetpoort.js maakt /api/metrics en /api/metrics/kort afhankelijk van de
+   OPSTELLING: met RTG_METRICS_TOKEN gezet moet dat token mee; zonder token gaat
+   de deur alleen open vanaf een intern adres. Deze sonde klopt aan vanaf
+   127.0.0.1 en dat IS een intern adres, dus zonder token ziet hij ze altijd open
+   -- precies zoals bedoeld voor een ontwikkelopstelling.
+
+   Ze op de publieke lijst zetten zou daarom het verkeerde repareren: dan valt
+   het ook niet meer op wanneer ze in PRODUCTIE opengaan, en dat is nu juist het
+   geval dat ertoe doet. Ze horen open te heten op een lokale ronde en dicht op
+   een productieronde, en het verschil zit in de omgeving en niet in de code.
+
+   Wat daar wel uit volgt: een uitslag is pas te lezen als je weet TEGEN WELKE
+   opstelling hij is gemaakt. Daarom staat dat sinds deze ronde in de uitvoer
+   (zie `gemeten` onderaan) -- twee rondes tegen verschillend geconfigureerde
+   servers zijn anders niet met elkaar te vergelijken, en dat is precies hoe een
+   configuratieverschil er als een bevinding uit gaat zien. */
+
+/* `pasNaLijf`: routes die pas bij de TWEEDE klop lieten zien dat ze een slot
+   hebben. Apart geteld, want dat is precies de winst van die tweede klop -- en
+   zonder eigen getal is niet te zien of hij nog iets oplevert. */
+const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0, pasNaLijf: 0, stilOmdat: {} };
 /* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
    hetzelfde oordeel dat hierboven wordt opgeteld -- geen tweede waarheid. */
 const perRoute = [];
@@ -127,7 +195,7 @@ const perRoute = [];
    en niet de lijst toetst die iemand met de hand heeft bijgehouden. */
 function routekaart() {
   const rauw = execFileSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'routekaart.js'), '--json'],
+    [path.join(__dirname, 'routekaart.js'), '--json'],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, timeout: 120000 });
   return JSON.parse(rauw).routes.filter(r => r.pad.startsWith('/api/'));
 }
@@ -136,17 +204,50 @@ function routekaart() {
    toetsen de poort, niet of het ding bestaat. */
 const vulPad = (pad) => pad.replace(/:([A-Za-z0-9_]+)/g, 'zzz-bestaat-niet');
 
-async function klop(pad, methode) {
+async function klop(pad, methode, lijf) {
   const url = BASIS + vulPad(pad);
   const opt = { method: methode === 'ALL' ? 'POST' : methode, redirect: 'manual' };
   if (opt.method !== 'GET' && opt.method !== 'HEAD') {
     opt.headers = { 'Content-Type': 'application/json' };
-    opt.body = '{}';
+    opt.body = JSON.stringify(lijf || {});
   }
   try {
     const r = await fetch(url, opt);
     return { status: r.status, tekst: (await r.text()).slice(0, 300) };
   } catch (e) { return { status: 0, tekst: String(e.message) }; }
+}
+
+/* ---- HET OORDEEL, ALS PURE FUNCTIE ----
+
+   EEN PLEK WAAR HET OORDEEL VALT, en buiten de meetlus zodat een toets hem kan
+   vastpakken zonder een server te starten. Dat is geen nettigheid: bij de
+   OUTPUT-as zat precies zo'n oordeel opgesloten in de lus, en daardoor kon
+   niemand met een mutatie natrekken of de regel wel ooit kon vuren. Hij kon het
+   niet -- nul bewezen op 4185 routes, en de suite bleef groen.
+
+   `eerste` en `tweede` zijn statuscodes (0 = onbereikbaar); `tweede` is null als
+   er geen tweede klop nodig was. `publiek` zegt of dit pad met opzet open staat.
+
+   DE TWEEDE KLOP, EN WAAROM HIJ ER IS. Een lege `{}` naar een route die eerst
+   zijn invoer valideert geeft 400 of 404, en dat zegt NIETS over een slot: de
+   validatie was gewoon eerder aan de beurt dan de autorisatie. 300 routes
+   heetten daarom `stil` -- eerlijk, en onbeslist. De tweede klop stuurt hetzelfde
+   plausibele lijf als de rolproef en nog steeds GEEN token. Komt er dan 401 of
+   403, dan is de route wel degelijk dicht. Komt er 2xx, dan gaat hij zonder
+   sleutel open, en dat is een bevinding die de eerste klop niet zag. */
+function oordeelVan(eerste, tweede, publiek) {
+  const dicht = (s) => s === 401 || s === 403;
+  const open = (s) => s >= 200 && s < 300;
+  if (eerste === 0) return { oordeel: 'onbereikbaar', pasNaLijf: false };
+  if (dicht(eerste)) return { oordeel: 'dicht', pasNaLijf: false };
+  if (open(eerste)) return { oordeel: publiek ? 'publiek' : 'open', pasNaLijf: false };
+  /* Vanaf hier was de eerste klop onbeslist. Zonder tweede klop blijft dat zo --
+     en dat is met opzet geen 'dicht': niet weten is iets anders dan weten dat er
+     iets is (LAT.md regel 3). */
+  if (tweede === null || tweede === undefined) return { oordeel: 'stil', pasNaLijf: false };
+  if (dicht(tweede)) return { oordeel: 'dicht', pasNaLijf: true };
+  if (open(tweede)) return { oordeel: publiek ? 'publiek' : 'open', pasNaLijf: true };
+  return { oordeel: 'stil', pasNaLijf: false };
 }
 
 async function ronde() {
@@ -162,31 +263,135 @@ async function ronde() {
            Eerst stond het oordeel in de tellingen zelf verweven; wie er een
            tweede uitvoer naast zet, bouwt dan onvermijdelijk een tweede
            waarheid die er langzaam naast gaat lopen. */
-        let oordeel;
-        if (a.status === 0) { uit.fout++; oordeel = 'onbereikbaar'; }
-        else if (a.status === 401 || a.status === 403) { uit.dicht++; oordeel = 'dicht'; }
-        else if (a.status >= 200 && a.status < 300) {
-          if (PUBLIEK.has(r.pad)) { uit.publiek++; oordeel = 'publiek'; }
-          else {
-            uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
-            oordeel = 'open';
-          }
-        } else { uit.stil++; oordeel = 'stil'; }
-        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status, oordeel });
+        const publiek = PUBLIEK.has(r.pad);
+        /* De tweede klop alleen waar de eerste onbeslist bleef; de kosten van
+           deze sonde blijven zo begrensd tot de routes die er iets aan hebben. */
+        const onbeslist = a.status !== 0 && !(a.status === 401 || a.status === 403) &&
+          !(a.status >= 200 && a.status < 300);
+        const b = onbeslist ? await klop(r.pad, m, plausibelLijf(r.pad)) : null;
+        const u = oordeelVan(a.status, b ? b.status : null, publiek);
+        const oordeel = u.oordeel;
+        const tweede = b && oordeel === 'stil' ? b.status : null;
+        if (oordeel === 'onbereikbaar') uit.fout++;
+        else if (oordeel === 'dicht') { uit.dicht++; if (u.pasNaLijf) uit.pasNaLijf++; }
+        else if (oordeel === 'publiek') uit.publiek++;
+        else if (oordeel === 'stil') uit.stil++;
+        else {
+          const bron = u.pasNaLijf ? b : a;
+          uit.open.push({ pad: r.pad, methode: m, status: bron.status,
+            ...(u.pasNaLijf ? { viaLijf: true } : {}),
+            begin: bron.tekst.replace(/\s+/g, ' ').slice(0, 120) });
+        }
+        /* ---- WAAROM BLIJFT DEZE STIL? ----
+
+           DIT VELD KWAM ER NA EEN NEGATIEF RESULTAAT, en dat is de nuttigste
+           soort. De tweede klop met een plausibel lijf bracht op 297 stille
+           routes exact NUL nieuwe sloten aan het licht: 276 bleven 404, 19
+           bleven 400, 2 bleven 503. De sonde was dus niet te zwak -- er valt
+           daar niets aan te kloppen. 179 van die routes hebben helemaal geen
+           bewakerslaag (de controle zit in de handler, achter een
+           capability-token), 78 zijn een objectpoort die eerst een bestaand
+           object wil, 37 hebben alleen een snelheidsrem. Drie blijven er over.
+
+           Zonder dit veld leest "297 stil" als 297 open vragen, terwijl 294
+           ervan al onder een andere post in BEWIJSSCHULD.json staan. Een
+           schuldpost die dezelfde routes een tweede keer telt, maakt de
+           achterstand groter dan hij is. */
+        const bewaking = oordeel === 'stil'
+          ? bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: (r.bewakers && r.bewakers[m]) || [] })
+          : null;
+        if (bewaking) {
+          /* Een 503 op een route MET een rol is de schakelkast die antwoordt
+             voor de poort: de functie staat uit (bijv. dom-eigendomein, een
+             boardroom-schakelaar die standaard dicht is). Dat is een besluit
+             van het huis en geen open vraag over het slot -- en het hoort hier
+             met naam, anders leest het als achterstand. Zelfde voor de
+             meetpoort: daar beslist de opstelling, niet de bezoeker. */
+          const k = bewaking.rol
+            ? (a.status === 503 ? 'functie staat uit: de schakelkast antwoordt voor de poort'
+              : 'een rol, maar de invoer strandt eerder')
+            : /geen bewakerslaag/.test(bewaking.reden) ? 'capability in de handler'
+              : /objectpoort/.test(bewaking.reden) ? 'objectpoort: eerst een bestaand object'
+                : /geenBewaker/.test(bewaking.reden) ? 'geen autorisatielaag, alleen een rem'
+                  : /omgeving/.test(bewaking.reden) ? 'omgeving beslist (meetpoort)'
+                    : 'anders';
+          uit.stilOmdat[k] = (uit.stilOmdat[k] || 0) + 1;
+        }
+        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status,
+          ...(tweede ? { statusMetLijf: tweede } : {}), oordeel,
+          ...(bewaking ? { bewaking: bewaking.rol ? 'rol: ' + bewaking.rol : bewaking.reden } : {}) });
       }
     }));
   }
 }
 
+module.exports = { oordeelVan };
+
+/* DE WACHT. Hieronder start een volledige ronde: een server, een routekaart en
+   tweeduizend kloppen. Zonder deze regel gebeurde dat ook bij een gewone
+   `require('./poortwacht')` -- en dat is precies hoe ROLPROEF.json ooit van 3377
+   beproefde routes werd teruggezet naar 292 door een onschuldige laadcontrole.
+   oordeelVan() staat er expres BOVEN, zodat een toets hem kan pakken zonder ook
+   maar iets te starten. */
+if (require.main !== module) return;
+
 ronde().then(() => {
   if (jsonUit) {
-    console.log(JSON.stringify(perRouteUit ? { ...uit, perRoute } : uit, null, 1));
-    process.exit(uit.open.length ? 1 : 0);
+    /* DE OPSTELLING HOORT BIJ DE UITSLAG. Zonder dit veld is een ronde niet te
+       lezen: /api/metrics staat open of dicht afhankelijk van RTG_METRICS_TOKEN
+       en RTG_CLUSTER_KEY (zie meetpoort.js en het blok bij PUBLIEK), en twee
+       rondes tegen verschillend geconfigureerde servers verschillen dan zonder
+       dat iemand kan zien waarom. Zo'n verschil leest als een bevinding, en dat
+       is de duurste soort ruis.
+
+       Bewust alleen of ze GEZET zijn en niet wat erin staat: dit bestand wordt
+       gecommit. */
+    /* Het stempel (wanneer, welke commit, vuile boom) komt uit de gedeelde
+       helper; de opstelling komt daar bovenop, want die is van deze sonde
+       alleen. Zonder commit kan scripts/versheid.js niet zien of deze uitslag
+       nog bij de huidige code hoort. */
+    const gemeten = Object.assign(stempel(), {
+      adres: BASIS,
+      metricsToken: !!process.env.RTG_METRICS_TOKEN,
+      clusterSleutel: !!process.env.RTG_CLUSTER_KEY,
+      domeinen: !!process.env.RTG_DOMAINS,
+      let: 'Deze uitslag geldt voor DEZE opstelling. /api/metrics gaat zonder token open ' +
+        'vanaf een intern adres; een lokale ronde meldt hem daarom als open zonder dat er ' +
+        'iets mis is. Vergelijk alleen rondes met dezelfde vlaggen.'
+    });
+    /* UITLEG EN GRENS HOREN IN DE UITSLAG, niet alleen in dit bestand. Een
+       register dat zichzelf niet uitlegt, wordt gelezen als een dekkende
+       garantie; scripts/meetkeuring.js handhaaft dat. */
+    const kop = {
+      uitleg: 'Per route: gaat hij open voor een verzoek ZONDER token. dicht = 401 of 403, ' +
+        'publiek = met opzet open (zie PUBLIEK in dit script), stil = iets anders dan 2xx ' +
+        'waaruit niets valt af te leiden.',
+      grens: 'klopt aan met een LEEG lichaam. Een 400 of 404 betekent dan dat de validatie of ' +
+        'een opzoeking eerder aan de beurt was dan de autorisatie, en zegt NIETS over een slot -- ' +
+        'die heten daarom stil en niet dicht. Sinds de TWEEDE klop met een plausibel lijf ' +
+        '(nog steeds zonder token) is die groep kleiner: wie dan alsnog 401 of 403 geeft, telt als dicht. Zegt ook niets over wie er met een GELDIG token ' +
+        'binnenkomt; dat is de rolproef.'
+    };
+    console.log(JSON.stringify(perRouteUit ? { ...kop, gemeten, ...uit, perRoute } : { ...kop, gemeten, ...uit }, null, 1));
+    /* process.exitCode EN NIET process.exit(), en dat verschil is hier 146 KB
+       waard. Naar een BESTAND schrijft node synchroon, dus `> POORTWACHT.json`
+       ging altijd goed. Naar een PIPE schrijft hij asynchroon, en process.exit()
+       wacht daar niet op: wie deze uitslag opving met spawnSync kreeg hem
+       AFGEKAPT op precies 146176 bytes -- geldige tekst, kapotte JSON, en een
+       exitcode 0 erbij. Dat is de ergste soort fout: hij ziet er geslaagd uit.
+       Gevonden doordat scripts/meetronde.js de poortwacht als kindproces draait.
+       Met exitCode loopt het proces netjes leeg en klopt de code nog steeds. */
+    process.exitCode = uit.open.length ? 1 : 0;
+    return;
   }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
   console.log('  aangeklopt        : ' + uit.totaal);
   console.log('  netjes geweigerd  : ' + uit.dicht + '  (401/403)');
-  console.log('  stil afgeslagen   : ' + uit.stil + '  (400/404/5xx -- geen gegevens eruit)');
+  console.log('  stil afgeslagen   : ' + uit.stil + '  (400/404/5xx op BEIDE kloppen -- geen gegevens eruit)');
+  console.log('  pas na een lijf   : ' + uit.pasNaLijf + '  (leeg verzoek strandde op de validatie; met een plausibel lijf kwam het slot tevoorschijn)');
+  for (const [k, n] of Object.entries(uit.stilOmdat).sort((a, b) => b[1] - a[1])) {
+    console.log('     stil omdat     : ' + String(n).padStart(4) + '  ' + k);
+  }
   console.log('  bewust publiek    : ' + uit.publiek);
   console.log('  onbereikbaar      : ' + uit.fout);
   if (!uit.open.length) {

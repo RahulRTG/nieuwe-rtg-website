@@ -1,6 +1,6 @@
 /* De 9+-ronde: de app-gids dekt elke app-pagina met echte uitleg, en Rahul
    is er kindveilig voor het hele gezin in de RTFoundation.
-   Draai los: node --experimental-sqlite --test test/negenplus.test.js */
+   Draai los: node --test test/negenplus.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -1,6 +1,6 @@
 {
- "uitleg": "De a11y-scan keurt elk scherm in DRIE staten (uitgelogd, als lid, en als zaak) op structuur en contrast, en meet het raakvlak (WCAG 2.5.8) op telefoonformaat in twee sessies. Alles staat op nul. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan.",
- "gemeten": "2026-08-23",
+ "uitleg": "De a11y-scan keurt elk scherm in TWEE staten (uitgelogd en ingelogd) op structuur en contrast, doet een DERDE ronde op telefoonformaat voor het raakvlak (WCAG 2.5.8), een VIERDE die twee keer draait -- een keer per hand -- voor breedte, leegte en duimbereik, een VIJFDE op tabletformaat (834) voor breedte en raakvlak, en een ZESDE over de drie andere thema-varianten (champagne, bordeaux, royal), ingelogd. De telefoonronde draagt een INKEPING (59 boven, 34 onder): zonder die zone ziet een scherm dat haar negeert er in de keuring perfect uit. Het getal per thema blijft hier staan omdat het de nul BEWAAKT en niet omdat er ruimte in zit -- het mag alleen omlaag. Dit bestand is geen uitzonderingslijst maar de vastgelegde nulstand: komt er ergens een fout bij, dan zakt de scan. DE RONDES KOMEN UIT TWEE TAKKEN die op 20 augustus 2026 zijn samengevoegd (PR #83); elke grens hieronder staat zoals zijn eigen tak hem heeft gemeten, en is niet omgerekend.",
+ "gemeten": "2026-08-19",
  "uitgelogd": {
   "structureel": 0,
   "contrast": 0
@@ -9,21 +9,9 @@
   "structureel": 0,
   "contrast": 0
  },
- "zaak": {
-  "structureel": 0,
-  "contrast": 0,
-  "waar": "de derde staat: ingelogd met rtg_sup_token, de zaak-inlog van een manager",
-  "waarom deze ronde er is": "De scan logde in met rtg_member_token. Alles achter een ZAAK-inlog -- de horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt rtg_sup_token, en kreeg dus de DEUR te zien: een lege schil met een inlogkaart, die netjes nul oplevert. \"Nul over alle schermen\" was waar voor de staat die gemeten werd en onwaar voor de staat waarin het personeel werkt.",
-  "wat de eerste meting vond": "Met de hand gemeten over negen horecaschermen op 23 augustus 2026: zonder zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15 contrast. Precies dezelfde schermen.",
-  "en wat daarvan is gerepareerd": [
-   "de structurele: twee naamloze velden in de kassa (het vraagveld van de dialoog en de tafelkeuze) -- aria-labelledby op de kop die de vraag al draagt, en een aria-label op de select",
-   "de vijftien contrastfouten: tien grijstinten in horeca-command.css en een in horeca-enterprise-modules.css stonden tussen 2,48:1 en 4,55:1. Opgehoogd tot minstens 4,6:1 -- en gerekend tegen #111, de LICHTSTE ondoorzichtige grond in de schil. De eerste poging rekende tegen #080808 (de donkerste) en liet er zes staan op 4,36.",
-   "de merkkleur is niet aangeraakt: --burgundy-on-dark (#C23A5E) draagt hier alleen een rand en geen tekst"
-  ]
- },
  "raakvlak": {
   "onder24": 0,
-  "waar": "390x844, in twee sessies (lid en zaak), 600ms na load -- en wie iets vindt, meet nog een keer",
+  "waar": "de derde ronde: 390x844, ingelogd, 600ms na load -- en wie iets vindt, meet nog een keer",
   "stand bij het openen van deze ronde": "267 raakvlakken op 188 van de 259 schermen",
   "de twee oorzaken die het leeuwendeel droegen": [
    "de home-indicator van de iOS-schil stond op 150x22 -- twee pixels te laag, op elk scherm dat de schil laadt (146 gevallen)",
@@ -83,5 +71,107 @@
   "2. de focus terugzetten is nu de taak van de laag die hem wegnam": "Zelfs zonder dat frame lukt het de pagina niet: zij sluit en focust in EEN tik, terwijl inert pas daarna weggaat. De gedeelde laag houdt daarom bij waar de focus vandaan kwam (een focusin-luisteraar; achteraf vragen is te laat, want de pagina zet de focus zelf al in het venster) en geeft hem terug als hij bij het loslaten nergens meer staat. \"Nergens\" is meer dan body: de focus blijft eerst nog even staan op de knop in het zojuist verborgen venster, een element zonder afmetingen.",
   "3. de laatste modaal wint, niet de eerste": "Op app.html staat de onboardingpoort in de markup en wordt een later venster aan het eind van body gehangen. De laag nam de EERSTE aria-modal en sloot alles daarbuiten af -- inclusief het nieuwere venster van pin-herstel, dat bovenop stond, in beeld was en onaanklikbaar werd; de tik viel door naar het veld eronder. Later in de boom is bovenop, dus telt de laatste.",
   "en een gat dat daarbij aan het licht kwam": "Dat venster van pin-herstel had role=\"dialog\" maar geen aria-modal, terwijl het modaal LIGT: een scrim over de hele pagina op z-index 9990. Een schermlezer las dus de pagina eronder gewoon door. Dat is dezelfde soort belofte-zonder-code als elders: wat modaal is, zegt dat. Nu staat het er."
+ },
+ "contrast": {
+  "stand bij het openen van deze ronde": "60 contrastfouten (26 uitgelogd, 34 ingelogd), zichtbaar geworden toen de keuring verlopen leerde lezen -- ze waren nooit nul, ze waren ongemeten",
+  "de vijf oorzaken die het leeuwendeel droegen": [
+   "de drie juridische pagina's verklaren zichzelf licht, maar de gedeelde `body.rtg-stijl` en de themalaag zijn specifieker en namen alleen de GROND over: bijna zwarte tekst op een bijna zwarte grond, 1,08:1, op een juridisch stuk. Ze dragen nu data-rtg-eigenvlak en schilderen hun eigen grond EN inkt",
+   "de grote iOS-titel stond op --ios-inkt, en dat is de inkt van de BALK, die altijd donker is; op een licht thema gaf dat lichte letters op een lichte grond op vrijwel elk scherm",
+   "drie gedeelde componenten (de tabbalk, de uitvoerknop, de horeca-rail) gebruikten --muted en --txt: een vaste grijstoon en een vaste lichte, allebei blind voor het thema. Nu --rtg-muted en --rtg-txt",
+   "--burgundy-on-dark stond als KLEINE tekst op donker (2,84:1) in de RTFoundation en op schoolpartner -- iets dat CLAUDE.md met zoveel woorden verbiedt en dat de poort tot nu toe niet kon zien",
+   "de dagkleur stond als accentTEKST in de iOS-balk en op vier plekken in de UI-kit; geen van de zestien ankertinten haalt 4,5 op alle vier de thema-gronden"
+  ],
+  "en de staart die daarna overbleef": [
+   "het gouden bovenschrift en de vertrouwens-chips van bestellen.html: kleine tekst op een grond die naar licht oranje loopt. De chips maakten hun eigen grond LICHTER (wit op 12%) en daarmee hun witte tekst onleesbaar",
+   "het schoolmerkbeeld: wit op groen, 2,37:1. Niet de merkgroen veranderd maar er licht van afgehaald -- dezelfde tint, in de schaduw",
+   "de kicker van de juridische pagina's: goud op een LICHTE grond haalt 4,34; --gold-diep, het bestaande huistoken voor goud in de schaduw, haalt 7,22",
+   "de KOMPAS-onderregel van de Rahul-tab: die had een eigen zachtere toon die op elke middentoon zakte. Vervallen -- zie de toelichting in shared/rahul-tab/inkt.js"
+  ],
+  "wat de poort nog steeds niet meet": "NAGETELD OP 20 AUGUSTUS 2026, en het getal dat hier stond (830 van 4927, 17%) klopte niet. Over alle schermen in drie thema's, 5977 tekstelementen: 3346 gewogen (56%), 663 overgeslagen om een url() als achtergrond (11,1%), NUL om \"een keten die tot de wortel doorzichtig blijft\" -- die reden stond hier jarenlang zonder ooit te zijn voorgekomen -- en 1968 (32,9%) om iets dat hier helemaal niet stond: de VOORGROND had een alfa, en keurInPagina() deed daar `if (fg[3] < 1) return`. Dat is precies de groep waar --rtg-muted en --rtg-soft in wonen. Sinds opGrond() die letter over zijn grond mengt, weegt de poort 84,6%. EN DAT GETAL KOMT NU UIT DE METING ZELF: dat het hier met de hand stond, is de reden dat het kon verouderen zonder dat iemand het merkte. scripts/a11y.js telt de dekking per ronde mee en sluit ermee af. Wat er nu nog buiten valt is EEN ding: een url() als achtergrond (15,4%), een foto -- daar valt zonder de pixels niets van te rekenen. Een letter met alfa nul zou ook stoppen (dat is geen bleke letter maar een onzichtbare, background-clip:text), maar die staat op nul."
+ },
+ "themas": {
+  "champagne": 0,
+  "bordeaux": 0,
+  "royal": 0
+ },
+ "themamarge": 3,
+ "de vierde ronde: de drie andere thema's": "Stand bij het openen van deze ronde: champagne 220, bordeaux 154, royal 153. Op 20 augustus 2026 staan alle drie op NUL en is de grens hard. De weg ernaartoe in drie stappen. (1) 116 gevallen van ONZICHTBARE tekst op champagne, tot 1,01:1 -- een vlak dat zijn grond hard schildert terwijl zijn inkt meethemaat, of andersom. Gerepareerd met data-rtg-eigenvlak=\"onyx\" voor schermen die geen thema verdragen, en met tokens voor de rest. (2) Wat overbleef leek EEN merkbesluit (goud is een vulkleur) maar was een token dat niet meethemaat. Vier tonen kregen een leestoken per thema -- goud, groen, zacht en rood -- en alle vier zijn ze DEKKEND, want de keuring slaat een voorgrond met alfa over: een zachte toon daarheen sturen zou de bevinding laten verdwijnen zonder hem op te lossen. (3) De staart: een inline style op stad.html die buiten elke zoek-vervang viel, twee links zonder kleur (dan zet de browser er een), de zonstand in seizoen.css die de grond en de inkt koos maar het goud niet, twee schermen die hun eigen donkere vlak schilderen (office, leverancier -- nu onyx), de iOS-balk die zijn eigen kaartvlakken niet zette, en de OV-hero waar de SERVER de accentkleur inline meestuurt per lidmaatschap: die wordt op een lichte grond niet vervangen maar VERDIEPT (40% van de tint), zodat het onderscheid tussen de passen blijft.",
+ "de wiebel van de thema-ronde, en waar hij vandaan kwam": "De eerste grenzen zette ik op EEN meting (28/19/19) plus drie, en de ronde daarna zakte de scan op 26 en 24. Dat was geen ruis maar een pagina die nog aan het veranderen was: shared/seizoen.css zette een overgang van 0,8 seconde op de achtergrondkleur van elke body, en die gold ook bij de EERSTE weergave. Elke pagina fadede bij het openen dus acht tienden van een seconde van de kleur waarmee hij begon naar de kleur die hij hoort te hebben -- op de juridische pagina's zag je bijna een seconde bordeaux voor het wit stond, en de keuring mat op 600ms precies daarin. De overgang is nu gearmeerd met data-licht-zacht, een frame NA de eerste toepassing (shared/seizoen.js): een zonsondergang blijft zacht, het openen van een pagina is geen zonsondergang. Daarna gemeten over drie ronden: champagne 33-34, bordeaux 21-22, royal 21-22. De wiebel ging van zes naar een. De grenzen hieronder staan op de hoogste meting plus drie; wat er nog wiebelt is de ECHT data-afhankelijke rest (stad.html kleurt een waarde alleen bordeaux als een domein op dat moment druk is).",
+ "de alfa: wat de poort een dag later zag": "Op 20 augustus 2026 leerde de keuring een halfdoorzichtige VOORGROND rekenen, en toen stonden er 2893 bevindingen: 949 champagne, 1106 bordeaux, 740 royal, 22 uitgelogd, 27 ingelogd. 795 van de getoonde voorbeelden waren TWEE tokens. --rtg-soft en --rtg-muted waren zelf de grootste bron van onleesbare tekst in dit huis. De oorzaak is dat alfa de verkeerde knop is: '56% van de inkt' zegt iets over sluier en niets over leesbaarheid, want wat het oplevert hangt af van de grond -- op onyx 5,6:1, op parelmoer 3,5 en op fluweel 3,6. Ze zijn nu dekkend en per thema uitgerekend: de zachte toon is de lichtste tint die op de ergste grond van dat materiaal nog 4,85:1 haalt, de gedempte staat halverwege tussen die vloer en de volle inkt. De ergste grond is opgesomd en niet gegokt (elke stop van het glansverloop, de zestien dagkleuren daarover, de twee kaartvlakken daar weer overheen); test/thema.test.js rekent het na zonder browser. Op fluweel is er nauwelijks ruimte -- de lichtste bordeaux-stop haalt met de volle ivoren inkt maar 6,40:1 -- dus daar draagt de hierarchie meer op maat en gewicht dan op toon. De rest waren tien vlakken die hun eigen grond schilderen en hun eigen inkt niet; twee daarvan waren een patroon en geen incident: (1) een VLAK binnen een scherm dat altijd donker is (een inlogpoort, een onboarding-overlay) heeft nu dezelfde afspraak als een heel scherm -- data-rtg-vlak=\"onyx\", en test/thema.test.js houdt die twee regels gelijk; (2) de UI-kit van RTG claimt `.blok` als sectiekaart, en de bloklaag van een door een LID gemaakte website gebruikte dezelfde naam. De site van een lid werd daardoor getekend met de kaartachtergrond, de rand en de padding van RTG -- op champagne een half doorzichtig wit vlak waar de hulptekst 1,91:1 op haalde. Die laag heet nu .wb-blok. Dat raakt ook een bezoeker van een gepubliceerde site, die geen lid is en niets aan die kleuren kan doen.",
+ "telefoon": {
+  "breed": 0,
+  "leeg": 2,
+  "balk": 0,
+  "duim": 0,
+  "waar": "de vierde ronde: 390x844, ingelogd, twee keer -- rechtshandig en linkshandig (shared/hand.js)",
+  "wat elk getal is": {
+   "breed": "schermen die op 390px rechts buiten beeld lopen. Die staan zelf op overflow:hidden, dus er is niet naartoe te scrollen: de rechterkant is gewoon weg",
+   "leeg": "schermen die passen, renderen en een mens toch niets tonen -- de val waar Instant Reality op omviel",
+   "balk": "vaste balken die zich grotendeels tonen en er dan uitlopen. Een balk die HELEMAAL buiten beeld staat telt niet mee: dat is een springlink of een geparkeerde lade, en die horen daar",
+   "duim": "hoofdhandelingen die niet aan drie eisen voldoen: 44x44, middelpunt in de onderste 60%, en een smalle knop niet in het kwart aan de ankerzijde (GRAMMATICA.md)"
+  },
+  "stand bij het openen van deze ronde": "22 te breed (11 schermen), 37 buiten duimbereik (19 schermen), over 514 metingen. Alle tellers staan nu op nul, over 510 metingen (254 schermen, twee handen), en het raakvlak ook -- dat ging van 46 terug naar 0 nadat de RTF-deur openging en de lege berichtenknop eronder vandaan kwam.",
+  "wat de breedte veroorzaakte": [
+   "shared/ios.css had `auto` als derde rasterkolom, en `auto` zakt nooit onder zijn max-content: een volle actierij duwde het hele raster open, tot 1153px op sitemaker. Nu minmax(0,auto), en de rij scrolt in zichzelf zoals .cmd-tabs dat al deed. Dit repareerde er zes in een keer",
+   "browser.html: .zoekgroot input had flex:1 zonder min-width:0, dus het veld zakte nooit onder de breedte van zijn eigen PLACEHOLDER en duwde de zoekknop eruit. Alleen ingelogd zichtbaar",
+   "rtmail.html: .lt droeg white-space/overflow/text-overflow al, maar is een SPAN -- en op een inline-element doet overflow niets. De regel stond er en deed niets; de voorregel groeide door tot 1216px",
+   "foundation/bord.html, gereedschap.html, websitestudio.html: dezelfde familie -- een flexitem of rasterkolom die niet mag krimpen (min-width:0, minmax(0,1fr))"
+  ],
+  "wat het duimbereik veroorzaakte": [
+   "`.knop` levert 12,8px tekst met 8px lucht: 37 tot 40 pixels. Genoeg om te RAKEN met een trillende hand (24 is de WCAG-grens), te weinig voor een duim in beweging. Een gedeelde regel in rtg-ui.css tilt alles met data-hoofdactie of .hoofd-op-een-knop naar 44",
+   "acht van de negentien schermen hadden hun hoofdhandeling in het kwart waar de duim van die mens niet komt -- en WELKE acht verschilde per hand. Volle breedte op telefoonformaat lost dat voor beide handen tegelijk op; naar de andere kant schuiven draait het probleem alleen om",
+   "drie schermen wezen de verkeerde knop aan of geen: genootschap, partner-worden en rtgid dragen nu data-hoofdactie, en muziek.html wees Doe mee aan (meedoen met andermans luistersessie) terwijl dat scherm RTG Sound is -- de hoofdhandeling daar is afspelen"
+  ],
+  "de meetfouten die deze ronde zelf maakte, en er waren er vier": [
+   "378 van de 514 metingen meldden een balk buiten beeld, en op 189 schermen was het dezelfde knop: de SPRINGLINK op y -64..-33. Die hoort daar tot iemand hem focust",
+   "132 meldden leeg, want de meting keek naar een vaste lijst tags (main, section, article, .kaart, form, table, ul) en veel schermen bouwen hun inhoud in een div",
+   "de tweede leeg-poging keek naar HOOGTE en veroordeelde gast.html -- de QR-landingspagina, die terecht een zin lang is. De derde keek in <main> en meldde er 130, om drie redenen tegelijk: babyboek heeft geen <main>, camera heeft er een met nul hoge kinderen, en de toegangspoort van de stichting is een overlay",
+   "de detectie van de hoofdhandeling had een derde regel, 'de enige zichtbare verzendknop'. Die leek redelijk en raadde: op app.html koos hij de verzendknop van het Rahul-veld (24x24) als hoofdhandeling van het BEGINSCHERM, waar de handeling is: kies een wereld, en dat zijn er vier",
+   "VIJF: de ronde mat vijfenvijftig keer een DEUR. De RTF-leerling- en gezinsschermen hangen achter apps/foundation/sessie.js, en die deur staat los van het RTG-lidmaatschap dat de keuring aanmaakte. Tweeentwintig procent van het platform stond in dit register als gemeten terwijl het nooit open is geweest. De keuring maakt nu ook een gezin met een profiel aan; /apps/foundation/agenda.html ging daarmee van 21 naar 77 handelingen, en er kwam meteen een echt gebrek achter vandaan (een tegelraster dat 353 pixels buiten beeld liep).",
+   "ZES: de maat werd afgerond naar een getal dat slaagt -- 43,67 stond als 'maat 93x44, hoort 44' op de foutenlijst. Een gebrek met een maat die klopt.",
+   "ZEVEN: er werd niet nagemeten. Dat stond al in de raakvlakronde ernaast, met dezelfde uitleg erbij, en de mobiele ronde had het niet: een kaart die binnenkomt met een schaal-animatie meet 600ms na load 43,4 waar min-height 44 staat.",
+   "ACHT: mijn eigen reparatie brak een scherm. De uitzondering 'als er een veld in hetzelfde blok zit, laat de knop dan smal' was een :has()-gok naar OPMAAK; op /apps/foundation/klas.html staan twee velden van width:100% onder elkaar met de knop eronder, en die werd 65 pixels breed in de linkerhoek van een kinderscherm. CSS kan niet zien of iets op dezelfde regel staat, dus wordt het nu gezegd: .rtg-duimeind, gemeten op tweeentwintig echte veldrijen.",
+   "NEGEN, EN DIT IS DE ERGSTE: de leegte-meting telde alleen elementen ZONDER kinderen -- 'alleen bladeren, geen dubbeltelling'. Dat klopt tegen dubbeltelling en is fout voor tekst: een alinea met een <br> erin heeft een kind en werd overgeslagen. Op /apps/wereld.html stond de lege staat volledig in beeld op y 271 tot 432 en de meting telde er DRIE tekens. Ik heb dat scherm twee rondes lang van een gebrek beschuldigd dat in de meter zat, en er zelfs een reparatie voor geschreven. Nu lopen er tekstknopen in plaats van bladeren: een tekstknoop hoort bij precies een ouder, dus dubbeltelling kan sowieso niet. Gemeten 3 -> 108 tekens; een werkelijk leeggemaakte main meldt zich nog gewoon.",
+   "TIEN: er werd zonder inkeping gemeten. Een browservenster heeft geen statusbalk en geen thuisstreep, dus env(safe-area-inset-*) is er nul en elk scherm dat die zone negeert ziet er in de keuring perfect uit. Vijf schermen deden dat (de Command-modus-familie) en dat kwam boven met een schermafdruk van een echt toestel, niet met een ronde. Chromium KAN het nabootsen (Emulation.setSafeAreaInsetsOverride) -- dat is nu bekend, en gebruikt om de reparatie in beide richtingen te meten. De ronde zelf draagt nog geen inkeping."
+  ],
+  "werkvoorraad, en met opzet geen fout": "332 van de 510 metingen vonden geen aangewezen hoofdhandeling: 89 van de 254 schermen declareren er een, tegen 18 bij het openen van deze ronde. Dat is geen gebrek maar een teller (GRAMMATICA.md). Een lijst, een overzicht, een cockpit of een dagbriefing heeft niet een handeling die eruit springt, en 'wijs maar iets aan' als reparatie maakt geen enkel scherm beter -- dat is precies hoe muziek.html en meet.html de verkeerde knop kregen en weer ontmarkeerd zijn.",
+  "gemeten": "2026-08-19",
+  "waarom duim niet op nul staat": {
+   "stand": "0. Hij stond op 12, en die twaalf zijn opgelost in plaats van vrijgepleit.",
+   "hoe": "De botsing tussen shared/ios.css (maak-actie bovenaan) en GRAMMATICA.md (de handeling hoort bij de duim) is beslecht in het voordeel van de grammatica: agenda, notities, galerij, bestanden, scanner, clips, media, websitestudio en sitemaker dragen hun hoofdhandeling nu in .rtg-duimbalk -- op telefoonmaat een vaste strook onderaan, daarboven gewoon een rij onder de kop. Dat moest in de DOM en niet met opmaak: .ios-nav draagt backdrop-filter, en dat maakt een eigen containing block, dus een position:fixed kind blijft bovenin hangen.",
+   "wat er NIET is gebeurd": "geen uitzondering en geen getal met de hand op nul gezet. Wie deze tellers ooit weer ziet stijgen, kijkt naar een echt scherm."
+  },
+  "schermen die aan hun deur gemeten worden": {
+   "/apps/foundation/bord.html": "tijdelijke schoolpas -- een klassleutel die alleen in de tab van een lopende les bestaat en na 30 minuten vervalt; niet aan te maken zonder /api/les/maak, en daar hangt een model achter",
+   "/apps/foundation/schrift.html": "dezelfde schoolpas, aan de leerlingkant",
+   "waarom dit hier staat": "omdat 'gemeten' anders iets anders betekent dan het doet. Twee schermen van de 254 gaan niet open in deze ronde, en dat is een regel waard in plaats van een stille nul."
+  },
+  "waarom leeg niet op nul staat": {
+   "stand": "2 metingen op 1 scherm: /apps/werkruimte.html, rechts- en linkshandig.",
+   "wat er staat": "Het werkvlak draagt op 390x844 nul tekens en nul beelden, terwijl <main> eromheen gewoon vult (de bank, de bladen, de wereldkiezer). Het scherm rendert dus, alleen het vlak waar het om gaat blijft leeg.",
+   "waarom dit een bovengrens is en geen reparatie": "Dit is geen fout in een regel maar een ontbrekende VORM. WERKRUIMTE.md beschrijft RTG Desktop met zoveel woorden als a movable operational space -- surfaces met een gouden greep rond een centrale console -- en die vorm bestaat op een telefoon niet. ADAPTIEF.md zegt daar tegenover dat verbergen niet bestaat: een capability die op bureau bestaat en op telefoon geen vorm heeft, is een gebrek. Die twee documenten spreken elkaar hier tegen, en dat beslecht een mens en niet een reparatie onderweg. Besloten op 22 augustus 2026: de telefoonvorm van de werkruimte is een eigen opdracht.",
+   "de sluitweg": "Geef de werkruimte een taakmodus volgens ADAPTIEF.md (een blad tegelijk, de acties binnen duimbereik) in plaats van de bureauconsole te verkleinen. Zodra die er is gaat dit getal terug naar 0 en vervalt deze paragraaf.",
+   "wat deze grens NIET afdekt": "Alleen dit ene scherm. Elk ander scherm dat leeg rendert laat de ronde gewoon zakken -- de grens staat op 2 en niet op 'leeg mag'."
+  }
+ },
+ "tablet": {
+  "breed": 0,
+  "klein": 0,
+  "waar": "de vijfde ronde: 834x1112, ingelogd -- een iPad staand, ruim boven de 760 waar de duimregels ophouden",
+  "waarom deze ronde bestaat": "ADAPTIEF.md kent telefoon (<640), tablet (640-999) en bureau (>=1000), en de band ertussen was tot 19 augustus 2026 NOOIT door een browser getekend. Dat is geen detail: een gebrek kan precies daar zitten en nergens anders. Twee voorbeelden kwamen meteen boven. Op /apps/rtg.html is een dossierregel een link naar een betaalpagina: op 390 breekt hij af en meet 74 hoog, op 700 en 834 past hij op een regel en meet 20. Op /apps/salon.html geldt hetzelfde voor de naam boven een post (23). Allebei onzichtbaar voor de raakvlakronde, want die meet 390 -- waar het toevallig goed gaat.",
+  "een breedte en niet twee": "De eerste meting draaide 700 en 834 naast elkaar en gaf op allebei exact dezelfde twee vondsten. Een tweede venster kost dan een ronde en levert niets. 700 blijft wel het interessante getal voor een MENS: daar geldt volgens ADAPTIEF.md de tabletvorm terwijl de duimregels van rtg-ui.css nog tot 760 lopen.",
+  "wat hier NIET gemeten wordt": "leegte en duimbereik. Die twee gaan over een hand aan een telefoon (GRAMMATICA.md); een tablet ligt op tafel. Breedte en raakvlak gaan wel over elk toestel dat je aanraakt."
+ },
+ "zaak": {
+  "structureel": 0,
+  "contrast": 0,
+  "waar": "de derde staat: ingelogd met rtg_sup_token, de zaak-inlog van een manager",
+  "waarom deze ronde er is": "De scan logde in met rtg_member_token. Alles achter een ZAAK-inlog -- de horecaschermen, de kassa, het personeelsscherm, de leveranciers-app -- draagt rtg_sup_token, en kreeg dus de DEUR te zien: een lege schil met een inlogkaart, die netjes nul oplevert. \"Nul over alle schermen\" was waar voor de staat die gemeten werd en onwaar voor de staat waarin het personeel werkt.",
+  "wat de eerste meting vond": "Met de hand gemeten over negen horecaschermen op 23 augustus 2026: zonder zaak-sessie 0 structureel en 0 contrast, met zaak-sessie 1 structureel en 15 contrast. Precies dezelfde schermen.",
+  "en wat daarvan is gerepareerd": [
+   "de structurele: twee naamloze velden in de kassa (het vraagveld van de dialoog en de tafelkeuze) -- aria-labelledby op de kop die de vraag al draagt, en een aria-label op de select",
+   "de vijftien contrastfouten: tien grijstinten in horeca-command.css en een in horeca-enterprise-modules.css stonden tussen 2,48:1 en 4,55:1. Opgehoogd tot minstens 4,6:1 -- en gerekend tegen #111, de LICHTSTE ondoorzichtige grond in de schil. De eerste poging rekende tegen #080808 (de donkerste) en liet er zes staan op 4,36.",
+   "de merkkleur is niet aangeraakt: --burgundy-on-dark (#C23A5E) draagt hier alleen een rand en geen tekst"
+  ]
  }
 }

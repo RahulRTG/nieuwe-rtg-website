@@ -63,7 +63,7 @@ const LAGEN = [
        "zakt er iets" maar "kijkt er iemand". Een soort ding zonder handhaver is
        precies het gat dat de rest van deze suite per definitie niet ziet -- zij
        draait immers alleen de handhavers die er WEL zijn. */
-    ['samenhang', [NODE, ['--experimental-sqlite', 'scripts/samenhang.js']]]
+    ['samenhang', [NODE, ['scripts/samenhang.js']]]
   ] },
   { id: 'tests', naam: 'DE TESTSUITE', hard: true, stappen: [
     /* De gedeelde runner begrenst serverconcurrentie en draait de twee
@@ -83,7 +83,7 @@ const LAGEN = [
     ['a11y-scan', [NODE, ['scripts/a11y.js'], { A11Y_STRICT: '1' }]]
   ] },
   { id: 'beproeving', naam: 'DE BEPROEVING', hard: true, overslaanBijSnel: true, stappen: [
-    ['de storm', [NODE, ['--experimental-sqlite', 'scripts/beproeving.js']]]
+    ['de storm', [NODE, ['scripts/beproeving.js']]]
   ] },
   { id: 'keuring', naam: 'DE KEURING', hard: false, intern: true }
 ];

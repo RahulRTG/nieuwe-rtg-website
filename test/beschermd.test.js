@@ -2,7 +2,7 @@
    15 of jonger (groepen mini/kind/tiener, of rol kind) zijn onvindbaar en
    onbenaderbaar; alleen een ouder/verzorger voegt contacten voor hen toe.
    Draait tegen een echte server in een tijdelijke datamap.
-   Draai los: node --experimental-sqlite --test test/beschermd.test.js */
+   Draai los: node --test test/beschermd.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

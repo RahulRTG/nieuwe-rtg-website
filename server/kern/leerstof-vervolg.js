@@ -6,6 +6,9 @@
    2. Het NIVEAU-ADVIES is en blijft een advies: over echte overgangen en
       examens beslissen mensen en de officiele instellingen, nooit wij. */
 const { DOELEN, PER_FASE } = require('./leerstof');
+/* De adviesgrens staat op een plek (./schooladvies.js) en niet als zin in elk
+   antwoord: over overgaan, toelating en niveau beslist een mens, met naam. */
+const { uitspraak, volledig } = require('./schooladvies');
 const { opgave } = require('./leerstof-gen');
 const { FASEN } = require('./onderwijs-ladder');
 
@@ -78,9 +81,14 @@ function maakVervolg({ db, save, onderwijs }) {
     else if (behaald >= Math.ceil(ids.length * 0.8) && (gem == null || gem >= 6.5)) tekst = 'Je ligt goed op koers voor ' + pas.fase.naam + ': de meeste leerdoelen zijn binnen. Bespreek met je school of mentor of de volgende stap in beeld komt.';
     else if (behaald >= Math.ceil(ids.length * 0.4)) tekst = 'Je bent onderweg in ' + pas.fase.naam + ': een deel van de leerdoelen is binnen. Oefen gericht verder; de examentraining laat zien waar je staat.';
     else tekst = 'Je staat aan het begin van ' + pas.fase.naam + '. Begin bij de leerdoelen van je vakken en bouw rustig op; elke oefensessie telt.';
+    const u = uitspraak('niveau', tekst);
     return { ok: true, fase: pas.fase, doelenBehaald: behaald, doelenTotaal: ids.length,
       examens: examens.map(e => ({ indicatie: e.indicatie, at: e.at })), examenGemiddelde: gem,
-      advies: tekst + ' Dit is een advies, geen besluit: over overgaan, toelating en echte examens beslissen mensen en de officiele instellingen.',
+      /* `advies` draagt het bijschrift ZELF mee (volledig), want een scherm dat
+         alleen dit veld toont mag de grens niet kwijtraken. De losse velden
+         staan er voor een scherm dat het netter wil zetten. */
+      advies: volledig(u), bijschrift: u.bijschrift, beslist: u.beslist,
+      besluitDoorMens: u.besluitDoorMens, adviesSoort: u.soort,
       eerlijk: pas.eerlijk };
   }
 

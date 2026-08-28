@@ -13,7 +13,7 @@
    5. HET DOSSIER ONTSTAAT VANZELF; eraan denken is precies wat er misgaat in de
       week dat iemand begint.
 
-   Draai los: node --experimental-sqlite --test test/werkindienst.test.js */
+   Draai los: node --test test/werkindienst.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

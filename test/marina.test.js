@@ -3,7 +3,7 @@
    vol is vol), de bescherming van vaste liggers, de brandstofsteiger,
    service met de hellingbaan, de marina-concierge waar een mens
    bevestigt, en de cap-poorten.
-   Draai los: node --experimental-sqlite --test test/marina.test.js */
+   Draai los: node --test test/marina.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

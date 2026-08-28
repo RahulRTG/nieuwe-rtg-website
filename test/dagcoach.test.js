@@ -7,7 +7,7 @@
       laag die het ding bezit, anders liggen er twee waarheden over dezelfde dag.
    3. GEEN SCORE. Er staat hoeveel er open is, nergens "vier van de zeven".
    4. Een lege dag is een geldige uitkomst, en een kapotte laag wordt gemeld.
-   Draai los: node --experimental-sqlite --test test/dagcoach.test.js */
+   Draai los: node --test test/dagcoach.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

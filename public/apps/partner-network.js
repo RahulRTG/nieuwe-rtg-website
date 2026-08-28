@@ -1,1 +1,36 @@
-(function(){'use strict';var $=s=>document.querySelector(s),incident=false;function scenario(){incident=!incident;document.body.classList.toggle('pn-incident',incident);$('#pnState').textContent=incident?'HERSTELMARKT · 1 WIJZIGING':'NETWERK RUSTIG';$('#pnTitle').textContent=incident?'Vlucht +6 uur. Het netwerk herstelt.':'Vier beloften sluiten op elkaar aan.';$('#pnHealth').innerHTML=(incident?'89':'97')+'<small>network fit</small>';$('#pnExplain').textContent=incident?'Hotelbelofte blijft beschermd. Vervoer en diner bereiden nieuwe tijden voor; de gast ontvangt pas één samengesteld voorstel.':'Iedere partner kent zijn eigen prestatie, vergoeding en afhankelijkheden. Persoonsgegevens blijven buiten het consortium.';$('#pnContext').textContent=incident?'Twee herstelroutes staan klaar. Niemand heeft de gast nog belast.':'Ik bewaak gastbelofte, marge, werkdruk en privacy tegelijk.'}function act(a){if(a==='scenario')scenario();else if(a==='contract')$('#pnDialog').showModal();else if(a==='only')document.body.classList.toggle('pn-focus');else if(a==='inspect')document.body.classList.toggle('pn-inspect');else if(a==='capacity'){$('#pnContext').textContent='Deze belofte verhoogt omzet 7%, zonder extra late shift.'}else if(a==='learn'){$('#pnContext').textContent='Voorstel klaar: lichte roomservice-capaciteit +12% tussen 22:00 en 23:00.'}}document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>act(b.dataset.act));document.querySelectorAll('[data-link]').forEach(b=>b.onclick=()=>location.href=b.dataset.link);document.querySelectorAll('.pn-intent').forEach(b=>b.onclick=()=>{document.querySelectorAll('.pn-intent').forEach(x=>x.classList.toggle('actief',x===b))});function ask(){var q=$('#pnInput').value.trim().toLowerCase();if(!q)return;$('#pnInput').value='';if(/storing|vertraging|herstel/.test(q)&&!incident)scenario();else if(/contract|belofte/.test(q))$('#pnDialog').showModal();else if(/aandacht|uitzondering/.test(q))document.body.classList.add('pn-focus');else if(/capaciteit|werkdruk/.test(q))$('#pnContext').textContent='Capaciteit is gezond. Acht late aankomsten passen zonder extra shift.'}$('#pnSend').onclick=ask;$('#pnInput').onkeydown=e=>{if(e.key==='Enter')ask()};$('#pnMouth').onclick=()=>$('#pnInput').focus();if(window.RTGMond)RTGMond.fab($('#pnMouth'),20)})();
+(function(){'use strict';var $=s=>document.querySelector(s),incident=false;function scenario(){incident=!incident;document.body.classList.toggle('pn-incident',incident);$('#pnState').textContent=incident?'HERSTELMARKT · 1 WIJZIGING':'NETWERK RUSTIG';$('#pnTitle').textContent=incident?'Vlucht +6 uur. Het netwerk herstelt.':'Vier beloften sluiten op elkaar aan.';$('#pnHealth').innerHTML=(incident?'89':'97')+'<small>network fit</small>';$('#pnExplain').textContent=incident?'Hotelbelofte blijft beschermd. Vervoer en diner bereiden nieuwe tijden voor; de gast ontvangt pas één samengesteld voorstel.':'Iedere partner kent zijn eigen prestatie, vergoeding en afhankelijkheden. Persoonsgegevens blijven buiten het consortium.';$('#pnContext').textContent=incident?'Twee herstelroutes staan klaar. Niemand heeft de gast nog belast.':'Ik bewaak gastbelofte, marge, werkdruk en privacy tegelijk.'}function act(a){if(a==='scenario')scenario();else if(a==='contract')$('#pnDialog').showModal();else if(a==='only')document.body.classList.toggle('pn-focus');else if(a==='inspect')document.body.classList.toggle('pn-inspect');else if(a==='capacity'){$('#pnContext').textContent='Deze belofte verhoogt omzet 7%, zonder extra late shift.'}else if(a==='learn'){$('#pnContext').textContent='Voorstel klaar: lichte roomservice-capaciteit +12% tussen 22:00 en 23:00.'}}/* DE RAIL DEED NIETS, OP ELKE BREEDTE.
+
+   Vijf knoppen met data-zone, en geen enkel script las dat attribuut: Network,
+   Beloven, Samenstellen, Uitvoeren en Leren waren decoratie. Gevonden toen de
+   verbergronde vroeg waarom twee kolommen op een telefoon onbereikbaar waren --
+   het antwoord was dat de schakelaar ernaast ook nooit had gewerkt.
+
+   WELKE ZONE WELK BLOK IS, STAAT IN DE BLOKKEN ZELF. Dat is nagelezen en niet
+   verzonnen:
+     pulse    -> .pn-pulse      "KYOTO UNIVERSE", de netwerkpuls
+     promise  -> .pn-capacity   "Living Capacity ... Late aankomst BELOFTE",
+                                met de knop "Simuleer belofte" erin
+     compose  -> .pn-composer   "Experience COMPOSER"
+     execute  -> .pn-now        "NU - GEDEELDE WAARHEID, alles loopt volgens
+                                belofte": de lopende uitvoering
+     learn    -> .pn-learning   "Collective Intelligence"
+
+   Scrollen en niet verbergen: de kolommen staan sinds vandaag onder elkaar op
+   een telefoon (shared/partner-network.css), dus elke zone is een plek op deze
+   pagina en geen apart blad. Focus gaat mee, anders springt het beeld wel en de
+   schermlezer niet. */
+var ZONES={pulse:'.pn-pulse',promise:'.pn-capacity',compose:'.pn-composer',execute:'.pn-now',learn:'.pn-learning'};
+document.querySelectorAll('[data-zone]').forEach(function(knop){
+  knop.setAttribute('aria-current', knop.classList.contains('actief') ? 'true' : 'false');
+  knop.onclick=function(){
+    var doel=document.querySelector(ZONES[knop.dataset.zone]);
+    if(!doel) return;
+    document.querySelectorAll('[data-zone]').forEach(function(x){
+      var aan=(x===knop); x.classList.toggle('actief',aan); x.setAttribute('aria-current',aan?'true':'false');
+    });
+    if(!doel.hasAttribute('tabindex')) doel.setAttribute('tabindex','-1');
+    doel.scrollIntoView({behavior:'smooth',block:'start'});
+    doel.focus({preventScroll:true});
+  };
+});
+document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>act(b.dataset.act));document.querySelectorAll('[data-link]').forEach(b=>b.onclick=()=>location.href=b.dataset.link);document.querySelectorAll('.pn-intent').forEach(b=>b.onclick=()=>{document.querySelectorAll('.pn-intent').forEach(x=>x.classList.toggle('actief',x===b))});function ask(){var q=$('#pnInput').value.trim().toLowerCase();if(!q)return;$('#pnInput').value='';if(/storing|vertraging|herstel/.test(q)&&!incident)scenario();else if(/contract|belofte/.test(q))$('#pnDialog').showModal();else if(/aandacht|uitzondering/.test(q))document.body.classList.add('pn-focus');else if(/capaciteit|werkdruk/.test(q))$('#pnContext').textContent='Capaciteit is gezond. Acht late aankomsten passen zonder extra shift.'}$('#pnSend').onclick=ask;$('#pnInput').onkeydown=e=>{if(e.key==='Enter')ask()};$('#pnMouth').onclick=()=>$('#pnInput').focus();if(window.RTGMond)RTGMond.fab($('#pnMouth'),20)})();

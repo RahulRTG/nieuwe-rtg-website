@@ -27,9 +27,16 @@
       'border-bottom:1px solid var(--line,var(--lijn,#2A2724));}' +
     '.rtgdeel-balk button{background:none;border:0;cursor:pointer;padding:.55rem .8rem .6rem;margin-bottom:-1px;' +
       'font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;' +
-      'color:var(--muted,var(--zacht,#8A8680));border-bottom:2px solid transparent;white-space:nowrap;}' +
-    '.rtgdeel-balk button:hover{color:var(--txt,#F7F5F1);}' +
-    '.rtgdeel-balk button[aria-current="true"]{color:var(--txt,#F7F5F1);' +
+      /* --rtg-muted en --rtg-txt VOOR --muted en --txt, en dat is geen smaak.
+         Die eerste twee volgen het thema (donkere inkt op champagne, lichte op
+         onyx); --muted is een vaste grijstoon en --txt een vaste lichte. Op de
+         donkere thema's haalde de niet-actieve tab daarmee 4,07:1 waar 4,5 moet
+         (11,5px halfvet is geen grote tekst), en op champagne stond de actieve
+         tab licht op licht. Gemeten over alle schermen: 70 keer, op elk scherm
+         dat deze balk draagt. */
+      'color:var(--rtg-muted,var(--muted,var(--zacht,#8A8680)));border-bottom:2px solid transparent;white-space:nowrap;}' +
+    '.rtgdeel-balk button:hover{color:var(--rtg-txt,var(--txt,#F7F5F1));}' +
+    '.rtgdeel-balk button[aria-current="true"]{color:var(--rtg-txt,var(--txt,#F7F5F1));' +
       'border-bottom-color:var(--gold,var(--goud,#857007));}' +
     '.rtgdeel-weg{display:none!important;}' +
     '@media print{.rtgdeel-balk{display:none;}}';

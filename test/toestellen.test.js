@@ -7,7 +7,7 @@
 
    Verder: wat een toestel meet komt binnen als 'apparaat' en niet als 'zelf',
    en het overschrijft niet wat het lid zelf zei over dezelfde nacht.
-   Draai los: node --experimental-sqlite --test test/toestellen.test.js */
+   Draai los: node --test test/toestellen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

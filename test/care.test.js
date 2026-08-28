@@ -1,7 +1,7 @@
 /* Toren 4: RTG Care (zorg & welzijn). Een behandeling boeken bij een
    behandelaar in een tijdslot, het zorgprofiel dat meereist, de aparte en
    veilige intake-deling per aanbieder, en Rahul die het in gewone taal
-   regelt. Draai los: node --experimental-sqlite --test test/care.test.js */
+   regelt. Draai los: node --test test/care.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

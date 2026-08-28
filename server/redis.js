@@ -16,6 +16,8 @@
 'use strict';
 const net = require('net');
 const tls = require('tls');
+/* SNI alleen bij een NAAM -- zie de kop van ./lib/sni.js. */
+const { sniVan } = require('./lib/sni');
 const { URL } = require('url');
 
 const ONVOLLEDIG = Symbol('onvolledig');
@@ -105,7 +107,7 @@ function createClient(opts) {
           verbondenOoit = true; resolve();
         } catch (e) { reject(e); }
       };
-      sock = secure ? tls.connect({ host, port, servername: host }, klaar) : net.connect({ host, port }, klaar);
+      sock = secure ? tls.connect(Object.assign({ host, port }, sniVan(host)), klaar) : net.connect({ host, port }, klaar);
       if (sock.setNoDelay) sock.setNoDelay(true);
       sock.on('data', c => { buf = buf.length ? Buffer.concat([buf, c]) : c; verwerk(); });
       sock.on('error', e => { emitFout(e); if (!verbondenOoit) reject(e); });

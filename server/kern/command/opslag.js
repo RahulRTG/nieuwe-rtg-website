@@ -71,7 +71,21 @@ module.exports = function maakOpslag({ db }) {
     },
     /* Alleen lezen, maar wel dezelfde gedeelde collectie -- vandaar hier en
        niet bij `vreemd`, zodat er één plek is die techniek noemt. */
-    techniek: () => (db.data.techniek && typeof db.data.techniek === 'object') ? db.data.techniek : {}
+    techniek: () => (db.data.techniek && typeof db.data.techniek === 'object') ? db.data.techniek : {},
+    /* HET UITROLVAK, schrijvend -- zelfde snit als schakelkast() hierboven.
+       techniek() hieronder geeft bewust een wegwerp-{} terug zolang de
+       collectie niet bestaat (alleen lezen); een schrijver die dat vak
+       gebruikte raakte zijn wijziging geruisloos kwijt. De uitrolregie
+       schrijft, dus krijgt hij een vak dat beide lagen echt aanmaakt. */
+    uitrol: () => {
+      const t = (db.data.techniek && typeof db.data.techniek === 'object')
+        ? db.data.techniek : (db.data.techniek = {});
+      if (!t.uitrol || typeof t.uitrol !== 'object' || Array.isArray(t.uitrol)) {
+        t.uitrol = { trede: null, sinds: null, stand: 'stil', reden: null, basis: null, geschiedenis: [] };
+      }
+      if (!Array.isArray(t.uitrol.geschiedenis)) t.uitrol.geschiedenis = [];
+      return t.uitrol;
+    }
   };
 
   /* ----------------------------------------------------------------------------

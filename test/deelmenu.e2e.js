@@ -10,17 +10,13 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const bundel = require('../scripts/bundel');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -30,7 +26,7 @@ test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
       body: JSON.stringify({ name: 'Menulid', email: 'dm' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -86,7 +82,7 @@ test('deelmenu: een deel tegelijk, wisselen werkt, deep-link werkt',
    blijft het menu daar leeg -- alle drie zijn hier met een mutatie
    nagetrokken. */
 test('deelmenu: ook een app die zijn scherm pas na een fetch bouwt',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -96,7 +92,7 @@ test('deelmenu: ook een app die zijn scherm pas na een fetch bouwt',
       body: JSON.stringify({ name: 'Paylid', email: 'pm' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -167,7 +163,7 @@ const METER = function (html) {
 };
 
 test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen naam',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -177,7 +173,7 @@ test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen n
       body: JSON.stringify({ name: 'iDlid', email: 'id' + u + '@x.nl', phone: '06' + u,
         password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

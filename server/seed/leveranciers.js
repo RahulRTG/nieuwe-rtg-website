@@ -70,11 +70,14 @@ module.exports = {
     {
       code: 'PONTO', name: 'Sunset Ibiza', type: 'bar', city: 'Ibiza',
       loc: { lat: 38.981, lng: 1.294, label: 'Sant Antoni, Ibiza' }, rate: 0.18,
+      /* elk item zegt zelf of het alcohol is: wat de zaak opgeeft wint van de
+         strenge bar-standaard in kern/supplierdefaults.js, en zonder deze
+         vlaggen telde de patatas bravas daar als drank */
       menu: [
-        { id: 'b1', cat: 'Signatuur', name: 'Hierbas Sunset', desc: 'Ibizaanse kruidenlikeur, citroen, bruisend.', price: 16, allergens: [] },
-        { id: 'b2', cat: 'Signatuur', name: 'Sangria blanca', desc: 'Cava, perzik, munt.', price: 15, allergens: [] },
-        { id: 'b3', cat: 'Alcoholvrij', name: 'Virgin Colada (0%)', desc: 'Kokos, ananas, geen alcohol.', price: 12, allergens: [] },
-        { id: 'b4', cat: 'Hapjes', name: 'Patatas bravas', desc: 'Met pittige saus en aioli.', price: 8, allergens: ['ei'] }
+        { id: 'b1', cat: 'Signatuur', name: 'Hierbas Sunset', desc: 'Ibizaanse kruidenlikeur, citroen, bruisend.', price: 16, allergens: [], alcohol: true },
+        { id: 'b2', cat: 'Signatuur', name: 'Sangria blanca', desc: 'Cava, perzik, munt.', price: 15, allergens: [], alcohol: true },
+        { id: 'b3', cat: 'Alcoholvrij', name: 'Virgin Colada (0%)', desc: 'Kokos, ananas, geen alcohol.', price: 12, allergens: [], alcohol: false },
+        { id: 'b4', cat: 'Hapjes', name: 'Patatas bravas', desc: 'Met pittige saus en aioli.', price: 8, allergens: ['ei'], alcohol: false }
       ]
     },
     /* Een club, en BEWUST ZONDER KAART. De clubkant van de horecatoren

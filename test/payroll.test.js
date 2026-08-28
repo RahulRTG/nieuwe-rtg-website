@@ -2,7 +2,7 @@
    die het platform al heeft (klok, rollen, fiscale landtabellen), en de
    matchtafel linkt medewerkers en bedrijven -- maar alleen wie zichzelf
    "open voor werk" zet, is vindbaar.
-   Draai: node --experimental-sqlite --test test/payroll.test.js */
+   Draai: node --test test/payroll.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

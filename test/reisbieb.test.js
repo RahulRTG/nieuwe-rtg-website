@@ -2,7 +2,7 @@
    Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. En het
    toegangsmodel op beide bibliotheken: bladeren is voor iedereen, installeren
    uit de App-Bibliotheek blijft een voordeel van betalende leden.
-   Draai los: node --experimental-sqlite --test test/reisbieb.test.js */
+   Draai los: node --test test/reisbieb.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4144 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4674 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4144 |
-| servermodules (`server/**/*.js`) | 2394 |
-| routebestanden (`server/routes/**`) | 484 |
-| kernmodules (`server/kern/**`) | 1475 |
-| schermen (`public/**/*.html`) | 268 |
-| gedeelde browsermodules (`public/shared/*.js`) | 229 |
-| toetsbestanden (`test/*.test.js`) | 982 |
-| schermtoetsen (`test/*.e2e.js`) | 139 |
+| API-endpoints | 4674 |
+| servermodules (`server/**/*.js`) | 2759 |
+| routebestanden (`server/routes/**`) | 533 |
+| kernmodules (`server/kern/**`) | 1720 |
+| schermen (`public/**/*.html`) | 273 |
+| gedeelde browsermodules (`public/shared/*.js`) | 268 |
+| toetsbestanden (`test/*.test.js`) | 1178 |
+| schermtoetsen (`test/*.e2e.js`) | 169 |
 
 ## 2. De weg van een verzoek
 
@@ -65,6 +65,7 @@ inzagelog
 verzoekketen
 poortwachters
 ai
+ai-stand
 leverancierpoort
 diensten
 media
@@ -74,12 +75,14 @@ pinslot
 kernlaag1
 kernlaag2
 kernlaag3
+kernlaag3c
 kernlaag3w
 kernlaag3b
 kernlaag4
 kernlaag4b
 kernlaag4c
 kernlaag5
+kernlaag5f
 kernlaag6
 kernlaag7
 kernlaag7b
@@ -98,26 +101,29 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 194 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 209 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 5 | 8 | 46 |
-| `member` | 645 | 58 | 12 | 399 |
-| `supplier` | 599 | 111 | 10 | 297 |
-| `office` | 40 | 7 | 5 | 64 |
-| `staff` | 26 | 7 | 1 | 40 |
-| `social` | 71 | 9 | 39 | 60 |
-| `techniek` | 67 | 15 | 1 | 55 |
+| `auth` | 19 | 6 | 8 | 53 |
+| `member` | 671 | 64 | 14 | 414 |
+| `supplier` | 606 | 116 | 6 | 304 |
+| `office` | 59 | 15 | 3 | 75 |
+| `staff` | 26 | 8 | 1 | 42 |
+| `social` | 75 | 10 | 31 | 66 |
+| `techniek` | 68 | 16 | 1 | 55 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
-op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
-per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
-wegwijzer, geen verdict.
+als EIGEN LAAG voor de handler -- gelezen uit de router zelf (`app._routes()`), niet
+meer geraden uit de brontekst. Dat is niet hetzelfde als onbeveiligd, en dat verschil
+is hier echt: honderden routes controleren een capability-token IN de handler (de
+lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
+bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
+publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 2360 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3112 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -125,9 +131,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1422 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 194 |
-| daarvan door precies één domein | 1228 |
+| kern-namen die routes aanraken | 1494 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 209 |
+| daarvan door precies één domein | 1285 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -139,12 +145,12 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(175) auth(107) supplierAuth(56) officeAuth(39) db(36) status(27) liveCodename(27)
-accounts(23) schoon(21) managerOnly(16) codenaamVan(16) save(15) rtf(15)
-boardroomWie(11) crypto(11) findSupplier(11) anthropic(11) tooManyTries(10) geenGast(10)
-rtmail(10) express(9) gegevensStop(9) payrollOS(9) keyVanCodenaam(9) kern(8)
-logActivity(8) noteFailedTry(7) stuur(7) sseToOffice(7) mail(6) sseToSupplier(6)
-notifySupplier(6) boardroomAuth(6) pay(6) talen(6) appUrl(5) onboarding(5) tenant(5)
+app(185) auth(113) supplierAuth(61) officeAuth(41) db(37) liveCodename(33) status(27)
+accounts(25) schoon(23) managerOnly(18) codenaamVan(17) save(16) rtf(15)
+boardroomWie(12) geenGast(12) tooManyTries(11) crypto(11) express(11) findSupplier(11)
+pay(11) anthropic(11) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
+sseToOffice(9) payrollOS(9) kern(8) stuur(8) mail(7) noteFailedTry(7) sseToSupplier(7)
+boardroomAuth(7) appUrl(6) onboarding(6) notifySupplier(6) talen(6) tenant(5)
 loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 ```
 
@@ -153,14 +159,14 @@ loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
+| 42 | `server/routes/auth/account.js` |
 | 41 | `server/routes/member/voertuigen/huur.js` |
 | 40 | `server/routes/member/voertuigen/charter.js` |
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
+| 38 | `server/routes/staff.js` |
 | 36 | `server/routes/auth.js` |
-| 36 | `server/routes/staff.js` |
-| 35 | `server/routes/auth/account.js` |
 | 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat

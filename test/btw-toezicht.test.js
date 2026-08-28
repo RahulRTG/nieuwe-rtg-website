@@ -7,7 +7,7 @@
    juist over een kwartaal dat voorbij is -- wie heeft niet ingediend, en wiens
    aangifte is achterhaald door facturen die er daarna bij kwamen. Met een
    verzetbare klok is dat na te lopen; met de kalender niet.
-   Draai: node --experimental-sqlite --test test/btw-toezicht.test.js */
+   Draai: node --test test/btw-toezicht.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');

@@ -16,7 +16,7 @@
    5. ALLES OP CODENAAM. Een verkooppijplijn is precies de plek waar de
       codenaam-regel stilletjes zou sneuvelen.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-pijplijn.test.js */
+   Draai los: node --test test/onderneming-pijplijn.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

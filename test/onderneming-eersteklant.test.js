@@ -12,7 +12,7 @@
    3. ZONDER ZAAK GEEN PERCENTAGE. Null en geen 0%: 0% zegt dat er niets gedaan
       is, terwijl er niets te doen valt.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-eersteklant.test.js */
+   Draai los: node --test test/onderneming-eersteklant.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

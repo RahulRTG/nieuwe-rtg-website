@@ -10,13 +10,17 @@
    - langverblijf (zakenreis, project, relocatie) rekent vanaf 28 nachten op
      een maandtarief in plaats van de nachtprijs;
    - een zakelijke gast kan op factuur boeken, met een kostenplaats erbij;
-   - de zaak betaalt de gewone RTG-partnercommissie over haar omzet -- het
-     lid nog steeds 0% servicekosten. Dat verschil staat aan beide kanten
-     open en uitgerekend op het scherm.
+   - RTG rekent NUL commissie over de omzet van de zaak, net als overal
+     (kern/commercie/vergoeding.js), en het lid betaalt 0% servicekosten. Tot
+     20 augustus 2026 was dit de enige plek waar wel een commissie werd
+     afgetrokken -- met een eigen terugval van 10% en over het tarief van het
+     eerste huis van de host. Dat was in strijd met de partnervoorwaarden.
 
    Wat we nooit doen: beweren dat er al betaald is. De prijsopbouw is
    transparant, de uitbetaling staat "gepland" en een factuur "volgt".
    Krijgt de gedeelde ctx van kern/thuis/index.js. */
+const vergoeding = require('../commercie/vergoeding');
+
 module.exports = (ctx) => {
   const { save, schoon, huizen, boekingen, nachten, TYPES, LANDEN, findSupplier, hostNaam, ratingVan } = ctx;
 
@@ -36,19 +40,22 @@ module.exports = (ctx) => {
   }
   const landNaam = land => ((LANDEN && LANDEN[String(land || '')]) || {}).naam || null;
 
-  /* De partnercommissie van de zaak: hetzelfde tarief dat zij overal op het
-     platform betaalt. Geen apart Thuis-tarief, geen verrassing. */
-  function commissiePct(h) {
-    const z = isZaak(h) && findSupplier && findSupplier(codeVan(h));
-    const r = z && Number(z.rate);
-    return Number.isFinite(r) ? Math.round(r * 1000) / 10 : 10;
-  }
+  /* De partnervergoeding over omzet is NUL, hier net zo goed als overal
+     (kern/commercie/vergoeding.js). Dit was de enige plek op het platform waar
+     een commissie ook echt van een partneruitbetaling werd afgetrokken -- met
+     een eigen terugval van 10 procent terwijl de standaard elders 12 was, en
+     berekend over het tarief van het EERSTE huis van de host. Drie fouten in
+     vier regels, en ze bestonden alleen omdat het tarief op vier plekken woonde.
+
+     De functie blijft staan zodat het commerciele profiel en het
+     omzetoverzicht hun veld houden; het antwoord is nul. */
+  function commissiePct() { return vergoeding.PARTNER_COMMISSIE * 100; }
 
   /* ---------- het commerciele profiel van een huis ---------- */
   function zakelijkZet(hostVlag, id, data) {
     const h = huizen()[String(id || '')];
     if (!h || h.host !== hostVlag) return { status: 404, error: 'Dit huis beheert u niet.' };
-    if (!isZaak(h)) return { status: 403, error: 'De commerciele tak is voor zaken. Een prive-host verhuurt zonder btw en zonder commissie.' };
+    if (!isZaak(h)) return { status: 403, error: 'De commerciele tak is voor zaken. Een prive-host verhuurt zonder btw.' };
     data = data || {};
     h.zakelijk = {
       aan: data.aan !== false,
@@ -121,7 +128,7 @@ module.exports = (ctx) => {
     const excl = som(b => (b.prijsopbouw || {}).exclBtw != null ? b.prijsopbouw.exclBtw : (b.prijsopbouw || {}).totaal);
     const btw = som(b => (b.prijsopbouw || {}).btw);
     const bruto = Math.round((excl + btw) * 100) / 100;
-    const pct = mijn.length ? commissiePct(mijn[0]) : 10;
+    const pct = commissiePct();
     const commissie = Math.round(excl * pct) / 100;
     const nachtenTotaal = klaar.reduce((s, b) => s + nachten(b.van, b.tot), 0);
     return {
@@ -133,7 +140,7 @@ module.exports = (ctx) => {
       commissiePct: pct, commissie, nettoUitbetaling: Math.round((excl - commissie) * 100) / 100,
       opFactuur: klaar.filter(b => b.opFactuur).length,
       huizen: comm.map(profiel),
-      uitleg: 'Het lid betaalt 0% servicekosten; de zaak draagt de logies-btw af en betaalt de gewone partnercommissie van ' + pct + '%. De uitbetaling staat gepland naar de zakelijke RTG Bank-rekening; er is nog niets overgemaakt.'
+      uitleg: 'Het lid betaalt 0% servicekosten en RTG rekent 0% commissie over uw omzet; u draagt alleen de logies-btw af. De uitbetaling staat gepland naar de zakelijke RTG Bank-rekening; er is nog niets overgemaakt.'
     };
   }
 

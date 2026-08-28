@@ -19,12 +19,14 @@
    meer, dan valt de werkplek weg in plaats van naamloos mee te reizen. */
 'use strict';
 
+const { idVanKey } = require('../lib/lidsleutel');
+
 function maakWerkplekken({ accounts, findSupplier }) {
   function zakenVan(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return [];
+    const id = idVanKey(key);
+    if (id == null) return [];
     let rijen = [];
-    try { rijen = accounts.staffPositions(Number(m[1])) || []; } catch (e) { return []; }
+    try { rijen = accounts.staffPositions(id) || []; } catch (e) { return []; }
     return rijen.map(r => {
       const s = findSupplier ? findSupplier(r.supplier_code) : null;
       return { code: r.supplier_code, naam: (s && s.name) || r.supplier_code, bestaat: !!s, leiding: r.role === 'manager' };

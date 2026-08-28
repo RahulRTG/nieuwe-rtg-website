@@ -9,7 +9,7 @@
    WEIGERT EEN LOPEND POTJE, op de status en niet in een prompt. Een
    prompt-instructie is niet te toetsen; deze weigering is dat wel.
 
-   Draai los: node --experimental-sqlite --test test/spelnabespreking.test.js */
+   Draai los: node --test test/spelnabespreking.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

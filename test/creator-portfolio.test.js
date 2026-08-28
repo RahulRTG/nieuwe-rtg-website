@@ -21,7 +21,7 @@
      uit dezelfde lus; deze toets loopt ze allemaal langs zodat een gat in de
      lus niet vier keer onopgemerkt blijft.
 
-   Draai los: node --experimental-sqlite --test test/creator-portfolio.test.js
+   Draai los: node --test test/creator-portfolio.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

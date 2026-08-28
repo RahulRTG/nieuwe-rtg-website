@@ -15,7 +15,7 @@
    foundation-huis als het foundation-huis, zonder dat er ergens een tweede
    palet ontstaat. */
 
-.lp-rij{border:1px solid var(--rtg-line,var(--lijn,#DEDBD5));border-radius:12px;padding:.85rem 1rem;margin:.6rem 0;}
+.lp-rij{border:1px solid var(--rtg-line,var(--lijn,#DEDBD5));border-radius:0;padding:.85rem 1rem;margin:.6rem 0;}
 .lp-kop{display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;}
 .lp-wie{font-weight:600;}
 .lp-soort{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-soft,var(--zacht,#8A8680));}

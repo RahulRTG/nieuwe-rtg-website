@@ -20,7 +20,7 @@
    constructie niet zien. Dit bestand gaat over de ROUTE, met een echte server en
    echte inloggen, want daar zat hij.
 
-   Draai los: node --experimental-sqlite --test test/aanmeldbesluit.test.js
+   Draai los: node --test test/aanmeldbesluit.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -81,8 +81,12 @@ test('2. een Business Pass net zo min', async () => {
    dat de goede persoon er wel doorheen komt. */
 test('3. de eigenaar met zijn eigen inlog kan het wel, en komt met naam in het spoor', async () => {
   const a = await vraagAan('lifestyle');
+  /* `contractEuro` hoort erbij sinds de ladder: de Lifestyle Pass heeft geen
+     lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd
+     (kern/aanmeldingen/besluit.js). Deze toets gaat over WIE er beslist, niet
+     over de prijs -- maar hij loopt wel langs dezelfde poort. */
   const besluit = await api('/api/aanmelding/beslis',
-    { id: a.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'Op uitnodiging' }, eigenaarKantoor);
+    { id: a.body.aanmelding.id, besluit: 'geaccepteerd', notitie: 'Op uitnodiging', contractEuro: 20000 }, eigenaarKantoor);
   assert.equal(besluit.status, 200, JSON.stringify(besluit.body).slice(0, 160));
   const door = besluit.body.aanmelding.besluit.door;
   assert.ok(door && door.length > 1, 'het besluit draagt een herleidbare sleutel: ' + door);

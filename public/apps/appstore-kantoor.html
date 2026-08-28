@@ -18,23 +18,23 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:4rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   a{color:inherit;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.88));backdrop-filter:blur(8px);
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 88%,transparent));backdrop-filter:blur(8px);
     padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.3rem;margin-top:.05rem;}
   main{padding:1.1rem;max-width:940px;margin:0 auto;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem 1.1rem;margin-bottom:.8rem;}
   .kaart h2{font-size:1.1rem;margin-bottom:.15rem;}
   .sub{font-size:.8rem;color:var(--soft);line-height:1.6;}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
-  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:10px;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
+  .veld{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.5rem .7rem;font:inherit;font-size:.85rem;min-height:2.6rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.5rem .9rem;font:inherit;font-weight:600;font-size:.83rem;cursor:pointer;min-height:2.6rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
-  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.4rem;background:rgba(194,58,94,.07);border-radius:0 10px 10px 0;font-size:.8rem;line-height:1.5;}
+  .bev{border-left:3px solid var(--burgundy);padding:.45rem .7rem;margin-top:.4rem;background:rgba(194,58,94,.07);border-radius:0;font-size:.8rem;line-height:1.5;}
   .bev.letop{border-left-color:var(--gold);background:rgba(169,143,28,.08);}
-  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:7px;border:1px solid var(--gold);color:var(--gold);}
+  .st{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .5rem;border-radius:0;border:1px solid var(--gold);color:var(--gold);}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
+    border-radius:0;padding:.6rem .9rem;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:88vw;}
   code{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--gold);}
   /* Uit de inline stijlattributen gehaald. Die houden style-src-attr in de CSP
      open en de norm telt ze (scripts/norm.js, inlineStijlAttributen); ze stonden

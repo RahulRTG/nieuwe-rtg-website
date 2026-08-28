@@ -15,7 +15,7 @@
    - een correctie rekent op de regels van TOEN, niet die van vandaag;
    - een contractwijziging overschrijft niet, en terugwerkend is zichtbaar.
 
-   Draai los: node --experimental-sqlite --test test/payroll-run.test.js */
+   Draai los: node --test test/payroll-run.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

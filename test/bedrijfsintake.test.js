@@ -3,7 +3,7 @@
    akkoord gebeurt er niets; na akkoord + eerste termijn voldaan staat de
    zaak er (met dorp van het genre en de wensen uit de intake), en de
    eigenaar kan met de eenmalige PIN op de zaak inloggen.
-   Draai los: node --experimental-sqlite --test test/bedrijfsintake.test.js */
+   Draai los: node --test test/bedrijfsintake.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');
@@ -52,7 +52,11 @@ test('ondernemersintake: behoeften mee, mens beslist, zaak na eerste voldane ter
   const metCode = await json(await raw('/aanmelding/beslis', { id, besluit: 'geaccepteerd' }, office));
   assert.ok(metCode.error && /herleidbaar persoon/.test(metCode.error),
     'de gedeelde kantoorcode kent geen Business Pass toe: ' + JSON.stringify(metCode).slice(0, 140));
-  r = await json(await raw('/aanmelding/beslis', { id, besluit: 'geaccepteerd', notitie: 'welkom' }, baas));
+  /* `contractEuro` hoort erbij sinds de ladder: de Business Pass heeft geen
+     lijstprijs, dus accepteren zonder afgesproken maandbedrag wordt geweigerd
+     (kern/aanmeldingen/besluit.js). Deze toets gaat over de intake en niet over
+     de prijs, maar hij loopt langs dezelfde poort. */
+  r = await json(await raw('/aanmelding/beslis', { id, besluit: 'geaccepteerd', notitie: 'welkom', contractEuro: 5000 }, baas));
   assert.equal(r.ok, true, JSON.stringify(r).slice(0, 160));
   assert.ok(r.aanmelding.besluit.door && r.aanmelding.besluit.door !== 'RTG-personeel',
     'en het besluit draagt een herleidbare sleutel: ' + r.aanmelding.besluit.door);

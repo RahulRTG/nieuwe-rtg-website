@@ -32,13 +32,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-reis-'));
 
 /* Per reizigersscherm de belofte die erop hoort te staan. Steeds iets dat het
@@ -87,23 +83,24 @@ async function toon(page, base, app, token) {
     localStorage.removeItem('rtg_office_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
+  await wachtOpRust(page);
   return page.evaluate(() => ({
     pad: location.pathname, tekst: document.body.innerText.replace(/\s+/g, ' ')
   }));
 }
 
 async function opstelling(base) {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   const fouten = [];
   letOpFouten(page, fouten);
   return { browser, page, fouten };
 }
 
 test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -129,7 +126,7 @@ test('elf reizigersschermen tonen hun eigen belofte, en geen enkel echt merk',
 });
 
 test('de vier dienstschermen zijn van het personeel, niet van de reiziger',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -153,7 +150,7 @@ test('de vier dienstschermen zijn van het personeel, niet van de reiziger',
 });
 
 test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste niet',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
@@ -195,9 +192,17 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
       const b = [...document.querySelectorAll('#zoneBalk button')].find(x => /18\+/.test(x.textContent));
       b.click();
     });
+    /* WACHTEN OP WAT DE BEWERING HIERONDER MEET, en niet op iets ernaast. Hier
+       stond alleen "poortReden heeft tekst", en dat is eerder waar dan dat het
+       POORTSCHERM ook echt vooraan staat: de app vult de reden en wisselt daarna
+       pas van paneel. In een volle ronde viel de meting daar precies tussen --
+       `vZaal` was nog zichtbaar en `vPoort` nog niet -- en dan leest de uitslag
+       als "de 18+-deur staat open" terwijl er niets mis is met de deur. Zelfde
+       fout als wachten op de klok, alleen met een ander teken ernaast. */
     await o.page.waitForFunction(() => {
       const p = document.getElementById('poortReden');
-      return p && p.textContent.trim().length > 0;
+      const poort = document.getElementById('vPoort');
+      return p && p.textContent.trim().length > 0 && poort && poort.offsetParent !== null;
     }, null, { timeout: 10000 });
 
     const reden = await o.page.evaluate(() => document.getElementById('poortReden').textContent);

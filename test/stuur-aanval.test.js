@@ -24,6 +24,58 @@ test('de expliciete allowlist is per rol en standaard dicht', () => {
     ['/api/kantoorpakket/open']);
 });
 
+test('DE BEWIJSPOORT: een geschorste capability wordt de AI niet eens aangeboden', () => {
+  /* Proof-aware routing (PROOF.md par. 8), en de omkering is het punt: niet
+     "de AI probeert iets en de beveiliging houdt hem misschien tegen", maar
+     "een onbewezen handeling staat niet in de lijst waaruit de AI kiest".
+     Een verzonnen register op een tijdelijk pad, zodat deze toets niets van de
+     echte meting nodig heeft en niets aan de echte meting verandert. */
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+  const vervalstaat = require('../server/lib/vervalstaat');
+  const reg = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bewijspoort-')), 'vertrouwen.json');
+  const oud = process.env.RTG_VERTROUWEN;
+  const zetRegister = (perRoute) => {
+    fs.writeFileSync(reg, JSON.stringify({ perRoute }));
+    process.env.RTG_VERTROUWEN = reg;
+    vervalstaat.vergeet();
+  };
+  try {
+    /* Een route die OP de allowlist staat en waarvan het bewijs gezakt is. */
+    zetRegister({ 'POST /api/pay/oplaad': { staat: 'geschorst', reden: 'gezakt op ROLLBACK' } });
+    const gesloten = beleidVoor('/api/pay/oplaad', 'member');
+    assert.equal(gesloten.niveau, 'verboden', 'geschorst bewijs sluit de actie voor de AI');
+    assert.equal(gesloten.vervalstaat, 'geschorst');
+    assert.match(gesloten.reden, /hermeting/);
+    assert.deepEqual(toegestanePaden(['/api/pay/oplaad', '/api/pay/saldo'], 'member'), ['/api/pay/saldo'],
+      'de geschorste capability valt uit de lijst waaruit de AI kiest');
+
+    /* VERZWAKT sluit NIET, en dat is de bewuste grens: vrijwel elke route
+       draagt op dit moment een ongemeten schakel, en daarop sluiten zou de
+       hele AI-laag dichtzetten -- precies de vorm van "veiligheid" die mensen
+       uitzetten. Geschorst is tegensprekend bewijs, verzwakt is ontbrekend. */
+    zetRegister({ 'POST /api/pay/oplaad': { staat: 'verzwakt', reden: 'een schakel ongemeten' } });
+    assert.equal(beleidVoor('/api/pay/oplaad', 'member').niveau, 'voorstel');
+
+    /* En een geschorste route die NIET op de allowlist staat, blijft dicht om
+       de eerste reden: de bewijspoort verruimt nooit. */
+    zetRegister({ 'POST /api/nieuw/onbekend': { staat: 'bewezen', reden: 'alles staat' } });
+    assert.equal(beleidVoor('/api/nieuw/onbekend', 'member').niveau, 'verboden');
+
+    /* Zonder register verandert er niets: de bewijspoort is een EXTRA
+       vernauwing boven de met de hand samengestelde allowlist, geen vervanger
+       ervan (zie de kop van server/lib/vervalstaat.js). */
+    process.env.RTG_VERTROUWEN = path.join(path.dirname(reg), 'bestaat-niet.json');
+    vervalstaat.vergeet();
+    assert.equal(beleidVoor('/api/pay/oplaad', 'member').niveau, 'voorstel');
+  } finally {
+    if (oud === undefined) delete process.env.RTG_VERTROUWEN; else process.env.RTG_VERTROUWEN = oud;
+    vervalstaat.vergeet();
+    try { fs.rmSync(path.dirname(reg), { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('de centrale AI-noodrem sluit zowel acties als de routekaart', () => {
   const oud = process.env.RTG_AI_STUUR_UIT;
   process.env.RTG_AI_STUUR_UIT = '1';

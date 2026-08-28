@@ -72,7 +72,9 @@ const VERMOGENS = [
   { id: 'zaken', naam: 'De zakenkant', laag: 'dienst', leuntOp: ['binnenkomen', 'betalen'],
     mens: 'Partners en personeel kunnen werken.',
     waarvoor: 'De kassa, de zaak-app, personeel, payroll en werving.',
-    categorieen: ['Partners (leveranciers)', 'Werk (zaken en personeel)', 'Personeel & integraties'],
+    /* Festival hoort bij de zakenkant: terrein en diensten zijn werk van een
+       zaak, en het gastzicht is een venster daarop. */
+    categorieen: ['Partners (leveranciers)', 'Werk (zaken en personeel)', 'Personeel & integraties', 'Festival'],
     bronnen: ['meting', 'schakelaars'], proefHoudbaarUren: 24 },
 
   { id: 'foundation', naam: 'De RTFoundation', laag: 'dienst', leuntOp: ['binnenkomen'],

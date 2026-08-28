@@ -70,6 +70,54 @@
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
     ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
+    /* De cockpit van LivingOS (WERELDEN.md). Het bestand heet nog living-os,
+       want een bestandsnaam is geen merknaam; de APP heette dat ook, en dat
+       botste vier regels ver in de bank met de WERELD LivingOS. */
+    vooruitzicht:{ naam: 'Het Vooruitzicht', url: '/apps/living-os.html' },
+    /* De STICHTING, en niet het gezin eromheen. Onder /apps/foundation/ staan
+       71 schermen; negen daarvan gaan over RTFoundation als organisatie en de
+       rest over het leven van een kind (WERELDEN.md). Deze twee zijn de deuren
+       naar die negen: het portaal (donateur, vrijwilliger, deelnemer) en de
+       publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
+       een kantoortoken en is geen deur voor een lid. */
+    rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
+       De bank had onder de werelden een tweede kopje, Software, met twaalf apps
+       die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
+       wil afschaffen: 'staat dit in een wereld of in de lijst ernaast?' Een app
+       hoort in de context waarin een mens hem gebruikt, en anders nergens.
+       Negen kregen hier een sleutel; Reizen & Veilig, Gastdossier en Het
+       Vooruitzicht hingen al ergens. shared/command/catalog.js houdt zijn lijst
+       -- die is Rahuls routeertabel en de bron van werkbladtitels -- maar tekent
+       geen bank-sectie meer. test/wereldregister.test.js bewaakt dat elke app
+       uit die catalogus ook echt in een wereld hangt. */
+    vandaag:     { naam: 'Vandaag',        url: '/apps/vandaag.html' },
+    leven:       { naam: 'Mijn leven',     url: '/apps/leven.html' },
+    sociaal:     { naam: 'Sociaal',        url: '/apps/sociaal.html' },
+    /* De WERELDLAAG (README: server/kern/wereld/) -- een LEESLAAG over vijf
+       contexten met een schakelaar Alles / Lifestyle / Business / Communities /
+       Prive. Hij bezit die domeinen niet en plaatsen loopt er nooit langs; wie
+       in Lifestyle plaatst, plaatst in De Salon.
+
+       Hij stond hier niet, en niets in het huis linkte ernaar: een scherm van
+       23 KB dat gebouwd, gedocumenteerd en onbereikbaar was (gevonden met
+       scripts/lib/bereik.js op 19 augustus 2026). Hij hangt in LivingOS en niet
+       in een van de vijf werelden die hij toont, want de contextvraag van
+       WERELDEN.md gaat over de MENS: wie zijn eigen tijdlijn leest, is bezig
+       met zijn dagelijks leven. */
+    wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
+    geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
+       samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
+       paren"). Instant Reality en Het Vooruitzicht (link:vooruitzicht) beloofden
+       allebei een intentie in drie werelden met twee beslissingen; Private
+       Office en het Privekantoor (link:rechterhand) allebei een directietafel.
+       Vier ingangen naar twee dingen. Wie de oude sleutel nog gebruikt, komt
+       niets tegen: een onbekende sleutel levert geen tegel op, en beide adressen
+       bestaan niet meer. */
+    horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
+    partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
+    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

@@ -51,7 +51,13 @@ const KLASSEN = {
     uitbetaalbaar: true,
     uitbetaalVermogen: 'LID_UITBETALING',
     overdraagbaar: 'leden',
-    plafondCenten: 500000,      // 5.000 euro per wallet
+    /* 10.000 euro, gelijk aan de standaard van kern/bankregie. Hier stond
+       500000 en dat was een TWEEDE waarheid over hetzelfde getal: de boardroom
+       stelt het walletplafond in en kern/pay/plafond.js leest dat per boeking,
+       terwijl deze tabel op de helft bleef staan. Het getal hier is nog slechts
+       de terugval voor een waardelaag zonder koppeling; draait hij in het huis,
+       dan wint koppelWalletPlafond() -- zie ./index.js. */
+    plafondCenten: 1000000,     // 10.000 euro per wallet, zie ./index.js
     vervaltNaDagen: null,
     /* DEZE GROND IS OP 24 AUGUSTUS 2026 VERVANGEN. Er stond een gesloten
        circuit: alleen binnen RTG te besteden, niet uitbetaald aan het lid, met

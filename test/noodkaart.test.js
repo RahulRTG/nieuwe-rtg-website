@@ -9,7 +9,7 @@
       jaar hebt geschrapt.
    2. NIEMAND KAN HEM OPVRAGEN. Er is geen route waarmee een zaak of een kantoor
       de noodkaart van een lid ophaalt. U toont hem zelf.
-   Draai los: node --experimental-sqlite --test test/noodkaart.test.js */
+   Draai los: node --test test/noodkaart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

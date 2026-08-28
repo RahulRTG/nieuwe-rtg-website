@@ -6,7 +6,7 @@
    dat mag hier onder geen beding. De eerste vier toetsen gaan daarom niet over
    wat het kan, maar over wat het NIET bewaart.
 
-   Draai los: node --experimental-sqlite --test test/mall-vraagbeeld.test.js */
+   Draai los: node --test test/mall-vraagbeeld.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

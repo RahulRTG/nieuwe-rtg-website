@@ -18,17 +18,17 @@
   header h1{font-size:1.25rem;margin-top:.1rem;}
   header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
   main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;}
   .kaart + .kaart{margin-top:.7rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.6rem .75rem;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.92rem;padding:.6rem .75rem;}
   select.veld{min-width:9rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
   .pil.goed{color:#7FC79B;border-color:#2F5E42;}
-  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .pil.let{color:var(--rtg-leesgoud,var(--gold));border-color:#5C4E10;}
   .pil.fout{color:var(--burgundy);border-color:#5C1B2C;}
   .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.86rem;flex-wrap:wrap;}
   .lijnrij:last-child{border-bottom:none;}
@@ -38,7 +38,7 @@
   .stat{flex:1;min-width:6rem;text-align:center;padding:.3rem 0;}
   .stat b{font-size:1.2rem;display:block;}
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
-  .melder{font-size:.85rem;border-radius:10px;padding:.6rem .8rem;margin-top:.5rem;border:1px solid var(--line);line-height:1.5;}
+  .melder{font-size:.85rem;border-radius:0;padding:.6rem .8rem;margin-top:.5rem;border:1px solid var(--line);line-height:1.5;}
   .melder.fout{color:#F0A9BB;border-color:#5C1B2C;}
   .melder.goed{color:#9FD6B4;border-color:#2F5E42;}
   .uitleg{font-size:.8rem;color:var(--muted);line-height:1.55;}
@@ -48,7 +48,7 @@
 <body class="rtg-stijl">
 <header>
   <div><div class="ey">RTFoundation</div><h1>Mijn lijst</h1></div>
-  <a href="os.html">Foundation OS</a>
+  <a class="h-raak24" href="os.html">Foundation OS</a>
 </header>
 <main id="main">
   <div id="meldingTop"></div>
@@ -178,5 +178,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
      de rest, geen home-indicator, en sinds kort ook geen app-menu (dat wordt
      door deze laag binnengehaald). -->
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

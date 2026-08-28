@@ -35,11 +35,11 @@
          alleen ruimer. Dat is precies de bedoeling: geen ander scherm, een
          groter scherm. */
       'body.rtg-vol #shell{max-width:none !important;width:100% !important;height:100dvh !important;' +
-        'max-height:none !important;border:none !important;border-radius:0 !important;box-shadow:none !important;}' +
+        'max-height:none !important;border:none !important;border-radius:0;box-shadow:none !important;}' +
       'body.rtg-vol{padding:0 !important;}' +
       /* Een losse app-pagina: de omkaderde kaart wordt de pagina. */
       'html.rtg-vol body > main{max-width:none !important;margin:0 !important;border:none !important;' +
-        'border-radius:0 !important;box-shadow:none !important;min-height:100dvh;resize:none !important;' +
+        'border-radius:0;box-shadow:none !important;min-height:100dvh;resize:none !important;' +
         'max-height:none !important;}' +
       /* De overgang is een rustige, want een scherm dat van maat wisselt mag
          niet klappen. Alleen de maten bewegen mee; de inhoud staat stil. */

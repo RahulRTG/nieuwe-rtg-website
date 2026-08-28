@@ -5,7 +5,7 @@
    op), (2) de schilden die de ingebouwde niet heeft (__proto__ geweerd,
    diepte-grens, strikte afwijzing van rommel), (3) end-to-end door de echte
    server: een verzoek gaat er via de eigen parser in en via de eigen
-   stringifier uit. Draai los: node --experimental-sqlite --test test/rtgjson.test.js */
+   stringifier uit. Draai los: node --test test/rtgjson.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -14,16 +14,59 @@ const path = require('path');
 const rtgjson = require('../server/lib/rtgjson');
 const { startServer, stop } = require('./helper');
 
-test('1. spec-randgevallen: byte-voor-byte gelijk aan de ingebouwde motor', () => {
-  const gevallen = [null, true, false, 0, -0, 1.5, 1e21, 5e-324, -3.25e-7, 0.1 + 0.2,
-    Number.MAX_SAFE_INTEGER, 'hoi', '', 'a"b\\c', 'regel1\nregel2\ttab\rterug\fboog\bbel',
-    'unicode: € en emoji 😀', String.fromCharCode(0xD800), String.fromCharCode(0xDC00),
-    'stuurteken', [1, [2, [3, []]]], { a: 1, b: { c: [true, null, 'x'] }, leeg: {}, lijst: [] },
-    { datum: new Date(0) }, { u: undefined, f: () => 1, n: 9 }, [undefined, () => 1, Symbol('s')],
-    { getallen: [NaN, Infinity, -Infinity] }];
-  for (const w of gevallen) {
-    assert.equal(rtgjson.stringify(w), JSON.stringify(w), 'stringify van ' + String(JSON.stringify(w)).slice(0, 60));
+test('1. spec-randgevallen: de uitvoer staat vast, teken voor teken', () => {
+  /* GOUDEN WAARDEN, GEEN VERGELIJKING MET DE INGEBOUWDE.
+
+     Hier stond `assert.equal(rtgjson.stringify(w), JSON.stringify(w))`. Dat was
+     de juiste toets zolang stringify een EIGEN implementatie was: twee wegen
+     naar hetzelfde antwoord, en de toets zag het als ze uiteenliepen. Sinds
+     stringify de ingebouwde aanroept, vergelijkt die bewering de ingebouwde met
+     zichzelf -- een toets die niet meer kan zakken, en dat is slechter dan geen
+     toets (LAT.md regel 9).
+
+     Vaste verwachtingen kunnen wel zakken: als de delegatie ooit breekt, als
+     iemand er een eigen weg naast legt, of als een nieuwe Node-versie een van
+     deze randgevallen anders opschrijft (1e+21, 5e-324, \ud800, -0 dat "0"
+     wordt, Date via toJSON, undefined dat in een array "null" wordt en in een
+     object verdwijnt). Juist dat laatste wil je horen, en de oude vorm kon het
+     per definitie niet melden. */
+  const GOUD = [
+    [null, "null"],
+    [true, "true"],
+    [false, "false"],
+    [0, "0"],
+    [-0, "0"],
+    [1.5, "1.5"],
+    [1e21, "1e+21"],
+    [5e-324, "5e-324"],
+    [-3.25e-7, "-3.25e-7"],
+    [0.1 + 0.2, "0.30000000000000004"],
+    [Number.MAX_SAFE_INTEGER, "9007199254740991"],
+    ['hoi', "\"hoi\""],
+    ['', "\"\""],
+    ['a"b\\c', "\"a\\\"b\\\\c\""],
+    ['regel1\nregel2\ttab\rterug\fboog\bbel', "\"regel1\\nregel2\\ttab\\rterug\\fboog\\bbel\""],
+    ['unicode: \u20ac en emoji \ud83d\ude00', "\"unicode: \u20ac en emoji \ud83d\ude00\""],
+    [String.fromCharCode(0xD800), "\"\\ud800\""],
+    [String.fromCharCode(0xDC00), "\"\\udc00\""],
+    ['stuur\u0000teken', "\"stuur\\u0000teken\""],
+    [[1, [2, [3, []]]], "[1,[2,[3,[]]]]"],
+    [{ a: 1, b: { c: [true, null, 'x'] }, leeg: {}, lijst: [] }, "{\"a\":1,\"b\":{\"c\":[true,null,\"x\"]},\"leeg\":{},\"lijst\":[]}"],
+    [{ datum: new Date(0) }, "{\"datum\":\"1970-01-01T00:00:00.000Z\"}"],
+    [{ u: undefined, f: () => 1, n: 9 }, "{\"n\":9}"],
+    [{ getallen: [NaN, Infinity, -Infinity] }, "{\"getallen\":[null,null,null]}"]
+  ];
+  for (const [waarde, verwacht] of GOUD) {
+    assert.equal(rtgjson.stringify(waarde), verwacht, 'stringify van ' + String(verwacht).slice(0, 60));
   }
+  // een functie of symbool als hele waarde levert undefined, net als een lege plek
+  assert.equal(rtgjson.stringify(() => 1), undefined);
+  assert.equal(rtgjson.stringify(Symbol('s')), undefined);
+  // en een BigInt blijft een NETTE rtgjson-fout, geen kale TypeError
+  assert.throws(() => rtgjson.stringify(10n), (e) => e.rtgjson === true, 'BigInt hoort een rtgjson-fout te geven');
+  assert.throws(() => rtgjson.stringify({ a: 10n }), (e) => e.rtgjson === true, 'ook genest');
+
+
   // parse: witruimte, exponents, escapes, dubbele sleutels (laatste wint)
   assert.deepEqual(rtgjson.parse('  { "a" : [ 1 , 2.5e2 , -0.5 , "\\u0041\\n" ] } '), { a: [1, 250, -0.5, 'A\n'] });
   assert.deepEqual(rtgjson.parse('{"k":1,"k":2}'), { k: 2 });
@@ -61,40 +104,76 @@ test('3. differentiele fuzz: 5000 willekeurige documenten, beide kanten op ident
   for (let i = 0; i < 5000; i++) {
     const x = maak(0);
     const eigen = rtgjson.stringify(x), inge = JSON.stringify(x);
-    assert.equal(eigen, inge, 'stringify wijkt af in fuzz-ronde ' + i);
+    /* PARSE blijft een echte differentiele toets: onze parser is eigen werk en
+       moet hetzelfde document opleveren als de ingebouwde. */
     assert.equal(JSON.stringify(rtgjson.parse(inge)), JSON.stringify(JSON.parse(inge)), 'parse wijkt af in fuzz-ronde ' + i);
+    /* STRINGIFY is dat niet meer -- die roept de ingebouwde aan, dus `eigen ===
+       inge` zou de ingebouwde met zichzelf vergelijken en nooit meer kunnen
+       zakken (LAT.md regel 9). Wat hier wel iets bewijst is de RONDRIT door de
+       eigen motor: wat wij opschrijven moet onze eigen parser identiek
+       teruggeven. Dat bijt op allebei de helften, en juist op hun naad. */
+    assert.deepEqual(rtgjson.parse(eigen), x, 'rondrit door de eigen motor wijkt af in fuzz-ronde ' + i);
   }
 });
 
-/* De SNELLE WEG in strEsc. Verreweg de meeste tekst hoeft niet ge-escaped en
-   krijgt sinds taak 17 alleen nog een regex-test in plaats van een lus per
-   teken (3,7x sneller; stringify was 12% van de warme rekentijd). Zo'n voorwacht
-   is precies het soort optimalisatie dat een STIL verschil kan opleveren: een
-   teken dat de detector mist gaat rauw de uitvoer in en dat merk je pas als een
-   ander systeem de JSON weigert.
+/* DE ESCAPE-CONTRACTEN, ALS EIGENSCHAPPEN.
 
-   Daarom uitputtend en niet steekproefsgewijs: elk teken van 0x00 tot 0x2FFF op
-   drie posities, elk los surrogaat, en een raster van complete paren.
+   Hier stond een uitputtende vergelijking met de ingebouwde motor: elk teken
+   van 0x00 tot 0x2FFF op drie posities, elk los surrogaat, en een raster van
+   complete paren -- allemaal via `assert.equal(rtgjson.stringify(s),
+   JSON.stringify(s))`. Die toets was er om de eigen escape-voorwacht (strEsc)
+   te bewaken, en dat deed hij goed.
 
-   MUTATIE-BEWIJS: haal 0x00-0x1f uit BIJZONDER en deze toets zakt op teken 0
-   (een rauw stuurteken in de uitvoer); haal de surrogaten eruit en hij zakt op
-   het eerste losse surrogaat. */
-test('3b. de snelle weg escapeert precies wat de ingebouwde escapeert', () => {
+   Die voorwacht bestaat niet meer: stringify roept de ingebouwde aan. Daarmee
+   werd elke bewering hier de ingebouwde tegen zichzelf -- ruim twaalfduizend
+   vergelijkingen die niet meer konden zakken (LAT.md regel 9). Zoiets weggooien
+   mag niet, maar laten staan is erger: het is precies de vorm die vertrouwen
+   koopt dat er niet is.
+
+   Dus dezelfde uitputtendheid, maar met beweringen die WEL kunnen zakken, en
+   die bovendien iets zeggen wat we werkelijk nodig hebben in plaats van "gelijk
+   aan de buurman":
+
+     1. de uitvoer draagt nooit een rauw stuurteken. Zo'n teken maakt de JSON
+        ongeldig voor elke andere lezer, en dat merk je pas ver weg.
+     2. een LOS surrogaat staat er ge-escapet. Rauw is het ongeldige UTF-8 en
+        knapt de bezorging.
+     3. een COMPLEET paar blijft rauw: geen escaping-laag over een tekst die al
+        goed was.
+     4. alles komt via ONZE eigen parser identiek terug -- de rondrit is het
+        eigenlijke contract tussen de twee helften van deze motor.
+
+   MUTATIE-BEWIJS: laat stringify het escapen van stuurtekens achterwege en punt
+   1 zakt op teken 0; laat een los surrogaat rauw staan en punt 2 zakt op de
+   eerste. Beide zijn geprobeerd en beide sloegen aan. */
+test('3b. de uitvoer draagt geen rauw stuurteken, en losse surrogaten staan ge-escaped', () => {
+  const RAUW_STUUR = /[\x00-\x1f]/;
+  const controleer = (s, waar) => {
+    const uit = rtgjson.stringify(s);
+    assert.ok(!RAUW_STUUR.test(uit), 'rauw stuurteken in de uitvoer bij ' + waar);
+    assert.equal(rtgjson.parse(uit), s, 'rondrit door de eigen motor wijkt af bij ' + waar);
+  };
   for (let i = 0; i <= 0x2fff; i++) {
     const c = String.fromCharCode(i);
-    for (const s of [c, 'x' + c, 'x' + c + 'y']) {
-      assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'teken 0x' + i.toString(16));
-    }
-    assert.equal(rtgjson.stringify({ [c]: 1 }), JSON.stringify({ [c]: 1 }), 'als SLEUTEL, teken 0x' + i.toString(16));
+    for (const s of [c, 'x' + c, 'x' + c + 'y']) controleer(s, 'teken 0x' + i.toString(16));
+    // ook als SLEUTEL: daar geldt exact hetzelfde, en een sleutel loopt langs een andere weg
+    const uitSleutel = rtgjson.stringify({ [c]: 1 });
+    assert.ok(!RAUW_STUUR.test(uitSleutel), 'rauw stuurteken in een SLEUTEL, teken 0x' + i.toString(16));
+    assert.deepEqual(rtgjson.parse(uitSleutel), { [c]: 1 }, 'rondrit van een SLEUTEL, teken 0x' + i.toString(16));
   }
   for (let h = 0xd800; h <= 0xdfff; h++) {
-    const s = 'a' + String.fromCharCode(h) + 'b';
-    assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'los surrogaat 0x' + h.toString(16));
+    const c = String.fromCharCode(h);
+    const uit = rtgjson.stringify('a' + c + 'b');
+    assert.ok(uit.includes('\\u' + h.toString(16)),
+      'los surrogaat 0x' + h.toString(16) + ' hoort ge-escapet in de uitvoer te staan, niet rauw');
+    assert.ok(!RAUW_STUUR.test(uit), 'los surrogaat 0x' + h.toString(16));
   }
   for (let h = 0xd800; h <= 0xdbff; h += 7) {
     for (let l = 0xdc00; l <= 0xdfff; l += 13) {
       const s = String.fromCharCode(h) + String.fromCharCode(l);
-      assert.equal(rtgjson.stringify(s), JSON.stringify(s), 'compleet paar ' + h + '/' + l);
+      const uit = rtgjson.stringify(s);
+      assert.ok(!/\\u/.test(uit), 'compleet paar ' + h + '/' + l + ' hoort RAUW te blijven, niet ge-escaped');
+      assert.equal(rtgjson.parse(uit), s, 'rondrit van een compleet paar ' + h + '/' + l);
     }
   }
 });

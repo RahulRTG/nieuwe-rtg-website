@@ -17,17 +17,39 @@ function maakLid(deps) {
   const zijnVriendenVan = (a, b) => { try { return typeof deps.zijnVrienden === 'function' ? !!deps.zijnVrienden(a, b) : false; } catch (e) { return false; } };
   const { hasContact, addContact, canEngage, engageError, registerContact } =
     require('./lid/contact')({ db, PERSONAS });
-  const { facturenVoor, reisVoor } = require('./lid/facturen')({ i18n, deps });
+  const { facturenVoor, reisVoor, eersteBijdrageFactuur } = require('./lid/facturen')({ i18n, deps });
 
-  /* Startinhoud voor een nieuw account: een eigen kopie van de voorbeeldreis en
-     -facturen, zodat elk lid zijn eigen boekingen/betalingen heeft. */
+  /* STARTINHOUD VOOR EEN NIEUW ACCOUNT: LEEG.
+
+     Hier stond `JSON.parse(JSON.stringify(db.data.invoices))` en hetzelfde voor
+     db.data.trip. Wie zich echt aanmeldde kreeg daarmee de DEMO-inhoud als zijn
+     eigen persoonlijke gegevens: een reis naar Ibiza die hij nooit boekte, vier
+     facturen op zijn naam, een villa in Cala Jondal. Dat is geen kennismaking
+     maar een leugen -- en precies de leugen die de merkregel verbiedt (nooit
+     claimen dat een boeking verwerkt is).
+
+     De demo blijft bestaan, maar op de plek waar hij hoort: de demo-SESSIES
+     (inloggen op een pas zonder account, alleen als DEMO aanstaat) lezen
+     db.data, en het geseede demo-account krijgt zijn inhoud expliciet mee
+     (demoLidInhoud in server.js). Een echt account begint leeg en vult zich met
+     wat het lid zelf doet. Wat de schermen in die lege stand tonen is geen wit
+     vlak maar een uitleg: wat hier komt te staan, en hoe je het in gang zet. */
   function memberTemplate() {
-    return {
-      invoices: JSON.parse(JSON.stringify(db.data.invoices)),
-      trip: JSON.parse(JSON.stringify(db.data.trip)),
-      creatorCredit: 0,
-      creatorLikes: 0
-    };
+    return { invoices: [], trip: null, creatorCredit: 0, creatorLikes: 0 };
+  }
+
+  /* De leden-inhoud die bij een SLEUTEL hoort, met dezelfde regel als stateFor:
+     een echt account leest zijn eigen dossier, een demo-sessie leest db.data (de
+     demo-inhoud), en een gast heeft niets van zichzelf. Bestaat als functie
+     omdat dezelfde vraag op vier plekken werd gesteld -- de Salon-state, de
+     system prompt van Rahul, de partnerlijst per stad en het live-scherm -- en
+     drie daarvan het antwoord van de demo pakten voor een echt lid. */
+  function ledenInhoudVan(key) {
+    const s = String(key || '');
+    const m = /^user-(\d+)$/.exec(s);
+    if (m) { try { return accounts.getMemberState(Number(m[1])) || memberTemplate(); } catch (e) { return memberTemplate(); } }
+    if (!s || s.startsWith('guest-') || s === 'guest') return memberTemplate();
+    return db.data;
   }
 
   function stateFor(sess, lang) {
@@ -122,9 +144,11 @@ function maakLid(deps) {
     return out.sort((x, y) => new Date(y.at) - new Date(x.at)).slice(0, 10);
   }
 
-  // memberTemplate blijft intern (stateFor gebruikt hem); server.js houdt zijn
-  // eigen hoisted memberTemplate voor de demo-seed die vóór deze fabriek draait.
-  return { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications };
+  // memberTemplate gaat mee naar buiten: server.js heeft dezelfde lege
+  // startinhoud nodig vóór deze fabriek draait (hoisted), en twee bestanden die
+  // hetzelfde bedoelen horen niet twee keer te beslissen wat "leeg" is.
+  return { hasContact, addContact, canEngage, engageError, registerContact, stateFor, myApplications,
+    memberTemplate, eersteBijdrageFactuur, ledenInhoudVan };
 }
 
 module.exports = { maakLid };

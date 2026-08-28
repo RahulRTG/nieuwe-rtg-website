@@ -45,11 +45,21 @@ module.exports = (ctx) => {
 
   /* Een entiteit in een groep hangen. Een entiteit hoort bij hoogstens één
      concern: de groep is een economische indeling, en twee groepen die dezelfde
-     entiteit claimen maken de consolidatie onbeslisbaar. */
+     entiteit claimen maken de consolidatie onbeslisbaar.
+
+     DE GROEP MOET VAN DEZELFDE EIGENAAR ZIJN. Zonder die tweede regel was het
+     bestaan van een groep genoeg: wie een `con_`-id in handen kreeg, hing er
+     zijn eigen entiteit in en las daarna met /api/concern/boom de hele groep --
+     de namen van andermans entiteiten, hun vestigingen en de codenaam van de
+     eigenaar. De route erboven controleert al dat de ENTITEIT van de aanvrager
+     is; dat de GROEP dat ook is, stond nergens. Gevonden door de gluurronde
+     (TAKEN.md 4.17), en hier gerepareerd en niet in de route -- een tweede
+     aanroeper zou anders zijn eigen kopie van de regel nodig hebben. */
   function concernZet(e, concernId) {
     if (concernId === null || concernId === '') { e.concern = null; save(); return { ok: true }; }
     const c = concernVind(concernId);
     if (!c) return { status: 404, error: 'Deze groep bestaat niet.' };
+    if (c.eigenaar !== e.eigenaar) return { status: 404, error: 'Deze groep bestaat niet.' };
     e.concern = c.id;
     save();
     return { ok: true, concern: { id: c.id, naam: c.naam } };

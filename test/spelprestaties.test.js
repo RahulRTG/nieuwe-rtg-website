@@ -4,7 +4,7 @@
    10", geen lijst van wat je nog kunt halen), er zijn geen reeksen, en het
    venster is dat van de log -- dus een prestatie kan weer verdwijnen.
 
-   Draai los: node --experimental-sqlite --test test/spelprestaties.test.js */
+   Draai los: node --test test/spelprestaties.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -92,7 +92,7 @@ test('onder de progressiegrens bestaan er geen prestaties', () => {
   const r = u.spelPrestaties('kind1');
   assert.deepEqual(r.prestaties, []);
   assert.equal(r.progressie, false);
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 });
 
 test('het venster reist mee, zodat het scherm het kan zeggen', () => {

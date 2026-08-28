@@ -17,22 +17,23 @@
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
     if (standaard()) {
-      var bank = Math.min(166, Math.max(148, Math.round(m.b * .12)));
-      var tabhoog = 49;
+      /* De vaste Work OS-kamer heeft op ELK formaat dezelfde drie ankers:
+         links de software, boven het open werk en onder de korte route. Een
+         actieve app krijgt altijd het volledige vlak ertussen. Voorheen werd
+         dit vlak nog als een raster verdeeld terwijl CSS de overige apps
+         verborg; daardoor kon de zichtbare app letterlijk een half scherm
+         krijgen. */
+      var bank = m.b < 700 ? 56 : (m.b < 1100 ? 68 : 178);
+      var tabhoog = m.b < 700 ? 52 : 50;
+      var onderhoog = m.b < 700 ? 62 : 58;
       zet(schil.console, 0, 0, bank, m.h);
       if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
+      if (schil.onderbalk) zet(schil.onderbalk, bank, m.h - onderhoog, m.b - bank, onderhoog);
       if (!n) return;
       var werkbreed = m.b - bank;
-      var werkhoog = m.h - tabhoog;
-      var sk = n <= 3 ? n : 2;
-      var sr = Math.ceil(n / sk);
-      var sw = Math.floor(werkbreed / sk);
-      var sh = Math.floor(werkhoog / sr);
-      schil.surfaces.forEach(function (s, i) {
-        var c = i % sk, r = Math.floor(i / sk);
-        zet(s.el, bank + c * sw, tabhoog + r * sh,
-          c === sk - 1 ? werkbreed - c * sw : sw,
-          r === sr - 1 ? werkhoog - r * sh : sh);
+      var werkhoog = m.h - tabhoog - onderhoog;
+      schil.surfaces.forEach(function (s) {
+        zet(s.el, bank, tabhoog, werkbreed, werkhoog);
       });
       return;
     }

@@ -42,6 +42,7 @@ const LOOPT_DOOR = {
     'geldcategorieën hierboven en bevriezen dus daar.',
   'Cultuur en gezelschap': 'gezelschap en cultuur bewegen geen rechten en geen geld.',
   'Winkel en media': 'een bestelling raakt geld pas bij het betalen, en dat bevriest hierboven.',
+  'Festival': 'terrein, diensten en gastzicht bewegen geen rechten en geen geld; kaartverkoop raakt geld pas bij het betalen, en dat bevriest in de geldcategorieën.',
   'Werk (zaken en personeel)': 'een zaak die zijn eigen bestellingen bijwerkt, is de eigenaar van ' +
     'die gegevens en geen derde. Wie er van buiten in schrijft, doet dat via "Partners".'
 };

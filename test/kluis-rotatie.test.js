@@ -11,7 +11,7 @@
    buitenstaan. Die sleutel blijft daarom gepind. Dat is wat deze tests vooral
    bewaken.
 
-   Draai los: node --experimental-sqlite --test test/kluis-rotatie.test.js */
+   Draai los: node --test test/kluis-rotatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

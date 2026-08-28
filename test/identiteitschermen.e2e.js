@@ -33,13 +33,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-idscherm-'));
 
 async function toon(page, base, scherm, token) {
@@ -49,16 +45,16 @@ async function toon(page, base, scherm, token) {
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
   }, token || null);
   await page.goto(base + '/apps/' + scherm + '.html', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(900);
+  await wachtOpRust(page);
   return page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 }
 
 test('RTG iD en passkeys: uitleg voor iedereen, gegevens voor niemand zonder inlog',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -68,6 +64,7 @@ test('RTG iD en passkeys: uitleg voor iedereen, gegevens voor niemand zonder inl
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 
@@ -101,11 +98,11 @@ test('RTG iD en passkeys: uitleg voor iedereen, gegevens voor niemand zonder inl
 });
 
 test('Balans: het welzijnsscherm belooft geen streaks, en heeft ze ook niet',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     /* DE SERVICE WORKER ERUIT. Zonder dit blokje meet deze toets iets anders
        dan hij denkt: de RTF-schil registreert een service worker die tientallen
        schermen vooruit ophaalt, en die staan daarna in het schermjournaal alsof
@@ -115,6 +112,7 @@ test('Balans: het welzijnsscherm belooft geen streaks, en heeft ze ook niet',
        test/leven.e2e.js blokkeerde ze al; hier stond het nog niet. */
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     const fouten = [];
     letOpFouten(page, fouten);
 

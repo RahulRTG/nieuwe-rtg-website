@@ -6,7 +6,7 @@
    sleutel (verkeerde sleutel dicht, vreemde sensor geweigerd); het losse
    regime; de AI-stadsregisseur; de STAD-01-check op het technische bord en de
    aidata-bron 'stad'.
-   Draai los: node --experimental-sqlite --test test/stad.test.js */
+   Draai los: node --test test/stad.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

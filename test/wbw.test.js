@@ -2,7 +2,7 @@
    worden sluitend verdeeld in centen; de balans klopt altijd op nul; wie rood
    staat betaalt het eigen deel in een tik via RTG Pay (idempotent); wie
    tegoed heeft stuurt Klompjes. Draai los:
-   node --experimental-sqlite --test test/wbw.test.js */
+   node --test test/wbw.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

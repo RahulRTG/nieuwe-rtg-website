@@ -2,7 +2,7 @@
    de zaak zet producten en de dienst aan; het lid bestelt (ophalen of
    bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op
    eigen naam, deelt GPS (klant krijgt ETA) en meldt de rit af.
-   Draai: node --experimental-sqlite --test test/bezorg.test.js */
+   Draai: node --test test/bezorg.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

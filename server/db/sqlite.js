@@ -79,7 +79,10 @@ function saveSqlite(force) {
     if (laatsteJson.get(k) !== j) gewijzigd.push([k, j]);
   }
   if (uitgesteld) voorcheck.planNaronde(saveSqlite);
-  if (!gewijzigd.length) return;
+  /* Niets te schrijven is iets anders dan niet geschreven; beide gaven hier
+     `undefined`, en de duurzame bundel las dat als verlies -- zie duurzaam.js.
+     Alleen zonder uitgesteld werk is elke collectie ook echt nagekeken. */
+  if (!gewijzigd.length) return { alGelijk: !uitgesteld };
   const { bump, huidig, lees, up } = statements();
   kvdb.exec('BEGIN IMMEDIATE'); // pak meteen de schrijflock, zodat de versie en de merge kloppen
   try {
@@ -105,6 +108,7 @@ function saveSqlite(force) {
     }
     kvdb.exec('COMMIT');
   } catch (e) { try { kvdb.exec('ROLLBACK'); } catch (x) {} throw e; }
+  return { alGelijk: false };
 }
 // Haal de collecties op die een ANDER proces sinds onze laatste versie schreef,
 // en zet ze in db.data. Zo blijven losse domeinprocessen bij elkaar in de pas.

@@ -11,7 +11,7 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De elf regels
+## De twaalf regels
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -133,9 +133,21 @@ staat moet waar zijn, of weg.
 "gezet en er komt een testfout binnen". Niets las die variabele. Wie de checklist
 netjes afliep ging live zonder alarmering.
 
+*Tweede voorbeeld, 18 augustus 2026, en het is een parameter die er al stond.*
+`dicht()` in `server/middleware/schakelaar-antwoord.js` kreeg `bekend`
+meegestuurd en het commentaar erboven beloofde een vreemde "ook de NEUTRALE zin
+en niet die van de reden". De functie las die parameter nooit. Het was daarmee
+het derde geval van deze vorm in dezelfde twee bestanden -- eerst
+functieschakelaars.js dat beloofde "nooit voor de deur" te antwoorden, toen de
+bevoegdheids-as die maar half zweeg, en nu de schakelaar-as. De vorm om op te
+letten: een parameter die alleen in het commentaar iets doet leest als
+werkende beveiliging, ook voor wie de code ernaast bekijkt.
+
 **Handhaver:** `check.js` regel 27 (elke aangeraden omgevingsvariabele wordt
 ergens gelezen). Voor commentaar bestaat geen handhaver; dat is regel 2 en
-mensenwerk.
+mensenwerk. Voor deze derde: `test/schakelaar-zwijgt.test.js` houdt nu beide
+kanten van beide assen vast, dus de belofte en de code kunnen niet meer los van
+elkaar bewegen zonder dat er iets zakt.
 
 ### 7. Een grendel hangt aan het doel, niet aan de aanvrager
 
@@ -227,6 +239,21 @@ de cijfers van een GEZAKTE ronde als grondwaarde, en vergelijkt niet tussen
 machines of opslagstanden -- 144 ms op vier kernen is geen betere 144 ms dan op
 zestien, het is een andere.
 
+*En de achtste, van 18 augustus 2026: een meter die met een leeg lijf aanklopt,
+meet een dichte deur.* De gluurronde meldde negen aanmaakroutes "waarvan geen
+enkele leesroute het resultaat toont". Acht van die negen hadden hun lezer
+gewoon naast zich staan. De ronde vroeg ze alleen verkeerd: op `/api/rtf/*` wil
+een route de gezinsreferentie in het lijf, en een detailroute wil het
+identificator -- een leeg lijf levert daar een 403 of een 404 op, en dat las de
+meter als "die functie bestaat niet". Het bijzondere is dat het instrument die
+sleutelvorm al kende: bij het AANLEGGEN stuurde het hem netjes mee. De les was
+niet meeverhuisd naar het TERUGZOEKEN, precies zoals de uitlogkanarie eerder
+niet meeverhuisde van de rolronde naar de gluurronde. De vorm om op te letten:
+een meter die een ONTBREKEN telt, moet kunnen aantonen dat hij het bestaande
+wél ziet -- anders telt hij zijn eigen onvermogen. Wat er daarna wel echt uit
+kwam, was een lek: `/api/concern/entiteit/groep` controleerde de eigenaar van
+de entiteit maar niet die van de groep.
+
 **Handhaver:** sinds deze ronde machinaal, en niet meer alleen als voornemen.
 `test/meterijk.test.js` houdt een registratie waarin ELKE meter staat: met een
 proef die hem op een bekend-foute invoer laat uitslaan, of met een opgeschreven
@@ -277,6 +304,52 @@ vellen. Zolang die twee kanten elkaars uitkomst niet kunnen zien, kan de een de
 ander niet groen praten. Voor de mens die ze naast elkaar legt bestaat geen
 handhaver; daarvoor staat deze regel hier.
 
+
+### 12. Een meting die niet heeft gedraaid is geen slechte uitslag
+
+Regel 3 gaat over een meter die groen blijft zonder invoer. Dit is de omkering,
+en die is gemener: een meter die zonder invoer een NETJES OPGEMAAKT SLECHT CIJFER
+geeft. Groen zonder invoer valt op zodra iemand het nakijkt. Een slecht cijfer
+valt niet op -- het ziet eruit als diligentie, en iemand gaat eraan werken.
+
+De vraag die elke meter moet kunnen beantwoorden is dus niet alleen "wat is de
+uitslag" maar eerst "heeft de meting plaatsgevonden". Zolang die twee in een
+getal zitten, kun je ze niet uit elkaar houden.
+
+*Het geval, 18 augustus 2026:* de e2e-ronde viel om op alle 122 browsertoetsen --
+de omgeving had chromium 1194 staan en playwright vroeg om bouw 1234. Het
+schermjournaal van die ronde bevatte 294 TOETS-regels, 296 AUDIT-regels en nul
+SCHERM-regels. Precies hetzelfde bestand als een geslaagde ronde oplevert waarin
+geen enkel scherm wordt geopend. Het platformregister zou daar "262 schermen
+nooit geopend" van hebben gemaakt: een hard oordeel over 262 apps op grond van
+een storing in de meetopstelling.
+
+*En de twee wachten die dit hadden moeten zien, keken naar de verpakking:*
+`test/skipwacht.test.js` en `test/browserpoort.e2e.js` controleerden allebei of
+de MODULE playwright te vinden was. Die lag er die dag ook. Een aanwezige functie
+is geen startende browser.
+
+*Dezelfde fout, een laag hoger:* `scripts/meetkeuring.js` keurde het REGISTER en
+trok daaruit een conclusie over het INSTRUMENT. Een instrument dat de regel nooit
+heeft geleerd en een instrument dat hem vanmorgen leerde maar sindsdien niet
+heeft gedraaid, zien er in het register identiek uit -- en ze vragen om twee
+verschillende reparaties. Er is nu een derde uitslag, `oud register`, met de
+herstelopdracht erbij.
+
+*En het positieve spiegelbeeld:* waar een route niet te bewijzen valt, hoort er
+te staan WAT eraan ontbreekt. 3112 keer "ongemeten" is eerlijk en onbruikbaar;
+`scripts/waarom.js` maakt er negen soorten van met per soort wat eraan te doen
+is. Dat is hetzelfde onderscheid van de andere kant: niet de uitslag maar de
+voorwaarde.
+
+**Handhaver:** `scripts/schermen.js` `rondeVerslag()` (nul geopende schermen uit
+een ronde met browsertoetsen is een storing, geen uitslag; `--vastleggen` weigert
+dan), `test/schermronde.test.js`, `test/meetkeuring.test.js` toets 7, en
+`scripts/check.js` regel 50 (een browser start op EEN plek, zodat er iets te
+repareren valt als hij niet start). Voor de mens die een slecht cijfer leest en
+zich niet afvraagt of er wel gemeten is, bestaat geen handhaver; daarvoor staat
+deze regel hier.
+
 ---
 
 ## Wat de lat betekent per tijdvak
@@ -286,6 +359,21 @@ handhaver; daarvoor staat deze regel hier.
 Bindend. Nieuw werk voldoet aan alle elf, en waar een machine kan handhaven
 handhaaft hij. Wie een regel toevoegt aan `check.js` beproeft hem met een mutatie
 voordat hij hem inlevert (regel 2 geldt ook voor regels).
+
+**Sinds 18 augustus 2026 handhaaft een machine dit ook echt: `scripts/deltapoort.js`.**
+Die zin hierboven was tot dan een voornemen, en wel een van de gevaarlijkste
+soort -- hij klonk als een regel. Wat eronder zat: elke meter in `NORM.json` is
+een SOM over de hele codebase, en een som verrekent. Vijf inline stijlattributen
+erbij in het ene bestand en zes eruit in het andere is een daling; de ratel
+juicht, en het nieuwe bestand houdt zijn vijf. Zo blijft nieuw werk precies zo
+slecht als oud werk mag zijn, terwijl elke meter de goede kant op wijst.
+
+De deltapoort weigert die verrekening en hanteert twee latten. Een NIEUW bestand
+staat op de norm -- nul inline stijlattributen, onder de omvanggrens, geen
+zelfpoortende toets, elk endpoint met een toets. Een AANGERAAKT bestand mag niet
+zakken: de erfenis hoef je niet op te ruimen om iets te mogen wijzigen, maar je
+mag hem niet vergroten. Daarmee kan het geheel alleen nog dalen, en dat is het
+verschil tussen "niet slechter worden" en "beter worden".
 
 ### Het heden
 
@@ -306,6 +394,36 @@ terugwerkende kracht herschreven. Wat wel geldt:
    wil verlagen doet dat met de hand in `NORM.json`, met een reden erbij, zodat
    het een besluit is en geen erosie.
 
+   Ook in die zin zaten twee gaten, en `scripts/normverval.js` sluit ze sinds
+   18 augustus 2026. Het eerste: de reden was een GEWOONTE en geen eis. Er
+   staan 62 notities in `NORM.json` -- een ongewoon nauwkeurig register -- maar
+   niets hield tegen dat de 63e er niet kwam. Wie een getal verlaagt en verder
+   niets doet, komt gewoon door de poort: `norm.js` vergelijkt de meting met de
+   norm en heeft geen idee dat de norm zelf net is opgeschoven. De ratel
+   bewaakte de code, en niemand bewaakte de ratel.
+
+   Het tweede: een reden had geen EINDE. Een verlaging blijft staan tot iemand
+   er toevallig over struikelt, en een excuus dat nooit verloopt is na een half
+   jaar geen uitzondering meer maar een tweede norm die nergens staat
+   opgeschreven. Vandaar twee soorten, en het verschil is echt. *Structureel*:
+   het gemetene veranderde van vorm (elf schermtoetsen verdwenen omdat de
+   schermen verdwenen). Daar valt niets terug te halen, dus geen vervaldatum --
+   wel de eis te zeggen WAARHEEN de belofte ging. *Schuld*: we konden het even
+   niet. Dat mag, met een datum erbij; daarna zakt de ronde tot de meter terug
+   is. Zo wordt een schuld geind in plaats van vergeten.
+
+4. **De ratel mag niet krimpen, en stilstand is zichtbaar.** Een ratel kan
+   alleen tegenhouden wat hij meet, dus dekt hij over de tijd een steeds kleiner
+   deel van een steeds grotere codebase. `ratelTanden` telt daarom hoeveel
+   meters er geratelde zijn en mag alleen omhoog; `metingenZonderRatel` telt de
+   meetbestanden in de wortel waar niets achter staat (zes van de eenentwintig)
+   en mag alleen omlaag. En omdat een ratel over STILSTAND niets zegt --
+   negentien van de drieentwintig meters stonden bij de laatste ronde op
+   "gelijk", en dat mag eeuwig zo blijven -- toont `npm run norm` sinds
+   dezelfde dag de veer: welke meter staat het langst stil terwijl er nog werk
+   aan is. Die zakt met opzet niet. Een poort op stilstand koopt cosmetische
+   winst, en dat heeft dit huis bij de dekkingsteller al een keer geleerd.
+
 Dat is geen enterprise-grade verleden. Het is een verleden dat elke week een
 stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
@@ -315,13 +433,21 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 54 codeafspraken, binair | `scripts/check.js` |
+| 59 codeafspraken, binair | `scripts/check.js` |
 | de INVOER van elke bronkeuring: commentaar eruit, maar geen code opeten | `scripts/lib/bron.js` + `test/bron.test.js` |
 | toegankelijkheid van elk scherm, uitgelogd EN ingelogd, hard op nul | `scripts/a11y.js` + `A11Y-INGELOGD.json` |
 | elk media-element een besluit over ondertiteling, met een reden | `scripts/check.js` regel 49 |
 | de onderhoudsveger lost de rem niet, en is aan te roepen met een eigen klok | `server/opzet/onderhoud.js` + `test/onderhoud.test.js` |
 | elk raakvlak 24x24 op telefoonformaat, en de uitzonderingen niet te ruim | `scripts/raakvlakkeuring.js` + `test/raakvlak.test.js` |
+| geen geheim uit `Math.random()`, geen handtekening met `!==` vergeleken | `scripts/check.js` regel 50 |
+| geen bestand plukt een naam uit een bereik dat het niet heeft | `scripts/check.js` regel 51 |
+| WERELDLIJST.md loopt niet achter op het wereldregister | `scripts/check.js` regel 52 |
+| elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
+| nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
+| een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |
+| de ratel zelf mag niet krimpen, en wat nergens aan hangt is geteld | `ratelTanden` + `metingenZonderRatel` + `scripts/lib/metingen.js` |
+| welke meter het langst stilstaat terwijl er werk aan is (wijst, zakt niet) | de veer in `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
 | geen geslaagde toets met een serverfout eronder | `test/helper.js` (strenge poort) |
@@ -335,8 +461,16 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm opent en geeft een teken van leven (dood is stiller dan stuk) | `test/paginas.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
-| een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
+| een omgeving die schermtoetsen belooft, heeft ook een browser die START | `test/browserpoort.e2e.js` + `test/skipwacht.test.js` |
+| een ronde die niet heeft gedraaid, telt niet als uitslag | `scripts/schermen.js` `rondeVerslag()` |
+| de instrumenten gemeten langs hun eigen regels | `scripts/meetkeuring.js` + `test/meetkeuring.test.js` |
+| waarom een route niet te bewijzen valt, in zijn eigen woorden | `scripts/waarom.js` + `WAAROM.json` |
+| een browser start op EEN plek | `test/helper.js` + `scripts/check.js` regel 50 |
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
+| dertien treden van kleuter tot aanvaller tegen een ECHTE server | `scripts/ladder.js` + `LADDER.json` + `ci.yml` |
+| welke rol waar binnenkomt, gevraagd aan de server en niet aan de bron | `scripts/rolronde.js` + `ROLRONDE.json` + `ci.yml` |
+| mag lid A bij de spullen van lid B (horizontaal), met een zelfproef erop | `scripts/gluurronde.js` + `GLUURRONDE.json` + `ci.yml` |
+| geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
@@ -345,6 +479,94 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.
+
+De ladder stond hier tot 18 augustus 2026 niet in, en dat was geen vergeetachtigheid
+maar een gevolg. Hij was de meest complete aanvalsproef van dit huis -- 3878
+pogingen over dertien treden -- en hij kon niet groen worden: twaalf bewust
+openbare routes stonden niet in zijn publieke lijst, een 503 uit de schakelkast
+telde als serverfout, en de begane grond toetste op seed-gegevens die
+weggedreven waren (KIKUNOI staat allang niet meer in de seed). Achttien keer
+RAAK, elke ronde, geen van alle een bevinding.
+
+En de derde helft kwam uit het instrument dat ik er zelf bij bouwde. De
+gluurronde (`scripts/gluurronde.js`) meldde bij zijn eerste draaien netjes "A
+kwam nergens bij de spullen van B" -- over 1084 vragen die allemaal **uitgelogd**
+waren. A klopt in zijn passieve veeg op elke route, en daar zit
+`/api/auth/logout` bij, alfabetisch vooraan; A logde zichzelf uit en kreeg
+daarna 401 op alles. Groen, over een proef die niets had geprobeerd.
+
+Het is exact dezelfde fout die een dag eerder in `scripts/rolronde.js` was
+gevonden en gerepareerd. Hij kwam terug omdat de LES niet meeverhuisde, alleen
+de reparatie. Vandaar dat de kanarie nu op de plek zit waar de vraag gesteld
+wordt (`vraagA`) en niet in een losse controle ernaast: er is geen weg omheen.
+
+Twee dingen leerde datzelfde instrument nog, allebei over METEN en niet over de
+code. Toen de vernielingscontrole breder werd gemaakt -- van de eigen familie naar
+een opname over alles -- vond hij VEERTIEN van B's stukken waar de smalle
+zoektocht er vijftien vond. Een bredere zoektocht die minder vindt, vernietigt
+onderweg: tussen die duizenden aanroepen zitten wis- en archiveerroutes die met
+een leeg lijf gewoon hun werk doen. En de versie daarna liep tegen de
+snelheidsrem: de eerste opname gaf 299 keer 2xx, de tweede nog 36, met 2700 keer
+401 -- waarna de controle veertien lekken meldde die geen van alle bestonden.
+**Een meting die de rem uitlokt, meet de rem.** Beide keren zag de uitslag er
+geloofwaardig uit; beide keren was het getal verzonnen door het instrument zelf.
+
+En daaruit volgde nog een correctie, op een meter die ik twee dagen eerder zelf
+had gezet. `gluurProeven` telde VERZOEKEN. De herbouw controleerde meer en vroeg
+minder (9349 in plaats van 9540), en de ratel las die winst als achteruitgang.
+Een meter die geklets beloont, duwt de volgende verbetering de verkeerde kant op;
+hij is vervangen door `gluurGecontroleerd`, dat telt wat er is NAGEKEKEN. Die
+vervanging is langs de vervalregel gegaan als een structurele verlaging met een
+waarheen -- het mechanisme uit de vorige ronde liep daarmee voor het eerst zijn
+eigen pad.
+
+En de dekking van diezelfde ronde kwam er niet met meer handwerk maar met
+BETER LUISTEREN. Van de 73 aanmaakroutes lukten er 20; de andere 53 zeiden bijna
+allemaal met zoveel woorden wat ze misten -- "een clip duurt 1 tot 60 seconden",
+"welk vak is het?", "minstens twee vraag-antwoordparen", "wat is de kaart- of
+ticketcode?". Die meldingen zijn de invoer voor de volgende poging, en elf
+andere routes zeiden "Log opnieuw in bij je gezin", wat geen ontbrekend RECHT
+bleek maar een andere SLEUTELVORM (gezinscode in het lijf, profieltoken in de
+header of in body.token, afhankelijk van de route). Twaalf van de 73 waren
+bovendien helemaal geen leden-routes. Een foutmelding die zegt wat er ontbreekt,
+is een handleiding; wie hem als muur leest, bouwt een proef die minder ziet dan
+hij kan.
+
+En daaronder ligt de reden dat die ronde nu ook een ZELFPROEF heeft. Drie
+pogingen om zijn scherpste controle -- ziet hij dat A iets van B heeft
+weggegooid? -- met een opzettelijk gat te beproeven sloegen alle drie af, en
+niet omdat de controle deugde: de mutatie werkte alleen zolang de notities van
+het slachtoffer niet in een bundel waren opgeborgen. **Een ijking die van de
+opslagvorm afhangt, is geen ijking.** Met `GLUUR_ZELFPROEF=1` laat B nu zelf
+een stuk verdwijnen langs de gewone weg, en de ronde eist van zichzelf dat hij
+dat ziet. Die stap draait in CI, naast de ronde zelf.
+
+Dezelfde week kwam de tweede helft van die les uit een andere hoek.
+`test/auth-rol.test.js` opende met "Uitputtende auth-scoping-test. Niet een
+steekproef en geen mooipraterij" -- en herkende een leden-endpoint aan het
+eerste woord na het pad. Staat de grendel in de BODY van de handler
+(`const g = werkPoort(req, res); if (!g) return;`), dan valt de route buiten de
+uitdrukking en dus stilzwijgend buiten de toets: 511 van de 1885 registraties,
+waarvan zeventig echte leden-endpoints die nooit op rolscheiding zijn beproefd.
+
+Geen van die zeventig bleek lek -- `scripts/rolronde.js` vraagt het nu aan de
+server in plaats van aan de bron en vindt 1444 leden-endpoints met nul gaten.
+Maar de belofte was onwaar, en dat is het punt: **een toets die zegt dat hij
+alles ziet en 5% mist, is gevaarlijker dan een toets die zegt dat hij een
+steekproef is.** De eerste laat je stoppen met zoeken. Beide meters van die
+ronde staan er daarom naast elkaar: `rolscheidingGaten` (nul, mag niet omhoog)
+en `rolscheidingGemeten` (1444, mag niet omlaag) -- want nul gaten is triviaal
+te halen door minder te onderzoeken.
+
+**Een proef die per definitie rood staat, kan nergens aan hangen.** Dat is de
+stille manier waarop een handhaver uit deze tabel verdwijnt: niet doordat iemand
+hem weghaalt, maar doordat hij zo veel ruis geeft dat niemand hem meer in een
+poort durft te zetten. En dan valt de negentiende melding -- de echte -- niemand
+meer op. De reparatie was dus niet de meldingen dempen maar ze waar maken; pas
+daarna kon hij aan `ci.yml` en aan twee ratels. `ladderNietGeprobeerd` staat er
+naast `ladderRaak` omdat nul bevindingen anders te halen is door niets meer te
+proberen -- precies wat er gebeurde met de insider-trede, die nul proeven deed
+en keurig geen enkele bevinding meldde.
 
 En sinds `scripts/samenhang.js` is die lijst niet langer alleen een belofte in
 tekst (regel 6). Die census draait de vraag om: niet "zakt er iets" maar "kijkt

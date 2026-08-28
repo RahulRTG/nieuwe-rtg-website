@@ -291,6 +291,16 @@ const BEVEILIGING = [
    te groeien met de app en zelden te krimpen. Een nieuwe route die per ongeluk
    publiek is, valt hier meteen op. */
 const PUBLIEK = new Map([
+  /* De commerciele kern (#98): drie beweringen die ook in de voorwaarden staan.
+     Een voorwaardenpagina hoort ze HIER op te halen in plaats van ze zelf op te
+     schrijven -- dat uiteenlopen was de oorzaak van "0% commissie" naast een
+     knop op 12%. Zetten zit achter de boardroom-poort; dit is alleen lezen. */
+  ['GET /api/betaaldiensttarief', 'het tarief staat in de partnervoorwaarden en mag niet los lopen van wat de code rekent'],
+  ['POST /api/betaaldiensttarief', 'idem; de POST geeft dezelfde lijst terug als de GET'],
+  ['GET /api/sociaalbeleid', 'de verdeelregels van de bijdrage zijn een belofte aan leden, dus leesbaar zonder inlog'],
+  ['POST /api/sociaalbeleid', 'idem; de POST geeft dezelfde lijst terug als de GET'],
+  ['GET /api/claims', 'wat RTG publiek beweert, met per bewering de waarde, de bron en hoe hard hij is'],
+  ['POST /api/claims', 'idem; de POST geeft dezelfde lijst terug als de GET'],
   // de voordeur zelf: zonder deze routes kan niemand ooit inloggen
   ['POST /api/auth/register', 'aanmelden kan per definitie niet ingelogd'],
   ['POST /api/auth/login', 'inloggen'],
@@ -344,6 +354,25 @@ const PUBLIEK = new Map([
      over kan zeggen. */
   ['GET /api/metrics', 'bewaakt met een token of een intern adres; de dwaler klopt van binnenuit en komt er daarom langs'],
   ['GET /api/metrics/kort', 'idem'],
+  /* ---- bijgewerkt na de ladderronde van 18 augustus 2026 ----
+     Twaalf routes die de dwaler als RAAK meldde en die stuk voor stuk BEWUST
+     openbaar zijn; bij elk staat de reden zoals hij ook in de broncode staat.
+     Ze stonden hier niet omdat deze lijst achterliep op de code, en het gevolg
+     was erger dan een verkeerd getal: een trede die twaalf verwachte meldingen
+     geeft, wordt niet meer gelezen -- en dan valt de dertiende, die er wel toe
+     doet, niemand op. */
+  ['POST /api/stad/algoritmes', 'het algoritmeregister van een stad: regels, geen mensen -- openbaar zoals het privacybeleid'],
+  ['GET /api/stad/algoritmes', 'idem'],
+  ['POST /api/stad/besluiten', 'het besluitenregister: fracties stemmen met zetels, er staat geen persoon in'],
+  ['GET /api/stad/besluiten', 'idem'],
+  ['POST /api/rtfos/publiek/steden', 'de buurt zonder code; getemperd'],
+  ['POST /api/rtfos/publiek/campagnes', 'idem'],
+  ['POST /api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatie -- openbaar, want anders is het geen publicatie'],
+  ['POST /api/lab2/bewoner/labs', 'het publieke labbeeld: alleen actieve labs, zonder budget, tekenaars en partners'],
+  ['POST /api/lab2/bewoner/kader', 'de spelregels van de cyclus; dezelfde tabel als het kantoorscherm, een waarheid'],
+  ['GET /api/onderneming/rechtsvormen', 'wat een B.V. van een stichting onderscheidt, te lezen voor je een account hebt'],
+  ['POST /api/fout/client', 'de foutmelder van een kapot scherm; met opzet zonder inlog, met 4 kB-grens en rem'],
+  ['POST /api/arrival/interpret', 'leest vrije tekst en geeft een plan terug -- vraagt niets aan, bewaart niets, getemperd'],
   // alleen in de testomgeving; de trede bewijst hieronder dat ze in productie weg zijn
   ['POST /api/test/bug', 'opzettelijke storing, alleen bij NODE_ENV=test'],
   ['POST /api/test/crash', 'opzettelijke storing, alleen bij NODE_ENV=test']
@@ -358,6 +387,15 @@ const NIET_KLOPPEN = [
   [/^\/api\/doos\/update/, 'zet een update in gang op de zaakdoos']
 ];
 
+/* Zit dit pad achter een functie die standaard uit staat? De ladder mag de
+   catalogus lezen -- hij is een instrument van het huis en geen buitenstaander.
+   Dat scheelt een verklikkend veld in het ANTWOORD, en juist dat veld is deze
+   week weggehaald omdat het aan vreemden werd meegegeven. */
+function dichteFunctie(pad) {
+  try { return !!require('../../server/functies').padGeblokkeerd(pad, {}); }
+  catch (e) { return false; }
+}
+
 BEVEILIGING.push({
   id: 'dwaler',
   naam: 'de dwaler',
@@ -366,9 +404,33 @@ BEVEILIGING.push({
     let routes;
     try { routes = require('../lib/routes').alleRoutes(); }
     catch (e) { return w.nietGeprobeerd('de routetabel is niet te lezen: ' + e.message); }
-    // alleen de eigen API, en geen router-paden (die staan onder een mount die
-    // hier niet bekend is -- de dwaler zou dan op een niet-bestaand pad kloppen)
-    const doelen = routes.filter(r => r.pad.startsWith('/api/') && !r.viaRouter
+    /* Alleen de eigen API. De beperking tot routes die rechtstreeks op `app`
+       staan is sinds vandaag een KEUZE en geen noodzaak meer, en dat verdient
+       uitleg.
+
+       Hier stond: "geen router-paden (die staan onder een mount die hier niet
+       bekend is -- de dwaler zou dan op een niet-bestaand pad kloppen)". Dat was
+       waar zolang lib/routes.js de paden uit de brontekst raadde: een route in
+       een gemounte router staat daar met zijn pad BINNEN de mount, dus
+       '/leden' in plaats van '/api/tak/leden'. Kloppen op zo'n pad meet een 404.
+
+       Sinds lib/routes.js de LEVENDE router vraagt (scripts/routekaart.js) zijn
+       alle paden volledig en zou de dwaler er wel op kunnen kloppen -- ruim
+       zevenhonderd deuren meer, waaronder de RTFoundation.
+
+       Dat is niet stilletjes aan te zetten. Onder die deuren zitten routes die
+       met opzet zonder inlog werken (de lessen en schoolborden van foundation
+       controleren een capability-token IN de handler), en die zouden hier
+       massaal als "gaf zonder inlog een geslaagd antwoord" opduiken. Zo'n
+       uitslag is geen bevinding maar ruis, en ruis leert je een trede te
+       negeren. De verbreding hoort samen met een publieke-lijst met redenen, en
+       dat is eigen werk.
+
+       Dus houden we het doelwit voorlopig exact zoals het was: routes waarvan we
+       WETEN dat ze rechtstreeks op app staan (viaRouter === false). Een route
+       waarvan de bron niet te vinden was (viaRouter === null) valt daar bewust
+       buiten -- die zou de trede stil verbreden. */
+    const doelen = routes.filter(r => r.pad.startsWith('/api/') && r.viaRouter === false
       && !NIET_KLOPPEN.some(([re]) => re.test(r.pad)));
     if (!doelen.length) return w.nietGeprobeerd('geen routes gevonden om aan te kloppen');
 
@@ -379,7 +441,25 @@ BEVEILIGING.push({
         r.methode === 'GET' ? null : {}, { timeout: 8000 });
       if (res.status === 0) continue;                    // niet bereikbaar/afgekapt: geen oordeel
       const sleutel = r.methode + ' ' + r.pad;
-      if (res.status >= 500) {
+      if (res.status === 503 && dichteFunctie(r.pad)) {
+        /* "BEWUST DICHT" IS GEEN STORING, en die regel bestond al -- alleen niet
+           hier. server/middleware/functieschakelaars.js zegt het bij de
+           storingswachter met zoveel woorden: een 503 uit de schakelkast telt
+           bewust nooit mee, "dat is de taal van bewust dicht, geen storing".
+           Deze trede paste die regel niet toe en meldde elke uitgezette functie
+           als serverfout.
+
+           Dat is niet alleen een verkeerd getal. Het is de reden dat deze hele
+           ladder nergens aan hing: een proef die per definitie rood staat, kan
+           niet in een poort. Nu kan hij dat wel.
+
+           STRIKT 503 EN ALLEEN VOOR EEN PAD DAT ECHT ACHTER EEN DICHTE FUNCTIE
+           ZIT. Een 500 of 502 blijft RAAK, ook op zo'n pad -- dat is wel een
+           storing. De catalogus wordt zonder bewaarde stand geraadpleegd, want
+           zo start de ladder zijn server ook: dan staat elke functie op zijn
+           eigen standaard. */
+        w.afgeslagen();
+      } else if (res.status >= 500) {
         w.raak('een verzoek zonder token gaf een serverfout', sleutel + ' -> ' + res.status + '  (' + r.bestand + ':' + r.regel + ')');
       } else if (res.status >= 200 && res.status < 300) {
         if (PUBLIEK.has(sleutel)) { open++; w.afgeslagen(); }

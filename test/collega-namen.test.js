@@ -4,7 +4,7 @@
    codenaam: dat is het privacy-fundament van het platform (de echte naam
    staat in de kluis en is alleen via de kantoor-inzage met auditlog te
    zien). Deze test bewaakt beide kanten. Draai los:
-   node --experimental-sqlite --test test/collega-namen.test.js */
+   node --test test/collega-namen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

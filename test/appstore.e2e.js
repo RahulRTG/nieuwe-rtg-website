@@ -16,7 +16,8 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtOpTekst } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -52,8 +53,12 @@ const path = require('path');
    die weigering als onopgevangen fout in de lijst en zakt de celtoets op zijn
    eigen sandbox. Zakt het zetten op de RTG-pagina zelf, dan valt de toets alsnog
    om op elke bewering die een sessie nodig heeft. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+/* De browser komt uit test/helper.js, net als in de rest van de suite. Deze
+   toets kwam met main mee en droeg zijn eigen lader plus zijn eigen
+   launch-opties; keuringsregel 57 vraagt om EEN plek die een browser start,
+   omdat zes varianten precies is hoe hier ooit een scan zich groen meldde
+   zonder iets te hebben gemeten. */
+const pw = laadPlaywright();
 
 async function api(base, pad, body, token) {
   const headers = { 'Content-Type': 'application/json' };
@@ -124,7 +129,7 @@ test('de cel: naamloze herkomst, werkende brug, en een geweigerde machtiging', {
       { sleutel: 'cel-proef', machtigingen: ['opslag.eigen'] }, lid)).status, 200);
 
     // ---- de browser ----
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = letOpFouten(page, []);
     await page.addInitScript((t) => { try { localStorage.setItem('rtg_member_token', t); } catch (e) { /* de cel mag niet bij opslag */ } }, lid);
@@ -199,7 +204,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
     await api(base, '/api/appstore/kantoor/besluit', { versieId: inz.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     // ---- de winkel in de Mall ----
     const page = await browser.newPage();
@@ -344,7 +349,7 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
       bestanden: [{ pad: 'index.html', inhoud: PROEF_HTML }, { pad: 'app.js', inhoud: PROEF_JS }] }, sup);
     assert.equal(inz.status, 200, JSON.stringify(inz.body.bevindingen || inz.body.fouten || inz.body.error));
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     /* ---- eerst de keuringskant: hier moet een MENS aftekenen ---- */
     const kp = await browser.newPage();
@@ -368,7 +373,15 @@ test('de bon, de koop en de keuringskant in een browser', { skip: !pw && 'Playwr
     assert.match(await kp.textContent('body'), /keurt nooit goed/, 'en de pagina zegt zelf dat de machine niets goedkeurt');
     // zonder naam gaat het niet
     await kp.click('[data-v] .pub');
-    await kp.waitForTimeout(800);
+    /* WAAROM OP DE WEIGERING EN NIET OP RUST. Dit is een NEGATIEVE bewering: er
+       hoort niets gepubliceerd te zijn. Een wacht op stilte valt hier meteen
+       door -- vlak na de klik is het scherm stil omdat het verzoek nog niet eens
+       op gang is -- en dan bewijst de regel eronder niets: hij zou ook groen
+       staan als de server nog aan het antwoorden was. De server weigert met
+       "Zet je naam erbij: een keuring hoort een mens te hebben gedaan.", en
+       appstore-kantoor.html zet die tekst via meld() in #melding. Die tekst is
+       dus het bewijs dat de heenreis ECHT is gemaakt en ECHT is afgewezen. */
+    await wachtOpTekst(kp, /Zet je naam erbij/, { in: '#melding' });
     assert.equal((await api(base, '/api/appstore/catalogus', {}, lid)).body.totaal, 0, 'zonder naam is er niets gepubliceerd');
     await kp.fill('#wie', 'Sam van RTG');
     await kp.click('[data-v] .pub');

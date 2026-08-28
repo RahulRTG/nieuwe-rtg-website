@@ -17,18 +17,18 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
-  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;padding:calc(env(safe-area-inset-top) + .55rem) .9rem .55rem;}
-  .nav{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;flex:0 0 auto;}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;padding:calc(env(safe-area-inset-top) + .55rem) .9rem .55rem;}
+  .nav{width:34px;height:34px;border-radius:0;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;display:grid;place-items:center;font-size:1rem;flex:0 0 auto;}
   .nav:hover{border-color:var(--gold);}
   .titel{flex:1;font-family:'Bodoni Moda',serif;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ey{font-size:.56rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);}
+  .ey{font-size:.56rem;letter-spacing:.26em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   main{min-height:calc(100dvh - 56px);}
   .feed{max-width:900px;margin:0 auto;padding:1.6rem 1.1rem 4rem;}
   .rubriek-lint{display:flex;gap:.4rem;flex-wrap:wrap;margin:0 0 1.2rem;}
-  .chip{font:inherit;font-size:.76rem;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:.3rem .8rem;cursor:pointer;}
+  .chip{font:inherit;font-size:.76rem;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:0;padding:.3rem .8rem;cursor:pointer;}
   .chip.aan{border-color:var(--acc,var(--gold));color:var(--txt);}
   .lead{display:grid;grid-template-columns:1.3fr 1fr;gap:1.2rem;border-bottom:1px solid var(--line);padding-bottom:1.4rem;margin-bottom:1.4rem;cursor:pointer;}
-  .lead .beeld{aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:var(--card);}
+  .lead .beeld{aspect-ratio:16/10;border-radius:0;overflow:hidden;background:var(--card);}
   .lead .beeld img{width:100%;height:100%;object-fit:cover;display:block;}
   .lead h2{font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.1;}
   .lead .chapo{color:var(--muted);margin-top:.6rem;line-height:1.6;}
@@ -46,13 +46,13 @@
   .lezen h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.08;margin:.3rem 0 .5rem;}
   .lezen .chapo{color:var(--muted);font-size:1.1rem;line-height:1.6;}
   .lezen .meta{color:var(--soft);font-size:.8rem;margin:.7rem 0 1.2rem;border-bottom:1px solid var(--line);padding-bottom:1rem;}
-  .lezen .beeld{border-radius:14px;overflow:hidden;margin-bottom:1.3rem;} .lezen .beeld img{width:100%;display:block;}
+  .lezen .beeld{border-radius:0;overflow:hidden;margin-bottom:1.3rem;} .lezen .beeld img{width:100%;display:block;}
   .lezen .inhoud p{line-height:1.8;margin-bottom:1.1rem;font-size:1.05rem;color:var(--txt);}
   /* de gids van kranten */
   .gids{max-width:900px;margin:0 auto;padding:2.2rem 1.1rem 4rem;}
   .gids h1{font-size:clamp(1.8rem,5vw,2.8rem);text-align:center;}
   .gids .lead2{text-align:center;color:var(--muted);max-width:48ch;margin:.4rem auto 1.8rem;line-height:1.6;}
-  .krantkaart{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;cursor:pointer;color:var(--txt);border-left:3px solid var(--gold);}
+  .krantkaart{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;cursor:pointer;color:var(--txt);border-left:3px solid var(--gold);}
   .krantkaart:hover{border-color:var(--gold);}
   .krantkaart .nm{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
   .krantkaart .po{color:var(--muted);font-size:.84rem;margin-top:.15rem;}
@@ -95,7 +95,7 @@ function versieNu(){ const w=Math.min(window.innerWidth,1080); return w<=640?'te
 function toonBlok(b,v){ if(v==='desktop')return b; const o=b.varianten&&b.varianten[v]; return o?Object.assign({},b,o):b; }
 function ordenSite(site,v){ const vs=site.volgorde&&site.volgorde[v]; if(v!=='desktop'&&vs&&vs.length){const m={};(site.blokken||[]).forEach(b=>m[b.id]=b);const u=[];vs.forEach(id=>{if(m[id]){u.push(m[id]);delete m[id];}});(site.blokken||[]).forEach(b=>{if(m[b.id])u.push(b);});return u;} return (site.blokken||[]).slice(); }
 function tk(el,v){el.textContent=v||'';return el;}
-function blokEl(b,v){ const T=toonBlok(b,v),s=document.createElement('section');s.className='blok';const t=b.type;
+function blokEl(b,v){ const T=toonBlok(b,v),s=document.createElement('section');s.className='wb-blok';const t=b.type;
   if(t==='hero'){s.classList.add('b-hero');s.appendChild(tk(document.createElement('h1'),T.kop));const p=document.createElement('div');p.className='sub';tk(p,T.sub);s.appendChild(p);if(T.knop){const a=document.createElement('span');a.className='b-knop';tk(a,T.knop);s.appendChild(a);}}
   else if(t==='kop'){s.classList.add('b-kop');s.appendChild(tk(document.createElement('h2'),T.tekst));}
   else if(t==='tekst'){s.classList.add('b-tekst');const d=document.createElement('div');tk(d,T.tekst);s.appendChild(d);}

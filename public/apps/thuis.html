@@ -19,42 +19,42 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:3rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.4rem;margin-top:.05rem;}
-  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:900px;margin:0 auto;}
-  .veld{background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
+  .veld{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.5rem .65rem;}
   .lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-bottom:.25rem;display:block;}
   .rij{display:flex;gap:.7rem;flex-wrap:wrap;align-items:flex-end;}
   /* de aanvinkvakjes: 13x13 is te klein om te raken (WCAG 2.5.8) */
   .rij input[type="checkbox"],label input[type="checkbox"]{width:24px;height:24px;flex:0 0 auto;}
-  .knop{background:var(--gold);color:#000;border:none;border-radius:11px;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop{background:var(--gold);color:#000;border:none;border-radius:0;padding:.55rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .sec{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1.4rem 0 .5rem;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.9rem;}
-  .huis{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;text-align:left;display:flex;flex-direction:column;}
+  .huis{background:var(--card);border:1px solid var(--line);border-radius:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;text-align:left;display:flex;flex-direction:column;}
   .huis:hover{border-color:var(--gold);transform:translateY(-2px);}
   .beeld{height:120px;display:flex;align-items:flex-end;padding:.6rem;}
   .v0{background:linear-gradient(135deg,#2b2320,#5a4630);} .v1{background:linear-gradient(135deg,#1e2a2b,#3f6257);}
   .v2{background:linear-gradient(135deg,#2a1e2b,#6a3a55);} .v3{background:linear-gradient(135deg,#232b1e,#5c6a3a);}
   .v4{background:linear-gradient(135deg,#1e222b,#3a4d6a);} .v5{background:linear-gradient(135deg,#2b271e,#6a5a3a);}
   .v6{background:linear-gradient(135deg,#2b1e1e,#6a3a3a);} .v7{background:linear-gradient(135deg,#1e2b26,#3a6a5a);}
-  .badge{background:rgba(0,0,0,.55);border:1px solid var(--gold);color:var(--gold);border-radius:20px;padding:.1rem .55rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+  .badge{background:rgba(0,0,0,.55);border:1px solid var(--gold);color:var(--rtg-leesgoud,var(--gold));border-radius:0;padding:.1rem .55rem;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
   .huis .inhoud{padding:.8rem .9rem 1rem;display:flex;flex-direction:column;gap:.25rem;}
   .huis .meta{font-size:.7rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase;}
   .huis h3{font-size:1.05rem;}
-  .huis .prijs{color:var(--gold);font-size:.85rem;font-variant-numeric:tabular-nums;}
+  .huis .prijs{color:var(--rtg-leesgoud,var(--gold));font-size:.85rem;font-variant-numeric:tabular-nums;}
   .leeg{color:var(--muted);font-size:.9rem;padding:1.4rem 0;text-align:center;}
   .blad{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;display:none;}
   .blad.open{display:block;}
-  .blad-kop{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
+  .blad-kop{position:sticky;top:0;z-index:2;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.8rem;}
   .paneel{max-width:620px;margin:0 auto;padding:1.1rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin-top:.8rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-top:.8rem;}
   .r{display:flex;justify-content:space-between;gap:.6rem;padding:.3rem 0;font-size:.86rem;}
   .r .k{color:var(--soft);}
-  .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:.15rem .6rem;font-size:.74rem;color:var(--muted);margin:.15rem .2rem 0 0;}
-  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92%;z-index:40;}
+  .chip{display:inline-block;border:1px solid var(--line);border-radius:0;padding:.15rem .6rem;font-size:.74rem;color:var(--muted);margin:.15rem .2rem 0 0;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:92%;z-index:40;}
   /* De tabbladenrij (Zoeken / Mijn reizen / Host) is de eigen schakelaar van
      deze app -- het wisselen blijft van de pagina -- maar draagt de stijl van
      het deelmenu (shared/deelmenu.js): geen vakjes met een randje, maar een
@@ -71,8 +71,8 @@
   body.rtg-stijl .tabs > button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   .boeking{border-bottom:1px solid var(--line);padding:.7rem 0;font-size:.86rem;}
   .boeking:last-child{border-bottom:none;}
-  .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);}
-  .deur{font-family:'Bodoni Moda',serif;font-size:1.5rem;letter-spacing:.35em;color:var(--gold);}
+  .st{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  .deur{font-family:'Bodoni Moda',serif;font-size:1.5rem;letter-spacing:.35em;color:var(--rtg-leesgoud,var(--gold));}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -92,7 +92,7 @@
       <span><label class="lbl" for="zTot">Vertrek</label><input class="veld" id="zTot" type="date"></span>
       <span><label class="lbl" for="zGasten">Gasten</label><input class="veld" id="zGasten" type="number" min="1" max="20" value="2" style="width:4.5rem;"></span>
       <label style="font-size:.8rem;display:flex;gap:.35rem;align-items:center;color:var(--muted);"><input type="checkbox" id="zInstant"> Instant boeken</label>
-      <button class="knop" id="zGo">Zoek</button>
+      <button class="knop" id="zGo" data-hoofdactie>Zoek</button>
     </div>
     <div class="sec">Aanbod</div>
     <div class="grid" id="zUit"><div class="leeg">Zoek een plaats of laat alles zien met een lege zoekopdracht.</div></div>
@@ -221,18 +221,18 @@ async function openHuis(id){
     const p = HUIDIG.prijsopbouw;
     const w = HUIDIG.reiswijzer;
     $('#bInhoud').innerHTML =
-      '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:14px;height:150px;"></div>'+
+      '<div class="beeld v'+(HUIDIG.visual||0)+'" style="border-radius:0;height:150px;"></div>'+
       '<p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:.8rem;">'+esc(HUIDIG.beschrijving||'')+'</p>'+
       '<div class="h-mt40">'+(HUIDIG.voorzieningen||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join('')+
         '<span class="chip">'+HUIDIG.slaapkamers+' slaapkamers</span><span class="chip">'+HUIDIG.bedden+' bedden</span><span class="chip">'+HUIDIG.badkamers+' badkamers</span>'+
-        (HUIDIG.keyless?'<span class="chip" style="color:var(--gold);border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
+        (HUIDIG.keyless?'<span class="chip" style="color:var(--rtg-leesgoud,var(--gold));border-color:var(--gold);">keyless check-in</span>':'')+'</div>'+
       '<div class="kaart"><h3 style="font-size:1rem;">Prijs</h3>'+
         (p ? '<div class="r"><span class="k">'+p.nachten+' nachten × '+euro(p.perNacht)+'</span><span>'+euro(p.basis)+'</span></div>'+
           (p.korting ? '<div class="r"><span class="k">Korting ('+p.kortingPct+'%)</span><span>− '+euro(p.korting)+'</span></div>' : '')+
           (p.schoonmaak ? '<div class="r"><span class="k">Schoonmaak</span><span>'+euro(p.schoonmaak)+'</span></div>' : '')+
-          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--gold);">'+euro(0)+'</span></div>'+
+          '<div class="r"><span class="k">Servicekosten</span><span style="color:var(--rtg-leesgoud,var(--gold));">'+euro(0)+'</span></div>'+
           (p.zakelijk && p.btw ? '<div class="r"><span class="k">Logies-btw ('+p.btwPct+'%)</span><span>'+euro(p.btw)+'</span></div>' : '')+
-          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--gold);">'+euro(p.totaal)+'</b></div>'+
+          '<div class="r" style="border-top:1px solid var(--line);"><span><b>Totaal</b></span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(p.totaal)+'</b></div>'+
           (p.borg ? '<div class="r"><span class="k">Borg (apart, terug na verblijf)</span><span>'+euro(p.borg)+'</span></div>' : '')+
           '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(p.serviceTekst)+
             (p.langverblijf ? ' ' + esc(p.langverblijf.tekst) : '')+
@@ -330,7 +330,7 @@ async function laadBord(){
     const d = await api('bord');
     $('#hBord').innerHTML =
       '<div class="r"><span class="k">Huizen live</span><span>'+d.live+' van '+d.huizen+'</span></div>'+
-      '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--gold);">'+euro(d.inkomstenTotaal)+'</b></div>'+
+      '<div class="r"><span class="k">Inkomsten (afgerond)</span><b style="color:var(--rtg-leesgoud,var(--gold));">'+euro(d.inkomstenTotaal)+'</b></div>'+
       '<div class="r"><span class="k">Bezetting komende 30 dagen</span><span>'+d.bezettingPct+'%</span></div>'+
       '<div class="r"><span class="k">Superhost</span><span>'+(d.superhost?'★ ja':'nog niet (3 verblijven, gemiddeld 4,8+)')+'</span></div>'+
       '<div style="font-size:.76rem;color:var(--soft);margin-top:.3rem;">'+esc(d.uitbetaling)+'</div>'+

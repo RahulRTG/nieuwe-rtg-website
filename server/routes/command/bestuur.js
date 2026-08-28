@@ -8,7 +8,7 @@
    raakt gegarandeerd niets aan omdat hij met een schaduw-beleid rekent. */
 const klok = require('../../lib/klok');
 
-module.exports = ({ app, officeAuth, veilig, wie, command }) => {
+module.exports = ({ app, officeAuth, veilig, wie, command, apiSpoor }) => {
 
   app.post('/api/command/beleid', officeAuth, (req, res) => veilig(res, () => ({
     regels: command.beleid.alles(),
@@ -51,6 +51,28 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
     venster: command.journaal.venster(),
     keten: command.journaal.controleer()
   })));
+
+  /* HET API-SPOOR: dezelfde vraag, een laag lager. Het journaal hierboven gaat
+     over BESLUITEN (met een reden, een oude en een nieuwe toestand); dit gaat
+     over HANDELINGEN: elke geslaagde schrijfaanroep op de API, met wie, wat,
+     wanneer en welke status. Twee aparte ketens, want een breuk in het ene zegt
+     iets anders dan een breuk in het andere -- zie server/opzet/auditspoor.js.
+
+     `keten` staat er ook hier bij, en om dezelfde reden: een spoor waarvan je
+     de heelheid niet kunt nakijken, is een lijst die je op je woord moet
+     geloven. Dit is de route waarmee scripts/auditproef-route.js meet of een
+     schrijfroute werkelijk een spoor nalaat. */
+  app.post('/api/command/apispoor', officeAuth, (req, res) => veilig(res, () => {
+    const spoor = apiSpoor;
+    if (!spoor) return { status: 503, error: 'Het API-spoor is niet opgezet in dit proces.' };
+    return {
+      regels: spoor.recent(Math.min(Number(req.body.n || 50) || 50, 500), {
+        actor: req.body.actor, actie: req.body.actie }),
+      aantal: spoor.aantal(),
+      venster: spoor.venster(),
+      keten: spoor.controleer()
+    };
+  }));
 
   /* De gegevenskwaliteit: wat er in de gegevens zelf kapot is. Apart van de
      runbooks, want dat gaat over toestanden die verkeerd zijn en dit over

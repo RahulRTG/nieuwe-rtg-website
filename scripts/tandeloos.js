@@ -205,8 +205,15 @@ function zelftoets() {
   return stuk ? 1 : 0;
 }
 
-function main() {
+/* `opties.stil` naast de vlag op de opdrachtregel, en dat is geen luxe: sinds
+   scripts/norm.js deze telling als meter gebruikt, roept test/meterijk.test.js
+   hem tientallen keren aan -- en drukte hij bij elke aanroep de hele leeslijst
+   van honderd regels af, midden in de TAP-uitvoer van die suite. Een meter die
+   zijn eigen rapport in andermans log dumpt, maakt dat log onleesbaar en dus
+   ongelezen. */
+function main(opties) {
   if (process.argv.includes('--zelftoets')) return zelftoets();
+  const zwijg = stil || !!(opties && opties.stil);
   const map = path.join(WORTEL, 'test');
   const bestanden = fs.readdirSync(map).filter(f => f.endsWith('.js')).sort();
   let meldingen = 0, bekeken = 0, beoordeeld = 0;
@@ -241,7 +248,7 @@ function main() {
     if (hier.length) perBestand.push({ f, hier });
   }
 
-  if (!stil) {
+  if (!zwijg) {
     const alleen = (process.argv.find(a => a.startsWith('--risico=')) || '').split('=')[1] || null;
     console.log('\n\x1b[1mTANDELOZE BEWERINGEN\x1b[0m ' + K.grijs + '(een bewering die op een lege verzameling vanzelf slaagt)' + K.reset);
     console.log(K.grijs + '  op risico gesorteerd; hoog = "na het weghalen is hij weg" of "de buurman ziet niets",'
@@ -263,6 +270,17 @@ function main() {
       + (beoordeeld ? ', ' + beoordeeld + ' eerder beoordeeld en met reden vrijgesteld' : '') + '.');
     console.log('  ' + K.grijs + 'Dit is een leeslijst, geen poort: soms is "er staat niets" precies wat je toetst.' + K.reset + '\n');
   }
-  return 0;
+  return { bekeken: bekeken, meldingen: meldingen, beoordeeld: beoordeeld, perBestand: perBestand };
 }
-if (require.main === module) process.exit(main());
+
+/* DE UITSLAG GAAT NU OOK NAAR BUITEN, en dat is geen opsmuk. Dit was een
+   CLI-only leeslijst: je moest hem draaien om te weten hoe hij ervoor stond, en
+   dus wist niemand het. De twee zusters van deze voorraad staan wel op de ratel
+   (endpointsZonderTest en toetsenNietGemeten in NORM.json); deze niet, en die
+   kon dus stil groeien.
+
+   Wat NIET verandert: het blijft een leeslijst en geen poort. Soms is "er staat
+   niets" precies wat je toetst -- daar is BEOORDEELD voor. De ratel zegt alleen
+   dat het er niet MEER mogen worden zonder dat iemand het opschrijft. */
+module.exports = { meet: main };
+if (require.main === module) { main(); process.exit(0); }

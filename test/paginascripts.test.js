@@ -12,7 +12,7 @@
    doet: iets zeggen over wat de code betekent -- alleen dat de browser hem kan
    lezen. Dat is precies de klasse fout waar het om gaat.
 
-   Draai los: node --experimental-sqlite --test test/paginascripts.test.js */
+   Draai los: node --test test/paginascripts.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

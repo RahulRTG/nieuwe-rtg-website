@@ -37,7 +37,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,13 +45,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const PUB = path.join(ROOT, 'public');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  return null;
-}
-const pw = laadPlaywright();
+const pw = laadPlaywright({ eigenDriver: false });
 
 function appPaden(dir = path.join(PUB, 'apps'), uit = []) {
   for (const naam of fs.readdirSync(dir)) {
@@ -83,7 +77,7 @@ async function metLid(fn) {
   let browser;
   try {
     const tok = await lidToken(base, 'appmenu' + process.pid + '@x.nl');
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
     /* DE INTAKE STAAT HIER BUITEN, EN DAT MOET VIA DE STATUS.
 
@@ -139,13 +133,21 @@ async function metLid(fn) {
    Twee wachtmomenten en niet een: #osMappen is nog steeds de registry waar de
    bank uit gevuld wordt (app-main reikt hem aan, zie app-main-29c.js), dus de
    bank kan pas kloppen als die registry klaar is. Wachten op alleen de bank
-   levert een toets op die soms een tel te vroeg meet. */
+   levert een toets op die soms een tel te vroeg meet.
+
+   HIER STOND `=== 3` EN DAT WAS EEN PROXY DIE VERLIEP. Het was een telling van
+   tegels, bedoeld als "de registry is klaar", en toen WERELDEN.md er een vierde
+   wereld en Instellingen bij zette liep hij vast op een tijdslimiet -- vier
+   toetsen vielen om zonder dat er iets aan die toetsen mankeerde. Een
+   wachtvoorwaarde hoort te noemen WAAROP hij wacht: de vier wereldtegels, bij
+   hun sleutel. Komt er een wereld bij, dan hoort die hier ook te staan. */
+const WERELDTEGELS = ['map-rtg', 'map-werk', 'map-reizen', 'map-rtf'];
 async function wachtWerelden(page) {
-  await page.waitForFunction(() => {
+  await page.waitForFunction((sleutels) => {
     const app = document.getElementById('app');
-    return !!(app && app.classList.contains('active') &&
-      document.querySelectorAll('#osMappen .os-app').length === 3);
-  }, null, { timeout: 60000 });
+    if (!app || !app.classList.contains('active')) return false;
+    return sleutels.every((s) => document.querySelector('#osMappen .os-app[data-sleutel="' + s + '"]'));
+  }, WERELDTEGELS, { timeout: 60000 });
   /* De werktafel hoort er dan ook te zijn: de intake staat buiten deze toetsen
      (zie metLid), dus is #onbGate dicht en is er geen grendel meer. */
   await page.waitForSelector('#rtgCommand .cmd-nav', { state: 'attached', timeout: 20000 });
@@ -157,17 +159,20 @@ async function wachtWerelden(page) {
   }, null, { timeout: 20000 });
 }
 
-/* De drie werelden zoals ze in de bank staan, in volgorde. De software eronder
-   blijft buiten beeld: die komt uit de catalogus van Command en niet uit MAPPEN,
-   en deze toetsen gaan over de werelden. */
+/* De werelden zoals ze in de bank staan, in volgorde.
+
+   HIER STOND EEN GRENS, en die is niet meer nodig. De bank had twee secties --
+   Werelden en daaronder Software -- en deze functie las tot het TWEEDE kopje om
+   de software buiten beeld te houden. Dat tweede kopje bestaat niet meer
+   (WERELDEN.md): de twaalf apps die eronder hingen staan nu in de wereld waar ze
+   horen, en de nav draagt alleen nog werelden. De voet (Rahul, Instellingen,
+   Pagina-instellingen) staat in .cmd-bankvoet en niet hierin. */
 async function werelden(page) {
   return page.evaluate(() => {
     const nav = document.querySelector('#rtgCommand .cmd-nav');
     const koppen = [...nav.querySelectorAll('.cmd-kop')].map((k) => k.textContent.trim());
-    const grens = nav.querySelector('.cmd-kop:nth-of-type(2)');
     const uit = [];
     for (const el of [...nav.children]) {
-      if (el === grens) break;
       if (el.tagName !== 'BUTTON') continue;
       const r = el.getBoundingClientRect();
       uit.push({
@@ -193,7 +198,7 @@ async function openLade(page) {
 }
 
 test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async (t) => {
+  { skip: geenBrowser(pw) }, async (t) => {
   await metLid(async ({ base, ctx }) => {
     /* Alle vier de ingangen van de homescreen (zie voordeur.js) plus een paar
        gewone app-pagina's, want daar hoort de balk van metgezel.js juist WEL te
@@ -204,13 +209,30 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
 
     for (const pad of thuisPaden.concat(appPagina)) {
       const page = await ctx.newPage();
+      await volgVerzoeken(page);
       try {
         await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-        await page.waitForTimeout(1200);
-        const r = await page.evaluate(() => ({
+        await wachtOpRust(page);
+        /* EEN LATE OMLEIDING, en die hoort hier gewoon te mogen. Twee van de
+           vier ingangen van de homescreen sturen door zodra hun eigen script
+           klaar is, en dat kan NA de rust vallen -- dan sterft de meting op een
+           vernielde context. Dat is geen defect maar precies wat een ingang
+           doet. Kwam de pagina ergens anders uit, dan is dit pad niet meer wat
+           we meten: de bestemming staat zelf ook in deze lijst en wordt daar
+           geteld. Zonder deze vangst zakte de toets op "Execution context was
+           destroyed" en las dat als een breuk in de balk. */
+        const meet = () => page.evaluate(() => ({
           eigen: document.querySelectorAll('.os-aibalk').length,
           metgezel: document.querySelectorAll('.mgz-balk').length
         }));
+        let r;
+        try { r = await meet(); }
+        catch (e) {
+          if (!/Execution context was destroyed|Target closed|Target page/.test(String(e && e.message))) throw e;
+          await wachtOpRust(page);
+          if (new URL(page.url()).pathname !== pad) continue;
+          r = await meet();
+        }
         const totaal = r.eigen + r.metgezel;
         if (totaal > 1) {
           fouten.push(pad + ': ' + totaal + ' balken (eigen ' + r.eigen + ', metgezel ' + r.metgezel + ')');
@@ -231,14 +253,15 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
        veilige uitweg. Eén pagina tegelijk houdt samen met de tweede fileworker
        de totale browserparalleliteit op twee. */
     await t.test('elke app-pagina draagt het app-menu of een beveiligde uitweg',
-      { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+      { skip: geenBrowser(pw) }, async () => {
       const menuFouten = [];
       let gemeten = 0;
       for (const pad of appPaden()) {
         const page = await ctx.newPage();
+        await volgVerzoeken(page);
         try {
           await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 60000 });
-          await page.waitForTimeout(200);
+          await wachtOpRust(page);
           let meedoen;
           try {
             meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
@@ -269,9 +292,10 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
 });
 
 test('het menu opent en brengt je terug naar het beginscherm',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/wallet.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#osMenuBtn', { timeout: 10000 });
     await page.click('#osMenuBtn');
@@ -308,9 +332,10 @@ test('het menu opent en brengt je terug naar het beginscherm',
 });
 
 test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank en van de bovenrand',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     /* Een vers geregistreerd lid staat nog in de intake, en die legt een blad
        over het hele scherm. hidden is het signaal waarop Command wacht;
@@ -369,12 +394,12 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     await openLade(page);
     const deuren = await page.evaluate(() =>
       [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')].map((b) => b.textContent.trim()));
-    assert.ok(deuren.some((t) => /Bedieningspaneel/i.test(t)),
+    assert.ok(deuren.some((t) => /^Instellingen$/i.test(t)),
       'de voet van de bank heeft geen deur naar het bedieningspaneel, gevonden: ' + deuren.join(', '));
     /* Op NAAM en niet op positie: er staan twee systeemdeuren in de voet
        (Rahul boven het bedieningspaneel), dus `[data-systeem]` pakte de
        eerste en opende het vraagveld van Rahul. */
-    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Bedieningspaneel' }).first().click();
+    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Instellingen' }).first().click();
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim').getBoundingClientRect();
@@ -390,7 +415,10 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     }
     // en de tegel doet het echt: hij klikt de verborgen bel aan
     await page.click('#osCcBel');
-    await page.waitForTimeout(500);
+    await wachtTot(page, () => {
+      const p = document.getElementById('notifPanel');
+      return !!(p && p.classList.contains('open'));
+    }, null, { wat: 'het geopende meldingenpaneel' });
     assert.equal(await page.evaluate(() => {
       const p = document.getElementById('notifPanel');
       return !!(p && p.classList.contains('open'));
@@ -404,9 +432,15 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     await wachtWerelden(page);
     await page.mouse.move(196, 4);
     await page.mouse.down();
-    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    /* Een veeg is een REEKS bewegingen, geen sprong -- daar had die 40 ms mee te
+       maken. Playwright doet dat zelf met `steps`, en dan is het geen wachttijd
+       meer maar een beweging met tussenstappen. */
+    for (const y of [20, 50, 90, 130]) await page.mouse.move(196, y, { steps: 4 });
     await page.mouse.up();
-    await page.waitForTimeout(600);
+    await wachtTot(page, () => {
+      const s = document.getElementById('osCcScrim');
+      return !!(s && s.classList.contains('open'));
+    }, null, { wat: 'het bedieningspaneel dat de bovenrand opent' });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim');
       return !!(s && s.classList.contains('open'));
@@ -415,16 +449,17 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
   });
 });
 
-test('de bank zet de drie werelden boven de software, en het springboard is weg',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+test('de bank zet de vier werelden bovenaan, en het springboard is weg',
+  { skip: geenBrowser(pw) }, async () => {
   /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
 
-     Hij mat de voordeur: drie wereldtegels als één gecentreerde rij op het
+     Hij mat de voordeur: drie wereldtegels (er zijn er nu vier) als één
+     gecentreerde rij op het
      springboard, met de klok eronder en de balk van Rahul aan de onderrand.
      Dat springboard is geen scherm meer -- het beginscherm is de werktafel van
      RTG Command (WERELD.md) -- en de werelden staan nu bovenaan de bank.
 
-     Wat hetzelfde bleef is de VRAAG: staan de drie werelden er, staan ze
+     Wat hetzelfde bleef is de VRAAG: staan de werelden er, staan ze
      bovenaan, en zijn ze echt te zien? Een rij die op nul pixels staat of onder
      de software wegzakt komt door elke telling heen. Wat er bij komt is de
      andere helft van dezelfde afspraak: het springboard mag NIET meer in beeld
@@ -436,6 +471,7 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
      scherm er weer onder. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
@@ -443,11 +479,15 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
     await openLade(page);
 
     const b = await werelden(page);
-    assert.deepEqual(b.koppen, ['Werelden', 'Software'],
-      'de bank hoort de werelden van de software te scheiden, gevonden: ' + b.koppen.join(', '));
+    /* EEN KOPJE EN NIET TWEE. Er stond ook "Software" met twaalf apps eronder
+       die in geen wereld hingen; dat is weg (WERELDEN.md) en die twaalf staan
+       nu in hun eigen wereld. De bank draagt navigatie en geen tweede
+       voorraadkast. */
+    assert.deepEqual(b.koppen, ['Werelden'],
+      'de bank hoort alleen werelden te dragen, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation bovenaan te dragen');
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+      'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
       'deze werelden staan wel in de bank maar zijn nul groot');
@@ -476,12 +516,14 @@ test('de bank zet de drie werelden boven de software, en het springboard is weg'
 });
 
 test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* PREMIUMRECHTEN VERANDEREN DE INHOUD, NIET DE KWALITEIT VAN DE VOORDEUR.
      Een RTG-pas ziet minder onderdelen dan Lifestyle of Business, maar krijgt
-     dezelfde drie volledige huizen. Daarom toetst dit pad bewust met de
-     instappas: geen hoofdwereld mag daar terugvallen op een kaal monogram of
-     verdwijnen.
+     dezelfde vier volledige huizen (WERELDEN.md). Daarom toetst dit pad bewust
+     met de instappas: geen hoofdwereld mag daar terugvallen op een kaal
+     monogram of verdwijnen. TravelOS is de kleinste van de vier en juist
+     daarom de scherpste meting: elf onderdelen zijn genoeg voor een wereld,
+     maar niet als hij zijn beeldmerk kwijtraakt.
 
      DE METING IS DRIE KEER VERHUISD, en dat hoort hier te staan.
 
@@ -503,6 +545,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
      icoon van Command in plaats van het eigen merkteken. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
@@ -510,8 +553,8 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 
     const b = await werelden(page);
     assert.deepEqual(b.werelden.map((w) => w.url),
-      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/foundation/index.html'],
-      'de bank hoort exact RTG, RTG Kantoor en RTFoundation te dragen');
+      ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
+      'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS te dragen');
     const kaal = b.werelden.filter((w) => !w.glyf);
     assert.deepEqual(kaal.map((w) => w.naam), [],
       'deze werelden dragen geen eigen glyf maar het standaard icoon:\n' +
@@ -521,7 +564,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
 });
 
 test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
      Een deur die er goed uitziet en niets doet komt door elke telling heen. Dat
@@ -536,6 +579,7 @@ test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
      (app-main-29c.js filtert erop) en staat niet meer in de bank. */
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
+    await volgVerzoeken(page);
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);

@@ -2,7 +2,7 @@
    Goed = een bakje omhoog en langer rust, fout = terug naar bakje 1 en
    vandaag nog een keer; de dagstapel loopt over alle lijsten heen en
    andermans lijsten blijven dicht.
-   Draai los: node --experimental-sqlite --test test/rtfcurve.test.js */
+   Draai los: node --test test/rtfcurve.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

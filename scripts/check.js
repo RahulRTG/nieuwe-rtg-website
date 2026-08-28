@@ -18,7 +18,7 @@ const regexVeilig = (waarde) => String(waarde).replace(/[.*+?^${}()|[\]\\]/g, '\
    "// require('x') -> 'x'" niet als echte require wordt gelezen. Strings blijven
    staan; voor deze keuringen is dat genoeg. Staat in scripts/lib/bron.js omdat
    scripts/keuring.js hem ook gebruikt. */
-const { zonderCommentaar } = require('./lib/bron');
+const { zonderCommentaar, zonderTekst } = require('./lib/bron');
 const { paginaDraagt } = require('./lib/hulpcss');
 
 function loop(dir, filter, fn) {
@@ -415,8 +415,41 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        volgorde is precies de inhoud: kernlaag4b hangt het concern op NA de
        onderneming, omdat het er een bestaande onderneming in aanwijst. */
     ['server/opzet/kernlaag4b.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    /* kernlaag1 en kernlaag2 zijn dezelfde soort lijst en stonden er alleen nog
+       niet op omdat ze er nog net onder bleven -- kernlaag2 met 118 bytes
+       speling. Een grens die je haalt door niets meer toe te voegen, is geen
+       grens maar een rem, en dat is niet wat regel 13 wil zeggen. Ze horen in
+       MAG om precies dezelfde reden als hun twee broers hierboven: een
+       ophanglijst in tweeën hakken levert twee halve lijsten op waarvan de
+       volgorde tussen de helften niet meer te lezen is.
+
+       LET OP WAT DIT NIET IS: een uitzondering voor "het paste net niet". De
+       reden staat erbij en geldt voor dit SOORT bestand; een gewone module die
+       erover gaat, hoort nog steeds geknipt te worden. */
+    ['server/opzet/kernlaag1.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    ['server/opzet/kernlaag2.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
     ['server/opzet/routes.js', 'de mountlijst van alle routers: geen naad, alleen volgorde, net als de kernlagen'],
-    ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
+    ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE'],
+
+    /* DEZE TWEE ZIJN GEMETEN VOOR ZE HIER KWAMEN, en dat getal hoort erbij te
+       staan. Een uitzondering met alleen een verhaal is niet na te rekenen.
+
+         server/bewaarbeleid.js   10,3 KB waarvan 5,2 KB code
+         server/lib/keten.js      10,4 KB waarvan 2,9 KB code
+
+       Bij allebei zit de helft of meer in de kop, en dat is hier geen luxe maar
+       de inhoud: het bewaarbeleid is een TABEL waarin elke regel een termijn
+       met een grondslag is (dezelfde soort als livinglab/kader.js hierboven),
+       en keten.js legt in zijn kop uit wat een hashketen NIET tegenhoudt --
+       precies het stuk dat je moet lezen voor je erop vertrouwt.
+
+       En let op wat hier NIET is gebeurd: de maat is niet verzet naar "alleen
+       codebytes". Dat is nagerekend en het zou 21 van de 23 bestaande
+       uitzonderingen in een klap laten slagen, ook server/db/index.js van 23 KB.
+       Een ratel die je losdraait omdat je er zelf tegenaan loopt, is geen
+       ratel. */
+    ['server/bewaarbeleid.js', 'de bewaartabel: een regel per tak met termijn en grondslag, geen logica -- 5,2 KB code van 10,3 KB'],
+    ['server/lib/keten.js', 'een ketenprimitief van 2,9 KB code; de rest is de kop die uitlegt wat het middel NIET tegenhoudt, en dat hoort bij de code die het beweert']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
      dat is bij een servermodule geen byte-knip: het vraagt echte bedrading
@@ -424,6 +457,60 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* DRIE UIT DE IDEM- EN UITROLRONDE. Ze staan hier en niet in MAG, want bij
+       alle drie is de naad aan te wijzen -- en een naad die je kunt benoemen
+       hoort geknipt te worden, niet vrijgesteld.
+
+         server/lib/idem-poort.js          11,3 KB / 4,1 KB code
+           de bewaarkast IS eruit (./idem-kast.js, 4,3 KB): de ring, het venster
+           en de regel dat alleen een geslaagd antwoord erin mag, staan nu los
+           en zonder een enkel begrip uit het web erin. Wat hier over is, is het
+           http-deel -- en dat ligt nog boven de maat. De volgende naad is de
+           SLEUTELBEPALING (welke sleutel geldt, en van wie) los van wat de
+           poort met een herhaling doet.
+
+         server/kern/command/uitrolregie.js  12,7 KB / 7,6 KB code
+           naad: het METEN (5xx over al het verkeer sinds de sport) los van het
+           BESLUIT (klimmen, zakken, wachten op een mens). Nu deelt het een
+           bestand omdat het meten er ooit bij hoorde.
+
+         server/functies/register/index.js  12,8 KB / 5,8 KB code
+           naad: de FASES-ladder los van het register zelf. Ze hangen aan elkaar
+           via een controle bij het laden, en die controle hoort mee te
+           verhuizen -- anders valt de ladder stil naast het register. */
+    'server/lib/idem-poort.js',
+    'server/kern/command/uitrolregie.js',
+    'server/functies/register/index.js',
+    /* Drie van de vier NOG-gevallen uit de samenvoeging van 24 augustus
+       (state.js, functieschakelaars.js, poortwachters.js) staan er niet meer:
+       op 26 augustus zijn ze onder de grens teruggebracht door het proza in te
+       dichten zonder een redenering te schrappen -- de groei zat in toelichting,
+       niet in code. De naden die hier beschreven stonden blijven de juiste
+       knipplekken zodra ze WEL weer groeien.
+       (verkoop.js stond hier ook en is al geknipt: ./inwissel.js) */
+    /* TWEE UIT DE SAMENVOEGING VAN 25 AUGUSTUS (main +50). Zelfde patroon als de
+       vier hierboven: main breidde ze uit terwijl wij er aan de andere kant bij
+       kwamen, en bij allebei is de naad te benoemen -- dus NOG en niet MAG.
+
+         server/kern/pay/index.js   10,3 KB
+           naad: de KERN van het grootboek (pasToe, boek, boekAsync -- wat een
+           boeking DOET met de saldi) los van de BEDRADING (welke deelmodule er
+           aan de api wordt geschroefd: verzoeken, kassa, tegoed, zaakbetaling,
+           verkoop). Ze delen een bestand omdat het grootboek er ooit het enige
+           was; de regels van dubbel boekhouden in de kop horen met de kern mee
+           te verhuizen, niet bij de bedrading achter te blijven.
+         (server/web/routing.js stond hier ook en is op 26 augustus onder de
+          grens teruggebracht via het proza; de naad -- dispatch-index los van
+          afhandelen -- blijft de knipplek zodra hij weer groeit.) */
+    /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
+       ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
+       (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
+       stuk, er zit een duidelijke naad tussen de diagnose (reden/NAMEN/vraag) en
+       de zichtbare melding. Opknippen is wel echte bedrading: 21 pagina's laden
+       nu een module en een blad, en keuringsregel 38 rekent dat na, dus er komt
+       een tweede script bij dat overal mee moet. Dat doe je een voor een met de
+       toetsen ernaast en niet in de staart van een ronde. */
+    'public/shared/media.js',
     /* public/shared/media.js STOND HIER en is er weer af, en de reden waarom hij
        bleef staan bleek geen reden. Er stond: opknippen kost 26 pagina's een
        TWEEDE script, voor een module wiens hele werk is om te WERKEN als er iets
@@ -1410,7 +1497,16 @@ console.log('\n25) elk toetsbestand dat een database of Redis vraagt, staat in d
          regel staan als de skip-beslissing of de constante die hem draagt.
          Alleen "noemt de naam ergens" zou elk bestand met een uitleg in het
          commentaar meetellen. */
-      const poort = zonderCommentaar(bron).split('\n').some(r =>
+      /* TEKENREEKSEN ERUIT, en dat is een reparatie en geen verfijning.
+         test/deltapoort.test.js draagt als bekend-foute invoer de letterlijke
+         tekst `test('a', { skip: !process.env.DATABASE_URL }, f)` -- een string,
+         geen poort. Deze keuring las hem als code en meldde dat bestand als een
+         toets die Postgres nodig heeft en nergens draait. Dat is de vierde keer
+         in dit huis dat een teller tekst voor code aanziet (zie de kop van
+         zonderTekst in scripts/lib/bron.js); vandaar dezelfde functie en niet
+         een uitzondering voor dit ene bestand. Een uitzonderingenlijst zou de
+         volgende keer weer moeten groeien. */
+      const poort = zonderTekst(zonderCommentaar(bron)).split('\n').some(r =>
         POORT.test(r) && /\b(OVERSLAAN|HEEFT_PG|HEEFT_REDIS|skip|BRON|URL)\b/.test(r));
       if (!poort) continue;
       if (MAG_ERBUITEN.has(rel)) continue;
@@ -1727,9 +1823,43 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
   const PUBLIEK = new Map([
     // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
     ['/api/auth/register', 'registreren kan alleen zonder account'],
+    ['/api/mail/ses', 'AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht'],
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+    /* DE INLOGDEUR ZELF, en waarom hij hier hoort te staan in plaats van op de
+       heuristiek te leunen.
+
+       Hij stond nooit op deze lijst en werd toch goedgekeurd, want de regel
+       telt "geeft ergens binnen achthonderd tekens een 401 of 403 terug" ook als
+       poort. Dat klopte toevallig: de 401 stond net binnen dat venster. Toen de
+       inlog er drie remmen, een beveiligingsregel en een hash-opwaardering bij
+       kreeg, schoof diezelfde 401 erbuiten -- en meldde de poort een gat waar
+       niets was veranderd aan wie er binnenkomt.
+
+       Een groen dat aan tekstafstand hangt is geen groen (dezelfde les die
+       hierboven bij het venster staat). Daarom staat hij nu bij naam. De REDEN
+       is bovendien dezelfde als bij register en forgot hierboven: dit IS de
+       deur, er kan per definitie nog geen sessie zijn, en een poort die een
+       sessie eist zou inloggen onmogelijk maken.
+
+       Wat hem beschermt staat er wel: drie remmen (per adres+account, per
+       adres, per doelwit), een vertraging bij een belaagd account, en een regel
+       in het beveiligingsjournaal bij elke mislukte poging. */
+    /* Hij is hier op 20 augustus 2026 nog even AF geweest, met als reden dat de
+       401 in de handler als poort telt. Dat is de heuristiek waarvoor het blok
+       hierboven juist waarschuwt, en het ging binnen een dag opnieuw mis: toen
+       de doelemmer zijn vertraging terugkreeg, schoof de 401 weer buiten het
+       venster van achthonderd tekens en meldde deze regel een gat waar niets
+       was veranderd aan wie er binnenkomt. De naam blijft dus staan. */
+    ['/api/auth/login', 'dit IS de deur: wie inlogt heeft nog geen sessie; drie remmen, een vertraging bij een belaagd account en het beveiligingsjournaal beschermen hem'],
+    /* Dezelfde deur, andere sleutel. /api/webauthn/opties staat hierboven al op
+       de lijst met "het bewijs volgt bij /login" -- dit is dat /login. Het
+       bewijs zit in het verzoek: een handtekening over de uitdaging die de
+       server zelf net heeft uitgegeven, en die maar een keer geldig is. */
+    ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],
+    ['/api/foundation/registratie/status', 'de willekeurige, gehashte statussleutel is de geloofsbrief en toont uitsluitend die ene aanvraag (met rem per ip)'],
     /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
        loopt dus dezelfde weg: wie een apotheek aanvraagt heeft op dat moment
        geen zaak, geen personeelslogin en soms geen account -- alleen zijn
@@ -1851,6 +1981,19 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
 
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
+    /* DE DRIE COMMERCIELE FEITEN. Ze staan hier om dezelfde reden als
+       /api/pasprijzen erboven, en ze zijn de reparatie van het gat dat dit hele
+       traject begon: artikel 1 van de partnervoorwaarden beloofde "0% commissie"
+       terwijl de boardroom een commissieknop op 12 procent had. Dat kon bestaan
+       omdat HTML, code en documenten onafhankelijk over hetzelfde getal praatten.
+       De voorwaardenpagina's halen die getallen nu HIER op in plaats van ze zelf
+       op te schrijven -- en een voorwaardenpagina lees je zonder in te loggen,
+       dus een poort ervoor zou betekenen dat de pagina zijn eigen bedragen weer
+       gaat overtypen. Alledrie geven alleen wat er publiek beloofd wordt; er komt
+       geen ledendata langs. */
+    ['/api/claims', 'de publieke claims voeden de voorwaardenpagina\'s, die je zonder inlog leest'],
+    ['/api/betaaldiensttarief', 'het betaaldiensttarief staat in de partnervoorwaarden'],
+    ['/api/sociaalbeleid', 'de sociale afdracht is een publieke belofte (RTFoundation)'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
     ['/api/gids/app', 'de app-gids is openbaar'],
     ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],
@@ -1859,6 +2002,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
     ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
     ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
+    /* Een klaargezette reis wordt geopend door iemand die nog GEEN lid is --
+       dat is de hele opzet van de reisuitnodiging. Het slot is de code zelf
+       (128 bits uit crypto.randomBytes); wat er zonder opeisen te zien is,
+       is bewust mager (bestemming, periode, hoeveel onderdelen) zodat een
+       doorgestuurde link geen boekingsnummers lekt. Opeisen kan alleen mét
+       sessie. Zie de kop van server/kern/reisuitnodiging.js. */
+    ['/api/reis/uitnodiging/open', 'een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)'],
     ['/api/talen', 'de talenlijst voedt de kiezer op het inlogscherm'],
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
@@ -2059,6 +2209,16 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
     ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
       'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.'],
+    ["server/lib/idem-poort.js|const auth = (typeof req.get === 'function' && req.get('authorization')) || '';",
+      'hasht de kop tot een SCOPE en beslist er niets mee: de idem-poort verleent geen toegang, hij zorgt ' +
+      'alleen dat twee afzenders nooit dezelfde opslagsleutel delen. De echte authenticatie staat achter de ' +
+      'poort, en alleen een 2xx gaat de kast in -- een verzonnen kop levert dus nooit een bewaard antwoord op.'],
+    ["server/lib/dubbeltik.js|const kop = req.get('authorization') || '';",
+      'de dubbeltik VERSLEUTELT de kop tot een hash en kijkt er nooit in. Hij beslist niets over toegang -- de hash bepaalt alleen in welke la het bewaarde antwoord komt, zodat twee bellers met dezelfde idem-sleutel nooit elkaars antwoord krijgen. Een verzonnen kop levert dus hooguit een eigen lege la op; of het verzoek mag, beslist de echte auth verderop in de keten.'],
+    ["server/middleware/idempotentie.js|const wie = (req.get('authorization') || '') + '|' + String(req.ip || '');",
+      'de kop is hier alleen ONDOORZICHTIG sleutelmateriaal: hij gaat een sha256 in zodat twee afzenders ' +
+      'met dezelfde idempotentiesleutel nooit elkaars antwoord krijgen. Er wordt niets uit gelezen en niets ' +
+      'besloten -- een fout token betekent hoogstens een eigen kasvakje, en de poort van de route oordeelt zelf.'],
     ["server/trio-kleef.js|const kop = (req && req.headers && req.headers.authorization) || '';",
       'de poortwachter gebruikt het token als ROUTELABEL en niets anders: het gaat rechtstreeks een hash in en de uitkomst is een servernummer. ' +
       'Er wordt niets verleend -- de gekozen server draait de volledige stapel en verifieert zelf, dus een verzonnen Bearer levert daar gewoon een 401 op. ' +
@@ -3363,7 +3523,6 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
      zakten. Dat is precies waar een anker voor is. */
   const CLIPBAND = ['public/shared/ondertitelband.js', 'RTGOndertitelband'];
   const REGISTER = new Map([
-    ['public/apps/app-main/app-main-09a.js#scPinCam', ['werktuig', 'de sociale balk leest een contactpin of een levende code van het scherm van een ander; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
     ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
@@ -3375,7 +3534,6 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
     ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
-    ['public/apps/foundation/vrienden.html#pinCam', ['werktuig', 'dezelfde pinlezer aan de gezinskant: beeld als invoer om een code te lezen, zonder geluid']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
@@ -3463,8 +3621,74 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   }
 }
 
+
+console.log('\n50) een geheim wordt tijd-veilig vergeleken, en een credential komt uit crypto');
+{
+  /* TWEE FOUTEN DIE HIER ECHT ZIJN GEMAAKT, EN DIE ALLEBEI EEN TWEEDE WAARHEID
+     WAREN IN PLAATS VAN EEN ONTBREKENDE.
+
+     A) De eenmalige manager-PIN van een nieuwe zaak kwam uit
+        `Math.floor(1000 + Math.random() * 9000)`. Math.random is geen
+        cryptografische bron: uit een handvol uitkomsten is de staat van de
+        generator af te leiden en daarmee de VOLGENDE pin. Er bestond al een
+        huisfunctie (accounts.makePin -> crypto.randomInt); deze plek had er
+        stil een tweede naast gezet.
+
+     B) verifyToken vergeleek de HMAC van het SESSIETOKEN met `!==`. Een gewone
+        stringvergelijking stopt bij het eerste verschillende teken, dus de tijd
+        verraadt hoeveel tekens er klopten. Exact deze redenering stond al
+        uitgeschreven bij de clustersleutel in server.js -- en uitgerekend de
+        deur waar ELK verzoek langskomt stond nog op de kale vergelijking.
+
+     Waarom dit een keuring is en geen toets: geen van beide is met een
+     gedragstoets eerlijk te betrappen. Een timingverschil van microseconden is
+     op een testmachine niet betrouwbaar te meten, en een PIN uit Math.random
+     ziet er precies zo uit als een goede. Ze zijn alleen in de BRON te zien, en
+     dus hoort de bewaker daar te staan (LAT.md regel 2: beide zijn met een
+     mutatie nagetrokken -- de fout teruggezet, deze regel werd rood, en toen
+     pas terug). */
+  const stripRegels = (b) => String(b)
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+
+  /* A) Math.random op een regel die een geheim maakt.
+     Bewust NAUW: 'code' en 'id' staan er niet bij. Een leverancierscode of een
+     gespreks-id is geen credential, en een regel die ook die aanwijst wordt
+     binnen een week weggeklikt -- dat is precies hoe scripts/samenhang.js zijn
+     eerste maatstaf verloor (849 valse gevallen). Liever een smalle regel die
+     altijd klopt dan een brede die niemand meer gelooft. */
+  const CREDENTIAL = /\b(pin|pincode|otp|token|secret|geheim|sleutel|wachtwoord|password|salt|nonce|apikey|herstelcode|verificatiecode|resetcode)\b/i;
+  /* B) een handtekening die met == of != wordt vergeleken. `handtekening(` staat
+     er NIET in: dat is Nederlands proza ("er ontbreken 2 handtekening(en)") en
+     geen cryptografie. Alleen echte crypto-aanroepen tellen. */
+  const HANDTEKENING = /\b(kluis\.sign|\bsign)\s*\(|createHmac\s*\(|\.digest\s*\(/;
+  const VERGELIJK = /[!=]==?/;
+  const VEILIG = /veiligGelijk|timingSafeEqual/;
+  const VENSTER = 2;   // regels boven en onder waarin de veilige vergelijker mag staan
+
+  let losA = 0, losB = 0, gekeurd = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const regels = stripRegels(fs.readFileSync(f, 'utf8')).split('\n');
+    regels.forEach((r, i) => {
+      if (/Math\.random\s*\(/.test(r) && CREDENTIAL.test(r)) {
+        losA++;
+        fout(rel + ':' + (i + 1) + ' maakt een geheim met Math.random() -- gebruik crypto' +
+          ' (crypto.randomInt/randomBytes, of de bestaande accounts.makePin)');
+      }
+      if (!HANDTEKENING.test(r) || !VERGELIJK.test(r)) return;
+      gekeurd++;
+      if (VEILIG.test(regels.slice(Math.max(0, i - VENSTER), i + VENSTER + 1).join('\n'))) return;
+      losB++;
+      fout(rel + ':' + (i + 1) + ' vergelijkt een handtekening met == of != -- dat stopt bij het' +
+        ' eerste verschillende teken en lekt daarmee hoeveel er klopte; gebruik veiligGelijk()');
+    });
+  });
+  if (!losA && !losB) ok('geen enkel geheim uit Math.random(), en alle ' + gekeurd +
+    ' handtekeningvergelijkingen gaan tijd-veilig');
+}
 /* ============================================================================
-   50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft
+   51) geen enkel bestand plukt een naam uit een bereik dat het niet heeft
 
    WAAR DIT UIT KOMT. Een groot bestand opknippen ziet er onschuldig uit: de
    regels verhuizen en de code is woord voor woord dezelfde. Maar een blok dat in
@@ -3496,7 +3720,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
    maar elke fout daarin is een vals alarm op een regel die verder klopt. In een
    harde poort is een vals alarm duurder dan een gemist geval. De nul hieronder
    is dus geen garantie; hij is de ondergrens. */
-console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet heeft');
+console.log('\n51) geen enkel bestand plukt een naam uit een bereik dat het niet heeft');
 {
   const { vrijeNamen } = require('./lib/vrijenamen');
   let gekeken = 0, stuk = 0;
@@ -3509,7 +3733,21 @@ console.log('\n50) geen enkel bestand plukt een naam uit een bereik dat het niet
      en een regel die honderd keer onterecht rood staat, leert niemand meer
      iets. Wat public/ WEL bewaakt staat in regel 19 (geen twee modules die
      dezelfde window-naam opeisen) en regel 42. */
-  for (const map of ['server', 'scripts']) {
+  /* EN test/ ERBIJ, sinds 21 augustus 2026. Die map stond hier niet, en dat
+     kostte een nacht: de samenvoeging van 24 takken liet `bankDeur` achter in
+     drie toetsbestanden die hem niet hadden (hij woonde in apps-ui.e2e.js),
+     plus `pw` en `fs` in twee andere. Node deelt geen bereik tussen
+     toetsbestanden, dus dat is een ReferenceError -- maar pas op de tak van de
+     toets die hem raakt, en dus pas in CI, na twee uur suite. Deze analyser had
+     ze alle drie gevonden; hij keek alleen de andere kant op. Nagetrokken op de
+     stand van vóór de reparatie: werkscherm, zegel-ui en pinherstel melden
+     bankDeur, vakbewijs-scherm meldt pw.
+
+     Wat daarvoor wel moest: de BROWSERKANT overslaan. Een schermtoets geeft een
+     functie mee aan de pagina (page.evaluate, waitForFunction), en die draait in
+     Chromium waar window.Geo gewoon bestaat. Zonder die uitzondering meldt deze
+     regel elke browsernaam als vrij. Zie BROWSERHAAK in lib/vrijenamen.js. */
+  for (const map of ['server', 'scripts', 'test']) {
     const m = path.join(ROOT, map);
     if (!fs.existsSync(m)) continue;
     loop(m, /\.js$/, (f) => {
@@ -3637,8 +3875,533 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
   }
 }
 
+
+/* 53) DE WERELDLIJST LOOPT NIET ACHTER OP HET REGISTER.
+
+   Zelfde vorm als regel 40 (de kaart) en 46 (de SLO-tabel): WERELDLIJST.md wordt
+   uit `MAPPEN` gegenereerd, dus hoort hij gelijk te zijn aan wat de code nu
+   zegt. Verhuist er een onderdeel naar een andere wereld, dan wordt deze regel
+   rood tot iemand `npm run wereldlijst` draait -- en dat is een commando, geen
+   schrijfwerk.
+
+   Waarom dit ernaast moet en test/wereldregister.test.js niet volstaat: die
+   toets meet dat elk item ergens OP UITKOMT. Hij zegt niets over de vraag of het
+   document dat mensen lezen nog dezelfde inhoud beschrijft. */
+console.log('\n53) WERELDLIJST.md loopt niet achter op het wereldregister');
+{
+  try {
+    const wl = require('./wereldlijst');
+    const opSchijf = fs.existsSync(wl.DOEL) ? fs.readFileSync(wl.DOEL, 'utf8') : null;
+    const verwacht = wl.bouw();
+    if (opSchijf === null) fout('WERELDLIJST.md bestaat niet -- draai: npm run wereldlijst');
+    else if (opSchijf !== verwacht) fout('WERELDLIJST.md loopt achter op de code -- draai: npm run wereldlijst');
+    else ok('WERELDLIJST.md is gelijk aan wat MAPPEN nu zegt');
+  } catch (e) {
+    fout('de wereldlijst kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
+/* 53) ELK SCHERM IS ERGENS VANDAAN TE BEREIKEN.
+
+   Een scherm dat bestaat, door de a11y-keuring gaat, in de schermdekking
+   meetelt en waar geen enkele weg heen loopt, is geen scherm maar een bestand.
+   Dat is de stilste soort dode code: alle meters staan groen.
+
+   Gevonden op 19 augustus 2026, en het leverde er elf op. Twee daarvan waren
+   vitrines uit de tijd dat er nog een marketinglaag was (het skelethorloge en
+   een skyline van het ecosysteem) -- die stonden in geen enkel document en zijn
+   weg. Twee andere waren juist WEL gedocumenteerd en gebouwd: /apps/werk.html
+   staat in PLATFORM.md als "voor organisaties" en /apps/wereld.html in README.md
+   als de wereldlaag. Die hadden geen deur en hangen nu in hun wereld.
+
+   DE LIJST HIERONDER IS GEEN UITZONDERINGSLIJST MAAR EEN BESLUIT PER REGEL. Wie
+   er een bij zet, schrijft op waarom een scherm nergens vandaan bereikbaar HOORT
+   te zijn -- en dat is bij een omleiding of een QR-landing een goed antwoord, en
+   bij al het andere geen.
+
+   De meting staat in scripts/lib/bereik.js; daar staat ook wat hij niet ziet
+   (een adres dat een script uit stukjes samenstelt), dus dit is een ondergrens. */
+console.log('\n53) elk scherm is vanaf de bank te bereiken');
+{
+  try {
+    const { meet, MAG_LOS } = require('./lib/bereik');
+    const r = meet();
+    const onbekend = r.wezen.filter((p) => !MAG_LOS.has(p));
+    const verdwenen = [...MAG_LOS.keys()].filter((p) => !r.wezen.includes(p));
+    if (onbekend.length) {
+      for (const p of onbekend) fout('nergens vandaan te bereiken: ' + p + ' -- hang hem ergens, of zet hem met een reden in MAG_LOS');
+    } else if (verdwenen.length) {
+      /* Een naam op de lijst die niet meer los staat, groeit stil mee -- zelfde
+         controle als bij regel 28, 47 en 49. */
+      for (const p of verdwenen) fout('staat in MAG_LOS maar is wel bereikbaar (of bestaat niet meer): ' + p);
+    } else {
+      ok(r.totaal + ' schermen, ' + r.wezen.length + ' met opzet los: ' +
+        r.wezen.map((p) => p.replace('/apps/', '')).join(', '));
+    }
+  } catch (e) {
+    fout('de bereikbaarheid kon niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
+
 /* ============================================================================
-   52) EEN ONTSNAPPINGSFUNCTIE DEKT HET AANHALINGSTEKEN.
+   54) DE RELEASE-WORKFLOW PUBLICEERT NIETS ZONDER STUKLIJST EN HERKOMST
+
+   WAT HIER ACHTER ZIT. Het releasebewijs (scripts/release-bewijs.js) hasht elke
+   bron in dit huis, en dat bewijs zit ook in het image. Maar een image is meer
+   dan deze repository: uit node:22-slim komen ruim honderd deb-pakketten mee die
+   wij niet schrijven en niet kiezen. Op de vraag "zit die kwetsbaarheid in wat
+   jullie draaien?" gaf een bronhash geen antwoord, en die vraag komt bij elke
+   doorlichting langs. scripts/imageherkomst.js maakt daarom een stuklijst UIT het
+   gepubliceerde image en bindt die met een handtekening aan het image-digest.
+
+   WAAROM DAT HIER EEN POORT NODIG HEEFT. Die stappen staan in een
+   workflow-bestand, en workflow-bestanden zijn de makkelijkste plek om iets uit
+   te zetten: een stap uitcommentarieren is een regel, en de publicatie gaat
+   daarna gewoon door. Groen, sneller, en niemand die het ziet -- tot een
+   inkoper om de stuklijst vraagt. Deze regel maakt van dat weglaten een rood
+   vinkje.
+
+   DE VOLGORDE DOET ERTOE, en dat is geen vormkwestie. Een stuklijst die VOOR de
+   publicatie wordt gemaakt beschrijft een image dat misschien niet is wat er
+   uiteindelijk gepusht is. Daarom eist deze regel dat --sbom NA de push staat.
+
+   WAT HIJ NIET KAN. Of de handtekening ooit gezet is, weet dit bestand niet:
+   dat hangt aan een secret in GitHub. Wel kan hij eisen dat de publieke sleutel,
+   als hij er staat, een echte Ed25519-sleutel is -- een verminkte plak tekst in
+   deploy/release-sleutel.pub zou anders pas opvallen op het moment dat iemand
+   een release probeert te verifieren. */
+console.log('\n54) de release-workflow publiceert niets zonder stuklijst en herkomst');
+{
+  const wfPad = path.join(ROOT, '.github/workflows/release-image.yml');
+  if (!fs.existsSync(wfPad)) fout('.github/workflows/release-image.yml bestaat niet meer');
+  else if (!fs.existsSync(path.join(ROOT, 'scripts/imageherkomst.js'))) fout('scripts/imageherkomst.js is weg, terwijl de workflow hem aanroept');
+  else {
+    const wf = fs.readFileSync(wfPad, 'utf8');
+    const na = (naald) => wf.indexOf(naald);
+    const push = na('docker push');
+    const sbom = na('imageherkomst.js --sbom');
+    const binden = na('imageherkomst.js --binden');
+    const controle = na('imageherkomst.js --controle');
+    const klachten = [];
+    if (push < 0) klachten.push('de workflow pusht geen image meer -- dan klopt deze regel niet meer bij wat hij bewaakt');
+    if (sbom < 0) klachten.push('er wordt geen stuklijst meer gemaakt (imageherkomst.js --sbom ontbreekt)');
+    else if (push >= 0 && sbom < push) klachten.push('de stuklijst wordt VOOR de push gemaakt; dan beschrijft hij niet wat er gepubliceerd is');
+    if (binden < 0) klachten.push('het image-digest wordt nergens aan de stuklijst gebonden (imageherkomst.js --binden ontbreekt)');
+    else if (sbom >= 0 && binden < sbom) klachten.push('er wordt gebonden voordat de stuklijst bestaat');
+    if (controle < 0) klachten.push('de workflow controleert zijn eigen publicatie niet (imageherkomst.js --controle ontbreekt)');
+    if (!/upload-artifact/.test(wf) || !/sbom\.json/.test(wf)) klachten.push('de stuklijst wordt niet bewaard: zonder upload blijft er na de run niets van over');
+    /* Een sleutel die er WEL staat maar geen sleutel is, is erger dan geen
+       sleutel: hij ziet eruit als een vertrouwensanker. */
+    const pubPad = path.join(ROOT, 'deploy/release-sleutel.pub');
+    if (fs.existsSync(pubPad)) {
+      try {
+        const sleutel = require('crypto').createPublicKey(fs.readFileSync(pubPad, 'utf8'));
+        if (sleutel.asymmetricKeyType !== 'ed25519') klachten.push('deploy/release-sleutel.pub is geen Ed25519-sleutel maar ' + sleutel.asymmetricKeyType);
+      } catch (e) { klachten.push('deploy/release-sleutel.pub is geen leesbare publieke sleutel: ' + e.message); }
+    }
+    if (klachten.length) klachten.forEach(fout);
+    else ok('de workflow maakt de stuklijst na de push, bindt hem aan het digest, controleert en bewaart hem' +
+      (fs.existsSync(pubPad) ? ', en de vastgelegde publieke sleutel is een geldige Ed25519-sleutel' : ' (nog geen vastgelegde publieke sleutel: releases zijn ongetekend)'));
+  }
+}
+
+
+/* ============================================================================
+   55) DE DUBBELTIK STAAT NA ELKE ANDERE RES.JSON-WIKKEL
+
+   DEZE REGEL KOMT UIT EEN FOUT DIE DERTIEN GROENE TOETSEN NIET ZAGEN. De
+   dubbeltik (server/lib/dubbeltik.js) hing res.json om zich een antwoord te
+   herinneren. jsonGzip() doet dat OOK, en stuurt een antwoord boven de kilobyte
+   via res.send in plaats van via res.json. Stond de dubbeltik daarvoor, dan zag
+   hij grote antwoorden nooit -- en liet hij de herhaling het werk gewoon opnieuw
+   doen. Negentien routes in de idemproef, allemaal met een groot antwoord, en
+   nergens een foutmelding: kleine antwoorden gingen goed, en curl vraagt
+   standaard geen compressie.
+
+   Wie het laatst om res.json heen gaat, ziet het antwoord het eerst. De
+   dubbeltik hoort dus de BUITENSTE wikkel te zijn. test/dubbeltikgzip.test.js
+   bewijst dat die samenstelling werkt; deze regel bewaakt dat de PRODUCTIECODE
+   die volgorde ook echt aanhoudt -- een toets die zijn eigen volgorde opschrijft
+   zegt niets over wat er in server/ gebeurt. */
+console.log('\n55) de dubbeltik staat na elke andere res.json-wikkel');
+{
+  const wikkelaars = [];
+  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    const bron = zonderCommentaar(fs.readFileSync(f, 'utf8'));
+    /* Elke plek die res.json vervangt is een wikkel. De dubbeltik zelf hoort
+       er ook bij: die moet als laatste komen. */
+    if (/\bres\.json\s*=/.test(bron)) wikkelaars.push(rel);
+  });
+  const poortwachters = path.join(ROOT, 'server/opzet/poortwachters.js');
+  const bron = fs.existsSync(poortwachters) ? zonderCommentaar(fs.readFileSync(poortwachters, 'utf8')) : '';
+  const gzip = bron.indexOf('app.use(jsonGzip())');
+  const dub = bron.indexOf('app.use(dubbeltik.middleware())');
+  const klachten = [];
+  if (dub < 0) klachten.push('de dubbeltik wordt in poortwachters.js niet meer gemount; dan is geen enkele route tegen een herhaling beschermd');
+  else if (gzip < 0) klachten.push('jsonGzip() staat niet meer in poortwachters.js -- controleer of de dubbeltik nog de buitenste wikkel is');
+  else if (dub < gzip) klachten.push('de dubbeltik staat VOOR jsonGzip(); grote antwoorden gaan dan buiten hem om (zie test/dubbeltikgzip.test.js)');
+  /* En een NIEUWE wikkel is geen fout, maar wel iets waar iemand naar hoort te
+     kijken: hij kan de dubbeltik opnieuw onzichtbaar maken. De lijst staat hier
+     bij naam, dus hij groeit niet stil. */
+  const BEKEND = {
+    'server/middleware/compressie.js': 'jsonGzip -- staat VOOR de dubbeltik, precies daarom bestaat deze regel',
+    'server/opzet/lijfpoort.js': 'het zaakdoos-journaal; staat voor de dubbeltik en verandert het antwoord niet',
+    'server/opzet/liegpoort.js': 'meetgereedschap, draait alleen met RTG_LIEG en nooit in een echte rit',
+    'server/lib/dubbeltik.js': 'de dubbeltik zelf',
+    'server/lib/cache.js': 'antwoordcache; alleen op leesroutes (GET), en een cachetreffer doet per definitie geen werk',
+    'server/web/verrijk.js': 'de EIGEN webserver voor klantdomeinen, een andere server dan deze app -- geen express, geen dubbeltik',
+    'server/lib/idem-poort.js': "de idem-poort. NAGEKEKEN op 20 augustus 2026 bij het samenvoegen: hij wordt gemount in opzet/lijfpoort.js (stap 8 van de verzoekketen, server.js r.422) en de dubbeltik in opzet/poortwachters.js (server.js r.441). De idem-poort wikkelt dus EERDER en de dubbeltik staat er nog achter, precies wat deze regel eist. Hij bewaart alleen een 2xx-antwoord onder een sleutel en verandert het antwoord zelf niet.",
+    'server/middleware/idempotentie.js': "de opt-in idempotentielaag. NAGEKEKEN op 20 augustus 2026: gemount in opzet/poortwachters.js r.114, dus NA de dubbeltik (r.96) -- hij is de buitenste wikkel. Dat is hier juist: hij grijpt alleen in als de client ZELF een idem-sleutel meestuurde, en dan is de herhaling een bewuste retry en geen dubbeltik. Elk ander antwoord gaat ongewijzigd door naar de dubbeltik.",
+  };
+  const nieuw = wikkelaars.filter(w => !BEKEND[w]);
+  if (nieuw.length) klachten.push('nieuwe res.json-wikkel(s) buiten de bekende lijst: ' + nieuw.join(', ') +
+    ' -- staat de dubbeltik daar nog achter? Zet hem op de lijst in check.js regel 51 zodra dat is nagekeken');
+  if (klachten.length) klachten.forEach(fout);
+  else ok(wikkelaars.length + ' plekken vervangen res.json, en de dubbeltik komt na jsonGzip()');
+}
+
+/* ============================================================================
+   56) GEEN NIEUWE PRIVE-ROUTELIJST
+
+   WAAROM DEZE REGEL BESTAAT. "Welke routes heeft deze server" werd op ACHT
+   plekken los uitgezocht, en elke plek kwam op een ander getal:
+
+     scripts/lib/routes.js            2934   (regex over de bron)
+     magnaat-capabilities-bronnen.js  3679   (regex over de bron)
+     POORTWACHT-ronde                 3987
+     scripts/routekaart.js            4191   (de levende router)
+     plus prive-scanners in beproeving.js, tot-crash.js en schakelbaar.js
+
+   Geen van die verschillen was ergens te zien. De vier bewijsproeven leunden op
+   de eerste en misten daardoor alle vier dezelfde 1257 routes -- waaronder de
+   hele RTFoundation. Dat is niet "een scanner die iets mist": dat is een huis
+   waarvan niemand weet hoe groot het is.
+
+   Er is nu EEN antwoord: scripts/routekaart.js vraagt het aan de router
+   (app._routes(), server/web/routing.js), en scripts/lib/routes.js verdeelt dat
+   onder de afnemers. Deze regel houdt dat zo. Wie een nieuwe eigen scanner
+   schrijft, ziet hem hier zakken -- met de reden erbij, want de verleiding is
+   begrijpelijk: een regex is in vijf regels klaar en een routekaart kost een
+   kindproces.
+
+   WAT HIJ MEET. Een bestand in scripts/ dat zelf een `app.post('/pad'`-achtige
+   uitdrukking over de BRON legt, terwijl het de routekaart of lib/routes niet
+   gebruikt. De drie bekende gevallen staan met naam op de lijst en mogen blijven
+   staan tot ze zijn omgezet; ze mogen alleen niet met een vierde vermeerderen.
+
+   WAT HIJ NIET MEET. Of de routekaart zelf klopt -- dat doet
+   test/routedekking.test.js, en de achterstand van de bronscanner van de
+   Capability Graph staat als ratel in test/magnaat-capabilities.test.js. */
+console.log('\n56) geen nieuwe prive-routelijst: EEN plek bepaalt welke routes er zijn');
+{
+  /* De drie die er al zijn, met wat er nodig is om ze op te ruimen. Deze lijst
+     MAG ALLEEN KRIMPEN -- zelfde afspraak als BEKEND hierboven en als de
+     schuldlijst in BEREIK.json. */
+  const BEKENDE_SCANNERS = new Map([
+    ['scripts/beproeving.js', 'eigen alleRoutes(); draait zelf een server en kan de routekaart lenen'],
+    ['scripts/tot-crash.js', 'eigen alleRoutes(); zelfde omzetting als beproeving.js'],
+    ['scripts/schakelbaar.js', 'leest paden voluit om ze te kunnen tellen (keuringsregel 45); een eigen soort']
+  ]);
+  /* HET KENMERK VAN EEN EIGEN SCANNER, en dat is niet te verzinnen: een
+     reguliere uitdrukking met `\.(` gevolgd door een HTTP-methode-alternatie.
+     Alle vier de bestaande scanners hebben precies die vorm --
+
+       /\b(app|router)\.(post|get|put|delete|patch)\(     lib/routes.js
+       /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(  capabilities-bronnen
+       /app\.(get|post|put|delete)\(\s*'(\/api\/...        beproeving, tot-crash
+       /app\.(get|post|put|delete|patch|all)\(             schakelbaar
+
+     Plus de eis dat het bestand ook echt de servermap afloopt; anders vlagt
+     deze regel elke toevallige `/x\.(get|set)/` in een script dat met routes
+     niets te maken heeft. Twee kenmerken samen, want een van de twee is te
+     grof -- en een keuring die roept bij dingen die kloppen, leert je hem te
+     negeren (zie de kop van test/blindevlek.test.js). */
+  const METHODE_ALTERNATIE = /\\\.\s*\(\??:?\s*(?:get|post|put|delete|patch|all)\s*\|/i;
+  const LOOPT_SERVER_AF = /(?:readdirSync|readFileSync)[\s\S]{0,400}?['"]server['"]|['"]server['"][\s\S]{0,400}?(?:readdirSync|readFileSync)/;
+  const eigenScanner = (bron) => METHODE_ALTERNATIE.test(bron) && LOOPT_SERVER_AF.test(bron);
+
+  const nieuw = [];
+  let bekeken = 0;
+  const scanMap = (d) => {
+    for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, f.name);
+      if (f.isDirectory()) { scanMap(p); continue; }
+      if (!f.name.endsWith('.js')) continue;
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      /* Drie bestanden horen hier niet in: de twee die de ENE routelijst maken,
+         en deze keuring zelf -- die draagt het patroon in zijn eigen detectie en
+         zou zichzelf aanwijzen. Dat is precies wat er gebeurde bij het schrijven. */
+      if (rel === 'scripts/lib/routes.js' || rel === 'scripts/routekaart.js' ||
+          rel === 'scripts/check.js') continue;
+      bekeken++;
+      const bron = fs.readFileSync(p, 'utf8');
+      const bouwtRegex = eigenScanner(bron);
+      /* DE OVERTREDING IS DE EIGEN UITDRUKKING, niet het ontbreken van een
+         require. Hier stond eerst "gebruikt hij lib/routes? dan is het goed", en
+         dat gaf meteen een valse vrijspraak: scripts/beproeving.js importeert
+         `isSchakel` uit lib/routes EN heeft daarnaast zijn eigen alleRoutes().
+         Een module lenen voor iets anders is geen bewijs dat je haar routelijst
+         gebruikt. Wie zijn eigen scanner niet meer heeft, is klaar -- dat is de
+         enige toets die niet te omzeilen is met een import erbij. */
+      if (!bouwtRegex) continue;
+      if (BEKENDE_SCANNERS.has(rel)) continue;
+      nieuw.push(rel);
+    }
+  };
+  scanMap(path.join(ROOT, 'scripts'));
+
+  /* De lijst mag alleen krimpen: een naam die zijn eigen scanner kwijt is, hoort
+     eraf. Anders slijt hij tot namen die niets meer zeggen. */
+  const opgelost = [...BEKENDE_SCANNERS.keys()].filter(rel => {
+    const p = path.join(ROOT, rel);
+    if (!fs.existsSync(p)) return true;
+    return !eigenScanner(fs.readFileSync(p, 'utf8'));
+  });
+
+  if (nieuw.length) {
+    for (const rel of nieuw) {
+      fout(rel + ' leidt zijn eigen routelijst uit de brontekst af. Gebruik ' +
+        'scripts/lib/routes.js (die vraagt het aan de router) -- een tweede lijst ' +
+        'komt op een ander getal en niemand ziet het verschil.');
+    }
+  } else if (opgelost.length) {
+    for (const rel of opgelost) {
+      fout(rel + ' gebruikt de gedeelde routelijst nu wel; haal hem van BEKENDE_SCANNERS ' +
+        'in keuringsregel 49 (die lijst mag alleen krimpen).');
+    }
+  } else {
+    ok(bekeken + ' scripts bekeken; geen nieuwe eigen routelijst, ' + BEKENDE_SCANNERS.size +
+      ' erkend op de lijst (die alleen mag krimpen)');
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   57) EEN BROWSER START OP EEN PLEK
+
+   WAT ER GEBEURDE. Deze suite laadde playwright op 123 plekken met dezelfde
+   zesregelige functie onder twee namen (laadBrowser en laadPlaywright), startte
+   hem op 164 plekken met dezelfde letterlijke opties, en sloeg zich over met
+   vijf verschillende zinnen. Op de dag dat de omgeving een andere chromium had
+   dan playwright vroeg, vielen alle 122 browsertoetsen om -- en er was geen plek
+   waar dat te repareren viel. Een waarheid in bijna driehonderd kopieen is geen
+   waarheid maar een gerucht (LAT.md regel 4).
+
+   Erger dan de storing was wat de storing NALIET: het schermjournaal van die
+   ronde zag er identiek uit aan dat van een geslaagde ronde waarin geen enkel
+   scherm werd geopend. Zie test/schermronde.test.js.
+
+   WAT HIJ MEET. Een toetsbestand dat zelf playwright opzoekt of zelf
+   launch-opties samenstelt, in plaats van het aan test/helper.js te vragen.
+
+   WAT HIJ NIET MEET. Of de browser het DOET -- dat merk je vanzelf. Deze regel
+   gaat alleen over waar het antwoord op "hoe start hier een browser" staat. */
+console.log('\n57) een browser start op EEN plek: test/helper.js');
+{
+  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+  const EIGEN_LADER = /function\s+laad(?:Browser|Playwright)\s*\(/;
+  const EIGEN_OPTIES = /\.launch\(\s*\{/;
+  const EIGEN_REDEN = /skip:\s*\w+\s*\?\s*false\s*:/;
+  const overtreders = [];
+  let bekeken = 0;
+  for (const f of fs.readdirSync(path.join(ROOT, 'test'))) {
+    if (!f.endsWith('.js') || f === 'helper.js') continue;
+    /* ZONDER COMMENTAAR. De eerste versie las de hele bron en wees
+       test/skipwacht.test.js aan, die de oude schrijfwijze in zijn KOPTEKST
+       aanhaalt om uit te leggen wat er mis mee was. Een keuring die een
+       toelichting voor een overtreding aanziet, leert je hem te negeren. */
+    const bron = zonderCommentaar(fs.readFileSync(path.join(ROOT, 'test', f), 'utf8'));
+    if (!/chromium/.test(bron)) continue;
+    bekeken++;
+    const wat = [];
+    if (EIGEN_LADER.test(bron)) wat.push('zoekt zelf playwright op');
+    if (EIGEN_OPTIES.test(bron)) wat.push('stelt zelf launch-opties samen');
+    if (EIGEN_REDEN.test(bron)) wat.push('verzint zijn eigen overslaan-reden');
+    if (wat.length) overtreders.push('test/' + f + ': ' + wat.join(', '));
+  }
+  if (overtreders.length) {
+    for (const r of overtreders) fout(r);
+    fout('Vraag het aan test/helper.js: laadPlaywright(), browserOpties(pw) en geenBrowser(pw).');
+  } else {
+    ok(bekeken + ' browsertoetsen halen hun browser bij test/helper.js');
+  }
+}
+
+console.log('\n58) geen ronde hoeken: elke border-radius is 0, behalve een echte cirkel');
+{
+  const RE = /border-radius\s*:\s*([^;}"'\n\\`]+)/g;
+  const mag = (v) => {
+    const k = String(v).trim().toLowerCase().replace(/\s+/g, '');
+    return k === '0' || k === '0!important' || k === '50%' || k === '50%!important';
+  };
+  const kapot = [];
+  let gekeken = 0, cirkels = 0;
+  loop(path.join(ROOT, 'public'), /\.(css|html|js)$/, f => {
+    const rel = path.relative(ROOT, f);
+    if (rel.endsWith('.min.js')) return;
+    let bron; try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return; }
+    if (!bron.includes('border-radius')) return;
+    gekeken++;
+    let m;
+    RE.lastIndex = 0;
+    while ((m = RE.exec(bron))) {
+      const v = m[1].trim();
+      if (mag(v)) { if (v.toLowerCase().startsWith('50%')) cirkels++; continue; }
+      kapot.push(rel + ' regel ' + bron.slice(0, m.index).split('\n').length + ': ' + v.slice(0, 40));
+    }
+  });
+  if (kapot.length) {
+    for (const k of kapot.slice(0, 12)) {
+      fout('ronde hoek: ' + k + ' -- zet hem op 0 (CLAUDE.md ontwerpprincipe 3);' +
+        ' een echte cirkel mag, en die schrijf je als border-radius:50%');
+    }
+    if (kapot.length > 12) fout('... en nog ' + (kapot.length - 12) + ' plekken');
+  } else {
+    ok(gekeken + ' bestanden met een radius: allemaal 0, plus ' + cirkels + ' echte cirkels');
+  }
+}
+
+
+/* ==========================================================================
+   59) ELKE MODULE DIE ROUTES REGISTREERT, WORDT OOK ECHT INGELADEN.
+
+   Bij de samenvoeging van 24 takken (21 augustus 2026) viel de mountregel van
+   server/routes/office/rendezvous.js weg. Het bestand stond er, de kern eronder
+   ook, en alle drie zijn adressen gaven 404 -- "Onbekend eindpunt". Vier toetsen
+   zakten daarop, na twee uur suite.
+
+   EN GEEN ENKELE METER ZAG HET AANKOMEN, want dat kan ook niet: een module die
+   niemand inlaadt staat in geen enkele teller, dus hij kan er ook nergens uit
+   verdwijnen. De dekking daalt niet, de routekaart wordt korter, en alles ziet
+   er kleiner maar gezond uit. Dat is de stilste vorm van kapot die dit huis
+   kent.
+
+   Deze regel stelt een kleine vraag -- is er een pad van een ingang naar dit
+   bestand? -- en beantwoordt hem in milliseconden. Zie scripts/lib/bedrading.js
+   voor hoe requires worden opgelost en waarom samengestelde requires RUIM
+   worden benaderd (liever een gemist geval dan een vals alarm, want een poort
+   die onterecht rood staat leert niemand meer iets).
+
+   MUTATIE (RAAK): haal de mountregel van office/rendezvous uit routes/office.js
+   -> deze regel meldt dat bestand bij naam.
+   ========================================================================== */
+/* DE REALITY INDEX -- EEN wandeling, EEN leesronde, EEN antwoord op de
+   commentaarvraag. Regel 59 en 60 stellen verschillende vragen over dezelfde
+   feiten; ze horen die feiten niet elk apart op te halen. Zie
+   PROOF-INCREMENTAL.md stap 1: drie scanners met elk een eigen boomwandeling was
+   niet alleen traag, het was de bron van drie van de vier meetfouten die bij het
+   bouwen van deze twee poorten zijn gemaakt -- want elke kopie had zijn eigen
+   antwoord op de vraag wat commentaar is. */
+const WERKELIJKHEID = require('./lib/werkelijkheid').index(['server', 'public']);
+
+console.log('\n59) elke module die routes registreert, wordt ook echt ingeladen');
+{
+  const { meet } = require('./lib/bedrading');
+  const r = meet(['server'], WERKELIJKHEID);
+  if (r.wezen.length) {
+    for (const w of r.wezen.slice(0, 12)) {
+      fout('registreert routes maar wordt nergens ingeladen: ' + w +
+        ' -- mount hem, of haal hem weg');
+    }
+    if (r.wezen.length > 12) fout('... en nog ' + (r.wezen.length - 12) + ' module(s)');
+  } else {
+    /* DE DRIE GETALLEN STAAN ERBIJ, en dat is de hele bedoeling: een graaf die
+       zegt "nul wezen" moet kunnen laten zien hoeveel hij zeker wist. Zie
+       PROOF-INCREMENTAL.md par. 3.2 -- known / potentially relevant /
+       unresolved als GEMETEN grootheden, niet als gevoel. */
+    ok(r.gekeken + ' bestanden, ' + r.kanten.opgelost + ' kanten opgelost, ' +
+      r.kanten.benaderd.length + ' benaderd, ' + r.kanten.onbekend.length + ' onbekend' +
+      ' -- geen enkele routemodule zonder pad vanaf een ingang');
+    for (const o of r.kanten.onbekend) {
+      console.log('  \x1b[2m  onbekend: ' + o.bestand + ':' + o.lijn + '  [' + o.vorm + ']\x1b[0m');
+    }
+    for (const [g, b] of Object.entries(r.vertrouwen).sort()) {
+      console.log('  \x1b[2m  ' + g.padEnd(9) + String(b.pct).padStart(6) + '% exact' +
+        (b.onbekend ? '  (' + b.onbekend + ' onbekend)' : '') + '\x1b[0m');
+    }
+  }
+
+  /* DE RATEL, EN DE HARDE NUL VOOR DRIE GEBIEDEN.
+
+     Onbekende kanten zijn geen gewone technische schuld. Het zijn de GRENZEN
+     van wat dit systeem op dit moment veilig kan bewijzen, en daar hangt straks
+     een beslissing aan: over een onbekende kant mag geen bewijs worden geerfd,
+     dus dan moet de impactzone conservatief worden opgerekt
+     (PROOF-INCREMENTAL.md par. 3.2 en 7.3). Een onbekende die er stilletjes
+     bijkomt, maakt die zone dus stilletjes groter of -- erger -- wordt vergeten.
+
+     Voor identity, money en security is de eis NUL en geen ratel. Daar mag een
+     impactzone nooit te klein uitvallen omdat de graaf een kant niet kon
+     bepalen; liever een gebied dat weigert te groeien dan een gebied waar we
+     het niet zeker weten. */
+  {
+    const REG = path.join(ROOT, 'BEDRADING.json');
+    let oud = null;
+    try { oud = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { oud = null; }
+    if (!oud) {
+      fout('BEDRADING.json ontbreekt of is onleesbaar -- draai node scripts/check.js met een verse meting');
+    } else {
+      if (r.kanten.onbekend.length > oud.gemeten.onbekend) {
+        fout('de bedradingsonzekerheid groeit: ' + oud.gemeten.onbekend + ' -> ' +
+          r.kanten.onbekend.length + '. Los de nieuwe op, of leg de groei met een reden vast in BEDRADING.json');
+        for (const o of r.kanten.onbekend) fout('  ' + o.bestand + ':' + o.lijn + '  ' + o.reden);
+      }
+      for (const g of ['identity', 'money', 'security']) {
+        const b = r.vertrouwen[g];
+        if (b && b.onbekend) {
+          fout(g + ' heeft ' + b.onbekend + ' onbekende kant(en); daar is de eis nul --' +
+            ' een impactzone mag hier nooit te klein uitvallen');
+        }
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   60) DE VERBODEN GRAAF: paden die er niet eens mogen ZIJN.
+
+   Dit huis beweert zulke dingen al -- de gluurronde (mag A bij de spullen van
+   B), de rolronde (welke rol komt waar binnen), het gesloten circuit van RTG
+   Pay -- maar dynamisch, achteraf, en alleen op de paden waar iemand een toets
+   voor maakte. Een verboden kant die STATISCH staat, geldt overal en altijd,
+   ook waar niemand aan gedacht heeft.
+
+   FAIL-CLOSED: elke regel in scripts/lib/verboden.js noemt wie het WEL mag, met
+   een reden. Al het andere is verboden. Een lijst van wie het NIET mag vergeet
+   zichzelf zodra er een map bijkomt.
+
+   MUTATIE (RAAK): roep accounts.realNameOf() aan in een bestand onder
+   server/routes/member/ -> deze regel meldt het, met de reden dat de ledenkant
+   op codenamen draait.
+
+   Zie PROOF-INCREMENTAL.md par. 4.
+   ========================================================================== */
+console.log('\n60) de verboden graaf: geen enkel pad dat er niet mag zijn');
+{
+  const { meet } = require('./lib/verboden');
+  const r = meet(['server', 'public'], WERKELIJKHEID);
+  if (r.overtredingen.length) {
+    for (const o of r.overtredingen.slice(0, 12)) {
+      fout(o.werkwoord + ' geschonden (' + o.regel + '): ' + o.bestand + ':' + o.lijn +
+        ' raakt ' + o.wat + ' -- ' + o.reden);
+    }
+    if (r.overtredingen.length > 12) fout('... en nog ' + (r.overtredingen.length - 12) + ' plek(ken)');
+  } else {
+    const raakt = Object.values(r.gedekt).reduce((a, g) => a + g.geraakt, 0);
+    ok(r.regels + ' verboden kanten over ' + r.gekeken + ' bestanden; ' + raakt +
+      ' plek(ken) raken ze en dragen allemaal een reden');
+    for (const [id, g] of Object.entries(r.gedekt)) {
+      console.log('  \x1b[2m  ' + id.padEnd(18) + g.geraakt + ' plek(ken), allemaal toegestaan\x1b[0m');
+    }
+  }
+}
+
+/* De drie regels hieronder kwamen uit PR #128 binnen als 52-54, terwijl deze
+   tak 53-60 al droeg; ze zijn hernummerd naar 61-63 boven het maximum, zodat
+   geen twee regels een nummer delen (zelfde greep als bij TAKEN.md par. 4). */
+/* ============================================================================
+   61) EEN ONTSNAPPINGSFUNCTIE DEKT HET AANHALINGSTEKEN.
 
    WAAR DEZE REGEL VANDAAN KOMT. Dit huis droeg 28 eigen escape-helpers, en vijf
    daarvan vervingen alleen `&` en `<`. Dat is genoeg zolang de uitkomst in TEKST
@@ -3675,7 +4438,7 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
    reparatie. Dit is een ondergrens, geen uitvoergrens. Die laatste (tekst /
    attribuut / url / html als aparte contracten) hoort bij de Interface Runtime
    en is groter werk dan een keuringsregel. */
-console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
+console.log('\n61) elke ontsnappingsfunctie dekt & < en "');
 {
   const { lex } = require('./ast/lexer');
 
@@ -3793,7 +4556,7 @@ console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
 }
 
 /* ============================================================================
-   53) EEN GECONTRACTEERD DOMEIN HEEFT EEN DEUR, EN NIET ZEVENTIEN.
+   62) EEN GECONTRACTEERD DOMEIN HEEFT EEN DEUR, EN NIET ZEVENTIEN.
 
    WAAROM DEZE REGEL NAAST DE RATEL STAAT. scripts/norm.js telt de deuren naar
    db.data over het hele huis (dbDeuren, dbDeurenSchrijvend) en laat ze alleen
@@ -3816,7 +4579,7 @@ console.log('\n52) elke ontsnappingsfunctie dekt & < en "');
    payroll is dat vandaag geen gat: na de migratie krijgt geen enkele laag daar
    nog een database mee, alleen het contract, en dat is sterker dan een regel.
    Deze poort vangt de terugval. */
-console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eigen deur');
+console.log('\n62) een gecontracteerd domein raakt db.data alleen door zijn eigen deur');
 {
   const { lex } = require('./ast/lexer');
   const GECONTRACTEERD = [
@@ -3929,7 +4692,7 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
 }
 
 /* ============================================================================
-   54) EEN COLLECTIE HEEFT EEN EIGENAAR, EN DIE IS DE ENIGE DIE ERIN SCHRIJFT.
+   63) EEN COLLECTIE HEEFT EEN EIGENAAR, EN DIE IS DE ENIGE DIE ERIN SCHRIJFT.
 
    server/kern/eigencollectie.js is de lichte vorm van een opslagcontract: een
    module zegt op zijn eigen plek welke collecties hij bezit en met welke vorm.
@@ -3950,7 +4713,7 @@ console.log('\n53) een gecontracteerd domein raakt db.data alleen door zijn eige
    HIJ LEEST TOKENS EN GEEN TEKST, om dezelfde reden als regel 53: een naam in
    een kop of een string is geen aanraking (TAKEN.md 6.17).
    ========================================================================== */
-console.log('\n54) elke gedeclareerde collectie heeft een eigenaar, en die schrijft als enige');
+console.log('\n63) elke gedeclareerde collectie heeft een eigenaar, en die schrijft als enige');
 {
   const { lex } = require('./ast/lexer');
   const SERVER = path.join(ROOT, 'server');

@@ -16,19 +16,12 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-e2e-handel-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende pad */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 async function api(base, pad, body) {
@@ -47,18 +40,24 @@ async function beheerToken(base, code) {
 async function zaakPagina(browser, base, token, fouten) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  await volgVerzoeken(page);
   letOpFouten(page, fouten);
   await page.addInitScript((t) => {
     localStorage.setItem('rtg_sup_token', t);
     localStorage.setItem('rtg_lang', 'nl');
     localStorage.setItem('rtg_cookieinfo_v1', '1');
   }, token);
-  await page.goto(base + '/apps/handel.html', { waitUntil: 'load' });
+  /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+     plaatje, elk lettertype -- terwijl beide aanroepers hierna als eerste op het
+     echte teken wachten (de gevulde keuzelijst, de kaart van de koper). Onder
+     belasting valt `load` om op zijn eigen tijdslimiet, en dan is de uitslag
+     rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+  await page.goto(base + '/apps/handel.html', { waitUntil: 'domcontentloaded' });
   return page;
 }
 
 test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de wasserij ziet hem staan',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -68,7 +67,7 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     const was = await beheerToken(base, 'LAVANDA');
     assert.ok(club && was, 'beide demozaken horen een beheerder met PIN 1234 te hebben');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
 
     /* ---- de koper: een aanvraag uitzetten, helemaal vanaf het scherm ---- */
     const clubPagina = await zaakPagina(browser, base, club, fouten);
@@ -115,9 +114,11 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     /* ---- offerte uitbrengen vanaf het scherm, en de koper ziet de prijs ---- */
     await wasPagina.fill('#hOpen [data-in$=":prijs"]', '240');
     await wasPagina.click('#hOpen [data-stap="offreren"]');
-    await wasPagina.waitForTimeout(600);
+    await wachtOpRust(wasPagina);
 
-    await clubPagina.reload({ waitUntil: 'load' });
+    // zelfde reden als bij de goto hierboven: de regel eronder wacht al op het
+    // echte teken (de knop in de kaart van de koper).
+    await clubPagina.reload({ waitUntil: 'domcontentloaded' });
     await clubPagina.waitForSelector('#hKoper [data-gun]', { timeout: 12000 });
     assert.match(await clubPagina.textContent('#hKoper'), /Lavanda Wasserij/);
     assert.match(await clubPagina.textContent('#hKoper'), /240[.,]00/);

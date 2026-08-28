@@ -4,7 +4,7 @@
    server die een echte client bedient -- GET, POST met Content-Length, POST
    met chunked transfer-encoding, keep-alive met twee verzoeken op een
    verbinding, en een streaming (SSE-achtig) antwoord met losse writes.
-   Draai los: node --experimental-sqlite --test test/http1.test.js */
+   Draai los: node --test test/http1.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const net = require('net');

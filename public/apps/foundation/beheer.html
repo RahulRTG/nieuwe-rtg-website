@@ -18,15 +18,15 @@
   .blok{padding:1.2rem;margin-bottom:1.2rem;}
   .blok h2{font-family:var(--serif);font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
   .blok .h{color:var(--zacht);font-size:.85rem;margin-bottom:1rem;line-height:1.4;}
-  .codepaneel{display:flex;align-items:center;gap:.8rem;justify-content:space-between;flex-wrap:wrap;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.9rem 1.1rem;}
-  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--goud);}
+  .codepaneel{display:flex;align-items:center;gap:.8rem;justify-content:space-between;flex-wrap:wrap;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.9rem 1.1rem;}
+  .codepaneel .code{font-size:1.5rem;font-weight:700;letter-spacing:.28em;color:var(--rtg-leesgoud,var(--goud));}
   .plist{display:flex;flex-direction:column;gap:.6rem;}
-  .prow{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;padding:.6rem .8rem;}
-  .prow .av{width:2.4rem;height:2.4rem;border-radius:.7rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .prow{display:flex;align-items:center;gap:.8rem;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .8rem;}
+  .prow .av{width:2.4rem;height:2.4rem;border-radius:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
   .prow .nm{font-weight:600;}.prow .rl{font-size:.78rem;color:var(--zacht);}
   .prow .sp{margin-left:auto;display:flex;gap:.4rem;}
   .avkies{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0 .8rem;}
-  .avkies button{width:2.2rem;height:2.2rem;border-radius:.6rem;background:var(--paneel2);font-size:1.2rem;border:2px solid transparent;}
+  .avkies button{width:2.2rem;height:2.2rem;border-radius:0;background:var(--paneel2);font-size:1.2rem;border:2px solid transparent;}
   .avkies button.aan{border-color:var(--goud);}
   .klkies{display:flex;gap:.4rem;margin-bottom:.9rem;}
   .klkies button{width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid transparent;}
@@ -34,17 +34,20 @@
   .veld{margin-bottom:.7rem;}
   select.veld{appearance:none;}
   .rijknop{display:flex;gap:.6rem;flex-wrap:wrap;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .rijknop.los{margin-top:1rem;}
+  .h.los{margin-top:.7rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .ok{color:var(--groen);font-size:.85rem;min-height:1.1rem;}
   .naarkeuze{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem;}
-  .naarkeuze button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.4rem .8rem;font-size:.85rem;}
+  .naarkeuze button{background:var(--paneel2);border:1px solid var(--lijn);color:var(--txt);border-radius:0;padding:.4rem .8rem;font-size:.85rem;}
   .naarkeuze button.aan{background:var(--goud);color:#1a1710;border-color:var(--goud);font-weight:700;}
   dialog{border:none;background:transparent;color:var(--txt);}
   dialog::backdrop{background:rgba(4,4,3,.78);}
   .modal{width:min(92vw,25rem);padding:1.5rem;}
   .modal h3{font-family:var(--serif);font-weight:500;font-size:1.2rem;margin-bottom:.9rem;}
   .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
-  .rolhint{background:var(--paneel2);border:1px solid var(--lijn);border-radius:8px;padding:.6rem .8rem;font-size:.8rem;color:var(--zacht);line-height:1.45;margin:-.3rem 0 .7rem;}
+  .rolhint{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;padding:.6rem .8rem;font-size:.8rem;color:var(--zacht);line-height:1.45;margin:-.3rem 0 .7rem;}
+  .uitrij{padding:.7rem 0;border-bottom:1px solid var(--lijn);display:flex;gap:.6rem;align-items:center;}.uitrij>div{flex:1}.deelcode{word-break:break-all;padding:.7rem;border:1px solid var(--goud);border-radius:0;color:var(--goud);font-size:.78rem;margin:.7rem 0;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -57,15 +60,15 @@
 
   <div class="kaart blok">
     <h2>Jullie gezinscode</h2>
-    <div class="h">Hiermee logt iedereen thuis in op hetzelfde gezin. Deel hem alleen met je eigen gezin.</div>
+    <div class="h">Dit is het adres van jullie gezin. Inloggen vraagt daarnaast altijd ieders eigen pincode; nieuwe volwassenen koppelen alleen via een persoonlijke uitnodiging.</div>
     <div class="codepaneel"><span class="code" id="uCode">------</span><button class="knop grijs klein" id="uDeel">Kopieer</button></div>
   </div>
 
   <div class="kaart blok">
     <h2>Profielen</h2>
-    <div class="h">Ieder gezinslid een eigen profiel. Bescherm een profiel met een pincode als dat nodig is.</div>
+    <div class="h">Een kind krijgt hier een beschermd profiel met geboortedatum en eigen pincode. Volwassenen en gasten accepteren eerst zelf een persoonlijke uitnodiging.</div>
     <div class="plist" id="plist"></div>
-    <div class="h-mt100"><button class="knop" id="bNieuw">+ Profiel toevoegen</button></div>
+    <div class="rijknop los"><button class="knop" id="bNieuw">+ Kindprofiel</button><button class="knop grijs" id="bNodig">Volwassene uitnodigen</button></div>
   </div>
 
   <div class="kaart blok">
@@ -82,14 +85,14 @@
   </div>
 
   <div class="kaart blok">
-    <h2>Oppas of familie met een RTG-pas</h2>
-    <div class="h">Heeft een oppas, opa of oma een RTG-, Lifestyle- of Business-pas? Dan hoeven zij deze app niet te installeren. Ze koppelen dit gezin in hun eigen RTG-app met jullie gezinscode (<b id="uCode2"></b>) en hun oppasprofiel, en krijgen de meldingen daar binnen. Maak eerst een profiel met de rol "Oppas of familie" aan.</div>
-    <div id="koppelUitleg" class="h h-mt40"></div>
+    <h2>Persoonlijke uitnodigingen</h2>
+    <div class="h">Iedere sleutel werkt één keer en maximaal 48 uur. Deel hem rechtstreeks met de bedoelde persoon. Alleen een gezinscode is niet genoeg om te koppelen.</div>
+    <div id="uitnodigingen"><div class="h">Nog geen uitnodigingen.</div></div>
   </div>
 
   <div class="kaart blok">
     <h2>Gegevens en privacy</h2>
-    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--goud)">privacy en veiligheid</a>-pagina.</div>
+    <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--rtg-leesgoud,var(--goud))">privacy en veiligheid</a>-pagina.</div>
     <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
     <div class="h" id="wisUitleg" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
   </div>
@@ -125,6 +128,18 @@
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dDoe">Opslaan</button></div>
 </div></dialog>
 
+<dialog id="dlgUitnodiging"><div class="kaart modal">
+  <h3>Volwassene uitnodigen</h3>
+  <input class="veld" id="iNaam" placeholder="Naam van de ontvanger" maxlength="40">
+  <input class="veld" id="iRelatie" placeholder="Relatie, optioneel (bijv. oma of buurvrouw)" maxlength="40">
+  <select class="veld" id="iRol"><option value="ouder">Ouder of verzorger</option><option value="gezinslid">Gezinslid</option><option value="gast">Oppas of familie · beperkte toegang</option></select>
+  <label class="rolhint" id="iGezagBlok"><input id="iGezag" type="checkbox"> Ik bevestig dat deze persoon als ouder of verzorger toegang mag krijgen. Dit is geen officiële gezagscontrole.</label>
+  <div class="rolhint">Een ouder of gezinslid krijgt toegang tot de gezamenlijke gezinsfuncties. Een gast ziet alleen het noodzakelijke voor helpen, contact en veiligheid.</div>
+  <div id="iResultaat" hidden><b>Deel deze persoonlijke link:</b><div class="deelcode" id="iLink"></div><button class="knop grijs klein" id="iKopieer" type="button">Link kopiëren</button><div class="h los">Gebruikt de ontvanger de RTG-app als oppas? Dan kan die deze volledige link daar plakken.</div></div>
+  <div class="fout" id="iFout"></div>
+  <div class="rij"><button class="knop grijs klein" data-sluit>Sluiten</button><button class="knop" id="iDoe">Uitnodiging maken</button></div>
+</div></dialog>
+
 <script src="sessie.js"></script>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat roept RTGUitvoer.bron aan -->
 <script src="/shared/uitvoer.js"></script>
@@ -152,7 +167,7 @@ $('#dRol').addEventListener('change', ()=>{ $('#rolhint').hidden = $('#dRol').va
 async function laad(){
   const d = await fetch('/api/foundation/gezin/'+s.code+'/mij?token='+encodeURIComponent(s.token)).then(r=>r.json());
   if (d.error || !d.profiel){ location.href='index.html'; return; }
-  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--goud)">Terug naar de app</a>.</p>'; return; }
+  if (!d.profiel.beheerder){ document.querySelector('.wrap').innerHTML='<h1>Alleen de beheerder</h1><p class="zin">Alleen de beheerder van het gezin kan hier profielen en berichten beheren. <a href="index.html" style="color:var(--rtg-leesgoud,var(--goud))">Terug naar de app</a>.</p>'; return; }
   Sessie.balk($('#balk'), { terug:'index.html', terugTekst:'← Terug' });
   $('#uCode').textContent = s.code;
   $('#zin').textContent = 'Beheer het gezin "' + d.gezin.naam + '". Voeg profielen toe en houd iedereen op de hoogte.';
@@ -174,21 +189,13 @@ async function laad(){
   function knop(id, tekst){ const b=document.createElement('button'); b.textContent=tekst; b.onclick=()=>{ naarWie=id; [...nk.children].forEach(c=>c.classList.toggle('aan', c===b)); }; return b; }
   const allen=knop('allen','Iedereen'); allen.classList.add('aan'); nk.appendChild(allen);
   d.profielen.filter(p=> p.id!==d.profiel.id).forEach(p=> nk.appendChild(knop(p.id, p.naam)));
-  // oppas/familie met RTG-pas: gezinscode tonen en welke gasten al gekoppeld zijn
-  $('#uCode2').textContent = s.code;
-  const gasten = d.profielen.filter(p=>p.gast);
-  const gekoppeld = gasten.filter(p=>p.gekoppeld);
-  $('#koppelUitleg').innerHTML = !gasten.length
-    ? 'Er is nog geen oppas- of familieprofiel. Voeg er hierboven een toe.'
-    : (gekoppeld.length
-      ? 'Gekoppeld aan de RTG-app: ' + gekoppeld.map(p=>esc(p.naam)).join(', ') + '.'
-      : 'Nog geen van de oppas/familie-profielen is gekoppeld. Zij doen dat zelf in hun RTG-app.');
+  await laadUitnodigingen();
   // openstaand verzoek om te verwijderen
   const adults = d.profielen.filter(p=> p.beheerder || p.rol==='ouder').length;
   if (d.wisVerzoek && !d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Toestemming geven om alles te verwijderen';
     $('#wisAlles').dataset.mode = 'bevestig';
-    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--goud)">wijs het verzoek af</a>.';
+    $('#wisUitleg').innerHTML = '<b style="color:var(--rood)">'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens verwijderen.</b> Geef jij toestemming, of <a href="#" id="wisWeiger" style="color:var(--rtg-leesgoud,var(--goud))">wijs het verzoek af</a>.';
     $('#wisWeiger').onclick = async (e)=>{ e.preventDefault(); try{ await api('/gezin/wissen/intrekken', { code:s.code, token:s.token }); laad(); }catch(err){ alert(err.message); } };
   } else if (d.wisVerzoek && d.wisVerzoek.vanMij){
     $('#wisAlles').textContent = 'Verzoek intrekken';
@@ -201,6 +208,17 @@ async function laad(){
       ? 'Er zijn twee volwassenen. Verwijderen vraagt daarom de toestemming van de ander. Dit verwijdert het hele gezin en kan niet ongedaan worden gemaakt.'
       : 'Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.';
   }
+}
+
+async function laadUitnodigingen(){
+  const host=$('#uitnodigingen');
+  try{
+    const d=await api('/gezin/uitnodigingen',{code:s.code,token:s.token});
+    const lijst=(d.uitnodigingen||[]).slice(0,20);
+    host.innerHTML=lijst.length?lijst.map(u=>'<div class="uitrij"><div><b>'+esc(u.naam)+'</b><div class="rl">'+esc(u.rolNaam)+(u.relatie?' · '+esc(u.relatie):'')+' · '+esc(u.status)+'</div></div>'+
+      (u.status==='open'?'<button class="knop grijs klein" data-intrek="'+u.id+'">Intrekken</button>':'')+'</div>').join(''):'<div class="h">Nog geen uitnodigingen.</div>';
+    host.querySelectorAll('[data-intrek]').forEach(b=>b.onclick=async()=>{if(!confirm('Deze uitnodiging intrekken?'))return;try{await api('/gezin/uitnodiging/intrek',{code:s.code,token:s.token,id:b.dataset.intrek});laadUitnodigingen();}catch(e){alert(e.message);}});
+  }catch(e){host.innerHTML='<div class="fout">Uitnodigingen konden niet worden geladen.</div>';}
 }
 
 /* Meenemen (shared/uitvoer.js): het profielenregister van dit gezin, precies de
@@ -216,7 +234,7 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function(){
 
 function bewerk(p){
   bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';
-  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').value=p.rol; $('#dGeboren').value=p.geboortedatum||''; $('#dPin').value=''; $('#rolhint').hidden = p.rol!=='gast';
+  $('#dNaam').value=p.naam; dAv=p.avatar; dKl=p.kleur; $('#dRol').disabled=false; $('#dRol').value=p.rol; $('#dGeboren').value=p.geboortedatum||''; $('#dPin').value=''; $('#rolhint').hidden = p.rol!=='gast';
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dPin').placeholder = p.heeftPin ? 'Pincode wijzigen (leeg = laten staan)' : 'Pincode (leeg = geen)';
@@ -224,7 +242,7 @@ function bewerk(p){
 }
 $('#bNieuw').onclick=()=>{
   bewerkId=null; $('#dTitel').textContent='Profiel toevoegen';
-  $('#dNaam').value=''; dAv=''; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dGeboren').value=''; $('#dPin').value=''; $('#dPin').placeholder='Pincode (leeg = geen)'; $('#rolhint').hidden=true;
+  $('#dNaam').value=''; dAv=''; dKl=KLEUREN[0]; $('#dRol').value='kind'; $('#dRol').disabled=true; $('#dGeboren').value=''; $('#dPin').value=''; $('#dPin').placeholder='Eigen pincode (verplicht)'; $('#rolhint').hidden=true;
   [...$('#dAv').children].forEach(c=>c.classList.toggle('aan',c.textContent===dAv));
   [...$('#dKl').children].forEach(c=>c.classList.toggle('aan',c.style.background===dKl));
   $('#dFout').textContent=''; $('#dlg').showModal();
@@ -234,12 +252,27 @@ $('#dDoe').onclick=async()=>{
   const body={ code:s.code, token:s.token, naam:$('#dNaam').value, avatar:dAv, kleur:dKl, rol:$('#dRol').value, geboortedatum:$('#dGeboren').value };
   if(body.rol==='kind' && !body.geboortedatum){ $('#dFout').textContent='Vul de geboortedatum in; zonder automatische leeftijdspas blijft de leerling-Campus dicht.'; return; }
   const pin=$('#dPin').value.trim();
+  if(!bewerkId && !/^\d{4,6}$/.test(pin)){ $('#dFout').textContent='Geef het kind een eigen pincode van 4 tot 6 cijfers.'; return; }
   try{
     if(bewerkId){ if(pin!=='') body.pin=pin; body.profielId=bewerkId; await api('/gezin/profiel/wijzig', body); }
     else { if(pin!=='') body.pin=pin; await api('/gezin/profiel/maak', body); }
     $('#dlg').close(); laad();
   }catch(e){ $('#dFout').textContent=e.message; }
 };
+$('#iRol').onchange=()=>{$('#iGezagBlok').hidden=$('#iRol').value!=='ouder';};
+$('#bNodig').onclick=()=>{
+  $('#iNaam').value='';$('#iRelatie').value='';$('#iRol').value='ouder';$('#iGezag').checked=false;$('#iGezagBlok').hidden=false;
+  $('#iFout').textContent='';$('#iResultaat').hidden=true;$('#iDoe').hidden=false;$('#dlgUitnodiging').showModal();
+};
+$('#iDoe').onclick=async()=>{
+  $('#iFout').textContent='';$('#iDoe').disabled=true;
+  try{
+    const d=await api('/gezin/uitnodiging/maak',{code:s.code,token:s.token,naam:$('#iNaam').value,relatie:$('#iRelatie').value,rol:$('#iRol').value,gezagVerklaard:$('#iGezag').checked});
+    const link=location.origin+'/apps/foundation/registreren.html#familie='+encodeURIComponent(d.uitnodiging);
+    $('#iLink').textContent=link;$('#iLink').dataset.code=d.uitnodiging;$('#iResultaat').hidden=false;$('#iDoe').hidden=true;laadUitnodigingen();
+  }catch(e){$('#iFout').textContent=e.message;}finally{$('#iDoe').disabled=false;}
+};
+$('#iKopieer').onclick=async()=>{try{await navigator.clipboard.writeText($('#iLink').textContent);$('#iKopieer').textContent='Gekopieerd';}catch(e){alert($('#iLink').textContent);}};
 async function verwijder(id){
   if(!confirm('Dit profiel verwijderen? Het schrift en de cv van dit profiel op dit toestel blijven staan.')) return;
   try{ await api('/gezin/profiel/verwijder', { code:s.code, token:s.token, profielId:id }); laad(); }

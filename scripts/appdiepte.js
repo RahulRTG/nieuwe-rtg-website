@@ -37,9 +37,9 @@
 
    DRAAIEN
 
-     node --experimental-sqlite scripts/appdiepte.js
-     node --experimental-sqlite scripts/appdiepte.js --json
-     node --experimental-sqlite scripts/appdiepte.js --md > docs/apps-volwaardig.md
+     node scripts/appdiepte.js
+     node scripts/appdiepte.js --json
+     node scripts/appdiepte.js --md > docs/apps-volwaardig.md
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -159,7 +159,7 @@ function alsMd(rijen) {
   m += 'Een inventarisatie, gemeten en niet geschat. Per app staat wat hij bij het\n';
   m += 'openen ECHT doet: hoeveel verschillende server-endpoints hij aanroept, en\n';
   m += 'hoeveel knoppen en velden er staan als de pagina klaar is met opbouwen.\n\n';
-  m += '**Gemeten op ' + nu + ' met `node --experimental-sqlite scripts/appdiepte.js`.**\n\n';
+  m += '**Gemeten op ' + nu + ' met `node scripts/appdiepte.js`.**\n\n';
 
   m += '## Waarom dit opnieuw gemeten is\n\n';
   m += 'De vorige versie telde letterlijke `/api/`-paden in de bron. Dat is een\n';

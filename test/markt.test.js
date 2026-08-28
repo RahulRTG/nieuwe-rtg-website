@@ -2,7 +2,7 @@
    kunnen er ook op verkopen. Met de vier pijlers: veiligheid (kinderen kijken
    alleen, oplichting wordt gemarkeerd, melden/blokkeren), respect (verboden waar
    en kwetsende taal worden geweigerd), gemak (zoeken/filteren, chat) en AI-hulp.
-   Draai: node --experimental-sqlite --test test/markt.test.js */
+   Draai: node --test test/markt.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

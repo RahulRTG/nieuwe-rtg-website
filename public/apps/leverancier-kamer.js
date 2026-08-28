@@ -30,14 +30,14 @@
       '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}' +
       'h1,h2,h3{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;}' +
       '.wrap{max-width:820px;margin:0 auto;}.cover{border-bottom:1px solid var(--line);padding-bottom:1.4rem;margin-bottom:1.4rem;}' +
-      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}.cover h1{font-size:2rem;margin:.4rem 0 .2rem;}.cover .sub2{color:var(--muted);font-size:.9rem;}' +
+      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}.cover h1{font-size:2rem;margin:.4rem 0 .2rem;}.cover .sub2{color:var(--muted);font-size:.9rem;}' +
       'section{border-top:1px solid var(--line);padding:1.1rem 0;page-break-inside:avoid;}section h3{font-size:1.05rem;margin-bottom:.5rem;}' +
       '.st-row{display:flex;justify-content:space-between;gap:1rem;font-size:.88rem;padding:.28rem 0;border-bottom:1px solid var(--line);}' +
       '.st-row:last-child{border-bottom:none;}.st-row .sub,.sub{display:block;color:var(--muted);font-size:.76em;}' +
       '.tkc-who{color:var(--muted);font-size:.85rem;line-height:1.6;margin:.3rem 0;}b{color:var(--ink);}' +
-      'img{max-width:110px;border-radius:8px;}.acts{display:none;}' +
+      'img{max-width:110px;border-radius:0;}.acts{display:none;}' +
       '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}' +
-      '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
+      '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
       '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub2,.sub,.tkc-who{color:#555;}section,.cover,.st-row{border-color:#ddd;}b{color:#111;}}' +
       '</style></head><body>' +
       '<div class="balk"><span>' + kamer + ' &middot; ' + naam + '</span><button id="pbtn" type="button">Print / PDF</button></div>' +

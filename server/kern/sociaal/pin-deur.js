@@ -21,40 +21,34 @@
    accounts, elk vijf pogingen, op EEN personeelspin). De les daar is dat de
    teller aan het DOEL hangt en niet aan de aanvrager. Bij een contactpin is er
    geen doel om aan te hangen -- de aanvaller noemt er juist geen -- dus hangt
-   hij hier aan de DEUR: een huisbreed budget aan MISSERS per minuut, gedeeld
-   door elke ingang die een pin opzoekt (de leden-app, de gezinsapp, de
-   ouderroute). Wie er een derde bij bouwt, gebruikt hem ook; dat is de hele
-   bedoeling.
+   hij aan de DEUR: een huisbreed budget aan MISSERS per minuut, gedeeld door
+   elke ingang die een code oplost (de leden-app, de gezinsapp, de ouderroute,
+   en sinds RTG Link ook /api/link/los).
+
+   DIE REM WOONT HIER NIET MEER, en dat is de hele verhuizing van 20 augustus
+   2026: hij staat in ../link/rem.js. Zolang de contactpin de enige deur was,
+   was "de rem van de contactpin" hetzelfde als "de rem van het huis". Met een
+   tweede ingang is dat niet meer waar, en een huisbrede rem die bij een van de
+   deuren woont, is de rem van die deur (LINK.md par. 3.7). De redenering
+   hierboven verandert er niet door; alleen het adres.
 
    ALLEEN MISSERS TELLEN, en dat is wat het budget bruikbaar maakt. Een lid dat
    een pin overtypt of scant, mist vrijwel nooit: hij kreeg hem net. Een raadster
    mist per definitie bijna altijd. Het budget staat daarom laag genoeg om te
    bijten en zo hoog dat normaal gebruik er nooit aan komt.
 
-   DE PRIJS, EERLIJK: een huisbrede teller is een huisbrede knop. Wie bereid is
-   MIS_PER_MINUUT missers per minuut te produceren, zet het opzoeken op pin voor
-   iedereen een minuut lang dicht. Dat is een bewuste ruil: zoeken op codenaam
-   werkt gewoon door, bestaande vrienden merken niets, en het alternatief is een
-   deur die alleen per bezoeker telt en dus bij genoeg bezoekers niet telt. Deze
-   rem woont in het geheugen en telt per proces -- dezelfde bekende beperking als
-   elke rem in dit huis (zie server/pinslot.js), en hij hoort bij de stap naar
-   gedeelde opslag.
+   De prijs van een huisbrede teller (hij is ook een huisbrede knop) en zijn
+   bekende beperking (geheugen, per proces) staan bij de rem zelf.
    --------------------------------------------------------------------------- */
 module.exports = (ctx) => {
 const { codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd, sociaalRate,
   statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin } = ctx;
 
 const UUR = 60 * 60 * 1000;
-const MIS_VENSTER = 60 * 1000;
-const MIS_PER_MINUUT = 120;   // een misser is zeldzaam bij echt gebruik; raden is niets anders
-
-const misBudget = { vanaf: 0, n: 0 };
-function misserGeteld() {
-  const nu = Date.now();
-  if (nu - misBudget.vanaf > MIS_VENSTER) { misBudget.vanaf = nu; misBudget.n = 0; }
-  misBudget.n++;
-}
-const deurDicht = () => (Date.now() - misBudget.vanaf <= MIS_VENSTER) && misBudget.n >= MIS_PER_MINUUT;
+/* De gedeelde deurrem van RTG Link. Rechtstreeks binnengehaald en niet via de
+   context: hij is een singleton en geen laag, en wie hem uit ctx zou halen kan
+   hem ook per ongeluk vervangen. */
+const { misserGeteld, deurDicht, remReset, MIS_PER_MINUUT } = require('../link/rem');
 
 /* Opzoeken wie er achter een pin zit -- zonder iets te doen. Dat is met opzet
    een aparte stap: het scherm toont eerst "dit is Gouden Ibis", en de MENS
@@ -124,8 +118,10 @@ function pinNaarHandle(ruw) {
   return doel;
 }
 
-// alleen voor de toetsen: het budget terugzetten zonder een minuut te wachten
-function pinDeurReset() { misBudget.vanaf = 0; misBudget.n = 0; }
+/* Alleen voor de toetsen: het budget terugzetten zonder een minuut te wachten.
+   Blijft hier staan onder zijn oude naam, want de contactpin-toetsen roepen hem
+   zo aan; hij zet nu de gedeelde rem terug en niet een eigen kopie. */
+const pinDeurReset = remReset;
 
 return { pinZoek, pinVerbind, pinNaarHandle, pinKijk: kijk, pinDeurReset, MIS_PER_MINUUT };
 };

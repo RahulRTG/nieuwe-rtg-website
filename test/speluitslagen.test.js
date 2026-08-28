@@ -8,7 +8,7 @@
    niets bewaard. Zo raakt een volwassene zijn historie niet kwijt zodra hij met
    een tiener speelt, en bouwt het systeem toch geen profiel van die tiener op.
 
-   Draai los: node --experimental-sqlite --test test/speluitslagen.test.js */
+   Draai los: node --test test/speluitslagen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -117,7 +117,7 @@ test('onder de grens is er geen historie om te lezen', () => {
   const r = u.spelUitslagen('kind1');
   assert.deepEqual(r.uitslagen, []);
   assert.equal(r.progressie, false);
-  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+  assert.match(r.reden, /identiteitsbewijs heeft gezien/);
 });
 
 test('je ziet alleen je eigen partijen', () => {

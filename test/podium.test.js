@@ -2,7 +2,7 @@
    (makers en kijkers), een kanaal gaat pas open na menselijke goedkeuring
    door kantoor, kijken/chatten/cadeautjes/abonnementen via RTG Pay, en de
    maker blokkeert; iedereen kan melden. Draai los:
-   node --experimental-sqlite --test test/podium.test.js */
+   node --test test/podium.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -22,12 +22,12 @@
   .dag .dl{width:2.7rem;flex-shrink:0;text-align:center;}
   .dag .dl b{display:block;text-transform:capitalize;font-size:.9rem;}
   .dag .dl span{font-size:.72rem;color:var(--zacht);}
-  .dag.nu .dl b{color:var(--goud2);}
+  .dag.nu .dl b{color:var(--accent-tekst);}
   .dag .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:.35rem;}
   .dag input.g{width:100%;}
   .dag select.k{width:100%;appearance:none;font-size:.85rem;padding:.35rem .5rem;}
   .dag .btns{display:flex;flex-direction:column;gap:.3rem;}
-  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:10px;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
+  .ikoon{background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;color:var(--zacht);width:2rem;height:2rem;font-size:.95rem;cursor:pointer;}
   .ikoon:hover{color:var(--txt);border-color:var(--goud);}
   .lijstrij{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--lijn);}
   .lijstrij:last-child{border-bottom:0;}
@@ -37,7 +37,7 @@
   .lijstrij small{color:var(--zacht);font-size:.72rem;}
   .toevoeg{display:flex;gap:.5rem;margin-bottom:.8rem;}
   .toevoeg .veld{flex:1;min-width:0;}
-  .fout{color:var(--rood);font-size:.85rem;min-height:1.1rem;}
+  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
   .leeg{color:var(--zacht);font-size:.9rem;padding:.3rem 0;}
   .regelrij{display:flex;justify-content:flex-end;margin-top:.6rem;}
 </style>
@@ -161,7 +161,7 @@ async function laad(){
     const opLijst = new Set(d.lijst.filter(x=>!x.af).map(x=>x.wat.toLowerCase()));
     $('#vast').innerHTML = (d.vast||[]).map(v =>
       '<span style="display:inline-flex;align-items:center;gap:.15rem;">'
-      + '<button class="chip" data-v="'+esc(v)+'" style="font-size:.8rem;padding:.35rem .7rem;border:1px solid var(--lijn);border-radius:999px;background:transparent;color:'+(opLijst.has(v.toLowerCase())?'var(--goud2)':'var(--zacht)')+';cursor:pointer;">'+(opLijst.has(v.toLowerCase())?'✓ ':'+ ')+esc(v)+'</button>'
+      + '<button class="chip" data-v="'+esc(v)+'" style="font-size:.8rem;padding:.35rem .7rem;border:1px solid var(--lijn);border-radius:0;background:transparent;color:'+(opLijst.has(v.toLowerCase())?'var(--goud2)':'var(--zacht)')+';cursor:pointer;">'+(opLijst.has(v.toLowerCase())?'✓ ':'+ ')+esc(v)+'</button>'
       + '<button class="chip" data-vdel="'+esc(v)+'" title="Uit het vaste rijtje" style="font-size:.72rem;padding:.3rem .4rem;border:0;background:transparent;color:var(--zacht);cursor:pointer;">✕</button></span>'
     ).join('') || '<span class="leeg">Nog geen vaste boodschappen. Maak hieronder je eerste vaste boodschap.</span>';
     $('#vast').querySelectorAll('[data-v]').forEach(c=> c.onclick = ()=> doe('/gezin/keuken/lijst', { wat:c.dataset.v }, true));

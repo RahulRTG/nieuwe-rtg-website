@@ -14,18 +14,14 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
-test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scherm-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -38,7 +34,7 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
     }).then(r => r.json());
     assert.ok(reg.token, 'het lid moet een token krijgen');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
     await ctx.addInitScript((tok) => { try { localStorage.setItem('rtg_member_token', tok); } catch (e) {} }, reg.token);
 
@@ -95,7 +91,21 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
       await page.evaluate(() => window.RTGChatScherm.zet('vol'));
       assert.equal(await stand(), 'vol');
       await page.evaluate(() => window.__handenvrijKamer.beurt('member', 'En nog iets.'));
-      await new Promise(r => setTimeout(r, 300));
+      /* GEEN 300 ms MEER, en dat is nagelopen en niet weggelaten.
+
+         Hier stond `setTimeout(300)` om "het paneel de kans te geven terug te
+         veren". Maar die weg is helemaal SYNCHROON: beurt() roept inBeeld()
+         aan, inBeeld() roept naStand() aan, en naStand() doet meteen
+         zet('min') -- alle drie in handenvrij-chat.js en handenvrij-scherm.js,
+         zonder timer ertussen. Zodra de evaluate hierboven terug is, is het
+         terugveren dus al GEBEURD of nooit gebeurd. 300 ms wachten voegde daar
+         niets aan toe behalve de suggestie dat er iets te wachten viel.
+
+         De bel in de DOM is het teken dat beurt() echt is gelopen; zonder die
+         controle zou deze toets ook slagen als de beurt stilletjes wegviel. */
+      const bel = await page.evaluate(() => Array.from(
+        document.querySelectorAll('.hv-beurt.ik .hv-bel')).some(b => /En nog iets/.test(b.textContent)));
+      assert.equal(bel, true, 'de beurt staat in het gesprek; anders zegt de meting hieronder niets');
       assert.equal(await stand(), 'vol', 'een met de hand gezette stand hoort te blijven staan');
     });
 

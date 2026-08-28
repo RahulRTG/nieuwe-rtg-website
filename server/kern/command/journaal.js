@@ -87,6 +87,46 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     return kern;
   }
 
+  /* EEN ACTOR ONLEESBAAR MAKEN, EN DE HERSCHRIJVING IN DE KETEN ZETTEN.
+
+     Hier botsen twee dingen die allebei waar zijn. Een auditspoor hoort niet
+     herschreven te worden -- dat is de hele reden dat elke regel de hash van de
+     vorige draagt. En een mens die zijn recht op vergetelheid uitoefent, hoort
+     niet als sleutel in een spoor achter te blijven; test/vergeten.test.js veegt
+     daarom door de HELE database en rekent af wat er nog van hem in staat.
+
+     De uitweg is niet kiezen maar OPSCHRIJVEN. De actor wordt vervangen door
+     "gewist", de keten wordt opnieuw gezegeld, en er komt een regel bij die
+     zegt dát er is herschreven, hoeveel regels het betrof, en wat de KOP was
+     vóór de wissing. Wie een eerder geexporteerd zegel naast dit spoor legt,
+     ziet het verschil dus staan, met de reden erbij -- in plaats van een keten
+     die stilletjes klopt over een verleden dat is aangepast.
+
+     Wat blijft: WAT er is gebeurd en WANNEER. Wat weggaat: WIE, en dat is
+     precies wat er gevraagd werd. */
+  function wisActor(actor, reden) {
+    const wie = String(actor || '');
+    if (!wie) return { geraakt: 0 };
+    const rij = lijst();
+    const kopVoor = rij.length ? rij[rij.length - 1].zegel : null;
+    let geraakt = 0;
+    for (const r of rij) if (r.actor === wie) { r.actor = 'gewist'; geraakt++; }
+    if (!geraakt) return { geraakt: 0 };
+    /* Opnieuw zegelen vanaf het begin van het venster: elke regel krijgt zijn
+       nieuwe verwijzing en zijn nieuwe zegel, zodat controleer() weer klopt. */
+    let vorig = rij.length ? rij[0].vorig : null;
+    for (const r of rij) {
+      r.vorig = vorig;
+      const { zegel, ...zonder } = r;
+      r.zegel = hash(zonder);
+      vorig = r.zegel;
+    }
+    noteer({ actor: 'systeem', actie: 'wissing in het spoor', niveau: 'auto',
+      reden: reden || 'recht op vergetelheid (AVG art. 17)',
+      uitslag: 'gedaan', voor: { kopVoorWissing: kopVoor }, na: { regelsGewist: geraakt } });
+    return { geraakt, kopVoor };
+  }
+
   /* De keten nalopen. Geeft de eerste breuk terug, of null als hij heel is.
      Let op wat dit WEL en NIET bewijst: het bewijst dat de regels in het
      geheugen onderling kloppen. Het bewijst niet dat er niets vóór het venster
@@ -137,7 +177,7 @@ function maakJournaal({ db, save, crypto, vak, opslag }) {
     };
   }
 
-  return { noteer, controleer, overObject, recent, herbeleef,
+  return { noteer, controleer, overObject, recent, herbeleef, wisActor,
     aantal: () => tellerLees(), venster: () => lijst().length, MAX };
 }
 

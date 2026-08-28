@@ -22,21 +22,26 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
   a{color:inherit;}
-  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0 0 10px 10px;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
+  .skip{position:absolute;left:.6rem;top:-3rem;z-index:120;background:var(--gold);color:#0C0C0B;padding:.5rem .9rem;border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;transition:top .15s;}
   .skip:focus{top:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem;}
   header{border-bottom:1px solid var(--line);padding:1.1rem 0;position:sticky;top:0;background:rgba(12,12,11,0.92);backdrop-filter:blur(10px);z-index:10;}
   header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
   .brand{font-family:'Bodoni Moda',serif;font-size:1.2rem;}
-  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  .brand small{display:block;font-family:'Inter',sans-serif;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   main{padding:1.6rem 0 4rem;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.7rem;margin:.3rem 0 .2rem;}
   .deck{color:var(--muted);font-size:.95rem;max-width:46rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;}
-  .veld{width:100%;border:1px solid var(--line);border-radius:10px;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
+  .rw-bronnen{margin-top:.7rem;}
+  .rw-bron{padding:.3rem 0;font-size:.82rem;}
+  .rw-bron .stil{display:block;}
+  .rw-bronlet{font-size:.74rem;}
+  .rw-signalen{margin-top:.6rem;padding:.5rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.82rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;}
+  .veld{width:100%;border:1px solid var(--line);border-radius:0;padding:.8rem 1rem;font-size:.95rem;font-family:inherit;color:var(--txt);background:var(--bg);outline:none;}
   .veld:focus{border-color:var(--burgundy);}
-  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:999px;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .knop{background:var(--txt);color:var(--bg);border:none;border-radius:0;padding:.7rem 1.5rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;}
   .knop:hover{background:var(--burgundy);color:#fff;}
   .knop.stil{background:var(--card2);color:var(--txt);border:1px solid var(--line);}
   .fout{color:var(--burgundy);font-size:.85rem;min-height:1.2rem;margin-top:.5rem;}
@@ -48,7 +53,7 @@
   /* de gezondheidsband: alles-gecontroleerd op één oogopslag, boven de kamers.
      Rustig -- een haarlijn met stille pillen; klikken opent de Techniek-kamer. */
   .gezondband{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:1.2rem;
-    padding:.7rem 1rem;border:1px solid var(--line);border-radius:12px;
+    padding:.7rem 1rem;border:1px solid var(--line);border-radius:0;
     background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);cursor:pointer;
     transition:border-color .13s, transform .13s;}
   .gezondband:hover{border-color:color-mix(in srgb, var(--gold) 45%, transparent);transform:translateY(-1px);}
@@ -57,10 +62,10 @@
   .gezondband .gb-stip{width:.6rem;height:.6rem;border-radius:50%;flex-shrink:0;background:var(--soft);}
   .gezondband .gb-stip.groen{background:var(--green);box-shadow:0 0 6px var(--green);}
   .gezondband .gb-stip.oranje{background:var(--amber);box-shadow:0 0 6px var(--amber);}
-  .gezondband .gb-meer{margin-left:auto;font-size:.72rem;color:var(--gold);font-weight:650;white-space:nowrap;}
+  .gezondband .gb-meer{margin-left:auto;font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));font-weight:650;white-space:nowrap;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-top:1.4rem;}
   .kamer{
-    padding:1.1rem 1.2rem;cursor:pointer;border-radius:14px;
+    padding:1.1rem 1.2rem;cursor:pointer;border-radius:0;
     background:linear-gradient(155deg,#1B1815 0%,var(--card) 60%);
     box-shadow:0 10px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
     transition:border-color .13s cubic-bezier(.22,.7,.3,1), transform .13s cubic-bezier(.22,.7,.3,1), box-shadow .13s;
@@ -72,14 +77,14 @@
   }
   .kamer:active{transform:scale(.985);}
   .kamer .ic{
-    width:46px;height:46px;border-radius:12px;font-size:1.35rem;
+    width:46px;height:46px;border-radius:0;font-size:1.35rem;
     display:flex;align-items:center;justify-content:center;
     background:linear-gradient(155deg,#23201C,#161311);
     border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);
   }
   .kamer h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.05rem;}
   .kamer p{font-size:.78rem;color:var(--soft);flex:1;}
-  .kamer .kpi{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:650;font-variant-numeric:tabular-nums;}
+  .kamer .kpi{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));font-weight:650;font-variant-numeric:tabular-nums;}
   .kamer.board{border-color:color-mix(in srgb, var(--gold) 55%, transparent);background:linear-gradient(160deg, #1a1610, var(--card));}
   /* klok rechtsboven, zoals in elk RTG OS */
   .wos-klokchip{font-size:.86rem;font-weight:650;color:var(--txt);font-variant-numeric:tabular-nums;letter-spacing:.02em;margin-left:.9rem;}
@@ -110,7 +115,7 @@
   #vKamer:has(#tabWereld:not([hidden])) [data-tab="wereld"]{color:var(--txt);border-bottom-color:var(--gold);}
   .betaal-kop{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
   .betaal-providers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:.8rem;}
-  .betaal-provider{border:1px solid var(--line);border-radius:12px;padding:.8rem;background:rgba(255,255,255,.025);}
+  .betaal-provider{border:1px solid var(--line);border-radius:0;padding:.8rem;background:rgba(255,255,255,.025);}
   .betaal-provider h5{margin:0 0 .25rem;font-size:.94rem;display:flex;justify-content:space-between;gap:.5rem;}
   .betaal-stip{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#B0483B;margin-right:.35rem;}
   .betaal-stip.ok{background:#4C7A4C;}.betaal-stip.wacht{background:#C9A24B;}
@@ -131,24 +136,24 @@
   /* boardroom: schakelbord */
   .schakels{display:grid;gap:.8rem;margin-top:.6rem;}
   .cat{padding:1rem 1.2rem;}
-  .cat h4{font-size:.85rem;color:var(--gold);margin-bottom:.5rem;}
+  .cat h4{font-size:.85rem;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.5rem;}
   .fx{display:flex;align-items:center;gap:.7rem;padding:.4rem 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
   .fx:last-child{border-bottom:0;}
   .fx .nm{flex:1;min-width:12rem;font-size:.88rem;}
   .fx .nm small{display:block;color:var(--soft);font-size:.72rem;}
-  .wip{position:relative;width:2.6rem;height:1.4rem;border-radius:999px;background:var(--card2);border:1px solid var(--line);cursor:pointer;flex-shrink:0;transition:background .15s;}
+  .wip{position:relative;width:2.6rem;height:1.4rem;border-radius:0;background:var(--card2);border:1px solid var(--line);cursor:pointer;flex-shrink:0;transition:background .15s;}
   .wip::after{content:'';position:absolute;top:2px;left:2px;width:1rem;height:1rem;border-radius:50%;background:var(--soft);transition:left .15s, background .15s;}
-  .wip[aria-checked="true"]{background:rgba(76,154,117,.35);border-color:var(--green);}
+  .wip[aria-checked="true"]{background:rgba(76,154,117,.35);border-color:var(--rtg-leesgroen,var(--green));}
   .wip[aria-checked="true"]::after{left:calc(100% - 1rem - 2px);background:var(--green);}
   .dgchips{display:flex;gap:.35rem;flex-wrap:wrap;}
-  .dg{font-size:.68rem;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;background:var(--card2);color:var(--muted);cursor:pointer;}
+  .dg{font-size:.68rem;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;background:var(--card2);color:var(--muted);cursor:pointer;}
   .dg.uit{border-color:var(--burgundy);color:var(--burgundy);}
   .voorstel{display:flex;gap:.7rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.88rem;}
   .voorstel:last-child{border-bottom:0;}
-  .voorstel .kamerlabel{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;padding-top:.15rem;}
-  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
+  .voorstel .kamerlabel{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));white-space:nowrap;padding-top:.15rem;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1.1rem;border-radius:0;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50;}
   /* de wereld: bolletjes */
-  .wkaart{width:100%;border-radius:12px;background:#0a0f14;border:1px solid var(--line);display:block;}
+  .wkaart{width:100%;border-radius:0;background:#0a0f14;border:1px solid var(--line);display:block;}
   .bol{display:inline-block;width:.72rem;height:.72rem;border-radius:50%;flex-shrink:0;}
   .bol.groen{background:var(--green);box-shadow:0 0 7px var(--green);}
   .bol.oranje{background:var(--amber);box-shadow:0 0 7px var(--amber);}
@@ -159,12 +164,12 @@
   .witem .wdt{flex:1;color:var(--muted);font-size:.8rem;min-width:9rem;}
   .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
-.kantoor-nav{display:flex;align-items:center;gap:.9rem;}.kantoor-nav a{font-size:.8rem;color:var(--muted);}.kantoor-nav a.eerst{color:var(--gold);}
+.kantoor-nav{display:flex;align-items:center;gap:.9rem;}.kantoor-nav a{font-size:.8rem;color:var(--muted);}.kantoor-nav a.eerst{color:var(--rtg-leesgoud,var(--gold));}
 .ik-kop{margin-top:1rem;}.ik-overzicht{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;}.ik-groei{flex:1;min-width:15rem;}.ik-inline{display:inline;}.ik-noodstop{border-color:var(--burgundy);}.ik-proefuit{margin-top:.55rem;}
-.ik-tegel{padding:1rem;}.ik-tegel.aan{border-color:#1e7d4f;}.ik-tegelkop{display:flex;gap:.5rem;justify-content:space-between;align-items:center;}.ik-tegelkop h3{margin:0;}.ik-status.aan{color:#1e7d4f;}.ik-status.uit{color:var(--gold);}.ik-status.niet-ingericht{color:var(--burgundy);}
-.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:8px;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
+.ik-tegel{padding:1rem;}.ik-tegel.aan{border-color:#1e7d4f;}.ik-tegelkop{display:flex;gap:.5rem;justify-content:space-between;align-items:center;}.ik-tegelkop h3{margin:0;}.ik-status.aan{color:#1e7d4f;}.ik-status.uit{color:var(--rtg-leesgoud,var(--gold));}.ik-status.niet-ingericht{color:var(--burgundy);}
+.ik-doel{min-height:2.5rem;color:var(--soft);font-size:.82rem;line-height:1.5;}.ik-omgeving{font-size:.72rem;color:var(--soft);padding:.45rem .55rem;border:1px solid var(--line);border-radius:0;}.ik-laatste{margin-top:.55rem;font-size:.74rem;}.ik-storing{margin-top:.45rem;color:var(--burgundy);font-size:.74rem;}.ik-label{display:block;margin-top:.55rem;font-size:.7rem;color:var(--soft);}
 .ik-invoer{display:flex;gap:.35rem;}.ik-invoer input{flex:1;min-width:7rem;}.ik-acties{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.65rem;}.ik-ketenlijst{display:grid;gap:.5rem;}.ik-rij{display:flex;align-items:center;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--line);}.ik-rijtekst{flex:1;}.ik-besluitrij{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line);}.ik-logrij{padding:.45rem 0;border-bottom:1px solid var(--line);}
-.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+.merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:0;}
   /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
      Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
      tweede is de echte: die attributen houden style-src-attr in de CSP open
@@ -174,7 +179,7 @@
   .bk-stil{color:var(--soft);}
   /* --burgundy is in dit bestand al #C23A5E, de variant voor op zwart. */
   .bk-let{color:var(--burgundy);}
-  .bk-goed{color:var(--gold);}
+  .bk-goed{color:var(--rtg-leesgoud,var(--gold));}
   .bk-krap{margin-top:-.4rem;}
   .bk-na{margin-top:.7rem;}
   .bk-nazin{color:var(--soft);margin-top:.3rem;}
@@ -189,10 +194,10 @@
     font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.08);}
   .bk-rij.wijd{padding:.4rem 0;}
   .bk-rij .soort{min-width:9rem;}
-  .bk-rij .bedrag{color:var(--gold);font-variant-numeric:tabular-nums;}
+  .bk-rij .bedrag{color:var(--rtg-leesgoud,var(--gold));font-variant-numeric:tabular-nums;}
   .bk-rij .reden{flex:1;min-width:12rem;color:var(--soft);}
   .bk-rij .mini{padding:.15rem .6rem;font-size:.72rem;}
-  .bk-vink{min-width:1.2rem;color:var(--gold);}
+  .bk-vink{min-width:1.2rem;color:var(--rtg-leesgoud,var(--gold));}
   .bk-vink.nee{color:var(--burgundy);}
   .bk-handeling{min-width:14rem;}
   .bk-via{color:var(--soft);min-width:9rem;}
@@ -204,7 +209,7 @@
   .bk-tegel{text-align:center;padding:.9rem .6rem;}
   .bk-tegel.rood{border-color:var(--burgundy);}
   .bk-tegel .lab{font-size:.72rem;color:var(--soft);}
-  .bk-tegel .waarde{font-size:1.05rem;color:var(--gold);margin-top:.25rem;}
+  .bk-tegel .waarde{font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.25rem;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -225,7 +230,7 @@
   <!-- kamergrid -->
   <section id="vKamers" hidden>
     <h1>De kantoren</h1>
-    <p class="deck">Elke afdeling een eigen kamer met de cijfers en werklijsten die er toe doen, plus het RTG Atelier: het ontwerpbureau van het kantoor. De boardroom ziet alles en kan alles schakelen. <a href="/apps/personeel.html?kantoor=1" style="color:var(--gold);">Aanmelden voor je dienst (ook thuiswerken) via de personeels-app →</a></p>
+    <p class="deck">Elke afdeling een eigen kamer met de cijfers en werklijsten die er toe doen, plus het RTG Atelier: het ontwerpbureau van het kantoor. De boardroom ziet alles en kan alles schakelen. <a href="/apps/personeel.html?kantoor=1" style="color:var(--rtg-leesgoud,var(--gold));">Aanmelden voor je dienst (ook thuiswerken) via de personeels-app →</a></p>
     <div id="gezondBand" hidden></div>
     <div class="grid" id="grid"></div>
   </section>
@@ -286,12 +291,48 @@
     <div class="kaart" id="kKantine" hidden>
       <h4 style="margin:0 0 .4rem;">De kaart van vandaag</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;">Een gerecht per regel; opslaan vervangt de kaart van vandaag en iedereen ziet hem meteen.</p>
-      <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="kKantineMenu" rows="4" maxlength="1000" placeholder="Bijv. dagsoep, nasi van gisteren maar beter, vega wrap" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div class="taakrij h-mt50">
         <input class="veld" id="kKantineNaam" style="max-width:10rem;" placeholder="Wie zet de kaart?" maxlength="30">
         <button class="knop stil" id="kKantineZet" type="button">Zet de kaart</button>
         <span class="stil" id="kKantineStand" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
+    </div>
+    <!-- de reisbalie: alleen in de kamer 'reisbureau' -->
+    <div class="kaart" id="kReisbureau" hidden>
+      <h4 style="margin:0 0 .4rem;">Aanvragen bevestigen</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
+      <div id="kReisOpen"><div class="leeg">Laden...</div></div>
+
+      <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">
+        Plak de bevestigingen van de klant, zet de onderdelen erbij en u krijgt een link. Wie die link opent
+        kan lid worden en de reis overnemen. Er wordt hierbij <b>niets over de klant bewaard</b> -- geen naam,
+        geen e-mailadres, geen telefoonnummer, en geen bestanden. U stuurt de link zelf.</p>
+      <textarea id="kKlaarTekst" rows="3" maxlength="20000" placeholder="Plak hier een bevestiging, voucher of boardingpass-strook"
+        style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <button class="knop stil" id="kKlaarLees" type="button">Lees voor</button>
+        <span class="stil" id="kKlaarGelezen" style="font-size:.78rem;color:var(--soft);"></span>
+      </div>
+      <div class="taakrij" style="margin-top:.5rem;flex-wrap:wrap;">
+        <input class="veld" id="kKlaarTitel" style="flex:2 1 10rem;" placeholder="Naam (bijv. Casa Ibiza)" maxlength="120">
+        <select class="veld" id="kKlaarSoort" style="flex:1 1 7rem;">
+          <option>verblijf</option><option>vlucht</option><option>vervoer</option><option>transfer</option>
+          <option>activiteit</option><option>tafel</option><option>evenement</option><option>spoor</option>
+        </select>
+        <input class="veld" id="kKlaarPlaats" style="flex:1 1 7rem;" placeholder="Bestemming" maxlength="80">
+        <input class="veld" id="kKlaarVan" style="flex:1 1 7rem;" placeholder="van (jjjj-mm-dd)" maxlength="10">
+        <input class="veld" id="kKlaarTot" style="flex:1 1 7rem;" placeholder="tot (mag leeg)" maxlength="10">
+        <button class="knop stil" id="kKlaarErbij" type="button">Zet erbij</button>
+      </div>
+      <div id="kKlaarLijst" style="margin-top:.5rem;"></div>
+      <div class="taakrij" style="margin-top:.5rem;">
+        <button class="knop" id="kKlaarZet" type="button">Zet de reis klaar</button>
+      </div>
+      <div id="kKlaarUit" style="margin-top:.5rem;" aria-live="polite"></div>
+      <h4 style="margin:1.2rem 0 .4rem;">Klaargezette reizen</h4>
+      <div id="kKlaarStaat"><div class="leeg">Laden...</div></div>
     </div>
     <div class="kaart" id="kZelfzorg" hidden>
       <h4 style="margin:0 0 .4rem;">De zelfzorg van het platform</h4>
@@ -483,16 +524,9 @@
         <button class="knop stil" id="gPasZet" type="button">Zet de pasprijs</button>
         <span class="stil" id="gPasNu" style="font-size:.78rem;color:var(--soft);"></span>
       </div>
-      <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
-        <span style="flex:1;min-width:11rem;">
-          <label for="gComGenre" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding (interne afspraak RTG en zaak; raakt het lid nooit)</label>
-          <select id="gComGenre"></select>
-        </span>
-        <span><label for="gComZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Of een zaak (code)</label>
-          <input id="gComZaak" maxlength="12" placeholder="bijv. TRANSIT" style="width:8rem;text-transform:uppercase;"></span>
-        <span><label for="gComPct" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">%</label>
-          <input id="gComPct" type="number" min="0" max="30" step="0.1" style="width:5.5rem;"></span>
-        <button class="knop stil" id="gComZet" type="button">Zet de vergoeding</button>
+      <div class="rij" style="margin-top:.8rem;">
+        <div style="font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Partnervergoeding over omzet</div>
+        <div id="gVergoeding" class="stil" style="font-size:.82rem;"></div>
       </div>
       <div class="rij" style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.8rem;">
         <span style="flex:1;min-width:11rem;">
@@ -553,9 +587,9 @@
     <div class="kaart" id="bRahul">
       <p class="stil" style="font-size:.82rem;color:var(--soft);">De vaste kern van Rahuls karakter en levensverhaal ligt vast in de code en wordt door tests bewaakt. Hier vult de boardroom hem aan of stuurt hem bij; de aanvulling komt live mee in elke assistent (leden, zaken, personeel, boardroom). Leeg laten = alleen de vaste kern.</p>
       <label for="rKarakter" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het karakter (max 2000 tekens)</label>
-      <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="rKarakter" rows="3" maxlength="2000" placeholder="Bijv. extra eigenschappen, voorkeuren of omgangsregels" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <label for="rVerhaal" style="display:block;font-size:.72rem;color:var(--soft);margin:.7rem 0 .3rem;">Aanvulling op het verhaal (max 2000 tekens)</label>
-      <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="rVerhaal" rows="4" maxlength="2000" placeholder="Bijv. nieuwe hoofdstukken of details van het levensverhaal" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div style="display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap;">
         <button class="knop stil" id="rBewaar" type="button">Bewaar de aanvulling</button>
         <span class="stil" id="rStand" style="font-size:.78rem;color:var(--soft);"></span>
@@ -645,7 +679,7 @@
       <button class="terug" id="aTerug">← alle kamers</button>
       <h1>RTG Atelier</h1>
     </div>
-    <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur. <a href="/apps/websitestudio.html" style="color:var(--gold);">Bouw met de muis een eigen website-sjabloon in de Website-studio →</a></p>
+    <p class="deck">Het besloten ontwerpbureau van de kantoren voor mode en alles wat je aan het lijf draagt: couture, tassen, horloges, schoenen, hoeden, haute joaillerie, eyewear en kleinlederwaren. Geef een brief, de AI tekent het concept uit met silhouet, materialen, een gedempt palet en een verhaal, levert een tech pack en de blik van de creatief directeur. <a href="/apps/websitestudio.html" style="color:var(--rtg-leesgoud,var(--gold));">Bouw met de muis een eigen website-sjabloon in de Website-studio →</a></p>
     <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="aKpi"></div>
     <div class="kaart" id="atelier3dKaart">
@@ -657,7 +691,7 @@
           <select class="veld" id="atelier3dKies" style="max-width:16rem;font-size:.78rem;padding:.3rem .5rem;" aria-label="Kies een ontwerp voor het podium"></select>
         </div>
       </div>
-      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:10px;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
+      <canvas id="atelier3d" style="display:block;width:100%;margin-top:.5rem;border-radius:0;touch-action:none;cursor:grab;" aria-label="Een draaibaar 3D-podium met het gekozen ontwerp als sculptuur, opgebouwd in de eigen ontwerpkleuren met een gouden kroon."></canvas>
       <p style="font-size:.72rem;color:var(--muted);margin:.4rem 0 0;" id="atelier3dUitleg"></p>
     </div>
     <h3 class="sec">Nieuw ontwerp briefen</h3>
@@ -667,7 +701,7 @@
         <input class="veld" id="aNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Bordeaux Top-Handle No.2" maxlength="100">
         <input class="veld" id="aHuis" style="max-width:11rem;" placeholder="Huis / maison (optioneel)" maxlength="80">
       </div>
-      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="aBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gelegenheid, materiaal of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="aMaak">Ontwerp aanmaken</button>
     </div>
     <h3 class="sec">Het atelier <span id="aFilters" style="margin-left:.4rem;"></span></h3>
@@ -697,7 +731,7 @@
         <input class="veld" id="wpDoel" style="flex:1;min-width:11rem;" placeholder="Welk onderdeel? bijv. RTG Pay" maxlength="120" hidden>
       </div>
       <input class="veld" id="wpNaam" style="width:100%;margin-top:.5rem;" placeholder="Naam van de opdracht" maxlength="120">
-      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="wpBrief" rows="2" maxlength="900" placeholder="De brief: wat moet het worden of beter kunnen?" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="wpMaak">Opdracht aanmaken + laten uitwerken</button>
     </div>
     <h3 class="sec">De werkbank <span id="wpFilters" style="margin-left:.4rem;"></span></h3>
@@ -710,7 +744,7 @@
       <button class="terug" id="sTerug">← alle kamers</button>
       <h1>RTG Ontwerpstudio</h1>
     </div>
-    <p class="deck">Het ontwerpbureau van de kantoren voor alles wat je beweegt: automotive (hypercars, GT's, limousines), jachten & boten, luchtvaart en helikopters. Geef een brief, de AI tekent het concept uit met silhouet, aandrijving, materialen, een gedempt palet en een verhaal, levert een specsheet en de blik van de chef-ontwerper. <a href="/apps/studio-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Studio PDA →</a></p>
+    <p class="deck">Het ontwerpbureau van de kantoren voor alles wat je beweegt: automotive (hypercars, GT's, limousines), jachten & boten, luchtvaart en helikopters. Geef een brief, de AI tekent het concept uit met silhouet, aandrijving, materialen, een gedempt palet en een verhaal, levert een specsheet en de blik van de chef-ontwerper. <a href="/apps/studio-pda.html" style="color:var(--rtg-leesgoud,var(--gold));">Onderweg? Open de RTG Studio PDA →</a></p>
     <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="sKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
@@ -720,7 +754,7 @@
         <input class="veld" id="sNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Meridiaan GT" maxlength="100">
         <input class="veld" id="sHuis" style="max-width:11rem;" placeholder="Huis / programma (optioneel)" maxlength="80">
       </div>
-      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="sBrief" rows="2" maxlength="600" placeholder="De brief: sfeer, gebruik, aandrijving of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="sMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Programma's <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een lookbook</span></h3>
@@ -742,7 +776,7 @@
       <button class="terug" id="hTerug">← alle kamers</button>
       <h1>RTG Hardwarelab</h1>
     </div>
-    <p class="deck">Het ontwerpbureau van de kantoren voor de eigen apparaten: PDA's en tablets, schermen en panelen, sensoren en IoT, de zaakdoos-familie (edge & servers) en accessoires. Geef een brief, de AI tekent het concept uit met behuizing, chip, materialen, een gedempt palet, poorten en een verhaal, levert een stuklijst en de blik van de chef-engineer. <a href="/apps/hardware-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Hardware PDA →</a></p>
+    <p class="deck">Het ontwerpbureau van de kantoren voor de eigen apparaten: PDA's en tablets, schermen en panelen, sensoren en IoT, de zaakdoos-familie (edge & servers) en accessoires. Geef een brief, de AI tekent het concept uit met behuizing, chip, materialen, een gedempt palet, poorten en een verhaal, levert een stuklijst en de blik van de chef-engineer. <a href="/apps/hardware-pda.html" style="color:var(--rtg-leesgoud,var(--gold));">Onderweg? Open de RTG Hardware PDA →</a></p>
     <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="hKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
@@ -752,7 +786,7 @@
         <input class="veld" id="hNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. RTG PDA One" maxlength="100">
         <input class="veld" id="hHuis" style="max-width:11rem;" placeholder="Huis / serie (optioneel)" maxlength="80">
       </div>
-      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="hBrief" rows="2" maxlength="600" placeholder="De brief: gebruik, formaat, aansluitingen of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="hMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Series <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een productblad</span></h3>
@@ -774,7 +808,7 @@
       <button class="terug" id="gTerug">← alle kamers</button>
       <h1>RTG Architectenbureau</h1>
     </div>
-    <p class="deck">Het ontwerpbureau van de kantoren voor het gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. Geef een brief, de AI tekent het concept uit met typologie, constructie, materialen, een gedempt palet, voorzieningen en een verhaal, levert een bouwstaat en de blik van de chef-architect. <a href="/apps/architect-pda.html" style="color:var(--gold);">Onderweg? Open de RTG Architect PDA →</a></p>
+    <p class="deck">Het ontwerpbureau van de kantoren voor het gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. Geef een brief, de AI tekent het concept uit met typologie, constructie, materialen, een gedempt palet, voorzieningen en een verhaal, levert een bouwstaat en de blik van de chef-architect. <a href="/apps/architect-pda.html" style="color:var(--rtg-leesgoud,var(--gold));">Onderweg? Open de RTG Architect PDA →</a></p>
     <p style="margin:.2rem 0 0;"><button class="knop stil ideeKnop" type="button" style="font-size:.78rem;">Samen ideeën in de Ideeënkamer</button></p>
     <div class="kpis" id="gKpi"></div>
     <h3 class="sec">Nieuw concept briefen</h3>
@@ -784,7 +818,7 @@
         <input class="veld" id="gNaam" style="flex:1;min-width:11rem;" placeholder="Naam, bijv. Villa Meridiaan" maxlength="100">
         <input class="veld" id="gHuis" style="max-width:11rem;" placeholder="Huis / project (optioneel)" maxlength="80">
       </div>
-      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="gBrief" rows="2" maxlength="600" placeholder="De brief: ligging, sfeer, gebruik of inspiratie" style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <button class="knop h-mt50" id="gMaak">Concept aanmaken</button>
     </div>
     <h3 class="sec">Projecten <span class="stil" style="font-weight:400;color:var(--soft);font-size:.8rem;">wijs concepten toe en exporteer een portfolio</span></h3>
@@ -810,7 +844,7 @@
     <h3 class="sec">Nieuw idee</h3>
     <div class="kaart">
       <input class="veld" id="iTitel" style="width:100%;" placeholder="Titel, bijv. Reislijn Meridiaan" maxlength="100">
-      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
+      <textarea id="iBrief" rows="2" maxlength="800" placeholder="Waar gaat het over? De gedachte, de sfeer, het gebruik." style="width:100%;margin-top:.5rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.82rem;padding:.55rem .7rem;resize:vertical;"></textarea>
       <div id="iBureaus" class="rij" style="margin-top:.5rem;gap:.5rem;"></div>
       <button class="knop h-mt50" id="iMaak">Idee toevoegen</button>
     </div>
@@ -1157,6 +1191,16 @@ async function openKamer(id){
   // de identiteitskluis alleen voor kamers die klanten bij naam moeten kennen
   $('#kKluis').hidden = !d.naamInzage;
   $('#kKluisUit').textContent = '';
+  // de reisbalie: hier wordt een aanvraag pas een toezegging
+  $('#kReisbureau').hidden = (id !== 'reisbureau');
+  if (id === 'reisbureau') {
+    laadReisbalie();
+    /* De knoppen een KEER bedraden. Twee keer dezelfde luisteraar erop zetten
+       levert twee klaargezette reizen per klik op -- en die tweede staat dan
+       met een geldige link in de wereld zonder dat iemand hem bedoeld heeft. */
+    if (!KLAAR_BEDRAAD) { KLAAR_BEDRAAD = true; bedraadKlaarzetten(); }
+    tekenKlaarLijst(); laadKlaargezet();
+  }
   // de kantine mag de kaart van vandaag zetten
   $('#kKantine').hidden = (id !== 'kantine');
   if (id === 'kantine') api('kantine/menu').then(r => {
@@ -1173,6 +1217,128 @@ async function openKamer(id){
   // en elke afdeling heeft haar eigen huis
   $('#kHotel').hidden = false;
   laadAfdHotel(id, d.naam);
+}
+
+/* DE REISBALIE. De aanvragen staan op codenaam; de echte naam haalt u zo nodig
+   uit de identiteitskluis hierboven, en die opvraging komt in het auditlog.
+   Bevestigen en afwijzen lopen allebei over /api/office/reisbureau/besluit --
+   een knop die alleen maar 'bevestigd' meestuurt zou een typefout in een
+   toezegging veranderen, dus de stand staat op de knop en de server keurt hem. */
+async function laadReisbalie(){
+  const el = $('#kReisOpen');
+  el.innerHTML = '<div class="leeg">Laden...</div>';
+  let d; try { d = await api('reisbureau'); } catch(e){ el.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
+  if (!open.length){ el.innerHTML = '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>'; return; }
+  el.innerHTML = open.map(a =>
+    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+      '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
+      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
+        esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
+        ' · '+esc(a.codename||'lid')+(a.prijs ? ' · \u20ac '+esc(String(a.prijs.totaal)) : '')+
+        (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>'+
+      '<div class="taakrij">'+
+        '<input class="veld" style="flex:1;" maxlength="300" data-bericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
+        '<button class="knop" type="button" data-besluit="bevestigd" data-ref="'+esc(a.ref)+'">Bevestig</button>'+
+        '<button class="knop stil" type="button" data-besluit="afgewezen" data-ref="'+esc(a.ref)+'">Wijs af</button>'+
+      '</div>'+
+    '</div>').join('');
+  el.querySelectorAll('button[data-besluit]').forEach(b => b.addEventListener('click', async () => {
+    const veld = el.querySelector('input[data-bericht="'+b.dataset.ref+'"]');
+    b.disabled = true;
+    try {
+      await api('reisbureau/besluit', { ref: b.dataset.ref, besluit: b.dataset.besluit, bericht: veld ? veld.value : '' });
+      meld(b.dataset.besluit === 'bevestigd' ? 'Bevestigd. Het lid ziet het meteen staan.' : 'Afgewezen, met uw reden erbij.');
+      openKamer('reisbureau');
+    } catch(e){ b.disabled = false; meld(e.message); }
+  }));
+}
+
+/* EEN REIS KLAARZETTEN VOOR EEN KLANT DIE NOG GEEN LID IS.
+
+   De onderdelen worden hier opgebouwd en pas bij "Zet de reis klaar" verstuurd.
+   Er gaat NIETS over de klant mee: dit scherm vraagt niet naar een naam, een
+   e-mailadres of een telefoonnummer, en het stuurt ook niets. De medewerker
+   krijgt een link en verstuurt die zelf -- wat er niet gevraagd wordt, kan ook
+   niet bewaard worden (kern/reisuitnodiging.js). */
+let KLAAR = [], KLAAR_BEDRAAD = false;
+function tekenKlaarLijst(){
+  $('#kKlaarLijst').innerHTML = KLAAR.length
+    ? '<ul>' + KLAAR.map((o, i) => '<li>' + esc(o.soort) + ': ' + esc(o.titel) +
+        (o.bestemming ? ' (' + esc(o.bestemming) + ')' : '') + ' &middot; ' + esc(o.van) +
+        (o.tot ? ' t/m ' + esc(o.tot) : '') +
+        ' <button class="knop stil" type="button" data-af="' + i + '" style="padding:.15rem .5rem;">weg</button></li>').join('') + '</ul>'
+    : '<div class="leeg">Nog geen onderdelen.</div>';
+  $('#kKlaarLijst').querySelectorAll('[data-af]').forEach(b => b.addEventListener('click', () => {
+    KLAAR.splice(Number(b.dataset.af), 1); tekenKlaarLijst();
+  }));
+}
+async function laadKlaargezet(){
+  try {
+    const d = await api('reisbureau/uitnodigingen');
+    const rij = (d.uitnodigingen || []).filter(x => x.soort === 'klaargezet');
+    $('#kKlaarStaat').innerHTML = rij.length ? rij.map(x =>
+      '<div class="lijst" style="border-top:1px solid var(--line);padding:.5rem 0;">' +
+        '<div style="font-size:.86rem;">' + esc(x.bestemming || 'zonder bestemming') + ' &middot; ' +
+          esc(x.venster.van) + ' t/m ' + esc(x.venster.tot) + ' &middot; ' + x.aantal + ' onderdelen</div>' +
+        '<div class="stil" style="font-size:.76rem;color:var(--soft);">' +
+          (x.opgeeist ? 'overgenomen door de klant' : x.ingetrokken ? 'ingetrokken' : 'geldig tot ' + esc(x.geldigTot)) + '</div>' +
+        (x.opgeeist || x.ingetrokken ? '' :
+          '<div class="taakrij" style="margin-top:.3rem;">' +
+          '<input class="veld" readonly style="flex:1;font-size:.76rem;" value="' + esc(location.origin + x.link) + '">' +
+          '<button class="knop stil" type="button" data-kopie="' + esc(location.origin + x.link) + '">Kopieer</button>' +
+          '<button class="knop stil" type="button" data-introk="' + esc(x.id) + '">Trek in</button></div>') +
+      '</div>').join('') : '<div class="leeg">Er staat niets klaar.</div>';
+    $('#kKlaarStaat').querySelectorAll('[data-kopie]').forEach(b => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.kopie); meld('Link gekopieerd.'); } catch (e) {}
+    }));
+    $('#kKlaarStaat').querySelectorAll('[data-introk]').forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await api('reisbureau/uitnodiging-weg', { id: b.dataset.introk }); laadKlaargezet(); }
+      catch (e) { meld(e.message); b.disabled = false; }
+    }));
+  } catch (e) { $('#kKlaarStaat').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+}
+function bedraadKlaarzetten(){
+  $('#kKlaarLees').addEventListener('click', async () => {
+    $('#kKlaarGelezen').textContent = 'Lezen...';
+    try {
+      const d = await api('reisbureau/lees', { tekst: $('#kKlaarTekst').value });
+      const v = d.gelezen.velden || {};
+      const w = (n) => (v[n] || {}).waarde || '';
+      if (w('titel') || w('vlucht') || w('kenmerk')) $('#kKlaarTitel').value = w('titel') || w('vlucht') || w('kenmerk');
+      if (w('soort')) $('#kKlaarSoort').value = w('soort');
+      if (w('bestemming')) $('#kKlaarPlaats').value = w('bestemming');
+      if (w('van_datum')) $('#kKlaarVan').value = w('van_datum');
+      if (w('tot_datum')) $('#kKlaarTot').value = w('tot_datum');
+      const onzeker = d.gelezen.onzeker || [];
+      $('#kKlaarGelezen').textContent = 'Gelezen uit ' + (d.gelezen.hoe === 'bcbp' ? 'de boardingpass-strook' : 'de tekst') +
+        (onzeker.length ? ' -- kijk na: ' + onzeker.join(', ') : ' -- alles eenduidig');
+    } catch (e) { $('#kKlaarGelezen').textContent = e.message; }
+  });
+  $('#kKlaarErbij').addEventListener('click', () => {
+    const o = { soort: $('#kKlaarSoort').value, titel: $('#kKlaarTitel').value.trim(),
+      bestemming: $('#kKlaarPlaats').value.trim(), van: $('#kKlaarVan').value.trim(), tot: $('#kKlaarTot').value.trim() };
+    if (!o.titel || !/^\d{4}-\d{2}-\d{2}$/.test(o.van)) { meld('Een onderdeel heeft een naam en een datum nodig.'); return; }
+    KLAAR.push(o); tekenKlaarLijst();
+    $('#kKlaarTekst').value = ''; $('#kKlaarTitel').value = ''; $('#kKlaarVan').value = ''; $('#kKlaarTot').value = '';
+    $('#kKlaarGelezen').textContent = '';
+  });
+  $('#kKlaarZet').addEventListener('click', async () => {
+    if (!KLAAR.length) { meld('Zet eerst een onderdeel erbij.'); return; }
+    try {
+      const d = await api('reisbureau/klaarzetten', { onderdelen: KLAAR });
+      const link = location.origin + d.link;
+      KLAAR = []; tekenKlaarLijst();
+      $('#kKlaarUit').innerHTML = '<div class="stil" style="font-size:.8rem;">De reis staat klaar. Stuur deze link naar de klant:</div>' +
+        '<div class="taakrij" style="margin-top:.3rem;"><input class="veld" readonly style="flex:1;font-size:.78rem;" value="' + esc(link) + '">' +
+        '<button class="knop stil" type="button" id="kKlaarKopie">Kopieer</button></div>';
+      $('#kKlaarKopie').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(link); meld('Link gekopieerd.'); } catch (e) {}
+      });
+      laadKlaargezet();
+    } catch (e) { meld(e.message); }
+  });
 }
 
 function geld(centen){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format((Number(centen)||0)/100); }
@@ -1220,7 +1386,7 @@ async function laadRegering(){
       '<span style="color:var(--soft);">' + esc(b.portefeuilleNaam) + ' · door ' + esc(b.door) + '</span>' +
       (b.status === 'voorgenomen'
         ? '<button class="knop stil" data-teken="' + esc(b.id) + '" style="margin-left:auto;padding:.2rem .7rem;font-size:.76rem;">Teken mee</button>'
-        : '<span style="margin-left:auto;color:var(--gold);font-size:.76rem;">genomen · meegetekend door ' + esc(b.medeondertekend) + '</span>') + '</div>').join('')
+        : '<span style="margin-left:auto;color:var(--rtg-leesgoud,var(--gold));font-size:.76rem;">genomen · meegetekend door ' + esc(b.medeondertekend) + '</span>') + '</div>').join('')
       : '<div class="leeg">Nog geen besluiten.</div>';
     $('#kRegBesluiten').querySelectorAll('[data-teken]').forEach(btn => btn.addEventListener('click', async () => {
       try { await api('regering/teken', { id: btn.dataset.teken, naam: $('#kRegNaam').value });
@@ -1243,7 +1409,7 @@ async function laadOpvang(){
       $('#kOpvSoort').innerHTML = Object.entries(d.soorten).map(([k, v]) => '<option value="' + esc(k) + '">' + esc(v) + '</option>').join('');
     $('#kOpvDosLoc').innerHTML = d.locaties.map(l => '<option value="' + esc(l.id) + '">' + esc(l.naam) + ' (' + l.vrij + ' vrij)</option>').join('');
     $('#kOpvLocaties').innerHTML =
-      '<div style="font-size:.84rem;color:var(--gold);margin-bottom:.3rem;">' + d.totaal.bezet + ' van ' + d.totaal.capaciteit + ' plekken bezet (' + d.totaal.bezettingPct + '%) · ' + d.totaal.vrij + ' vrij</div>' +
+      '<div style="font-size:.84rem;color:var(--rtg-leesgoud,var(--gold));margin-bottom:.3rem;">' + d.totaal.bezet + ' van ' + d.totaal.capaciteit + ' plekken bezet (' + d.totaal.bezettingPct + '%) · ' + d.totaal.vrij + ' vrij</div>' +
       (d.locaties.length ? d.locaties.map(l =>
         '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.84rem;">' +
         '<strong style="min-width:11rem;">' + esc(l.naam) + '</strong>' +
@@ -1306,7 +1472,7 @@ const zzTijd = t => new Date(t).toLocaleString('nl-NL', { day: '2-digit', month:
 function zelfzorgHtml(s){
   const l = s.laatste || {};
   return '<p class="stil" style="font-size:.82rem;color:var(--soft);margin:0 0 .6rem;">Versie '+esc(s.versie)+' · datakast op schema v'+s.schema+
-    (s.wachtend.length ? ' · <b style="color:var(--gold);">upgrade naar v'+s.doelSchema+' staat klaar</b>' : ' (bij)')+
+    (s.wachtend.length ? ' · <b style="color:var(--rtg-leesgoud,var(--gold));">upgrade naar v'+s.doelSchema+' staat klaar</b>' : ' (bij)')+
     ' · automaat: '+(s.automaat.aan ? 'elke '+s.automaat.elkeUren+' uur een stille opruim- en beschermronde' : 'uit')+'.</p>'+
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;">'+
       '<button class="knop stil" data-zz="opruim" type="button">Ruim op</button>'+
@@ -1320,7 +1486,7 @@ function zelfzorgHtml(s){
       (s.journaal.length ? s.journaal.map(r =>
         '<div>'+zzTijd(r.at)+' · <b>'+esc(r.soort)+'</b> door '+esc(r.door)+
         (r.acties.length ? ' · '+r.acties.map(a => esc(a.wat)+(a.aantal > 1 ? ' ('+a.aantal+')' : '')).join('; ') : ' · niets te doen')+
-        (r.adviezen && r.adviezen.length ? ' · <span style="color:var(--gold);">'+r.adviezen.length+' advies(en)</span>' : '')+'</div>').join('')
+        (r.adviezen && r.adviezen.length ? ' · <span style="color:var(--rtg-leesgoud,var(--gold));">'+r.adviezen.length+' advies(en)</span>' : '')+'</div>').join('')
       : '<div class="leeg">Nog geen zelfzorg-rondes gedraaid.</div>')+
     '</div>';
 }
@@ -1405,9 +1571,9 @@ async function openAtelier(){
   if (!sel.options.length) sel.innerHTML = d.categorieen.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
   renderAtelier();
 }
-function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
+function statusPil(s){ const g = s==='productie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:'+g+';border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;">'+esc(s)+'</span>'; }
 function swatches(kleuren){ return '<div style="display:flex;gap:.3rem;margin:.4rem 0;">'+(kleuren||[]).map(k =>
-  '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:6px;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
+  '<span title="'+esc(k.naam)+'" style="width:1.5rem;height:1.5rem;border-radius:0;border:1px solid var(--line);background:'+esc(k.hex)+';"></span>').join('')+
   '<span style="align-self:center;font-size:.7rem;color:var(--muted);margin-left:.3rem;">'+(kleuren||[]).map(k => esc(k.naam)).join(' · ')+'</span></div>'; }
 function renderAtelier(){
   const d = ATELIER; if (!d) return;
@@ -1439,7 +1605,7 @@ function renderAtelier(){
         (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
         : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.techpack ? techpackHtml(o.techpack) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Creatief directeur:</b> '+esc(o.kritiek)+'</div>' : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--rtg-leesgoud,var(--gold));">Creatief directeur:</b> '+esc(o.kritiek)+'</div>' : '')+
       '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
         '<button class="knop aConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil aTech" data-o="'+o.id+'">Tech pack</button>'+
@@ -1452,7 +1618,7 @@ function renderAtelier(){
   bindAtelier();
 }
 function techpackHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Tech pack</div>'+
     (p.onderdelen||[]).map(o => '<div style="font-size:.8rem;"><b>'+esc(o.naam)+'</b> · '+esc(o.materiaal)+' <span style="color:var(--muted);">('+esc(o.spec)+')</span></div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.constructie)+' · '+esc(p.maten)+'</div>'+
@@ -1534,11 +1700,11 @@ function renderWerkplaats(){
   $('#wpLijst').innerHTML = it.map(o => '<div class="kaart" style="margin-bottom:.6rem;">'+
     '<div class="rij" style="justify-content:space-between;gap:.5rem;align-items:baseline;flex-wrap:wrap;">'+
       '<h3 style="margin:0;font-size:1rem;">'+esc(o.naam)+'</h3>'+
-      '<span class="stil" style="font-size:.72rem;color:var(--gold);">'+esc(o.soortLabel)+(o.doelSoortLabel?' · '+esc(o.doelSoortLabel):'')+(o.doel?' · '+esc(o.doel):'')+'</span></div>'+
+      '<span class="stil" style="font-size:.72rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(o.soortLabel)+(o.doelSoortLabel?' · '+esc(o.doelSoortLabel):'')+(o.doel?' · '+esc(o.doel):'')+'</span></div>'+
     (o.brief?'<p class="stil" style="font-size:.82rem;color:var(--soft);margin:.3rem 0 0;">'+esc(o.brief)+'</p>':'')+
     wpPlan(o.plan)+
     (o.kritiek?'<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.83rem;font-style:italic;">'+esc(o.kritiek)+'</div>':'')+
-    (o.uitgifte?'<div class="rij" style="gap:.4rem;margin-top:.5rem;align-items:center;font-size:.78rem;color:var(--gold);"><span class="ic" style="width:1rem;height:1rem;">'+ico('sitemaker')+'</span>Live in de '+esc(o.uitgifte.plankLabel||'winkel')+' · zichtbaar in de Mall</div>':'')+
+    (o.uitgifte?'<div class="rij" style="gap:.4rem;margin-top:.5rem;align-items:center;font-size:.78rem;color:var(--rtg-leesgoud,var(--gold));"><span class="ic" style="width:1rem;height:1rem;">'+ico('sitemaker')+'</span>Live in de '+esc(o.uitgifte.plankLabel||'winkel')+' · zichtbaar in de Mall</div>':'')+
     '<div class="rij" style="gap:.4rem;margin-top:.6rem;flex-wrap:wrap;align-items:center;">'+
       '<button class="knop stil" data-wp-uit="'+o.id+'" style="font-size:.78rem;">'+(o.plan?'Opnieuw uitwerken':'AI werkt het uit')+'</button>'+
       (o.plan?'<button class="knop stil" data-wp-kri="'+o.id+'" style="font-size:.78rem;">Scherpe blik</button>':'')+
@@ -1620,7 +1786,7 @@ function renderStudio(){
         (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
         : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.specsheet ? specsheetHtml(o.specsheet) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-ontwerper:</b> '+esc(o.kritiek)+'</div>' : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--rtg-leesgoud,var(--gold));">Chef-ontwerper:</b> '+esc(o.kritiek)+'</div>' : '')+
       '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
         '<button class="knop sConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil sSpec" data-o="'+o.id+'">Specsheet</button>'+
@@ -1632,7 +1798,7 @@ function renderStudio(){
   bindStudio();
 }
 function specsheetHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Specsheet</div>'+
     (p.modules||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.prestaties)+' · '+esc(p.afmetingen)+'</div>'+
@@ -1712,7 +1878,7 @@ async function exportLookbook(naam){
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+
     '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}'+
-    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}'+
+    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}'+
     '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}'+
     '.cover .sub{color:var(--muted);font-size:.9rem;}'+
     'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}'+
@@ -1722,16 +1888,16 @@ async function exportLookbook(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     '</style></head><body>'+
     '<div class="balk"><span>Lookbook &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
@@ -1793,7 +1959,7 @@ function renderHardware(){
         (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
         : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.stuklijst ? stuklijstHtml(o.stuklijst) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-engineer:</b> '+esc(o.kritiek)+'</div>' : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--rtg-leesgoud,var(--gold));">Chef-engineer:</b> '+esc(o.kritiek)+'</div>' : '')+
       '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
         '<button class="knop hConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil hStuk" data-o="'+o.id+'">Stuklijst</button>'+
@@ -1802,7 +1968,7 @@ function renderHardware(){
         '<button class="knop stil hDel" data-o="'+o.id+'" style="margin-left:auto;color:var(--burgundy);">Verwijder</button>'+
       '</div>'+
       '<div style="margin-top:.5rem;border-top:1px solid var(--line);padding-top:.5rem;">'+(o.winkel ?
-        '<div class="rij" style="gap:.5rem;align-items:center;font-size:.8rem;"><span style="color:var(--gold);">In de winkel · EUR '+o.winkel.eenmalig+' eenmalig'+(o.winkel.perMaand?' · EUR '+o.winkel.perMaand+' p/m':'')+' · '+esc(o.winkel.eenheid)+'</span>'+
+        '<div class="rij" style="gap:.5rem;align-items:center;font-size:.8rem;"><span style="color:var(--rtg-leesgoud,var(--gold));">In de winkel · EUR '+o.winkel.eenmalig+' eenmalig'+(o.winkel.perMaand?' · EUR '+o.winkel.perMaand+' p/m':'')+' · '+esc(o.winkel.eenheid)+'</span>'+
           '<button class="knop stil hWinkelUit" data-o="'+o.id+'" style="margin-left:auto;font-size:.75rem;padding:.25rem .5rem;">Terughalen</button></div>'
         :
         '<div class="rij" style="gap:.4rem;align-items:center;font-size:.8rem;"><span style="color:var(--muted);">Naar de winkel:</span>'+
@@ -1815,7 +1981,7 @@ function renderHardware(){
   bindHardware();
 }
 function stuklijstHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Stuklijst</div>'+
     (p.onderdelen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.verbruik)+' · '+esc(p.afmetingen)+'</div>'+
@@ -1904,7 +2070,7 @@ async function exportProductblad(naam){
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+
     '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}'+
-    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}'+
+    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}'+
     '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}'+
     '.cover .sub{color:var(--muted);font-size:.9rem;}'+
     'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}'+
@@ -1914,16 +2080,16 @@ async function exportProductblad(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     '</style></head><body>'+
     '<div class="balk"><span>Productblad &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
@@ -1985,7 +2151,7 @@ function renderArchitect(){
         (c.verhaal?'<p style="font-size:.82rem;line-height:1.65;margin:.4rem 0 0;font-style:italic;">'+esc(c.verhaal)+'</p>':'')+'</div>'
         : '<p style="font-size:.78rem;color:var(--muted);margin-top:.4rem;">Nog geen concept. Laat de AI het uittekenen.</p>')+
       (o.bouwstaat ? bouwstaatHtml(o.bouwstaat) : '')+
-      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--gold);">Chef-architect:</b> '+esc(o.kritiek)+'</div>' : '')+
+      (o.kritiek ? '<div style="margin-top:.5rem;border-left:2px solid var(--gold);padding-left:.7rem;font-size:.82rem;line-height:1.6;"><b style="color:var(--rtg-leesgoud,var(--gold));">Chef-architect:</b> '+esc(o.kritiek)+'</div>' : '')+
       '<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem;">'+
         '<button class="knop gConcept" data-o="'+o.id+'">'+(c?'Herteken concept':'✶ AI tekent concept')+'</button>'+
         '<button class="knop stil gBouw" data-o="'+o.id+'">Bouwstaat</button>'+
@@ -1997,7 +2163,7 @@ function renderArchitect(){
   bindArchitect();
 }
 function bouwstaatHtml(p){
-  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+  return '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
     '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Bouwstaat</div>'+
     (p.delen||[]).map(m => '<div style="font-size:.8rem;"><b>'+esc(m.naam)+'</b> · '+esc(m.spec)+'</div>').join('')+
     '<div style="font-size:.75rem;color:var(--muted);margin-top:.35rem;">'+esc(p.oppervlak)+' · '+esc(p.kavel)+'</div>'+
@@ -2077,7 +2243,7 @@ async function exportPortfolio(naam){
     'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.01em;}'+
     '.wrap{max-width:820px;margin:0 auto;}'+
     '.cover{border-bottom:1px solid var(--line);padding-bottom:1.6rem;margin-bottom:2.4rem;}'+
-    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}'+
+    '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}'+
     '.cover h1{font-size:2.4rem;margin:.5rem 0 .3rem;}'+
     '.cover .sub{color:var(--muted);font-size:.9rem;}'+
     'article{border-top:1px solid var(--line);padding:2rem 0;page-break-inside:avoid;}'+
@@ -2087,16 +2253,16 @@ async function exportPortfolio(naam){
     'article h2{font-size:1.4rem;}.meta{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;}'+
     '.swrij{display:flex;flex-wrap:wrap;gap:1rem;margin:.4rem 0 1rem;}'+
     '.sw{display:flex;flex-direction:column;align-items:center;gap:.25rem;font-size:.62rem;}'+
-    '.sw span{width:3.2rem;height:3.2rem;border-radius:8px;border:1px solid var(--line);display:block;}'+
+    '.sw span{width:3.2rem;height:3.2rem;border-radius:0;border:1px solid var(--line);display:block;}'+
     '.sw em{color:var(--muted);font-style:normal;}.sw b{color:var(--soft);font-weight:400;}'+
     '.lead{font-size:1.05rem;margin-bottom:.3rem;}.mat{color:var(--muted);font-size:.9rem;}.uit{color:var(--soft);}'+
     '.verhaal{font-style:italic;color:var(--ink);margin-top:.8rem;font-size:.96rem;}'+
-    '.spec{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin-top:1.1rem;}'+
+    '.spec{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin-top:1.1rem;}'+
     '.spectitel{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}'+
     '.specrij{display:flex;justify-content:space-between;gap:1rem;font-size:.86rem;padding:.15rem 0;}'+
     '.specrij span{color:var(--muted);text-align:right;}.specfoot{font-size:.78rem;color:var(--soft);margin-top:.5rem;}'+
     '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}'+
-    '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
+    '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}'+
     '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.meta,.mat,.sw em{color:#555;}.sw b,.uit,.specfoot,.nr{color:#999;}.verhaal,.specrij span,.lead{color:#111;}article,.cover{border-color:#ddd;}}'+
     /* Let op: hier hoort GEEN desktopframe-koppeling te staan. Dit is een
        string die een LOSSE, af te drukken pagina opbouwt (portfolio-export),
@@ -2150,10 +2316,10 @@ function renderIdeeen(){
         '<span style="font-size:.72rem;color:var(--muted);">'+o.bureaus.map(b => b.icon+' '+esc(b.label.replace('RTG ',''))).join(' · ')+(o.door?' · '+esc(o.door):'')+'</span></div>'+
         statusPil(o.status)+'</div>'+
       (o.brief?'<p style="font-size:.82rem;color:var(--muted);line-height:1.6;margin:.4rem 0 0;">'+esc(o.brief)+'</p>':'')+
-      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;">'+
+      (o.uitwerking ? '<div style="margin-top:.5rem;border:1px solid var(--line);border-radius:0;padding:.6rem .7rem;">'+
         '<div style="font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;">Brief per bureau</div>'+
         Object.keys(o.uitwerking).map(k => { const b = bureauOpts.find(x => x.id === k) || { icon:'•', label:k }; return '<div style="font-size:.8rem;line-height:1.55;margin-bottom:.2rem;"><b>'+ico(b.icon)+' '+esc(b.label.replace('RTG ',''))+':</b> '+esc(o.uitwerking[k])+'</div>'; }).join('')+'</div>' : '')+
-      (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--gold);margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
+      (o.spinoffs && o.spinoffs.length ? '<div style="font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.45rem;">Als concept: '+o.spinoffs.map(s => esc(s.bureauLabel.replace('RTG ',''))).join(', ')+'</div>' : '')+
       (o.reacties && o.reacties.length ? '<div style="margin-top:.5rem;border-left:2px solid var(--line);padding-left:.7rem;">'+o.reacties.slice(-4).map(r => '<div style="font-size:.8rem;line-height:1.5;"><b>'+esc(r.door)+':</b> '+esc(r.tekst)+'</div>').join('')+'</div>' : '')+
       '<div class="rij" style="margin-top:.55rem;gap:.4rem;">'+
         '<input class="veld iReactieIn" data-o="'+o.id+'" placeholder="Reageer..." maxlength="500" style="flex:1;min-width:9rem;font-size:.78rem;padding:.3rem .5rem;">'+
@@ -2217,9 +2383,9 @@ function chatWidget(el, kamerId){
       const box = el.querySelector('#cb_' + kamerId);
       if (!box) return;
       box.innerHTML = d.berichten.length ? d.berichten.map(m =>
-        '<div style="padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.88rem;"><b style="color:var(--gold);">'+esc(m.naam)+'</b> '+
+        '<div style="padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.88rem;"><b style="color:var(--rtg-leesgoud,var(--gold));">'+esc(m.naam)+'</b> '+
         '<span style="color:var(--soft);font-size:.7rem;">'+new Date(m.at).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})+'</span><br>'+
-        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:10px;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
+        (m.foto ? '<img src="'+m.foto+'" alt="Snap van '+esc(m.naam)+'" style="max-width:12rem;border-radius:0;margin:.2rem 0;">' : '')+esc(m.tekst||'')+'</div>').join('')
         : '<div class="leeg">Nog stil hier; zeg eens hallo.</div>';
       box.scrollTop = box.scrollHeight;
     } catch (e) {}
@@ -2348,7 +2514,7 @@ function voorstelKaart(v, alsBoardroom){
   const stand = v.status === 'open' ? 'wacht op de boardroom' : v.status;
   return '<div class="voorstel" style="flex-direction:column;align-items:stretch;gap:.3rem;" data-vid="'+v.id+'">'+
     '<div><b>'+esc(v.functieNaam)+'</b> '+(v.aan ? 'AAN' : 'UIT')+(v.doelgroep ? ' voor '+esc(v.doelgroep) : ' (globaal)')+
-    ' · <span style="color:var(--gold);">'+esc(stand)+'</span>'+(v.reden ? '<br><small style="color:var(--soft);">Reden: '+esc(v.reden)+'</small>' : '')+'</div>'+
+    ' · <span style="color:var(--rtg-leesgoud,var(--gold));">'+esc(stand)+'</span>'+(v.reden ? '<br><small style="color:var(--soft);">Reden: '+esc(v.reden)+'</small>' : '')+'</div>'+
     (v.discussie.length ? '<div style="font-size:.8rem;color:var(--muted);">'+v.discussie.map(m => '<div>'+(m.wie==='boardroom'?'gebouw':'help')+' '+esc(m.tekst)+'</div>').join('')+'</div>' : '')+
     (v.status === 'open' ? '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">'+
       (alsBoardroom ? '<button class="knop stil" data-acc="'+v.id+'" style="padding:.3rem .9rem;font-size:.78rem;">Accepteer en schakel</button>'+
@@ -2440,11 +2606,11 @@ async function bankSchakel(pad, body){
 function bankRenderKnop(r){
   const seg = r.modi.map(m => '<button class="knop' + (m === r.modus ? '' : ' stil') + '" data-modus="' + m + '" style="padding:.45rem 1rem;">' + esc(BK_MODUS[m]) + '</button>').join(' ');
   const nood = r.nood && r.nood.actief
-    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:8px;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
+    ? '<div style="margin:.5rem 0;padding:.55rem .7rem;border:1px solid var(--burgundy);border-radius:0;color:var(--burgundy-on-dark,#C23A5E);"><strong>NOODSTOP actief</strong> -- alles clearet via de kaart-rails. <span style="color:var(--soft);">' + esc(r.nood.reden || '') + '</span> <button class="knop stil" id="bankHerstel" style="padding:.2rem .7rem;margin-left:.4rem;">Herstel</button></div>'
     : '';
   const a = r.autorisatie;
   const aut = a
-    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
+    ? '<div style="margin:.5rem 0;padding:.6rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>Autorisatie nodig</strong>: ' + esc(a.actie) + (a.modus ? ' → ' + esc(a.modus) : '') + ', aangevraagd door <strong>' + esc(a.door) + '</strong>. Een <em>tweede</em> persoon bevestigt.<div style="margin-top:.4rem;display:flex;gap:.4rem;"><button class="knop" id="bankBevestig" style="padding:.3rem .9rem;">Bevestig (ik ben iemand anders)</button><button class="knop stil" id="bankIntrek" style="padding:.3rem .9rem;">Intrekken</button></div></div>'
     : '';
   $('#bankKnop').innerHTML =
     '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.6rem;">' +
@@ -2452,7 +2618,7 @@ function bankRenderKnop(r){
       '<label style="font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankLeden"' + (r.ledenAan ? ' checked' : '') + '> Live voor leden</label>' +
       '<button class="knop stil" id="bankNood" style="margin-left:auto;border-color:var(--burgundy);">Noodstop</button>' +
     '</div>' + nood + aut +
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--gold);">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen rekeninglaag is operationeel.' : 'De eigen rekeninglaag staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Huidige stand: <strong style="color:var(--rtg-leesgoud,var(--gold));">' + esc(BK_MODUS[r.modus]) + '</strong>. ' + (r.operationeel ? 'De eigen rekeninglaag is operationeel.' : 'De eigen rekeninglaag staat nog uit.') + ' Opschalen vraagt een tweede persoon; afschalen (terug naar partner) mag direct.</p>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">' + seg +
       ' <button class="knop" id="bankDraai" style="padding:.45rem 1rem;">Eén slag verder →</button>' +
       '<label style="margin-left:auto;font-size:.85rem;display:flex;gap:.45rem;align-items:center;cursor:pointer;"><input type="checkbox" id="bankOper"' + (r.operationeel ? ' checked' : '') + '> Bank operationeel</label>' +
@@ -2469,7 +2635,7 @@ function bankRenderKnop(r){
 function bankRenderGezond(g){
   const tegels = [['Deposito', bkEuro(g.depositoCenten)], ['In omloop (eigen huis)', bkEuro(g.inOmloopCenten)], ['Krediet uit', bkEuro(g.kredietCenten)], ['Rente betaald', bkEuro(g.renteBetaaldCenten)], ['Reserve', bkEuro(g.reserveCenten)], ['Naar de foundation', bkEuro(g.foundationCenten)], ['Rekeningen', String(g.aantalRekeningen)], ['Sluitcontrole', g.sluit.klopt ? '✓ klopt' : '✗ ' + g.sluit.som]];
   $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
-    '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
+    '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--rtg-leesgoud,var(--gold));margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
 }
 /* DE RAIL-RECONCILIATIE. Bewust NAAST de sluitcontrole en niet ertussen: die
    twee meten verschillende dingen, en dat verschil is precies waarom een gat
@@ -2579,9 +2745,20 @@ function bankRenderInstel(r){
     '<div class="bk-velden">' +
     '<span><label for="bankRente" class="bk-lab">Spaarrente per jaar (%)</label><input id="bankRente" class="bk-w7" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '"></span>' +
     '<span><label for="bankRood" class="bk-lab">Standaard rood staan (€)</label><input id="bankRood" class="bk-w8" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '"></span>' +
-    '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
+    /* De twee plafonds staan hier en niet bij de tarieven, want dit zijn geen
+       getallen waarmee de bank REKENT: het zijn de harde grenzen waarop het
+       besluit onder WALLET_SALDO rust (kern/bevoegdheid/lijst.js). Wie ze
+       verzet, verzet de grond onder dat besluit -- vandaar de zin eronder. */
+    '<span><label for="bankWalletMax" class="bk-lab">Plafond per wallet (€)</label><input id="bankWalletMax" class="bk-w8" type="number" min="5000" max="100000" step="500" value="' + ((r.plafonds ? r.plafonds.walletCenten : 0) / 100) + '"></span>' +
+    '<span><label for="bankPuntenMax" class="bk-lab">Plafond punten-tegoed (€)</label><input id="bankPuntenMax" class="bk-w8" type="number" min="0" max="5000" step="50" value="' + ((r.plafonds ? r.plafonds.puntenCenten : 0) / 100) + '"></span>' +
+    '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button>' +
+    '<p class="bk-lab" style="flex-basis:100%;margin:.4rem 0 0;">De twee plafonds zijn de grond onder het besluit dat RTG ledengeld mag aanhouden zonder vergunning. Hoger zetten verzwakt die grond; het walletplafond kan niet onder de € 5.000 per boeking, want dan kan een lid een betaling niet meer bijladen.</p></div>';
   $('#bankInstelZet').addEventListener('click', async () => {
-    try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
+    try {
+      await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value),
+        walletPlafondEuro: Number($('#bankWalletMax').value), puntenPlafondEuro: Number($('#bankPuntenMax').value) });
+      meld('Instellingen bewaard.'); bankVervers();
+    } catch (e) { meld(e.message); }
   });
 }
 /* De Regelwacht: de belasting- en regeltabellen waarmee het hele systeem
@@ -2591,10 +2768,10 @@ function bankRenderInstel(r){
 function bankRenderRegels(s){
   const rijen = (s.landen || []).map(l =>
     '<div data-rwrij data-zoek="' + esc((l.naam + ' ' + l.code + ' ' + l.regio).toLowerCase()) + '" style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;' + bkLijn + 'font-size:.82rem;">' +
-    '<strong style="min-width:11rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--gold);font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
+    '<strong style="min-width:11rem;">' + esc(l.naam) + ' (' + esc(l.code) + ')' + (l.bijgewerkt ? ' <span style="color:var(--rtg-leesgoud,var(--gold));font-size:.7rem;">· bijgewerkt</span>' : '') + '</strong>' +
     '<span style="color:var(--soft);">' + esc(l.regio) + ' · btw ' + l.standaardBtw + '% · minimumloon € ' + l.uurloonMin + '/u · lasten ' + Math.round(l.lasten * 100) + '% · vakantiegeld ' + Math.round(l.vakantiegeld * 100) + '%</span></div>').join('');
   $('#bankRegels').innerHTML =
-    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;"><strong style="color:var(--gold);">' + (s.totaal || (s.landen || []).length) + ' landen</strong> -- de hele wereld, elke rekenplek rekent hiermee. Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
+    '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;"><strong style="color:var(--rtg-leesgoud,var(--gold));">' + (s.totaal || (s.landen || []).length) + ' landen</strong> -- de hele wereld, elke rekenplek rekent hiermee. Basis: ingebouwd peiljaar <strong>' + esc(String(s.peiljaar)) + '</strong>' +
       (s.versie ? ' · bronversie <strong>' + esc(String(s.versie)) + '</strong>' : '') +
       ((s.landenMetUpdates || []).length ? ' · ' + s.landenMetUpdates.length + ' land(en) bijgewerkt' : '') +
       (s.laatsteCheck ? ' · laatste controle ' + esc(new Date(s.laatsteCheck).toLocaleString('nl-NL')) : '') +
@@ -2606,7 +2783,27 @@ function bankRenderRegels(s){
       '<span><label for="rwVeld" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Regel</label><select id="rwVeld"><option value="uurloonMin">Minimumloon (€/u)</option><option value="lasten">Werkgeverslasten (0-0,6)</option><option value="vakantiegeld">Vakantiegeld (0-0,25)</option><option value="alcoholLeeftijd">Alcoholleeftijd</option></select></span>' +
       '<span><label for="rwWaarde" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nieuwe waarde</label><input id="rwWaarde" type="number" step="0.01" style="width:7rem;"></span>' +
       '<button class="knop stil" id="rwZet" type="button">Voer door</button>' +
-      '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>';
+      '<button class="knop stil" id="rwGesch" type="button">Wat veranderde?</button>' +
+      '<button class="knop stil" id="rwCheck" type="button" style="margin-left:auto;">Controleer de bron nu</button></div>' +
+    /* DE BRONNEN, met hun gezag. Een tarief uit de instantie zelf en een
+       tarief uit een spiegel zijn niet even hard, en dat hoort bij het getal te
+       staan in plaats van in een handleiding. */
+    '<div class="rw-bronnen">' + (s.bronnen || []).map(b =>
+      '<div class="rw-bron"><strong>' + esc(b.naam) + '</strong> <span class="stil">' + esc(b.gezag) + ' · ' +
+      (b.geconfigureerd ? 'geconfigureerd' : 'niet geconfigureerd (' + esc(b.env) + ')') +
+      (b.laatsteUitslag ? ' · ' + esc(b.laatsteUitslag) : '') + '</span>' +
+      (b.let ? '<span class="stil rw-bronlet">' + esc(b.let) + '</span>' : '') + '</div>').join('') +
+    /* DE SIGNALEN: wat een bron zag veranderen maar niet zelf mag toewijzen.
+       Dit is werk, geen melding -- welke categorie welk verlaagd tarief krijgt,
+       is een toewijzing die een mens maakt. Daarom krijgt dit kleur en de rest
+       hierboven niet. */
+    ((s.signalen || []).length
+      ? '<div class="rw-signalen"><strong>' + (s.signalen || []).length + ' toewijzing(en) om na te lopen</strong>' +
+        (s.signalen || []).slice(0, 12).map(g => '<div class="stil">' + esc(g.land) + ' · ' + esc(g.categorie) +
+          ' staat op ' + g.onsTarief + '%, de bron kent ' + (g.bronTarieven || []).join('%, ') + '%</div>').join('') +
+        '</div>'
+      : '') + '</div>' +
+    '<div id="rwUit"></div>';
   $('#rwZoek').addEventListener('input', () => {
     const q = $('#rwZoek').value.trim().toLowerCase();
     // inline display:flex wint van [hidden], dus schakel display zelf
@@ -2619,6 +2816,50 @@ function bankRenderRegels(s){
       bankVervers();
     } catch (e) { meld(e.message); }
   });
+  /* WAT VERANDERDE ER, EN WAT RAAKT DAT (server: kern/fiscaal/jaargangen.js en
+     kern/fiscaal/herkomst.js).
+
+     De lijst hierboven zegt DAT een land is bijgewerkt; dit zegt wat er is
+     gebeurd, wanneer het inging en wat het verving. En bij een tariefwijziging
+     de tweede vraag, die tot nu toe alleen met de hand te beantwoorden was:
+     welke facturen dragen na de ingangsdatum nog het oude percentage.
+
+     Dat is bewust een LIJST OM NA TE LOPEN en geen lijst met fouten -- een
+     levering van voor de wijziging mag het oude tarief dragen. De zin van de
+     server zegt dat, en hij wordt hier niet vervangen door iets stelligers. */
+  $('#rwGesch').addEventListener('click', async () => {
+    const land = $('#rwLand').value;
+    let g;
+    try { g = await api('bank/regels/geschiedenis', { land }); }
+    catch (e) { return meld(e.message); }
+    if (!g.wijzigingen.length) {
+      $('#rwUit').innerHTML = '<p class="stil">Voor ' + esc(land) + ' is niets doorgevoerd; hier geldt het ingebouwde peiljaar.</p>';
+      return;
+    }
+    const veldjes = (w) => Object.entries(w || {}).map(([k, v]) =>
+      esc(k) + ': ' + esc(typeof v === 'object' ? Object.entries(v).map(([a, b]) => a + ' ' + b).join(', ') : String(v))).join(' · ');
+    $('#rwUit').innerHTML = g.wijzigingen.map(w =>
+      '<div data-rwj="' + esc(w.id) + '" style="padding:.45rem 0;' + bkLijn + 'font-size:.82rem;">' +
+      '<strong>' + esc(w.geldigVanaf) + '</strong> · ' + veldjes(w.wijzigingen) +
+      '<span style="color:var(--soft);"> (was ' + veldjes(w.vorige) + ')</span>' +
+      '<span style="color:var(--soft);"> · ' + esc(w.stand) + ' · bron ' + esc((w.bron && (w.bron.naam || w.bron.soort)) || 'onbekend') + '</span>' +
+      (w.wijzigingen && w.wijzigingen.tarieven
+        ? ' <button class="knop stil" type="button" data-raak="' + esc(w.id) + '">Wat raakt dit?</button>' : '') +
+      '</div>').join('');
+    $('#rwUit').querySelectorAll('[data-raak]').forEach(b => b.addEventListener('click', async () => {
+      let r;
+      try { r = await api('bank/regels/geraakt', { land, jaargang: b.dataset.raak }); }
+      catch (e) { return meld(e.message); }
+      const rij = $('#rwUit').querySelector('[data-rwj="' + b.dataset.raak + '"]');
+      const uit = document.createElement('p');
+      uit.className = 'stil';
+      uit.textContent = r.facturen + ' factuur/facturen (' + r.regels + ' regels) bij ' + r.zaken.length +
+        ' zaak/zaken dragen na ' + r.geldigVanaf + ' nog een vervangen percentage. ' + r.let;
+      rij.appendChild(uit);
+      b.remove();
+    }));
+  });
+
   $('#rwCheck').addEventListener('click', async () => {
     try { const d = await api('bank/regels/check'); meld(d.ok ? (d.bron ? 'Bron gecontroleerd: ' + (d.bijgewerkt || 0) + ' land(en) bijgewerkt.' : 'Geen externe bron gekoppeld; het peiljaar plus doorgevoerde updates geldt.') : d.fout); bankVervers(); }
     catch (e) { meld(e.message); }
@@ -3134,7 +3375,7 @@ function stadRenderScenario(){
     '</div>' +
     '<div style="display:flex;gap:.5rem;flex-wrap:wrap;">' + seg + '</div>' +
     (actief ? '<p style="margin:.6rem 0 0;color:var(--soft);font-size:.85rem;">' + esc(actief.uitleg) + '</p>' : '') +
-    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
+    (b.alerts.length ? '<div style="margin-top:.6rem;padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;font-size:.85rem;">' + b.alerts.map(a => '⚠ ' + esc(a.tekst)).join('<br>') + '</div>' : '');
   $('#stadWie').addEventListener('input', e => { stadWie = e.target.value; });
   $('#stadScenario').querySelectorAll('[data-scenario]').forEach(k => k.addEventListener('click', async () => {
     try { const r = await api('stad/scenario', { scenario: k.dataset.scenario, naam: stadWie });
@@ -3175,7 +3416,7 @@ function stadRenderNodeAan(){
     try {
       const r = await api('stad/node/aanmeld', { doosNaam: $('#stadDoosNaam').value, zone: $('#stadZoneSel').value,
         sensoren: $('#stadSens').value.split(',').map(s => s.trim()).filter(Boolean), naam: stadWie });
-      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:8px;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
+      $('#stadSleutel').innerHTML = '<div style="padding:.55rem .7rem;border:1px solid var(--gold);border-radius:0;"><strong>' + esc(r.serial) + '</strong> · apparaat-sleutel: <code>' + esc(r.sleutel) + '</code><br><span style="color:var(--soft);">' + esc(r.let_op) + '</span></div>';
       $('#stadDoosNaam').value = ''; $('#stadSens').value = '';
       stadVervers();
     } catch (e) { meld(e.message); }
@@ -3312,7 +3553,7 @@ async function laadPapieren(baas){
   try { d = await api('papieren'); } catch (e) { $('#bPapStand').textContent = e.message; return; }
 
   $('#bPapStand').innerHTML = d.klaar
-    ? '<span style="color:var(--gold);">Alle achttien zijn ingevuld.</span>'
+    ? '<span style="color:var(--rtg-leesgoud,var(--gold));">Alle achttien zijn ingevuld.</span>'
     : '<b>' + d.open + '</b> van de ' + d.totaal + ' staan nog open.' +
       (d.bijgewerkt ? ' <span style="color:var(--soft);">Laatst bijgewerkt ' + new Date(d.bijgewerkt).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '.</span>' : '');
 
@@ -3356,7 +3597,7 @@ async function laadPapieren(baas){
   $('#bPapLijst').querySelectorAll('[data-pappark]').forEach(b => b.addEventListener('click', () => zet(b.dataset.pappark, true)));
 
   $('#bPapSpoor').innerHTML = (d.spoor && d.spoor.length) ? d.spoor.map(x =>
-    '<div class="witem"><span class="wnm" style="color:var(--gold);">' + esc(x.door || 'onbekend') + '</span>' +
+    '<div class="witem"><span class="wnm" style="color:var(--rtg-leesgoud,var(--gold));">' + esc(x.door || 'onbekend') + '</span>' +
     '<span class="wdt">' + esc(x.actie) + ': ' + esc(x.id) + '</span>' +
     '<span style="color:var(--soft);font-size:.72rem;">' + new Date(x.at).toLocaleString('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + '</span></div>').join('')
     : '<div class="leeg">Nog niets gewijzigd.</div>';
@@ -3393,7 +3634,7 @@ async function openBoard(){
   wereldWidget($('#bWereld'));
   api('stats').then(s => { $('#bStats').innerHTML = statsHtml(s); }).catch(() => {});
   $('#bAudit').innerHTML = (d.audit && d.audit.length) ? d.audit.map(a =>
-    '<div class="witem"><span class="wnm" style="color:var(--gold);">'+esc(a.wie)+'</span><span class="wdt">'+esc(a.wat)+'</span>'+
+    '<div class="witem"><span class="wnm" style="color:var(--rtg-leesgoud,var(--gold));">'+esc(a.wie)+'</span><span class="wdt">'+esc(a.wat)+'</span>'+
     '<span style="color:var(--soft);font-size:.72rem;">'+new Date(a.at).toLocaleString('nl-NL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})+'</span></div>').join('')
     : '<div class="leeg">Nog geen handelingen gelogd.</div>';
   chatWidget($('#bChat'), 'boardroom');
@@ -3475,7 +3716,7 @@ async function openBoard(){
       .concat((f.persoonUit || []).map(p => 'persoon ' + ((p && p.label) || p)));
     const automaat = f.automaat ? ('wachter: ' + (f.automaat.stand === 'dicht' ? 'automatisch dicht' : 'op proef open') + ' (ronde ' + f.automaat.ronde + ')') : '';
     const s = delen.concat(automaat ? [automaat] : []).join(' · ');
-    return s ? '<br><span style="color:var(--gold);">' + esc(s) + '</span>' : '';
+    return s ? '<br><span style="color:var(--rtg-leesgoud,var(--gold));">' + esc(s) + '</span>' : '';
   };
   $('#bSchakels').innerHTML = koppelKaart + d.functies.map(g =>
     '<div class="kaart cat"><h4>'+esc(g.categorie)+'</h4>'+g.functies.map(f =>
@@ -3520,7 +3761,7 @@ async function laadMagnaatLeren(){
         '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="terug-naar-ontwerp">Terug naar ontwerp</button>'+
         '<button class="knop stil" type="button" data-ml-id="'+esc(k.id)+'" data-ml-keuze="afwijzen">Afwijzen</button></div>';
       return '<div class="voorstel" style="display:block;margin-bottom:.65rem;">'+
-        '<div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;"><span class="kamerlabel">'+esc(k.soort||'patroon')+'</span><span class="stil" style="font-size:.7rem;color:var(--gold);">'+esc(k.status||'kandidaat')+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:.7rem;align-items:center;"><span class="kamerlabel">'+esc(k.soort||'patroon')+'</span><span class="stil" style="font-size:.7rem;color:var(--rtg-leesgoud,var(--gold));">'+esc(k.status||'kandidaat')+'</span></div>'+
         '<b style="display:block;margin:.45rem 0 .25rem;">'+esc(k.titel||k.id)+'</b>'+
         (bewijs?'<div class="stil" style="font-size:.76rem;color:var(--soft);">Bewijs: '+esc(bewijs)+'</div>':'')+
         (t.gegeven?'<div style="font-size:.8rem;line-height:1.55;margin-top:.45rem;"><b>Proef:</b> '+esc(t.gegeven)+' → '+esc(t.dan||'controleer de uitkomst')+'</div>':'')+
@@ -3559,22 +3800,27 @@ async function laadGeld(){
   try {
     const d = await api('geld');
     const genres = d.genres.map(g => '<option value="'+esc(g.id)+'">'+esc(g.label||g.id)+'</option>').join('');
-    if (!$('#gComGenre').options.length) { $('#gComGenre').innerHTML = genres; $('#gKorGenre').innerHTML = genres; }
+    if (!$('#gKorGenre').options.length) { $('#gKorGenre').innerHTML = genres; }
+    /* De prijsregel per trede komt uit de ladder en wordt niet hier opgebouwd:
+       een contractuele trede draagt `vanafCenten` en GEEN maandbedrag, en wie
+       dat verschil hier zou platslaan, zet een bodem neer als prijs. */
     const p = d.pasprijzen;
-    $('#gPasNu').textContent = 'Nu: RTG ' + eurC(p.rtg.maandCenten) + ' · Lifestyle ' + eurC(p.lifestyle.maandCenten) + ' · gratis app € 0 · Business op maat · 30% naar RTFoundation';
+    $('#gPasNu').textContent = 'Nu: ' + Object.values(p).map(r =>
+      r.naam + ' ' + (Number.isFinite(r.maandCenten) ? eurC(r.maandCenten)
+        : Number.isFinite(r.vanafCenten) ? 'vanaf ' + eurC(r.vanafCenten) : 'op maat')
+      + (r.beschikbaar === false ? ' (nog niet beschikbaar)' : '')).join(' · ')
+      + ' · 30% naar RTFoundation';
     const kort = Object.entries(d.kortingen).map(([g, pct]) => esc(g) + ' ' + pct + '%').join(', ');
-    const com = Object.entries(d.commissies.standaard).map(([g, r]) => esc(g) + ' ' + (r*100).toFixed(1) + '%').join(', ');
-    const per = Object.entries(d.commissies.perZaak).map(([c, r]) => esc(c) + ' ' + (r*100).toFixed(1) + '%').join(', ');
-    $('#gStand').innerHTML = 'Ledenvoordeel: ' + (kort || 'geen') + '<br>Vergoeding per genre: ' + (com || 'standaard van de zaak') + (per ? '<br>Eigen afspraken: ' + per : '');
+    $('#gStand').innerHTML = 'Ledenvoordeel: ' + (kort || 'geen');
+    // de partnervergoeding is nul en er valt niets te zetten; wel te lezen wat er WEL in rekening komt
+    const v = d.partnervergoeding || {};
+    $('#gVergoeding').innerHTML = '<b>' + ((v.overOmzet || 0) * 100).toFixed(0) + '%</b> over de omzet van een partner. ' +
+      esc(v.uitleg || '') + '<br><span style="color:var(--soft);">' +
+      (d.vergoedingssoorten || []).map(x => '<b>' + esc(x.label) + '</b>: ' + esc(x.grondslag)).join('<br>') + '</span>';
   } catch (e) { $('#gStand').textContent = e.message; }
 }
 $('#gPasZet').addEventListener('click', async () => {
   try { await api('geld/pasprijs', { pas: $('#gPasKeuze').value, euro: Number($('#gPasEuro').value) }); meld('Pasprijs gezet; de voorwaarden tonen meteen het nieuwe bedrag.'); laadGeld(); }
-  catch (e) { meld(e.message); }
-});
-$('#gComZet').addEventListener('click', async () => {
-  const zaak = $('#gComZaak').value.trim().toUpperCase();
-  try { await api('geld/commissie', zaak ? { code: zaak, pct: Number($('#gComPct').value) } : { genre: $('#gComGenre').value, pct: Number($('#gComPct').value) }); meld('Vergoeding gezet.'); laadGeld(); }
   catch (e) { meld(e.message); }
 });
 $('#gKorZet').addEventListener('click', async () => {
@@ -3610,7 +3856,7 @@ async function laadDoosRegie(){
     if (r.update && !$('#dVersie').value) { $('#dVersie').value = r.update.versie; $('#dNotities').value = r.update.notities || ''; }
     $('#dStand').textContent = r.update ? 'Doelversie: v' + r.update.versie + ' (gezet door ' + r.update.door + ')' : 'Nog geen doelversie gezet; de vloot draait wat hij draait.';
     $('#dStatussen').innerHTML = (r.statussen || []).slice(0, 6).map(s =>
-      '<span style="color:var(--gold);">'+esc(s.doos)+'</span> ' + (s.gelukt ? 'update gelukt' : 'update NIET gelukt') +
+      '<span style="color:var(--rtg-leesgoud,var(--gold));">'+esc(s.doos)+'</span> ' + (s.gelukt ? 'update gelukt' : 'update NIET gelukt') +
       (s.naar ? ' naar v'+esc(s.naar) : '') + ': ' + esc(s.melding)).join('<br>') || '';
   } catch (e) { $('#dStand').textContent = e.message; }
 }
@@ -3704,11 +3950,11 @@ async function laadLedenregister(){
   const eur = c => '€ ' + (Math.round(Number(c)*100)/100).toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const kop = t => '<div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin:.7rem 0 .35rem;">'+t+'</div>';
   const tegels = arr => '<div style="display:flex;flex-wrap:wrap;gap:.5rem;">'+arr.map(x =>
-    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:10px;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--gold);">'+x.aantal+'</span></span>').join('')+'</div>';
+    '<span style="background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.35rem .7rem;font-size:.82rem;"><b>'+esc(x.naam)+'</b> <span style="color:var(--rtg-leesgoud,var(--gold));">'+x.aantal+'</span></span>').join('')+'</div>';
   // de omzet + 30%-split
   const omzetRijen = (d.omzet||[]).map(o =>
-    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span class="h-flex1"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
-    '<span style="color:var(--gold);font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
+    '<div class="taakrij" style="border-bottom:1px solid var(--line);padding:.4rem 0;gap:.6rem;"><span style="flex:1;"><b>'+esc(o.pasNaam)+'</b> <span class="stil" style="color:var(--soft);font-size:.72rem;">'+o.aantal+' leden'+(o.opMaat?'':' · '+eur(o.prijsPP)+' p/m ex btw')+'</span></span>'+
+    '<span style="color:var(--rtg-leesgoud,var(--gold));font-size:.82rem;">'+(o.opMaat?'op maat':eur(o.maandOmzet)+' /mnd')+'</span></div>').join('');
   const s = d.split || {};
   box.innerHTML =
     kop('Per pas') + tegels((d.perPas||[]).map(p => ({ naam: p.naam, aantal: p.aantal }))) +
@@ -3716,11 +3962,11 @@ async function laadLedenregister(){
     kop('Per land (top)') + tegels((d.perLand||[]).slice(0,12)) +
     kop('Per stad (top)') + tegels((d.perStad||[]).slice(0,12)) +
     kop('Omzet per pas') + omzetRijen +
-    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:12px;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
+    '<div style="margin-top:.6rem;background:var(--paneel2,#1B1817);border:1px solid var(--line);border-radius:0;padding:.7rem .9rem;line-height:1.7;font-size:.86rem;">'+
       'Maandomzet (bekende prijzen): <b>'+eur(s.totaalOmzet)+'</b><br>'+
-      '30% naar de RTFoundation: <b style="color:var(--gold);">'+eur(s.foundation30)+'</b><br>'+
+      '30% naar de RTFoundation: <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(s.foundation30)+'</b><br>'+
       '&nbsp;&nbsp;20% lokaal: <b>'+eur(s.lokaal20)+'</b> · 10% RTFoundation: <b>'+eur(s.rtf10)+'</b>'+
-      (s.businessOpMaat ? '<br><span class="stil" style="color:var(--soft);font-size:.78rem;">'+s.businessOpMaat+' Business-lid(en) op maat: de 30% geldt ook daar, over de afgesproken prijs.</span>' : '')+
+      (s.businessOpMaat ? '<br><span class="stil" style="color:var(--soft);font-size:.78rem;">'+s.businessOpMaat+' lid(en) op contractprijs (Business, Lifestyle): niet in het totaal hierboven; de 30% geldt daar over de afgesproken prijs.</span>' : '')+
     '</div>';
   // de alfabetische, gefilterde ledenlijst
   const lijst = d.lijst || [];

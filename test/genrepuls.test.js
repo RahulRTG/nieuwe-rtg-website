@@ -4,7 +4,7 @@
    de eigen genre-motor haalt, dat een nog niet geseede zaak netjes
    puls:null krijgt (de route seedt zelf niets), en dat genres met een
    eigen plus-laag (zoals horeca) geen pols zien.
-   Draai los: node --experimental-sqlite --test test/genrepuls.test.js */
+   Draai los: node --test test/genrepuls.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

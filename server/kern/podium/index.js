@@ -19,6 +19,8 @@
    levensloop van een kanaal in ./kanaal, de zaal (chat/cadeau/abonnement/
    veiligheid) in ./interactie. */
 
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const MIN_LEEFTIJD = 18;
 const CADEAUS = [
   { id: 'roos',     naam: 'Roos',     icoon: '\u{1F339}', centen: 500 },
@@ -48,9 +50,9 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
      genoeg. Welke zone WELKE eis stelt staat in ./zones.js -- daar hoort dat
      besluit, niet hier. */
   function accountVanKey(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
+    const id = idVanKey(key);
+    if (id == null) return null;
+    try { return accounts.getUserById(id); } catch (e) { return null; }
   }
   function lat(key, minLeeftijd, opties) {
     const u = accountVanKey(key);

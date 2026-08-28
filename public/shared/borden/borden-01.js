@@ -24,25 +24,25 @@
     s.id = 'bordStijl';
     s.textContent =
       '.bd-chips{display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.8rem;}' +
-      '.bd-chip{background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:999px;padding:0.45rem 0.9rem;font-size:0.76rem;color:var(--txt,#F4F1EC);cursor:pointer;}' +
+      '.bd-chip{background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;padding:0.45rem 0.9rem;font-size:0.76rem;color:var(--txt,#F4F1EC);cursor:pointer;}' +
       '.bd-chip.aan{border-color:var(--gold,#A98F1C);color:var(--gold,#A98F1C);font-weight:600;}' +
       '.bd-kolommen{display:flex;gap:0.7rem;overflow-x:auto;padding:0.9rem 0 1rem;align-items:flex-start;}' +
-      '.bd-kolom{background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:14px;padding:0.7rem;min-width:230px;max-width:260px;flex-shrink:0;}' +
+      '.bd-kolom{background:var(--card,#151312);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;padding:0.7rem;min-width:230px;max-width:260px;flex-shrink:0;}' +
       '.bd-kolom .kop{display:flex;justify-content:space-between;align-items:center;gap:0.4rem;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft,rgba(244,241,236,0.62));font-weight:700;padding:0 0.2rem 0.5rem;}' +
-      '.bd-kaart{background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:10px;padding:0.55rem 0.65rem;margin-bottom:0.45rem;font-size:0.82rem;}' +
+      '.bd-kaart{background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;padding:0.55rem 0.65rem;margin-bottom:0.45rem;font-size:0.82rem;}' +
       '.bd-kaart.klaar{opacity:0.55;}.bd-kaart.klaar b{text-decoration:line-through;}' +
       '.bd-kaart b{display:block;font-weight:600;line-height:1.35;}' +
       '.bd-kaart .mt{display:flex;gap:0.35rem;align-items:center;flex-wrap:wrap;margin-top:0.35rem;font-size:0.62rem;color:var(--soft,rgba(244,241,236,0.62));}' +
-      '.bd-due{border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:999px;padding:0.1rem 0.45rem;}' +
+      '.bd-due{border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;padding:0.1rem 0.45rem;}' +
       '.bd-due.laat{color:#FF8589;border-color:rgba(229,72,77,0.5);}' +
       '.bd-av{display:inline-flex;align-items:center;justify-content:center;background:var(--card,#151312);border:1px solid var(--gold,#A98F1C);color:var(--gold,#A98F1C);border-radius:50%;width:1.25rem;height:1.25rem;font-size:0.55rem;font-weight:700;}' +
       '.bd-knopjes{display:flex;gap:0.25rem;margin-top:0.4rem;}' +
-      '.bd-knopjes button{background:none;border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:7px;color:var(--soft,rgba(244,241,236,0.62));font-size:0.68rem;padding:0.18rem 0.42rem;cursor:pointer;}' +
+      '.bd-knopjes button{background:none;border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;color:var(--soft,rgba(244,241,236,0.62));font-size:0.68rem;padding:0.18rem 0.42rem;cursor:pointer;}' +
       '.bd-knopjes button:hover{color:var(--txt,#F4F1EC);border-color:var(--gold,#A98F1C);}' +
       '.bd-vuil{width:0.9em;height:0.9em;vertical-align:-0.12em;display:inline-block;}' +
       '.bd-kolom .kop .bd-vuil{width:0.95em;height:0.95em;}' +
-      '.bd-add{width:100%;background:none;border:1px dashed var(--line,rgba(255,255,255,0.16));border-radius:10px;color:var(--soft,rgba(244,241,236,0.62));font-size:0.76rem;padding:0.5rem;cursor:pointer;}' +
-      '.bd-in{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:10px;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt,#F4F1EC);outline:none;margin-bottom:0.4rem;}' +
+      '.bd-add{width:100%;background:none;border:1px dashed var(--line,rgba(255,255,255,0.16));border-radius:0;color:var(--soft,rgba(244,241,236,0.62));font-size:0.76rem;padding:0.5rem;cursor:pointer;}' +
+      '.bd-in{width:100%;background:var(--card2,#1B1817);border:1px solid var(--line,rgba(255,255,255,0.09));border-radius:0;padding:0.5rem 0.6rem;font-size:0.82rem;color:var(--txt,#F4F1EC);outline:none;margin-bottom:0.4rem;}' +
       '.bd-groep{font-size:0.72rem;color:var(--soft,rgba(244,241,236,0.62));margin-top:0.3rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}' +
       '.bd-groep label{display:inline-flex;gap:0.25rem;align-items:center;cursor:pointer;}';
     document.head.appendChild(s);

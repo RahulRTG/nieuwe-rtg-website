@@ -21,7 +21,7 @@
    Draait alleen waar Playwright beschikbaar is. Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -32,11 +32,10 @@ const path = require('path');
    "Executable doesn't exist", en zegt de toets iets over de omgeving in plaats
    van over het scherm. `test/browser.js` bestaat precies daarvoor: die probeert
    te STARTEN en loopt de kandidaten af. */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('de klant nodigt uit, ziet het voorstel en trekt weer in',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bijstandscherm-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -53,7 +52,7 @@ test('de klant nodigt uit, ziet het voorstel en trekt weer in',
     assert.equal((await post('/api/techniek/tenant/bind',
       { org: 'O-HOSHI', soort: 'werkruimte', code: w.werkruimte }, eigenaar)).s, 200);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];

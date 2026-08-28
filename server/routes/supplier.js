@@ -9,6 +9,11 @@ module.exports = (kern) => {
 
 /* De toegang- en backofficelaag draaien als submodules op de gedeelde kern. */
 require('./supplier/toegang')(kern);
+/* Wat het abonnement van deze zaak bevat, en wie haar aanspreekpunt is. Zie
+   ./supplier/abonnement.js: de poort houdt sinds vandaag onderdelen tegen die er
+   niet in zitten, en een grens die je pas voelt als je ertegenaan loopt is geen
+   product maar een verrassing. */
+require('./supplier/abonnement')(kern);
 require('./supplier/moedertaal')(kern);
 /* De zakelijke kant van het communicatieplatform: dezelfde kern als de
    ledenapp, met de sleutel die uit de sessie volgt. Zie ./supplier/comm.js. */

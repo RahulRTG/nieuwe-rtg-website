@@ -164,6 +164,51 @@ test('6. een onbevestigde allergiewijziging die toch doorliep, wordt geteld', as
   assert.match(punt(m2, 'onbevestigde allergie').rekensom, /wachten er/, 'met hoeveel er nu wachten');
 });
 
+/* ----------------------------------------------------------------------------
+   6. EEN BELOFTE OVER MIDDERNACHT HEEN BLIJFT EEN BELOFTE.
+
+   Een gang die om 23:35 wordt vrijgegeven met "we serveren om 00:05" is een
+   normale bestelling in een keuken die 's avonds draait -- geen gang die
+   drieentwintig uur te vroeg klaar stond. De meting plakte de afgesproken tijd
+   op de dag waarop de gang klaar was en kwam daardoor uit op 1411 minuten; in
+   CI zakte deze suite daar ook echt op, om 23:35 UTC. De cadanslaag las de klok
+   al goed, en die lezing wordt nu gedeeld. Beide kanten staan hier: de gang die
+   over middernacht heen wordt beloofd, en de gang die na middernacht klaar komt
+   terwijl de belofte van voor middernacht is.
+   -------------------------------------------------------------------------- */
+const { belofte } = require('../server/kern/horeca/dienstmeting-tijden');
+
+function gangMet(vrij, klaar, om) {
+  return [{ regels: [{ gang: 2, serveerOm: om, vrijAt: vrij.toISOString(), klaarAt: klaar.toISOString() }] }];
+}
+const opDag = (u, m, dagen) => {
+  const d = new Date(2026, 7, 20 + (dagen || 0), u, m, 0, 0);
+  return d;
+};
+
+test('6. een serveertijd na middernacht is geen gang van gisteren', () => {
+  /* Vrijgegeven om 23:35, beloofd voor 00:05, klaar om 00:06: een minuut laat. */
+  const uit = belofte(gangMet(opDag(23, 35), opDag(0, 6, 1), '00:05'), 'beloofde versus werkelijke');
+  assert.equal(uit.soort, 'gemeten');
+  assert.ok(uit.waarde <= 2, 'een minuut te laat, geen kwart etmaal: ' + uit.waarde);
+});
+
+test('6b. en een belofte van voor middernacht telt niet als bijna een dag te vroeg', () => {
+  /* Vrijgegeven om 23:20, beloofd voor 23:50, klaar om 00:10 de volgende dag. */
+  const uit = belofte(gangMet(opDag(23, 20), opDag(0, 10, 1), '23:50'), 'beloofde versus werkelijke');
+  assert.equal(uit.soort, 'gemeten');
+  assert.ok(uit.waarde >= 19 && uit.waarde <= 21, 'twintig minuten uitgelopen: ' + uit.waarde);
+});
+
+/* ----------------------------------------------------------------------------
+   EN DEZELFDE VONDST VAN DE ANDERE KANT.
+
+   Deze toets komt van main: een tweede sessie liep dezelfde nacht tegen
+   dezelfde middernachtfout aan en schreef er zijn eigen proef bij, met een
+   gang die om 23:55 klaarstaat op een belofte van 00:20. Hij blijft staan, en
+   met opzet: hij geeft GEEN vrijAt mee, dus hij houdt vast dat de meting ook
+   klopt als het moment van vrijgeven ontbreekt en er op het klaar-moment moet
+   worden geankerd. Hernummerd naar 7 omdat 6 hierboven al bezet was. */
 /* DE BELOFTE OVER MIDDERNACHT HEEN.
 
    Toets 4 hierboven bouwt zijn serveertijd als "nu + 30 minuten" in HH:MM, en
@@ -177,7 +222,7 @@ test('6. een onbevestigde allergiewijziging die toch doorliep, wordt geteld', as
    Deze toets voedt de rekenkant rechtstreeks met vaste tijdstempels, zodat hij
    niet afhangt van het moment waarop de suite draait -- dat is immers precies
    wat toets 4 de das omdeed. */
-test('6. een gang die om 23:55 klaarstaat met belofte 00:20 is 25 minuten TE VROEG, geen dag', () => {
+test('7. een gang die om 23:55 klaarstaat met belofte 00:20 is 25 minuten TE VROEG, geen dag', () => {
   const { REGELS } = require('../server/kern/horeca/dienstmeting')(
     { horeca: { nu: () => new Date().toISOString() } });
   assert.ok(REGELS.length >= 12, 'de meetlat staat er nog');

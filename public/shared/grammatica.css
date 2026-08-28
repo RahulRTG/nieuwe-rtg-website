@@ -1,0 +1,177 @@
+/* DE GRAMMATICA, in vorm. De regels staan in GRAMMATICA.md, het gedrag in
+   shared/adaptief/. shared/adaptief.css draagt de basislaag (de tijdelijke lagen
+   en de contextzone); dit blad draagt wat daar bovenop kwam:
+
+     de Trust Rail        de strook boven het dock
+     het gewicht          de lades waarin bevestigd wordt
+     vasthouden           de knop die niet met één tik afgaat
+     waarom               hoe een verhinderde handeling eruitziet
+
+   Hetzelfde materiaal als de rest: onyxglas, haarlijnen, Inter, en goud
+   uitsluitend waar het iets betekent (MATERIAAL.md, ONTWERP.md par. 4). */
+
+/* ======================================================== de Trust Rail == */
+.cmd-rail{
+  display:flex;align-items:center;gap:.1rem;min-height:30px;padding:0 .55rem;
+  border-top:1px solid var(--rtg-line);background:rgba(12,12,11,.94);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  color:var(--rtg-soft,#8A8680);font:400 .68rem/1 var(--rtg-interface,'Inter',sans-serif);
+  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  max-height:60px;
+  transition:max-height 180ms var(--rtg-veer,cubic-bezier(.22,.61,.36,1)),
+             opacity 180ms var(--rtg-veer,cubic-bezier(.22,.61,.36,1));
+}
+.cmd-rail::-webkit-scrollbar{display:none}
+.cmd-rail[hidden]{display:none}
+
+.rail-deel{
+  position:relative;flex:0 0 auto;display:inline-flex;align-items:center;gap:.3rem;
+  border:0;background:transparent;color:inherit;padding:.35rem .4rem;cursor:pointer;
+  font:inherit;white-space:nowrap;
+}
+/* HET RAAKVLAK IS GROTER DAN DE INKT, en dat is hier de enige manier om allebei
+   te krijgen: een strook die rustig genoeg is om te negeren, en een knop die een
+   duim kan raken. De inkt is 30px hoog, het raakvlak 44 -- zeven pixels erboven
+   en zeven eronder. Naar beneden loopt dat over de bovenrand van het dock, en dat
+   is ongevaarlijk: het dock staat later in de DOM en wint de aanraking daar. */
+.rail-deel::after{content:"";position:absolute;left:-2px;right:-2px;top:-7px;bottom:-7px}
+.rail-deel:hover,.rail-deel:focus-visible{color:var(--rtg-txt,#F4F1EC)}
+.rail-teken{font-size:.78em;opacity:.9}
+.rail-scheiding{flex:0 0 auto;opacity:.4;padding:0 .1rem}
+/* AANDACHT DRAAGT EEN WOORD EN GEEN KLEUR ALLEEN (ONTWERP.md par. 5). Het goud
+   is een tweede signaal naast de tekst, nooit het enige. */
+.rail-deel.aandacht{color:var(--gold-tekst,#C0A544)}
+.rail-deel.bezig{opacity:.75}
+.cmd-rail[data-staat="aandacht"]{border-top-color:rgba(192,165,68,.42)}
+
+.rail-melding{display:flex;align-items:center;gap:.7rem;width:100%;min-width:0}
+.rail-melding > span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  color:var(--rtg-txt,#F4F1EC)}
+.rail-ongedaan{
+  position:relative;flex:0 0 auto;border:0;background:transparent;cursor:pointer;
+  color:var(--gold-tekst,#C0A544);font:600 .7rem var(--rtg-interface,'Inter',sans-serif);
+  padding:.35rem .4rem;text-decoration:underline;text-underline-offset:3px;
+}
+.rail-ongedaan::after{content:"";position:absolute;left:-6px;right:-6px;top:-7px;bottom:-7px}
+.rail-uitleg{margin:0;padding:.45rem 1rem;color:var(--rtg-muted,#8A8680);
+  font:400 .8rem/1.5 var(--rtg-interface,'Inter',sans-serif)}
+
+/* DE CHROME ZAKT IN TIJDENS HET WERK, HET DOCK NIET.
+   Wie leest of typt heeft geen statusstrook nodig; wie leest of typt heeft zijn
+   handelingen juist wél nodig. Vandaar dat hier de rail en de bladnaam wijken en
+   de knoppenrij blijft staan waar hij stond -- de eerste zin van deze grammatica
+   is dat je duim zijn werk onderaan vindt, en dat mag scrollen niet afnemen. */
+/* min-height:0 ALLEEN IS NIET GENOEG, en dat is hier gemeten: de strook bleef
+   dertig pixels hoog omdat haar KINDEREN die hoogte vragen. Een minimum verlagen
+   krimpt niets; een maximum wel. De bovenrand gaat mee, anders blijft er een
+   haarlijn zweven die naar niets meer hoort.
+
+   De eerste kiezer (~) staat er niet meer: de rail komt VOOR het dock in de DOM,
+   en de algemene broer-kiezer kijkt alleen vooruit. Hij deed dus niets, en zag
+   eruit alsof hij het werk deed. */
+.cmd-rail:has(+ .cmd-balk[data-bezig="1"]){
+  min-height:0;max-height:0;opacity:0;pointer-events:none;overflow:hidden;border-top-width:0}
+.cmd-balk[data-bezig="1"] .cmd-anker{display:none}
+
+/* Terwijl je het dock omhoog trekt: één streep die zegt hoe ver je bent. Geen
+   tekst, want tijdens een gebaar leest niemand. */
+.cmd-balk[data-trek]{position:relative}
+.cmd-balk[data-trek="een"]::before,.cmd-balk[data-trek="twee"]::before{
+  content:"";position:absolute;left:50%;transform:translateX(-50%);top:-9px;
+  width:36px;height:3px;border-radius:0;background:var(--rtg-soft,#8A8680);
+}
+.cmd-balk[data-trek="twee"]::before{width:72px;background:var(--gold-tekst,#C0A544)}
+
+/* ==================================================== verhinderd == */
+/* NIET ALLEEN GRIJS. Een lichtere knop is een kleursignaal, en dat leest niet
+   iedereen; de streep erdoorheen is een VORM en zegt hetzelfde. De toegankelijke
+   NAAM zegt het voor wie luistert ("niet beschikbaar, tik voor de reden"), en de
+   knop blijft gewoon bedienbaar -- hij doet alleen iets anders: hij legt zichzelf
+   uit (shared/adaptief/waarom.js). Hier stond aria-disabled, en dat is precies
+   verkeerd: dan slaat een schermlezer hem over, en is de uitleg onbereikbaar
+   voor wie hem het hardst nodig heeft. */
+.cmd-actie.verhinderd,.lg-rij.verhinderd{opacity:.45;position:relative}
+.cmd-actie.verhinderd::after,.lg-rij.verhinderd::after{
+  content:"";position:absolute;left:22%;right:22%;top:50%;height:1px;
+  background:currentColor;transform:rotate(-16deg);pointer-events:none;
+}
+.lg-rij.verhinderd::after{left:auto;width:14px;right:1rem;transform:rotate(-16deg)}
+.cmd-actie.verhinderd:hover,.lg-rij.verhinderd:hover{opacity:.7}
+
+.wm-reden{margin:0;padding:.6rem 1rem .2rem;color:var(--rtg-txt,#F4F1EC);
+  font:400 .88rem/1.55 var(--rtg-interface,'Inter',sans-serif)}
+.wm-belofte{margin:0;padding:.6rem 1rem;color:var(--rtg-muted,#8A8680);
+  font:400 .84rem/1.5 var(--rtg-interface,'Inter',sans-serif)}
+.wm-bron{display:flex;gap:.7rem;padding:.5rem 1rem;border-top:1px solid var(--rtg-line);
+  border-bottom:1px solid var(--rtg-line);margin-top:.5rem;
+  font:400 .78rem var(--rtg-interface,'Inter',sans-serif);color:var(--rtg-muted,#8A8680)}
+.wm-bronkop{flex:0 0 5.5rem;color:var(--rtg-soft,#8A8680);
+  font:600 .56rem/1.6 var(--rtg-interface,'Inter',sans-serif);letter-spacing:.18em;text-transform:uppercase}
+.wm-stap{margin:0;padding:.55rem 1rem;color:var(--rtg-soft,#8A8680);
+  font:400 .78rem/1.5 var(--rtg-interface,'Inter',sans-serif)}
+
+/* ========================================================= het gewicht == */
+.gw-uitleg{margin:0;padding:.55rem 1rem;color:var(--rtg-txt,#F4F1EC);
+  font:400 .86rem/1.5 var(--rtg-interface,'Inter',sans-serif)}
+.gw-plechtig{margin:0;padding:.5rem 1rem;color:var(--gold-tekst,#C0A544);
+  font:400 .78rem/1.5 var(--rtg-interface,'Inter',sans-serif)}
+/* Een REGISTER en geen kaartjes: kop links, waarde rechts, op haarlijnen
+   (ONTWERP.md par. 7). Wie een bedrag moet nakijken, leest liever een rij dan
+   een tegel. */
+.gw-paar{display:flex;gap:.7rem;align-items:baseline;padding:.5rem 1rem;
+  border-bottom:1px solid var(--rtg-line)}
+.gw-kop{flex:0 0 6.5rem;color:var(--rtg-soft,#8A8680);
+  font:600 .56rem/1.6 var(--rtg-interface,'Inter',sans-serif);letter-spacing:.18em;text-transform:uppercase}
+.gw-waarde{flex:1 1 auto;min-width:0;color:var(--rtg-txt,#F4F1EC);
+  font:500 .86rem var(--rtg-interface,'Inter',sans-serif);font-variant-numeric:tabular-nums}
+.gw-redenlabel{display:block;padding:.7rem 1rem .2rem;color:var(--rtg-soft,#8A8680);
+  font:600 .56rem/1.6 var(--rtg-interface,'Inter',sans-serif);letter-spacing:.18em;text-transform:uppercase}
+.gw-reden{display:block;width:100%;margin-top:.4rem;background:transparent;
+  border:1px solid var(--rtg-line);color:var(--rtg-txt,#F4F1EC);padding:.55rem .6rem;
+  font:400 .84rem/1.45 var(--rtg-interface,'Inter',sans-serif);resize:vertical}
+.gw-reden:focus-visible{outline:0;border-color:rgba(192,165,68,.5)}
+.gw-knoppen{display:flex;gap:.5rem;padding:.8rem 1rem calc(.6rem + env(safe-area-inset-bottom,0px))}
+.gw-af,.gw-ga{flex:1 1 auto;min-height:var(--rtg-raak,44px);border:1px solid var(--rtg-line);
+  background:transparent;cursor:pointer;
+  font:600 .78rem var(--rtg-interface,'Inter',sans-serif);letter-spacing:.03em}
+.gw-af{color:var(--rtg-muted,#8A8680)}
+.gw-af:hover{color:var(--rtg-txt,#F4F1EC)}
+/* Bordeaux is een accent en geen tekstkleur op zwart (CLAUDE.md); de rand draagt
+   hem, het woord blijft wit. */
+.gw-ga{color:var(--rtg-txt,#F4F1EC);border-color:rgba(158,28,64,.65)}
+.gw-ga:hover{background:rgba(127,22,52,.18)}
+
+/* ====================================================== vasthouden == */
+.vh-knop{
+  position:relative;flex:1 1 auto;min-height:var(--rtg-raak,44px);overflow:hidden;
+  border:1px solid rgba(192,165,68,.42);background:transparent;cursor:pointer;
+  color:var(--gold-tekst,#C0A544);
+  font:600 .78rem var(--rtg-interface,'Inter',sans-serif);letter-spacing:.03em;
+  touch-action:none;                       /* anders scrolt de pagina onder je duim weg */
+}
+.vh-knop:disabled{opacity:.4;cursor:default}
+.vh-vulling{position:absolute;left:0;top:0;bottom:0;width:0;
+  background:rgba(192,165,68,.22);pointer-events:none}
+.vh-tekst{position:relative}
+.vh-knop.tweede{border-color:rgba(192,165,68,.85)}
+.vh-knop.af{border-color:rgba(192,165,68,.85);background:rgba(192,165,68,.14)}
+
+@media (min-width:1000px){
+  /* De grammatica is de MOBIELE taal (GRAMMATICA.md). Op een breed scherm doen
+     de werkbalk, het contextvlak en de console van het scherm zelf dit werk, en
+     een tweede strook onderin zou een tweede bediening naast een bestaande zijn.
+     De lades blijven wel bestaan: een bevestiging hoort overal hetzelfde te
+     wegen. */
+  .cmd-rail{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  .cmd-rail,.vh-vulling{transition:none!important}
+}
+
+/* ============================================================== de orb == */
+/* Het gewicht staat achter de naam en niet ervoor: je leest eerst WAT het is en
+   dan pas wat het kost. Klein en grijs, want het is een bijzin. */
+.orb-weegt{margin-left:auto;flex:0 0 auto;color:var(--rtg-soft,#8A8680);
+  font:400 .66rem var(--rtg-interface,'Inter',sans-serif);letter-spacing:.02em;white-space:nowrap}
+.orb-voet{margin:.9rem 0 0;padding:.7rem 1rem;border-top:1px solid var(--rtg-line);
+  color:var(--rtg-soft,#8A8680);font:400 .74rem/1.5 var(--rtg-interface,'Inter',sans-serif)}

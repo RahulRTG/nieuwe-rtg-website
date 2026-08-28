@@ -1,4 +1,5 @@
-/* RTG Bank, deel "sparen": de spaarkant. Rente wordt per dag opgebouwd over het
+
+const { magBij } = require('./eigendom');/* RTG Bank, deel "sparen": de spaarkant. Rente wordt per dag opgebouwd over het
    spaarsaldo tegen het tarief dat de boardroom zet (kern/bankregie), en als echte
    boeking bijgeschreven vanaf rtg:rente -- zo blijft het grootboek sluiten en is de
    rente-uitgave zichtbaar in de bank-gezondheid. Daarnaast spaardoelen (een potje
@@ -37,7 +38,7 @@ module.exports = (ctx) => {
   // een spaardoel (potje met streefbedrag) op een spaarrekening zetten
   function spaardoelZet({ iban, euro, codenaam }) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     if (m.soort !== 'spaar') return { status: 400, error: 'Een spaardoel hoort bij een spaarrekening.' };
     const centen = Math.round(Number(euro) * 100);
     if (!Number.isFinite(centen) || centen < 0 || centen > 100000000) return { status: 400, error: 'Kies een doelbedrag tot 1 miljoen euro.' };

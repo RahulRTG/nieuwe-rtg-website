@@ -11,7 +11,7 @@
    3. DIT ZEGT NIETS OVER ZICHTBAARHEID. Dat blijft aan de ondernemerspoort en
       de salonregel; twee antwoorden op die vraag is er een te veel.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-mallprofiel.test.js */
+   Draai los: node --test test/onderneming-mallprofiel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

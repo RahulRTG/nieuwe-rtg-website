@@ -156,17 +156,17 @@ body.travel-os > main:not([style]){padding-top:clamp(1.2rem,3vw,2rem)}
 
 body.travel-os :where(.kaart,.card,.resto,.reis,.stat,.pass,.kamer){
   border:1px solid var(--tos-line) !important;
-  border-radius:2px !important;
+  border-radius:0!important;
   background:var(--tos-graphite) !important;
   box-shadow:none !important;
 }
 body.travel-os .inlog{
   border:1px solid var(--tos-line) !important;
-  border-radius:2px !important;
+  border-radius:0!important;
   background:var(--tos-graphite) !important;
   box-shadow:none !important;
 }
-body.travel-os #inhoud > .item{border:1px solid var(--tos-line) !important;border-radius:2px !important;background:var(--tos-graphite) !important}
+body.travel-os #inhoud > .item{border:1px solid var(--tos-line) !important;border-radius:0!important;background:var(--tos-graphite) !important}
 body.travel-os :where(.resto,.reis,.tstl){transition:border-color .18s,background-color .18s !important}
 body.travel-os :where(.resto,.reis,.tstl):hover{transform:none !important;border-color:#565a58 !important;background:#151717 !important}
 body.travel-os .moveHero{
@@ -184,14 +184,14 @@ body.travel-os .moveStop{border-radius:50% !important;color:var(--tos-gold) !imp
 
 body.travel-os :where(input,select,.veld){
   border-color:#373a3a !important;
-  border-radius:1px !important;
+  border-radius:0!important;
   background:#0e1010 !important;
   color:var(--tos-ivory) !important;
 }
 body.travel-os :where(.knop,button.knop){
   min-height:44px;
   border:0 !important;
-  border-radius:1px !important;
+  border-radius:0!important;
   background:linear-gradient(90deg,#74102f,#a61040) !important;
   color:#fff !important;
   font-weight:700 !important;
@@ -201,10 +201,10 @@ body.travel-os :where(.knop.stil,.terug,.meldknop){
   border:1px solid #3a3d3d !important;
   background:#101212 !important;
   color:var(--tos-ivory) !important;
-  border-radius:1px !important;
+  border-radius:0!important;
 }
 body.travel-os .ios-terug{min-height:44px}
-body.travel-os :where(.step button,.lagen button,.paneel .x,.weg){border-radius:1px !important}
+body.travel-os :where(.step button,.lagen button,.paneel .x,.weg){border-radius:0!important}
 body.travel-os :where(.tabs,.chips){border-bottom:1px solid var(--tos-line) !important;background:transparent !important}
 body.travel-os :where(.tabs,.chips) > button{
   border:0 !important;
@@ -219,7 +219,7 @@ body.travel-os :where(.tabs,.chips) > button{
 }
 body.travel-os :where(.tabs,.chips) > button.aan,
 body.travel-os :where(.tabs,.chips) > button[aria-selected="true"]{border-bottom-color:var(--tos-wine-bright) !important;color:var(--tos-ivory) !important}
-body.travel-os :where(.badge,.status,.stand,.chip){border-radius:1px !important}
+body.travel-os :where(.badge,.status,.stand,.chip){border-radius:0!important}
 body.travel-os .status.goud{border-color:var(--tos-gold) !important;color:var(--tos-gold) !important}
 body.travel-os .status.ok{border-color:var(--tos-green) !important;color:var(--tos-green) !important}
 body.travel-os .status.open{border-color:var(--tos-danger) !important;color:#ed527d !important}
@@ -227,7 +227,7 @@ body.travel-os .prijs,
 body.travel-os .vanaf,
 body.travel-os .nr{color:var(--tos-gold) !important;font-family:Inter,system-ui,sans-serif !important}
 body.travel-os .melding,
-body.travel-os .toast{bottom:1.25rem !important;border:1px solid #3b3e3e !important;border-radius:1px !important;background:var(--tos-ivory) !important;color:var(--tos-onyx) !important;box-shadow:0 15px 45px rgba(0,0,0,.42) !important}
+body.travel-os .toast{bottom:1.25rem !important;border:1px solid #3b3e3e !important;border-radius:0!important;background:var(--tos-ivory) !important;color:var(--tos-onyx) !important;box-shadow:0 15px 45px rgba(0,0,0,.42) !important}
 body.travel-os .blad{
   top:var(--tos-top) !important;
   left:var(--tos-rail) !important;
@@ -245,7 +245,7 @@ body.travel-os #rtg-cookie{
   gap:.75rem !important;
   padding:.7rem .85rem !important;
   border:1px solid #3a3d3d !important;
-  border-radius:1px !important;
+  border-radius:0!important;
   background:rgba(17,19,19,.98) !important;
   color:var(--tos-muted) !important;
   box-shadow:0 12px 36px rgba(0,0,0,.5) !important;
@@ -257,11 +257,11 @@ body.travel-os #rtg-cookie button{border:0 !important;background:none !important
 body.travel-os .rtgplek{
   bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px) + 4.5rem) !important;
   border:1px solid #3a3d3d !important;
-  border-radius:2px !important;
+  border-radius:0!important;
   background:rgba(17,19,19,.98) !important;
   box-shadow:0 18px 55px rgba(0,0,0,.55) !important;
 }
-body.travel-os .rtgplek button{border-radius:1px !important}
+body.travel-os .rtgplek button{border-radius:0!important}
 body.travel-os .rtgplek .ja{background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
 body.travel-os .rtgplek .nee{border:1px solid var(--tos-line) !important;background:#101212 !important;color:var(--tos-muted) !important}
 
@@ -295,8 +295,8 @@ body.travel-os-map .lagen{right:1rem}
 body.travel-os-map .legenda{left:calc(var(--tos-rail) + 1rem)}
 body.travel-os-map .paneel{left:var(--tos-rail) !important;bottom:0 !important;border-radius:0 !important;background:rgba(17,19,19,.97) !important}
 body.travel-os-map .poort{top:var(--tos-top) !important;left:var(--tos-rail) !important}
-body.travel-os-map .poort .kaartje{border-radius:2px !important;background:var(--tos-graphite) !important;box-shadow:none !important}
-body.travel-os-map .poort a{border-radius:1px !important;background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
+body.travel-os-map .poort .kaartje{border-radius:0!important;background:var(--tos-graphite) !important;box-shadow:none !important}
+body.travel-os-map .poort a{border-radius:0!important;background:linear-gradient(90deg,#74102f,#a61040) !important;color:#fff !important}
 
 @media(max-width:939px){
   :root{--tos-top:72px;--tos-rail:0px;--tos-bottom:78px}
@@ -334,6 +334,16 @@ body.travel-os-map .poort a{border-radius:1px !important;background:linear-gradi
   body.travel-os-map .zoekwrap{top:calc(var(--tos-top) + env(safe-area-inset-top,0px) + 3.7rem) !important;left:1rem !important}
   body.travel-os-map .legenda{left:1rem}
   body.travel-os-map .paneel{left:0 !important;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px)) !important}
+  /* GEPARKEERD MOET GEPARKEERD BLIJVEN. De regel hierboven tilt het routepaneel
+     op zodat het boven de Travel OS-balk uitkomt -- terecht, want anders valt het
+     erachter. Maar navigatie.html parkeert dat paneel met translateY(102%), en
+     die 102% is berekend op bottom:0. Opgetild met 78 pixels tilt 102% van zijn
+     eigen hoogte hem niet meer buiten beeld: er bleef 89 pixel paneel onderaan
+     staan, zichtbaar en half aanraakbaar, op een scherm waar niemand een route
+     had gekozen. De parkeerstand telt de optilling nu mee. */
+  body.travel-os-map .paneel:not(.zien){
+    transform:translateY(calc(102% + var(--tos-bottom) + env(safe-area-inset-bottom,0px))) !important;
+  }
   body.travel-os-map .poort{top:calc(var(--tos-top) + env(safe-area-inset-top,0px)) !important;left:0 !important;bottom:calc(var(--tos-bottom) + env(safe-area-inset-bottom,0px)) !important}
 }
 

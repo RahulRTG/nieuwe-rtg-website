@@ -1,7 +1,7 @@
 /* RTG Meet: kamers op codenaam, de toegangsregels (open op code, besloten
    via de agenda-afspraak), het doorgeefluik voor WebRTC-seinen en de
    idempotente koppeling met RTG Agenda.
-   Draai los: node --experimental-sqlite --test test/meet.test.js */
+   Draai los: node --test test/meet.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

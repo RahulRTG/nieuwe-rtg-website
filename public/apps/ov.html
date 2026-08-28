@@ -20,20 +20,20 @@
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
   .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
   .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;white-space:nowrap;}
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:640px;margin:0 auto;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.6rem 0.95rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .knop[disabled]{opacity:0.45;cursor:default;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
-  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin:0.7rem 0;}
+  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);padding:0.55rem 0.7rem;width:100%;}
   select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
   label{display:block;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.3rem;}
@@ -50,7 +50,7 @@
   /* de twee snelle check-ins: twee grote rustige vlakken */
   .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
   .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:16px;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
+    border:1px solid var(--line);border-radius:0;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
   .snel button .i{display:block;width:1.9rem;height:1.9rem;}
   .snel button .sub{font-size:0.68rem;color:var(--soft);}
   .snel button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
@@ -68,7 +68,7 @@
   .rit{border-left:3px solid var(--groen);}
   /* de statusketen van een lopende rit */
   .keten{display:flex;gap:0.3rem;margin:0.7rem 0 0.2rem;}
-  .keten span{flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .keten span{flex:1;height:3px;border-radius:0;background:var(--line);}
   .keten span.af{background:var(--gold);}
   .prijs{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
   .rijtje{display:flex;justify-content:space-between;gap:0.7rem;border-top:1px solid var(--line);
@@ -78,21 +78,55 @@
     justify-content:center;gap:1.2rem;z-index:50;}
   .codeScherm.zien{display:flex;}
   .codeScherm .code{font-family:'Bodoni Moda',serif;font-size:3.4rem;letter-spacing:0.35em;padding-left:0.35em;
-    color:#0C0C0B;background:var(--gold);border-radius:16px;padding:1rem 1.4rem;
+    color:#0C0C0B;background:var(--gold);border-radius:0;padding:1rem 1.4rem;
     box-shadow:0 0 60px rgba(201,162,75,0.65), 0 0 140px rgba(201,162,75,0.35);}
   .melding{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1rem);transform:translateX(-50%);
-    background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;
+    background:var(--card2);border:1px solid var(--line);border-radius:0;padding:0.55rem 1rem;font-size:0.8rem;
     max-width:88vw;opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
   .melding.zien{opacity:1;}
   .weg{display:none !important;}
-  .moveHero{--accent:#5EE7F7;position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:26px;
+  /* DE ACCENTTOON MOET OOK OP EEN LICHT VLAK LEZEN. #5EE7F7 is een heldere
+     cyaan: prachtig op pianolak (13,3:1) en onleesbaar op parelmoer (1,4). En de
+     tint is niet van dit blad: de server stuurt hem mee met het lidmaatschap
+     (private goud, lifestyle amber) en laadMoveWereld() zet hem INLINE. Een
+     inline stijl wint van elke regel hier, dus een vaste vervanging op champagne
+     haalde niets uit -- dat was mijn eerste poging en de poort zag hem gewoon
+     staan.
+
+     Wat hier staat vervangt de kleur dus niet maar VERDIEPT hem: dezelfde tint,
+     in de schaduw, zodat het onderscheid tussen de passen blijft. 40% van de
+     tint, nagerekend op de drie accenten die de server stuurt en op de twee
+     gronden waar ze staan: 5,8 tot 7,4 -- alle drie ruim boven de 4,5.
+
+     Champagne is het enige LICHTE thema van het huis (rtg-themas.css), dus dat
+     is hier de schakelaar. Komt er ooit een tweede lichte grond bij, dan hoort
+     deze regel mee te groeien -- de a11y-poort zegt het dan meteen. */
+  /* EN DE SCHAKELAAR IS HET VLAK, NIET HET THEMA -- dat is met schade geleerd.
+     Deze pagina verklaart haar eigen grond als onyx (data-rtg-eigenvlak op de
+     body hieronder), dus zij is DONKER ook als het thema champagne is. De regel
+     keek naar het thema en verdonkerde de inkt dus juist op een donkere grond:
+     de orb haalde 2,42:1. `:not(:has(...))` laat hem alleen gelden waar de grond
+     werkelijk het thema volgt -- dezelfde vorm die rtg-themas.css gebruikt om
+     een eigen vlak te herkennen. */
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .eyebrow,
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveStop,
+  :root[data-rtg-thema="champagne"]:not(:has(> body[data-rtg-eigenvlak])) .moveHero .moveOrb b{
+    color:color-mix(in srgb,var(--accent) 40%,#000);}
+  .moveHero{--accent:var(--ov-accent,#5EE7F7);position:relative;overflow:hidden;min-height:310px;margin:.4rem auto 1rem;max-width:640px;padding:1.35rem 1.5rem 4rem;border-radius:0;
     border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--card)),var(--card) 70%);box-shadow:0 24px 70px rgba(0,0,0,.25)}
   .moveHero.private{--accent:#D8C8A0;background:linear-gradient(145deg,#24231e,#0c1015 72%)}.moveHero.lifestyle{--accent:#E8C98B;background:linear-gradient(145deg,#34251f,#17110f 72%)}
   .moveHero .eyebrow{font-size:.59rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}.moveHero h2{font:500 clamp(2rem,7vw,3.1rem)/1.02 'Bodoni Moda',serif;letter-spacing:0;text-transform:none;color:var(--txt);margin:.55rem 0;max-width:58%}.moveHero>p{max-width:48%}
   .moveOrb{position:absolute;right:9%;top:33px;width:158px;height:158px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);box-shadow:inset 0 0 38px color-mix(in srgb,var(--accent) 13%,transparent),0 0 75px color-mix(in srgb,var(--accent) 14%,transparent);display:grid;place-items:center;animation:moveAdem 5s ease-in-out infinite}
   .moveOrb:before,.moveOrb:after{content:'';position:absolute;inset:13px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-left-color:transparent;animation:moveDraai 13s linear infinite}.moveOrb:after{inset:29px;animation-direction:reverse;animation-duration:9s}.moveOrb b{font:500 .95rem 'Bodoni Moda',serif;text-align:center;max-width:9ch;z-index:1}.moveOrb i{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent);animation:moveBaan 7s linear infinite}
-  .moveRail{position:absolute;left:1.5rem;right:1.5rem;bottom:2.9rem;display:flex;align-items:center}.moveStop{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent) 44%,var(--line));background:var(--card2);font-size:.7rem;color:var(--accent)}.moveLine{height:1px;flex:1;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 17%,var(--line)));position:relative}.moveLine span{position:absolute;top:.45rem;left:.25rem;color:var(--soft);font-size:.57rem;white-space:nowrap}.moveStatus{position:absolute;bottom:1rem;left:1.5rem;font-size:.62rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase}.moveStatus:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);box-shadow:0 0 12px var(--groen);margin-right:.45rem}
-  .privateForm{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.privateModes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}.privateModes button{border:1px solid var(--line);border-radius:99px;background:var(--card2);color:var(--soft);padding:.42rem .62rem;font-size:.68rem}.privateModes button[aria-pressed=true]{border-color:var(--gold);color:var(--txt)}
+  .moveRail{position:absolute;left:1.5rem;right:1.5rem;bottom:2.9rem;display:flex;align-items:center}.moveStop{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent) 44%,var(--line));background:var(--card2);font-size:.7rem;color:var(--accent)}.moveLine{height:1px;flex:1;position:relative}
+  /* DE STREEP IS EEN EIGEN ELEMENT GEWORDEN, en dat is geen opsmuk. Het label
+     ("Vertrek") staat absoluut ONDER de streep, buiten de doos van zijn ouder.
+     Zolang die ouder zelf het cyaanverloop droeg, was dat de enige grond die
+     eronder te vinden was: ivoor op helder cyaan, 1,30:1. In het echt ligt er
+     de donkere hero onder. De streep zit nu in een eigen <i>, zodat het label
+     de grond heeft waar het ook echt op ligt. */
+  .moveLine i{position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 17%,var(--line)))}.moveLine span{position:absolute;top:.45rem;left:.25rem;color:var(--soft);font-size:.57rem;white-space:nowrap}.moveStatus{position:absolute;bottom:1rem;left:1.5rem;font-size:.62rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase}.moveStatus:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--groen);box-shadow:0 0 12px var(--groen);margin-right:.45rem}
+  .privateForm{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.privateModes{display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}.privateModes button{border:1px solid var(--line);border-radius:0;background:var(--card2);color:var(--soft);padding:.42rem .62rem;font-size:.68rem}.privateModes button[aria-pressed=true]{border-color:var(--gold);color:var(--txt)}
   @keyframes moveAdem{50%{transform:scale(1.035);filter:brightness(1.14)}}@keyframes moveDraai{to{transform:rotate(360deg)}}@keyframes moveBaan{from{transform:rotate(0) translateX(79px)}to{transform:rotate(360deg) translateX(79px)}}
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
   @media(max-width:560px){.moveHero{margin:.3rem 1.1rem 1rem;min-height:430px;padding:1.2rem}.moveHero h2,.moveHero>p{max-width:100%}.moveOrb{right:50%;top:150px;transform:translateX(50%);width:135px;height:135px}.moveRail{left:1.2rem;right:1.2rem}.privateForm{grid-template-columns:1fr}}
@@ -103,7 +137,7 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl travel-os">
+<body class="rtg-stijl travel-os" data-rtg-eigenvlak="onyx">
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
   <h1>RTG Vervoer</h1>
@@ -113,7 +147,7 @@
 <section class="moveHero" id="moveHero" aria-labelledby="moveTitel">
   <div class="eyebrow" id="moveBelofte">Slim, eerlijk en zonder gedoe</div><h2 id="moveTitel">Alles voor uw volgende reis</h2><p class="stil" id="moveBrief">Live vervoer, de beste route en alleen bevestigen wanneer dat echt nodig is.</p>
   <div class="moveOrb"><b id="moveOrbTekst">Alles onder controle</b><i></i></div>
-  <div class="moveRail" aria-label="Reisstatus"><span class="moveStop">&#9670;</span><span class="moveLine"><span>Vertrek</span></span><span class="moveStop">&#9678;</span><span class="moveLine"><span>Vervoer gereed</span></span><span class="moveStop">&#10003;</span></div>
+  <div class="moveRail" aria-label="Reisstatus"><span class="moveStop">&#9670;</span><span class="moveLine"><i></i><span>Vertrek</span></span><span class="moveStop">&#9678;</span><span class="moveLine"><i></i><span>Vervoer gereed</span></span><span class="moveStop">&#10003;</span></div>
   <div class="moveStatus" id="moveStatus">Regie actief, u houdt de beslissing</div>
 </section>
 <nav class="tabs" role="tablist" aria-label="Soort vervoer">
@@ -171,7 +205,7 @@
           <p class="stil" id="beleidUit"></p>
         </div>
         <div style="margin-top:0.9rem;">
-          <button class="knop vol" id="velPlan" type="button">Plan mijn reis</button>
+          <button class="knop vol hoofd" id="velPlan" type="button" data-hoofdactie>Plan mijn reis</button>
         </div>
         <p class="stil" style="margin-top:0.5rem;">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
           vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
@@ -289,13 +323,19 @@
 </div>
 <div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
   <p class="stil" id="qrTitel"></p>
-  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:12px;background:#fff;padding:0.6rem;">
+  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:0;background:#fff;padding:0.6rem;">
   <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
   <button class="knop" id="qrDicht" type="button">Sluiten</button>
 </div>
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
+<!-- plek.js VOOR de inline code hieronder: die vraagt via RTGPlek om je
+     positie, maar het script werd nergens geladen. window.RTGPlek was dus
+     altijd undefined en de vraag verscheen nooit -- de app bleef op het
+     demo-startpunt staan en toonde haltes die niets met jou te maken
+     hebben. -->
+<script src="/shared/plek.js" defer></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
 (() => {
@@ -312,7 +352,11 @@
   const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
   const glyf = n => (window.RTGGlyf && RTGGlyf.heeft(n)) ? RTGGlyf.svgHTML(n, { klasse: 'gl-inline' }) : '';
 
-  let hier = { lat: 38.908, lng: 1.432 };   // demo-startpunt tot de gps spreekt
+  /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
+     de gps spreekt". Deze app toont haltes en ritten BIJ JOU; met dat punt keek
+     je naar een eiland waar je niet bent, en een incheck-tik zou daar landen.
+     Zonder locatie weten we het niet, en dan zegt het scherm dat ook. */
+  let hier = null;
   // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
   // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
   /* De schakelaar blijft de baas, maar hier stil overslaan betekent: de app
@@ -321,8 +365,13 @@
      staan en vraagt hij deze sessie niet opnieuw. */
   let gpsUit = false;
   try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-  if (gpsUit && window.RTGPlek) {
+  /* De toets op window.RTGPlek stond BUITEN deze haak, en deze code draait
+     tijdens het parsen: een defer-script bestaat dan nog niet, dus de toets was
+     altijd onwaar en de haak werd nooit eens gezet. Nu binnen, waar plek.js
+     gegarandeerd geladen is. */
+  if (gpsUit) {
     document.addEventListener('DOMContentLoaded', () => {
+      if (!window.RTGPlek) return;
       RTGPlek.vraag({ waarom: 'Om de haltes en ritten bij jou in de buurt te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
         .then(plek => { if (plek) location.reload(); });
     });
@@ -458,7 +507,9 @@
        met "zet GPS aan", terwijl deze app al lang een punt heeft waarmee hij de
        haltes in de buurt ophaalt. En het klopt ook beter: de reiziger zegt waar
        hij opgehaald wil worden; dat is niet de server zijn oordeel. */
-    if (w === 'hier') return { lat: hier.lat, lng: hier.lng, label: 'Huidige locatie' };
+    // zonder plek laten we de server het symbool afhandelen in plaats van een
+    // coordinaat te verzinnen; hij zegt dan zelf dat de locatie nodig is
+    if (w === 'hier') return hier ? { lat: hier.lat, lng: hier.lng, label: 'Huidige locatie' } : { hier: true };
     const [soort, code] = w.split(':');
     if (soort === 'zaak') return { zaak: code };
     if (soort === 'halte') return { halte: code };
@@ -706,7 +757,7 @@
   });
 
   async function verversOv() {
-    const r = await api('kaart', hier);
+    const r = await api('kaart', hier || {});
     if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
     // de actieve rit
     const rit = r.body.rit;
@@ -755,6 +806,7 @@
 
   /* ---- snelle optie 2: een tik op GPS ---- */
   $('#knopGps').addEventListener('click', async () => {
+    if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om met een tik in te checken.');
     const r = await api('hier', hier);
     if (r.body.error) return zeg(r.body.error);
     zeg('Ingecheckt met één tik. Goede reis.');
@@ -763,6 +815,7 @@
 
   /* ---- uitchecken ---- */
   $('#uitKnop').addEventListener('click', async () => {
+    if (!hier) return zeg('Ik weet nog niet waar je bent; zet je locatie aan om uit te checken.');
     const r = await api('uit', { ...hier, idem: RTGIdem('ov') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');

@@ -13,7 +13,7 @@
 
    Zo blijft de belofte meegroeien met het systeem in plaats van erachteraan.
 
-   Draai los: node --experimental-sqlite --test test/vergeten.test.js */
+   Draai los: node --test test/vergeten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
@@ -62,6 +62,29 @@ function opSchijf() {
 }
 
 const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* WACHTEN TOT IETS WAAR IS, in plaats van een ronde getal gokken.
+
+   Drie plekken in dit bestand wachtten op "de opslag laten landen" of "de bezem
+   zijn werk laten doen" met 400 of 600 ms. Dat is een gok die twee kanten op
+   fout gaat: op deze machine bijna altijd te lang, en op een trage machine te
+   kort -- en dan meldt deze toets dat een bestand nog op schijf staat terwijl
+   het wegschrijven nog liep, of juist dat er niets is terwijl het er zo komt.
+   Bij een toets over VERGETEN WORDEN is dat het slechtste soort onbetrouwbaar:
+   allebei de uitslagen zeggen iets zwaars dat niet waar hoeft te zijn.
+
+   totdat() vraagt het gewoon opnieuw tot het antwoord er is, met een ruim
+   budget en een leesbare fout als het niet gebeurt. */
+async function totdat(wat, kijk, ms) {
+  const eind = Date.now() + (ms || 15000);
+  for (;;) {
+    let uit = null;
+    try { uit = kijk(); } catch (e) { uit = null; }
+    if (uit) return uit;
+    if (Date.now() >= eind) throw new Error('wachtte ' + (ms || 15000) + 'ms tot ' + wat + ', en dat gebeurde niet');
+    await wacht(25);
+  }
+}
 function post(pad, body, tok) {
   const h = { 'Content-Type': 'application/json' };
   if (tok) h.Authorization = 'Bearer ' + tok;
@@ -81,7 +104,7 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      alleen het doosje verschilt. Met de JSON-opslag kan de bezem hieronder
      rechtstreeks lezen wat er op schijf staat, zonder dat de test een
      databaseschema hoeft te kennen dat met elke functie kan veranderen. */
-  kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
+  kind = spawn(process.execPath, [SERVER], {
     env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP,
       SMTP_URL: '', RTG_DEMO: '1', RTG_STORE: 'json' },
     // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)
@@ -232,10 +255,16 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
     'na twee paspoortpogingen staat er precies EEN bewijs op schijf (nu: ' + bewijzen.join(', ') + ')');
   assert.equal(selfies.length, 1, 'en precies een selfie (nu: ' + selfies.join(', ') + ')');
 
-  await wacht(400); // de opslag even laten landen
-
-  const na = opSchijf();
-  bestandenVanWilma = na.filter(p => !bestandenVoor.includes(p));
+  /* WACHTEN TOT DE BESTANDEN ER ZIJN, niet 400 ms. De vijf hieronder zijn de
+     ondergrens van deze toets; zolang er minder staan is de opslag nog bezig
+     (of is de wandeling stilletjes leeggelopen, en dan zakt de wacht met die
+     reden erin in plaats van dat de bewering eronder het als "te weinig"
+     meldt). */
+  const na = await totdat('de vijf bestanden van Wilma op schijf stonden', () => {
+    const nu = opSchijf().filter(p => !bestandenVoor.includes(p));
+    return (nu.length >= 5 && nu.some(p => p.includes('/uploads/'))) ? nu : null;
+  });
+  bestandenVanWilma = na;
   /* Vijf is de ondergrens: de kluisupload, de Salon-foto, de site-foto, het
      paspoort en de selfie. Blijft dit eronder, dan is de wandeling hierboven in
      stilte leeggelopen en bewijst de controle na het verwijderen niets. */
@@ -262,9 +291,55 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
   /* De server heeft zijn eigen kopie in het geheugen; we lezen wat er op schijf
      staat, want dat is wat na een herstart terugkomt en wat in een backup
      belandt. Dat is de eerlijke maat voor "weg". */
-  await wacht(600);
+  /* WACHTEN TOT DE SLEUTEL WEG IS, niet 600 ms. Het teken is precies waar deze
+     toets over gaat: zolang de sleutel nog in db.json staat is de bezem nog
+     bezig. Blijft hij staan, dan zakt de wacht met die reden -- en dat is
+     dezelfde uitslag als voorheen, alleen niet meer afhankelijk van hoe druk de
+     machine was. */
   const bestand = path.join(TMP, 'db.json');
-  assert.ok(fs.existsSync(bestand), 'er staat een databasebestand: ' + bestand);
+  /* WACHTEN OP DE TAKKEN DIE DE BEZEM WEL VEEGT, en niet op het hele bestand.
+     Hier stond `!inhoud.includes(sleutel)` over db.json als geheel, en dat kan
+     sinds het handelingsspoor bestaat NOOIT waar worden: die tak bewaart de
+     sleutel met opzet (zie AUDITTAK hieronder, met zijn drie grondslagen). De
+     wacht liep dus altijd zijn vijftien seconden vol en zakte met een reden die
+     niets met de bezem te maken had -- een toets die alleen nog kan slagen als
+     er toevallig niets is gelogd. Nu wacht hij op `users`, de tak waar de bezem
+     als eerste doorheen gaat; wat daarna nog ergens staat, is precies wat de
+     controle hieronder per tak beoordeelt. */
+  /* HET GROOTBOEK VAN RTG PAY HOUDT ZIJN CODENAAM, en dat is een besluit met een
+     grond en een grens -- geen vrijstelling omdat het lastig was.
+
+     DE GROND. paySaldi en payBoekingen zijn de financiele administratie van het
+     gesloten circuit (TOKEN.md, GELD.md). Een saldo en zijn boekingen zijn geld:
+     art. 52 AWR vraagt zeven jaar bewaring van de administratie, en AVG art. 17
+     lid 3 onder b laat daar de ruimte voor. Een boeking uit een grootboek halen
+     is bovendien niet wissen maar VALSEN -- een grootboek dat niet meer sluit,
+     bewijst niets meer, ook niet ten gunste van het lid zelf.
+
+     DE GRENS, EN DIE IS DE HELE REDEN DAT DIT MAG. Wat er blijft staan is een
+     CODENAAM, en na deze bezem leidt die nergens meer naartoe: de gids is de
+     laatste plek waar de sleutel aan de codenaam vastzit (zie de toelichting bij
+     gidsWeg in server/kern/gids.js) en die wordt geveegd. Wat overblijft is dus
+     een pseudoniem zonder sleutel -- voor iedereen zonder de kluis, en de kluisrij
+     van dit lid is vernietigd. Zou die afbeelding ergens ANDERS blijven bestaan,
+     dan valt deze grond weg en hoort dit weer te zakken; daarom staat hier alleen
+     'codenaam' vrij en niet 'sleutel' of 'NAAM/E-MAIL'.
+
+     Zet iemand hier later een echte naam of de sleutel in, dan zakt deze toets
+     gewoon. Dat is precies de bedoeling van een vrijstelling per SOORT in plaats
+     van per tak. */
+  const AUDITTAK = new Map([
+    ['handelingLog', ['sleutel']],
+    ['paySaldi', ['codenaam']],
+    ['payBoekingen', ['codenaam']]
+  ]);
+  await totdat('de sleutel van het lid overal weg was behalve uit het auditspoor',
+    () => {
+      if (!fs.existsSync(bestand)) return false;
+      let d; try { d = JSON.parse(fs.readFileSync(bestand, 'utf8')); } catch (e) { return false; }
+      return !Object.entries(d).some(([tak, waarde]) =>
+        !AUDITTAK.has(tak) && JSON.stringify(waarde == null ? null : waarde).includes(sleutel));
+    });
   const data = JSON.parse(fs.readFileSync(bestand, 'utf8'));
 
   /* Per tak kijken, zodat de fout zegt WAAR het lid nog staat. Een tak die het
@@ -284,14 +359,37 @@ test('de bezem door de hele database: geen sleutel, codenaam of naam meer', asyn
      gevolgd worden door een cijfer (anders is user-50 een valse treffer), maar
      wat eraan VOORAF gaat maakt niet uit. */
   const sleutelRe = sleutel ? new RegExp(sleutel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![0-9])') : null;
+
+  /* HET AUDITSPOOR, en waarom het NIET blanco is vrijgesteld.
+
+     Het handelingsspoor (server/lib/handelingsspoor.js) bewaart per geslaagde
+     schrijfactie de pseudonieme sleutel, en die blijft na wissing staan. Dat is
+     een besluit met drie grondslagen die alle drie ergens anders staan dan
+     hier: VERWERKINGSREGISTER.md punt 9 legt het doel en de afweging vast,
+     server/bewaarbeleid.js geeft hem een termijn van een jaar, en AVG art. 17
+     lid 3 laat de ruimte.
+
+     Er is ook een technische reden die zwaarder weegt dan een voorkeur: het
+     spoor is een HASHKETEN. Een regel achteraf bijstellen -- ook om er een
+     sleutel uit te halen -- breekt de keten precies zoals een aanvaller dat zou
+     doen, en dan is er geen auditspoor meer om iets mee vast te stellen. Wissen
+     kan hier dus niet stil; het kan alleen door het bewijs zelf op te geven.
+
+     Waarom dan niet gewoon de hele tak overslaan: dan ziet deze bezem er nooit
+     meer iets. Zet iemand hier later een naam of een codenaam in -- door de
+     body alsnog mee te loggen bijvoorbeeld -- dan hoort dat gewoon te zakken.
+     Alleen de sleutel valt weg, de rest niet. */
+
   const raak = [];
   for (const [tak, waarde] of Object.entries(data)) {
     const tekst = JSON.stringify(waarde == null ? null : waarde);
     if (!tekst) continue;
-    const wat = [];
+    let wat = [];
     if (sleutelRe && sleutelRe.test(tekst)) wat.push('sleutel');
     if (codenaam && tekst.includes(codenaam)) wat.push('codenaam');
     if (tekst.includes(NAAM) || tekst.includes(MAIL)) wat.push('NAAM/E-MAIL');
+    const vrij = AUDITTAK.get(tak);
+    if (vrij) wat = wat.filter(w => !vrij.includes(w));
     if (wat.length) raak.push(tak + ' (' + wat.join(' + ') + ')');
   }
 
@@ -329,8 +427,13 @@ test('de vakbewijzen gaan mee, ook al ziet de bezem ze niet', async () => {
 });
 
 test('en de bezem over de schijf: geen weesbestanden van dit lid', async () => {
-  await wacht(600);
   assert.ok(bestandenVanWilma.length >= 5, 'de vorige test heeft bestanden vastgelegd om op te controleren');
+  /* WACHTEN TOT ZE WEG ZIJN, niet 600 ms. Ook hier is het teken de bewering
+     zelf. Blijft er een bestand staan, dan komt de wacht na zijn budget terug
+     en zakt de deepEqual hieronder met de volledige lijst erbij -- dezelfde
+     fout als voorheen, alleen niet meer omdat de machine traag was. */
+  await totdat('de bestanden van het lid van schijf waren',
+    () => bestandenVanWilma.every(p => !fs.existsSync(p))).catch(() => {});
   const blijven = bestandenVanWilma.filter(p => fs.existsSync(p));
   assert.deepEqual(blijven, [],
     'na verwijderen staan deze bestanden van het lid nog op schijf; elk bestand hier ' +
@@ -349,7 +452,16 @@ test('de echte naam stond sowieso nooit in de gedeelde database', () => {
 });
 
 test.after(async () => {
-  if (kind) kind.kill();
-  await wacht(200);
+  /* SIGTERM en wachten tot hij ECHT weg is, in plaats van kill() met 200 ms
+     ernaast. De server flusht zijn snapshot op SIGTERM; pas als het proces weg
+     is, is de map veilig om te verwijderen. */
+  if (kind) {
+    await new Promise(klaar => {
+      if (kind.exitCode != null) return klaar();
+      kind.on('exit', klaar);
+      try { kind.kill('SIGTERM'); } catch (e) { klaar(); }
+      setTimeout(() => { try { kind.kill('SIGKILL'); } catch (e) {} klaar(); }, 15000).unref();
+    });
+  }
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });

@@ -13,7 +13,7 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
-  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--goud);}
+  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--rtg-leesgoud,var(--goud));}
   .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
   .wrap{max-width:42rem;margin:0 auto;padding:1.4rem 1.1rem 3rem;}
   h1{font-family:var(--serif);font-weight:500;font-size:1.8rem;margin:.4rem 0 .3rem;}
@@ -23,10 +23,14 @@
   .blok p{line-height:1.6;margin-bottom:.6rem;}
   .blok ul{margin:.2rem 0 .6rem 1.1rem;line-height:1.6;}
   .blok li{margin-bottom:.3rem;}
-  .blok b{color:var(--goud2);}
-  .nood{background:#12211a;border:1px solid var(--groen);border-radius:12px;padding:1rem 1.1rem;line-height:1.6;margin-top:.4rem;}
+  /* Lopende tekst, dus de tekstkleur en niet het accent: --goud2 is voor de
+     drie leeftijdsgroepen bordeaux (#C23A5E) en haalt op deze grond 2,84:1.
+     CLAUDE.md zegt het met zoveel woorden -- bordeaux-op-donker is genoeg
+     voor grote tekst en te weinig voor lopende tekst en kleine labels. */
+  .blok b{color:var(--txt);}
+  .nood{background:#12211a;color:#EAF3EC;border:1px solid var(--groen);border-radius:0;padding:1rem 1.1rem;line-height:1.6;margin-top:.4rem;}
   .nood b{color:#8fd69b;}
-  .nood .nr{font-family:var(--serif);color:var(--txt);font-size:1.1rem;}
+  .nood .nr{font-family:var(--serif);color:inherit;font-size:1.1rem;}
   /* de deelmarkeringen: korte namen voor het deelmenu; zonder JavaScript
      blijven ze als rustige tussenkopjes boven hun blok staan */
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
@@ -34,7 +38,7 @@
   /* een link die in zijn eentje een alinea vult is geen link IN een zin: WCAG
      2.5.8 zondert hem niet uit, dus hij hoort 24px hoog te zijn */
   .foot > a{display:inline-block;padding:.25rem 0;min-height:24px;}
-  .foot a{color:var(--goud);text-decoration:none;}
+  .foot a{color:var(--rtg-leesgoud,var(--goud));text-decoration:none;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
@@ -54,7 +58,7 @@
       <li>de <b>gezondheidsinfo</b> bij de oppasinfo (allergieën en medisch);</li>
       <li>de <b>berichten</b> die je binnen je gezin stuurt.</li>
     </ul>
-    <p>Pincodes bewaren we nooit als leesbare code, maar versleuteld met een eenrichtingsmethode (scrypt). Zo kan niemand ze teruglezen.</p>
+    <p>Pincodes bewaren we nooit als leesbare code, maar als een sterke eenrichtingshash (scrypt). Persoonlijke uitnodigingssleutels bewaren we eveneens alleen als hash. Zo kan niemand ze uit het opslagbestand teruglezen.</p>
   </div>
 
   <div class="deel">Locatie</div>
@@ -66,7 +70,14 @@
   <div class="deel">Wie ziet wat</div>
   <div class="kaart blok">
     <h2>Wie ziet wat</h2>
-    <p>Ieder gezinslid heeft een eigen profiel. Een <b>oppas, opa/oma of familielid</b> (gastprofiel) ziet alleen het broodnodige: waar de kinderen zijn, de belangrijke info en de berichten. De privézaken van het gezin (geld, mentale steun, dromen) blijven voor hen verborgen. De beheerder beschermt zijn profiel met een pincode.</p>
+    <p>Ieder gezinslid heeft een eigen profiel en eigen pincode. Een volwassene of gast wordt alleen toegevoegd met een persoonlijke sleutel die één keer werkt en na 48 uur verloopt. Een <b>oppas, opa/oma of familielid</b> (gastprofiel) ziet alleen het broodnodige: waar de kinderen zijn, de belangrijke info en de berichten. De privézaken van het gezin (geld, mentale steun, dromen) blijven voor hen verborgen.</p>
+  </div>
+
+  <div class="deel">Schoolpersoneel</div>
+  <div class="kaart blok">
+    <h2>Persoonlijke schooltoegang</h2>
+    <p>Alleen de gecontroleerde directie nodigt een medewerker uit. We bewaren naam, schoolmail, toegewezen rollen en het noodzakelijke toegangsjournaal. Het mailadres staat versleuteld; uitnodigings- en inloggeheimen staan alleen als hash en verdwijnen na gebruik.</p>
+    <p>Een uitnodiging werkt één keer en 48 uur, een latere inloglink één keer en 15 minuten. De toegang blijft alleen in de huidige tabsessie. De directie kan toegang onmiddellijk intrekken; iedere inhoudelijke schoolroute controleert daarna opnieuw de actuele rol en status.</p>
   </div>
 
   <div class="deel">Wissen</div>

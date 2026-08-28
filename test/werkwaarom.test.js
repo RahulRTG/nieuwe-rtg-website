@@ -14,7 +14,7 @@
       wordt gezegd in plaats van verzonnen.
    5. VOORTGANG WORDT NIET OPNIEUW UITGEREKEND maar overgenomen van de bron.
 
-   Draai los: node --experimental-sqlite --test test/werkwaarom.test.js */
+   Draai los: node --test test/werkwaarom.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

@@ -6,7 +6,7 @@
 
    Deze test bootst een verse server en roept het signaal-endpoint als allereerste
    ontmoeting-call aan. De eis: een nette 404 (afspraak niet gevonden), nooit 500.
-   Draai: node --experimental-sqlite --test test/ontmoeting-leeg.test.js */
+   Draai: node --test test/ontmoeting-leeg.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

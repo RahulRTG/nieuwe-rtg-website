@@ -18,7 +18,7 @@
    Dus: nog niet aangegeven hoort `open` te zijn en niet stilzwijgend
    weggelaten, en `volledig` hoort pas waar te worden als het echt waar is.
 
-   Draai los: node --experimental-sqlite --test test/payroll-dossier.test.js */
+   Draai los: node --test test/payroll-dossier.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

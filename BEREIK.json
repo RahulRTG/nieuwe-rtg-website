@@ -1,8 +1,8 @@
 {
   "uitleg": "Schermen zonder zichtbare klikroute vanaf /apps/app.html. MAG ALLEEN KRIMPEN -- zie test/bereikbaar.test.js. LEEG betekent: elk scherm is aan te tikken.",
   "gemeten": {
-    "schermen": 242,
-    "bereikbaar": 242,
+    "schermen": 261,
+    "bereikbaar": 261,
     "zonderRoute": 0
   },
   "schuld": []

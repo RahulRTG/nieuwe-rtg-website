@@ -4,6 +4,8 @@
    naamInzage op de kamer) en de boardroom mogen de naam bij een codenaam
    opvragen. Elke opvraging, ook zonder treffer, komt in het auditlog:
    inzage is een handeling, geen bladerfunctie. */
+const { idVanKey } = require('../../lib/lidsleutel');
+
 const inzagelog = require('../../inzagelog');
 
 module.exports = (ctx) => {
@@ -20,8 +22,8 @@ module.exports = (ctx) => {
     audit(String(wie || kamer.naam).replace(/[<>]/g, '').slice(0, 30),
       'Identiteitskluis: naam opgevraagd bij codenaam "' + c + '" vanuit ' + kamer.naam + (tref ? '' : ' (geen treffer)'));
     if (!tref) return { status: 404, error: 'Geen lid gevonden met deze codenaam.' };
-    const m = /^user-(\d+)$/.exec(String(tref.key || ''));
-    const u = m ? accounts.getUserById(Number(m[1])) : null;
+    const lidId = idVanKey(tref.key);
+    const u = lidId != null ? accounts.getUserById(lidId) : null;
     if (!u) return { status: 404, error: 'Bij deze codenaam hoort geen accountdossier (demo-persona of gast zonder account).' };
     /* Ook naar het centrale inzagejournaal. Het kantoor-auditlog hierboven is
        van het kantoor; dit journaal is van de betrokkene -- daar kan een lid

@@ -27,23 +27,8 @@ function natieNaarLand(nat) {
   return null;
 }
 
-const ZIN = {
-  globaal: 'Deze functie is tijdelijk uitgeschakeld door de beheerder.',
-  pas: 'Deze functie is voor jouw pas uitgeschakeld door de beheerder.',
-  land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
-  plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
-  persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.',
-  /* De canary is geen storing en geen straf: de functie wordt uitgerold en is
-     nog niet aan iedereen toe. Dat hoort er ook zo te staan -- "uitgeschakeld
-     door de beheerder" zou een supportvraag opleveren die nergens over gaat. */
-  canary: 'Deze functie wordt stap voor stap uitgerold en staat nog niet voor iedereen open.',
-  /* De beschermstand is geen storing en geen beheerbesluit over DEZE functie:
-     het platform houdt tijdelijk alle nieuwe rechten, betalingen en mutaties
-     van derden tegen. Dat hoort er ook zo te staan -- "uitgeschakeld door de
-     beheerder" zou de lezer laten zoeken naar een knop die niemand omzette. */
-  bescherming: 'Het platform staat tijdelijk in de veilige noodstand: lezen gaat door, maar nieuwe ' +
-    'rechten, betalingen en wijzigingen van buitenaf worden even niet aangenomen.'
-};
+/* ZIN woonde hier ook; hij staat nu alleen in ./schakelaar-antwoord.js --
+   beide takken hadden dezelfde teksten uitgeplaatst, elk naar een eigen
+   module, en twee bronnen voor dezelfde zin lopen uiteen (LAT-regel 4). */
 
-module.exports = { natieNaarLand, ZIN };
+module.exports = { natieNaarLand };

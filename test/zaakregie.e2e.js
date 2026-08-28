@@ -12,18 +12,11 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 async function post(base, pad, body, token) {
@@ -48,7 +41,7 @@ async function metScherm(opts) {
   let browser;
   try {
     const token = await managerToken(base);
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage(opts.viewport ? { viewport: opts.viewport } : {});
     const fouten = [];
     letOpFouten(page, fouten);
@@ -56,7 +49,12 @@ async function metScherm(opts) {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, opts.sleutels(token));
-    await page.goto(base + opts.pad, { waitUntil: 'load' });
+    /* `domcontentloaded` en niet `load`: `load` wacht op ELK subverzoek -- elk
+       plaatje, elk lettertype -- terwijl beide aanroepers hieronder als eerste
+       op het echte teken wachten (de poort die dichtgaat, `#gate` verborgen).
+       Onder belasting valt `load` om op zijn eigen tijdslimiet, en dan is de
+       uitslag rood zonder dat er iets stuk is (TAKEN.md 4.39). */
+    await page.goto(base + opts.pad, { waitUntil: 'domcontentloaded' });
     await opts.doe(page);
     assert.deepEqual(fouten, [], 'geen JS-fouten op ' + opts.pad);
   } finally {
@@ -67,7 +65,7 @@ async function metScherm(opts) {
 }
 
 test('Zaak-app: de Regie komt op en elke werkplek tekent',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metScherm({
     pad: '/apps/leverancier.html',
     sleutels: (t) => ({ rtg_sup_token: t }),
@@ -102,7 +100,7 @@ test('Zaak-app: de Regie komt op en elke werkplek tekent',
 });
 
 test('Personeels-PDA: dezelfde Regie in duimstand, met drie werkplekken',
-  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   await metScherm({
     pad: '/apps/personeel.html',
     viewport: { width: 390, height: 844 },

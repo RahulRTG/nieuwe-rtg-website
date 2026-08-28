@@ -14,7 +14,7 @@
    echte functie 'salon' uit de catalogus -- de padkoppeling loopt dus ook
    echt, niet via een verzonnen functie-id.
 
-   Draai los: node --experimental-sqlite --test test/wachter.test.js */
+   Draai los: node --test test/wachter.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { maakWachter } = require('../server/functies/wachter');

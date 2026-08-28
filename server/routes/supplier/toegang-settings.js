@@ -1,12 +1,14 @@
 /* Supplier (deelmodule): de zaakinstellingen (manager). Open/dicht voor
    bestellingen en reserveringen, de genre-opties, land + uurloon voor de
-   boekhouding, de luchtzijde-stand met toeslag en het vervoerderstarief. Bij
+   boekhouding, de luchtzijde-stand met toeslag, het vervoerderstarief, en wat de
+   zaak KAN (rolstoeltoegankelijk, halal, prikkelarm -- kern/geschikt.js). Bij
    het dichtzetten van de bestellingen valt de shift-samenvatting vanzelf als
    bericht naar het team. Afgesplitst uit toegang.js zodat elk deel klein
    blijft. */
 module.exports = (kern) => {
   const { app, supplierAuth, managerOnly, ZAAK_OPTIES, LANDEN, save, logActivity,
     broadcastSync, sseToSupplier, shiftSamenvatting, notifySupplier } = kern;
+  const G = require('../../kern/geschikt');
 
   app.post('/api/supplier/settings', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
@@ -14,6 +16,19 @@ module.exports = (kern) => {
     const changed = [];
     if (typeof req.body.ordersOpen === 'boolean' && st.ordersOpen !== req.body.ordersOpen) { st.ordersOpen = req.body.ordersOpen; changed.push('bestellingen ' + (st.ordersOpen ? 'open' : 'dicht')); }
     if (typeof req.body.reservationsOpen === 'boolean' && st.reservationsOpen !== req.body.reservationsOpen) { st.reservationsOpen = req.body.reservationsOpen; changed.push('reserveringen ' + (st.reservationsOpen ? 'open' : 'dicht')); }
+    /* WAT DE ZAAK KAN. Dit is een uitspraak van de ondernemer en geen keuring
+       door RTG -- net als de allergenen bij een gerecht. Wat er niet staat,
+       geldt nergens als toegezegd: een lid met een harde eis krijgt deze zaak
+       dan simpelweg niet voorgesteld. Liever geen voorstel dan een verrassing
+       bij de deur (kern/geschikt.js). */
+    if (Array.isArray(req.body.geschikt)) {
+      const nieuw = G.schoonGeschikt(req.body.geschikt);
+      const oud = G.geschiktVan(req.supplier);
+      if (nieuw.join(',') !== oud.join(',')) {
+        req.supplier.geschikt = nieuw;
+        changed.push('wat de zaak kan (' + (nieuw.length ? nieuw.length + ' punten' : 'niets opgegeven') + ')');
+      }
+    }
     if (req.body.opties && typeof req.body.opties === 'object') {
       st.opties = st.opties || {};
       for (const k of Object.keys(ZAAK_OPTIES)) {

@@ -39,7 +39,7 @@
    werkwijze als test/stripe-eigen.test.js). Een toets die van het internet
    afhangt is geen toets maar een weerbericht.
 
-   Draai los: node --experimental-sqlite --test test/adresopzoek.test.js
+   Draai los: node --test test/adresopzoek.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

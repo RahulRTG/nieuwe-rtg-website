@@ -33,7 +33,7 @@
    Alle zeven zakten op precies hun eigen bewering en lieten de andere vijf
    groen -- een mutatie die alles laat zakken, bewijst niets (LAT.md regel 2).
 
-   Draai los: node --experimental-sqlite --test test/rtfos-uitvoering.test.js
+   Draai los: node --test test/rtfos-uitvoering.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

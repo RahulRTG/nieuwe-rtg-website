@@ -1,3 +1,4 @@
+const klok = require('../lib/klok');
 /* De zorgvolle keten: het zorgprofiel van de gast (allergenen, dieet en
    medische aandachtspunten) en het live meekijken met de locatie.
 
@@ -8,12 +9,22 @@
    2. Niet langer dan nodig. De zaak zet het meekijken uit zodra het niet
       meer nodig is; de gast kan het altijd zelf stoppen. Beide kanten
       krijgen daar meteen een melding van. */
+const inzagelog = require('../inzagelog');
+const { idVanKey } = require('../lib/lidsleutel');
+
+/* Hoe vaak eenzelfde zaak in het journaal komt voor hetzelfde profiel: een keer
+   per dag. Een restaurant dekt een tafel meerdere keren per avond, en zonder
+   deze rem verdrinkt het echte signaal -- "die zaak heeft mijn allergieen
+   gezien" -- in vijftig regels van dezelfde zaak op dezelfde avond. De grens
+   staat op een dag omdat dat is wat een lid zou zeggen: gisteren, vandaag. */
+const INZAGE_STIL_MS = 24 * 60 * 60 * 1000;
+
 module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }) => {
   const lijsten = () => {
     if (!db.data.zorgProfielen) db.data.zorgProfielen = {};   // per gast: allergenen, dieet, medisch + delen-schakelaar
     if (!db.data.locatieDelen) db.data.locatieDelen = [];      // toestemmingen om live mee te kijken, per gast en zaak
   };
-  const nu = () => new Date().toISOString();
+  const nu = () => klok.datum().toISOString();
 
   /* ---- het zorgprofiel ---- */
   function zorgVan(key) {
@@ -29,12 +40,46 @@ module.exports = ({ db, save, crypto, schoon, notify, notifySupplier, sseToSuppl
     save();
     return { ok: true, zorg: p };
   }
-  // wat de keten mag zien: alleen met toestemming, en alleen als er iets in staat
-  function zorgVoor(key) {
+  /* Wat de keten mag zien: alleen met toestemming, en alleen als er iets in
+     staat.
+
+     EN WIE HET ZAG KOMT IN HET JOURNAAL. Dat ontbrak, en het was het gat met de
+     zwaarste inhoud: allergieen, dieet en medische aandachtspunten zijn de
+     gevoeligste gegevens die dit huis kent, en ze reisden mee zonder dat het lid
+     ooit kon zien welke zaak ze had gelezen. De deel-schakelaar stond wel op het
+     toestemmingsscherm ("wat er nu mag"), maar de andere helft -- wie er
+     werkelijk keek -- nergens.
+
+     EEN AANROEPER DIE EEN ZAAK NOEMT, WORDT GENOTEERD; een aanroeper die niets
+     noemt niet. Dat verschil is geen slordigheid maar dezelfde regel als in
+     server/inzagelog.js: je eigen profiel lezen is geen inzage. De schermen van
+     het lid zelf (zijn bestelling, zijn rit, zijn zorgkaart) vragen het profiel
+     voor hem, niet over hem. */
+  function zorgVoor(key, door) {
     const p = zorgVan(key);
     if (!p.delen) return null;
     if (!p.allergenen.length && !p.dieet && !p.medisch) return null;
+    if (door && door.zaak) noteerInzage(key, door);
     return { allergenen: p.allergenen, dieet: p.dieet, medisch: p.medisch };
+  }
+
+  function noteerInzage(key, door) {
+    const id = idVanKey(key);
+    if (id == null) return;                       // een gast of persona heeft geen dossier
+    const zaak = String(door.zaak || '').slice(0, 40);
+    lijsten();
+    if (!db.data.zorgInzageStil || typeof db.data.zorgInzageStil !== 'object') db.data.zorgInzageStil = {};
+    const sleutel = key + '|' + zaak;
+    const nu = klok.nu();
+    if (nu - (db.data.zorgInzageStil[sleutel] || 0) < INZAGE_STIL_MS) return;
+    db.data.zorgInzageStil[sleutel] = nu;
+    const s = findSupplier ? findSupplier(zaak) : null;
+    try {
+      inzagelog.noteer({ door: (s && s.name) || zaak, over: { id },
+        waarom: door.reden || 'zorgprofiel gelezen bij een bestelling of verblijf',
+        bron: 'zorgprofiel' });
+    } catch (e) {}
+    save();
   }
 
   /* ---- live meekijken met toestemming ---- */

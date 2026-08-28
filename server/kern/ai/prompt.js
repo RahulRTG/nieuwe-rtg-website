@@ -8,14 +8,26 @@ const { TAALREGELS } = require('../rahul/taal');
 const { TWIJFELREGELS } = require('../rahul/twijfel');
 const { cannedAnswer } = require('./demoantwoorden');
 module.exports = (ctx) => {
-  const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel } = ctx;
+  const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel, ledenInhoudVan } = ctx;
   function aiSystemPrompt(tier, lang, key) {
     const persona = PERSONAS[tier];
-    const trip = db.data.trip;
+    /* DE REIS EN DE FACTUREN VAN DIT LID, NIET DIE VAN DE DEMO.
+
+       Hier stond `db.data.trip` en `db.data.invoices`. Dat is de seed-inhoud:
+       de demo-reis naar Ibiza en de vier demo-facturen. Rahul kreeg die dus in
+       elke system prompt mee als "de komende reis van het lid", ook tegen
+       iemand die zich net had aangemeld en nog nergens heen ging. Hij vertelde
+       vervolgens overtuigd over een boot naar Formentera die niemand had
+       geboekt -- precies wat de merkregel verbiedt.
+
+       ledenInhoudVan (kern/lid.js) kent de regel wel: een echt account leest
+       zijn eigen dossier, een demo-sessie de demo-inhoud. */
+    const md = ledenInhoudVan ? ledenInhoudVan(key) : db.data;
+    const trip = md && md.trip ? md.trip : null;
     // de omgangsvormen: hoe Rahul zich tot dit lid verhoudt (alleen bij
     // volwassen leden met een bekend geslacht; anders een lege string)
     const omgang = require('../rahul').rahulOmgangVoor(key);
-    const openInvoices = db.data.invoices.filter(i => i.status === 'open');
+    const openInvoices = ((md && md.invoices) || []).filter(i => i.status === 'open');
     // Rahul spreekt de taal van het lid (wereldtalen via de Boardroom).
     const taalRegel = (!lang || lang === 'nl')
       ? 'Antwoord in het Nederlands, beknopt (maximaal ~120 woorden), zonder opsmuk.'
@@ -66,7 +78,12 @@ module.exports = (ctx) => {
          (routes/member/persoonlijk.js geeft liveCodename mee); hier stond nog
          persona.full. Dezelfde tabel draagt de codenaam al. */
       `Het lid: ${persona.codename || persona.name} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
-      `Komende reis: ${trip.dest}, ${trip.dates} (over ${trip.days} dagen). Geboekte diensten: ${trip.items.map(i => `${i.title} [${i.label}]`).join('; ')}.`,
+      /* GEEN REIS IS OOK EEN ANTWOORD. Een leeg reisdossier hoort Rahul te
+         weten, niet in te vullen: hij vraagt waar het lid heen wil en wat er
+         moet gebeuren, en verzint geen bestemming om iets te zeggen te hebben. */
+      trip
+        ? `Komende reis: ${trip.dest}, ${trip.dates} (over ${trip.days} dagen). Geboekte diensten: ${(trip.items || []).map(i => `${i.title} [${i.label}]`).join('; ')}.`
+        : 'Dit lid heeft nog GEEN reis in het systeem staan. Noem geen bestemming, datum of boeking: die zijn er niet. Vraag waar het lid heen wil en wanneer, en bied aan het vanaf daar te regelen.',
       openInvoices.length
         ? `Openstaande betalingen: ${openInvoices.map(i => `${i.desc} (€ ${i.netto + i.bijdrage})`).join('; ')}. Wijs daar alleen op als het relevant is.`
         : 'Er staan geen betalingen open.',

@@ -526,8 +526,19 @@
         "bestand": "CONCERN.md",
         "anker": "Een gegeven zonder bron bestaat niet"
       },
-      "handhaver": [],
-      "mensenwerk": "CONCERN.md noemt vier bronsoorten en eist ze per gegeven. In de code bestaat de bronsoort wel op sommige plekken, maar er is geen enkele poort die een juridisch gegeven ZONDER bron weigert -- niet in de opslag en niet op de route. De wet is dus opgeschreven en niet gehandhaafd. Dat is precies wat dit register zichtbaar hoort te maken."
+      "handhaver": [
+        "server/kern/concern/bron.js",
+        "server/kern/concern/tijd.js"
+      ],
+      "sabotage": {
+        "wat": "laat de tijdmachine een gegeven ZONDER bron alsnog vastleggen, met bron null -- precies de stille vorm die ./bron.js kwam voorkomen",
+        "bestand": "server/kern/concern/tijd.js",
+        "zoek": "const b = maakBron(o.bronSoort, o.bronDetail, o.wie);\n    if (b.error) return { status: 400, error: b.error, uitleg: b.uitleg };",
+        "zet": "const b = maakBron(o.bronSoort, o.bronDetail, o.wie);\n    if (b.error) b.bron = null;",
+        "wachters": [
+          "test:test/concern.test.js"
+        ]
+      }
     },
     {
       "id": "concern-werknemer-koopt-geen-pas",

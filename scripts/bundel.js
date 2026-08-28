@@ -45,6 +45,9 @@ const bundels = {
   'shared/bediening.js': 'shared/bediening',
   'shared/klok3d.js': 'shared/klok3d',
   'shared/glyf.js': 'shared/glyf',
+  // RTG Gebaren: de kern en het licht, het gebaar zelf, de wegen die geen veeg
+  // zijn (tik, greep, toetsen, vasthouden), en de actielade met de publieke deur
+  'shared/gebaar.js': 'shared/gebaar',
   'shared/qr.js': 'shared/qr',
   'shared/klok.js': 'shared/klok',
   'shared/metgezel.js': 'shared/metgezel',
@@ -76,6 +79,9 @@ const bundels = {
   // De bureau-PDA: één werking voor de drie ontwerpbureaus (studio, hardware,
   // architect). Deel 1 is de tabel met wat per bureau verschilt, deel 2 de
   // werking die daarvoor drie keer bestond en uit elkaar liep.
+  // De cookiemelding: zij meet de grond waarop zij staat, en die meting groeide
+  // haar bestand uit. Twee delen: de melding zelf en de grondmeting.
+  'shared/cookie.js': 'shared/cookie',
   'shared/bureaupda.js': 'shared/bureaupda',
   'apps/techniek.js': 'apps/techniek',
   'apps/meldkamer.js': 'apps/meldkamer',
@@ -90,6 +96,15 @@ const bundels = {
   'apps/notities/app.js': 'apps/notities/app',
   'apps/rtgschool/leer.js': 'apps/rtgschool/leer',
   'apps/schoolpartner/app.js': 'apps/schoolpartner/app',
+  /* De vijf enterprise-delen van School Partner. Ze delen geen scope met
+     app.js -- elk is een eigen IIFE -- maar ze zijn per stuk over de 10 KB
+     gegroeid, en de huisregel is dan: opknippen bij een naad die iets
+     betekent. De naad ligt telkens tussen "wat toont het" en "wat doet het". */
+  'apps/schoolpartner/veiligheid.js': 'apps/schoolpartner/veiligheid',
+  'apps/schoolpartner/hr.js': 'apps/schoolpartner/hr',
+  'apps/schoolpartner/geld.js': 'apps/schoolpartner/geld',
+  'apps/schoolpartner/dossier.js': 'apps/schoolpartner/dossier',
+  'apps/schoolpartner/enterprise-beheer.js': 'apps/schoolpartner/enterprise-beheer',
   'shared/i18n.js': 'shared/i18n',
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',

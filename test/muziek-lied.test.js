@@ -5,7 +5,7 @@
    lettergrepen eronder, en het refrein ligt hoger dan het couplet. En de regel
    die daarbij hoort: RAHUL SCHRIJFT UW WOORDEN NIET. Typt u niets, dan zingt de
    stem open klinkers -- hoorbaar een lege plek, geen verzonnen tekst.
-   Draai: node --experimental-sqlite --test test/muziek-lied.test.js */
+   Draai: node --test test/muziek-lied.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

@@ -5,7 +5,7 @@
    dat de aanroep via de centrale AI-laag loopt (uitwijkketen, geen eigen
    modelnaam in de gate-module), en de route zelf: de boardroom-deur, de stand,
    een echte ronde tegen een nagemaakte provider en de audit-regel.
-   Draai los: node --experimental-sqlite --test test/salon-curatie.test.js */
+   Draai los: node --test test/salon-curatie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -15,7 +15,7 @@ const http = require('http');
 const { startServer, stop } = require('./helper');
 
 const viraal = require('../server/kern/salonviraal');
-const { jaNee } = require('../server/ai');
+const { jaNee } = require('../server/ai-kort');
 
 /* Een nagemaakte AI-client in de vorm die de centrale laag oplevert: alleen
    messages.create. Meer heeft salonviraal niet nodig -- dat is precies het punt. */
@@ -89,7 +89,13 @@ test('6. de gate-module kiest geen aanbieder en geen model zelf', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'salonviraal.js'), 'utf8');
   assert.ok(!/model\s*:/.test(src), 'de modelkeuze hoort in de centrale AI-laag, niet in de feed-gate');
   assert.ok(!/require\('\.\.\/(anthropic|openai|gemini)'\)/.test(src), 'geen rechtstreekse aanbieder-client');
-  assert.match(src, /require\('\.\.\/ai'\)/, 'de aanroep loopt via server/ai.js (met de uitwijkketen)');
+  /* De aanroep loopt via de centrale AI-laag en niet langs een aanbieder. Sinds
+     19 augustus staan daar TWEE bestanden: ../ai.js is de uitwijkketen zelf, en
+     ../ai-kort.js is de gemakslaag erop (jaNee, tekst) die diezelfde keten
+     gebruikt. Allebei goed; wat deze toets tegenhoudt is een module die zijn
+     eigen client of eigen modelnaam pakt. */
+  assert.match(src, /require\('\.\.\/ai(-kort)?'\)/,
+    'de aanroep loopt via server/ai.js of server/ai-kort.js (met de uitwijkketen)');
 });
 
 /* ---------- de route: de knop in de boardroom ---------- */

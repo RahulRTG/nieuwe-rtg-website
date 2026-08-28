@@ -4,7 +4,7 @@
    afwikkeling via DEZELFDE settleFactuur als de kaart- en muntweg -- de
    factuur gaat pas op betaald als het hele bedrag er is, en een tweede
    poging kaatst af.
-   Draai los: node --experimental-sqlite --test test/factuursaldo.test.js */
+   Draai los: node --test test/factuursaldo.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

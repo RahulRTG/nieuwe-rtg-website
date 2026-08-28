@@ -19,7 +19,7 @@
    en de fout in de route zat. Hier komt de origin dus uit het verzoek, net zoals
    de route hem afleidt.
 
-   Draai los: node --experimental-sqlite --test test/webauthn-ceremonie.test.js
+   Draai los: node --test test/webauthn-ceremonie.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

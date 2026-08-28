@@ -18,18 +18,18 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
-  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 90%,transparent));
     backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + .9rem) 1.1rem .7rem;
     border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
-  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header .ey{display:block;font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
   header h1{font-size:1.15rem;}
   header a.terug{color:var(--muted);text-decoration:none;font-size:1.1rem;}
   main{padding:1rem 1.1rem;max-width:1100px;margin:0 auto;}
-  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;font-weight:600;padding:.45rem .8rem;cursor:pointer;}
   .knop:hover{border-color:var(--gold);}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;}
-  .knop.aan{border-color:var(--gold);color:var(--gold);}
+  .knop.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .knop:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* De galerij houdt zijn eigen weergave-schakelaar (tijdlijn / favorieten /
      albums), maar draagt hem in de stijl van het deelmenu: geen randje om een
@@ -42,7 +42,7 @@
   #toonFav.aan,#toonAlbums.aan{color:var(--txt);border-bottom-color:var(--gold);}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
   .stil{color:var(--soft);font-size:.82rem;line-height:1.55;}
-  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .5rem;}
+  .kop{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));margin:1.2rem 0 .5rem;}
 
   /* de terugblik: een rustige rij, geen carrousel-trucjes */
   #terugblik{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.4rem;}
@@ -51,13 +51,13 @@
   /* het raster: vierkant, veel lucht eromheen niet nodig -- het beeld is de lucht */
   .raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:.4rem;}
   .thumb{position:relative;aspect-ratio:1;background:var(--card2);border:1px solid var(--line);
-    border-radius:10px;overflow:hidden;cursor:pointer;}
+    border-radius:0;overflow:hidden;cursor:pointer;}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .thumb .ster{position:absolute;top:.35rem;right:.4rem;color:var(--gold);font-size:.8rem;
+  .thumb .ster{position:absolute;top:.35rem;right:.4rem;color:var(--rtg-leesgoud,var(--gold));font-size:.8rem;
     text-shadow:0 1px 4px rgba(0,0,0,.7);}
   .thumb .wacht{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     color:var(--soft);font-size:.62rem;letter-spacing:.1em;}
-  .albumkaart{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem .9rem;
+  .albumkaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.8rem .9rem;
     margin-bottom:.5rem;display:flex;align-items:center;gap:.7rem;cursor:pointer;}
   .albumkaart:hover{border-color:var(--gold);}
   .albumkaart b{flex:1;font-size:.9rem;}
@@ -67,13 +67,13 @@
   .scrim{position:fixed;inset:0;z-index:20;background:rgba(8,8,7,.94);display:none;
     flex-direction:column;align-items:center;justify-content:center;padding:1rem;}
   .scrim.open{display:flex;}
-  #kkBeeld{max-width:100%;max-height:70vh;border-radius:10px;background:var(--card2);}
+  #kkBeeld{max-width:100%;max-height:70vh;border-radius:0;background:var(--card2);}
   #kkMeta{color:var(--muted);font-size:.78rem;margin-top:.6rem;text-align:center;}
   #kkBalk{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.8rem;align-items:center;}
-  #kkBalk select{background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);
+  #kkBalk select{background:var(--card2);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font:inherit;font-size:.8rem;padding:.4rem .55rem;}
   .melding{position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);background:var(--card2);
-    border:1px solid var(--line);border-radius:999px;padding:.5rem .95rem;font-size:.82rem;
+    border:1px solid var(--line);border-radius:0;padding:.5rem .95rem;font-size:.82rem;
     opacity:0;transition:opacity .25s;pointer-events:none;z-index:30;}
   .melding.zie{opacity:1;}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
@@ -89,9 +89,13 @@
   <span class="rij" style="margin-left:auto;">
     <button class="knop" id="toonFav" type="button">Favorieten</button>
     <button class="knop" id="toonAlbums" type="button">Albums</button>
-    <button class="knop vol" id="nieuwAlbum" type="button">+ Album</button>
   </span>
 </header>
+<!-- De hoofdhandeling staat onderaan en niet in de kopbalk: GRAMMATICA.md,
+     "ik wil iets doen -> mijn duim vindt het onderaan". Op telefoonmaat is dit
+     een vaste strook (shared/rtg-ui.css, .rtg-duimbalk); daarboven een gewone
+     rij onder de kop. -->
+<div class="rtg-duimbalk"><button class="knop vol" id="nieuwAlbum" type="button" data-hoofdactie>+ Album</button></div>
 <main>
   <div id="terugblikWrap" style="display:none;">
     <div class="kop">Dezelfde maand, eerdere jaren</div>

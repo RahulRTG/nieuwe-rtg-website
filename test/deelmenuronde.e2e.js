@@ -38,14 +38,10 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpRust, wachtTot } = require('./helper');
 const { bundel } = require('../scripts/bundel');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-deelronde-'));
 
 const PROEFPAD = '/apps/zz-deelmenu-ronde-proef.html';
@@ -83,7 +79,7 @@ function telLuisteraars() {
    geen menu te staan en wachten we op de module in plaats van op de balk. */
 async function opstelling(inhoud) {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const fouten = [];
@@ -114,7 +110,7 @@ function stand() {
 }
 
 test('een deep-link komt ook NA een hertekening op het juiste deel uit',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     const ronde1 = await page.evaluate(stand);
@@ -123,7 +119,13 @@ test('een deep-link komt ook NA een hertekening op het juiste deel uit',
 
     // de app hertekent zijn scherm met drie ANDERE delen
     await page.evaluate(html => { document.getElementById('laag').innerHTML = html; }, RONDE2);
-    await page.waitForTimeout(700);
+    /* De wacht hertekent op een DOM-wijziging, niet op een verzoek: wachten tot
+       de nieuwe indeling er staat is dus wachten op precies de bewering. */
+    await wachtTot(page, () => {
+      const b = document.querySelector('.rtgdeel-balk');
+      return !!b && [...b.querySelectorAll('button')].map(x => x.textContent.trim().toLowerCase())
+        .join(',').includes('foxtrot');
+    }, null, { wat: 'de opnieuw ingedeelde balk' });
     const ronde2 = await page.evaluate(stand);
     assert.deepEqual(ronde2.delen, ['delta', 'echo', 'foxtrot'], 'de wacht heeft opnieuw ingedeeld');
 
@@ -132,7 +134,11 @@ test('een deep-link komt ook NA een hertekening op het juiste deel uit',
        over de hash heen, en leest de luisteraar van ronde 2 daarna een hash die
        al veranderd is: de deep-link komt op het verkeerde deel uit. */
     await page.evaluate(() => { location.hash = '#deel-foxtrot'; });
-    await page.waitForTimeout(400);
+    /* Wachten met DEZELFDE meting als de bewering eronder: aria-current is hoe
+       dit menu "dit deel staat open" zegt (zie stand() hierboven). */
+    await wachtTot(page, () => [...document.querySelectorAll('.rtgdeel-balk button')]
+      .some(b => b.getAttribute('aria-current') === 'true' && /foxtrot/i.test(b.textContent)),
+      null, { wat: 'het deel Foxtrot dat de deep-link opent' });
     const na = await page.evaluate(stand);
     const hash = await page.evaluate(() => location.hash);
     assert.deepEqual(na.open, ['Foxtrot'], 'de deep-link opent het gevraagde deel');
@@ -145,7 +151,7 @@ test('een deep-link komt ook NA een hertekening op het juiste deel uit',
 });
 
 test('een MISLUKTE hertekening laat geen menu achter dat kaarten kan verbergen',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* De app houdt na zijn hertekening nog maar twee delen over. Dan hoort er
@@ -178,14 +184,19 @@ test('een MISLUKTE hertekening laat geen menu achter dat kaarten kan verbergen',
 });
 
 test('een teruggezette KOPIE van de balk telt niet als menu: de knoppen moeten werken',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* Een app die zijn scherm uit een eigen momentopname terugzet, zet de balk
        mee terug -- als HTML, dus zonder de klik-luisteraars. Het menu staat er
        dan wel, maar doet niets. */
     await page.evaluate(() => { var m = document.getElementById('main'); m.innerHTML = m.innerHTML; });
-    await page.waitForTimeout(700);
+    await wachtTot(page, () => document.querySelectorAll('.rtgdeel-balk').length === 1,
+      null, { wat: 'precies een balk na de hertekening' });
+    /* Drie stille rondes, geen een: shared/deelmenu.js herbouwt pas 120 ms NA de
+       laatste wijziging, en bij een polling van 100 ms is een enkele gelijke
+       ronde dus nog vóór dat moment. Drie rondes overleven de wachttijd. */
+    await wachtOpRust(page, null, { rondes: 3 });
     const na = await page.evaluate(stand);
     assert.equal(na.balken, 1, 'er staat precies een balk');
     assert.deepEqual(na.knoppen, ['Alfa', 'Bravo', 'Charlie'], 'met de drie delen erop');
@@ -201,7 +212,7 @@ test('een teruggezette KOPIE van de balk telt niet als menu: de knoppen moeten w
 });
 
 test('een vreemde balk voor de onze wordt opgeruimd, niet eindeloos herbouwd',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { page, fouten, sluit } = await opstelling();
   try {
     /* De gevaarlijke vorm: een dode kopie van de balk STAAT VOOR de onze in
@@ -221,7 +232,15 @@ test('een vreemde balk voor de onze wordt opgeruimd, niet eindeloos herbouwd',
       var m = document.getElementById('main');
       m.insertBefore(document.querySelector('.rtgdeel-balk').cloneNode(true), m.firstChild);
     });
-    await page.waitForTimeout(1500);
+    /* Hier wordt gewacht tot de wacht de VREEMDE balk heeft opgeruimd -- dat is
+       de bewering -- en daarna tot het scherm stil is, zodat "hij herbouwt niet
+       eindeloos" op een rustige stand wordt gemeten en niet middenin. */
+    await wachtTot(page, () => document.querySelectorAll('.rtgdeel-balk').length === 1,
+      null, { wat: 'een opgeruimde vreemde balk' });
+    /* Drie stille rondes, geen een: shared/deelmenu.js herbouwt pas 120 ms NA de
+       laatste wijziging, en bij een polling van 100 ms is een enkele gelijke
+       ronde dus nog vóór dat moment. Drie rondes overleven de wachttijd. */
+    await wachtOpRust(page, null, { rondes: 3 });
 
     const na = await page.evaluate(() => ({
       balken: document.querySelectorAll('.rtgdeel-balk').length,
@@ -240,7 +259,7 @@ test('een vreemde balk voor de onze wordt opgeruimd, niet eindeloos herbouwd',
 });
 
 test('een pagina die blijft muteren zonder ooit drie delen te krijgen laat de wacht los',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   /* De belofte boven de vergeefs-teller: een chat die berichten blijft
      aanvullen krijgt geen menu EN betaalt geen eeuwige wacht. Dat er een
      grens IS staat hier vast; welk getal die grens is, staat in de code en in
@@ -282,7 +301,12 @@ test('een pagina die blijft muteren zonder ooit drie delen te krijgen laat de wa
        Zonder die tweede helft zou deze toets ook slagen op een pagina die
        nooit een menu had kunnen krijgen. */
     await page.evaluate(html => { document.getElementById('laag').innerHTML = html; }, DRIE_KAARTEN);
-    await page.waitForTimeout(900);
+    /* Een AFWEZIGHEID valt niet af te wachten met "verschijnt het?" -- dus
+       wachten tot het scherm stil is, en dan pas kijken of er niets is gebouwd. */
+    /* Drie stille rondes, geen een: shared/deelmenu.js herbouwt pas 120 ms NA de
+       laatste wijziging, en bij een polling van 100 ms is een enkele gelijke
+       ronde dus nog vóór dat moment. Drie rondes overleven de wachttijd. */
+    await wachtOpRust(page, null, { rondes: 3 });
     const zonder = await page.evaluate(stand);
     assert.equal(zonder.balken, 0, 'de wacht bouwt niet meer uit zichzelf');
     const metHand = await page.evaluate(() => { window.RTGDeel.herscan(); return document.querySelectorAll('.rtgdeel-balk').length; });

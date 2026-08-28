@@ -17,7 +17,7 @@
         het werk van ACL en INPUT, en een tweede oordeel daarover zou een tweede
         waarheid zijn.
 
-   Draai los: node --experimental-sqlite --test test/uitvoerproef.test.js */
+   Draai los: node --test test/uitvoerproef.test.js */
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const u = require('../scripts/lib/uitvoerproef');

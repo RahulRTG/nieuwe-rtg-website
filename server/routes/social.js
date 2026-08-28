@@ -24,7 +24,27 @@ function rtfSociaal(req, res) {
 
   /* De leden- en gezinnenlaag draaien als submodules op de gedeelde kern
      plus de sessie-helpers, een keer gemount bij het opstarten. */
-  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal };
+  /* DE BON VAN RTG LINK, EEN KEER (LINK.md par. 4, stap 6). Hij stond in
+     ./social/pin.js, en toen de gezinskant zijn eigen linkdeur kreeg zou dat de
+     tweede kopie zijn geworden -- met als uitkomst dat "mijn koppelingen" aan de
+     ene kant wel en aan de andere kant niet vertelt wat je hebt gedaan. Precies
+     dat gat vond test/linkgezin.test.js.
+
+     linkBon wordt OP AANROEPMOMENT uit de kern gehaald: de sociale routes hangen
+     eerder dan RTG Link (opzet/aanbouw2.js), dus hierboven uitlezen levert voor
+     altijd undefined op.
+
+     Hij mag het verzoek nooit omgooien -- dat is al gelukt als we hier zijn --
+     maar ook niet stil mislukken (LAT.md regel 5): een lege bonnenlijst leest
+     als "ik heb niets gedaan", en dat is dan niet waar. */
+  function linkBon(wie, vorm, naar) {
+    try {
+      if (typeof kern.linkBon !== 'function') throw new Error('de linklaag draait hier niet');
+      kern.linkBon({ wie, type: 'persoon', intentie: 'contact.verbinden', vorm, naar });
+    } catch (e) { console.warn('[link] bon niet geschreven voor ' + vorm + '-verbinding: ' + (e && e.message)); }
+  }
+
+  const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal, linkBon };
   require('./social/leden')(sctx);
   require('./social/pin')(sctx);
   require('./social/snaps')(sctx);

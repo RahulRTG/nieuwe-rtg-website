@@ -22,15 +22,15 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, letOpFouten } = require('./helper');
-const { laadBrowser } = require('./browser');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser,
+  wachtTot, wachtOpVerandering } = require('./helper');
 
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkmerk-'));
 const ACCENT = '#1B7F5A';
 
 test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   const base = srv.base;
   let browser;
@@ -56,7 +56,7 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
     await post('/api/techniek/tenant/merk',
       { org: 'O-HAARLEM', merk: { naam: 'Imran Group One', payoff: 'Werk zoals het hoort', accent: ACCENT } }, tech);
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const ctx = await browser.newContext({ serviceWorkers: 'block' });
     const page = await ctx.newPage();
     const fouten = [];
@@ -66,11 +66,43 @@ test('het Werk OS draagt de naam van de klant, en de RTG-schil verft niet mee',
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
       await page.evaluate(() => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.removeItem('rtg_werk_sessie'); });
       await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(500);
+      /* WACHTEN TOT DE INLOGKAART ECHT WERKT, en niet tot hij te ZIEN is. Het
+         veld en de knop staan boven in de HTML en zijn er dus meteen; de
+         klikbinding van #inlogGa staat in /apps/werk/app.js, het laatste gewone
+         script onderin de pagina. Klikken voordat dat script heeft gedraaid
+         gaat nergens heen -- dan is de knop een knop zonder luisteraar. Zodra
+         readyState niet meer 'loading' is, zijn alle gewone en uitgestelde
+         scripts uitgevoerd; kern.js heeft dan ook zijn poort gezet, en die zet
+         de inlogkaart open omdat we de sessie net gewist hebben. */
+      await wachtTot(page, () => {
+        const kaart = document.getElementById('inlog');
+        return document.readyState !== 'loading' && !!kaart && !kaart.hidden;
+      }, null, { wat: 'de inlogkaart van het Werk OS, met de scripts van de pagina geladen' });
       await page.fill('#iWerkruimte', code);
       await page.fill('#iToken', token);
       await page.click('#inlogGa');
-      await page.waitForTimeout(1100);
+      /* NA DE KLIK KOMEN ER TWEE ANTWOORDEN ACHTER ELKAAR, en wat deze toets
+         leest hangt aan het tweede. Eerst antwoordt /api/bedrijf/mijn-rechten:
+         pas dan gaat de inlogkaart dicht, verschijnt #inhoud en begint het
+         startscherm te laden. Dat startscherm haalt vervolgens
+         /api/tenant/bootstrap op, en in de afhandeling DAARVAN worden de
+         merkbalk, het contract, de vertrouwensregel en "niet gebouwd" getekend
+         -- in die volgorde, met wkNietGebouwd als laatste.
+
+         Daarom wachten we op deze twee vakken en niet op "het scherm is stil":
+         vlak na de klik is het scherm stil omdat er nog niets begonnen is, en
+         dan valt zo'n wacht meteen door.
+
+         Beide vakken zijn leeg tot hun antwoord binnen is -- de pagina is net
+         opnieuw geladen -- en beide worden altijd gevuld: wActies desnoods met
+         "Geen acties", wkNietGebouwd met de lijst die de server altijd
+         meestuurt. Samen zeggen ze: het startscherm is af EN het merk van de
+         klant is verwerkt. Dat tweede geldt ook voor de werkruimte ZONDER
+         tenant: daar verbergt diezelfde afhandeling de balk juist. Zonder de
+         eerste wacht zou de kleurcontrole hieronder een half getekend scherm
+         aflopen en een lek buiten de merkbalk kunnen missen. */
+      await wachtOpVerandering(page, '#wActies', '');
+      await wachtOpVerandering(page, '#wkNietGebouwd', '');
     };
 
     /* ---- de werkruimte MET een tenant ---- */

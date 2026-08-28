@@ -9,7 +9,7 @@
 
    Elke toets is met een mutatie nagetrokken (LAT-regel 2); wat er is omgezet
    staat in het commit-bericht.
-   Draai los: node --experimental-sqlite --test test/mall-kaart.test.js */
+   Draai los: node --test test/mall-kaart.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

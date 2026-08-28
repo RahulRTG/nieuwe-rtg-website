@@ -12,7 +12,7 @@
        geen rtf-handle, alleen codenamen (privacy by design, CLAUDE.md);
      - een gast van het gezin (oppas, opa en oma) komt er niet in.
 
-   Draai los: node --experimental-sqlite --test test/levenbandroutes.test.js */
+   Draai los: node --test test/levenbandroutes.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

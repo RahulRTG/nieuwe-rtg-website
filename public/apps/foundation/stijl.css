@@ -2,8 +2,18 @@
 @import url('/fonts/fonts.css');
 :root{
   --bg:#0C0C0B; --paneel:#151412; --paneel2:#100F0E; --lijn:#2A2724;
-  --txt:#F7F5F1; --zacht:#A79F92; --goud:#C9A24B; --goud2:#e0bd6b;
+  --txt:#F7F5F1; --zacht:var(--rtg-leeszacht,#A79F92); --goud:#C9A24B; --goud2:#e0bd6b;
   --groen:#5FA56A; --rood:#B4574E; --bord:#12110F;
+  /* TWEE ROLLEN, TWEE TOKENS. --goud is het ACCENT: randen, vlakken, actieve
+     staten, grote tekst. --accent-tekst is wat het accent mag zijn zodra het
+     KLEINE TEKST wordt. Bij goud (#C9A24B op zwart, ~7:1) is dat hetzelfde
+     ding; bij de bordeaux hieronder niet, en juist daar ging het mis. */
+  --accent-tekst:#C9A24B;
+  /* En dezelfde splitsing voor rood. --rood (#B4574E) is de kleur van een
+     waarschuwing op een vlak; als TEKST haalt hij op zwart 4,11 en dat is net
+     te weinig. Deze tint is dezelfde kleur, alleen licht genoeg om te lezen
+     (4,99) -- geen nieuwe merkkleur maar een leesbare stand van dezelfde. */
+  --rood-tekst:#C2665C;
   --radius:16px; --serif:'Bodoni Moda',Georgia,'Times New Roman',serif;
   --sans:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif;
 }
@@ -12,32 +22,32 @@ html,body{height:100%;}
 body{background:var(--bg);color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
 button{font-family:inherit;cursor:pointer;border:none;}
 input,textarea,select{font-family:inherit;}
-.knop{background:var(--goud);color:#1a1710;border-radius:12px;padding:0.7rem 1.1rem;font-size:0.95rem;font-weight:700;transition:filter .15s;}
+.knop{background:var(--goud);color:#1a1710;border-radius:0;padding:0.7rem 1.1rem;font-size:0.95rem;font-weight:700;transition:filter .15s;}
 .knop:hover{filter:brightness(1.07);}
 .knop.groen{background:var(--groen);color:#fff;}
 .knop.grijs{background:#26221d;color:var(--txt);}
 .knop.rood{background:var(--rood);color:#fff;}
-.knop.klein{padding:0.45rem 0.7rem;font-size:0.82rem;border-radius:10px;}
-.veld{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:12px;
+.knop.klein{padding:0.45rem 0.7rem;font-size:0.82rem;border-radius:0;}
+.veld{width:100%;background:var(--paneel2);border:1px solid var(--lijn);border-radius:0;
   padding:0.8rem 1rem;font-size:1rem;color:var(--txt);outline:none;}
 .veld:focus{border-color:var(--goud);}
-.kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:var(--radius);}
+.kaart{background:var(--paneel);border:1px solid var(--lijn);border-radius:0;}
 .zacht{color:var(--zacht);}
 .serif{font-family:var(--serif);}
-.badge{display:inline-block;background:#241f16;color:var(--goud);border-radius:999px;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
+.badge{display:inline-block;background:#241f16;color:var(--rtg-leesgoud,var(--goud));border-radius:0;padding:0.15rem 0.6rem;font-size:0.72rem;font-weight:600;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#3a352d;}
 .dot.aan{background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.7);}
-.kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--goud);font-weight:700;}
+.kick{font-size:0.7rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));font-weight:700;}
 .campus-ingang{display:grid;grid-template-columns:1fr auto;gap:.32rem 1rem;align-items:center;padding:1rem 1.1rem;margin:0 0 1rem;text-decoration:none;color:var(--txt);background:radial-gradient(circle at 92% 12%,color-mix(in oklab,var(--goud) 22%,transparent),transparent 38%),var(--paneel);transition:transform .15s,border-color .15s;}
 .campus-ingang:hover{transform:translateY(-2px);border-color:var(--goud);}
-.campus-ingang .campus-merk{grid-column:1;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--goud);font-weight:800;}
+.campus-ingang .campus-merk{grid-column:1;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--goud));font-weight:800;}
 .campus-ingang strong{grid-column:1;font-family:var(--serif);font-size:1.15rem;font-weight:600;}
 .campus-ingang span:not(.campus-merk){grid-column:1;color:var(--zacht);font-size:.77rem;line-height:1.45;}
-.campus-ingang b{grid-column:2;grid-row:1/4;color:var(--goud);font-size:.78rem;white-space:nowrap;}
+.campus-ingang b{grid-column:2;grid-row:1/4;color:var(--rtg-leesgoud,var(--goud));font-size:.78rem;white-space:nowrap;}
 @media(max-width:560px){.campus-ingang{grid-template-columns:1fr}.campus-ingang b{grid-column:1;grid-row:auto;margin-top:.35rem}}
 /* gedeelde AI-chat (coach-pagina's) */
 .chat{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;margin-bottom:.7rem;}
-.chat .b{padding:.6rem .8rem;border-radius:12px;max-width:88%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
+.chat .b{padding:.6rem .8rem;border-radius:0;max-width:88%;line-height:1.45;font-size:.92rem;white-space:pre-wrap;}
 .chat .b.ik{align-self:flex-end;background:var(--goud);color:#1a1710;}
 .chat .b.ai{align-self:flex-start;background:var(--paneel2);border:1px solid var(--lijn);}
 .rijveld{display:flex;gap:.5rem;}
@@ -97,10 +107,23 @@ input,textarea,select{font-family:inherit;}
    geen leeftijd. */
 :root[data-rtf-groep="tiener"], :root[data-rtf-groep="jong"], :root[data-rtf-groep="volw"]{
   --goud:#C23A5E; --goud2:#C23A5E;
+  /* En hier de reden dat --accent-tekst bestaat. CLAUDE.md is er expliciet
+     over: #C23A5E haalt op --black 3,78:1. Genoeg voor grote tekst (WCAG AA
+     vraagt 3,0 vanaf 24px), te weinig voor lopende tekst en kleine labels
+     (4,5). "Voor kleine tekst op zwart is het dus wit." Zolang deze twee
+     rollen op EEN token zaten, erfde elk label van 10 tot 16px die 3,78 --
+     gemeten waren dat 155 van de 312 contrastovertredingen in dit huis. */
+  --accent-tekst:var(--txt);
   --rtf-g1:#0C0C0B; --rtf-g2:#151412; --rtf-g3:#100F0E; --rtf-k:8%;
 }
-/* op bordeaux hoort witte tekst; het donkerbruin was op goud gerekend */
-:root[data-rtf-groep="tiener"] .knop, :root[data-rtf-groep="jong"] .knop, :root[data-rtf-groep="volw"] .knop{ color:#fff; }
+/* op bordeaux hoort witte tekst; het donkerbruin was op goud gerekend.
+   DE GROND STAAT ER NU BIJ, en dat is de reparatie van 19 augustus 2026: deze
+   regel zette alleen de INKT, en op elk scherm dat ook rtg-ui.css laadt won
+   `body.rtg-stijl .knop{background:var(--rtg-card)}` de grond. De knop werd dus
+   een kaartknop met witte tekst -- op onyx nog leesbaar, op champagne wit op
+   bijna-wit (1,04:1 op spelen.html). Inkt en grond horen in dezelfde regel,
+   anders lopen ze uit elkaar zodra iemand er een blad naast legt. */
+:root[data-rtf-groep="tiener"] .knop, :root[data-rtf-groep="jong"] .knop, :root[data-rtf-groep="volw"] .knop{ background:var(--goud); color:#fff; }
 :root[data-rtf-groep="tiener"] .knop.grijs, :root[data-rtf-groep="jong"] .knop.grijs, :root[data-rtf-groep="volw"] .knop.grijs{ color:var(--txt); }
 :root[data-rtf-groep="tiener"] .chat .b.ik, :root[data-rtf-groep="jong"] .chat .b.ik, :root[data-rtf-groep="volw"] .chat .b.ik{ color:#fff; }
 :root[data-rtf-groep="tiener"] .badge, :root[data-rtf-groep="jong"] .badge, :root[data-rtf-groep="volw"] .badge{

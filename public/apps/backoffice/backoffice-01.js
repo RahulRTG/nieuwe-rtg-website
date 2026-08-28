@@ -28,8 +28,8 @@
     location.replace('/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname + location.search));
   }
 
-  // Werk-OS-bord: Cmd+K (of de Panelen-knop in de kop) opent een springboard
-  // over het bord; een tik scrolt naar het paneel en licht het even op.
+  // WerkOS-bord: Cmd+K (of de Panelen-knop in de kop) opent het register
+  // over het bord; een keuze scrolt naar het paneel en licht het even op.
   let wosBord = null;
   function startWerkOS(){
     if (wosBord || !window.WerkOS) return;
@@ -39,9 +39,8 @@
       if (!el || apps.some(a => a.el === el)) return;
       const lab = h.querySelector('[data-i18n]');
       const ruw = ((lab ? lab.textContent : h.textContent) || '').trim().replace(/\s+/g, ' ');
-      const emoji = ((h.textContent || '').match(/\p{Extended_Pictographic}/u) || [])[0] || '▦';
       const naam = ruw.replace(/^[^\p{L}]+/u, '').replace(/[▾▸›\s]+$/g, '').split('·')[0].trim().slice(0, 26);
-      if (naam) apps.push({ naam, icoon: emoji, el });
+      if (naam) apps.push({ naam, glyf: 'paneel', el });
     });
     wosBord = WerkOS.bord({ titel: 'RTG Backoffice, alle panelen', apps, knopIn: document.querySelector('header .wrap > span') });
   }
@@ -52,11 +51,14 @@
     $('#liveInd').style.display = 'inline-flex';
     startWerkOS();
     render();
+    loadHandelsRegels();
+    loadFoundationRegistraties();
     laadTimeline();
     loadAanmeldingen();
     loadVerify();
     loadVakbewijzen();
     loadConcierge();
+    laadTafels();
     loadIncidenten();
     loadSalonNaleving();
     loadOntmoetingen();
@@ -71,17 +73,39 @@
     let t = null; try { t = localStorage.getItem('rtg_office_token'); } catch(e){}
     if (!t){ naarInlog(); return; }
     API.token = t;
+    /* TWEE DINGEN DIE NIET IN DEZELFDE try HOREN, en dat kostte een oneindige lus.
+       Hier stond `state = await call('/office/state'); enterApp();` samen in een
+       try met een catch die het token weggooit en naar de inlog stuurt. Dat klopt
+       voor de EERSTE regel: een sessie die de server niet kent, is geen sessie.
+       Voor de tweede klopt het niet -- enterApp() bouwt het scherm op, en als daar
+       iets omvalt is dat geen authenticatieprobleem. De catch wiste dan toch het
+       token en stuurde door naar /apps/personeel.html?kantoor=1&terug=..., waar de
+       poort een geldige kantoorsessie zag en meteen terugstuurde naar `terug`.
+       Backoffice heen, poort terug, zeven keer per seconde, eindeloos: in vier
+       seconden laadde de pagina zichzelf 42 keer opnieuw. Voor een medewerker een
+       knipperend scherm, voor de server een storm.
+
+       Het spoor dat het verraadde was een verzoek zonder Authorization-header:
+       /api/aanmelding/betalingen vertrok tokenloos terwijl /aanmelding/lijst uit
+       dezelfde functie hem negen milliseconden eerder nog wel droeg. Het token was
+       er dus tussenuit gehaald terwijl het scherm nog aan het laden was.
+
+       Nu staan ze los. Zakt het scherm, dan blijft u ingelogd en zegt de console
+       WAT er omviel -- in plaats van u stil uit te loggen om een fout die niets met
+       inloggen te maken had. */
     try {
       state = (await call('/office/state')).state;
-      enterApp();
     } catch(e){
       API.token = null;
       try { localStorage.removeItem('rtg_office_token'); } catch(e2){}
       naarInlog();
+      return;
     }
+    try { enterApp(); }
+    catch(e){ console.error('[backoffice] het scherm kwam niet op:', e); }
   })();
 
-  async function refresh(){ try { state = (await call('/office/state')).state; render(); } catch(e){} }
+  async function refresh(){ try { state = (await call('/office/state')).state; render(); loadHandelsRegels(); loadFoundationRegistraties(); } catch(e){} }
 
   async function loadVerify(){
     let pend = [];
@@ -92,6 +116,12 @@
           '<div class="sub">'+escHtml(v.email||'')+' · '+escHtml(v.tier)+'</div></div>' +
         '<button class="vbtn doc" data-doc="'+v.doc+'">'+T('bo.viewdoc','Document')+'</button>' +
         '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;"><input type="checkbox" data-face checked> '+T('bo.face','Gezicht = paspoort')+'</label>' +
+        /* De geboortedatum van het DOCUMENT. Voorgevuld met wat het lid zelf
+           opgaf, zodat de keurder vergelijkt in plaats van overtypt; wijkt hij
+           af, dan wint het document. Zonder dit veld rustte elke leeftijdsclaim
+           in het huis op een zelf ingetypte datum. */
+        '<label style="font-size:0.72rem;display:flex;align-items:center;gap:0.3rem;">'+T('bo.dob','Geb. op document')+
+          '<input type="date" data-geb value="'+escHtml(v.geborenOpgegeven||'')+'" style="font:inherit;font-size:0.72rem;"></label>' +
         '<button class="vbtn ok" data-ok>'+T('bo.approve','Goedkeuren')+'</button>' +
         '<button class="vbtn no" data-no>'+T('bo.reject','Afwijzen')+'</button>' +
         /* Langer bewaren dan de regel: het bewijs verdwijnt zodra de
@@ -106,7 +136,8 @@
         $('#docImg').src = '/api/office/doc?token='+encodeURIComponent(API.token)+'&file='+encodeURIComponent(e.target.dataset.doc);
         $('#docScrim').classList.add('open');
       });
-      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve', row.querySelector('[data-face]').checked));
+      row.querySelector('[data-ok]').addEventListener('click', () => decide(id, 'approve',
+        row.querySelector('[data-face]').checked, row.querySelector('[data-geb]').value));
       row.querySelector('[data-no]').addEventListener('click', () => decide(id, 'reject', false));
       row.querySelector('[data-bewaar]').addEventListener('click', () => bewaarVerzoek(id));
     });
@@ -121,7 +152,8 @@
     try { await call('/office/bewaarverzoek', { userId, reden: reden.trim() }); alert(T('bo.keep.ok','Vastgelegd. Het dossier blijft tot een jaar na het einde van het lidmaatschap; daarna wist de bewaarveger het alsnog.')); }
     catch(e){ alert(e.message); }
   }
-  async function decide(userId, decision, faceMatch){
-    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch }); } catch(e){ alert(e.message); return; }
+  async function decide(userId, decision, faceMatch, geboortedatum){
+    try { await call('/office/verify', { userId, decision, faceMatch: !!faceMatch,
+      geboortedatum: geboortedatum || undefined }); } catch(e){ alert(e.message); return; }
     loadVerify();
   }

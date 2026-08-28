@@ -7,7 +7,7 @@
    - een stand terugzetten kan alleen met een reden, en die blijft staan;
    - het regiescherm zegt hoe lang het eerste bord al KOUD staat te worden;
    - de drukterem waarschuwt met zijn eigen rekensom en zet nooit zelf iets dicht.
-   Draai: node --experimental-sqlite --test test/horeca-keuken.test.js */
+   Draai: node --test test/horeca-keuken.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

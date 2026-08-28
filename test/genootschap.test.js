@@ -5,7 +5,7 @@
    op een gewoon netwerk: geheim is echt geheim, een uitnodiging is geen
    lidmaatschap, de laatste beheerder kan niet zomaar weglopen, en een volle
    bijeenkomst is vol.
-   Draai los: node --experimental-sqlite --test test/genootschap.test.js */
+   Draai los: node --test test/genootschap.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

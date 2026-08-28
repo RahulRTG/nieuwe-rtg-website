@@ -2,7 +2,7 @@
    houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer
    "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar
    ze verboden zijn; en er is bewust geen enkele spelmechaniek. Draai los:
-   node --experimental-sqlite --test test/flits.test.js */
+   node --test test/flits.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

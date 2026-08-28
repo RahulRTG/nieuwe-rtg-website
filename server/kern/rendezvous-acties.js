@@ -2,8 +2,16 @@
    matchselectie los van mutaties tussen twee leden en van de meldingen voor
    kantoor. Naar de routelaag blijft dit bewust twee kernnamen breed: kiezen
    en meldingen lezen. */
-module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd }) => {
+module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, geblokkeerd, mag }) => {
+  /* DE ONTMOETPOORT STAAT OOK OP DE MUTATIES, en dat komt uit de samenvoeging
+     van twee rondes. Deze module komt uit de dating-premium-ronde (blokkades en
+     meldingen); de 18+-poort met geverifieerd paspoort komt uit de
+     ONTMOETEN.md-fasen en stond daar op rvLike/rvPas. De routelaag stuurt alle
+     drie de keuzes nu hierlangs, dus hoort de poort hier -- anders kan wie de
+     poort niet haalt geen kandidaten ZIEN maar wel iemand liken. */
+  const poortDicht = key => { const p = mag ? mag(key) : { ok: true }; return p.ok ? null : { status: 403, error: p.reden }; };
   function like(key, targetKey) {
+    const dicht = poortDicht(key); if (dicht) return dicht;
     const r = R();
     if (!targetKey || targetKey === key) return { status: 400, error: 'Onbekend lid.' };
     if (geblokkeerd(r, key, targetKey)) return { status: 403, error: 'Dit contact is geblokkeerd.' };
@@ -25,6 +33,7 @@ module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, gebl
   }
 
   function pas(key, targetKey) {
+    const dicht = poortDicht(key); if (dicht) return dicht;
     const r = R();
     if (!targetKey) return { status: 400, error: 'Onbekend lid.' };
     if (!r.passes[key]) r.passes[key] = {};
@@ -35,6 +44,7 @@ module.exports = ({ R, save, crypto, notify, schoon, nu, codenaam, gedeeld, gebl
   }
 
   function blokkeer(key, targetKey, reden) {
+    const dicht = poortDicht(key); if (dicht) return dicht;
     const r = R();
     if (!targetKey || targetKey === key || !r.profielen[targetKey])
       return { status: 400, error: 'Onbekend lid.' };

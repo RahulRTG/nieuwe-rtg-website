@@ -58,9 +58,18 @@ test('1. de stand bevriest werkelijk iets, en laat werkelijk iets door', () => {
 });
 
 test('2. dit is geen isolatie met een andere naam', () => {
-  /* Tien categorieën werken gewoon door -- een lid dat zijn reis bijwerkt is
-     geen derde partij en geen voorrecht. */
-  assert.equal(Object.keys(lijst.LOOPT_DOOR).length, 10, Object.keys(lijst.LOOPT_DOOR).join(', '));
+  /* Elf categorieën werken gewoon door -- een lid dat zijn reis bijwerkt is
+     geen derde partij en geen voorrecht.
+
+     HET WAREN ER TIEN, en dit getal is met opzet een getal en geen berekening:
+     het dwingt af dat een NIEUWE categorie bewust wordt ingedeeld in plaats van
+     stilzwijgend door te lopen tijdens een incident. Hij deed zijn werk: met de
+     samenvoegronde kwam "Festival" erbij, in LOOPT_DOOR en met zijn eigen reden
+     (terrein, diensten en gastzicht bewegen geen rechten en geen geld;
+     kaartverkoop raakt geld pas bij het betalen, en dat bevriest in de
+     geldcategorie). Die indeling is nagelopen en volgt de leer van dit bestand,
+     dus gaat het getal mee omhoog. Bevriest blijft op zes. */
+  assert.equal(Object.keys(lijst.LOOPT_DOOR).length, 11, Object.keys(lijst.LOOPT_DOOR).join(', '));
   assert.equal(Object.keys(lijst.BEVRIEST).length, 6);
   for (const pad of ['/api/leden/reis', '/api/salon/post', '/api/command/start'])
     assert.equal(B.houdtTegen(pad, 'POST'), null, pad + ' werd tegengehouden');

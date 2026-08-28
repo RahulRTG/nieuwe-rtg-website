@@ -14,9 +14,9 @@
 
    WAT ERIN ZIT, EN WAAROM ELK VELD:
 
-   - `alcohol` volgt uit de categorie, een vlaggetje of de naam. De leeftijdsregel
-     in kern/gast/beleid.js hangt eraan, dus raden mag hier niet stil gebeuren --
-     wie het raadt, doet het hier, één keer, zichtbaar.
+   - `alcohol` komt van het ITEM (kern/supplierdefaults.js zet hem op elke
+     kaart; wat de zaak opgeeft wint). De leeftijdsregel in kern/gast/beleid.js
+     hangt eraan, dus hier wordt niets meer geraden.
    - `uitverkocht` komt uit de zaakinstelling OF uit de keukencapaciteit. Hij
      wordt hier NIET weggefilterd: de gastdeur laat zulke items niet kiezen, de
      bediening hoort te kunnen zien dat iets op is. Wegfilteren zou van "op" een
@@ -30,7 +30,6 @@
      niet in: dat is nog niemands waarheid. */
 'use strict';
 
-const ALCOHOL = /wijn|bier|cava|cocktail|gin|whisk|rum|vodka|borrel/i;
 
 module.exports = ({ findSupplier, horeca }) => {
   function kaartVanZaak(zaakcode) {
@@ -49,7 +48,15 @@ module.exports = ({ findSupplier, horeca }) => {
       opties: Array.isArray(m.opties) ? m.opties : [],
       station: m.station || null,
       prepMin: m.prepMin || null,
-      alcohol: !!m.alcohol || ALCOHOL.test(String(m.name || '')),
+      /* GEEN NAAM-GOK MEER (24 augustus 2026). Hier stond `|| ALCOHOL.test(naam)`,
+         en die kan het besluit van kern/supplierdefaults.js alleen de verkeerde
+         kant op overschrijven: "Virgin Colada (0%)" bevat de letters g-i-n, dus
+         het ene item dat zichzelf uitdrukkelijk alcoholvrij noemt werd hier weer
+         drank. supplierdefaults zet m.alcohol op ELKE kaart (bij het opstarten en
+         bij elke nieuwe partner): wat de zaak opgeeft wint, en een onbekend
+         bar-item telt daar al streng als alcohol. Twee plekken die dezelfde vraag
+         beantwoorden lopen uiteen (LAT-regel 4). */
+      alcohol: !!m.alcohol,
       uitverkocht: !!uit[m.id] || capaciteitPauze.has(String(m.id)),
       tijdelijkGepauzeerd: capaciteitPauze.has(String(m.id)),
       sindsWanneerUit: uit[m.id] ? uit[m.id].at : null,

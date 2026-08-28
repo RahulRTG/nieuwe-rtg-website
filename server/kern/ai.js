@@ -21,10 +21,10 @@ const { dagContext } = require('./context');
 // regelantwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
 const { schrob } = require('./rahul/taal');
 
-function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, stemmingVoor, geloofRegel }) {
+function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
   /* De promptlaag (system prompt + regelantwoorden) draait als submodule
      op een gedeelde context, een keer opgebouwd bij het opstarten. */
-  const ctx = { db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n,
+  const ctx = { db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan,
     AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel };
   const { aiSystemPrompt, cannedAnswer } = require('./ai/prompt')(ctx);
 
@@ -46,7 +46,9 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
         if (reply) return { text: schrob(reply), lang };
       } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
-    const canned = schrob(cannedAnswer(last, tier));
+    // de eigen reis van het lid mee: zonder reis noemt Rahul geen bestemming
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(key) || {}) : {}).trip || null;
+    const canned = schrob(cannedAnswer(last, tier, eigenReis));
     if (lang !== 'nl' && i18n) {
       try {
         const t = await i18n.translate(canned, lang, 'nl');

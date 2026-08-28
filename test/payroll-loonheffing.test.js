@@ -24,7 +24,7 @@
       betekent het maal twaalf herleiden -- en dan jaagt een enkele
       vakantiegeldbetaling de hele strook een schijf omhoog.
 
-   Draai los: node --experimental-sqlite --test test/payroll-loonheffing.test.js */
+   Draai los: node --test test/payroll-loonheffing.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

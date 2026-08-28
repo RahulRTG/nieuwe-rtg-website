@@ -69,7 +69,7 @@
     var h = '<div class="wgrid">';
     for (var i = 0; i < 7; i++) {
       var dag = plusDagen(start, i);
-      h += '<div class="wdag"><div class="mkop"' + (dag === vandaag ? ' style="color:var(--gold)"' : '') + '>' +
+      h += '<div class="wdag"><div class="mkop"' + (dag === vandaag ? ' style="color:var(--rtg-leesgoud,var(--gold))"' : '') + '>' +
         DAGEN[i] + ' ' + +dag.slice(8) + '</div>' +
         (kaart[dag] || []).map(function (x) { return chip(x, x._i); }).join('') +
         '<button type="button" class="mdag" data-dag="' + dag + '" style="min-height:1.4rem;background:none;" aria-label="Nieuw op ' + dag + '"></button></div>';

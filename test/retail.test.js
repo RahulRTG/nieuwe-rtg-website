@@ -190,3 +190,45 @@ test('10. winkelvloer bereikbaar: de PDA/leverancier-gate vindt MAISON-personeel
   assert.equal(rs.status, 200, 'de winkelvloer krijgt de retail-toestand');
   assert.ok((rs.body.retail.artikelen || []).length >= 3, 'de vloer ziet de catalogus');
 });
+
+test('11. de winkelvloer neemt ook de ondertekende RTG-code, langs dezelfde inner', async () => {
+  /* DE VIERDE KASSA-INGANG. /api/supplier/retail/verkoop ging rechtstreeks naar
+     `pay.kasInt` en kende dus alleen de code van zes tekens: een klant die zijn
+     QR ophield -- sinds RTG Link een ondertekende verwijzing (LINK.md) -- kon
+     hier niet afrekenen, terwijl dat aan de kassa van een restaurant wel kon.
+
+     Er zit hier iets bij dat de andere ingangen niet hebben: het TOTAAL staat
+     pas na het boeken vast (serverprijzen), dus er wordt eerst geboekt en dan
+     geind. Ketst de code af, dan moet de verkoop terugdraaien -- en dat mag
+     langs deze weg niet anders gaan dan langs de oude. */
+  const rt = await retail();
+  const shirt = rt.artikelen.find(a => a.naam === 'Linnen overhemd');
+  const vL = shirt.varianten.find(v => v.maat === 'L' && v.voorraad > 1) || shirt.varianten.find(v => v.voorraad > 1);
+  const voorraadVoor = vL.voorraad;
+  /* Eerst de KYC-poort van RTG Pay, anders blijft het saldo nul en betaalt de
+     kassacode stilletjes via bijladen -- dan meet deze toets niets. Dat de
+     poort ook via de capabilitydeur geldt, staat in test/linkcap.test.js. */
+  const KYC_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  await api(base, '/api/verify/upload', { image: KYC_PNG }, lid.token);
+  await api(base, '/api/pay/oplaad', { centen: 200000, idem: 'rt-op-' + Date.now() }, lid.token);
+  const saldo = async () => (await api(base, '/api/pay/overzicht', {}, lid.token)).body.saldo;
+  const voor = await saldo();
+  assert.ok(voor > 0, 'er staat geld op de rekening, anders meet deze toets niets');
+
+  const cap = await api(base, '/api/link/cap/maak', { handeling: 'geld.kassa', maxCenten: 50000 }, lid.token);
+  const verk = await api(base, '/api/supplier/retail/verkoop',
+    { method: 'rtgpay', payCode: cap.body.token, regels: [{ vsku: vL.vsku, aantal: 1 }] }, brand.token);
+  assert.equal(verk.status, 200, JSON.stringify(verk.body));
+  assert.equal(verk.body.sale.betaler, lid.codename, 'de bon weet wie er betaalde');
+  assert.equal(await saldo(), voor - Math.round(verk.body.sale.total * 100), 'en het geld is echt bewogen');
+
+  /* Een token dat al op is: geen bon, geen geld, en de voorraad terug. Dat
+     laatste is de eigenlijke zorg hier -- een verkoop die is geboekt maar niet
+     betaald, is een artikel dat uit de kast is zonder dat iemand het meenam. */
+  const nogEens = await api(base, '/api/supplier/retail/verkoop',
+    { method: 'rtgpay', payCode: cap.body.token, regels: [{ vsku: vL.vsku, aantal: 1 }] }, brand.token);
+  assert.equal(nogEens.status, 404, 'een opgebruikte code levert geen tweede bon op');
+  assert.equal(await saldo(), voor - Math.round(verk.body.sale.total * 100), 'er is niets extra afgeschreven');
+  const na = (await retail()).artikelen.find(a => a.naam === 'Linnen overhemd').varianten.find(v => v.vsku === vL.vsku).voorraad;
+  assert.equal(na, voorraadVoor - 1, 'de afgeketste verkoop is teruggedraaid; alleen de gelukte telt');
+});

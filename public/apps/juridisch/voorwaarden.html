@@ -15,14 +15,31 @@
     --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+  /* body.rtg-stijl en niet body: de gedeelde UI-kit zet `body.rtg-stijl` en die
+   is specifieker, dus de verklaring hieronder verloor de GROND maar hield de
+   INKT -- bijna zwarte tekst op een bijna zwarte grond, 1,08:1. Een juridisch
+   stuk is een document en geen appvlak; het schildert zijn eigen vlak, en dan
+   allebei de kanten ervan. Zie data-rtg-eigenvlak op de body hierboven. */
+  /* EN MET data-rtg-eigenvlak ERBIJ, want anders wint de kit alsnog. `body.rtg-stijl`
+     hierboven is even specifiek als de regel in de gedeelde kit, dus besliste de
+     VOLGORDE -- en die kit wordt later ingesloten. Gemeten onder een thema stond
+     deze pagina daardoor gewoon donker (rgb(23,19,16)), leesbaar maar niet wat er
+     staat: een juridisch stuk hoort een document te zijn. Met het attribuut erbij
+     is de regel specifieker dan de kit en klopt de verklaring ook echt. */
+  /* EN ZIJ ZEGT OOK DAT ZIJ LICHT IS. Deze pagina draagt thema onyx (de
+     themalaag zet dan color-scheme:dark) en schildert daarna haar EIGEN witte
+     grond. Alles wat het kleurschema volgt koos daardoor de donkere stand op een
+     lichte pagina -- de cookiemelding kwam zo op 1,03:1 terecht, onzichtbare
+     tekst onder een juridisch stuk. Wie zijn eigen grond schildert, hoort ook
+     zijn eigen schema te melden. */
+    body.rtg-stijl[data-rtg-eigenvlak]{color-scheme:light;background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
   header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}
   header .wrap{display:flex;justify-content:space-between;align-items:center;}
   header a{font-size:0.8rem;color:var(--grey);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
   main{padding:clamp(3rem,7vw,5rem) 0 5rem;}
-  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--leesgoud,var(--rtg-leesgoud,var(--gold-diep,#5E4F05)));font-weight:600;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.15;margin:0.8rem 0 0.4rem;}
   .updated{font-size:0.78rem;color:var(--grey-soft);}
   h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:2.6rem 0 0.7rem;}
@@ -35,7 +52,7 @@
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body data-rtg-eigenvlak class="rtg-stijl">
 <header>
   <div class="wrap">
     <a href="/apps/juridisch.html">← Juridisch</a>
@@ -52,9 +69,9 @@
     <ul>
       <li>RTG kent drie passen: <b>RTG Pass</b>, <b>Lifestyle Pass</b> en <b>Business Pass</b>, elk met eigen rechten in de app en De Salon.</li>
       <li>Zonder aanmelding zijn de apps niet te gebruiken: het <b>gratis RTG-abonnement</b> is de minimale ingang tot het RTG OS. Aanmelden gaat via Rahul en kost niets.</li>
-      <li>De <b>gratis app</b> is en blijft kosteloos. De maandbijdrage bedraagt <b><span data-pasprijs="rtg">&euro; 65</span></b> (RTG Pass) of <b><span data-pasprijs="lifestyle">&euro; 20.000</span></b> (Lifestyle Pass), telkens exclusief 21% btw. De Business Pass kent een <b>prijs op maat</b>, onder dezelfde condities.</li>
+      <li>De <b>gratis app</b> is en blijft kosteloos. De maandbijdrage van de <b>RTG Pass</b> bedraagt <b><span data-pasprijs="rtg">&euro; 65</span></b>, exclusief 21% btw. De <b>Business Pass</b> (vanaf <span data-pasvanaf="business">&euro; 5.000</span> per maand) en de <b>Lifestyle Pass</b> (vanaf <span data-pasvanaf="lifestyle">&euro; 20.000</span> per maand) kennen een prijs die per klant wordt afgesproken en op uw contract staat; de genoemde bedragen zijn ondergrenzen, onder dezelfde condities en eveneens exclusief btw.</li>
       <li>Het lidmaatschap wordt aangegaan voor <b>minimaal 12 maanden</b> (jaarcontract).</li>
-      <li>Leden reizen op <b>nettoprijzen</b> (inkoopprijs); RTG rekent daar niets over. RTG's enige inkomsten zijn de maandbijdragen, en daarvan <b>gaat 30% (ex btw) naar de RTFoundation</b>: <span data-pasrtf="rtg">€ 19,50</span> per maand van de RTG Pass, <span data-pasrtf="lifestyle">€ 6.000</span> van de Lifestyle Pass en 30% van elke Business Pass-bijdrage.</li>
+      <li>Leden reizen op <b>nettoprijzen</b> (inkoopprijs); RTG rekent daar niets over. RTG's enige inkomsten zijn de maandbijdragen, en daarvan <b>gaat 30% (ex btw) naar de RTFoundation</b>: <span data-pasrtf="rtg">€ 19,50</span> per maand van de RTG Pass, en 30% van elke Business Pass- en Lifestyle Pass-bijdrage (dus ten minste <span data-pasrtfvanaf="business">€ 1.500</span> respectievelijk <span data-pasrtfvanaf="lifestyle">€ 6.000</span> per maand).</li>
       <li><b>Ledenprijsgarantie:</b> bij partners betaalt u via de app nooit meer dan de eigen publieke prijs van de zaak voor dezelfde dienst op hetzelfde moment. Ziet u het bij de zaak zelf toch goedkoper, meld het via de app: de partner past de prijs aan en het verschil wordt voor u rechtgezet.</li>
       <li>Diensten die het lid afneemt (reizen, verblijf, vervoer, horeca) betaalt het lid per afname tegen nettoprijs, rechtstreeks aan de partner; RTG verdient daar niets aan.</li>
       <li>Het lidmaatschap is persoonlijk en niet overdraagbaar. De digitale pas en codenaam zijn gekoppeld aan uw account.</li>
@@ -184,6 +201,17 @@ fetch('/api/pasprijzen').then(r => (r.ok ? r.json() : null)).then(d => {
   for (const el of document.querySelectorAll('[data-pasrtf]')) {
     const p = d.passen[el.dataset.pasrtf];
     if (p && Number.isFinite(p.rtfCenten)) el.textContent = eur(p.rtfCenten);
+  }
+  /* De contractuele passen dragen geen prijs maar een ondergrens. Die staat als
+     `vanafCenten` in het antwoord en NOOIT als `maandCenten` -- anders zou een
+     bodem hier als afgesproken bedrag komen te staan. */
+  for (const el of document.querySelectorAll('[data-pasvanaf]')) {
+    const p = d.passen[el.dataset.pasvanaf];
+    if (p && Number.isFinite(p.vanafCenten)) el.textContent = eur(p.vanafCenten);
+  }
+  for (const el of document.querySelectorAll('[data-pasrtfvanaf]')) {
+    const p = d.passen[el.dataset.pasrtfvanaf];
+    if (p && Number.isFinite(p.rtfVanafCenten)) el.textContent = eur(p.rtfVanafCenten);
   }
 }).catch(() => {});
 </script>

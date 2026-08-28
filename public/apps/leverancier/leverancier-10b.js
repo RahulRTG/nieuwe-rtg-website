@@ -40,7 +40,7 @@
       const omzetB = klaarB.reduce((x, b) => x + (b.price || 0), 0);
       const kaartB = (b, acties) => '<div class="tkc h-volbreed">'+
         '<div class="tkc-top"><span class="tkc-code" style="font-size:1.2rem;">'+b.customerCodename+'</span><span class="tkc-age">'+(b.wanneer || timeAgo(b.at))+'</span></div>'+
-        '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'':'')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--gold);">'+eur(b.price)+'</b></div>'+
+        '<div class="tkc-who" style="font-size:0.95rem;">'+(b.service.soort==='product'?'':'')+b.service.name+(b.service.duurMin?' · '+b.service.duurMin+' min':'')+' · <b style="color:var(--rtg-leesgoud,var(--gold));">'+eur(b.price)+'</b></div>'+
         (b.note?'<div class="tkc-alg">'+b.note+'</div>':'')+
         (b.zorg?'<div class="tkc-alg" style="color:#E2B93B;">'+T('sup.zorgp','Zorgprofiel gast:')+' '+[((b.zorg.allergenen||[]).length?T('zorg.allergie','Allergie')+': '+b.zorg.allergenen.join(', '):''), b.zorg.dieet, b.zorg.medisch].filter(Boolean).join(' · ')+'</div>':'')+
         (acties?'<div class="tkc-act">'+acties+'</div>':'')+
@@ -104,7 +104,7 @@
           const nuRows = Object.entries(nuPer).sort((a,b)=>b[1].n-a[1].n);
           if (nuRows.length)
             html += '<div class="tkc" style="grid-column:1/-1;border-top:4px solid #2E7D5B;"><h3>'+T('lijn.maaknu','Maak nu, in een keer')+'</h3>'+
-              nuRows.map(([naam,r])=>'<div class="st-row"><span><b style="color:var(--gold);">'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.bonnen','bonnen ')+[...new Set(r.bonnen)].join(', ')+'</span></span></div>').join('')+'</div>';
+              nuRows.map(([naam,r])=>'<div class="st-row"><span><b style="color:var(--rtg-leesgoud,var(--gold));">'+r.n+'×</b> '+naam+'<span class="sub">'+T('lijn.bonnen','bonnen ')+[...new Set(r.bonnen)].join(', ')+'</span></span></div>').join('')+'</div>';
           // tussendoor: slim gebruik van de wachttijd (voorbereiden, MEP, de lijn)
           const straks = {};
           actief.forEach(o => {

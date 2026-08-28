@@ -14,7 +14,7 @@
        op de kaart heeft gezet -- want RTG bezorgt niets, en dat mag het scherm
        dus ook niet beloven.
 
-   Draai los: node --experimental-sqlite --test test/podiumhandel.test.js */
+   Draai los: node --test test/podiumhandel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -47,6 +47,22 @@ function luister(token) {
   return { tekst: () => brokken.join(''), stop: () => { ac.abort(); return klaar; } };
 }
 const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* WACHTEN TOT DE SERVER DE LUISTERAAR KENT, en niet een paar tellen gokken.
+
+   /api/stream zet de client in sseClients en stuurt daarna meteen een
+   `hello`-event (server/server.js). Zien wij dat event, dan staan we
+   geregistreerd -- en dat is precies de voorwaarde voor de handelingen erna.
+   Zonder die zekerheid gaat het bericht naar niemand en zakt de toets op iets
+   dat niet stuk is. */
+async function oorOpen(oor, ms) {
+  const eind = Date.now() + (ms || 15000);
+  while (!oor.tekst().includes('hello')) {
+    if (Date.now() >= eind) throw new Error('de SSE-lijn stuurde binnen ' + (ms || 15000) + 'ms geen hello; ' +
+      'de server heeft deze luisteraar niet');
+    await wacht(20);
+  }
+}
 
 let seq = 0;
 async function lid(naam) {
@@ -182,7 +198,7 @@ test('6. de zaal weet DAT er een weg is, niet WIE hem kocht', async () => {
   await api('/api/podium/waar', { id: sjaalId, voorraad: 2 }, maker.token);
   const zaalOor = luister(tweede.token);
   const makerOor = luister(maker.token);
-  await wacht(300);
+  await oorOpen(zaalOor); await oorOpen(makerOor);
   const koop = await api('/api/podium/koop', { id: kanaalId, waarId: sjaalId, idem: 'k5' }, koper.token);
   assert.equal(koop.status, 200, JSON.stringify(koop.body).slice(0, 160));
   for (let i = 0; i < 40 && !zaalOor.tekst().includes('"kind":"waar"'); i++) await wacht(50);

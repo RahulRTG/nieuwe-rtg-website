@@ -84,7 +84,7 @@ const vertaalModelBatch = require('./translate/batch-model');
 async function claudeTranslate(text, to) {
   const target = to === 'nl' ? 'Dutch' : naamEn(to);
   const response = await anthropic.messages.create({
-    model: 'claude-opus-4-8',
+    model: 'claude-sonnet-5',
     max_tokens: 600,
     system: 'You are a translation engine for a luxury travel club. Translate the user message into ' + target +
       '. Keep the tone natural and courteous. Preserve names, places and emoji. Reply with ONLY the translation, no quotes, no notes.',

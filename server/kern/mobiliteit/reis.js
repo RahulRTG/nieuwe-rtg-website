@@ -153,7 +153,7 @@ module.exports = (ctx) => {
         r.organisatie && nuBetaald
           ? 'De rit gaat op rekening van ' + r.organisatie + '; uw vervoerbewijzen blijven persoonlijk.' : null,
         wacht ? 'De rit wacht nog op akkoord van uw werkgever; tot dan wordt er geen wagen gezocht.' : null
-      ].filter(Boolean).join(' ') || 'Alles is betaald.' };
+      ].filter(Boolean).join(' ') || 'Er staat niets open.' };
   }
 
   const reisMijn = session => ({ ok: true, reizen: reizenVan(session.key).slice(0, 20).map(reisBeeld) });

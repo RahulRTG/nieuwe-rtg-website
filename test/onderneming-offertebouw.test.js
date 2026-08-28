@@ -15,7 +15,7 @@
    5. ALLEEN EEN PRIJS MAG NOG STEEDS. Een klus van een uur is soms gewoon een
       bedrag; dat is geen tijdelijke tolerantie maar een echt geval.
 
-   Draai los: node --experimental-sqlite --test test/onderneming-offertebouw.test.js */
+   Draai los: node --test test/onderneming-offertebouw.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 

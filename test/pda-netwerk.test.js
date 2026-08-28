@@ -4,7 +4,7 @@
       personeel in die aparte ruimte berichten sturen.
    2) De gast vraagt zelf om aandacht; het personeel ziet dat als prioriteit en
       handelt het af. Te lang stille tafels komen als 'traag' terug.
-   Draai: node --experimental-sqlite --test test/pda-netwerk.test.js */
+   Draai: node --test test/pda-netwerk.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');

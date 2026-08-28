@@ -33,6 +33,22 @@ module.exports = (kern) => {
       : payrollOS.dossier.vanRun(String(b.runId || '')));
   });
 
+  /* ---------- de bewijsketen van de aangifte ----------
+     Het dossier hierboven gaat van een RUN naar een medewerker; dit gaat van de
+     AANGIFTE omlaag naar de nominatieve regels, en verwijst voor het detail
+     terug naar dat dossier. Twee ingangen op dezelfde keten, en met opzet geen
+     twee ketens (kern/payroll/herkomst.js).
+
+     Bij het KANTOOR en niet bij de zaak: dit legt de loonheffing per werknemer
+     open, en de werkgever leest zijn aangifte al mee via ./payroll-os-zaak.js.
+     Een tweede, ruimere ingang op dezelfde gegevens is geen extra dienst maar
+     een tweede sleutel op dezelfde deur. */
+  app.post('/api/office/payroll/verklaar', officeAuth, (req, res) =>
+    antwoord(res, payrollOS.herkomst.verklaar(String((req.body || {}).id || ''))));
+
+  app.post('/api/office/payroll/herbouw', officeAuth, (req, res) =>
+    antwoord(res, payrollOS.herkomst.herbouw(String((req.body || {}).id || ''))));
+
   /* ---------- journaal en betaalbestand ---------- */
   app.post('/api/office/payroll/journaal', officeAuth, (req, res) => {
     const r = payrollOS.run.haal(String((req.body || {}).runId || ''));

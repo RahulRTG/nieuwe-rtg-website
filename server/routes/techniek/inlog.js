@@ -33,7 +33,7 @@ module.exports = (tctx) => {
     const zelfde = () => res.status(401).json({ error: 'Onjuiste inloggegevens.' });
     const user = accounts.findByLogin(req.body.login);
     if (!user || !await accounts.verifyPassword(String(req.body.wachtwoord || ''), user.password_hash)) {
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       if (beveilig) beveilig.meld('tech-login-mislukt', 'waarschuwing',
         'Mislukte inlogpoging op de technische pagina (login: ' + String(req.body.login || '').slice(0, 40) + ').',
         { bron: req.ip });
@@ -42,7 +42,7 @@ module.exports = (tctx) => {
     if (!magInzien(user)) {
       // telt WEL mee voor de rem: anders is een account zonder rechten een
       // gratis orakel om onbeperkt wachtwoorden op te proberen
-      noteFailedTry(bucket);
+      noteFailedTry(bucket, req.ip);
       /* De identiteitssleutel, niet de echte naam: die staat in de kluis en
          hoort niet via een melding in de gedeelde database te belanden (en de
          opvraging ging bovendien langs het inzagejournaal heen). Zie de

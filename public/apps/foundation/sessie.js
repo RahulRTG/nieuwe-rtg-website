@@ -12,6 +12,16 @@
       vscript.src = '/shared/verbinding.js';
       (document.head || document.documentElement).appendChild(vscript);
     }
+    /* De balk hieronder draagt pictogrammen (data-glyf). Dit bestand zit op elk
+       Foundation-scherm en shared/glyf.js op vier; zonder deze regel zou de
+       berichtenknop op zevenenzestig schermen een leeg vakje zijn -- precies de
+       fout die op de hub al zesenvijftig keer stond. Zelfde patroon als de
+       verbindingslaag hierboven: de component brengt mee wat hij nodig heeft. */
+    if (!document.querySelector('script[src="/shared/glyf.js"]')) {
+      var gscript = document.createElement('script');
+      gscript.src = '/shared/glyf.js';
+      (document.head || document.documentElement).appendChild(gscript);
+    }
   } catch (e) {}
   function lees() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
   function api(p, b) {
@@ -21,7 +31,7 @@
   /* Bestandsnamen en catalogussleutels zijn bewust gelijk. Alleen deze
      leerling- en gezinsruimtes krijgen de centrale serverdeur; de openbare
      inlog, privacy-uitleg en professionele RTF-kantoren houden hun eigen deur. */
-  var BESCHERMDE_APPS = ('leren overhoren school schrift projecten toetsen studie presenteren klas schrijven tellen kleuren memorie verhaaltje liedjes babyboek magazine dromen bord speelhal agenda ochtend klusjes keuken verjaardagen reis vrienden markt opvoeden club gevoel rust pesten kompas steun hulpwijzer zakgeld geld cv werk budget rechten veilig gezondheid privacy mijnbanden mediawijs schoolbieb beroepen geloofbieb leerpaspoort').split(' ');
+  var BESCHERMDE_APPS = ('mail leren overhoren school schrift projecten toetsen studie presenteren klas schrijven tellen kleuren memorie verhaaltje liedjes babyboek magazine dromen bord speelhal agenda ochtend klusjes keuken verjaardagen reis vrienden markt opvoeden club gevoel rust pesten kompas steun hulpwijzer zakgeld geld cv werk budget rechten veilig gezondheid privacy mijnbanden mediawijs schoolbieb beroepen geloofbieb leerpaspoort').split(' ');
   function paginaSleutel() {
     var m = /\/([^/?#]+)\.html$/.exec(location.pathname);
     return m ? m[1].toLowerCase() : '';
@@ -31,7 +41,7 @@
     document.documentElement.classList.add('rtf-toegang-dicht');
     if (!document.getElementById('rtf-toegang-stijl')) {
       var stijl = document.createElement('style'); stijl.id = 'rtf-toegang-stijl';
-      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot){visibility:hidden!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none}';
+      stijl.textContent = 'html.rtf-toegang-dicht body>*:not(#rtf-toegang-slot){visibility:hidden!important}html.rtf-toegang-dicht #rtf-toegang-slot{visibility:visible!important}#rtf-toegang-slot [data-rtf-uitweg]{padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none}';
       (document.head || document.documentElement).appendChild(stijl);
     }
     if (!el) {
@@ -40,14 +50,14 @@
       (document.body || document.documentElement).appendChild(el);
     }
     var s = lees(), beheer = !!(s && s.profiel && s.profiel.beheerder);
-    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:18px;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
+    el.innerHTML = '<div style="width:min(92vw,34rem);padding:1.35rem;border:1px solid #3a3730;border-radius:0;background:#151513;box-shadow:0 24px 80px rgba(0,0,0,.55)">' +
       '<div style="font:600 .68rem/1 Inter;letter-spacing:.17em;text-transform:uppercase;color:#c9a24b">RTF veilige toegang</div>' +
       '<h1 style="font:500 1.75rem/1.15 Georgia,serif;margin:.55rem 0">' + (laden ? 'Jouw passen worden gecontroleerd…' : 'Deze ruimte blijft nog dicht') + '</h1>' +
       '<p style="color:#bdb8ad;line-height:1.55;margin:0 0 1rem">' + esc(reden || 'De server controleert je leeftijd en passen voordat dit scherm opengaat.') + '</p>' +
-      (laden ? '<div style="height:3px;border-radius:9px;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
-        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:10px;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
+      (laden ? '<div style="height:3px;border-radius:0;background:linear-gradient(90deg,#c23a5e,#c9a24b,#69b891)"></div>' :
+        '<div style="display:flex;gap:.5rem;flex-wrap:wrap"><a data-rtf-wissel href="index.html#profielen" style="padding:.65rem .85rem;border-radius:0;background:#f6f1e7;color:#111;text-decoration:none;font-weight:700">Kies een profiel</a>' +
         '<a data-rtf-uitweg href="/apps/app.html">Naar RTG OS</a>' +
-        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:10px;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
+        (beheer ? '<a href="beheer.html" style="padding:.65rem .85rem;border:1px solid #4a463d;border-radius:0;color:#f6f1e7;text-decoration:none">Leeftijd instellen</a>' : '') + '</div>') + '</div>';
     var wissel = el.querySelector('[data-rtf-wissel]');
     if (wissel) wissel.onclick = function () {
       var ss = lees(); if (ss) { delete ss.token; delete ss.profiel; localStorage.setItem(KEY, JSON.stringify(ss)); }
@@ -74,6 +84,25 @@
         return d;
       }).catch(function () { toegangSlot('De toegangscontrole is nu niet bereikbaar. Uit veiligheid blijft deze ruimte dicht; probeer het zo opnieuw.', false); return null; });
   }
+/* WELKE LETTER PAST OP DEZE CIRKEL. De avatar krijgt de kleur die het lid
+   zelf koos, en de letter stond vast op de tekstkleur van het huis -- wit.
+   Wit op het standaardgoud #C9A24B haalt 2,2:1, en dat is geen initiaal maar
+   een vlek; over de zeventig Foundation-schermen was dit in zijn eentje goed
+   voor 43 contrastovertredingen. Een VASTE letterkleur is hier per definitie
+   soms fout, want de achtergrond is van de gebruiker. Dus rekent hij het uit:
+   wit of bijna zwart, wat van de twee het verst van deze kleur af staat. Zo
+   klopt hij ook voor een kleur die vandaag nog niet bestaat. */
+function opKleur(hex) {
+  var h = String(hex == null ? '' : hex).trim().replace(/^#/, '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return '#0C0C0B';
+  function k(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+  var L = 0.2126 * k(parseInt(h.slice(0, 2), 16)) +
+          0.7152 * k(parseInt(h.slice(2, 4), 16)) +
+          0.0722 * k(parseInt(h.slice(4, 6), 16));
+  return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.05) ? '#FFFFFF' : '#0C0C0B';
+}
+
 /* de sessie van de hulppas: lezen, actief en bewaren */
   var Sessie = {
     huidig: lees,
@@ -164,8 +193,8 @@
       el.innerHTML =
         '<div class="sb-balk">' +
         '<span class="sb-brand">RT<b>Foundation</b></span>' + terug +
-        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
-        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
+        '<button class="sb-bel" id="sbBel" title="Berichten van je gezin" aria-label="Berichten"><span data-glyf="berichten" aria-hidden="true"></span><span class="sb-tel" id="sbTel" hidden>0</span></button>' +
+        '<button class="sb-prof" id="sbProf"><span class="sb-av" style="background:' + (p.kleur || '#C9A24B') + ';color:' + opKleur(p.kleur || '#C9A24B') + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span><span class="sb-nm">' + esc(p.naam) + '</span></button>' +
         '</div>' +
         '<div class="sb-menu" id="sbMenu" hidden>' +
         (p.beheerder ? '<a href="beheer.html">Gezin beheren</a>' : '') +
@@ -174,6 +203,9 @@
         '</div>' +
         '<div class="sb-berichten" id="sbBerichten" hidden></div>';
       injectCss();
+      /* De balk wordt NA het laden getekend, dus de vuller van glyf.js is al
+         langsgeweest. Hier nog een keer, alleen over dit stukje DOM. */
+      try { if (window.RTGGlyf) RTGGlyf.vul(el); } catch (e) {}
       var menu = el.querySelector('#sbMenu'), ber = el.querySelector('#sbBerichten');
       el.querySelector('#sbProf').onclick = function () { ber.hidden = true; menu.hidden = !menu.hidden; };
       el.querySelector('#sbWissel').onclick = function () { Sessie.wisProfiel(); };
@@ -213,26 +245,36 @@
   function injectCss() {
     if (cssGedaan) return; cssGedaan = true;
     var css = '.sb-balk{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;border-bottom:1px solid var(--lijn);position:relative;}' +
-      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:4px;}.sb-brand b{color:#F4E9C8;}' +
+      '.sb-brand{font-family:var(--serif);font-weight:500;background:#7F1634;color:#fff;padding:.18rem .6rem .22rem;border-radius:0;}.sb-brand b{color:#F4E9C8;}' +
       '.sb-terug{color:var(--zacht);text-decoration:none;font-size:.85rem;}' +
-      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;}' +
-      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:999px;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
+      /* min-* erbij, zodat de knop de 24x24 van WCAG 2.5.8 haalt ook als de
+         envelop ooit weer uit de markup zou vallen. Een ondergrens hoort bij de
+         component en niet bij het toeval van zijn inhoud. */
+      '.sb-bel{margin-left:auto;background:transparent;color:var(--txt);font-size:1.15rem;position:relative;line-height:1;padding:.2rem;' +
+        'min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;}' +
+      '.sb-bel .rtg-glyf{width:1.15rem;height:1.15rem;display:block;}' +
+      '.sb-tel{position:absolute;top:-4px;right:-6px;background:var(--rood);color:#fff;font-size:.62rem;font-weight:700;border-radius:0;min-width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;}' +
       '.sb-tel[hidden]{display:none;}' +
       '.sb-prof{display:flex;align-items:center;gap:.45rem;background:transparent;color:var(--txt);}' +
       '.sb-av{width:1.8rem;height:1.8rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}' +
       '.sb-nm{font-size:.9rem;font-weight:600;max-width:7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
-      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
+      /* Op een telefoon is je eigen naam naast je eigen avatar geen informatie
+         maar breedte: hij kostte 62 punten in een balk die er 390 heeft, en
+         duwde daarmee een andere actie naar de tweede rij. De avatar zegt
+         hetzelfde. Vanaf een tablet is er ruimte en staat hij er weer. */
+      '@media (max-width:640px){.sb-nm{display:none;}}' +
+      '.sb-menu{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.4rem;display:flex;flex-direction:column;min-width:12rem;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-menu[hidden],.sb-berichten[hidden]{display:none;}' +
-      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:8px;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--goud);}' +
-      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:12px;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
+      '.sb-menu a{color:var(--txt);text-decoration:none;padding:.6rem .7rem;border-radius:0;font-size:.9rem;}.sb-menu a:hover{background:var(--paneel2);color:var(--rtg-leesgoud,var(--goud));}' +
+      '.sb-berichten{position:absolute;top:100%;right:1rem;z-index:40;background:var(--paneel);border:1px solid var(--lijn);border-radius:0;padding:.5rem;width:min(92vw,22rem);max-height:70vh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5);}' +
       '.sb-leeg{color:var(--zacht);font-size:.85rem;padding:.8rem;text-align:center;}' +
-      '.sb-b{padding:.6rem .7rem;border-radius:10px;background:var(--paneel2);margin-bottom:.4rem;}' +
+      '.sb-b{padding:.6rem .7rem;border-radius:0;background:var(--paneel2);margin-bottom:.4rem;}' +
       '.sb-b.reis{border:1px solid var(--goud);}' +
       '.sb-b.hulp{border:1px solid var(--rood);background:#2a1512;}' +
       '.sb-hulplabel{color:#e88;font-weight:700;font-size:.78rem;margin-bottom:.25rem;}' +
       '.sb-bkop{font-size:.78rem;color:var(--zacht);margin-bottom:.2rem;}.sb-bkop b{color:var(--txt);}' +
       '.sb-btxt{font-size:.92rem;line-height:1.4;white-space:pre-wrap;}' +
-      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:8px;}';
+      '.sb-reisknop{display:inline-block;margin-top:.5rem;background:var(--goud);color:#1a1710;font-weight:700;font-size:.82rem;text-decoration:none;padding:.35rem .7rem;border-radius:0;}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   }
   w.Sessie = Sessie;
@@ -240,3 +282,105 @@
      bruikbaar wordt. De server beslist; bij storing blijft de deur dicht. */
   controleerToegang();
 })(window);
+/* De wereldschil van de RTFoundation: welke bestemmingen er zijn, en welk
+   scherm onder welke valt.
+
+   WAAROM DIT HIER STAAT EN NIET IN 59 BESTANDEN. shared/wereldschil.js kent
+   geen enkele wereld -- het is een naam, een pictogram, een adres en een lijst
+   schermen. De invulling hoort bij de wereld, en deze bundel (sessie.js) zit
+   al op elk gezinsscherm van de Foundation. Dat maakt dit de ene plek waar de
+   kaart staat; zou elk scherm zijn eigen balk krijgen, dan zijn het over drie
+   maanden 59 balken die net iets van elkaar verschillen.
+
+   DE ZES BESTEMMINGEN ZIJN NIET BEDACHT. Het zijn de secties die de hub zelf
+   al had ("Voor de kleinsten", "Leren en groeien", "Elke dag", "Ook hier voor
+   je"), samengevat tot zes koppen. Elk van de 56 tegels op de hub viel al
+   onder precies een ervan, dus er is niets verplaatst en niets verzonnen --
+   alleen wat een lange lijst met koppen was, is nu een vaste balk.
+
+   WAT ER BEWUST NIET IN ZIT. De professionele en bestuurlijke schermen van de
+   Foundation (os-bestuur, os-donateur, os-vrijwilliger, kantoor, partner,
+   clubswerk) dragen deze bundel niet en krijgen dus geen gezinsbalk. Dat is
+   geen omissie: een bestuurder in het donateursportaal heeft niets aan een tab
+   "Elke dag" met de gezinsagenda erachter. PLATFORM.md noemt die drie niveaus
+   -- individu, professional, organisatie -- en dit is het eerste.
+
+   EEN SCHERM DAT HIER NIET STAAT licht nergens op. Dat is met opzet: dan zie je
+   dat het ontbreekt, terwijl een verkeerde tab die oplicht je de verkeerde kant
+   op stuurt zonder dat iemand het merkt. */
+(function (w, d) {
+  'use strict';
+  if (w.RTGWereld) return;
+
+  var KAART = {
+    sleutel: 'rtf',
+    naam: 'RTFoundation',
+    bestemmingen: [
+      { id: 'thuis', naam: 'Thuis', href: 'index.html', glyf: 'rtf',
+        schermen: ['index'] },
+
+      { id: 'campus', naam: 'Campus', href: 'campus.html', glyf: 'diploma',
+        schermen: ['campus', 'school', 'klas', 'leren', 'overhoren', 'schrijven',
+          'schrift', 'projecten', 'toetsen', 'presenteren', 'studie', 'cv', 'werk',
+          'beroepen', 'leerpaspoort', 'schoolbieb', 'bieb', 'geloofbieb', 'magazine',
+          'bord', 'tellen', 'kleuren', 'memorie', 'verhaaltje', 'liedjes',
+          'speeltuin', 'speelhal', 'arena', 'societeit'] },
+
+      { id: 'dag', naam: 'Elke dag', href: 'agenda.html', glyf: 'agenda',
+        schermen: ['agenda', 'keuken', 'ochtend', 'verjaardagen', 'klusjes',
+          'gezondheid', 'babyboek', 'oppasinfo', 'reis', 'zakgeld', 'budget', 'geld'] },
+
+      { id: 'samen', naam: 'Samen', href: 'vrienden.html', glyf: 'vrienden',
+        schermen: ['vrienden', 'markt', 'contact', 'dromen', 'mijnbanden'] },
+
+      { id: 'steun', naam: 'Steun', href: 'kompas.html', glyf: 'hart',
+        schermen: ['kompas', 'rust', 'gevoel', 'veilig', 'pesten', 'steun',
+          'hulpwijzer', 'opvoeden', 'rechten', 'mediawijs'] },
+
+      { id: 'beheer', naam: 'Beheer', href: 'beheer.html', glyf: 'gear',
+        schermen: ['beheer'] }
+    ]
+  };
+
+  /* EEN WERELD CLAIMT ALLEEN ZIJN EIGEN SCHERMEN.
+
+     Deze bundel zit op elk scherm in de Foundation-map dat een gezinssessie
+     draagt -- en dat zijn er een paar die geen gezinsscherm ZIJN. Het
+     Clubportaal is het duidelijkste geval: het vraagt om een clubcode, spreekt
+     de bezoeker met u aan, en hoort bij de kantoorset in schil-os.js. Zonder
+     deze controle zette dit bestand daar toch de gezinswereld neer, en omdat
+     schil-os.js netjes afhaakt zodra er al een wereld staat, won de verkeerde
+     van de twee -- met zes tabs die niet over zijn werk gaan en geen enkele
+     die oplicht.
+
+     De regel is dus dezelfde als in schil-os.js: staat dit scherm niet in mijn
+     eigen kaart, dan is het niet van mij, en laat ik het aan de volgende. Een
+     scherm dat in geen enkele kaart staat krijgt geen balk, en dat is eerlijker
+     dan de verkeerde. */
+  var m = /\/([^\/?#]+)\.html?$/.exec(w.location.pathname);
+  var nu = m ? m[1].toLowerCase() : '';
+  var vanMij = KAART.bestemmingen.some(function (b) {
+    return (b.schermen || []).indexOf(nu) >= 0;
+  });
+  if (!vanMij) return;
+  w.RTGWereld = KAART;
+
+  /* Het blad en het gedrag erbij halen. Zelfde patroon als de verbindingslaag
+     en de glyfen in sessie-00: de component brengt mee wat hij nodig heeft,
+     zodat een scherm er niets voor hoeft te doen. De volgorde luistert niet --
+     een script dat hier wordt ingehangen draait pas nadat deze bundel klaar is,
+     en dan staat RTGWereld er dus al. */
+  try {
+    if (!d.querySelector('link[href="/shared/wereldschil.css"]')) {
+      var blad = d.createElement('link');
+      blad.rel = 'stylesheet';
+      blad.href = '/shared/wereldschil.css';
+      (d.head || d.documentElement).appendChild(blad);
+    }
+    if (!d.querySelector('script[src="/shared/wereldschil.js"]')) {
+      var s = d.createElement('script');
+      s.src = '/shared/wereldschil.js';
+      (d.head || d.documentElement).appendChild(s);
+    }
+  } catch (e) {}
+})(window, document);

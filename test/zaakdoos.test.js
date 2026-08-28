@@ -5,14 +5,14 @@
       en werkt door (overschot melden op het keukenscherm), het journaal telt.
    3. De cloud komt terug op dezelfde poort: de doos speelt het journaal na en
       de actie staat daarna echt in de cloud.
-   Draai los: node --experimental-sqlite --test test/zaakdoos.test.js */
+   Draai los: node --test test/zaakdoos.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, vrijePoort, stop } = require('./helper');
+const { startServer, vrijePoort, stop, stopHard } = require('./helper');
 
 /* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
 
@@ -76,7 +76,7 @@ function stopCloud(kind) {
 }
 function startCloud() {
   stopCloud(cloudChild);
-  cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  cloudChild = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
@@ -189,8 +189,13 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
   const d = await r.json();
   assert.ok(d.ok && d.doorgegeven, 'de melding is doorgegeven aan de cloud');
   // en de vlootkaart in de Intern & IT-kamer toont hem, met via-stempel
+  /* Ruimere kap dan de 10 s van de wrapper: de eerste aanvraag betaalt ook de
+     warmte van het proces, en op een volgeladen runner (twee rondes op rij om
+     11,1 s gezakt, in de drukte na de GitHub-storing) is 10 s net te krap. Het
+     meegegeven signal wint, zie de kop van dit bestand. */
   const login = await fetch(cloudBase() + '/api/auth/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(30000),
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const kamer = await fetch(cloudBase() + '/api/office/kamer', {
@@ -203,8 +208,13 @@ test('de buurtfailover: een buurdoos zonder lijn meldt zich via deze doos', asyn
 
 test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug', async () => {
   // het kantoor drukt op Help bij testdoos (die staat op de kaart via zijn meldingen)
+  /* Ruimere kap dan de 10 s van de wrapper: de eerste aanvraag betaalt ook de
+     warmte van het proces, en op een volgeladen runner (twee rondes op rij om
+     11,1 s gezakt, in de drukte na de GitHub-storing) is 10 s net te krap. Het
+     meegegeven signal wint, zie de kop van dit bestand. */
   const login = await fetch(cloudBase() + '/api/auth/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(30000),
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })
   });
   const token = (await login.json()).token;
   const office = (pad, body) => fetch(cloudBase() + '/api/office/' + pad, {
@@ -212,10 +222,15 @@ test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug
     body: JSON.stringify(body || {})
   }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
   // wachten tot testdoos op de wereldkaart staat (zijn eerste melding)
+  /* EEN TRAGE PEILING IS GEEN KAPOTTE DOOS. De lus heeft zelf dertig seconden
+     geduld, maar een antwoord dat de 10s-kap van de wrapper raakte gooide de
+     hele toets om -- de TimeoutError sloeg door de for-lus heen. Te laat telt
+     nu als "nog niet"; alleen de LUS bepaalt wanneer het genoeg is geweest, en
+     de bewering eronder blijft precies even streng. */
   let w;
   for (let i = 0; i < 60; i++) {
-    w = await office('wereld');
-    if ((w.body.items || []).some(x => x.id === 'doos:testdoos')) break;
+    try { w = await office('wereld'); } catch (e) { w = w || { body: {} }; }
+    if (((w.body || {}).items || []).some(x => x.id === 'doos:testdoos')) break;
     await new Promise(r => setTimeout(r, 500));
   }
   const bol = w.body.items.find(x => x.id === 'doos:testdoos');
@@ -227,7 +242,8 @@ test('de wereldknop bereikt een echte doos: hulp-opdracht, diagnoserapport terug
   // zijn diagnoserapport; dat verschijnt in het nachtwerk-overzicht
   let gezien = false;
   for (let i = 0; i < 60 && !gezien; i++) {
-    const kamer = (await office('kamer', { id: 'intern' })).body;
+    let kamer = {};
+    try { kamer = (await office('kamer', { id: 'intern' })).body; } catch (e) { /* te laat telt als nog-niet */ }
     const nacht = ((kamer.lijsten || []).find(l => /nachtwerk/i.test(l.titel)) || {}).items || [];
     gezien = nacht.some(t => t.includes('testdoos'));
     if (!gezien) await new Promise(r => setTimeout(r, 500));
@@ -253,8 +269,11 @@ test('de lijn valt weg: de zaak werkt lokaal door en het journaal telt mee', asy
   // pinger tikt elke 10s, dus op een snelle runner kan het dagrapport (verderop)
   // anders pings=0 zien omdat de eerste tik nog niet gelopen had.
   await wachtOp('/api/doos/rapport', doos.base, d => d.pings >= 1);
-  cloudChild.kill('SIGKILL');
-  await new Promise(r => setTimeout(r, 300));
+  /* SIGKILL EN WACHTEN TOT HIJ WEG IS. De cloud gaat met opzet hard neer -- dat
+     is het onderwerp -- maar of hij al weg is, is een toestand en geen duur. Met
+     300 ms ernaast kon de doos hem nog even zien leven en dus nog niet
+     terugvallen op lokaal. */
+  await stopHard(cloudChild);
   // het eerstvolgende verzoek merkt het en valt door naar lokaal: inloggen
   // lukt gewoon, op de kloon-data van de doos zelf
   let login;
@@ -318,7 +337,7 @@ test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', 
   const dirBox = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-fo-'));
   const portA = await vrijePoort();
   const portB = await vrijePoort();
-  const spawnCloud = (port, dir) => spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
+  const spawnCloud = (port, dir) => spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
     env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(port), RTG_DATA_DIR: dir, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-2' },
     stdio: ['ignore', 'ignore', 'inherit']
   });

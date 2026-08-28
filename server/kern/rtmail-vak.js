@@ -77,7 +77,7 @@ module.exports = ({ db, save, rtmail }) => {
 
   const publiek = (m, adres, nu) => {
     const v = vakVan(m, adres, false);
-    return Object.assign({}, m, {
+    return Object.assign({}, rtmail.publiek ? rtmail.publiek(m) : m, {
       vak: undefined,
       map: mapVan(m, adres),
       labels: (v && v.labels) || [],

@@ -1,4 +1,5 @@
-/* RTG Bank, deel "krediet": leningen en creditcard-krediet. Een lid vraagt een
+
+const { magBij } = require('./eigendom');/* RTG Bank, deel "krediet": leningen en creditcard-krediet. Een lid vraagt een
    lening aan; het kantoor beslist (mens beslist, nooit de AI). Bij goedkeuring
    stort de bank het bedrag op de rekening (vanaf extern:krediet) en ontstaat een
    openstaand saldo dat het lid aflost; de rente gaat naar rtg:reserve. Rood staan
@@ -15,7 +16,7 @@ module.exports = (ctx) => {
 
   function aanvraag({ iban, euro, looptijdMnd, codenaam }) {
     const m = rekMeta(iban);
-    if (!m || (codenaam && m.codenaam !== String(codenaam).trim())) return { status: 404, error: 'De rekening bestaat niet.' };
+    if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     const centen = Math.round(Number(euro) * 100);
     if (!Number.isFinite(centen) || centen < 10000 || centen > MAX_CENTEN) return { status: 400, error: 'Vraag een lening tussen 100 en 50 miljoen euro aan.' };
     const mnd = Math.round(Number(looptijdMnd));
@@ -54,7 +55,7 @@ module.exports = (ctx) => {
      het afgeloste deel (naar rato van het jaartarief, één maand) naar rtg:reserve. */
   async function aflossing({ id, centen, codenaam }) {
     const k = kredieten().find(x => x.id === id);
-    if (!k || (codenaam && k.codenaam !== String(codenaam).trim())) return { status: 404, error: 'Deze lening bestaat niet.' };
+    if (!magBij(k, codenaam)) return { status: 404, error: 'Deze lening bestaat niet.' };
     if (k.status !== 'goedgekeurd' || k.restCenten <= 0) return { status: 409, error: 'Op deze lening valt niets af te lossen.' };
     const c = Math.min(Math.round(Number(centen)), k.restCenten);
     if (!Number.isFinite(c) || c < 1) return { status: 400, error: 'Dat bedrag kan niet.' };

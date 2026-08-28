@@ -4,7 +4,7 @@
    beroep (griffie en inwoner) met de Berichtenbox, de zittingsrol zonder
    dubbelboekingen, en de PDA voor receptie, security, schoonmaak en bode op
    elke overheidslocatie. Alleen voor het rijk.
-   Draai los: node --experimental-sqlite --test test/rechtbank.test.js */
+   Draai los: node --test test/rechtbank.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

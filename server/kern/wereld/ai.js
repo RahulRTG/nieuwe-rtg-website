@@ -25,7 +25,7 @@
    Als het model iemand noemt, noemt het een codenaam -- net als het scherm. */
 'use strict';
 
-const { tekst } = require('../../ai');
+const { tekst } = require('../../ai-kort');
 
 const TOON = 'Je bent Rahul, de assistent van Rahul Travel Group. Schrijf rustig, zeker en zonder ' +
   'opsmuk: geen uitroeptekens, geen verkooppraat, geen vleierij. Antwoord in het Nederlands. ' +

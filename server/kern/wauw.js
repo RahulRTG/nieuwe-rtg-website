@@ -8,6 +8,8 @@
    - De Terugblik: jouw sociale week in een warm overzicht (berichten, likes,
      reacties, gesprekken) -- terugkijken, geen scorebord.
    Gedeelde context vanuit server.js (na de sociale laag gemount). */
+const { idVanKey } = require('../lib/lidsleutel');
+
 module.exports = ({ db, save, accounts, socialConnecties }) => {
   const vandaag = () => new Date().toISOString().slice(0, 10);
   // de vaste 9+-lijst: vrolijk, neutraal, niets om achter te verschuilen
@@ -34,10 +36,10 @@ module.exports = ({ db, save, accounts, socialConnecties }) => {
 
   // jarig? de geboortedag (uit het eigen profiel) valt vandaag
   function jarigVan(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m || !accounts) return false;
+    const id = idVanKey(key);
+    if (id == null || !accounts) return false;
     let md = null;
-    try { md = accounts.getMemberState(Number(m[1])); } catch (e) { return false; }
+    try { md = accounts.getMemberState(id); } catch (e) { return false; }
     return !!(md && md.geboren && String(md.geboren).slice(5) === vandaag().slice(5));
   }
 

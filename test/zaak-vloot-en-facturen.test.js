@@ -21,7 +21,7 @@
      een betaalverzoek, waar de tweede poging 409 krijgt -- daar gaat het over
      geld en telt "is dit al gebeurd", hier niet.
 
-   Draai los: node --experimental-sqlite --test test/zaak-vloot-en-facturen.test.js
+   Draai los: node --test test/zaak-vloot-en-facturen.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

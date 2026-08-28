@@ -21,10 +21,10 @@
   .kop .rek{flex:1;}
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem 3rem;max-width:46rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:1rem;margin-top:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-top:.9rem;}
   .kaart h2{font-family:'Bodoni Moda',serif;font-size:1.1rem;font-weight:600;margin-bottom:.5rem;}
   .stil{color:var(--soft);font-size:.85rem;line-height:1.5;}
-  .stand{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.78rem;font-weight:600;}
+  .stand{display:inline-block;padding:.2rem .6rem;border-radius:0;font-size:.78rem;font-weight:600;}
   .ja{background:rgba(105,184,145,.16);color:var(--groen);}
   .nee{background:rgba(222,110,146,.16);color:var(--rood);}
   .bijna{background:rgba(201,162,75,.16);color:var(--let);}
@@ -37,7 +37,7 @@
     color:var(--txt);padding:.6rem 0;font:inherit;cursor:pointer;}
   .vlootrij:last-child{border-bottom:0;}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:.7rem;padding:.6rem 1rem;opacity:0;transition:opacity .2s;font-size:.9rem;}
+    border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;opacity:0;transition:opacity .2s;font-size:.9rem;}
   .melding.zien{opacity:1;}
 </style>
 </head>
@@ -46,7 +46,7 @@
   <a href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <h1>Voertuig</h1>
   <span class="rek"></span>
-  <button class="knop" id="ververs" type="button">Ververs</button>
+  <button class="knop h-raak24" id="ververs" type="button">Ververs</button>
 </header>
 <main>
   <div class="kaart" id="geen" hidden>

@@ -1,7 +1,7 @@
 /* De werkplek: RTG en RTF als twee aparte huizen. Het gaat hier vooral om de
    deur: de eigenaar mag in beide huizen, een medewerker alleen in het zijne, en
    wie geen sleutel heeft ziet niets. Draai los:
-   node --experimental-sqlite --test test/werkplek.test.js */
+   node --test test/werkplek.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

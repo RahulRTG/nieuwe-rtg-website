@@ -10,20 +10,16 @@
    Het loopt via de echte api-helper van foodcourt.html, dus de bedrading van de
    pagina wordt meegetoetst en niet alleen de module.
 
-   Draai los: node --experimental-sqlite --test test/poortgesprek.e2e.js */
+   Draai los: node --test test/poortgesprek.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs'); const os = require('os'); const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 test('Rahul vraagt het in beeld, en daarna gaat de handeling vanzelf door',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-poort-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -35,7 +31,7 @@ test('Rahul vraagt het in beeld, en daarna gaat de handeling vanzelf door',
         password: 'poortgeheim12', geboortedatum: '1991-02-02', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
     assert.ok(reg.token, 'aanmelden lukt met vier velden');
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);

@@ -27,7 +27,7 @@
       'background:rgba(0,0,0,.6);}' +
     '.rtgsnel[hidden]{display:none;}' +
     '.rtgsnel-kaart{background:var(--paneel,#151412);border:1px solid var(--line,var(--lijn,#2A2724));' +
-      'border-radius:var(--radius,14px);padding:1.3rem 1.5rem;min-width:min(22rem,92vw);' +
+      'border-radius:0;padding:1.3rem 1.5rem;min-width:min(22rem,92vw);' +
       'font-family:Inter,system-ui,sans-serif;color:var(--txt,#F7F5F1);}' +
     '.rtgsnel-kaart h2{font-family:var(--serif),Georgia,serif;font-weight:500;font-size:1.15rem;margin:0 0 .8rem;}' +
     '.rtgsnel-kaart dl{display:grid;grid-template-columns:auto 1fr;gap:.5rem .9rem;margin:0;font-size:.9rem;}' +

@@ -94,45 +94,22 @@ module.exports = (kern) => {
     }));
   });
 
-  // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
-  app.post('/api/pay/tikcode', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    res.json(pay.tikCode({ codenaam: liveCodename(req.session) }));
-  });
-  app.post('/api/pay/tik', auth, async (req, res) => {
-    if (geenGast(req, res)) return;
-    if (kyc(req, res)) return;
-    stuur(res, await pay.tikBetaal({ van: liveCodename(req.session), code: req.body.code, centen: req.body.centen, oms: req.body.oms, idem: req.body.idem }));
-  });
-  app.post('/api/pay/tiks', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    res.json(pay.tikFeed(liveCodename(req.session)));
-  });
-  // de kassacode: vijf minuten geldig, tot een zelfgekozen maximum
-  app.post('/api/pay/kascode', auth, (req, res) => {
-    if (geenEchtAccount(req, res)) return;
-    res.json(pay.kasCode({ codenaam: liveCodename(req.session), maxCenten: req.body.maxCenten }));
-  });
+  /* de tik: ontvangen met een aanraking (tikcode), betalen met een knop
 
-  /* ---- de portefeuille van het lid ----
-     Niet hetzelfde als /overzicht: dat gaat over zijn wallet, dit over ALLES
-     wat hij heeft. Sinds een lid een maaltijdbudget of een gemeentetegoed kan
-     hebben, is "wat heb ik" een lijst met regels erbij en geen getal. */
-  app.post('/api/pay/portefeuille', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    if (!pay.portefeuille) return res.json({ ok: true, posities: [], vrijBesteedbaar: 0, gebonden: 0 });
-    res.json(pay.portefeuille(liveCodename(req.session)));
-  });
+     GEEN IDEM-SLEUTEL, en dat is een besluit. `npm run idemproef` noemt deze
+     route onbeschermd omdat een herhaling een andere code teruggeeft. Klopt --
+     maar tikCode zet eerst elke lopende code van dit lid op verlopen, dus na
+     twee oproepen leeft er precies een en valt er niets op te tellen. Het geld
+     beweegt bij /api/pay/tik, en die draagt de sleutel wel. Nagemeten in
+     test/pay.test.js ("twee keer een code vragen laat er een leven"). */
 
-  /* ---- de waardegraaf van het lid ----
-     Niet "wat is er gebeurd" (dat is /overzicht) maar "waar ging mijn geld
-     heen". Alles hier is afgeleid uit het grootboek; er wordt niets apart
-     geteld. */
-  app.post('/api/pay/graaf', auth, (req, res) => {
-    if (geenGast(req, res)) return;
-    if (!pay.graafVanLid) return res.json({ ok: true, bronnen: [], bestemmingen: [] });
-    res.json(pay.graafVanLid(liveCodename(req.session), { dagen: req.body.dagen }));
-  });
+  /* HET TEGOED (./pay-tegoed.js): geld dat een lid voor een ANDER klaarzet,
+     tegenover zijn eigen wallet hierboven. */
+  require('./pay-tegoed')(kern, { stuur, geenGast, kyc, geenEchtAccount });
+
+  /* DE WAARDEKANT (./pay-waarde.js): de portefeuille en de waardegraaf --
+     wat een lid HEEFT, tegenover wat hij hierboven met zijn wallet DOET. */
+  require('./pay-waarde')(kern, { geenGast });
 
   /* DE TERUGSTORTING (./pay-terug.js): het saldo van een lid terug naar zijn
      eigen bankrekening. Afgesplitst omdat dit bestand anders over de

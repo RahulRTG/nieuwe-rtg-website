@@ -62,13 +62,27 @@ const K = { rood: '\x1b[31m', groen: '\x1b[32m', grijs: '\x1b[2m', reset: '\x1b[
    met opzet streng: niet "probeer alles opnieuw", maar "alleen dit". */
 const BEZET = /EADDRINUSE|is al in gebruik/;
 
+/* EEN KAART DIE NIET AFKWAM IS GEEN OORDEEL OVER ROUTES.
+
+   Deze stap zakte in CI met een kale spawnSync-dump: ETIMEDOUT, met daaronder
+   de complete opstartuitvoer van een server die het gewoon deed. Twee dingen
+   waren mis. De grens stond op drie minuten terwijl deze kaart lokaal in drie
+   SECONDEN klaar is -- ruim genoeg, tot deze baan achter vier toetsscherven en
+   tien pg-toetsen aan op een belaste runner draait en er twee servers achter
+   elkaar op moeten starten. En een tijdgrens die valt, hoort te zeggen dat de
+   METING niet afkwam; nu leek het of er iets met de routes aan de hand was.
+   De grens gaat naar tien minuten (gelijk aan die van de toetsscherven), een
+   tijdgrens telt als ruis en mag dus opnieuw, en als hij twee keer valt komt er
+   een zin te staan in plaats van een dump. */
+const TRAAG = /ETIMEDOUT/;
+
 function routesVan(boom) {
   let laatste = null;
   for (let poging = 0; poging < 3; poging++) {
     try {
       const uit = execFileSync(process.execPath,
-        ['--experimental-sqlite', path.join(boom, 'scripts/routekaart.js'), '--json'],
-        { cwd: boom, encoding: 'utf8', timeout: 180000, maxBuffer: 64 * 1024 * 1024,
+        [path.join(boom, 'scripts/routekaart.js'), '--json'],
+        { cwd: boom, encoding: 'utf8', timeout: 600000, maxBuffer: 64 * 1024 * 1024,
           /* Een eigen poort per poging, en niet die van de vorige. Zonder dit
              zou routekaart.js zelf opnieuw loten en kon hij dezelfde weer
              trekken. */
@@ -78,9 +92,19 @@ function routesVan(boom) {
     } catch (e) {
       laatste = e;
       const tekst = [e && e.message, e && e.stderr, e && e.stdout].join(' ');
+      if (TRAAG.test(tekst)) {
+        console.error('  de routekaart kwam niet af binnen de tijd, nieuwe poging ('
+          + (poging + 1) + '/3)');
+        continue;
+      }
       if (!BEZET.test(tekst)) throw e;
       console.error('  poort bezet, nieuwe poging (' + (poging + 1) + '/3)');
     }
+  }
+  if (laatste && TRAAG.test(String(laatste.message))) {
+    throw new Error('de routekaart van ' + boom + ' kwam drie keer niet af binnen tien minuten. '
+      + 'Dat is een storing van de meting en geen bevinding over de routes: de server startte wel. '
+      + 'Kijk of de runner overbelast was, of draai `node scripts/routekaart.js --json` met de hand.');
   }
   throw laatste;
 }

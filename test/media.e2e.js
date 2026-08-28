@@ -45,18 +45,11 @@
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, nepMediaArgs, installeerNepMicrofoon } = require('./helper');
+const { startServer, stop, nepMediaArgs, installeerNepMicrofoon, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
 
 /* Een adres dat GEEN localhost is. Zonder zo'n adres is (a) niet te meten: op
@@ -84,14 +77,14 @@ const MEDIAPAGINAS = ['/apps/camera.html', '/apps/oog.html', '/apps/clips.html',
   '/apps/foundation/vrienden.html'];
 
 test('camera en microfoon: op een LAN-adres zegt de app WAAROM het niet gaat, en op een veilig adres gaat het',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-media-e2e-'));
   const lan = lanAdres();
   // op alle interfaces luisteren, anders is het LAN-adres niet te bereiken
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_BIND: '0.0.0.0' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: nepMediaArgs() });
+    browser = await pw.chromium.launch(browserOpties(pw, { args: nepMediaArgs() }));
     const ctx = await browser.newContext({ permissions: ['camera', 'microphone'] });
     await installeerNepMicrofoon(ctx);
 

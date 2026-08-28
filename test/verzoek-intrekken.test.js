@@ -19,7 +19,7 @@
    - WAT BETAALD IS, IS BETAALD. Een betaald verzoek intrekken is geen
      terugbetaling; dat zou een storting zijn die niemand goedkeurde. 409.
 
-   Draai los: node --experimental-sqlite --test test/verzoek-intrekken.test.js
+   Draai los: node --test test/verzoek-intrekken.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -20,13 +20,20 @@ function router() {
 test('Rahul routeert op appnaam en niet op de positie in de catalogus', () => {
   const r = router();
   const gevallen = {
-    'open mijn tijdlijn': ['/apps/sociaal.html', 'Sociaal'],
-    'open de media studio': ['/apps/media.html', 'Media'],
-    'toon het gastdossier': ['/apps/reisboek.html', 'Gastdossier'],
-    'open het restaurant': ['/apps/horeca.html', 'Horeca'],
-    'breng me naar mijn vlucht': ['/apps/reizen-veilig.html', 'Reizen & Veilig'],
-    'open mijn bank': ['/apps/geld-command.html', 'Geld'],
-    'ga naar home': ['/apps/vandaag.html', 'Vandaag']
+    'open mijn tijdlijn': ['/apps/rtg.html', 'LIFE'],
+    'open de media studio': ['/apps/rtg.html', 'LIFE'],
+    'toon het gastdossier': ['/apps/rtg.html', 'LIFE'],
+    'breng me naar mijn vlucht': ['/apps/rtg.html', 'LIFE'],
+    'open mijn bank': ['/apps/rtg.html', 'LIFE'],
+    'ga naar home': ['/apps/rtg.html', 'LIFE'],
+    'open Private Office': ['/apps/rtg.html', 'LIFE'],
+    'open het restaurant': ['/apps/kantoor.html', 'WORK'],
+    'toon mijn onderneming': ['/apps/kantoor.html', 'WORK'],
+    /* os-portaal.html en niet index.html: dat laatste is de speeltuin (de
+       kinder- en gezinskant) en een binnenscherm. Zie de toelichting boven
+       de lijst in shared/command/catalog.js. */
+    'open de stichting': ['/apps/foundation/os-portaal.html', 'FOUNDATION'],
+    'open mijn passkeys': ['/apps/ik.html', 'INSTELLINGEN']
   };
   for (const [vraag, verwacht] of Object.entries(gevallen)) {
     const uit = r.herken(vraag);

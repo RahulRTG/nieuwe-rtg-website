@@ -6,23 +6,19 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 const api = async (base, pad, body, token) => (await fetch(base + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 })).json();
 
 test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-metier-e2e-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -34,7 +30,7 @@ test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
     const zaak = await api(base, '/api/supplier/login', { username: 'rahul', password: 'Imran' });
     const zaakCode = zaak.state.supplier.code;
 
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
@@ -42,7 +38,7 @@ test('Métier: je kaart, het beroepsregister en de naam die je zelf vrijgeeft',
       localStorage.setItem('rtg_member_token', tok);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, token);
-    await page.goto(base + '/apps/geld.html#metier', { waitUntil: 'load' });
+    await page.goto(base + '/apps/geld.html#metier', { waitUntil: 'domcontentloaded' });
 
     // 1. de app opent op je eigen profiel, en toont je codenaam -- niet je naam
     await page.waitForSelector('#mtFkop', { timeout: 15000 });

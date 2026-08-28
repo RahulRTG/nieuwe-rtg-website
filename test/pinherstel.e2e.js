@@ -24,24 +24,17 @@
 
    Draait alleen waar een Chromium staat; anders overgeslagen.
    Draai: npm run e2e  --  of los:
-   RTG_CHROMIUM=... node --experimental-sqlite --test test/pinherstel.e2e.js */
+   RTG_CHROMIUM=... node --test test/pinherstel.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, letOpFouten, bankDeur } = require('./helper');
+const { startServer, stop, letOpFouten, laadPlaywright, browserOpties, geenBrowser, bankDeur } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
 function verseDataDir() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pinh-')); }
-function laadPlaywright() {
-  for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); } catch (e) { /* volgende */ }
-  }
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
 const pw = laadPlaywright();
-const skip = pw ? false : 'geen browser beschikbaar in deze omgeving';
+const skip = geenBrowser(pw);
 
 async function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -68,7 +61,7 @@ async function omgeving(fn) {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEV_LINKS: '1' } });
   let browser;
   try {
-    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    browser = await pw.chromium.launch(browserOpties(pw));
     await fn({ base, browser });
   } finally {
     if (browser) await browser.close();
@@ -87,7 +80,7 @@ async function ingelogd(browser, base, token, pad) {
   }, token);
   const page = await ctx.newPage();
   const fouten = letOpFouten(page, []);
-  await page.goto(base + pad, { waitUntil: 'load' });
+  await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
   await page.waitForSelector('#app', { state: 'visible', timeout: 10000 });
   return { page, fouten };
@@ -158,7 +151,7 @@ test('pin-herstel: "Pin vergeten?" staat in het pin-scherm en start de stroom', 
        Via openBank() en niet via .cmd-lade: deze pagina draait op de
        standaardbreedte van Playwright, en daar is de bank een vaste rail
        zonder greep. Zie test/helper.js. */
-    await bankDeur(page, 'Bedieningspaneel');
+    await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
     await page.click('#osCcPin');
 

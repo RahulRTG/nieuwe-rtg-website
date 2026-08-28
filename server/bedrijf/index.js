@@ -48,7 +48,29 @@ module.exports = (kern) => {
      Een holding is een gewone werkruimte met kinderen eronder. Dat is bewust
      geen apart soort: anders krijgt de tweede laag zijn eigen rechten- en
      journaalregels, en die lopen gegarandeerd uit de pas met de eerste. */
+  /* De eerste deur van het Werk OS is BEWUST open (zie scripts/poortwacht.js,
+     PUBLIEK): wie hem aanroept heeft nog niets -- geen zaak, geen login. Maar
+     een open scheppingsdeur zonder rem is een uitnodiging om de opslag vol te
+     gieten. Vijf per afzender per tien minuten is voor een echt bedrijf ruim
+     en voor een script niets. Lokaal geteld: de gedeelde tooManyTries-emmer
+     wordt alleen door mislukte logins gevuld en zou hier dus nooit remmen. */
+  const maakBeurten = new Map();
+  // Zelfde ontsnapping als foundation/basis.js: in de testsuite delen alle
+  // aanroepers een IP, en daar remt er niets.
+  const GEEN_LIMIET = process.env.NODE_ENV === 'test';
+  function maakRem(ip) {
+    if (GEEN_LIMIET) return false;
+    const t = Date.now();
+    if (maakBeurten.size > 10000) maakBeurten.clear();
+    const b = (maakBeurten.get(ip) || []).filter(x => t - x < 10 * 60000);
+    b.push(t); maakBeurten.set(ip, b);
+    return b.length > 5;
+  }
+
   app.post('/api/bedrijf/werkruimte/maak', (req, res) => {
+    if (maakRem(String(req.ip || ''))) {
+      return res.status(429).json({ error: 'Te veel nieuwe werkruimtes achter elkaar. Wacht een paar minuten.' });
+    }
     const naam = schoon(req.body.naam, 80);
     if (!naam) return res.status(400).json({ error: 'Hoe heet de organisatie?' });
     const moeder = schoon(req.body.moeder, 8).toUpperCase();

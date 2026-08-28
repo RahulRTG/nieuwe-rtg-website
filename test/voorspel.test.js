@@ -1,7 +1,7 @@
 /* De voorspeller: RTG leert het ritme van leden en zaken uit het
    Pay-grootboek en voorspelt eerlijk (bij te weinig data: zeggen dat het
    nog niet kan). Draai los:
-   node --experimental-sqlite --test test/voorspel.test.js */
+   node --test test/voorspel.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

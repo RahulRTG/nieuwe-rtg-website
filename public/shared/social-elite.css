@@ -97,10 +97,10 @@ body:not(.rtg-salon-elite)>.rtg-social-commandbar{left:0;}
 }
 .rtg-social-commandbar-brand span{font-size:1.04rem;letter-spacing:.14em;}
 .rtg-social-commandbar-brand small{
-  border-left-color:rgba(23,23,18,.16);color:rgba(23,23,18,.47);
+  border-left-color:rgba(23,23,18,.16);color:#69695F;
   font-size:.53rem;letter-spacing:.18em;
 }
-.rtg-social-commandbar-state{padding-right:0;color:rgba(23,23,18,.48);font-size:.52rem;letter-spacing:.17em;}
+.rtg-social-commandbar-state{padding-right:0;color:#69695F;font-size:.52rem;letter-spacing:.17em;}
 .rtg-social-commandbar-state::before{width:5px;height:5px;background:#691f32;box-shadow:none;}
 .rtg-social-commandbar .rtg-rahul-tab{
   height:65px!important;margin-left:1.5rem!important;padding-left:1.5rem!important;

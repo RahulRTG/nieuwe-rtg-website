@@ -14,7 +14,7 @@
    - niet over iemand die er niet werkt;
    - en de medewerker hoort het, elke keer.
 
-   Draai los: node --experimental-sqlite --test test/identiteit-opvraag.test.js */
+   Draai los: node --test test/identiteit-opvraag.test.js */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

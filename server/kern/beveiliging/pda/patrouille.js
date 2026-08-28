@@ -6,7 +6,23 @@
 module.exports = (ctx) => {
   const { db, save, findSupplier, sseToSupplier, logActivity,
     id, nu, vandaag, schoon, isBeveiliging, functieAan,
-    diensten, rondes, guardNaam, postVan, dienstPubliek } = ctx;
+    diensten, rondes, guardNaam, postVan, dienstPubliek,
+    /* `laat` is de late-binding-sleuf uit kern/beveiliging.js: de plaatslaag
+       bestaat nog niet als deze module wordt gebouwd. Leeg = niets te zeggen. */
+    laat } = ctx;
+
+  /* De aanwezigheid van deze bewaker bij de post van zijn dienst. `plaats` mag
+     ontbreken (een kaal testproces mount de laag niet) en dan is er niets te
+     zeggen -- niet 'niet bevestigd', maar niets. */
+  function plekBijPost(s, d) {
+    const plaats = laat && laat.plaats;
+    if (!plaats || typeof plaats.plaatsAanwezig !== 'function' || typeof laat.codenaamVanGuard !== 'function') return null;
+    const codenaam = laat.codenaamVanGuard(s, d.guardId);
+    if (!codenaam) return { bevestigd: false, gemeten: false, sinds: null, reden: 'geen ledenaccount' };
+    const a = plaats.plaatsAanwezig(codenaam, 'dienst', 'bevpost:' + s.code + ':' + d.postId);
+    if (!a.bekend) return { bevestigd: false, gemeten: false, sinds: null, reden: 'niets waargenomen' };
+    return { bevestigd: !!a.binnen, gemeten: true, sinds: a.sinds, reden: null };
+  }
 
   function mijnDiensten(supplierCode, gid) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { diensten: [], ronde: null };
@@ -18,13 +34,39 @@ module.exports = (ctx) => {
     const ronde = rondes().find(r => r.supplierCode === s.code && r.guardId === gid && !r.klaar) || null;
     return { diensten: lijst, ronde: ronde ? rondePubliek(s, ronde) : null, walkie: functieAan(s, 'walkie') };
   }
-  function inklok(supplierCode, gid, dienstId, lat, lng) {
+  /* GEEN COORDINAAT MEER OP DE DIENST (PLAATS.md, grens 2: geen plaats zonder
+     doel). Hier stond `if (Number.isFinite(Number(lat))) { d.lat = ...; d.lng =
+     ...; }`: de positie van de bewaker bij het inklokken werd opgeslagen op zijn
+     dienst en bleef daar staan. Niemand las hem ooit -- dienstPubliek() geeft
+     hem niet terug, geen scherm toont hem, geen rapportage rekent ermee. Een
+     coordinaat die niemand leest is geen functie maar alleen een risico, en juist
+     bij een bewaker: dat is een mens wiens werkgever precies weet waar hij op
+     welk moment stond, zonder dat iemand daar iets mee doet.
+
+     Wat er WEL hoort te komen is de hek-bevestiging bij de POST waar de dienst
+     op staat, net als bij de prikklok in routes/staff/dienst.js -- binnen of
+     buiten, met een tijd. Dat wacht op eigen hekken (PLAATS.md fase 2b), want de
+     posten van een beveiligingsteam staan niet in de plekken van kern/navigatie.
+     Tot die er zijn is niets vastleggen beter dan te veel vastleggen.
+
+     De aanroeper (routes/supplier/beveiliging.js) stuurt lat/lng niet meer mee. */
+  function inklok(supplierCode, gid, dienstId) {
     const s = findSupplier(supplierCode); if (!isBeveiliging(s)) return { status: 404, error: 'Team niet gevonden.' };
     const d = diensten().find(x => x.id === dienstId && x.supplierCode === s.code && x.guardId === gid);
     if (!d) return { status: 404, error: 'Dienst niet gevonden.' };
     if (d.status === 'afgerond') return { status: 409, error: 'Deze dienst is al afgerond.' };
     d.status = 'ingeklokt'; d.inklokAt = nu();
-    if (Number.isFinite(Number(lat))) { d.lat = Number(lat); d.lng = Number(lng); }
+    /* En hier komt terug wat de coordinaat hierboven nooit was: BINNEN OF BUITEN
+       DE POST, met een tijd. De hek-motor op het toestel van de bewaker heeft
+       dat zelf uitgerekend (opzet/plaatsbronnen.js levert de posten als hek);
+       wij vragen het alleen. Meer gebruikt, minder bewaard.
+
+       Drie uitkomsten, nooit twee -- 'niet gemeten' is iets anders dan 'niet
+       bevestigd', want een bewaker zonder gekoppeld ledenaccount hoort geen
+       verdachte bewaker te worden. En het blokkeert niets: inklokken buiten de
+       post gaat gewoon door. */
+    const plek = plekBijPost(s, d);
+    if (plek) d.plekIn = plek;
     save();
     logActivity(s.code, { name: d.guardNaam || 'Bewaker' }, 'klokte in op ' + ((postVan(s, d.postId) || {}).naam || 'post'));
     sseToSupplier(s.code, 'sync', { scope: 'beveiliging' });

@@ -1,7 +1,7 @@
 /* RTF School, de exclusieve laag: de vrijwillige ouderbijdrage, de excursie
    met tijdelijke GPS (toestemming vooraf, kijklog voor het gezin, wissen bij
    de stop) en de telefoonboom.
-   Draai los: node --experimental-sqlite --test test/schoolexcursie.test.js */
+   Draai los: node --test test/schoolexcursie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

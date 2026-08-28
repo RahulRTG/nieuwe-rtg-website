@@ -51,7 +51,7 @@ module.exports = (ctx) => {
         } else if (d.soort === 'rit' && acties && acties.vraagRit) {
           const r = acties.vraagRit(sess, { supplierCode: d.supplierCode, to: d.to, toCode: d.toCode, personen: d.personen, datum: d.datum, tijd: d.tijd });
           if (r.error) { regels.push('✕ ' + d.oms + ': ' + r.error); continue; }
-          const b = acties.betaalRit(sess, { ref: r.rit.ref });
+          const b = await acties.betaalRit(sess, { ref: r.rit.ref });
           regels.push(b.error ? '✕ ' + d.oms + ': ' + b.error : '✓ ' + d.oms + ' om ' + d.tijd + ' (' + r.rit.ref + ')');
           if (!b.error) gelukt++;
         } else if (d.soort === 'tafel' && reserveerTafel) {

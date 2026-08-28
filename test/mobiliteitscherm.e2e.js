@@ -26,13 +26,9 @@
    Draait alleen waar een browser is. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 
-/* Eén browserkeuze voor alle schermtoetsen: ./browser.js. Die probeert te
-   STARTEN in plaats van te laden -- een Playwright zonder bijbehorende Chromium
-   liet elke schermtoets anders omvallen op "Executable doesn't exist". */
-const { laadBrowser } = require('./browser');
-const pw = laadBrowser();
+const pw = laadPlaywright();
 
 const PAPIEREN_OK = { kenteken: '2030-01-01', verzekering: '2030-01-01', apk: '2030-01-01',
   taxivergunning: '2030-01-01', boordcomputer: '2030-01-01' };
@@ -63,7 +59,7 @@ async function zaakToken(base) {
 }
 
 async function open(base, url, sleutel, token) {
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch(browserOpties(pw));
   const page = await browser.newPage();
   const fouten = [];
   letOpFouten(page, fouten);
@@ -77,7 +73,7 @@ async function open(base, url, sleutel, token) {
 }
 
 test('de reizigersapp plant een reis, toont de opties en boekt er een',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -93,11 +89,9 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
     assert.ok(opties.some(o => /restaurant|hotel|koffie|bar/i.test(o)),
       'de bestemmingslijst bevat onze eigen zaken, kreeg: ' + opties.slice(0, 5).join(' | '));
 
-    /* Via de ZOEKBALK een bestemming ver weg kiezen. Dat is ook de echte weg:
-       de eerste pagina van de lijst staat vol met wat vlakbij is, en juist wat
-       je zoekt staat er dan niet in. Zonder zoeken pakte deze toets de zaak op
-       nul meter afstand en kreeg hij terecht "vertrek en bestemming liggen op
-       dezelfde plek". */
+    /* Via de ZOEKBALK een bestemming ver weg vinden. Dat is de echte weg: de
+       eerste pagina van de lijst staat vol met wat vlakbij is, en juist wat je
+       zoekt staat er dan niet in. */
     await page.fill('#velZoek', 'Santa Eularia');
     await page.waitForFunction(() => {
       const els = [...document.querySelectorAll('#velNaar option')];
@@ -107,6 +101,44 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
       (els.find(e => /Santa Eularia/i.test(e.textContent)) || {}).value || '');
     assert.ok(doel, 'zoeken vindt de bestemming');
     await page.selectOption('#velNaar', doel);
+
+    /* EERST HET EERLIJKE GEVAL: plannen VANAF "Huidige locatie" terwijl deze
+       browser geen locatie geeft. Dit scherm had een vast punt op Ibiza als
+       "startpunt tot de gps spreekt", en daarmee plande hij een reis vanaf een
+       eiland waar je niet bent. Dat punt is weg (zie de kop bij `hier` in
+       ov.html), dus hier hoort nu een reden te staan in plaats van een reis. */
+    await page.click('#velPlan');
+    await page.waitForFunction(() => {
+      const m = document.querySelector('#melding');
+      return m && m.classList.contains('zien') && m.textContent.trim().length > 5;
+    }, null, { timeout: 20000 });
+    const reden = (await page.textContent('#melding')) || '';
+    assert.match(reden, /locatie|plek|waar/i,
+      'zonder locatie zegt het scherm waarom het niet kan: ' + reden.slice(0, 120));
+    const geenOpties = await page.$$eval('#opties .kaart', els => els.length);
+    assert.equal(geenOpties, 0, 'en er staat geen verzonnen reis op het scherm');
+
+    /* EN DAN DE ECHTE WEG die daarvoor in de plaats komt: de reiziger kiest
+       zelf een vertrekpunt. Die keuzelijst staat er al -- hij wordt met dezelfde
+       plekken gevuld als de bestemmingslijst -- en dat is meteen eerlijker: de
+       reiziger zegt waar hij opgehaald wil worden in plaats van dat het scherm
+       het voor hem verzint.
+
+       Eerst het zoekveld leegmaken, want zoeken vult BEIDE lijsten en dat ene
+       zoekresultaat kan niet tegelijk vertrek en bestemming zijn. Leeg levert
+       de gewone lijst met plekken terug, en daar kiezen we er twee uit. */
+    await page.fill('#velZoek', '');
+    await page.waitForFunction(() => {
+      const els = [...document.querySelectorAll('#velVan option')];
+      return els.filter(e => e.value && e.value !== 'hier').length >= 2;
+    }, null, { timeout: 20000 });
+    const paar = await page.$$eval('#velVan option', els => {
+      const echt = els.filter(e => e.value && e.value !== 'hier').map(e => e.value);
+      return echt.length >= 2 ? [echt[0], echt[1]] : [];
+    });
+    assert.equal(paar.length, 2, 'er staan twee echte plekken om uit te kiezen');
+    await page.selectOption('#velVan', paar[0]);
+    await page.selectOption('#velNaar', paar[1]);
     await page.click('#velPlan');
 
     /* De bewering die telt: er verschijnen OPTIES met cijfers, niet een enkele
@@ -145,7 +177,7 @@ test('de reizigersapp plant een reis, toont de opties en boekt er een',
 });
 
 test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er wel een als het mag',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-SCHERM-1' } });
   let browser;
   try {
@@ -209,7 +241,7 @@ test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er
 });
 
 test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {
@@ -273,7 +305,7 @@ test('het dispatchscherm toont de openstaande rit met de rekensom van de matcher
    dat een API-toets niet kan zien -- daar is een code een string, hier moet er
    een leesbare QR staan en moet een tweede scherm er een oordeel over geven. */
 test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-QR-1' } });
   let browser;
   try {
@@ -372,7 +404,7 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
    rit blijft liggen tot de medewerker belt. Dat is precies de situatie die een
    drempel had moeten voorkomen. */
 test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
-  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  { skip: geenBrowser(pw) }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
   try {

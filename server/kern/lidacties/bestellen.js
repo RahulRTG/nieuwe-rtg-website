@@ -40,7 +40,10 @@ function plaatsOrderVoor(session, body) {
   // Zonder RTG-geverifieerd ID geldt de STANDAARD "onder de 18": een onbekende
   // of ongeverifieerde leeftijd telt dus als te jong, nooit als volwassen.
   const lft = idGeverifieerd(session) ? leeftijdVan(geborenVan(session)) : null;
-  const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return m && m.station === 'bar'; });
+  /* `m.alcohol` en niet `m.station`: de werkplek zegt waar iets wordt gemaakt,
+     niet wat erin zit. Zie kern/supplierdefaults.js -- in een bar of club kreeg
+     elk item de werkplek 'bar', en dan telde een Virgin Colada 0% als alcohol. */
+  const metAlcohol = items.some(it => { const m = (s.menu || []).find(x => x.id === it.id); return !!(m && m.alcohol); });
   if (metAlcohol) {
     const a = alcoholGrensVan(s);
     if (lft == null) return { status: 403, error: 'Zonder geverifieerde leeftijd geldt de standaard "onder de 18": alcohol kan niet. Laat uw identiteit verifieren, of kies iets zonder alcohol.' };

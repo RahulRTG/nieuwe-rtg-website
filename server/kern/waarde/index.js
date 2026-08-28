@@ -53,8 +53,21 @@ function klasseVan(rek) {
   return null;
 }
 
+/* HET WALLETPLAFOND KOMT VAN BUITEN, en dat is een samenvoegbesluit van
+   26 augustus 2026. ./klassen.js draagt per klasse een plafondCenten, en voor
+   PERSOONLIJK SALDO stond daar 500000 hard ingevuld. Tegelijk kent dit huis al
+   een INSTELBAAR walletplafond: de boardroom verzet het via
+   /api/office/bank/instellingen en kern/pay/plafond.js leest het per boeking.
+   Twee getallen over hetzelfde, en dat liep meteen uit elkaar -- de boardroom
+   verzette het naar 10.000 en deze laag weigerde nog steeds op 5.000, met een
+   melding die een ander bedrag noemde dan het scherm van het lid.
+   Nu is er EEN bron: koppelWalletPlafond() bindt de live waarde, precies zoals
+   pay.koppelPlafond dat doet. Zonder koppeling blijft het getal uit de tabel
+   staan, dus een losse waardelaag gedraagt zich exact als voorheen. */
 function maakWaarde({ db, save, crypto, nu = klokNu }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/waarde', bezit: { waardePosities: 'kaart' } });
+  let walletPlafondBron = null;
+  const koppelWalletPlafond = (fn) => { walletPlafondBron = typeof fn === 'function' ? fn : null; };
   const reserve = maakReserve({ db, save, crypto, nu });
   /* Oormerken (./oormerk.js) zijn de tweede manier waarop geld vaststaat, en
      met opzet een ander begrip dan een reservering: iemand anders houdt uw geld
@@ -74,7 +87,15 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
     const eigen = posities()[rek];
     const klasse = (eigen && KLASSEN[eigen.klasse]) ? eigen.klasse : klasseVan(rek);
     if (!klasse) return null;
-    return { rek, klasse, spec: KLASSEN[klasse],
+    /* Het plafond van de PERSOONLIJKE wallet komt uit de koppeling als die er is;
+       de rest van de spec blijft de tabel. Een kapotte bron mag het plafond nooit
+       OPENEN, dus een onbruikbare waarde valt terug op de tabel. */
+    let spec = KLASSEN[klasse];
+    if (klasse === 'PERSONAL_FUNDED' && walletPlafondBron) {
+      const v = Math.round(Number(walletPlafondBron()));
+      if (Number.isFinite(v) && v > 0) spec = Object.assign({}, spec, { plafondCenten: v });
+    }
+    return { rek, klasse, spec,
       uitgever: (eigen && eigen.uitgever) || null,
       eigenaar: (eigen && eigen.eigenaar) || (rek.startsWith('lid:') ? rek.slice(4) : null),
       beleid: (eigen && eigen.beleid) || {},
@@ -121,6 +142,7 @@ function maakWaarde({ db, save, crypto, nu = klokNu }) {
   const kijk = require('./kijken')({ posities, positie, beschikbaar, ruimte, reserve, oormerk, KLASSEN });
 
   const api = { KLASSEN, SOORTEN, STANDAARD, positie, registreer, beschikbaar, ruimte, poort, toets,
+    koppelWalletPlafond,
     positiesVan: kijk.positiesVan, overzicht: kijk.overzicht, portefeuille: kijk.portefeuille,
     reserveer: reserve.reserveer, vastleggen: reserve.vastleggen, vrijgeven: reserve.vrijgeven,
     gereserveerd: reserve.vastgezet, reserveringen: reserve.open,

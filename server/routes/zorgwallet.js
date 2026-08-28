@@ -3,7 +3,7 @@
    RTG Wallet van het lid (achter de leden-inlog; gasten hebben geen
    wallet). */
 module.exports = (kern) => {
-  const { app, db, auth, supplierAuth, zorgpolis, wallet } = kern;
+  const { app, db, auth, supplierAuth, zorgpolis, wallet, onboarding } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; r.error ? res.status(status || 400).json({ error: r.error }) : res.status(200).json(rest); };
 
   // de verzekeraar: werkplek en PDA
@@ -33,6 +33,21 @@ module.exports = (kern) => {
   app.post('/api/wallet', ...lid, (req, res) => stuur(res, wallet.lijst(req.session.key)));
   app.post('/api/wallet/voeg', ...lid, (req, res) => stuur(res, wallet.voegZelf(req.session.key, req.body || {})));
   app.post('/api/wallet/weg', ...lid, (req, res) => stuur(res, wallet.weg(req.session.key, req.body.id)));
-  app.post('/api/wallet/munt/koop', ...lid, (req, res) => stuur(res, wallet.muntKoop(req.session.key, req.body || {})));
+  /* Kopen kost sinds kort echt geld (via RTG Pay), en daarmee is dit een
+     geld-moment als elk ander: dus async EN achter dezelfde eenmalige
+     paspoortpoort die routes/pay.js voor de wallet hanteert. Zonder die poort
+     was deze route de enige plek waar een lid zijn RTG Pay-saldo kon uitgeven
+     -- en de kaart eronder kon laten bijladen -- zonder hem ooit gezien te
+     hebben; een gesloten deur met een raam ernaast. */
+  const kyc = (req, res) => {
+    if (!onboarding || !onboarding.payGate) return false;
+    const g = onboarding.payGate(req.session);
+    if (!g.ok) { res.status(g.status || 403).json({ error: g.error, kyc: true }); return true; }
+    return false;
+  };
+  app.post('/api/wallet/munt/koop', ...lid, async (req, res) => {
+    if (kyc(req, res)) return;
+    stuur(res, await wallet.muntKoop(req.session.key, req.body || {}));
+  });
   app.post('/api/wallet/munt/wissel', ...lid, (req, res) => stuur(res, wallet.muntWissel(req.session.key, req.body || {})));
 };

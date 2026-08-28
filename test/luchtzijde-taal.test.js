@@ -1,7 +1,7 @@
 /* De luchtzijde-stand voor partners (boarding pass aan de deur, dubbele
    prijzen op de kassa, de vertaalknop) + de moedertaal van het account
    (iedereen praat de eigen taal, de ander leest de zijne in de vriendenchat).
-   Draai los: node --experimental-sqlite --test test/luchtzijde-taal.test.js */
+   Draai los: node --test test/luchtzijde-taal.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

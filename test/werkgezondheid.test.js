@@ -14,7 +14,7 @@
    5. "NIET GEMETEN" STAAT NOOIT TUSSEN HET ADVIES. Geen signaal is geen goed
       nieuws.
 
-   Draai los: node --experimental-sqlite --test test/werkgezondheid.test.js */
+   Draai los: node --test test/werkgezondheid.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

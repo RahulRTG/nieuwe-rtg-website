@@ -24,18 +24,18 @@
       '*{box-sizing:border-box;margin:0;}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;line-height:1.6;padding:3rem 1.4rem 5rem;}' +
       'h1,h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:500;}' +
       '.wrap{max-width:820px;margin:0 auto;}.cover{border-bottom:1px solid var(--line);padding-bottom:1.4rem;margin-bottom:1.8rem;}' +
-      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}.cover h1{font-size:2.1rem;margin:.4rem 0 .2rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
+      '.cover .ey{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}.cover h1{font-size:2.1rem;margin:.4rem 0 .2rem;}.cover .sub{color:var(--muted);font-size:.9rem;}' +
       '.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.6rem;margin:1rem 0;}' +
-      '.kpi{border:1px solid var(--line);border-radius:12px;padding:.7rem .85rem;}.kpi b{display:block;font-family:"Bodoni Moda",serif;font-weight:500;font-size:1.3rem;color:var(--gold);}' +
+      '.kpi{border:1px solid var(--line);border-radius:0;padding:.7rem .85rem;}.kpi b{display:block;font-family:"Bodoni Moda",serif;font-weight:500;font-size:1.3rem;color:var(--rtg-leesgoud,var(--gold));}' +
       '.kpi span{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}' +
       'section{border-top:1px solid var(--line);padding:1.3rem 0;page-break-inside:avoid;}section h2{font-size:1.1rem;margin-bottom:.6rem;}' +
       '.staaf{display:flex;align-items:flex-end;gap:.5rem;height:110px;}.staaf>div{flex:1;text-align:center;font-size:.62rem;color:var(--muted);display:flex;flex-direction:column;justify-content:flex-end;gap:.2rem;height:100%;}' +
-      '.staaf i{display:block;width:100%;max-width:36px;margin:0 auto;background:var(--gold);border-radius:4px 4px 2px 2px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+      '.staaf i{display:block;width:100%;max-width:36px;margin:0 auto;background:var(--gold);border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
       '.staaf>div:last-child i{background:#7F1634;}' +
       '.rij3{display:flex;justify-content:space-between;gap:1rem;font-size:.88rem;padding:.25rem 0;border-bottom:1px solid var(--line);}.rij3:last-child{border-bottom:none;}.rij3 span{color:var(--muted);}' +
       '.blok3{border-left:2px solid var(--gold);padding-left:.8rem;font-size:.88rem;color:var(--muted);line-height:1.65;}' +
       '.balk{position:fixed;top:0;left:0;right:0;background:#000;border-bottom:1px solid var(--gold);padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;}' +
-      '.balk button{background:var(--ink);color:#000;border:none;border-radius:8px;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
+      '.balk button{background:var(--ink);color:#000;border:none;border-radius:0;padding:.4rem .9rem;font:inherit;font-weight:600;cursor:pointer;}' +
       '@media print{.balk{display:none;}body{background:#fff;color:#111;padding-top:2rem;}.cover .sub,.kpi span,.rij3 span,.blok3,.staaf>div{color:#555;}section,.cover,.kpi,.rij3{border-color:#ddd;}.kpi b{color:#7F1634;}}' +
       '</style></head><body>' +
       '<div class="balk"><span>' + T('z3.rapport','Weekrapport') + ' &middot; ' + naam3 + '</span><button id="pbtn" type="button">Print / PDF</button></div>' +

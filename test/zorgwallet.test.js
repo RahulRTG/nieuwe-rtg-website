@@ -5,7 +5,7 @@
    en de wallet zelf: klantenkaarten, tickets, sleutels en feestmunten
    met een saldo dat nooit onder nul komt. Plus de poorten: gasten en
    anoniemen niet, en zonder polis-cap geen zorgtak.
-   Draai los: node --experimental-sqlite --test test/zorgwallet.test.js */
+   Draai los: node --test test/zorgwallet.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -22,6 +22,10 @@ function api(pad, body, token) {
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
+/* Een piepklein geldig PNG'je voor de eenmalige paspoortcontrole die RTG Pay
+   vraagt; de feestmunt-toets loopt die poort af in plaats van hem te omzeilen. */
+const MINI_PNG = 'data:image/png;base64,' +
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 let seq = 0;
 async function lid() {
   const u = (Date.now() + (++seq)).toString().slice(-8);
@@ -145,7 +149,24 @@ test('5. de wallet zelf: klantenkaarten en tickets toevoegen, tonen en weghalen'
   assert.equal((await wallet('/weg', { id: k.body.item.id }, lidTok)).status, 404);
 });
 
-test('6. feestmunten: kopen stapelt per zaak, inwisselen verlaagt, en onder nul kan nooit', async () => {
+/* DE FEESTMUNT WORDT BETAALD, en deze toets is daarop uitgebreid. Hij stond
+   hier al, en hij stond groen terwijl muntKoop() het saldo verhoogde zonder
+   ooit iets te innen: er werd een `prijs` teruggegeven en verder niets. Een
+   toets die alleen telt wat erbij komt, ziet een munt die uit het niets
+   ontstaat niet -- vandaar dat er nu ook gekeken wordt naar wat er AF gaat.
+
+   MUTATIE GEZIEN ZAKKEN: de aanroep van pay.huisIn in server/kern/wallet.js
+   overgeslagen (alsof de betaling altijd lukt zonder te boeken); deze toets
+   zakte op "de tien munten zijn echt betaald uit de wallet". Teruggedraaid,
+   daarna groen. */
+test('6. feestmunten: kopen kost echt geld, stapelt per zaak, inwisselen verlaagt, en onder nul kan nooit', async () => {
+  /* Eerst de poort: kopen is een geld-moment, dus het paspoort komt er eenmalig
+     aan te pas -- net als bij elke andere RTG Pay-route. */
+  const dicht = await wallet('/munt/koop', { zaak: 'Zomerfeest', aantal: 1 }, lidTok);
+  assert.equal(dicht.status, 403, 'zonder paspoort gaat de kassa niet open');
+  assert.equal(dicht.body.kyc, true, 'en de app weet waarheen: naar de paspoort-stap');
+  assert.equal((await api('/api/verify/upload', { image: MINI_PNG }, lidTok)).status, 200);
+
   assert.equal((await wallet('/munt/koop', { zaak: '', aantal: 5 }, lidTok)).status, 400);
   assert.equal((await wallet('/munt/koop', { zaak: 'Zomerfeest', aantal: 0 }, lidTok)).status, 400);
   assert.equal((await wallet('/munt/koop', { zaak: 'Zomerfeest', aantal: 101 }, lidTok)).status, 400);
@@ -153,6 +174,12 @@ test('6. feestmunten: kopen stapelt per zaak, inwisselen verlaagt, en onder nul 
   assert.equal(k1.status, 200);
   assert.equal(k1.body.item.saldo, 10);
   assert.equal(k1.body.prijs, 35, '10 munten a 3,50');
+  assert.equal(k1.body.betaaldCenten, 3500, 'en dat bedrag is ook echt geind');
+  /* Het bewijs staat in het grootboek en niet in het antwoord: een afschrijving
+     van precies 35 euro naar de huisrekening. */
+  const boeken = await api('/api/pay/overzicht', {}, lidTok);
+  assert.ok(boeken.body.geschiedenis.some(r => r.centen === -3500 && r.soort === 'huis'),
+    'de tien munten zijn echt betaald uit de wallet: ' + JSON.stringify(boeken.body.geschiedenis).slice(0, 240));
   // nog eens kopen bij dezelfde zaak stapelt op hetzelfde item
   const k2 = await wallet('/munt/koop', { zaak: 'Zomerfeest', aantal: 5 }, lidTok);
   assert.equal(k2.body.item.id, k1.body.item.id, 'een saldo per zaak');

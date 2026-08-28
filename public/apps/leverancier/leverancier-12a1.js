@@ -31,7 +31,8 @@
             escT(a.ingediendDoor)+' · '+T('fn.btwkenmerk','kenmerk')+' '+escT(a.kenmerk)+'</div>'+
           '<button class="obtn" id="btwCorr" data-p="'+escT(a.periode)+'">'+T('fn.btwmaakcorr','Correctie opmaken')+'</button>'
         : a.periodeLoopt ? ''
-        : '<div class="btw-rij">'+
+        : btwPreflight(a)+
+          '<div class="btw-rij">'+
           '<input class="st-in btw-kenmerk" id="btwKenmerk" placeholder="'+T('fn.btwkenmerk.ph','Kenmerk van de Belastingdienst')+'">'+
           '<button class="obtn primary" id="btwDien" data-id="'+escT(a.id)+'">'+T('fn.btwdien','Indienen vastleggen')+'</button></div>')+
       '</div>';

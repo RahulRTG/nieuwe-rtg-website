@@ -15,7 +15,7 @@
       leerstof bij de schoolbron hoort; de descriptor zegt dat met
       `variantFout`.
 
-   Draai los: node --experimental-sqlite --test test/spelvariant.test.js */
+   Draai los: node --test test/spelvariant.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

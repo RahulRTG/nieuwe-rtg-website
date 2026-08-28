@@ -3,7 +3,7 @@
    gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt de
    uitslag van zijn update-hook terug. De stroomwacht kleurt het wereldbord
    oranje zodra een zaak op batterij draait. Draai los:
-   node --experimental-sqlite --test test/doos-regie.test.js */
+   node --test test/doos-regie.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

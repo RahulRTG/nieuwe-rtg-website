@@ -207,6 +207,125 @@ Op desktop permanent rechts. Selecteer een boeking → het paneel toont die
 boeking. Selecteer een betaling → hetzelfde paneel verandert. Je klikt niet meer
 door pagina's heen.
 
+### RTG Gebaren
+Een operationele regel is een **plank met twee laden eronder**. Veeg naar links
+en de rechterlade komt tevoorschijn, veeg naar rechts en de linker; veeg door en
+de eerste actie van die kant gebeurt meteen. De laden zijn onyx met de actie in
+kapitaaltjes — geen gekleurde blokken met een prullenbakje, want dat is precies
+de doosjes-UI uit par. 7.
+
+**De drempel is zichtbaar.** Voorbij het punt waar loslaten iets doet, neemt de
+eerste actie de hele lade over, wijkt de rest en licht de snede goud op — één
+keer, met één korte tik. Een doorveeg die je niet zag aankomen is geen bediening
+maar een ongeluk.
+
+**De eerste actie ligt aan de snede.** De lade gaat vanaf de snede open, dus wat
+daar ligt zie je het eerst — en een volle veeg voert de eerste actie uit. Aan de
+rechterkant klopte dat toevallig; aan de linkerkant niet. Daar hing de knoppenrij
+wel aan de snede maar stond hij in leesvolgorde, dus je zag eerst de LAATSTE
+actie en de eerste pas als de lade helemaal open stond. Gemeten op de post, veeg
+naar rechts, bij 40, 90 en 150 pixels: *Ster* nul van 55 pixels zichtbaar, alle
+drie de keren. Wat je wél zag was het midden van een tweeregelig label — een
+grijze bak. De actie die afgaat, hoort de actie te zijn die je ziet.
+
+**De lade toont alleen wat er heel op past, en hij eindigt zoals de regel
+eindigt.** Twee dingen die je pas ziet als je kijkt, en die er tot 19 augustus
+2026 allebei naast zaten. De lade werd afgeknipt op 72% van de regel terwijl de
+knoppen hun eigen breedte hielden, dus stond de laatste half in beeld: op de post
+las *Overnemen* als *OVER*. Wat er niet bij past valt er nu UIT — en dat kost
+niets, want de actielade toont ze alle drie. De eerste blijft altijd staan: dat
+is de actie die een volle veeg uitvoert. En de lade was een rechthoek tegen een
+regel met ronde hoeken; nu meet de laag de ronding van de regel en volgt de snede
+hem. Een half woord is geen knop, en een scherpe hoek naast een ronde regel is
+geen afwerking.
+
+**Vier wegen, één deur.** Vasthouden, rechtermuisklik, de menutoets en de
+pijltoetsen openen dezelfde acties als lijst, met echte knoppen in de bovenlaag.
+Dat is geen stapeling: het is dezelfde deur, die op elk toestel anders heet. De
+lade zelf is aria-hidden en is er voor de hand; de actielade is er voor de toets
+en de schermlezer. Wat niet terug te draaien is, gaat op vasthouden en nooit op
+een veeg.
+
+**Een veeg die de server raakt, is optimistisch.** De regel verdwijnt meteen en
+de server volgt; komt er een fout terug, dan komt de regel terug met een melding.
+Snelheid is wat een veeg beter maakt dan een knop, en die weggeven maakt hem
+zinloos. De prijs is dat elke server-actie een tegenactie moet hebben — zonder
+weg terug hoort hij niet op een veeg maar op vasthouden.
+
+*Sinds 19 augustus 2026 is dit uitgevoerd en gehandhaafd.* `RTGGebaar.klaar.server()`
+doet het drieluik op één plek: de regel klapt meteen in, de server volgt, en gaat
+het mis dan komt de regel terug mét de reden — stil falen is hier de ergste
+uitkomst, want dan denkt het lid dat het gelukt is en staat het er morgen weer.
+Een actie zónder tegenactie krijgt geen terugdraai-knop maar wordt automatisch
+een `borg`: die gaat alleen op vasthouden. Dat is geen strengheid maar de enige
+eerlijke uitkomst — een knop "Terugdraaien" die niets terugdraait is erger dan
+geen knop.
+
+Het eerste domein is RTG Bestanden: naar links is de prullenbak (`/weg`, terug
+met `/herstel`), naar rechts de ster. In de prullenbak zelf is een tweede `/weg`
+onomkeerbaar, en juist daar valt de borg vanzelf op zijn plek.
+
+Het tweede is **RTMAIL**, en dat is het gebaar dat een lid al meebrengt van
+buiten dit huis: opzij is weg, de andere kant is markeren. Juist daarom moet hij
+hier kloppen — een veeg die op post iets anders doet dan overal, is verwarrender
+dan geen veeg. Naar links liggen Opbergen en Weggooien, naar rechts de ster,
+sluimeren tot morgen en overnemen. Alles is omkeerbaar: opbergen, weggooien en
+terugzetten zijn dezelfde route (`verplaats`) met een andere map, en sluimeren
+gaat terug met `verplaats` naar `in` (dat wist het sluimermoment). Er is hier dus
+geen enkele borg, en dat is de reden dat dit domein het tweede is en niet het
+tiende. De melding zegt EERST wat er gebeurd is en dan welk bericht: andersom
+werd hij op een telefoon afgekapt tot het onderwerp, met een knop Terugdraaien
+ernaast en geen woord over wat je terugdraait.
+
+Het derde is **RTG Notities**, en dat is het eerste bord waar de twee soorten
+actie naast elkaar liggen. Archiveren is de la — `bewaar {archief:true}` legt
+hem erin en `{archief:false}` haalt hem eruit, dus een echte weg terug. Weggooien
+is dat niet: de kern gooit de notitie echt van het bord en neemt een gekoppelde
+agenda-afspraak mee. Die actie krijgt daarom geen `terug`, en daarmee maakt de
+laag er vanzelf een borg van. Naast elkaar op één regel maakt dat het verschil
+zichtbaar zonder dat er een woord bij hoeft: het ene gaat op een veeg, het andere
+alleen als je hem vasthoudt. Het gedeelde bord houdt zijn knoppen — vastpinnen en
+archiveren horen bij de eigenaar, en een gedeelde notitie "weggooien" betekent
+iets anders (jezelf van de lijst halen) met een andere weg terug.
+
+Het vierde is **De Salon**, en dat is het eerste domein waar niet elke actie de
+regel weghaalt. Archiveren, verbergen en verwijderen halen een post uit je
+tijdlijn, dus die lopen via `klaar.server()`. Bewaren doet dat niet — een
+bewaarde post blijft gewoon staan — dus daar drukt de veeg de knop in die op de
+regel zelf al staat (`klaar.eigenKnop()`). Zo blijft er één waarheid over wat
+bewaren doet, en die staat op het scherm en niet in de gebarenlaag. Wat je mag
+hangt bovendien af van wiens post het is: op je eigen post archiveer je, op die
+van iemand anders verberg je — dat is iets anders en het heet hier ook anders.
+
+Dat vierde domein legde meteen een fout in de laag zelf bloot: **de laag slikte
+zijn eigen klik op.** Na een gebaar staat `slikRij` op de regel, want de echte
+klik die achter een veeg aankomt hoort niet door te lekken naar de link eronder —
+maar de klik die `eigenKnop` zelf stuurt komt uit diezelfde regel en werd net zo
+hard tegengehouden. Bewaren bereikte de server dus nooit. De onderdrukking wordt
+nu precies om die ene klik heen opgetild en daarna teruggezet; de naklik van de
+vinger wordt nog steeds geslikt.
+
+**En de laag werkte tot 19 augustus 2026 niet op een telefoon.** `.gb-rij` kreeg
+zijn `position:relative` alleen binnen de mediaquery van het aanwijslicht —
+`(hover:hover) and (pointer:fine)` — en op een aanraakscherm is die onwaar. De
+lade is absoluut geplaatst en zocht dus de PAGINA als houvast: gemeten met
+aanraakemulatie stond er naast een regel van 62 pixels een lade van 844, van de
+bovenkant tot de onderkant van het scherm. Geen enkele toets of schermafdruk zag
+het, want die draaiden allemaal met een muis — en daar zette de lichtregel de
+positie er per ongeluk bij. Een eigenschap die je nodig hebt, mag geen bijwerking
+van een andere regel zijn.
+
+*Handhaving:* `test/gebaar.test.js` bewaakt wat je niet ziet (de laag raakt in
+rust alleen aan wat met naam geleend is, de lade draagt geen knop-in-een-link,
+het gebaar is nooit de enige weg, de drie wereldregisters delen één bouwer, en de
+regel draagt zijn plaatsanker buiten elke mediaquery), `test/gebaar.e2e.js` veegt
+in een echte browser — met een derde scenario in de aanraakstand, over een regel
+die zichzelf NIET plaatst, want een scherm dat dat wel doet verbergt de fout van
+de laag. `test/gebaar-bestanden.e2e.js`, `test/gebaar-rtmail.e2e.js`,
+`test/gebaar-notities.e2e.js` en `test/gebaar-salon.e2e.js` meten de belofte met
+een server erachter, tot aan een geweigerde aanvraag, een borg die pas op de
+tweede druk afgaat en een veeg die de eigen knop van het scherm indrukt toe.
+
 ### RTG Command Palette (⌘K)
 `Boeking ECF153` · `Open Ibiza` · `Maak factuur` · `Sluit kassadag` · `Toon
 voertuigen Haarlem`. Hier verdwijnt de AI natuurlijk in, in plaats van als los
@@ -280,6 +399,11 @@ Een telefoonontwerp uitrekken is geen desktopontwerp.
 schermtoetsen meten op 430px én op 1440px, zodat "het staat scheef op desktop"
 een zakkende toets is en geen smaakkwestie.
 
+*En wat eronder hangt:* een layout zegt waar dingen staan, niet wat een mens er
+kan. Dat tweede staat in **`ADAPTIEF.md`** — per capability een presentatie per
+vorm, met als harde grens dat een handeling die op bureau bestaat op telefoon
+niet mag verdwijnen. `test/adaptief.test.js` laat de bouw daarop zakken.
+
 ---
 
 ## 11. Dichtheid met contrast
@@ -312,6 +436,9 @@ onder draait:
 | Rahul verwerkt iets | kleine pulse |
 | Paneel opent | 180 ms, strak |
 | Teller verandert | zonder pagina-herlading |
+| Vinger sleept een regel | 1-op-1, zonder overgang — dat is geen animatie maar bediening |
+| Lade klapt terug | 180 ms, dezelfde als een paneel |
+| Hand boven een vlak | het licht volgt, één lichtpunt (MATERIAAL.md) |
 
 *Handhaving:* alle duren staan als tokens (`--rtg-tijd-kort`, `--rtg-tijd-paneel`)
 en elke animatie respecteert `prefers-reduced-motion`.

@@ -1,7 +1,7 @@
 /* Samen: meekijken en samen doen door het leden-OS. Kamers op code, alles op
    codenaam, live seintjes via de SSE-stroom; gasten doen niet mee en kamers
    verlopen vanzelf. Draai los:
-   node --experimental-sqlite --test test/samen.test.js */
+   node --test test/samen.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -44,25 +44,76 @@ test('1. een lid start een samen-sessie en een vriend doet mee met de code', asy
 test('2. "kijk hier": een lid deelt waar hij is en de kamer onthoudt het; het SSE-seintje komt live binnen', async () => {
   // B luistert op de stroom; A stuurt de kamer naar de Mall
   const events = [];
+  let zagHello = false; let eerste = ''; let reden = '';
   const es = await fetch(base + '/api/stream?token=' + encodeURIComponent(B));
+  /* DE VOORWAARDE EERST, en dat is met schade geleerd. /api/stream antwoordt
+     401 met een LEGE body, en de rem hieronder 429 met een korte. In beide
+     gevallen ziet de lezer meteen `done`, valt de lus eruit en zakte deze toets
+     op "B kreeg het kijk-seintje niet" -- over een server die dat seintje nooit
+     had hoeven sturen. In CI gebeurde dat binnen 30 ms terwijl de tijdgrens 15
+     seconden is; het getal wees de kant op, de melding niet. Een toets hoort te
+     zakken op zijn onderwerp, dus staan de voorwaarden er nu apart, met de
+     eerste bytes erbij zodat de reden er meteen staat. */
+  assert.equal(es.status, 200, 'de stroom van B ging niet open (status ' + es.status + ')');
   const lezer = es.body.getReader();
+  /* WACHTEN TOT DE SERVER ONS KENT, en niet 300 ms gokken. /api/stream zet de
+     luisteraar in sseClients en stuurt daarna meteen een `hello` (server.js).
+     Zien wij dat, dan is de registratie een feit -- en dat is precies de
+     voorwaarde voor de zet hieronder. Zet A eerder, dan gaat het seintje naar
+     niemand en wacht deze toets vijf seconden op een event dat nooit komt.
+
+     De lezer meldt dat zelf: `open` gaat af zodra de eerste brok binnen is. */
+  let meldOpen;
+  const open = new Promise(k => { meldOpen = k; });
   const leesEven = (async () => {
     const dec = new TextDecoder(); let buf = '';
-    const tot = Date.now() + 5000;
+    /* DE TIJDGRENS GELDT VOOR HET GEHEEL EN NIET PER BROK, en dat is waarom deze
+       toets hier altijd groen was en in CI altijd rood. Er stond een race van
+       elke read() tegen 1200 ms, en won die klok, dan BRAK de lus af -- terwijl
+       het seintje nog onderweg was. Op deze machine komt het binnen een tel; op
+       een belaste runner zit er meer tussen `hello` en het event, en dan gaf de
+       toets op en meldde "B kreeg het seintje niet" over een server die het
+       keurig had gestuurd.
+       Nu racet de read tegen de RESTERENDE tijd: een trage brok kost geduld, en
+       alleen de totale grens beeindigt het wachten. */
+    const tot = Date.now() + 15000;
     while (Date.now() < tot) {
-      const { value, done } = await Promise.race([lezer.read(), new Promise(r => setTimeout(() => r({ done: true }), 1200))]);
+      const uit = await Promise.race([lezer.read(),
+        new Promise(r => setTimeout(() => r({ tijdOp: true }), Math.max(50, tot - Date.now())))]);
+      if (uit.tijdOp) break;
+      const { value, done } = uit;
       if (done || !value) break;
       buf += dec.decode(value);
-      if (buf.includes('event: samen')) { events.push(buf); break; }
+      if (!eerste) eerste = buf.slice(0, 120);
+      if (buf.includes('hello')) { zagHello = true; meldOpen(); }
+      /* WACHTEN OP EEN HELE GEBEURTENIS, niet op haar kopregel. Hier stond
+         `buf.includes('event: samen')`, en dat is waar zodra de REGEL binnen is
+         -- terwijl `data:` er dan nog niet hoeft te staan. Op deze machine komt
+         een SSE-brok in zijn geheel binnen en viel dat nooit op; op een belaste
+         runner splitst hij, en dan brak de lus af op een halve gebeurtenis en
+         zakte de toets op zijn eigen leessnelheid. Een gebeurtenis is pas af bij
+         de lege regel erna; daar wachten we nu op. */
+      const k = buf.indexOf('event: samen');
+      if (k >= 0 && buf.indexOf('\n\n', k) >= 0) { events.push(buf); reden = 'seintje'; break; }
     }
+    if (!reden) reden = 'lijn dicht of tijd op';
+    meldOpen();   // ook als de lijn dichtging: nooit blijven hangen
   })();
-  await new Promise(r => setTimeout(r, 300));
+  await open;
   const zet = await api(base, '/api/samen/zet', { code, pad: '/apps/mall.html', titel: 'De RTG Mall' }, A);
   assert.equal(zet.status, 200);
   assert.equal(zet.body.kamer.pad, '/apps/mall.html');
   await leesEven;
   try { await lezer.cancel(); } catch (e) {}
-  assert.ok(events.length && /"kind":"kijk"/.test(events[0]) && /mall\.html/.test(events[0]), 'B kreeg het kijk-seintje live');
+  assert.ok(zagHello, 'de stroom sloot voordat de server B als luisteraar kende; eerste bytes: ' + JSON.stringify(eerste));
+  /* DE ONTVANGEN BYTES HOREN IN DE MELDING. Zonder ze zegt deze toets alleen
+     "B kreeg het seintje niet", en dat is drie verschillende oorzaken tegelijk:
+     geen seintje, een seintje met andere inhoud, of een lijn die dichtging. In
+     CI zakt hij binnen 33 ms terwijl de tijdgrens 15 seconden is -- dus kwam er
+     WEL iets. Wat, dat hoort de melding te zeggen. */
+  assert.ok(events.length && /"kind":"kijk"/.test(events[0]) && /mall\.html/.test(events[0]),
+    'B kreeg het kijk-seintje live (einde: ' + reden + ', hello gezien: ' + zagHello +
+    ', ontvangen: ' + JSON.stringify((events[0] || eerste).slice(0, 400)) + ')');
   // en wie later binnenkomt ziet het in de staat
   const staat = await api(base, '/api/samen/staat', { code }, B);
   assert.equal(staat.body.kamer.pad, '/apps/mall.html');

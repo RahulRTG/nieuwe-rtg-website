@@ -16,6 +16,7 @@
    over in plaats van de foto stil te verwijderen. */
 'use strict';
 const OpenAI = require('./openai');
+const { Poort } = require('./local-ai-poort');
 
 function heeftBeeld(params) {
   return (params && params.messages || []).some(m => Array.isArray(m.content) &&
@@ -81,9 +82,24 @@ class LocalAI extends OpenAI {
     this.verwerking = verwerking;
     this.modellen = { tekst: model, kort, tools: toolsModel, vision: visionModel || null };
     this.mogelijkheden = { tekst: true, hulpmiddelen: tools, beeld: !!visionModel };
+
+    /* De poort: hoeveel er tegelijk naar de eigen modelserver mogen en wanneer
+       we hem overslaan. Waarom die er is en hoe hij werkt staat in
+       ./local-ai-poort.js -- dat is CAPACITEIT, en dit bestand gaat over
+       modelkeuze en de netwerkgrens. */
+    this.poort = new Poort(opts);
+
+    const rauweCreate = this.messages.create;
+    const zelf = this;
+    this.messages = { create: (params) => zelf.poort.door(() => rauweCreate(params)) };
   }
 
+  /* De stand van de poort, voor het luik op de meter. */
+  staat(nu) { return this.poort.staat(nu); }
+
   kan(params) {
+    // een open onderbreker betekent: sla deze aanbieder over, betaal geen timeout
+    if (this.poort.onderbrokenTot()) return false;
     if (heeftBeeld(params)) return this.mogelijkheden.beeld;
     if (params && Array.isArray(params.tools) && params.tools.length) return this.mogelijkheden.hulpmiddelen;
     return true;

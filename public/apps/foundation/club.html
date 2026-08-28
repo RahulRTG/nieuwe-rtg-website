@@ -16,17 +16,17 @@
   header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
   header h1{font-size:1.25rem;}
   main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.85rem .95rem;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
-  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
-  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
-  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
-  .pil.actief{color:var(--green);border-color:var(--green);}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .7rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.15rem .55rem;color:var(--muted);}
+  .pil.actief{color:var(--rtg-leesgroen,var(--green));border-color:var(--rtg-leesgroen,var(--green));}
   .item{padding:.35rem 0;border-bottom:1px solid var(--line);font-size:.86rem;}
   .item.af{opacity:.5;text-decoration:line-through;}
   .log{font-size:.84rem;line-height:1.5;padding:.35rem 0;border-bottom:1px solid var(--line);}
-  .log b{color:var(--burgundy);} .log.rtf b{color:var(--gold);}
+  .log b{color:var(--burgundy);} .log.rtf b{color:var(--rtg-leesgoud,var(--gold));}
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -40,9 +40,9 @@
   <div class="kaart" id="inlog">
     <div class="sec">Aanmelden met uw clubcode</div>
     <p class="leeg" style="margin-bottom:.5rem;">De RTFoundation werkt met grote clubs in elke stad aan de jeugd en de buurt. Hier ziet u alleen het dossier van uw eigen club: de programma's, de afspraken en het gedeelde logboek met het RTF-team.</p>
-    <div class="rij">
+    <div class="rij rtg-duimeind">
       <input class="veld" id="code" placeholder="CLUB-XXXXXX" maxlength="14" autocomplete="off">
-      <button class="knop" id="open">Open</button>
+      <button class="knop" id="open" data-hoofdactie>Open</button>
     </div>
     <div class="leeg" id="fout"></div>
   </div>
@@ -128,5 +128,6 @@ if (CODE) open(CODE);
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="schil-os.js" defer></script>
 </body>
 </html>

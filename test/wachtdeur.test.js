@@ -23,7 +23,7 @@
    afzenderadres via X-Forwarded-For -- want vanaf 127.0.0.1 slaat de voordeur
    deze twee reflexen bewust over.
 
-   Draai los: node --experimental-sqlite --test test/wachtdeur.test.js
+   Draai los: node --test test/wachtdeur.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -21,7 +21,7 @@
    blijven op een zelfproef die niets verstuurt, en dat is precies het soort
    dekking dat taak 34 heeft opgeruimd.
 
-   Draai los: node --experimental-sqlite --test test/laatste-twee-endpoints.test.js
+   Draai los: node --test test/laatste-twee-endpoints.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

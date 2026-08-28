@@ -14,7 +14,7 @@
      niets meer.
    - HET STARTSCHERM LIEGT NIET. Blokken zonder bron staan als niet gemeten en
      niet als nul, en de snelle acties volgen de rechten.
-   Draai los: node --experimental-sqlite --test test/bedrijfkern.test.js */
+   Draai los: node --test test/bedrijfkern.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs'); const os = require('os'); const path = require('path');

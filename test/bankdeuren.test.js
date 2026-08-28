@@ -26,7 +26,7 @@
    dat ze niet ongemerkt verandert. Dat onderscheid staat hier expres, zodat
    niemand deze toets voor een goedkeuring aanziet.
 
-   Draai los: node --experimental-sqlite --test test/bankdeuren.test.js
+   Draai los: node --test test/bankdeuren.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

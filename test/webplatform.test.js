@@ -21,7 +21,7 @@
    - ZOEKEN VINDT SITES EN BEDRIJVEN, maar lekt niets: alleen wat toch al
      publiek is (naam, stad, type) en alleen online sites.
 
-   Draai los: node --experimental-sqlite --test test/webplatform.test.js
+   Draai los: node --test test/webplatform.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -492,8 +492,22 @@ test('17. publiceren op een gekozen moment brengt naar buiten wat er DAN klaarst
   const voor = await api('/api/browser/open', { adres: 'kaarshuis' }, lid);
   assert.equal(voor.body.site.blokken[0].tekst, 'Wat er online staat');
 
-  await new Promise(r => setTimeout(r, 1700));
-  const na = await api('/api/browser/open', { adres: 'kaarshuis' }, lid);
+  /* WACHTEN TOT DE GEPLANDE STAND ER ECHT IS, en niet 1700 ms gokken. Net als
+     bij een gepland concept zijn er twee dingen nodig: de klok voorbij het
+     moment, en iemand die de site opvraagt. Nu vragen we hem net zo lang op tot
+     de tekst is veranderd; dat opvragen IS de handeling die hem naar buiten
+     brengt. De regel hierboven legde de stand van VOOR het moment al vast, dus
+     de vergelijking blijft precies wat hij was. */
+  let na = null;
+  {
+    const eind = Date.now() + 20000;
+    for (;;) {
+      na = await api('/api/browser/open', { adres: 'kaarshuis' }, lid);
+      if (na.body.site.blokken[0].tekst !== voor.body.site.blokken[0].tekst) break;
+      if (Date.now() >= eind) throw new Error('de geplande publicatie kwam binnen 20 s niet naar buiten');
+      await new Promise(r => setTimeout(r, 50));
+    }
+  }
   /* De belofte: wat er op het geplande moment klaarstond gaat naar buiten --
      niet de stand van toen er gepland werd. Anders verdwijnt alles wat je er
      na het plannen nog aan deed, en merk je dat pas als het buiten staat. */

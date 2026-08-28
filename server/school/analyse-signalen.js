@@ -7,7 +7,18 @@
    zelf kan nakijken: zoveel lessen gemist, zoveel keer te laat, dit
    gemiddelde, zoveel huiswerk open. De lijst staat op naam en niet op zwaarte
    -- een ranglijst maakt van "wie heeft aandacht nodig" vanzelf "wie
-   presteert het slechtst". */
+   presteert het slechtst".
+
+   Wie erover beslist staat niet als losse zin in dit antwoord maar komt uit
+   kern/schooladvies.js: die grens hoort op een plek te staan, niet in vijf
+   kopieen. */
+const { uitspraak } = require('../kern/schooladvies');
+
+/* Vast per antwoord: de tekst hangt aan de lijst en niet aan een leerling, dus
+   hij wordt hier een keer gemaakt en niet per verzoek opnieuw. */
+const SIGNAAL = uitspraak('signaal',
+  'Dit zijn waarnemingen waar een gesprek achter hoort.');
+
 module.exports = (sctx) => {
   const { router, schoon, K, poort, presentieLijst, schoolVerzuim: verzuim, gemiddelde } = sctx;
   const MIN_LESSEN = 10;
@@ -51,7 +62,8 @@ module.exports = (sctx) => {
     }
     res.json({ ok: true, aantal: rijen.length,
       leerlingen: rijen.sort((a, b) => String(a.naam).localeCompare(String(b.naam))).slice(0, 300),
-      advies: true, besluitDoorMens: true,
+      advies: true, besluitDoorMens: SIGNAAL.besluitDoorMens, adviesSoort: SIGNAAL.soort,
+      beslist: SIGNAAL.beslist, bijschrift: SIGNAAL.bijschrift,
       uitleg: 'Dit zijn waarnemingen, geen voorspelling en geen oordeel. Er hoort een gesprek achter, geen maatregel uit het systeem. '
         + 'Er is bewust geen score en geen volgorde op zwaarte.',
       reden: schoon(req.body.reden, 120) || null });

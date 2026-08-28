@@ -15,7 +15,7 @@
    haar eigen blok. Een tenant die de hele app kan omverven, kan een lid laten
    denken dat hij ergens anders is dan hij is.
 
-   Draai los: node --experimental-sqlite --test test/huisstijl.test.js */
+   Draai los: node --test test/huisstijl.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

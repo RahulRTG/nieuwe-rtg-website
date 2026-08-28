@@ -28,7 +28,7 @@
         zet en verder niets tegenhoudt, is erger dan geen knop: dan denkt de
         bank dat het geld stilstaat terwijl het gewoon wegloopt.
 
-   Draai los: node --experimental-sqlite --test test/office-bank.test.js
+   Draai los: node --test test/office-bank.test.js
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');

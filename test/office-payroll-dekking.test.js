@@ -37,7 +37,7 @@
    - laat componenten.zet geldigTot negeren: dan blijft een vervallen component
      in nieuwe runs meetellen.
 
-   Draai los: node --experimental-sqlite --test test/office-payroll-dekking.test.js
+   Draai los: node --test test/office-payroll-dekking.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');

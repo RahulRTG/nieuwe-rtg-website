@@ -64,7 +64,7 @@ app.post('/api/supplier/accountant', supplierAuth, async (req, res) => {
         system: require('../../kern/rahul').RAHUL_LEAD + 'je bent de AI-boekhouder van RTG voor ' + req.supplier.name + ' in ' + L.naam + '. Je kent de branche door en door en helpt de ondernemer concreet, met de eigen cijfers erbij. ' +
           boekhoudkennis.systeemContext(req.supplier, fin, L.naam) + ' ' +
           'Fiscale regels: ' + fin.regels.join(' ') + ' Zakelijke aftrek: ' + Object.values(L.zakelijk).join(' ') + ' ' +
-          'Antwoord in het Nederlands, maximaal 150 woorden, praktisch en concreet, met een getal of percentage waar het kan, en waar passend een concrete volgende stap. Sluit af met: dit is voorlichting, geen bindend fiscaal advies.',
+          'Antwoord in het Nederlands, maximaal 150 woorden, praktisch en concreet, met een getal of percentage waar het kan, en waar passend een concrete volgende stap. Sluit af met deze zin: ' + require('../../kern/fiscaal/zekerheid').zin('boekhouding.advies'),
         messages: [{ role: 'user', content: vraag }]
       });
       answer = msg.content[0].text;

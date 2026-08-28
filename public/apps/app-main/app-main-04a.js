@@ -123,7 +123,7 @@
       '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
         'background:color-mix(in srgb,var(--onyx-basis) 82%,transparent);' +
         'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 34%,transparent),' +
-          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:14px;' +
+          'inset 0 1px 0 color-mix(in srgb,var(--gold-hoog) 15%,transparent);border-radius:0;' +
         'margin-inline:auto;padding:0.35rem 0.45rem 0.35rem 0.9rem;}' +
       '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold-tekst) 70%,transparent);}' +
       '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +

@@ -21,7 +21,7 @@
    - de "nooit geoefend"-mutatie raakte `verouderd()`, terwijl de bewering aan
      `staat` hangt. De mutatie was op de verkeerde plek gezet, niet de toets te
      zwak -- en dat is een ander soort fout dan de eerste.
-   Draai los: node --experimental-sqlite --test test/stadshardware.test.js */
+   Draai los: node --test test/stadshardware.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');

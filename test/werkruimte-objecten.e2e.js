@@ -13,7 +13,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, volgVerzoeken, wachtOpRust, stopHard } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -131,7 +131,7 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
     assert.deepEqual(fouten, [], 'de werkruimte hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    child.kill();
+    await stopHard(child);
     fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

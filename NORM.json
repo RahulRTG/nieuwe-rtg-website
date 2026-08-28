@@ -6,7 +6,7 @@
     "keuringStuk": 0,
     "keuringScheef": 34,
     "dependencies": 0,
-    "testbestanden": 949,
+    "testbestanden": 982,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 139,
@@ -1108,6 +1108,14 @@
       "waarheen": "dekkingPct 73, e2eBestanden 139, browserpoortToetsen 211",
       "meter": "dekkingPct 72 -> 73, e2eBestanden 136 -> 139, browserpoortToetsen 206 -> 211",
       "reden": "BIJ HET SAMENGAAN STOND MAIN OP DEZE DRIE STRENGER, en ik had bij het oplossen van de conflicten onze waarde genomen. Dat is voor een RATEL de verkeerde keuze: hij mag alleen strakker worden, dus is de merge van twee latten het strengste van de twee en niet 'de onze'. De latten staan nu op main's waarde. De samengevoegde boom meet er ruim boven (78, 169 en 260), dus dit kost niets en het houdt de tand die main had gezet. Gevonden doordat scripts/normverval.js de nieuwe basis met main vergeleek -- precies waar die wachter voor is."
+    },
+    {
+      "datum": "2026-08-28",
+      "soort": "structureel",
+      "sleutel": "testbestanden",
+      "waarheen": "testbestanden 982",
+      "meter": "testbestanden 949 -> 982",
+      "reden": "VIERDE EN LAATSTE VAN DEZELFDE FOUT: main stond strenger (982) dan deze tak (949) en bij het oplossen van de conflicten nam ik onze waarde. Een ratel mag alleen strakker, dus is de merge van twee latten de strengste van de twee -- niet 'de onze'. De samengevoegde boom telt 1169 toetsbestanden en staat er dus ruim boven. Gevonden doordat de vergelijking met main in CI hem als enige zonder reden aanwees; de andere drie (dekkingPct, e2eBestanden, browserpoortToetsen) waren al gezet."
     }
   ],
   "prestatie": {

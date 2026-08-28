@@ -18,6 +18,7 @@ const { keurInvulplekken } = require('./productie-invoer');
 const { keurLokaleBouwstanden } = require('./productie-lokaal');
 const { keurOpslag } = require('./productie-opslag');
 const { keurMotor } = require('./productie-motor');
+const { keurPin } = require('./productie-pin');
 
 function keur(env, fouten, waarschuwingen) {
     keurInvulplekken(env, fouten);
@@ -87,7 +88,7 @@ function keur(env, fouten, waarschuwingen) {
     /* RTG_VAULT_KEY en RTG_SECRET_KEY stonden hier vroeger als waarschuwing.
        Ze zijn nu blokkerende fouten (punt 2b hierboven) -- twee keer melden zou
        de lijst alleen langer maken zonder iets toe te voegen. */
-    if (!env.REDIS_URL) waarschuwingen.push('REDIS_URL niet gezet: realtime werkt alleen binnen één proces (niet over meerdere instances).');
+    keurPin(env, fouten, waarschuwingen);
     // Media (Salon-foto's, snaps) op lokale schijf worden niet gedeeld tussen
     // instances; bij meerdere instances is S3-compatibele opslag (of een gedeeld
     // volume) nodig zodat elke server dezelfde foto's ziet.

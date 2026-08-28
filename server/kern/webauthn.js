@@ -158,6 +158,13 @@ function maakWebauthn({ db, save, accounts, schoon }) {
     return { status: 200, ok: true, sleutels: publiekeLijst(user) };
   }
 
+  const { webauthn, pinBeveiliging } = require('./webauthn-poorten')({
+    regOpties, regMaak, loginOpties, loginMaak, publiekeLijst, weg,
+    actieNodig: webauthnActieNodig,
+    actieOpties: webauthnActieOpties,
+    actieMaak: webauthnActieMaak
+  });
+
   return { webauthnRegOpties: regOpties, webauthnRegMaak: regMaak, webauthnLoginOpties: loginOpties,
     webauthnLoginMaak: loginMaak, webauthnLijst: user => ({ status: 200, sleutels: publiekeLijst(user) }),
     webauthnWeg: weg, webauthnStapOpOpties: stapOpOpties, webauthnStapOpMaak: stapOpMaak,

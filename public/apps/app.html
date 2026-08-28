@@ -860,6 +860,11 @@
   .sc-pin-kop{display:flex;align-items:baseline;gap:0.6rem;}
   .sc-pin-kop span{font-size:0.68rem;color:var(--soft);text-transform:uppercase;letter-spacing:0.08em;}
   .sc-pin-kop b{font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;letter-spacing:0.14em;}
+  .sc-pin-status{margin-left:auto;border:1px solid rgba(46,125,79,0.45);border-radius:999px;padding:0.18rem 0.5rem;
+    color:var(--green,#2E7D4F);font-size:0.58rem;font-style:normal;text-transform:uppercase;letter-spacing:0.06em;}
+  .sc-pin-status.alarm{border-color:rgba(179,39,63,0.55);color:#B3273F;}
+  .sc-pin-belofte{margin-top:0.45rem;padding:0.5rem 0.65rem;border-left:2px solid var(--gold);background:rgba(169,143,28,0.06);
+    font-size:0.7rem;line-height:1.45;color:var(--muted);}
   .sc-pin-akt{display:flex;gap:0.4rem;margin-top:0.55rem;flex-wrap:wrap;}
   .sc-pin-akt button{border:1px solid var(--line);background:var(--bg);color:var(--txt);border-radius:0;padding:0.3rem 0.8rem;font-size:0.72rem;}
   #scPinQrBeeld{display:block;margin:0.7rem auto 0;width:min(190px,60%);height:auto;border-radius:0;}
@@ -875,7 +880,12 @@
   .sc-av.klein{width:34px;height:34px;font-size:0.7rem;}
   .sc-pin-kop b.uit{opacity:0.45;text-decoration:line-through;}
   .sc-pin-noot{margin-top:0.55rem;font-size:0.7rem;line-height:1.45;color:var(--soft);}
+  .sc-pin-noot.alarm{border:1px solid rgba(179,39,63,0.4);border-radius:10px;padding:0.55rem 0.65rem;color:#B3273F;background:rgba(179,39,63,0.06);}
   .sc-pin-noot[hidden]{display:none;}
+  .sc-pin-historie{margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.55rem;}
+  .sc-pin-historie>strong{display:block;margin-bottom:0.25rem;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--soft);}
+  .sc-pin-historie>div{display:flex;gap:0.5rem;justify-content:space-between;padding:0.2rem 0;font-size:0.66rem;color:var(--muted);}
+  .sc-pin-historie time{color:var(--soft);white-space:nowrap;font-size:0.6rem;}
   #scPinLiveDoek{margin-top:0.7rem;}
   #scPinLiveDoek[hidden]{display:none;}
   .sc-pin .sc-zoek input{letter-spacing:0.1em;text-transform:uppercase;}

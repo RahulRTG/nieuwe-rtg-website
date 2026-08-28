@@ -169,6 +169,7 @@ loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 | 38 | `server/routes/staff.js` |
 | 36 | `server/routes/auth.js` |
 | 34 | `server/routes/auth/herstel.js` |
+| 34 | `server/routes/member/handel/uitjes.js` |
 
 ## 6. Waar de waarheid staat
 

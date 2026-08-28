@@ -3,7 +3,7 @@
    Praat alleen via de kern met de gedeelde data en realtime, zodat dit domein
    later als een eigen proces kan draaien zonder de routes aan te passen. */
 module.exports = (kern) => {
-  const { app, db, rtf, webpush } = kern;
+  const { app, db, rtf, webpush, pinBeveiliging } = kern;
 
   // Hoort dit kind-handle echt bij het gezin van deze beheerder? (voogd-check)
   const isKindVanGezin = (gezinCode, kindHandle) =>

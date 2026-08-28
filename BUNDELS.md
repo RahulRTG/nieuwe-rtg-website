@@ -36,6 +36,7 @@ omlaag.
 | `app-main-08b.js` | Vervolg van app-main-08: de snaps- en verhalenstrip boven de contactenkaart |
 | `app-main-09.js` | de storyrij bovenaan De Salon |
 | `app-main-09a.js` | de contactpin: je eigen code, als tekst en als QR |
+| `app-main-09a1.js` | jouw RTG PIN: stand, veiligheidsjournaal en vaste QR |
 | `app-main-09a2.js` | de levende code en de aan/uit-schakelaar |
 | `app-main-09b.js` | de directe berichten openen |
 | `app-main-10.js` | de directe berichten: versturen en aan het gesprek toevoegen |

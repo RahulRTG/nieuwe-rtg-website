@@ -104,7 +104,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 47 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 50 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 2 |
@@ -113,7 +113,7 @@ Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
 
 **Wat er precies in elke wereld hangt staat in [`WERELDLIJST.md`](WERELDLIJST.md)**
-— alle zeventig onderdelen met hun adres, uit `MAPPEN` geschreven door
+— alle 76 onderdelen met hun adres, uit `MAPPEN` geschreven door
 `npm run wereldlijst`. Dit document zegt *waarom* de werelden zo lopen; die lijst
 zegt *wat* erin zit, en regel 50 van `scripts/check.js` houdt de twee gelijk.
 

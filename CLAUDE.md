@@ -595,7 +595,7 @@ de mens mee. `test/wereldregister.test.js` houdt het register fail-closed en
 vergelijkt de kaart met de code, zodat een document dat niet meer klopt de bouw
 laat zakken in plaats van stil verkeerd te blijven staan.
 
-**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — zeventig
+**Wat er precies in elke wereld hangt staat in `WERELDLIJST.md`** — 76
 onderdelen met hun adres, geschreven uit `MAPPEN` met `npm run wereldlijst` en
 bewaakt door regel 50 van `scripts/check.js`. Wat daar bewust NIET in staat is de
 laag ertussen: welke onderdelen samen "het huishouden" of "zorg en gezin" heten

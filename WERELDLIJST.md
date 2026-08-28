@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 47 |
+| **LivingOS** | `/apps/rtg.html` | 50 |
 | **WorkOS** | `/apps/kantoor.html` | 13 |
 | **TravelOS** | `/apps/reizen.html` | 11 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 2 |
-| | **samen** | **73** |
+| | **samen** | **76** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 47 onderdelen.
+Huis: `/apps/rtg.html` — 50 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -53,6 +53,9 @@ Huis: `/apps/rtg.html` — 47 onderdelen.
 | Vrienden | `link:vrienden` | `/apps/foundation/vrienden.html` |
 | Snaps | `os:snaps` | kiezer in de app |
 | Camera | `link:camera` | `/apps/camera.html` |
+| Berichten | `link:berichten` | `/apps/comm.html` |
+| Bellen | `os:bellen` | kiezer in de app |
+| Videobellen | `os:videobellen` | kiezer in de app |
 | Daten | `link:vonk` | `/apps/vonk.html` |
 | Cercle | `link:cercle` | `/apps/cercle.html` |
 | Entourage | `link:entourage` | `/apps/entourage.html` |
@@ -126,13 +129,16 @@ Huis: `/apps/foundation/os-publiek.html` — 2 onderdelen.
 
 ## Wat er buiten de werelden valt
 
-Deze standen van de ledenapp staan in geen enkele wereld: `tab:home` (Home), `tab:ai` (AI).
+Deze onderdelen hangen met opzet in geen enkele wereld:
 
-Dat hoeft geen fout te zijn. `tab:home` ís het beginscherm van de
-ledenapp en hoort nergens onder te hangen, en `tab:ai` is Rahul — die is
-RTG Core en reist met de mens mee in plaats van in één wereld te wonen
-(`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te staan: een
-tab die nergens in hangt is voor een lid alleen via de tabbalk te vinden,
-en het verschil tussen "met opzet overal" en "per ongeluk nergens" is van
-buiten niet te zien.
+- `tab:home` (Home) — het beginscherm van de ledenapp zelf.
+- `tab:ai` (AI) — Rahul, die met de mens meereist.
+
+Dat is RTG Core: een laag die overal geldt is geen tegel op een
+beginscherm (`WERELDEN.md`, *RTG Core*). Maar het hoort wel zichtbaar te
+staan, want het verschil tussen "met opzet overal" en "per ongeluk
+nergens" is van buiten niet te zien.
+
+Er is geen onderdeel zonder plek: alles wat de registry kent, wordt door
+een map genoemd.
 

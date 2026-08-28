@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0c7df0d9';
+var RTG_BOUW = '0d1310d8';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4041,13 +4041,13 @@ var RTG_BOUW = '0c7df0d9';
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
-    berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
        stonden er vier op het beginscherm -- Berichten, Bellen, Videobellen en
        Snaps -- voor iets dat een mens als EEN ding ziet: contact met iemand.
        Bellen en videobellen zijn nu twee knoppen in de kop van het gesprek
        waar je toch al bent; de oude /apps/berichten.html blijft bestaan als
-       pad, want er kan naar gelinkt zijn. */
+       pad -- als OMLEIDING, dus deze tegel wijst naar comm.html zelf. */
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
@@ -4179,6 +4179,13 @@ var RTG_BOUW = '0c7df0d9';
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
       'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+    /* CONTACT MET IEMAND HOORT HIER, en het stond nergens: deze drie bestonden
+       in LINKS/OSAPPS maar werden door geen enkele map genoemd, en dat bleef
+       stil omdat scripts/wereldlijst.js alleen tabs op dakloosheid controleerde
+       (die kijkt nu naar alle drie de soorten). Wie belt denkt niet dat hij in
+       zijn werk of op reis is; en niet Core, want dat is een laag die meereist
+       en een gesprek is een handeling. */
+      'link:berichten', 'os:bellen', 'os:videobellen',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
        tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
@@ -4241,6 +4248,12 @@ var RTG_BOUW = '0c7df0d9';
        app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
+  /* Afgesplitst van app-main-24a2.js, dat over de 10 KB ging (keuringsregel 13).
+     De snede loopt langs een echte grens: hierboven de drie werelden waarin een
+     lid leeft, werkt en reist, hier FoundationOS -- de wereld die als laatste
+     bijkwam. De MAPPEN-array loopt door over de snede heen; dat is geen
+     uitzondering maar hoe deze bundel werkt (scripts/bundel.js plakt de delen
+     eerst aaneen, en scripts/lib/wereldregister.js leest ze zo ook). */
     /* De zelfstandige Foundation-wereld. De stichting stond als EEN tegel binnen Het Huis
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld

@@ -3117,37 +3117,35 @@ console.log('\n43) geen weggegooide tekstoptelling in een gebundeld script');
    die telde de tegels door elke map open te klikken. Sinds een wereldtegel de
    APP opent en niet een tegelveld, is die lijst uit het scherm verdwenen. De
    regel is niet vervallen; hij heeft een andere plek nodig, en de bron is de
-   juiste: MAPPEN staat als letterlijke lijst in app-main-24a2.js.
+   juiste: MAPPEN zelf.
+
+   EN NIET MEER MET EEN REGEX OP EEN SNEDE. Deze regel las app-main-24a2.js met
+   een regex, en toen dat bestand over de 10 KB ging (regel 13) en FoundationOS
+   naar een eigen snede verhuisde, zei hij "MAPPEN staat er niet meer" -- terwijl
+   MAPPEN gewoon bestond en over twee snedes liep. Een meter die zakt op de
+   INDELING van de bron in plaats van op de bron, meet de verkeerde dingen. Hij
+   leest nu dezelfde lezer als de toets en de wereldlijst
+   (scripts/lib/wereldregister.js), die de bundel eerst aaneenplakt.
 
    Wat deze regel NIET doet: iets zeggen over welke wereld de juiste is. Dat is
    een ontwerpvraag. Hij zegt alleen dat het er precies een is. */
 console.log('\n44) elke app staat in precies een wereld op het beginscherm');
 {
-  /* Het pad uit ROOT en niet uit PUB: die laatste is een blok-constante die hier
-     niet bestaat. Met een try/catch eromheen werd die ReferenceError een lege
-     bron, en die lege bron werd de melding "MAPPEN staat er niet meer" -- een
-     diagnose die naar het verkeerde bestand wees. Een vangnet dat de oorzaak
-     verbergt is erger dan geen vangnet. */
-  const mappenPad = path.join(ROOT, 'public', 'apps/app-main/app-main-24a2.js');
-  let bron = '';
-  try { bron = fs.readFileSync(mappenPad, 'utf8'); }
-  catch (e) { fout('app-main-24a2.js is niet te lezen: ' + e.message); }
-  const blok = /const MAPPEN = \[([\s\S]*?)\n  \];/.exec(bron);
-  if (!blok) fout('MAPPEN staat niet meer als lijst in app-main-24a2.js; deze regel meet dan niets');
-  else {
-    const zonderCommentaar = blok[1].replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
-    const items = (zonderCommentaar.match(/'(?:tab|link|os):[a-z0-9-]+'/g) || []).map(x => x.slice(1, -1));
-    const gezien = new Map();
-    const dubbel = [];
-    for (const it of items) {
-      if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
-      else gezien.set(it, true);
-    }
-    if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
-    else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
-    else ok(items.length + ' items over ' + (blok[1].match(/sleutel:/g) || []).length +
-      ' werelden: geen enkele staat er twee keer in');
+  let items = [], werelden = 0;
+  try {
+    const reg = require('./lib/wereldregister');
+    werelden = reg.MAPPEN.length;
+    for (const m of reg.MAPPEN) for (const it of (m.items || [])) items.push(it);
+  } catch (e) { fout('MAPPEN is niet uit de app-main-bundel te lezen: ' + e.message); }
+  const gezien = new Set();
+  const dubbel = [];
+  for (const it of items) {
+    if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
+    else gezien.add(it);
   }
+  if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
+  else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
+  else ok(items.length + ' items over ' + werelden + ' werelden: geen enkele staat er twee keer in');
 }
 
 /* 45) ELK ROUTEPAD STAAT VOLUIT.

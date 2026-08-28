@@ -62,6 +62,17 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     // 1. de vijf werelden staan er, en Business is voor de gratis pas DICHT --
     //    zichtbaar, want wegstoppen wat je niet hebt is oneerlijk naar beide kanten
     await page.waitForSelector('#werelden button', { timeout: 15000 });
+    await page.waitForSelector('#passport:not([hidden])', { timeout: 15000 });
+    assert.match(await page.locator('#passport').innerText(), /Member passport/i);
+    assert.match(await page.locator('#passport').innerText(), /Verified/i,
+      'RTG Pass hoort als Verified in het member passport te staan');
+    assert.match(await page.locator('#identiteit').innerText(), /loopt/,
+      'een net account mag geen vals afgerond identiteitsvinkje krijgen');
+    const lenzen = await page.evaluate(() => [...document.querySelectorAll('#lenzen > *')]
+      .map(x => ({ naam: x.childNodes[0] && x.childNodes[0].textContent, dicht: x.getAttribute('aria-disabled') === 'true' })));
+    assert.deepEqual(lenzen.map(x => x.naam), ['Dating', 'Friends', 'Business', 'Travel', 'Events']);
+    assert.equal(lenzen.find(x => x.naam === 'Dating').dicht, true, 'Dating is Signature');
+    assert.equal(lenzen.find(x => x.naam === 'Business').dicht, true, 'Business is Signature');
     const werelden = await page.evaluate(() => [...document.querySelectorAll('#werelden button')]
       .map(b => ({ naam: b.textContent, dicht: b.disabled })));
     assert.equal(werelden.length, 5, 'er horen vijf werelden te staan: ' + JSON.stringify(werelden));
@@ -156,6 +167,10 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     }, b);
     await page2.goto(base + '/apps/wereld.html', { waitUntil: 'domcontentloaded' });
     await page2.waitForSelector('#werelden button', { timeout: 15000 });
+    assert.match(await page2.locator('#passport').innerText(), /Signature/i,
+      'Lifestyle hoort als Signature in het member passport te staan');
+    assert.equal(await page2.locator('#lenzen [aria-disabled="true"]').count(), 0,
+      'Signature krijgt alle vijf de lenzen');
     await page2.click('#ontdekTab');
     await page2.waitForSelector('#zoekform', { timeout: 10000 });
     assert.equal(await page2.evaluate(() => location.pathname), '/apps/wereld.html',

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Wereld</title>
+<title>RTG Elite · Private Society</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -38,23 +38,63 @@
   body{margin:0;background:var(--rtg-bg);color:var(--rtg-txt);
     font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
 
-  /* de kop: wie ik ben, en in welke wereld ik sta */
+  /* De kop is het member passport: eerst wie u in dit huis bent, daarna wat u
+     hier wilt doen. De passtatus komt volledig van de server; dit scherm kent
+     zelf geen vertaling van RTG/Lifestyle/Business naar Verified/Signature. */
   .kop{position:sticky;top:0;z-index:5;background:var(--rtg-bg);
-    border-bottom:1px solid var(--rtg-line);padding:1rem 1.1rem 0;}
-  .kop h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
-    font-size:1.5rem;margin:0 0 0.15rem;letter-spacing:0.01em;}
-  .kop .wie{font-size:0.74rem;color:var(--rtg-soft);margin:0 0 0.85rem;}
-  /* De pasnaam stond hier in het accent (--rtg-acc, de dagkleur). Op deze
-     donkere grond haalt dat 3,78:1 bij 11,8px -- te weinig, want AA vraagt 4,5
-     onder 24px. De kleurregel in CLAUDE.md: het accent is voor GROTE tekst, en
-     kleine tekst op zwart hoort wit te zijn. Het vet blijft de nadruk dragen. */
-  .kop .wie b{color:var(--rtg-txt);font-weight:600;}
+    border-bottom:1px solid var(--rtg-line);padding:0.9rem 1.1rem 0;}
+  .kopinhoud{max-width:760px;margin:0 auto;}
+  .elite-merk{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+    margin-bottom:0.7rem;}
+  .elite-merk .eyebrow{font-size:0.58rem;line-height:1.2;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--rtg-leesgoud,#D5BF62);margin:0 0 0.18rem;}
+  .kop .elite-titel{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
+    font-size:1.65rem;margin:0;letter-spacing:0.01em;}
+  .belofte{font-family:'Bodoni Moda',Georgia,serif;font-size:0.88rem;
+    color:var(--rtg-muted);font-style:italic;text-align:right;padding-bottom:0.1rem;}
+
+  .passport{background:linear-gradient(125deg,var(--rtg-card2),var(--rtg-card));
+    border:1px solid var(--rtg-line);border-radius:0;padding:0.72rem 0.8rem;
+    margin-bottom:0.65rem;box-shadow:inset 0 1px rgba(255,255,255,0.025);}
+  .passportkop{display:flex;align-items:center;justify-content:space-between;
+    gap:0.8rem;}
+  .passportlabel{font-size:0.56rem;letter-spacing:0.16em;text-transform:uppercase;
+    color:var(--rtg-soft);margin:0 0 0.18rem;}
+  .kop .wie{font-size:0.8rem;color:var(--rtg-txt);margin:0;font-weight:600;}
+  .kop .wie span{color:var(--rtg-muted);font-weight:400;}
+  .badges{display:flex;justify-content:flex-end;gap:0.35rem;flex-wrap:wrap;}
+  .lidbadge{border:1px solid var(--rtg-line);border-radius:0;
+    padding:0.25rem 0.55rem;font-size:0.58rem;line-height:1;
+    letter-spacing:0.08em;text-transform:uppercase;color:var(--rtg-muted);}
+  .lidbadge.lidstatus.signature{border-color:rgba(169,143,28,0.72);color:var(--rtg-leesgoud,#D5BF62);
+    background:rgba(169,143,28,0.09);}
+  .lidbadge.lidstatus.verified{border-color:rgba(255,255,255,0.28);color:var(--rtg-txt);}
+  .pasvoet{display:flex;gap:0.45rem;align-items:center;margin-top:0.48rem;
+    padding-top:0.48rem;border-top:1px solid var(--rtg-line);font-size:0.62rem;
+    color:var(--rtg-soft);}
+  .pasvoet::before{content:'';width:0.38rem;height:0.38rem;border-radius:50%;
+    background:var(--rtg-acc);box-shadow:0 0 0 3px rgba(194,58,94,0.1);}
+  .pasvoet.verified::before{background:#74A886;box-shadow:0 0 0 3px rgba(116,168,134,0.1);}
+
+  /* Eén identiteit, vijf lenzen. Dichte lenzen blijven zichtbaar als belofte,
+     met de reden uit de server. */
+  .lenzen{display:flex;gap:0.38rem;overflow-x:auto;padding-bottom:0.65rem;
+    scrollbar-width:none;}
+  .lenzen::-webkit-scrollbar{display:none;}
+  .lenzen a,.lenzen span{flex:1 0 auto;min-width:5.2rem;text-align:center;
+    text-decoration:none;border:1px solid var(--rtg-line);border-radius:0;
+    padding:0.42rem 0.58rem;color:var(--rtg-muted);font-size:0.64rem;
+    font-weight:600;letter-spacing:0.035em;transition:border-color .18s,color .18s;}
+  .lenzen a:hover,.lenzen a[aria-current="page"]{color:var(--rtg-txt);
+    border-color:var(--rtg-acc);}
+  .lenzen span{opacity:0.42;cursor:not-allowed;}
+  .lenzen span::after{content:'  ·  Signature';font-size:0.52rem;}
 
   /* DE WERELDSCHAKELAAR. Een rij, horizontaal scrollend op een telefoon.
      Een wereld die dicht is verdwijnt niet: hij staat er, gedimd, met een slotje.
      Wegstoppen wat je niet hebt is oneerlijk naar beide kanten -- je weet dan
      niet wat je mist, en je merkt ook niet dat het er is. */
-  .werelden{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:0.9rem;
+  .werelden{display:flex;gap:0.4rem;overflow-x:auto;padding:0.05rem 0 0.9rem;
     scrollbar-width:none;}
   .werelden::-webkit-scrollbar{display:none;}
   .werelden button{flex:0 0 auto;background:none;border:1px solid var(--rtg-line);
@@ -145,14 +185,36 @@
   .balk a[aria-current="page"]{color:var(--rtg-txt);}
   .balk a[aria-current="page"] span{color:var(--rtg-txt);}
   .balk span{display:block;font-size:1.05rem;line-height:1.35;}
+
+  @media (max-width:520px){
+    .belofte{display:none;}
+    .passportkop{align-items:flex-start;}
+    .badges{max-width:48%;}
+    .lenzen{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.25rem;
+      overflow:visible;}
+    .lenzen a,.lenzen span{min-width:0;padding:0.4rem 0.12rem;font-size:0.56rem;}
+    .lenzen span::after{content:'S';display:block;font-size:0.44rem;margin-top:0.12rem;}
+  }
 </style>
 </head>
 <body>
 
 <header class="kop">
-  <h1>RTG</h1>
-  <p class="wie" id="wie">Bezig met laden…</p>
-  <nav class="werelden" id="werelden" aria-label="Kies je wereld"></nav>
+  <div class="kopinhoud" id="eliteKop">
+    <div class="elite-merk">
+      <div><p class="eyebrow">Private social &amp; dating society</p><div class="elite-titel" role="heading" aria-level="1">RTG Elite</div></div>
+      <div class="belofte">Experience the Elite Class</div>
+    </div>
+    <section class="passport" id="passport" aria-label="Member passport" hidden>
+      <div class="passportkop">
+        <div><p class="passportlabel">Member passport</p><p class="wie" id="wie">Bezig met laden…</p></div>
+        <div class="badges" id="badges"></div>
+      </div>
+      <div class="pasvoet" id="identiteit"></div>
+    </section>
+    <nav class="lenzen" id="lenzen" aria-label="Kies je intentie"></nav>
+    <nav class="werelden" id="werelden" aria-label="Kies je wereld"></nav>
+  </div>
 </header>
 
 <main>
@@ -207,7 +269,7 @@
         .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
 
-  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [], kaart: {},
+  var staat = { modus: 'alles', modi: [], lenzen: [], vanaf: 0, items: [], kaart: {},
     weergave: 'feed', zichtbaarheden: [], vermogens: [] };
   var mag = function (v) { return staat.vermogens.indexOf(v) >= 0; };
 
@@ -225,6 +287,35 @@
   };
   var BRONNAAM = { salon: 'De Salon', pulse: 'Pulse', zakelijk: 'Zakelijk',
     genootschap: 'Genootschap', verhalen: 'Verhaal' };
+
+  function tekenPassport(d) {
+    var lid = d.lidmaatschap;
+    if (!lid) return;
+    $('#passport').hidden = false;
+    $('#wie').innerHTML = esc(d.ik.codenaam) + ' <span>· ' + esc(lid.pas.naam) + '</span>';
+    $('#badges').innerHTML = '<span class="lidbadge member">' + esc(lid.member.naam) + '</span>'
+      + '<span class="lidbadge lidstatus ' + esc(lid.status.id) + '">' + esc(lid.status.naam) + '</span>';
+    var identiteit = $('#identiteit');
+    identiteit.className = 'pasvoet ' + esc(lid.identiteit.id);
+    identiteit.textContent = lid.identiteit.naam;
+  }
+
+  function tekenLenzen() {
+    var n = $('#lenzen');
+    n.textContent = '';
+    staat.lenzen.forEach(function (lens) {
+      var el = document.createElement(lens.open ? 'a' : 'span');
+      el.textContent = lens.naam;
+      if (lens.open) {
+        el.href = lens.url;
+        if (lens.id === 'friends') el.setAttribute('aria-current', 'page');
+      } else {
+        el.setAttribute('aria-disabled', 'true');
+        el.title = lens.reden || '';
+      }
+      n.appendChild(el);
+    });
+  }
 
   /* De wereldschakelaar. Een dichte wereld blijft staan maar is uitgeschakeld,
      met de reden die de SERVER meegaf -- hier staat geen eigen tekst over wat
@@ -450,6 +541,7 @@
     $('#profiel').hidden = welke !== 'profiel';
     $('#ontdek').hidden = welke !== 'ontdek';
     $('#werelden').hidden = welke !== 'feed';
+    $('#lenzen').hidden = welke !== 'feed';
     var bij = { feed: 'homeTab', profiel: 'profielTab', ontdek: 'ontdekTab' };
     document.querySelectorAll('.balk a').forEach(function (a) {
       a.setAttribute('aria-current', a.id === bij[welke] ? 'page' : 'false');
@@ -481,18 +573,20 @@
   api('/state', {})
     .then(function (d) {
       staat.modus = d.modus; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
-      staat.vermogens = d.vermogens || [];
+      staat.vermogens = d.vermogens || []; staat.lenzen = d.lenzen || [];
       /* De modus reist mee naar de aparte berichten-app: de la die bij deze
          wereld hoort komt van de SERVER (kern/wereld/koppel.js), zodat dit
          scherm geen eigen kaart bijhoudt. Is er geen la voor deze wereld, dan
          blijft de link gewoon de inbox openen. */
       var chat = document.querySelector('.balk a[href="/apps/comm.html"]');
       if (chat) chat.href = '/apps/comm.html' + (d.chatLade ? '?lade=' + encodeURIComponent(d.chatLade) : '');
-      $('#wie').innerHTML = esc(d.ik.codenaam) + ' · <b>' + esc(d.ik.pas.toUpperCase()) + ' Pass</b>';
+      tekenPassport(d);
+      tekenLenzen();
       tekenWerelden();
       return laad();
     })
     .catch(function (e) {
+      $('#passport').hidden = false;
       $('#wie').textContent = 'Niet ingelogd';
       /* De wachtregel weghalen, anders staat er "Bezig met laden..." ONDER een
          foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat

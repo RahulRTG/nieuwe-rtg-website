@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-27",
+  "vastgelegd": "2026-08-28",
   "gemeten": {
-    "bestanden": 1803,
-    "vormen": 1257,
+    "bestanden": 1804,
+    "vormen": 1260,
     "velden": 1812,
-    "modules": 670,
-    "domeinen": 238,
+    "modules": 671,
+    "domeinen": 239,
     "envelopDrempel": 15,
     "envelop": 31,
-    "veldenDomeineigen": 1274,
+    "veldenDomeineigen": 1273,
     "veldenGedeeldVanafVier": 181,
     "gelijkendeVormparen": 18
   },
@@ -144,6 +144,18 @@
       ]
     },
     {
+      "veld": "open",
+      "domeinen": 12,
+      "waar": [
+        "kern/concern",
+        "kern/festival",
+        "kern/labfonds",
+        "kern/lidmaatschap",
+        "kern/livinglab",
+        "kern/luchthaven"
+      ]
+    },
+    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -273,18 +285,6 @@
         "kern/labfonds",
         "kern/ledenbalie",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "open",
-      "domeinen": 11,
-      "waar": [
-        "kern/concern",
-        "kern/festival",
-        "kern/labfonds",
-        "kern/livinglab",
-        "kern/luchthaven",
-        "kern/mall"
       ]
     },
     {
@@ -516,15 +516,15 @@
       ]
     },
     {
-      "veld": "totaal",
+      "veld": "url",
       "domeinen": 8,
       "waar": [
-        "kern/assets",
-        "kern/command",
-        "kern/facturatie",
-        "kern/magnaat-dekkingsmatrix",
-        "kern/mobiliteit",
-        "kern/onderneming"
+        "kern/appbieb",
+        "kern/bedrijfscontrole",
+        "kern/foundationregistratie-register",
+        "kern/handelsregelbronnen",
+        "kern/handelsregelwacht",
+        "kern/lidmaatschap"
       ]
     }
   ],

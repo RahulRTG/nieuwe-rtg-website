@@ -8,6 +8,7 @@
    met andere RTG-leden, tenzij een hoger lid het contact eerst legde. */
 
 const salonviraal = require('./salonviraal');
+const lidmaatschap = require('./lidmaatschap');
 
 function maakLid(deps) {
   const { db, accounts, PERSONAS, findSupplier, i18n, rtf, talen, leeftijdVan, leeftijdsgroepVan, geborenVan } = deps;
@@ -104,7 +105,8 @@ function maakLid(deps) {
         folder: p.folder ? { titel: p.folder.titel, fotos: p.folder.fotos || [], items: p.folder.items || [] } : null
       };
     });
-    const state = { user: { tier: sess.tier, ...persona }, posts, creatorCredit: 0, creatorLikes: 0, lang };
+    const state = { user: { tier: sess.tier, ...persona, lidmaatschap: lidmaatschap.voorSessie(sess) },
+      posts, creatorCredit: 0, creatorLikes: 0, lang };
     // Ook gratis gebruikers (zonder pas) mogen solliciteren en hun sollicitaties
     // met status terugzien; de rest van het ledenpaneel blijft voor leden.
     state.myApplications = myApplications(sess.key);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
-<title>Rendez-vous · Lifestyle Pass</title>
+<title>Rendez-vous · RTG Signature</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -28,7 +28,7 @@
 </head>
 <body class="rtg-stijl" data-rtg-modus="world" data-rtg-dating="rendezvous">
 <a class="skip" href="#main">Naar de inhoud</a>
-<header><div><span>Lifestyle Pass · besloten</span><h1>Rendez-vous</h1></div></header>
+<header><div><span>RTG Elite · Signature members only</span><h1>Rendez-vous</h1></div></header>
 <nav class="dating-tabs" id="tabs" aria-label="Rendez-vous"></nav>
 <main id="main" tabindex="-1"><div class="dating-empty"><strong>Rendez-vous wordt geopend</strong><p>Uw besloten ruimte en identiteitsstatus worden gecontroleerd.</p></div></main>
 <div class="melding" id="melding" role="status" aria-live="polite"></div>
@@ -95,7 +95,7 @@
   function shell(werk, context, titel, detail) {
     return command(titel, detail) + '<div class="dating-layout"><article class="dating-work">'+werk+'</article><aside class="dating-context" aria-label="Vertrouwen en uitleg">'+context+'</aside></div>';
   }
-  const trust = (titel, tekst) => '<div><span class="dating-eyebrow">Uw privacy</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p></div><div><dl><div><dt>Profiel</dt><dd>Codenaam, nooit echte naam</dd></div><div><dt>Selectie</dt><dd>Besloten Lifestyle-pool</dd></div><div><dt>Actie</dt><dd>Niets zonder uw akkoord</dd></div></dl><a href="/apps/app.html">Beheer uw identiteit</a></div>';
+  const trust = (titel, tekst) => '<div><span class="dating-eyebrow">Uw privacy</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p></div><div><dl><div><dt>Profiel</dt><dd>Codenaam, nooit echte naam</dd></div><div><dt>Selectie</dt><dd>Besloten Signature-pool</dd></div><div><dt>Actie</dt><dd>Niets zonder uw akkoord</dd></div></dl><a href="/apps/app.html">Beheer uw identiteit</a></div>';
   function chips(items, shared) {
     const samen = (shared || []).map(x => x.toLowerCase());
     return (items || []).map(x => '<span class="dating-chip'+(samen.includes(String(x).toLowerCase())?' shared':'')+'">'+esc(x)+'</span>').join('');
@@ -104,10 +104,10 @@
     const inlog = !token || (fout && fout.status === 401);
     const identiteit = fout && fout.code === 'IDENTITY_REQUIRED';
     const leeftijd = fout && fout.code === 'AGE_REQUIRED';
-    const titel = inlog ? 'Open uw besloten ledenaccount' : identiteit ? 'Verifieer eerst uw identiteit' : leeftijd ? 'Alleen voor geverifieerde leden van 18+' : 'Lifestyle Pass vereist';
+    const titel = inlog ? 'Open uw besloten ledenaccount' : identiteit ? 'Verifieer eerst uw identiteit' : leeftijd ? 'Alleen voor geverifieerde leden van 18+' : 'Signature-membership vereist';
     const tekst = fout && fout.message ? fout.message : 'Log eerst in via de leden-app om Rendez-vous te openen.';
     const href = inlog || identiteit || leeftijd ? '/apps/app.html' : '/apps/lifestyle.html';
-    const knop = inlog ? 'Naar de leden-app' : identiteit ? 'Start identiteitscontrole' : leeftijd ? 'Terug naar de leden-app' : 'Bekijk de Lifestyle Pass';
+    const knop = inlog ? 'Naar de leden-app' : identiteit ? 'Start identiteitscontrole' : leeftijd ? 'Terug naar de leden-app' : 'Bekijk Signature';
     $('#main').innerHTML = '<section class="dating-gate"><div class="dating-seal">R</div><span class="dating-eyebrow">Toegang bewaakt</span><h2>'+esc(titel)+'</h2><p>'+esc(tekst)+'</p><div class="dating-actions"><a class="dating-button primary" href="'+href+'">'+knop+'</a></div></section>';
   }
   function openSafety(id, naam) {
@@ -178,7 +178,7 @@
     const data = await api('profiel'); const p = data.profiel; locaties = [...(p.locaties || [])];
     const buiten = (p.wensen || []).filter(x => !voorkeuren.some(v => v.toLowerCase() === String(x).toLowerCase()));
     const checks = voorkeuren.map(v => '<label><input type="checkbox" data-pref="'+esc(v)+'"'+((p.wensen||[]).some(x=>String(x).toLowerCase()===v.toLowerCase())?' checked':'')+'><span>'+esc(v)+'</span></label>').join('');
-    let werk = '<div class="dating-visibility"><div><strong>Profielzichtbaarheid</strong><small>U verschijnt uitsluitend op codenaam in de besloten Lifestyle-selectie.</small></div><label class="dating-switch"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+' aria-label="Profiel zichtbaar"><span></span></label></div>'+
+    let werk = '<div class="dating-visibility"><div><strong>Profielzichtbaarheid</strong><small>U verschijnt uitsluitend op codenaam in de besloten Signature-selectie.</small></div><label class="dating-switch"><input type="checkbox" id="aan"'+(p.aan?' checked':'')+' aria-label="Profiel zichtbaar"><span></span></label></div>'+
       '<div class="dating-section-head"><div><span class="dating-eyebrow">Uw signatuur</span><h2>Een profiel met intentie</h2></div><p>Kort, specifiek en oprecht werkt beter dan veel tekst.</p></div>'+
       '<div class="dating-form-grid"><div class="dating-field wide"><label for="over">Over u</label><textarea class="dating-input" id="over" maxlength="600" placeholder="Wat typeert een avond of reis met u?">'+esc(p.over)+'</textarea></div>'+
       '<div class="dating-field wide"><label for="zoekt">Wat u zoekt</label><input class="dating-input" id="zoekt" maxlength="300" value="'+esc(p.zoekt)+'" placeholder="Bijvoorbeeld: iemand met humor, nieuwsgierigheid en liefde voor kunst."></div>'+
@@ -236,7 +236,7 @@
     uitvoer = {naam:'kandidaten',kolommen:['codenaam','status','zoekt','locaties','gedeelde locaties','tegelijk ergens'],rijen:(data.kandidaten||[]).map(k=>[k.codenaam||'',k.status||'',k.zoekt||'',(k.locaties||[]).join(', '),(k.gedeeldeLocaties||[]).join(', '),(k.samen||[]).map(v=>v.stad+' '+v.van+'/'+v.tot).join(', ')])};
     let lijst = '';
     if (!data.profielAan) lijst += '<div class="dating-date"><strong>Uw profiel is verborgen.</strong> Zet het bij Profiel aan om een like te kunnen geven en zelf gevonden te worden.</div>';
-    if (!data.kandidaten.length) lijst += '<div class="dating-empty"><strong>Uw selectie is voor nu compleet</strong><p>Rendez-vous blijft bewust eindig. Nieuwe passende Lifestyle-leden verschijnen zodra ze beschikbaar zijn.</p></div>';
+    if (!data.kandidaten.length) lijst += '<div class="dating-empty"><strong>Uw selectie is voor nu compleet</strong><p>Rendez-vous blijft bewust eindig. Nieuwe passende Signature-members verschijnen zodra ze beschikbaar zijn.</p></div>';
     else lijst += '<div class="dating-list">'+data.kandidaten.map(k => {
       const match=k.status==='match', liked=k.status==='geliked';
       return '<article class="dating-person"><div class="dating-person-main"><div class="dating-person-mark">'+(match?'Wederzijdse match':liked?'Uw interesse is genoteerd':k.likteMij?'Interesse in u':'Besloten introductie')+'</div><h3>'+esc(k.codenaam)+'</h3>'+
@@ -246,7 +246,7 @@
         '<div class="dating-person-actions">'+(match?'<button class="dating-button primary" data-matches>Open match</button>':'<button class="dating-button wine" data-like="'+esc(k.id)+'">Interesse</button><button class="dating-button" data-pass="'+esc(k.id)+'">Voorbij</button>')+'<button class="dating-button quiet" data-safe="'+esc(k.id)+'" data-name="'+esc(k.codenaam)+'">Veiligheid</button></div></article>';
     }).join('')+'</div>';
     const werk='<div class="dating-section-head"><div><span class="dating-eyebrow">Een eindige selectie</span><h2>Ontdek op inhoud</h2></div><p>Geen score en geen oneindig vegen. U ziet alleen besloten profielen.</p></div>'+lijst;
-    $('#main').innerHTML=shell(werk,trust('Rust boven bereik','Een like wordt pas een verbinding wanneer de ander u ook kiest. Afwijzen blijft stil en privé.'),'Uw Lifestyle-selectie',data.kandidaten.length+' introducties');
+    $('#main').innerHTML=shell(werk,trust('Rust boven bereik','Een like wordt pas een verbinding wanneer de ander u ook kiest. Afwijzen blijft stil en privé.'),'Uw Signature-selectie',data.kandidaten.length+' introducties');
     document.querySelectorAll('[data-like]').forEach(b=>b.onclick=async()=>{try{const r=await api('like',{id:b.dataset.like});meld(r.match?'Het is wederzijds. Uw match staat klaar.':'Uw interesse is discreet genoteerd.');laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-pass]').forEach(b=>b.onclick=async()=>{try{await api('pas',{id:b.dataset.pass});laad();}catch(e){meld(e.message);}});
     document.querySelectorAll('[data-matches]').forEach(b=>b.onclick=()=>{tab='matches';laad();});

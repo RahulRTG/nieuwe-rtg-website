@@ -37,7 +37,7 @@ kan later niet meer zeggen wie waarvoor verantwoordelijk is.
 | **app** | de identiteit: sleutel, naam, uitgever. Bestaat los van code. | `kern/appstore/index.js` |
 | **versie** | een onveranderlijke bundel met een hash. Alleen VERSIES worden gepubliceerd. | `kern/appstore/versies.js` |
 | **manifest** | wat de app zegt te zijn en wat hij VRAAGT. | `kern/appstore/manifest.js` |
-| **keuring** | de poort: machine (vorm) en daarna mens (inhoud). | `kern/appstore/keuring.js` + `besluit.js` |
+| **keuring** | de poort: machine (vorm), toegankelijkheid (gerenderd), en daarna mens (inhoud). | `kern/appstore/keuring.js` + `toegankelijk.js` + `besluit.js` |
 | **machtiging** | wat een lid werkelijk VERLEENT. Nooit wat het manifest vroeg. | `kern/appstore/machtigingen.js` + `brug.js` |
 
 **De uitgever is een `org` en geen nieuw begrip.** `TENANT.md` legt vast dat `org`
@@ -45,6 +45,24 @@ de juridische, beveiligings- en contractgrens IS, en dat er geen vijfde
 identiteitsmodel bij komt. Een aparte "ontwikkelaarsaccount" zou precies dat
 zijn. Een zaak die nog niet onder een organisatie hangt, wordt daarom geen
 uitgever — met de weg erbij, niet met een stille weigering.
+
+**Een uitgever heeft sinds 27 augustus 2026 een SOORT, en dat is een bevoegdheid
+en geen etiket.** Een `rechtspersoon` mag geld vragen voor een app; een
+geverifieerd `persoon` publiceert gratis. Betaalde distributie blijft aan een
+rechtspersoon omdat de btw, de afdracht en de aanspreekbaarheid daaraan hangen,
+en die drie zijn niet aan een natuurlijk persoon op te hangen zonder iets te
+beloven wat RTG niet kan waarmaken. De regel staat op één plek
+(`kern/appstore/uitgevers.js`, `magPrijsVragen`) en geeft een **reden** terug in
+plaats van een ja of nee — dezelfde redenering als `WAARDE.md` hanteert voor
+uitbetaalbaar. De soort wordt bij het aanmaken gezet en verandert nooit meer:
+een bevoegdheid die je met een volgend verzoek kunt omzetten, is geen
+bevoegdheid.
+
+Dit voegt geen begrip toe. Ook een mens IS hier een `org`; wat verschilt is
+alleen de deur waarlangs hij aantoont dat hij die org is — een zaak toont een
+zaakinlog (`/api/appstore/uitgever/…`), een mens zijn ledeninlog
+(`/api/appstore/persoon/…`). Zijn organisatiecode is **willekeurig** en nooit
+uit zijn account afgeleid: die code staat publiek in de catalogus bij elke app.
 
 **"De app" is nooit iets anders dan een versie.** Publiceren is een hash
 aanwijzen; intrekken is hem loslaten. Er is geen toestand waarin een app leeft
@@ -125,6 +143,26 @@ waardeloos als een die nooit afgaat (LAT-regel 9). Twee bevindingen worden voor
 de tekstsoorten bij naam overgeslagen; alle andere handtekeningen, de dubbele
 extensies en de afgepelde gzip-/base64-lagen blijven staan, en voor de BINAIRE
 soorten draait de scanner volledig ongewijzigd.
+
+**En sinds 27 augustus 2026 staat er een tweede controle die de poort DICHT kan
+houden: de toegankelijkheidskeuring.** Zij hoort niet in `keur()` thuis — die is
+synchroon en heeft geen browser, terwijl deze keuring de app juist *rendert*, in
+de cel, met dezelfde CSP, op telefoonformaat. Zij staat daarom bij het
+**besluit**: inzenden mag altijd, publiceren pas nadat zij is gedraaid en
+geslaagd. Weigeren mag ook zonder haar — een mens die een app afkeurt hoeft niet
+eerst te meten.
+
+Drie standen, en *niet vast te stellen* is geen ja: draait de keuring niet, dan
+gaat de poort dicht en niet open — precies dezelfde regel als bij de virusscanner
+hierboven. De uitslag hangt aan de **bundelhash** en niet aan de app; zou hij aan
+de app hangen, dan keurt de eerste versie de volgende goed, en dat is het gat
+waar zo'n poort doorheen lekt. En ook zij keurt niets goed: `in-orde` haalt
+alleen de blokkade weg, een mens tekent nog steeds af. RTG draait haar zelf
+(`scripts/appstore-a11y.js`) en neemt geen uitslag aan van de uitgever — een
+ingediend stuk is geen bewijs.
+
+De prijs van dit besluit is bekend en aanvaard: een app die vandaag live staat,
+kan zonder aanpassing geen nieuwe versie meer publiceren.
 
 ### 3. Een app ziet codenamen, nooit een naam
 

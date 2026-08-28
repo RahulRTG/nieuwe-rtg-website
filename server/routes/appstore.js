@@ -1,7 +1,8 @@
 /* De RTG App Store -- het kanaal waarlangs een DERDE een app in dit huis krijgt.
-   Vier kanten, vier poorten, en ze staan met opzet uit elkaar:
+   Vijf kanten, vijf poorten, en ze staan met opzet uit elkaar:
 
-     uitgever.js  supplierAuth -- een derde zendt in
+     uitgever.js  supplierAuth -- een ZAAK zendt in
+     persoon.js   auth         -- een geverifieerd MENS zendt in (en gratis)
      kantoor.js   officeAuth   -- een MENS van RTG tekent af
      lid.js       auth         -- een lid bladert, verleent en opent
      kopen.js     auth         -- de bon vooraf, en daarna de aanschaf
@@ -12,6 +13,7 @@
    routes/concern.js en routes/vakbewijs.js. */
 module.exports = (kern) => {
   require('./appstore/uitgever')(kern);
+  require('./appstore/persoon')(kern);
   require('./appstore/kantoor')(kern);
   require('./appstore/lid')(kern);
   require('./appstore/kopen')(kern);

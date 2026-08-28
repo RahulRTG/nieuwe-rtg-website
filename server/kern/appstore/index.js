@@ -37,7 +37,19 @@ const { INZENDINGEN_PER_UUR } = require('./versies');
    ./besluit.js (versie). */
 const STATUS_VERSIE = ['wacht-op-mens', 'gepubliceerd', 'geweigerd', 'ingetrokken'];
 
-function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
+function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus }) {
+  /* De gebeurtenissenstroom loopt over de BUS, en de bus doet de envelop.
+
+     Hier stond eerst een eigen laag (kern/gebeurtenis.js) die zelf een envelop
+     maakte en hem op de bus zette. Die is weg, en niet omdat hij stuk was:
+     server/bus.js doet sinds OS.md precies hetzelfde voor ELKE publicerende
+     plek, inclusief de keten die vanzelf doorloopt. Twee lagen die allebei een
+     envelop maken is een tweede berichtformaat binnen een jaar -- wat de kop van
+     kern/envelop.js zelf als de fout benoemt (LAT-regel 4).
+
+     Wat een publicist nog wel zelf zegt, zegt hij in `envelop`: WIE het deed en
+     hoe gevoelig het is. De rest -- id, tijd, keten, oorzaak -- vult de bus in.
+     Het uitzenden zelf staat in ./journaal.js, naast de regel die het uitzendt. */
   const opslag = maakOpslag({ dir, log });
   const nu = () => datum().toISOString();
   const id = (p) => p + crypto.randomBytes(6).toString('hex');
@@ -53,33 +65,35 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
     return s;
   }
 
-  /* Het journaal GROEIT AAN en wordt nooit herschreven -- dezelfde regel als het
-     actielog van de werelden (PLATFORM.md, de vijfde laag). Elke beslissing over
-     een derde is hier terug te vinden, ook een die iemand liever kwijt was. */
-  function boek(wat, over, wie, extra) {
-    const j = S().journaal;
-    j.unshift(Object.assign({ at: nu(), wat, over: over || null, wie: wie || null }, extra || null));
-    if (j.length > 5000) j.length = 5000;
-    return j[0];
-  }
-  const journaal = (n) => S().journaal.slice(0, Math.max(1, Math.min(500, Number(n) || 100)));
+  /* Het journaal en wat er van naar buiten gaat, staan in ./journaal.js. Ook dat
+     is een naad: dit bestand BOUWT de motor op, dat bestand houdt bij wat er
+     gebeurd is en zendt het uit. Wie wil weten hoe een beslissing over een derde
+     wordt vastgelegd, hoeft daar maar een bestand voor te lezen. */
+  const { boek, journaal, uitgeverApps, journaalVan, KANAAL } =
+    require('./journaal')({ S, nu, norm, bus, log });
 
   /* Wie hier mag publiceren en wie dat besloot, staat in ./uitgevers.js. Dat is
      een naad en geen opdeling om de omvang: het gaat over een PARTIJ, terwijl de
      rest van dit bestand over BYTES gaat. */
   const U = require('./uitgevers')({ S, save, nu, boek, eigen, norm });
-  const { uitgever, magInzenden, uitgeverAanvragen, uitgeverBesluit, publiekU, uitgevers } = U;
+  const { uitgever, magInzenden, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit, publiekU, uitgevers,
+    magPrijsVragen, uitgeverVanPersoon } = U;
 
   /* De versiekant (inzenden, keuren, aftekenen, intrekken) staat in ./versies.js.
      Hij krijgt de motor-delen mee die hij leest -- de opslag, het journaal, de
      uitgeverslijst -- en niet de kern eromheen. */
-  const V = require('./versies')({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, antivirus });
+  const V = require('./versies')({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, magPrijsVragen, antivirus });
   const { app, versie, inzenden, proef, publiekV } = V;
+  /* De toegankelijkheidspoort. Hij wordt VOOR ./besluit.js opgebouwd omdat die
+     hem meekrijgt: publiceren kan niet zonder een geslaagde keuring op deze
+     bundelhash (besluit 27 augustus 2026, kern/appstore/toegankelijk.js). */
+  const toegankelijk = require('./toegankelijk').maakToegankelijk({ S, save, nu, versie, boek });
+
   /* En het aftekenen apart daarvan (./besluit.js): dat is de ENIGE plek waar een
      versie live gaat, en die scheiding is de reden dat grens 2 na te lezen is
      zonder de hele motor door te moeten. */
   const { wachtrij, besluit, intrekkenKaal, mijnUitgeverij } =
-    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV });
+    require('./besluit')({ S, save, nu, boek, eigen, norm, uitgever, publiekU, opslag, app, versie, publiekV, toegankelijk });
 
   /* De naad met het geld (./naad.js): daar wordt de betaalde kant opgebouwd en
      wordt intrekken uitgebreid met de teruggaverechten. Apart bestand omdat het
@@ -88,8 +102,9 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier }) {
   const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
-  const motor = { S, journaal, boek, opslag, nu, save,
-    uitgever, uitgevers, uitgeverAanvragen, uitgeverBesluit, magInzenden,
+  const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
+    uitgever, uitgevers, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit,
+    magInzenden, magPrijsVragen, uitgeverVanPersoon,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,
     publiekV, publiekU, eigen, norm, STATUS_VERSIE, STATUS_UITGEVER: U.STATUS_UITGEVER, geld,
     tijdlijn, noteer, hercontrole, TIJDLIJN_SOORTEN };

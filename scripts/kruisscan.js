@@ -180,7 +180,21 @@ function topDecls(s) {
   return namen;
 }
 
-const gebruikt = (s, naam) => new RegExp('(?<![.\\w$])' + naam + '(?![\\w$])(?!\\s*:)').test(s);
+/* Is deze naam ergens KAAL gebruikt? Twee dingen tellen met opzet niet mee:
+
+   - `naam:` -- een property met een dubbele punt. Dat is een sleutel.
+   - `naam(params) {` -- een methode in de KORTE vorm. Dat is ook een sleutel,
+     en dat is niet vanzelfsprekend: hij lijkt op een aanroep. Zonder deze
+     uitzondering meldt de scan `{ save() {}, boek() {} }` als een kale
+     verwijzing naar `save` en `boek` van een zuster-slice -- en dat is precies
+     wat er gebeurde bij kern/appstore/naslag.js, dat de brug echt opbouwt met
+     lege functies erin. Een aanroep ziet er anders uit: `boek(x)` wordt gevolgd
+     door een puntkomma of een haakje, nooit door een accolade.
+
+   Het blijft een test over de HELE tekst: staat dezelfde naam verderop wel kaal,
+   dan matcht die vindplaats gewoon en gaat de melding alsnog op. */
+const gebruikt = (s, naam) => new RegExp(
+  '(?<![.\\w$])' + naam + '(?![\\w$])(?!\\s*:)(?!\\s*\\([^()]*\\)\\s*\\{)').test(s);
 
 /* Doorzoek de hele boom onder `root`. Retourneert een lijst bevindingen:
    { bestand, naam, zuster } -- allemaal repo-relatieve paden. */

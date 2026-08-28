@@ -52,6 +52,12 @@ const manifest = (over) => {
 async function publiceer(over) {
   const r = await api('/api/appstore/uitgever/inzenden', { manifest: manifest(over), bestanden: bundel(over && over._extra) }, sup);
   assert.equal(r.status, 200, JSON.stringify(r.body.fouten || r.body.bevindingen || r.body.error || ''));
+  /* De toegankelijkheidspoort staat sinds 27 augustus 2026 aan: publiceren kan
+     niet zonder een geslaagde keuring op DEZE bundelhash. De keurloper doet dat
+     in het echt (scripts/appstore-a11y.js); hier zetten we de uitslag zelf neer,
+     want deze toetsen gaan over de winkel en niet over de keuring. */
+  await api('/api/appstore/kantoor/toegankelijk',
+    { versieId: r.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
   const b = await api('/api/appstore/kantoor/besluit', { versieId: r.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
   assert.equal(b.status, 200, JSON.stringify(b.body));
   return r.body.versie;
@@ -286,6 +292,7 @@ test('9. een uitgever leest wat de klant leest -- en alleen over zijn eigen app'
   const ander = await api('/api/appstore/uitgever/inzenden',
     { manifest: manifest({ sleutel: 'andermans-app', naam: 'Andermans app' }), bestanden: bundel() }, sup2);
   assert.equal(ander.status, 200, JSON.stringify(ander.body.fouten || ander.body.bevindingen || ander.body.error || ''));
+  await api('/api/appstore/kantoor/toegankelijk', { versieId: ander.body.versie.id, stand: 'in-orde', fouten: 0 }, office);
   await api('/api/appstore/kantoor/besluit', { versieId: ander.body.versie.id, besluit: 'gepubliceerd', door: 'Sam van RTG' }, office);
 
   assert.equal((await api('/api/appstore/uitgever/dossier', { sleutel: 'andermans-app' }, sup2)).status, 200,

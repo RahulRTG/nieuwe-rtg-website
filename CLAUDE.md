@@ -352,6 +352,34 @@ zijn vier kandidaten, waarvan er één de drempel haalt: een **ontwerpopdracht**
 gedeeld door architect, atelier, hardwarelab en studio. Voeg geen type toe dat
 niet uit die meting komt.
 
+**`CREATE.md` is de laag bóven de Developer Cloud** — RTG Create: niet één soort
+ontwikkelaar maar de hele ladder van amateur tot enterprise, over de vier
+makersroutes die dit huis al heeft (Website-maker, Website Platform, App Store,
+tenant). Lees die vóór je iets aan een maker, een projectbegrip of een
+publicatiestroom verandert. Alles hangt aan één zin: **Create verenigt
+vindbaarheid, identiteit, publiceren, bewijs en de makerservaring — nooit
+domeinbetekenis zonder gemeten overlap.** Create maakt de ervaring uniform, niet
+de implementatie; de formule is *gedeelde ingang, zelfstandig domein*. Daaruit
+volgt de grondwet CREATE-01 t/m 07 in par. 1, met bij elke regel wie hem
+handhaaft en waar dat nog niemand is. De toetsvraag van PLATFORM.md par. 0b
+beslist per maker of samenvoegen mag, en waar het antwoord niet vaststaat wordt
+het **gemeten** zoals `scripts/objectmodel.js` dat deed — niet aangenomen.
+Website-maker en Website-studio delen aantoonbaar een kern; Lesmaker en
+Clips-studio delen alleen een woord. Let in par. 3 op de bloktaal: de naad loopt
+niet tussen consument en zakelijk maar tussen **inhoud (12), view (`zaakdata`) en
+handeling (`formulier`)** — een blok dat iets DOET is precies waar machtigingen
+aan hangen, en een indeling in consument/zakelijk had die vraag nooit gesteld.
+Par. 9 staat er even groot bij: drie dingen die makkelijk voor bestaand worden
+aangezien en het niet zijn — **Magnaat is een leerspel voor mensen en hoort niet
+in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
+ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
+App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
+zie par. 9.2), en er is geen kostenvlak. En
+par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
+zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
+maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
+`UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
+
 **`OS.md` is de laag ónder de Developer Cloud** — RTG Universal OS: niet "RTG
 heeft veel operating layers" maar "RTG is één besturingssysteem van
 gestandaardiseerde capabilities". Lees die vóór je een capability, een woordenlijst

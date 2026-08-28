@@ -25,7 +25,7 @@ const { MACHTIGINGEN, toonbaar, NIET_GEBOUWD } = require('./machtigingen');
 
 const INZENDINGEN_PER_UUR = 12;
 
-module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, antivirus }) {
+module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, uitgever, magInzenden, magPrijsVragen, antivirus }) {
   /* Het versie-id woont hier en niet in ./index.js: een versie wordt in dit
      bestand gemaakt en nergens anders. */
   const id = () => 'v-' + require('crypto').randomBytes(6).toString('hex');
@@ -55,6 +55,20 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
 
     const m = manifestLezer.lees(ruwM);
     if (!m.ok) return { status: 400, error: 'Het manifest klopt nog niet.', fouten: m.fouten };
+
+    /* MAG DEZE UITGEVER GELD VRAGEN? (besluit 27 augustus 2026) Een geverifieerd
+       PERSOON publiceert gratis; betaalde distributie vraagt een rechtspersoon.
+       De regel zelf staat in ./uitgevers.js en niet hier -- dit is het moment
+       waarop hij knelt, niet de plek waar hij woont (LAT-regel 4).
+
+       Hij staat hier en niet bij het publiceren, om twee redenen. Het manifest
+       met de prijs komt HIER binnen, dus dit is het vroegste eerlijke moment;
+       en een uitgever die het pas bij het aftekenen hoort, heeft een bundel
+       gebouwd die nooit kon. */
+    if (Number(m.manifest.prijsCenten || 0) > 0 && magPrijsVragen) {
+      const geld = magPrijsVragen(o);
+      if (!geld.mag) return { status: 403, error: geld.reden };
+    }
 
     const bestaandeApp = app(m.manifest.sleutel);
     if (bestaandeApp && bestaandeApp.org !== o) return { status: 409, error: 'De sleutel "' + m.manifest.sleutel + '" is al van een andere uitgever. Kies een andere.' };
@@ -107,7 +121,14 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
       uitleg: v.manifest.uitleg, categorie: v.manifest.categorie, taal: v.manifest.taal,
       prijsCenten: Number(v.manifest.prijsCenten || 0),
       vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen), hash: v.hash, maten: v.maten,
-      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null };
+      bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null,
+      /* DE TOEGANKELIJKHEIDSUITSLAG REIST MEE, en alleen als hij bij DEZE bytes
+         hoort. Een uitslag van een vorige bundel is geen uitslag (zie
+         ./toegankelijk.js), dus hij hoort hier ook niet te verschijnen -- anders
+         leest een mens op het keuringsscherm een groen vinkje dat over iets
+         anders gaat. Dit is TONEN en geen beslissen: de poort blijft
+         toegankelijk.belet() in ./besluit.js (LAT-regel 4). */
+      toegankelijk: v.toegankelijk && v.toegankelijk.hash === v.hash ? v.toegankelijk : null };
   }
 
   return { app, versie, inzenden, proef, publiekV, remGehaald, INZENDINGEN_PER_UUR };

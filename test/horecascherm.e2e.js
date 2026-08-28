@@ -364,10 +364,13 @@ test('het horecascherm toont uitgelogd een deur en ingelogd de zaal en de keuken
       const o = [...s.options].find(x => x.text.indexOf('Tafel 12') === 0);
       if (!o) return null;
       s.value = o.value;
+      /* Kiezen en klikken in dezelfde browsertik. Een vertraagde hertekening
+         kan de keuzelijst opnieuw vullen; tussen twee losse Playwright-calls
+         kon die daardoor de waarde wissen voordat de klik aankwam. */
+      document.getElementById('zVoegSamen').click();
       return o.value;
     });
     assert.equal(gekozen, rek4.rekening.id, 'Tafel 12 staat in de samenvoeglijst');
-    await page.click('#zVoegSamen');
     /* Wacht op het UNIEKE eindbericht van deze handeling. Alleen "de melding
        veranderde" is te breed: onder runnerbelasting kan een vertraagde
        hertekening van de korting hierboven die voorwaarde al waar maken. */

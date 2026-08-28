@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1409 bestanden en 9906 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1410 bestanden en 9907 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1409 |
-| losse beweringen (`test(...)`) | 9906 |
+| toetsbestanden | 1410 |
+| losse beweringen (`test(...)`) | 9907 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 968 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 116 |
-| niets van beide | 277 |
+| niets van beide | 278 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1275,7 +1275,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-174 bestanden, 297 beweringen.
+175 bestanden, 298 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1303,6 +1303,7 @@ toets omvalt.
 | `comm-zaak.e2e.js` | 3 | -- | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
 | `comm.e2e.js` | 5 | genoemd | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |
 | `command.e2e.js` | 1 | gezakt op `liegpoort /api/` | Schermtoets voor RTG Command: de app komt beveiligd op met een kantoortoken, tekent het Command Center, laat de operator een plan maken en opent een objectdossier -- alles zonder onopgevangen JS-fouten. WAAROM DIT... |
+| `commerce-scherm.e2e.js` | 1 | -- | HET ONDERNEMERSSCHERM VAN RTG COMMERCE IN EEN ECHTE BROWSER. De commerce-kern heeft zijn eigen servertoetsen, maar die bewijzen niet dat het scherm met een leverancierssessie opkomt en zijn verkoopweg werkelijk langs... |
 | `commercie-ronde.e2e.js` | 4 | -- | DE RONDE IN DE ECHTE SERVER. test/ronde.test.js toetst de ronde met een nagebootste wereld; dit bestand toetst dat hij in de gemonteerde server BESTAAT en draait. |
 | `concern-routes.e2e.js` | 3 | -- | RTG CONCERN: DE DEUR. test/concern.test.js toetst de kern zonder server. |
 | `contactpin.e2e.js` | 4 | -- | DE CONTACTPIN OP HET SCHERM (apps/app.html, sociale balk in De Salon). test/contactpin.test.js bewijst dat de kern en de routes kloppen. |

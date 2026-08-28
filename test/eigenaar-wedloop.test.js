@@ -32,7 +32,22 @@ const migraties = require('../server/migraties');
 
 const SERVER = path.join(__dirname, '..', 'server', 'server.js');
 const HOEVEEL = 3;      // drie processen: net als de vloot, en genoeg om te botsen
-const OPKOMST = 60000;  // ruim; een server die er echt niet komt zakt straks net zo hard
+
+/* HOE LANG DRIE SERVERS MOGEN DOEN OVER OPKOMEN, en waarom dat niet 60 s is.
+
+   Dit stond op zestig seconden en dat is ruim -- los gedraaid komen ze er in
+   zestien. In de volle ronde niet: `npm run test:gate` draait alles tegelijk
+   MET dekkingsmeting, en dan is een serveropstart een veelvoud trager. Op
+   28 augustus 2026 zakte deze toets daar op 60,19 s, terwijl er geen enkel
+   proces was omgevallen -- ze waren alleen nog niet klaar.
+
+   Precies dezelfde les staat al in test/vloot.test.js, die om deze reden op
+   120 s staat. Die stond hier ook, en ik heb hem gelezen en niet toegepast.
+
+   Wachten kost hier niets: een proces dat OMVALT breekt de lus meteen af (zie
+   de controle op `gestopt` hieronder), dus een echte terugval zakt nog steeds
+   binnen een paar seconden. Alleen een trage opkomst krijgt meer lucht. */
+const OPKOMST = 120000;
 
 function vrijePoort() {
   return new Promise((res, rej) => {

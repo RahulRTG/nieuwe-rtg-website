@@ -48,12 +48,15 @@ test('RTG Office gebruikt in Work OS geen dubbele of uitgerekte bovenbalk',()=>{
   assert.match(office,/body\.setAttribute\('data-ios-uit',''\)/);
 });
 
-test('de standaard schil heeft links, boven en onder en geeft de app het hele werkvlak',()=>{
+test('de standaard schil draagt navigatie over aan Edge System en geeft apps het hele werkvlak',()=>{
   const schilJs=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.js'),'utf8');
   const schilCss=fs.readFileSync(path.join(__dirname,'../public/shared/rtg-schil.css'),'utf8');
   assert.match(schilJs,/el\('nav', 'rtg-tabbar'/);
   assert.match(schilJs,/el\('nav', 'rtg-onderbalk'/);
-  assert.match(schilJs,/m\.h - tabhoog - onderhoog/);
+  assert.match(schilJs,/if \(standaard\(\)\)[\s\S]*zet\(schil\.console, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/if \(schil\.tabs\) zet\(schil\.tabs, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/if \(schil\.onderbalk\) zet\(schil\.onderbalk, 0, 0, 0, 0\)/);
+  assert.match(schilJs,/r === sr - 1 \? m\.h - r \* sh : sh/);
   assert.doesNotMatch(bron,/\.rtg-werkruimte\{display:none;\}/,
     'Work OS mag op mobiel niet verdwijnen');
   assert.match(schilJs,/Sluit ' \+ esc\(s\.naam\)/);

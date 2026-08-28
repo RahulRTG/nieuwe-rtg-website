@@ -59,6 +59,7 @@ test('de eigenaar krijgt zijn werkruimte, een keer, met zichzelf als directie', 
   assert.ok(eerst.aangemaakt, 'en die is bij deze aanroep gemaakt');
   const w = eerst.werkruimtes[0];
   assert.equal(w.naam, 'Rahul Travel Group');
+  assert.ok(w.lidNaam, 'de accountbrug kan de persoonlijke kop meteen vullen');
   assert.deepEqual(w.rollen, ['directie'], 'met de eigenaar als directie');
   assert.equal(w.eigenaarsRuimte, true);
   assert.ok(w.lidToken, 'en met zijn eigen lid-token, zodat het scherm meteen open kan');
@@ -98,6 +99,7 @@ test('een gewoon lid krijgt niets automatisch, en vindt na koppelen zijn eigen w
   const na = (await api('/mijn', {}, lidToken)).body;
   assert.equal(na.aantal, 1, 'na koppelen vindt hij zijn werkruimte terug');
   assert.equal(na.werkruimtes[0].lidToken, a.lidToken, 'met zijn eigen token');
+  assert.equal(na.werkruimtes[0].lidNaam, 'Nieuwe collega', 'met de identiteit voor de persoonlijke kop');
   assert.deepEqual(na.werkruimtes[0].rollen, ['medewerker']);
   assert.equal(na.werkruimtes[0].eigenaarsRuimte, false);
 

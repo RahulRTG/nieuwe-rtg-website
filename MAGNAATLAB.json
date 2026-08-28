@@ -1,12 +1,12 @@
 {
   "simulatiemodules": 66,
-  "kernmodules": 1654,
+  "kernmodules": 1655,
   "kernDomeinen": 502,
   "perWereld": {
     "magnaat": {
       "modules": 63,
       "regels": 0,
-      "raaktKern": 3
+      "raaktKern": 4
     },
     "hospitality": {
       "modules": 3,
@@ -14,9 +14,9 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 117,
-  "geraakteKernmodules": 3,
-  "geraakteKernDomeinen": 3,
+  "requiresTotaal": 120,
+  "geraakteKernmodules": 4,
+  "geraakteKernDomeinen": 4,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
   "kruisWereldAanroepen": 3,
@@ -38,6 +38,15 @@
     }
   ],
   "bereik": [
+    {
+      "doel": "server/kern/eigencollectie",
+      "door": [
+        "server/kern/magnaat-trainingslobby.js",
+        "server/kern/magnaatwereld.js",
+        "server/kern/spellen/magnaat/leerkring.js"
+      ],
+      "aantal": 3
+    },
     {
       "doel": "server/kern/bestuursroutes",
       "door": [

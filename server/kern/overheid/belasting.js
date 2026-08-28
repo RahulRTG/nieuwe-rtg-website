@@ -5,7 +5,15 @@
    ctx van kern/overheid/index.js. */
 module.exports = (ctx) => {
   const { db, save, nu, jaar, id, ref, schoon, eur, seed, bericht, IB, TOESLAGEN } = ctx;
-  const eigen = require('../eigencollectie')({ db, domein: 'kern/overheid/belasting', bezit: { rijkAanslagen: 'lijst', rijkToeslagen: 'lijst' } });
+  /* LAAT GEBONDEN, en dat is hier geen stijl. `aangifteAdvies` haalt bedragen
+     uit vrije tekst en raakt geen opslag aan; test/lokaal-eerst.test.js bouwt
+     deze module daarvoor bewust zonder `db`. Het contract weigert terecht een
+     db zonder data, dus zou een declaratie bij het bouwen dat pad breken --
+     terwijl het niets bewaart. Wie wel bewaart, krijgt dezelfde weigering
+     alsnog, op zijn eerste aanraking. */
+  let _eigen = null;
+  const eigen = () => (_eigen || (_eigen = require('../eigencollectie')({
+    db, domein: 'kern/overheid/belasting', bezit: { rijkAanslagen: 'lijst', rijkToeslagen: 'lijst' } })));
 
   function berekenIB(inkomen, aftrek, ingehouden) {
     const belastbaar = Math.max(0, eur(inkomen) - Math.max(0, eur(aftrek)));
@@ -27,10 +35,10 @@ module.exports = (ctx) => {
     const b = berekenIB(inkomen, data.aftrek, data.ingehouden);
     // één aangifte per jaar; opnieuw indienen overschrijft de vorige
     const j = jaar();
-    let a = eigen.bak('rijkAanslagen').find(x => x.key === sess.key && x.jaar === j);
-    if (!a) { a = { id: id(), ref: ref('IB'), key: sess.key, codenaam, jaar: j, at: nu() }; eigen.bak('rijkAanslagen').unshift(a); }
+    let a = eigen().bak('rijkAanslagen').find(x => x.key === sess.key && x.jaar === j);
+    if (!a) { a = { id: id(), ref: ref('IB'), key: sess.key, codenaam, jaar: j, at: nu() }; eigen().bak('rijkAanslagen').unshift(a); }
     Object.assign(a, { inkomen, aftrek: Math.max(0, eur(data.aftrek)), ...b, betaald: a.betaald || false, ingediend: nu() });
-    eigen.zetBak('rijkAanslagen', eigen.bak('rijkAanslagen').slice(0, 40000));
+    eigen().zetBak('rijkAanslagen', eigen().bak('rijkAanslagen').slice(0, 40000));
     bericht(sess.key, 'Belastingdienst', 'Aanslag inkomstenbelasting ' + j,
       a.saldo > 0 ? 'Je moet € ' + a.saldo + ' bijbetalen. Betaal via MijnOverheid.' :
       a.saldo < 0 ? 'Je krijgt € ' + Math.abs(a.saldo) + ' terug.' : 'Je aangifte komt uit op nul: niets te betalen of terug te ontvangen.', 'belasting');
@@ -44,10 +52,10 @@ module.exports = (ctx) => {
   }
   function mijnAanslagen(key) {
     seed();
-    return { ok: true, aanslagen: eigen.bak('rijkAanslagen').filter(a => a.key === key).slice(0, 20).map(publiekeAanslag) };
+    return { ok: true, aanslagen: eigen().bak('rijkAanslagen').filter(a => a.key === key).slice(0, 20).map(publiekeAanslag) };
   }
   function aanslagBetaal(key, r) {
-    const a = eigen.bak('rijkAanslagen').find(x => x.ref === String(r || '') && x.key === key);
+    const a = eigen().bak('rijkAanslagen').find(x => x.ref === String(r || '') && x.key === key);
     if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
     if (a.saldo <= 0) return { status: 409, error: 'Voor deze aanslag hoef je niets te betalen.' };
     if (a.betaald) return { status: 409, error: 'Deze aanslag is al betaald.' };
@@ -69,13 +77,13 @@ module.exports = (ctx) => {
     if (!soort) return { status: 400, error: 'Kies een geldige toeslag.' };
     const inkomen = eur(data.inkomen);
     if (inkomen < 0) return { status: 400, error: 'Vul je jaarinkomen in.' };
-    if (eigen.bak('rijkToeslagen').some(x => x.key === sess.key && x.soort === soort && x.status !== 'gestopt' && x.status !== 'afgewezen'))
+    if (eigen().bak('rijkToeslagen').some(x => x.key === sess.key && x.soort === soort && x.status !== 'gestopt' && x.status !== 'afgewezen'))
       return { status: 409, error: 'Je hebt al een aanvraag voor ' + TOESLAGEN[soort].label + ' lopen.' };
     const maandbedrag = eur(toeslagBereken(soort, inkomen));
     const t = { id: id(), ref: ref('TS'), key: sess.key, codenaam, soort, soortLabel: TOESLAGEN[soort].label,
       inkomen, maandbedrag, status: maandbedrag > 0 ? 'aangevraagd' : 'geen recht', at: nu() };
-    eigen.bak('rijkToeslagen').unshift(t);
-    eigen.zetBak('rijkToeslagen', eigen.bak('rijkToeslagen').slice(0, 40000));
+    eigen().bak('rijkToeslagen').unshift(t);
+    eigen().zetBak('rijkToeslagen', eigen().bak('rijkToeslagen').slice(0, 40000));
     bericht(sess.key, 'Dienst Toeslagen', 'Aanvraag ' + t.soortLabel,
       maandbedrag > 0 ? 'Je aanvraag is ontvangen. Voorlopige berekening: € ' + maandbedrag + ' per maand. Een medewerker beoordeelt hem.'
         : 'Op basis van je inkomen is er geen recht op ' + t.soortLabel + '.', 'toeslag');
@@ -83,16 +91,16 @@ module.exports = (ctx) => {
     return { ok: true, toeslag: publiekeToeslag(t) };
   }
   function publiekeToeslag(t) { return { ref: t.ref, soort: t.soort, soortLabel: t.soortLabel, inkomen: t.inkomen, maandbedrag: t.maandbedrag, status: t.status, at: t.at }; }
-  function mijnToeslagen(key) { seed(); return { ok: true, toeslagen: eigen.bak('rijkToeslagen').filter(t => t.key === key).slice(0, 30).map(publiekeToeslag) }; }
+  function mijnToeslagen(key) { seed(); return { ok: true, toeslagen: eigen().bak('rijkToeslagen').filter(t => t.key === key).slice(0, 30).map(publiekeToeslag) }; }
   function toeslagenLijst(filter) {
     seed(); filter = filter || {};
-    let list = eigen.bak('rijkToeslagen');
+    let list = eigen().bak('rijkToeslagen');
     list = filter.status ? list.filter(t => t.status === filter.status) : list.filter(t => t.status === 'aangevraagd');
     return { ok: true, toeslagen: list.slice(0, 200).map(t => ({ ...publiekeToeslag(t), aanvrager: t.codenaam })) };
   }
   function toeslagBeslis(actor, r, data) {
     data = data || {};
-    const t = eigen.bak('rijkToeslagen').find(x => x.ref === String(r || ''));
+    const t = eigen().bak('rijkToeslagen').find(x => x.ref === String(r || ''));
     if (!t) return { status: 404, error: 'Aanvraag niet gevonden.' };
     const besluit = ['toegekend', 'afgewezen', 'in behandeling'].includes(data.besluit) ? data.besluit : null;
     if (!besluit) return { status: 400, error: 'Kies een geldig besluit.' };

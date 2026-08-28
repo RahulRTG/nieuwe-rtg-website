@@ -187,8 +187,16 @@ test('de Capability Graph maakt de gekozen motorstand zichtbaar', () => {
    is voor deze scanner te zien. Wie dit getal ooit weer ziet stijgen zonder dat
    die groepering klopt, kijkt naar iets anders en hoort niet dit getal te
    verzetten maar de oorzaak te zoeken.
+
+   EN VAN 576 NAAR 577 OP 28 AUGUSTUS 2026 -- een route, en de groepering klopt.
+   Nagegaan welke: `POST /api/foundation/kosten`, wat een gezin zijn eigen
+   kostenbeeld geeft. Hij staat in server/foundation/kosten.js als
+   `router.post('/kosten')` op de router die op /api/foundation gemount is, dus
+   hij is de 342e van de foundation-familie hierboven en precies dezelfde blinde
+   vlek. Geen nieuwe vorm, geen tweede oorzaak: de andere 33 routes van deze tak
+   schrijven hun volle adres wel op en worden alle 33 gewoon gezien.
    ========================================================================== */
-const GEMIST_MAX = 576;   // routes die de router heeft en de bronscanner niet
+const GEMIST_MAX = 577;   // routes die de router heeft en de bronscanner niet
 const SPOOK_MAX = 6;      // routes die de bronscanner noemt en de router niet
 
 test('de bronscanner loopt niet verder achter op de router dan is vastgelegd', () => {

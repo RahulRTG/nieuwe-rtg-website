@@ -139,13 +139,20 @@ test('elk nieuw endpoint bestaat, heeft een poort, en valt niet om op rommel', a
     const bestaatNiet = [];
     const stuk = [];
 
+    const stijl = await fetch(base + '/stijlblok.css');
+    assert.equal(stijl.status, 400, 'een stijlverzoek zonder blokverwijzing wordt veilig geweigerd');
+    assert.match(await stijl.text(), /geen blok gevraagd/);
+
     for (const pad of NIEUW) {
       for (const lijf of ROMMEL) {
-        const r = await fetch(base + pad, {
-          method: 'POST',
+        const methode = pad === '/api/betaaldiensttarief' ? 'GET' : 'POST';
+        const opties = methode === 'GET' ? { method: methode } : {
+          method: methode,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(lijf)
-        }).catch((e) => ({ status: 0, fout: e.message }));
+        };
+        const r = await fetch(base + pad, opties)
+          .catch((e) => ({ status: 0, fout: e.message }));
 
         if (r.status === 0) { stuk.push(pad + ' -- geen antwoord: ' + r.fout); continue; }
         if (r.status === 404) { bestaatNiet.push(pad); break; }

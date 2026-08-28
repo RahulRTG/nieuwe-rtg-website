@@ -103,6 +103,11 @@ const SLEUTELS = {
   'POST /api/rtgid/stapop/opties': { nietIdempotent: true,
     waarom: 'elke aanroep munt een nieuwe WebAuthn-uitdaging; de herhaling hoort een nieuwe uitdaging te geven en niet de oude terug' },
 
+  // -- TravelOS Navigation Intelligence en de partner-signaallaag --
+  'POST /api/nav/status': { leest: true },                       // actuele motor- en dekkingsstatus; bewaart niets
+  'POST /api/supplier/nav/events': { leest: true },              // de actieve signalen van deze partner
+  'POST /api/supplier/nav/event': { zelfdeVerzoek: true },       // een dubbeltik op hetzelfde signaal mag geen tweede gebeurtenis maken
+
   /* ---- de datingapps (dating-premium-ronde, main van 26 augustus) ----
      De toetsvraag van dit register: krijgt een woordelijk gelijke HERHALING een
      ANDER antwoord dan de eerste keer? Bij blokkeren niet -- en samenvouwen is

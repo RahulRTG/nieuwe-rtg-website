@@ -112,3 +112,28 @@ test('6. chauffeurs melden mee via de PDA en de vooruitblik kijkt 12 uur vooruit
   assert.equal(v.status, 200);
   assert.equal((v.body.uurbeeld || []).length, 12, 'de Ghost Driver-motor levert de vooruitblik');
 });
+
+test('7. Route Intelligence toont zijn status en neemt partnersignalen gecontroleerd over', async () => {
+  const status = await api('/api/nav/status', { ...IBIZA, land: 'ES' }, await lid('rtg'));
+  assert.equal(status.status, 200);
+  assert.equal(status.body.eigenMotor, true);
+  assert.equal(status.body.motor, 'RTG Route Intelligence');
+
+  const rooster = await api('/api/supplier/roster', { code: 'MKKX' });
+  const chauffeur = (rooster.body.staff || []).find(x => x.role !== 'manager');
+  const token = (await api('/api/supplier/login', {
+    code: 'MKKX', staffId: chauffeur.id, pin: '5678'
+  })).body.token;
+  const gezet = await api('/api/supplier/nav/event', {
+    soort: 'wachtrij', naam: 'Drukte bij vertrekhal', ...IBIZA,
+    straalM: 700, ernst: 3, betrouwbaarheid: 92
+  }, token);
+  assert.equal(gezet.status, 200);
+  assert.equal(gezet.body.gebeurtenis.bron, 'partner');
+  assert.equal(Object.hasOwn(gezet.body.gebeurtenis, 'route'), false,
+    'de partner deelt een signaal en schrijft nooit de route voor');
+
+  const lijst = await api('/api/supplier/nav/events', {}, token);
+  assert.equal(lijst.status, 200);
+  assert.ok(lijst.body.gebeurtenissen.some(x => x.id === gezet.body.gebeurtenis.id));
+});

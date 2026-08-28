@@ -1,0 +1,48 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
+const { haversine } = require('../server/lib/geo');
+const { maakWereldNet } = require('../server/kern/navigatie/wereld');
+const { schrijfLijn } = require('../server/kern/navigatie/wereld-geo');
+
+test('een lokaal World Graph-pakket routeert, zoekt en tekent dezelfde echte wegen', () => {
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-world-test-'));
+  const bestand = path.join(map, 'testland.sqlite'), graaf = path.join(map, 'testland-graaf'); fs.mkdirSync(graaf);
+  fs.writeFileSync(path.join(map, 'manifest.json'), JSON.stringify({ versie: 1, regios: [{ id: 'testland', naam: 'Testland',
+    db: 'testland.sqlite', graaf: 'testland-graaf', bounds: { lat0: 40, lat1: 41, lng0: 5, lng1: 6 } }] }));
+  const db = new DatabaseSync(bestand);
+  db.exec(`CREATE TABLE meta(sleutel TEXT PRIMARY KEY,waarde TEXT);
+    INSERT INTO meta VALUES('wegen','2'),('bron','OpenStreetMap'),('licentie','ODbL 1.0');
+    CREATE TABLE node_seq(idx INTEGER PRIMARY KEY,id INTEGER UNIQUE,lat REAL,lng REAL);
+    INSERT INTO node_seq VALUES(0,10,40.5,5.2),(1,11,40.5,5.3),(2,12,40.5,5.4);
+    CREATE VIRTUAL TABLE node_seq_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
+    INSERT INTO node_seq_rtree SELECT idx,lng,lng,lat,lat FROM node_seq;
+    CREATE TABLE roads(id INTEGER PRIMARY KEY,lengte REAL,hoofd INTEGER,naam TEXT,ref TEXT,geom BLOB,minLat REAL,maxLat REAL,minLng REAL,maxLng REAL);
+    CREATE VIRTUAL TABLE road_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
+    CREATE TABLE plaatsen(id INTEGER PRIMARY KEY,naam TEXT,extra TEXT,soort TEXT,lat REAL,lng REAL,gewicht INTEGER);
+    INSERT INTO plaatsen VALUES(1,'Teststad','Testland','stad',40.5,5.2,100);
+    CREATE VIRTUAL TABLE plaatsen_fts USING fts5(naam,extra,content='plaatsen',content_rowid='id');
+    INSERT INTO plaatsen_fts(plaatsen_fts) VALUES('rebuild');`);
+  const weg = db.prepare('INSERT INTO roads VALUES(?,?,?,?,?,?,?,?,?,?)');
+  weg.run(1, 8500, 1, 'Wereldlaan', 'W1', schrijfLijn([{ lat: 40.5, lng: 5.2 }, { lat: 40.5, lng: 5.3 }]), 40.5, 40.5, 5.2, 5.3);
+  weg.run(2, 8500, 1, 'Wereldlaan', 'W1', schrijfLijn([{ lat: 40.5, lng: 5.3 }, { lat: 40.5, lng: 5.4 }]), 40.5, 40.5, 5.3, 5.4);
+  db.exec('INSERT INTO road_rtree SELECT id,minLng,maxLng,minLat,maxLat FROM roads'); db.close();
+  const schrijf = (naam, rij) => fs.writeFileSync(path.join(graaf, naam), Buffer.from(rij.buffer));
+  schrijf('coords.f64', new Float64Array([40.5, 5.2, 40.5, 5.3, 40.5, 5.4]));
+  schrijf('offsets.u32', new Uint32Array([0, 1, 3, 4])); schrijf('doelen.u32', new Uint32Array([1, 0, 2, 1]));
+  schrijf('kosten.f32', new Float32Array([300, 300, 300, 300])); schrijf('lengtes.f32', new Float32Array([8500, 8500, 8500, 8500]));
+  schrijf('wegen.u32', new Uint32Array([1, 1, 2, 2])); schrijf('vlaggen.u8', new Uint8Array([15, 15, 15, 15]));
+  fs.writeFileSync(path.join(graaf, 'graaf.json'), JSON.stringify({ versie: 1, knopen: 3, kanten: 4 }));
+  const wereld = maakWereldNet({ haversine, map }), regio = wereld.regioVoor({ lat: 40.5, lng: 5.2 }, { lat: 40.5, lng: 5.4 });
+  assert.ok(regio); assert.equal(regio.def.naam, 'Testland');
+  const route = regio.zoek(regio.snap({ lat: 40.5, lng: 5.2 }), regio.snap({ lat: 40.5, lng: 5.4 }), { modus: 'auto' });
+  assert.deepEqual(route.map(p => p.i), [0, 1, 2]); assert.equal(route[2]._ref, 'W1');
+  assert.equal(regio.zoekPlekken('Teststad')[0].naam, 'Teststad');
+  const kaart = wereld.kaart({ lat: 40.5, lng: 5.3 }, [], false);
+  assert.equal(kaart.netwerk, 'RTG-WORLD-GRAPH'); assert.equal(kaart.wegen.length, 2);
+  assert.equal(wereld.status({ lat: 40.5, lng: 5.3 }).hierActief, true);
+  fs.rmSync(map, { recursive: true, force: true });
+});

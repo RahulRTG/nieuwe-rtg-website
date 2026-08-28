@@ -17,7 +17,8 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;overflow:hidden;}
   body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;}
-  #kaart{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;background:#0C0C0B;}
+  #kaart,#wereldkaart{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;background:#0C0C0B;}
+  #kaart[hidden],#wereldkaart[hidden]{display:none;}
   main{position:fixed;inset:0;pointer-events:none;}
   main > *{pointer-events:auto;}
   .kop{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;gap:0.7rem;
@@ -112,6 +113,7 @@
 </head>
 <body class="rtg-stijl travel-os travel-os-map" data-rtg-eigenvlak="onyx">
 <canvas id="kaart" aria-label="3D-navigatiekaart van het netwerk"></canvas>
+<canvas id="wereldkaart" aria-label="Interactieve wereldkaart van RTG" hidden></canvas>
 <main>
   <header class="kop">
     <a class="terug" href="/apps/app.html" aria-label="Terug naar alle apps">&#8592;</a>
@@ -119,6 +121,7 @@
     <h1>Navigation Intelligence</h1>
     <span class="badge" id="badge3d">3D</span>
     <span class="rek"></span>
+    <button class="world-toggle" id="worldToggle" type="button" aria-pressed="false"><span aria-hidden="true">◎</span> Wereld</button>
     <span class="badge live-badge" id="liveBadge">Motor actief</span>
   </header>
 
@@ -151,7 +154,18 @@
       <div><b id="sourcePartners">·</b><span>Partners</span></div>
       <div><b id="sourceCore">Eigen</b><span id="sourceCoreLabel">Routekern</span></div>
     </div>
+    <div class="world-coverage" id="worldCoverage">
+      <span><i></i><b id="atlasCountries">177</b> landen direct zichtbaar</span>
+      <span><i></i><b id="worldPacks">0</b> routepakketten lokaal</span>
+    </div>
     <p class="privacy-line"><i></i> Uw positie wordt niet als reisgeschiedenis bewaard.</p>
+  </section>
+
+  <section class="world-hud" id="worldHud" aria-label="RTG World Atlas" hidden>
+    <span class="eyebrow">RTG World Atlas</span>
+    <strong id="worldFocus">De wereld. Eén routekern.</strong>
+    <p id="worldMeta">Landen, steden en lokale regiopakketten in één eigen kaartlaag.</p>
+    <small>Sleep om te verkennen · scroll of knijp om te zoomen</small>
   </section>
 
   <section class="paneel" id="paneel" aria-label="Route">
@@ -205,6 +219,7 @@
     </div>
   </div>
 </main>
+<div class="map-attribution" id="mapAttribution">Atlas © Natural Earth · Routes © OpenStreetMap-bijdragers, ODbL</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="/shared/plek.js" defer></script>
@@ -221,15 +236,17 @@
   let toastT;
   const zeg = t => { const m = $('#toast'); m.textContent = t; m.classList.add('zien'); clearTimeout(toastT); toastT = setTimeout(() => m.classList.remove('zien'), 3000); };
 
-  let land = 'ES';
-  const landVan = p => p && p.lat >= 50.70 && p.lat <= 53.72 && p.lng >= 3.20 && p.lng <= 7.30 ? 'NL' : 'ES';
+  let land = '';
+  const landVan = p => p && p.lat >= 50.70 && p.lat <= 53.72 && p.lng >= 3.20 && p.lng <= 7.30 ? 'NL'
+    : p && p.lat >= 38.855 && p.lat <= 38.995 && p.lng >= 1.28 && p.lng <= 1.56 ? 'ES' : '';
   /* GEEN VERZONNEN PLEK. Hier stond een vast punt op Ibiza als "startpunt tot
      de gps spreekt", en de opmerking hieronder zegt het zelf al: voor navigatie
      IS je positie de hele functie. De kaart bouwde zich dus rond een eiland
      waar je niet bent, met routes en flitspalen die niets met jou te maken
      hadden. Zonder plek bouwen we niets en zegt de poort waarom. */
   let hier = null;
-  let kaartData = null, modus = 'auto', profiel = 'slim', route = null, naar = null, kaartBegonnen = false;
+  let kaartData = null, wereldData = null, wereldWeergave = false;
+  let modus = 'auto', profiel = 'slim', route = null, naar = null, kaartBegonnen = false;
   let navigerend = false, laatsteHerberekening = 0;
   const actief = { leverancier: true, ov: true, laad: true, tank: false, civic: false, flits: true, wegennet: true };
   /* Meenemen (shared/uitvoer.js): staat er een route, dan is dat wat je mee
@@ -259,7 +276,8 @@
     tank:        { css: '#8FA0AE', rgb: [0.56, 0.63, 0.68], ico: '\u{26FD}',   naam: 'Tankstation' },
     civic:       { css: '#7C93C4', rgb: [0.49, 0.58, 0.77], ico: '\u{1F3DB}', naam: 'Loket' },
     flits:       { css: '#DE6E92', rgb: [0.87, 0.43, 0.57], ico: '\u{1F6A8}', naam: 'Flits' },
-    wegennet:    { css: '#C9A24B', rgb: [0.79, 0.63, 0.29], ico: '\u{1F6E3}', naam: 'Nederlands wegennet' }
+    wegennet:    { css: '#C9A24B', rgb: [0.79, 0.63, 0.29], ico: '\u{1F6E3}', naam: 'Nederlands wegennet' },
+    wereld:      { css: '#D7B56D', rgb: [0.84, 0.71, 0.43], ico: '\u{1F30D}', naam: 'Wereldkaart' }
   };
 
   /* ---- projectie: lat/lng -> wereld-eenheden (dezelfde als de server) ---- */
@@ -268,7 +286,7 @@
   const naarWereld = (lat, lng) => [(lng - ref.lng) * 111320 * cosRef * WERELD, (ref.lat - lat) * 110540 * WERELD];
 
   /* ================= 3D-renderer via Drie ================= */
-  const canvas = $('#kaart');
+  const canvas = $('#kaart'), wereldCanvas = $('#wereldkaart');
   let R = null, laagPinnen = null, laagRoute = null, laagHier = null;
   const cam = { doel: [0, 0, 0], afstand: 240, azimut: 0.6, hoek: 0.9 };
 
@@ -276,6 +294,9 @@
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.floor(canvas.clientWidth * dpr);
     canvas.height = Math.floor(canvas.clientHeight * dpr);
+    wereldCanvas.width = Math.floor(wereldCanvas.clientWidth * dpr);
+    wereldCanvas.height = Math.floor(wereldCanvas.clientHeight * dpr);
+    if (wereldWeergave) tekenWereld();
   }
   function oogVan() {
     const c = Math.cos(cam.hoek), s = Math.sin(cam.hoek);
@@ -297,7 +318,7 @@
     const hoek = naarWereld(b.lat0, b.lng1), hoek2 = naarWereld(b.lat1, b.lng0);
     const half = Math.max(Math.abs(hoek[0]), Math.abs(hoek[1]), Math.abs(hoek2[0]), Math.abs(hoek2[1])) + 40;
     R.voegToe(Drie.vlak(half, [0.055, 0.055, 0.052]), { raster: true });
-    if (kaartData.netwerk === 'NWB') {
+    if (kaartData.netwerk === 'NWB' || kaartData.netwerk === 'RTG-WORLD-GRAPH') {
       const wegen = Drie.leegMesh();
       for (const weg of (kaartData.wegen || [])) {
         const pl = weg.punten.map(p => naarWereld(p.lat, p.lng));
@@ -411,7 +432,7 @@
     ctx.fillStyle = '#0C0C0B'; ctx.fillRect(0, 0, W, H);
     // hoofdwegen
     ctx.strokeStyle = 'rgba(201,162,75,0.16)'; ctx.lineWidth = 2;
-    if (kaartData.netwerk === 'NWB') {
+    if (kaartData.netwerk === 'NWB' || kaartData.netwerk === 'RTG-WORLD-GRAPH') {
       for (const weg of (kaartData.wegen || [])) {
         ctx.lineWidth = weg.hoofd ? 2.4 : 1; ctx.beginPath();
         weg.punten.forEach((k, i) => { const p = toXY(k.lat, k.lng); i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); }); ctx.stroke();
@@ -443,6 +464,93 @@
   canvas.addEventListener('pointerup', stop); canvas.addEventListener('pointercancel', stop);
   canvas.addEventListener('wheel', e => { e.preventDefault(); cam.afstand = Math.max(60, Math.min(6000, cam.afstand * (1 + Math.sign(e.deltaY) * 0.08))); }, { passive: false });
 
+  /* ================= RTG World Atlas =================
+     Een aparte 2D-canvas houdt de wereldmodus scherp en licht. De 3D-canvas
+     blijft ongewijzigd klaarstaan voor de lokale rijdersweergave. */
+  const wereldView = { lng: 0, lat: 14, zoom: 1 };
+  const continentKleur = {
+    Europe: '#25231f', Asia: '#211f1d', Africa: '#24201d', 'North America': '#202122',
+    'South America': '#241f21', Oceania: '#202322', Antarctica: '#1d2022', 'Seven seas (open ocean)': '#1c1c1b'
+  };
+  function wereldProject(lat, lng, W, H) {
+    const schaal = Math.min(W / 360, H / 172) * wereldView.zoom;
+    let dlng = lng - wereldView.lng; while (dlng > 180) dlng -= 360; while (dlng < -180) dlng += 360;
+    return [W / 2 + dlng * schaal, H / 2 - (lat - wereldView.lat) * schaal];
+  }
+  function wereldPad(ctx, ring, W, H) {
+    let laatste = null, begonnen = false;
+    for (const punt of ring) {
+      const p = wereldProject(punt[1], punt[0], W, H);
+      if (!begonnen || (laatste && Math.abs(p[0] - laatste[0]) > W * .55)) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+      laatste = p; begonnen = true;
+    }
+  }
+  function tekenWereld() {
+    if (!wereldWeergave || !wereldData) return;
+    const ctx = wereldCanvas.getContext('2d'), W = wereldCanvas.width, H = wereldCanvas.height;
+    if (!ctx || !W || !H) return;
+    const bg = ctx.createRadialGradient(W * .58, H * .42, 0, W * .58, H * .42, Math.max(W, H) * .75);
+    bg.addColorStop(0, '#181714'); bg.addColorStop(.48, '#0e0e0d'); bg.addColorStop(1, '#050505');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.lineWidth = Math.max(1, wereldCanvas.width / wereldCanvas.clientWidth * .55);
+    ctx.strokeStyle = 'rgba(215,181,109,.075)';
+    for (let lng = -180; lng <= 180; lng += 30) { const a = wereldProject(-80, lng, W, H), b = wereldProject(85, lng, W, H);
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+    for (let lat = -60; lat <= 60; lat += 30) { ctx.beginPath();
+      for (let lng = -180; lng <= 180; lng += 3) { const p = wereldProject(lat, lng, W, H); lng === -180 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]); } ctx.stroke(); }
+    for (const landPoly of (wereldData.landen || [])) {
+      ctx.beginPath(); for (const ring of landPoly.lijnen || []) wereldPad(ctx, ring, W, H);
+      ctx.fillStyle = continentKleur[landPoly.continent] || '#22211f'; ctx.fill('evenodd');
+      ctx.strokeStyle = 'rgba(215,181,109,.34)'; ctx.lineWidth = wereldView.zoom > 2 ? 1.4 : .8; ctx.stroke();
+    }
+    const regios = wereldData.dekking && wereldData.dekking.regios || [];
+    for (const regio of regios) { const b = regio.bounds; if (!b) continue;
+      const p0 = wereldProject(b.lat1, b.lng0, W, H), p1 = wereldProject(b.lat0, b.lng1, W, H);
+      ctx.fillStyle = 'rgba(99,214,146,.07)'; ctx.fillRect(p0[0], p0[1], p1[0] - p0[0], p1[1] - p0[1]);
+      ctx.strokeStyle = 'rgba(99,214,146,.68)'; ctx.lineWidth = 1.5; ctx.strokeRect(p0[0], p0[1], p1[0] - p0[0], p1[1] - p0[1]); }
+    const toonRang = wereldView.zoom < 1.4 ? 12 : wereldView.zoom < 2.4 ? 9 : 1;
+    ctx.font = Math.max(10, Math.min(15, 9 + wereldView.zoom)) + 'px Inter, sans-serif';
+    for (const stad of (wereldData.steden || [])) { if ((stad.rang || 0) < toonRang) continue;
+      const p = wereldProject(stad.lat, stad.lng, W, H); if (p[0] < -30 || p[0] > W + 30 || p[1] < -20 || p[1] > H + 20) continue;
+      ctx.fillStyle = '#d7b56d'; ctx.beginPath(); ctx.arc(p[0], p[1], wereldView.zoom > 2 ? 3.2 : 2.1, 0, Math.PI * 2); ctx.fill();
+      if (wereldView.zoom > 1.55 || stad.rang >= 13) { ctx.fillStyle = 'rgba(243,238,228,.76)'; ctx.fillText(stad.naam, p[0] + 7, p[1] + 4); }
+    }
+    if (hier) { const p = wereldProject(hier.lat, hier.lng, W, H); ctx.strokeStyle = '#f4d24e'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(p[0], p[1], 8, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = '#f4d24e'; ctx.beginPath(); ctx.arc(p[0], p[1], 2.5, 0, Math.PI * 2); ctx.fill(); }
+    if (naar) { const p = wereldProject(naar.lat, naar.lng, W, H); ctx.fillStyle = '#a50d32'; ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#f3eee4'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p[0], p[1], 11, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.restore();
+  }
+  function focusWereld(p, landFocus) {
+    if (!p) return; wereldView.lat = Math.max(-65, Math.min(75, Number(p.lat) || 0)); wereldView.lng = Number(p.lng) || 0;
+    wereldView.zoom = landFocus ? 1.7 : 3.2; $('#worldFocus').textContent = p.naam || 'RTG World Atlas';
+    $('#worldMeta').textContent = landFocus ? 'Werelddekking en lokale routepakketten rond ' + (p.naam || 'dit land') + '.'
+      : (p.extra ? p.extra + ' · ' : '') + 'Klaar voor een lokaal RTG World Graph-pakket.';
+  }
+  async function toonWereld(focus) {
+    if (!wereldData) { const r = await api('kaart', { lat: hier && hier.lat, lng: hier && hier.lng, wereld: true });
+      if (r.status !== 200) return zeg(r.body.error || 'Wereldkaart niet beschikbaar.'); wereldData = r.body; }
+    wereldWeergave = true; document.body.classList.add('world-view'); canvas.hidden = true; wereldCanvas.hidden = false;
+    $('#worldHud').hidden = false; $('#worldToggle').setAttribute('aria-pressed', 'true'); $('#worldToggle').lastChild.textContent = ' Lokaal';
+    if (focus) focusWereld(focus, focus.soort === 'land'); grootte(); tekenWereld(); $('#badge3d').textContent = 'WORLD';
+  }
+  function toonLokaal() {
+    if (kaartData && kaartData.netwerk === 'RTG-WORLD-ATLAS') return zeg('Voor deze plek is de wereldatlas de actieve kaart.');
+    wereldWeergave = false; document.body.classList.remove('world-view'); wereldCanvas.hidden = true; canvas.hidden = false;
+    $('#worldHud').hidden = true; $('#worldToggle').setAttribute('aria-pressed', 'false'); $('#worldToggle').lastChild.textContent = ' Wereld';
+    $('#badge3d').textContent = R ? '3D' : '2D'; grootte();
+  }
+  $('#worldToggle').addEventListener('click', () => wereldWeergave ? toonLokaal() : toonWereld());
+  let wereldSleep = false, wereldX = 0, wereldY = 0;
+  wereldCanvas.addEventListener('pointerdown', e => { wereldSleep = true; wereldX = e.clientX; wereldY = e.clientY; wereldCanvas.setPointerCapture(e.pointerId); });
+  wereldCanvas.addEventListener('pointermove', e => { if (!wereldSleep) return;
+    const schaal = Math.min(wereldCanvas.clientWidth / 360, wereldCanvas.clientHeight / 172) * wereldView.zoom;
+    wereldView.lng -= (e.clientX - wereldX) / schaal; wereldView.lat += (e.clientY - wereldY) / schaal;
+    wereldView.lat = Math.max(-70, Math.min(78, wereldView.lat)); wereldX = e.clientX; wereldY = e.clientY; tekenWereld(); });
+  const wereldStop = () => { wereldSleep = false; };
+  wereldCanvas.addEventListener('pointerup', wereldStop); wereldCanvas.addEventListener('pointercancel', wereldStop);
+  wereldCanvas.addEventListener('wheel', e => { e.preventDefault(); wereldView.zoom = Math.max(.8, Math.min(12, wereldView.zoom * (e.deltaY > 0 ? .84 : 1.18))); tekenWereld(); }, { passive: false });
+
   /* ================= UI: zoeken, route, lagen ================= */
   let zoekT, zoekVraag = 0;
   $('#zoek').addEventListener('input', e => {
@@ -470,14 +578,19 @@
     res.classList.add('zien');
   }
   async function kiesBestemming(p) {
-    naar = { lat: p.lat, lng: p.lng, naam: p.naam };
+    naar = { lat: p.lat, lng: p.lng, naam: p.naam, land: p.land || '' };
+    if (p.soort === 'land') { await toonWereld(p); return; }
     await berekenRoute();
   }
   async function berekenRoute() {
     if (!naar) return;
     const r = await api('route', { van: hier, naar, modus, profiel });
-    if (r.status !== 200) { zeg(r.body.error || 'Geen route gevonden.'); return; }
+    if (r.status !== 200) {
+      if (r.status === 503 && naar) await toonWereld({ ...naar, extra: naar.land || '', soort: 'wereldstad' });
+      zeg(r.body.error || 'Geen route gevonden.'); return;
+    }
     route = r.body;
+    if (wereldWeergave) toonLokaal();
     toonRoute();
     bouwRoute(); kaderRoute();
   }
@@ -574,6 +687,13 @@
       $('#sourceCoreLabel').textContent = 'NWB-wegvakken';
       $('#liveBadge').textContent = dekking.hierActief ? 'NWB Nederland actief' : (r.body.motor || 'Motor actief');
     } else $('#liveBadge').textContent = r.body.motor || 'Motor actief';
+    const w = r.body.wereld || {};
+    $('#atlasCountries').textContent = w.landen || '177';
+    $('#worldPacks').textContent = (w.regios || []).filter(x => x.actief).length;
+    if (!dekking.hierActief && w.hierActief) {
+      $('#sourceCore').textContent = 'OSM'; $('#sourceCoreLabel').textContent = w.regio || 'World Graph';
+      $('#liveBadge').textContent = 'World Graph actief';
+    }
   }
 
   (() => {
@@ -608,7 +728,7 @@
       const soort = document.createElement('span'); soort.textContent = (LAAG[p.laag] || LAAG.leverancier).naam + (p.extra ? ' · ' + p.extra : '');
       b.append(nm, soort);
       b.addEventListener('click', async () => {
-        hier = { lat: p.lat, lng: p.lng }; land = landVan(hier); $('#poort').classList.remove('zien');
+        hier = { lat: p.lat, lng: p.lng, land: p.land || '' }; land = p.land || landVan(hier); $('#poort').classList.remove('zien');
         await initialiseerKaart(); zeg('Vertrekpunt ingesteld op ' + p.naam + '.');
       });
       lijst.appendChild(b);
@@ -619,7 +739,7 @@
   document.querySelectorAll('.lagen button').forEach(b => b.addEventListener('click', async () => {
     const laag = b.dataset.laag; actief[laag] = !actief[laag]; b.setAttribute('aria-pressed', actief[laag]);
     if (laag === 'flits' && actief.flits) await haalFlits();
-    bouwPinnen();
+    if (R && !wereldWeergave) bouwPinnen();
   }));
   async function haalFlits() {
     const r = await api('poi', { lagen: ['flits'], lat: hier.lat, lng: hier.lng, land });
@@ -659,7 +779,8 @@
     stopVolgen = RTGPlek.volg(plek => {
       const eerste = !hier;
       hier = { lat: plek.lat, lng: plek.lng }; land = landVan(hier);
-      if (kaartData) bouwPinnen();
+      if (kaartData && R && !wereldWeergave) bouwPinnen();
+      if (wereldWeergave) tekenWereld();
       if (navigerend && naar && Date.now() - laatsteHerberekening > 30000) {
         laatsteHerberekening = Date.now(); berekenRoute();
       }
@@ -677,6 +798,9 @@
     if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.'; $('#poort').classList.add('zien'); return; }
     kaartBegonnen = true; kaartData = r.body; ref = kaartData.ref; land = landVan(ref); cosRef = Math.cos(ref.lat * Math.PI / 180);
     await haalStatus(); grootte();
+    if (kaartData.netwerk === 'RTG-WORLD-ATLAS') {
+      wereldData = kaartData; legenda(); await toonWereld(); return;
+    }
     R = Drie.maakRenderer ? Drie.maakRenderer(canvas, {}) : null;
     legenda();
     if (R) { bouwStad(); await haalFlits(); bouwPinnen(); bouwRoute(); teken(); $('#badge3d').textContent = '3D'; }

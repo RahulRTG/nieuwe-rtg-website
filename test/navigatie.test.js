@@ -199,3 +199,23 @@ test('12. de compacte Nederlandse graaf snapt, zoekt en respecteert voertuigtoeg
   assert.equal(n.zoekPlekken('Amsterdam')[0].naam, 'Amsterdam');
   fs.rmSync(map, { recursive: true, force: true });
 });
+
+test('13. de ingebouwde wereldatlas zoekt echte wereldsteden en landen', () => {
+  const { nav } = opzet();
+  const tokyo = nav.navBestemmingen('Tokyo', { lat: 52.36, lng: 4.89 });
+  assert.equal(tokyo.status, 200);
+  assert.ok(tokyo.bestemmingen.some(p => p.naam === 'Tokyo' && p.laag === 'wereld'));
+  const brazilie = nav.navBestemmingen('Brazil', { lat: 52.36, lng: 4.89 });
+  assert.ok(brazilie.bestemmingen.some(p => p.soort === 'land' && p.laag === 'wereld'));
+});
+
+test('14. buiten echte routedekking toont RTG de wereld en verzint geen rasterrit', () => {
+  const { nav } = opzet();
+  const kaart = nav.navKaart({ lat: 35.6762, lng: 139.6503 });
+  assert.equal(kaart.status, 200);
+  assert.equal(kaart.netwerk, 'RTG-WORLD-ATLAS');
+  assert.ok(kaart.landen.length >= 170 && kaart.steden.length >= 200);
+  const route = nav.navRoute({ van: { lat: 35.6762, lng: 139.6503 }, naar: { lat: 35.6895, lng: 139.6917 }, modus: 'auto' });
+  assert.equal(route.status, 503);
+  assert.match(route.error, /routepakket/);
+});

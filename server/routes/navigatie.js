@@ -16,7 +16,8 @@ module.exports = (kern) => {
   // de kaart voor de 3D-app: net-definitie + alle koppelpunten
   app.post('/api/nav/kaart', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, navKaart(hier(req.body)));
+    const b = req.body || {};
+    stuur(res, navKaart(hier(b), { wereld: !!b.wereld }));
   });
   // bestemmingen zoeken over alle eigen bronnen (leverancier/OV/loket/tank/laad)
   app.post('/api/nav/bestemmingen', auth, (req, res) => {

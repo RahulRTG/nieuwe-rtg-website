@@ -1070,18 +1070,30 @@ async function veegDoor(page, doos, opties) {
 
     await los(x0 + eerste);
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(250);
+    /* Een door de timer geopende actielade moet ook echt WEG zijn. Een vaste
+       250 ms liet onder runnerdruk soms de dialoog of veeglade op de oude
+       coordinaten staan; elementFromPoint raakte dan de bovenlaag in plaats
+       van de regel die we opnieuw wilden bewegen. */
+    await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
+      { timeout: 5000 }).catch(() => {});
     const rendererPoging = await page.evaluate(({ x0, y, px, stappen, eerste }) => {
-      const doel = document.elementFromPoint(x0, y);
+      /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
+         dat punt. Na een langdruk kan daar nog één frame een verdwijnende
+         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt. */
+      const doel = [...document.querySelectorAll('.gb-rij')].find((rij) => {
+        const r = rij.getBoundingClientRect();
+        return x0 >= r.left && x0 <= r.right && y >= r.top && y <= r.bottom;
+      });
       if (!doel) return false;
+      const pid = 917;
       const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
-        bubbles: true, cancelable: true, view: window, pointerId: 1,
+        bubbles: true, cancelable: true, view: window, pointerId: pid,
         pointerType: 'mouse', isPrimary: true, button: type === 'pointermove' ? -1 : 0,
         buttons, clientX: x, clientY: y
       }));
       stuur('pointerdown', x0, 1);
       stuur('pointermove', x0 + eerste, 1);
-      const begon = !!document.querySelector('[data-gb]');
+      const begon = doel.hasAttribute('data-gb');
       if (begon) {
         for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
       }

@@ -9,7 +9,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stopHard, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -136,7 +136,10 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     assert.deepEqual(fouten, [], 'de werkruimte hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});
-    child.kill();
+    /* Eerst wachten tot de server echt weg is. Alleen child.kill() verstuurt
+       het signaal; onder runnerdruk schreef het proces daarna nog in TMP en
+       verloor rmSync de race met ENOTEMPTY. */
+    await stopHard(child);
     fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

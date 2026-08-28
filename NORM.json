@@ -1533,6 +1533,84 @@
       "pad": "public/shared/linkkaart.js",
       "vervalt": "2026-10-01",
       "reden": "binnengekomen met de samenvoegronde van 20 augustus 2026 (PR #83). Na drie omzetrondes naar de hulpklassen blijven hier 1 attribu(u)t(en) over, en die zijn eenmalig: een component-eigen vorm en geen herhaalde maat. Er een klasse van maken zou een klasse opleveren die een keer wordt gebruikt. Aflossen gebeurt met een stijlblok bij het component, niet met een zoek-en-vervang."
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/commerce.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de 13 eenmalige stijlattributen gaan naar componentklassen bij het aflossen van COMMERCE.md"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/kosten.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; het ene attribuut verhuist naar de gedeelde kostprijs-tekenlaag"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier-commerce.html",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes eenmalige stijlattributen gaan naar de commerce-stijlkop"
+    },
+    {
+      "regel": "inline-stijl",
+      "pad": "public/apps/leverancier/leverancier-56a.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere commerce-tak van PR #129; de zes schermspecifieke attributen worden bij de volgende leveranciersbundelknip klassen"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/accounts/users.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #123/#131; de wachtwoordzaaiing wordt als eigen accountmodule afgesplitst"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/fiscaal/index.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #120/#129; de commerce-fiscale regels krijgen een eigen fiscaal deelbestand"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/magnaatwereld.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de al te grote Magnaatwereld groeide 41 bytes en wordt langs de bestaande wereldkamers verder gesplitst"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/kern/vergeten.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #106/#132; duurzame privacywissing verhuist naar een eigen vergeetregister"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/diensten2.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijsdiensten worden in een derde dienstenkamer aangesloten"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/kernlaag4.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere kostprijstak van PR #125; de economische besturingslaag krijgt een eigen kernlaagdeel"
+    },
+    {
+      "regel": "omvang",
+      "pad": "server/opzet/leverancierpoort.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #112/#125; de kostprijs- en gezagsroutes worden naar een leverancierspoortdeel verplaatst"
+    },
+    {
+      "regel": "nieuw-endpoint-zonder-toets",
+      "pad": "server/routes/appstore/persoon.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit de oudere makerstak van PR #126; de vier lees- en intrekpaden krijgen expliciete HTTP-contracttoetsen naast de bestaande kern- en schermtoetsen"
+    },
+    {
+      "regel": "zelfpoortende-toets",
+      "pad": "test/grafsteen.pg.test.js",
+      "vervalt": "2026-10-15",
+      "reden": "binnengekomen met samenvoeg-PR #137 uit PR #132; de proef vereist bewust PostgreSQL, draait in CI met die dienst en blijft lokaal expliciet overgeslagen tot de standaarddraaier PostgreSQL start"
     }
   ]
 }

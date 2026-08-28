@@ -17,6 +17,7 @@
    maakWerkplek(state) volgt het vaste kern-patroon. */
 
 const CODES = ['rtg', 'rtf'];
+const werkplekKantoren = require('./werkplek-kantoren');
 
 module.exports = ({ db, save, crypto }) => {
   const nu = () => Date.now();
@@ -79,6 +80,8 @@ module.exports = ({ db, save, crypto }) => {
   }
   const mensenVan = code => bak('werkplekMensen', code);
   const takenVan = code => bak('werkplekTaken', code);
+  const kantorenVan = code => werkplekKantoren(code, mensenVan(code), takenVan(code));
+  const kantoorKent = (code, id) => kantorenVan(code).some(k => k.id === String(id || ''));
 
   /* ---- de twee huizen naast elkaar ---- */
   function bedrijven() {
@@ -99,6 +102,7 @@ module.exports = ({ db, save, crypto }) => {
     return { ok: true, code, naam: b.naam, kort: b.kort, icoon: b.icoon, aard: b.aard, kantoor: b.kantoor,
       cijfers: b.cijfers().map(([label, waarde]) => ({ label, waarde })),
       loopt: b.loopt(),
+      kantoren: kantorenVan(code),
       mensen: mensenVan(code).slice(0, 50),
       taken: takenVan(code).slice(0, 30) };
   }
@@ -109,14 +113,20 @@ module.exports = ({ db, save, crypto }) => {
     if (!kent(code)) return { status: 404, error: 'Dit bedrijf kennen we niet.' };
     const codenaam = String((body || {}).codenaam || '').replace(/[<>]/g, '').trim().slice(0, 60);
     const functie = String((body || {}).functie || '').replace(/[<>]/g, '').trim().slice(0, 60);
+    const afdeling = kantoorKent(code, body && body.afdeling) ? String(body.afdeling) : 'operations';
     if (!codenaam) return { status: 400, error: 'Wie komt erbij? Geef een codenaam.' };
     const rij = mensenVan(code);
     const bestaat = rij.find(m => m.codenaam.toLowerCase() === codenaam.toLowerCase());
-    if (bestaat) { bestaat.functie = functie || bestaat.functie; save(); return { ok: true, mensen: rij.slice(0, 50) }; }
+    if (bestaat) {
+      bestaat.functie = functie || bestaat.functie;
+      bestaat.afdeling = afdeling;
+      save();
+      return { ok: true, mensen: rij.slice(0, 50), kantoren: kantorenVan(code) };
+    }
     if (rij.length >= 200) return { status: 400, error: 'Deze werkplek zit vol (200 mensen).' };
-    rij.unshift({ id: crypto.randomBytes(4).toString('hex'), codenaam, functie: functie || 'Medewerker', sinds: nu() });
+    rij.unshift({ id: crypto.randomBytes(4).toString('hex'), codenaam, functie: functie || 'Medewerker', afdeling, sinds: nu() });
     save();
-    return { ok: true, mensen: rij.slice(0, 50) };
+    return { ok: true, mensen: rij.slice(0, 50), kantoren: kantorenVan(code) };
   }
   function mensWeg(code, id) {
     code = norm(code);
@@ -126,20 +136,21 @@ module.exports = ({ db, save, crypto }) => {
     if (i < 0) return { status: 404, error: 'Deze persoon staat hier niet meer.' };
     rij.splice(i, 1);
     save();
-    return { ok: true, mensen: rij.slice(0, 50) };
+    return { ok: true, mensen: rij.slice(0, 50), kantoren: kantorenVan(code) };
   }
 
   /* ---- de takenlijst van het huis ---- */
-  function taakMaak(code, tekst) {
+  function taakMaak(code, tekst, afdeling) {
     code = norm(code);
     if (!kent(code)) return { status: 404, error: 'Dit bedrijf kennen we niet.' };
     const t = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 200);
     if (!t) return { status: 400, error: 'Wat moet er gebeuren?' };
+    afdeling = kantoorKent(code, afdeling) ? String(afdeling) : 'operations';
     const rij = takenVan(code);
-    rij.unshift({ id: crypto.randomBytes(4).toString('hex'), tekst: t, af: false, at: nu() });
+    rij.unshift({ id: crypto.randomBytes(4).toString('hex'), tekst: t, afdeling, af: false, at: nu() });
     if (rij.length > 100) rij.pop();
     save();
-    return { ok: true, taken: rij.slice(0, 30) };
+    return { ok: true, taken: rij.slice(0, 30), kantoren: kantorenVan(code) };
   }
   function taakZet(code, id, af) {
     code = norm(code);
@@ -148,7 +159,7 @@ module.exports = ({ db, save, crypto }) => {
     if (!t) return { status: 404, error: 'Deze taak staat er niet meer.' };
     t.af = af === true;
     save();
-    return { ok: true, taken: takenVan(code).slice(0, 30) };
+    return { ok: true, taken: takenVan(code).slice(0, 30), kantoren: kantorenVan(code) };
   }
 
   /* ---- wie mag in welk huis ----

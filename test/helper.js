@@ -1030,10 +1030,11 @@ async function keurLidGoed(base, token, codenaam, geboortedatum) {
 
    Wat hier nu staat maakt dat zichtbaar in plaats van dodelijk: na de eerste
    beweging wordt gecontroleerd of het gebaar echt begonnen is. Zo niet, dan is
-   het deze race, en dan gaat de lade dicht en volgt EEN nieuwe poging. Gebeurt
-   het twee keer, dan zakt de toets met de reden erbij -- want twee keer is geen
-   traagheid meer. Geen langere wachttijden: die maken een dobbelsteen stiller,
-   niet eerlijker. */
+   het deze race, gaat de lade dicht en volgt EEN rendererpoging waarin neer,
+   bewegen en loslaten synchroon worden afgeleverd. Een timer kan niet midden
+   in één JavaScript-taak vallen. Ook die poging loopt door precies dezelfde
+   pointerlisteners; alleen de CI-planner zit er niet meer tussen. Geen langere
+   wachttijden: die maken een dobbelsteen stiller, niet eerlijker. */
 async function veegDoor(page, doos, opties) {
   const o = opties || {};
   const y = doos.y + (o.vanBoven ? Math.min(o.vanBoven, doos.height / 2) : doos.height / 2);
@@ -1056,25 +1057,40 @@ async function veegDoor(page, doos, opties) {
     type: 'mouseReleased', button: 'left', buttons: 0, x, y, clickCount: 1
   });
   try {
-    for (let poging = 1; poging <= 2; poging++) {
-      await beweeg(x0, false);
-      const omlaag = druk();
-      const aanzet = beweeg(x0 + eerste, true);
-      await Promise.all([omlaag, aanzet]);
-      const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
-      if (!begonnen) {
-        await los(x0 + eerste);
-        await page.keyboard.press('Escape');
-        await page.waitForTimeout(250);
-        if (poging === 2) {
-          throw new Error('het gebaar begon twee keer niet: de vasthoud-teller (520ms) won ' +
-            'van de eerste beweging. Een keer is een trage opstart, twee keer is een fout.');
-        }
-        continue;
-      }
+    await beweeg(x0, false);
+    const omlaag = druk();
+    const aanzet = beweeg(x0 + eerste, true);
+    await Promise.all([omlaag, aanzet]);
+    const begonnen = await page.evaluate(() => !!document.querySelector('[data-gb]'));
+    if (begonnen) {
       for (let i = 2; i <= stappen; i++) await beweeg(x0 + (px * i) / stappen, true);
       await los(x0 + px);
       return;
+    }
+
+    await los(x0 + eerste);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(250);
+    const rendererPoging = await page.evaluate(({ x0, y, px, stappen, eerste }) => {
+      const doel = document.elementFromPoint(x0, y);
+      if (!doel) return false;
+      const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
+        bubbles: true, cancelable: true, view: window, pointerId: 1,
+        pointerType: 'mouse', isPrimary: true, button: type === 'pointermove' ? -1 : 0,
+        buttons, clientX: x, clientY: y
+      }));
+      stuur('pointerdown', x0, 1);
+      stuur('pointermove', x0 + eerste, 1);
+      const begon = !!document.querySelector('[data-gb]');
+      if (begon) {
+        for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
+      }
+      stuur('pointerup', x0 + (begon ? px : eerste), 0);
+      return begon;
+    }, { x0, y, px, stappen, eerste });
+    if (!rendererPoging) {
+      throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling; ' +
+        'dan is de gebaarbedrading zelf stuk.');
     }
   } finally {
     await cdp.detach();

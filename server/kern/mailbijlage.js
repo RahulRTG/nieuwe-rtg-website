@@ -41,10 +41,11 @@ module.exports = ({ db, save, crypto, antivirus, dir }) => {
   const OPSLAG = path.join(dir || path.join(__dirname, '..', 'data'), 'mailbijlagen');
   const nu = () => new Date().toISOString();
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/mailbijlage', bezit: { mailBijlagen: 'kaart' } });
   function B() {
-    if (!db.data.mailBijlagen || typeof db.data.mailBijlagen !== 'object') db.data.mailBijlagen = { rijen: [] };
-    if (!Array.isArray(db.data.mailBijlagen.rijen)) db.data.mailBijlagen.rijen = [];
-    return db.data.mailBijlagen;
+    const b = eigen.bak('mailBijlagen');
+    if (!Array.isArray(b.rijen)) b.rijen = [];
+    return b;
   }
 
   /* De bytes gaan door `versleutelBestand`, de aan de NAAM gebonden variant, en

@@ -11,7 +11,7 @@
 
    Privacy by design: de gevoelige deel-functies (locatie, GPS, paspoort delen,
    Bluetooth) staan STANDAARD UIT; de rest staat aan zodat de app draait zoals
-   altijd tot iemand bewust iets omzet. De stand staat in db.data.ledenBoard:
+   altijd tot iemand bewust iets omzet. De stand staat in de collectie ledenBoard:
      { <sleutel>: { <functie-id>: true|false, _v: <versie>, _at: <iso> } }
    Wat er niet in staat volgt de standaard van de functie.
 
@@ -35,7 +35,8 @@ function maakLidboard({ db, save }) {
   const journaal = maakJournaal({ db, save });
   const werk = maakWerkbeleid({ db, save });
 
-  function store() { if (!db.data.ledenBoard || typeof db.data.ledenBoard !== 'object') db.data.ledenBoard = {}; return db.data.ledenBoard; }
+  const eigenC = require('../eigencollectie')({ db, domein: 'kern/lidboard/index', bezit: { ledenBoard: 'kaart' } });
+  function store() { return eigenC.bak('ledenBoard'); }
   function eigen(sleutel) { const s = store(); return (s[sleutel] && typeof s[sleutel] === 'object') ? s[sleutel] : {}; }
   function versie(sleutel) { const v = Number(eigen(sleutel)._v); return Number.isFinite(v) && v > 0 ? v : 0; }
 

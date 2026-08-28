@@ -6,7 +6,7 @@
    Declaraties beslist een mens: goedkeuren kan met een tik, afwijzen kan
    alleen met een reden. De pas verschijnt automatisch in de RTG Wallet
    van het lid en verdwijnt daar weer bij stopzetting.
-   Opslag per verzekeraar in db.data.zorgpolis[code]. */
+   Opslag per verzekeraar in de zorgpolis-collectie onder [code]. */
 
 const PAKKETTEN = { basis: 129, plus: 159, top: 189 };
 const MAX_LIJST = 300;
@@ -15,11 +15,12 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
   const nu = () => new Date().toISOString();
   const id = p => p + crypto.randomBytes(3).toString('hex');
   const cap = (l, m) => { if (l.length > m) l.length = m; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/zorgpolis', bezit: { zorgpolis: 'kaart' } });
 
   function Z(code) {
-    if (!db.data.zorgpolis) db.data.zorgpolis = {};
-    if (!db.data.zorgpolis[code]) db.data.zorgpolis[code] = { verzekerden: [], declaraties: [] };
-    return db.data.zorgpolis[code];
+    const alle = eigen.bak('zorgpolis');
+    if (!alle[code]) alle[code] = { verzekerden: [], declaraties: [] };
+    return alle[code];
   }
 
   function overzicht(code) {

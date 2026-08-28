@@ -37,10 +37,8 @@ function maakMandaat({ db, save, nu }) {
   const tijd = nu || (() => new Date().toISOString());
   const vandaag = () => tijd().slice(0, 10);
 
-  function bak() {
-    if (!Array.isArray(db.data.gatewayMandaten)) db.data.gatewayMandaten = [];
-    return db.data.gatewayMandaten;
-  }
+  const eigen = require('../../eigencollectie')({ db, domein: 'kern/fiscaal/gateway/mandaat', bezit: { gatewayMandaten: 'lijst' } });
+  const bak = () => eigen.bak('gatewayMandaten');
 
   function verleen({ code, soort, van, tot, doorNaam, doorRol, kenmerk }) {
     const zaak = String(code || '').toUpperCase();

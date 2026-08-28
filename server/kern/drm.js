@@ -12,7 +12,8 @@ function maakDrm({ db, save, crypto }) {
   const nu = () => new Date().toISOString();
   // ruwe bytes -> base64url (het formaat dat EME/JWK verwacht)
   const b64url = buf => Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  const store = () => (db.data.drmSleutels = db.data.drmSleutels || {});
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/drm', bezit: { drmSleutels: 'kaart', drmRapport: 'lijst' } });
+  const store = () => eigen.bak('drmSleutels');
 
   // per content een vaste kid + key; op aanvraag aangemaakt en bewaard
   function ensureKey(contentId) {
@@ -52,13 +53,12 @@ function maakDrm({ db, save, crypto }) {
   // lichte telemetrie: welke sleutelsystemen de clients melden (voor de regie)
   function report(sess, data) {
     data = data || {};
-    if (!Array.isArray(db.data.drmRapport)) db.data.drmRapport = [];
-    db.data.drmRapport.unshift({
+    eigen.bak('drmRapport').unshift({
       key: (sess && sess.key) || null,
       keySystems: (Array.isArray(data.keySystems) ? data.keySystems : []).slice(0, 8).map(x => String(x).slice(0, 40)),
       eme: !!data.eme, at: nu()
     });
-    db.data.drmRapport = db.data.drmRapport.slice(0, 5000);
+    eigen.zetBak('drmRapport', eigen.bak('drmRapport').slice(0, 5000));
     save();
     return { ok: true };
   }

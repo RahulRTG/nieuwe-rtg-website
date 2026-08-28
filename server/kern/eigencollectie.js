@@ -34,6 +34,25 @@
        (kern/command/register.js, de bronnen van kern/levensgraaf).
    Wie een van die vier tegenkomt, schrijft een contract en gebruikt dit niet.
 
+   EN TWEE DIE ER PAS BIJ DE STAART UIT KWAMEN. De 122 kandidaten van de
+   afbouwronde leverden twaalf bestanden op die hier niet in passen, en ze
+   vielen in maar twee soorten -- dus staan ze hier, met hun aantal, in plaats
+   van dat de volgende ze opnieuw ontdekt:
+
+     - EEN LEESPAD DAT NIETS MAG SCHEPPEN (vier keer: kern/socialebeleid,
+       kern/checklijst, kern/levensband, kern/levensbeleid). `bak()` maakt de
+       collectie altijd aan, en die vier hebben een `kijk()` waarvan een toets
+       vastlegt dat db.data ONAANGERAAKT blijft -- bij checklijst is het zelfs
+       een ROLLBACK-cel van de staatproef. Een kijken-zonder-scheppen is bewust
+       niet toegevoegd: dan zou elke aanroeper moeten weten welke van de twee
+       hij nodig heeft, en dat is precies de kennis die dit bestand weghaalt.
+     - EEN GETAL OF EEN STRING (drie keer: factuurTeller, doosSeq,
+       balieSteunZout). Een teller of een zout is geen collectie; wie hem als
+       kaart declareert, liegt over zijn vorm. De handgeschreven contracten
+       hebben hier `teller()` voor (kern/command/opslag.js). Drie gevallen is te
+       weinig om die vorm hierheen te tillen -- zie de kop hierboven over
+       gevonden worden in plaats van eroverheen verklaard.
+
    DE DECLARATIE STAAT BIJ DE EIGENAAR EN NIET IN EEN MIDDENREGISTER. Dat is met
    opzet: een centrale lijst van vierhonderd collecties is binnen een jaar de
    volgende plek die uit de pas loopt met de code (BEWIJSMACHINE.md over een

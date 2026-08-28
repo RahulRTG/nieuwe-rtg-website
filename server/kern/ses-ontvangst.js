@@ -42,6 +42,7 @@ const teken = (geheim, velden) => crypto.createHmac('sha256', geheim)
   .update(grondtekst(velden)).digest('hex');
 
 module.exports = ({ db, save, geheim, nu } = {}) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/ses-ontvangst', bezit: { sesOntvangst: 'kaart' } });
   const secret = tekst(geheim == null ? process.env.SES_INBOUND_SECRET : geheim);
   const klok = typeof nu === 'function' ? nu : klokNu;
   const actief = secret.length >= 32;
@@ -99,10 +100,9 @@ module.exports = ({ db, save, geheim, nu } = {}) => {
   }
 
   function kast() {
-    if (!db.data.sesOntvangst || typeof db.data.sesOntvangst !== 'object')
-      db.data.sesOntvangst = { claims:[] };
-    if (!Array.isArray(db.data.sesOntvangst.claims)) db.data.sesOntvangst.claims = [];
-    return db.data.sesOntvangst.claims;
+    const s = eigen.bak('sesOntvangst', (b) => { b.claims = []; });
+    if (!Array.isArray(s.claims)) s.claims = [];
+    return s.claims;
   }
   const sleutelVan = v => sha256(Buffer.from(v.berichtId + '\n' + v.ontvanger));
   const bewaar = () => { if (typeof save === 'function') save(); };

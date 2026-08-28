@@ -4,7 +4,7 @@
    boeken -> onderweg per etappe -> douane (alleen bij een grensoverschrijding)
    -> aangekomen -> afgeleverd. Elke zending krijgt een volgcode waarmee de
    klant publiek kan meekijken, zonder klantgegevens.
-   Opslag per zaak in db.data.vracht[code]; begrensd, nette demo-start. */
+   Opslag per zaak in de vracht-collectie onder [code]; begrensd, nette demo-start. */
 
 const MODALITEITEN = {
   lucht:       { label: 'Luchtvracht',  icon: 'vluchten',      document: 'AWB (luchtvrachtbrief)' },
@@ -27,7 +27,8 @@ const DEMO = [
 ];
 
 module.exports = ({ db, save, crypto, schoon }) => {
-  const V = () => { if (!db.data.vracht) db.data.vracht = {}; return db.data.vracht; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/vracht', bezit: { vracht: 'kaart' } });
+  const V = () => eigen.bak('vracht');
   const nu = () => new Date().toISOString();
   const meld = (z, tekst) => { z.gebeurtenissen.unshift({ at: nu(), tekst }); if (z.gebeurtenissen.length > MAX_GEBEURTENISSEN) z.gebeurtenissen.length = MAX_GEBEURTENISSEN; };
   const internationaal = z => z.van.land.toLowerCase() !== z.naar.land.toLowerCase();

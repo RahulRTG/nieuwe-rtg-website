@@ -12,10 +12,8 @@
    maakAlgPin(state) volgt het vaste kern-patroon. */
 
 function maakAlgPin({ db, save, crypto, slot }) {
-  const rij = () => {
-    if (!db.data.algPin || typeof db.data.algPin !== 'object') db.data.algPin = {};
-    return db.data.algPin;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/algpin', bezit: { algPin: 'kaart', algPinHerstel: 'kaart' } });
+  const rij = () => eigen.bak('algPin');
   /* Het slot komt van buiten (server/pinslot.js) en wordt gedeeld met de
      personeelspin, de sleutelwoorden en het koppelen. Hier stond een eigen
      kopie van dezelfde teller, met dezelfde grenzen -- maar zonder de
@@ -89,10 +87,7 @@ function maakAlgPin({ db, save, crypto, slot }) {
      heeft, kon het wachtwoord toch al herstellen; de pin wordt daarmee niet
      zwakker dan de deur die eromheen zit. */
   const HERSTEL_MS = 3600000;   // een uur, net als de wachtwoordlink
-  const herstelRij = () => {
-    if (!db.data.algPinHerstel || typeof db.data.algPinHerstel !== 'object') db.data.algPinHerstel = {};
-    return db.data.algPinHerstel;
-  };
+  const herstelRij = () => eigen.bak('algPinHerstel');
   const sleutelHash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
 
   function pinHerstelStart(key) {

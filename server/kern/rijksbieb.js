@@ -36,10 +36,11 @@ let SOM_WAARDE = 0;
 for (let i = 0; i < TOTAAL; i++) SOM_WAARDE += 49900 + ((i * 7919) % 90) * 1000;
 
 function maakRijksBieb({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rijksbieb', bezit: { rijksInstallaties: 'kaart' } });
   const rij = (key) => {
-    if (!db.data.rijksInstallaties) db.data.rijksInstallaties = {};
-    if (!Array.isArray(db.data.rijksInstallaties[key])) db.data.rijksInstallaties[key] = [];
-    return db.data.rijksInstallaties[key];
+    const alle = eigen.bak('rijksInstallaties');
+    if (!Array.isArray(alle[key])) alle[key] = [];
+    return alle[key];
   };
 
   function overzicht() {

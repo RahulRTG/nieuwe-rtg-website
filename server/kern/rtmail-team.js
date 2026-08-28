@@ -21,6 +21,7 @@
 const adresLaag = require('./rtmail-adres');
 
 module.exports = ({ db, save, crypto, rtmail, findSupplier, CODENAMES }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtmail-team', bezit: { rtmailTeams: 'kaart' } });
   const MAX_EIGEN = 10;       // teams die één iemand mag oprichten
   const MAX_TEAMS = 5000;     // bovengrens voor het hele huis
   const MAX_LEDEN = 100;
@@ -33,8 +34,7 @@ module.exports = ({ db, save, crypto, rtmail, findSupplier, CODENAMES }) => {
   const vrij = require('./rtmail-vrij')({ rtmail, findSupplier, CODENAMES });
 
   function T() {
-    if (!db.data.rtmailTeams || typeof db.data.rtmailTeams !== 'object') db.data.rtmailTeams = { teams: [] };
-    const t = db.data.rtmailTeams;
+    const t = eigen.bak('rtmailTeams', (b) => { b.teams = []; });
     if (!Array.isArray(t.teams)) t.teams = [];
     return t;
   }

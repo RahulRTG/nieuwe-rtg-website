@@ -39,10 +39,8 @@ function maakBtwAangifte({ db, save, crypto, nu }) {
   const vandaag = () => tijd().slice(0, 10);
   const { telFacturen, tarievenPerTarief, controleerRegister } = maakBtwTelling({ db });
 
-  function bak() {
-    if (!Array.isArray(db.data.btwAangiftes)) db.data.btwAangiftes = [];
-    return db.data.btwAangiftes;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/fiscaal/btwaangifte', bezit: { btwAangiftes: 'lijst' } });
+  const bak = () => eigen.bak('btwAangiftes');
   const vind = (id) => bak().find(a => a.id === id) || null;
 
   /* ---------- opmaken ---------- */

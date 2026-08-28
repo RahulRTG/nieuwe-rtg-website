@@ -10,7 +10,7 @@
    - een update wordt streng gevalideerd en dan IN PLACE op het gedeelde
      register gezet, zodat elke lezer -- het scherm, het oprichtingsproject, de
      capslijst -- per direct met de nieuwe stand rekent;
-   - de overlay wordt bewaard (db.data.rechtsvormRegels) en bij het opstarten
+   - de overlay wordt bewaard (collectie rechtsvormRegels) en bij het opstarten
      opnieuw toegepast: een herstart verliest nooit een update;
    - met RECHTSVORM_BRON_URL gezet haalt de dagelijkse controle de nieuwste
      tabel op; zonder bron meldt de status eerlijk dat de ingebouwde tabel geldt.
@@ -56,8 +56,9 @@ const filterStappen = (lijst) => (Array.isArray(lijst)
 module.exports = ({ db, save, fetchImpl }) => {
   const haal = fetchImpl || ((...a) => fetch(...a));
 
-  const staat = () => (db.data.rechtsvormRegels = db.data.rechtsvormRegels ||
-    { versie: null, bron: null, at: null, wijzigingen: {} });
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/onderneming/rechtsvormwacht', bezit: { rechtsvormRegels: 'kaart' } });
+  const staat = () => eigen.bak('rechtsvormRegels',
+    b => Object.assign(b, { versie: null, bron: null, at: null, wijzigingen: {} }));
 
   /* Een BESTAANDE vorm bijwerken. Geeft terug wat er echt veranderde, zodat de
      overlay alleen draagt wat hij ook heeft gedaan. */

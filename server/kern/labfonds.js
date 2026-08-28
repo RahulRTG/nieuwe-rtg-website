@@ -9,7 +9,7 @@
    staat los in kern/onderzoekslab.js en is niet via dit fonds zichtbaar.
 
    Geld is hier een toezegging in het fondsgrootboek (centen); er wordt nooit
-   geclaimd dat een echte betaling is verwerkt. Opslag: db.data.labFonds. */
+   geclaimd dat een echte betaling is verwerkt. Opslag: labFonds. */
 
 module.exports = ({ db, save, crypto, anthropic }) => {
   const nu = () => new Date().toISOString();
@@ -20,9 +20,9 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   // richtingen die geen omgeving dienen maar privaat gewin: de scheidsrechter raadt af
   const PRIVAAT = ['mezelf', 'mijzelf', 'eigen zak', 'prive', 'privé', 'vakantie voor mij', 'cadeau voor mij', 'zakgeld', 'mijn rekening'];
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/labfonds', bezit: { labFonds: 'kaart' } });
   function F() {
-    if (!db.data.labFonds || typeof db.data.labFonds !== 'object') db.data.labFonds = {};
-    const f = db.data.labFonds;
+    const f = eigen.bak('labFonds');
     if (!f.locaties || typeof f.locaties !== 'object') f.locaties = {};
     if (!Array.isArray(f.bijdragen)) f.bijdragen = [];
     if (!Array.isArray(f.voorstellen)) f.voorstellen = [];
@@ -101,7 +101,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
      datum. fonds() geeft alleen sommen, en die in euro's omdat dat beeld
      rechtstreeks naar het scherm gaat; de geldgraaf (kern/geldgraaf) heeft
      de losse gebeurtenissen nodig voor zijn tijdlijn en mag daarvoor niet
-     zelf in db.data.labFonds graven -- dan leest een tweede plek de vorm
+     zelf in labFonds graven -- dan leest een tweede plek de vorm
      van een bijdrage na en loopt die vanzelf uit de pas met dit domein
      (LAT.md regel 4). Kopieen, geen verwijzingen: meekijken is geen
      meeschrijven. */

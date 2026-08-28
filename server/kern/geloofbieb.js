@@ -46,10 +46,11 @@ for (const a of ITEMS) { if (!TRAD_LABEL[a.traditie]) { TRAD_LABEL[a.traditie] =
 const THEMAS = [...new Set(ITEMS.map(a => a.thema))];
 
 function maakGeloofBieb({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/geloofbieb', bezit: { geloofInstallaties: 'kaart' } });
   const rij = (handle) => {
-    if (!db.data.geloofInstallaties) db.data.geloofInstallaties = {};
-    if (!Array.isArray(db.data.geloofInstallaties[handle])) db.data.geloofInstallaties[handle] = [];
-    return db.data.geloofInstallaties[handle];
+    const alles = eigen.bak('geloofInstallaties');
+    if (!Array.isArray(alles[handle])) alles[handle] = [];
+    return alles[handle];
   };
   const magZien = (groep, doelgroep) => (ZICHT[groep] || ZICHT.kind).includes(doelgroep);
   const publiek = (a) => ({ id: a.id, naam: a.naam, titel: a.titel, traditie: a.traditie, traditieLabel: a.traditieLabel,

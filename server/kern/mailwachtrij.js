@@ -41,9 +41,9 @@ module.exports = ({ db, save, crypto, verzend }) => {
   const nu = () => new Date().toISOString();
   const kap = (s, n) => String(s == null ? '' : s).slice(0, n);
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/mailwachtrij', bezit: { mailQ: 'kaart' } });
   function Q() {
-    if (!db.data.mailQ || typeof db.data.mailQ !== 'object') db.data.mailQ = { rijen: [], dood: [] };
-    const q = db.data.mailQ;
+    const q = eigen.bak('mailQ');
     if (!Array.isArray(q.rijen)) q.rijen = [];
     if (!Array.isArray(q.dood)) q.dood = [];
     return q;

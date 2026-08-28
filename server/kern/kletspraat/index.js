@@ -31,11 +31,12 @@ const PER_DAG = 1;                 // per paar per dag
 module.exports = (state) => {
   const { db, save, crypto, sociaal, ordersVanKlant, boekingenVanKlant, anthropic, dagContext, sseToCustomer } = state;
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/kletspraat/index', bezit: { klets: 'kaart' } });
   function lijsten() {
-    if (!db.data.klets) db.data.klets = { aan: {}, gesprekken: [] };
-    if (!db.data.klets.aan) db.data.klets.aan = {};
-    if (!db.data.klets.gesprekken) db.data.klets.gesprekken = [];
-    return db.data.klets;
+    const k = eigen.bak('klets');
+    if (!k.aan) k.aan = {};
+    if (!k.gesprekken) k.gesprekken = [];
+    return k;
   }
   const paarSleutel = (a, b) => [a, b].sort().join('|');
 

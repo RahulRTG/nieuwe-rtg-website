@@ -28,7 +28,8 @@ function maakNotities({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodena
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'notities' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const store = () => { if (!db.data.notities || typeof db.data.notities !== 'object') db.data.notities = {}; return db.data.notities; };
+  const eigenNotities = require('./eigencollectie')({ db, domein: 'kern/notities', bezit: { notities: 'kaart' } });
+  const store = () => eigenNotities.bak('notities');
   const ruw = k => { const s = store(); if (!Array.isArray(s[k])) s[k] = []; return s[k]; };
   const alleVan = key => ruw('lid:' + key);
   const naam = k => codenaamVan(k) || 'een lid';

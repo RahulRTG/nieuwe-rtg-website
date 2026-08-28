@@ -13,7 +13,7 @@
    - AI-hulp: schrijft een eerlijke omschrijving, stelt een prijs voor, raadt de
      categorie, en doet een veiligheidscheck op een advertentie of een chat.
 
-   Alles staat onder db.data.markt zodat het meelift op het atomische wegschrijven
+   Alles staat onder de collectie markt zodat het meelift op het atomische wegschrijven
    en de back-up van de hoofdserver, en gedeeld is met de RTFoundation-router. */
 
 /* De spelregels (categorieen, verbodslijsten, richtprijzen, drempels) staan
@@ -23,9 +23,9 @@ const { CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONT
 const { advertentieOpenbaar } = require('./markt/openbaar');
 
 function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/markt', bezit: { markt: 'kaart' } });
   function store() {
-    if (!db.data.markt) db.data.markt = { ads: [], chats: {}, geblokkeerd: {}, teller: 0 };
-    const m = db.data.markt;
+    const m = eigen.bak('markt');
     if (!Array.isArray(m.ads)) m.ads = [];
     if (!m.chats) m.chats = {};
     if (!m.geblokkeerd) m.geblokkeerd = {};

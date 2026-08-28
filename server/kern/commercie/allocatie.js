@@ -56,11 +56,8 @@ const { REGELS, HUIDIGE_VERSIE, STATUS, OVERGANG, magOvergaan, regelVan, regelKl
    verleden. */
 function maakAllocatie({ db, save, nu }) {
   const tijd = nu || klok.nu;
-  function rij() {
-    if (!db.data) db.data = {};
-    if (!Array.isArray(db.data.socialeAfdrachten)) db.data.socialeAfdrachten = [];
-    return db.data.socialeAfdrachten;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/allocatie', bezit: { socialeAfdrachten: 'lijst' } });
+  function rij() { return eigen.bak('socialeAfdrachten'); }
 
   function zet(a, naar, velden) {
     if (!magOvergaan(a.status, naar))

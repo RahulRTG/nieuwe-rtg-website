@@ -217,11 +217,11 @@ module.exports = ({
   let capabilityGraph = capabilityScanner.scan();
   let alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/magnaatwereld', bezit: { magnaatWereld: 'kaart' } });
   function state() {
-    if (!db.data.magnaatWereld || typeof db.data.magnaatWereld !== 'object') {
-      db.data.magnaatWereld = { versie: VERSIE, spelers: {}, voorstellen: [], logboek: [], laatsteScan: 0 };
-    }
-    const s = db.data.magnaatWereld;
+    const s = eigen.bak('magnaatWereld', (b) => {
+      b.versie = VERSIE; b.spelers = {}; b.voorstellen = []; b.logboek = []; b.laatsteScan = 0;
+    });
     s.versie = VERSIE;
     if (!s.spelers || typeof s.spelers !== 'object') s.spelers = {};
     if (!Array.isArray(s.voorstellen)) s.voorstellen = [];

@@ -10,7 +10,7 @@
    - Rendez-vous de besloten datingdienst van de Lifestyle Pass, met wensen,
      wederzijdse likes en een date-voorstel van Rahul.
    Beide verbouwen zou twee werkende concepten slopen om een derde te maken. De
-   groepen-laag bestond echt nog niet (er is geen db.data.groepen; het bestaande
+   groepen-laag bestond echt nog niet (er is geen collectie groepen; het bestaande
    /api/event/rsvp is de gastenlijst van een PARTNER, niet van een lid), dus die
    komt hier, in een eigen huis.
 
@@ -33,9 +33,9 @@ module.exports = ({ db, save, codenaamVan, keyVanCodenaam, liveCodename, notify,
   const SOORTEN = ['openbaar', 'besloten', 'geheim'];
   const nu = () => new Date().toISOString();
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/genootschap/index', bezit: { genootschap: 'kaart' } });
   function S() {
-    if (!db.data.genootschap || typeof db.data.genootschap !== 'object') db.data.genootschap = {};
-    const g = db.data.genootschap;
+    const g = eigen.bak('genootschap');
     if (!Array.isArray(g.groepen)) g.groepen = [];
     for (const k of ['prikbord', 'bijeenkomst']) if (!g[k] || typeof g[k] !== 'object') g[k] = {};
     return g;

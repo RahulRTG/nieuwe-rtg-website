@@ -29,12 +29,12 @@
    zegt niets meer over een spel dat sindsdien is veranderd. */
 module.exports = (ctx) => {
   const { db, save, nu, SOORTEN } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/spellen/telling', bezit: { spelTelling: 'lijst' } });
 
   const MAX_DAGEN = 400;   // wat een vraag hoogstens terug mag kijken
 
   function T() {
-    if (!Array.isArray(db.data.spelTelling)) db.data.spelTelling = [];
-    return db.data.spelTelling;
+    return eigen.bak('spelTelling');
   }
 
   /* Een afgelopen potje bijtellen. Alleen het SOORT en het AANTAL stoelen gaan

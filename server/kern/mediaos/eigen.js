@@ -19,10 +19,8 @@ const MELD_SOORTEN = ['muziek', 'video', 'flow', 'live'];
 module.exports = ({ db, save, schoon, catalogus }) => {
   const nu = () => new Date().toISOString();
 
-  function biebTabel() {
-    if (!db.data.mediaBieb || typeof db.data.mediaBieb !== 'object') db.data.mediaBieb = {};
-    return db.data.mediaBieb;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mediaos/eigen', bezit: { mediaBieb: 'kaart', mediaMeldingen: 'kaart' } });
+  const biebTabel = () => eigen.bak('mediaBieb');
   const biebVan = (key) => {
     const t = biebTabel();
     if (!Array.isArray(t[key])) t[key] = [];
@@ -66,10 +64,7 @@ module.exports = ({ db, save, schoon, catalogus }) => {
   }
 
   /* ---- de meldingsvoorkeur per maker ---- */
-  function meldTabel() {
-    if (!db.data.mediaMeldingen || typeof db.data.mediaMeldingen !== 'object') db.data.mediaMeldingen = {};
-    return db.data.mediaMeldingen;
-  }
+  const meldTabel = () => eigen.bak('mediaMeldingen');
   function meldZet(sess, opdracht) {
     const o = opdracht || {};
     const naam = schoon(o.codenaam, 60);

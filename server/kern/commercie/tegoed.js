@@ -60,12 +60,9 @@ const { magVerbruiken } = require('./tegoed/plafond');
 const caps = require('./capaciteiten');
 
 function maakTegoed({ db, save, nu }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/tegoed', bezit: { aiTegoed: 'kaart' } });
   const tijd = nu || klok.nu;
-  function alles() {
-    if (!db.data) db.data = {};
-    if (!db.data.aiTegoed || typeof db.data.aiTegoed !== 'object') db.data.aiTegoed = {};
-    return db.data.aiTegoed;
-  }
+  const alles = () => eigen.bak('aiTegoed');
   const maandVan = t => new Date(t).toISOString().slice(0, 7);
 
   /* De rij van een houder (een lid op codenaam, of een zaak op code). Rolt bij

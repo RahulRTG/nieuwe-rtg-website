@@ -12,7 +12,8 @@
 
 const { KAMERS, BASIS, DEMO_SCENES } = require('./homekit-data');
 module.exports = ({ db, save, crypto, schoon, anthropic }) => {
-  const H = () => { if (!db.data.homekit) db.data.homekit = {}; return db.data.homekit; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/homekit', bezit: { homekit: 'kaart' } });
+  const H = () => eigen.bak('homekit');
   const woningVan = (key) => {
     const h = H();
     if (!h[key]) { h[key] = { apparaten: JSON.parse(JSON.stringify(BASIS)), scenes: [] }; save(); }

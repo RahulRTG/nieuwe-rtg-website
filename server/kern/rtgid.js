@@ -23,7 +23,7 @@
      (mantelzorg): een ander mag tijdelijk namens u inloggen, herroepbaar,
      en elke inlog namens u staat in uw eigen log.
 
-   Opslag in db.data.rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
+   Opslag in de eigen collectie rtgid; maakRtgid(state) volgt het vaste kern-patroon. */
 
 const { idVanKey } = require('../lib/lidsleutel');
 const { bestaat } = require('./betrouwbaarheid');
@@ -34,6 +34,7 @@ const MAX_LOG = 100, MAX_KOPPELS = 300, MAX_SESSIES = 300;
 const ATTRIBUTEN = ['codenaam', '18plus', 'leeftijd', 'nationaliteit', 'naam'];
 
 function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, keyVanCodenaam, stapOp, passkeysVan }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtgid', bezit: { rtgid: 'kaart' } });
   const nu = () => Date.now();
   const iso = t => new Date(t == null ? Date.now() : t).toISOString();
   const hash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
@@ -42,9 +43,7 @@ function maakRtgid({ db, save, crypto, accounts, schoon, leeftijdVan, gidsHaal, 
   const codeMaak = () => 'ID-' + Array.from(crypto.randomBytes(5)).map(b => CODE_TEKENS[b % CODE_TEKENS.length]).join('');
 
   function S() {
-    if (!db.data.rtgid || typeof db.data.rtgid !== 'object')
-      db.data.rtgid = { koppels: [], sessies: [], logs: {}, machtigingen: [] };
-    return db.data.rtgid;
+    return eigen.bak('rtgid', (b) => { Object.assign(b, { koppels: [], sessies: [], logs: {}, machtigingen: [] }); });
   }
   const cap = (l, m) => { if (l.length > m) l.length = m; };
   function logVan(key) { const s = S(); if (!s.logs[key]) s.logs[key] = []; return s.logs[key]; }

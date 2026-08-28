@@ -26,10 +26,8 @@ const MAX_TERUG = 60;
 const dagVan = d => new Date(d).toISOString().slice(0, 10);
 
 module.exports = ({ db, save, schoon, crypto }) => {
-  const lijst = () => {
-    if (!db.data.gedachten) db.data.gedachten = [];
-    return db.data.gedachten;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/gedachten', bezit: { gedachten: 'lijst' } });
+  const lijst = () => eigen.bak('gedachten');
   const mijne = key => lijst().filter(g => g.key === key);
   const toon = g => ({ id: g.id, op: g.op, at: g.at, tekst: g.tekst });
 

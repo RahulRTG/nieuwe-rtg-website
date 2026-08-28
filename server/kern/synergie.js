@@ -7,15 +7,14 @@
    som van de aandelen MOET de pakketprijs zijn (fail-fast, geen stille
    afrondingen). maakSynergie(state) volgt het vaste kern-patroon. */
 function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, pay }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/synergie', bezit: { synergie: 'lijst', synergieKopen: 'lijst' } });
   const id = () => 'syn' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const vandaag = () => nu().slice(0, 10);
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
 
   function store() {
-    if (!Array.isArray(db.data.synergie)) db.data.synergie = [];
-    if (!Array.isArray(db.data.synergieKopen)) db.data.synergieKopen = [];
-    return db.data;
+    return { synergie: eigen.bak('synergie'), synergieKopen: eigen.bak('synergieKopen') };
   }
   const vind = (dealId) => store().synergie.find(d => d.id === dealId);
   const doetMee = (d, code) => d.aandelen.some(a => a.code === code);

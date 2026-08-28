@@ -6,7 +6,7 @@
     "magnaat": {
       "modules": 63,
       "regels": 0,
-      "raaktKern": 4
+      "raaktKern": 5
     },
     "hospitality": {
       "modules": 3,
@@ -14,8 +14,8 @@
       "raaktKern": 0
     }
   },
-  "requiresTotaal": 120,
-  "geraakteKernmodules": 4,
+  "requiresTotaal": 121,
+  "geraakteKernmodules": 5,
   "geraakteKernDomeinen": 4,
   "bereikPct": 1,
   "modulesDiePratenNaarBuiten": 0,
@@ -63,6 +63,13 @@
     },
     {
       "doel": "server/kern/pay",
+      "door": [
+        "server/kern/spellen/magnaat/rtg-keten.js"
+      ],
+      "aantal": 1
+    },
+    {
+      "doel": "server/kern/pay/loshistorie",
       "door": [
         "server/kern/spellen/magnaat/rtg-keten.js"
       ],

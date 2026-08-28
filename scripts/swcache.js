@@ -16,20 +16,10 @@ const crypto = require('crypto');
 const WORTEL = path.join(__dirname, '..');
 const SW = path.join(WORTEL, 'public', 'sw.js');
 
-function schilVan(tekst) {
-  const m = /const SHELL = \[([^\]]*)\]/.exec(tekst);
-  if (!m) return null;
-  return (m[1].match(/'\/[^']*'/g) || []).map((s) => s.slice(1, -1));
-}
-
-function vingerafdruk(schil) {
-  const h = crypto.createHash('sha256');
-  for (const p of schil) {
-    h.update(p);
-    h.update(fs.readFileSync(path.join(WORTEL, 'public', p)));
-  }
-  return h.digest('hex').slice(0, 8);
-}
+/* De afdruk komt uit ./lib/swvingerafdruk.js, want hij werd ook door
+   scripts/build.js gerekend -- en die twee waren het niet eens. Zie de kop
+   daar voor de drie verschillen en wat ze kostten. */
+const { schilVan, cachenaamVoor } = require('./lib/swvingerafdruk');
 
 const tekst = fs.readFileSync(SW, 'utf8');
 const schil = schilVan(tekst);
@@ -37,8 +27,9 @@ if (!schil || !schil.length) {
   console.error('[swcache] de SHELL-lijst in public/sw.js is niet te lezen');
   process.exit(1);
 }
-const hoort = 'rtg-app-' + vingerafdruk(schil);
-const staat = (/const CACHE = '([^']+)'/.exec(tekst) || [])[1];
+const uit = cachenaamVoor(tekst, path.join(WORTEL, 'public'));
+const hoort = uit && uit.nieuw;
+const staat = uit && uit.huidig;
 
 if (staat === hoort) {
   console.log('[swcache] klopt: ' + staat + ' (' + schil.length + ' schilbestanden)');

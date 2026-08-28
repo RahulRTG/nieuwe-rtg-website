@@ -32,9 +32,16 @@ module.exports = function maakSqliteAchter(opslag) {
     const bestand = path.join(DATA_DIR, 'grootboek.db');
     sdb = new DatabaseSync(bestand);
     besloten(bestand);
+    /* DE WACHTTIJD EERST, NET ALS IN ../sqlite.js. Daar staat waarom, en die
+       reden gold hier net zo goed: journal_mode=WAL neemt zelf even een
+       exclusief slot, dus een busy_timeout die ERNA wordt gezet geldt niet voor
+       de PRAGMA die hem nodig heeft. Bij vier processen die tegelijk opkomen
+       (test/vloot.test.js) viel het grootboek daardoor om met "database is
+       locked", waarna de kantoorgroep 502 bleef geven en de vloottoets op zijn
+       opkomstgrens liep -- twee keer, en beide keren leek het een trage start. */
+    sdb.exec('PRAGMA busy_timeout=5000');
     sdb.exec('PRAGMA journal_mode=WAL');
     sdb.exec('PRAGMA synchronous=NORMAL');
-    sdb.exec('PRAGMA busy_timeout=5000');
     sdb.exec('PRAGMA journal_size_limit=' + Number(process.env.RTG_SQLITE_WAL_MAX || 8 * 1024 * 1024));
   }
 

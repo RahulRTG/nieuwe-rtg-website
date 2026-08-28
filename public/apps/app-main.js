@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0c7df0d9';
+var RTG_BOUW = '344e0881';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -343,7 +343,13 @@ var RTG_BOUW = '0c7df0d9';
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
 /* de demomelding: een demo is een toestand, geen terugval na een storing */
-  const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
+  /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `|| zoekParams.get('demo')
+     === '1'`, en daarmee kon iedereen met ?demo=1 een RTG-portaal openen dat
+     met verzonnen leden, reizen en Salon-berichten gevuld werd. Dat is precies
+     wat RTG niet mag zijn: wat hier staat is echt, of het staat er niet.
+     Magnaat is de plek waar gesimuleerd wordt (MAGNAATLAB.md), en die houdt
+     zijn eigen ingang. */
+  const explicieteDemo = magnaatProef;
 
   /* Een demo is een toestand, geen terugval na een storing. De melding stond
      altijd op het homescreen en daardoor leek ook een echte installatie een
@@ -506,11 +512,13 @@ var RTG_BOUW = '0c7df0d9';
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
+        /* HIER STOND EEN WACHTWOORD IN DE CLIENT. De tak controleerde
+           letterlijk op een naam en een wachtwoord en gaf daarna de
+           business-pas -- leesbaar voor iedereen die de bron opent, en de
+           naam van een echt mens. Weg. Zonder server valt er niets in te
+           loggen, en dat hoort een lege deur te zijn en geen achterdeur. */
         if (!explicieteDemo){
-          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
-        }
-        if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
-          toast('Onjuiste inloggegevens.'); return;
+          toast('Geen serververbinding. Start RTG via de server.'); return;
         }
         tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
       }
@@ -524,7 +532,7 @@ var RTG_BOUW = '0c7df0d9';
       } else if (explicieteDemo) {
         user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
-        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        toast('Geen serververbinding. Start RTG via de server.'); return;
       }
     }
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
@@ -9321,6 +9329,19 @@ var RTG_BOUW = '0c7df0d9';
 
   /* ---------- PWA ---------- */
 
+  /* WAAROM HIER NIETS EXTRA'S STAAT.
+
+     Na de uitrol van 28 augustus 2026 zag de eigenaar nog de oude schil. Er
+     stonden hier kort twee toevoegingen; allebei weer weg. Een reload() op
+     controllerchange sloot de lade halverwege (grammatica.e2e.js liep in zijn
+     tijdslimiet) -- een pagina die zichzelf onder je handen herlaadt is een
+     echte bijwerking. En registration.update() voegt niets toe: sw.js komt met
+     `cache-control: no-cache`, dus de browser hervalideert hem AL bij elke
+     navigatie; de 24-uursregel geldt alleen voor een cachebare worker. Hij
+     schaadde wel -- met die regel erin zakte de toegankelijkheidskeuring twee
+     rondes op twee VERSCHILLENDE toetsen, terwijl die taak op andere takken 7
+     van de 7 groen stond. Een extra netwerkronde in elk opstartpad verschuift
+     precies zulke timing. */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }

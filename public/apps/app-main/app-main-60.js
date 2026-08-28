@@ -9,6 +9,19 @@
 
   /* ---------- PWA ---------- */
 
+  /* WAAROM HIER NIETS EXTRA'S STAAT.
+
+     Na de uitrol van 28 augustus 2026 zag de eigenaar nog de oude schil. Er
+     stonden hier kort twee toevoegingen; allebei weer weg. Een reload() op
+     controllerchange sloot de lade halverwege (grammatica.e2e.js liep in zijn
+     tijdslimiet) -- een pagina die zichzelf onder je handen herlaadt is een
+     echte bijwerking. En registration.update() voegt niets toe: sw.js komt met
+     `cache-control: no-cache`, dus de browser hervalideert hem AL bij elke
+     navigatie; de 24-uursregel geldt alleen voor een cachebare worker. Hij
+     schaadde wel -- met die regel erin zakte de toegankelijkheidskeuring twee
+     rondes op twee VERSCHILLENDE toetsen, terwijl die taak op andere takken 7
+     van de 7 groen stond. Een extra netwerkronde in elk opstartpad verschuift
+     precies zulke timing. */
   if ('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }

@@ -152,7 +152,7 @@ body[data-rtg-world="living"]{
   --zacht:#E6CECC;
   background:
     radial-gradient(circle at 76% 11%,rgba(158,28,64,.32),transparent 27rem),
-    var(--bordeaux-glans);
+    var(--bordeaux-diep);
 }
 body[data-rtg-world="living"]::before{
   opacity:.35;
@@ -166,6 +166,7 @@ body[data-rtg-world="living"]::after{
 body[data-rtg-world="living"] .os-switcher{
   background:rgba(74,12,30,.92);
 }
+body[data-rtg-world="living"] .os-switcher__links a span{color:#F4F0E9;}
 body[data-rtg-world="living"] .schil{
   min-height:calc(100vh - 64px);
   grid-template-rows:58px 1fr;
@@ -189,6 +190,7 @@ body[data-rtg-world="living"] .bank a.actief{
   background:var(--bordeaux-glans);
   color:var(--op-bordeaux);
 }
+body[data-rtg-world="living"] .bank a.actief span{color:#F4F0E9;}
 body[data-rtg-world="living"] .topbar{
   border-color:var(--bordeaux-rand);
   background:rgba(74,12,30,.76);
@@ -214,7 +216,9 @@ body[data-rtg-world="living"] .kop::after{
   font:500 clamp(9rem,22vw,20rem)/.7 var(--rtg-display);
   pointer-events:none;
 }
-body[data-rtg-world="living"] .kop .ey{color:var(--gold-tekst);}
+body[data-rtg-world="living"] .kop .ey{color:#F4F0E9;}
+body[data-rtg-world="living"] .kop .os-kicker,
+body[data-rtg-world="living"] .kop .os-kicker span{color:#F4F0E9;}
 body[data-rtg-world="living"] .kop h1{
   max-width:840px;
   margin:.5rem 0 1rem;
@@ -226,7 +230,7 @@ body[data-rtg-world="living"] .kop h1{
 body[data-rtg-world="living"] .kop p{
   margin:0;
   max-width:680px;
-  color:#EDE0DC;
+  color:#F4F0E9;
   font-size:clamp(.9rem,1.3vw,1.08rem);
 }
 body[data-rtg-world="living"] .kop .status{

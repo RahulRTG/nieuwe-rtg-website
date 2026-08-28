@@ -36,28 +36,51 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
     const begin = await page.evaluate(() => RTGSchil.surfaces.map(s => s.id));
     assert.deepEqual(begin.sort(), ['agenda', 'reizen'], 'de tafel hoort niet leeg te beginnen');
 
-    /* De standaardkamer is geen raster meer. De zichtbare app vult op desktop
-       én telefoon exact de ruimte tussen linkerbank, tabbalk en onderbalk. */
+    /* De Edge-randen zijn de enige navigator. Het werkvlak begint er direct
+       naast en toont op desktop twee apps naast elkaar; op een telefoon vult
+       precies de actieve app het hele overblijvende vlak. */
     const maten = async () => page.evaluate(() => {
       const pak = (s) => { const r = document.querySelector(s).getBoundingClientRect();
         return { x:r.x, y:r.y, width:r.width, height:r.height }; };
-      return { scherm:{ width:innerWidth, height:innerHeight }, werk:pak('.rtg-surface[data-actief]'),
-        links:pak('.rtg-console'), boven:pak('.rtg-tabbar'), onder:pak('.rtg-onderbalk'),
-        zichtbaar:getComputedStyle(document.querySelector('.rtg-werkruimte')).display };
+      return { scherm:{ width:innerWidth, height:innerHeight }, ruimte:pak('.rtg-werkruimte'),
+        zichtbaar:[...document.querySelectorAll('.rtg-surface[data-edge-visible]')].map((e) => {
+          const r=e.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height };
+        }), rand:{ boven:pak('.rtg-edge-top'), links:pak('.rtg-edge-side'), onder:pak('.rtg-edge-bottom') } };
     });
-    const volledig = (m) => {
-      assert.equal(m.zichtbaar, 'block');
-      assert.ok(Math.abs(m.werk.x - m.links.width) < 1);
-      assert.ok(Math.abs(m.werk.y - m.boven.height) < 1);
-      assert.ok(Math.abs(m.werk.width + m.links.width - m.scherm.width) < 1);
-      assert.ok(Math.abs(m.werk.height + m.boven.height + m.onder.height - m.scherm.height) < 1);
+    const randKlopt = (m) => {
+      assert.ok(Math.abs(m.ruimte.x - m.rand.links.width) < 1);
+      assert.ok(Math.abs(m.ruimte.y - m.rand.boven.height) < 1);
+      assert.ok(Math.abs(m.ruimte.width + m.rand.links.width - m.scherm.width) < 1);
+      assert.ok(Math.abs(m.ruimte.height + m.rand.boven.height + m.rand.onder.height - m.scherm.height) < 1);
     };
-    volledig(await maten());
+    await page.waitForFunction(() => {
+      const r = document.querySelector('.rtg-surface[data-edge-visible]').getBoundingClientRect();
+      const w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width * 2 - w.width) < 1;
+    }, null, { timeout: 5000 });
+    let m = await maten(); randKlopt(m);
+    assert.equal(m.zichtbaar.length, 2, 'desktop toont de gekozen indeling met twee apps');
+    assert.ok(Math.abs(m.zichtbaar[0].width * 2 - m.ruimte.width) < 1);
+    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
     await page.setViewportSize({ width:390, height:844 });
-    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 56);
-    volledig(await maten());
+    await page.waitForFunction(() => {
+      const v = document.querySelectorAll('.rtg-surface[data-edge-visible]');
+      if (v.length !== 1) return false;
+      const r = v[0].getBoundingClientRect(), w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width - w.width) < 1 && Math.abs(r.height - w.height) < 1;
+    });
+    m = await maten(); randKlopt(m);
+    assert.equal(m.zichtbaar.length, 1);
+    assert.ok(Math.abs(m.zichtbaar[0].width - m.ruimte.width) < 1);
+    assert.ok(Math.abs(m.zichtbaar[0].height - m.ruimte.height) < 1);
     await page.setViewportSize({ width:1440, height:900 });
-    await page.waitForFunction(() => document.querySelector('.rtg-console').getBoundingClientRect().width === 178);
+    await page.evaluate(() => RTGEdge.setLayout(2));
+    await page.waitForFunction(() => {
+      const v = document.querySelectorAll('.rtg-surface[data-edge-visible]');
+      if (v.length !== 2) return false;
+      const r = v[0].getBoundingClientRect(), w = document.querySelector('.rtg-werkruimte').getBoundingClientRect();
+      return Math.abs(r.width * 2 - w.width) < 1;
+    });
 
     // er komt er een bij, en dan bewaren we de kamer
     await page.evaluate(() => RTGSchil.open('office', { naam: 'Documenten', url: '/apps/office.html', kort: 'Documenten' }));
@@ -114,6 +137,6 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

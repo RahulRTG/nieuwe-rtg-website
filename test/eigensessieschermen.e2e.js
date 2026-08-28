@@ -23,10 +23,9 @@
    5.5, de Arena, het RTF-kantoor en de Societeit -- dit was de laatste van die
    familie. Hij toont nu zijn eigen deur, en dat ligt hieronder vast.
 
-   DE STUBS ZIJN GEEN UITZONDERING MAAR EEN BELOFTE. `kantoorpda.html`,
-   `zorgbalie.html`, `partner-network.html` en `private-office.html` zijn bewust
-   geen dubbele apps maar doorverwijzingen naar hun echte productpagina. Precies
-   daarom horen ze getoetst:
+   DE STUBS ZIJN GEEN UITZONDERING MAAR EEN BELOFTE. `kantoorpda.html` en
+   `zorgbalie.html` zijn bewust geen dubbele apps maar doorverwijzingen naar hun
+   echte productpagina. Precies daarom horen ze getoetst:
    een stub die niet doorverwijst is een wit scherm voor iemand die op zijn werk
    staat, en aan een meta-refresh valt niets af te lezen zonder hem te draaien.
 
@@ -72,16 +71,10 @@ const EIGEN_SLEUTEL = [
 
 /* De stubs, met waar ze heen horen te wijzen. `kantoor=1` is geen detail:
    dat is het verschil tussen de kantoorcode-inlog en de gewone personeelsinlog,
-   en de zorgbalie hoort juist de gewone te krijgen. De twee oude wereldnamen
-   bewaren bovendien hun context in query en fragment wanneer ze naar de echte
-   productpagina gaan. */
+   en de zorgbalie hoort juist de gewone te krijgen. */
 const STUBS = [
   { app: 'kantoorpda', naar: '/apps/personeel.html', zoek: 'kantoor=1' },
-  { app: 'zorgbalie', naar: '/apps/personeel.html', zoek: null },
-  { app: 'partner-network', naar: '/apps/partner-worden.html', zoek: null,
-    achtervoegsel: '?bron=rand#aanvragen', bewaart: 'bron=rand', fragment: '#aanvragen' },
-  { app: 'private-office', naar: '/apps/lifestyle.html', zoek: null,
-    achtervoegsel: '?bron=rand#kantoor', bewaart: 'bron=rand', fragment: '#kantoor' }
+  { app: 'zorgbalie', naar: '/apps/personeel.html', zoek: null }
 ];
 
 /* Een schone bezoeker: cookie-melding weg, en GEEN enkele sessiesleutel. Dat

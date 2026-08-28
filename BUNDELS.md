@@ -588,7 +588,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 184 regels in de delen
+`public/shared/cookie/` -- 2 delen, 179 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -782,7 +782,7 @@ omlaag.
 
 ## `shared/rtg-schil.js`
 
-`public/shared/rtg-schil/` -- 8 delen, 805 regels in de delen
+`public/shared/rtg-schil/` -- 8 delen, 808 regels in de delen
 
 | deel | onderwerp |
 |---|---|

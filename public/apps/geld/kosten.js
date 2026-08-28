@@ -71,7 +71,7 @@
   }
 
   async function grensZet() {
-    var c = w.Geld.centen;
+    var c = w.Geld.naarCenten;
     var wv = $('#ksWaarschuw').value.trim(), pv = $('#ksPlafond').value.trim();
     if ((wv && c(wv) == null) || (pv && c(pv) == null)) { w.Geld.melding('Vul een bedrag in, bijvoorbeeld 12,50.'); return; }
     try {

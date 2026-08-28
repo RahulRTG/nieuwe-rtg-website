@@ -33,7 +33,7 @@
   function teken() {
     if (!A) return;
     var e = A, c = e.ctx, t = e.cfg.tools, cr = e.root.querySelector('.rtg-edge-crumbs');
-    cr.innerHTML = '<button type="button" data-crumb="home">' + esc(e.cfg.naam) + '</button><i>/</i><button type="button" data-crumb="scope">' + esc(c.scope) + '</button><i>/</i><button type="button" data-crumb="current">' + esc(c.title) + '</button>';
+    cr.innerHTML = '<button type="button" data-crumb="home">' + esc(e.cfg.naam) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="scope">' + esc(c.scope) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="current">' + esc(c.title) + '</button>';
     e.root.querySelector('.rtg-edge-scope').textContent = c.scope;
     e.root.querySelector('.rtg-edge-tools').innerHTML = t.map(function (x, i) { return '<a class="rtg-edge-tool" data-tool="' + x[0] + '" data-shortcut="' + (i + 1) + '" href="' + x[3] + '" aria-label="' + esc(x[1]) + '" ' + ((c.tool === x[0] || (!c.tool && actief(x))) ? 'aria-current="page"' : '') + '>' + s(x[2]) + '<span class="rtg-edge-tip">' + esc(x[1]) + '<kbd>Alt+' + (i + 1) + '</kbd></span></a>'; }).join('');
     e.root.querySelector('.rtg-edge-action button').textContent = c.actie || e.cfg.actie;

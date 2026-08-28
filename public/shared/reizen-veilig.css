@@ -93,8 +93,12 @@ body.rtg-stijl main.rv-werk{width:auto;max-width:none;margin:0;padding:0}
 .rv-app{padding-top:env(safe-area-inset-top,0px)}
 body.amn-zwevend .rv-bank{padding-top:56px}
 @media(max-width:760px){
-  body.amn-zwevend .rv-tabs{margin-left:3.6rem}
+  body.amn-zwevend .rv-tabs{width:calc(100% - 3.6rem);max-width:calc(100% - 3.6rem);min-width:0;margin-left:3.6rem}
   body.amn-zwevend .rv-bank{padding-top:6px}
+  /* De zes wereldknoppen moeten als groep kunnen krimpen naast Instellingen.
+     Zonder min-width:0 hield nav zijn inhoudsbreedte vast en duwde de laatste
+     knop zeven pixels buiten een venster van 390px. */
+  .rv-bank,.rv-bank nav{min-width:0}
 }
 /* EN DE RIJ MOET MEEGROEIEN, ANDERS KNIJPT DE VEILIGE ZONE DE LABELS ERUIT.
 

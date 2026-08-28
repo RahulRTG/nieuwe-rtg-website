@@ -50,7 +50,7 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/werkruimte.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('.rtg-surface[data-id="agenda"]', { timeout: 15000 });
+    await page.waitForSelector('.rtg-surface[data-id="agenda"]', { state: 'attached', timeout: 15000 });
     /* EEN DERDE SURFACE die de soort NIET kent. Zonder hem is "zwijgen is nee"
        niet te toetsen: met alleen een verzender en een ontvanger licht de
        ontvanger sowieso als enige op, ook als de schil iedereen zou aanwijzen.
@@ -132,6 +132,6 @@ test('Werkruimte: een object slepen is een voorstel, en pas een mens voert het u
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

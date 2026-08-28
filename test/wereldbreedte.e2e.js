@@ -58,7 +58,12 @@ test('elk scherm uit de catalogus past op een telefoon van 390px', { skip: geenB
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-breedte-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: dataDir } });
   const browser = await pw.chromium.launch(browserOpties(pw));
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  /* De breedte gaat over de ruststand. De gedeelde iOS-laag lanceert het hele
+     body met een schaalanimatie; halverwege daarvan kunnen getransformeerde
+     kindranden tijdelijk buiten de layoutbreedte vallen. reducedMotion zet
+     die alleen-visuele lancering uit en maakt de meting deterministisch. */
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 },
+    serviceWorkers: 'block', reducedMotion: 'reduce' });
   const page = await ctx.newPage();
   await volgVerzoeken(page);
   const teBreed = [];
@@ -84,10 +89,35 @@ test('elk scherm uit de catalogus past op een telefoon van 390px', { skip: geenB
           const W = document.documentElement.clientWidth;
           for (const el of document.querySelectorAll('body *')) {
             const r = el.getBoundingClientRect();
-            if (r.width <= W + 2) continue;
-            if ([...el.children].some(k => k.getBoundingClientRect().width > W + 2)) continue;
-            return el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className
-              ? '.' + el.className.trim().split(/\s+/)[0] : '') + ' (' + Math.round(r.width) + 'px)';
+            /* Een springlink hoort bewust links buiten beeld te staan en
+               veroorzaakt geen horizontale overloop. Zoek daarom eerst de
+               rechterrand of een werkelijk te brede doos. */
+            if (r.width <= W + 2 && r.right <= W + 2) continue;
+            if ([...el.children].some(k => {
+              const kr = k.getBoundingClientRect();
+              return kr.width > W + 2 || kr.right > W + 2;
+            })) continue;
+            var ouders = [], p = el.parentElement;
+            while (p) {
+              var pr = p.getBoundingClientRect();
+              var pc = getComputedStyle(p);
+              ouders.push(p.tagName.toLowerCase() + (p.className ? '.' + String(p.className).trim().split(/\s+/)[0] : '') +
+                ':' + Math.round(pr.left) + '..' + Math.round(pr.right) + '/' + p.scrollWidth +
+                (p === document.body ? '/t=' + pc.transform + '/a=' + pc.animationName : '') +
+                (p.classList && p.classList.contains('rv-app') ? '/w=' + pc.width + '/ml=' + pc.marginLeft +
+                  '/pl=' + pc.paddingLeft + '/pos=' + pc.position : ''));
+              p = p.parentElement;
+            }
+            return el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+              (typeof el.className === 'string' && el.className
+              ? '.' + el.className.trim().split(/\s+/)[0] : '') +
+              ' [' + el.textContent.trim().replace(/\s+/g, ' ').slice(0, 32) + ']' +
+              ' (' + Math.round(r.left) + '..' + Math.round(r.right) + ', ' + Math.round(r.width) + 'px; ' +
+              ouders.join(' > ') + '; kinderen=' + [...document.body.children].map(function (k) {
+                var x = k.getBoundingClientRect(), c = getComputedStyle(k);
+                return k.tagName.toLowerCase() + (k.id ? '#' + k.id : '') + (k.className ? '.' + String(k.className).trim().split(/\s+/)[0] : '') +
+                  ':' + Math.round(x.left) + '..' + Math.round(x.right) + '/' + c.position + '/' + c.float;
+              }).join(',') + ')';
           }
           return null;
         })(),

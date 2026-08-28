@@ -17,6 +17,7 @@
 const crypto = require('crypto');
 
 const btw = require('./commercie/btw');
+const { naarCenten } = require('./geld/eenheid');
 
 const AANDEEL = 0.30;   // 30% van de abonnementsbijdrage
 /* Het btw-tarief kwam hier als constante `1.21` binnen, terwijl dit platform
@@ -36,8 +37,8 @@ function isAbonnement(desc) {
    NL 21% -- hetzelfde antwoord als vroeger, maar nu als expliciete standaard in
    plaats van als enige mogelijkheid. */
 function aandeelCenten(bijdrageInclBtw, btwProfiel) {
-  const centenIncl = Math.round((Number(bijdrageInclBtw) || 0) * 100);
-  const o = btw.overBruto(centenIncl, btwProfiel);
+  const bijdrageCenten = naarCenten(bijdrageInclBtw) || 0;
+  const o = btw.overBruto(bijdrageCenten, btwProfiel);
   return Math.round(o.nettoCenten * AANDEEL);
 }
 // Zelfde bedrag in euro's (voor tonen).

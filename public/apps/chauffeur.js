@@ -34,7 +34,7 @@
        die de app opent hoort te zien wat er echt voor hem klaarstaat, of dat
        hij niet is aangemeld -- die tekst stond er al ("Niet aangemeld").
        Simuleren doet Magnaat, en die houdt zijn eigen ingang. */
-    demo: new URLSearchParams(location.search).get('magnaat') === '1',
+    demo: window.RTG_MAGNAAT_PROEF === true,
     gegevens: null, fout: null, bezig: false, gekozen: null, blad: 'ritten',
     genegeerd: new Set(), laatsteOpen: null, eersteLading: true, poll: null,
     positieWatch: null, laatstePositieAt: 0, laatstePositie: null,

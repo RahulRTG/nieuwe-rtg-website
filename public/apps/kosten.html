@@ -400,7 +400,7 @@ async function laden(){
       tekenGebruikers(o.gebruikers) + tekenTarieven(t.tarieven, o.ontbreekt.tarieven) +
       tekenNota(n.posten, n.ontbreekt, o.afstemming, SOORTEN, lf.facturen || []) + tekenGaten(o.nietGemeten);
   } catch (e) {
-    $('#main').innerHTML = '<div class="kaart"><h2>Dat lukte niet</h2><p class="sub">'+esc(e.message)+
+    $('#main').innerHTML = '<div class="kaart"><h2 style="color:var(--rtg-txt,var(--txt))">Dat lukte niet</h2><p class="sub">'+esc(e.message)+
       ' Dit scherm hoort achter de boardroom; log in via de boardroom en probeer het opnieuw.</p></div>';
   }
 }

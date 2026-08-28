@@ -379,6 +379,7 @@ body[data-rtf-page="klas"] #cGo{background:linear-gradient(135deg,var(--rtf-crim
   .rtf-hubgrid{grid-template-columns:1fr}
 }
 @media(max-width:620px){
+  #balk .sb-brand{display:none}
   .wrap{width:100%;max-width:100%;padding-left:.9rem!important;padding-right:.9rem!important}
   .tiles{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.7rem .22rem!important}
   .tile .ic{width:54px!important;height:54px!important;flex-basis:54px}

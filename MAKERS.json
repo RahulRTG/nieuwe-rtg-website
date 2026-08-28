@@ -1,10 +1,10 @@
 {
   "uitleg": "Gemeten met scripts/makers.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 3. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist. De envelop is niet hier afgeleid maar overgenomen uit OBJECTMODEL.json.",
-  "vastgelegd": "2026-08-27",
+  "vastgelegd": "2026-08-28",
   "gemeten": {
     "makers": 8,
     "bestanden": 63,
-    "vormen": 18,
+    "vormen": 19,
     "paren": 28,
     "metGedeeldeKern": 1,
     "drempel": 0.6
@@ -14,16 +14,14 @@
       "id": "websitemaker",
       "naam": "Website-maker",
       "bestanden": 19,
-      "vormen": 6,
+      "vormen": 7,
       "talen": 9,
       "opslag": [
         "ledenSites",
         "reviewStats",
-        "siteTeam",
         "supplierTypes",
         "suppliers",
-        "vacatures",
-        "webMerken"
+        "vacatures"
       ],
       "levensloop": [
         "concept",
@@ -46,7 +44,7 @@
       "naam": "Website-studio (Atelier)",
       "bestanden": 1,
       "vormen": 2,
-      "talen": 2,
+      "talen": 1,
       "opslag": [
         "atelierSites"
       ],
@@ -94,9 +92,7 @@
       "bestanden": 2,
       "vormen": 0,
       "talen": 1,
-      "opslag": [
-        "lessen"
-      ],
+      "opslag": [],
       "levensloop": [],
       "poorten": []
     },
@@ -108,8 +104,6 @@
       "talen": 2,
       "opslag": [
         "clips",
-        "clipsMeldingen",
-        "clipsReacties",
         "clipsVolg"
       ],
       "levensloop": [],
@@ -209,8 +203,8 @@
       "b": "clips",
       "gedeeldeKern": false,
       "via": null,
-      "vorm": 0.07,
-      "vormA": "server/kern/webmaker.js",
+      "vorm": 0.11,
+      "vormA": "server/kern/webdomein.js",
       "vormB": "server/kern/clips.js",
       "vormGedeeld": [
         "online"
@@ -227,7 +221,7 @@
         "auth",
         "officeAuth"
       ],
-      "waarom": "taal 0.09 en vorm 0.07 halen de drempel 0.6 niet"
+      "waarom": "taal 0.09 en vorm 0.11 halen de drempel 0.6 niet"
     },
     {
       "a": "appstore",

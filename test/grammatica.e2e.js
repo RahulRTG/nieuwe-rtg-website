@@ -408,6 +408,15 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
       await page.waitForSelector('#rtgCommand .cmd-pane.actief iframe', { timeout: 20000 });
       const frame = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
       await frame.locator('body').waitFor({ timeout: 20000 });
+      await frame.locator('body').evaluate(() => new Promise((resolve, reject) => {
+        const einde = Date.now() + 20000;
+        const kijk = () => {
+          if (window.RTGAdaptiefLeer && window.RTGGrammatica && window.RTGAdaptief && window.RTGLagen) return resolve();
+          if (Date.now() >= einde) return reject(new Error('adaptieve taal is niet geladen'));
+          setTimeout(kijk, 25);
+        };
+        kijk();
+      }));
       const heeft = await page.evaluate(() => {
         const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
         const w = f && f.contentWindow;

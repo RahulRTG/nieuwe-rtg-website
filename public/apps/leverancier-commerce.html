@@ -59,7 +59,7 @@
   .slot{margin:.45rem 0;}
   .slot i{font-style:normal;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:0;padding:.1rem .5rem;margin-right:.4rem;}
   .slot i.ja{color:var(--gold);border-color:var(--gold);}
-  .slot i.nee{color:var(--burgundy);border-color:var(--burgundy);}
+  .slot i.nee{color:var(--rtg-leesrood,var(--burgundy));border-color:var(--burgundy);}
   .slot i.onb{color:var(--soft);}
   .slot .sub{display:block;color:var(--soft);font-size:.76rem;margin:.1rem 0 0 .2rem;}
   .stil{border:1px solid var(--burgundy);border-radius:0;padding:.5rem .7rem;margin:.5rem 0;color:var(--burgundy);font-size:.82rem;line-height:1.5;}
@@ -108,7 +108,7 @@ const api = (pad, body) => fetch(pad, {
   if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; });
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<p class="leeg">Log eerst in op uw zaak via <a href="/apps/leverancier.html" style="color:var(--gold);">de leverancier-app</a>.</p>';
+  $('#main').innerHTML = '<p class="leeg">Log eerst in op uw zaak via <a href="/apps/leverancier.html" style="color:var(--rtg-leesgoud,var(--gold));">de leverancier-app</a>.</p>';
 } else { start(); }
 
 let SOORTEN = [], TOEGANG = [], PUBLIEK = null;
@@ -186,8 +186,8 @@ function tekenNieuw(nietGebouwd){
     '<h3>Nieuwe verkoopweg</h3>' +
     '<div class="rij">' +
       '<input id="n-naam" placeholder="Naam, bijvoorbeeld Onze webshop" style="min-width:15rem;">' +
-      '<select id="n-soort">' + SOORTEN.map(s => '<option value="'+esc(s.id)+'">'+esc(s.label)+'</option>').join('') + '</select>' +
-      '<select id="n-toegang">' + TOEGANG.map(t => {
+      '<select id="n-soort" aria-label="Soort verkoopweg">' + SOORTEN.map(s => '<option value="'+esc(s.id)+'">'+esc(s.label)+'</option>').join('') + '</select>' +
+      '<select id="n-toegang" aria-label="Toegang tot verkoopweg">' + TOEGANG.map(t => {
         const kan = t.kan === null ? magPubliek : t.kan !== false;
         return '<option value="'+esc(t.id)+'"'+(kan?'':' disabled')+'>'+esc(t.label)+(kan?'':' (nog niet)')+'</option>';
       }).join('') + '</select>' +

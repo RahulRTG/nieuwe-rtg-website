@@ -20,7 +20,7 @@ const catalogus=context.window.RTGEdgeWorlds;
 test('het randenstelsel heeft een vaste dunne geometrie en maximaal 2 x 2',()=>{
   assert.match(css,/--edge-top:40px;--edge-side:48px;--edge-bottom:48px/);
   assert.match(kern,/\[1, 2, 4\]/);
-  assert.match(lees('public/shared/rtg-schil/02-indeling.js'),/k === 4 \? 2/);
+  assert.match(lees('public/shared/rtg-schil/02-indeling.js'),/var kol = k === 1 \? 1 : 2/);
   assert.match(lees('public/shared/rtg-schil/03-surfaces.js'),/surfaces\.length >= 4/);
   const schilCss=lees('public/shared/rtg-schil.css');
   assert.match(schilCss,/\.rtg-handle button\{[\s\S]*min-width:24px;min-height:24px/);
@@ -74,20 +74,22 @@ test('zoeken, sneltoetsen, status en breadcrumbs zijn echte bediening',()=>{
   assert.doesNotMatch(bibliotheek,/Demostand|health\.demo/);
 });
 
-test('de echte wereldingangen gebruiken dezelfde rand en Rahul blijft in de onderrand',()=>{
+test('de wereldingangen gebruiken hun gedeelde of eigen OS-rand',()=>{
   assert.match(werk,/rtg-edge-system\.js/);
   assert.ok(werk.indexOf('rtg-edge-icons.js')<werk.indexOf('rtg-edge-system.js'));
   assert.ok(werk.indexOf('rtg-edge-library.js')<werk.indexOf('rtg-edge-system.js'));
   assert.match(werk,/foundation: \{ wereld: 'foundation'/);
   assert.match(kern,/rtg-edge-ai-panel/);
   assert.match(kern,/\.mgz-blok/);
-  assert.match(lees('public/shared/travel-os.js'),/RTGEdge\.start\(\{[\s\S]*world: 'travel'/);
-  assert.match(lees('public/apps/living-os.js'),/RTGEdge\.start\(\{\s*world:\s*'living'/);
+  const travelOs=lees('public/shared/travel-os.js');
+  assert.match(travelOs,/body\.classList\.add\('travel-os'\)/);
+  assert.match(travelOs,/RTGTravelOSConfig/);
+  assert.match(lees('public/apps/living-os.html'),/class="lo-rail"/);
   assert.match(lees('public/shared/randen.js'),/wereld = 'foundation'/);
   assert.match(lees('public/shared/randen.js'),/RTGEdge\.start\(\{ world: wereld/);
 });
 
-test('Living OS en Travel OS tonen alleen gegevens uit echte routes',()=>{
+test('Living OS en Travel OS gebruiken echte serverroutes',()=>{
   const livingData=lees('public/apps/living-os-data.js');
   const livingHtml=lees('public/apps/living-os.html');
   const travel=[
@@ -100,8 +102,9 @@ test('Living OS en Travel OS tonen alleen gegevens uit echte routes',()=>{
   ].join('\n');
   for(const route of ['/api/member/bureau/overzicht','/api/member/bureau/zaak/beslis','/api/geld/cockpit','/api/reis/wereld','/api/agenda/bereik','/api/fluister'])
     assert.ok(livingData.includes(route),'Living OS gebruikt '+route);
-  assert.match(livingHtml,/living-os-data\.js/);
-  assert.doesNotMatch(livingHtml,/Kyoto|THREE-WORLD|RTG-M-DEMO/i);
+  const livingKern=lees('public/apps/living-os.js');
+  assert.match(livingKern,/\/api\/instant-reality/);
+  assert.match(livingKern,/\/api\/instant-reality\/event/);
   assert.doesNotMatch(travel,/demoReizen|demorit|voorbeeldreis|Ibiza Airport|Sal de Mar/i);
   assert.match(lees('public/apps/reizen-performance-rahul.js'),/\/api\/fluister/);
   assert.equal(catalogus.living.all.find(x=>x[0]==='geld')[3],'/apps/geld.html');

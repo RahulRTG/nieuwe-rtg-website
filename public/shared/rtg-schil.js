@@ -69,23 +69,26 @@
     var m = meet(), g = m.g;
     var n = schil.surfaces.length;
     if (standaard()) {
-      /* De vaste Work OS-kamer heeft op ELK formaat dezelfde drie ankers:
-         links de software, boven het open werk en onder de korte route. Een
-         actieve app krijgt altijd het volledige vlak ertussen. Voorheen werd
-         dit vlak nog als een raster verdeeld terwijl CSS de overige apps
-         verborg; daardoor kon de zichtbare app letterlijk een half scherm
-         krijgen. */
-      var bank = m.b < 700 ? 56 : (m.b < 1100 ? 68 : 178);
-      var tabhoog = m.b < 700 ? 52 : 50;
-      var onderhoog = m.b < 700 ? 62 : 58;
-      zet(schil.console, 0, 0, bank, m.h);
-      if (schil.tabs) zet(schil.tabs, bank, 0, m.b - bank, tabhoog);
-      if (schil.onderbalk) zet(schil.onderbalk, bank, m.h - onderhoog, m.b - bank, onderhoog);
+      /* De Edge System-randen zijn de enige navigator. In het vlak liggen
+         maximaal vier echte apps: 1, 2 of 2 x 2. Op een telefoon is het altijd
+         precies de actieve app. */
+      zet(schil.console, 0, 0, 0, 0);
+      if (schil.tabs) zet(schil.tabs, 0, 0, 0, 0);
+      if (schil.onderbalk) zet(schil.onderbalk, 0, 0, 0, 0);
       if (!n) return;
-      var werkbreed = m.b - bank;
-      var werkhoog = m.h - tabhoog - onderhoog;
-      schil.surfaces.forEach(function (s) {
-        zet(s.el, bank, tabhoog, werkbreed, werkhoog);
+      var limiet = m.b < 720 ? 1 : parseInt(d.body.dataset.rtgLayout || '2', 10);
+      if ([1, 2, 4].indexOf(limiet) < 0) limiet = 1;
+      var zichtbaar = schil.surfaces.slice(0, limiet);
+      if (schil.actief && zichtbaar.indexOf(schil.actief) < 0) zichtbaar[zichtbaar.length - 1] = schil.actief;
+      schil.surfaces.forEach(function (s) { s.el.toggleAttribute('data-edge-visible', zichtbaar.indexOf(s) >= 0); });
+      var k = zichtbaar.length;
+      var sk = k === 4 ? 2 : (k === 2 && m.b >= 760 ? 2 : 1);
+      var sr = Math.ceil(k / sk), sw = Math.floor(m.b / sk), sh = Math.floor(m.h / sr);
+      zichtbaar.forEach(function (s, i) {
+        var c = i % sk, r = Math.floor(i / sk);
+        zet(s.el, c * sw, r * sh,
+          c === sk - 1 ? m.b - c * sw : sw,
+          r === sr - 1 ? m.h - r * sh : sh);
       });
       return;
     }

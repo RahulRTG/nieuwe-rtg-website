@@ -166,7 +166,11 @@ function mobielInPagina(opt) {
     if (kr.bottom < 0 || kr.top > H) continue; // buiten beeld telt niet mee
     tekst += ' ' + stuk;
   }
-  var beeldjes = document.querySelectorAll('img, canvas, svg, video, picture');
+  /* Een werkruimte toont zijn echte app in een iframe. Dat is zichtbaar
+     scherminhoud, net zo goed als een canvas of video; alleen tekst uit het
+     bovenliggende document tellen maakte zo'n gevulde werkruimte ten onrechte
+     leeg. Dezelfde oppervlaktegrens voorkomt dat een onzichtbaar meetkader telt. */
+  var beeldjes = document.querySelectorAll('img, canvas, svg, video, picture, iframe');
   for (var t = 0; t < beeldjes.length; t++) {
     var bl = beeldjes[t];
     if (!zichtbaar(bl) || isSchil(bl)) continue;

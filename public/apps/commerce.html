@@ -64,7 +64,7 @@
   .retourvorm input,.retourvorm select{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:0;padding:.38rem .6rem;font:inherit;font-size:.8rem;}
   .chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;}
   .chip{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--line);border-radius:0;color:var(--muted);}
-  .chip.aan{border-color:var(--gold);color:var(--gold);}
+  .chip.aan{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
   .chip.uit{opacity:.4;text-decoration:line-through;}
 
   .waarom{border-left:2px solid var(--burgundy);padding-left:.8rem;margin-top:.5rem;color:var(--muted);font-size:.84rem;line-height:1.55;}
@@ -119,7 +119,7 @@
 
   <section id="etalage-sec">
     <div class="kop"><h2>Etalage van een verkoper</h2><span class="n">te koop, en wat er niet bij staat</span></div>
-    <div style="margin-bottom:1rem;"><select id="kies"><option>Laden…</option></select></div>
+    <div style="margin-bottom:1rem;"><select id="kies" aria-label="Verkoper"><option>Laden…</option></select></div>
     <div id="etalage"></div>
   </section>
 

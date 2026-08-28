@@ -150,7 +150,10 @@ test('mijn koppelingen: wat openstaat is er weg te halen, wat gebeurd is blijft 
   await metApp(async ({ pg, base, a, b }) => {
     // iets dat gebeurd is (een verzoek) en iets dat nog openstaat (een code)
     const pin = (await api(base, '/api/member/pin', {}, b.token)).body;
-    await api(base, '/api/member/pin/connect', { pin: pin.toon }, a.token);
+    const kaart = (await api(base, '/api/member/pin/zoek', { pin: pin.toon }, a.token)).body;
+    await api(base, '/api/member/pin/connect', {
+      pin: pin.toon, bevestiging: kaart.bevestiging
+    }, a.token);
     await api(base, '/api/link/cap/maak', { handeling: 'geld.ontvangen', centen: 2500, oms: 'borrel' }, a.token);
 
     await pg.evaluate(() => document.getElementById('privKoppel').click());

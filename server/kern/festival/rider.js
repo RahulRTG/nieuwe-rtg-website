@@ -19,7 +19,7 @@ module.exports = (ctx) => {
   const { save, crypto, schoon, editieVind } = ctx;
 
   const nuIso = () => new Date().toISOString();
-  const centen = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
+  const heelBedrag = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
   const bak = (e) => {
     if (!e.boekingen || typeof e.boekingen !== 'object') e.boekingen = {};
     return e.boekingen;
@@ -85,7 +85,7 @@ module.exports = (ctx) => {
     if (!x) return { status: 404, error: 'Deze boeking bestaat niet.' };
     const wat = schoon(d.wat, 120);
     if (!wat) return { status: 400, error: 'Waarvoor is deze post?' };
-    x.extras.push({ id: 'ex' + crypto.randomBytes(3).toString('hex'), wat, centen: centen(d.centen) });
+    x.extras.push({ id: 'ex' + crypto.randomBytes(3).toString('hex'), wat, centen: heelBedrag(d.centen) });
     save();
     return { ok: true, boeking: x };
   }

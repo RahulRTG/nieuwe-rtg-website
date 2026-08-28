@@ -116,6 +116,6 @@ test('de levenspas van het kind: de ouder wacht op HEM, en niets spreekt hem met
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

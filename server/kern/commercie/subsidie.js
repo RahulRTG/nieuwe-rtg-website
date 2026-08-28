@@ -40,7 +40,7 @@
    in een afronding en de invariant hierboven laat wankelen. */
 'use strict';
 
-const centenVan = euro => Math.round((Number(euro) || 0) * 100);
+const { naarCenten } = require('../geld/eenheid');
 const euroVan = centen => Math.round(centen) / 100;
 
 /* De vier bedragen van een transactie met ledenvoordeel.
@@ -87,7 +87,7 @@ function keur(rij) {
    opgepakt. Een boolean `betaald: false` zou hetzelfde lijken en het verschil
    tussen "nog niet" en "niet nodig" wegpoetsen. */
 function opbouwVan(brutoEuro, voordeelEuro) {
-  const rij = splits(centenVan(brutoEuro), centenVan(voordeelEuro));
+  const rij = splits(naarCenten(brutoEuro) || 0, naarCenten(voordeelEuro) || 0);
   return {
     ...rij,
     lidBetaalt: euroVan(rij.lidBetaaltCenten),
@@ -97,4 +97,4 @@ function opbouwVan(brutoEuro, voordeelEuro) {
   };
 }
 
-module.exports = { splits, keur, opbouwVan, centenVan, euroVan };
+module.exports = { splits, keur, opbouwVan, centenVan: naarCenten, euroVan };

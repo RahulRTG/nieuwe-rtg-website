@@ -84,7 +84,7 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "node scripts/geheimen.js",
     "schermen": "node scripts/schermen.js",
-    "e2e": "rm -f .schermjournaal && RTG_ROUTELOG=.schermjournaal node --test --test-concurrency=1 --test-timeout=600000 test/*.e2e.js",
+    "e2e": "node scripts/e2e.js",
     "test:pg": "node scripts/pgtoetsen.js",
     "kvwis": "node scripts/kvwis.js",
     "icons": "node scripts/icons.js",

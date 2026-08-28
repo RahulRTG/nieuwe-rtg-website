@@ -435,16 +435,17 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
    demostand af aan `NODE_ENV !== 'production'`: dat wás de regel van de seed, en
    het was dezelfde regel die voor de demo-INLOG al was afgekeurd (server.js bij
    `const DEMO`). Op een echte server die geen NODE_ENV had gezet stond de demo
-   dus aan. De seed volgt nu dezelfde schakelaar als de inlog -- RTG_DEMO=1 -- en
+   dus aan. De seed volgt nu dezelfde schakelaar als de inlog --
+   RTG_MAGNAAT_TEST=1 -- en
    deze toets meet dat voortaan ook. Wat hij TOETST is niet veranderd. */
 test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
   const laad = (demoAan) => {
-    const oudDemo = process.env.RTG_DEMO;
-    if (demoAan) process.env.RTG_DEMO = '1'; else delete process.env.RTG_DEMO;
+    const oudDemo = process.env.RTG_MAGNAAT_TEST;
+    if (demoAan) process.env.RTG_MAGNAAT_TEST = '1'; else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     delete require.cache[require.resolve('../server/seed/livinglab')];
     const uit = require('../server/seed')();
-    if (oudDemo != null) process.env.RTG_DEMO = oudDemo; else delete process.env.RTG_DEMO;
+    if (oudDemo != null) process.env.RTG_MAGNAAT_TEST = oudDemo; else delete process.env.RTG_MAGNAAT_TEST;
     delete require.cache[require.resolve('../server/seed')];
     return uit;
   };
@@ -454,15 +455,15 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
   const tek = demo.labs[0].tekenaars.map(t => t.rol);
   for (const rol of ['professional', 'reviewer', 'toezichthouder'])
     assert.ok(tek.includes(rol), 'er is een ' + rol + ' -- zonder register kan er niets ondertekend worden');
-  assert.ok(proef.labs[0].tekenaars.some(t => t.onafhankelijk),
+  assert.ok(demo.labs[0].tekenaars.some(t => t.onafhankelijk),
     'er is een ONAFHANKELIJKE tekenaar; klasse hoog vraagt er een');
-  assert.ok(proef.themas.length >= 2, 'er staan vragen uit de buurt klaar');
-  assert.ok(proef.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
+  assert.ok(demo.themas.length >= 2, 'er staan vragen uit de buurt klaar');
+  assert.ok(demo.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
     'er staat een nooit-gekalibreerd apparaat bij: dat weigert een reservering en legt uit waarom');
 
   /* Geen verzonnen resultaten. De ene studie staat bij de eerste stap en haar
      dossier is leeg -- geen conclusie, geen bewijsgraad, geen deelnemer. */
-  for (const s of proef.studies) {
+  for (const s of demo.studies) {
     assert.equal(s.stap, 'vraagstuk', 'een seed-studie staat bij het vraagstuk');
     assert.deepEqual(s.dossier.conclusies, [], 'geen verzonnen conclusies in de startdata');
     assert.deepEqual(s.dossier.deelnemers, [], 'geen verzonnen deelnemers');
@@ -471,7 +472,7 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
   }
 
   const schoon = laad(false).livingLab;
-  assert.deepEqual(schoon.labs, [], 'zonder RTG_DEMO start het Living Lab leeg');
+  assert.deepEqual(schoon.labs, [], 'zonder RTG_MAGNAAT_TEST start het Living Lab leeg');
   assert.deepEqual(schoon.studies, [], 'en zonder studies');
 });
 

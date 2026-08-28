@@ -98,7 +98,9 @@ test('MELDEN: een echte route laat de val aanslaan, met de collectie erbij', asy
     const id = await stuk(srv.base, token);
     const weg = await api(srv.base, '/api/muziek/weg', { id }, token);
     assert.equal(weg.status, 200, 'in meldmodus hoort de handeling gewoon door te gaan');
-    await new Promise(r => setTimeout(r, 400));   // het log loopt na het antwoord
+    for (let i = 0; i < 40 && !/begroting: zou zijn geweigerd/.test(log); i++) {
+      await new Promise(r => setTimeout(r, 50));
+    }
 
     assert.match(log, /begroting: waakt/,
       'de val kwam in deze server niet eens tot installatie:\n' + log.slice(-1500));
@@ -137,7 +139,9 @@ test('WEIGEREN: de route komt er niet door, en het stuk staat er NA de poging no
 
     assert.deepEqual(await ids(srv.base, token), [id],
       'het stuk is WEG na een geweigerde handeling: de weigering kwam te laat, of maar half');
-    await new Promise(r => setTimeout(r, 400));
+    for (let i = 0; i < 40 && !/begroting: handeling geweigerd/.test(log); i++) {
+      await new Promise(r => setTimeout(r, 50));
+    }
     assert.match(log, /begroting: handeling geweigerd/,
       'de weigering staat niet in het log:\n' + log.slice(-2000));
   } finally {

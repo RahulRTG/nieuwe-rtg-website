@@ -97,7 +97,7 @@ if (!URL) {
        starts op DEZELFDE datamap, met het wissen ertussen -- precies het
        scenario uit TAKEN.md 4.38, dat voor de reparatie reproduceerbaar een
        herrezen rij opleverde. */
-    const { startServer, stop } = require('./helper');
+    const { startServer, stopHard } = require('./helper');
     const fs = require('fs'), os = require('os'), path = require('path');
     const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-grafsteen-'));
     const env = { SMTP_URL: '', RTG_DATA_DIR: TMP, DATABASE_URL: URL, RTG_STORE: 'postgres' };
@@ -108,16 +108,14 @@ if (!URL) {
       "SELECT count(*)::int AS n FROM kv WHERE key = 'lastafworp' AND weg = false")).rows[0].n;
     try {
       const een = await startServer({ env });
-      stop(een.child);
-      await new Promise(r => setTimeout(r, 800));
+      await stopHard(een.child);
       assert.equal(await leeft(), 1, 'na de eerste start staat de collectie er gewoon');
 
       assert.equal(await opzet.wisCollectie('lastafworp'), true, 'de beheerder wist hem');
       assert.equal(await leeft(), 0, 'en hij is weg');
 
       const twee = await startServer({ env });   // dezelfde datamap, dus dezelfde snapshot
-      stop(twee.child);
-      await new Promise(r => setTimeout(r, 800));
+      await stopHard(twee.child);
       assert.equal(await leeft(), 0,
         'na de tweede start staat hij er NOG STEEDS niet -- zonder grafsteen herrees hij hier');
     } finally {

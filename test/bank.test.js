@@ -778,13 +778,12 @@ test('een dubbeltik op de bank boekt niet twee keer -- gemeten aan het saldo', a
      VERSE sleutel (moet wel werken). Die derde is de ijking -- zonder hem zou
      een route die helemaal niets doet ook groen staan. */
   const pas = (await api('bank/pas/uitgeven', { iban: van, soort: 'debit', idem: 'dt-pas' }, k.token)).body.pas.id;
-  /* Alle ZES routes die het saldo raken. naar-wallet staat voor van-wallet, want
-     die tweede haalt terug wat de eerste erheen bracht; een negatieve wallet
-     zou op "onvoldoende saldo" stranden en dan meet deze toets niets. */
+  /* Alle vijf routes die binnen de toegestane bankrichting het saldo raken.
+     Van wallet terug naar bank is bewust gesloten en wordt hierboven als
+     eenrichtingsregel apart getoetst. */
   const gevallen = [
     ['bank/overboek', { vanIban: van, naarIban: naar, centen: 1000 }, 1000],
     ['bank/naar-wallet', { iban: van, centen: 1000 }, 1000],
-    ['bank/van-wallet', { iban: van, centen: 500 }, -500],
     ['bank/bulk', { vanIban: van, posten: [{ naarIban: naar, centen: 700 }] }, 700],
     ['bank/salaris', { vanIban: van, posten: [{ naarIban: naar, centen: 900 }] }, 900],
     ['bank/pas/betaal', { id: pas, centen: 1100 }, 1100]

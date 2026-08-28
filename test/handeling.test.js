@@ -310,8 +310,10 @@ test('IN EEN ECHTE SERVER: de laag haalt db.data op en meldt een handeling', asy
     const r = await post(port, '/api/office/login', { code: 'RTG-OFFICE' });
     assert.equal(r.status, 200, 'het kantoorlogin bestaat niet meer, dus deze toets meet niets: ' +
       JSON.stringify(r).slice(0, 200));
-    // res.finish loopt na het antwoord; even ademruimte voor het log
-    await new Promise(r => setTimeout(r, 600));
+    // res.finish loopt na het antwoord; wacht op de regel en niet op een gok.
+    for (let i = 0; i < 40 && !/grote handeling/.test(log); i++) {
+      await new Promise(r2 => setTimeout(r2, 50));
+    }
 
     assert.match(log, /grote handeling/,
       'geen enkele handelingsmelding in een echte server -- de laag komt niet bij db.data ' +

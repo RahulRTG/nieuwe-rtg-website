@@ -46,24 +46,24 @@ const { startServer, stop } = require('./helper');
 
 const W = require('../server/accounts/wachtwoord');
 
-test('1. hashDemoSync bestaat alleen in de demostand', () => {
-  const oud = process.env.RTG_DEMO;
+test('1. hashDemoSync bestaat alleen in Magnaat Test', () => {
+  const oud = process.env.RTG_MAGNAAT_TEST;
   try {
-    delete process.env.RTG_DEMO;
-    assert.throws(() => W.hashDemoSync('1234'), /demostand/i,
-      'zonder RTG_DEMO=1 hoort deze functie te weigeren, niet goedkoop te hashen');
-    process.env.RTG_DEMO = '0';
-    assert.throws(() => W.hashDemoSync('1234'), /demostand/i, 'en 0 is ook geen 1');
-    process.env.RTG_DEMO = '1';
+    delete process.env.RTG_MAGNAAT_TEST;
+    assert.throws(() => W.hashDemoSync('1234'), /Magnaat Test/i,
+      'zonder RTG_MAGNAAT_TEST=1 hoort deze functie te weigeren, niet goedkoop te hashen');
+    process.env.RTG_MAGNAAT_TEST = '0';
+    assert.throws(() => W.hashDemoSync('1234'), /Magnaat Test/i, 'en 0 is ook geen 1');
+    process.env.RTG_MAGNAAT_TEST = '1';
     assert.ok(W.hashDemoSync('1234').startsWith('s2$'), 'mét de vlag doet hij zijn werk');
   } finally {
-    if (oud === undefined) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = oud;
+    if (oud === undefined) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = oud;
   }
 });
 
 test('2. een demohash is een gewone hash: hij klopt, en een fout wachtwoord niet', async () => {
-  const oud = process.env.RTG_DEMO;
-  process.env.RTG_DEMO = '1';
+  const oud = process.env.RTG_MAGNAAT_TEST;
+  process.env.RTG_MAGNAAT_TEST = '1';
   try {
     const h = W.hashDemoSync('1234');
     const d = h.split('$');
@@ -73,13 +73,13 @@ test('2. een demohash is een gewone hash: hij klopt, en een fout wachtwoord niet
     assert.equal(await W.verifyPassword('5678', h), false, 'een ander niet');
     assert.equal(await W.verifyPassword('', h), false);
   } finally {
-    if (oud === undefined) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = oud;
+    if (oud === undefined) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = oud;
   }
 });
 
 test('3. een demohash is achterstallig, dus de eerste echte inlog waardeert hem op', () => {
-  const oud = process.env.RTG_DEMO;
-  process.env.RTG_DEMO = '1';
+  const oud = process.env.RTG_MAGNAAT_TEST;
+  process.env.RTG_MAGNAAT_TEST = '1';
   try {
     assert.ok(W.DEMO_N < W.SCRYPT_N, 'anders levert dit hele bestand niets op');
     assert.equal(W.moetVernieuwen(W.hashDemoSync('1234')), true,
@@ -87,15 +87,15 @@ test('3. een demohash is achterstallig, dus de eerste echte inlog waardeert hem 
     assert.equal(W.moetVernieuwen(W.hashPasswordSync('1234')), false,
       'en een volwaardige hash hoort juist NIET vernieuwd te worden');
   } finally {
-    if (oud === undefined) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = oud;
+    if (oud === undefined) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = oud;
   }
 });
 
-test('4. DE METER: na een demostart staat de seed-pincode op demokosten', async () => {
+test('4. DE METER: de zaai-seed hergebruikt een volwaardige pincodehash', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-demokosten-'));
   let srv;
   try {
-    srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_DEMO: '1' } });
+    srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_MAGNAAT_TEST: '1' } });
 
     /* Rechtstreeks in de database kijken: de hash gaat niet over de HTTP-lijn,
        en dat hoort ook zo. Alleen-lezen, zodat deze toets de server die er nog
@@ -110,8 +110,8 @@ test('4. DE METER: na een demostart staat de seed-pincode op demokosten', async 
     for (const r of rijen) {
       const d = String(r.pin_hash || '').split('$');
       assert.equal(d[0], 's2', 'een seed-hash hoort het huidige formaat te hebben: ' + String(r.pin_hash).slice(0, 12));
-      assert.equal(Number(d[1]), W.DEMO_N,
-        'de demoseed betaalt weer volle scrypt-kosten (N=' + d[1] + '); dat is twintig seconden voor listen');
+      assert.equal(Number(d[1]), W.SCRYPT_N,
+        'de zaai-seed bewaart een volwaardige hash; versnelling komt uit veilig hergebruik, niet lagere kosten');
     }
 
     /* TEGENPROEF op dezelfde server: het eigenaarsaccount is GEEN seed-pincode
@@ -133,7 +133,7 @@ test('5. en de seed-pincode werkt gewoon: de manager van KIKUNOI logt in', async
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-demopin-'));
   let srv;
   try {
-    srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_DEMO: '1' } });
+    srv = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '', RTG_MAGNAAT_TEST: '1' } });
     const post = (pad, body) => fetch(srv.base + pad, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));

@@ -24,7 +24,7 @@
    Alles komt binnen; dit bestand leest geen omgeving en houdt geen stand vast. */
 'use strict';
 
-module.exports = ({ saldi, saldoVan, grootboek, save, id, schoon, nu, waardePoort,
+module.exports = ({ saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, schoon, nu, waardePoort,
   betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN }) => {
 
   /* Gedeeld door de JS-guard (schaduw-modus) en door de motor-spiegel
@@ -34,8 +34,8 @@ module.exports = ({ saldi, saldoVan, grootboek, save, id, schoon, nu, waardePoor
   function pasToe(rij) {
     saldi()[rij.van] = saldoVan(rij.van) - rij.centen;
     saldi()[rij.naar] = saldoVan(rij.naar) + rij.centen;
-    grootboek().unshift(rij);
-    if (grootboek().length > 50000) grootboek().pop();
+    grootboek();
+    payBoekingenVoegToe(rij);
     save();
   }
 

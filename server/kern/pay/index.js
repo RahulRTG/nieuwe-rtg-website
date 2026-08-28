@@ -28,7 +28,11 @@
    het tegoed dat een lid voor een ander koopt in ./tegoed, en het afrekenen
    met een zaak in ./zaakbetaling. */
 
-module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten, waarde, accounts }) => {
+module.exports = (ctxIn) => {
+  const { db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
+    betaaldienstKosten, betaalOpdrachten, waarde, accounts, payBoekingenVoegToe } = ctxIn;
+  if (typeof payBoekingenVoegToe !== 'function')
+    throw new Error('pay: payBoekingenVoegToe ontbreekt. Zonder die weg landt geen enkele grootboekregel in het transactiegrootboek.');
   /* DE TIJD VAN DE HELE PAYLAAG, uit de huisklok en niet uit het
      besturingssysteem. Elk deelbestand hieronder leest `nu` uit deze ctx, dus
      deze ene regel bepaalt of vervaldatums, aflopende reserveringen, de
@@ -76,7 +80,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
      verandert, verandert wat er met GELD gebeurt; wie hier iets verandert,
      verandert welke ONDERDELEN aan elkaar hangen. */
   const { pasToe, boek, boekAsync } = require('./boeking')({
-    saldi, saldoVan, grootboek, save, id, schoon, nu, waardePoort,
+    saldi, saldoVan, grootboek, payBoekingenVoegToe, save, id, schoon, nu, waardePoort,
     betalingenUit, uitFout, geldModus, motorklant, schaduw, MIN_CENTEN, MAX_CENTEN });
 
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat

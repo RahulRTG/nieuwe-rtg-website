@@ -92,7 +92,19 @@ function zetGelijktijdigheid(db) {
      processen die tegelijk migreren (test/migratierace.test.js): met de oude
      volgorde vielen er een tot drie om, met deze geen. */
   db.exec('PRAGMA busy_timeout=5000');
-  db.exec('PRAGMA journal_mode=WAL');
+  const staatIn = () => String((db.prepare('PRAGMA journal_mode').get() || {}).journal_mode || '').toLowerCase();
+  const tot = Date.now() + 5000;
+  for (;;) {
+    if (staatIn() === 'wal') break;
+    try { db.exec('PRAGMA journal_mode=WAL'); break; }
+    catch (e) {
+      const bezet = /lock|busy/i.test(String((e && e.message) || e));
+      if (!bezet || Date.now() >= tot) throw e;
+      // De server luistert hier nog niet; synchroon wachten voorkomt dat de
+      // rest van de opstart op een half ingestelde verbinding doorgaat.
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
+    }
+  }
   db.exec('PRAGMA synchronous=NORMAL');
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een

@@ -16,6 +16,9 @@ module.exports = (ctx) => {
     ensure();
     const s = findSupplier(supplierCode);
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
+    const cent = centenVan(bedragCenten);
+    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
+    if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
     /* DUBBELTIK OP HET VERZOEK ZELF. Een betaling was al beschermd, een verzoek
        OM te betalen niet: twee keer op "stuur" drukken zette er twee bij de
        klant, met twee bedragen die allebei openstaan. De sleutel hangt aan de
@@ -25,11 +28,10 @@ module.exports = (ctx) => {
     const idemSleutel = idem ? ('bv:' + s.code + ':' + String(idem).slice(0, 60)) : null;
     if (idemSleutel) {
       const al = verzoekIdemZoek(idemSleutel);
+      if (al && al.bedrag !== cent)
+        return { status: 409, error: 'Deze idempotentiesleutel hoort al bij een ander bedrag.' };
       if (al) return { status: 200, ok: true, verzoek: verzoekPubliek(al), herhaald: true };
     }
-    const cent = centenVan(bedragCenten);
-    if (!Number.isFinite(cent) || cent < MIN_CENTEN) return { status: 400, error: 'Kies een bedrag van minstens € ' + (MIN_CENTEN / 100).toFixed(2) + '.' };
-    if (cent > MAX_CENTEN) return { status: 400, error: 'Dit bedrag is te hoog.' };
     const v = {
       ref: id('BV'), supplierCode: s.code, supplierName: s.name,
       naarCodename: naarCodename ? schoon(naarCodename, 40) : null,

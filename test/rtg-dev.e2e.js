@@ -69,7 +69,7 @@ test('rtg dev in een echte browser', async (t) => {
       const f = document.querySelector('#cel');
       return f && f.contentWindow;
     });
-    await pagina.waitForTimeout(600);
+    await cel.locator('#uit').filter({ hasText: 'Havik' }).waitFor();
     const gelukt = await cel.locator('#uit').textContent();
     assert.match(gelukt, /Havik/, 'de codenaam van het synthetische lid hoort terug te komen');
     assert.match(gelukt, /lifestyle/);
@@ -77,9 +77,8 @@ test('rtg dev in een echte browser', async (t) => {
 
     // 3 -- de machtiging intrekken, en dan komt de weigering MET velden aan
     await pagina.locator('input[data-id="profiel.basis"]').uncheck();
-    await pagina.waitForTimeout(250);
     await cel.locator('#knop').click();
-    await pagina.waitForTimeout(600);
+    await cel.locator('#uit').filter({ hasText: 'RTG_MACHTIGING_NIET_VERLEEND' }).waitFor();
     const geweigerd = await cel.locator('#uit').textContent();
     assert.match(geweigerd, /RTG_MACHTIGING_NIET_VERLEEND/,
       'de code hoort in de cel aan te komen en niet alleen de zin');

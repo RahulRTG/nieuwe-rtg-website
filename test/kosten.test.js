@@ -217,7 +217,7 @@ test('onder de drempel gaat er niets naar de rekening, erboven wel, en maar een 
   assert.equal(kleinBeeld.body.wieBetaalt.opDeRekening, false, 'een paar cent hoort niet op een rekening');
   assert.match(kleinBeeld.body.wieBetaalt.waaromNiet, /drempel/i);
 
-  await verzoektarief(100000);           // 100 cent per verzoek: ruim boven de drempel
+  await verzoektarief(100000000);        // 100 cent per verzoek: ruim boven de drempel
   const groot = await versLid();
   for (let i = 0; i < 12; i++) await api('/api/kosten/mij', {}, groot);
   const mij = await api('/api/kosten/mij', {}, groot);
@@ -231,7 +231,10 @@ test('onder de drempel gaat er niets naar de rekening, erboven wel, en maar een 
   assert.ok(vrij.body.geboekt >= 1, 'er is niets geboekt terwijl er wel wat te factureren was');
 
   const nogmaals = await api('/api/office/kosten/vrijgeven', { periode: p }, kantoor);
-  assert.equal(nogmaals.status, 409, 'een tweede vrijgave hoort te weigeren');
+  assert.equal(nogmaals.status, 200, 'een exacte netwerkherhaling krijgt het bewaarde antwoord');
+  assert.equal(nogmaals.body.herhaald, true, 'de centrale idempotentiepoort markeert de herhaling');
+  const derde = await api('/api/office/kosten/vrijgeven', { periode: p, controle: 'eigen-slot' }, kantoor);
+  assert.equal(derde.status, 409, 'een nieuw verzoek voor dezelfde periode hoort te weigeren');
 
   const staat = await api('/api/state', {}, groot);
   const inv = (((staat.body.state || {}).invoices) || []).find(i => /VERBRUIK/.test(i.id || ''));
@@ -250,7 +253,7 @@ test('onder de drempel gaat er niets naar de rekening, erboven wel, en maar een 
    een toets die zijn eigen geval niet neerzet, toetst niets. */
 test('het huisbeeld zegt wat het niet weet in plaats van er nul van te maken', async () => {
   const p = await nu();
-  await verzoektarief(100000);
+  await verzoektarief(100000000);
   const lid = await versLid();
   const op = await elevateTier(base, lid, 'business', kantoor);
   assert.ok(op, 'het lid kwam niet op de Business Pass; dan valt "op maat" niet te toetsen');

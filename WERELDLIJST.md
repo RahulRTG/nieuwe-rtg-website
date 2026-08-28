@@ -59,7 +59,7 @@ Huis: `/apps/rtg.html` — 47 onderdelen.
 | Rendez-vous | `link:rendezvous` | `/apps/rendezvous.html` |
 | Attenties | `link:attenties` | `/apps/attenties.html` |
 | Ontdekken | `link:ontdek` | `/apps/rtg.html` |
-| **lost niet op** | `link:commerce` | **nergens** |
+| Commerce | `link:commerce` | `/apps/commerce.html` |
 | Bestellen | `tab:bestellen` | `/apps/app.html (stand bestellen)` |
 | Zorg | `tab:zorg` | `/apps/app.html (stand zorg)` |
 | Gezin | `tab:gezin` | `/apps/app.html (stand gezin)` |
@@ -76,8 +76,6 @@ Huis: `/apps/rtg.html` — 47 onderdelen.
 | Nieuws | `link:nieuws` | `/apps/nieuws.html` |
 | Krant | `link:krant` | `/apps/krant.html` |
 | Sport | `link:sport` | `/apps/sport.html` |
-
-> **Deze onderdelen lossen niet op** en tekenen zich op het scherm stil weg: `link:commerce`. Zie `test/wereldregister.test.js`.
 
 ## WorkOS
 

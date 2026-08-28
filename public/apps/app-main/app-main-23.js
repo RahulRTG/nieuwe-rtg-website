@@ -107,6 +107,7 @@
        met zijn dagelijks leven. */
     wereldlaag:  { naam: 'Alles bij elkaar', url: '/apps/wereld.html' },
     geldcommand: { naam: 'Geld',           url: '/apps/geld-command.html' },
+    commerce:    { naam: 'Commerce',       url: '/apps/commerce.html' },
     /* HIER STONDEN INSTANTREALITY EN PRIVATEOFFICE, en die zijn 19 augustus 2026
        samengevoegd met de sleutel ernaast (WERELDEN.md, "de twee dubbele
        paren"). Instant Reality en Het Vooruitzicht (link:vooruitzicht) beloofden

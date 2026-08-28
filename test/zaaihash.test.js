@@ -109,8 +109,11 @@ test('de seed rekent nog een handvol hashes uit, en die hash logt gewoon in', as
   let srv;
   try {
     srv = await startServer({ env: { NODE_OPTIONS: '-r ' + telraam } });
-    await new Promise(r => setTimeout(r, 600));  // het telraam schrijft elke 200 ms
-    const n = Number(fs.readFileSync(telling, 'utf8'));
+    let n = 0;
+    for (let i = 0; i < 20 && n === 0; i++) {
+      try { n = Number(fs.readFileSync(telling, 'utf8')); } catch (e) {}
+      if (n === 0) await new Promise(r => setTimeout(r, 100));
+    }
     assert.ok(n > 0, 'het telraam heeft niets gezien; dan stelt deze toets niets vast');
     assert.ok(n <= 10, 'de seed maakte ' + n + ' scrypt-hashes; de zaai-hash is stuk of iemand zaait weer per account');
 

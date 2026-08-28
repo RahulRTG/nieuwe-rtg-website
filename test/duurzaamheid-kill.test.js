@@ -183,8 +183,7 @@ test('na een crash EN een verloren historie-blob staat de bevestigde overdracht 
     const saldoVoor = await saldo(srv.base, A.token);
 
     // ---- de HARDE crash ----
-    stop(srv.child);
-    await new Promise(r2 => setTimeout(r2, 300));
+    await stopHard(srv.child);
 
     /* ---- en dan de trage flush-laan: de historie-blob is er niet doorheen ----
        We zetten de kv-regel op een lege lijst in plaats van hem te verwijderen:

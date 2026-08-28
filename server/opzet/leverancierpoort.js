@@ -119,7 +119,11 @@ module.exports = ({ db, save, crypto, rtgKlok, sessionFor, DEMO,
        DICHTVALT, staat in kern/commercie/routepoort.js. */
     const abo = routepoort.voorZaak(kern.zaakAbonnement, req.supplier.code, req.path, kern.handhavingSchaduw);
     if (!abo.ok) return res.status(402).json({ error: abo.error, capability: abo.cap, nodig: abo.nodig || null });
-    next();
+
+    // Kostencontext op de ZAAKCODE en NA de abonnementspoort (KOSTEN.md par. 6).
+    const drager = kostenhaak.drager('zaak', req.supplier.code);
+    kostenhaak.meld('verzoek', 1, { drager, pas: 'zaak' });
+    kostenhaak.binnen(drager, next, 'zaak');
   }
 
   /* Mag deze mens werken in een zaak van dit genre? Late binding: de kernlaag

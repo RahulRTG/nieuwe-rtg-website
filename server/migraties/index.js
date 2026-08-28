@@ -126,6 +126,7 @@ function draai(db, opties) {
   const o = opties || {};
   controleer(db);
   const al = new Set(gedraaid(db).map(r => r.n));
+  const staatEr = db.prepare('SELECT n FROM schema_versie WHERE n = ?');
   const uit = [];
   const overgeslagen = [];
   for (const m of MIGRATIES.slice().sort((a, b) => a.n - b.n)) {

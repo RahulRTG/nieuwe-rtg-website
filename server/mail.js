@@ -75,6 +75,7 @@ const { sendSms, zetSandbox, sandboxStand } = kanalen;
    ./mail-bezorgen.js hieronder: daar staat HOE het over de lijn gaat, hier
    staat WAT er over de lijn gaat, en in dit bestand blijft WAARHEEN en wat
    er gebeurt als dat niet lukt. */
+const kostenhaak = require('./kern/kosten/haak'); // KOSTEN.md par. 6
 const { bouwBericht } = require('./mail-opstellen')({ FROM, MAIL_DOMEIN, DKIM_SLEUTEL, DKIM_SELECTOR });
 /* Zelf bezorgen staat in ./mail-bezorgen.js. Afgesplitst omdat dit bestand over
    de 10 KB ging, en de knip loopt langs een echte grens: hierboven staat WAT er
@@ -86,6 +87,16 @@ const stuurDirect = (to, subject, text, opties) =>
 
 function send(to, subject, text, opties) {
   if (!to) return;
+  /* DE KOSTENMETER (kern/kosten/haak.js), en alleen voor MAIL: een sms gaat een
+     paar regels lager door sendSms, en die telt zichzelf. Twee tellingen op een
+     bericht is erger dan geen, want dan klopt de factuur precies twee keer zo
+     hard niet.
+
+     Elk bericht dat dit huis aanneemt telt er een, ook een dat in de outbox
+     blijft staan: dat is een bericht dat nog moet gaan, en niet een dat niet
+     bestaat. Wie de kost draagt staat in de async-context van de poort, dus een
+     bericht uit een cronronde is van het huis. */
+  if (/@/.test(String(to))) kostenhaak.meld('bericht', 1, { bron: 'mail' });
   /* EEN BERICHT DAT NERGENS HEEN KAN, MOET JE KUNNEN ZIEN.
 
      Hier stond `if (!/@/.test(to)) return;` -- alles zonder apenstaartje viel

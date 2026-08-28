@@ -184,18 +184,39 @@ const gebruikt = (s, naam) => new RegExp('(?<![.\\w$])' + naam + '(?![\\w$])(?!\
 
 /* Doorzoek de hele boom onder `root`. Retourneert een lijst bevindingen:
    { bestand, naam, zuster } -- allemaal repo-relatieve paden. */
+/* EEN BESTAND KAN VERDWIJNEN TERWIJL WIJ LOPEN, en dan hoort deze scanner niet
+   om te vallen. De suite kent toetsen die tijdelijk een proefbestand in
+   server/kern zetten en het weer weghalen (test/keuring.test.js); draait er zo
+   een tegelijk met deze scan -- wat gebeurt zodra de suite ZONDER
+   scripts/test-runner.js wordt gestart, en dat doet `npm run test:gate` -- dan
+   staat de naam nog in readdirSync en is het bestand bij de statSync al weg.
+
+   De uitslag was dan geen bevinding maar een ENOENT, en daarmee werd een
+   geldige build rood op een dobbelsteen. Wat er niet meer is, telt niet mee:
+   dat is de enige eerlijke uitkomst, want over een bestand dat weg is valt
+   niets te beweren. Een andere fout dan ENOENT gaat wel gewoon omhoog -- een
+   leesrecht dat ontbreekt is geen wedloop maar een probleem. */
+const isMap = (p) => {
+  try { return fs.statSync(p).isDirectory(); }
+  catch (e) { if (e.code === 'ENOENT') return false; throw e; }
+};
+const leesOfWeg = (p) => {
+  try { return fs.readFileSync(p, 'utf8'); }
+  catch (e) { if (e.code === 'ENOENT') return null; throw e; }
+};
+
 function scan(root) {
   const bevindingen = [];
   function bezoek(dir) {
     const namen = fs.readdirSync(dir);
     for (const naam of namen) {
       const vol = path.join(dir, naam);
-      if (fs.statSync(vol).isDirectory()) { if (!/node_modules|\.git|data|dist/.test(naam)) bezoek(vol); }
+      if (isMap(vol)) { if (!/node_modules|\.git|data|dist/.test(naam)) bezoek(vol); }
     }
     if (!namen.includes('index.js')) return;
     const slices = namen.filter(n => n.endsWith('.js')).map(n => path.join(dir, n));
     if (slices.length < 2) return;
-    const info = slices.map(f => { const s = strip(fs.readFileSync(f, 'utf8')); return { f, s, D: bindings(s), top: topDecls(s) }; });
+    const info = slices.map(f => { const b = leesOfWeg(f); if (b == null) return null; const s = strip(b); return { f, s, D: bindings(s), top: topDecls(s) }; }).filter(Boolean);
     for (const F of info) {
       const gemeld = new Set();
       for (const S of info) {

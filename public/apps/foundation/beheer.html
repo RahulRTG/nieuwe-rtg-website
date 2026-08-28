@@ -90,6 +90,25 @@
     <div id="uitnodigingen"><div class="h">Nog geen uitnodigingen.</div></div>
   </div>
 
+  <!-- WAT DIT GEZIN KOST, EN WIE HET BETAALT. Geen rekening, en het hoort ook
+       niet als rekening te lezen: de RTFoundation betaalt dit en er komt hier
+       nooit een factuur. Daarom staat de BELOFTE bovenaan en het bedrag
+       daaronder -- een blok dat met een bedrag opent, leest als een openstaande
+       post (LEVEN.md: nooit sturen, altijd openen).
+
+       En er staat NIETS vergelijkends bij. Geen "meer dan andere gezinnen",
+       geen positie in een lijst, geen advies om minder te doen. De
+       bijdrage-spiegel is nooit vergelijkend, en dat geldt hier net zo goed.
+
+       Alleen de beheerder ziet dit blok, en de server beslist dat -- niet dit
+       scherm. Het is een cijfer over het hele gezin, en een kind heeft geen
+       boodschap aan wat het kost dat het sommen oefent. -->
+  <div class="kaart blok" id="kostenBlok">
+    <h2>Wat dit kost, en wie het betaalt</h2>
+    <div class="h" id="kostenBelofte">De RTFoundation betaalt dit. Je krijgt hiervoor nooit een rekening.</div>
+    <div id="kostenUit"><div class="h">Even kijken...</div></div>
+  </div>
+
   <div class="kaart blok">
     <h2>Gegevens en privacy</h2>
     <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--rtg-leesgoud,var(--goud))">privacy en veiligheid</a>-pagina.</div>
@@ -182,6 +201,7 @@ async function laad(){
       (p.beheerder && d.profielen.filter(x=>x.beheerder).length<=1 ? '' : '<button class="knop rood klein" data-del="'+p.id+'">×</button>')+'</div>';
     pl.appendChild(row);
   });
+  laadKosten();
   pl.querySelectorAll('[data-bew]').forEach(b=> b.onclick=()=> bewerk(d.profielen.find(x=>x.id===b.dataset.bew)));
   pl.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=> verwijder(b.dataset.del));
   // naar-keuze
@@ -231,6 +251,41 @@ if (window.RTGUitvoer) RTGUitvoer.bron(function(){
     rijen: PROFIELEN.map(p => [p.naam, rolTekst(p), p.groepNaam || '', p.heeftPin ? 'ja' : 'nee'])
   };
 });
+
+/* Het kostenblok. Mislukt de vraag, dan blijft het blok gewoon dicht: dit is
+   een antwoord op een vraag die een gezin nooit hoeft te stellen, en een
+   foutmelding erover hoort niet tussen het beheer van je gezin te staan.
+
+   HET BEDRAG STAAT ER MET ZIJN BEWIJSGRAAD, precies zoals overal in deze laag.
+   "vermoed" is een verdeling van een echte nota en geen meting, en zonder tarief
+   staat er geen bedrag maar de reden -- een nul zou hier "gratis omdat het niets
+   kost" betekenen, en het is gratis omdat de RTFoundation het betaalt. Dat zijn
+   twee verschillende dingen. */
+const euroF = c => '€ ' + (Math.round(Number(c)||0)/100).toLocaleString('nl-NL',{minimumFractionDigits:2,maximumFractionDigits:2});
+async function laadKosten(){
+  let d;
+  /* Mislukt de vraag, dan blijft de BELOFTE staan en verdwijnt alleen het
+     bedrag. Het blok zelf weghalen zou het deelmenu een lege ingang geven, en
+     een foutmelding over geld hoort niet tussen het beheer van een gezin. */
+  const stil = (t) => { $('#kostenUit').innerHTML = '<div class="h">' + t + '</div>'; };
+  try { d = await api('/kosten', { code:s.code, token:s.token }); }
+  catch(e){ stil('Dit is nu niet op te halen. Aan de belofte hierboven verandert dat niets.'); return; }
+  if (!d || !d.overzicht){ stil('Dit is nu niet op te halen. Aan de belofte hierboven verandert dat niets.'); return; }
+  const t = d.overzicht.totaal || {};
+  if (d.betaald && d.betaald.zin) $('#kostenBelofte').textContent = d.betaald.zin;
+  const regels = (d.overzicht.regels||[]).concat(d.overzicht.toegerekend||[]);
+  $('#kostenUit').innerHTML =
+    (t.graad === 'onbekend'
+      ? '<div class="h">Wat het draaien van deze app voor jullie gezin kost, is nu niet uit te rekenen: er staat nog geen tarief tegenover. Er staat daarom geen bedrag -- ook geen nul, want dat zou iets anders beweren.</div>'
+      : '<div class="prow"><div><div class="nm">' + esc(euroF(t.centen)) + '</div>' +
+        '<div class="rl">in ' + esc(d.periode) + ' &middot; ' + esc(t.graad) + '</div></div></div>') +
+    (regels.length
+      ? '<div class="h h-mt40">' + regels.map(r => esc(r.naam) + ': ' +
+          (r.centen != null ? euroF(r.centen) : r.millicenten != null ? euroF(Math.round(r.millicenten/1000)) : 'geen bedrag') +
+          ' (' + esc(r.graad) + ')').join('<br>') + '</div>'
+      : '') +
+    '<div class="h h-mt40">' + esc(d.zegtNiet.toegerekend) + ' Er staat hier niets over andere gezinnen: dit is geen vergelijking en geen doel om onder te blijven.</div>';
+}
 
 function bewerk(p){
   bewerkId=p.id; $('#dTitel').textContent='Profiel bewerken';

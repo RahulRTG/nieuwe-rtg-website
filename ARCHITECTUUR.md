@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4674 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4708 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -102,7 +102,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 209 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 210 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -124,7 +124,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3112 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3146 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -132,9 +132,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1494 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 209 |
-| daarvan door precies één domein | 1285 |
+| kern-namen die routes aanraken | 1496 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 210 |
+| daarvan door precies één domein | 1286 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -146,12 +146,12 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(185) auth(113) supplierAuth(61) officeAuth(41) db(37) liveCodename(33) status(27)
+app(188) auth(114) supplierAuth(62) officeAuth(41) db(37) liveCodename(33) status(27)
 accounts(25) schoon(23) managerOnly(18) codenaamVan(17) save(16) rtf(15)
-boardroomWie(12) geenGast(12) tooManyTries(11) crypto(11) express(11) findSupplier(11)
+boardroomWie(14) geenGast(13) tooManyTries(11) crypto(11) express(11) findSupplier(11)
 pay(11) anthropic(11) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
-sseToOffice(9) payrollOS(9) kern(8) stuur(8) mail(7) noteFailedTry(7) sseToSupplier(7)
-boardroomAuth(7) appUrl(6) onboarding(6) notifySupplier(6) talen(6) tenant(5)
+boardroomAuth(9) sseToOffice(9) payrollOS(9) kern(8) stuur(8) mail(7) noteFailedTry(7)
+sseToSupplier(7) appUrl(6) onboarding(6) notifySupplier(6) talen(6) tenant(5)
 loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 ```
 

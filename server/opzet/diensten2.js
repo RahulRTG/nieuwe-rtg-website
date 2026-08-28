@@ -155,7 +155,13 @@ function auth(req, res, next) {
   envelop.zet(req, { soort: 'lid', id: sess.key || null, rol: sess.tier || null,
     capability: _fid || null });
   dirTouch(sess);
-  next();
+  /* WIE DRAAGT DE KOSTEN VAN DIT VERZOEK -- één keer, op het keelgat waar elke
+     leden-route langs moet; verderop vindt alles de eigenaar in de async-context
+     (kern/kosten/haak.js). Het verzoek telt mee, anders leest een gebruiker die
+     nooit met de AI praat als kosteloos. */
+  const drager = kostenhaak.drager('lid', sess.key);
+  kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
+  kostenhaak.binnen(drager, next, sess.tier);
 }
 
 /* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >

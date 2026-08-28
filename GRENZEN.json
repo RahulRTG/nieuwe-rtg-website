@@ -275,6 +275,11 @@
   "drm": [
    "drm"
   ],
+  "economie": [
+   "boardroomAuth",
+   "economie",
+   "kosten"
+  ],
   "facturatie": [
    "facturatie"
   ],
@@ -549,6 +554,10 @@
   ],
   "klok": [
    "klok"
+  ],
+  "kosten": [
+   "boardroomAuth",
+   "kosten"
   ],
   "labfonds": [
    "labfonds"

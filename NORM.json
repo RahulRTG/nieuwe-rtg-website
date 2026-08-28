@@ -21,8 +21,8 @@
     "keuringTeGroot": 26,
     "inlineStijlAttributen": 4954,
     "browserpoortToetsen": 211,
-    "kernBreedte": 1494,
-    "kernGedeeld": 209,
+    "kernBreedte": 1496,
+    "kernGedeeld": 210,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 386,
@@ -44,10 +44,18 @@
     "bewijsCellenBewezen": 16475,
     "bewijsAchterstand": 989,
     "schermenZonderVormtaal": 184,
-    "dbDeuren": 600,
-    "dbDeurenSchrijvend": 370
+    "dbDeuren": 605,
+    "dbDeurenSchrijvend": 372
   },
   "notities": [
+    {
+      "datum": "2026-08-28",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "waarheen": "GRENZEN.json, waar de twee nieuwe domeinen (kosten, economie) hun kern-namen opgeschreven hebben staan",
+      "meter": "kernBreedte 1494 -> 1496, kernGedeeld 209 -> 210, dbDeuren 600 -> 605, dbDeurenSchrijvend 370 -> 372 (de kostprijslaag erbij, gemeten)",
+      "reden": "Twee kern-eigenschappen erbij en geen negentien: kern.kosten en kern.economie, allebei EEN ingang voor een hele laag. De vijf deuren naar db zijn de huisrekening, de tellerstand, de tarieven, de periodes en het relatieregister van de firewall -- van die vijf schrijven er twee (de nota en de vrijgave), en dat is precies de scheiding die KOSTEN.md eist: de meter houdt tellers, een mens boekt. Geen erosie maar de prijs van een laag die er niet was; wie hem terugdraait, draait de vraag \"wat kost deze gebruiker ons\" terug."
+    },
     {
       "datum": "2026-08-21",
       "soort": "schuld",

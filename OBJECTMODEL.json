@@ -132,6 +132,18 @@
       ]
     },
     {
+      "veld": "eenheid",
+      "domeinen": 12,
+      "waar": [
+        "kern/boerderij",
+        "kern/command",
+        "kern/groothandel",
+        "kern/keuken",
+        "kern/kosten",
+        "kern/life"
+      ]
+    },
+    {
       "veld": "waarom",
       "domeinen": 12,
       "waar": [
@@ -237,18 +249,6 @@
         "kern/galerij",
         "kern/gedachten",
         "kern/klok"
-      ]
-    },
-    {
-      "veld": "eenheid",
-      "domeinen": 11,
-      "waar": [
-        "kern/boerderij",
-        "kern/command",
-        "kern/groothandel",
-        "kern/keuken",
-        "kern/life",
-        "kern/magnaat-partnerstudio-bedrijf"
       ]
     },
     {
@@ -501,6 +501,18 @@
         "kern/festival",
         "kern/ledenbalie",
         "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "periode",
+      "domeinen": 8,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/commercie",
+        "kern/fiscaal",
+        "kern/kosten",
+        "kern/overheid",
+        "kern/payroll"
       ]
     },
     {

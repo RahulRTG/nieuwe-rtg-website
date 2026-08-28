@@ -14,6 +14,8 @@ const Anthropic = require('./anthropic');
 const OpenAI = require('./openai');
 const Gemini = require('./gemini');
 const LocalAI = require('./local-ai');
+const { kompasStatus } = require('./ai-kompas');
+const kostenhaak = require('./kern/kosten/haak'); // begint leeg; KOSTEN.md par. 6
 const meter = require('./ai-meter');
 const rem = require('./ai-rem');
 const budget = require('./ai-budget');
@@ -61,6 +63,16 @@ function maakAI(opts) {
     routes(params) { return ketting.filter(a => typeof a.kan !== 'function' || a.kan(params)).map(a => a.naam); },
     messages: {
       async create(params) {
+        /* DE VERBRUIKSGRENS (kern/kosten/grens.js), vlak voor het geld. Dicht:
+           dan geen aanroep, en valt de app terug op de regelgestuurde werkmodus
+           die er toch al is voor als er geen model is -- het verschil tussen een
+           grens en een storing. Zonder grens kost dit een kaartopzoeking. */
+        const grens = kostenhaak.magUitgeven();
+        if (grens && grens.ok === false) {
+          const fout = new Error(grens.uitleg || 'De verbruiksgrens voor deze gebruiker is bereikt.');
+          fout.code = 'KOSTENGRENS';
+          throw fout;
+        }
         let laatste = null;
         for (const aanbieder of ketting) {
           if (typeof aanbieder.kan === 'function' && !aanbieder.kan(params)) continue;
@@ -94,6 +106,20 @@ function maakAI(opts) {
             const uit = await aanbieder.messages.create(params);
             client.actief = aanbieder.naam;
             client.bron = aanbieder.lokaal ? 'lokaal' : 'extern';
+            /* DE KOSTENMETER (kern/kosten/haak.js), op de enige plek waar elke
+               modelaanroep langskomt. Geen usage: dan melden we niets.
+
+               NAAST ./ai-meter.js hieronder en niet in plaats daarvan: die telt
+               wat het HUIS uitgeeft en hoeveel capaciteit de eigen modelserver
+               draagt, deze telt aan WELKE gebruiker de tokens toe te rekenen
+               zijn (KOSTEN.md par. 6). Twee vragen, twee tellers. */
+            const u = uit && uit.usage;
+            if (u) {
+              const inv = (Number(u.input_tokens) || 0) + (Number(u.cache_read_input_tokens) || 0);
+              const uitv = Number(u.output_tokens) || 0;
+              if (inv > 0) kostenhaak.meld('ai-invoer', inv, { bron: aanbieder.naam });
+              if (uitv > 0) kostenhaak.meld('ai-uitvoer', uitv, { bron: aanbieder.naam });
+            }
             /* Beide tellen, maar in hun eigen emmer: extern kost geld, intern
                kost capaciteit. De verhouding tussen die twee is het signaal dat
                je wilt zien -- de keten is lokaal-eerst, dus loopt het aandeel

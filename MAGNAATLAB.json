@@ -60,8 +60,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 12,
-  "kandidaatparen": 33,
+  "gedeeldeOnderwerpen": 13,
+  "kandidaatparen": 35,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {
@@ -184,23 +184,23 @@
       "meetbaar": false
     },
     {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/magnaat-economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
+      "onderwerp": "economie",
+      "simulatie": "server/kern/spellen/magnaat/economie.js",
+      "rtg": "server/kern/economie/index.js",
+      "vormgelijkenis": 0,
+      "meetbaar": false
+    },
+    {
       "onderwerp": "foundation",
       "simulatie": "server/kern/spellen/magnaat/foundation.js",
       "rtg": "server/kern/wereldroutes/foundation.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel-acties.js",
-      "rtg": "server/kern/markt/handel.js",
-      "vormgelijkenis": 0,
-      "meetbaar": false
-    },
-    {
-      "onderwerp": "handel",
-      "simulatie": "server/kern/spellen/magnaat/handel.js",
-      "rtg": "server/kern/markt/handel.js",
       "vormgelijkenis": 0,
       "meetbaar": false
     }

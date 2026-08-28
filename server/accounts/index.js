@@ -74,10 +74,9 @@ function loadRing(file, vault) {
   return uit;
 }
 
-function init() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  const db = new DatabaseSync(DB_FILE);
-  S.db = db;
+/* De gelijktijdigheidsstand van een verbinding. Staat apart zodat de VOLGORDE
+   beproefbaar is (test/pragmavolgorde.test.js) in plaats van alleen bedoeld. */
+function zetGelijktijdigheid(db) {
   /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
      als twee processen dezelfde accountsdatabase raken (failover-trio, een
      herstart die de oude instance een tel overlapt, parallelle testservers)
@@ -139,7 +138,7 @@ function schrijfKluisRing(ring) {
 }
 
 module.exports = {
-  init, checkpoint, schrijfKluisRing, RING_FILE,
+  init, zetGelijktijdigheid, checkpoint, schrijfKluisRing, RING_FILE,
   startPostgres: mirror.startPostgres, onExternalChange: mirror.onExternalChange, flushBijAfsluiten: mirror.flushBijAfsluiten,
   verifyPassword: kluis.verifyPassword,
   moetVernieuwen: kluis.moetVernieuwen,

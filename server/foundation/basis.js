@@ -68,6 +68,11 @@ module.exports = function maakBasis() {
   foutisolatie.isoleer(router);
   router.use(express.json({ limit: '4mb' }));
 
+  /* De kostenpoort van de RTFoundation: de derde, naast die van de leden en de
+     zaken. In een eigen bestandje zoals kern/aipoort.js, zodat de beslissing te
+     beproeven is zonder server. */
+  router.use(require('./kostenpoort')({ db }));
+
   function F() {
     if (!db.data.foundation) db.data.foundation = { lessen: {} };
     if (!db.data.foundation.lessen) db.data.foundation.lessen = {};

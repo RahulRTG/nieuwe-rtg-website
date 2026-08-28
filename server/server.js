@@ -264,6 +264,19 @@ const DEMO = testomgeving.actief(process.env);
    'listen'. Dat klopte -- tot de Postgres-spiegel eronder kwam. */
 function zetEigenaarsAccountEens() {
   const DEMO_WACHTWOORD = process.env.DEMO_PASS || 'Imran';
+  /* EN HET WACHTWOORD OOK ALS HET ACCOUNT AL BESTOND. Dat gebeurde niet, en
+     daarmee was de demo-stand een garantie die alleen gold op een verse
+     database -- precies wanneer je hem niet nodig hebt. Op een gedeelde
+     Postgres kwam de rij ergens anders vandaan en was het wachtwoord
+     onbekend. "Demo" hoort een bekende, herhaalbare toestand te betekenen.
+     Dit staat achter DEMO en draait dus nooit in productie. */
+  const bijwerken = (rij) => {
+    let x = rij;
+    if (accounts.realNameOf(x) !== 'Rahul Imran Ismail') x = accounts.renameUser(x.id, { username: 'Rahul', realName: 'Rahul Imran Ismail' });
+    accounts.setPasswordSync(x.id, DEMO_WACHTWOORD);
+    accounts.setVerification(x.id, 'verified');
+    return x;
+  };
   let u = accounts.findByLogin(eigenaar.OWNER_EMAIL);
   if (!u) {
     /* Nog geen account op het eigenaarsadres. Op een verse database maken we er
@@ -1107,6 +1120,10 @@ const notities = require('./kern/notities').maakNotities({
   db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
 /* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
    (zelfde aanpak als media.js), alleen verwijzingen in de database. */
+/* De opslagpeiling van de kostprijslaag (KOSTEN.md) staat naast de kluis en niet
+   erin; zie de kop van kern/bestanden-opslag.js voor waarom, en welke toets die
+   naad bewaakt. */
+const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
   // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
@@ -2117,7 +2134,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

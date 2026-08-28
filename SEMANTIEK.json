@@ -1,12 +1,12 @@
 {
-  "catalogi": 951,
-  "verschillendeNamen": 571,
-  "namenInMeerDomeinen": 107,
-  "woordenMetMeerBetekenissen": 92,
-  "betekenissenTotaal": 334,
+  "catalogi": 959,
+  "verschillendeNamen": 573,
+  "namenInMeerDomeinen": 110,
+  "woordenMetMeerBetekenissen": 93,
+  "betekenissenTotaal": 338,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 43,
-  "dubbelingen": 28,
+  "ergsteAantal": 44,
+  "dubbelingen": 30,
   "dubbelingLijst": [
     {
       "naam": "PALET",
@@ -23,6 +23,21 @@
         "kalksteen",
         "zichtbeton",
         "leisteen"
+      ]
+    },
+    {
+      "naam": "MAAND",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/kosten/factuurregel.js",
+        "server/kern/lid/reisdossier.js"
+      ],
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april"
       ]
     },
     {
@@ -240,7 +255,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 43,
+      "betekenissenVanDitWoord": 44,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -297,6 +312,21 @@
         "kind",
         "tiener",
         "gezin"
+      ]
+    },
+    {
+      "naam": "GRAAD",
+      "betekenissenVanDitWoord": 1,
+      "waar": [
+        "server/kern/command/gezondheid.js",
+        "server/kern/kosten/soorten.js"
+      ],
+      "leden": 4,
+      "voorbeeld": [
+        "onbekend",
+        "vermoed",
+        "gemeten",
+        "bewezen"
       ]
     },
     {
@@ -408,7 +438,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 43,
+      "betekenissenVanDitWoord": 44,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -422,7 +452,7 @@
     },
     {
       "naam": "STANDEN",
-      "betekenissenVanDitWoord": 12,
+      "betekenissenVanDitWoord": 13,
       "waar": [
         "server/kern/avond/voorkeuren.js",
         "server/kern/werkvenster.js"
@@ -449,7 +479,7 @@
       ]
     }
   ],
-  "dubbelingenZonderNaam": 179,
+  "dubbelingenZonderNaam": 187,
   "dubbelingZonderNaamLijst": [
     {
       "overlap": 1,
@@ -470,6 +500,21 @@
       "overlap": 1,
       "a": "server/kern/betekenis.js",
       "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/betekenis.js",
+      "aNaam": "MAANDEN",
       "b": "server/kern/lid/facturen.js",
       "bNaam": "MAAND_NL",
       "leden": 12,
@@ -500,6 +545,21 @@
       "overlap": 1,
       "a": "server/kern/concern/voorstel.js",
       "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/concern/voorstel.js",
+      "aNaam": "MAANDEN",
       "b": "server/kern/lid/facturen.js",
       "bNaam": "MAAND_NL",
       "leden": 12,
@@ -530,6 +590,21 @@
       "overlap": 1,
       "a": "server/kern/huis.js",
       "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/huis.js",
+      "aNaam": "MAANDEN",
       "b": "server/kern/lid/facturen.js",
       "bNaam": "MAAND_NL",
       "leden": 12,
@@ -560,6 +635,21 @@
       "overlap": 1,
       "a": "server/kern/invoer-lezer.js",
       "aNaam": "MAANDEN",
+      "b": "server/kern/kosten/factuurregel.js",
+      "bNaam": "MAAND",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/invoer-lezer.js",
+      "aNaam": "MAANDEN",
       "b": "server/kern/lid/facturen.js",
       "bNaam": "MAAND_NL",
       "leden": 12,
@@ -588,6 +678,51 @@
     },
     {
       "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
+      "b": "server/kern/lid/facturen.js",
+      "bNaam": "MAAND_NL",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
+      "b": "server/kern/socialegraaf/lijn.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
+      "a": "server/kern/kosten/factuurregel.js",
+      "aNaam": "MAAND",
+      "b": "server/kern/tijdlijn.js",
+      "bNaam": "MAANDEN",
+      "leden": 12,
+      "voorbeeld": [
+        "januari",
+        "februari",
+        "maart",
+        "april",
+        "mei"
+      ]
+    },
+    {
+      "overlap": 1,
       "a": "server/kern/lid/facturen.js",
       "aNaam": "MAAND_NL",
       "b": "server/kern/socialegraaf/lijn.js",
@@ -644,119 +779,14 @@
         "maart",
         "april",
         "mei"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/webmaker-schoon.js",
-      "aNaam": "ZAAKBRONNEN",
-      "b": "server/kern/webplatform.js",
-      "bNaam": "BRONNEN",
-      "leden": 12,
-      "voorbeeld": [
-        "menu",
-        "diensten",
-        "kamers",
-        "agenda",
-        "events"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/atelierweb.js",
-      "aNaam": "ATELIER_TYPES",
-      "b": "server/kern/journalistiek.js",
-      "bNaam": "TYPES",
-      "leden": 10,
-      "voorbeeld": [
-        "hero",
-        "kop",
-        "tekst",
-        "knop",
-        "beeld"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/agenda.js",
-      "aNaam": "DAGEN",
-      "b": "server/kern/genootschap/inzicht.js",
-      "bNaam": "WEEKDAG",
-      "leden": 7,
-      "voorbeeld": [
-        "zondag",
-        "maandag",
-        "dinsdag",
-        "woensdag",
-        "donderdag"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/berichten/ai.js",
-      "aNaam": "DAGEN",
-      "b": "server/kern/genootschap/inzicht.js",
-      "bNaam": "WEEKDAG",
-      "leden": 7,
-      "voorbeeld": [
-        "zondag",
-        "maandag",
-        "dinsdag",
-        "woensdag",
-        "donderdag"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/context.js",
-      "aNaam": "DAGEN",
-      "b": "server/kern/genootschap/inzicht.js",
-      "bNaam": "WEEKDAG",
-      "leden": 7,
-      "voorbeeld": [
-        "zondag",
-        "maandag",
-        "dinsdag",
-        "woensdag",
-        "donderdag"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/genootschap/inzicht.js",
-      "aNaam": "WEEKDAG",
-      "b": "server/kern/leerstof-gen-meten.js",
-      "bNaam": "DAGEN",
-      "leden": 7,
-      "voorbeeld": [
-        "zondag",
-        "maandag",
-        "dinsdag",
-        "woensdag",
-        "donderdag"
-      ]
-    },
-    {
-      "overlap": 1,
-      "a": "server/kern/genootschap/inzicht.js",
-      "aNaam": "WEEKDAG",
-      "b": "server/kern/voorspel/rekenen.js",
-      "bNaam": "DAGEN",
-      "leden": 7,
-      "voorbeeld": [
-        "zondag",
-        "maandag",
-        "dinsdag",
-        "woensdag",
-        "donderdag"
       ]
     }
   ],
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 45,
-      "betekenissen": 43,
+      "domeinen": 46,
+      "betekenissen": 44,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -985,6 +1015,18 @@
             "hotel",
             "winkel",
             "plek"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/kosten/soorten.js"
+          ],
+          "leden": 9,
+          "voorbeeld": [
+            "ai-invoer",
+            "ai-uitvoer",
+            "verzoek",
+            "opslag"
           ]
         },
         {
@@ -1277,8 +1319,8 @@
     },
     {
       "naam": "STANDEN",
-      "domeinen": 13,
-      "betekenissen": 12,
+      "domeinen": 14,
+      "betekenissen": 13,
       "hoogsteOverlap": 0.4,
       "soort": "gemengd",
       "waar": [
@@ -1315,6 +1357,18 @@
             "opgepakt",
             "klaar",
             "ingetrokken"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/kosten/beleidkaart.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "inbegrepen",
+            "doorbelasten",
+            "rtfoundation",
+            "huis"
           ]
         },
         {
@@ -3263,5 +3317,5 @@
       ]
     }
   ],
-  "bestanden": 2737
+  "bestanden": 2769
 }

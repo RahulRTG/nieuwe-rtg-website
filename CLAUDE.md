@@ -104,6 +104,70 @@ de AI beweegt geen geld. Waarom "voucher" het verkeerde woord was, staat in
 paragraaf 1: transactiekosten verdwijnen niet, ze verhuizen naar het
 oplaadmoment — en dát is het echte voordeel.
 
+**`ECONOMIE.md` is de laag erboven** -- RTG Economic Control Plane: de financiële
+intelligentielaag van het hele ecosysteem, als richtingsdocument met per onderdeel
+of het **staat**, **een stap weg** is, **een besluit vraagt** of **jaren weg** is
+(zoals PLATFORM.md en DEVELOPERCLOUD.md). Lees die vóór je aan doorbelasten,
+werelden of financiële voorspellingen werkt. De kern in één zin: **de RTFoundation
+is geen kostenpost van RTG die je over gebruikers uitsmeert, maar een eigen
+rechtspersoon met een eigen vermogen** -- en dat wordt afgedwongen en niet
+beloofd. Vier economische werelden (`consument`, `commercieel`, `rtg-intern`,
+`rtfoundation`) waarvan de wereld een eigenschap is van de IDENTITEIT en niet van
+de transactie, met een **firewall** ertussen die standaard weigert
+(`kern/economie/firewall.js`): een relatie tussen twee werelden bestaat alleen met
+een grondslag én een plafond, het register is standaard leeg, en een weigering
+zegt altijd hoe het wel kan. De nota's van de infrastructuur gaan daarom eerst
+over de vier werelden en pas daarna binnen elke wereld over haar eigen gebruikers.
+Er is een tweede poort die geen relatie kan openen: een rekening landt bij de
+ENTITEIT van een wereld, nooit bij een gebruiker ervan -- RTG mag de stichting
+factureren, nooit een gezin. Wat er nog niet is (economische graaf, provenance tot
+de providerfactuur, periode sluiten, forecast, cost routing) staat in ECONOMIE.md
+mét de reden en de stand, niet als lege functie.
+
+**`KOSTEN.md` is de kostprijskant** -- RTG Kostprijs: wat kost elke gebruiker ons,
+en wie betaalt dat. WAARDE.md gaat over waarde die BINNEN RTG beweegt; dit gaat
+over het geld dat het huis er zelf aan uitgeeft. Lees die vóór je aan tarieven,
+verbruik, doorbelasten of "wat kost een gratis account" werkt. De kern in één zin:
+**elke euro die dit huis uitgeeft krijgt een eigenaar, of de eerlijke mededeling
+dat hij er geen heeft.** Negen kostensoorten (`kern/kosten/soorten.js`) waarvan er
+zeven per gebruiker meetbaar zijn en twee niet; stroom en serverhuur worden
+verdeeld uit de echte nota met de sleutel erbij en dragen daarom altijd de graad
+`vermoed` -- het plafond volgt uit de meetweg en staat níét per regel, want die
+tweede plek werd door de toerekening genegeerd. De meter houdt tellers en geen
+journaal (een gedragslogboek per lid is voor een factuur niet nodig), de drager
+komt uit de async-context die de poort zet (`kern/kosten/haak.js`), en de AI-meter
+hangt op de enige plek waar élke modelaanroep langskomt (`server/ai.js`). Drie
+grenzen die niet mogen sneuvelen: er staat nooit een getal waar er geen is (geen
+tarief of nota = een REDEN, geen nul), deze laag kent geen namen (sessiesleutel,
+zaakcode, gezinscode -- nooit de kluis), en de machine zet klaar terwijl een mens
+uit de boardroom vrijgeeft. Wie wat betaalt staat in `kern/kosten/beleidkaart.js`:
+vier standen, met **RTG Lite en Business Lite er al in en `bestaatNog: false`
+erbij**, en met `gezin` en `huis` als beloften die géén schakelaar zijn -- de
+RTFoundation blijft gratis voor elk gezin, dat gezin ziet alleen wát het kost
+(`/api/foundation/kosten`, alleen de beheerder, en het antwoord opent met de
+belofte en niet met het bedrag). **Vier lezers, vier schermen, een antwoord**:
+een lid ziet het in RTG Geld (stand *Kosten*), een zaak op
+`/apps/zaakkosten.html`, het kantoor op `/apps/kosten.html` -- die drie op
+dezelfde gedeelde vormtaal (`public/shared/kostenbeeld.js`), zodat "vermoed" op
+het scherm van het lid hetzelfde betekent en er hetzelfde uitziet als op het bord
+waar een mens besluit hem de rekening te sturen. Het vierde is het gezin, in het
+beheerscherm van de RTFoundation: eigen route, eigen toon, en het opent met de
+belofte in plaats van met het bedrag. **Alle negen soorten hebben nu een teller of een
+verdeling**: AI en verzoeken via de poorten, berichten via mail én sms (twee
+choke points, want er komt een aanroeper rechtstreeks langs `sendSms`), opslag als
+STAND die je peilt in plaats van optelt (`kern/kosten/meterstand.js` -- wie een
+stand als stroom telt, laat de rekening van wie niets doet het hardst groeien), en
+transactiekosten op het oplaadmoment. Daarbovenop: de herkomstketen tot de
+leveranciersfactuur (`kern/kosten/herkomst.js`, en die eindigt eerlijk bij "zo is
+hij overgenomen door een mens"), de maandafsluiting waarin een maand pas dichtgaat
+als elk verschil een verklaring draagt en een maand **in onderzoek** nooit naar een
+rekening gaat (`kern/kosten/periode.js`), een vooruitblik waarvan de bandbreedte
+pas verschijnt als de trefzekerheid over drie afgesloten maanden GEMETEN is
+(`kern/kosten/vooruitblik.js`), en een verbruiksgrens die de AI-weg werkelijk
+dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
+(`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
+andere stand dan `ruim`).
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig
@@ -336,10 +400,10 @@ code gehouden.
 `GAMEHALL.md` beschrijft: de simulatieomgeving waarin een capability bewijst dat
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
-(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 64 modules en
-113 requires, en raakt daarmee **1 van 412 kerndomeinen** aan — 0%. Als testhal
+(`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
+116 requires, en raakt daarmee **2 van 415 kerndomeinen** aan — 0%. Als testhal
 bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
-van de 29 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+van de 34 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
 afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
 tenant-isolatie, doelschending, canary met automatische terugrol, shadow
@@ -394,10 +458,10 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 95 namen die in meer dan
-één domein staan, dragen er **77 meer dan één betekenis** — samen 279
-betekenissen, met `SOORTEN` op **38**. Daarnaast **28** betekenissen die op meer
-dan één plek wonen én **101** paren die dezelfde waarheid onder een ándere naam
+`SEMANTIEK.json`) en het was **geen incident**: van de 96 namen die in meer dan
+één domein staan, dragen er **78 meer dan één betekenis** — samen 284
+betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
+dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
 dubbeling draagt per definitie twee namen. Botsing en dubbeling vragen het
 tegenovergestelde: hernoemen tegenover samenvoegen. **Twee onafhankelijke
@@ -408,7 +472,8 @@ gedeeld type dat hier te krijgen is. **De eerste reparatie is gedaan:** de vraag
 "welke passen bestaan er" stond op vier plekken (twee met een identieke `pasVan`)
 en woont nu in `server/kern/passen.js`, met `BETALEND` afgeleid in plaats van
 overgetypt — zelfde patroon als `kern/pasprijs.js`. Drie mutaties raak, en de
-meter bewoog mee: 111 → 101. De 77 zijn geen foutenlijst
+meter bewoog mee: 111 → 101 (en staat nu op 106: deze tak zette er zelf
+code bij, en de meter telt de hele boom). De 78 zijn geen foutenlijst
 maar een prijskaart: ze zeggen wat één capability-grammatica (`OS.md`) gaat
 kosten en waar hij het eerst schuurt. **Drie dingen die dit huis al heeft besloten
 en die de opzet raakt:** een enkel `READY` boven een bewijs-scorecard is precies

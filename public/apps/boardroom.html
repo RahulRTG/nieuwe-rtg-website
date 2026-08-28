@@ -42,6 +42,17 @@
     <button class="tab" type="button" role="tab" aria-selected="false" data-paneel="tabLeden" data-i18n="bo.tab.leden">Leden</button>
   </div>
 
+  <!-- HET KOSTENBORD WAS NERGENS VANDAAN TE BEREIKEN. /apps/kosten.html
+       bestond, werkte, stond in de app-gids -- en er wees geen enkele knop
+       naartoe, dus alleen wie het adres kende kwam er. Een scherm dat je niet
+       kunt vinden is geen scherm. Het hoort hier: het staat achter dezelfde
+       poort als deze pagina (boardroomAuth), want een tarief zetten bepaalt wat
+       er op andermans rekening komt. Hij verschijnt daarom pas als de server
+       die poort werkelijk opendoet -- samen met de tabrij hierboven. -->
+  <p class="rtg-uitleg" id="boKostprijs" hidden>
+    <a href="/apps/kosten.html">RTG Kostprijs: wat kost elke gebruiker, en wie betaalt dat &#8594;</a>
+  </p>
+
   <!-- #bord blijft de eerste eigen doos: de eigenaarszetel schuift zichzelf er
        vlak voor, en hoort dus binnen deze tab te landen. -->
   <div id="tabBoard">
@@ -318,6 +329,11 @@ window.I18N = { en: {
       });
     });
     bar.hidden = false;
+    /* Dezelfde poort, dezelfde zichtbaarheid: het kostenbord staat achter
+       boardroomAuth, dus het hoort te verschijnen op het moment dat de server
+       die poort opendoet en geen seconde eerder. */
+    var kp = $('boKostprijs');
+    if (kp) kp.hidden = false;
   }
 
   function start() {

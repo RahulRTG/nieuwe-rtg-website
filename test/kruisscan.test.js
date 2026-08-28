@@ -25,6 +25,36 @@ test('de echte server-boom bevat geen kruis-slice-verwijzingen', () => {
     bevindingen.map(b => b.bestand + ' -> ' + b.naam + ' (uit ' + b.zuster + ')').join('; '));
 });
 
+test('een bestand dat tijdens de scan verdwijnt, laat de scan niet omvallen', () => {
+  /* DE WEDLOOP DIE DIT VANGT. De suite kent toetsen die tijdelijk een
+     proefbestand in server/kern zetten en het weer weghalen
+     (test/keuring.test.js). Draait er zo een tegelijk met deze scan -- wat
+     gebeurt zodra de suite ZONDER scripts/test-runner.js start, en dat doet
+     `npm run test:gate` in CI -- dan staat de naam nog in readdirSync en is het
+     bestand bij de statSync al weg. De scan viel dan om met ENOENT, en een
+     geldige build werd rood op een dobbelsteen.
+
+     Een verdwijnend bestand is in een toets niet te timen; een DANGLING
+     SYMLINK geeft exact dezelfde fout op exact dezelfde regel -- statSync op
+     een naam die readdirSync wel teruggaf. Zonder de reparatie zakt deze toets
+     met "ENOENT ... stat"; dat is hier ook echt zien gebeuren.
+
+     En de tegenproef staat erbij: de zusters ERNAAST worden nog steeds
+     gelezen. Een scan die bij het eerste gat stilletjes stopt, zou ook groen
+     zijn -- en niets meer bewaken. */
+  const dir = maakGroep({
+    'index.js': "module.exports = (ctx) => { require('./a')(ctx); require('./b')(ctx); };\n",
+    'a.js': "const SALON_BIO = { tekst: 'x' };\nmodule.exports = (ctx) => { const { db } = ctx; return { a() { return SALON_BIO.tekst + db.x; } }; };\n",
+    'b.js': "module.exports = (ctx) => { const { db } = ctx; return { b() { return SALON_BIO.tekst + db.y; } }; };\n"
+  });
+  try {
+    fs.symlinkSync(path.join(dir, 'bestaat-niet-meer.js'), path.join(dir, 'grp', 'weg.js'));
+    const b = scan(dir);
+    assert.equal(b.length, 1, 'de scan hoort gewoon door te lopen over wat er WEL is');
+    assert.equal(b[0].naam, 'SALON_BIO');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('een kale verwijzing naar een top-level naam van een zuster-slice wordt gevangen', () => {
   const dir = maakGroep({
     'index.js': "module.exports = (ctx) => { require('./a')(ctx); require('./b')(ctx); };\n",

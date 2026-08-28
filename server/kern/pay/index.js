@@ -82,7 +82,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
-  const { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
+  const { laadOp, oplaadAfronden, koppelBank, koppelKosten, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
     motorklant, geldModus, keyVanCodenaam, plafondFout,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
@@ -112,7 +112,7 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   /* KASCODE_* staat OP DE API en niet alleen in de ctx: ./kassacode.js leest
      pay.KASCODE_MS voor zijn eigen ttl. Main kent dat bestand niet, dus was het
      undefined en weigerde de linklaag bij het opstarten. */
-  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
+  const api = { MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, koppelKosten, reconcileVanMotor };
   api.schaduw = schaduwStand;
   // de portefeuille: de waardelaag kent de betekenis, dit grootboek de bedragen
   if (waarde) api.portefeuille = c => waarde.portefeuille(c, saldoVan);

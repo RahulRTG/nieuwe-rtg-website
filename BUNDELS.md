@@ -869,4 +869,3 @@ omlaag.
 | `zaakcommand-02.js` | De Regie van de zaak, deel 2: de werkplekken zelf |
 | `zaakcommand-03.js` | De Regie van de zaak, deel 3: zoeken en het objectdossier |
 | `zaakcommand-04.js` | De Regie van de zaak, deel 4: rechtzetten en de regels |
-

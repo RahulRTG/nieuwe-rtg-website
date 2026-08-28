@@ -9,9 +9,6 @@ const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-/* Alleen voor het geduld: zie de kop van geduldFactor() in helper.js. */
-const { drukte } = require('./helper');
-
 const POORT = 4200 + Math.floor(Math.random() * 60);  // de gateway
 const BASIS = POORT + 100;                            // groepspoorten: leden, kantoor, rtf
 const BASE = 'http://127.0.0.1:' + POORT;
@@ -45,18 +42,22 @@ async function wachtTot(fn, ms = 20000) {
    terugkomt). Twee getallen voor dezelfde vraag lopen uiteen (LAT-regel 4).
    Een poll kost niets; een vloot die er echt niet komt zakt straks net zo
    hard, alleen later. */
-/* DE OPKOMSTGRENS: RUIM GENOEG OM EEN HANGER TE BLIJVEN VINDEN.
+/* DE OPKOMSTGRENS.
 
-   Stond op twee minuten. Op 27 augustus 2026 zakte deze toets in CI met
-   {"leden":200,"kantoor":502,"rtf":200}: twee groepen stonden, de derde was nog
-   aan het opstarten. Geen crash dus, maar een vloot van vier processen die na
-   een grote samenvoeging meer code laadt op een runner die tegelijk drie andere
-   scherven draait. Vier minuten is nog steeds ruim onder een echte hanger (die
-   komt nooit) en ruim boven wat een trage start kost. De melding zegt al welke
-   groep achterbleef -- dat is de aanwijzing die telt, niet het cijfer zelf. */
-const { extra: GEDULD, druk } = drukte();
-const DRUK = Math.round(druk * 100) / 100;
-const OPKOMST = 120000 * GEDULD;
+   Stond op twee minuten, ging op 27 augustus 2026 naar vier omdat de vloot in
+   CI met {"leden":200,"kantoor":502,"rtf":200} zakte -- twee groepen op, de
+   derde niet. Ik noemde dat toen een trage start. Dat was het niet: het log gaf
+   "[db] tx-grootboek (sqlite) init mislukt: database is locked", en de oorzaak
+   stond in server/db/tx/sqliteachter.js, waar de busy_timeout NA de
+   WAL-schakeling werd gezet. Vier processen die tegelijk opkomen vechten dan om
+   een slot waar niemand op wacht. Dat is gerepareerd, in alle drie de
+   SQLite-openers.
+
+   De grens gaat daarom terug naar twee minuten: hij hoort een hanger te vangen,
+   niet een fout toe te dekken. Zakt hij weer, dan is dat een echt signaal en
+   geen reden om er nog een minuut bij te doen -- lees dan eerst het log op
+     "locked". Zie ook LAT-regel 1: repareer de oorzaak, niet het symptoom. */
+const OPKOMST = 120000;
 
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
@@ -83,8 +84,7 @@ test.before(async () => {
     return a && b && c;
   }, OPKOMST);
   assert.ok(klaar, 'de vloot (3 groepen + poortwachter) komt op binnen ' +
-    Math.round(OPKOMST / 1000) + 's (belasting ' + DRUK + ' per kern, geduldfactor ' + GEDULD +
-    '); laatste stand per groep: ' + JSON.stringify(stand));
+    Math.round(OPKOMST / 1000) + 's; laatste stand per groep: ' + JSON.stringify(stand));
 });
 test.after(() => {
   if (vloot) try { vloot.kill('SIGTERM'); } catch (e) {}

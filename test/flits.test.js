@@ -112,3 +112,26 @@ test('6. chauffeurs melden mee via de PDA en de vooruitblik kijkt 12 uur vooruit
   assert.equal(v.status, 200);
   assert.equal((v.body.uurbeeld || []).length, 12, 'de Ghost Driver-motor levert de vooruitblik');
 });
+
+test('7. navigatie toont de eigen motor en neemt alleen partnersignalen aan', async () => {
+  const gebruiker = await lid('rtg');
+  const status = await api('/api/nav/status', { lat: 52.37, lng: 4.90, land: 'NL' }, gebruiker);
+  assert.equal(status.status, 200);
+  assert.equal(status.body.eigenMotor, true);
+
+  const css = await fetch(base + '/stijlblok.css');
+  assert.equal(css.status, 400, 'alleen een door de HTML uitgegeven stijl-adres is geldig');
+
+  const login = await api('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  assert.ok(login.body.token);
+  const gezet = await api('/api/supplier/nav/event', {
+    soort: 'file', naam: 'Drukte bij de ingang', lat: 52.37, lng: 4.90,
+    ernst: 3, betrouwbaarheid: 90
+  }, login.body.token);
+  assert.equal(gezet.status, 200, JSON.stringify(gezet.body));
+  assert.equal(gezet.body.gebeurtenis.bron, 'partner');
+
+  const lijst = await api('/api/supplier/nav/events', {}, login.body.token);
+  assert.equal(lijst.status, 200);
+  assert.ok(lijst.body.gebeurtenissen.some(e => e.id === gezet.body.gebeurtenis.id));
+});

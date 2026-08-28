@@ -18,7 +18,7 @@ const BREED = [
      een terugval telt in het Controleregister als dekkingsgat. `sociaalbeleid`
      moet bovendien HIER matchen en niet verderop op `/sociaal`: de sociale
      afdracht is geld, geen klantenservice. */
-  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen|\/claims|sociaalbeleid|commercie|prijsgarantie|(?:api|apps|office|supplier|foundation)\/kosten\b|zaakkosten/, 'financien', 'Financiën'],
+  [/bank|pay|betaal|factuur|finance|krediet|rekening|wallet|munt|wbw|\/geld|\/pin\b|giftcard|pasprijzen|\/balans|\/facturen|\/claims|sociaalbeleid|commerce|commercie|prijsgarantie|(?:api|apps|office|supplier|foundation)\/kosten\b|zaakkosten/, 'financien', 'Financiën'],
   [/marketing|campagne|analytics|\/merk/, 'marketing', 'Marketing'],
   [/\/pr\/|communicatie|persbericht/, 'pr', 'PR & communicatie'],
   [/\/sales|acquisitie|lead/, 'sales', 'Sales'],

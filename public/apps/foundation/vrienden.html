@@ -157,7 +157,7 @@
       <summary>Pin beheren</summary>
       <div class="pinakt">
         <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
-        <button class="knop grijs mini" id="pinLiveKnop">Live code</button>
+        <button class="knop grijs mini" id="pinLiveBeheerKnop">Live code</button>
         <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
         <button class="knop grijs mini" id="pinKoppelKnop">Mijn koppelingen</button>
       </div>
@@ -677,7 +677,9 @@ function pinScanOpen(){
 const LINK_ACTIES = {
   'contact.verbinden': async (kaart, tekst, intentie) => {
     const g = window.RTGCode ? RTGCode.lees(tekst) : { soort:'tekst' };
-    const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+    const lijf = kaart.vorm === 'levend'
+      ? { livecode: tekst, bevestiging: kaart.bevestiging }
+      : { pin: g.pin || tekst, bevestiging: kaart.bevestiging };
     const r = await soc(String(intentie.weg).replace('/api/rtf/social',''), lijf);
     alert(r.status === 'wacht-op-ouder'
       ? 'Verzoek verstuurd. Een ouder moet het nog goedkeuren.'
@@ -752,6 +754,7 @@ $('#pinKopie').addEventListener('click', pinKopieer);
 $('#pinQrKnop').addEventListener('click', pinQrWissel);
 $('#pinNieuwKnop').addEventListener('click', pinNieuw);
 $('#pinLiveKnop').addEventListener('click', pinLiveWissel);
+$('#pinLiveBeheerKnop').addEventListener('click', pinLiveWissel);
 $('#pinUitKnop').addEventListener('click', pinUitWissel);
 $('#pinNoodKnop').addEventListener('click', pinNoodslotWissel);
 

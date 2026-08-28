@@ -181,7 +181,6 @@ jobs:
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
-          REDIS_URL: redis://localhost:6379
       - name: De dekking van deze scherf bewaren
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

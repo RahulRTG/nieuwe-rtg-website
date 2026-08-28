@@ -421,7 +421,25 @@ test('14. een geweigerde versie laat geen bytes achter, wel het bewijs', async (
   assert.match(afgekeurd.besluit.reden, /niet wat hij in zijn uitleg belooft/);
 });
 
-test('15. zonder inlog en zonder pas blijft alles dicht', async () => {
+test('15. kantoor en uitgever lezen hun nieuwe werktafels via de echte deuren', async () => {
+  const wachtrij = await api('/api/appstore/kantoor/toegankelijk/wachtrij', {}, office);
+  assert.equal(wachtrij.status, 200);
+  assert.ok(Array.isArray(wachtrij.body.lijst));
+
+  const naslag = await api('/api/appstore/naslag', {}, sup);
+  assert.equal(naslag.status, 200);
+  assert.ok(Array.isArray(naslag.body.methodes), 'de SDK-methodes komen uit dezelfde naslagbron');
+
+  const cijfers = await api('/api/appstore/uitgever/cijfers', { dagen: 30 }, sup);
+  assert.equal(cijfers.status, 200);
+  assert.ok(Array.isArray(cijfers.body.apps));
+
+  const journaal = await api('/api/appstore/uitgever/journaal', {}, sup);
+  assert.equal(journaal.status, 200);
+  assert.ok(Array.isArray(journaal.body.lijst));
+});
+
+test('16. zonder inlog en zonder pas blijft alles dicht', async () => {
   assert.equal((await api('/api/appstore/catalogus', {})).status, 401);
   assert.equal((await api('/api/appstore/brug', { sleutel: 'derden-teller', methode: 'opslag.lijst' })).status, 401);
   assert.equal((await api('/api/appstore/uitgever/inzenden', { manifest: manifest(), bestanden: bundel() })).status, 401);

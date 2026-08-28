@@ -59,15 +59,13 @@
       .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
-  /* De expliciete demostand (?demo=1, zonder backend) laadt zijn inhoud hier,
-     op het moment dat iemand er echt voor kiest. Stond die inhoud als
-     beginwaarde in app-main-01.js, dan droeg ELK scherm hem -- ook dat van een
-     echt, leeg account (zie de uitleg bij DEMO_DATA). */
-  function laadDemoData(tier){
-    invoices = JSON.parse(JSON.stringify(DEMO_DATA.invoices));
-    trip = JSON.parse(JSON.stringify(DEMO_DATA.trip));
-    posts = JSON.parse(JSON.stringify(DEMO_DATA.posts));
-    creatorLikes = DEMO_DATA.creatorLikes[tier] || 0;
+  /* De afgeschermde Magnaat-kopie laadt haar losse trainingsbestand hier.
+     De echte app-bundel blijft daardoor vrij van synthetische dossiers. */
+  function laadMagnaatData(){
+    invoices = JSON.parse(JSON.stringify(MAGNAAT.invoices || []));
+    trip = MAGNAAT.trip ? JSON.parse(JSON.stringify(MAGNAAT.trip)) : null;
+    posts = JSON.parse(JSON.stringify(MAGNAAT.posts || []));
+    creatorLikes = Number(MAGNAAT.creatorLikes || 0);
   }
 
   async function login(tier, cred){
@@ -97,10 +95,10 @@
            business-pas -- leesbaar voor iedereen die de bron opent, en de
            naam van een echt mens. Weg. Zonder server valt er niets in te
            loggen, en dat hoort een lege deur te zijn en geen achterdeur. */
-        if (!explicieteDemo){
+        if (!magnaatKopie){
           toast('Geen serververbinding. Start RTG via de server.'); return;
         }
-        tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
+        tier = 'business'; user = {...PERSONAS[tier]}; laadMagnaatData();
       }
     } else {
       if (API.enabled){
@@ -109,8 +107,8 @@
           API.token = data.token;
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
-      } else if (explicieteDemo) {
-        user = {...PERSONAS[tier]}; laadDemoData(tier);
+      } else if (magnaatKopie) {
+        user = {...PERSONAS[tier]}; laadMagnaatData();
       } else {
         toast('Geen serververbinding. Start RTG via de server.'); return;
       }

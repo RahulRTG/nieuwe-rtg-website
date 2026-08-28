@@ -71,9 +71,9 @@ module.exports = function naslag({ crypto, stripe, mollie, adyen, stripeGehost, 
       return { id: r.pspReference || r.id, status: r.status || 'received',
         aanbieder: 'adyen', providerId, bedrag: Math.round(bedrag), valuta };
     }
-    if (aanbieder === 'demo' && !stripe && !mollie && !adyen)
-      return { id: 'demo_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',
-        aanbieder: 'demo', providerId, bedrag: Math.round(bedrag), valuta };
+    if (aanbieder === 'magnaat-test' && !stripe && !mollie && !adyen)
+      return { id: 'magnaat_ref_' + crypto.randomBytes(8).toString('hex'), status: 'refunded',
+        aanbieder: 'magnaat-test', providerId, bedrag: Math.round(bedrag), valuta };
     throw new Error('Deze betaalprovider is niet beschikbaar voor terugbetalen.');
   }
 

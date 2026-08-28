@@ -96,16 +96,15 @@ var RTG_BOUW = '382540c5';
      (server/kern/lid.js); dit was de laatste plek waar demo-inhoud nog voor
      eigen gegevens doorging.
 
-     De demo is niet weg maar apart: hij staat in DEMO_DATA hieronder en wordt
-     alleen door laadDemoData() geladen, in de expliciete demostand (?demo=1,
-     zonder backend), waar er per definitie geen echt account is.
+     De trainingsinhoud staat apart in magnaat-data.js en wordt alleen door
+     laadMagnaatData() geladen in de afgeschermde Magnaat-kopie, zonder backend.
 
      test/nieuwlid-leeg.test.js legt allebei de helften vast. */
   let user = null;
   let invoices = [];
   let trip = null;
   let posts = [];
-  let creatorLikes = 320;
+  let creatorLikes = 0;
   let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
 
   /* ---------- backend-koppeling ---------- */
@@ -124,60 +123,9 @@ var RTG_BOUW = '382540c5';
   }
   // Een PDF (factuur, overzicht) ophalen met het token en als download aanbieden.
   async function downloadPdf(pad, body, filename){
-  /* ---------- de inhoud van de expliciete demostand ----------
-
-     Deze drie lijsten stonden als BEGINWAARDE van `invoices`, `trip` en `posts`
-     in app-main-01.js. applyState() overschrijft wat de server stuurt -- maar
-     een reis die er niet is, stuurt de server niet mee (`if (state.trip)`), en
-     dan bleef de reis naar Ibiza gewoon staan. Wie zich echt aanmeldde zag
-     daardoor op zijn eigen beginscherm een villa in Cala Jondal en vier
-     facturen op zijn naam. De server begint een nieuw account leeg
-     (server/kern/lid.js); dit was de laatste plek waar de demo nog voor
-     persoonlijke gegevens doorging.
-
-     De demo gaat nergens heen, hij staat alleen apart: laadDemoData() in
-     app-main-03.js zet hem klaar in de expliciete demostand (?demo=1, zonder
-     backend), waar er per definitie geen echt account is om iets van te tonen. */
-  const DEMO_DATA = {
-    invoices: [
-      {id:'RTG-2026-0158', desc:'Ibiza, Aguamarina, 3 nachten', netto:1740, bijdrage:150, status:'open', date:'Vervalt 28 juli 2026'},
-      {id:'RTG-2026-0141', desc:'Villa Bahia Ibiza, Cala Jondal, 4 nachten', netto:2240, bijdrage:180, status:'open', date:'Vervalt 15 augustus 2026'},
-      {id:'RTG-2026-0093', desc:'Privejet Schiphol - Ibiza (retour, gedeeld)', netto:1460, bijdrage:120, status:'paid', date:'Betaald op 2 mei 2026'},
-      {id:'RTG-2025-0871', desc:'Jaarbijdrage lidmaatschap 2026', netto:0, bijdrage:480, status:'paid', date:'Betaald op 4 januari 2026'}
-    ],
-    trip: {
-      dest:'Ibiza', dates:'18 - 25 juli 2026', days:7,
-      items:[
-        {when:'18 jul', title:'Lijnvlucht RTG-1263, Amsterdam Schiphol → Ibiza', sub:'Economy comfort · 2 personen', status:'paid', label:'Bevestigd'},
-        {when:'18 jul', title:'Privétransfer luchthaven → Aguamarina', sub:'Chauffeur bij aankomsthal', status:'paid', label:'Bevestigd'},
-        {when:'18-21 jul', title:'Aguamarina Ibiza, Sea-view suite', sub:'3 nachten, late check-out', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0158'},
-        {when:'19 jul', title:'Diner, Sal de Mar', sub:'Chef-menu · 21:00 uur', status:'req', label:'In aanvraag'},
-        {when:'20 jul', title:'Privéboot naar Formentera', sub:'Met de groep · 10:00 uur', status:'paid', label:'Bevestigd'},
-        {when:'21-25 jul', title:'Villa Bahia Ibiza, Cala Jondal', sub:'4 nachten, eigen zwembad', status:'open', label:'Wacht op betaling', invoiceId:'RTG-2026-0141'}
-      ]
-    },
-    posts: [
-      {id:1, author:'Katja Kiss', tier:'rtg', place:'Ibiza', visual:'v-ibiza',
-       text:'Met de hele vriendengroep neergestreken: de helft in het hotel aan zee, wij in de villa boven Cala Jondal. Rahul kwam met de privéjet, wij pakten de ochtendvlucht, en toch checken we samen in.',
-       likes:168, liked:false, comments:[{who:'Timothy de Groot', tier:'rtg', text:'Tussen twee tentamens door even bijkomen, precies wat ik nodig had.'}]},
-      {id:2, author:'Rahul Imran', tier:'business', place:'Ibiza', visual:'v-ibiza',
-       text:'Ochtend: twee calls vanaf het terras. Middag: boot naar Formentera met de groep. De jet stond klaar op Schiphol Business Aviation.',
-       likes:96, liked:false, comments:[]},
-      {id:3, author:'Fleur Johanna', tier:'lifestyle', place:'Gstaad', visual:'v-gstaad',
-       text:'Wij oude rotten trekken de bergen in terwijl de jeugd op Ibiza ligt. Chalet in Gstaad, open haard, en morgen de piste op. Op je 69e mag dat.',
-       likes:132, liked:false, comments:[
-         {who:'Marieke Hooi', tier:'lifestyle', text:'Als schooldirectrice tel ik de dagen af tot de vakantie; deze is het waard.'},
-         {who:'William Draak', tier:'business', text:'Vanuit Monaco groeten wij Gstaad. De boekhouding klopt, de rosé ook.'}
-       ]},
-      {id:4, author:'Dani da Cruz Carvalho', tier:'business', place:'Monaco', visual:'v-monaco',
-       text:'Na mijn voetbaljaren dacht ik alles gezien te hebben in Monaco, maar aankomen op codenaam en toch als vanouds ontvangen worden, dat is nieuw.',
-       likes:214, liked:false, comments:[]},
-      {id:5, author:'Feroz Mohammed', tier:'business', place:'Dubai', visual:'v-dubai',
-       text:'Een week Dubai met vrienden: de een in de wolkenkrabber-suite, de ander in een strandappartement aan de Palm. Ik werk voor de Nederlandse staat, maar deze dagen tel ik even niet mee.',
-       likes:78, liked:false, comments:[]}
-    ],
-    creatorLikes: {rtg:320, lifestyle:680, business:210}
-  };
+  /* De synthetische inhoud woont uitsluitend in magnaat-data.js. Dit deel
+     bewaart alleen de naad in de bundel; de echte app draagt daardoor geen
+     voorbeeldfacturen, reizen of Salon-berichten meer mee. */
 
 /* de API-laag van de app: elke aanroep met token, taal en foutafhandeling */
     if (!API.token) return;
@@ -340,19 +288,14 @@ var RTG_BOUW = '382540c5';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
-/* de demomelding: een demo is een toestand, geen terugval na een storing */
-  /* DEMO IS VAN MAGNAAT, NIET VAN RTG. Hier stond `|| zoekParams.get('demo')
-     === '1'`, en daarmee kon iedereen met ?demo=1 een RTG-portaal openen dat
-     met verzonnen leden, reizen en Salon-berichten gevuld werd. Dat is precies
-     wat RTG niet mag zijn: wat hier staat is echt, of het staat er niet.
-     Magnaat is de plek waar gesimuleerd wordt (MAGNAATLAB.md), en die houdt
-     zijn eigen ingang. */
-  const explicieteDemo = magnaatProef;
+/* de trainingsmelding: een proef is een toestand, geen terugval na een storing */
+  /* TRAINING IS VAN MAGNAAT, NIET VAN RTG. Alleen de afgeschermde Magnaat-kopie
+     mag verzonnen leden, reizen en Salon-berichten laden. */
+  const magnaatKopie = magnaatProef;
 
   /* Een demo is een toestand, geen terugval na een storing. De melding stond
      altijd op het homescreen en daardoor leek ook een echte installatie een
-     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
-     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
+     demo. Alleen Magnaat kiest de trainingskopie expliciet. */
   function zetDemoMelding(aan, tekst) {
     const el = document.getElementById('osDemoWet');
     if (!el) return;
@@ -472,15 +415,13 @@ var RTG_BOUW = '382540c5';
       .finally(() => history.replaceState(null, '', location.pathname + (vastePas ? '?pas=' + vastePas : '')));
   })();
 
-  /* De expliciete demostand (?demo=1, zonder backend) laadt zijn inhoud hier,
-     op het moment dat iemand er echt voor kiest. Stond die inhoud als
-     beginwaarde in app-main-01.js, dan droeg ELK scherm hem -- ook dat van een
-     echt, leeg account (zie de uitleg bij DEMO_DATA). */
-  function laadDemoData(tier){
-    invoices = JSON.parse(JSON.stringify(DEMO_DATA.invoices));
-    trip = JSON.parse(JSON.stringify(DEMO_DATA.trip));
-    posts = JSON.parse(JSON.stringify(DEMO_DATA.posts));
-    creatorLikes = DEMO_DATA.creatorLikes[tier] || 0;
+  /* De afgeschermde Magnaat-kopie laadt haar losse trainingsbestand hier.
+     De echte app-bundel blijft daardoor vrij van synthetische dossiers. */
+  function laadMagnaatData(){
+    invoices = JSON.parse(JSON.stringify(MAGNAAT.invoices || []));
+    trip = MAGNAAT.trip ? JSON.parse(JSON.stringify(MAGNAAT.trip)) : null;
+    posts = JSON.parse(JSON.stringify(MAGNAAT.posts || []));
+    creatorLikes = Number(MAGNAAT.creatorLikes || 0);
   }
 
   async function login(tier, cred){
@@ -510,10 +451,10 @@ var RTG_BOUW = '382540c5';
            business-pas -- leesbaar voor iedereen die de bron opent, en de
            naam van een echt mens. Weg. Zonder server valt er niets in te
            loggen, en dat hoort een lege deur te zijn en geen achterdeur. */
-        if (!explicieteDemo){
+        if (!magnaatKopie){
           toast('Geen serververbinding. Start RTG via de server.'); return;
         }
-        tier = 'business'; user = {...PERSONAS[tier]}; laadDemoData(tier);
+        tier = 'business'; user = {...PERSONAS[tier]}; laadMagnaatData();
       }
     } else {
       if (API.enabled){
@@ -522,8 +463,8 @@ var RTG_BOUW = '382540c5';
           API.token = data.token;
           applyState(data.state);
         } catch (e) { toast(e.message || 'De server kon de sessie niet openen.'); return; }
-      } else if (explicieteDemo) {
-        user = {...PERSONAS[tier]}; laadDemoData(tier);
+      } else if (magnaatKopie) {
+        user = {...PERSONAS[tier]}; laadMagnaatData();
       } else {
         toast('Geen serververbinding. Start RTG via de server.'); return;
       }
@@ -8963,7 +8904,9 @@ var RTG_BOUW = '382540c5';
     // een mens toevoegen: de vaste pin draagt hij leesbaar, de levende code niet
     'contact.verbinden': async (kaart, tekst, intentie) => {
       const g = window.RTGCode ? RTGCode.lees(tekst) : { soort: 'tekst' };
-      const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+      const lijf = kaart.vorm === 'levend'
+        ? { livecode: tekst, bevestiging: kaart.bevestiging }
+        : { pin: g.pin || tekst, bevestiging: kaart.bevestiging };
       const r = await API.call(intentie.weg.replace(/^\/api/, ''), lijf);
       toast(T('scan.verzoekuit','Verzoek verstuurd naar ') + (kaart.onderwerp.codename || r.codename || ''));
       if (typeof loadSocial === 'function') loadSocial();

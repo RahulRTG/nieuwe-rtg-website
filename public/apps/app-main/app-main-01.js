@@ -96,16 +96,15 @@ var RTG_BOUW = '382540c5';
      (server/kern/lid.js); dit was de laatste plek waar demo-inhoud nog voor
      eigen gegevens doorging.
 
-     De demo is niet weg maar apart: hij staat in DEMO_DATA hieronder en wordt
-     alleen door laadDemoData() geladen, in de expliciete demostand (?demo=1,
-     zonder backend), waar er per definitie geen echt account is.
+     De trainingsinhoud staat apart in magnaat-data.js en wordt alleen door
+     laadMagnaatData() geladen in de afgeschermde Magnaat-kopie, zonder backend.
 
      test/nieuwlid-leeg.test.js legt allebei de helften vast. */
   let user = null;
   let invoices = [];
   let trip = null;
   let posts = [];
-  let creatorLikes = 320;
+  let creatorLikes = 0;
   let rtf = { gekoppeld: [], meldingen: [] }; // RTFoundation-gezinnen die dit lid als oppas/familie koppelde
 
   /* ---------- backend-koppeling ---------- */

@@ -232,3 +232,46 @@ test('11. de winkelvloer neemt ook de ondertekende RTG-code, langs dezelfde inne
   const na = (await retail()).artikelen.find(a => a.naam === 'Linnen overhemd').varianten.find(v => v.vsku === vL.vsku).voorraad;
   assert.equal(na, voorraadVoor - 1, 'de afgeketste verkoop is teruggedraaid; alleen de gelukte telt');
 });
+
+test('12. bon, annulering, retourtafel en verkoopwegen lopen door hun HTTP-deuren', async () => {
+  const rt = await retail();
+  const artikel = rt.artikelen.find(a => a.varianten.some(v => v.voorraad > 0));
+  const variant = artikel.varianten.find(v => v.voorraad > 0);
+  const verkoop = await api(base, '/api/supplier/retail/verkoop', {
+    method: 'contant', regels: [{ vsku: variant.vsku, aantal: 1 }]
+  }, brand.token);
+  assert.equal(verkoop.status, 200, JSON.stringify(verkoop.body));
+
+  const bon = await api(base, '/api/supplier/retail/bon', { saleId: verkoop.body.sale.id }, brand.token);
+  assert.equal(bon.status, 200);
+  assert.equal(bon.body.bon.id, verkoop.body.sale.id);
+  assert.ok(bon.body.gronden.some(g => g.id === 'vergissing'));
+
+  const annuleer = await api(base, '/api/supplier/retail/annuleer', {
+    saleId: verkoop.body.sale.id, grond: 'vergissing', toelichting: 'routeproef'
+  }, brand.token);
+  assert.equal(annuleer.status, 200, JSON.stringify(annuleer.body));
+  assert.equal(annuleer.body.bon.geannuleerd.grond, 'vergissing');
+
+  const retouren = await api(base, '/api/supplier/retour/lijst', {}, brand.token);
+  assert.equal(retouren.status, 200);
+  assert.ok(Array.isArray(retouren.body.retouren));
+  assert.equal((await api(base, '/api/supplier/retour/zet', {
+    id: 'bestaat-niet', naar: 'aanvaard'
+  }, brand.token)).status, 404);
+  assert.equal((await api(base, '/api/supplier/retour/uitvoeren', {
+    id: 'bestaat-niet'
+  }, brand.token)).status, 404);
+
+  const gezet = await api(base, '/api/supplier/verkoopweg/zet', {
+    naam: 'Ledenwinkel', soort: 'web', toegang: 'leden'
+  }, brand.token);
+  assert.equal(gezet.status, 200, JSON.stringify(gezet.body));
+  const wegId = gezet.body.verkoopweg.id;
+  const wegen = await api(base, '/api/supplier/verkoopweg/lijst', {}, brand.token);
+  assert.ok(wegen.body.wegen.some(w => w.id === wegId));
+  assert.equal((await api(base, '/api/supplier/verkoopweg/publiceer', {
+    id: wegId, live: false
+  }, brand.token)).status, 200);
+  assert.equal((await api(base, '/api/supplier/verkoopweg/wis', { id: wegId }, brand.token)).status, 200);
+});

@@ -23,8 +23,8 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
        testhal die stilzwijgend de altijd-slaagt-demo krijgt, bewijst niets. */
     if (!rails.length && simAan)
       rails.push({ id: 'simulatie', label: 'Simulatiebank · testhal, geen echt geld', soort: 'simulatie', echt: false });
-    if (!rails.length && standaard === 'demo')
-      rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
+    if (!rails.length && standaard === 'magnaat-test')
+      rails.push({ id: 'magnaat-test', label: 'Magnaat Test-betaling', soort: 'test', echt: false });
     if (!rails.length) return { standaard: 'uit', rails: [], uit: true,
       uitleg: 'Geen echte betaalprovider actief; de betaalrail staat fail-closed.' };
     return { standaard, rails };
@@ -37,7 +37,8 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       if (gevraagd === 'stripe' && stripe) return 'stripe';
       if (gevraagd === 'mollie' && mollie) return 'mollie';
       if (gevraagd === 'adyen' && adyen) return 'adyen';
-      if (gevraagd === 'demo' && standaard === 'demo' && !stripe && !mollie && !adyen) return 'demo';
+      if (gevraagd === 'magnaat-test' && standaard === 'magnaat-test' && !stripe && !mollie && !adyen)
+        return 'magnaat-test';
       /* Wie de simulatiebank vraagt terwijl die dichtzit, hoort te horen WELKE
          grendel dichtzit -- niet "niet beschikbaar", want dan zoekt iemand een
          kwartier naar een sleutel die er niet toe doet. */
@@ -107,9 +108,9 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     } else if (rail === 'simulatie') {
       res = simulatie.maak({ bedrag, valuta, referentie, idempotentieSleutel: sleutel,
         simulatie: opdracht && opdracht.simulatie });
-    } else if (rail === 'demo') {
-      res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
-        aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };
+    } else if (rail === 'magnaat-test') {
+      res = { id: 'magnaat_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
+        aanbieder: 'magnaat-test', bedrag: Math.round(bedrag), valuta, referentie };
     } else {
       const e = new Error('Geen betaalprovider actief. Koppel een echte provider; oefenen kan uitsluitend in Magnaat Test.');
       e.code = 'BETAALRAIL_UIT';

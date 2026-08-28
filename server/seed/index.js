@@ -31,7 +31,10 @@
    start.sh zet hem voor de lokale demonstratie; `npm start` en elke server die
    niets weet, beginnen schoon en vullen zich met wat mensen zelf doen. */
 module.exports = function seed() {
-  const demo = process.env.RTG_DEMO === '1';
+  /* De seed en de inlog moeten door exact dezelfde deur. Sinds de afgescheiden
+     Magnaat-testomgeving is RTG_MAGNAAT_TEST de primaire vlag; alleen de oude
+     RTG_DEMO-vlag lezen leverde wel testaccounts maar geen reizen of partners. */
+  const demo = require('../testomgeving').actief(process.env);
   const vol = maakVolledigeSeed();
   if (demo) return vol;
   return Object.assign(vol, {
@@ -58,11 +61,10 @@ module.exports = function seed() {
        en vult hij zich met wat leden zelf uitgeven. De Media OS zegt in die
        stand zelf wat er komt en hoe (kern/mediaos/index.js). */
     muziekUitgaven: { lijst: [], reacties: {} },
-    /* En de tellers van de creator-laag. Die horen bij de demo-persona's (een
-       demo-sessie leest ze rechtstreeks) en hebben op een schoon platform geen
-       betekenis: een lid dat nog niets plaatste heeft geen 320 likes. */
-    creatorCredit: { rtg: 0, lifestyle: 0, business: 0 },
-    creatorLikes: { rtg: 0, lifestyle: 0, business: 0 }
+    /* En de tellers van de creator-laag. Die horen bij testpersona's en hebben
+       op een schoon platform geen betekenis. */
+    creatorCredit: {},
+    creatorLikes: {}
   });
 };
 

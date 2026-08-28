@@ -133,7 +133,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   const sale = {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
-    room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: true,
+    room: chk.table, items: null, total: chk.subtotaal, method, omzetElders: 'bestellingen',
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);

@@ -74,7 +74,9 @@ test('een gezinslid scant een pin en krijgt ZIJN eigen weg, niet die van een lid
     'de gezinsweg, want de ledendeur zou hem weigeren');
 
   // en die weg werkt ook echt
-  const stuur = await json(await soc('/pin/connect', { code: g.code, token: g.token, pin }));
+  const stuur = await json(await soc('/pin/connect', {
+    code: g.code, token: g.token, pin, bevestiging: r.bevestiging
+  }));
   assert.equal(stuur.ok, true);
   const bij = await json(await post('/api/member/connections', {}, lid.token));
   assert.equal((bij.requests || []).length, 1, 'het lid heeft het verzoek');
@@ -116,7 +118,8 @@ test('de twee werelden vinden elkaar: heen op de pin van het gezinslid, terug op
   assert.equal(heen.type, 'persoon');
   assert.deepEqual(heen.intenties.map(i => i.weg), ['/api/member/pin/connect'],
     'een lid krijgt de ledenweg, ook bij een gezinslid');
-  assert.equal((await json(await post(heen.intenties[0].weg, { pin: gezinsPin }, lid.token))).ok, true);
+  assert.equal((await json(await post(heen.intenties[0].weg,
+    { pin: gezinsPin, bevestiging: heen.bevestiging }, lid.token))).ok, true);
 
   // en het gezinslid ziet dat er een verzoek staat
   const bij = await json(await soc('/connections', { code: g.code, token: g.token }));
@@ -142,7 +145,10 @@ test('mijn koppelingen werkt ook aan de gezinskant, en staat daar altijd op nul 
   const g = await gezin('Linkboek');
   const lid = await nieuwLid('Boek Lid');
   const pin = (await json(await post('/api/member/pin', {}, lid.token))).toon;
-  await soc('/pin/connect', { code: g.code, token: g.token, pin });
+  const scan = await json(await post('/api/rtf/link/los', {
+    code: g.code, token: g.token, tekst: 'rtg:pin:' + pin
+  }));
+  await soc('/pin/connect', { code: g.code, token: g.token, pin, bevestiging: scan.bevestiging });
 
   const k = await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: g.token }));
   assert.deepEqual(k.open, [], 'een gezinslid geeft geen codes uit, dus er staat niets open');
@@ -174,8 +180,12 @@ test('een lid krijgt de ledendeur, een gezinslid de zijne -- voor dezelfde hande
   const a = await nieuwLid('Wegen A');
   const b = await nieuwLid('Wegen B');
   const pinB = (await json(await post('/api/member/pin', {}, b.token))).toon;
-  await post('/api/member/pin/connect', { pin: pinB }, a.token);
-  await soc('/pin/connect', { code: g.code, token: g.token, pin: pinB });
+  const scanLid = await json(await post('/api/link/los', { tekst: 'rtg:pin:' + pinB }, a.token));
+  await post('/api/member/pin/connect', { pin: pinB, bevestiging: scanLid.bevestiging }, a.token);
+  const scanGezin = await json(await post('/api/rtf/link/los', {
+    code: g.code, token: g.token, tekst: 'rtg:pin:' + pinB
+  }));
+  await soc('/pin/connect', { code: g.code, token: g.token, pin: pinB, bevestiging: scanGezin.bevestiging });
 
   const vanLid = await json(await post('/api/link/koppelingen', {}, a.token));
   const vanGezin = await json(await post('/api/rtf/link/koppelingen', { code: g.code, token: g.token }));

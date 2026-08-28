@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 const testomgeving = require('../server/testomgeving');
+const { demoAan } = require('../server/kern/demostand');
 
 const post = (base) => async (pad, body) => {
   const r = await fetch(base + pad, {
@@ -46,6 +47,22 @@ test('de omgevingspoort is fail-closed en de echte seed is volledig leeg', () =>
   assert.equal(testomgeving.actief({ NODE_ENV: 'production', RTG_MAGNAAT_TEST: '1' }), false,
     'zelfs de nieuwe testvlag mag productie niet activeren');
   assert.equal(testomgeving.actief({ NODE_ENV: 'test', RTG_MAGNAAT_TEST: '1' }), true);
+
+  const omgeving = { node: process.env.NODE_ENV, test: process.env.RTG_MAGNAAT_TEST, demo: process.env.RTG_DEMO };
+  try {
+    process.env.NODE_ENV = 'test';
+    process.env.RTG_MAGNAAT_TEST = '1';
+    delete process.env.RTG_DEMO;
+    assert.equal(demoAan(), true, 'de luie wereldseeds volgen dezelfde Magnaat-testpoort als server.js');
+    assert.ok(require('../server/seed')().partnerTrips.length > 0,
+      'ook de centrale testseed volgt die poort; accounts zonder hun testwereld is een halve omgeving');
+    process.env.NODE_ENV = 'production';
+    assert.equal(demoAan(), false, 'ook de wereldseeds blijven in productie dicht');
+  } finally {
+    if (omgeving.node == null) delete process.env.NODE_ENV; else process.env.NODE_ENV = omgeving.node;
+    if (omgeving.test == null) delete process.env.RTG_MAGNAAT_TEST; else process.env.RTG_MAGNAAT_TEST = omgeving.test;
+    if (omgeving.demo == null) delete process.env.RTG_DEMO; else process.env.RTG_DEMO = omgeving.demo;
+  }
 
   const oud = { node: process.env.NODE_ENV, test: process.env.RTG_MAGNAAT_TEST, demo: process.env.RTG_DEMO };
   try {

@@ -99,7 +99,7 @@ if (zonderAi) regels.push(['RTG_AI_UIT', '1', 'BEWUST: geen externe AI; handmati
    Per proces en in het geheugen, dus na een herstart begint de dag opnieuw --
    het is een noodrem, geen boekhouding. */
 regels.push(['RTG_AI_DAGPLAFOND', '50', 'noodrem: dagbedrag in dollar voor ALLE externe modellen samen']);
-if (zonderBetalen) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of demo-betaalrail; elke betaalactie weigert fail-closed']);
+if (zonderBetalen || priveBeta) regels.push(['RTG_BETALEN_UIT', '1', 'BEWUST: geen echte of fictieve betaalrail; elke betaalactie weigert fail-closed']);
 if (zonderSms) regels.push(['RTG_HERSTEL_SMS_UIT_BEWUST', '1', 'BEWUST: telefoonherstel weigert fail-closed zolang geen echte SMS-provider is gekoppeld']);
 if (nativeTls) regels.push(
   ['RTG_TLS', '1', 'native TLS/HTTP2 in RTG zelf'],

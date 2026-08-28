@@ -21,7 +21,9 @@
     // een mens toevoegen: de vaste pin draagt hij leesbaar, de levende code niet
     'contact.verbinden': async (kaart, tekst, intentie) => {
       const g = window.RTGCode ? RTGCode.lees(tekst) : { soort: 'tekst' };
-      const lijf = kaart.vorm === 'levend' ? { livecode: tekst } : { pin: g.pin || tekst };
+      const lijf = kaart.vorm === 'levend'
+        ? { livecode: tekst, bevestiging: kaart.bevestiging }
+        : { pin: g.pin || tekst, bevestiging: kaart.bevestiging };
       const r = await API.call(intentie.weg.replace(/^\/api/, ''), lijf);
       toast(T('scan.verzoekuit','Verzoek verstuurd naar ') + (kaart.onderwerp.codename || r.codename || ''));
       if (typeof loadSocial === 'function') loadSocial();

@@ -49,9 +49,8 @@ function maak(opties = {}) {
     gidsHaalWacht: async h => ({ codename: 'Lid ' + h, tier: 'rtg' }),
     gidsZoekCodenaam: async () => [], media: {}, dyncodeGeef: () => dyncode });
   const link = maakLink({ db, save() {}, dyncodeGeef: () => dyncode,
-    handleVanPin: sociaal.handleVanPin, pinNormaliseer: sociaal.pinNormaliseer,
-    pinKijk: sociaal.pinKijk, liveKijk: sociaal.liveKijk,
-    persoonRate: (mij) => sociaal.sociaalRate(mij, 'pinzoek', 30, UUR),
+    pinNormaliseer: sociaal.pinNormaliseer, pinZoek: sociaal.pinZoek,
+    liveKijk: sociaal.liveKijk,
     zaakVan: (code) => (code === 'RITZ' ? { code: 'RITZ', name: 'Hotel Ritz' } : null) });
   link.linkRemReset();
   return { db, sociaal, link, dyncode };
@@ -121,7 +120,7 @@ test('de pindeur en de linkdeur wijzen dezelfde mens aan, met dezelfde band', as
   assert.equal(viaLink.onderwerp.status, viaPin.st, 'dezelfde band');
 
   // en na het verbinden verschuift de band bij ALLEBEI mee
-  await sociaal.pinVerbind('B', pin);
+  await sociaal.pinVerbind('B', pin, viaLink.bevestiging);
   const na = await link.linkLos(lid('B'), 'rtg:pin:' + pin);
   assert.equal(na.onderwerp.status, sociaal.pinZoek('B', pin).st);
   assert.equal(na.onderwerp.status, 'aangevraagd');
@@ -538,7 +537,7 @@ test('scannen doet niets; pas de handeling erna schrijft een bon', async () => {
   assert.equal((stil.requests || []).length, 0, 'en er ging ook echt niets de deur uit');
 
   // en nu de weg volgen die de intentie noemde
-  await json(await api('/api/member/pin/connect', { pin }, dirk.token));
+  await json(await api('/api/member/pin/connect', { pin, bevestiging: kijk.bevestiging }, dirk.token));
   const naDoen = await json(await api('/api/link/koppelingen', {}, dirk.token));
   assert.equal(naDoen.bonnen.length, 1);
   assert.equal(naDoen.bonnen[0].intentie, 'contact.verbinden');

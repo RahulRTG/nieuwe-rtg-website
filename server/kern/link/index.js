@@ -30,8 +30,8 @@ const rem = require('./rem');
 const intenties = require('./intenties');
 
 module.exports = (opties) => {
-const { db, save, crypto, dyncodeGeef, handleVanPin, pinNormaliseer, pinKijk, liveKijk,
-        persoonRate, rate, codenaamVan, bandStand, zaakVan, nu } = opties;
+const { db, save, crypto, dyncodeGeef, pinNormaliseer, pinZoek, liveKijk,
+        rate, codenaamVan, bandStand, zaakVan, nu } = opties;
 const { duidt, TYPES } = require('./register')({ dyncodeGeef });
 const { bonSchrijf, bonnenVan, BON_MAX } = require('./bonnen')({ db, save, nu });
 /* De capabilitylaag: codes die een HANDELING dragen in plaats van een ding aan
@@ -62,7 +62,7 @@ const { koppelingen } = require('./koppelingen')({
 const isMens = s => s === 'lid' || s === 'gezin';
 
 /* De takken per type, elk met de deur die er al is (zie ./oplossen.js). */
-const { onderwerpVan } = require('./oplossen')({ handleVanPin, pinKijk, liveKijk, zaakVan, cap, isMens });
+const { onderwerpVan } = require('./oplossen')({ pinZoek, liveKijk, zaakVan, cap, isMens });
 
 async function los(scanner, tekst) {
   const wie = scanner && scanner.soort ? String(scanner.soort) : null;
@@ -105,11 +105,8 @@ async function los(scanner, tekst) {
      Alleen bij de vaste pin: de levende code brengt zijn eigen rem mee
      (pin-live.js), en een tafel of een entree is geen mens om naar te vissen --
      daar staat alleen de huisrem hieronder omheen. */
-  const eigen = eigenRem(g, wie, mij);
-  if (eigen) return eigen;
-  /* En dan pas de huisrem: wie zelf al te snel ging hoort dat te horen, en het
-     budget van het huis mag niet opgaan aan een vraag die toch al geweigerd was.
-     Dezelfde volgorde als bij de contactpin, en om dezelfde reden. */
+  /* De pindeur past voor een vaste persoon zelf de persoons- en bronrem toe;
+     alle andere codes komen rechtstreeks langs het huisbudget. */
   if (rem.deurDicht())
     return { status: 429, error: 'Het oplossen van codes ligt even stil. Probeer het zo opnieuw.' };
 
@@ -117,21 +114,8 @@ async function los(scanner, tekst) {
   if (uit.error) return uit;
   return { status: 200, type: g.type, wat: (TYPES[g.type] || {}).wat, vorm: g.vorm,
     onderwerp: uit.onderwerp,
+    bevestiging: uit.bevestiging, bevestigingVervalt: uit.bevestigingVervalt,
     intenties: intenties.voor({ type: g.type, scanner: wie, vorm: g.vorm, band: uit.band, mag: uit.mag }) };
-}
-
-/* De rem die aan de VRAGER hangt, voor het ene geval waar er een is. Geeft een
-   antwoord terug als hij bijt, en anders niets. */
-function eigenRem(g, wie, mij) {
-  if (!(g.type === 'persoon' && g.vorm === 'vast' && isMens(wie))) return null;
-  /* Een sessie zonder sleutel is een demo-pas: die heeft geen handle, en zonder
-     handle is er geen band met de ander en dus niets te tonen. Dat is geen
-     "niet ingelogd" -- hij is dat wel -- dus zegt het antwoord wat er echt aan
-     ontbreekt. */
-  if (!mij) return { status: 403, error: 'Hier heb je een eigen ledenaccount voor nodig.' };
-  if (typeof persoonRate === 'function' && !persoonRate(mij))
-    return { status: 429, error: 'Te veel pins geprobeerd. Probeer het over een uur opnieuw.' };
-  return null;
 }
 
 return { linkLos: los, linkBon: bonSchrijf, linkBonnen: bonnenVan,

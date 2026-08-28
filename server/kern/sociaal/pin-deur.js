@@ -45,7 +45,12 @@ module.exports = (ctx) => {
 const { codenaamVan, soortVan, isBeschermdHandle, isGeblokkeerd, sociaalRate,
   statusVan, connectieTussen, socialVerbind, pinHuidig, pinNormaliseer, handleVanPin,
   pinBevroren, pinBeveiligingNoteer, pinIntentMaak, pinIntentGebruik, crypto } = ctx;
-const rem = require('./pin-deur-rem')({ crypto });
+/* De bronrem uit de enterprise-rand blijft per netwerkspoor tellen. Het
+   huisbudget zelf is de singleton van RTG Link: de pindeur en de linkdeur
+   moeten dezelfde missers zien, ook wanneer beide PR's tegelijk landen. */
+const bronRem = require('./pin-deur-rem')({ crypto });
+const huisRem = require('../link/rem');
+const UUR = bronRem.UUR;
 
 /* Opzoeken wie er achter een pin zit -- zonder iets te doen. Dat is met opzet
    een aparte stap: het scherm toont eerst "dit is Gouden Ibis", en de MENS
@@ -62,17 +67,17 @@ function pinZoek(mij, ruw, context) {
   const pin = pinNormaliseer(ruw);
   if (!pin) return { status: 400, error: 'Een RTG PIN heeft acht of tien tekens, bijvoorbeeld 7K2M9-XPQH3.' };
   if (pinBevroren(mij)) return { status: 423, error: 'Je RTG PIN staat in het noodslot. Zet het slot uit voordat je een nieuwe PIN-handeling doet.' };
-  if (!sociaalRate(mij, 'pinzoek', 30, rem.UUR))
+  if (!sociaalRate(mij, 'pinzoek', 30, UUR))
     return { status: 429, error: 'Te veel pins geprobeerd. Probeer het over een uur opnieuw.' };
-  if (!rem.bronMag(context && context.bron))
+  if (!bronRem.bronMag(context && context.bron))
     return { status: 429, error: 'Te veel PIN-verzoeken vanaf deze verbinding. Probeer het later opnieuw.' };
   /* De huisrem staat NA de eigen rem en VOOR het opzoeken: wie zelf al te snel
      ging, hoort dat te horen, en het budget van het huis mag niet opgaan aan een
      opzoeking die toch al geweigerd werd. */
-  if (rem.dicht()) return { status: 429, error: 'Het opzoeken op pin ligt even stil. Probeer het zo opnieuw, of zoek op codenaam.' };
+  if (huisRem.deurDicht()) return { status: 429, error: 'Het opzoeken op pin ligt even stil. Probeer het zo opnieuw, of zoek op codenaam.' };
   if (pinHuidig(mij) === pin) return { status: 400, error: 'Dat is je eigen pin.' };
   const kaart = kijk(mij, handleVanPin(pin));
-  if (!kaart) { rem.misser(); return { status: 404, error: 'Deze pin kennen we niet.' }; }
+  if (!kaart) { huisRem.misserGeteld(); return { status: 404, error: 'Deze pin kennen we niet.' }; }
   const intent = pinIntentMaak({ actor: mij, doel: kaart.key, bron: 'vast', referentie: pin });
   pinBeveiligingNoteer(kaart.key, 'pin_bekeken', { bron: 'vast', uitkomst: 'getoond', doel: codenaamVan(mij) });
   return { status: 200, ...kaart, bevestiging: intent.token, bevestigingVervalt: intent.exp };
@@ -123,17 +128,17 @@ async function pinVerbind(mij, ruw, bevestiging) {
    deur naar dezelfde pins. */
 function pinNaarHandle(ruw) {
   const pin = pinNormaliseer(ruw);
-  if (!pin || rem.dicht()) return null;
+  if (!pin || huisRem.deurDicht()) return null;
   const doel = handleVanPin(pin);
-  if (!doel || pinBevroren(doel)) { rem.misser(); return null; }
+  if (!doel || pinBevroren(doel)) { huisRem.misserGeteld(); return null; }
   return doel;
 }
 
 /* Alleen voor de toetsen: het budget terugzetten zonder een minuut te wachten.
    Blijft hier staan onder zijn oude naam, want de contactpin-toetsen roepen hem
    zo aan; hij zet nu de gedeelde rem terug en niet een eigen kopie. */
-const pinDeurReset = () => rem.reset();
+const pinDeurReset = () => { bronRem.reset(); huisRem.remReset(); };
 
 return { pinZoek, pinVerbind, pinNaarHandle, pinKijk: kijk, pinDeurReset,
-  MIS_PER_MINUUT: rem.MIS_PER_MINUUT };
+  MIS_PER_MINUUT: huisRem.MIS_PER_MINUUT };
 };

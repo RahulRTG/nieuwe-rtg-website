@@ -27,7 +27,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { LANDEN, FISCAAL_PEILJAAR, maakFiscaal, zzpBerekening } = require('../server/kern/fiscaal');
 const { maakJaargangen } = require('../server/kern/fiscaal/jaargangen');
-const { centen } = require('../server/kern/util');
+const { rondEuro } = require('../server/kern/util');
 const { btwSplit } = require('../server/kern/afgeleid');
 
 const MAAND = new Date().toISOString().slice(0, 7);
@@ -59,7 +59,7 @@ test('een tariefwijziging midden in de maand splitst de maandboekhouding', () =>
   ] });
   // het eten-tarief gaat op de tiende van 9% naar 10%
   const jaargangen = metJaargang(db, { tarieven: { eten: 10 } }, MAAND + '-10');
-  const { financeVoor } = maakFiscaal({ db, centen, btwSplit, jaargangen });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit, jaargangen });
   const fin = financeVoor(s);
 
   const eten = fin.btw.filter(r => r.cat === 'eten').sort((a, b) => a.tarief - b.tarief);
@@ -71,7 +71,7 @@ test('een tariefwijziging midden in de maand splitst de maandboekhouding', () =>
   assert.equal(fin.btwTotaal, 19);
 
   // zonder jaargangen valt hij terug op de lopende tabel: een pot, alles 9%
-  const zonder = maakFiscaal({ db, centen, btwSplit }).financeVoor(s);
+  const zonder = maakFiscaal({ db, rondEuro, btwSplit }).financeVoor(s);
   assert.equal(zonder.btw.filter(r => r.cat === 'eten').length, 1, 'terugval: een tarief voor de hele maand');
   assert.equal(zonder.regelstand.bron, 'lopend');
 });
@@ -84,7 +84,7 @@ test('een Z-rapport van een afgesloten dag beweegt niet mee met een latere wijzi
     { at: MAAND + '-15T20:00:00.000Z', method: 'pin', total: 110, items: [{ name: 'Sushi', price: 110, qty: 1 }] }
   ] } });
   const jaargangen = metJaargang(db, { tarieven: { eten: 10 } }, MAAND + '-10');
-  const { dagrapport } = maakFiscaal({ db, centen, btwSplit, jaargangen });
+  const { dagrapport } = maakFiscaal({ db, rondEuro, btwSplit, jaargangen });
 
   const voor = dagrapport(s, MAAND + '-05');
   assert.equal(voor.btw[0].tarief, 9, 'de vijfde houdt het oude tarief');
@@ -103,7 +103,7 @@ test('het Z-rapport gebruikt dezelfde categorie als de factuur en de boekhouding
   const db = stubDb({ posSales: { MODE: [
     { at: MAAND + '-05T12:00:00.000Z', method: 'pin', total: 121, items: [{ name: 'Jas', price: 121, qty: 1 }] }
   ] } });
-  const { dagrapport, financeVoor } = maakFiscaal({ db, centen, btwSplit });
+  const { dagrapport, financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
 
   const z = dagrapport(winkel, MAAND + '-05');
   assert.equal(z.btw[0].cat, 'standaard', 'een jas is geen eten');
@@ -120,7 +120,7 @@ test('elke uitkomst draagt een stempel van de regels die eronder liggen', () => 
   const s = { code: 'KIKUNOI', type: 'horeca', menu: [], settings: { land: 'NL', uurloon: 20 } };
   const db = stubDb({});
   const jaargangen = metJaargang(db, { uurloonMin: 15.5 }, MAAND + '-01');
-  const { financeVoor, dagrapport } = maakFiscaal({ db, centen, btwSplit, jaargangen });
+  const { financeVoor, dagrapport } = maakFiscaal({ db, rondEuro, btwSplit, jaargangen });
 
   const fin = financeVoor(s);
   assert.equal(fin.regelstand.bron, 'jaargangen');

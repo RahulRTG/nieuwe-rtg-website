@@ -80,7 +80,7 @@ const AANBIEDER = BETALEN_UIT ? 'uit'
      stilzwijgend de altijd-slaagt-demo krijgt, bewijst dat de zonnige dag werkt
      en verder niets -- en dat is precies de dag waarop niemand een fout maakt. */
   : SIMULATIE_AAN ? 'simulatie'
-  : DEMO_BETALEN ? 'demo' : 'uit';
+  : DEMO_BETALEN ? 'magnaat-test' : 'uit';
 
 /* Idempotentie-opslag. Standaard in het geheugen; een aanroeper kan een
    persistente store injecteren (bijv. gespiegeld in de database), zodat de

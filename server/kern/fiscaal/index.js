@@ -47,7 +47,9 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
     const potten = {};
     const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     const tel = (cat, bedrag, datum) => {
-      if (!(bedrag > 0)) return;
+      /* Een tegenboeking is een negatief bedrag en moet dezelfde btw-pot weer
+         verlagen. Alleen nul en ongeldige invoer dragen niets bij. */
+      if (!Number.isFinite(bedrag) || bedrag === 0) return;
       const t = regelbron.tariefOp(landCode, cat, String(datum || '').slice(0, 10));
       const sleutel = cat + '@' + t;
       const p = potten[sleutel] || (potten[sleutel] = { cat, tarief: t, omzet: 0 });

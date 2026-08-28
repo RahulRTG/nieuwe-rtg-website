@@ -1,0 +1,405 @@
+/* WorkOS premium shell
+   Eén materiaal- en navigatielaag voor Werk OS, partner/leverancier, personeel,
+   horeca en de losse werktoestellen. De taaklogica blijft in de afzonderlijke
+   apps; deze laag bewaakt herkenning, schermhoogte en de vaste onderbalk. */
+body[data-workos-premium]{
+  --wo-black:#050505;
+  --wo-onyx:#090909;
+  --wo-panel:#11100f;
+  --wo-panel-hi:#171513;
+  --wo-silver:#eee9e2;
+  --wo-muted:#aaa29a;
+  --wo-line:rgba(238,233,226,.14);
+  --wo-line-gold:rgba(202,176,91,.34);
+  --wo-gold:#cab05b;
+  --wo-bordeaux:#821b3a;
+  --wo-bordeaux-hi:#b12950;
+  --wo-green:#69b891;
+  color-scheme:dark;
+  background:
+    radial-gradient(85% 46% at 82% -6%,rgba(130,27,58,.22),transparent 67%),
+    linear-gradient(135deg,#050505,#0a0909 54%,#050505);
+  color:var(--wo-silver);
+  -webkit-font-smoothing:antialiased;
+}
+
+body[data-workos-premium] :focus-visible{
+  outline:2px solid var(--wo-gold)!important;
+  outline-offset:3px;
+}
+
+/* Black-on-black blijft leesbaar door materiaal, niet door grote kleurvlakken. */
+body[data-workos-premium] .card,
+body[data-workos-premium] .kaart,
+body[data-workos-premium] .order,
+body[data-workos-premium] .kpi,
+body[data-workos-premium] .bon,
+body[data-workos-premium] .pn-intent{
+  border-color:var(--wo-line)!important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012) 35%,rgba(0,0,0,.18)),
+    var(--wo-panel)!important;
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.075),
+    inset 0 -1px rgba(0,0,0,.55),
+    0 16px 38px rgba(0,0,0,.16)!important;
+}
+
+body[data-workos-premium] .card:hover,
+body[data-workos-premium] .kaart:hover,
+body[data-workos-premium] .order:hover,
+body[data-workos-premium] .pn-intent:hover{
+  border-color:var(--wo-line-gold)!important;
+}
+
+body[data-workos-premium] .knop.p,
+body[data-workos-premium] .abtn:not(.ghost),
+body[data-workos-premium] .gbtn[aria-current="page"]{
+  border-color:rgba(202,176,91,.5)!important;
+  background:
+    linear-gradient(115deg,rgba(255,255,255,.13),transparent 32%),
+    linear-gradient(180deg,var(--wo-bordeaux-hi),var(--wo-bordeaux))!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.2),0 12px 30px rgba(87,7,31,.2)!important;
+}
+
+/* De aangeleverde Rotterdamse havenstrook is het vaste professionele anker.
+   De donkere lagen zorgen dat tabs en status in elke viewport leesbaar zijn. */
+body[data-workos-premium] .wk-top,
+body[data-workos-premium] .hq-top,
+body[data-workos-premium] .pn-top,
+body[data-workos-premium] .topbar,
+body[data-workos-premium].workos-has-bottom > header{
+  background-image:
+    linear-gradient(90deg,rgba(5,5,5,.96),rgba(5,5,5,.67) 48%,rgba(5,5,5,.9)),
+    linear-gradient(180deg,rgba(5,5,5,.1),rgba(5,5,5,.92)),
+    url('/beeld/workos-haven.jpg')!important;
+  background-position:center 48%!important;
+  background-size:cover!important;
+  border-bottom:1px solid var(--wo-line-gold)!important;
+  box-shadow:inset 0 -1px rgba(255,255,255,.04),0 14px 34px rgba(0,0,0,.28);
+}
+
+body[data-workos-premium] .topbar{
+  min-height:72px;
+  padding-block:calc(env(safe-area-inset-top,0px) + .65rem) .65rem;
+}
+
+body[data-workos-premium] .topbar .who b,
+body[data-workos-premium] .topbar .who span,
+body[data-workos-premium].workos-has-bottom > header h1,
+body[data-workos-premium].workos-has-bottom > header .ey{
+  text-shadow:0 2px 12px #000;
+}
+
+/* Partner en personeel: het appframe staat vast, alleen .content beweegt. */
+body[data-workos-premium] #shell{
+  height:100dvh!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(80% 45% at 90% 0,rgba(130,27,58,.18),transparent 70%),
+    var(--wo-onyx)!important;
+}
+
+body[data-workos-premium] #app.active{
+  min-height:0;
+  overflow:hidden;
+}
+
+body[data-workos-premium] .content{
+  min-height:0;
+  overscroll-behavior:contain;
+  scrollbar-color:rgba(202,176,91,.38) transparent;
+  padding-top:1rem;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))!important;
+}
+
+/* Bestaande vijfdelige appnavigatie: altijd buiten het scrollvlak. */
+body[data-workos-premium] .tabbar{
+  position:absolute!important;
+  inset:auto 0 0!important;
+  min-height:70px;
+  padding:.48rem max(.4rem,env(safe-area-inset-right,0px)) calc(.42rem + env(safe-area-inset-bottom,0px)) max(.4rem,env(safe-area-inset-left,0px))!important;
+  overflow:hidden!important;
+  border-top:1px solid var(--wo-line-gold)!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.015) 27%,rgba(0,0,0,.22)),
+    rgba(7,7,7,.94)!important;
+  box-shadow:0 -18px 42px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.05);
+  backdrop-filter:blur(24px) saturate(1.25)!important;
+}
+
+body[data-workos-premium] .tabbar button{
+  min-width:0!important;
+  min-height:52px;
+  position:relative;
+  justify-content:center;
+  color:#8f8983!important;
+  font-size:.57rem!important;
+  letter-spacing:.08em!important;
+}
+
+body[data-workos-premium] .tabbar button.active{
+  color:var(--wo-silver)!important;
+}
+
+body[data-workos-premium] .tabbar button.active::before{
+  content:'';
+  position:absolute;
+  top:-.48rem;
+  left:22%;
+  right:22%;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--wo-gold),transparent);
+  box-shadow:0 0 12px rgba(202,176,91,.35);
+}
+
+body[data-workos-premium] .tabbar button.active svg{
+  stroke:var(--wo-gold)!important;
+  filter:drop-shadow(0 0 7px rgba(202,176,91,.22));
+}
+
+/* Losse PDA/vloerschermen krijgen dezelfde vaste vijfdelige navigatie. */
+body[data-workos-premium].workos-has-bottom{
+  width:100%;
+  max-width:none!important;
+  height:100dvh;
+  min-height:0;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr) auto;
+}
+
+body[data-workos-premium].workos-has-bottom > header{
+  position:relative!important;
+  top:auto!important;
+  z-index:20;
+  min-height:70px;
+  padding:calc(env(safe-area-inset-top,0px) + .65rem) max(1rem,env(safe-area-inset-right,0px)) .65rem max(1rem,env(safe-area-inset-left,0px))!important;
+}
+
+body[data-workos-premium].workos-has-bottom > main{
+  width:min(100%,1100px);
+  max-width:1100px;
+  min-height:0;
+  margin:0 auto!important;
+  padding:1rem max(1rem,env(safe-area-inset-left,0px)) 1.1rem max(1rem,env(safe-area-inset-right,0px))!important;
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-color:rgba(202,176,91,.38) transparent;
+}
+
+.workos-bottom{
+  z-index:100;
+  width:100%;
+  min-height:70px;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  padding:.4rem max(.35rem,env(safe-area-inset-right,0px)) calc(.38rem + env(safe-area-inset-bottom,0px)) max(.35rem,env(safe-area-inset-left,0px));
+  border-top:1px solid var(--wo-line-gold);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.015) 28%,rgba(0,0,0,.2)),
+    rgba(7,7,7,.96);
+  box-shadow:0 -18px 42px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.05);
+  backdrop-filter:blur(24px) saturate(1.25);
+}
+
+.workos-bottom a{
+  min-width:0;
+  min-height:52px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  color:#8f8983!important;
+  text-decoration:none!important;
+  font:500 9px/1 Inter,system-ui,sans-serif;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+.workos-bottom svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.workos-bottom a[aria-current="page"]{color:var(--wo-silver)!important}
+.workos-bottom a[aria-current="page"] svg{stroke:var(--wo-gold);filter:drop-shadow(0 0 7px rgba(202,176,91,.25))}
+.workos-bottom a[aria-current="page"]::before{content:'';position:absolute;top:-.4rem;left:23%;right:23%;height:2px;background:linear-gradient(90deg,transparent,var(--wo-gold),transparent)}
+
+body[data-workos-premium].workos-has-bottom .melding,
+body[data-workos-premium].workos-has-bottom #toast{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}
+
+/* Toestemming blijft leesbaar, maar mag de primaire navigatie nooit bedekken. */
+body[data-workos-premium] #rtg-cookie{
+  bottom:calc(78px + env(safe-area-inset-bottom,0px))!important;
+}
+
+/* Command-schillen: vaste viewport, compacter werkvlak, glanzende rail. */
+body[data-workos-premium] .wk-shell,
+body[data-workos-premium] .hq-shell,
+body[data-workos-premium] .pn-shell{
+  background:
+    radial-gradient(72% 46% at 82% 0,rgba(130,27,58,.21),transparent 68%),
+    var(--wo-black)!important;
+}
+
+body[data-workos-premium] .wk-bank,
+body[data-workos-premium] .hq-rail,
+body[data-workos-premium] .pn-rail{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.055),transparent 22%),
+    linear-gradient(180deg,#151112,#070707 72%)!important;
+  border-color:var(--wo-line)!important;
+  box-shadow:inset -1px 0 rgba(255,255,255,.025),14px 0 40px rgba(0,0,0,.22);
+}
+
+body[data-workos-premium] .wk-bank button.actief,
+body[data-workos-premium] .hq-rail a.actief,
+body[data-workos-premium] .pn-rail button.actief{
+  border-color:var(--wo-gold)!important;
+  color:var(--wo-silver)!important;
+  background:linear-gradient(90deg,rgba(130,27,58,.52),rgba(130,27,58,.08),transparent)!important;
+}
+
+body[data-workos-premium] .wk-stage,
+body[data-workos-premium] .hq-stage,
+body[data-workos-premium] .pn-grid{
+  min-height:0!important;
+  overscroll-behavior:contain;
+}
+
+body[data-workos-premium] .wk-view,
+body[data-workos-premium] .pn-column{
+  background-color:var(--wo-onyx)!important;
+}
+
+@media(max-width:760px){
+  body[data-workos-premium] .wk-shell,
+  body[data-workos-premium] .hq-shell,
+  body[data-workos-premium] .pn-shell{
+    grid-template-rows:minmax(0,1fr) calc(70px + env(safe-area-inset-bottom,0px))!important;
+  }
+
+  body[data-workos-premium] .wk-main,
+  body[data-workos-premium] .hq-main,
+  body[data-workos-premium] .pn-shell > main{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    grid-template-rows:58px minmax(0,1fr)!important;
+  }
+
+  body[data-workos-premium] .wk-top,
+  body[data-workos-premium] .hq-top,
+  body[data-workos-premium] .pn-top{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:58px!important;
+    min-height:58px!important;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+
+  body[data-workos-premium] .wk-top::-webkit-scrollbar,
+  body[data-workos-premium] .hq-top::-webkit-scrollbar,
+  body[data-workos-premium] .pn-top::-webkit-scrollbar{display:none}
+
+  body[data-workos-premium] .wk-bank,
+  body[data-workos-premium] .hq-rail,
+  body[data-workos-premium] .pn-rail{
+    z-index:100;
+    width:100%!important;
+    height:auto!important;
+    min-height:0;
+    overflow:hidden!important;
+    padding:.35rem max(.35rem,env(safe-area-inset-right,0px)) calc(.3rem + env(safe-area-inset-bottom,0px)) max(.35rem,env(safe-area-inset-left,0px))!important;
+    border-top:1px solid var(--wo-line-gold)!important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.012) 28%),
+      rgba(7,7,7,.96)!important;
+    box-shadow:0 -18px 42px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.05);
+    backdrop-filter:blur(24px) saturate(1.25);
+  }
+
+  body[data-workos-premium] .wk-bank nav,
+  body[data-workos-premium] .hq-rail nav,
+  body[data-workos-premium] .pn-rail nav{
+    min-height:54px;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+
+  body[data-workos-premium] .wk-bank nav::-webkit-scrollbar,
+  body[data-workos-premium] .hq-rail nav::-webkit-scrollbar,
+  body[data-workos-premium] .pn-rail nav::-webkit-scrollbar{display:none}
+
+  body[data-workos-premium] .wk-bank nav button,
+  body[data-workos-premium] .hq-rail nav a,
+  body[data-workos-premium] .pn-rail nav button{
+    min-width:62px;
+    min-height:54px;
+    height:54px;
+    position:relative;
+    border:0!important;
+    background:transparent!important;
+  }
+
+  body[data-workos-premium] .wk-bank nav button,
+  body[data-workos-premium] .pn-rail nav button{
+    flex:1 1 0;
+    min-width:0;
+  }
+
+  body[data-workos-premium] .wk-bank nav button.actief::before,
+  body[data-workos-premium] .hq-rail nav a.actief::before,
+  body[data-workos-premium] .pn-rail nav button.actief::before{
+    content:'';
+    position:absolute;
+    top:-.35rem;
+    left:22%;
+    right:22%;
+    height:2px;
+    background:linear-gradient(90deg,transparent,var(--wo-gold),transparent);
+  }
+
+  body[data-workos-premium] .wk-bank nav button.actief i,
+  body[data-workos-premium] .hq-rail nav a.actief i,
+  body[data-workos-premium] .pn-rail nav button.actief i{color:var(--wo-gold)}
+
+  body[data-workos-premium] .wk-bank nav button span,
+  body[data-workos-premium] .hq-rail nav a span,
+  body[data-workos-premium] .pn-rail nav button span{
+    font-size:9px!important;
+    letter-spacing:.035em;
+  }
+
+  body[data-workos-premium] .wk-stage,
+  body[data-workos-premium] .hq-stage{padding-bottom:1rem!important}
+
+  body[data-workos-premium] .wk-view{padding:20px 15px 24px!important}
+  body[data-workos-premium] .wk-view > h1{font-size:32px!important;margin:10px 0!important}
+  body[data-workos-premium] .wk-view > h2{font-size:24px!important;margin:10px 0 15px!important}
+  body[data-workos-premium] .wk-stage .kaart{margin:7px 0!important;padding:13px!important}
+  body[data-workos-premium] .wk-stage .stil{font-size:11px!important}
+  body[data-workos-premium] .wk-stage .item{font-size:11px!important}
+
+  body[data-workos-premium] .hq-hero > div{padding:22px 18px!important}
+  body[data-workos-premium] .hq-hero h1{font-size:32px!important;margin:9px 0!important}
+  body[data-workos-premium] .hq-stage > section:not(.hq-hero){padding:13px!important}
+}
+
+@media(max-width:420px){
+  .workos-bottom a{font-size:8px;letter-spacing:0}
+  body[data-workos-premium] .tabbar button{font-size:.52rem!important;letter-spacing:.03em!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-workos-premium] *,
+  body[data-workos-premium] *::before,
+  body[data-workos-premium] *::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}

@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LIFE</title>
+<title>LivingOS · RTG LIFE</title>
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#090908">
+<meta name="theme-color" content="#4A0C1E">
 <link href="../fonts/fonts.css" rel="stylesheet">
 <link href="../shared/rtg-uniform.css" rel="stylesheet">
 <link href="../shared/rtg-ui.css" rel="stylesheet">
@@ -28,9 +28,20 @@
 @media(max-width:650px){.laagkeuze{padding:14px}.lifelagen{gap:4px}.lifelagen button{font-size:.57rem;letter-spacing:.08em}.campagne{grid-template-columns:1fr}.campagne figure{min-height:210px}.dossierkop{align-items:flex-start;flex-direction:column}.mag-dossier .regel{grid-template-columns:1fr;gap:5px}}
 [hidden]{display:none!important}
 </style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-ios-home data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl" data-ios-home data-rtg-eigenvlak="bordeaux" data-rtg-world="living">
 <a class="skip" href="#inhoud">Naar inhoud</a>
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <div class="schil">
 <aside class="bank"><nav aria-label="Onderdelen van LIFE">
   <div class="merk">LIFE<small>ONE LIFE PLATFORM</small></div>
@@ -42,9 +53,9 @@
   <a href="/apps/geld-command.html"><span>06</span>Geld</a>
   <a href="/apps/media.html"><span>07</span>Media</a>
 </nav></aside>
-<header class="topbar" role="banner"><a href="/apps/app.html" aria-label="Terug naar het beginscherm"><span class="terug">‹</span><span class="titel">LIFE</span></a><button class="bediening" type="button" aria-label="Bedieningspaneel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="#050504"/><circle cx="15" cy="12" r="2" fill="#050504"/><circle cx="7" cy="17" r="2" fill="#050504"/></svg></button></header>
+<header class="topbar" role="banner"><a href="/apps/app.html" aria-label="Terug naar het beginscherm"><span class="terug">‹</span><span class="titel">LivingOS · LIFE</span></a><button class="bediening" type="button" aria-label="Bedieningspaneel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="#050504"/><circle cx="15" cy="12" r="2" fill="#050504"/><circle cx="7" cy="17" r="2" fill="#050504"/></svg></button></header>
 <main class="werk" id="inhoud">
-  <header class="kop"><div><div class="ey">LIFE · EEN ACCOUNT · DRIE LAGEN</div><h1>Alles voor uw leven.</h1><p>Reizen, mensen, thuis, veiligheid, geld en media zijn onderdelen van één app. Uw rechten, gegevens en vertrouwde diensten blijven intact.</p></div><div class="status"><i></i><span id="lifePasStatus">RTG Pass · LIFE</span></div><span class="aiherkomst">AI-gegenereerd campagnebeeld</span></header>
+  <header class="kop"><div><p class="os-kicker"><span>01</span>LivingOS · uw dagelijkse wereld</p><div class="ey">LIFE · EEN ACCOUNT · DRIE LAGEN</div><h1>Uw leven, in één ritme.</h1><p>Reizen, mensen, thuis, veiligheid, geld en media bewegen samen. LivingOS brengt alleen naar voren wat vandaag werkelijk aandacht vraagt.</p></div><div class="status"><i></i><span id="lifePasStatus">RTG Pass · LIFE</span></div><span class="aiherkomst">AI-gegenereerd campagnebeeld</span></header>
   <section class="laagkeuze" aria-labelledby="lifeLaagKop">
     <nav class="lifelagen" aria-label="Lagen van LIFE">
       <button class="actief" type="button" data-life-laag="rtg" aria-pressed="true">RTG</button>

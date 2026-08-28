@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4708 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4677 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,12 +18,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4674 |
-| servermodules (`server/**/*.js`) | 2760 |
+| API-endpoints | 4677 |
+| servermodules (`server/**/*.js`) | 2765 |
 | routebestanden (`server/routes/**`) | 533 |
-| kernmodules (`server/kern/**`) | 1721 |
+| kernmodules (`server/kern/**`) | 1726 |
 | schermen (`public/**/*.html`) | 273 |
-| gedeelde browsermodules (`public/shared/*.js`) | 268 |
+| gedeelde browsermodules (`public/shared/*.js`) | 269 |
 | toetsbestanden (`test/*.test.js`) | 1179 |
 | schermtoetsen (`test/*.e2e.js`) | 169 |
 
@@ -125,7 +125,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3146 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3115 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -133,9 +133,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1496 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 210 |
-| daarvan door precies één domein | 1286 |
+| kern-namen die routes aanraken | 1497 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 209 |
+| daarvan door precies één domein | 1288 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -147,7 +147,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(188) auth(114) supplierAuth(62) officeAuth(41) db(37) liveCodename(33) status(27)
+app(185) auth(113) supplierAuth(62) officeAuth(41) db(37) liveCodename(33) status(27)
 accounts(25) schoon(23) managerOnly(18) codenaamVan(17) save(16) rtf(15)
 boardroomWie(14) geenGast(13) tooManyTries(11) crypto(11) express(11) findSupplier(11)
 pay(11) anthropic(11) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)

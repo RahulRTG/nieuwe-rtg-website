@@ -35,7 +35,13 @@ module.exports = ({ REF, BOUNDS, GRID, ARTERIE, V_HOOFD, V_STAD, haversine }) =>
         const b = knopen[r2 * GRID + c2];
         const hoofd = k.art && b.art;                 // hoofdweg als beide knopen op een hoofdlijn liggen
         const v = hoofd ? V_HOOFD : V_STAD;
-        buren[k.i].push({ i: b.i, kost: meters(k, b) / v, m: meters(k, b) });
+        buren[k.i].push({
+          i: b.i,
+          kost: meters(k, b) / v,
+          m: meters(k, b),
+          hoofd,
+          id: Math.min(k.i, b.i) + ':' + Math.max(k.i, b.i)
+        });
       }
     }
     net = { knopen, buren };
@@ -49,11 +55,18 @@ module.exports = ({ REF, BOUNDS, GRID, ARTERIE, V_HOOFD, V_STAD, haversine }) =>
   }
 
   // ---- A*: de snelste weg over het net ----
-  function zoek(vanN, naarN) {
+  function zoek(vanN, naarN, opties = {}) {
     const n = bouwNet();
     const g = new Map([[vanN.i, 0]]);
     const via = new Map();
-    const h = k => meters(k, naarN) / V_HOOFD;
+    /* Met een eigen kostenfunctie kan een etappe goedkoper of onbegaanbaar
+       worden door verkeer, voertuigprofiel of partnerinformatie. Dan is nul de
+       enige altijd geldige heuristiek: op dit kleine lokale net is de paar
+       milliseconden extra de prijs voor een aantoonbaar optimale route. */
+    const h = opties.kost ? () => 0 : k => meters(k, naarN) / V_HOOFD;
+    const kostVan = typeof opties.kost === 'function'
+      ? opties.kost
+      : e => e.kost;
     const open = [{ i: vanN.i, f: h(vanN) }];
     const dicht = new Set();
     while (open.length) {
@@ -63,7 +76,9 @@ module.exports = ({ REF, BOUNDS, GRID, ARTERIE, V_HOOFD, V_STAD, haversine }) =>
       if (dicht.has(cur.i)) continue;
       dicht.add(cur.i);
       for (const e of n.buren[cur.i]) {
-        const ng = (g.get(cur.i) ?? Infinity) + e.kost;
+        const stap = Number(kostVan(e, n.knopen[cur.i], n.knopen[e.i]));
+        if (!Number.isFinite(stap) || stap < 0) continue;
+        const ng = (g.get(cur.i) ?? Infinity) + stap;
         if (ng < (g.get(e.i) ?? Infinity)) {
           g.set(e.i, ng); via.set(e.i, cur.i);
           open.push({ i: e.i, f: ng + h(n.knopen[e.i]) });

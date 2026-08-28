@@ -1,0 +1,673 @@
+/* RTG Worlds 2026
+
+   Vier werelden, vier materialen, een familie. De wereld bepaalt de compositie;
+   de onderliggende apps, rechten en data blijven ongemoeid. Alle kleuren komen
+   uit rtg-materiaal.css: LivingOS = Bordeaux, WorkOS = Royal,
+   TravelOS = Onyx en FoundationOS = Pearl. */
+
+/* ---------------------------------------------------------- gedeelde atlas */
+body[data-rtg-world]{
+  --world-accent:var(--gold-tekst);
+  --world-accent-deep:var(--gold-basis);
+  --world-ink:var(--rtg-txt,var(--op-onyx));
+  --world-soft:var(--rtg-soft,#CDC9C0);
+  --world-line:var(--rtg-line,var(--onyx-rand));
+  min-width:320px;
+  background:var(--rtg-grond,var(--onyx-glans));
+  color:var(--world-ink);
+  font-family:var(--rtg-interface);
+}
+body[data-rtg-world]::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.55;
+  background:
+    linear-gradient(90deg,transparent 0,transparent calc(50% - .5px),var(--world-line) 50%,transparent calc(50% + .5px)),
+    linear-gradient(0deg,transparent 0,transparent calc(50% - .5px),var(--world-line) 50%,transparent calc(50% + .5px));
+  background-size:min(25vw,22rem) min(25vw,22rem);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.72),transparent 72%);
+}
+
+.os-switcher{
+  position:relative;
+  z-index:60;
+  min-height:64px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:clamp(.8rem,2.8vw,2.4rem);
+  padding:.55rem clamp(1rem,4vw,3rem);
+  border-bottom:1px solid var(--world-line);
+  background:color-mix(in srgb,var(--rtg-bg,var(--onyx-basis)) 92%,transparent);
+  color:var(--world-ink);
+  backdrop-filter:blur(22px) saturate(1.1);
+}
+.os-switcher__brand{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  color:inherit;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.os-switcher__brand b{
+  font-family:var(--rtg-display);
+  font-size:1.25rem;
+  font-weight:500;
+  letter-spacing:-.02em;
+}
+.os-switcher__brand span{
+  font-size:.53rem;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--world-soft);
+}
+.os-switcher__links{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.28rem;
+}
+.os-switcher__links a{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:.48rem;
+  min-height:40px;
+  padding:.45rem clamp(.48rem,1.3vw,.9rem);
+  border:1px solid transparent;
+  color:var(--world-soft);
+  font-size:.63rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.os-switcher__links a span{
+  color:var(--world-accent);
+  font-variant-numeric:tabular-nums;
+  font-size:.54rem;
+}
+.os-switcher__links a:hover,
+.os-switcher__links a:focus-visible{
+  border-color:var(--world-line);
+  color:var(--world-ink);
+}
+.os-switcher__links a[aria-current="page"]{
+  border-color:var(--world-accent-deep);
+  background:color-mix(in srgb,var(--world-accent) 9%,transparent);
+  color:var(--world-ink);
+}
+.os-switcher__state{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  color:var(--world-soft);
+  font-size:.54rem;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.os-switcher__state::before{
+  content:"";
+  width:7px;
+  height:7px;
+  background:var(--rtg-sig-gezond,#4C9A75);
+  border-radius:50%;
+}
+.os-kicker{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  margin:0 0 .85rem;
+  color:var(--world-soft);
+  font-size:.6rem;
+  font-weight:750;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+}
+.os-kicker span{
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border:1px solid var(--world-accent-deep);
+  color:var(--world-accent);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ------------------------------------------------------------- 01 LivingOS */
+body[data-rtg-world="living"]{
+  --world-accent:var(--gold-tekst);
+  --world-accent-deep:var(--gold-basis);
+  --goud:var(--gold-tekst);
+  --lijn:var(--bordeaux-rand);
+  --vlak:rgba(12,12,11,.72);
+  --zacht:#E6CECC;
+  background:
+    radial-gradient(circle at 76% 11%,rgba(158,28,64,.32),transparent 27rem),
+    var(--bordeaux-glans);
+}
+body[data-rtg-world="living"]::before{
+  opacity:.35;
+  background:
+    repeating-linear-gradient(90deg,transparent 0,transparent calc(20vw - 1px),rgba(244,240,233,.09) 20vw),
+    linear-gradient(150deg,transparent 0 57%,rgba(192,165,68,.07) 57% 57.15%,transparent 57.15%);
+}
+body[data-rtg-world="living"]::after{
+  background:radial-gradient(circle at 70% 7%,rgba(192,165,68,.12),transparent 28rem);
+}
+body[data-rtg-world="living"] .os-switcher{
+  background:rgba(74,12,30,.92);
+}
+body[data-rtg-world="living"] .schil{
+  min-height:calc(100vh - 64px);
+  grid-template-rows:58px 1fr;
+}
+body[data-rtg-world="living"] .bank{
+  top:64px;
+  height:calc(100vh - 64px);
+  padding-top:48px;
+  border-color:var(--bordeaux-rand);
+  background:rgba(5,5,5,.88);
+}
+body[data-rtg-world="living"] .bank .merk{
+  color:var(--op-onyx);
+  font-size:1.28rem;
+}
+body[data-rtg-world="living"] .bank a{
+  border-color:rgba(244,240,233,.08);
+  color:#CFC6C2;
+}
+body[data-rtg-world="living"] .bank a.actief{
+  background:var(--bordeaux-glans);
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="living"] .topbar{
+  border-color:var(--bordeaux-rand);
+  background:rgba(74,12,30,.76);
+}
+body[data-rtg-world="living"] .werk{
+  max-width:1440px;
+  padding-top:clamp(2.6rem,6vw,6rem);
+}
+body[data-rtg-world="living"] .kop{
+  position:relative;
+  max-width:1050px;
+  margin:0 0 clamp(2rem,5vw,4.5rem);
+  padding:0 clamp(1rem,5vw,5rem) 2.2rem 0;
+  text-align:left;
+  border-bottom:1px solid var(--bordeaux-rand);
+}
+body[data-rtg-world="living"] .kop::after{
+  content:"L";
+  position:absolute;
+  right:0;
+  bottom:-.28em;
+  color:rgba(244,240,233,.045);
+  font:500 clamp(9rem,22vw,20rem)/.7 var(--rtg-display);
+  pointer-events:none;
+}
+body[data-rtg-world="living"] .kop .ey{color:var(--gold-tekst);}
+body[data-rtg-world="living"] .kop h1{
+  max-width:840px;
+  margin:.5rem 0 1rem;
+  color:var(--op-bordeaux);
+  font-size:clamp(3.4rem,9vw,8.5rem);
+  line-height:.82;
+  letter-spacing:-.055em;
+}
+body[data-rtg-world="living"] .kop p{
+  margin:0;
+  max-width:680px;
+  color:#EDE0DC;
+  font-size:clamp(.9rem,1.3vw,1.08rem);
+}
+body[data-rtg-world="living"] .kop .status{
+  border-color:var(--bordeaux-rand);
+  background:rgba(0,0,0,.18);
+}
+body[data-rtg-world="living"] .laagkeuze,
+body[data-rtg-world="living"] .hero{
+  border-color:var(--onyx-rand);
+  background:var(--onyx-glans);
+  color:var(--op-onyx);
+}
+body[data-rtg-world="living"] .laagkeuze{
+  max-width:none;
+  margin-bottom:2.2rem;
+  padding:clamp(1rem,3vw,2rem);
+  display:grid;
+  grid-template-columns:minmax(220px,.55fr) minmax(0,1.45fr);
+  gap:clamp(1rem,4vw,4rem);
+}
+body[data-rtg-world="living"] .lifelagen{
+  align-content:start;
+  grid-template-columns:1fr;
+  margin:0;
+}
+body[data-rtg-world="living"] .lifelagen button{
+  min-height:58px;
+  text-align:left;
+  padding-inline:1rem;
+  border-color:var(--onyx-rand);
+  background:transparent;
+}
+body[data-rtg-world="living"] .lifelagen button.actief{
+  background:var(--bordeaux-glans);
+  border-color:var(--bordeaux-rand);
+}
+body[data-rtg-world="living"] .laagtekst{text-align:left;}
+body[data-rtg-world="living"] .laagtekst h2{font-size:clamp(1.5rem,3vw,2.5rem);}
+body[data-rtg-world="living"] .laagtekst>p{margin-inline:0;}
+body[data-rtg-world="living"] .laagfocus a{
+  min-height:118px;
+  border-color:var(--onyx-rand);
+  background:rgba(255,255,255,.03);
+}
+body[data-rtg-world="living"] .standen{justify-content:flex-start;}
+body[data-rtg-world="living"] .wereldklok,
+body[data-rtg-world="living"] .wereldklok.rtg-ring{
+  margin-left:0;
+}
+body[data-rtg-world="living"] .hero{padding:clamp(1.4rem,4vw,3.2rem);}
+body[data-rtg-world="living"] .grid{gap:1px;background:var(--onyx-rand);}
+body[data-rtg-world="living"] .kaart{
+  min-height:175px;
+  border:0;
+  border-top:3px solid transparent;
+  background:var(--onyx-basis);
+}
+body[data-rtg-world="living"] .kaart:hover{
+  transform:none;
+  border-top-color:var(--gold-basis);
+  background:var(--bordeaux-diep);
+}
+
+/* --------------------------------------------------------------- 02 WorkOS */
+body[data-rtg-world="work"]{
+  --world-accent:var(--gold-tekst);
+  --world-accent-deep:var(--gold-basis);
+  background:var(--royal-glans);
+}
+body[data-rtg-world="work"]::before{
+  opacity:.65;
+  background:
+    linear-gradient(90deg,rgba(240,242,247,.06) 1px,transparent 1px),
+    linear-gradient(rgba(240,242,247,.06) 1px,transparent 1px);
+  background-size:52px 52px;
+  mask-image:linear-gradient(to bottom,#000,transparent 86%);
+}
+body[data-rtg-world="work"] .os-switcher{background:rgba(16,30,63,.93);}
+body[data-rtg-world="work"]>main{
+  max-width:1180px;
+  padding:clamp(2rem,5vw,5rem) clamp(1rem,3vw,2.5rem) 5rem;
+}
+body[data-rtg-world="work"] .merkkop{
+  position:relative;
+  display:block;
+  min-height:clamp(250px,34vw,410px);
+  padding:clamp(2rem,6vw,5.2rem) clamp(1rem,4vw,3.5rem);
+  border:1px solid var(--royal-rand);
+  overflow:hidden;
+}
+body[data-rtg-world="work"] .merkkop::before{
+  content:"02 / UW WERK EN ORGANISATIES";
+  display:block;
+  margin-bottom:1rem;
+  color:#CED6E5;
+  font-size:.6rem;
+  font-weight:750;
+  letter-spacing:.22em;
+}
+body[data-rtg-world="work"] .merkkop::after{
+  content:"";
+  position:absolute;
+  right:-8%;
+  top:-30%;
+  width:min(48vw,540px);
+  aspect-ratio:1;
+  border:1px solid var(--gold-rand);
+  transform:rotate(45deg);
+  background:linear-gradient(135deg,transparent 49.8%,rgba(192,165,68,.22) 50%,transparent 50.2%);
+}
+body[data-rtg-world="work"] .merkkop h1{
+  position:relative;
+  z-index:1;
+  max-width:860px;
+  color:var(--op-royal);
+  font-size:clamp(4rem,12vw,10rem);
+  line-height:.78;
+  letter-spacing:-.055em;
+}
+body[data-rtg-world="work"] .merkkop .onder{
+  max-width:650px;
+  margin-top:1.3rem;
+  color:#DADFE8;
+  line-height:1.6;
+}
+body[data-rtg-world="work"] .doelgroep{
+  margin:-2.4rem clamp(.5rem,3vw,3rem) 3rem;
+  position:relative;
+  z-index:2;
+  padding:clamp(1rem,3vw,2rem);
+  border-color:var(--pearl-rand);
+  background:var(--pearl-glans);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="work"] .doelgroepnav a{
+  border-color:var(--pearl-rand);
+  color:#41403E;
+}
+body[data-rtg-world="work"] .doelgroepnav a.actief,
+body[data-rtg-world="work"] .doelgroepnav a:hover,
+body[data-rtg-world="work"] .doelgroepnav a:focus-visible{
+  border-color:var(--royal-basis);
+  background:var(--royal-glans);
+  color:var(--op-royal);
+}
+body[data-rtg-world="work"] .doelgroeptekst p{color:#41403E;}
+body[data-rtg-world="work"] .doelgroeppoorten a{
+  min-height:145px;
+  display:flex;
+  flex-direction:column;
+  border-color:var(--pearl-rand);
+  background:rgba(255,255,255,.34);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="work"] .doelgroeppoorten a:hover{border-color:var(--royal-basis);}
+body[data-rtg-world="work"] .doelgroeppoorten span{color:#41403E;}
+body[data-rtg-world="work"] .doelgroeppoorten em{
+  margin-top:auto;
+  padding-top:1rem;
+  color:var(--royal-basis);
+}
+body[data-rtg-world="work"] #stand,
+body[data-rtg-world="work"] #rust{
+  border-inline:1px solid var(--royal-rand);
+  background:rgba(0,0,0,.13);
+}
+body[data-rtg-world="work"] .regkop{margin-top:2.4rem;}
+body[data-rtg-world="work"] .regkop h2,
+body[data-rtg-world="work"] .regkop .tel{color:#CED6E5;}
+body[data-rtg-world="work"] .reis .doos{border-color:var(--royal-rand);}
+body[data-rtg-world="work"] .reis::before{background:var(--royal-rand);}
+body[data-rtg-world="work"] .kern .feiten,
+body[data-rtg-world="work"] .kern .bron,
+body[data-rtg-world="work"] .dag .wd,
+body[data-rtg-world="work"] .dag .mnd,
+body[data-rtg-world="work"] .dag .uur{color:#CED6E5;}
+body[data-rtg-world="work"] .poort{
+  min-height:132px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-color:var(--royal-rand);
+  background:rgba(0,0,0,.14);
+}
+body[data-rtg-world="work"] .poort:hover{background:var(--onyx-glans);border-color:var(--gold-rand);}
+body[data-rtg-world="work"] .poort span{color:#CED6E5;}
+
+/* ------------------------------------------------------------- 03 TravelOS */
+body[data-rtg-world="travel"]{
+  --world-accent:var(--gold-tekst);
+  --world-accent-deep:var(--gold-basis);
+  --wine:var(--bordeaux-basis);
+  --wine-bright:var(--bordeaux-hoog);
+  --gold:var(--gold-tekst);
+  --onyx:var(--onyx-basis);
+  --graphite:var(--onyx-hoog);
+  --graphite-2:var(--rtg-card2);
+  --ivory:var(--op-onyx);
+  --muted:#ABA79C;
+  --line:var(--onyx-rand);
+  --line-soft:rgba(255,255,255,.055);
+  background:var(--onyx-glans);
+}
+body[data-rtg-world="travel"]::before{
+  opacity:1;
+  background:
+    radial-gradient(ellipse at 78% 6%,rgba(42,70,128,.3),transparent 31rem),
+    linear-gradient(164deg,transparent 0 61%,rgba(127,22,52,.18) 61% 61.2%,transparent 61.2%);
+  mask-image:none;
+}
+body[data-rtg-world="travel"] .os-switcher{background:rgba(5,5,5,.94);}
+body[data-rtg-world="travel"] .reisapp{background:transparent;}
+body[data-rtg-world="travel"] .prestatiekop{
+  border-color:var(--gold-rand);
+  background:rgba(12,12,11,.91);
+}
+body[data-rtg-world="travel"] .prestatiekop>p{color:var(--op-onyx);}
+body[data-rtg-world="travel"] .rtgmerk{color:var(--gold-tekst);}
+body[data-rtg-world="travel"] .dagkop{
+  position:relative;
+  padding:clamp(1rem,3vw,2rem) 0 clamp(2rem,4vw,3.4rem);
+  border-bottom:1px solid var(--onyx-rand);
+}
+body[data-rtg-world="travel"] .dagkop::after{
+  content:"03 / TRAVELOS";
+  position:absolute;
+  right:0;
+  top:1.1rem;
+  color:var(--gold-tekst);
+  font-size:.58rem;
+  font-weight:750;
+  letter-spacing:.2em;
+}
+body[data-rtg-world="travel"] .bestemmingkop h1{
+  color:var(--op-onyx);
+  font-size:clamp(5rem,20vw,12rem);
+  line-height:.76;
+}
+body[data-rtg-world="travel"] .vandaagraster{gap:1px;background:var(--onyx-rand);}
+body[data-rtg-world="travel"] .volgendblok{
+  border:0;
+  background:var(--bordeaux-glans);
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="travel"] .volgendblok::after{
+  border-color:rgba(244,240,233,.16);
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 9px,rgba(244,240,233,.06) 10px);
+}
+body[data-rtg-world="travel"] .volgendblok .micro,
+body[data-rtg-world="travel"] .volgendblok .routekort,
+body[data-rtg-world="travel"] .volgendblok .vluchtregel{color:#EDE0DC;}
+body[data-rtg-world="travel"] .volgendblok .vluchtregel{border-color:var(--bordeaux-rand);}
+body[data-rtg-world="travel"] .reiscontext{
+  padding:clamp(1.2rem,3vw,2rem);
+  background:var(--pearl-glans);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="travel"] .reiscontext .padpunt{color:#34322F;}
+body[data-rtg-world="travel"] .reiscontext .padpunt small{color:#41403E;}
+body[data-rtg-world="travel"] .reiscontext .padlijn{background:var(--pearl-rand);}
+body[data-rtg-world="travel"] .reiscontext .padlijn::after{background:var(--bordeaux-basis);}
+body[data-rtg-world="travel"] .reiscontext .padpunt i{background:var(--pearl-basis);}
+body[data-rtg-world="travel"] .statuslijst{border-color:var(--pearl-rand);}
+body[data-rtg-world="travel"] .statuslijst button{
+  border-color:var(--pearl-rand);
+  background:rgba(255,255,255,.28);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(255,255,255,.58);}
+body[data-rtg-world="travel"] .statuslijst small{color:#41403E;}
+body[data-rtg-world="travel"] .statuslijst strong{color:var(--bordeaux-basis);}
+body[data-rtg-world="travel"] .actieknop{
+  clip-path:none;
+  background:var(--gold-glans);
+  color:var(--op-gold);
+}
+body[data-rtg-world="travel"] .hoofdtabs{
+  border-color:var(--onyx-rand);
+  background:rgba(5,5,5,.96);
+}
+body[data-rtg-world="travel"] .hoofdtabs button.actief svg,
+body[data-rtg-world="travel"] .hoofdtabs button.actief{color:var(--gold-tekst);}
+body[data-rtg-world="travel"] .hoofdtabs button::after{background:var(--gold-basis);}
+body[data-rtg-world="travel"] .canvasband,
+body[data-rtg-world="travel"] .reisdiensten,
+body[data-rtg-world="travel"] .reisdiensten a,
+body[data-rtg-world="travel"] .routevelden,
+body[data-rtg-world="travel"] .voertuig,
+body[data-rtg-world="travel"] .rahulsnel,
+body[data-rtg-world="travel"] .rahulformulier{
+  border-color:var(--onyx-rand);
+  background:var(--onyx-glans);
+}
+
+/* --------------------------------------------------------- 04 FoundationOS */
+body[data-rtg-world="foundation"]{
+  --world-accent:var(--bordeaux-basis);
+  --world-accent-deep:var(--bordeaux-basis);
+  --bg:var(--pearl-basis);
+  --card:rgba(255,255,255,.48);
+  --line:var(--pearl-rand);
+  --txt:var(--op-pearl);
+  --muted:#34322F;
+  --soft:#41403E;
+  --burgundy:var(--bordeaux-basis);
+  --gold:var(--gold-diep);
+  background:var(--pearl-glans);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="foundation"]::before{
+  opacity:.6;
+  background:
+    radial-gradient(circle at 86% 8%,rgba(133,112,7,.17),transparent 24rem),
+    repeating-linear-gradient(90deg,transparent 0,transparent calc(25vw - 1px),rgba(120,108,88,.12) 25vw);
+}
+body[data-rtg-world="foundation"] .os-switcher{
+  background:rgba(244,240,233,.93);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="foundation"]>header{
+  position:relative;
+  min-height:clamp(330px,48vw,610px);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:clamp(2.5rem,8vw,8rem) clamp(1rem,8vw,8rem) clamp(3rem,7vw,6rem);
+  border:0;
+  overflow:hidden;
+  background:var(--bordeaux-glans);
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="foundation"]>header::before{
+  content:"04";
+  position:absolute;
+  right:-.02em;
+  top:-.2em;
+  color:rgba(244,240,233,.07);
+  font:500 clamp(14rem,42vw,36rem)/1 var(--rtg-display);
+}
+body[data-rtg-world="foundation"]>header::after{
+  content:"";
+  position:absolute;
+  right:clamp(1rem,8vw,8rem);
+  bottom:clamp(2rem,5vw,4rem);
+  width:clamp(54px,8vw,104px);
+  aspect-ratio:1;
+  border:1px solid var(--gold-rand);
+  transform:rotate(45deg);
+}
+body[data-rtg-world="foundation"]>header .ey{
+  position:relative;
+  color:var(--gold-tekst);
+  font-size:.64rem;
+  font-weight:750;
+}
+body[data-rtg-world="foundation"]>header h1{
+  position:relative;
+  max-width:960px;
+  margin:.8rem 0 1.1rem;
+  font-size:clamp(3rem,8.4vw,8rem);
+  line-height:.88;
+  letter-spacing:-.045em;
+}
+body[data-rtg-world="foundation"]>header p{
+  position:relative;
+  max-width:700px;
+  margin:0;
+  color:#EDE0DC;
+  font-size:clamp(.92rem,1.5vw,1.15rem);
+}
+body[data-rtg-world="foundation"]>main{
+  max-width:1180px;
+  padding:clamp(1.2rem,4vw,4rem);
+  gap:1px;
+}
+body[data-rtg-world="foundation"] .kaart{
+  border-color:var(--pearl-rand);
+  background:rgba(255,255,255,.46);
+  color:var(--op-pearl);
+}
+body[data-rtg-world="foundation"]>main>.kaart{
+  padding:clamp(1.2rem,3vw,2.2rem);
+}
+body[data-rtg-world="foundation"] .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--pearl-rand);}
+body[data-rtg-world="foundation"] .stadkaart{
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  border:0;
+  background:var(--pearl-glans);
+}
+body[data-rtg-world="foundation"] .stadkaart:hover,
+body[data-rtg-world="foundation"] .stadkaart:focus-within{
+  background:var(--gold-glans);
+  color:var(--op-gold);
+}
+body[data-rtg-world="foundation"] .knop{
+  background:var(--bordeaux-glans);
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="foundation"] .knop.stil{
+  border-color:var(--bordeaux-basis);
+  color:var(--bordeaux-basis);
+}
+body[data-rtg-world="foundation"] .lijnrij{border-color:var(--pearl-rand);}
+body[data-rtg-world="foundation"] .pil{border-color:var(--pearl-rand);color:#34322F;}
+body[data-rtg-world="foundation"] .uitleg,
+body[data-rtg-world="foundation"] .leeg,
+body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
+
+/* ------------------------------------------------------------ klein scherm */
+@media(max-width:760px){
+  .os-switcher{
+    grid-template-columns:auto 1fr;
+    min-height:58px;
+    padding:.42rem .8rem;
+  }
+  .os-switcher__brand span,.os-switcher__state{display:none;}
+  .os-switcher__links{
+    justify-content:flex-start;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .os-switcher__links::-webkit-scrollbar{display:none;}
+  .os-switcher__links a{padding-inline:.55rem;}
+  .os-switcher__links a span{display:none;}
+  body[data-rtg-world="living"] .laagkeuze{grid-template-columns:1fr;}
+  body[data-rtg-world="living"] .lifelagen{grid-template-columns:repeat(3,1fr);}
+  body[data-rtg-world="living"] .kop h1{font-size:clamp(3.2rem,17vw,6rem);}
+  body[data-rtg-world="work"] .merkkop{min-height:290px;}
+  body[data-rtg-world="work"] .doelgroep{margin:-1.2rem .45rem 2.5rem;}
+  body[data-rtg-world="foundation"] .grid{grid-template-columns:1fr;}
+}
+
+@media(max-width:520px){
+  .os-switcher__links a{font-size:.57rem;letter-spacing:.035em;}
+  body[data-rtg-world="travel"] .dagkop::after{position:static;display:block;margin-top:1rem;}
+  body[data-rtg-world="travel"] .bestemmingkop h1{font-size:clamp(4rem,22vw,6.2rem);}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-world] *{scroll-behavior:auto!important;transition:none!important;animation:none!important;}
+}

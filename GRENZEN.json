@@ -1217,8 +1217,11 @@
    "navBestemmingen",
    "navKaart",
    "navMeld",
+   "navPartnerEvent",
+   "navPartnerEvents",
    "navPoi",
-   "navRoute"
+   "navRoute",
+   "navStatus"
   ],
   "noodkaart": [
    "noodkaartVan",

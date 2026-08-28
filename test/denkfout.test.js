@@ -115,9 +115,17 @@ test('Explain Differently kiest de vorm die bij de denkfout past', () => {
 
 /* ---------- en door de hele machine heen ---------- */
 test('bij het oefenen komt de duiding mee, met een andere uitleg erbij', async () => {
-  const start = (await api('/leerstof/oefen', { doel: 'rekenen.g5.tafels-tot-10' })).body;
-  const m = /^(\d+) x (\d+)/.exec(start.vraag);
-  assert.ok(m, 'de tafelvraag heeft de verwachte vorm');
+  let start, m;
+  for (let poging = 0; poging < 8; poging++) {
+    start = (await api('/leerstof/oefen', { doel: 'rekenen.g5.tafels-tot-10' })).body;
+    m = /^(\d+) x (\d+)/.exec(start.vraag);
+    assert.ok(m, 'de tafelvraag heeft de verwachte vorm');
+    /* Bij 2 x 2 is optellen toevallig ook vermenigvuldigen. Dat is geen
+       denkfout en mag deze proef dus niet als fout antwoord aanbieden. */
+    if (+m[1] + +m[2] !== +m[1] * +m[2]) break;
+  }
+  assert.notEqual(+m[1] + +m[2], +m[1] * +m[2],
+    'de proef heeft een tafel nodig waarbij optellen echt een ander antwoord geeft');
   const r = (await api('/leerstof/antwoord', { antwoord: String(+m[1] + +m[2]) })).body;
 
   assert.equal(r.goed, false);

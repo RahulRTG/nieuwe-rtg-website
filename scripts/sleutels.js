@@ -75,7 +75,7 @@ const regels = [
 ];
 
 if (priveBeta) {
-  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox en betalingen zijn demo']);
+  regels.push(['RTG_PRIVATE_BETA', '1', 'ALLEEN LOKAAL: mail blijft in de outbox']);
 } else {
   regels.push(
     ['DATABASE_URL', docker ? '' : 'postgresql://VUL-IN', docker ? 'Docker bouwt deze veilig uit het aparte PostgreSQL-geheim' : 'HANDMATIG: PostgreSQL (verplicht bij meerdere instances/vloot)'],

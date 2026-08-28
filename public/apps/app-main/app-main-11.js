@@ -100,7 +100,7 @@
       '<div class="klets-draad">' + (g.beurten || []).map(b =>
         '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
       '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
-      (g.echt ? '' : ' Dit is een demogesprek: er staat geen AI-sleutel ingesteld.') + '</p>' +
+      (g.echt ? '' : ' Dit antwoord komt uit de ingebouwde assistent; vrije AI is niet actief.') + '</p>' +
       '<button class="knop h-mt70" id="kletsTerug">Terug</button>';
     const t = $('#kletsTerug');
     if (t) t.addEventListener('click', async () => kletsTekenLeeg(await kletsLaad()));

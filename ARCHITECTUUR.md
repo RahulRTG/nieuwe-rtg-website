@@ -56,6 +56,7 @@ accounts
 eigenaar
 mail
 log
+testomgeving
 betaal
 muntbetaal
 talen

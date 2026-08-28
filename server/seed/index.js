@@ -46,6 +46,9 @@ module.exports = function seed() {
        productie-installatie hoort geen bestemming te kennen die niemand boekte. */
     trip: null,
     contacts: [],
+    creatorCredit: {},
+    creatorLikes: {},
+    trip: { dest: '', dates: '', days: 0, items: [] },
     /* Het Living Lab start in productie leeg: een echt lab hoort door de RTF
        zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt
        de steiger (lab, tekenaars, apparatuur, buurtvragen) maar nooit verzonnen

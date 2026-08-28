@@ -71,7 +71,8 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
 
     /* EN NU TERUG. Dit is waar het om gaat: een klik en de hele kamer staat er,
        met dezelfde apps op dezelfde adressen. */
-    await page.click('[data-ruimtes] [data-ruimte="Mijn Directie"]');
+    await page.click('.rtg-edge-menu');
+    await page.click('[data-edge-ruimte="Mijn Directie"]');
     await page.waitForFunction(() => RTGSchil.surfaces.length === 3, { timeout: 8000 });
     const terug = await page.evaluate(() => RTGSchil.surfaces.map(s => ({ id: s.id, url: s.url })));
     assert.deepEqual(terug.map(s => s.id).sort(), ['agenda', 'office', 'reizen']);
@@ -88,25 +89,24 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
         'een bewaarde surface hoort alleen een meubelplan te zijn: ' + JSON.stringify(s));
     }
 
-    // ---- stap 6: het palet ----
+    // ---- stap 6: het palet zit nu in de dunne linkerrand ----
     await page.keyboard.press('Control+k');
-    await page.waitForSelector('#palet:not([hidden])', { timeout: 5000 });
-    await page.fill('#paletIn', 'Veilig');
-    await page.waitForFunction(() =>
-      document.querySelectorAll('#paletLijst li[role="option"]').length > 0, { timeout: 5000 });
-    const eerste = await page.textContent('#paletLijst li[role="option"] span');
-    assert.equal(eerste.trim(), 'Veilig', 'wat je typt hoort bovenaan te staan');
+    await page.waitForSelector('.rtg-edge-index[aria-hidden="false"] .rtg-edge-find input', { timeout: 5000 });
+    await page.fill('.rtg-edge-find input', 'Bestanden');
+    await page.waitForSelector('.rtg-edge-group a[data-tool="bestanden"]:not([hidden])', { timeout: 5000 });
+    const eerste = await page.textContent('.rtg-edge-group a[data-tool="bestanden"] b');
+    assert.equal(eerste.trim(), 'Bestanden', 'wat je typt hoort bovenaan te staan');
     await page.keyboard.press('Enter');
-    await page.waitForFunction(() => RTGSchil.surfaces.some(s => s.id === 'veilig'), { timeout: 8000 });
-    assert.equal(await page.evaluate(() => document.getElementById('palet').hidden), true,
+    await page.waitForFunction(() => RTGSchil.surfaces.some(s => s.id === 'bestanden'), { timeout: 8000 });
+    assert.equal(await page.getAttribute('.rtg-edge-index', 'aria-hidden'), 'true',
       'het palet hoort dicht te gaan zodra de opdracht is uitgevoerd');
 
     // Escape sluit zonder iets te doen
     await page.keyboard.press('Control+k');
-    await page.waitForSelector('#palet:not([hidden])', { timeout: 5000 });
+    await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { timeout: 5000 });
     const voor = await page.evaluate(() => RTGSchil.surfaces.length);
     await page.keyboard.press('Escape');
-    assert.equal(await page.evaluate(() => document.getElementById('palet').hidden), true);
+    assert.equal(await page.getAttribute('.rtg-edge-index', 'aria-hidden'), 'true');
     assert.equal(await page.evaluate(() => RTGSchil.surfaces.length), voor,
       'Escape hoort niets te openen');
 

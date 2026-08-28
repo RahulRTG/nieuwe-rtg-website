@@ -92,8 +92,8 @@
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!explicieteDemo){
-          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        if (!magnaatProef){
+          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
         }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
@@ -110,7 +110,7 @@
       } else if (explicieteDemo) {
         user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
-        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
       }
     }
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}

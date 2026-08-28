@@ -37,3 +37,16 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   };
+
+  /* Een Magnaat-scherm mag bij het openen van een tweede oppervlak nooit
+     ongemerkt terugvallen naar de echte omgeving. Alleen lokale app-URL's
+     erven de testmarkering; externe adressen worden bewust niet herschreven. */
+  function oppervlakUrl(url) {
+    if (!url || new URLSearchParams(location.search).get('magnaat') !== '1') return url;
+    try {
+      var doel = new URL(url, location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return url;
+      doel.searchParams.set('magnaat', '1');
+      return doel.pathname + doel.search + doel.hash;
+    } catch (e) { return url; }
+  }

@@ -13,12 +13,14 @@
 module.exports = (ctx, H) => {
   const { save, crypto, nu, nodes, metingen, MAX_METINGEN } = ctx;
   const { BEREIK, zorgPlaats, boekReeks } = H;
+  const MAGNAAT_TEST = require('../../testomgeving').actief(process.env);
 
   /* De demoseed: acht Stadsdozen over de zes zones van het weefsel, alleen als
      de stad nog leeg is. De demodozen dragen demo:true; hun sleutels bestaan
      niet (niemand kan namens ze insturen), hun waarden komen uit de simulator
      hieronder. */
   function zorgBasis() {
+    if (!MAGNAAT_TEST) { zorgPlaats(); return; }
     if (Object.keys(nodes()).length) { zorgPlaats(); return; }
     const demo = [
       ['Stadsdoos Plein',      'Centrum',          ['verkeer', 'lucht', 'geluid', 'licht']],
@@ -48,6 +50,7 @@ module.exports = (ctx, H) => {
   // meting. Alleen schrijven als er echt iets veranderde -- het stadsbeeld wordt
   // vaak opgevraagd (bord + SSE) en elke save is een fsync naar schijf.
   function simuleer() {
+    if (!MAGNAAT_TEST) return;
     const grens = nu() - 5 * 60 * 1000;
     let geraakt = false;
     for (const n of Object.values(nodes())) {

@@ -15,16 +15,16 @@
       fout die de-lijn.md verbiedt.
 
    De INTERFACE is van ons: een ontvangstverzoek maken, de gelockte koers, de
-   idempotentie en de webhook-verificatie. Zonder MUNT_PROVIDER_KEY draait alles
-   in demo (geen echte munten, een vaste demokoers), zodat lokaal en in demo
-   alles werkt zonder configuratie. Acceptatie staat standaard UIT en gaat pas
-   aan met MUNT_AAN=1, zodat niemand per ongeluk live crypto aanzet. */
+   idempotentie en de webhook-verificatie. Zonder MUNT_PROVIDER_KEY weigert de
+   echte omgeving. Alleen Magnaat Test gebruikt synthetische koersen en adressen.
+   Acceptatie staat bovendien standaard UIT. */
 const crypto = require('crypto');
+const magnaatTest = require('./testomgeving').actief(process.env);
 
 const PROVIDER_KEY = process.env.MUNT_PROVIDER_KEY || '';
 const WEBHOOK_SECRET = process.env.MUNT_WEBHOOK_SECRET || '';
-const AAN = process.env.MUNT_AAN === '1';
-const AANBIEDER = PROVIDER_KEY ? 'provider' : 'demo';
+const AAN = process.env.MUNT_AAN === '1' && (!!PROVIDER_KEY || magnaatTest);
+const AANBIEDER = PROVIDER_KEY ? 'provider' : (magnaatTest ? 'magnaat-test' : 'uit');
 
 /* Ondersteunde munten met hun aantal decimalen. Configureerbaar via
    MUNT_MUNTEN (kommagescheiden), anders een verstandige standaard. */
@@ -32,9 +32,8 @@ const DECIMALEN = { btc: 8, eth: 8, usdc: 2, usdt: 2 };
 const MUNTEN = (process.env.MUNT_MUNTEN || 'btc,eth,usdc')
   .split(',').map(s => s.trim().toLowerCase()).filter(m => m in DECIMALEN);
 
-/* Demokoersen: euro-CENTEN per 1 hele munt. In productie levert de aanbieder een
-   live, korte tijd gelockte koers; hier houden we vaste getallen zodat tests en
-   demo deterministisch zijn. Nooit voor echte waardering gebruiken. */
+/* Synthetische Magnaat-koersen: euro-CENTEN per hele munt. Nooit voor echte
+   waardering; een live koppeling moet de koers bij de aanbieder vastzetten. */
 const DEMO_KOERS = { btc: 6000000, eth: 300000, usdc: 92, usdt: 92 };
 
 function magMunt(munt) { return MUNTEN.includes(String(munt || '').toLowerCase()); }
@@ -70,7 +69,7 @@ function koppelStore(store) {
 /* Maak (of hervind) een ontvangstverzoek: een adres waarop de klant zijn munten
    stuurt, met het exacte muntbedrag en de gelockte koers. Idempotent op sleutel.
    In productie zou hier een adres van de aanbieder komen, met auto-conversie naar
-   euro's ingesteld; in demo genereren we een pseudo-adres. */
+   euro's ingesteld; alleen Magnaat Test genereert een synthetisch adres. */
 async function maakOntvangst(opdracht) {
   const { euroCenten, munt, referentie, idempotentieSleutel, vervalMin = 30 } = opdracht || {};
   if (!AAN) throw new Error('Munt-ontvangst staat uit (zet MUNT_AAN=1 om te accepteren).');
@@ -92,14 +91,14 @@ async function maakOntvangst(opdracht) {
     // auto-conversie naar euro ingesteld. Achter de naad; live gaan raakt de
     // rest van de code niet.
     throw new Error('Munt-aanbieder is geconfigureerd maar de live-koppeling is nog niet aangezet.');
-  } else {
+  } else if (magnaatTest) {
     res = {
-      id: 'muntdemo_' + crypto.randomBytes(8).toString('hex'),
-      aanbieder: 'demo', munt: m, adres: 'demo-' + m + '-' + crypto.randomBytes(10).toString('hex'),
+      id: 'magnaat_' + crypto.randomBytes(8).toString('hex'),
+      aanbieder: 'magnaat-test', munt: m, adres: 'test-' + m + '-' + crypto.randomBytes(10).toString('hex'),
       bedragMunt, koersCenten: koers, euroCenten: Math.round(euroCenten),
       referentie: referentie || null, status: 'wacht', vervalt
     };
-  }
+  } else throw new Error('Munt-ontvangst weigert zonder echte provider. Gebruik Magnaat Test om deze stroom te oefenen.');
   bewaar(sleutel, res);
   return res;
 }
@@ -121,9 +120,9 @@ function verifieerWebhook(ruweBody, handtekening) {
      geverifieerde waarheid: wie het adres kent, kan zelf "de munten zijn binnen"
      roepen en zo een factuur laten afboeken zonder ooit te betalen.
 
-     Buiten productie blijft de doorval bestaan -- daar draait alles op
-     demo-geld en zou een verplicht secret elke lokale start blokkeren. */
-  if (!WEBHOOK_SECRET && process.env.NODE_ENV === 'production')
+     Alleen de expliciete Magnaat Test-installatie mag zonder secret een
+     synthetische melding verwerken. */
+  if (!WEBHOOK_SECRET && !magnaatTest)
     throw new Error('Munt-webhook geweigerd: er is geen webhook-secret ingesteld, dus dit bericht is niet te vertrouwen.');
   if (WEBHOOK_SECRET) {
     const verwacht = crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');
@@ -135,7 +134,7 @@ function verifieerWebhook(ruweBody, handtekening) {
   return JSON.parse(buf.toString('utf8'));
 }
 
-// Hulp om in demo/tests een geldige handtekening te maken.
+// Hulp voor providercontracttests en Magnaat Test.
 function tekenDemo(ruweBody) {
   const buf = Buffer.isBuffer(ruweBody) ? ruweBody : Buffer.from(String(ruweBody));
   return crypto.createHmac('sha256', WEBHOOK_SECRET).update(buf).digest('hex');

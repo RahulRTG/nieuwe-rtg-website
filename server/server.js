@@ -67,6 +67,7 @@ const eigenaar = require('./eigenaar');
 const mail = require('./mail');
 const logboek = require('./log');
 const log = logboek.log;
+const testomgeving = require('./testomgeving');
 const betaal = require('./betaal');
 const systeemKlok = require('./lib/klok');
 const { schoon, ledenPrijs, centen, entreeCode, pickupCode, veiligGelijk } = require('./kern/util');
@@ -226,7 +227,7 @@ try {
    aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
    gaan lopen. */
 accounts.init();
-/* DEMO-MODUS: UIT, TENZIJ IEMAND HEM BEWUST AANZET.
+/* SYNTHETISCHE DATA: ALLEEN IN MAGNAAT TEST.
 
    Hier stond `NODE_ENV !== 'production' || RTG_DEMO === '1'`, met de belofte
    erboven dat de demo-inlog "nooit per ongeluk open op productie" staat. Die
@@ -239,10 +240,10 @@ accounts.init();
    met de vaste code 'RTG-OFFICE' die in deze repo te lezen staat -- en achter
    die deur ligt de identiteitskluis met echte namen en paspoortscans.
 
-   Een slot dat opengaat als iemand iets vergeet is geen slot. Aanzetten kan
-   alleen nog uitdrukkelijk, met RTG_DEMO=1. Wie lokaal demonstreert zet die
-   vlag; een server die niets weet, doet niets. */
-const DEMO = process.env.RTG_DEMO === '1';
+   Een slot dat opengaat als iemand iets vergeet is geen slot. De echte vier
+   werelden hebben daarom geen demo-stand. Alleen de afzonderlijke Magnaat-
+   testomgeving mag synthetische accounts en gegevens laden. */
+const DEMO = testomgeving.actief(process.env);
 // Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
 // echte accountlogin werkt. Bestaat het account al (een oudere lokale
 // database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
@@ -771,7 +772,7 @@ function demoLidInhoud() {
 app.get('/api/health', (req, res) => {
   const model = require('./ai-stand').beschikbaarheid(anthropic);
   res.json({
-    ok: true, demo: DEMO, ai: model.modus, verwerking: model.verwerking,
+    ok: true, ...omgeving, ai: model.modus, verwerking: model.verwerking,
     betalen: betaal.AANBIEDER,
     /* `active` is "schrijft dit proces?", `leider` is "doet dit proces het werk
        dat per installatie een keer hoort te gebeuren?". In spreidingsmodus
@@ -2084,7 +2085,7 @@ const kern = {
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, betaalWaarheid, betaalRegie, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
-  crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
+  crypto, cvReady, db, bijeen, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,

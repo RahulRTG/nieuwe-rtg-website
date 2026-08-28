@@ -37,6 +37,19 @@
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
     });
   };
+
+  /* Een Magnaat-scherm mag bij het openen van een tweede oppervlak nooit
+     ongemerkt terugvallen naar de echte omgeving. Alleen lokale app-URL's
+     erven de testmarkering; externe adressen worden bewust niet herschreven. */
+  function oppervlakUrl(url) {
+    if (!url || new URLSearchParams(location.search).get('magnaat') !== '1') return url;
+    try {
+      var doel = new URL(url, location.href);
+      if (doel.origin !== location.origin || doel.pathname.indexOf('/apps/') !== 0) return url;
+      doel.searchParams.set('magnaat', '1');
+      return doel.pathname + doel.search + doel.hash;
+    } catch (e) { return url; }
+  }
 /* ---------------------------------------------------------- de indeling --
      De console is het ANKER en schuift naar waar hij het minst stoort
      (WERKRUIMTE.md par. 2): bij een lege ruimte staat hij midden, zodra er
@@ -131,6 +144,12 @@
     opties = opties || {};
     var bestaand = vind(id);
     if (bestaand) { maakActief(bestaand); return bestaand; }
+    /* Vier is een systeemgrens, geen aanbeveling. Een vijfde app vervangt de
+       oudste niet-actieve app zodat de werktafel nooit buiten 2 x 2 groeit. */
+    if (standaard() && schil.surfaces.length >= 4) {
+      var oud = schil.surfaces.filter(function (x) { return x !== schil.actief; })[0] || schil.surfaces[0];
+      if (oud) sluit(oud.id);
+    }
 
     var e = el('article', 'rtg-surface', schil.vak);
     e.dataset.id = id;
@@ -145,7 +164,8 @@
 
     el('div', 'kort', e).innerHTML = opties.kort || '';
     var vlak = el('div', 'vlak', e);
-    if (opties.url) {
+    var veiligeUrl = oppervlakUrl(opties.url || '');
+    if (veiligeUrl) {
       var f = d.createElement('iframe');
       f.setAttribute('title', opties.naam || id);
       /* Het recht op camera en microfoon doorgeven VOOR de src wordt gezet.
@@ -156,7 +176,7 @@
       /* De app draait als eigen pagina in de surface. Dat is met opzet: een app
          houdt zijn eigen diepte en zijn eigen sessie, en de shell hoeft niets
          van zijn binnenkant te weten (PLATFORM.md). */
-      f.src = opties.url;
+      f.src = veiligeUrl;
       vlak.appendChild(f);
     }
 
@@ -164,8 +184,17 @@
        (naam, adres, zoom) en moet dat adres dus kunnen teruglezen; stond het
        alleen in de opties, dan wist de shell na het openen niet meer wat er in
        een surface draaide. */
-    var s = { id: id, naam: opties.naam || id, url: opties.url || '', el: e, zoom: e.dataset.zoom, eigen: false };
+    var s = { id: id, naam: opties.naam || id, url: veiligeUrl, el: e, zoom: e.dataset.zoom, eigen: false };
     schil.surfaces.push(s);
+    /* Een pointer in een iframe borrelt niet door naar het bovenliggende
+       article. De apps zijn same-origin, dus koppelen we hun eerste aanraking
+       expliciet terug: werken in een vak maakt precies dat vak actief en laat
+       breadcrumb, functies, hoofdactie en Rahul-context meteen meeschakelen. */
+    var kader = e.querySelector('iframe');
+    if (kader) kader.addEventListener('load', function () {
+      try { kader.contentDocument.addEventListener('pointerdown', function () { maakActief(s); }, true); }
+      catch (fout) { /* een niet-lokaal kader blijft via de eigen kop selecteerbaar */ }
+    });
 
     h.addEventListener('pointerdown', function (ev) {
       if (ev.target.closest('button')) return;
@@ -222,6 +251,10 @@
     // de actieve surface bovenop, zodat zweven ook echt zweeft
     schil.surfaces.forEach(function (x, i) { x.el.style.zIndex = String(10 + i); });
     s.el.style.zIndex = '40';
+    if (w.RTGEdge) w.RTGEdge.setContext({
+      title: s.naam, tool: s.id, actie: (schil.actionPrefix || 'Open') + ' ' + s.naam
+    });
+    schik();
     tekenConsole(); tekenTabs();
   }
 
@@ -735,6 +768,7 @@
     schil.apps = (opties.apps || []).slice();
     schil.dockApps = (opties.dock || []).slice();
     w.addEventListener('resize', schik);
+    w.addEventListener('rtg-edge-layout', schik);
     /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
        is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {

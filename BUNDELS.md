@@ -20,7 +20,7 @@ omlaag.
 | `app-main-01.js` | de bouwstempel-controle en de start van de app-bundel: html en script van dezelfde bouw |
 | `app-main-01b.js` | de inhoud van de expliciete demostand |
 | `app-main-02.js` | de API-laag van de app: elke aanroep met token, taal en foutafhandeling |
-| `app-main-02a.js` | de demomelding: een demo is een toestand, geen terugval na een storing |
+| `app-main-02a.js` | De trainingsmelding bestaat uitsluitend in Magnaat |
 | `app-main-02b.js` | pas-thema (kleuren van de website) |
 | `app-main-03.js` | de stem van de pas: welke koppen en teksten bij RTG, Lifestyle of Business horen |
 | `app-main-04.js` | inloggen en de staat binnenhalen: token, pas en het eerste scherm |

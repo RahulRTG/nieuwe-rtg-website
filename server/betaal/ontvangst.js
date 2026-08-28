@@ -14,7 +14,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
   };
   function mogelijkheden() {
     if (uit) return { standaard: 'uit', rails: [], uit: true,
-      uitleg: 'Betalen staat bewust uitgeschakeld; er is geen demo- of echte betaalrail actief.' };
+      uitleg: 'Betalen staat bewust uitgeschakeld; er is geen betaalrail actief.' };
     const rails = [];
     if (stripe) rails.push({ id: 'stripe', label: 'Stripe · kaart, iDEAL of wallet', soort: 'doorsturen', echt: true });
     if (mollie) rails.push({ id: 'mollie', label: 'Mollie · iDEAL of bankbetaling', soort: 'doorsturen', echt: true });
@@ -26,7 +26,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
     if (!rails.length && standaard === 'demo')
       rails.push({ id: 'demo', label: 'Demobetaling', soort: 'demo', echt: false });
     if (!rails.length) return { standaard: 'uit', rails: [], uit: true,
-      uitleg: 'Geen betaalprovider of bewuste demo actief; de betaalrail staat fail-closed.' };
+      uitleg: 'Geen echte betaalprovider actief; de betaalrail staat fail-closed.' };
     return { standaard, rails };
   }
 
@@ -111,7 +111,7 @@ module.exports = function ontvangst({ crypto, stripe, mollie, adyen, standaard, 
       res = { id: 'demo_' + crypto.randomBytes(8).toString('hex'), status: 'betaald',
         aanbieder: 'demo', bedrag: Math.round(bedrag), valuta, referentie };
     } else {
-      const e = new Error('Geen betaalprovider actief. Stel een provider in of zet de demo-betaalstand bewust aan.');
+      const e = new Error('Geen betaalprovider actief. Koppel een echte provider; oefenen kan uitsluitend in Magnaat Test.');
       e.code = 'BETAALRAIL_UIT';
       throw e;
     }

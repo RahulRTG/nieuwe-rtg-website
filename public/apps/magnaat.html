@@ -110,7 +110,7 @@
       <button data-screen="economie"><span class="ni">05</span><span>Economie</span></button>
       <button data-screen="future"><span class="ni">06</span><span>Future Lab</span></button>
     </nav>
-    <div class="rail-foot"><div class="live"><i class="dot"></i><b>Wereld actief</b></div><small>De kantoorcomputer en PDA draaien op dezelfde veilige spelbrug.</small></div>
+    <div class="rail-foot"><div class="live"><i class="dot"></i><b>Magnaat Test actief</b></div><small>Afgeschermd van klantdata, geldstromen en productieacties.</small></div>
   </aside>
 
   <main>
@@ -168,7 +168,7 @@
           <iframe class="rtg-frame" id="rtgComputer" title="Echte RTG Business Pass op de kantoorcomputer" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe>
         </div>
         <div class="pda"><iframe class="rtg-frame" id="rtgPda" title="Echte mobiele RTG Business Pass op de PDA" src="/apps/app.html?pas=business&amp;magnaat=1" sandbox="allow-scripts allow-same-origin" allow="camera 'none'; microphone 'none'; geolocation 'none'; payment 'none'"></iframe><div class="pda-task" id="pdaTask"><b>Geen actieve opdracht</b><p>Open een RTG-app om direct een missie te starten.</p><button class="btn" data-go="speelhal">Kies een functie</button></div></div>
-        <div class="office-label"><div class="eyebrow">Kantoor 14 · Amsterdam</div><h2>Dit is de echte RTG-software</h2><p>Dezelfde Business Pass, apptegels, Rahul, Pay, Salon en reisschermen uit de code. Alleen de data is een veilige trainingskopie.</p><div class="mission-now" id="missionNow"><b>Vrije dienst</b>Open een app op de computer of PDA; Magnaat maakt er een gecontroleerd dossier van.</div></div>
+        <div class="office-label"><div class="eyebrow">Kantoor 14 · Amsterdam · TEST</div><h2>Echte RTG-code, volledig geïsoleerd</h2><p>Dezelfde Business Pass, apptegels, Rahul, Pay, Salon en reisschermen. Alle gegevens zijn herkenbare Magnaat-testdata; klantdata en productieacties blijven buiten bereik.</p><div class="mission-now" id="missionNow"><b>Vrije dienst</b>Open een app op de computer of PDA; Magnaat maakt er een gecontroleerd testdossier van.</div></div>
       </div>
     </section>
 
@@ -453,7 +453,7 @@ function bindRtgFrame(id,apparaat){
       }
       const app=e.target.closest&&e.target.closest('.os-app[data-sleutel]');if(!app)return;
       const sleutel=app.dataset.sleutel||'';
-      // Losse app-pagina's zouden buiten de lokale demomotor vallen. De klik
+      // Losse app-pagina's zouden buiten de lokale testmotor vallen. De klik
       // telt wel als echte handeling, maar navigatie blijft in deze kopie.
       if(sleutel.startsWith('link:')){e.preventDefault();e.stopImmediatePropagation()}
       setTimeout(()=>softwareAction(sleutel,apparaat),0);
@@ -585,5 +585,6 @@ load();
 </script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<script src="/shared/randen.js" defer></script>
 </body>
 </html>

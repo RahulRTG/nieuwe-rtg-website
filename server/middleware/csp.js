@@ -19,17 +19,16 @@ const CSP = (nonce, magnaat = false) =>
 
 function magnaatHtml(html, actief) {
   if (!actief) return html;
-  const tag = '<script src="/apps/magnaat-sandbox.js"></script>';
+  const patroon = /<script src="\/apps\/magnaat-sandbox\.js(?:\?v=[^"]*)?"><\/script>/g;
+  const gevonden = html.match(patroon);
+  const tag = gevonden && gevonden[0]
+    ? gevonden[0]
+    : '<script src="/apps/magnaat-sandbox.js"></script>';
   /* Dit is server-eigen, statische HTML: alleen onze exacte bouwtag wordt
      verplaatst. Maak de oude plek even lang onschadelijk in plaats van tekst
      weg te knippen. Wegknippen kan twee losse stukken zoals `<scr` en `ipt>`
      per ongeluk samenvoegen tot een nieuw uitvoerbaar element. */
-  const masker = ' '.repeat(tag.length);
-  let plek = html.indexOf(tag);
-  while (plek !== -1) {
-    html = html.slice(0, plek) + masker + html.slice(plek + tag.length);
-    plek = html.indexOf(tag, plek + masker.length);
-  }
+  html = html.replace(patroon, m => ' '.repeat(m.length));
   return /<head[^>]*>/i.test(html)
     ? html.replace(/<head[^>]*>/i, m => m + tag)
     : tag + html;

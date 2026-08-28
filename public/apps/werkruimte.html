@@ -12,7 +12,8 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
-<link href="/shared/rtg-schil.css" rel="stylesheet">
+<link href="/shared/rtg-schil.css?v=edge2" rel="stylesheet">
+<link href="/shared/rtg-edge-system.css?v=edge2" rel="stylesheet">
 <!-- de vorm van de mediamelding hoort bij de mediapoort: zonder dit blad
      staat de uitleg er wel, maar ongestileerd -->
 <link href="/shared/media.css" rel="stylesheet">
@@ -89,7 +90,11 @@
 <!-- media.js VOOR de schil: die geeft het camera- en microfoonrecht door aan
      elke surface, en dat moet gebeuren voordat er een frame wordt gemaakt. -->
 <script src="/shared/media.js"></script>
-<script src="/shared/rtg-schil.js"></script>
+<script src="/shared/rtg-edge-worlds.js"></script>
+<script src="/shared/rtg-edge-icons.js"></script>
+<script src="/shared/rtg-edge-library.js"></script>
+<script src="/shared/rtg-edge-system.js"></script>
+<script src="/shared/rtg-schil.js?v=6880d97b"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -125,13 +130,8 @@
   const kantoorModus = new URLSearchParams(location.search).get('gebied') === 'kantoor';
   const WERELDEN = kantoorModus ? KANTOOR : PERSOONLIJK;
   if (kantoorModus) {
-    document.title = 'RTG Work OS';
-    $('#ruimteTitel').textContent = 'RTG Work OS';
-    $('#wie').textContent = 'Rahul Travel Group · Kantooromgeving';
-    $('#wereldLabel').textContent = 'Werkbanken';
     $('#ruimteTerug').href = '/apps/personeel.html?kantoor=1';
     $('#ruimteTerug').textContent = '‹ Personeelsingang';
-    document.body.dataset.omgeving = 'kantoor';
   }
 
   const SNEL = kantoorModus
@@ -187,18 +187,58 @@
 
   /* Een kamer bewaren (stap 5). Bewust met een naam die u zelf geeft: "Mijn
      Directie" onthoudt u, "Werkruimte 3" niet. */
-  $('#bewaar').addEventListener('click', () => {
+  function bewaarKamer() {
     const n = prompt('Hoe heet deze kamer?', 'Mijn Directie');
     if (n) RTGSchil.bewaarRuimte(n);
-  });
+  }
+  $('#bewaar').addEventListener('click', bewaarKamer);
 
-  // een werkruimte begint niet leeg: twee surfaces, zodat de tafel meteen leest
-  const begin = kantoorModus
-    ? [{ id: 'vandaag', naam: 'Vandaag', url: '/apps/kantoor.html' },
-       { id: 'afdelingen', naam: 'Afdelingen', url: '/apps/kantoren.html' }]
-    : [{ id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
-       { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' }];
+  /* De oude brede console is in de standaardrand bewust onzichtbaar. Bewaarde
+     schermindelingen blijven daarom als echte functie in de linkerrand staan:
+     niets verdwijnt alleen omdat de bediening dunner is geworden. */
+  function tekenRandRuimtes() {
+    const groepen = document.querySelector('.rtg-edge-groups');
+    if (!groepen) return;
+    let groep = groepen.querySelector('.rtg-edge-workspace-group');
+    if (!groep) {
+      groep = document.createElement('section');
+      groep.className = 'rtg-edge-group rtg-edge-workspace-group';
+      groepen.prepend(groep);
+    }
+    groep.replaceChildren();
+    const kop = document.createElement('h3');
+    kop.textContent = 'Schermindelingen';
+    groep.appendChild(kop);
+    const lijst = document.createElement('div');
+    lijst.className = 'rtg-edge-workspaces';
+    const bewaar = document.createElement('button');
+    bewaar.type = 'button'; bewaar.dataset.edgeBewaar = '';
+    bewaar.textContent = 'Huidige indeling bewaren';
+    bewaar.addEventListener('click', bewaarKamer);
+    lijst.appendChild(bewaar);
+    RTGSchil.ruimtes.forEach(naam => {
+      const knop = document.createElement('button');
+      knop.type = 'button'; knop.dataset.edgeRuimte = naam;
+      knop.textContent = naam;
+      knop.addEventListener('click', () => RTGSchil.haalRuimte(naam));
+      lijst.appendChild(knop);
+    });
+    groep.appendChild(lijst);
+  }
+  tekenRandRuimtes();
+  document.querySelector('.rtg-edge-menu')?.addEventListener('click', () => setTimeout(tekenRandRuimtes));
+
+  // Een gekozen functie uit een wereldrand opent meteen actief. Zonder keuze
+  // begint de werkruimte met twee surfaces, zodat de tafel direct leesbaar is.
+  const gevraagd = new URLSearchParams(location.search).get('open');
+  const gekozen = WERELDEN.find(x => x.id === gevraagd);
+  const persoonlijkBegin = ['agenda', 'reizen'].map(id => WERELDEN.find(x => x.id === id)).filter(Boolean);
+  const begin = gekozen
+    ? WERELDEN.filter(x => x.id !== gekozen.id).slice(0, 1).concat(gekozen)
+    : (gebied === 'persoonlijk' ? persoonlijkBegin : WERELDEN.slice(0, 2));
   begin.forEach(x => RTGSchil.open(x.id, { naam: x.naam, url: x.url, kort: x.naam }));
+  if (gekozen) RTGSchil.open(gekozen.id);
+  else if (innerWidth < 768 && begin[0]) RTGSchil.open(begin[0].id);
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

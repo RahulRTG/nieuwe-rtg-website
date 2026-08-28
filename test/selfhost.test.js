@@ -43,7 +43,7 @@ function veiligeBasis(extra) {
     RTG_SECRET_KEY: 's'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@voorbeeld.test',
     OFFICE_CODE: 'KANTOOR-CODE-12', OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     DATABASE_URL: 'postgresql://rtg:test@postgres/rtg',
-    REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1'
+    REDIS_URL: 'redis://redis:6379', RTG_PRIVATE_BETA: '1', RTG_BETALEN_UIT: '1'
   }, extra || {});
 }
 
@@ -67,6 +67,8 @@ test('selfhost:init maakt alle Docker-geheimen en overschrijft ze niet stil', ()
   const envEerst = fs.readFileSync(envPad, 'utf8');
   const pgEerst = fs.readFileSync(pgPad, 'utf8');
   assert.match(envEerst, /RTG_PRIVATE_BETA=1/);
+  assert.match(envEerst, /RTG_BETALEN_UIT=1/,
+    'een private bouwversie gebruikt geen fictieve betaalprovider');
   assert.match(envEerst, /RTG_MOTOR_TOKEN=[a-f0-9]{64}/);
   assert.doesNotMatch(envEerst, /VUL-IN/);
   assert.equal(fs.statSync(envPad).mode & 0o777, 0o600);

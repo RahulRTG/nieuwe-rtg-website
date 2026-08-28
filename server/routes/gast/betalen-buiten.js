@@ -40,7 +40,7 @@ module.exports = function betaalBuiten(ctx) {
 
   function verrijkCheckout(req, uit) {
     const m = betaal.mogelijkheden();
-    const online = m.rails.filter(x => ['stripe', 'mollie', 'adyen', 'demo'].includes(x.id));
+    const online = m.rails.filter(x => ['stripe', 'mollie', 'adyen', 'magnaat-test'].includes(x.id));
     uit.betaling.keuzes = [{ id: 'ontvangst', label: uit.kanaal === 'bezorging'
       ? 'Betalen bij ontvangst' : 'Betalen bij afhalen', provider: null, echt: true }]
       .concat(online.map(x => ({ id: 'online-' + x.id, label: x.label,
@@ -74,7 +74,7 @@ module.exports = function betaalBuiten(ctx) {
       if (open !== waarheid.centen) throw new Error('Het openstaande rekeningbedrag wijkt af van de bevestigde betaling.');
       rek.betalingen.push({ id: 'bw:' + waarheid.id, waarheidId: waarheid.id,
         providerId: waarheid.providerId, wijze: waarheid.provider === 'mollie' ? 'Mollie' :
-          waarheid.provider === 'stripe' ? 'Stripe' : waarheid.provider === 'adyen' ? 'Adyen' : 'Demo',
+          waarheid.provider === 'stripe' ? 'Stripe' : waarheid.provider === 'adyen' ? 'Adyen' : 'Magnaat Test',
         centen: waarheid.centen, at: horeca.nu() });
     }
     if (horeca.openstaand(rek) <= 0) rek.status = 'betaald';

@@ -79,13 +79,11 @@ var RTG_BOUW = '0c7df0d9';
     }
   }
 
-  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+  /* ---------- gegevens: echt via API, synthetisch alleen via Magnaat ---------- */
 
-  const PERSONAS = {
-    rtg:       {name:'K. Kiss',    full:'Katja Kiss',    since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Amberen Vos',      tier:'rtg'},
-    lifestyle: {name:'F. Johanna', full:'Fleur Johanna', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
-    business:  {name:'R. Imran',   full:'Rahul Imran',   since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
-  };
+  const MAGNAAT = window.RTG_MAGNAAT_PROEF && window.RTG_MAGNAAT_DATA
+    ? window.RTG_MAGNAAT_DATA : {};
+  const PERSONAS = MAGNAAT.personas || {};
   const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   /* DEZE DRIE BEGINNEN LEEG, en dat is de hele pointe van de demo-erfenis.
@@ -342,13 +340,8 @@ var RTG_BOUW = '0c7df0d9';
     const ml = document.getElementById('manifestLink');
     if (ml) ml.remove(); // een keuzescherm installeer je niet als app
   }
-/* de demomelding: een demo is een toestand, geen terugval na een storing */
-  const explicieteDemo = magnaatProef || zoekParams.get('demo') === '1';
-
-  /* Een demo is een toestand, geen terugval na een storing. De melding stond
-     altijd op het homescreen en daardoor leek ook een echte installatie een
-     demo. De server vertelt nu zelf of RTG_DEMO aanstaat. Bij Magnaat en bij
-     ?demo=1 is de keuze al expliciet en is geen netwerkantwoord nodig. */
+/* De trainingsmelding bestaat uitsluitend in Magnaat. De echte app kent geen
+   queryparameter, health-status of netwerkfout die voorbeelddata kan openen. */
   function zetDemoMelding(aan, tekst) {
     const el = document.getElementById('osDemoWet');
     if (!el) return;
@@ -356,12 +349,7 @@ var RTG_BOUW = '0c7df0d9';
     if (tekst) { el.removeAttribute('data-i18n'); el.textContent = tekst; }
   }
   if (magnaatProef) {
-    zetDemoMelding(true, 'Magnaat · afgeschermde trainingskopie · geen echte klant-, geld- of productieactie');
-  } else if (explicieteDemo) {
-    zetDemoMelding(true);
-  } else if (API.enabled) {
-    fetch('/api/health').then(r => r.ok ? r.json() : null)
-      .then(h => zetDemoMelding(!!(h && h.demo))).catch(() => zetDemoMelding(false));
+    zetDemoMelding(true, 'MAGNAAT TEST · geïsoleerde trainingskopie · geen echte klant-, geld- of productieactie');
   }
   /* ---------- pas-thema (kleuren van de website) ----------
      RTG krijgt het bordeauxrode thema, Lifestyle het parelmoeren thema,
@@ -506,8 +494,8 @@ var RTG_BOUW = '0c7df0d9';
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
       } else {
-        if (!explicieteDemo){
-          toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        if (!magnaatProef){
+          toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
         }
         if (!(String(cred.u).trim().toLowerCase() === 'rahul' && cred.p === 'Imran')){
           toast('Onjuiste inloggegevens.'); return;
@@ -524,7 +512,7 @@ var RTG_BOUW = '0c7df0d9';
       } else if (explicieteDemo) {
         user = {...PERSONAS[tier]}; laadDemoData(tier);
       } else {
-        toast('Geen serververbinding. Start RTG via de server; een demo opent alleen met ?demo=1.'); return;
+        toast('Geen serververbinding. De echte app toont zonder server geen gegevens.'); return;
       }
     }
     if (API.live) try { localStorage.setItem('rtg_member_token', API.token); } catch(e){}
@@ -2254,7 +2242,7 @@ var RTG_BOUW = '0c7df0d9';
       '<div class="klets-draad">' + (g.beurten || []).map(b =>
         '<div class="dm-m' + (b.mij ? ' mine' : '') + '">' + escT(b.tekst) + '</div>').join('') + '</div>' +
       '<p style="font-size:.75rem;color:var(--soft);line-height:1.6;margin-top:.9rem;">' + escT(g.noot || '') +
-      (g.echt ? '' : ' Dit is een demogesprek: er staat geen AI-sleutel ingesteld.') + '</p>' +
+      (g.echt ? '' : ' Dit antwoord komt uit de ingebouwde assistent; vrije AI is niet actief.') + '</p>' +
       '<button class="knop h-mt70" id="kletsTerug">Terug</button>';
     const t = $('#kletsTerug');
     if (t) t.addEventListener('click', async () => kletsTekenLeeg(await kletsLaad()));
@@ -6265,7 +6253,7 @@ var RTG_BOUW = '0c7df0d9';
       navigator.geolocation.getCurrentPosition(async pos => {
         try { liveData = (await API.call('/live/update', { lat: pos.coords.latitude, lng: pos.coords.longitude })).live; renderLivePanel(); toast(T('live.shared','Locatie gedeeld met uw partners.')); }
         catch (e){ toast(e.message); }
-      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Gebruik "Simuleer rit" voor de demo.')), { timeout: 4000 });
+      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Vul de locatie handmatig in.')), { timeout: 4000 });
     } else toast(T('live.geono','Locatie is hier niet beschikbaar.'));
   }
 
@@ -8656,7 +8644,7 @@ var RTG_BOUW = '0c7df0d9';
         (user.emailVerified === false ? knopje('boVerstuur', T('bo2.verstuur','Stuur bevestigingsmail opnieuw')) : ''));
     } else {
       html += kaart('' + T('bo2.beveiliging','Beveiliging'),
-        '<div class="fineprint">' + T('bo2.demo','U gebruikt een demoprofiel. Met een echt account beheert u hier uw wachtwoord en tweestapsherstel.') + '</div>');
+        '<div class="fineprint">' + T('bo2.demo','Magnaat-testprofiel · accountbeheer en tweestapsherstel zijn in deze geïsoleerde training uitgeschakeld.') + '</div>');
     }
 
     // weergave: RTG en Lifestyle kunnen tussen het pas-thema en klassiek donker

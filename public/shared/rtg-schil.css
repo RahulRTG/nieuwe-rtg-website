@@ -192,6 +192,8 @@ body[data-rtg-schil="standaard"] .rtg-console{
   gap:0;padding:0;border:0;border-right:1px solid var(--rtg-line);border-radius:0;
   background:linear-gradient(180deg,#0c0c0b,#090908);overflow:hidden;box-shadow:none;
 }
+body[data-rtg-schil="standaard"].rtg-edge-workspace .rtg-console,
+body[data-rtg-schil="standaard"].rtg-edge-workspace .rtg-tabbar{display:none!important;}
 body[data-rtg-schil="standaard"] .rtg-console>div:first-child,
 body[data-rtg-schil="standaard"] .console-zoek,
 body[data-rtg-schil="standaard"] .console-actief,
@@ -256,9 +258,13 @@ body[data-rtg-schil="standaard"] .rtg-tab[data-actief] button{color:var(--rtg-tx
 body[data-rtg-schil="standaard"] .rtg-surface{
   border:0;border-right:1px solid var(--rtg-line);border-radius:0;box-shadow:none;background:var(--rtg-bg);
 }
-body[data-rtg-schil="standaard"] .rtg-surface:not([data-actief]){visibility:hidden;pointer-events:none;}
+body[data-rtg-schil="standaard"] .rtg-surface:not([data-edge-visible]){display:none;}
 body[data-rtg-schil="standaard"] .rtg-surface[data-actief]{border-color:var(--rtg-line);}
-body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{display:none;}
+body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle{min-height:27px;height:27px;padding:0 8px;border-color:var(--rtg-line);background:color-mix(in srgb,var(--rtg-card) 94%,transparent);cursor:default;}
+body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle .naam{font-size:.54rem;letter-spacing:.13em;}
+body[data-rtg-schil="standaard"] .rtg-surface>.rtg-handle [data-doe="zoom"]{display:none;}
+body[data-rtg-schil="standaard"] .rtg-surface[data-actief]{box-shadow:inset 0 0 0 1px var(--edge-accent,#7f1634);}
+body[data-rtg-schil="standaard"] .rtg-surface[data-actief]>.rtg-handle::before{height:1px;background:var(--edge-accent,#7f1634);}
 
 /* De derde vaste balk. Het is geen generiek app-dock met verzonnen logo's:
    de namen komen rechtstreeks uit de huidige werkwereld en openen exact

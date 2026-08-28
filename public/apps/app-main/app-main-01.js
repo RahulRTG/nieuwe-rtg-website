@@ -79,13 +79,11 @@ var RTG_BOUW = '0c7df0d9';
     }
   }
 
-  /* ---------- lokale demo-data (fallback zonder backend) ---------- */
+  /* ---------- gegevens: echt via API, synthetisch alleen via Magnaat ---------- */
 
-  const PERSONAS = {
-    rtg:       {name:'K. Kiss',    full:'Katja Kiss',    since:'Maart 2026',    number:'RTG · 2026 · 8841', codename:'Amberen Vos',      tier:'rtg'},
-    lifestyle: {name:'F. Johanna', full:'Fleur Johanna', since:'Augustus 2025', number:'LSP · 2025 · 0217', codename:'Gouden Ibis',      tier:'lifestyle'},
-    business:  {name:'R. Imran',   full:'Rahul Imran',   since:'November 2025', number:'BSP · 2025 · 1104', codename:'Noordelijke Ster', tier:'business'}
-  };
+  const MAGNAAT = window.RTG_MAGNAAT_PROEF && window.RTG_MAGNAAT_DATA
+    ? window.RTG_MAGNAAT_DATA : {};
+  const PERSONAS = MAGNAAT.personas || {};
   const TIER_LABEL = {rtg:'RTG Pass', lifestyle:'Lifestyle Pass', business:'Business Pass', partner:'RTG-partner'};
 
   /* DEZE DRIE BEGINNEN LEEG, en dat is de hele pointe van de demo-erfenis.

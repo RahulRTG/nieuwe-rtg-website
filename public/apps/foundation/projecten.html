@@ -202,7 +202,7 @@ $('#tMaak').addEventListener('click', async () => {
 $('#tNieuw').addEventListener('keydown', e => { if (e.key === 'Enter') $('#tMaak').click(); });
 $('#pAi').addEventListener('click', async () => {
   $('#pFout').textContent = ''; $('#pAi').disabled = true;
-  try { const d = await api('project-ai', { id: P.id, groep }); $('#pFout').textContent = d.erbij ? 'De buddy zette ' + d.erbij + ' taken klaar' + (d.demo ? ' (demo)' : '') + '.' : 'Alles uit het plan staat er al.'; ververs(); }
+  try { const d = await api('project-ai', { id: P.id, groep }); $('#pFout').textContent = d.erbij ? 'De buddy zette ' + d.erbij + ' taken klaar' + (d.demo ? ' vanuit de vaste basis' : '') + '.' : 'Alles uit het plan staat er al.'; ververs(); }
   catch (e) { $('#pFout').textContent = e.message; }
   $('#pAi').disabled = false;
 });

@@ -13,9 +13,10 @@ const cookie=fs.readFileSync(path.join(__dirname,'../public/shared/cookie.js'),'
 test('RTG Work OS opent de echte kantoorsoftware als zelfstandige surfaces',()=>{
   for(const url of ['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html?kantoor=1',
     '/apps/office.html?werk=kantoor','/apps/agenda.html','/apps/rtmail.html',
-    '/apps/bestanden.html','/apps/backoffice.html','/apps/command.html'])assert.ok(bron.includes(url),url);
+    '/apps/bestanden.html','/apps/backoffice.html','/apps/command.html'])assert.ok(werelden.includes(url),url);
   assert.match(bron,/gebied.*kantoor/);
-  assert.match(bron,/id: 'vandaag'[\s\S]*id: 'afdelingen'/);
+  assert.match(bron,/appsVan\('work'\)/);
+  assert.match(bron,/RTGEdgeWorlds\[wereld\]\.all/);
   assert.match(bron,/data-rtg-schil="standaard"/);
 });
 

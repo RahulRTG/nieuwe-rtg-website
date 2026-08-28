@@ -2,9 +2,9 @@
    reizigersapp en dispatch. De browser tekent geen eigen waarheid: open ritten,
    bedragen, voertuigen en toegestane statusstappen komen van de server.
 
-   Zonder personeelssessie opent een duidelijk gemarkeerde demostand. Die is
-   bedoeld om de volledige bediening veilig te kunnen beoordelen en doet geen
-   verzoeken die ritten, geld of posities veranderen. */
+   Zonder personeelssessie blijft de werkvloer leeg en vraagt de app om een
+   persoonlijke aanmelding. Alleen de expliciete Magnaat-trainingskopie krijgt
+   synthetische ritten; die sandbox blokkeert API-, geld- en locatieverkeer. */
 (function () {
   'use strict';
 
@@ -14,21 +14,21 @@
   try { token = localStorage.getItem('rtg_pda_token') || localStorage.getItem('rtg_sup_token'); } catch (e) {}
 
   var DEMO_RIT = {
-    ref: 'RTG-DEMO-2408', ritsoort: 'direct', boeking: 'direct', categorie: 'taxi',
+    ref: 'RTG-TEST-2408', ritsoort: 'direct', boeking: 'direct', categorie: 'taxi',
     van: { label: 'Ibiza Airport' }, naar: { label: 'Sal de Mar' }, reizigers: 2,
     bagage: 2, km: 8.4, minuten: 23, prijs: 1240, status: 'aangevraagd',
     reizigerCodenaam: 'Zonvogel', gemaakt: new Date(Date.now() - 2 * 60000).toISOString(),
     vertrekWens: null, notitie: 'Ophalen bij aankomsthal 1.'
   };
   var DEMO_GEPLAND = {
-    ref: 'RTG-DEMO-1640', ritsoort: 'reservering', boeking: 'op-aanvraag', categorie: 'taxi',
+    ref: 'RTG-TEST-1640', ritsoort: 'reservering', boeking: 'op-aanvraag', categorie: 'taxi',
     van: { label: 'Marina Botafoch' }, naar: { label: 'Ibiza Airport' }, reizigers: 1,
     bagage: 1, km: 10.2, minuten: 26, prijs: 1890, status: 'aangevraagd',
     reizigerCodenaam: 'Maanlicht', gemaakt: new Date().toISOString(), vertrekWens: vandaagOm(16, 40)
   };
 
   var staat = {
-    demo: !token || new URLSearchParams(location.search).get('demo') === '1',
+    demo: window.RTG_MAGNAAT_PROEF === true,
     gegevens: null, fout: null, bezig: false, gekozen: null, blad: 'ritten',
     genegeerd: new Set(), laatsteOpen: null, eersteLading: true, poll: null,
     positieWatch: null, laatstePositieAt: 0, laatstePositie: null,
@@ -82,8 +82,8 @@
 
   function demoGegevens() {
     return {
-      ok: true, vervoerder: 'RTG-DEMO', demo: true,
-      actor: { name: 'Yara El Idrissi', staffId: 'demo-yara', manager: false },
+      ok: true, vervoerder: 'RTG-MAGNAAT', demo: true,
+      actor: { name: 'Yara El Idrissi', staffId: 'test-yara', manager: false },
       vloot: [{ id: 'RTG-E1', naam: 'RTG Executive 01', bestuurder: 'Yara El Idrissi', inzetbaar: true }],
       open: [Object.assign({}, DEMO_RIT), Object.assign({}, DEMO_GEPLAND)],
       lopend: [], klaar: staat.demoVoltooid.slice()
@@ -149,9 +149,9 @@
     $('#apparaatStand').textContent = navigator.onLine ? 'Online' : 'Offline';
   }
   function zetModus() {
-    $('#modusLabel').textContent = staat.demo ? 'DEMO' : 'LIVE';
+    $('#modusLabel').textContent = staat.demo ? 'MAGNAAT TEST' : 'LIVE';
     $('#demoKnop').hidden = !staat.demo;
-    $('#sessieStand').textContent = staat.demo ? 'Veilige demostand' : (token ? 'Persoonlijk aangemeld' : 'Niet aangemeld');
+    $('#sessieStand').textContent = staat.demo ? 'Geïsoleerde trainingskopie' : (token ? 'Persoonlijk aangemeld' : 'Niet aangemeld');
     $('#meldingStand').textContent = !('Notification' in window) ? 'Niet beschikbaar op dit apparaat'
       : Notification.permission === 'granted' ? 'Ingeschakeld' : Notification.permission === 'denied' ? 'Geblokkeerd in apparaatinstellingen' : 'Schakel apparaatmeldingen in';
     $('#voorleesStand').textContent = staat.automatischVoorlezen ? 'Aan' : 'Uit';
@@ -295,7 +295,7 @@
     staat.bezig = true; staat.fout = null;
     if (staat.demo) {
       if (!staat.gegevens) staat.gegevens = demoGegevens();
-      staat.bezig = false; zetVerbinding(true, 'DEMO'); render(); staat.eersteLading = false; return;
+      staat.bezig = false; zetVerbinding(true, 'MAGNAAT TEST'); render(); staat.eersteLading = false; return;
     }
     try {
       var gegevens = await api('/api/staff/mob/mijn', {});
@@ -404,7 +404,7 @@
     var rit = actieveRit(); if (!rit || !navigator.geolocation) { toast('Geen actieve rit of locatiefunctie beschikbaar.'); return; }
     navigator.geolocation.getCurrentPosition(function (p) {
       staat.laatstePositie = { lat: p.coords.latitude, lng: p.coords.longitude };
-      if (staat.demo) { toast('Demopositie bijgewerkt zonder gegevens te versturen.'); return; }
+      if (staat.demo) { toast('Testpositie lokaal bijgewerkt; er zijn geen gegevens verstuurd.'); return; }
       api('/api/staff/mob/positie', { ref: rit.ref, lat: p.coords.latitude, lng: p.coords.longitude })
         .then(function () { toast('Huidige positie veilig gedeeld.'); }).catch(function (e) { toast(e.message); });
     }, function () { toast('Geef locatietoegang om uw positie te delen.'); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 });
@@ -430,10 +430,10 @@
   }
   function simuleerRit() {
     if (!staat.demo) return;
-    var rit = Object.assign({}, DEMO_RIT, { ref: 'RTG-DEMO-' + Date.now().toString().slice(-5), gemaakt: new Date().toISOString() });
+    var rit = Object.assign({}, DEMO_RIT, { ref: 'RTG-TEST-' + Date.now().toString().slice(-5), gemaakt: new Date().toISOString() });
     staat.gegevens.lopend = []; staat.gegevens.open = [rit, Object.assign({}, DEMO_GEPLAND)]; staat.genegeerd.clear(); staat.laatsteOpen = rit.ref;
     if (navigator.vibrate) navigator.vibrate([180, 90, 180]); if (staat.automatischVoorlezen) spreekRit(rit, false);
-    wisselBlad('ritten'); render(); toast('Nieuwe demonstratierit ontvangen.');
+    wisselBlad('ritten'); render(); toast('Nieuwe Magnaat-testrit ontvangen.');
   }
 
   $$('[data-naar]').forEach(function (b) { b.addEventListener('click', function () { wisselBlad(b.dataset.naar); }); });

@@ -422,7 +422,7 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
 });
 
 /* DE STARTDATA. Twee dingen die allebei moeten kloppen, en het tweede is het
-   belangrijkste: de demostand geeft een BRUIKBAAR lab (met tekenbevoegden,
+   belangrijkste: Magnaat Test geeft een BRUIKBAAR lab (met tekenbevoegden,
    want zonder die kan er niets ondertekend worden), en er staat GEEN enkel
    verzonnen onderzoeksresultaat in. Een lab dat opstart met nepbevindingen
    leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
@@ -454,15 +454,15 @@ test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten
   const tek = demo.labs[0].tekenaars.map(t => t.rol);
   for (const rol of ['professional', 'reviewer', 'toezichthouder'])
     assert.ok(tek.includes(rol), 'er is een ' + rol + ' -- zonder register kan er niets ondertekend worden');
-  assert.ok(demo.labs[0].tekenaars.some(t => t.onafhankelijk),
+  assert.ok(proef.labs[0].tekenaars.some(t => t.onafhankelijk),
     'er is een ONAFHANKELIJKE tekenaar; klasse hoog vraagt er een');
-  assert.ok(demo.themas.length >= 2, 'er staan vragen uit de buurt klaar');
-  assert.ok(demo.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
+  assert.ok(proef.themas.length >= 2, 'er staan vragen uit de buurt klaar');
+  assert.ok(proef.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
     'er staat een nooit-gekalibreerd apparaat bij: dat weigert een reservering en legt uit waarom');
 
   /* Geen verzonnen resultaten. De ene studie staat bij de eerste stap en haar
      dossier is leeg -- geen conclusie, geen bewijsgraad, geen deelnemer. */
-  for (const s of demo.studies) {
+  for (const s of proef.studies) {
     assert.equal(s.stap, 'vraagstuk', 'een seed-studie staat bij het vraagstuk');
     assert.deepEqual(s.dossier.conclusies, [], 'geen verzonnen conclusies in de startdata');
     assert.deepEqual(s.dossier.deelnemers, [], 'geen verzonnen deelnemers');

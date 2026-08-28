@@ -89,7 +89,7 @@ module.exports = (ctx) => {
       ref: id('DP'), key, codename: codename || key, supplierCode: s.code, supplierName: s.name,
       bedrag: cent, omschrijving: schoon(omschrijving, 120) || 'Directe betaling',
       bron: ['ai', 'salon', 'verzoek', 'app'].includes(bron) ? bron : 'app',
-      providerId: prov.id || null, aanbieder: prov.aanbieder || 'demo', idem: idemSleutel || null, at: nu()
+      providerId: prov.id || null, aanbieder: prov.aanbieder || 'uit', idem: idemSleutel || null, at: nu()
     };
     vastleggen(b, cent, key, 'Rechtstreeks betaald', 'betaalde rechtstreeks € ' + (cent / 100).toFixed(2));
     idemBewaar(b);

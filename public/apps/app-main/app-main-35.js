@@ -63,7 +63,7 @@
       navigator.geolocation.getCurrentPosition(async pos => {
         try { liveData = (await API.call('/live/update', { lat: pos.coords.latitude, lng: pos.coords.longitude })).live; renderLivePanel(); toast(T('live.shared','Locatie gedeeld met uw partners.')); }
         catch (e){ toast(e.message); }
-      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Gebruik "Simuleer rit" voor de demo.')), { timeout: 4000 });
+      }, () => toast(T('live.geodenied','Locatie niet beschikbaar. Vul de locatie handmatig in.')), { timeout: 4000 });
     } else toast(T('live.geono','Locatie is hier niet beschikbaar.'));
   }
 

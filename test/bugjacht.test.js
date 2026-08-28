@@ -347,10 +347,9 @@ test('munt-webhook: zonder secret in productie wordt niets geloofd', () => {
      naar JSON.parse en gaf een ONONDERTEKEND bericht terug als geverifieerde
      waarheid: wie het adres kent, roept zelf "de munten zijn binnen".
 
-     Buiten productie blijft de doorval bestaan; daar draait alles op demo-geld
-     en zou een verplicht secret elke lokale start blokkeren. Deze toets meet
-     allebei de kanten, in een apart proces zodat NODE_ENV van de suite niet
-     wordt aangeraakt. */
+     Ook lokaal blijft die poort dicht. Alleen de expliciete Magnaat
+     Test-installatie mag een synthetische melding zonder providersecret
+     verwerken. Deze toets meet beide kanten in een apart proces. */
   const { execFileSync } = require('child_process');
   const proef = (env) => execFileSync(process.execPath, ['-e',
     'const m = require("' + path.join(__dirname, '..', 'server', 'muntbetaal.js').replace(/\\/g, '/') + '");'
@@ -359,7 +358,10 @@ test('munt-webhook: zonder secret in productie wordt niets geloofd', () => {
   { env: Object.assign({}, process.env, env, { MUNT_WEBHOOK_SECRET: '' }), encoding: 'utf8' }).trim();
 
   assert.equal(proef({ NODE_ENV: 'production' }), 'GEWEIGERD', 'in productie zonder secret: niets geloven');
-  assert.equal(proef({ NODE_ENV: 'test' }), 'DOOR', 'lokaal blijft de demo gewoon werken');
+  assert.equal(proef({ NODE_ENV: 'development', RTG_MAGNAAT_TEST: '' }), 'GEWEIGERD',
+    'een gewone lokale installatie gelooft evenmin fictieve meldingen');
+  assert.equal(proef({ NODE_ENV: 'test', RTG_MAGNAAT_TEST: '1' }), 'DOOR',
+    'alleen Magnaat Test kan de synthetische contractmelding verwerken');
 });
 
 test('de configuratiekeuring noemt een ontbrekend munt-secret een FOUT, geen waarschuwing', () => {
@@ -510,9 +512,8 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
     RTG_ENC_KEY: sleutel('x'), RTG_VAULT_KEY: sleutel('a'), RTG_SECRET_KEY: sleutel('b'),
     OFFICE_TOTP_SECRET: 'JBSWY3DPEHPK3PXP',
     RTG_OWNER_EMAIL: 'eigenaar-proef@voorbeeld.test',
-    // deze proef gaat niet over betalen; zonder deze vlag weigert productie te
-    // starten omdat de demo-provider anders elke betaling zelf zou bevestigen
-    STRIPE_DEMO_BEWUST: '1',
+    // deze proef gaat niet over betalen; de rail staat daarom hard dicht
+    RTG_BETALEN_UIT: '1',
     // er is nog geen extern SMS-kanaal; telefoonherstel blijft in deze
     // productietoets daarom bewust en aantoonbaar fail-closed
     RTG_HERSTEL_SMS_UIT_BEWUST: '1',
@@ -544,7 +545,7 @@ test('het eigenaarsadres is niet via de openbare registratie te claimen', async 
 });
 
 /* ---------- 13. het Stripe-blok ---------- */
-test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
+test('productie zonder betaalsleutel is een FOUT, tenzij de rail fail-closed uit staat', () => {
   /* Zonder sleutel draait de demo-provider, en die BEVESTIGT ELKE BETALING ZELF:
      facturen gaan op 'paid' zonder dat er ooit is afgeschreven. En het is niet
      eens symmetrisch onschuldig -- de 30%-afdracht aan de RTFoundation wordt wel
@@ -559,9 +560,9 @@ test('productie zonder betaalsleutel is een FOUT, tenzij het bewust is', () => {
   const zonder = valideer(basis);
   assert.ok((zonder.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'zonder sleutel: fout, geen waarschuwing');
 
-  const bewust = valideer(Object.assign({}, basis, { STRIPE_DEMO_BEWUST: '1' }));
-  assert.ok(!(bewust.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'een bewust gekozen demo-provider mag nog voor afgeschermd testen');
-  assert.ok((bewust.waarschuwingen || []).some(f => /STRIPE_DEMO_BEWUST/.test(f)), 'maar het blijft zichtbaar');
+  const oudeVlag = valideer(Object.assign({}, basis, { STRIPE_DEMO_BEWUST: '1' }));
+  assert.ok((oudeVlag.fouten || []).some(f => /STRIPE_DEMO_BEWUST/.test(f)),
+    'de oude losse testprovider-vlag opent productie niet meer');
 
   const echtUit = valideer(Object.assign({}, basis, { RTG_BETALEN_UIT: '1' }));
   assert.ok(!(echtUit.fouten || []).some(f => /STRIPE_SECRET_KEY/.test(f)), 'fail-closed uit heeft geen provider nodig');

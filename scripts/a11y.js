@@ -127,7 +127,7 @@ function startEchteServer() {
              is bovendien de betere stand om a11y in te meten: de schermen hebben
              er echte inhoud in plaats van lege lijsten. */
           env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '',
-            STUN_UIT: '1', RTG_DEMO: '1' }
+            STUN_UIT: '1', NODE_ENV: 'test', RTG_DEMO: '', RTG_MAGNAAT_TEST: '1' }
         });
         const basis = 'http://127.0.0.1:' + poort;
         const stop = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };

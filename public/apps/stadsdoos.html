@@ -170,7 +170,7 @@ async function laad(){
     const rij = b.nodes.slice().sort((a, z) => (a.online === z.online) ? 0 : a.online ? 1 : -1);
     $('#vLijst').innerHTML = '<div style="font-size:.78rem;color:var(--soft);margin-bottom:.35rem;">' + b.vloot.online + ' van ' + b.vloot.totaal + ' online · scenario "' + esc(b.scenario) + '"</div>' +
       rij.map(n => '<div class="klus"><span class="dot" style="background:' + (n.online ? 'var(--green)' : 'var(--burgundy)') + ';margin-top:.35rem;"></span>' +
-        '<span style="flex:1;font-size:.84rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">demo</span>' : '') +
+        '<span style="flex:1;font-size:.84rem;"><strong>' + esc(n.naam) + '</strong> · ' + esc(n.zone) + (n.demo ? ' · <span style="color:var(--soft);">Magnaat Test</span>' : '') +
         '<br><span style="color:var(--soft);font-size:.74rem;">' + esc(n.serial) + ' · ' + n.sensoren.map(esc).join(', ') + (n.laatsteContact ? ' · ' + tijd(n.laatsteContact) : ' · nooit gezien') + '</span></span></div>').join('');
     const sel = $('#aZone');
     if (!sel.options.length) sel.innerHTML = b.zones.map(z => '<option>' + esc(z) + '</option>').join('');

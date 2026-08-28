@@ -60,10 +60,20 @@
   K.poort();
   if (K.sessie()) { toon('start'); } else {
     K.viaLid().then(function (gelukt) {
+      var w = K._welkom;
+      if (gelukt && w) {
+        /* De accountbrug kent naam, functie en rollen al. Zet die meteen in de
+           kop voordat /start terugkomt: op een trage verbinding hoort een
+           geopende werkruimte nooit even te zeggen dat er niemand kijkt. */
+        var rollen = Array.isArray(w.rollen) ? w.rollen : [];
+        $('wWie').textContent = (w.lidNaam || 'Medewerker') +
+          (w.functie ? ' · ' + w.functie : '') +
+          ' · ' + (rollen.join(', ') || 'zonder rol');
+        K.meld('Welkom in ' + w.naam + (w.eigenaarsRuimte ? ' (uw eigen werkruimte)' : '') + '.');
+      }
+      /* Pas na het vullen van de kop gaat de werkruimte zichtbaar open. */
       K.poort();
       if (!gelukt) return;
-      var w = K._welkom;
-      if (w) K.meld('Welkom in ' + w.naam + (w.eigenaarsRuimte ? ' (uw eigen werkruimte)' : '') + '.');
       toon('start');
     });
   }

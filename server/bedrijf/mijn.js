@@ -86,7 +86,7 @@ module.exports = (sctx) => {
       const l = lidVoor(w, key);
       if (!l) return null;
       return { werkruimte: w.code, naam: w.naam, lidToken: l.token,
-        rollen: (l.rollen || []).map(r => r.id), functie: l.functie || null,
+        lidNaam: l.naam, rollen: (l.rollen || []).map(r => r.id), functie: l.functie || null,
         eigenaarsRuimte: !!w.eigenaarsRuimte };
     }).filter(Boolean);
 

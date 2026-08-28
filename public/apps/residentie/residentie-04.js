@@ -11,7 +11,7 @@
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
         '<button class="rij-item" data-kamer="' + esc(s2.adres) + '"><span><b>' + esc(s2.naam) + '</b><span class="m">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
         '<span class="tel">' + s2.aanwezig + ' aanwezig</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
+        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
       $('#gidsLaag').classList.add('open');
       $('#gidsLaag').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => {
         $('#gidsLaag').classList.remove('open');
@@ -93,7 +93,7 @@
   if (!TOKEN) {
     document.querySelector('.kop').style.display = 'none';
     $('#poort').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;">De Résidence</h2>' +
-      '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
+      '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
       '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
   } else {
     const wens = new URLSearchParams(location.search).get('kamer') || 'lobby';

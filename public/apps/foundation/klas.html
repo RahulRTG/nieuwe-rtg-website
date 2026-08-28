@@ -105,7 +105,7 @@ function teken(){
       opties.innerHTML = ''; return;
     }
     inhoud.innerHTML = '<span class="stil">Vraag '+(LES.vraagIx+1)+' van '+LES.totaalVragen+'</span>'+
-      '<h1 style="font-size:1.2rem;margin-top:.4rem;">'+esc(LES.vraag.v)+'</h1>';
+      '<h1 style="font-size:1.2rem;margin-top:0.5rem;">'+esc(LES.vraag.v)+'</h1>';
     opties.innerHTML = LES.vraag.opties.map((o,i) =>
       '<button class="optie" data-k="'+i+'"><span class="ltr">'+'ABCD'[i]+'</span>'+esc(o)+'</button>').join('');
     opties.querySelectorAll('.optie').forEach(b => b.addEventListener('click', async () => {

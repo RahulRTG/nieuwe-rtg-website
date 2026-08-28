@@ -4,6 +4,7 @@
    automatisch, betalen loopt via de geld-drempel omdat het pad "betaal" bevat) en
    de meldingen aan het waterschap met hun afhandeling. Krijgt de gedeelde ctx van
    kern/overheid/index.js. */
+const { zelfdeMeldingKortGeleden } = require('../dubbelemelding');
 module.exports = (ctx) => {
   const { db, save, nu, jaar, id, ref, schoon, hash, eur, seed, bericht, SUBSIDIES, WATERHEFFINGEN, WATERMELD, WATER_STATUS } = ctx;
 
@@ -89,6 +90,10 @@ module.exports = (ctx) => {
     const soort = WATERMELD[data.soort] ? data.soort : 'wateroverlast';
     const tekst = schoon(data.tekst, 500);
     if (tekst.length < 4) return { status: 400, error: 'Omschrijf kort wat er aan de hand is.' };
+    // dezelfde melder, dezelfde soort, dezelfde tekst binnen een minuut is EEN
+    // melding -- zelfde afspraak als bij de gemeente; zie kern/dubbelemelding.js
+    const eerder = zelfdeMeldingKortGeleden(db.data.waterMeldingen, { melderKey: sess.key, soort, tekst }, ['soort', 'tekst']);
+    if (eerder) return { ok: true, melding: publiekeWaterMelding(eerder), herhaald: true };
     const m = { id: id(), ref: ref('WM'), soort, soortLabel: WATERMELD[soort], tekst, locatie: schoon(data.locatie, 120) || null,
       melderKey: sess.key, melder: codenaam, status: 'nieuw', updates: [], at: nu() };
     db.data.waterMeldingen.unshift(m);

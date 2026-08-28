@@ -5,6 +5,7 @@
    onbekende categorie optioneel een model voor een tweede lezing gebruikt. Krijgt de gedeelde ctx van
    kern/gemeente/index.js. */
 const { coord } = require('../util');
+const { zelfdeMeldingKortGeleden } = require('../dubbelemelding');
 module.exports = (ctx) => {
   const { db, save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
     notify, notifySupplier, sseToSupplier, weefsel, CATS, PLOEG, MELD_STATUS } = ctx;
@@ -15,6 +16,12 @@ module.exports = (ctx) => {
     const categorie = CATS[data.categorie] ? data.categorie : 'overig';
     const tekst = schoon(data.tekst, 500);
     if (tekst.length < 4) return { status: 400, error: 'Omschrijf kort wat er aan de hand is.' };
+    /* Dezelfde melder, dezelfde categorie, dezelfde tekst binnen een minuut is
+       DEZELFDE melding -- geen tweede dossier in de wachtrij van de behandelaar.
+       Zie kern/dubbelemelding.js voor waarom een idem-sleutel hier niet volstaat. */
+    const eerder = zelfdeMeldingKortGeleden(db.data.gemeenteMeldingen, { melderKey: sess.key, categorie, tekst },
+      ['categorie', 'tekst']);
+    if (eerder) return { ok: true, melding: publiekeMelding(eerder), herhaald: true };
     const g = deGemeente();
     const m = {
       id: id(), ref: ref('M'), gemeente: g ? g.code : 'GEMEENTE',

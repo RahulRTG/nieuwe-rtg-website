@@ -21,29 +21,29 @@
     const mijn = (verzOv && verzOv.mijn) || [];
     let html = '';
     if (mijn.length){
-      html += '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.5rem;">'+T('verz.mijn','Mijn verzorgingsafspraken')+'</div>';
+      html += '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.5rem;">'+T('verz.mijn','Mijn verzorgingsafspraken')+'</div>';
       html += mijn.map(a => '<div class="card">'+
         '<div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">'+esc(a.salon)+'</div>'+
-        '<div style="margin-top:0.35rem;font-size:0.92rem;"><b>'+esc(a.behandeling)+'</b> <span class="soft-sm">· '+esc(a.stoel)+'</span></div>'+
+        '<div style="margin-top:0.25rem;font-size:0.92rem;"><b>'+esc(a.behandeling)+'</b> <span class="soft-sm">· '+esc(a.stoel)+'</span></div>'+
         '<div class="soft-sm h-mt15">'+a.datum+' · '+a.van+' tot '+a.tot+' · '+eur(a.prijs)+' · '+T('verz.bijsalon','af te rekenen bij de salon')+'</div>'+
         '<button class="bz-btn h-mt55" data-verzannul="'+esc(a.code)+':'+esc(a.id)+'">'+T('verz.annuleer','Annuleer')+'</button></div>').join('');
     }
-    html += '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.35rem;">'+T('verz.kop','Kapper, barbier en nagels')+'</div>'+
+    html += '<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--soft);margin:1.25rem 0 0.25rem;">'+T('verz.kop','Kapper, barbier en nagels')+'</div>'+
       '<div class="soft-sm" style="margin-bottom:0.5rem;">'+T('verz.uitleg','Verzorging, geen zorg: er reist geen zorgprofiel mee en er valt niets medisch te delen. U boekt op uw codenaam.')+'</div>'+
-      '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.6rem;">'+dagen.map(d =>
+      '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+dagen.map(d =>
         '<button class="bz-btn'+(gekozenDag===d?' on':'')+'" data-verzdag="'+d+'">'+(d===dagen[0]?T('care.vandaag','vandaag'):d.slice(8)+'/'+d.slice(5,7))+'</button>').join('')+'</div>';
     for (const a of aanb){
       html += '<div class="card"><div><b>'+esc(a.naam)+'</b>'+(a.waar?' <span class="soft-sm">· '+esc(a.waar)+'</span>':'')+'</div>';
       for (const b of a.behandelingen){
         const sleutel = a.code+':'+b.id;
-        html += '<div style="border-top:1px solid var(--line,rgba(255,255,255,0.08));margin-top:0.55rem;padding-top:0.55rem;">'+
+        html += '<div style="border-top:1px solid var(--line,rgba(255,255,255,0.08));margin-top:0.5rem;padding-top:0.55rem;">'+
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;align-items:baseline;">'+
             '<span>'+esc(b.naam)+' <span class="soft-sm">· '+b.duurMin+' min</span></span>'+
             '<span class="soft-sm">'+eur(b.prijs)+'</span></div>';
         if (!b.tijden.length){
           html += '<div class="soft-sm h-mt30">'+T('verz.vol','Deze dag is vol. Kies een andere dag.')+'</div>';
         } else if (verzOpen === sleutel){
-          html += '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">'+b.tijden.map(t2 =>
+          html += '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">'+b.tijden.map(t2 =>
             '<button class="bz-btn'+((verzKeuze&&verzKeuze.tijd===t2)?' on':'')+'" data-verzt="'+t2+'">'+t2+'</button>').join('')+'</div>'+
             '<button class="bz-groot h-mt70" id="verzBoek"'+((verzKeuze&&verzKeuze.tijd)?'':' disabled')+'>'+T('verz.boek','Maak deze afspraak')+'</button>';
         } else {

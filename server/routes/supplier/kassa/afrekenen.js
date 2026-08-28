@@ -106,6 +106,7 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   for (const o of chk.bonnen) {
     o.paid = true;
     o.paidAt = new Date().toISOString();
+    o.betaaldMet = method; // waarmee de tafel werkelijk afrekende (TAKEN.md 4.59)
     if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
     o.rekeningVoldaan = true;
     if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);

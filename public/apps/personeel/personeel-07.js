@@ -21,7 +21,7 @@
       if (!p || !p.ingeklokt) return '';
       const rest = p.restMinuten;
       const op = rest <= 0;
-      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--line);">'+
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.5rem;padding-top:0.6rem;border-top:1px solid var(--line);">'+
         '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.p.rest','Pauze')+' <b style="color:'+(op?'var(--soft)':'var(--txt)')+';">'+rest+'/'+p.budget+' min</b>'+
         (p.pauze && !p.binnenBudget ? ' · '+T('pd.p.over','uw pauze loopt door, het beleid geldt weer') : '')+'</span>'+
         '<button class="abtn'+(p.pauze?'':' ghost')+'" id="pauzeBtn">'+
@@ -45,7 +45,7 @@
     if (wisselOpties.length){
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.ws.h','Andere afdeling')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
+        '<div style="margin-top:0.5rem;font-size:0.76rem;color:var(--soft);">'+T('pd.ws.sub','U bent hier ook geaccrediteerd; wisselen kan direct, uw inlog reist mee.')+'</div>'+
         wisselOpties.map(o => '<div class="task"><span class="ic">'+RTGGlyf.tekst(BEDRIJVEN[o.code]?BEDRIJVEN[o.code].icon:'')+'</span><div class="t"><b>'+esc(o.naam)+'</b><span>'+T('pd.ws.acc','Geaccrediteerd via het personeelsnetwerk')+'</span></div>'+
           '<button class="abtn" data-wissel="'+esc(o.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-wissel]').forEach(b => b.addEventListener('click', async () => {
@@ -68,7 +68,7 @@
     if (andere.length){
       $('#todayWrap').insertAdjacentHTML('beforeend',
         '<div class="card"><div class="k">'+T('pd.mw.h','Mijn werkplekken')+'</div>'+
-        '<div style="margin-top:0.4rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
+        '<div style="margin-top:0.5rem;font-size:0.76rem;color:var(--soft);">'+T('pd.mw.sub','U werkt bij meer bedrijven; wissel met één tik. U klokt daar zelf in.')+'</div>'+
         andere.map(p => '<div class="task"><span class="ic">'+RTGGlyf.tekst(BEDRIJVEN[p.code]?BEDRIJVEN[p.code].icon:'')+'</span><div class="t"><b>'+esc(p.naam)+'</b><span>'+esc(p.func || (p.manager?'Manager':T('pd.staff','Medewerker')))+'</span></div>'+
           '<button class="abtn" data-mijn="'+esc(p.code)+'">'+T('pd.ws.ga','Wissel')+'</button></div>').join('')+'</div>');
       document.querySelectorAll('[data-mijn]').forEach(b => b.addEventListener('click', async () => {

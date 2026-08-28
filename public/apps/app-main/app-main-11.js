@@ -17,6 +17,9 @@
     } else if (d.kind === 'ice'){
       if (call.pc && call.pc.remoteDescription) { try { await call.pc.addIceCandidate(d.payload); } catch(e){} }
       else call.pendingIce.push(d.payload);
+    } else if (d.kind === 'tekst'){
+      const m = csBaan();
+      if (m && d.payload && d.payload.r) m.voed(d.payload.r, { wie: d.codename, bron: 'mens' });
     } else if (d.kind === 'hangup' || d.kind === 'decline' || d.kind === 'busy'){
       toast(d.kind === 'busy' ? T('sal.bezet','In gesprek.') : d.kind === 'decline' ? T('sal.geweigerd','Oproep geweigerd.') : T('sal.opgehangen','Gesprek beëindigd.'));
       eindeGesprek(false);
@@ -69,14 +72,14 @@
   function kletsTekenLeeg(d){
     $('#kletsBody').innerHTML =
       '<p class="stil" style="font-size:.82rem;color:var(--soft);line-height:1.6;">' + escT(d.uitleg || '') + '</p>' +
-      '<label style="display:flex;gap:.6rem;align-items:flex-start;margin:.9rem 0;font-size:.85rem;">' +
+      '<label style="display:flex;gap:.6rem;align-items:flex-start;margin:0.75rem 0;font-size:.85rem;">' +
         '<input class="h-mt20" type="checkbox" id="kletsSchakel"' + (kletsAan ? ' checked' : '') + '>' +
         '<span>Rahul mag met de Rahul van mijn vrienden kletsen over hoe mijn dag was.' +
         '<br><span style="color:var(--soft);font-size:.78rem;">Uit te zetten wanneer je wilt. Zolang het uit staat, gebeurt er niets.</span></span>' +
       '</label>' +
       '<button class="knop" id="kletsGo"' + (kletsAan ? '' : ' disabled') + '>Laat ze kletsen</button>' +
       (d.gesprekken && d.gesprekken.length
-        ? '<div style="margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem;">' +
+        ? '<div style="margin-top:1.25rem;border-top:1px solid var(--line);padding-top:.8rem;">' +
           d.gesprekken.slice(0, 8).map(g =>
             '<button class="klets-eerder" data-klets="' + escT(g.id) + '" style="display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:.5rem 0;font:inherit;cursor:pointer;">' +
             '<b style="font-size:.78rem;color:var(--rtg-leesgoud,var(--gold));">' + escT(g.metCodenaam) + '</b>' +

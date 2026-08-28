@@ -72,7 +72,7 @@ module.exports = function maakSqliteAchter(opslag) {
         vanZaak: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? AND zaak=? ORDER BY at DESC LIMIT ? OFFSET ?'),
         telAlles: sdb.prepare('SELECT count(*) AS c FROM tx_ledger WHERE soort=?'),
         telKlant: sdb.prepare('SELECT count(*) AS c FROM tx_ledger WHERE soort=? AND klant=?'),
-        recent: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? ORDER BY at DESC LIMIT ?')
+        recent: sdb.prepare('SELECT data FROM tx_ledger WHERE soort=? ORDER BY at DESC LIMIT ? OFFSET ?')
       };
     },
     async upsert(rijen) {
@@ -101,9 +101,11 @@ module.exports = function maakSqliteAchter(opslag) {
       const r = klant != null ? st.telKlant.get(soort, String(klant)) : st.telAlles.get(soort);
       return Number((r && r.c) || 0);
     },
-    async recent(soort, limit) {
+    // Met een OFFSET, om dezelfde reden als aan de Postgres-kant: het venster
+    // bijvullen leest verder dan een bladzijde (zie ./topup.js).
+    async recent(soort, limit, offset) {
       verbind();
-      return st.recent.all(soort, limit).map(x => x.data);
+      return st.recent.all(soort, limit, Math.max(0, Number(offset) || 0)).map(x => x.data);
     },
     // Netjes afronden: de WAL in het hoofdbestand vouwen zodat de volgende start
     // niets hoeft in te lezen. Mislukt hij omdat een ander proces nog leest, dan

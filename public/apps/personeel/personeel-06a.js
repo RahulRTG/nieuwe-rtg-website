@@ -13,7 +13,7 @@
     const klok = zaken && zaken.klok;
     $('#todayWrap').innerHTML =
       '<div class="card"><div class="k">'+T('pd.myshift','Uw dienst vandaag')+'</div><div class="shift-big">'+(shift||T('pd.noshift','Geen dienst'))+'</div>'+
-      (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.7rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
+      (klok ? '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.8rem;margin-top:0.75rem;padding-top:0.7rem;border-top:1px solid var(--line);">'+
         '<span style="font-size:0.76rem;color:var(--soft);">'+T('pd.k.vandaag','Vandaag')+' <b style="color:var(--txt);">'+klok.vandaagUren+' u</b> · '+T('pd.k.week','deze week')+' <b style="color:var(--txt);">'+klok.weekUren+' u</b></span>'+
         '<button class="abtn'+(klok.open?'':' ghost')+'" id="klokBtn">'+(klok.open?''+T('pd.k.uit','Klok uit'):'▶ '+T('pd.k.in','Klok in'))+'</button></div>' : '')+
       pauzeBlok()+
@@ -24,7 +24,7 @@
       (tasks.length>6?'<div style="margin-top:0.5rem;font-size:0.74rem;color:var(--soft);">+'+(tasks.length-6)+' '+T('pd.more','meer onder Taken')+'</div>':'')+'</div>'+
       (vwPda && vwPda.ok && vwPda.morgen
         ? '<div class="card"><div class="k">'+T('pd.vw','Morgen verwacht')+'</div>'+
-          '<div style="margin-top:0.4rem;font-size:0.8rem;line-height:1.55;color:var(--soft);">'+
+          '<div style="margin-top:0.5rem;font-size:0.8rem;line-height:1.55;color:var(--soft);">'+
           '~<b style="color:var(--txt);">'+vwPda.morgen.verwachtTransacties+'</b> '+T('pd.vw.trans','transacties')+' ('+vwPda.morgen.dagNaam+')'+
           (vwPda.morgen.drukUren.length ? ' · '+T('pd.vw.piek','piek rond')+' '+vwPda.morgen.drukUren.map(u=>u.uur+':00').join(', ') : '')+
           '<br>'+esc(vwPda.morgen.advies||'')+'</div></div>'
@@ -32,7 +32,7 @@
     const nuMissie = horecaMissies.filter(x=>x.status!=='klaar').sort((a,b)=>(a.prioriteit==='hoog'?-1:0)-(b.prioriteit==='hoog'?-1:0))[0];
     if (horecaOverdrachten.length) {
       const o=horecaOverdrachten[0];
-      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:.4rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn h-mt70" id="hmAccept">Accepteer overdracht</button></div>');
+      $('#todayWrap').insertAdjacentHTML('afterbegin','<div class="card" style="border-color:var(--gold);"><div class="k" style="color:var(--gold);">GEVERIFIEERDE OVERDRACHT</div><div class="shift-big" style="color:var(--txt);">'+esc(o.vanNaam)+' draagt een missie over</div><p style="font-size:.76rem;color:var(--soft);margin-top:0.5rem;">De verantwoordelijkheid wisselt pas nadat u accepteert.</p><button class="abtn h-mt70" id="hmAccept">Accepteer overdracht</button></div>');
       $('#hmAccept').addEventListener('click',async()=>{try{await API.call('/supplier/horeca/handover/accept',{id:o.id});toast('Overdracht geaccepteerd.');await laadZaken();renderAll();}catch(e){toast(e.message)}});
     }
     if (nuMissie) {

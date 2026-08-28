@@ -77,7 +77,7 @@ app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
 app.post('/api/supplier/ontvangsten', supplierAuth, (req, res) => {
   res.json(dpOntvangsten(req.supplier.code));
 });
-app.post('/api/supplier/betaalverzoek', supplierAuth, (req, res) => {
+app.post('/api/supplier/betaalverzoek', supplierAuth, async (req, res) => {
   const cent = req.body.centen != null ? Math.round(Number(req.body.centen)) : Math.round(Number(req.body.bedrag) * 100);
   const r = dpVerzoekMaak({ supplierCode: req.supplier.code, actorName: req.actor.name,
     naarCodename: req.body.codename, bedragCenten: cent, omschrijving: req.body.omschrijving,

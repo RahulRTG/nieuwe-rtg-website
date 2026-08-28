@@ -726,7 +726,7 @@
     $('#spelKeuze').innerHTML = '<h2>Wie daagt u uit?</h2><div class="sub">' +
       esc((S.kamer && S.kamer.naam) || '') + ' · een potje om elkaar te leren kennen</div>' +
       anderen.map(l => '<button class="rij-item" data-daag="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">daag uit</span></button>').join('') +
-      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="spelKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#spelLaag').classList.add('open');
     $('#spelKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     $('#spelKeuze').querySelectorAll('[data-daag]').forEach(b => b.addEventListener('click', () => kiesSpel(b.dataset.daag)));
@@ -812,7 +812,7 @@
         '<div class="sub">' + (d.uitslag.samen
           ? esc(namen[0]) + ' · samen ' + d.uitslag.stand[0] + ' ' + (P ? esc(P.eenheid) : '')
           : esc(namen[0]) + ': ' + d.uitslag.stand[0] + ' · ' + esc(namen[1]) + ': ' + d.uitslag.stand[1]) + '</div>' +
-        '<p style="margin:.6rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
+        '<p style="margin:0.5rem 0;font-family:\'Bodoni Moda\',serif;font-size:1.15rem;">' +
         (d.uitslag.samen ? 'Wat een paar. De vloer was van u.'
           : w == null ? 'Gelijkspel; dat vraagt om een revanche.' : esc(namen[w]) + ' wint. Mooi gespeeld, allebei.') + '</p>' +
         '<button class="knop2" id="spelUitslagWeg" type="button" style="width:100%;">Verder</button>';
@@ -828,7 +828,7 @@
     if (d.kind === 'spel-uitnodiging') {
       $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
         '<div class="sub">' + esc(d.van) + ' vraagt u voor een potje ' + esc(d.naam) + '</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
         '<button class="knop2 h-flex1" id="spelJa" type="button">Graag</button>' +
         '<button class="knop2 stil2 h-flex1" id="spelNee" type="button">Nu even niet</button></div>';
       $('#spelLaag').classList.add('open');
@@ -857,10 +857,10 @@
     const k = $('#vraagKaart'), rahul = v.van === 'rahul';
     k.classList.toggle('rahul', rahul);
     k.innerHTML = '<div class="ey" style="font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:' +
-      (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:.35rem;">' +
+      (rahul ? 'var(--burgundy)' : 'var(--gold)') + ';margin-bottom:0.25rem;">' +
       (rahul ? 'Rahul · directeur van het huis' : 'Vraag van het huis') +
       (v.niveau ? ' · ' + esc(v.niveau) : '') + '</div>' +
-      (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:.3rem;">' + esc(v.intro) + '</div>' : '') +
+      (rahul && v.intro ? '<div style="font-size:.74rem;color:var(--soft);margin-bottom:0.25rem;">' + esc(v.intro) + '</div>' : '') +
       '<div style="font-family:\'Bodoni Moda\',serif;font-size:1.05rem;line-height:1.4;">' + esc(v.tekst) + '</div>';
     k.classList.add('open');
     clearTimeout(k._t); k._t = setTimeout(() => k.classList.remove('open'), rahul ? 16000 : 12000);
@@ -880,7 +880,7 @@
       $('#belLijst').innerHTML = d.leden.length ? d.leden.map(l =>
         '<button class="rij-item" data-bel="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b><span class="m">nu in ' + esc(l.kamer) + '</span></span>' +
         '<span class="tel">nodig uit</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Er is nu verder niemand in het huis.</div>';
+        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Er is nu verder niemand in het huis.</div>';
       $('#belLaag').classList.add('open');
       $('#belLijst').querySelectorAll('[data-bel]').forEach(b => b.addEventListener('click', async () => {
         $('#belLaag').classList.remove('open');
@@ -895,7 +895,7 @@
   function toonBel(d) {
     $('#spelKeuze').innerHTML = '<h2>De telefoon gaat</h2>' +
       '<div class="sub">' + esc(d.van) + ' nodigt u uit in de suite</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
       '<button class="knop2 h-flex1" id="belGa" type="button">Ga erheen</button>' +
       '<button class="knop2 stil2 h-flex1" id="belNiet" type="button">Niet nu</button></div>';
     $('#spelLaag').classList.add('open');
@@ -938,7 +938,7 @@
     if (!anderen.length) return meld('U bent hier nog alleen.');
     $('#spelKeuze').innerHTML = '<h2>Samen wandelen</h2><div class="sub">vast aan elkaar door het huis, zolang u allebei hier bent</div>' +
       anderen.map(l => '<button class="rij-item" data-paar="' + esc(l.codenaam) + '"><span><b>' + esc(l.codenaam) + '</b></span><span class="tel">vraag</span></button>').join('') +
-      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="paarKeuzeWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#spelLaag').classList.add('open');
     $('#paarKeuzeWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     $('#spelKeuze').querySelectorAll('[data-paar]').forEach(b => b.addEventListener('click', async () => {
@@ -962,7 +962,7 @@
     if (d.kind === 'paar-verzoek') {
       $('#spelKeuze').innerHTML = '<h2>Samen wandelen?</h2>' +
         '<div class="sub">' + esc(d.van) + ' wil vast aan u wandelen, zolang u hier samen bent</div>' +
-        '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+        '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
         '<button class="knop2 h-flex1" id="paarJa" type="button">Graag</button>' +
         '<button class="knop2 stil2 h-flex1" id="paarNee" type="button">Liever niet</button></div>';
       $('#spelLaag').classList.add('open');
@@ -982,7 +982,7 @@
         S.paar = d.a === S.ik ? d.b : d.a; zetKnopPaar();
         $('#spelKeuze').innerHTML = '<h2>U wandelt samen</h2>' +
           '<div class="sub">met ' + esc(S.paar) + ' · u loopt nu vast aan elkaar door het huis</div>' +
-          '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+          '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
           '<button class="knop2 h-flex1" id="paarVriend" type="button">Word ook vrienden</button>' +
           '<button class="knop2 stil2 h-flex1" id="paarKlaar" type="button">Verder</button></div>';
         $('#spelLaag').classList.add('open');
@@ -1859,7 +1859,7 @@
       tweede.map(([k, n, t2]) => '<button class="rij-item" data-zaal2="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">' + t2 + '</span></button>').join('') +
       Object.entries(KAST).map(([k, n]) =>
         '<button class="rij-item" data-kast="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">aan de speeltafel</span></button>').join('') +
-      '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#kiesWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     if (zaalSpel) $('#kiesZaal').addEventListener('click', async () => {
       $('#spelLaag').classList.remove('open');
@@ -1887,7 +1887,7 @@
   function naarTafel(id, naam, wie) {
     $('#spelKeuze').innerHTML = '<h2>De tafel is gedekt</h2>' +
       '<div class="sub">' + esc(naam) + ' met ' + esc(wie) + ' -- de uitnodiging is onderweg</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
       '<button class="knop2 h-flex1" id="tafelGa" type="button">Naar de speeltafel</button>' +
       '<button class="knop2 stil2 h-flex1" id="tafelHier" type="button">Hier wachten</button></div>';
     $('#spelLaag').classList.add('open');
@@ -1905,7 +1905,7 @@
     if (!uit) return;
     $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
       '<div class="sub">' + esc(uit.van || 'een lid') + ' vraagt u aan de speeltafel voor een potje ' + esc(uit.naam || KASTNAAM[d.soort] || 'spel') + '</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
       '<button class="knop2 h-flex1" id="bordJa" type="button">Speel mee</button>' +
       '<button class="knop2 stil2 h-flex1" id="bordNee" type="button">Nu even niet</button></div>';
     $('#spelLaag').classList.add('open');
@@ -1933,7 +1933,7 @@
       $('#gidsSuites').innerHTML = d.suites.length ? d.suites.map(s2 =>
         '<button class="rij-item" data-kamer="' + esc(s2.adres) + '"><span><b>' + esc(s2.naam) + '</b><span class="m">van ' + esc(s2.van) + ' · ' + s2.meubels + ' meubels</span></span>' +
         '<span class="tel">' + s2.aanwezig + ' aanwezig</span></button>').join('')
-        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
+        : '<div class="m" style="color:var(--soft);font-size:.78rem;margin-top:0.5rem;">Nog geen open suites; richt de uwe in en zet hem open.</div>';
       $('#gidsLaag').classList.add('open');
       $('#gidsLaag').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () => {
         $('#gidsLaag').classList.remove('open');
@@ -2015,7 +2015,7 @@
   if (!TOKEN) {
     document.querySelector('.kop').style.display = 'none';
     $('#poort').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.5rem;">De Résidence</h2>' +
-      '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
+      '<p style="color:var(--muted);margin-top:0.5rem;line-height:1.6;">Het virtuele huis van RTG is er voor leden. Open de app en log in met je RTG-account.</p>' +
       '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
   } else {
     const wens = new URLSearchParams(location.search).get('kamer') || 'lobby';

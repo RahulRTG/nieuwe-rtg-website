@@ -150,3 +150,28 @@ test('9. alleen de eigenaar: het papierwerk zit achter de eigenaarspoort', async
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('10. EEN MERKTEKEN ZONDER VRAAG IS OOK EEN GAT', () => {
+  /* Gevonden met een mutatie op de go-live-keuring: hernoem `{{verantwoordelijke}}`
+     in het verwerkingsregister naar iets waar geen vraag bij hoort, en de keuring
+     ging er vrolijk overheen. `vulIn()` laat zo'n merkteken met opzet staan -- het
+     weet niet waar het antwoord vandaan moet komen -- maar het telde niet als gat.
+     Uitkomst: het document meldde zich als INGEVULD terwijl er letterlijk
+     `{{...}}` in stond, en dat is precies wat de kop van deze module verbiedt.
+
+     Dit is geen bedacht geval. Vraag-id's hernoemen is gewoon werk, en de dag
+     waarop iemand dat doet is de dag waarop het papierwerk stilletjes een gat
+     krijgt dat pas opvalt als de jurist het document leest. */
+  for (const v of papieren.openVragen()) papieren.antwoord(v.id, 'Ingevuld: ' + v.veld, { door: 'Tester' });
+  const heel = papieren.document('verwerkingsregister');
+  assert.equal(heel.gaten, 0, 'alles beantwoord: geen gaten');
+
+  const bestand = path.join(__dirname, '..', 'VERWERKINGSREGISTER.md');
+  const origineel = fs.readFileSync(bestand, 'utf8');
+  try {
+    fs.writeFileSync(bestand, origineel + '\n\nVerantwoordelijke: {{eenveldzonder_vraag}}\n');
+    const met = papieren.document('verwerkingsregister');
+    assert.equal(met.gaten, 1, 'een merkteken zonder vraag telt als gat');
+    assert.match(met.tekst, /\{\{eenveldzonder_vraag\}\}/, 'en blijft zichtbaar in de tekst staan');
+  } finally { fs.writeFileSync(bestand, origineel); }
+});

@@ -20,10 +20,18 @@
       body.payCode = await payCodeMetKaart(body.total); if (!body.payCode) return;
       body.idem = RTGIdem('pos');
     }
+    /* Cadeaukaart: de bon draagt de omzet en trekt het saldo af, in EEN
+       handeling. Daarom hoort de code hier en niet in het boekhoudscherm --
+       daar boekt hij alleen saldo af en telt er niets als omzet. */
+    if (method === 'cadeaukaart'){
+      body.gcCode = (window.prompt(T('pos.gcvraag','Code van de cadeaukaart (bijv. RTG-GC-A1B2C3):'))||'').trim();
+      if (!body.gcCode) return;
+    }
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};
       toast(T('pos.done','Afgerekend:')+' '+eur(d.sale.total)+' ('+methodLabel(d.sale.method)+'), '+T('pos.bonnr','bon')+' '+d.sale.bon+
+        (d.sale.gcCode ? ' · '+T('pos.gcrest','restsaldo')+' '+eur(d.sale.gcRest) : '')+
         (d.sale.betaaldienstKosten ? ' · '+T('pos.kosten','betaaldienst')+' '+eur(d.sale.betaaldienstKosten/100)+' '+T('pos.kostendirect','direct verrekend') : ''));
       await refresh(); openTab('kassa');
     } catch(e){ toast(e.message); }

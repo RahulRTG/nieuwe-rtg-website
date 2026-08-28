@@ -4208,6 +4208,13 @@
       "gezakt": 6,
       "geprobeerd": 1
     },
+    "pay-grootboek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "pay.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -61,6 +61,7 @@
       try { if (call.pc) call.pc.close(); } catch (e) {}
       call = null;
     }
+    if (mee) mee.leeg();
     belUI(false);
   }
   function flushIce() { if (!call || !call.pc || !call.pc.remoteDescription) return Promise.resolve(); var ps = call.pendingIce.splice(0).map(function (c) { return call.pc.addIceCandidate(c).catch(function () {}); }); return Promise.all(ps); }
@@ -86,6 +87,8 @@
       call.pc.setRemoteDescription(d.payload).then(flushIce);
     } else if (d.kind === 'ice') {
       if (call.pc && call.pc.remoteDescription) { call.pc.addIceCandidate(d.payload).catch(function () {}); } else call.pendingIce.push(d.payload);
+    } else if (d.kind === 'tekst') {
+      if (mee && d.payload && d.payload.r) mee.voed(d.payload.r, { wie: d.vanNaam || lidNaam(d.van), bron: 'mens' });
     } else if (d.kind === 'hangup' || d.kind === 'decline' || d.kind === 'busy') {
       eindeGesprek(false);
     }

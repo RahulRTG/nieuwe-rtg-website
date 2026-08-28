@@ -46,11 +46,11 @@
           '<b>' + esc(d.titel || '(zonder titel)') + '</b>' +
           '<span>' + esc(String(d.tekst || '').split('\n')[0].slice(0, 42)) + '</span></button>';
       }).join('') + (magBewerken
-        ? '<button class="knop" id="diaErbij" type="button" style="width:100%;margin-top:.4rem;">+ Dia</button>' +
+        ? '<button class="knop" id="diaErbij" type="button" style="width:100%;margin-top:0.5rem;">+ Dia</button>' +
           /* het thema staat in de dia-kolom omdat het over het HELE deck gaat;
              naast de indeling van één dia zou het lezen als iets per dia */
           '<select id="deckThema" aria-label="Thema van het hele deck" title="Thema van het hele deck"' +
-          ' style="width:100%;margin-top:.4rem;">' + THEMAS.map(function (t) {
+          ' style="width:100%;margin-top:0.5rem;">' + THEMAS.map(function (t) {
             return '<option value="' + t[0] + '"' + (t[0] === thema ? ' selected' : '') + '>Thema: ' + t[1] + '</option>';
           }).join('') + '</select>' : '');
       Array.prototype.forEach.call(rail.querySelectorAll('[data-dia]'), function (b) {

@@ -18,7 +18,7 @@
       tweede.map(([k, n, t2]) => '<button class="rij-item" data-zaal2="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">' + t2 + '</span></button>').join('') +
       Object.entries(KAST).map(([k, n]) =>
         '<button class="rij-item" data-kast="' + k + '" type="button"><span><b>' + n + '</b></span><span class="tel">aan de speeltafel</span></button>').join('') +
-      '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:.9rem;width:100%;">Toch niet</button>';
+      '<button class="knop2 stil2" id="kiesWeg" type="button" style="margin-top:0.75rem;width:100%;">Toch niet</button>';
     $('#kiesWeg').addEventListener('click', () => $('#spelLaag').classList.remove('open'));
     if (zaalSpel) $('#kiesZaal').addEventListener('click', async () => {
       $('#spelLaag').classList.remove('open');
@@ -46,7 +46,7 @@
   function naarTafel(id, naam, wie) {
     $('#spelKeuze').innerHTML = '<h2>De tafel is gedekt</h2>' +
       '<div class="sub">' + esc(naam) + ' met ' + esc(wie) + ' -- de uitnodiging is onderweg</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
       '<button class="knop2 h-flex1" id="tafelGa" type="button">Naar de speeltafel</button>' +
       '<button class="knop2 stil2 h-flex1" id="tafelHier" type="button">Hier wachten</button></div>';
     $('#spelLaag').classList.add('open');
@@ -64,7 +64,7 @@
     if (!uit) return;
     $('#spelKeuze').innerHTML = '<h2>Een uitnodiging</h2>' +
       '<div class="sub">' + esc(uit.van || 'een lid') + ' vraagt u aan de speeltafel voor een potje ' + esc(uit.naam || KASTNAAM[d.soort] || 'spel') + '</div>' +
-      '<div style="display:flex;gap:.5rem;margin-top:.8rem;">' +
+      '<div style="display:flex;gap:.5rem;margin-top:0.75rem;">' +
       '<button class="knop2 h-flex1" id="bordJa" type="button">Speel mee</button>' +
       '<button class="knop2 stil2 h-flex1" id="bordNee" type="button">Nu even niet</button></div>';
     $('#spelLaag').classList.add('open');

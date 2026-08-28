@@ -20,7 +20,9 @@ function maakJsEngine() {
   const schoon = (s, n) => Array.from(String(s == null ? '' : s)).filter((c) => c.charCodeAt(0) >= 32).join('').slice(0, n).trim();
   const betaal = { async maakBetaling() { return { status: 'betaald', id: 'd' + crypto.randomBytes(4).toString('hex') }; }, async maakUitbetaling() { return { status: 'betaald', id: 'u' }; } };
   const keyVanCodenaam = async (c) => (leden.has(c) ? { key: 'k_' + c } : null);
-  const { pay } = require('../server/kern/pay')({ db, save: () => {}, crypto, betaal, keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0 });
+  // eigen db.data: de losse historie, zie server/kern/pay/loshistorie.js
+  const { pay } = require('../server/kern/pay')({ db, save: () => {}, crypto, betaal, keyVanCodenaam, sseToCustomer: () => {}, schoon, betaaldienstKosten: () => 0,
+    payBoekingenVoegToe: require('../server/kern/pay/loshistorie')(db) });
   return { pay, registreer: (c) => leden.add(c), som: () => Object.values(db.data.paySaldi || {}).reduce((s, v) => s + Math.round(v), 0) };
 }
 

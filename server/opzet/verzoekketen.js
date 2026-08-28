@@ -69,6 +69,7 @@ module.exports = function verzoekketen(deps) {
      (de testrun). Het levert de dekkingsmeting waargenomen feiten in plaats van
      een tekstzoektocht door de tests -- zie server/routelog.js. */
   require('../routelog');   // zet de haak in de router (alleen met RTG_ROUTELOG)
+  require('../staatlog').haak(app);  // idem: het tweede meetpunt van de idemproef
 
   /* De auditmeting (liet dit verzoek een spoor na) staat in ./auditmeting.js --
      een eigen onderwerp, en dit bestand ging er met dat blok erin over de 10 KB. */

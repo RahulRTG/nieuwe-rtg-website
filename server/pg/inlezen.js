@@ -28,10 +28,20 @@ module.exports = (ctx) => {
       // De blob apart ophalen, MET zijn eigen versienummer: tussen de lijst-query
       // en deze fetch kan een ander proces alweer geschreven hebben, en dan zou
       // het lijst-versienummer achterlopen op de inhoud die we toepassen.
-      const vr = await pool.query('SELECT val, ver FROM kv WHERE key = $1', [r.key]);
+      const vr = await pool.query('SELECT val, ver, weg FROM kv WHERE key = $1', [r.key]);
       if (!vr.rows.length) continue;
       const ver = Number(vr.rows[0].ver);
       if (ver <= (toegepast.get(r.key) || 0)) continue;
+      /* Een GRAFSTEEN: een ander proces heeft deze collectie bewust gewist. Hier
+         toepassen en niet mergen -- anders zet deze node hem bij de volgende
+         flush gewoon weer terug, en is het wissen alleen gelukt op de machine
+         waar het commando toevallig liep (TAKEN.md 4.38). */
+      if (vr.rows[0].weg) {
+        delete dataNu[r.key];
+        laatsteJson.delete(r.key);
+        toegepast.set(r.key, ver);
+        continue;
+      }
       const baseJson = laatsteJson.get(r.key);
       const hunJson = uitStore(vr.rows[0].val);
       const lokaalOpen = baseJson !== undefined && JSON.stringify(dataNu[r.key]) !== baseJson;

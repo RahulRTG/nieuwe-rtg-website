@@ -22,7 +22,7 @@
         '<div class="bk-rij h-mt70">' +
           '<input id="bkAiV" placeholder="Vraag de AI-bankier iets…" style="flex:1;min-width:10rem;">' +
           '<button class="knop hoofd" id="bkAiB">Vraag</button></div>' +
-        '<ul id="bkAiTips" class="stil" style="margin:.5rem 0 0 1.1rem;line-height:1.6;font-size:.8rem;"></ul>' +
+        '<ul id="bkAiTips" class="stil" style="margin:0.5rem 0 0 1.25rem;line-height:1.6;font-size:.8rem;"></ul>' +
       '</div>' +
       '<h2>Mijn rekeningen · totaal ' + Geld.euro(ov.totaalCenten) + '</h2>' +
       '<div class="kaart">' + (reks.length ? reks.map(B.rekHtml).join('') : '<p class="stil">Nog geen rekeningen.</p>') + '</div>' +
@@ -74,7 +74,7 @@
     $('#bkOdoe').addEventListener('click', async function () {
       var centen = Math.round(Number($('#bkObed').value) * 100);
       try {
-        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen });
+        await Geld.api('/api/bank/overboek', { vanIban: $('#bkOvan').value, naarIban: $('#bkOnaar').value, centen: centen, idem: B.sleutel('overboek') });
         $('#bkObed').value = ''; await B.herlaad();
       } catch (e) { Geld.melding(e.message); }
     });
@@ -98,13 +98,13 @@
       var euroS = prompt('Hoeveel naar je RTG Pay-wallet? (euro)');
       if (euroS == null) return;
       try {
-        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100) });
+        await Geld.api('/api/bank/naar-wallet', { iban: b.dataset.bkwallet, centen: Math.round(Number(euroS) * 100), idem: B.sleutel('naarwallet') });
         await B.herlaad();
       } catch (e) { Geld.melding(e.message); }
     });
     elk('[data-bkpas]', async function (b) {
       try {
-        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit' });
+        var r = await Geld.api('/api/bank/pas/uitgeven', { iban: b.dataset.bkpas, soort: 'debit', idem: B.sleutel('pasuit') });
         Geld.melding('Pas uitgegeven: ' + r.pas.nummer);
       } catch (e) { Geld.melding(e.message); }
     });

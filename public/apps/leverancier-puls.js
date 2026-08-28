@@ -67,13 +67,13 @@
       '<body style="font-family:Georgia,serif;color:#0C0C0B;max-width:46em;margin:2.5em auto;line-height:1.6;">' +
       '<div id="pwrap" style="text-align:right;"><button id="pbtn" type="button" style="padding:0.5rem 1rem;font-family:inherit;">Print / PDF</button></div>' +
       '<style>@media print { #pwrap { display:none; } }</style>' +
-      '<h1 style="font-size:1.6rem;margin-bottom:0.2rem;">' + esc(naam) + '</h1>' +
+      '<h1 style="font-size:1.6rem;margin-bottom:0.25rem;">' + esc(naam) + '</h1>' +
       '<p style="color:#8A8680;margin-top:0;">Polsrapport · ' + new Date().toLocaleDateString('nl-NL') + '</p>' +
-      '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.6rem 0 0.5rem;">De meters van vandaag</h2>' +
+      '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">De meters van vandaag</h2>' +
       '<table style="border-collapse:collapse;">' + p.meters.map(function (m) {
         return '<tr><td style="padding:0.3rem 0.6rem 0.3rem 0;color:#4D4A45;">' + esc(m[0]) + '</td><td style="padding:0.3rem 0;font-weight:600;">' + esc(String(m[1])) + '</td></tr>';
       }).join('') + '</table>' +
-      ((p.signalen || []).length ? '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.6rem 0 0.5rem;">Signalen</h2>' +
+      ((p.signalen || []).length ? '<h2 style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#7F1634;margin:1.25rem 0 0.5rem;">Signalen</h2>' +
         p.signalen.map(function (s) { return '<div style="padding:0.2rem 0;">&#9670; ' + esc(s.tekst) + '</div>'; }).join('') : '<p>Geen signalen vandaag.</p>') +
       '<p style="color:#8A8680;margin-top:2rem;font-size:0.85rem;">Opgesteld in de zaak-app van RTG; de stand van dit moment.</p>' +
       '<script>document.getElementById("pbtn").addEventListener("click",function(){window.print();});<\/script></body></html>';

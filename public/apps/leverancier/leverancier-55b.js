@@ -23,7 +23,7 @@
 
     // de belastingtool van de zaak: dezelfde motor als de Business Pass
     h += '<div class="st-sec">'+T('zb.bel','Belastingtool')+'</div>'+
-      '<div class="sub" style="margin-bottom:0.4rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
+      '<div class="sub" style="margin-bottom:0.5rem;">'+T('zb.bel.s','Vul de verwachte jaarwinst in voor een indicatie van de belasting, de nettowinst en wat u maandelijks opzij zet. Het land van de zaak is het vertrekpunt.')+'</div>'+
       '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
       '<input id="zbBelWinst" type="number" min="1" placeholder="'+T('zb.bel.ph','jaarwinst €')+'" style="width:9rem;">'+
       '<button class="abtn" id="zbBelGo">'+T('zb.bel.reken','Reken')+'</button></div>'+
@@ -66,8 +66,13 @@
     if (bvSend) bvSend.addEventListener('click', async () => {
       const bedrag = Number(($('#bvBedrag')||{}).value);
       if (!(bedrag >= 0.5)) { toast(T('zb.bedragmin','Kies een bedrag van minstens € 0,50.')); return; }
-      try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value }); toast(''+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
-      catch(e){ toast(e.message); }
+      /* Knop op slot tegen de dubbeltik, idem-sleutel tegen een herhaalde
+         poging. Twee verzoeken van hetzelfde bedrag kan de gast namelijk
+         ALLEBEI afrekenen (TAKEN.md 4.60). */
+      if (bvSend.disabled) return;
+      bvSend.disabled = true;
+      try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value, idem: RTGIdem('bv') }); toast(''+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
+      catch(e){ bvSend.disabled = false; toast(e.message); }
     });
     el.querySelectorAll('[data-bvweg]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/betaalverzoek/intrek', { ref:b.dataset.bvweg }); renderZaakBoard(); } catch(e){ toast(e.message); }

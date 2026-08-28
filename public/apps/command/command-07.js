@@ -32,7 +32,7 @@
   }
 
   function tzTeken(agents, rechten) {
-    var u = '<h2 class="ckop" style="font-size:1.15rem;margin-bottom:.7rem;">Agents</h2>';
+    var u = '<h2 class="ckop" style="font-size:1.15rem;margin-bottom:0.75rem;">Agents</h2>';
     if (!agents.length) u += '<div class="kaart"><p>Er heeft nog geen agent gehandeld. Er staan dus geen budgetten open -- dat is een uitslag, geen ontbrekende meting.</p></div>';
     for (var i = 0; i < agents.length; i++) {
       var a = agents[i];
@@ -47,7 +47,7 @@
         '</div></div>';
     }
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.6rem 0 .7rem;">Zware rechten</h2>';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.25rem 0 0.75rem;">Zware rechten</h2>';
     u += '<div class="kaart"><h3>Wat er tijdelijk te geven valt</h3>';
     for (var s = 0; s < rechten.soorten.length; s++) {
       var so = rechten.soorten[s];

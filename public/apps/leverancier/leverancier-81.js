@@ -27,7 +27,7 @@
 
     // de PDA van dit bedrijf: personeel opent met deze link (of QR) meteen
     // het eigen team, zonder sector- en bedrijfskeuze
-    html += '<a class="obtn" style="text-decoration:none;display:inline-block;margin:0.2rem 0 0.8rem;" href="/apps/personeel.html?bedrijf='+encodeURIComponent(S.code)+'">'+T('team.pdalink','Personeels-app van dit bedrijf')+'</a>';
+    html += '<a class="obtn" style="text-decoration:none;display:inline-block;margin:0.25rem 0 0.75rem;" href="/apps/personeel.html?bedrijf='+encodeURIComponent(S.code)+'">'+T('team.pdalink','Personeels-app van dit bedrijf')+'</a>';
 
     // activiteit
     html += '<div class="card"><div class="tt-h">'+T('team.activity','Wie deed wat')+'</div>';
@@ -37,7 +37,7 @@
     html += '</div>';
 
     // interne chat
-    html += '<div class="card"><div class="tt-h" style="margin-bottom:0.6rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
+    html += '<div class="card"><div class="tt-h" style="margin-bottom:0.5rem;">'+T('team.chat','Interne teamchat')+'</div><div class="tt-chat" id="ttChat">';
     html += team.length ? team.map(m =>
       '<div class="tt-msg '+(m.who===a.name?'me':'other')+'"><span class="who">'+m.who+'</span>'+esc(m.text)+'<time>'+timeAgo(m.at)+'</time></div>'
     ).join('') : '<div style="font-size:0.82rem;color:var(--soft);padding:0.4rem 0;">'+T('team.nochat','Nog geen berichten. Stuur je team een bericht.')+'</div>';

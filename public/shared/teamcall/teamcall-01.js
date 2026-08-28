@@ -21,6 +21,7 @@
   let stream = null;                 // eigen camera en microfoon
   let peers = new Map();             // staffId -> { pc, naam, queue, el }
   let kamer = null;                  // 'team' in een groepsgesprek
+  let mee = null;                    // de tekstbaan van het gesprek (shared/meelezen.js)
   let uitgaand = null;               // { naar, naam } zolang 1-op-1 overgaat
   let binnenkomend = null;           // { van, vanNaam } zolang het rinkelt
   let ice = null, timer = null, t0 = 0;
@@ -85,6 +86,17 @@
       const t = stream && stream.getVideoTracks()[0];
       if (t){ t.enabled = !t.enabled; ev.currentTarget.classList.toggle('uit', !t.enabled); }
     });
+    /* MEELEZEN. Een teamcall is beeld en geluid; wie doof is heeft zonder tekst
+       alleen het beeld. De baan hangt onder de knoppenbalk in dezelfde overlay
+       (shared/meelezen.js) -- getypt door mensen, niet uit spraak herkend. */
+    if (w.RTGMeelezen && !mee){
+      mee = w.RTGMeelezen.maak({ ik: (mij() || {}).name || 'Jij', stuur: regel => {
+        if (kamer) zend('tekst', { kamer, payload: { r: regel } });
+        else peers.forEach((p, id) => zend('tekst', { staffId: id, payload: { r: regel } }));
+      } });
+      mee.el.style.cssText += 'padding:0 12px 10px;';
+      el.appendChild(mee.el);
+    }
     // de eigen tegel (gedempt: je hoort jezelf niet)
     const eigen = document.createElement('div');
     eigen.className = 'tc-tegel';

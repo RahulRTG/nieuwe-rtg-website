@@ -46,7 +46,7 @@
         (rb.terugDraaibaar ? 'terug te draaien' : 'NIET terug te draaien') +
         (rb.klantImpact ? ' · de klant merkt dit' : ' · geen klantimpact') + '</p>' +
         '<p class="meta">Risico ' + rb.oordeel.score + ' -- ' + esc(rb.oordeel.waarom) + '</p>' +
-        '<div class="crij" style="margin-top:.7rem;align-items:baseline;">' +
+        '<div class="crij" style="margin-top:0.75rem;align-items:baseline;">' +
         '<b style="font-family:\'Bodoni Moda\',Georgia,serif;font-size:1.3rem;">' + rb.kandidaten + '</b>' +
         '<span class="meta">geval(len) passen nu</span>' +
         (rb.kandidaten ? '<button class="knop" data-droog="' + esc(rb.id) + '">Droog draaien</button>' +
@@ -56,7 +56,7 @@
         '<div class="meta" id="droog-' + esc(rb.id) + '"></div></div>';
     }
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.6rem 0 .7rem;">De laatste rondes</h2>';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.25rem 0 0.75rem;">De laatste rondes</h2>';
     if (!runs.length) u += '<div class="leeg">Er is nog geen herstelronde gedraaid.</div>';
     for (var j = 0; j < runs.length; j++) {
       var r = runs[j];

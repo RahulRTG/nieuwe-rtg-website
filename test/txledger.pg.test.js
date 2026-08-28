@@ -34,4 +34,25 @@ test('grootboek: RAM-venster + verlies-vrij vegen + historie + mutatie-doorstroo
   // een statuswissel op een venster-item stroomt via de veegronde door naar het grootboek
   assert.equal(r.mutatieStatus, 'terugbetaald', 'statuswissel is in het grootboek geland');
   assert.equal(r.vensterNogVindbaar, true, 'het venster-item blijft via de index vindbaar');
+
+  /* ---- RTG Pay in het grootboek, en het venster voorbij een bladzijde
+         (TAKEN.md 4.39) ----
+
+     DIT IS DE PLEK WAAR DE TIMESTAMPTZ-VRAAG THUISHOORT. Een pay-boeking draagt
+     `at` als GETAL en de kolom is een timestamptz; zonder normalisatie
+     struikelt de insert en slikken beide wegen naar het grootboek de fout
+     (txLedgerZet vangt hem, de veegronde meldt alleen "veegronde mislukt").
+     Netto geeft de app 200, klopt het saldo, en staat er geen rij. Alleen een
+     echte Postgres laat dat zien -- de SQLite-kolom is TEXT en neemt een getal
+     gewoon aan.
+
+     De asserties staan HIER en niet in een eigen bestand met een eigen skip:
+     `zelfpoortendeToetsen` in NORM.json mag alleen omlaag, en deze toets poort
+     zichzelf al. */
+  assert.equal(r.payLedger, 700, 'alle 700 pay-regels staan in het grootboek');
+  assert.equal(r.payTopUp, 700, 'na een verloren blob komt het HELE venster terug, niet de eerste bladzijde van 500');
+  assert.equal(r.payNieuwsteEerst, true, 'en in de goede volgorde: nieuwste eerst, ook met een tijdstip in milliseconden');
+  assert.equal(r.payTweedeRondeRaakteNiets, true, 'een tweede bijvulronde op een kloppend venster raakt niets aan: geen dubbele regels, geen nieuwe array');
+  assert.equal(r.payTijdstipIsBasis, true,
+    'en het tijdstip in de timestamptz-kolom is het tijdstip van de boeking, niet een moment van invoegen');
 });

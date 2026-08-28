@@ -11,7 +11,7 @@
       '<div class="h-mt50" id="boekSlots"></div>' +
       '<input id="boekNote" placeholder="' + T('boek.noteph','Bijv. maat, locatie of blessure') + '" style="width:100%;margin-top:0.5rem;background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.6rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.82rem;">' +
       '<div style="font-size:0.66rem;color:var(--soft);margin:0.5rem 0 0;">' + T('boek.los','U boekt rechtstreeks bij deze professional: een losse overeenkomst, en uw betaling gaat rechtstreeks naar de professional.') + '</div>' +
-      '<button id="boekGo" class="btn-pay" style="width:100%;margin-top:0.7rem;justify-content:center;">' + FID + T('boek.go','Boek en betaal') + '</button>';
+      '<button id="boekGo" class="btn-pay" style="width:100%;margin-top:0.75rem;justify-content:center;">' + FID + T('boek.go','Boek en betaal') + '</button>';
     $('#boek-sheet').classList.add('open');
     $('#boek-scrim').classList.add('open');
     // de vrije tijdvakken van de professional ophalen en als chips tonen
@@ -26,7 +26,7 @@
         box.innerHTML = '<div style="font-size:0.7rem;color:var(--soft);">' + T('boek.geenslots','Geen vrije tijden op deze dag; kies een andere datum of typ een tijd.') + '</div>';
         return;
       }
-      box.innerHTML = '<div style="font-size:0.66rem;color:var(--soft);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.35rem;">' + T('boek.vrijetijden','Vrije tijden') + '</div>' +
+      box.innerHTML = '<div style="font-size:0.66rem;color:var(--soft);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.25rem;">' + T('boek.vrijetijden','Vrije tijden') + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">' + d.tijden.map(t =>
           '<button class="js-slot" data-t="' + t + '" style="background:var(--card);border:1px solid var(--line);border-radius:0;padding:0.35rem 0.7rem;color:var(--txt);font-family:inherit;font-size:0.8rem;cursor:pointer;">' + t + '</button>').join('') + '</div>';
       box.querySelectorAll('.js-slot').forEach(b => b.addEventListener('click', () => {

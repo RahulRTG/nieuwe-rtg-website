@@ -568,3 +568,152 @@ test('8. een factuur die NIET lukt komt op het techniekbord, en trekt de betalin
   assert.equal(log.foutenSamenvatting().totaal, 0, 'geen motor is geen storing');
   log.foutenReset();
 });
+
+/* -------------------------------------------------------------------------
+   9. DE CADEAUKAART (TAKEN.md 4.27)
+
+   Dit geval stond hierboven met zoveel woorden als NIET gedekt, en met reden:
+   de inwisseling boekte geen factuur (dus de aangifte miste hem) EN de
+   boekhouding telde hem apart naast de kassabon (dus die telde dubbel). Twee
+   fouten in tegengestelde richting over hetzelfde geld.
+
+   Sinds die reparatie is 'cadeaukaart' een BETAALWIJZE aan de kassa: de gewone
+   bon draagt de omzet, de artikelen, de btw en de factuur, en diezelfde bon
+   trekt het saldo van de kaart af. Deze toets rekent een echte bon af met een
+   echte kaart en legt daarna dezelfde twee cijfers naast elkaar als toets 7.
+   ------------------------------------------------------------------------- */
+test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding blijven gelijk', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const lid = await registreer(base);
+    const kaartMenu = (await api(base, '/api/supplier/menu/get', { code: 'KIKUNOI' }, lid)).body;
+    const eten = (kaartMenu.menu || []).find(x => x.station !== 'bar');
+    const bar = (kaartMenu.menu || []).find(x => x.station === 'bar');
+    assert.ok(eten && bar, 'de zaak heeft eten en drank; anders meet deze toets maar een tarief');
+
+    // een cadeaukaart van 500 verkopen -- dat is nog GEEN omzet
+    const verkoop = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500 }, mgr);
+    assert.equal(verkoop.status, 200);
+    const gcCode = verkoop.body.kaart.code;
+
+    const voor = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((voor.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), 0,
+      'een verkochte cadeaukaart is nog geen omzet: het saldo is een verplichting');
+
+    // en nu een bon van 2 gerechten + 1 drankje, afgerekend MET de kaart
+    const items = [{ name: eten.name, qty: 2, price: eten.price }, { name: bar.name, qty: 1, price: bar.price }];
+    const totaal = Math.round((eten.price * 2 + bar.price) * 100) / 100;
+    const bon = await api(base, '/api/supplier/pos/sale',
+      { items, total: totaal, method: 'cadeaukaart', gcCode }, mgr);
+    assert.equal(bon.status, 200, JSON.stringify(bon.body).slice(0, 200));
+    assert.equal(bon.body.sale.method, 'cadeaukaart');
+    assert.equal(bon.body.sale.gcRest, Math.round((500 - totaal) * 100) / 100, 'het saldo is met de bon afgeboekt');
+    await even();
+
+    // dezelfde twee cijfers als in toets 7, op de grondslag (exclusief btw)
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    const omzetBoekhouding = Math.round((fin.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100);
+    const btwBoekhouding = Math.round((fin.body.btwTotaal || 0) * 100);
+    assert.ok(omzetBoekhouding > 0, 'de boekhouding telt deze bon');
+    assert.equal(new Set((fin.body.btw || []).map(r => r.tarief)).size, 2, 'twee tarieven: eten en drank');
+
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: fin.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    const omzetAangifte = (op.body.aangifte.tarieven || []).reduce((s, t) => s + t.omzetCenten, 0);
+
+    assert.equal(omzetAangifte, omzetBoekhouding,
+      'de aangifte telt exact de omzet van de boekhouding; telde de inwisseling er nog apart bij, dan stond hier het dubbele');
+    assert.equal(op.body.aangifte.verschuldigdCenten, btwBoekhouding, 'en dezelfde af te dragen btw');
+
+    /* FAIL-CLOSED, net als RTG Pay: eerst het geld, dan pas de bon. Een kaart
+       zonder dekking en een code die niet bestaat leveren geen bon op -- en dus
+       ook geen omzet. Zonder deze twee zou de betaalwijze een gratis bon zijn:
+       de omzet zou tellen terwijl er niets tegenover staat.
+
+       EN ZE BEWAKEN NOG IETS DAT GEEN ASSERTIE HIER KAN ZIEN. Beide takken
+       zitten binnen de herhalingslaag van de kassa (kern/kassa/herhaling.js),
+       en die eist dat het werk zijn antwoord TERUGGEEFT in plaats van het zelf
+       te versturen. Stond er `res.status(404).json(...)`, dan ging de Express-
+       `res` als antwoord terug -- een object dat naar zichzelf verwijst
+       (res.req.res...) -- en liep de serialisatie eromheen vast op "Maximum
+       call stack size exceeded". De twee statuscodes hieronder blijven daarbij
+       gewoon KLOPPEN, want het antwoord was al verstuurd; wat zakt is de
+       strenge poort in test/helper.js, die de uitzondering van de server
+       meeleest. Zo is deze fout ook gevonden. Wie hier ooit terugvalt op
+       res.json(), ziet deze asserties dus groen blijven en het bestand toch
+       rood worden -- dat is de bedoeling. */
+    const teDuur = await api(base, '/api/supplier/pos/sale',
+      { items, total: 5000, method: 'cadeaukaart', gcCode }, mgr);
+    assert.equal(teDuur.status, 409, 'meer dan het saldo wordt geweigerd');
+    const onbekend = await api(base, '/api/supplier/pos/sale',
+      { items, total: 1, method: 'cadeaukaart', gcCode: 'RTG-GC-ZZZZZZ' }, mgr);
+    assert.equal(onbekend.status, 404, 'een onbekende kaart wordt geweigerd');
+    await even();
+    const naWeigering = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((naWeigering.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), omzetBoekhouding,
+      'een geweigerde betaling laat geen bon en dus geen omzet achter');
+
+    /* De handmatige afboeking blijft bestaan als correctiemiddel, maar draagt
+       geen omzet -- en zegt dat ook, want geld dat buiten de boeken valt hoort
+       nooit stilletjes te verdwijnen. */
+    const hand = await api(base, '/api/supplier/giftcard/redeem', { code: gcCode, bedrag: 25 }, mgr);
+    assert.equal(hand.status, 200);
+    const na = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((na.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100), omzetBoekhouding,
+      'een handmatige afboeking verandert de omzet niet');
+    assert.equal(na.body.giftcards.handmatig, 25, 'maar staat wel apart gemeld');
+    assert.ok(na.body.regels.some(r => /met de hand/.test(r)), 'met een waarschuwing in het overzicht');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* -------------------------------------------------------------------------
+   10. EEN CADEAUKAART VERKOPEN WAS NIET IDEMPOTENT (TAKEN.md 4.60)
+
+   Elke oproep maakte een NIEUWE kaart met saldo. Een hapering of een retry na
+   een timeout gaf dus een tweede kaart van hetzelfde bedrag -- en die is
+   gewoon inwisselbaar, dus de zaak geeft dat bedrag echt weg. Gevonden bij het
+   opschrijven van de idempotentie-besluiten (4.30).
+
+   Wat een idem-sleutel WEL en NIET doet, want dat verschil hoort hier te
+   staan: hij vangt de HERHALING van dezelfde poging. Twee bewuste verkopen
+   achter elkaar horen twee kaarten te geven, en dat blijft zo -- die hebben
+   elk hun eigen sleutel. De dubbeltik zelf wordt aan de knop gevangen.
+   ------------------------------------------------------------------------- */
+test('10. een cadeaukaart verkopen met dezelfde sleutel geeft EEN kaart, geen twee', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    const eerste = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-1' }, mgr);
+    assert.equal(eerste.status, 200);
+    const code = eerste.body.kaart.code;
+
+    const herhaald = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-1' }, mgr);
+    assert.equal(herhaald.status, 200);
+    assert.equal(herhaald.body.kaart.code, code, 'dezelfde kaart terug, geen tweede met saldo');
+    assert.equal(herhaald.body.herhaald, true, 'de server merkt de herhaling zelf');
+
+    // een verse sleutel is wel een echte tweede verkoop
+    const tweede = await api(base, '/api/supplier/giftcard/sell', { bedrag: 250, idem: 'gc-vast-2' }, mgr);
+    assert.notEqual(tweede.body.kaart.code, code, 'twee bewuste verkopen geven twee kaarten');
+
+    // dezelfde sleutel voor een ander bedrag is een fout, geen stille echo
+    const ander = await api(base, '/api/supplier/giftcard/sell', { bedrag: 500, idem: 'gc-vast-1' }, mgr);
+    assert.equal(ander.status, 409, 'dezelfde sleutel voor een ander bedrag wordt geweigerd');
+
+    /* En de proef op de som die er echt toe doet: hoeveel saldo staat er nu bij
+       deze zaak open? Twee kaarten van 250, niet drie -- want de herhaling en
+       de geweigerde 409 mogen geen saldo hebben aangemaakt. */
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(fin.body.giftcards.open, 500, 'het openstaande kaartsaldo is 2 x 250, niet meer');
+    assert.equal(fin.body.giftcards.aantal, 2, 'en er staan twee kaarten, geen vier');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

@@ -104,7 +104,7 @@
     <div id="koppelBlok" hidden>
       <div class="sec" id="kopTitel">Kind uitnodigen voor een klas</div>
       <div class="kaart blok">
-        <div class="mini" id="kopUitleg" style="margin-bottom:.5rem;"></div>
+        <div class="mini" id="kopUitleg" style="margin-bottom:0.5rem;"></div>
         <input class="veld" id="kopCode" placeholder="Klascode (van de leraar)" maxlength="8" autocapitalize="characters">
         <select class="veld" id="kopKind" aria-label="Welk kind nodig je uit"></select>
         <button class="knop" id="kopDoe">Uitnodigen</button>
@@ -133,7 +133,7 @@
       <a class="knop schakel" href="/apps/schoolpartner.html">Open School Partner</a>
       <div style="border-top:1px solid var(--lijn);margin:.9rem 0;"></div>
       <b>Inloggen</b>
-      <div class="mini" style="margin:.3rem 0 .6rem;">Met je schoolcode en je token (beheer of personeel).</div>
+      <div class="mini" style="margin:0.25rem 0 0.5rem;">Met je schoolcode en je token (beheer of personeel).</div>
       <input class="veld" id="inCode" placeholder="Schoolcode" maxlength="8" autocapitalize="characters" autocomplete="organization" spellcheck="false">
       <input class="veld" id="inToken" placeholder="Persoonlijke toegangssleutel" type="password" autocomplete="current-password" spellcheck="false">
       <button class="knop grijs" id="inDoe">Veilig inloggen</button>
@@ -668,6 +668,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
+<script src="/shared/meelezen.js" defer></script>
 <script src="/shared/schoolbel.js" defer></script>
 <script src="school-extra.js" defer></script>
 <script src="school-portaal.js" defer></script>

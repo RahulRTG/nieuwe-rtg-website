@@ -53,8 +53,12 @@ module.exports = function maakPgAchter(pool) {
         : await pool.query('SELECT count(*)::bigint AS c FROM tx_ledger WHERE soort=$1', [soort]);
       return Number(r.rows[0].c);
     },
-    async recent(soort, limit) {
-      const r = await pool.query('SELECT data FROM tx_ledger WHERE soort=$1 ORDER BY at DESC LIMIT $2', [soort, limit]);
+    /* Met een OFFSET, want het venster bijvullen leest verder dan een bladzijde:
+       zie ./topup.js. Zonder offset kon een herstart hooguit de eerste bladzijde
+       terughalen, en dan bleef de rest in het grootboek staan. */
+    async recent(soort, limit, offset) {
+      const r = await pool.query('SELECT data FROM tx_ledger WHERE soort=$1 ORDER BY at DESC LIMIT $2 OFFSET $3',
+        [soort, limit, Math.max(0, Number(offset) || 0)]);
       return r.rows.map(x => x.data);
     }
   };

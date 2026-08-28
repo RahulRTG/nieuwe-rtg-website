@@ -2,12 +2,15 @@
    RTF-schoolapp) en de leraar (in de School Partner-app). Spraak loopt
    peer-to-peer (WebRTC, alleen audio); de server geeft louter de belsignalen
    door. Geen telefoonnummers nodig: alles blijft binnen het huis.
+   Er loopt een TEKSTBAAN mee (shared/meelezen.js): dit gesprek is alleen geluid,
+   dus wie doof is heeft hier zonder tekst niets -- er valt niet eens van te
+   liplezen. Wat in die baan staat is getypt en niet uit spraak herkend.
    Gebruik: SchoolBel.start({ klasCode, gezin:{code,token} }) of
             SchoolBel.start({ klasCode, leraar:{token} });
             SchoolBel.bel('leraar' | gezinCode, 'naam voor op het scherm'). */
 (function () {
   'use strict';
-  var S = null, es = null, pc = null, stream = null, call = null, iceQ = [], iceConfig = null;
+  var S = null, es = null, pc = null, stream = null, call = null, iceQ = [], iceConfig = null, mee = null;
 
   function post(body) {
     var b = Object.assign({ klasCode: S.klasCode }, S.gezin ? { code: S.gezin.code, token: S.gezin.token } : { leraarToken: S.leraar.token }, body || {});
@@ -37,6 +40,14 @@
       '<button id="sbelWeg" type="button" style="flex:1;padding:.55rem;border:0;border-radius:0;background:#7F1634;color:#fff;font:inherit;font-weight:600;cursor:pointer;">Ophangen</button></div>' +
       '<audio id="sbelAudio" autoplay></audio>';
     document.body.appendChild(el);
+    /* DE TEKSTBAAN. Dit gesprek is ALLEEN GELUID -- er valt niet eens van te
+       liplezen -- dus wie doof is heeft hier zonder tekst helemaal niets. De
+       baan hangt IN het belvenster en niet ernaast; wat er staat is getypt door
+       een mens, niet herkend uit spraak (zie de kop van shared/meelezen.js). */
+    if (window.RTGMeelezen) {
+      mee = window.RTGMeelezen.maak({ stuur: function (regel) { sein('tekst', { r: regel }); } });
+      el.appendChild(mee.el);
+    }
     el.querySelector('#sbelWeg').addEventListener('click', function () { sein('hangup'); stop(); });
     el.querySelector('#sbelNeem').addEventListener('click', neemOp);
     return el;
@@ -51,6 +62,7 @@
     if (pc) { try { pc.close(); } catch (e) {} pc = null; }
     if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
     call = null; iceQ = [];
+    if (mee) mee.leeg();          // een volgend gesprek begint met een lege baan
     var el = document.getElementById('sbel'); if (el) el.style.display = 'none';
   }
 
@@ -97,6 +109,10 @@
     } else if (d.kind === 'ice') {
       if (pc && pc.remoteDescription) { try { pc.addIceCandidate(d.payload); } catch (e) {} }
       else iceQ.push(d.payload);
+    } else if (d.kind === 'tekst') {
+      /* Een meegetypte regel van de ander. Ook zonder lopend gesprek tonen we
+         hem niet: dan is er geen venster en zou hij nergens landen. */
+      if (mee && d.payload && d.payload.r) mee.voed(d.payload.r, { wie: d.vanNaam, bron: 'mens' });
     } else if (d.kind === 'hangup') {
       stop();
     }

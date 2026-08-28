@@ -62,8 +62,8 @@
   }
   // de deurhost-regel: waar is de gast (GPS uit de leden-app)
   function pkGast(o){
-    if (o.guestArrived) return '<div style="font-size:0.74rem;color:#7BC79B;margin-bottom:0.4rem;">'+T('kds.gastin','De gast is binnen.')+'</div>';
-    if (Number.isFinite(o.guestEtaMin)) return '<div style="font-size:0.74rem;color:var(--soft);margin-bottom:0.4rem;">'+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
+    if (o.guestArrived) return '<div style="font-size:0.74rem;color:#7BC79B;margin-bottom:0.5rem;">'+T('kds.gastin','De gast is binnen.')+'</div>';
+    if (Number.isFinite(o.guestEtaMin)) return '<div style="font-size:0.74rem;color:var(--soft);margin-bottom:0.5rem;">'+T('kds.gast','Gast onderweg, ~')+o.guestEtaMin+' min</div>';
     return '';
   }
   // het overschot op de pas: wat er ligt hoef je niet te maken
@@ -92,7 +92,7 @@
   function pkVoorraadKaart(){
     if (!pkWv || (!(pkWv.adviezen||[]).length && !(pkWv.op||[]).length && !(pkWv.laag||[]).length)) return '';
     return '<div class="card" style="border-left:4px solid var(--gold,#A98F1C);"><div class="k">'+T('st.voorraad','Voorraad')+'</div>'+
-      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.4rem;align-items:center;">'+
+      '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">'+
       (pkWv.adviezen||[]).map(a => '<button class="abtn" data-pk86="'+a.menuItemId+'" style="border-color:#E5484D;color:#FF8589;">86: '+esc(a.gerecht)+' ('+esc(a.ingredient)+' '+T('st.isop','is op')+')</button>').join('')+
       (pkWv.op||[]).map(a => '<span style="font-size:0.78rem;color:#FF8589;font-weight:600;">'+esc(a.naam)+' '+T('st.op','OP')+'</span>').join('')+
       (pkWv.laag||[]).map(a => '<span style="font-size:0.78rem;color:var(--soft);">'+esc(a.naam)+' '+T('st.laag','laag')+' ('+a.aantal+' '+esc(a.eenheid)+')</span>').join('')+

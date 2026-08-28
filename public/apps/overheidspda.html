@@ -64,7 +64,7 @@
 <header><div class="ey">Rijksoverheid · personeel</div><h1 id="kop">Overheids-PDA</h1></header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">De werktelefoon voor al het personeel van alle rijkskantoren: receptie, security, schoonmaak en de bode. Log in met je persoonlijke pincode.</p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">De werktelefoon voor al het personeel van alle rijkskantoren: receptie, security, schoonmaak en de bode. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -143,16 +143,16 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+OVER.rondesVandaag+'</b><span>Rondes vandaag</span></div>'+
       (LOC === 'rechtbank' ? '<div class="kpi"><b>'+OVER.zittingenVandaag+'</b><span>Zittingen vandaag</span></div>' : '')+
     '</div>'+
-    '<h3 style="font-size:.95rem;margin:.2rem 0 .1rem;">Locatie</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.25rem 0 0.25rem;">Locatie</h3>'+
     '<div class="keuze">'+OVER.locaties.map(l => '<button data-loc="'+l.id+'" class="'+(l.id===LOC?'aan':'')+'"><span class="ic">'+l.icoon+'</span>'+esc(l.label)+'</button>').join('')+'</div>'+
-    '<h3 style="font-size:.95rem;margin:.2rem 0 .1rem;">Jouw rol</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.25rem 0 0.25rem;">Jouw rol</h3>'+
     '<div class="keuze">'+OVER.rollen.map(r => '<button data-rol="'+r.id+'"><span class="ic">'+r.icoon+'</span>'+esc(r.label)+'<span class="sub">'+esc(r.wat)+'</span></button>').join('')+'</div>';
   $('#app').querySelectorAll('[data-loc]').forEach(b => b.addEventListener('click', () => { LOC = b.dataset.loc; kiesScherm(); }));
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => { ROL = b.dataset.rol; rolScherm(); }));
 }
 
 function kopStuk(titel){
-  return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>';
+  return '<button class="terug" id="terug">← locatie en rol kiezen</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>';
 }
 function aiBlok(hint){
   return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-conciërge denkt mee; jij handelt.</div></div>';

@@ -531,12 +531,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
-    /* server/kern/pay/index.js STOND HIER en is er weer af. Twee onderwerpen
+    /* server/kern/pay/index.js STOND HIER en is er weer af. Drie onderwerpen
        eruit: de stand van de laag (de drie schakelaars uit de omgeving en de
-       zes bedragen, ./stand.js) en alles wat eruit komt zonder dat er geld
-       beweegt (./kijken.js). pasToe, boek en boekAsync bleven met opzet staan:
-       WETTEN.json handhaaft de wet geld-conservatie in dit bestand en wijst met
-       zijn sabotagerecept EEN REGEL uit pasToe() aan, met bestandsnaam erbij. */
+       zes bedragen, ./stand.js), alles wat eruit komt zonder dat er geld
+       beweegt (./kijken.js), en sinds 24 augustus ook de drie functies die een
+       cent verplaatsen (./boeken.js).
+       Die laatste bleven twee rondes staan omdat WETTEN.json de wet
+       geld-conservatie hier handhaafde en zijn sabotagerecept EEN REGEL uit
+       pasToe() aanwijst, met bestandsnaam erbij. Bij de knip zijn de
+       bestandsnaam en de handhaverlijst meeverhuisd naar boeken.js en is de
+       regel zelf letterlijk gelijk gebleven -- anders wijst de wet naar een
+       verplaatste regel en toetst ze niets meer. */
     /* DERTIEN REGELS STONDEN HIER EN ZIJN ER WEER AF, en ze stonden er te lang.
        De communicatiekern en wat eraan vastzit (comm/index, comm/wie, de twee
        comm-deuren, auth, vergeten), de zes van de werkplaats-ronde
@@ -3504,7 +3509,7 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     spiegel:     { open: false, stil: true },   // je eigen beeld, zichtbaar, zonder geluid
     werktuig:    { open: false, stil: true },   // beeld als invoer of rekenmiddel
     ondertiteld: { open: false, anker: true },  // opgenomen inhoud MET een weg naar tekst
-    gesprek:     { open: true },                // live, tweerichting
+    gesprek:     { open: true, baan: true },    // live, tweerichting -- MOET een tekstbaan dragen
     uitzending:  { open: true },                // live, eenrichting
     onbedekt:    { open: true }                 // opgenomen inhoud ZONDER weg naar tekst
   };
@@ -3526,22 +3531,22 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
   const REGISTER = new Map([
     ['public/apps/app.html#csRemote', ['gesprek', 'het beeld en geluid van de ander in een videogesprek tussen twee leden']],
     ['public/apps/app.html#csLocal', ['spiegel', 'je eigen beeld in de hoek van dat gesprek; stil, want jezelf terughoren is een echo']],
-    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij']],
+    ['public/apps/backoffice.html#ontLiveVid', ['uitzending', 'SOS: het kantoor kijkt live mee met de camera van een lid, met geluid erbij. GEEN tekstbaan, en dat is de eerlijke stand: wie doof is kan geen SOS-dienst draaien. Een noodscherm is niet de plek om er een even bij te zetten -- dat is een besluit, zie TOEGANKELIJK.md']],
     ['public/apps/camera.html#beeld', ['spiegel', 'de camera-app: je eigen beeld om een foto te maken, zonder geluid']],
     ['public/apps/clips.html#studioDoek', ['spiegel', 'het opnamedoek van de clipstudio: je eigen beeld voordat de opname loopt']],
     ['public/apps/clips.html#js1', ['ondertiteld', 'de clip in de feed; de gedeelde clipdeler zet de ondertitelband van de maker eroverheen', CLIPBAND]],
     ['public/apps/clips.html#js2', ['werktuig', 'een onzichtbaar element dat het eerste frame als affiche uitleest']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander']],
-    ['public/apps/foundation/gezin-rt/gezin-rt-02.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
-    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander']],
+    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-remote', ['gesprek', 'het gezinsgesprek van RTFoundation: het beeld van de ander', ['public/apps/foundation/gezin-rt.js', 'RTGMeelezen']]],
+    ['public/apps/foundation/gezin-rt/gezin-rt-03.js#grt-local', ['spiegel', 'je eigen beeld in dat gezinsgesprek']],
+    ['public/apps/foundation/vrienden.html#belRemote', ['gesprek', 'bellen met een vriend: het beeld van de ander', ['public/apps/foundation/vrienden.html', 'RTGMeelezen']]],
     ['public/apps/foundation/vrienden.html#belLocal', ['spiegel', 'je eigen beeld tijdens dat bellen']],
     ['public/apps/geld/rtgcodeb.js#rcCam', ['werktuig', 'de camera leest een RTG-code; shared/media.js vraagt bij een camera nooit geluid']],
     ['public/apps/media.html#film', ['ondertiteld', 'een opgenomen film uit het Theater; de kaart uit kern/mediaos draagt de cue-lijst mee en de gedeelde band toont hem', ['server/kern/mediaos/catalogus.js', 'ondertitels']]],
     ['public/apps/media.html#clipfilm', ['ondertiteld', 'een clip speelt hier via dezelfde clipdeler, met dezelfde ondertitelband', CLIPBAND]],
-    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted']],
+    ['public/apps/meet/kamer.js#1', ['gesprek', 'de vergaderkamer: een tegel per deelnemer, en de eigen tegel krijgt muted', ['public/apps/meet/kamer.js', 'RTGMeelezen']]],
     ['public/apps/memo/app.js#1', ['ondertiteld', 'een eigen spraakmemo; het toestel maakt er een transcript bij dat in de lijst staat en samen te vatten is', ['public/apps/memo/app.js', 'transcript']]],
     ['public/apps/oog.html#cam', ['werktuig', 'het oog schouwt een voertuig of werkvloer: beeldanalyse, geen geluid']],
-    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand']],
+    ['public/apps/podium.html#kijkVideo', ['uitzending', 'een live uitzending van het Podium; srcObject is er altijd een stroom, nooit een bestand. Er loopt WEL een tekstbaan mee: de kanaalchat (#chatKijk, aria-live), waarin de uitzender kan meeschrijven -- geen ondertiteling, wel een weg naar tekst', ['public/apps/podium.html', 'chatKijk']]],
     ['public/apps/podium.html#studioVideo', ['spiegel', 'het eigen beeld van de uitzender, voor en tijdens het uitzenden']],
     ['public/apps/scanner.html#beeld', ['werktuig', 'de documentscanner leest papier: beeld als invoer']],
     ['public/apps/theater.html#doekVideo', ['ondertiteld', 'de bioscoop van het Theater: de maker schrijft de ondertitels bij zijn eigen video, en de kijker krijgt ze mee met de zaal', ['server/kern/theater/video.js', 'videoOndertitels']]],
@@ -3550,9 +3555,9 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     ['public/shared/paspoortscan.js#pscanVid', ['werktuig', 'de paspoortscan leest de MRZ-regels van een document']],
     ['public/shared/scanknop.js#js1', ['werktuig', 'de gedeelde scanknop: hetzelfde leesinstrument, in een eigen venster']],
     ['public/shared/scanner.js#js1', ['werktuig', 'het reserve-element van de scanner zelf, als de aanroeper er geen meegeeft']],
-    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks']],
+    ['public/shared/schoolbel.js#sbelAudio', ['gesprek', 'het schoolgesprek is een live audiogesprek: wie opneemt hoort de ander rechtstreeks', ['public/shared/schoolbel.js', 'RTGMeelezen']]],
     ['public/shared/teamcall/teamcall-01.js#1', ['spiegel', 'de teamcall van het personeel: je eigen tegel, stil, want je eigen stem terughoren is een echo']],
-    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij']]
+    ['public/shared/teamcall/teamcall-01.js#2', ['gesprek', 'de teamcall van het personeel: de tegel van een collega, met diens stem erbij', ['public/shared/teamcall/teamcall-01.js', 'RTGMeelezen']]]
   ]);
 
   const bundelPaden = new Set(Object.keys(BUNDELLIJST).map(k => 'public/' + k));
@@ -3591,9 +3596,15 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     if (soort.stil && !el.stil) {
       klachten.push(sleutel + ' staat als ' + post[0] + ' (stil) maar is niet meer muted -- of er komt geluid uit, of de reden klopt niet meer');
     }
-    if (soort.anker) {
+    if (soort.anker || soort.baan) {
+      /* Twee ankers met dezelfde tand. Bij ONDERTITELD wijst hij naar de band
+         die de cues toont; bij een GESPREK naar de tekstbaan waarin deelnemers
+         meeschrijven (shared/meelezen.js). In allebei de gevallen geldt: wie
+         zegt dat er een weg naar tekst is, noemt WAAR -- en haalt iemand die
+         weg, dan zakt deze regel ook al is aan het scherm zelf niets veranderd. */
+      const wat = soort.baan ? 'draagt een tekstbaan' : 'staat als ondertiteld';
       const [bestand, naam] = post[2] || [];
-      if (!bestand || !naam) klachten.push(sleutel + ' staat als ondertiteld maar noemt niet waar dat geregeld is');
+      if (!bestand || !naam) klachten.push(sleutel + ' ' + wat + ' maar noemt niet waar dat geregeld is');
       else if (!fs.existsSync(path.join(ROOT, bestand))) klachten.push(sleutel + ': het anker ' + bestand + ' bestaat niet meer');
       else if (!fs.readFileSync(path.join(ROOT, bestand), 'utf8').includes(naam)) {
         klachten.push(sleutel + ': ' + bestand + ' draagt "' + naam + '" niet meer -- de weg naar tekst is eruit gehaald');
@@ -3616,9 +3627,18 @@ console.log('\n49) elk media-element draagt een besluit over ondertiteling');
     const per = {};
     for (const k of gevonden.keys()) { const s = REGISTER.get(k)[0]; per[s] = (per[s] || 0) + 1; }
     const noem = (lijst) => lijst.filter(s => per[s]).map(s => per[s] + ' ' + s).join(', ');
+    /* De open elementen tellen mee als open, ook als ze een tekstbaan dragen.
+       Dat is geen slordigheid maar het punt: meelezen is GEEN ondertiteling --
+       er wordt niets van spraak naar tekst omgezet, en WCAG 1.2.4 is dus niet
+       gehaald. Het getal zou stil dalen als we ze hier zouden wegstrepen, en dan
+       leest dit register als dekking die er niet is. Wat er WEL is, telt apart. */
+    const metBaan = [...gevonden.keys()].filter(k => REGISTER.has(k) &&
+      ((SOORTEN[REGISTER.get(k)[0]] || {}).baan || ((SOORTEN[REGISTER.get(k)[0]] || {}).open && (REGISTER.get(k)[2] || []).length)));
     ok(gevonden.size + ' media-elementen, elk met een besluit en een reden: ' +
       (gevonden.size - open.length) + ' geregeld (' + noem(['spiegel', 'werktuig', 'ondertiteld']) + '), ' +
-      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX);
+      open.length + ' open (' + noem(['gesprek', 'uitzending', 'onbedekt']) + '), ratel op ' + OPEN_MAX +
+      '\n  ' + metBaan.length + ' van die ' + open.length + ' dragen een TEKSTBAAN waarin deelnemers meeschrijven ' +
+      '(geen ondertiteling: WCAG 1.2.4 blijft open)');
   }
 }
 

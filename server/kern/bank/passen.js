@@ -6,7 +6,7 @@ const { magBij } = require('./eigendom');/* RTG Bank, deel "passen": betaalpasse
    pasnummer en de CVC bewaren we NOOIT -- alleen een gemaskeerd nummer en de laatste
    vier cijfers. Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, seintje } = ctx;
+  const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, seintje, metIdem } = ctx;
 
   const DAG_MS = 86400000;
   const SOORTEN = { debit: 'Betaalpas', credit: 'Creditcard' };
@@ -25,19 +25,27 @@ module.exports = (ctx) => {
   const publiek = p => ({ id: p.id, iban: p.iban, soort: p.soort, soortLabel: SOORTEN[p.soort], naam: p.naam,
     nummer: p.masker, laatste4: p.laatste4, bevroren: !!p.bevroren, dagLimietCenten: p.dagLimietCenten, geopend: p.geopend });
 
-  function uitgeven({ iban, soort = 'debit', naam, codenaam }) {
+  /* Een pas uitgeven. De sleutel zit erop omdat twee klikken twee GELDIGE passen
+     op dezelfde rekening gaven -- zelfde vorm als de dubbele kassacode uit 4.56:
+     de tweede wordt vergeten en blijft een open deur, hier naar het saldo.
+     Bewust WEL twee passen als iemand er echt twee wil: dan is het een nieuwe
+     poging met een verse sleutel. De naam zit niet in de afdruk (vrije tekst),
+     de rekening en de soort wel (TAKEN.md 4.57). */
+  function uitgeven({ iban, soort = 'debit', naam, codenaam, idem }) {
     const m = rekMeta(iban);
     if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Kies een betaalpas of creditcard.' };
     if (Object.values(passen()).filter(p => p.codenaam === m.codenaam).length >= 20) return { status: 429, error: 'Het maximaal aantal passen is bereikt.' };
-    const pan = genPan();
-    const pas = { id: 'PAS' + crypto.randomBytes(5).toString('hex').toUpperCase(), iban, codenaam: m.codenaam, soort,
-      naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40), masker: masker(pan), laatste4: pan.slice(-4),
-      bevroren: false, dagLimietCenten: 100000, besteed: 0, besteedDag: 0, geopend: nu() };
-    passen()[pas.id] = pas;
-    save();
-    seintje(m.codenaam);
-    return { ok: true, pas: publiek(pas) };
+    return metIdem(idem ? 'pasuit:' + iban + ':' + idem : null, 'pasuit|' + iban + '|' + soort, () => {
+      const pan = genPan();
+      const pas = { id: 'PAS' + crypto.randomBytes(5).toString('hex').toUpperCase(), iban, codenaam: m.codenaam, soort,
+        naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40), masker: masker(pan), laatste4: pan.slice(-4),
+        bevroren: false, dagLimietCenten: 100000, besteed: 0, besteedDag: 0, geopend: nu() };
+      passen()[pas.id] = pas;
+      save();
+      seintje(m.codenaam);
+      return { ok: true, pas: publiek(pas) };
+    });
   }
   function lijst(codenaam) {
     const c = String(codenaam || '').trim();
@@ -71,7 +79,7 @@ module.exports = (ctx) => {
   /* Betalen met de pas: bevroren kan niet, de daglimiet wordt bewaakt, en de
      boeking gaat van de gekoppelde rekening naar extern:kaartbetaling (de bodem
      van de rekening -- inclusief rood staan -- geldt gewoon). */
-  async function betaal({ id, centen, oms, codenaam }) {
+  async function betaal({ id, centen, oms, codenaam, idem }) {
     const p = passen()[id];
     if (!magBij(p, codenaam)) return { status: 404, error: 'De pas bestaat niet.' };
     if (p.bevroren) return { status: 423, error: 'Deze pas is bevroren.' };
@@ -80,12 +88,18 @@ module.exports = (ctx) => {
     const vandaag = Math.floor(nu() / DAG_MS);
     if (p.besteedDag !== vandaag) { p.besteedDag = vandaag; p.besteed = 0; }
     if (p.dagLimietCenten > 0 && p.besteed + c > p.dagLimietCenten) return { status: 429, error: 'De daglimiet van deze pas is bereikt.' };
-    const b = await boekAsync({ van: p.iban, naar: 'extern:kaartbetaling', centen: c, soort: 'pasbetaling', oms: oms || ('Pasbetaling ' + p.laatste4) });
-    if (b.error) return b;
-    p.besteed += c;
-    save();
-    seintje(p.codenaam);
-    return { ok: true, id, saldoCenten: saldoVan(p.iban), besteedVandaagCenten: p.besteed };
+    /* Een herhaling schreef het bedrag nog een keer af EN telde nog een keer mee
+       voor de daglimiet -- dus een dubbeltik kostte twee keer geld en at twee
+       keer van de limiet (TAKEN.md 4.57). De sleutel valt na de limietcontrole,
+       zodat een geweigerde betaling er geen verbruikt. */
+    return metIdem(idem ? 'pasbetaal:' + id + ':' + idem : null, 'pasbetaal|' + id + '|' + c, async () => {
+      const b = await boekAsync({ van: p.iban, naar: 'extern:kaartbetaling', centen: c, soort: 'pasbetaling', oms: oms || ('Pasbetaling ' + p.laatste4) });
+      if (b.error) return b;
+      p.besteed += c;
+      save();
+      seintje(p.codenaam);
+      return { ok: true, id, saldoCenten: saldoVan(p.iban), besteedVandaagCenten: p.besteed };
+    });
   }
 
   return { bankPasUitgeven: uitgeven, bankPassen: lijst, bankPasBevries: bevries, bankPasLimiet: limiet, bankPasSluit: sluit, bankPasBetaal: betaal };

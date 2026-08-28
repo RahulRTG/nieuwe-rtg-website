@@ -27,14 +27,15 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
 (async () => {
   const dbmod = require('../server/db');
   const { db, load, save, startSqliteSync, ordersVoegToe, orderMetRef, boekingenVoegToe,
-    directBetalingenVoegToe, betaalVerzoekenVoegToe,
+    directBetalingenVoegToe, betaalVerzoekenVoegToe, payBoekingenVoegToe,
     txLedgerTel, txLedgerVanKlant, txLedgerVanZaak, txVeegNu, txLedgerActief } = dbmod;
+  const { vensterTopUp } = require('../server/db/tx');
   load();
   startSqliteSync();          // zet de kruisproces-sync EN het grootboek aan
   for (let i = 0; i < 40 && !txLedgerActief() && process.env.TX_LEDGER_SQLITE !== '0'; i++) await slaap(25);
 
   db.data.orders = []; db.data.boekingen = [];
-  db.data.directBetalingen = []; db.data.betaalVerzoeken = [];
+  db.data.directBetalingen = []; db.data.betaalVerzoeken = []; db.data.payBoekingen = [];
   const BASIS = Date.parse('2026-01-01T00:00:00Z');
   const maakOrder = i => ({ ref: 'RTG-O-SQ' + i, supplierCode: 'KIKUNOI', customerKey: 'user-1', customerTier: 'rtg',
     total: 10 + i, paid: true, status: 'geserveerd', at: new Date(BASIS + i * 1000).toISOString() });
@@ -90,6 +91,67 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
   const grootboekPad = path.join(TMP, 'grootboek.db');
   const ruwGrootboek = fs.existsSync(grootboekPad) ? fs.readFileSync(grootboekPad, 'latin1') : '';
 
+
+  /* ==== RTG PAY: EEN TIJDSTIP IN MILLISECONDEN, EN EEN VENSTER VOORBIJ EEN
+     BLADZIJDE (TAKEN.md 4.39) ====
+
+     Twee dingen in EEN ronde, omdat ze dezelfde rijen nodig hebben.
+
+     (1) Een pay-boeking draagt `at` als GETAL (Date.now()), waar de vier andere
+         collecties een ISO-tekst dragen. De Postgres-kolom is een timestamptz,
+         en beide wegen naar het grootboek slikken een mislukte insert: zonder
+         normalisatie blijft `payLedger` gewoon op nul staan terwijl er nergens
+         een fout te zien is.
+
+     (2) Er worden er ZEVENHONDERD gemaakt, met opzet meer dan de bladzijde van
+         vijfhonderd waar vensterTopUp het ooit bij liet. Gaat de blob verloren
+         (de crash binnen het trage-flush-venster), dan hoort de start het hele
+         venster terug te halen en niet de eerste bladzijde ervan. */
+  const PAY_N = 700;
+  for (let i = 0; i < PAY_N; i++) payBoekingenVoegToe({ id: 'PB-SQ' + i, van: 'lid:a', naar: 'lid:b',
+    centen: 100 + i, soort: 'boeking', oms: 'rit', ref: null, at: BASIS + i * 1000 });
+  await txVeegNu();
+  const payLedger = await txLedgerTel('payBoekingen');
+
+  // de blob is de crash niet doorgekomen; het grootboek heeft alles nog
+  db.data.payBoekingen = [];
+  await vensterTopUp();
+  const payTopUp = db.data.payBoekingen.length;
+  const payNieuwsteEerst = !!(db.data.payBoekingen[0] && db.data.payBoekingen[0].id === 'PB-SQ' + (PAY_N - 1));
+  /* En een tweede ronde op een venster dat al klopt hoort NIETS te doen: geen
+     dubbele regels, geen andere volgorde, en niet eens een nieuwe array. Zo
+     blijft een herstart die twee keer bijvult even goed als een die dat een keer
+     doet. */
+  const voorTweede = db.data.payBoekingen;
+  const tweede = await vensterTopUp();
+  const payTweedeRondeRaakteNiets = db.data.payBoekingen === voorTweede &&
+    db.data.payBoekingen.length === payTopUp;
+  /* DE PRIJS VAN DIE TWEEDE RONDE. Hij hoort EEN bladzijde te lezen en dan te
+     stoppen, want die bladzijde gaf al niets nieuws. Zonder die stopregel
+     pagineert hij door tot het grootboek op is -- hier 700 rijen in plaats van
+     500, en bij een volle collectie tot ramMax. Dat is geen gedragsverschil
+     maar wel de helft van de reparatie, dus staat het getal er. */
+  const payTweedeRondeLas = (tweede.payBoekingen && tweede.payBoekingen.gelezen) || 0;
+
+  /* ==== DE VOLGORDE BIJ EEN GAT AAN DE ACHTERKANT ====
+
+     Hierboven was de blob helemaal leeg, en dan staat alles wat terugkomt toch
+     al op volgorde. Deze ronde zet de blob op de 200 NIEUWSTE en laat de rest
+     ontbreken. Wat er dan bijkomt is OUDER dan wat er staat, dus vooraan
+     plakken (missend.concat(arr)) geeft een venster dat met de oudste begint.
+     Alleen het sorteren erna zet dat recht.
+
+     Zo'n stand ontstaat niet vanzelf -- de kv-blob wordt in zijn geheel
+     weggeschreven, dus een gat zit altijd aan de VOORkant -- maar de sortering
+     staat er wel, en wat er staat hoort gemeten te zijn. */
+  const nieuwste200 = db.data.payBoekingen.slice(0, 200);
+  db.data.payBoekingen = nieuwste200.map(x => x);
+  await vensterTopUp();
+  const payGatAchteraanN = db.data.payBoekingen.length;
+  const payGatAchteraanOpVolgorde = db.data.payBoekingen.every((b, i, a) =>
+    i === 0 || String(a[i - 1].at) >= String(b.at));
+  const payGatAchteraanEerste = db.data.payBoekingen[0] && db.data.payBoekingen[0].id;
+
   console.log(JSON.stringify({
     actief: txLedgerActief(),
     ramOrders, ramBoekingen, ledgerOrders, ledgerBoekingen,
@@ -113,7 +175,9 @@ const walTekst = p => fs.existsSync(p + '-wal') ? fs.readFileSync(p + '-wal', 'l
     // `customerTier` bestaat alleen BINNEN de data-kolom, dus dit meet echt de
     // inhoud. `status` en `ref` zijn eigen kolommen en dus geen goede maatstaf.
     inhoudLeesbaar: /customerTier/.test(ruwGrootboek + walTekst(grootboekPad)),
-    sleutelLeesbaar: /RTG-O-SQ/.test(ruwGrootboek + walTekst(grootboekPad))
+    sleutelLeesbaar: /RTG-O-SQ/.test(ruwGrootboek + walTekst(grootboekPad)),
+    payLedger, payTopUp, payNieuwsteEerst, payTweedeRondeRaakteNiets, payTweedeRondeLas,
+    payGatAchteraanN, payGatAchteraanOpVolgorde, payGatAchteraanEerste
   }));
   await dbmod.flushBijAfsluiten();
   fs.rmSync(TMP, { recursive: true, force: true });

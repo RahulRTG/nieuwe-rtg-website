@@ -8,7 +8,7 @@
   var gebonden = false;
 
   function plekkenHTML(esc, r) {
-    var uit = '<div class="stil" style="margin:.4rem 0;">' + r.plekken.map(function (p) {
+    var uit = '<div class="stil" style="margin:0.5rem 0;">' + r.plekken.map(function (p) {
       return '<div class="item"><span>' + esc(p.naam) + ' <span class="tag">' + esc(p.rol) + '</span></span>' +
         '<span>' + Number(p.lat).toFixed(4) + ', ' + Number(p.lng).toFixed(4) + '</span></div>';
     }).join('') + '</div>';

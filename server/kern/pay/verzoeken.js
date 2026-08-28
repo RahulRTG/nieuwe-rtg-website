@@ -68,7 +68,7 @@ module.exports = (ctx) => {
   /* Een Klompje (goudklompje, het RTG-eigen betaalverzoek): vraag een bedrag aan een of meer vrienden. Met splitsMetMij
      deelt het totaal door de hele groep inclusief jezelf (jouw deel heb je
      immers al betaald aan de zaak); anders krijgt ieder het hele bedrag. */
-  async function verzoekMaak({ van, aan, totaalCenten, perCenten, oms, splitsMetMij }) {
+  async function verzoekMaak({ van, aan, totaalCenten, perCenten, oms, splitsMetMij, idem }) {
     const namen = [...new Set((Array.isArray(aan) ? aan : [aan]).map(x => schoon(x, 40)).filter(x => x && x !== van))].slice(0, 10);
     if (!namen.length) return { status: 400, error: 'Kies minstens een vriend.' };
     for (const n of namen) if (!(await bestaatLid(n))) return { status: 404, error: 'Codenaam ' + n + ' kennen we niet.' };
@@ -79,16 +79,24 @@ module.exports = (ctx) => {
       per = Math.floor(totaal / (namen.length + (splitsMetMij ? 1 : 0)));
     }
     if (per < MIN_CENTEN || per > MAX_CENTEN) return { status: 400, error: 'Dat bedrag per persoon kan niet.' };
-    const groep = id('TG');
-    const uit = namen.map(n => ({
-      id: id('TK'), groep, van, aan: n, centen: per,
-      oms: schoon(oms, 80) || 'Klompje', status: 'open', at: nu()
-    }));
-    klompjes().unshift(...uit);
-    if (klompjes().length > 5000) klompjes().length = 5000;
-    save();
-    for (const n of namen) seintje(n);
-    return { ok: true, verzoeken: uit, perPersoon: per };
+    /* Twee klompjes van hetzelfde bedrag kunnen ALLEBEI door de vriend worden
+       betaald -- precies het geval dat in 4.55 aan de leverancierskant is
+       gerepareerd (supplier/betaalverzoek), en dit is de ledenkant ervan. De
+       afdruk draagt de ontvangers en het bedrag per persoon, niet de
+       omschrijving (TAKEN.md 4.57). */
+    return metIdem(idem ? 'klompjemaak:' + van + ':' + idem : null,
+      'klompjemaak|' + van + '|' + namen.slice().sort().join(',') + '|' + per, () => {
+        const groep = id('TG');
+        const uit = namen.map(n => ({
+          id: id('TK'), groep, van, aan: n, centen: per,
+          oms: schoon(oms, 80) || 'Klompje', status: 'open', at: nu()
+        }));
+        klompjes().unshift(...uit);
+        if (klompjes().length > 5000) klompjes().length = 5000;
+        save();
+        for (const n of namen) seintje(n);
+        return { ok: true, verzoeken: uit, perPersoon: per };
+      });
   }
   function verzoekenVoor(codenaam) {
     const alle = klompjes();

@@ -8,8 +8,8 @@
       // intake-deling voor klinieken/medische zorg: uitdrukkelijk en per aanbieder
       if (medisch){
         const actief = !!a.intakeActief;
-        html += '<div style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
-          '<div class="soft-sm" style="margin-bottom:0.35rem;">'+(actief
+        html += '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
+          '<div class="soft-sm" style="margin-bottom:0.25rem;">'+(actief
             ? T('care.intakeaan','U deelt medische context met deze kliniek. U kunt dit bij Mijn afspraken stoppen.')
             : T('care.intakeuit','Wilt u dat de behandelaar iets weet (medicijnen, allergie, aandoening)? Deel het apart en alleen met deze kliniek.'))+'</div>'+
           (actief ? '' :
@@ -20,7 +20,7 @@
       for (const b of (a.behandelingen || [])){
         const open = careOpen === a.id + ':' + b.id;
         const behlr = (a.behandelaars || []).find(x => x.id === b.behandelaarId);
-        html += '<div style="margin-top:0.7rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
+        html += '<div style="margin-top:0.75rem;border-top:1px solid var(--line);padding-top:0.6rem;">'+
           '<div style="display:flex;justify-content:space-between;gap:0.5rem;"><div class="h-flex1"><div style="font-size:0.88rem;">'+esc(b.naam)+
             ' <span style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:'+(b.soort==='medisch'?'var(--gold)':'var(--green,#8bc3a8)')+';">'+(b.soort==='medisch'?T('care.med','medisch'):T('care.well','wellness'))+'</span></div>'+
             '<div class="soft-sm">'+b.duurMin+' '+T('care.min','min')+(behlr?' · '+esc(behlr.naam):'')+'</div></div>'+
@@ -30,7 +30,7 @@
           html += '<div class="h-mt50">'+
             '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;">'+dagen.map(d =>
               '<button class="bz-btn'+(k.datum===d?' on':'')+'" data-cared="'+d+'">'+(d===dagen[0]?T('care.vandaag','vandaag'):d.slice(8)+'/'+d.slice(5,7))+'</button>').join('')+'</div>'+
-            '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.45rem;">'+(b.tijden||[]).map(t2 =>
+            '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">'+(b.tijden||[]).map(t2 =>
               '<button class="bz-btn'+(k.tijd===t2?' on':'')+'" data-caret="'+t2+'">'+t2+'</button>').join('')+'</div>'+
             '<button class="bz-groot h-mt70" id="careBoek"'+(k.tijd?'':' disabled')+'>'+T('care.boek','Boek en betaal')+' · '+eur(b.prijs)+'</button></div>';
         } else {

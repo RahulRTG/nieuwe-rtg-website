@@ -62,7 +62,7 @@
   }
   function vrEtappeRijen(){
     return vrEtappes.map((e,i) =>
-      '<div class="row-gap" style="margin-top:0.35rem;align-items:center;">'+
+      '<div class="row-gap" style="margin-top:0.25rem;align-items:center;">'+
       '<select class="st-in js-vrmod" data-i="'+i+'" style="flex:0 0 9rem;">'+vrModOpties(e.modaliteit)+'</select>'+
       '<input class="st-in js-vrvan" data-i="'+i+'" placeholder="'+T('vr.et.van','Van (haven, airport, depot)')+'" value="'+escAttr(e.van)+'" maxlength="60" class="h-flex1">'+
       '<input class="st-in js-vrnaar" data-i="'+i+'" placeholder="'+T('vr.et.naar','Naar')+'" value="'+escAttr(e.naar)+'" maxlength="60" class="h-flex1">'+
@@ -70,7 +70,7 @@
       '</div>').join('');
   }
   function vrTijdlijn(z){
-    return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.45rem;">'+z.etappes.map(e => {
+    return '<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">'+z.etappes.map(e => {
       const stijl = e.status==='bezig' ? 'border-color:var(--gold);background:rgba(201,162,75,0.12);' : e.status==='klaar' ? 'opacity:0.6;' : 'opacity:0.85;';
       return '<span title="'+escAttr(e.document)+'" style="border:1px solid var(--line);'+stijl+'border-radius:0;padding:0.2rem 0.6rem;font-size:0.72rem;">'+
         T('vr.mod.'+e.modaliteit, VR_MOD[e.modaliteit].label)+' · '+esc(e.van)+' → '+esc(e.naar)+(e.status==='klaar'?' · '+T('vr.et.klaar','klaar'):e.status==='bezig'?' · '+T('vr.et.nu','nu'):'')+'</span>';

@@ -275,8 +275,8 @@ async function tekenFeed(){
       rijen:POSTS.map(p=>[String(p.at||'').slice(0,10), p.author, p.place||'', p.text||'',
         (p.onderwerpen||[]).join(' '), p.likes, p.reacties]) };
   });
-  const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Je archief</h2>'
-    : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:.7rem;">Wat je bewaarde</h2>'
+  const kop = ARCHIEF ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Je archief</h2>'
+    : TAB==='bewaard' ? '<h2 style="font-size:1rem;margin-bottom:0.75rem;">Wat je bewaarde</h2>'
     : ZOEK ? '<div class="kaart salon-selectie">Resultaten voor <b>“'+esc(ZOEK)+'”</b> <button class="mini" id="wisZoek" type="button">wissen</button></div>'
     : ONDERWERP ? '<div class="kaart" style="padding:.7rem .9rem;">Onderwerp <b>#'+esc(ONDERWERP)+'</b> <button class="mini" id="wisOnderwerp" style="background:none;border:none;color:var(--rtg-leesgoud,var(--gold));cursor:pointer;">wissen</button></div>' : '';
   toon(kop + (POSTS.length ? POSTS.map(postHtml).join('') : '<div class="leeg">'+(ARCHIEF?'Je archief is leeg.':TAB==='bewaard'?'Je hebt nog niets bewaard.':'Nog niets te zien. Plaats zelf iets, of volg iemand.')+'</div>')
@@ -301,7 +301,7 @@ async function tekenOntdek(){
   try{
     const d=await api('/api/salon/ai/waarover',{});
     $('#onderwerpen').innerHTML='<h2>Waar het over gaat</h2>'+
-      (d.tekst?'<p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-bottom:.6rem;">'+esc(d.tekst)+'</p>':'')+
+      (d.tekst?'<p style="color:var(--muted);font-size:.86rem;line-height:1.5;margin-bottom:0.5rem;">'+esc(d.tekst)+'</p>':'')+
       (d.onderwerpen&&d.onderwerpen.length
         ? '<div class="onderw" style="padding:0;">'+d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.naam)+'">#'+esc(o.naam)+' ('+o.aantal+')</button>').join('')+'</div>'
         : '<p style="color:var(--soft);font-size:.85rem;">Er is nog weinig gedeeld.</p>');
@@ -321,7 +321,7 @@ function tekenPlaats(){
     '<select id="preacties"><option value="iedereen">Iedereen</option><option value="vrienden">Alleen vrienden</option><option value="niemand">Niemand</option></select>'+
     '<div class="knoppen"><button class="knop" id="plaatsknop" type="button">Plaatsen</button>'+
     '<button class="knop stil" id="bijschriftknop" type="button">Rahul schrijft een bijschrift</button></div>'+
-    '<p style="color:var(--soft);font-size:.72rem;margin-top:.7rem;line-height:1.5;">Een alt-tekst beschrijft de foto voor wie niet ziet. Kort en concreet is genoeg.</p></div>');
+    '<p style="color:var(--soft);font-size:.72rem;margin-top:0.75rem;line-height:1.5;">Een alt-tekst beschrijft de foto voor wie niet ziet. Kort en concreet is genoeg.</p></div>');
   NIEUW={media:[]};
   $('#pfotos').onchange=async ev=>{
     const bestanden=[...ev.target.files].slice(0,6);
@@ -361,13 +361,13 @@ async function tekenInzicht(){
   const t=d.totaal||{posts:0,mooi:0,reacties:0,bewaard:0};
   const cijfer=(n,l)=>'<span><b style="display:block;font-size:1.15rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+n+'</b>'+l+'</span>';
   toon('<div class="kaart"><h2>Wat jouw posts deden</h2>'+
-    '<div class="cijfers" style="display:flex;gap:1.3rem;font-size:.74rem;color:var(--muted);margin:.6rem 0 .2rem;">'+
+    '<div class="cijfers" style="display:flex;gap:1.3rem;font-size:.74rem;color:var(--muted);margin:0.5rem 0 0.25rem;">'+
       cijfer(t.posts,'posts')+cijfer(t.mooi,'mooi')+cijfer(t.reacties,'reacties')+cijfer(t.bewaard,'bewaard')+'</div>'+
-    '<p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:.6rem;">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
+    '<p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Alleen van jou, en alleen voor jou. Je ziet dat iets bewaard is, nooit door wie.</p>'+
     '<div class="knoppen"><button class="knop stil" id="archknop" type="button">Toon je archief</button></div></div>'+
     ((d.onderwerpen||[]).length?'<div class="kaart"><h2>Wat aansloeg</h2><div class="onderw" style="padding:.4rem 0 0;">'+
       d.onderwerpen.map(o=>'<button type="button" data-onderwerp="'+esc(o.onderwerp)+'">#'+esc(o.onderwerp)+' · '+(o.mooi+o.reacties+o.bewaard)+'</button>').join('')+
-      '</div><p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:.6rem;">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
+      '</div><p style="color:var(--soft);font-size:.72rem;line-height:1.5;margin-top:0.5rem;">Je onderwerpen, op wat ze losmaakten. Over de inhoud, niet over hoe vaak je plaatst.</p></div>':'')+
     '<div class="kaart"><h2>Per post</h2>'+
       ((d.posts||[]).length? d.posts.map(p=>
         '<div class="reactie"><span class="wie">'+esc(p.tekst||'(zonder tekst)')+'</span>'+
@@ -390,7 +390,7 @@ async function toonProfiel(wie){
   toon('<div class="kaart">'+
     '<div class="profiel"><div><h2>'+esc(d.codenaam||'Lid')+'</h2>'+
       (d.plaats?'<div class="plek" style="font-size:.75rem;color:var(--soft);">'+esc(d.plaats)+'</div>':'')+'</div></div>'+
-    (d.bio?'<p style="font-size:.87rem;line-height:1.55;margin-bottom:.7rem;">'+esc(d.bio)+'</p>':'')+
+    (d.bio?'<p style="font-size:.87rem;line-height:1.55;margin-bottom:0.75rem;">'+esc(d.bio)+'</p>':'')+
     '<div class="cijfers" style="display:flex;gap:1.1rem;font-size:.76rem;color:var(--muted);">'+
       '<span><b style="display:block;font-size:1rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+d.posts+'</b>posts</span>'+
       '<span><b style="display:block;font-size:1rem;color:var(--txt);font-family:\'Bodoni Moda\',serif;">'+d.volgers+'</b>volgers</span>'+
@@ -433,7 +433,7 @@ async function toonReacties(id, alleen){
         '<div class="knoppen"><button class="knop" id="rknop" type="button">Plaatsen</button>'+
         (post&&post.vanMij?'<button class="knop stil" id="rsamen" type="button">Vat de reacties samen</button>':'')+
         '<button class="knop stil" id="rterug" type="button">Terug</button></div>'
-      : '<p style="color:var(--soft);font-size:.85rem;margin-top:.6rem;">De maker heeft reacties beperkt.</p><div class="knoppen"><button class="knop stil" id="rterug" type="button">Terug</button></div>')+
+      : '<p style="color:var(--soft);font-size:.85rem;margin-top:0.5rem;">De maker heeft reacties beperkt.</p><div class="knoppen"><button class="knop stil" id="rterug" type="button">Terug</button></div>')+
     '</div>';
   toon(html);
   let opId=null;

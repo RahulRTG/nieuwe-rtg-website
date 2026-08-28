@@ -56,6 +56,12 @@ function maakFiscaal({ db, centen, btwSplit, jaargangen }) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
     }
+    /* Vier soorten kassabonnen tellen hier niet mee, alle vier omdat hun omzet
+       al ergens anders in deze telling staat (TAKEN.md 4.28): `rtg` hoort bij
+       een bestelling hierboven; `kamer` en `tafel` zijn open rekeningen die pas
+       bij de check-out binnenkomen; en `omzetElders` merkt een gebundelde bon
+       waarvan de onderdelen al geteld zijn. Dat laatste is een merk en geen
+       methode: de methode moet blijven zeggen hoe er echt betaald is. */
     for (const v of db.data.posSales[s.code] || []) {
       /* `omzetElders` is het merk van een kassabon die alleen HET STUK is en
          niet de omzet: het tafelticket bundelt bonnen die hierboven al per

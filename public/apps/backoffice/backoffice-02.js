@@ -49,7 +49,7 @@
       if (nood) sosBlok = dt.sos.map(s =>
         '<div style="margin-top:0.4rem;background:rgba(220,40,40,0.12);border-radius:0;padding:0.5rem 0.7rem;">'+
         '<b style="color:#ff8a8a;">'+escHtml(s.door)+'</b> · '+escHtml(s.bericht)+
-        '<div style="margin-top:0.4rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
+        '<div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;">'+
         '<button class="vbtn ok" data-live="'+dt.id+'" data-naam="'+escHtml(s.door)+'">'+T('bo.ontlive','Live meekijken')+'</button>'+
         '<a class="vbtn" href="tel:112" style="text-decoration:none;background:#c62828;color:#fff;">'+T('bo.ont112','Bel 112')+'</a>'+
         '<button class="vbtn" data-sosaf="'+dt.id+'" data-sosid="'+s.id+'">'+T('bo.ontsosaf','SOS afgehandeld')+'</button>'+

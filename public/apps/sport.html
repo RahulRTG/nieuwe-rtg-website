@@ -132,8 +132,8 @@ async function laadBord(){
     '<div class="meta">'+esc(w.team)+' · '+esc(w.competitie)+(w.thuis?' · thuis':' · uit')+'</div>'+
     (!w.uitslag && w.thuis?'<div class="rij"><button class="knop stil" data-koop="'+esc(w.wedstrijdId)+'">Tickets voor deze wedstrijd</button></div>':'')+'</div>';
   $('#inhoud').innerHTML=
-    (komend.length?'<h3 style="font-size:1rem;margin:.2rem 0 .5rem;">Programma</h3>'+komend.map(kaart).join(''):'')+
-    (gespeeld.length?'<h3 style="font-size:1rem;margin:.7rem 0 .5rem;">Uitslagen</h3>'+gespeeld.map(kaart).join(''):'')+
+    (komend.length?'<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">Programma</h3>'+komend.map(kaart).join(''):'')+
+    (gespeeld.length?'<h3 style="font-size:1rem;margin:0.75rem 0 0.5rem;">Uitslagen</h3>'+gespeeld.map(kaart).join(''):'')+
     (!d.wedstrijden.length?'<div class="leeg">Nog geen wedstrijden op het bord.</div>':'');
   document.querySelectorAll('[data-koop]').forEach(b=>b.onclick=()=>{ TAB='tickets';
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x.dataset.t==='tickets'));
@@ -159,7 +159,7 @@ async function laadTickets(voorWedstrijd){
   $('#inhoud').innerHTML=
     '<div class="item" style="background:var(--card2);"><h4>Kies de wedstrijd</h4>'+
     '<div class="rij"><select class="veld h-flex1" id="tkW">'+thuis.map(w=>'<option value="'+esc(w.wedstrijdId)+'"'+(voorWedstrijd===w.wedstrijdId?' selected':'')+'>'+esc(w.club)+' - '+esc(w.tegen)+' · '+esc(w.datum)+' '+esc(w.tijd)+'</option>').join('')+'</select></div></div>'+
-    '<h3 style="font-size:1rem;margin:.2rem 0 .4rem;">De plattegrond van het stadion</h3>'+
+    '<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">De plattegrond van het stadion</h3>'+
     p.vakken.map(v=>'<button class="vak'+(v.id===VAK?' aan':'')+'" data-vak="'+esc(v.id)+'"><b>'+esc(v.naam)+'</b> · '+eur(v.prijsCenten)+' p.p.'+
       '<div class="vz">'+(vzBij(v.id)||'vrij vak')+'</div></button>').join('')+
     '<div class="item"><div class="rij h-mt0"><select class="veld" id="tkN">'+[1,2,3,4,5,6,7,8].map(n=>'<option value="'+n+'">'+n+' ticket'+(n>1?'s':'')+'</option>').join('')+'</select>'+
@@ -192,9 +192,9 @@ async function laadClub(){
   try{ m=await api('/momenten',{club:CLUB}); sp=await api('/sponsors',{club:CLUB}); }
   catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   $('#inhoud').innerHTML=
-    '<h3 style="font-size:1rem;margin:.2rem 0 .5rem;">Momenten van de club</h3>'+
+    '<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">Momenten van de club</h3>'+
     (m.momenten.length?m.momenten.map(x=>'<div class="item"><h4>'+esc(x.beeld)+' '+esc(x.tekst)+'</h4><div class="meta">'+esc(x.door)+' · '+new Date(x.at).toLocaleDateString('nl-NL')+'</div></div>').join(''):'<div class="leeg">Nog geen momenten.</div>')+
-    '<h3 style="font-size:1rem;margin:.7rem 0 .5rem;">Sponsor worden?</h3>'+
+    '<h3 style="font-size:1rem;margin:0.75rem 0 0.5rem;">Sponsor worden?</h3>'+
     (sp.sponsors.length?sp.sponsors.map(s=>
       '<div class="item"><h4>'+esc(s.pakket)+' <span class="status goud">'+eur(s.prijsCenten)+'</span></h4>'+
       (s.tekst?'<div class="meta">'+esc(s.tekst)+'</div>':'')+

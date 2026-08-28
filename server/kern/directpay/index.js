@@ -61,6 +61,13 @@ function maakDirectpay(ctxIn) {
   }
   const centenVan = (v) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? n : NaN; };
 
+  /* Idempotentie voor het MAKEN van een betaalverzoek (TAKEN.md 4.60). Het
+     AFREKENEN had het al, via idemZoek/idemBewaar hieronder; het aanmaken niet,
+     en daar kost een dubbeltik echt geld: twee verzoeken van hetzelfde bedrag
+     kan de gast allebei betalen. Dezelfde module als RTG Pay en RTG Bank, met
+     een eigen store zodat de sleutelruimtes gescheiden blijven. */
+  const metIdem = require('../../lib/idem')({ d: () => db.data, save, naam: 'dpIdem', bijeen: db.bijeen });
+
   /* O(1)-index op de idempotentiesleutel: het dubbeltik-antwoord hoeft niet
      door tweehonderdduizend betalingen te scannen. Lui opgebouwd uit de
      opgeslagen data, daarna bij elke insert bijgehouden. */

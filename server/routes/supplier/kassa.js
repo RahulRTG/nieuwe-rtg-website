@@ -12,6 +12,7 @@ const herhaling = require('../../kern/kassa/herhaling')({
 
 /* De verkoop- en afrekenlaag draaien als submodules op de gedeelde kern. */
 require('./kassa/verkoop')(kern, herhaling);
+require('./kassa/innen')(kern);
 require('./kassa/afrekenen')(kern, herhaling);
 /* De cadeaukaarten (onze afsplitsing om de 10 kB-maat) zonder herhaling:
    main's idempotentieronde wikkelde het uitchecken en de verkoop in, de

@@ -70,7 +70,7 @@
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">De hele luchthavenoperatie in een systeem: vluchtleiding, platform, toren, bagage en security. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -163,11 +163,11 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.loungeGasten+'</b><span>In de lounges</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig '+esc(s.soort)+'"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw werkplek</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Jouw werkplek</h3>'+
     '<div class="keuze">'+ROLLEN.map(([id,ic,naam,sub]) => '<button data-rol="'+id+'"><span class="ic">'+ic+'</span>'+naam+'<span class="sub">'+sub+'</span></button>').join('')+'</div>';
   $('#app').querySelectorAll('[data-rol]').forEach(b => b.addEventListener('click', () => rolScherm(b.dataset.rol)));
 }
-function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>'; }
+function kopStuk(titel){ return '<button class="terug" id="terug">← de operatie</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>'; }
 function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-operations adviseert; schakelen doet u zelf. Veiligheid voor snelheid.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);
@@ -297,7 +297,7 @@ async function schermToren(){
 async function schermBagage(){
   $('#app').innerHTML = kopStuk('Bagagekelder')+
     '<div class="item" style="background:var(--card2);"><div class="meta">De kofferketen: ingecheckt → gesorteerd → geladen → op de band → opgehaald. Achteruit draait hij nooit; vermist kan altijd gemeld en teruggevonden.</div></div>'+
-    '<div class="rij" style="margin:0 0 .7rem;"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
+    '<div class="rij" style="margin:0 0 0.75rem;"><select class="veld" id="bgFilter"><option value="">Alle koffers</option><option>ingecheckt</option><option>gesorteerd</option><option>geladen</option><option>op-band</option><option value="vermist">vermist</option></select></div>'+
     '<div id="bgLijst"></div>'+aiBlok('Bijv. hoe voorkom ik gemiste aansluitingen?');
   koppelBasis();
   $('#bgFilter').addEventListener('change', laadBagage);
@@ -349,7 +349,7 @@ async function schermVip(){
     '<div class="item" style="background:var(--card2);"><h4>Nieuw vip-protocol</h4><div class="meta">Onder PROTOCOLNAAM, nooit de echte naam. Een vip-vlucht boardt pas als alle stappen zijn afgevinkt.</div>'+
     '<div class="rij"><input class="veld" id="vVlucht" style="width:6rem;" placeholder="RT101" maxlength="8"><input class="veld" id="vNaam" style="flex:1;min-width:9rem;" placeholder="Protocolnaam, bijv. Valk Een" maxlength="60"><select class="veld" id="vSoort"><option value="koninklijk">koninklijk</option><option value="staatsbezoek">staatsbezoek</option><option value="vip">vip</option></select><button class="knop" id="vMaak">Start protocol</button></div></div>'+
     '<div id="vipLijst"></div>'+
-    '<h3 style="font-size:.95rem;margin:.8rem 0 .3rem;">Het charterloket</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.75rem 0 0.25rem;">Het charterloket</h3>'+
     '<div class="item" style="background:var(--card2);"><div class="meta">Leden vragen een privejet of helikopter aan via de Vluchten-app; OPERATIONS beslist, nooit de AI. Bij bevestiging komt de vlucht direct op het bord met een vrije stand of helipad.</div></div>'+
     '<div id="chLijst"></div>'+aiBlok('Bijv. hoe plan ik een staatsbezoek naast de middagpiek?');
   koppelBasis();

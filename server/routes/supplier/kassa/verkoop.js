@@ -1,7 +1,11 @@
-/* Kassa (deelmodule): de verkoop: de losse kassaverkoop (contant of RTG
-   Pay, met keukenafboeking) en het innen of uitgeven op RTG-code. Krijgt
-   de gedeelde kern een keer bij het opstarten vanuit
-   routes/supplier/kassa.js. */
+/* Kassa (deelmodule): de verkoop -- de losse kassaverkoop (contant, pin, RTG
+   Pay of cadeaukaart, met keukenafboeking). Krijgt de gedeelde kern en de
+   herhalingslaag van de hele kassa een keer bij het opstarten vanuit
+   routes/supplier/kassa.js.
+
+   Het INNEN op een RTG-ophaalcode stond hier ook en staat nu in ./innen.js:
+   daar bestaat de bestelling al, hier ontstaat de bon op dat moment. Dit
+   bestand kwam op 10,4 kB en daarmee over keuringsregel 13. */
 module.exports = (kern, herhaling) => {
   const { POS_METHODS, app, crypto, db, facturatie, logActivity, pickupCode, save, sseToSupplier, supplierAuth } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
@@ -103,6 +107,14 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
   list.unshift(sale);
   db.data.posSales[req.supplier.code] = list.slice(0, 300);
+  // saldo eraf met de bon erbij; `bron` scheidt hem van de handmatige afboeking
+  if (gcKaart) {
+    gcKaart.saldo = Math.round((gcKaart.saldo - total) * 100) / 100;
+    gcKaart.verzilveringen = gcKaart.verzilveringen || [];
+    gcKaart.verzilveringen.push({ bedrag: total, at: sale.at, actor: req.actor.name, bron: 'kassa', saleId: sale.id });
+    sale.gcCode = gcKaart.code;
+    sale.gcRest = gcKaart.saldo;
+  }
   save();
   // het keukenbrein boekt de ingredienten van de bon af via de recepten
   try { kern.keuken.boekVerkoopAf(req.supplier, items || [], 'kassa (' + req.actor.name + ')'); } catch (e) {}

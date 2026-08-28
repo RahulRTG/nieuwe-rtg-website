@@ -56,7 +56,7 @@
     try { sparLijst = ((await API.call('/spar/lijst', {})).spar) || []; } catch(e){}
     el.innerHTML =
       (v
-        ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
+        ? '<div class="live-start" style="margin-bottom:0.75rem;">' +
             '<div class="lh">' + T('vs.h','Rahul verwacht') + '</div>' +
             '<div class="ld">' + esc(v.wat) + ' · ' + esc(v.waarom) + '. ' +
               T('vs.d','Klopt het niet, dan negeert u dit gewoon; Rahul leert vanzelf bij.') + '</div>' +
@@ -64,7 +64,7 @@
           '</div>'
         : '') +
       (pk.length
-        ? '<div class="live-start" style="margin-bottom:0.8rem;">' +
+        ? '<div class="live-start" style="margin-bottom:0.75rem;">' +
             '<div class="lh">' + T('pk.h','Pakketten van onze huizen') + '</div>' +
             pk.map(p => '<div class="h-mt45">' +
               '<div style="font-size:0.85rem;"><b>' + esc(p.naam) + '</b> · € ' + (p.prijsCenten/100).toFixed(2).replace('.', ',') + '</div>' +
@@ -73,20 +73,20 @@
               '<button class="chip js-pkboek h-mt35" data-pk="' + esc(p.id) + '" data-pknaam="' + esc(p.naam) + '" data-pkprijs="' + p.prijsCenten + '">' + T('pk.boek','Boek dit pakket') + '</button></div>').join('') +
           '</div>'
         : '') +
-      '<div class="live-start" style="margin-bottom:0.8rem;">' +
+      '<div class="live-start" style="margin-bottom:0.75rem;">' +
         '<div class="lh">' + T('fl.h','Wat Rahul weet en ziet') + '</div>' +
         '<div class="ld">' + T('fl.d','Hij onthoudt wat u vertelt ("onthoud dat..."), leert van wat u gebruikt en regelt alles in de chat hieronder: zoeken, reserveren, bestellen en afrekenen, uw 24 uur, een Tik of betaalverzoek. Vraag "wat kun je" voor het hele overzicht; geld gaat nooit zonder uw "ja" de deur uit.') + '</div>' +
         ((prof.seintjes || []).length
           ? '<div style="margin-top:0.55rem;border:1px solid var(--line);border-radius:0;padding:0.55rem 0.7rem;">' +
               '<div style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);">' + T('fl.sein','Rahul ziet') + '</div>' +
-              prof.seintjes.map(x => '<div style="margin-top:0.3rem;font-size:0.76rem;line-height:1.45;">' + esc(x.icoon) + ' ' + esc(x.tekst) + '</div>').join('') + '</div>'
+              prof.seintjes.map(x => '<div style="margin-top:0.25rem;font-size:0.76rem;line-height:1.45;">' + esc(x.icoon) + ' ' + esc(x.tekst) + '</div>').join('') + '</div>'
           : '') +
         (prof.weetjes.length
           ? '<div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.5rem;">' + prof.weetjes.map((w, i) =>
               '<span style="display:inline-flex;align-items:center;gap:0.35rem;border:1px solid var(--line);border-radius:0;padding:0.25rem 0.6rem;font-size:0.68rem;color:var(--txt);">' + esc(w.tekst) +
               '<button class="js-flweg" data-i="' + i + '" aria-label="' + T('fl.weg','vergeet dit') + '" style="background:none;border:none;color:var(--soft);cursor:pointer;font-size:0.75rem;padding:0;">✕</button></span>').join('') + '</div>'
           : '<div style="margin-top:0.5rem;font-size:0.68rem;color:var(--soft);">' + T('fl.leeg','Nog geen weetjes. Zeg bijvoorbeeld: "onthoud dat ik cava drink, nooit rode wijn".') + '</div>') +
-        (prof.top.length ? '<div style="margin-top:0.4rem;font-size:0.64rem;color:var(--soft);">' + T('fl.top','Ik zie dat u het meest werkt met') + ': ' + prof.top.map(esc).join(', ') + '.</div>' : '') +
+        (prof.top.length ? '<div style="margin-top:0.5rem;font-size:0.64rem;color:var(--soft);">' + T('fl.top','Ik zie dat u het meest werkt met') + ': ' + prof.top.map(esc).join(', ') + '.</div>' : '') +
         // sparren: samen een idee beter maken; Rahul komt er op een rustig moment op terug
         sparBlokHtml(sparLijst) +
       '</div>';

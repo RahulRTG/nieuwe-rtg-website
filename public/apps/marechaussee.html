@@ -67,7 +67,7 @@
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1rem;">Het kantoor en de PDA van de brigade op het veld: de grensbalie, patrouilles en incidenten. Log in met je persoonlijke pincode.</p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.25rem;">Het kantoor en de PDA van de brigade op het veld: de grensbalie, patrouilles en incidenten. Log in met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -145,7 +145,7 @@ async function kiesScherm(){
       '<div class="kpi"><b>'+C.patrouillesVandaag+'</b><span>Patrouilles</span></div>'+
     '</div>'+
     (C.signalen.length ? C.signalen.map(s => '<div class="item sig"><div class="meta">'+esc(s.tekst)+'</div></div>').join('') : '')+
-    '<h3 style="font-size:.95rem;margin:.4rem 0 .1rem;">Jouw post</h3>'+
+    '<h3 style="font-size:.95rem;margin:0.5rem 0 0.25rem;">Jouw post</h3>'+
     '<div class="keuze">'+
       '<button data-rol="grens"><span class="ic"></span>Grensbalie<span class="sub">de passagierslijst per vlucht, besluit per reiziger</span></button>'+
       '<button data-rol="patrouille"><span class="ic"></span>Patrouille<span class="sub">rondes door de zones, met bevindingen</span></button>'+
@@ -157,7 +157,7 @@ async function kiesScherm(){
     if (b.dataset.rol === 'incidenten') schermIncidenten();
   }));
 }
-function kopStuk(titel){ return '<button class="terug" id="terug">← de brigade</button><h2 style="font-size:1.15rem;margin-bottom:.6rem;">'+titel+'</h2>'; }
+function kopStuk(titel){ return '<button class="terug" id="terug">← de brigade</button><h2 style="font-size:1.15rem;margin-bottom:0.5rem;">'+titel+'</h2>'; }
 function aiBlok(hint){ return '<div class="ai"><div class="rij h-mt0"><input class="veld" id="aiV" style="flex:1;min-width:9rem;" placeholder="'+hint+'"><button class="knop" id="aiK">Vraag</button></div><div class="uit" id="aiA">De AI-wachtcommandant adviseert; beslissen doet u zelf. Bij direct gevaar: eerst 112.</div></div>'; }
 function koppelBasis(){
   $('#terug').addEventListener('click', kiesScherm);

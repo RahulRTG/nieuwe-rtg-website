@@ -216,7 +216,7 @@
       tegel('Beleidsregels', p.beleid.regels, p.beleid.voorstellenOpen ? 'gold' : '', p.beleid.voorstellenOpen + ' voorstel(len) wachten op een tweede paar ogen') +
       '</div>';
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin-top:1.6rem;">Per domein</h2><div class="rooster">';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin-top:1.25rem;">Per domein</h2><div class="rooster">';
     for (var i = 0; i < p.domeinen.length; i++) {
       var d = p.domeinen[i];
       u += '<div class="tegel"><div class="l">' + esc(d.domein) + '</div>' +
@@ -287,7 +287,7 @@
       'dezelfde codenamen en dezelfde gegevens -- ze worden hier geopend, niet nagebouwd. ' +
       'Wat u in Command aan een object doet, ziet u daar terug, en omgekeerd.</p>';
     for (var i = 0; i < SUITE.length; i++) {
-      u += '<h2 class="ckop" style="font-size:1.1rem;margin:1.4rem 0 .6rem;">' + esc(SUITE[i][0]) + '</h2><div class="werkplek">';
+      u += '<h2 class="ckop" style="font-size:1.1rem;margin:1.25rem 0 0.5rem;">' + esc(SUITE[i][0]) + '</h2><div class="werkplek">';
       var rij = SUITE[i][1];
       for (var j = 0; j < rij.length; j++) {
         u += '<a href="' + esc(rij[j][0]) + '"><b>' + esc(rij[j][1]) + '</b><span>' + esc(rij[j][2]) + '</span></a>';
@@ -330,7 +330,7 @@
 
   function zoekuit(d) {
     if (d.kort) return '<div class="leeg">Een zoekterm van minstens twee tekens, graag.</div>';
-    var u = '<p class="meta" style="margin-bottom:.9rem;">' + d.totaal + ' treffer(s) in ' +
+    var u = '<p class="meta" style="margin-bottom:0.75rem;">' + d.totaal + ' treffer(s) in ' +
       d.groepen.length + ' soort(en)' + (d.domeinen && d.domeinen.length ? ' over ' + d.domeinen.length + ' domein(en)' : '') + '.</p>';
     if (!d.groepen.length) {
       u += '<div class="kaart"><h3>Niets gevonden</h3><p>Er is gekeken in ' + d.bereik.length + ' objectsoorten:</p>' +
@@ -672,7 +672,7 @@
         (rb.terugDraaibaar ? 'terug te draaien' : 'NIET terug te draaien') +
         (rb.klantImpact ? ' · de klant merkt dit' : ' · geen klantimpact') + '</p>' +
         '<p class="meta">Risico ' + rb.oordeel.score + ' -- ' + esc(rb.oordeel.waarom) + '</p>' +
-        '<div class="crij" style="margin-top:.7rem;align-items:baseline;">' +
+        '<div class="crij" style="margin-top:0.75rem;align-items:baseline;">' +
         '<b style="font-family:\'Bodoni Moda\',Georgia,serif;font-size:1.3rem;">' + rb.kandidaten + '</b>' +
         '<span class="meta">geval(len) passen nu</span>' +
         (rb.kandidaten ? '<button class="knop" data-droog="' + esc(rb.id) + '">Droog draaien</button>' +
@@ -682,7 +682,7 @@
         '<div class="meta" id="droog-' + esc(rb.id) + '"></div></div>';
     }
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.6rem 0 .7rem;">De laatste rondes</h2>';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.25rem 0 0.75rem;">De laatste rondes</h2>';
     if (!runs.length) u += '<div class="leeg">Er is nog geen herstelronde gedraaid.</div>';
     for (var j = 0; j < runs.length; j++) {
       var r = runs[j];
@@ -832,7 +832,7 @@
         '<p class="meta">' + esc(g.id) + ' · versie ' + g.versie + ' van ' + g.versies +
         (g.sinds ? ' · sinds ' + esc(C.tijd(g.sinds)) + ' door ' + esc(g.door) : ' · startwaarde') +
         (g.vierOgen ? ' · vier ogen vereist' : '') + '</p>' +
-        '<div class="crij" style="margin-top:.6rem;align-items:baseline;">' +
+        '<div class="crij" style="margin-top:0.5rem;align-items:baseline;">' +
         '<b style="font-family:\'Bodoni Moda\',Georgia,serif;font-size:1.4rem;">' + esc(String(g.waarde)) + '</b>' +
         '<span class="meta">' + esc(g.eenheid) + '</span>' +
         '<input class="veld" data-nw="' + esc(g.id) + '" placeholder="nieuwe waarde" style="width:8rem;">' +
@@ -854,7 +854,7 @@
         var w = document.querySelector('[data-nw="' + id + '"]').value;
         if (w === '') { C.meld('Vul eerst een nieuwe waarde in.'); return; }
         api('simulatie/beleid', { id: id, waarde: isNaN(Number(w)) ? w : Number(w) }).then(function (d) {
-          proefvak(id).innerHTML = '<div style="margin-top:.6rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
+          proefvak(id).innerHTML = '<div style="margin-top:0.5rem;border-top:1px solid var(--line);padding-top:.5rem;">' +
             '<b>Proef zonder te zetten:</b> ' + esc(d.gevolg) +
             (d.risicoWaarschuwing ? '<br><span style="color:var(--acc);">' + esc(d.risicoWaarschuwing) + '</span>' : '') +
             (d.wijzigingen.length ? '<br>' + d.wijzigingen.map(function (x) {
@@ -973,7 +973,7 @@
   }
 
   function tzTeken(agents, rechten) {
-    var u = '<h2 class="ckop" style="font-size:1.15rem;margin-bottom:.7rem;">Agents</h2>';
+    var u = '<h2 class="ckop" style="font-size:1.15rem;margin-bottom:0.75rem;">Agents</h2>';
     if (!agents.length) u += '<div class="kaart"><p>Er heeft nog geen agent gehandeld. Er staan dus geen budgetten open -- dat is een uitslag, geen ontbrekende meting.</p></div>';
     for (var i = 0; i < agents.length; i++) {
       var a = agents[i];
@@ -988,7 +988,7 @@
         '</div></div>';
     }
 
-    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.6rem 0 .7rem;">Zware rechten</h2>';
+    u += '<h2 class="ckop" style="font-size:1.15rem;margin:1.25rem 0 0.75rem;">Zware rechten</h2>';
     u += '<div class="kaart"><h3>Wat er tijdelijk te geven valt</h3>';
     for (var s = 0; s < rechten.soorten.length; s++) {
       var so = rechten.soorten[s];

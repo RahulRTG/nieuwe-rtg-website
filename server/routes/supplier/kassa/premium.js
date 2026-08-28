@@ -110,9 +110,18 @@ module.exports = (kern) => {
   app.post('/api/supplier/kassa/dagrapport', supplierAuth, (req, res) => {
     const dag = vandaag();
     const sales = (db.data.posSales[req.supplier.code] || []).filter(x => String(x.at).slice(0, 10) === dag);
-    const perMethode = {}, perKassa = {};
+    const perMethode = {}, perKassa = {}, openstaandGezet = {};
     let omzet = 0, retouren = 0, retourBedrag = 0, kortingen = 0;
     for (const s of sales) {
+      /* `kamer` en `tafel` zijn geen betaling maar UITSTEL: die post komt bij de
+         check-out nog een keer langs, als gewone bon. Ze telden hier allebei
+         mee, dus stond een kamerrekening dubbel in de dagomzet EN in de
+         uitsplitsing per betaalwijze. Ze staan nu apart: zichtbaar wat er open
+         is gezet, zonder dat het als ontvangst meetelt (TAKEN.md 4.59). */
+      if (s.method === 'kamer' || s.method === 'tafel') {
+        openstaandGezet[s.method] = Math.round(((openstaandGezet[s.method] || 0) + s.total) * 100) / 100;
+        continue;
+      }
       omzet += s.total;
       if (s.retour) { retouren++; retourBedrag += -s.total; }
       perMethode[s.method] = Math.round(((perMethode[s.method] || 0) + s.total) * 100) / 100;
@@ -122,8 +131,9 @@ module.exports = (kern) => {
     }
     const derving = (db.data.kassaDerving && db.data.kassaDerving[req.supplier.code] || [])
       .filter(d => String(d.at).slice(0, 10) === dag && d.soort !== 'repro');
-    res.json({ dag, bonnen: sales.length, omzet: Math.round(omzet * 100) / 100,
-      perMethode, perKassa, retouren, retourBedrag: Math.round(retourBedrag * 100) / 100,
+    res.json({ dag, bonnen: sales.filter(x => x.method !== 'kamer' && x.method !== 'tafel').length,
+      omzet: Math.round(omzet * 100) / 100,
+      perMethode, perKassa, openstaandGezet, retouren, retourBedrag: Math.round(retourBedrag * 100) / 100,
       kortingen: Math.round(kortingen * 100) / 100,
       derving: { regels: derving.length, waarde: Math.round(derving.reduce((s, d) => s + (d.waarde || 0), 0) * 100) / 100,
         perSoort: derving.reduce((m, d) => (m[d.label] = (m[d.label] || 0) + 1, m), {}) } });

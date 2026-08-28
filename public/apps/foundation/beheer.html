@@ -94,13 +94,13 @@
     <h2>Gegevens en privacy</h2>
     <div class="h">Gevoelige info (locaties, gezondheidsgegevens en berichten) bewaren we versleuteld. Meer weten? Lees de <a href="privacy.html" style="color:var(--rtg-leesgoud,var(--goud))">privacy en veiligheid</a>-pagina.</div>
     <button class="knop rood" id="wisAlles">Alle gegevens van ons gezin verwijderen</button>
-    <div class="h" id="wisUitleg" style="margin:.6rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
+    <div class="h" id="wisUitleg" style="margin:0.5rem 0 0;">Dit verwijdert het hele gezin, alle profielen en alles wat erin staat. Dit kan niet ongedaan worden gemaakt.</div>
   </div>
 </div>
 
 <dialog id="dlgWis"><div class="kaart modal">
   <h3 id="dlgWisTitel">Alles verwijderen?</h3>
-  <div class="sub" style="color:var(--zacht);font-size:.88rem;margin-bottom:1rem;line-height:1.45;">Hiermee verdwijnt alles van jullie gezin voorgoed: profielen, spaardoelen, dromen, berichten, locaties en de gezinsinfo. Vul je pincode in om te bevestigen.</div>
+  <div class="sub" style="color:var(--zacht);font-size:.88rem;margin-bottom:1.25rem;line-height:1.45;">Hiermee verdwijnt alles van jullie gezin voorgoed: profielen, spaardoelen, dromen, berichten, locaties en de gezinsinfo. Vul je pincode in om te bevestigen.</div>
   <input class="veld" id="wPin" placeholder="Jouw pincode" inputmode="numeric" maxlength="6" type="password">
   <div class="fout" id="wFout"></div>
   <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop rood" id="wDoe">Definitief verwijderen</button></div>
@@ -120,7 +120,7 @@
     <option value="beheerder">Beheerder</option>
   </select>
   <div class="rolhint" id="rolhint" hidden>Een oppas, opa/oma of familielid ziet alleen het broodnodige: waar de kinderen zijn, contact met het gezin, en samen leren of even rust. De privezaken van het gezin (geld, steun, dromen) blijven verborgen.</div>
-  <label style="display:block;font-size:.82rem;color:var(--zacht);margin:.2rem 0 .35rem;">Geboortedatum voor de automatische leeftijdspas</label>
+  <label style="display:block;font-size:.82rem;color:var(--zacht);margin:0.25rem 0 0.25rem;">Geboortedatum voor de automatische leeftijdspas</label>
   <input class="veld" id="dGeboren" type="date" autocomplete="bday">
   <div class="rolhint" id="groephint">De server rekent hier zelf Mini, Kind, Tiener, Jong of Volwassen uit. Op een verjaardag verandert de toegang automatisch; een leerling zonder geboortedatum komt de Campus niet in.</div>
   <input class="veld" id="dPin" placeholder="Pincode (leeg = geen)" inputmode="numeric" maxlength="6">

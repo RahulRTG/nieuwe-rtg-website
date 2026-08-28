@@ -226,7 +226,7 @@
 <!-- 2. Profielkiezer: gezin bekend, kies wie je bent -->
 <section id="vProfielen" class="profwrap" hidden>
   <div class="kick">Wie leert er vandaag?</div>
-  <div class="logo" style="font-size:1.9rem;margin-top:.4rem;" id="pGezinNaam">Gezin</div>
+  <div class="logo" style="font-size:1.9rem;margin-top:0.5rem;" id="pGezinNaam">Gezin</div>
   <div class="profgrid" id="pGrid"></div>
   <div class="mini"><a id="pAnder">Ander gezin</a></div>
 </section>
@@ -238,7 +238,7 @@
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck"></div>
     <div id="hPass" class="passband" hidden></div>
-    <div id="hImpact" class="kaart" style="margin-top:.7rem;padding:.7rem .6rem;" hidden></div>
+    <div id="hImpact" class="kaart" style="margin-top:0.75rem;padding:.7rem .6rem;" hidden></div>
   </div>
 
   <a class="campus-ingang kaart" href="campus.html">
@@ -656,7 +656,7 @@ async function laadImpact(){
       (d.scholen ? tegel(d.scholen, d.scholen === 1 ? 'school' : 'scholen') : '') +
       (d.gezinnen ? tegel(d.gezinnen, d.gezinnen === 1 ? 'gezin' : 'gezinnen') : '') +
       '</div>' +
-      (d.boodschap ? '<div style="font-size:.72rem;opacity:.8;text-align:center;margin-top:.5rem;">' + esc(d.boodschap) + '</div>' : '');
+      (d.boodschap ? '<div style="font-size:.72rem;opacity:.8;text-align:center;margin-top:0.5rem;">' + esc(d.boodschap) + '</div>' : '');
     box.hidden = false;
   } catch(e){}
 }
@@ -690,7 +690,7 @@ async function start(){
         } else {
           $('#hWisBanner').innerHTML =
             '<b>'+esc(d.wisVerzoek.doorNaam)+' wil alle gegevens van het gezin verwijderen.</b> Geef je toestemming?'+
-            '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;align-items:center;">'+
+            '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:0.5rem;align-items:center;">'+
             (d.profiel.heeftPin?'<input id="wbPin" class="veld" style="max-width:9rem;padding:.5rem .7rem;" inputmode="numeric" maxlength="6" type="password" placeholder="Jouw pincode">':'')+
             '<button class="knop rood klein" id="wbJa">Ja, verwijderen</button>'+
             '<button class="knop grijs klein" id="wbNee">Nee, afwijzen</button>'+

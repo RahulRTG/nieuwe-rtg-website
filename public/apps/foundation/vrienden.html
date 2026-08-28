@@ -125,6 +125,7 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/meelezen.js"></script>
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -235,13 +236,13 @@
 <!-- snap kijker -->
 <div class="ov" id="snapOv"><div class="ovkaart" style="background:#000;">
   <div class="ovkop" style="border-color:#222;"><b id="snapVan"></b><button class="ovx" id="snapX">✕</button></div>
-  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" style="color:#fff;margin-top:.6rem;"></div><div style="color:#888;font-size:.75rem;margin-top:.6rem;">Deze snap verdwijnt zodra je sluit.</div></div>
+  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="snapImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="snapTxt" style="color:#fff;margin-top:0.5rem;"></div><div style="color:#888;font-size:.75rem;margin-top:0.5rem;">Deze snap verdwijnt zodra je sluit.</div></div>
 </div></div>
 
 <!-- verhaal kijker -->
 <div class="ov" id="storyOv"><div class="ovkaart" style="background:#000;">
   <div class="ovkop" style="border-color:#222;"><b id="storyVan"></b><button class="ovx" id="storyX">✕</button></div>
-  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" style="color:#fff;margin-top:.6rem;"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:.4rem;"></div></div>
+  <div style="padding:1rem;text-align:center;"><img class="snapfull" id="storyImg" alt="" data-rtg-protect data-watermark="RTG Salon"><div id="storyTxt" style="color:#fff;margin-top:0.5rem;"></div><div id="storyOpdracht" style="color:var(--goud2);font-size:.8rem;margin-top:0.5rem;"></div></div>
 </div></div>
 
 <!-- belscherm -->
@@ -261,8 +262,8 @@
 
 <!-- inkomende oproep -->
 <div class="ov" id="inkOv"><div class="ovkaart" style="max-width:22rem;text-align:center;padding:1.4rem;">
-  <div class="belav" id="inkAv" style="margin:0 auto 1rem;">•</div>
-  <b id="inkNaam"></b><div class="beltijd" id="inkSoort" style="margin:.3rem 0 1.2rem;"></div>
+  <div class="belav" id="inkAv" style="margin:0 auto 1.25rem;">•</div>
+  <b id="inkNaam"></b><div class="beltijd" id="inkSoort" style="margin:0.25rem 0 1.25rem;"></div>
   <div style="display:flex;gap:1rem;justify-content:center;">
     <button class="knop" id="inkJa">Opnemen</button>
     <button class="knop grijs" id="inkNee">Weiger</button>
@@ -278,7 +279,7 @@
     <div class="strij"><span style="color:var(--zacht);font-size:.8rem;"></span><span id="stKleuren" style="display:flex;gap:.4rem;"></span><span class="h-flex1"></span><button class="stchip" id="stWis" type="button">↶ wis laatste</button></div>
     <div class="strij" id="stEmojis" role="group" aria-label="Stickers"></div>
     <input class="veld h-mt50" id="stTekst" placeholder="Tekst erbij (mag leeg)" maxlength="120">
-    <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:.55rem;">Versturen</button>
+    <button class="knop" id="stStuur" type="button" style="width:100%;margin-top:0.5rem;">Versturen</button>
   </div>
 </div></div>
 <input type="file" id="fotoIn" accept="image/*" style="display:none;">
@@ -954,7 +955,17 @@ async function haalIce(){ try{ iceConfig=(await (await fetch('/api/ice')).json()
 // het recht niet doorgeeft, weigering, geen apparaat, bezet) in plaats van een
 // melding die de gebruiker naar een knop stuurt die er niet is.
 async function pakMedia(video){ try{ return await RTGMedia.vraag({ audio:true, video: video?{facingMode:'user'}:false }, { stil:true }); }catch(e){ meld((e.rtg && (e.rtg.kort+'. '+e.rtg.uitleg)) || 'Geen toegang tot microfoon of camera.'); return null; } }
-function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; } }
+function belUI(open){ $('#belOv').classList.toggle('open', !!open); if(!open){ $('#belRemote').srcObject=null; $('#belLocal').srcObject=null; if(belMee) belMee.leeg(); } }
+/* MEELEZEN: zonder tekstbaan kan wie doof is niet meedoen aan dit gesprek
+   (TOEGANKELIJK.md). Wat erin staat is getypt door een mens en niet uit spraak
+   herkend -- zie de kop van /shared/meelezen.js. */
+let belMee = null;
+function belMeeBaan(){
+  if(belMee || !window.RTGMeelezen) return belMee;
+  belMee = window.RTGMeelezen.maak({ stuur: r => { if(call) belSein(call.met,'tekst',{payload:{r}}); } });
+  const vak = $('#belOv'); if(vak) vak.appendChild(belMee.el);
+  return belMee;
+}
 function belTimer(){ if(!call) return; const n=Math.round((Date.now()-call.t0)/1000); $('#belTijd').textContent=Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
 function toonBel(naam, video){ $('#belNaam').textContent=naam; $('#belAv').textContent=initcn(naam); $('#belAudio').style.display=video?'none':'flex'; $('#belLocal').style.display=video?'':'none'; $('#belCam').style.display=video?'':'none'; $('#belTijd').textContent='belt...'; belUI(true); }
 function maakPc(){
@@ -990,8 +1001,10 @@ async function opBelsignaal(d){
   else if(d.kind==='offer'){ const pc=maakPc(); await pc.setRemoteDescription(d.payload); await flushIce(); const answer=await pc.createAnswer(); await pc.setLocalDescription(answer); belSein(call.met,'answer',{payload:answer}); }
   else if(d.kind==='answer'){ await call.pc.setRemoteDescription(d.payload); await flushIce(); }
   else if(d.kind==='ice'){ if(call.pc && call.pc.remoteDescription){ try{ await call.pc.addIceCandidate(d.payload); }catch(e){} } else call.pendingIce.push(d.payload); }
+  else if(d.kind==='tekst'){ const m=belMeeBaan(); if(m && d.payload && d.payload.r) m.voed(d.payload.r,{ wie:d.codename, bron:'mens' }); }
   else if(['hangup','decline','busy'].includes(d.kind)){ meld(d.kind==='busy'?'In gesprek.':d.kind==='decline'?'Oproep geweigerd.':'Gesprek beeindigd.'); eindeBel(false); }
 }
+belMeeBaan();
 $('#belWeg').addEventListener('click', ()=> eindeBel(true));
 $('#belMute').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getAudioTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belMute').style.opacity=t.enabled?'1':'.4'; });
 $('#belCam').addEventListener('click', ()=>{ if(!call) return; const t=call.stream.getVideoTracks()[0]; if(!t) return; t.enabled=!t.enabled; $('#belCam').style.opacity=t.enabled?'1':'.4'; });

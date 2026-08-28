@@ -81,7 +81,7 @@
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Het meest complete rechtbanksysteem van het rijk. Log in als medewerker met je persoonlijke pincode. De uitspraak blijft altijd het besluit van de rechter.</p>
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem;">Het meest complete rechtbanksysteem van het rijk. Log in als medewerker met je persoonlijke pincode. De uitspraak blijft altijd het besluit van de rechter.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="knop prim" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -100,7 +100,7 @@
     <div class="tabs" id="tabs"></div>
 
     <section class="paneel" id="p-rol">
-      <div class="rij" style="margin:0 0 .7rem;">
+      <div class="rij" style="margin:0 0 0.75rem;">
         <input class="veld" id="rolDatum" type="date">
         <button class="knop stil" id="rolLaad">Toon de rol</button>
       </div>
@@ -119,9 +119,9 @@
           <input class="veld" id="zVerweerder" placeholder="Verweerder" maxlength="60">
           <button class="knop" id="zMaak">Aanbrengen</button>
         </div>
-        <textarea class="veld" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil" style="width:100%;margin-top:.5rem;resize:vertical;"></textarea>
+        <textarea class="veld" id="zOms" rows="2" maxlength="800" placeholder="Korte omschrijving van het geschil" style="width:100%;margin-top:0.5rem;resize:vertical;"></textarea>
       </div>
-      <div class="rij" style="margin:0 0 .7rem;">
+      <div class="rij" style="margin:0 0 0.75rem;">
         <select class="veld" id="zFilter"><option value="">Alle zaken</option><option value="aangebracht">Aangebracht</option><option value="gepland">Op de rol</option><option value="uitspraak">Uitspraak gedaan</option></select>
       </div>
       <div id="zakenLijst"></div>

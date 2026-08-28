@@ -77,7 +77,7 @@
 </header>
 <main id="main">
   <div class="login" id="login">
-    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem;">Log in als medewerker van het rijk met je persoonlijke pincode.</p>
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1.25rem;">Log in als medewerker van het rijk met je persoonlijke pincode.</p>
     <select class="veld" id="wie" aria-label="Medewerker"><option value="">Laden…</option></select>
     <input class="veld" id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="Pincode">
     <button class="hoofd knop" id="loginGo" style="width:100%;" data-hoofdactie>Inloggen</button>
@@ -213,8 +213,8 @@ async function laadBieb(){
   let d; try { d = await api('/api/overheid/bieb'); } catch(e){ $('#p-bieb').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   if (!RB.klaar){
     $('#p-bieb').innerHTML =
-      '<p class="meta" style="margin:.2rem 0 .6rem;">'+d.totaal.toLocaleString('nl-NL')+' werk-apps · 10.000 per afdeling · voor rijksambtenaren inbegrepen</p>'+
-      '<div class="rij" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;">'+
+      '<p class="meta" style="margin:0.25rem 0 0.5rem;">'+d.totaal.toLocaleString('nl-NL')+' werk-apps · 10.000 per afdeling · voor rijksambtenaren inbegrepen</p>'+
+      '<div class="rij" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:0.5rem;">'+
         '<select class="veld" id="rbAfd" aria-label="Afdeling" style="max-width:15rem;"><option value="">Alle afdelingen</option>'+
           d.afdelingen.map(a => '<option value="'+esc(a.id)+'">'+RTGGlyf.tekst(a.icon)+' '+esc(a.label)+' ('+a.aantal.toLocaleString('nl-NL')+')</option>').join('')+'</select>'+
         '<input class="veld" id="rbZoek" maxlength="60" placeholder="Zoek een taak (bijv. dossierscan)" aria-label="Zoeken" style="flex:1;min-width:10rem;">'+

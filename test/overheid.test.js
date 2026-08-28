@@ -92,6 +92,16 @@ test('3. RDW: voertuig registreren, dubbel geweigerd, en rijbewijs verlengen', a
   const verl = await api(base, '/api/overheid/rijbewijs/verleng', {}, lid);
   assert.equal(verl.status, 200);
   assert.ok(verl.body.rijbewijs.geldigTot > rb.body.rijbewijs.geldigTot, 'verlengen schuift de datum op');
+  /* TWEE KEER VERLENGEN VERLENGT NIET TWEE KEER (het besluit in IDEMBESLUIT.json).
+     De idemproef zag deze route aan de OPSLAG als onbeschermd -- er kwam bij
+     beide oproepen een bericht bij. Waar het om gaat is of het RIJBEWIJS twee
+     keer opschuift, en dat is de vraag die dit register beantwoordt: `geldigTot`
+     wordt absoluut berekend (vandaag + 10 jaar) en niet opgeteld bij de vorige
+     datum. Zou iemand dat naar `geldigTot + 10 jaar` veranderen, dan geeft een
+     dubbeltik twintig jaar rijbewijs, en dan zakt deze regel. */
+  const nog = await api(base, '/api/overheid/rijbewijs/verleng', {}, lid);
+  assert.equal(nog.body.rijbewijs.geldigTot, verl.body.rijbewijs.geldigTot,
+    'een tweede verlenging geeft dezelfde einddatum: de eindstand is idempotent');
 });
 
 test('4. KVK ondernemersloket: een lid schrijft een eenmanszaak in en vraagt zijn uittreksel op', async () => {
@@ -413,4 +423,27 @@ test('18. De gemeentebalie-AI verleent de eerste vergunning', async () => {
   assert.equal((await bevestigAi(d, gem)).body.ok, true);
   const mijn = await api(base, '/api/gemeente/vergunningen/mijn', {}, lid);
   assert.ok(mijn.body.vergunningen.some(v => v.status === 'verleend'), 'een vergunning is verleend door de AI');
+});
+
+/* Zelfde venster-afspraak als bij de gemeente (TAKEN.md 4.61): dezelfde melder,
+   dezelfde soort en dezelfde tekst binnen een minuut is EEN melding aan het
+   waterschap, geen tweede dossier voor de behandelaar. */
+test('19. dezelfde watermelding binnen een minuut geeft hetzelfde meldnummer', async () => {
+  const eerste = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'Duiker verstopt bij de molen' }, lid);
+  assert.equal(eerste.status, 200);
+  const ref = eerste.body.melding.ref;
+
+  const nogmaals = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'Duiker verstopt bij de molen' }, lid);
+  assert.equal(nogmaals.body.melding.ref, ref, 'hetzelfde meldnummer terug');
+  assert.equal(nogmaals.body.herhaald, true, 'gemerkt als herhaling');
+
+  const mijn = await api(base, '/api/overheid/water/meldingen/mijn', {}, lid);
+  const zelfde = (mijn.body.meldingen || []).filter(m => m.tekst === 'Duiker verstopt bij de molen');
+  assert.equal(zelfde.length, 1, 'de melder heeft er zelf ook maar een');
+
+  const ander = await api(base, '/api/overheid/water/meld',
+    { soort: 'wateroverlast', tekst: 'En het riool bij de brug ruikt' }, lid);
+  assert.notEqual(ander.body.melding.ref, ref, 'een andere melding komt gewoon binnen');
 });

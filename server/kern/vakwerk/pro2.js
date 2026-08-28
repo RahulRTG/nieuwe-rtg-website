@@ -8,6 +8,7 @@
 module.exports = (ctx) => {
   const { db, save, findSupplier, boekingenVanZaak, ordersVanZaak, scho, notify, sseToCustomer, geldDag } = ctx;
   const nu = () => new Date().toISOString();
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/vakwerk/pro2', bezit: { vakHerinnerd: 'kaart' } });
   /* Het klantenboek staat in kern/klantenboek.js: de vraag "wie zijn mijn
      klanten" hangt niet aan een genre, en twee boeken naast elkaar lopen
      uiteen (lat-regel 4). Vakwerk houdt er dus geen eigen meer op na. */
@@ -59,7 +60,7 @@ module.exports = (ctx) => {
       const oud = laatst.get(k);
       if (!oud || dag > oud.dag) laatst.set(k, { dag, key: b.customerKey, tier: b.customerTier });
     }
-    const herinnerd = db.data.vakHerinnerd = db.data.vakHerinnerd || {};
+    const herinnerd = eigen.bak('vakHerinnerd');
     const uit = [];
     for (const d of metInterval) {
       const grens = new Date(Date.now() - d.herhaalMnd * 30.44 * 864e5).toISOString().slice(0, 10);
@@ -85,7 +86,7 @@ module.exports = (ctx) => {
     const s = findSupplier(code);
     notify(b.customerTier, { icon: 'agenda', title: s.name, body: 'Vriendelijke herinnering: uw "' + rij.dienst + '" was ' + rij.mndGeleden + ' maanden geleden. Boeken kan in de Mall, wanneer het u uitkomt.', scope: 'orders' });
     sseToCustomer(b.customerKey || b.customerTier, 'sync', { scope: 'orders' });
-    (db.data.vakHerinnerd = db.data.vakHerinnerd || {})[code + '|' + codenaam + '|' + dienstId] = nu();
+    eigen.bak('vakHerinnerd')[code + '|' + codenaam + '|' + dienstId] = nu();
     save();
     return { status: 200, ok: true };
   }

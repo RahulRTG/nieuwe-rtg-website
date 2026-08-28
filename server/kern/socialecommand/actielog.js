@@ -35,21 +35,22 @@ const { datum } = require('../../lib/klok');
 const MAX = 200;
 
 module.exports = ({ db, save, klok }) => {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/socialecommand/actielog', bezit: { socialeacties: 'kaart' } });
   const nu = () => (klok ? klok() : datum());
 
   /* Opslag pas aanmaken als er echt iets bewaard wordt; kijken laat geen spoor
      achter. Dezelfde afspraak als kern/geldbeleid en kern/levensband. */
   function pak(key) {
-    if (!db.data.socialeacties || typeof db.data.socialeacties !== 'object') db.data.socialeacties = {};
+    const alles = eigen.bak('socialeacties');
     const k = String(key || '');
     if (!k) return null;
-    if (!Array.isArray(db.data.socialeacties[k])) db.data.socialeacties[k] = [];
-    return db.data.socialeacties[k];
+    if (!Array.isArray(alles[k])) alles[k] = [];
+    return alles[k];
   }
   const kijk = (key) => {
-    const alles = db.data.socialeacties;
+    const alles = eigen.bak('socialeacties');
     const k = String(key || '');
-    return (alles && Array.isArray(alles[k])) ? alles[k] : [];
+    return Array.isArray(alles[k]) ? alles[k] : [];
   };
 
   const kopie = (r) => ({ tijd: r.tijd, wie: r.wie, wat: r.wat, waarom: r.waarom,

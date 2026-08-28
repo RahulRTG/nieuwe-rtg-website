@@ -1,7 +1,7 @@
 /* Munt-ontvangst: orchestratie en grootboek (kern/munten.js).
 
    Bovenop de provider-naad (server/muntbetaal.js) legt deze laag het grootboek
-   van ontvangsten (db.data.muntOntvangsten) en de context per verzoek: welke
+   van ontvangsten (de collectie muntOntvangsten) en de context per verzoek: welke
    factuur van welk lid wordt hiermee betaald. Zodra de aanbieder bevestigt dat de
    munten binnen zijn EN omgezet naar euro, settelt de server die factuur langs de
    gewone weg (inclusief de 30%-afdracht aan de RTFoundation).
@@ -16,10 +16,8 @@ function maakMunten(state) {
 
   function aan() { return !!muntbetaal.AAN; }
 
-  function lijst() {
-    if (!Array.isArray(db.data.muntOntvangsten)) db.data.muntOntvangsten = [];
-    return db.data.muntOntvangsten;
-  }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/munten', bezit: { muntOntvangsten: 'lijst' } });
+  const lijst = () => eigen.bak('muntOntvangsten');
 
   // Wat mag de klant kiezen, en tegen welke (gelockte) koers.
   function opties() {

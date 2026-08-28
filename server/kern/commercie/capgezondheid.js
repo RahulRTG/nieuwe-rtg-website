@@ -54,11 +54,8 @@ const QUARANTAINE_NA_MS = 900000; // een kwartier onafgebroken rood
 function maakGezondheid({ db, save, nu }) {
   const tijd = nu || klok.nu;
 
-  function alles() {
-    if (!db.data) db.data = {};
-    if (!db.data.capGezondheid || typeof db.data.capGezondheid !== 'object') db.data.capGezondheid = {};
-    return db.data.capGezondheid;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/capgezondheid', bezit: { capGezondheid: 'kaart' } });
+  function alles() { return eigen.bak('capGezondheid'); }
 
   function rij(cap) {
     const k = String(cap || '');

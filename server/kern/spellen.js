@@ -16,12 +16,9 @@
    plus een SSE-duwtje. */
 module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, magnaatLeren, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
+  const { S } = require('./spellen/opslag')({ db });
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
-  function S() {
-    if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {} };
-    return db.data.spellen;
-  }
   /* Wat een descriptor kan zeggen staat in spellen/register.js en met opzet
      niet ook hier. Het register draait verderop, zodra de gedeelde spelregels
      bestaan die het aan de spellen doorgeeft. */

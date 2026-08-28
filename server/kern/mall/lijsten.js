@@ -33,7 +33,7 @@ const SOORTEN = ['lijst', 'reis'];
    maakt zichzelf aan bij het eerste gebruik en is niet te verwijderen, want een
    hartje dat een lijst weggooit die je zelf nooit hebt gemaakt is een verrassing.
    Let op: dit gaat over AANBOD. Favoriete ZAKEN bestonden al
-   (db.data.favorieten, kern/ervaring/leden/waardering.js) en blijven daar. */
+   (de collectie favorieten, kern/ervaring/leden/waardering.js) en blijven daar. */
 const BEWAARD = 'bewaard';
 const MAX_LIJSTEN = 40;
 const MAX_REGELS = 200;
@@ -54,10 +54,11 @@ module.exports = (ctx) => {
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
   const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/mall/lijsten', bezit: { mallLijsten: 'kaart' } });
   function bak(key) {
-    if (!db.data.mallLijsten) db.data.mallLijsten = {};
-    if (!Array.isArray(db.data.mallLijsten[key])) db.data.mallLijsten[key] = [];
-    return db.data.mallLijsten[key];
+    const t = eigen.bak('mallLijsten');
+    if (!Array.isArray(t[key])) t[key] = [];
+    return t[key];
   }
   const vind = (key, id) => bak(key).find(l => l.id === String(id || ''));
 

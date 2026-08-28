@@ -36,10 +36,8 @@ module.exports = (ctx) => {
   const { VERDIEPINGEN } = require('./aanbodvorm');
   const { GENRE_VERDIEPING } = require('./aanbodvorm');
 
-  function bak() {
-    if (!Array.isArray(db.data.mallAanvragen)) db.data.mallAanvragen = [];
-    return db.data.mallAanvragen;
-  }
+  const eigenC = require('../eigencollectie')({ db, domein: 'kern/mall/aanvragen', bezit: { mallAanvragen: 'lijst' } });
+  const bak = () => eigenC.bak('mallAanvragen');
   const verlopen = (a) => (Date.now() - new Date(a.at).getTime()) > DAGEN_GELDIG * 86400000;
   const open = (a) => a.status === 'open' && !verlopen(a);
 
@@ -67,7 +65,7 @@ module.exports = (ctx) => {
       status: 'open', reacties: [], at: nu()
     };
     lijst.unshift(a);
-    db.data.mallAanvragen = lijst.slice(0, 5000);
+    eigenC.zetBak('mallAanvragen', lijst.slice(0, 5000));
     save();
     return { ok: true, aanvraag: publiekeAanvraag(a, true) };
   }

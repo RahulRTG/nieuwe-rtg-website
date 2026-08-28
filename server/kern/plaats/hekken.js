@@ -17,7 +17,7 @@
        vasthouden lopen uiteen".
      - de GEBIEDEN van kern/stadsweefsel: de zones, met echte vlakgeometrie.
    Alleen wat nergens anders bestaat (een eigen hek van een bedrijf om zijn
-   terrein) staat in db.data.plaatsHekken.
+   terrein) staat in de collectie plaatsHekken.
 
    EEN GRENS DIE ER HOORT TE ZIJN, EN DIE OPVALT. De server kan de hekken niet
    op afstand tot jou sorteren, want daarvoor zou hij moeten weten waar je bent
@@ -68,7 +68,8 @@ module.exports = ({ db, weefsel, navPoi }) => {
      plaatsen leveren. Hier staat alleen wat een hek IS en wat er naar buiten mag. */
   const { bronToevoegen, vanBronnen, vanPlekken, vanWeefsel } = require('./bronnen')({ weefsel, navPoi, DOEL });
 
-  const eigen = () => { if (!Array.isArray(db.data.plaatsHekken)) db.data.plaatsHekken = []; return db.data.plaatsHekken; };
+  const contract = require('../eigencollectie')({ db, domein: 'kern/plaats/hekken', bezit: { plaatsHekken: 'lijst' } });
+  const eigen = () => contract.bak('plaatsHekken');
 
   /* De hekken voor één doel. Dit is wat het toestel ophaalt, en er staat dus
      bewust geen enkel persoonsgegeven in. */

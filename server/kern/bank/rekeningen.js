@@ -112,7 +112,8 @@ module.exports = (ctx) => {
      iedereen krijgt zijn eigen rekening pas NA akkoord (opt-in). Zo geldt hetzelfde
      voor nieuwe leden als voor bestaande leden bij live gaan: bij het eerste bezoek
      een akkoordscherm, en op akkoord meteen een betaalrekening. ---------- */
-  function akkoordStore() { if (!db.data.bankAkkoord || typeof db.data.bankAkkoord !== 'object') db.data.bankAkkoord = {}; return db.data.bankAkkoord; }
+  const eigenBank = require('../eigencollectie')({ db, domein: 'kern/bank/rekeningen', bezit: { bankAkkoord: 'kaart' } });
+  function akkoordStore() { return eigenBank.bak('bankAkkoord'); }
   function ledenOverzicht(codenaam) {
     const c = String(codenaam || '').trim();
     const mijn = vanLid(c);

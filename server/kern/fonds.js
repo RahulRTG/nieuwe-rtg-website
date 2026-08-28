@@ -75,10 +75,8 @@ function maakFonds(state) {
     };
   }
 
-  function lijst() {
-    if (!Array.isArray(db.data.fondsAfdrachten)) db.data.fondsAfdrachten = [];
-    return db.data.fondsAfdrachten;
-  }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/fonds', bezit: { fondsAfdrachten: 'lijst' } });
+  const lijst = () => eigen.bak('fondsAfdrachten');
 
   // Boek de 30%-afdracht voor een zojuist betaalde abonnementsfactuur. Idempotent
   // op (wie, invoiceId): dezelfde betaalde factuur levert nooit twee afdrachten.

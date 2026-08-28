@@ -25,9 +25,9 @@ const TOEGESTAAN = new Set(['quarantaine', 'vrij', 'hygiene', 'zekering', 'dremp
    begint hiermee, zodat geen enkele plek hoeft te controleren of een lijst al
    bestaat. */
 function maakW(db) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/wacht/staat', bezit: { wacht: 'kaart' } });
   return function W() {
-    if (!db.data.wacht) db.data.wacht = {};
-    const w = db.data.wacht;
+    const w = eigen.bak('wacht');
     if (!Array.isArray(w.grafiek)) w.grafiek = [];
     if (!w.quarantaine) w.quarantaine = {};       // bron -> { reden, sinds, tot }
     if (!Array.isArray(w.raad)) w.raad = [];      // voorstellen

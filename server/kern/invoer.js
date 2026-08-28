@@ -52,10 +52,8 @@ const SOORTEN = ['vlucht', 'verblijf', 'vervoer', 'transfer', 'activiteit', 'taf
 module.exports.maakInvoer = ({ db, save, crypto, bestandenUpload, plaatsVind }) => {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
-  const bak = () => {
-    if (!db.data.reisInvoer) db.data.reisInvoer = { voorstellen: [], items: [] };
-    return db.data.reisInvoer;
-  };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/invoer', bezit: { reisInvoer: 'kaart' } });
+  const bak = () => eigen.bak('reisInvoer', (b) => { b.voorstellen = []; b.items = []; });
   // een document, een foto of niets: dat bepaalt de herkomst en niets anders
   const herkomstVan = (mime) => !mime ? 'handmatig' : /^image\//.test(mime) ? 'beeld' : 'document';
 

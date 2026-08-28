@@ -4,26 +4,28 @@
 
 module.exports = function bouwTalenBeheer({ TALEN, BASIS, STANDAARD, STANDAARD_VERSIE, bestaat }) {
   return function maakTalen({ db, save }) {
+    const eigen = require('./kern/eigencollectie')({ db, domein: 'talen-beheer', bezit: { talen: 'kaart' } });
     function actieveSet() {
       let veranderd = false;
-      if (!db.data.talen || !Array.isArray(db.data.talen.actief)) {
-        db.data.talen = { actief: STANDAARD.slice(), standaardVersie: STANDAARD_VERSIE };
+      const t = eigen.bak('talen');
+      if (!Array.isArray(t.actief)) {
+        t.actief = STANDAARD.slice(); t.standaardVersie = STANDAARD_VERSIE;
         veranderd = true;
-      } else if (db.data.talen.standaardVersie !== STANDAARD_VERSIE) {
+      } else if (t.standaardVersie !== STANDAARD_VERSIE) {
         /* Bestaande installaties met precies de voormalige standaard (nl/en)
            krijgen de nieuwe wereldstand eenmalig. Een installatie met een
            afwijkende lijst heeft al een bewuste beheerkeuze en blijft intact. */
-        const oud = db.data.talen.actief;
+        const oud = t.actief;
         if (oud.length === BASIS.length && BASIS.every(c => oud.includes(c)))
-          db.data.talen.actief = STANDAARD.slice();
-        db.data.talen.standaardVersie = STANDAARD_VERSIE;
+          t.actief = STANDAARD.slice();
+        t.standaardVersie = STANDAARD_VERSIE;
         veranderd = true;
       }
-      for (const b of BASIS) if (!db.data.talen.actief.includes(b)) {
-        db.data.talen.actief.push(b); veranderd = true;
+      for (const b of BASIS) if (!t.actief.includes(b)) {
+        t.actief.push(b); veranderd = true;
       }
       if (veranderd && typeof save === 'function') save();
-      return db.data.talen.actief;
+      return t.actief;
     }
     function isActief(code) { return actieveSet().includes(String(code || '').toLowerCase()); }
     function alle() {

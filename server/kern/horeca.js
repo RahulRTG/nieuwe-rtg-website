@@ -42,11 +42,12 @@ module.exports = ({ db, save, crypto, schoon }) => {
 
   /* De staat per zaak. Bewust per zaakcode en niet een grote lijst met een
      zaakveld erin: een zaak leest en schrijft alleen zijn eigen doos. */
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/horeca', bezit: { horeca: 'kaart' } });
   function H(code) {
-    if (!db.data.horeca) db.data.horeca = {};
+    const alles = eigen.bak('horeca');
     const c = String(code || '');
-    if (!db.data.horeca[c]) db.data.horeca[c] = { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
-    const h = db.data.horeca[c];
+    if (!alles[c]) alles[c] = { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
+    const h = alles[c];
     if (!h.rekeningen) h.rekeningen = {};
     if (!h.bonnen) h.bonnen = {};
     if (!h.instel) h.instel = {};
@@ -64,7 +65,8 @@ module.exports = ({ db, save, crypto, schoon }) => {
      die nergens aan vast zit. */
   function Hlees(code) {
     const c = String(code || '');
-    return (db.data.horeca && db.data.horeca[c]) ? H(c)
+    // bak() maakt hooguit de lege wortel aan; de doos van een zaak nooit
+    return eigen.bak('horeca')[c] ? H(c)
       : { rekeningen: {}, bonnen: {}, instel: {}, wachtrij: [] };
   }
 

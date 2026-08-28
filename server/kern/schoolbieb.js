@@ -74,10 +74,11 @@ const NAMEN = []; let SOM_WAARDE = 0;
 for (let i = 0; i < TOTAAL; i++) { const a = appVan(i); NAMEN.push(a.naam.toLowerCase()); SOM_WAARDE += a.winkelwaardeCenten; }
 
 function maakSchoolBieb({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/schoolbieb', bezit: { schoolInstallaties: 'kaart' } });
   const rij = (handle) => {
-    if (!db.data.schoolInstallaties) db.data.schoolInstallaties = {};
-    if (!Array.isArray(db.data.schoolInstallaties[handle])) db.data.schoolInstallaties[handle] = [];
-    return db.data.schoolInstallaties[handle];
+    const alle = eigen.bak('schoolInstallaties');
+    if (!Array.isArray(alle[handle])) alle[handle] = [];
+    return alle[handle];
   };
   const zicht = (groep) => ZICHT[groep] || ZICHT.kind;
 

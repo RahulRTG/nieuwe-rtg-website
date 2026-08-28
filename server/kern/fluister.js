@@ -44,10 +44,11 @@ module.exports = ({ db, save, schoon, anthropic, notify, reserveerTafel, annulee
   // hetzelfde brein, een passend gezicht: Rahul voor leden, "uw
   // assistent" voor personeel en zaken
   const wieBen = () => 'Rahul'; // het ene AI-hart: iedereen praat met Rahul
-  const lijsten = () => { if (!db.data.fluister) db.data.fluister = {}; };
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/fluister', bezit: { fluister: 'kaart' } });
+  const lijsten = () => { eigen.bak('fluister'); };
   const van = key => {
-    lijsten();
-    const p = db.data.fluister[key] || (db.data.fluister[key] = { weetjes: [], focus: {}, at: nu() });
+    const alles = eigen.bak('fluister');
+    const p = alles[key] || (alles[key] = { weetjes: [], focus: {}, at: nu() });
     if (!Array.isArray(p.gesprek)) p.gesprek = [];
     return p;
   };

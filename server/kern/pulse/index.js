@@ -12,9 +12,10 @@ module.exports = ({ db, save, crypto, liveCodename, notify, stemmingVan, jarigVa
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(5).toString('hex');
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/pulse/index', bezit: { pulse: 'kaart' } });
+
   function P() {
-    if (!db.data.pulse || typeof db.data.pulse !== 'object') db.data.pulse = { posts: [], volgt: {}, laatstePost: {} };
-    const p = db.data.pulse;
+    const p = eigen.bak('pulse', (b) => Object.assign(b, { posts: [], volgt: {}, laatstePost: {} }));
     if (!Array.isArray(p.posts)) p.posts = [];
     if (!p.volgt || typeof p.volgt !== 'object') p.volgt = {};
     if (!p.laatstePost || typeof p.laatstePost !== 'object') p.laatstePost = {};

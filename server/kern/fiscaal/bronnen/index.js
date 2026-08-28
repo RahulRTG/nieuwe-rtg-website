@@ -60,10 +60,8 @@ function maakBronnen({ db, save, LANDEN, fetchImpl, nu }) {
   const haalHttp = fetchImpl || ((...a) => fetch(...a));
   const tijd = nu || (() => new Date().toISOString());
 
-  function staat() {
-    if (!db.data.fiscaalBronnen || typeof db.data.fiscaalBronnen !== 'object') db.data.fiscaalBronnen = {};
-    return db.data.fiscaalBronnen;
-  }
+  const eigen = require('../../eigencollectie')({ db, domein: 'kern/fiscaal/bronnen/index', bezit: { fiscaalBronnen: 'kaart' } });
+  const staat = () => eigen.bak('fiscaalBronnen');
   const urlVan = (sleutel) => process.env[BRONNEN[sleutel].env] || '';
 
   /* Wat er van een bron te verwachten valt -- zonder hem aan te roepen. Een

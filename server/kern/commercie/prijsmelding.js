@@ -72,11 +72,8 @@ function magOvergaan(van, naar) {
 
 function maakPrijsmeldingen({ db, save, nu }) {
   const tijd = nu || klok.nu;
-  function rij() {
-    if (!db.data) db.data = {};
-    if (!Array.isArray(db.data.prijsmeldingen)) db.data.prijsmeldingen = [];
-    return db.data.prijsmeldingen;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/prijsmelding', bezit: { prijsmeldingen: 'lijst' } });
+  function rij() { return eigen.bak('prijsmeldingen'); }
   const vind = id => rij().find(m => m.id === String(id || '')) || null;
 
   function zet(m, naar, velden) {

@@ -35,11 +35,9 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
   const nu = () => new Date().toISOString();
   const rid = () => 'u' + crypto.randomBytes(5).toString('hex');
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/muziek-uitgave', bezit: { muziekUitgaven: 'kaart' } });
   function U() {
-    if (!db.data.muziekUitgaven || typeof db.data.muziekUitgaven !== 'object') {
-      db.data.muziekUitgaven = { lijst: [], reacties: {} };
-    }
-    const u = db.data.muziekUitgaven;
+    const u = eigen.bak('muziekUitgaven');
     if (!Array.isArray(u.lijst)) u.lijst = [];
     if (!u.reacties || typeof u.reacties !== 'object') u.reacties = {};
     return u;

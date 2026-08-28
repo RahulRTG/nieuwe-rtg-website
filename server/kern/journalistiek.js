@@ -14,18 +14,19 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
   const nu = () => new Date().toISOString();
   const id = (p) => (p || 'x') + crypto.randomBytes(4).toString('hex');
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/journalistiek', bezit: { redacties: 'kaart' } });
   function ruimte(code) {
-    if (!db.data.redacties) db.data.redacties = {};
-    if (!db.data.redacties[code]) {
+    const alles = eigen.bak('redacties');
+    if (!alles[code]) {
       const s = findSupplier ? findSupplier(code) : null;
-      db.data.redacties[code] = {
+      alles[code] = {
         huisstijl: { naam: (s && s.name) || 'Mijn krant', payoff: 'Onafhankelijk nieuws', accent: '#7F1634', thema: 'donker' },
         rubrieken: ['Voorpagina', 'Stad', 'Cultuur', 'Sport', 'Opinie'],
         artikelen: [],
         site: { blokken: [], volgorde: null }
       };
     }
-    return db.data.redacties[code];
+    return alles[code];
   }
 
   /* ---- blok-schoonmaak (gedeelde bloktaal met de Website-studio); de
@@ -131,22 +132,23 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, claude }) => {
 
   /* ---- publiek: de krant lezen ---- */
   function krantGids() {
-    if (!db.data.redacties) return [];
-    return Object.keys(db.data.redacties).map(code => {
-      const r = db.data.redacties[code]; const live = r.artikelen.filter(a => a.status === 'live');
+    const alles = eigen.bak('redacties');
+    return Object.keys(alles).map(code => {
+      const r = alles[code]; const live = r.artikelen.filter(a => a.status === 'live');
       return { code, naam: r.huisstijl.naam, payoff: r.huisstijl.payoff, accent: r.huisstijl.accent, artikelen: live.length };
     }).filter(x => x.artikelen > 0).sort((a, b) => b.artikelen - a.artikelen).slice(0, 200);
   }
   function krant(code) {
-    if (!db.data.redacties || !db.data.redacties[code]) return { error: 'Geen krant op dit adres.', status: 404 };
-    const r = db.data.redacties[code];
+    const r = eigen.bak('redacties')[code];
+    if (!r) return { error: 'Geen krant op dit adres.', status: 404 };
     const live = r.artikelen.filter(a => a.status === 'live')
       .sort((a, b) => String(b.gepubliceerd || b.bij).localeCompare(String(a.gepubliceerd || a.bij)));
     return { ok: true, huisstijl: r.huisstijl, site: r.site, rubrieken: r.rubrieken, artikelen: live.map(kortArt) };
   }
   function leesArtikel(code, artId) {
-    if (!db.data.redacties || !db.data.redacties[code]) return { error: 'Geen krant op dit adres.', status: 404 };
-    const r = db.data.redacties[code]; const a = r.artikelen.find(x => x.id === scho(artId, 20) && x.status === 'live');
+    const r = eigen.bak('redacties')[code];
+    if (!r) return { error: 'Geen krant op dit adres.', status: 404 };
+    const a = r.artikelen.find(x => x.id === scho(artId, 20) && x.status === 'live');
     if (!a) return { error: 'Artikel niet gevonden.', status: 404 };
     a.gelezen = (a.gelezen || 0) + 1; save();
     return { ok: true, artikel: { id: a.id, titel: a.titel, chapo: a.chapo, inhoud: a.inhoud, rubriek: a.rubriek, beeld: a.beeld || '', auteur: a.auteur, bij: a.gepubliceerd || a.bij, naam: r.huisstijl.naam, accent: r.huisstijl.accent, thema: r.huisstijl.thema } };

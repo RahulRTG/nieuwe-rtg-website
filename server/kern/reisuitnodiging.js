@@ -53,10 +53,8 @@ module.exports.maakReisuitnodiging = ({ db, save, crypto, invoer, idGeverifieerd
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const datum = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : null;
 
-  function bak() {
-    if (!db.data.reisUitnodigingen || typeof db.data.reisUitnodigingen !== 'object') db.data.reisUitnodigingen = {};
-    return db.data.reisUitnodigingen;
-  }
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/reisuitnodiging', bezit: { reisUitnodigingen: 'kaart' } });
+  const bak = () => eigen.bak('reisUitnodigingen');
   const vindCode = (code) => Object.values(bak()).find(u => u.code === String(code || '').trim()) || null;
   const verlopen = (u) => !!u.geldigTot && u.geldigTot < nu().slice(0, 10);
 

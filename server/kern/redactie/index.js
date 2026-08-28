@@ -21,9 +21,10 @@ function maakRedactie({ db, save, crypto, anthropic, schoon }) {
   const id = p => p + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
 
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/redactie/index', bezit: { redactie: 'kaart' } });
+
   function R() {
-    if (!db.data.redactie || typeof db.data.redactie !== 'object') db.data.redactie = { artikelen: [], edities: [] };
-    const r = db.data.redactie;
+    const r = eigen.bak('redactie', (b) => Object.assign(b, { artikelen: [], edities: [] }));
     if (!Array.isArray(r.artikelen)) r.artikelen = [];
     if (!Array.isArray(r.edities)) r.edities = [];
     if (!r._seed) {

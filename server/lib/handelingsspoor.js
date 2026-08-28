@@ -97,12 +97,9 @@ function wieVan(req) {
 function maakHandelingsspoor({ db, save, nu, max }) {
   const tijd = nu || klok.nu;
   const grens = max || MAX;
+  const eigen = require('../kern/eigencollectie')({ db, domein: 'lib/handelingsspoor', bezit: { handelingLog: 'lijst' } });
 
-  function rij() {
-    if (!db.data) return [];
-    if (!Array.isArray(db.data.handelingLog)) db.data.handelingLog = [];
-    return db.data.handelingLog;
-  }
+  const rij = () => eigen.bak('handelingLog');
 
   function noteer({ wie, methode, pad, status, afdruk }) {
     return keten.noteerIn(rij(), {

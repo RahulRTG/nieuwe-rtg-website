@@ -34,10 +34,11 @@ const { MAX, koppenVan, ontcijferKop, ontcijferLijf, adresVan, delen } = mime;
 module.exports = ({ db, save, crypto, dkim }) => {
   const nu = () => new Date().toISOString();
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/mailinkomend', bezit: { mailIn: 'kaart' } });
   function O() {
-    if (!db.data.mailIn || typeof db.data.mailIn !== 'object') db.data.mailIn = { originelen: [] };
-    if (!Array.isArray(db.data.mailIn.originelen)) db.data.mailIn.originelen = [];
-    return db.data.mailIn;
+    const o = eigen.bak('mailIn');
+    if (!Array.isArray(o.originelen)) o.originelen = [];
+    return o;
   }
 
   /* De uitslag van de drie controles. DKIM rekenen we ECHT na als er een

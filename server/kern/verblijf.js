@@ -21,7 +21,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, notify, notifySuppli
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const isDatum = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x || ''));
-  const lijst = () => (db.data.verblijven = Array.isArray(db.data.verblijven) ? db.data.verblijven : []);
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/verblijf', bezit: { verblijven: 'lijst' } });
+  const lijst = () => eigen.bak('verblijven');
   const nachtenTussen = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
 
   const ACTIEF = ['aangevraagd', 'bevestigd', 'ingecheckt'];

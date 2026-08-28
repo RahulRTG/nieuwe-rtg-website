@@ -8,11 +8,12 @@
 const { datum: klokDatum } = require('../../../lib/klok');
 
 module.exports=({db,save,crypto})=>{
+  const eigen=require('../../eigencollectie')({db,domein:'kern/spellen/magnaat/leerkring',bezit:{magnaatLeren:'kaart'}});
   const nu=()=>klokDatum().toISOString();
   const hash=v=>crypto.createHash('sha256').update(String(v)).digest('hex');
   const rond=n=>Math.round(Number(n||0)*10)/10;
-  const S=()=>db.data.magnaatLeren=db.data.magnaatLeren||{
-    versie:1,runs:[],patronen:{},kandidaten:[],besluiten:[]};
+  const S=()=>eigen.bak('magnaatLeren',(b)=>{Object.assign(b,{
+    versie:1,runs:[],patronen:{},kandidaten:[],besluiten:[]})});
   const asVoor={allergie:'horeca-uitgifte',pin:'betalingen',privacy:'toestemming',
     dubbel:'reserveringen',document:'onboarding',ziek:'rooster',regen:'capaciteit',
     koeling:'haccp',levering:'inkoop',noshow:'reserveringen'};

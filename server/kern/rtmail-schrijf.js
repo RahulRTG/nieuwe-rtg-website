@@ -27,6 +27,7 @@ const MAX_CONCEPTEN = 200;
 const MAX_ALIASSEN = 5;
 
 module.exports = ({ db, save, crypto, rtmail, vrij }) => {
+  const eigenC = require('./eigencollectie')({ db, domein: 'kern/rtmail-schrijf', bezit: { rtmailSchrijf: 'kaart' } });
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(6).toString('hex');
   const kap = (s, n) => String(s == null ? '' : s).slice(0, n);
@@ -36,9 +37,7 @@ module.exports = ({ db, save, crypto, rtmail, vrij }) => {
   };
 
   function S() {
-    if (!db.data.rtmailSchrijf || typeof db.data.rtmailSchrijf !== 'object')
-      db.data.rtmailSchrijf = { concepten: [], vakken: {} };
-    const s = db.data.rtmailSchrijf;
+    const s = eigenC.bak('rtmailSchrijf', (b) => { b.concepten = []; b.vakken = {}; });
     if (!Array.isArray(s.concepten)) s.concepten = [];
     if (!s.vakken || typeof s.vakken !== 'object') s.vakken = {};
     return s;

@@ -23,18 +23,15 @@ const UITGAVE_MAX_CENTEN = 2500000;
 function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbActief, pay, notify }) {
   const id = () => 'wb' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/wbw', bezit: { wbwGroepen: 'lijst' } });
 
-  function lijsten() {
-    if (!Array.isArray(db.data.wbwGroepen)) db.data.wbwGroepen = [];
-    return db.data.wbwGroepen;
-  }
+  const lijsten = () => eigen.bak('wbwGroepen');
   const groepMet = gid => lijsten().find(g => g.id === gid) || null;
   const isLid = (g, key) => (g.leden || []).includes(key);
 
   /* ---- de groep ---- */
   function maak(key, data) {
-    lijsten();
-    if (db.data.wbwGroepen.filter(g => isLid(g, key)).length >= GROEPEN_MAX)
+    if (lijsten().filter(g => isLid(g, key)).length >= GROEPEN_MAX)
       return { status: 409, error: 'Tot ' + GROEPEN_MAX + ' lijstjes per lid.' };
     const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef het lijstje een naam.' };
     const leden = [key];
@@ -46,7 +43,7 @@ function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbA
     }
     if (leden.length < 2) return { status: 400, error: 'Een lijstje begint met minstens een vriend erbij.' };
     const g = { id: id(), naam, leden, regels: [], door: key, at: nu() };
-    db.data.wbwGroepen.push(g); save();
+    lijsten().push(g); save();
     for (const k of leden) if (k !== key)
       notify(k, { title: 'Wie betaalt wat', body: codenaamVan(key) + ' heeft u toegevoegd aan "' + naam + '".', scope: 'wbw' });
     return { status: 200, ok: true, groep: beeld(g, key) };
@@ -142,8 +139,7 @@ function maakWbw({ db, save, crypto, schoon, codenaamVan, connectieTussen, verbA
       mijnSaldo: saldo[key] || 0, at: g.at };
   }
   function mijn(key) {
-    lijsten();
-    const rijen = db.data.wbwGroepen.filter(g => isLid(g, key));
+    const rijen = lijsten().filter(g => isLid(g, key));
     return { status: 200, groepen: rijen.map(g => {
       const saldo = balansVan(g);
       return { id: g.id, naam: g.naam, leden: g.leden.length, mijnSaldo: saldo[key] || 0, at: g.at };

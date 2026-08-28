@@ -14,7 +14,7 @@
       is precies het soort stille verzameling waar LINK.md par. 3.8 en LIFE.md
       par. 4 tegen zijn.
    2. Geen tweede waarheid. De bon zegt DAT er een verzoek uitging; of dat verzoek
-      is geaccepteerd blijft in db.data.connections staan, en wordt daar gelezen.
+      is geaccepteerd blijft in de collectie connections staan, en wordt daar gelezen.
       Een bon die de status meeschrijft, loopt er binnen een week naast.
    3. Niet uitwisbaar. Intrekken sluit een deur; het wist niet dat hij open is
       geweest. Dezelfde afspraak als bij kern/toestellen.js.
@@ -35,17 +35,12 @@ module.exports = ({ db, save, nu }) => {
 
 const klok = typeof nu === 'function' ? nu : () => Date.now();
 
-function boek() {
-  if (!db.data.linkBonnen || typeof db.data.linkBonnen !== 'object') db.data.linkBonnen = {};
-  return db.data.linkBonnen;
-}
+const eigen = require('../eigencollectie')({ db, domein: 'kern/link/bonnen', bezit: { linkBonnen: 'kaart', linkBonnenWeg: 'kaart' } });
+const boek = () => eigen.bak('linkBonnen');
 /* De teller van wat er van de staart af viel staat in een EIGEN kaart en niet als
    `handle + ':weg'` in dezelfde: handles bevatten dubbele punten (rtf:...), dus
    dat is een sleutel die op een dag een echte handle kan zijn. */
-function afgevallen() {
-  if (!db.data.linkBonnenWeg || typeof db.data.linkBonnenWeg !== 'object') db.data.linkBonnenWeg = {};
-  return db.data.linkBonnenWeg;
-}
+const afgevallen = () => eigen.bak('linkBonnenWeg');
 
 /* Een bon schrijven. `wie` is de handle van degene die het deed -- de bon is van
    HEM, niet van de ander: wie zijn eigen lijst opvraagt, ziet zijn eigen daden.

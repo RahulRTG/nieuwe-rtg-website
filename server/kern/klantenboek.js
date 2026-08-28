@@ -29,9 +29,10 @@ const rond = (n) => Math.round(n * 100) / 100;
 
 module.exports = ({ db, save, scho, boekingenVanZaak, ordersVanZaak }) => {
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/klantenboek', bezit: { vakKlantNotities: 'kaart' } });
   const nots = (code) => {
-    if (!db.data.vakKlantNotities || typeof db.data.vakKlantNotities !== 'object') db.data.vakKlantNotities = {};
-    return (db.data.vakKlantNotities[code] = db.data.vakKlantNotities[code] || {});
+    const alles = eigen.bak('vakKlantNotities');
+    return (alles[code] = alles[code] || {});
   };
 
   /* Alles wat deze zaak aan transacties heeft, uit beide bronnen. Een boeking

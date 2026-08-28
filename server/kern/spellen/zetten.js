@@ -30,13 +30,13 @@
       afgekapte replay zegt dat er ook bij. */
 module.exports = (ctx) => {
   const { db, save, nu, codenaamVan } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/spellen/zetten', bezit: { spelZetten: 'lijst' } });
 
   const MAX_ZETTEN = 500;     // per partij
   const MAX_PARTIJEN = 5000;  // harde bovengrens op schijf, los van de termijn
 
   function Z() {
-    if (!Array.isArray(db.data.spelZetten)) db.data.spelZetten = [];
-    return db.data.spelZetten;
+    return eigen.bak('spelZetten');
   }
 
   /* Een geaccepteerde zet vastleggen. Wordt aangeroepen vanuit dezelfde plek
@@ -83,7 +83,7 @@ module.exports = (ctx) => {
       r.spelers = r.spelers.map(k => k === key ? null : k);
       if (r.spelers.some(Boolean)) over.push(r);
     }
-    db.data.spelZetten = over;
+    eigen.zetBak('spelZetten', over);
     save();
   }
 

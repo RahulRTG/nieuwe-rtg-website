@@ -62,13 +62,11 @@ const OVERSLAAN = [/^\/api\/cluster\//, /^\/api\/health$/, /^\/api\/ready$/, /^\
 
 function maakAuditspoor(deps) {
   const { db, save, sessionFor } = deps || {};
+  const eigen = require('../kern/eigencollectie')({ db, domein: 'opzet/auditspoor', bezit: { apiSpoor: 'kaart' } });
 
   /* Het eigen vak. Dezelfde sleutels als het command-journaal, maar in een
      eigen doos, zodat de twee ketens elkaar niet in de weg zitten. */
-  const vak = () => {
-    if (!db.data.apiSpoor || typeof db.data.apiSpoor !== 'object') db.data.apiSpoor = {};
-    return db.data.apiSpoor;
-  };
+  const vak = () => eigen.bak('apiSpoor');
   const journaal = maakJournaal({ db, save, crypto, vak });
 
   /* De actor, in volgorde van zekerheid. req.session en req.supplier zijn door

@@ -29,7 +29,7 @@ const { datum: klokDatum } = require('../../lib/klok');
 module.exports = ctx => {
   const { db, save, schoon } = ctx;
   const tierVan = tier => ERVARING[tier] ? tier : 'rtg';
-  function ensure() { if (!db.data.ovRegie || typeof db.data.ovRegie !== 'object') db.data.ovRegie = {}; }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/ov/regie', bezit: { ovRegie: 'kaart' } });
   function standaard(tier) {
     return {
       automaten: { verstoring: true, vertreksein: true, comfort: tier !== 'rtg', agenda: false, entourage: false, reserveplan: tier === 'business' },
@@ -39,8 +39,8 @@ module.exports = ctx => {
     };
   }
   function profiel(key, tier) {
-    ensure(); tier = tierVan(tier);
-    const bewaard = db.data.ovRegie[key] || standaard(tier);
+    tier = tierVan(tier);
+    const bewaard = eigen.bak('ovRegie')[key] || standaard(tier);
     const toegestaan = Object.fromEntries(Object.entries(AUTOMATEN).filter(([, a]) => a.tiers.includes(tier)).map(([id, a]) => [id, { ...a, aan: !!bewaard.automaten[id] }]));
     return { status: 200, ervaring: ERVARING[tier], tier, automaten: toegestaan,
       comfort: bewaard.comfort || standaard(tier).comfort,
@@ -60,8 +60,8 @@ module.exports = ctx => {
     return { status: 'helder', titel: 'Alles voor uw volgende rit', tekst: 'Live vervoer · beste halte · betalen pas bij uitchecken' };
   }
   function zet(key, tier, data) {
-    ensure(); tier = tierVan(tier);
-    const p = db.data.ovRegie[key] || standaard(tier);
+    tier = tierVan(tier);
+    const p = eigen.bak('ovRegie')[key] || standaard(tier);
     if (data.automaat) {
       const a = AUTOMATEN[data.automaat];
       if (!a || !a.tiers.includes(tier)) return { status: 403, error: 'Deze regie hoort niet bij uw lidmaatschap.' };
@@ -75,7 +75,7 @@ module.exports = ctx => {
     if (data.privacy) p.privacy.discreteMeldingen = tier === 'business' && data.privacy.discreteMeldingen === true;
     p.privacy.locatieNaRitWissen = true;
     p.bijgewerkt = klokDatum().toISOString();
-    db.data.ovRegie[key] = p; save();
+    eigen.bak('ovRegie')[key] = p; save();
     return profiel(key, tier);
   }
   return { ovRegie: profiel, ovRegieZet: zet, OV_ERvaring: ERVARING };

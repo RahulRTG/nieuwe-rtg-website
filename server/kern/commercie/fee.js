@@ -59,11 +59,8 @@ const { STATUS, OVERGANG, OPEN, AF, RIJ_MAX, magOvergaan } = require('./fee/vorm
 
 function maakFees({ db, save, nu }) {
   const tijd = nu || klok.nu;
-  function rij() {
-    if (!db.data) db.data = {};
-    if (!Array.isArray(db.data.betaaldienstFees)) db.data.betaaldienstFees = [];
-    return db.data.betaaldienstFees;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/fee', bezit: { betaaldienstFees: 'lijst' } });
+  function rij() { return eigen.bak('betaaldienstFees'); }
 
   function zet(f, naar, velden) {
     if (!magOvergaan(f.status, naar))

@@ -10,12 +10,10 @@ module.exports = (ctx) => {
   const { db, save, anthropic, scho, nu, vind, publiek } = ctx;
   const con = o => o.concept || maakConcept(o.discipline, o.brief, o.naam, scho);
 
-  function winkelStore() {
-    if (!db.data.winkelProducten || typeof db.data.winkelProducten !== 'object') db.data.winkelProducten = {};
-    return db.data.winkelProducten;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/hardwarelab/aiwinkel', bezit: { winkelProducten: 'kaart' } });
+  const winkelStore = () => eigen.bak('winkelProducten');
   /* Een afgerond concept als echt product in de RTG-winkel zetten: het komt in
-     db.data.winkelProducten en verschijnt zo op de verkooppagina en in het
+     de collectie winkelProducten en verschijnt zo op de verkooppagina en in het
      bestel-endpoint, naast de vaste catalogus. De prijs is euro, ex btw. */
   function naarWinkel(oid, prijs) {
     const o = vind(oid); if (!o) return { status: 404, error: 'Concept niet gevonden.' };

@@ -26,10 +26,11 @@ const BESTEMMINGEN = ITEMS.map(a => a.bestemming);
 const REGIOS = [...new Set(ITEMS.map(a => a.regio))];
 
 function maakReisBieb({ db, save }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/reisbieb/index', bezit: { reisInstallaties: 'kaart' } });
   const rij = (key) => {
-    if (!db.data.reisInstallaties) db.data.reisInstallaties = {};
-    if (!Array.isArray(db.data.reisInstallaties[key])) db.data.reisInstallaties[key] = [];
-    return db.data.reisInstallaties[key];
+    const b = eigen.bak('reisInstallaties');
+    if (!Array.isArray(b[key])) b[key] = [];
+    return b[key];
   };
   const publiek = (a) => ({ id: a.id, slug: a.slug, naam: a.naam, titel: a.titel, bestemming: a.bestemming,
     regio: a.regio, categorie: a.categorie, categorieLabel: a.categorieLabel, uitleg: a.uitleg,

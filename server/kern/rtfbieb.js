@@ -36,10 +36,11 @@ const OP_ID = new Map(APPS.map(a => [a.id, a]));
 const TOTAAL = APPS.length;
 
 function maakRtfBieb({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/rtfbieb', bezit: { rtfAppInstallaties: 'kaart' } });
   const rij = (handle) => {
-    if (!db.data.rtfAppInstallaties) db.data.rtfAppInstallaties = {};
-    if (!Array.isArray(db.data.rtfAppInstallaties[handle])) db.data.rtfAppInstallaties[handle] = [];
-    return db.data.rtfAppInstallaties[handle];
+    const alle = eigen.bak('rtfAppInstallaties');
+    if (!Array.isArray(alle[handle])) alle[handle] = [];
+    return alle[handle];
   };
   const magZien = (groep, doelgroep) => (ZICHT[groep] || ZICHT.kind).includes(doelgroep);
   const appVan = (id) => OP_ID.get(String(id || '')) || null;

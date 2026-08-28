@@ -17,8 +17,9 @@
    buiten met de voornaam die de gastvrouw doorgeeft, of gewoon met het
    stoelnummer. Meer heeft de keuken niet nodig. */
 module.exports = ({ db, save, crypto, schoon }) => {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/tafelwensen', bezit: { tafelWensen: 'kaart' } });
   const nu = () => new Date().toISOString();
-  const bak = () => { if (!db.data.tafelWensen || typeof db.data.tafelWensen !== 'object') db.data.tafelWensen = {}; return db.data.tafelWensen; };
+  const bak = () => eigen.bak('tafelWensen');
   const vanZaak = code => { const b = bak(); if (!Array.isArray(b[code])) b[code] = []; return b[code]; };
 
   /* De veertien wettelijke allergenen, plus de dieetwensen die een keuken

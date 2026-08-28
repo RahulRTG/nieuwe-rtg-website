@@ -43,10 +43,9 @@ function maakGateway({ db, save, crypto, nu, mandaat, kanalen }) {
   const { canoniek, hash, gebeurtenis, controleer: keurKeten } = maakZegel({ crypto, nu: tijd });
   const MAX_POGINGEN = 5;
 
-  function bak() {
-    if (!Array.isArray(db.data.gatewayZendingen)) db.data.gatewayZendingen = [];
-    return db.data.gatewayZendingen;
-  }
+  const eigen = require('../../eigencollectie')({ db, domein: 'kern/fiscaal/gateway/index',
+    bezit: { gatewayZendingen: 'lijst', gatewayLosseBewijzen: 'lijst' } });
+  const bak = () => eigen.bak('gatewayZendingen');
   const vind = (id) => bak().find(z => z.id === id) || null;
   const kanaalVan = (naam) => (kanalen || {})[naam] || null;
 
@@ -143,8 +142,7 @@ function maakGateway({ db, save, crypto, nu, mandaat, kanalen }) {
     const k = String(kenmerk || '').trim();
     const z = bak().find(x => x.idem === idem || x.id === idem);
     if (!z) {
-      if (!Array.isArray(db.data.gatewayLosseBewijzen)) db.data.gatewayLosseBewijzen = [];
-      db.data.gatewayLosseBewijzen.unshift({ idem: String(idem || ''), kenmerk: k, at: tijd(), aangenomen: !!aangenomen });
+      eigen.bak('gatewayLosseBewijzen').unshift({ idem: String(idem || ''), kenmerk: k, at: tijd(), aangenomen: !!aangenomen });
       save();
       return { status: 404, error: 'Dit ontvangstbewijs hoort bij geen enkele zending die wij kennen.',
         bewaard: true, let: 'Het is vastgelegd; een bewijs dat je niet kunt plaatsen is een signaal en geen ruis.' };

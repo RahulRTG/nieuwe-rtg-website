@@ -9,8 +9,9 @@ const OFFERTEBOUW = require('../onderneming/offertebouw');
 module.exports = (ctx) => {
   const { db, save, findSupplier, isVak, scho, crypto, notify, notifySupplier,
     sseToCustomer, sseToSupplier, boekingenVoegToe } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/vakwerk/pro', bezit: { vakOffertes: 'lijst' } });
   const nu = () => new Date().toISOString();
-  const lijst = () => (Array.isArray(db.data.vakOffertes) ? db.data.vakOffertes : (db.data.vakOffertes = []));
+  const lijst = () => eigen.bak('vakOffertes');
 
   /* `regels` reist mee naar de klant: een bedrag zonder onderbouwing is precies
      waar de offertebouwer voor bestaat. Null als de zaak alleen een prijs gaf --
@@ -38,7 +39,7 @@ module.exports = (ctx) => {
       status: 'aangevraagd', at: nu()
     };
     lijst().unshift(o);
-    db.data.vakOffertes = lijst().slice(0, 5000);
+    eigen.zetBak('vakOffertes', lijst().slice(0, 5000));
     save();
     notifySupplier(s.code, { icon: 'agenda', title: 'Offerte-aanvraag', body: o.customerCodename + ': ' + omschrijving.slice(0, 90) });
     sseToSupplier(s.code, 'sync', { scope: 'orders' });

@@ -56,11 +56,8 @@ const { maakKeuring } = require('./voornemen/keuring');
 function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheidskern }) {
   const tijd = nu || klok.nu;
 
-  function alles() {
-    if (!db.data) db.data = {};
-    if (!Array.isArray(db.data.voornemens)) db.data.voornemens = [];
-    return db.data.voornemens;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/voornemen', bezit: { voornemens: 'lijst' } });
+  function alles() { return eigen.bak('voornemens'); }
   const vind = id => alles().find(v => v.id === String(id || '')) || null;
 
   function zet(v, naar, velden) {

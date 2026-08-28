@@ -46,10 +46,8 @@ module.exports = (ctx) => {
   const { db, save, crypto, nu, ref, schoon, notifySupplier, bdBtwAansluiting } = ctx;
   const euro = (centen) => (centen / 100).toFixed(2).replace('.', ',');
 
-  function bak() {
-    if (!Array.isArray(db.data.rijkNaheffingen)) db.data.rijkNaheffingen = [];
-    return db.data.rijkNaheffingen;
-  }
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/overheid/naheffing', bezit: { rijkNaheffingen: 'lijst' } });
+  const bak = () => eigen.bak('rijkNaheffingen');
   const vind = (id) => bak().find(n => n.id === String(id || '')) || null;
   /* Dezelfde ogen tellen niet dubbel -- de vergelijking staat in kern/ogen.js
      en niet meer hier. Hij stond op vier plekken in huis en liep uiteen: de

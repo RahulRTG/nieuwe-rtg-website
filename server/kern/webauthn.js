@@ -24,11 +24,9 @@ function maakWebauthn({ db, save, accounts, schoon }) {
   let credentialIndex = null;            // credential-id -> userId
   const b64 = buf => Buffer.from(buf).toString('base64url');
   const vanB64 = s => new Uint8Array(Buffer.from(String(s), 'base64url'));
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/webauthn', bezit: { webauthn: 'kaart' } });
 
-  function lijsten() {
-    if (!db.data.webauthn) db.data.webauthn = {};   // userId -> [credentials]
-    return db.data.webauthn;
-  }
+  const lijsten = () => eigen.bak('webauthn');   // userId -> [credentials]
   const credsVan = userId => lijsten()[userId] || [];
   function index() {
     if (credentialIndex) return credentialIndex;

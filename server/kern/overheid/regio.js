@@ -7,6 +7,7 @@
 const { zelfdeMeldingKortGeleden } = require('../dubbelemelding');
 module.exports = (ctx) => {
   const { db, save, nu, jaar, id, ref, schoon, hash, eur, seed, bericht, SUBSIDIES, WATERHEFFINGEN, WATERMELD, WATER_STATUS } = ctx;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/overheid/regio', bezit: { rijkSubsidies: 'lijst', waterAanslagen: 'lijst', waterMeldingen: 'lijst' } });
 
   /* ---- provincie: subsidies ---- */
   function provincieSubsidies() {
@@ -24,8 +25,8 @@ module.exports = (ctx) => {
     const s = { id: id(), ref: ref('SB'), key: houder.key || null, supplierCode: houder.supplierCode || null,
       aanvrager: houder.codenaam || houder.bedrijf || null, regeling, regelingLabel: SUBSIDIES[regeling].label,
       project, gevraagd, status: 'aangevraagd', at: nu() };
-    db.data.rijkSubsidies.unshift(s);
-    db.data.rijkSubsidies = db.data.rijkSubsidies.slice(0, 40000);
+    eigen.bak('rijkSubsidies').unshift(s);
+    eigen.zetBak('rijkSubsidies', eigen.bak('rijkSubsidies').slice(0, 40000));
     if (houder.key) bericht(houder.key, 'Provincie', 'Subsidieaanvraag ' + s.regelingLabel, 'Je aanvraag (€ ' + gevraagd + ') is ontvangen en wordt beoordeeld.', 'subsidie');
     save();
     return { ok: true, subsidie: publiekeSubsidie(s) };
@@ -33,18 +34,18 @@ module.exports = (ctx) => {
   function publiekeSubsidie(s) { return { ref: s.ref, regeling: s.regeling, regelingLabel: s.regelingLabel, project: s.project, gevraagd: s.gevraagd, toegekend: s.toegekend || 0, status: s.status, at: s.at }; }
   function mijnSubsidies(houder) {
     seed();
-    const list = (db.data.rijkSubsidies || []).filter(s => (houder.key && s.key === houder.key) || (houder.supplierCode && s.supplierCode === houder.supplierCode));
+    const list = eigen.bak('rijkSubsidies').filter(s => (houder.key && s.key === houder.key) || (houder.supplierCode && s.supplierCode === houder.supplierCode));
     return { ok: true, subsidies: list.slice(0, 30).map(publiekeSubsidie) };
   }
   function subsidiesLijst(filter) {
     seed(); filter = filter || {};
-    let list = (db.data.rijkSubsidies || []);
+    let list = eigen.bak('rijkSubsidies');
     list = filter.status ? list.filter(s => s.status === filter.status) : list.filter(s => s.status === 'aangevraagd');
     return { ok: true, subsidies: list.slice(0, 200).map(s => ({ ...publiekeSubsidie(s), aanvrager: s.aanvrager })) };
   }
   function subsidieBeslis(actor, r, data) {
     data = data || {};
-    const s = (db.data.rijkSubsidies || []).find(x => x.ref === String(r || ''));
+    const s = eigen.bak('rijkSubsidies').find(x => x.ref === String(r || ''));
     if (!s) return { status: 404, error: 'Aanvraag niet gevonden.' };
     const besluit = ['toegekend', 'afgewezen', 'in behandeling'].includes(data.besluit) ? data.besluit : null;
     if (!besluit) return { status: 400, error: 'Kies een geldig besluit.' };
@@ -61,22 +62,22 @@ module.exports = (ctx) => {
   function ensureWaterAanslagen(key) {
     if (!key) return;
     const j = jaar();
-    if ((db.data.waterAanslagen || []).some(a => a.key === key && a.jaar === j)) return;
+    if (eigen.bak('waterAanslagen').some(a => a.key === key && a.jaar === j)) return;
     const h = hash('water' + String(key) + j);
     WATERHEFFINGEN.forEach((w, i) => {
       const bedrag = w.basis + ((h >>> (i * 5)) % (w.spreiding + 1));
-      db.data.waterAanslagen.unshift({ id: id(), ref: ref('WB'), key, soort: w.soort, jaar: j, bedrag, betaald: false, at: nu() });
+      eigen.bak('waterAanslagen').unshift({ id: id(), ref: ref('WB'), key, soort: w.soort, jaar: j, bedrag, betaald: false, at: nu() });
     });
-    db.data.waterAanslagen = db.data.waterAanslagen.slice(0, 40000);
+    eigen.zetBak('waterAanslagen', eigen.bak('waterAanslagen').slice(0, 40000));
     save();
   }
   function waterschapMijn(key) {
     seed(); ensureWaterAanslagen(key);
-    return { ok: true, aanslagen: (db.data.waterAanslagen || []).filter(a => a.key === key)
+    return { ok: true, aanslagen: eigen.bak('waterAanslagen').filter(a => a.key === key)
       .map(a => ({ ref: a.ref, soort: a.soort, jaar: a.jaar, bedrag: a.bedrag, betaald: !!a.betaald })) };
   }
   function waterschapBetaal(key, r) {
-    const a = (db.data.waterAanslagen || []).find(x => x.ref === String(r || '') && x.key === key);
+    const a = eigen.bak('waterAanslagen').find(x => x.ref === String(r || '') && x.key === key);
     if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
     if (a.betaald) return { status: 409, error: 'Deze aanslag is al betaald.' };
     a.betaald = true; a.betaaldAt = nu();
@@ -96,8 +97,8 @@ module.exports = (ctx) => {
     if (eerder) return { ok: true, melding: publiekeWaterMelding(eerder), herhaald: true };
     const m = { id: id(), ref: ref('WM'), soort, soortLabel: WATERMELD[soort], tekst, locatie: schoon(data.locatie, 120) || null,
       melderKey: sess.key, melder: codenaam, status: 'nieuw', updates: [], at: nu() };
-    db.data.waterMeldingen.unshift(m);
-    db.data.waterMeldingen = db.data.waterMeldingen.slice(0, 40000);
+    eigen.bak('waterMeldingen').unshift(m);
+    eigen.zetBak('waterMeldingen', eigen.bak('waterMeldingen').slice(0, 40000));
     save();
     return { ok: true, melding: publiekeWaterMelding(m) };
   }
@@ -106,17 +107,17 @@ module.exports = (ctx) => {
       updates: (m.updates || []).map(u => ({ tekst: u.tekst, at: u.at })), at: m.at };
   }
   function mijnWaterMeldingen(key) {
-    return { ok: true, meldingen: (db.data.waterMeldingen || []).filter(m => m.melderKey === key).slice(0, 40).map(publiekeWaterMelding) };
+    return { ok: true, meldingen: eigen.bak('waterMeldingen').filter(m => m.melderKey === key).slice(0, 40).map(publiekeWaterMelding) };
   }
   function waterMeldingenLijst(filter) {
     seed(); filter = filter || {};
-    let list = (db.data.waterMeldingen || []);
+    let list = eigen.bak('waterMeldingen');
     list = filter.status ? list.filter(m => m.status === filter.status) : list.filter(m => !['opgelost', 'afgewezen'].includes(m.status));
     return { ok: true, meldingen: list.slice(0, 200).map(m => ({ ...publiekeWaterMelding(m), melder: m.melder })) };
   }
   function waterMeldingZet(actor, r, data) {
     data = data || {};
-    const m = (db.data.waterMeldingen || []).find(x => x.ref === String(r || ''));
+    const m = eigen.bak('waterMeldingen').find(x => x.ref === String(r || ''));
     if (!m) return { status: 404, error: 'Melding niet gevonden.' };
     if (typeof data.status === 'string' && WATER_STATUS.includes(data.status)) m.status = data.status;
     const note = schoon(data.update, 300);

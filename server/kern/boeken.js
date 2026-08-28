@@ -8,11 +8,12 @@ const BIEB = require('./boeken-data');
 const MAX_BOEKEN = 200;
 
 function maakBoeken({ db, save }) {
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/boeken', bezit: { boeken: 'kaart' } });
   function bord(key) {
-    if (!db.data.boeken || typeof db.data.boeken !== 'object') db.data.boeken = {};
+    const b = eigen.bak('boeken');
     const k = 'lid:' + key;
-    if (!db.data.boeken[k]) db.data.boeken[k] = { voortgang: {} };
-    return db.data.boeken[k];
+    if (!b[k]) b[k] = { voortgang: {} };
+    return b[k];
   }
 
   function boekenBieb() {

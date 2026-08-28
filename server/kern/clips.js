@@ -23,13 +23,12 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   const nu = () => new Date().toISOString();
   const aanwezigheid = new Map();     // clipId -> ts van de laatste hartslag
 
+  const eigen = require('./eigencollectie')({ db, domein: 'kern/clips',
+    bezit: { clips: 'lijst', clipsVolg: 'kaart', clipsReacties: 'kaart', clipsMeldingen: 'lijst' } });
   function lijsten() {
-    if (!Array.isArray(db.data.clips)) db.data.clips = [];
-    if (!db.data.clipsVolg || typeof db.data.clipsVolg !== 'object') db.data.clipsVolg = {};
-    if (!db.data.clipsReacties || typeof db.data.clipsReacties !== 'object') db.data.clipsReacties = {};
-    if (!Array.isArray(db.data.clipsMeldingen)) db.data.clipsMeldingen = [];
+    eigen.bak('clips'); eigen.bak('clipsVolg'); eigen.bak('clipsReacties'); eigen.bak('clipsMeldingen');
   }
-  const clipMet = cid => db.data.clips.find(c => c.id === String(cid || '')) || null;
+  const clipMet = cid => eigen.bak('clips').find(c => c.id === String(cid || '')) || null;
   const online = c => Date.now() - (aanwezigheid.get(c.id) || 0) < AANWEZIG_TTL_MS;
   // de studio: knippen, geluid en ondertitels (kern/clips-studio.js)
   const studio = require('./clips-studio')({ db, save, schoon, clipMet, eigenTrack });
@@ -44,11 +43,11 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
       return { status: 400, error: 'Een clip duurt 1 tot ' + CLIP_MAX_S + ' seconden.' };
     const poster = typeof data.poster === 'string' && data.poster.startsWith('data:image/') && data.poster.length <= POSTER_MAX
       ? data.poster : null;
-    if (db.data.clips.filter(c => c.key === key).length >= CLIPS_PER_MAKER)
+    if (eigen.bak('clips').filter(c => c.key === key).length >= CLIPS_PER_MAKER)
       return { status: 409, error: 'U heeft het maximum van ' + CLIPS_PER_MAKER + ' clips; haal er eerst een weg.' };
     const c = { id: id(), key, titel, duurS, poster,
       mbGeschat: Math.min(200, Math.max(1, Math.round(Number(data.mbGeschat) || 1))), at: nu() };
-    db.data.clips.push(c);
+    eigen.bak('clips').push(c);
     save();
     aanwezigheid.set(c.id, Date.now());
     if (nieuwWerk) { try { nieuwWerk(key, 'flow', c.titel); } catch (e) {} }
@@ -58,8 +57,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     lijsten();
     const c = clipMet(cid);
     if (!c || c.key !== key) return { status: 404, error: 'Clip niet gevonden.' };
-    db.data.clips = db.data.clips.filter(x => x.id !== c.id);
-    delete db.data.clipsReacties[c.id];
+    eigen.zetBak('clips', eigen.bak('clips').filter(x => x.id !== c.id));
+    delete eigen.bak('clipsReacties')[c.id];
     aanwezigheid.delete(c.id);
     save();
     return { status: 200, ok: true };
@@ -90,8 +89,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   function beeld(c, key) {
     return Object.assign({ id: c.id, titel: c.titel, duurS: c.duurS, poster: c.poster, mb: c.mbGeschat,
       codenaam: codenaamVan(c.key), online: online(c), mijn: c.key === key,
-      volgIk: (db.data.clipsVolg[key] || []).includes(c.key),
-      reacties: (db.data.clipsReacties[c.id] || []).length, at: c.at },
+      volgIk: (eigen.bak('clipsVolg')[key] || []).includes(c.key),
+      reacties: (eigen.bak('clipsReacties')[c.id] || []).length, at: c.at },
       studio.clipsStudioBeeld(c));
   }
   /* De dagselectie blijft eindig en chronologisch. `alleenOndertiteld` is de
@@ -101,8 +100,8 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   function feed(key, opties) {
     lijsten();
     const o = opties || {};
-    const volgSet = new Set(db.data.clipsVolg[key] || []);
-    let rijen = [...db.data.clips].sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    const volgSet = new Set(eigen.bak('clipsVolg')[key] || []);
+    let rijen = [...eigen.bak('clips')].sort((a, b) => String(b.at).localeCompare(String(a.at)));
     const mijne = rijen.filter(c => c.key === key);
     if (o.alleenOndertiteld) rijen = rijen.filter(c => (c.ondertitels || []).length > 0);
     const eerst = rijen.filter(c => volgSet.has(c.key) && c.key !== key);
@@ -123,9 +122,10 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     lijsten();
     if (!makerKey) return { status: 404, error: 'Maker niet gevonden.' };
     if (makerKey === key) return { status: 400, error: 'Uzelf volgen hoeft niet.' };
-    const rij = (db.data.clipsVolg[key] = db.data.clipsVolg[key] || []).filter(k => k !== makerKey);
+    const volgBak = eigen.bak('clipsVolg');
+    const rij = (volgBak[key] = volgBak[key] || []).filter(k => k !== makerKey);
     if (aan !== false) rij.push(makerKey);
-    db.data.clipsVolg[key] = rij.slice(-500);
+    volgBak[key] = rij.slice(-500);
     save();
     return { status: 200, ok: true, volg: aan !== false };
   }
@@ -146,35 +146,35 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     lijsten();
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
     tekst = schoon(tekst, 300); if (!tekst) return { status: 400, error: 'Lege reactie.' };
-    const rij = db.data.clipsReacties[c.id] = db.data.clipsReacties[c.id] || [];
+    const reactieBak = eigen.bak('clipsReacties');
+    const rij = reactieBak[c.id] = reactieBak[c.id] || [];
     const r = { codenaam: codenaamVan(key), tekst, at: nu() };
-    rij.push(r); if (rij.length > REACTIES_MAX) db.data.clipsReacties[c.id] = rij.slice(-REACTIES_MAX);
+    rij.push(r); if (rij.length > REACTIES_MAX) reactieBak[c.id] = rij.slice(-REACTIES_MAX);
     save();
     return { status: 200, ok: true, reactie: r };
   }
-  const reacties = cid => { lijsten(); return { status: 200, reacties: (db.data.clipsReacties[String(cid || '')] || []).slice(-40) }; };
+  const reacties = cid => { lijsten(); return { status: 200, reacties: (eigen.bak('clipsReacties')[String(cid || '')] || []).slice(-40) }; };
   function meld(key, cid, reden) {
     lijsten();
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
-    db.data.clipsMeldingen.push({ id: id(), clipId: c.id, titel: c.titel, maker: codenaamVan(c.key),
+    eigen.bak('clipsMeldingen').push({ id: id(), clipId: c.id, titel: c.titel, maker: codenaamVan(c.key),
       van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
-    // de kap op deze lijst staat in kern/kappen.js en draait in de
-    // onderhoudsronde -- afkappen is huishouden, geen handeling van een lid
+    eigen.zetBak('clipsMeldingen', eigen.bak('clipsMeldingen').slice(-200));
     save(); sseToOffice('sync', { scope: 'clips' });
     return { status: 200, ok: true };
   }
   function officeLijst() {
     lijsten();
-    return { status: 200, meldingen: db.data.clipsMeldingen.slice(-50).reverse(),
-      totaal: db.data.clips.length };
+    return { status: 200, meldingen: eigen.bak('clipsMeldingen').slice(-50).reverse(),
+      totaal: eigen.bak('clips').length };
   }
   // kantoor haalt de kaart weg; het beeld zelf stond nooit bij RTG
   function officeVerwijder(cid) {
     lijsten();
     const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
-    db.data.clips = db.data.clips.filter(x => x.id !== c.id);
-    delete db.data.clipsReacties[c.id];
-    db.data.clipsMeldingen = db.data.clipsMeldingen.filter(m => m.clipId !== c.id);
+    eigen.zetBak('clips', eigen.bak('clips').filter(x => x.id !== c.id));
+    delete eigen.bak('clipsReacties')[c.id];
+    eigen.zetBak('clipsMeldingen', eigen.bak('clipsMeldingen').filter(m => m.clipId !== c.id));
     aanwezigheid.delete(c.id);
     save();
     return { status: 200, ok: true };

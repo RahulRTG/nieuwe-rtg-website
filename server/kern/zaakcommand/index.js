@@ -20,7 +20,7 @@
      - het beleidsregister, want een restaurant en een jachthaven vinden niet
        hetzelfde "te lang";
      - de uitzonderingenrij en de herstelrondes.
-   Ze wonen in db.data.zaakCommand[code] en gebruiken dezelfde modules als RTG:
+   Ze wonen in het vak zaakCommand[code] en gebruiken dezelfde modules als RTG:
    één implementatie, per eigenaar één vak. */
 'use strict';
 
@@ -40,12 +40,13 @@ const ZAAK_BELEID = [
 ];
 
 function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }) {
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakcommand/index', bezit: { zaakCommand: 'kaart' } });
   /* Het vak van deze zaak. Alles wat de motoren opslaan komt hierin terecht;
      er is geen sleutel die buiten de zaak wijst. */
   function vakVan(code) {
-    if (!db.data.zaakCommand) db.data.zaakCommand = {};
-    if (!db.data.zaakCommand[code]) db.data.zaakCommand[code] = {};
-    return db.data.zaakCommand[code];
+    const vakken = eigen.bak('zaakCommand');
+    if (!vakken[code]) vakken[code] = {};
+    return vakken[code];
   }
 
   /* Eén laag per zaak, gebouwd op aanvraag en niet bewaard: de zaak-objecten

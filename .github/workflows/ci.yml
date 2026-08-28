@@ -228,6 +228,10 @@ jobs:
           for bestand in dekking/*.info; do
             mv "$bestand" "${bestand%.info}-ijking-${{ matrix.ijking }}.info"
           done
+          # Niet elke ijking start een server. Een leeg journaal betekent dan
+          # eerlijk "deze job raakte nul routes" en bewijst tegelijk dat haar
+          # artefact niet stil uit de samenvoeging verdwijnt.
+          touch routejournaal.log
           exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log

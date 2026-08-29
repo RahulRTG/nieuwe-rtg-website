@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="a7f06b49">
+<meta name="rtg-bouw" content="dc8abc2c">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/meelezen.js"></script>
@@ -15,6 +15,17 @@
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+/* De app-shell is uitsluitend host. Als een oud of programmatisch child-pad
+   hier belandt, draagt het de volledige deep-link over vóór een tweede Command
+   kan initialiseren. De host herstelt een kale Home naar het bestaande blad. */
+try {
+  if (parent !== window && parent.location.origin === location.origin &&
+      parent.RTGCommand && parent.RTGCommand.uitKind(window, location.href)) {
+    window.stop(); document.documentElement.hidden = true;
+  }
+} catch (e) {}
+</script>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,6 +42,7 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/command.css" rel="stylesheet">
 <link href="/shared/adaptief.css" rel="stylesheet">
+<link href="/shared/interface/second-screen.css?v=dc8abc2c" rel="stylesheet">
 <link href="/shared/grammatica.css" rel="stylesheet">
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
@@ -1678,17 +1690,19 @@
   .privrij{display:flex;gap:0.5rem;}
   .privknop.wis{border-color:rgba(194,58,94,0.4);}
 </style>
-<script src="/shared/command/catalog.js?v=a7f06b49" defer></script>
-<script src="/shared/command/console.js?v=a7f06b49" defer></script>
-<script src="/shared/command/verdeler.js?v=a7f06b49" defer></script>
-<script src="/shared/command/bank.js?v=a7f06b49" defer></script>
-<script src="/shared/command/praat.js?v=a7f06b49" defer></script>
-<script src="/shared/command/inlogpoort.js?v=a7f06b49" defer></script>
-<script src="/shared/command/bladhaak.js?v=a7f06b49" defer></script>
-<script src="/shared/command/romp.js?v=a7f06b49" defer></script>
-<script src="/shared/command/geheugen.js?v=a7f06b49" defer></script>
-<script src="/shared/command/werktafel.js?v=a7f06b49" defer></script>
-<script src="/shared/command.js?v=a7f06b49" defer></script>
+<script src="/shared/command/catalog.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/console.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/verdeler.js?v=dc8abc2c" defer></script>
+<script src="/shared/interface/second-screen-modules.js?v=dc8abc2c" defer></script>
+<script src="/shared/interface/second-screen.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/bank.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/praat.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/inlogpoort.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/bladhaak.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/romp.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/geheugen.js?v=dc8abc2c" defer></script>
+<script src="/shared/command/werktafel.js?v=dc8abc2c" defer></script>
+<script src="/shared/command.js?v=dc8abc2c" defer></script>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -2373,8 +2387,8 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
-<script src="/apps/magnaat-sandbox.js?v=a7f06b49"></script>
-<script src="/apps/magnaat-data.js?v=a7f06b49"></script>
+<script src="/apps/magnaat-sandbox.js?v=dc8abc2c"></script>
+<script src="/apps/magnaat-data.js?v=dc8abc2c"></script>
 <script src="/apps/app-main.js" defer></script>
 <script>
 window.I18N = { en: {

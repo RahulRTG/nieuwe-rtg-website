@@ -48,4 +48,6 @@ test('de nieuwe vorm blijft ook offline onderdeel van de Foundation-schil', () =
   assert.match(sw, /foundation\/premium\.css/);
   assert.match(sw, /foundation\/premium\.js/);
   assert.match(sw, /const CACHE = 'rtf-premium-foundation-/);
+  assert.match(sw, /k\.startsWith\('rtf-premium-foundation-'\) && k !== CACHE/,
+    'Foundation mag bij activeren niet de offline cache van RTG wissen');
 });

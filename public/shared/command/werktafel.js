@@ -1,8 +1,4 @@
-/* De WERKTAFEL van RTG Command: het meubel -- bank, tabbladen, bladen, de
-   sleepbare scheiding en de lade. De grendel (wie er naar binnen mag) staat in
-   shared/command.js.
-
-   Deze laag stelt GEEN toegangsvragen: die krijgt hij van de grendel mee. */
+/* De werktafel: bank, bladen, scheiding en lade. De grendel staat in command.js. */
 (function(w,d){
   'use strict';
   w.RTGCommandWerktafel=function(o){
@@ -31,7 +27,7 @@
       if(panes.length)select(Math.min(g.actief,panes.length-1))}
     /* Afbreken staat op EEN plek. Het stond in de matchMedia-luisteraar en liet
        `actief` en `consoleLaag` wijzen naar DOM die net weg was. */
-    function sloop(){if(!root)return;poort.terug();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();}
+    function sloop(){if(!root)return;poort.terug();if(bank&&bank.stop)bank.stop();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();}
 
     function openNaast(a,kant){if(!a)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===a[1]){select(i);return panes[i]}if(panes.length>=2){var weg=actief===0?1:0;verwijder(weg)}var p=toon(a[1],a[0]);if(p&&kant==='links'&&panes.length===2){panes.splice(panes.indexOf(p),1);panes.unshift(p);root.querySelector('.cmd-panes').insertBefore(p.el,root.querySelector('.cmd-panes').firstChild);actief=0;sync()}return p}
     /* toon() gaat ervan uit dat het MAG: de grendel staat in shared/command.js
@@ -51,14 +47,7 @@
     function leeg(){var vak=root.querySelector('.cmd-panes');vak.textContent='';
       var m=d.createElement('div');m.className='cmd-leeg';
       m.innerHTML='<span>Kies een wereld om te beginnen.</span>';vak.appendChild(m)}
-    /* DE SCHILBALK: op een telefoon het enige wat de schil zelf laat zien. Hij
-       verving de tabstrip bovenin -- twee navigatielagen boven elkaar -- en
-       staat onderaan binnen duimbereik.
-
-       Vier dingen: de bank, waar je bent, weg hier, en Rahul (shared/command/
-       praat.js, die van deze balk een vraagveld maakt). Bij nul bladen valt de
-       sluitknop weg. "Waar je bent" draagt sinds ADAPTIEF.md ook handelingen
-       (shared/adaptief/balk.js). */
+    /* Op telefoon is dit de enige schilbalk; Adaptief vult de handelingen. */
     function balk(){
       var rij=root.querySelector('.cmd-balkbladen'),kruis=root.querySelector('.cmd-balksluit');
       if(!rij)return;
@@ -90,18 +79,22 @@
        zijn desktopbreedte mee naar een smal venster. */
     function verdeler(){var breed=o.breed();w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,breed);
       panes.forEach(function(p){if(p.haak&&p.haak.vorm)p.haak.vorm(breed)})}
-    // wat een pagina wordt zodra hij een blad is: shared/command/bladhaak.js
-    function haakScroll(p){if(w.RTGCommandBladhaak)p.haak=w.RTGCommandBladhaak(p,klein,o.breed())}
+    function vervang(p,url){var oud=p.frame,f=d.createElement('iframe');f.title=p.titel;f.src=url;if(w.RTGMedia)w.RTGMedia.kader(f);p.frame=f;p.haak=null;oud.replaceWith(f);f.addEventListener('load',function(){haakScroll(p)})}
+    // App-shell blijft host: kale Home opent Second Screen, een deep-link de host.
+    function neemHome(p,home){if(!p||!home)return false;if(home.diep){w.location.href=home.url.href;return true}
+      var terug=p.url;o.open(home.url.href,p.titel);if(terug&&!o.thuisAdres(terug)){vervang(p,terug);return true}
+      var i=panes.indexOf(p);if(i>=0)verwijder(i);sync();return true}
+    function thuisUitKind(bron,url){var home=o.thuisAdres(url),p=panes.find(function(x){return x.frame.contentWindow===bron});return neemHome(p,home)}
+    function haakScroll(p){var home=null;try{home=o.thuisAdres(p.frame.contentWindow.location.href)}catch(e){}
+      if(neemHome(p,home))return;
+      if(w.RTGCommandBladhaak)p.haak=w.RTGCommandBladhaak(p,klein,o.breed(),sync);sync()}
     function klein(){if(consoleLaag)consoleLaag.klein()}
 
-    /* De bank opnieuw vullen als de lijst werelden verandert (een pas die
-       binnenkomt, een gast die inlogt). Staat de werktafel er niet, dan is er
-       niets bij te werken: bouw() leest de lijst zelf bij het opbouwen. */
+    /* De bank opnieuw vullen wanneer werelden of passen veranderen. */
     function werelden(){if(bank)bank.vul();if(root)sync()}
-    /* Rahul roepen van buitenaf (de deur in de bank, een opdracht). De balk is
-       zijn plek, dus bouwt dit zo nodig eerst de werktafel op. */
+    /* Rahul roepen bouwt zo nodig eerst de werktafel. */
     function praat(){bouw();if(praatLaag)praatLaag.open()}
-    return{zet:zet,toon:toon,sluitAlles:sluitAlles,openNaast:openNaast,sluit:sluit,select:select,sync:sync,sloop:sloop,wis:wis,werelden:werelden,praat:praat,stand:function(){return stand},
+    return{zet:zet,toon:toon,sluitAlles:sluitAlles,openNaast:openNaast,sluit:sluit,select:select,sync:sync,sloop:sloop,wis:wis,werelden:werelden,praat:praat,thuisUitKind:thuisUitKind,stand:function(){return stand},
       staat:function(){return{root:root,panes:panes,actief:actief}}};
   };
 })(window,document);

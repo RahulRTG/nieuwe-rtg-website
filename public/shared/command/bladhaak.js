@@ -38,19 +38,47 @@
        aan; daarom mogen zowel de wereldwisselaar als de lokale kopie daar weg.
        --nav wordt nul, anders blijft onder de verborgen balk 78px lege ruimte. */
     'html.rtg-command-mobiel .os-switcher,' +
-    'html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs' +
+    'html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs,' +
+    'html.rtg-command-mobiel .tos-nav' +
     '{display:none!important}' +
-    'html.rtg-command-mobiel:has(body[data-rtg-world="travel"]){--nav:0px!important}';
-  w.RTGCommandBladhaak = function (p, klein, breed) {
+    'html.rtg-command-mobiel:has(body[data-rtg-world="travel"]){--nav:0px!important}' +
+    'html.rtg-command-mobiel:has(body.travel-os){--tos-bottom:0px!important;--tos-rail:0px!important}';
+  w.RTGCommandBladhaak = function (p, klein, breed, verander) {
     try {
       var doc = p.frame.contentDocument, st = doc.createElement('style');
+      /* Een gewone link kan hetzelfde werkblad naar een andere RTG-app sturen.
+         Het meubel bewaart dan de werkelijke canonieke URL en titel, anders
+         zou Continuity na Reizen & Veilig opnieuw het oude LivingOS openen. */
+      function route(meld){var loc=p.frame.contentWindow.location;
+        if(loc.origin!==w.location.origin)return;
+        p.url=loc.pathname+loc.search+loc.hash;p.titel=doc.title||p.titel;p.frame.title=p.titel;
+        if(meld&&verander)verander()}
+      route(false);
+      /* pushState en replaceState geven geen browser-event. Door de twee
+         bestaande ingangen te omwikkelen blijft Continuity ook bij lokale
+         tabwissels (zoals TravelOS #taxi) exact bij. */
+      var hist=p.frame.contentWindow.history;
+      ['pushState','replaceState'].forEach(function(naam){var oud=hist[naam];hist[naam]=function(){var r=oud.apply(hist,arguments);route(true);return r}});
+      p.frame.contentWindow.addEventListener('hashchange',function(){route(true)});
+      p.frame.contentWindow.addEventListener('popstate',function(){route(true)});
       doc.documentElement.classList.add('rtg-command-blad');
       function vorm(isBreed) {
+        breed = !!isBreed;
         doc.documentElement.classList.toggle('rtg-command-mobiel', !isBreed);
       }
       vorm(!!breed);
       st.textContent = VERBERG;
       doc.head.appendChild(st);
+      /* Een teruglink naar app.html mag IN een werkblad geen tweede app-schil
+         in dat frame bouwen. RTG opent daar zijn universele interfacelaag; de
+         actieve taak blijft erachter staan en standalone houdt zijn href. */
+      doc.addEventListener('click', function (e) {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var a = e.target && e.target.closest && e.target.closest('a[href]');
+        if (!a || a.target === '_blank') return;
+        if (!w.RTGCommand || !w.RTGCommand.thuisAdres(a.href)) return;
+        e.preventDefault(); w.RTGCommand.open(a.href, a.textContent.trim());
+      });
       /* Het bovendocument hoort te weten dat er in een blad wordt gewerkt: de
          chrome van het dock zakt dan in (shared/adaptief/diepte.js). Een frame
          kan dat niet zelf vertellen, en de schil kan het niet zien -- vandaar

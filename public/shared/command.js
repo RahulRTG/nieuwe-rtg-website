@@ -13,20 +13,7 @@
       catalog=w.RTGCommandCatalog,appUit=catalog.appUit;
 
   function aangemeld(){var app=d.getElementById('app');return !!(app&&app.classList.contains('active'))}
-  /* DE ONDERTEKENING WERD OP EEN BREED SCHERM OVERGESLAGEN.
-
-     #app krijgt `active` zodra er een sessie is, maar de intake is dan nog niet
-     af: de lidmaatschaps- en reisovereenkomst wordt getekend in #onbGate, modaal
-     over de app (app-main.js, checkOnboarding). aangemeld() keek alleen naar die
-     klasse, en de werktafel bouwde zich eroverheen -- #rtgCommand op z-index 210,
-     #onbGate op 130. Zelfde account, zelfde token: bij 999px stond je voor de
-     overeenkomst, bij 1001px erachter. Getekend was er niets.
-
-     Onder 1000px viel het niet op omdat de werktafel daar toen niet bestond. Dat
-     toevallige vangnet is weg: deze voorwaarde is nu op ELKE breedte het enige
-     wat de deur dichthoudt. Een bron van waarheid -- dezelfde `hidden` die de
-     onboarding zelf zet. Gaat de deur alsnog open (checkOnboarding is
-     asynchroon), dan wijkt een werktafel die er al stond; zie init(). */
+  /* De intake is op elke breedte de enige grendel voor de werktafel. */
   function poortDicht(){var g=d.getElementById('onbGate');return !g||g.hidden}
   /* DE WERKTAFEL DRAAIT OVERAL; `mq` ZEGT ALLEEN NOG HOE HIJ ERUITZIET: op een
      telefoon komt de bank van onderen als lade en staat er een blad tegelijk in
@@ -35,19 +22,7 @@
      breed() is een opmaakvraag en geen grendel. */
   function breed(){return mq.matches}
   function mag(){return aangemeld()&&poortDicht()}
-  /* DRIE STANDEN, EN MAAR EEN DAARVAN IS "WEG".
-
-     weg       de ondertekening ligt bovenop; hier mag niets overheen (zie
-               poortDicht hierboven -- dat is de grendel, niet een vorm)
-     gesloten  nog geen sessie: de bank staat er wel, maar de werkvloer draagt
-               het inloggesprek van Rahul en een wereld aanraken start dat
-               gesprek in plaats van een dode deur te openen
-     open      sessie en getekend: de gewone werktafel
-
-     `gesloten` bestaat omdat het inlogscherm dezelfde werktafel hoort te zijn:
-     wat je na het inloggen krijgt staat er dan al, alleen nog gesloten. Wat het
-     NIET mag worden is een rij deuren die niets doen -- vandaar dat de bank in
-     deze stand naar het gesprek wijst. */
+  /* weg = intake, gesloten = inloggesprek, open = gewone werktafel. */
   function stand(){return !poortDicht()?'weg':(aangemeld()?'open':'gesloten')}
   function magBestaan(){return poortDicht()}
   /* Het inloggesprek staat in #gate en wordt door app-main gebouwd; wij
@@ -59,7 +34,7 @@
 
   function bouwTafel(){
     if(!tafel)tafel=w.RTGCommandWerktafel({magBestaan:magBestaan,breed:breed,catalog:catalog,
-      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog,
+      open:open,bestemming:bestemming,thuis:thuis,inlog:inlog,thuisAdres:thuisAdres,
       werelden:function(){return werelden},systeem:deuren});
     return tafel;
   }
@@ -75,17 +50,7 @@
     werelden=Array.isArray(lijst)?lijst:[];
     if(tafel)tafel.werelden();
   }
-  /* DE SYSTEEMPANELEN, om dezelfde reden van buiten als de werelden.
-
-     Hier stond schil(): die vouwde de werktafel op en zette je op het
-     springboard eronder. Dat scherm is weg, dus is er ook niets meer om naar op
-     te vouwen -- wat eronder lag en WEL moest blijven zijn de panelen (het
-     bedieningspaneel met scannen, Zegel, backoffice, pin, taal, weergave, push,
-     zoeken, meldingen en uitloggen). Die komen nu over de werktafel heen te
-     liggen in plaats van eronder vandaan; zie de schil-regels in command.css.
-
-     Wie ze kent is app-main, en dus reikt app-main ze aan. Deze module weet niet
-     welke panelen er zijn en hoe je ze opent; dat blijft op één plek staan. */
+  /* app-main reikt systeempanelen aan; Command verzint geen tweede lijst. */
   var systeem=[];
   function zetSysteem(lijst){
     systeem=Array.isArray(lijst)?lijst:[];
@@ -100,21 +65,7 @@
     return [{naam:'Rahul',teken:'mens',doe:rahul}].concat(systeem);
   }
   function rahul(){if(!mag())return;bouwTafel().praat()}
-  /* DRIE WEGEN, EN TWEE ERVAN EINDIGEN LEEG (WERELD.md, geheugen.js):
-
-       thuis()  Home -> lege tafel, en dat is de enige knop die dat doet
-       land()   inloggen -> je laatste bladen staan er weer
-       sluiten  je laatste blad dicht -> lege tafel
-
-     Hier stond t.wis() ook in land(), en dat WAS de oude regel: inloggen kwam
-     altijd op een lege keuze uit. De werktafel hervat nu je bladen, en dan is
-     wissen bij binnenkomst het tegenovergestelde van wat er beloofd wordt.
-     thuis() wist wel, en moet dat blijven doen -- anders is er geen weg terug
-     naar een schone tafel en is hervatten geen gemak maar een gevangenis.
-
-     land() wordt rechtstreeks aangeroepen zodra de onboarding klaar is:
-     probeer() volgt de sessie via DOM-waarnemers, en dat is een vangnet en
-     geen navigatiebelofte. */
+  /* Home en het laatste blad sluiten eindigen leeg; inloggen hervat. */
   function thuis(){if(!tafel)return;tafel.wis();tafel.sync()}
   function land(){
     if(!mag())return false;
@@ -124,20 +75,21 @@
     return true;
   }
 
-  /* TWEE REDENEN OM NIET TE OPENEN, MET TWEE VERSCHILLENDE UITKOMSTEN.
-
-     Geen sessie is geen weigering maar een andere vorm: naar de pagina toe, die
-     draagt zijn eigen poort. (Hier stond ook `!mq.matches`; dat klopte zolang de
-     werktafel alleen breed bestond.)
-
-     De poort is wel een weigering. Toen die voorwaarde met mag() gedeeld werd,
-     viel open() met een openstaande intake terug op location.href -- precies de
-     omweg die de deur moest tegenhouden, want /apps/vandaag.html draagt #onbGate
-     niet. Zolang er niet getekend is, gebeurt hier dus niets. */
-  function open(url,titel){
+  /* Homealiases zijn de host, nooit een blad. Alleen een kale Home opent het
+     Second Screen; een echte deep-link herlaadt de buitenste host. */
+  function thuisAdres(url){
+    try{var u=new w.URL(url,w.location.href);
+      if(u.origin!==w.location.origin||!/^\/(?:apps(?:\/(?:app|index|bureau)\.html)?\/?)?$/.test(u.pathname))return null;
+      return{url:u,diep:!!u.hash||!!(u.search&&u.search!=='?magnaat=1')}}catch(e){return null}
+  }
+  function open(url,titel,kant){
     if(!poortDicht())return null;
     if(!aangemeld()){location.href=url;return null}
-    return bouwTafel().toon(url,titel);
+    var t=bouwTafel(),home=thuisAdres(url);
+    if(home){if(home.diep){w.location.href=home.url.href;return null}
+      var s=t.staat(),second=s.root&&s.root.__rtgSecondScreen;
+      if(second)second.setState(breed()?'workspace':'panel');else thuis();return null}
+    return kant?t.openNaast([titel,url],kant):t.toon(url,titel);
   }
 
   function bestemming(tekst){var q=String(tekst||'').trim(),laag=q.toLowerCase(),links=null,rechts=null,m,t;
@@ -176,13 +128,14 @@
      antwoord is precies mag(). Hij keek alleen naar de breedte: een tweede,
      mildere waarheid naast de grendel, waardoor de app-laag naar open() stuurde
      terwijl die zelf alsnog naar location.href terugviel. */
-  w.RTGCommand={open:open,bestemming:bestemming,
+  w.RTGCommand={open:open,bestemming:bestemming,thuisAdres:thuisAdres,
     herken:function(q){var a=appUit(q);return a?{naam:a[0],url:a[1]}:null},
     actief:mag,
     land:land,
     werelden:zetWerelden,
     systeem:zetSysteem,
     rahul:rahul,
+    uitKind:function(bron,url){return !!(tafel&&tafel.thuisUitKind(bron,url))},
     sluitAlles:function(){if(tafel)tafel.sluitAlles()}};
   if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',init);else init();
 })(window,document);

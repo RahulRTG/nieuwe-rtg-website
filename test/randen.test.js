@@ -6,6 +6,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const { schilVan } = require('../scripts/lib/swvingerafdruk');
 
 const WORTEL = path.join(__dirname, '..');
 const lees = p => fs.readFileSync(path.join(WORTEL, p), 'utf8');
@@ -144,6 +145,39 @@ test('de service worker vraagt na bij de server, ook als de browser denkt vers t
   const sw = lees('public/sw.js');
   assert.match(sw, /new Request\(e\.request, \{ cache: 'no-cache' \}\)/,
     'de service worker vraagt na in plaats van de browsercache te geloven');
+});
+
+test('offline cache verwart geen interfacevariant en wist geen buurapp', () => {
+  const sw = lees('public/sw.js');
+  assert.doesNotMatch(sw, /ignoreSearch\s*:\s*true/,
+    'een semantische query zoals ?magnaat=1 mag nooit de gewone app-shell krijgen');
+  assert.match(sw, /\/\\\.\(\?:js\|css\)\$\//,
+    'alleen JS en CSS mogen hun vingerafdrukquery offline afleggen');
+  assert.match(sw, /e\.request\.mode === 'navigate' && !url\.search/,
+    'een navigatie met betekenisvolle query mag niet op kale Home terugvallen');
+  assert.match(sw, /k\.startsWith\('rtg-app-'\) && k !== CACHE/,
+    'de RTG-worker mag uitsluitend zijn eigen oude caches verwijderen');
+});
+
+test('iedere installeerbare RTG-pas heeft zijn exacte offline startdocument', () => {
+  /* Een verse PWA kan voor het eerst zonder netwerk worden gestart. De drie
+     pasmanifesten openen niet kale Home maar een eigen ?pas=-adres. Omdat de
+     worker semantische query's terecht niet aliast, moeten juist die echte
+     startadressen tijdens install exact zijn voorgecached. */
+  const schil = new Set(schilVan(lees('public/sw.js')) || []);
+  for (const naam of ['rtg', 'lifestyle', 'business']) {
+    const manifest = JSON.parse(lees('public/manifests/pas-' + naam + '.webmanifest'));
+    assert.ok(manifest.start_url.includes('?pas='), naam + ' heeft geen eigen pas-startadres');
+    assert.ok(schil.has(manifest.start_url), manifest.start_url + ' ontbreekt als exact offline document');
+  }
+});
+
+test('iedere gestempelde Command-module bepaalt dezelfde bouwstempel', () => {
+  const html = lees('public/apps/app.html');
+  const build = lees('scripts/build.js');
+  const paden = [...html.matchAll(/src="\/(shared\/command(?:\/[^"?]+)?\.js)\?v=/g)].map((m) => m[1]);
+  assert.ok(paden.length >= 11, 'de toets ziet niet de volledige Command-runtime');
+  for (const p of paden) assert.ok(build.includes("'" + p + "'"), p + ' ontbreekt in commandDelen');
 });
 
 test('een kapotte kaart maakt het beginscherm niet zwart', () => {

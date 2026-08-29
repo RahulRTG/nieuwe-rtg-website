@@ -112,6 +112,21 @@ body.amn-zwevend .rv-bank{padding-top:56px}
    naar gekeken. */
 @media(max-width:760px){.rv-app{grid-template-rows:minmax(0,1fr) calc(68px + env(safe-area-inset-bottom,0px))}}
 
+/* COMMAND IS OP EEN TELEFOON DE ENIGE ONDERBALK. De zes knoppen uit deze bank
+   zijn in die vorm adaptieve capabilities (apps/reizen-veilig.js), en Rahul
+   woont al aan de duimzijde van de Command-balk. Alleen in dat expliciet door
+   de bovenliggende werktafel gemarkeerde geval gaan de twee lokale kopieën uit.
+   Standalone en bureau behouden hun eigen bank en reisassistent. */
+html.rtg-command-mobiel #rvApp{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+html.rtg-command-mobiel #rvApp>.rv-bank,
+html.rtg-command-mobiel #rvApp>.rv-rahul{display:none!important}
+html.rtg-command-mobiel #rvApp>.rv-werk{grid-column:1;grid-row:1}
+@media(max-width:760px){
+  html.rtg-command-mobiel #rvApp>.rv-werk{grid-template-rows:minmax(0,1fr)}
+  html.rtg-command-mobiel #rvApp .rv-tabs{display:none}
+  html.rtg-command-mobiel #rvApp .rv-panes{padding-bottom:0}
+}
+
 /* TravelOS-voorplein: dezelfde fotografische grammatica als Vluchten,
    Verblijven en Mobiliteit, zonder de eigen commandowerkruimte te vervangen. */
 .rv-command-hero{position:relative;isolation:isolate;min-height:clamp(310px,38vw,455px);display:flex;flex-direction:column;justify-content:flex-end;margin:-18px 0 30px;padding:clamp(22px,4vw,46px);overflow:hidden;border:1px solid rgba(192,165,68,.3);background-image:linear-gradient(90deg,rgba(5,5,5,.96),rgba(5,5,5,.68) 58%,rgba(5,5,5,.14)),linear-gradient(0deg,rgba(5,5,5,.92),transparent 58%),url('/images/travelos/travel-desk.jpg');background-size:cover;background-position:center;box-shadow:0 30px 80px rgba(0,0,0,.24)}

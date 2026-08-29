@@ -3,7 +3,7 @@
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
 /* DE CACHENAAM IS DE VINGERAFDRUK VAN DE SCHIL, en dat is hij nu ook echt:
-   sha256 over de zes bestanden hieronder, eerste acht tekens. Draai
+   sha256 over de bestanden hieronder, eerste acht tekens. Draai
    `npm run swcache` na een wijziging aan de schil; keuringsregel controleert
    of hij nog klopt.
 
@@ -14,8 +14,15 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-fca95f75';
-const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'rtg-app-f3c3ba70';
+const SHELL = ['/apps/app.html',
+  /* De drie installeerbare passen starten met een betekenisvolle query. Die
+     adressen staan daarom exact in de schil: ze mogen offline niet naar de
+     kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */
+  '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
+  '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
+  '/shared/interface/second-screen.css', '/shared/interface/second-screen-modules.js',
+  '/shared/interface/second-screen.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
@@ -24,7 +31,7 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('rtg-app-') && k !== CACHE).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
@@ -61,18 +68,23 @@ self.addEventListener('fetch', e => {
             caches.open(CACHE).then(c => c.put(e.request, copy));
           }
           return res;
-        }).catch(() =>
-          caches.match(e.request).then(hit => {
+        }).catch(() => {
+          /* Alleen een vingerafdruk op JS/CSS mag naar het kale, vooraf
+             gecachete adres terugvallen. Query's als ?magnaat=1, ?bel= en
+             ?pas= zijn semantische documenten en mogen nooit worden gealiasd. */
+          const vinger = /\.(?:js|css)$/.test(url.pathname) && url.searchParams.has('v') &&
+            Array.from(url.searchParams.keys()).every(k => k === 'v');
+          return caches.match(e.request).then(hit => hit || (vinger ? caches.match(url.pathname) : null)).then(hit => {
             if (hit) return hit;
             // Alleen een echte pagina-navigatie mag op het beginscherm
             // terugvallen. Elke andere mislukte GET (een script, een fetch
             // vanuit een app) kreeg hier ook app.html terug: de app "viel
             // terug naar het beginscherm" bij elke netwerkhapering, en een
             // script-URL kreeg HTML als JavaScript.
-            if (e.request.mode === 'navigate') return caches.match('/apps/app.html');
+            if (e.request.mode === 'navigate' && !url.search) return caches.match('/apps/app.html');
             return Response.error();
-          })
-        )
+          });
+        })
   );
 });
 

@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-085be8cb';
+const CACHE = 'rtf-premium-foundation-64c940b7';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -64,7 +64,7 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('rtf-premium-foundation-') && k !== CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
 self.addEventListener('fetch', e => {

@@ -3,6 +3,9 @@
   var R = {};
   R.$ = function (s, r) { return (r || d).querySelector(s); };
   R.$$ = function (s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); };
+  if (new URLSearchParams(w.location.search).get('embed') === '1') {
+    d.documentElement.classList.add('tos-ingebed');
+  }
   try { R.token = localStorage.getItem('rtg_member_token'); } catch (e) { R.token = null; }
   /* Bestemmingen en aanbod komen uit Mobility OS. Geen ingebouwde plaatsenlijst:
      als de bron niet antwoordt, werkt het scherm niet overtuigend door met een

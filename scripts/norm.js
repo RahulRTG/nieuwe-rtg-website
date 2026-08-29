@@ -250,7 +250,8 @@ const METERS = [
      gaan buiten de ontleder om en worden door CSP niet gecontroleerd -- ze zijn
      dus geen schuld maar juist de uitweg. */
   /* DE VORMTAAL IS GESPECIFICEERD EN WORDT NIET GEDRAGEN, en dat was tot deze
-     meter nergens te zien. ONTWERP.md legt het RTG Design System 2.0 vast,
+     meter nergens te zien. ONTWERP.md legt de visuele laag van de RTG
+     Interface Operating Standard vast,
      public/shared/rtg-ontwerp.css is de tokenlaag en test/ontwerp.test.js houdt
      hem streng -- maar die toets meet de tokenlaag TEGEN ZICHZELF. Van de
      app-pagina's laadde er precies EEN hem, en rtg-materiaal.css laadde er nul.

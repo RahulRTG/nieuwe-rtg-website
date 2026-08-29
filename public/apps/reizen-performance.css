@@ -6,6 +6,13 @@
   --serif:"Bodoni Moda",Didot,serif;--header:88px;--nav:88px;
   color-scheme:dark;
 }
+
+/* In Reizen & Veilig draagt de omhullende werkruimte de navigatie. `embed=1`
+   wordt door reizen-performance.js op <html> gemarkeerd; de lokale kopie gaat
+   dan uit en reserveert ook geen 78px meer. */
+html.tos-ingebed{--nav:0px}
+html.tos-ingebed .os-switcher,
+html.tos-ingebed .hoofdtabs{display:none!important}
 *{box-sizing:border-box}
 html{background:var(--onyx);scroll-behavior:smooth}
 body{margin:0;min-width:320px;min-height:100dvh;background:var(--onyx);color:var(--ivory);font-family:var(--sans);font-feature-settings:"tnum" 1,"ss01" 1;-webkit-font-smoothing:antialiased}

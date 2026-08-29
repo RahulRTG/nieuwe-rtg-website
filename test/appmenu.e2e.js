@@ -700,6 +700,15 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.dataset.cap),
       'reizen.vandaag', 'de hertekende actierij hoort toetsenbordfocus op dezelfde handeling te houden');
     await kies('reizen.taxi', 'Taxi', 'taxi');
+    assert.match(await page.evaluate(() => localStorage.getItem('rtg_cmd_bladen') || ''), /reizen\.html#taxi/,
+      'Continuity bewaart niet het lokaal gekozen TravelOS-blad');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await wachtWerelden(page);
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const b = f && f.contentDocument && f.contentDocument.querySelector('[data-blad="taxi"]');
+      return !!(f && f.contentWindow.location.hash === '#taxi' && b && !b.hidden);
+    }, null, { timeout: 20000 });
     await kies('reizen.rahul', 'Rahul', 'rahul');
     await kies('reizen.vandaag', 'Vandaag', 'vandaag');
 
@@ -739,6 +748,409 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     });
     assert.equal(bureau.tabs, true, 'op bureau hoort TravelOS zijn eigen navigatie te behouden');
     assert.equal(bureau.schil, false, 'de mobiele schilbalk hoort niet naar bureau te lekken');
+    await page.close();
+  });
+});
+
+test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk',
+  { skip: geenBrowser(pw) }, async () => {
+  /* Dit is de tweede echte-toestelroute: LivingOS navigeert zijn bestaande
+     Command-frame naar Reizen & Veilig. Gaan wordt vervolgens een direct
+     tweede Command-blad; de vroegere derde framelaag kon een derde balk tekenen. */
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await volgVerzoeken(page);
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await wachtWerelden(page);
+    await openLade(page);
+    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/rtg.html"]');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.contentDocument && /\/apps\/rtg\.html$/.test(f.contentWindow.location.pathname));
+    }, null, { timeout: 20000 });
+
+    const living = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
+    await living.locator('a[href="/apps/reizen-veilig.html"]:visible').first().click();
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const c = window.RTGAdaptief && window.RTGAdaptief.context();
+      return !!(f && f.contentDocument && f.contentDocument.documentElement &&
+        f.contentWindow.location.pathname === '/apps/reizen-veilig.html' &&
+        f.contentDocument.documentElement.classList.contains('rtg-command-mobiel') &&
+        c && c.bron === 'reizen-veilig.bank');
+    }, null, { timeout: 20000 });
+
+    const begin = await page.evaluate(() => {
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
+        el.getBoundingClientRect().height > 0);
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const doc = f.contentDocument;
+      return {
+        acties: window.RTGAdaptief.context().acties,
+        schil: zichtbaar(document.querySelector('#rtgCommand .cmd-balk')),
+        bank: zichtbaar(doc.querySelector('#rvApp > .rv-bank')),
+        rahul: zichtbaar(doc.querySelector('#rvApp > .rv-rahul')),
+        rasterrijen: getComputedStyle(doc.querySelector('#rvApp')).gridTemplateRows.trim().split(/\s+/).length
+      };
+    });
+    assert.deepEqual(begin.acties, [
+      'reisveilig.overzicht', 'reisveilig.vervoer', 'reisveilig.reisblad',
+      'reisveilig.veilig', 'reisveilig.navigatie', 'reisveilig.instellingen'
+    ], 'alle zes handelingen van Reizen & Veilig horen de ene buitenbalk te bereiken');
+    assert.equal(begin.schil, true, 'de Command-balk met menu en sluiten hoort te blijven');
+    assert.equal(begin.bank, false, 'de lokale Reizen & Veilig-bank staat dubbel in beeld');
+    assert.equal(begin.rahul, false, 'de lokale Rahul-balk staat naast de Rahul van Command');
+    assert.equal(begin.rasterrijen, 1, 'de verborgen bank laat nog een lege rasterrij achter');
+
+    /* Ook een gewone specialist-link blijft hetzelfde directe werkblad. Zo'n
+       route heeft geen embed-query, dus bewaakt de hostmarker zelf dat de
+       TravelOS-balk en haar gereserveerde ruimte niet terugkomen. */
+    const rvFrame = page.frameLocator('#rtgCommand .cmd-pane.actief iframe');
+    await rvFrame.locator('.rv-specialisten summary').click();
+    await rvFrame.locator('.rv-specialisten a[href="/apps/vluchten.html"]').click();
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f && f.contentDocument;
+      return !!(f && doc && doc.documentElement && f.contentWindow.location.pathname === '/apps/vluchten.html' &&
+        doc.documentElement.classList.contains('rtg-command-mobiel') && doc.body.classList.contains('travel-os'));
+    }, null, { timeout: 20000 });
+    assert.deepEqual(await page.evaluate(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe'), doc = f.contentDocument;
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+      return { eigenaren: [document.querySelector('#rtgCommand .cmd-balk'), doc.querySelector('.tos-nav')].filter(zichtbaar).length,
+        travel: zichtbaar(doc.querySelector('.tos-nav')),
+        onderruimte: getComputedStyle(doc.documentElement).getPropertyValue('--tos-bottom').trim() };
+    }), { eigenaren: 1, travel: false, onderruimte: '0px' },
+    'een gewone specialist-link brengt de tweede TravelOS-balk terug');
+    await page.evaluate(() => document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.history.back());
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const c = window.RTGAdaptief && window.RTGAdaptief.context();
+      return !!(f && f.contentWindow.location.pathname === '/apps/reizen-veilig.html' && c && c.bron === 'reizen-veilig.bank');
+    }, null, { timeout: 20000 });
+
+    async function kies(id, label) {
+      const direct = page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
+      if (await direct.count() && await direct.first().isVisible()) await direct.first().click();
+      else {
+        const meer = page.locator('#rtgCommand .cmd-meer');
+        assert.equal(await meer.isVisible(), true, label + ' is ook niet via Meer bereikbaar');
+        await meer.click();
+        await page.locator('.rtg-laag .lg-rij', { hasText: label }).click();
+      }
+    }
+
+    await kies('reisveilig.vervoer', 'Gaan');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.contentDocument && f.contentDocument.body &&
+        f.contentWindow.location.pathname === '/apps/ov.html' &&
+        f.contentDocument.body.classList.contains('travel-os') &&
+        f.contentDocument.documentElement.classList.contains('tos-ingebed') &&
+        document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane').length === 2);
+    }, null, { timeout: 20000 });
+    const vervoer = await page.evaluate(() => {
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
+        el.getBoundingClientRect().height > 0);
+      const buiten = document.querySelector('#rtgCommand .cmd-balk');
+      const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
+      const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
+      const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/ov.html');
+      const bank = rv.contentDocument.querySelector('#rvApp > .rv-bank');
+      const lokaal = leaf.contentDocument.querySelector('.tos-nav');
+      const stijl = getComputedStyle(leaf.contentDocument.documentElement);
+      return {
+        eigenaren: [buiten, bank, lokaal].filter(zichtbaar).length,
+        schil: zichtbaar(buiten), bank: zichtbaar(bank), travel: zichtbaar(lokaal),
+        marker: leaf.contentDocument.documentElement.classList.contains('tos-ingebed'),
+        embed: leaf.contentWindow.location.search,
+        rail: stijl.getPropertyValue('--tos-rail').trim(),
+        onderruimte: stijl.getPropertyValue('--tos-bottom').trim(),
+        diepte: frames.reduce((n, f) => n + f.contentDocument.querySelectorAll('iframe').length, 0),
+        paden: frames.map(f => f.contentWindow.location.pathname)
+      };
+    });
+    assert.equal(vervoer.eigenaren, 1, 'Command, Reizen & Veilig en OV tekenen samen meer dan één onderbalk');
+    assert.deepEqual({ schil: vervoer.schil, bank: vervoer.bank, travel: vervoer.travel },
+      { schil: true, bank: false, travel: false }, 'de verkeerde laag is eigenaar van de onderbalk');
+    assert.equal(vervoer.marker, true, 'OV herkent niet dat Command zijn navigatie al draagt (' +
+      vervoer.embed + ')');
+    assert.match(vervoer.embed, /(?:^|[?&])embed=1(?:&|$)/, 'het child-werkblad mist zijn expliciete embed-signaal');
+    assert.equal(vervoer.rail, '0px', 'de verborgen TravelOS-rail laat links lege ruimte achter');
+    assert.equal(vervoer.onderruimte, '0px', 'de verborgen TravelOS-balk laat onderaan lege ruimte achter');
+    assert.equal(vervoer.diepte, 0, 'een direct Command-blad hoort zelf geen nieuw app-frame te maken: ' + vervoer.paden);
+
+    /* Keer naar het bronblad terug. Zijn zes handelingen moeten opnieuw aan de
+       buitenbalk worden gemeld; daarna vervangt Navigatie alleen het rechterblad. */
+    await page.evaluate(() => {
+      const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
+      const i = frames.findIndex(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
+      document.querySelectorAll('#rtgCommand .cmd-balkblad')[i].click();
+    });
+    await page.waitForFunction(() => {
+      const c = window.RTGAdaptief && window.RTGAdaptief.context();
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.contentWindow.location.pathname === '/apps/reizen-veilig.html' &&
+        c && c.bron === 'reizen-veilig.bank');
+    }, null, { timeout: 10000 });
+    await kies('reisveilig.reisblad', 'Reizen');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const p = f && f.contentDocument && f.contentDocument.querySelector('.rv-pane.actief');
+      return !!(p && p.dataset.id === 'reisblad' && !p.querySelector('iframe'));
+    }, null, { timeout: 10000 });
+    await kies('reisveilig.navigatie', 'Navigatie');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const doc = f && f.contentDocument;
+      return !!(f && doc && doc.documentElement &&
+        f.contentWindow.location.pathname === '/apps/navigatie.html' &&
+        doc.documentElement.classList.contains('tos-ingebed') &&
+        !doc.querySelector('.tos-nav') &&
+        document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane').length === 2);
+    }, null, { timeout: 20000 });
+
+    /* De terugdeur van een ingebed moduleblad blijft binnen TravelOS en houdt
+       embed=1 vast. Een kale app-shell-link mag hier niet meer bestaan. */
+    const terugAdres = await page.frameLocator('#rtgCommand .cmd-pane.actief iframe')
+      .locator('.tos-mark').getAttribute('href');
+    assert.equal(terugAdres, '/apps/reizen.html?embed=1#reizen',
+      'de ingebedde terugdeur verliest zijn eigenaar- en embedcontract');
+    assert.equal(await page.frameLocator('#rtgCommand .cmd-pane.actief iframe')
+      .locator('a[href="/apps/app.html"]:visible').count(), 0,
+    'een moduleblad biedt opnieuw een geneste app-shell aan');
+
+    /* Ook een programmatische oude Homealias wordt door de host teruggenomen;
+       de actieve taak blijft staan en er initialiseert geen child-Command. */
+    await page.evaluate(() => {
+      document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.location.href = '/apps/index.html';
+    });
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand'), f = r.querySelector('.cmd-pane.actief iframe');
+      return r.dataset.rtgSecondScreen === 'panel' && f.contentWindow.location.pathname === '/apps/navigatie.html' &&
+        !f.contentDocument.querySelector('#rtgCommand');
+    }, null, { timeout: 20000 });
+    await page.click('#rtgCommand [data-ss-action="close"]');
+
+    /* Op bureau staan twee directe werkbladen naast elkaar. Reizen & Veilig
+       herstelt zijn lokale rail; het ingebedde moduleblad bouwt er geen bij. */
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForFunction(() => {
+      const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
+      const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
+      return !!(rv && !rv.contentDocument.documentElement.classList.contains('rtg-command-mobiel'));
+    }, null, { timeout: 10000 });
+    const bureau = await page.evaluate(() => {
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
+        el.getBoundingClientRect().height > 0);
+      const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
+      const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
+      const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
+      return { bank: zichtbaar(rv.contentDocument.querySelector('#rvApp > .rv-bank')),
+        schil: zichtbaar(document.querySelector('#rtgCommand .cmd-balk')),
+        kindnav: zichtbaar(leaf && leaf.contentDocument.querySelector('.tos-nav')),
+        directeBladen: frames.length };
+    });
+    assert.deepEqual(bureau, { bank: true, schil: false, kindnav: false, directeBladen: 2 },
+      'bureau herstelt niet precies de eigen Reizen & Veilig-rail');
+
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.contentDocument && f.contentDocument.documentElement.classList.contains('rtg-command-mobiel'));
+    }, null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => {
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+      const frames = [...document.querySelectorAll('#rtgCommand > .cmd-werk > .cmd-panes > .cmd-pane > iframe')];
+      const rv = frames.find(f => f.contentWindow.location.pathname === '/apps/reizen-veilig.html');
+      const leaf = frames.find(f => f.contentWindow.location.pathname === '/apps/navigatie.html');
+      return [document.querySelector('#rtgCommand .cmd-balk'), rv.contentDocument.querySelector('#rvApp > .rv-bank'),
+        leaf.contentDocument.querySelector('.tos-nav')].filter(zichtbaar).length;
+    }), 1, 'na terugdraaien naar telefoon verschijnen de drie balken opnieuw');
+
+    /* Standalone Reizen & Veilig blijft zelf eigenaar. Zowel de merklink als
+       een lokale teruglink houden het child in embedmodus; geen app-shell en
+       geen tweede TravelOS-balk mogen ontstaan. */
+    const los = await ctx.newPage();
+    await los.setViewportSize({ width: 393, height: 852 });
+    await los.goto(base + '/apps/reizen-veilig.html', { waitUntil: 'domcontentloaded' });
+    await los.click('#rvApp [data-open="vervoer"]');
+    await los.waitForSelector('#rvPanes .rv-pane.actief iframe[src*="/apps/ov.html"][src*="embed=1"]', { timeout: 20000 });
+    const losKind = los.frameLocator('#rvPanes .rv-pane.actief iframe');
+    const lokaleTerug = losKind.locator('a[href="/apps/reizen.html?embed=1#reizen"]:not(.tos-mark)').first();
+    assert.equal(await lokaleTerug.evaluate(el => getComputedStyle(el).clipPath), 'inset(50%)',
+      'het child toont naast de Reizen & Veilig-bank een tweede terugbediening');
+    await lokaleTerug.evaluate(el => el.click());
+    await los.waitForFunction(() => {
+      const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
+      const tabs = f && f.contentDocument && f.contentDocument.querySelector('.hoofdtabs');
+      return !!(f && f.contentWindow.location.pathname === '/apps/reizen.html' &&
+        f.contentWindow.location.search.includes('embed=1') && tabs && getComputedStyle(tabs).display === 'none');
+    }, null, { timeout: 20000 });
+    await los.evaluate(() => document.querySelector('#rvPanes .rv-pane.actief iframe').contentWindow.history.back());
+    await los.waitForFunction(() => document.querySelector('#rvPanes .rv-pane.actief iframe').contentWindow.location.pathname === '/apps/ov.html');
+    const ingebedMerk = losKind.locator('.tos-mark');
+    assert.equal(await ingebedMerk.evaluate(el => getComputedStyle(el.closest('.tos-topbar')).display), 'none',
+      'een childmodule tekent naast Reizen & Veilig opnieuw globale topchrome');
+    await ingebedMerk.evaluate(el => el.click());
+    await los.waitForFunction(() => {
+      const f = document.querySelector('#rvPanes .rv-pane.actief iframe');
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+      return f.contentWindow.location.pathname === '/apps/reizen.html' && !f.contentDocument.querySelector('#rtgCommand') &&
+        [document.querySelector('#rvApp > .rv-bank'), f.contentDocument.querySelector('.hoofdtabs')].filter(zichtbaar).length === 1;
+    }, null, { timeout: 20000 });
+    await los.close();
+
+    const deep = await page.evaluate(() => ({
+      bel: RTGCommand.thuisAdres('/apps/app.html?bel=123').diep,
+      herstel: RTGCommand.thuisAdres('/apps/app.html?pinherstel=1').diep,
+      ai: RTGCommand.thuisAdres('/apps/app.html#ai').diep,
+      pas: RTGCommand.thuisAdres('/apps/app.html?pas=business').diep,
+      index: RTGCommand.thuisAdres('/apps/index.html').diep
+    }));
+    assert.deepEqual(deep, { bel: true, herstel: true, ai: true, pas: true, index: false },
+      'de host verwart een Home-deeplink met kale Home');
+    await page.evaluate(() => {
+      document.querySelector('#rtgCommand .cmd-pane.actief iframe').contentWindow.location.href = '/apps/app.html#ai';
+    });
+    await page.waitForURL(/\/apps\/app\.html#ai$/, { timeout: 20000 });
+    await page.waitForFunction(() => document.querySelectorAll('#rtgCommand').length === 1 &&
+      !document.querySelector('#rtgCommand iframe[src*="/apps/app.html"]'), null, { timeout: 20000 });
+    await page.close();
+  });
+});
+
+test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await volgVerzoeken(page);
+    await page.route('**/api/comm/inbox', (r) => r.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true,
+        gesprekken: [{ titel: 'Rahul', laatste: 'Uw actieve context blijft beschikbaar.',
+          at: '2026-08-29T08:00:00.000Z', ongelezen: 1, link: '/apps/app.html' }],
+        laden: [], ongelezen: 1 }) }));
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await wachtWerelden(page);
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand');
+      return !!(r && r.__rtgSecondScreen && r.dataset.rtgSecondScreen === 'peek');
+    }, null, { timeout: 10000 });
+
+    await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand');
+      r.style.setProperty('--rtg-ss-safe-top', '47px');
+      r.style.setProperty('--rtg-ss-safe-bottom', '34px');
+      r.style.setProperty('--rtg-command-safe-top', '47px');
+      window.RTGUitvoer.bron(() => ({ kolommen: ['veld', 'waarde'], rijen: [['status', 'actief']] }));
+    });
+    await openLade(page);
+    await page.waitForFunction(() => {
+      const p = document.querySelector('#rtgCommand .rtg-ss-profile-copy strong');
+      const m = document.querySelector('#rtgCommand [data-ss-module="messages"] .rtg-ss-messages');
+      return !!(p && p.textContent.includes('Menu Lid') && m && !/laden/i.test(m.textContent));
+    }, null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand'), bank = r.querySelector('.cmd-bank'), grip = r.querySelector('.cmd-lade');
+      return bank.contains(document.activeElement) && grip.getAttribute('aria-controls') === bank.id;
+    }), true, 'Panel neemt toetsenbordfocus niet over van zijn greep');
+
+    const panel = await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand'), b = r.querySelector('.cmd-bank');
+      const rect = b.getBoundingClientRect();
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0);
+      return { state: r.dataset.rtgSecondScreen, top: Math.round(rect.top), bottom: Math.round(innerHeight - rect.bottom),
+        width: Math.round(rect.width), modules: r.querySelectorAll('[data-ss-module]').length,
+        balken: [r.querySelector('.cmd-balk')].filter(zichtbaar).length,
+        overloop: b.scrollWidth > b.clientWidth,
+        tekst: b.textContent };
+    });
+    assert.equal(panel.state, 'panel', 'de greep hoort Peek naar Panel te laten groeien');
+    assert.ok(panel.top >= 59, 'het Second Screen staat onder de nagebootste iPhone-uitsparing: ' + panel.top);
+    assert.ok(panel.bottom >= 94, 'het Second Screen houdt de ene onderdock en thuiszone vrij: ' + panel.bottom);
+    assert.ok(panel.width <= 369, 'het paneel loopt buiten de telefoon: ' + panel.width);
+    assert.ok(panel.modules >= 5, 'profiel, context, berichten, werelden en deuren horen levende modules te zijn');
+    assert.equal(panel.balken, 1, 'het Second Screen mag geen tweede globale navigatie tekenen');
+    assert.equal(panel.overloop, false, 'het Second Screen mag horizontaal niet overlopen');
+    assert.doesNotMatch(panel.tekst, /Sophie|Yassin|Laura/, 'de referentienamen mogen geen demodata worden');
+
+    /* Een echte Rahul-inboxbron verwijst naar app.html. De centrale hostregel
+       houdt dat Home-adres in het Second Screen; er mag geen app-shell als
+       werkblad (en dus geen tweede Command) ontstaan. */
+    await page.click('#rtgCommand [data-ss-module="messages"] [data-ss-url="/apps/app.html"]');
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand');
+      return r.dataset.rtgSecondScreen === 'panel' &&
+        !r.querySelector('.cmd-pane iframe[src*="/apps/app.html"]');
+    }), true, 'een inboxlink naar Home bouwt de app-shell in een werkblad');
+
+    await page.click('#rtgCommand [data-ss-action="workspace"]');
+    await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
+    const focusKnop = page.locator('#rtgCommand [data-ss-action="focus"]');
+    await focusKnop.click();
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand'), b = r.querySelector('.cmd-bank'), werk = r.querySelector('.cmd-werk');
+      return r.dataset.rtgSecondScreen === 'focus' && b.getAttribute('role') === 'dialog' &&
+        b.contains(document.activeElement) && werk.hasAttribute('inert') && werk.getAttribute('aria-hidden') === 'true';
+    });
+    await page.click('#rtgCommand .rtg-ss-header .rtguitvoer-knop');
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand'), laag = r.querySelector('.rtguitvoer-laag');
+      return !!(laag && !laag.hidden && r.querySelector('.cmd-bank').contains(laag));
+    });
+    await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand');
+      return r.dataset.rtgSecondScreen === 'focus' && r.querySelector('.rtguitvoer-laag').hidden;
+    }), true, 'Escape sluit tegelijk de uitvoerdialoog en het Focus-scherm');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand');
+      return document.activeElement === r.querySelector('[data-ss-action="focus"]') &&
+        !r.querySelector('.cmd-werk').hasAttribute('inert');
+    }), true, 'Focus herstelt de aanroeper of werkruimte niet');
+    await page.click('#rtgCommand [data-ss-action="close"]');
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand');
+      return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === r.querySelector('.cmd-lade');
+    });
+
+    /* Een Living Module gebruikt dezelfde Command-ingang. Hij sluit het paneel
+       op telefoon, opent één direct blad en meldt daarna zijn context terug. */
+    await openLade(page);
+    await page.click('#rtgCommand [data-ss-url="/apps/reizen.html#reizen"]');
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand');
+      const f = r.querySelector('.cmd-pane.actief iframe');
+      return !!(f && f.contentWindow.location.pathname === '/apps/reizen.html' &&
+        r.dataset.rtgSecondScreen === 'peek');
+    }, null, { timeout: 20000 });
+    await openLade(page);
+    await page.waitForFunction(() => {
+      const x = document.querySelector('#rtgCommand [data-ss-module="context"]');
+      return !!(x && /TravelOS|Reizen/.test(x.textContent));
+    }, null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand');
+      return [...r.querySelectorAll('.cmd-balk')].filter(x => getComputedStyle(x).display !== 'none').length;
+    }), 1, 'na een moduleactie hoort nog steeds één onderdock zichtbaar te zijn');
+    await page.click('#rtgCommand [data-ss-action="close"]');
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
+    assert.equal(await page.locator('#rtgCommand .cmd-bank').isVisible(), true,
+      'op bureau hoort de vaste Workspace beschikbaar te blijven');
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'peek');
+    await page.evaluate(() => document.getElementById('rtgCommand').__rtgSecondScreen.destroy());
+    await page.waitForTimeout(20);
+    assert.equal(await page.evaluate(() => {
+      const r = document.getElementById('rtgCommand'), out = document.querySelector('.rtguitvoer-knop');
+      return !r.__rtgSecondScreen && !r.querySelector('.rtg-ss-shell') &&
+        r.querySelector('.cmd-nav').parentElement === r.querySelector('.cmd-bank') && !r.querySelector('.cmd-werk').inert &&
+        !!(out && out.isConnected);
+    }), true, 'Second Screen laat na afbreken DOM, focus of uitvoerbediening achter');
     await page.close();
   });
 });

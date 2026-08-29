@@ -23,6 +23,12 @@
   color-scheme:dark;
 }
 
+/* Een module in Reizen & Veilig gebruikt de bank van die werkruimte. De eigen
+   TravelOS-rail wordt daar niet gebouwd; nul hier voorkomt dat zijn lege 104px
+   op bureau of 78px op telefoon wel gereserveerd blijft. */
+html.tos-ingebed{--tos-top:0px;--tos-rail:0px;--tos-bottom:0px}
+html.tos-ingebed .tos-nav,html.tos-ingebed .tos-topbar{display:none!important}
+
 body.travel-os{
   --bg:var(--tos-onyx);
   --card:var(--tos-graphite);
@@ -312,6 +318,7 @@ body.travel-os :where(.knop.stil,.terug,.meldknop){
   border-radius:0!important;
 }
 body.travel-os .ios-terug{min-height:44px}
+html.rtg-in-frame body.travel-os > .amn-knop{display:none!important}
 body.travel-os :where(.step button,.lagen button,.paneel .x,.weg){border-radius:0!important}
 body.travel-os :where(.tabs,.chips){border-bottom:1px solid var(--tos-line) !important;background:transparent !important}
 body.travel-os :where(.tabs,.chips) > button{

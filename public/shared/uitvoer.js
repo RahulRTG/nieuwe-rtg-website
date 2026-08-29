@@ -135,6 +135,7 @@
     '.rtguitvoer-rij button{flex:1 1 6rem;}';
 
   var knop = null, laag = null, melding = null, tik = 0, pogingen = 0;
+  var gastKnop = null, gastLaag = null;
 
   function sluit() {
     laag.hidden = true;
@@ -150,6 +151,7 @@
       '<button type="button" data-vorm="csv">CSV</button><button type="button" data-vorm="json">JSON</button>' +
       '<button type="button" class="rtguitvoer-sluit">Sluiten</button></div></div></div>');
     laag = document.body.lastElementChild;
+    if (gastLaag && gastLaag.isConnected) gastLaag.appendChild(laag);
     melding = laag.querySelector('p');
     laag.addEventListener('click', function (e) {
       if (e.target === laag) return sluit();                 // naast het venster tikken sluit ook
@@ -199,6 +201,7 @@
      in main is geen anker: die hoort bij een deel (dan neemt een deelwissel
      de knop mee) of bij een scherm dat de app verborgen houdt. */
   function plaats(k) {
+    if (gastKnop && gastKnop.isConnected) { gastKnop.appendChild(k); return; }
     var l = document.querySelectorAll('h1, h2'), kop = null, w = wortel();
     for (var i = 0; i < l.length && !kop; i++) if (l[i].offsetParent !== null) kop = l[i];
     var h = kop && kop.closest('header');
@@ -266,7 +269,20 @@
     bron: function (f) { eigenBron = typeof f === 'function' ? f : null; herzie(); },
     beschikbaar: function () { return !!verzamel(); },
     gegevens: verzamel,
-    neemMee: neemMee
+    neemMee: neemMee,
+    herzie: herzie,
+    zichtbaar: function () { return !!(laag && !laag.hidden); },
+    /* Knop én dialoog horen bij dezelfde dominante laag. */
+    mount: function (knopHost, laagHost) {
+      gastKnop = knopHost || null; gastLaag = laagHost || null;
+      if (laag && gastLaag && gastLaag.isConnected) gastLaag.appendChild(laag);
+      herzie();
+    },
+    unmount: function () {
+      if (laag && !laag.hidden) sluit();
+      if (laag && laag.isConnected) document.body.appendChild(laag);
+      gastKnop = null; gastLaag = null; setTimeout(herzie, 0);
+    }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

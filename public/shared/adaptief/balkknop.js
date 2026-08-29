@@ -129,6 +129,23 @@
       }
     });
   }
-    return { knop: knop, zetTeken: zetTeken, voer: voer, openLade: openLade };
+
+  /* EEN STANDSWISSEL MAG DE TOETSENBORDCURSOR NIET WEGGOOIEN. De balk tekent
+     na een gewijzigde aan/uit-stand zijn knoppen opnieuw; draag focus dan over
+     naar dezelfde capability, of naar Meer als juist die knop overliep. Focus
+     buiten de actierij blijft ongemoeid. */
+  function focusVan(rij) {
+    return rij.contains(d.activeElement) && d.activeElement.dataset ? d.activeElement.dataset.cap : '';
+  }
+  function herstelFocus(rij, meer, id) {
+    if (!id) return;
+    for (var i = 0; i < rij.children.length; i++) {
+      if (rij.children[i].dataset.cap === id) { rij.children[i].focus(); return; }
+    }
+    if (!meer.hidden) meer.focus();
+  }
+
+    return { knop: knop, zetTeken: zetTeken, voer: voer, openLade: openLade,
+      focusVan: focusVan, herstelFocus: herstelFocus };
   };
 })(window, document);

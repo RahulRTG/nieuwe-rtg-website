@@ -603,3 +603,142 @@ test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
     await page.close();
   });
 });
+
+test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen',
+  { skip: geenBrowser(pw) }, async () => {
+  /* Dit is het scherm uit de praktijk: 393×852, TravelOS geopend vanuit de
+     wereldbank. De fout bestond niet op /apps/reizen.html alleen, maar in de
+     combinatie van zijn vaste .hoofdtabs met de vaste .cmd-balk eromheen. */
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await volgVerzoeken(page);
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await wachtWerelden(page);
+    await openLade(page);
+    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/reizen.html"]');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const h = f && f.contentDocument && f.contentDocument.documentElement;
+      return !!(h && h.classList.contains('rtg-command-mobiel') &&
+        f.contentDocument.querySelector('.prestatiekop'));
+    }, null, { timeout: 20000 });
+    await page.waitForSelector('#rtgCommand .cmd-balk[data-zone="acties"]', { timeout: 20000 });
+
+    /* Chromium heeft geen iPhone-notch. De bronregel gebruikt daarom een
+       overschrijfbare variabele met env() als echte terugval; zo meet deze toets
+       dezelfde 47px die de bovenste uitsparing op het toestel opeist. */
+    await page.evaluate(async () => {
+      document.getElementById('rtgCommand').style.setProperty('--rtg-command-safe-top', '47px');
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    });
+    const maat = await page.evaluate(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const doc = f.contentDocument;
+      const balk = document.querySelector('#rtgCommand .cmd-balk');
+      const eigen = doc.querySelector('.hoofdtabs');
+      const werelden = doc.querySelector('.os-switcher');
+      const zichtbaar = (el) => !!(el && getComputedStyle(el).display !== 'none' &&
+        el.getBoundingClientRect().height > 0);
+      return {
+        frameTop: Math.round(f.getBoundingClientRect().top),
+        schilbalk: zichtbaar(balk),
+        eigenBalk: zichtbaar(eigen),
+        wereldbalk: zichtbaar(werelden),
+        onderbalken: [balk, eigen].filter(zichtbaar).length,
+        navRuimte: getComputedStyle(doc.documentElement).getPropertyValue('--nav').trim(),
+        acties: [...document.querySelectorAll('#rtgCommand .cmd-actie')].map(b => b.dataset.cap),
+        heeftMeer: zichtbaar(document.querySelector('#rtgCommand .cmd-meer'))
+      };
+    });
+    assert.ok(maat.frameTop >= 47,
+      'TravelOS begint onder de iPhone-statusbalk, gemeten top: ' + maat.frameTop);
+    assert.equal(maat.wereldbalk, false, 'de wereldwisselaar wordt in het mobiele werkblad dubbel getoond');
+    assert.equal(maat.eigenBalk, false, 'de lokale TravelOS-balk wordt naast de schilbalk getoond');
+    assert.equal(maat.schilbalk, true, 'de ene schilbalk met menu en sluiten hoort bereikbaar te blijven');
+    assert.equal(maat.onderbalken, 1, 'onderaan hoort exact één vaste navigatiebalk te staan');
+    assert.equal(maat.navRuimte, '0px', 'de verborgen lokale balk laat nog lege ruimte achter');
+    assert.ok(maat.acties.length || maat.heeftMeer, 'de TravelOS-tabhandelingen bereikten de ene balk niet');
+
+    async function kies(id, label, blad) {
+      const direct = page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
+      if (await direct.count() && await direct.first().isVisible()) {
+        await direct.first().click();
+      } else {
+        const meer = page.locator('#rtgCommand .cmd-meer');
+        assert.equal(await meer.isVisible(), true, label + ' is niet zichtbaar en ook niet bereikbaar via Meer');
+        await meer.click();
+        await page.locator('.rtg-laag .lg-rij', { hasText: label }).click();
+      }
+      await page.waitForFunction((naam) => {
+        const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+        const b = f && f.contentDocument && f.contentDocument.querySelector('[data-blad="' + naam + '"]');
+        return !!(b && !b.hidden);
+      }, blad, { timeout: 10000 });
+    }
+    await kies('reizen.reizen', 'Reizen', 'reizen');
+    await page.waitForFunction(() => {
+      const s = window.RTGAdaptief && window.RTGAdaptief.context().staat;
+      return !!(s && s['reizen.reizen'] && s['reizen.reizen'].aan &&
+        !document.querySelector('.rtg-laag'));
+    }, null, { timeout: 10000 });
+    const toetsenbord = page.locator('#rtgCommand .cmd-actie[data-cap="reizen.vandaag"]');
+    assert.equal(await toetsenbord.isVisible(), true, 'Vandaag hoort direct met het toetsenbord bereikbaar te zijn');
+    await toetsenbord.focus();
+    assert.deepEqual(await page.evaluate(() => ({ tag: document.activeElement && document.activeElement.tagName,
+      klasse: document.activeElement && document.activeElement.className,
+      cap: document.activeElement && document.activeElement.dataset.cap })),
+    { tag: 'BUTTON', klasse: 'cmd-actie', cap: 'reizen.vandaag' },
+    'de TravelOS-handeling moet focus kunnen ontvangen');
+    await toetsenbord.press('Enter');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const b = f && f.contentDocument && f.contentDocument.querySelector('[data-blad="vandaag"]');
+      const s = window.RTGAdaptief && window.RTGAdaptief.context().staat;
+      return !!(b && !b.hidden && s && s['reizen.vandaag'] && s['reizen.vandaag'].aan);
+    }, null, { timeout: 10000 });
+    assert.equal(await page.evaluate(() => document.activeElement && document.activeElement.dataset.cap),
+      'reizen.vandaag', 'de hertekende actierij hoort toetsenbordfocus op dezelfde handeling te houden');
+    await kies('reizen.taxi', 'Taxi', 'taxi');
+    await kies('reizen.rahul', 'Rahul', 'rahul');
+    await kies('reizen.vandaag', 'Vandaag', 'vandaag');
+
+    /* Een inactief frame mag de balk niet overnemen, maar moet zijn context
+       opnieuw aanbieden zodra het weer actief wordt. Zonder deze heen-en-
+       terugweg verdween de enige mobiele bediening na een werkbladwissel. */
+    await openLade(page);
+    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/kantoor.html"]');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.getAttribute('src') === '/apps/kantoor.html');
+    }, null, { timeout: 10000 });
+    await openLade(page);
+    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/reizen.html"]');
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      if (!f || f.getAttribute('src') !== '/apps/reizen.html') return false;
+      const c = window.RTGAdaptief && window.RTGAdaptief.context();
+      return !!(c && c.bron === 'reizen.tabs' && c.acties.includes('reizen.taxi'));
+    }, null, { timeout: 10000 });
+    await kies('reizen.taxi', 'Taxi', 'taxi');
+
+    /* Dezelfde pagina mag op bureau niet kaal worden: daar bestaat de mobiele
+       schilbalk niet en blijft de eigen TravelOS-navigatie dus eigenaar. */
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForFunction(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      return !!(f && f.contentDocument &&
+        !f.contentDocument.documentElement.classList.contains('rtg-command-mobiel'));
+    }, null, { timeout: 10000 });
+    const bureau = await page.evaluate(() => {
+      const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
+      const tabs = f.contentDocument.querySelector('.hoofdtabs');
+      const schil = document.querySelector('#rtgCommand .cmd-balk');
+      return { tabs: getComputedStyle(tabs).display !== 'none' && tabs.getBoundingClientRect().height > 0,
+        schil: getComputedStyle(schil).display !== 'none' && schil.getBoundingClientRect().height > 0 };
+    });
+    assert.equal(bureau.tabs, true, 'op bureau hoort TravelOS zijn eigen navigatie te behouden');
+    assert.equal(bureau.schil, false, 'de mobiele schilbalk hoort niet naar bureau te lekken');
+    await page.close();
+  });
+});

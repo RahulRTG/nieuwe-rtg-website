@@ -31,10 +31,24 @@
 (function (w, d) {
   'use strict';
   var VERBERG = '#rahulFab,.rahulfab,.rahulsheet,.mgz-blok,.mgz-ruimte,.amn-knop,#rtg-cookie' +
-    '{display:none!important}body{padding-bottom:0!important}';
-  w.RTGCommandBladhaak = function (p, klein) {
+    '{display:none!important}body{padding-bottom:0!important}' +
+    /* EEN WERELD IN DE MOBIELE WERKTAFEL DRAAGT DE SCHIL NIET NOG EENS MEE.
+       De wereldbank en de onderbalk bestaan al in het bovendocument. TravelOS
+       biedt zijn vier lokale tabs via de adaptieve brug aan die ene onderbalk
+       aan; daarom mogen zowel de wereldwisselaar als de lokale kopie daar weg.
+       --nav wordt nul, anders blijft onder de verborgen balk 78px lege ruimte. */
+    'html.rtg-command-mobiel .os-switcher,' +
+    'html.rtg-command-mobiel body[data-rtg-world="travel"] .hoofdtabs' +
+    '{display:none!important}' +
+    'html.rtg-command-mobiel:has(body[data-rtg-world="travel"]){--nav:0px!important}';
+  w.RTGCommandBladhaak = function (p, klein, breed) {
     try {
       var doc = p.frame.contentDocument, st = doc.createElement('style');
+      doc.documentElement.classList.add('rtg-command-blad');
+      function vorm(isBreed) {
+        doc.documentElement.classList.toggle('rtg-command-mobiel', !isBreed);
+      }
+      vorm(!!breed);
       st.textContent = VERBERG;
       doc.head.appendChild(st);
       /* Het bovendocument hoort te weten dat er in een blad wordt gewerkt: de
@@ -50,6 +64,8 @@
       doc.addEventListener('input', beweegt, true);
       var sc = doc.querySelectorAll('[class*=content],main');
       for (var i = 0; i < sc.length; i++) sc[i].addEventListener('scroll', beweegt, { passive: true });
+      return { vorm: vorm };
     } catch (e) {}
+    return null;
   };
 })(window, document);

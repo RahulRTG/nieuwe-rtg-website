@@ -31,7 +31,7 @@
       if(panes.length)select(Math.min(g.actief,panes.length-1))}
     /* Afbreken staat op EEN plek. Het stond in de matchMedia-luisteraar en liet
        `actief` en `consoleLaag` wijzen naar DOM die net weg was. */
-    function sloop(){if(!root)return;poort.terug();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');}
+    function sloop(){if(!root)return;poort.terug();if(praatLaag)praatLaag.stop();if(balkLaag)balkLaag.stop();balkLaag=null;root.remove();root=null;panes=[];actief=-1;consoleLaag=null;praatLaag=null;d.body.classList.remove('rtg-command');if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();}
 
     function openNaast(a,kant){if(!a)return null;for(var i=0;i<panes.length;i++)if(panes[i].url===a[1]){select(i);return panes[i]}if(panes.length>=2){var weg=actief===0?1:0;verwijder(weg)}var p=toon(a[1],a[0]);if(p&&kant==='links'&&panes.length===2){panes.splice(panes.indexOf(p),1);panes.unshift(p);root.querySelector('.cmd-panes').insertBefore(p.el,root.querySelector('.cmd-panes').firstChild);actief=0;sync()}return p}
     /* toon() gaat ervan uit dat het MAG: de grendel staat in shared/command.js
@@ -81,16 +81,17 @@
          Home en het sluiten van je laatste blad allebei op een schone tafel uit
          zonder dat daar een tweede regel voor nodig is (geheugen.js). */
       if(stand!=='gesloten'&&w.RTGCommandGeheugen)w.RTGCommandGeheugen.schrijf(panes,actief);
-      if(!panes.length){balk();if(stand!=='gesloten')leeg();return}
+      if(!panes.length){balk();if(stand!=='gesloten')leeg();if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();return}
       balk();
-      var oudLeeg=root.querySelector('.cmd-leeg');if(oudLeeg)oudLeeg.remove();panes.forEach(function(p,i){p.el.classList.toggle('actief',i===actief);var b=d.createElement('button');b.className='cmd-tab'+(i===actief?' actief':'');b.setAttribute('role','tab');b.innerHTML='<span>'+p.titel+'</span><i aria-label="Sluiten">×</i>';b.onclick=function(e){if(e.target.tagName==='I')sluit(i);else select(i)};tabs.appendChild(b)});verdeler();root.querySelectorAll('.cmd-nav button[data-url]').forEach(function(b){b.classList.toggle('actief',panes[actief]&&panes[actief].url===b.dataset.url)});if(consoleLaag)consoleLaag.intro()}
+      var oudLeeg=root.querySelector('.cmd-leeg');if(oudLeeg)oudLeeg.remove();panes.forEach(function(p,i){p.el.classList.toggle('actief',i===actief);var b=d.createElement('button');b.className='cmd-tab'+(i===actief?' actief':'');b.setAttribute('role','tab');b.innerHTML='<span>'+p.titel+'</span><i aria-label="Sluiten">×</i>';b.onclick=function(e){if(e.target.tagName==='I')sluit(i);else select(i)};tabs.appendChild(b)});if(w.RTGAdaptiefBrugSync)w.RTGAdaptiefBrugSync();verdeler();root.querySelectorAll('.cmd-nav button[data-url]').forEach(function(b){b.classList.toggle('actief',panes[actief]&&panes[actief].url===b.dataset.url)});if(consoleLaag)consoleLaag.intro()}
     /* De scheiding hoort bij TWEE bladen naast elkaar: een brede-schermvorm. Op
        een telefoon staat er een blad in beeld, dus valt er niets te verdelen.
        De inline `flex` van het slepen gaat hier ook weg, anders draagt een blad
        zijn desktopbreedte mee naar een smal venster. */
-    function verdeler(){w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,o.breed())}
+    function verdeler(){var breed=o.breed();w.RTGCommandVerdeler(root.querySelector('.cmd-panes'),panes,breed);
+      panes.forEach(function(p){if(p.haak&&p.haak.vorm)p.haak.vorm(breed)})}
     // wat een pagina wordt zodra hij een blad is: shared/command/bladhaak.js
-    function haakScroll(p){if(w.RTGCommandBladhaak)w.RTGCommandBladhaak(p,klein)}
+    function haakScroll(p){if(w.RTGCommandBladhaak)p.haak=w.RTGCommandBladhaak(p,klein,o.breed())}
     function klein(){if(consoleLaag)consoleLaag.klein()}
 
     /* De bank opnieuw vullen als de lijst werelden verandert (een pas die

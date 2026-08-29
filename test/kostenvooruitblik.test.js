@@ -38,7 +38,12 @@ test.before(async () => {
   kantoor = await kantoorAlsPersoon(base);
   assert.ok(kantoor, 'geen boardroom-sessie; zonder eigenaar valt hier niets te zien');
   await api('/api/office/kosten/tarief/zet',
-    { soort: 'verzoek', perEenheid: 100000, bron: 'Toetstarief, hostingcontract 2026' }, kantoor);
+    /* Een verzoek kost hier een hele cent. Met een tiende cent per verzoek kon
+       veertig keer verbruik op de voorlaatste dagen na beide afrondingen nog
+       hetzelfde hele-centenbedrag geven: de projectie werkte dan wel, maar de
+       toets zag het pas een maand later weer. Veertig cent groeit ook op de
+       voorlaatste dag van elke maand zichtbaar met minstens een cent. */
+    { soort: 'verzoek', perEenheid: 1000000, bron: 'Toetstarief, hostingcontract 2026' }, kantoor);
 });
 test.after(() => stop(srv));
 

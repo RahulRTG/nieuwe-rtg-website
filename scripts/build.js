@@ -125,8 +125,12 @@ function stempelBouw() {
     /(\/shared\/command(?:\/[^"?]+)?\.js)(?:\?v=[^"]*)?/g,
     '$1?v=' + hash
   );
+  /* De twee scripts krijgen dezelfde immutable bouwstempel als Command. Het
+     stylesheet blijft bewust kaal: zo blijft het onderdeel van de bestaande
+     stijlbundel, die zelf alle bron-mtimes in zijn ETag draagt. Een ?v= op juist
+     dit ene blad breekt de cascade-rij in twee extra blokkerende bundels. */
   const nieuwHMetInterface = nieuwHMetCommand.replace(
-    /(\/shared\/interface\/second-screen(?:-modules)?\.(?:js|css))(?:\?v=[^"]*)?/g,
+    /(\/shared\/interface\/second-screen(?:-modules)?\.js)(?:\?v=[^"]*)?/g,
     '$1?v=' + hash
   );
   if (nieuwJs !== s) fs.writeFileSync(js, nieuwJs);

@@ -78,7 +78,7 @@
        waarnaar hij verwijst, dan tekende de balk een lege rij en kwam er niets
        meer achteraan -- een fout die alleen optreedt als het frame traag laadt,
        en dus precies het soort fout dat je op je eigen machine nooit ziet. */
-    A.opContext(function (ctx) {
+    function zendContext(ctx) {
       var caps = (ctx.acties || []).map(function (id) {
         var c = A.capability(id);
         return c ? plat(c) : null;
@@ -88,12 +88,18 @@
           ctx: { bron: ctx.bron, titel: ctx.titel, acties: ctx.acties,
             selectie: ctx.selectie, staat: platteStaat(ctx.staat), rail: ctx.rail || [] } }, HERKOMST);
       } catch (e) {}
-    });
+    }
+    A.opContext(zendContext);
     w.addEventListener('message', function (e) {
       if (e.origin !== HERKOMST || e.source !== w.parent) return;
       var m = e.data;
       if (!m || m.merk !== MERK) return;
       var id = String(m.id || '');
+      /* Een verborgen blad heeft zijn eerste context al gemeld, maar die is
+         boven terecht genegeerd omdat het blad niet actief was. Zodra iemand
+         terugkeert vraagt de schil hem daarom zijn LEVENDE context opnieuw te
+         melden; context() zelf herhalen zou door de deduplicatie niets sturen. */
+      if (m.soort === 'meld') { zendContext(A.context()); return; }
       if (m.soort === 'doe') { A.doe(id, m.extra || undefined); return; }
       /* De weg terug draait hier, want hier woont de handeling. De functie wordt
          uit de LEVENDE context gehaald en niet uit een kopie: wie hem zou
@@ -163,27 +169,15 @@
 
   /* HET BLAD WISSELT, DE CONTEXT NIET -- en dat was stil fout.
 
-     select() in de werktafel zet alleen een klasse; er komt geen bericht van het
-     blad dat je verlaat. De balk bleef daardoor de documentacties van blad 1
-     tonen terwijl blad 2 in beeld stond. Vandaar een waarnemer op de bladen zelf
-     in plaats van vertrouwen op een melding die niemand stuurt. */
-  function bewaakBladen() {
-    var vak = d.querySelector('#rtgCommand .cmd-panes');
-    if (!vak || !w.MutationObserver) return;
-    new w.MutationObserver(function () {
-      if (!bron) return;
-      if (bron !== actiefFrame() || !bron.isConnected) { bron = null; A.wisContext(); }
-    }).observe(vak, { attributes: true, childList: true, subtree: true, attributeFilter: ['class'] });
-  }
-  /* De werktafel bestaat nog niet bij het laden -- hij wordt gebouwd zodra er een
-     sessie is. Daarom wachten we op #rtgCommand zelf en niet op DOMContentLoaded. */
-  if (d.querySelector('#rtgCommand .cmd-panes')) bewaakBladen();
-  else if (w.MutationObserver) {
-    var wacht = new w.MutationObserver(function () {
-      if (!d.querySelector('#rtgCommand .cmd-panes')) return;
-      wacht.disconnect();
-      bewaakBladen();
-    });
-    wacht.observe(d.body || d.documentElement, { childList: true, subtree: true });
-  }
+     De werktafel roept deze generieke brughaak aan NADAT hij zijn actieve blad
+     heeft gezet. Dat is betrouwbaarder dan een waarnemer op .cmd-panes: de hele
+     werktafel kan bij inloggen of onboarding worden vervangen, en een observer
+     zou dan aan een losgekoppelde oude root blijven hangen. Opnieuw melden is
+     goedkoop; het register dedupliceert een context die werkelijk gelijk bleef. */
+  w.RTGAdaptiefBrugSync = function () {
+    var actief = actiefFrame();
+    if (bron && (bron !== actief || !bron.isConnected)) { bron = null; A.wisContext(); }
+    if (!actief || !actief.contentWindow) return;
+    try { actief.contentWindow.postMessage({ merk: MERK, soort: 'meld' }, HERKOMST); } catch (e) {}
+  };
 })(window, document);

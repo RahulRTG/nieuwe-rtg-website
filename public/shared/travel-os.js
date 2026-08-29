@@ -7,6 +7,19 @@
   var module = (profiel && config.profiles[profiel]) || config.routes[pad] ||
     { naam: 'REIZEN', actief: 'reizen', scene: 'desk' };
   var body = d.body;
+  /* EEN INGEBOUWDE TRAVEL-MODULE HEEFT AL EEN NAVIGATIE-EIGENAAR. `embed=1`
+     is dezelfde expliciete afspraak die RTG Edge gebruikt; Reizen & Veilig zet
+     hem op zijn child-iframes. De marker haalt ook de ruimte van de niet
+     gebouwde rail/balk weg in travel-os.css. */
+  var ingebed = new URLSearchParams(w.location.search).get('embed') === '1';
+  var terugAdres = ingebed ? '/apps/reizen.html?embed=1#reizen' : '/apps/reizen.html#reizen';
+  if (ingebed) {
+    d.documentElement.classList.add('tos-ingebed');
+    var bestaandeNav = body && body.querySelector('.tos-nav');
+    if (bestaandeNav) bestaandeNav.remove();
+  }
+  /* De embed-afspraak moet ook gelden als deze module door een andere laag al
+     is opgebouwd; daarom staat zij vóór deze idempotentie-uitgang. */
   if (!body || body.querySelector('.tos-topbar')) return;
 
   function slug(tekst) {
@@ -41,7 +54,7 @@
   var kop = maak('div', 'tos-topbar');
   kop.setAttribute('role', 'banner');
   var merk = maak('a', 'tos-mark', 'RTG');
-  merk.href = module.guest ? '/apps/reizen.html' : '/apps/app.html';
+  merk.href = ingebed ? terugAdres : (module.guest ? '/apps/reizen.html' : '/apps/app.html');
   merk.setAttribute('aria-label', 'Naar RTG Vandaag');
   var identiteit = maak('div', 'tos-identity');
   identiteit.appendChild(maak('strong', '', module.operations ? 'TRAVEL OS · OPERATIONS' : 'TRAVEL OS'));
@@ -110,7 +123,7 @@
     }
   }
 
-  if (!module.geenNav && !module.operations) {
+  if (!module.geenNav && !module.operations && !ingebed) {
     var items = [
       { id: 'vandaag', label: 'Vandaag', href: '/apps/reizen.html#vandaag', icoon: [['rect', { x: '4', y: '5', width: '16', height: '15', rx: '1' }], ['path', { d: 'M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01' }]] },
       { id: 'reizen', label: 'Reizen', href: '/apps/reizen.html#reizen', icoon: [['path', { d: 'M4 7h16v12H4zM8 7V4h8v3M4 12h16' }]] },
@@ -163,7 +176,7 @@
 
   Array.prototype.forEach.call(body.querySelectorAll('a[href="/apps/app.html"]'), function (a) {
     if (a === merk || a.closest('.tos-topbar')) return;
-    a.href = '/apps/reizen.html#reizen';
+    a.href = terugAdres;
     if ((a.textContent || '').trim().length <= 8) a.textContent = '← Reizen';
     a.setAttribute('aria-label', 'Terug naar RTG Reizen');
   });

@@ -829,7 +829,7 @@ omlaag.
 
 ## `shared/uitvoer.js`
 
-`public/shared/uitvoer/` -- 2 delen, 274 regels in de delen
+`public/shared/uitvoer/` -- 2 delen, 290 regels in de delen
 
 | deel | onderwerp |
 |---|---|

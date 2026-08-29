@@ -1,13 +1,14 @@
-# RTG Design System 2.0
+# RTG Interface Operating Standard — visuele taal
 
 > **Van veraf classy, van dichtbij extreem krachtig.**
 >
 > Wie vijf seconden kijkt, ziet een exclusief Europees merk. Wie er acht uur per
 > dag mee werkt, merkt dat er een volledig operationeel systeem onder zit.
 
-Dit bestand legt de vormtaal vast. `CLAUDE.md` zegt wat het merk is, `LAT.md` hoe
-er geschreven wordt, `PLATFORM.md` hoe apps zich tot elkaar verhouden. Dit zegt
-hoe het eruitziet en waarom — en per regel wat hem handhaaft, want een
+Dit is geen los design system maar de visuele uitvoering van `INTERFACE.md`.
+`CLAUDE.md` zegt wat het merk is, `LAT.md` hoe er geschreven wordt en
+`PLATFORM.md` hoe apps zich tot elkaar verhouden. Dit bestand zegt hoe iedere
+RTG-surface eruitziet en waarom — en per regel wat hem handhaaft, want een
 ontwerpregel zonder handhaving is over drie maanden twintig stijlen.
 
 **Deze specificatie ligt vast vóór er schermen worden aangepast.** Dat is de

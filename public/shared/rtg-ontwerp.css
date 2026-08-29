@@ -1,4 +1,4 @@
-/* RTG Design System 2.0 -- de tokenlaag en de eigen componenten.
+/* RTG Interface Operating Standard -- de visuele tokenlaag en componenten.
    De regels en het waarom staan in ONTWERP.md; dit is de uitvoering.
 
    Deze laag komt NAAST shared/rtg-ui.css en niet eroverheen. rtg-ui.css blijft

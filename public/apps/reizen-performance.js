@@ -3,6 +3,9 @@
   var R = {};
   R.$ = function (s, r) { return (r || d).querySelector(s); };
   R.$$ = function (s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); };
+  if (new URLSearchParams(w.location.search).get('embed') === '1') {
+    d.documentElement.classList.add('tos-ingebed');
+  }
   try { R.token = localStorage.getItem('rtg_member_token'); } catch (e) { R.token = null; }
   /* Bestemmingen en aanbod komen uit Mobility OS. Geen ingebouwde plaatsenlijst:
      als de bron niet antwoordt, werkt het scherm niet overtuigend door met een
@@ -11,6 +14,7 @@
   R.staat = { blad: 'vandaag', reizen: null, bestemming: null, vertrek: null,
     moment: 'nu', voertuig: 'limousine', voertuigLabel: 'EXECUTIVE', indicatie: null,
     personen: 2, koffers: 2, zoekTimer: null };
+  R.meldAdaptief = function () {};
 
   var toastTimer;
   R.toast = function (tekst) {
@@ -51,6 +55,7 @@
     d.title = 'RTG Reizen · ' + naam.charAt(0).toUpperCase() + naam.slice(1);
     w.scrollTo({ top: 0, behavior: 'smooth' });
     if (naam === 'taxi' && R.laadMobiliteit) R.laadMobiliteit();
+    R.meldAdaptief();
   };
 
   R.$$('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { R.wisselBlad(b.dataset.tab); }); });
@@ -61,4 +66,34 @@
   }); });
 
   w.RTGReizen = R;
+
+  /* IN DE MOBIELE WERKTAFEL IS ER ÉÉN ONDERBALK. TravelOS implementeert de
+     vier bladen hierboven precies één keer; deze adapter biedt die bestaande
+     wissel aan de RTG Command-balk aan. shared/adaptief/brug.js brengt alleen
+     ids over de framegrens en stuurt een tik weer hierheen terug. Rechtstreeks
+     geopend blijft .hoofdtabs dus gewoon de bediening, op desktop eveneens. */
+  function startAdaptief() {
+    var A = w.RTGAdaptief;
+    if (!A || w.parent === w) return;
+    var tabs = [
+      { id: 'reizen.vandaag', naam: 'Vandaag', tab: 'vandaag' },
+      { id: 'reizen.reizen', naam: 'Reizen', tab: 'reizen' },
+      { id: 'reizen.taxi', naam: 'Taxi', tab: 'taxi' },
+      { id: 'reizen.rahul', naam: 'Rahul', tab: 'rahul' }
+    ];
+    tabs.forEach(function (item) {
+      A.declareer({ id: item.id, naam: item.naam, label: item.naam, groep: 'TravelOS',
+        telefoon: ['balk', 'lade'], tablet: ['balk', 'lade'], bureau: ['werkbalk'],
+        doe: function () { R.wisselBlad(item.tab); } });
+    });
+    R.meldAdaptief = function () {
+      var staat = {};
+      tabs.forEach(function (item) { staat[item.id] = { aan: R.staat.blad === item.tab }; });
+      A.context({ bron: 'reizen.tabs', titel: 'TravelOS',
+        acties: tabs.map(function (item) { return item.id; }), selectie: false, staat: staat });
+    };
+    R.meldAdaptief();
+  }
+  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', startAdaptief);
+  else startAdaptief();
 })(window, document);

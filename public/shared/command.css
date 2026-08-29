@@ -80,7 +80,7 @@ body.rtg-command > #shell .notif-panel{pointer-events:auto;}
 body.rtg-command .hv-balk{z-index:260;bottom:calc(60px + env(safe-area-inset-bottom,0px));}
 body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bottom,0px));}
 @media (min-width:1000px){body.rtg-command .hv-balk,body.rtg-command .hv-chat{bottom:auto;}}
-#rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);
+#rtgCommand{position:fixed;inset:0;z-index:210;display:grid;grid-template-columns:minmax(0,1fr);box-sizing:border-box;
   color:var(--rtg-txt,#F4F1EC);font-family:var(--rtg-interface,'Inter',system-ui,sans-serif);
   background:radial-gradient(90% 70% at 72% -20%,rgba(127,22,52,.13),transparent 58%),var(--onyx-glans,#0C0C0B);}
 
@@ -345,6 +345,14 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
    Alleen onder 1000px: op een breed scherm kost de strip geen leesruimte en
    toont hij bovendien welke twee bladen er naast elkaar staan. */
 @media (max-width:999px){
+  /* DE STATUSBALK HOORT NIET IN HET WERKBLAD. Een werkblad is een iframe en
+     krijgt op iOS niet betrouwbaar dezelfde safe-area als het bovendocument.
+     Daarom reserveert de schil -- het enige document dat de echte uitsparing
+     kent -- deze ruimte. De variabele maakt de afspraak ook meetbaar in een
+     browser zonder iPhone-notch; normaal valt hij rechtstreeks terug op env(). */
+  #rtgCommand[data-stand="open"]{
+    padding-top:var(--rtg-command-safe-top,env(safe-area-inset-top,0px));
+  }
   /* De tabstrip bovenin bestaat hier niet meer, in geen enkele stand: de
      schilbalk onderaan doet zijn werk, en dan is één navigatielaag genoeg. */
   .cmd-tabs{display:none}

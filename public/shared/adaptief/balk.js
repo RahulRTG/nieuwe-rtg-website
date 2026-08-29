@@ -157,14 +157,14 @@
       anker.textContent = toonAnker ? titel : '';
       if (toonAnker) anker.title = titel + ' · toon werkbladen';
       laatsteRij = items;
+      var focusId = knoppen.focusVan(rij);
       rij.textContent = '';
       items.forEach(function (it) { rij.appendChild(knoppen.knop(it)); });
-      /* De overloop verbergt niets: wat niet past staat in de lade, en de lade
-         draagt de VOLLEDIGE lijst en niet alleen de rest -- zoeken naar "stond
-         hij nou in de balk of erachter" is precies wat progressive disclosure
-         niet hoort te kosten. */
+      /* De lade draagt de VOLLEDIGE lijst: niemand hoeft te onthouden welke
+         handeling zichtbaar was en welke achter de overloop stond. */
       meer.hidden = true;
       pas();
+      knoppen.herstelFocus(rij, meer, focusId);
     }
 
 

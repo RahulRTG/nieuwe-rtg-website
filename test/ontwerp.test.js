@@ -1,4 +1,5 @@
-/* RTG Design System 2.0: de regels uit ONTWERP.md, machinaal gehandhaafd.
+/* RTG Interface Operating Standard: de visuele regels uit ONTWERP.md,
+   machinaal gehandhaafd.
 
    Waarom deze toets bestaat. Een ontwerpregel die alleen in een document staat,
    is over drie maanden twintig stijlen -- niet omdat iemand hem negeert, maar

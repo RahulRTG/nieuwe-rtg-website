@@ -1,17 +1,33 @@
 (function(){
   'use strict';
-  var $=function(s){return document.querySelector(s)}, panes=[],actief=-1;
+  var $=function(s){return document.querySelector(s)}, panes=[],actief=-1,meldAdaptief=function(){};
   var apps={overzicht:['Vandaag',null],reisblad:['Reizen',null],vervoer:['Gaan','/apps/ov.html'],reizen:['Mijn reizen','/apps/reizen.html'],veilig:['RTG Veilig','/apps/veilig.html#wacht'],navigatie:['Navigatie','/apps/navigatie.html'],instellingen:['Instellingen','/apps/veilig.html#rust']};
+  var bank=[['overzicht','Vandaag'],['vervoer','Gaan'],['reisblad','Reizen'],['veilig','RTG Veilig'],['navigatie','Navigatie'],['instellingen','Instellingen']];
+  function ingebed(pad){var u=new URL(pad,location.href);u.searchParams.set('embed','1');return u.pathname+u.search+u.hash}
+  function commandHost(){
+    try{return parent!==window&&document.documentElement.classList.contains('rtg-command-blad')&&
+      parent.location.origin===location.origin&&parent.RTGCommand&&parent.RTGCommand.actief()}
+    catch(e){return false}
+  }
   function token(){try{return localStorage.getItem('rtg_member_token')}catch(e){return null}}
   async function api(pad,body){var r=await fetch(pad,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(token()||'')},body:JSON.stringify(body||{})}),j=await r.json().catch(function(){return {}});if(!r.ok)throw new Error(j.error||'Dit lukte niet.');return j}
   function open(id,naast){var a=apps[id]||apps.overzicht,gevonden=panes.findIndex(function(p){return p.id===id});if(gevonden>=0){kies(gevonden);return}
+    /* Binnen Command is de buitenste werktafel de enige frame-eigenaar. Een
+       externe reismodule wordt daar een direct tweede blad; bron en module
+       blijven dus bestaan zonder Command -> Reizen & Veilig -> app-nesting.
+       Standalone blijft dezelfde lokale tweepaneel-werkruimte gebruiken. */
+    if(a[1]&&commandHost()){
+      var url=ingebed(a[1]);
+      parent.RTGCommand.open(url,a[0],'rechts');
+      return;
+    }
     if(!naast||innerWidth<761){panes.forEach(function(p){p.el.remove()});panes=[]}
     if(panes.length>=2){panes.shift().el.remove()}
     var el=document.createElement('section');el.className='rv-pane';el.dataset.id=id;
-    if(a[1]){var f=document.createElement('iframe');f.src=a[1];f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
+    if(a[1]){var f=document.createElement('iframe');f.src=ingebed(a[1]);f.title=a[0];RTGMedia.kader(f);el.appendChild(f)}else el.appendChild($(id==='reisblad'?'#rvReizen':'#rvOverzicht').content.cloneNode(true));
     $('#rvPanes').appendChild(el);panes.push({id:id,titel:a[0],el:el});kies(panes.length-1);haak(el);if(id==='overzicht')laadMomenten(el)
   }
-  function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context()}
+  function kies(i){actief=i;panes.forEach(function(p,n){p.el.classList.toggle('actief',n===i)});teken();document.querySelectorAll('[data-open]').forEach(function(b){b.classList.toggle('actief',b.dataset.open===panes[i].id);b.setAttribute('aria-current',b.dataset.open===panes[i].id?'page':'false')});context();meldAdaptief()}
   function teken(){var t=$('#rvTabs');t.innerHTML='';panes.forEach(function(p,i){var b=document.createElement('button');b.className='rv-tab'+(i===actief?' actief':'');b.textContent=p.titel;b.onclick=function(){kies(i)};t.appendChild(b)})}
   function haak(el){el.querySelectorAll('[data-action]').forEach(function(b){b.onclick=function(){open(b.dataset.action,innerWidth>760)}});el.querySelectorAll('[data-circle=maak]').forEach(function(b){b.onclick=function(){$('#rvMomentFout').textContent='';$('#rvDialoog').showModal()}});gebaren(el)}
   /* De regels van 'Uw eerstvolgende moment' dragen hun acties (shared/gebaar.js):
@@ -32,6 +48,21 @@
   async function laadMomenten(el){var vak=el.querySelector('[data-momenten]');if(!vak)return;try{var d=await api('/api/veiligheid/moment'),m=d.momenten||[],voor=d.voorMij||[],regels=m.map(function(x){return '<div class="rv-momentchip"><i></i><span>'+esc(x.titel)+' · '+esc(x.status)+(x.eta?' · '+esc(x.eta):'')+(x.gepauzeerd?' · gepauzeerd':'')+'</span><button data-status="'+esc(x.id)+'">Aangekomen</button><button data-pauze="'+esc(x.id)+'" data-aan="'+(!x.gepauzeerd)+'">'+(x.gepauzeerd?'Hervat':'Pauze')+'</button><button data-stop="'+esc(x.id)+'">Stop</button></div>'});voor.forEach(function(x){regels.push('<div class="rv-momentchip ontvangen"><i></i><span>'+esc(x.eigenaar)+' deelt: '+esc(x.titel)+(x.status?' · '+esc(x.status):'')+(x.eta?' · '+esc(x.eta):'')+'</span></div>')});vak.innerHTML=regels.length?regels.join(''):'<div class="rv-momentchip"><i></i><span>Nog niets live gedeeld</span></div>';vak.querySelectorAll('[data-status]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/status',{id:b.dataset.status,status:'aangekomen'});laadMomenten(el)}});vak.querySelectorAll('[data-pauze]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/pauze',{id:b.dataset.pauze,aan:b.dataset.aan==='true'});laadMomenten(el)}});vak.querySelectorAll('[data-stop]').forEach(function(b){b.onclick=async function(){await api('/api/veiligheid/moment/stop',{id:b.dataset.stop});laadMomenten(el)}})}catch(e){vak.innerHTML='<div class="rv-momentchip"><span>Log in om uw Live Circle te beheren.</span></div>'}}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function context(){var id=panes[actief]&&panes[actief].id,z={overzicht:'Ik bewaak uw reis en breng u waar u moet zijn.',vervoer:'Waar wilt u heen? Ik vergelijk de hele reis voor u.',reizen:'Ik zie uw reiswereld. Zal ik controleren wat nog aandacht vraagt?',veilig:'U bepaalt wie wat ziet en tot wanneer.',navigatie:'Ik blijf bij u tot u veilig bent aangekomen.'};$('#rvContext').textContent=z[id]||z.overzicht}
+  /* IN RTG COMMAND HEEFT DE ONDERBALK EEN EIGENAAR. De zes handelingen van
+     deze werkruimte blijven dezelfde open()-aanroepen; de adaptieve brug geeft
+     ze alleen door aan de buitenste Command-balk. Daardoor kan de lokale bank
+     in een mobiel werkblad verdwijnen zonder functies weg te nemen. */
+  function startAdaptief(){
+    var A=window.RTGAdaptief;if(!A||window.parent===window)return;
+    bank.forEach(function(item){A.declareer({id:'reisveilig.'+item[0],naam:item[1],label:item[1],groep:'Reizen & Veilig',telefoon:['balk','lade'],tablet:['balk','lade'],bureau:['werkbalk'],doe:function(){open(item[0],false)}})});
+    meldAdaptief=function(){
+      var id=panes[actief]&&panes[actief].id;if(id==='reizen')id='reisblad';
+      var staat={};bank.forEach(function(item){staat['reisveilig.'+item[0]]={aan:id===item[0]}});
+      A.context({bron:'reizen-veilig.bank',titel:'Reizen & Veilig',acties:bank.map(function(item){return'reisveilig.'+item[0]}),selectie:false,staat:staat});
+    };
+    meldAdaptief();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startAdaptief);else startAdaptief();
   function vraag(){var q=$('#rvIn').value.trim(),l=q.toLowerCase();if(!q)return;$('#rvIn').value='';if(/veilig|thuis|waak|kring|deel/.test(l))open('veilig',innerWidth>760);else if(/ov|taxi|route|gaan|breng|vervoer/.test(l))open('vervoer',innerWidth>760);else if(/navig/.test(l))open('navigatie',innerWidth>760);else if(/reis|vlucht|hotel/.test(l))open('reizen',innerWidth>760);else $('#rvContext').textContent='Ik begrijp de wens. Kies Gaan, Reizen of RTG Veilig om dit direct te regelen.'}
   document.querySelectorAll('[data-open]').forEach(function(b){b.onclick=function(){open(b.dataset.open,false)}});$('#rvPlus').onclick=function(){open(panes[0]&&panes[0].id==='veilig'?'vervoer':'veilig',true)};$('#rvStuur').onclick=vraag;$('#rvIn').onkeydown=function(e){if(e.key==='Enter')vraag()};$('#rvMond').onclick=function(){$('#rvIn').focus()};$('#rvMomentForm').onsubmit=async function(e){e.preventDefault();var f=new FormData(e.currentTarget),soort=f.get('soort'),niveau=f.get('niveau');if(soort==='bedrijf'&&niveau==='locatie')niveau='voortgang';try{await api('/api/veiligheid/moment/maak',{titel:f.get('titel'),doel:f.get('doel'),minuten:Number(f.get('minuten')),ontvangers:[{soort:soort,id:f.get('ontvanger'),niveau:niveau}]});$('#rvDialoog').close();e.currentTarget.reset();var p=panes.find(function(x){return x.id==='overzicht'});if(p)laadMomenten(p.el);$('#rvContext').textContent='Uw Live Circle is actief en stopt vanzelf op het gekozen moment.'}catch(x){$('#rvMomentFout').textContent=x.message}};if(window.RTGMond)window.RTGMond.fab($('#rvMond'),20);open('overzicht',false);if(innerWidth>980)open('veilig',true)
   if(innerWidth>980){open('reisblad',false);open('overzicht',true)}

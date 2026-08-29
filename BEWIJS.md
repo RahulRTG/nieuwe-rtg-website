@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1410 bestanden en 9907 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1410 bestanden en 9913 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1410 |
-| losse beweringen (`test(...)`) | 9907 |
+| losse beweringen (`test(...)`) | 9913 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1235 bestanden, 9609 beweringen.
+1235 bestanden, 9612 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -749,7 +749,7 @@ toets omvalt.
 | `onnozel.test.js` | 11 | gezakt op `liegpoort /api/` | Het onnozele-gedrag-harnas: invoer die je niet verwacht maar wel krijgt, omdat echte mensen echte mensen zijn. Emoji in schrijfvakken, lege spaties, kilometerslange teksten, datums die niet bestaan, bedragen die... |
 | `ontmoeting-leeg.test.js` | 1 | gezakt op `liegpoort /api/` | Regressie: de chaos-soak (scripts/mega65-storm.js) vond dat /api/office/ontmoeting/signaal een 500 gaf zodra het de EERSTE aanraking met de ontmoetingen was. Oorzaak: db.data.ontmoetDates wordt lui aangemaakt... |
 | `ontmoeting.test.js` | 8 | gezakt op `liegpoort /api/` | Salon-ontmoetingen: twee wederzijdse connecties die vlakbij elkaar zijn zetten de functie zelf aan, krijgen een voorstel, kiezen een activiteit (bij verschil wint de vrouw, anders de rustigste), tekenen een... |
-| `ontwerp.test.js` | 9 | geen module gevonden | RTG Design System 2.0: de regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
+| `ontwerp.test.js` | 9 | geen module gevonden | RTG Interface Operating Standard: de visuele regels uit ONTWERP.md, machinaal gehandhaafd. Waarom deze toets bestaat. |
 | `ontwerpbank.test.js` | 5 | gezakt op `+->-#0` | DE GEDEELDE REKENKERN VAN DE VIER ONTWERPBANKEN. hash, kies en palet stonden byte voor byte gelijk in kern/architect/bank.js, kern/atelier/bank.js, kern/hardwarelab/bank.js en kern/studio/bank.js. |
 | `oog.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Eye: de camerabril van de werkvloer. De visielaag draait op het toestel; de server bewaart compacte, gecodeerde regels: nulmetingen en schouwen per voertuig, aangeleerde spullen en het knoploze uitgifteregister... |
 | `oplaadgat.test.js` | 4 | gezakt op `===->!==#0` | AFGESCHREVEN MOET BIJGESCHREVEN WORDEN. WAT ER MISGING. |
@@ -854,7 +854,7 @@ toets omvalt.
 | `rahul-regie.test.js` | 3 | gezakt op `liegpoort /api/` | Rahul regelt de regie: de AI-hulp van de boardroom begrijpt gewone taal over de app-regie (per pas), de leveranciers-regie (per genre) en de geld-regie (pasprijzen, ledenvoordeel, partnervergoeding). Mens beslist: de... |
 | `rahul-reis.test.js` | 6 | gezakt op `liegpoort /api/` | De Rahul-reislaag: Rahul regelt met een vraag een hele reis (verblijf, transfer, diner, activiteit) die op een enkel "ja" in zijn geheel wordt geboekt; koopt kleding (apart leggen in de juiste maat bij de modezaak);... |
 | `rampbeeld.test.js` | 7 | gezakt op `liegpoort /api/` | Het gezamenlijke rampbeeld: korpsen, zorg en defensie delen tijdens een calamiteit hun paraatheid, vrije bedden en eenheden in een overzicht, met een coordinatieniveau. Een korps ziet de eigen keten-partners, de... |
-| `randen.test.js` | 11 | geen bronmutatie mogelijk | De randen van het scherm: instellingen van de bovenrand, Rahul van de onderrand. Deze test bewaakt de afspraken die je niet aan de code ziet als je er los naar kijkt -- vooral dat er nergens weer een zwevende knop... |
+| `randen.test.js` | 14 | geen bronmutatie mogelijk | De randen van het scherm: instellingen van de bovenrand, Rahul van de onderrand. Deze test bewaakt de afspraken die je niet aan de code ziet als je er los naar kijkt -- vooral dat er nergens weer een zwevende knop... |
 | `rechtbank.test.js` | 9 | gezakt op `liegpoort /api/` | De Rechtbank (kern/overheid/rechtbank.js) + de Overheids-PDA (kern/overheid/pda.js). Getest: de zaakketen (aanbrengen -> zitting op de rol -> uitspraak door een MENS, daarna dicht), de samenwerking bezwaar -> beroep... |
 | `rechten.test.js` | 10 | -- | HET RECHTENBORD -- wat mag deze partij nu ECHT? HET INTERESSANTSTE VERSCHIL DAT DIT BORD LAAT ZIEN: NOMINAAL wat het productprofiel zegt EFFECTIEF wat er vandaag werkelijk gebeurt Die twee lopen uiteen zodra een... |
 | `rechterhand-huis.test.js` | 5 | gezakt op `liegpoort /api/` | DE RECHTERHAND: HET HUIS EN DE MENSEN ERBUITEN. De tegenhanger van test/rechterhand-reis.test.js. |
@@ -1275,14 +1275,14 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-175 bestanden, 298 beweringen.
+175 bestanden, 301 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `a11y-hermeet.e2e.js` | 1 | -- | DE TWEEDE METING VAN DE A11Y-POORT (scripts/a11y-hermeet.js). Een poort die af en toe zomaar rood wordt, leert mensen om hem te negeren -- en dan is hij erger dan geen poort. |
 | `adaptief.e2e.js` | 1 | genoemd | DE ADAPTIEVE LAAG IN EEN ECHTE BROWSER. De regels staan in ADAPTIEF.md, de statische kant in test/adaptief.test.js. |
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
-| `appmenu.e2e.js` | 6 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
+| `appmenu.e2e.js` | 9 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `appstore.e2e.js` | 3 | -- | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
 | `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |

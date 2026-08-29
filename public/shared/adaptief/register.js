@@ -130,19 +130,13 @@
     luisterCtx.slice().forEach(function (f) { try { f(nu); } catch (e) {} });
     return nu;
   }
-  /* Context WISSEN hoort een eigen handeling te zijn en geen lege aanroep: een
-     app die zijn scherm verlaat moet de balk kunnen terugzetten naar "waar je
-     bent", en dat is wat een lege context betekent. */
+  /* Een vertrekkend scherm kan alleen zijn eigen context wissen. */
   function wisContext(bron) {
     if (bron && nu.bron && nu.bron !== bron) return nu;   // niet andermans context wissen
     return context({});
   }
 
-  /* ---------------------------------------------------------- uitvoeren --
-     De balk kent alleen ids. Wat er gebeurt staat bij de capability, en als daar
-     niets staat gebeurt er niets -- geen fout, want een capability mag ook
-     alleen een declaratie zijn die door de brug wordt uitgevoerd (in een frame,
-     shared/adaptief/brug.js). */
+  /* Uitvoeren gaat uitsluitend via het id van een capability. */
   /* EEN VERHINDERDE HANDELING WORDT HIER GEWEIGERD EN NIET ALLEEN GRIJS
      GETEKEND. Een knop die er uitgeschakeld uitziet maar bij een toetsaanslag of
      via de orb alsnog draait, is geen beperking maar een lek. */
@@ -200,7 +194,8 @@
     capabilities: function () { return Object.keys(caps).map(function (k) { return caps[k]; }); },
     context: context,
     wisContext: wisContext,
-    opContext: function (f) { if (typeof f === 'function') { luisterCtx.push(f); f(nu); } },
+    opContext: function (f) { if (typeof f !== 'function') return function () {};
+      luisterCtx.push(f); f(nu); return function () { var i = luisterCtx.indexOf(f); if (i >= 0) luisterCtx.splice(i, 1); }; },
     voorNu: voorNu,
     doe: doe,
     mag: mag,

@@ -10,9 +10,9 @@
 (function(w,d){
   'use strict';
   w.RTGCommandBank=function(o){
-    var root=o.root, svg=o.svg, dicht=o.stand==='gesloten';
+    var root=o.root, svg=o.svg, dicht=o.stand==='gesloten',second=null;
 
-    function sluit(){if(!root)return;root.classList.remove('bank-open');
+    function sluit(){if(!root)return;if(second){if(w.matchMedia('(max-width:999px)').matches)second.setState('peek');return}root.classList.remove('bank-open');
       var k=root.querySelector('.cmd-lade');if(k)k.setAttribute('aria-expanded','false')}
 
     /* EEN DEUR IN DE BANK, en er is er maar een soort van.
@@ -136,6 +136,7 @@
     function bouw(){
       vul();
       root.querySelector('.cmd-lade').onclick=function(){
+        if(second){second.setState(second.state==='peek'?'panel':'peek');return}
         var aan=root.classList.toggle('bank-open');
         this.setAttribute('aria-expanded',aan?'true':'false');};
       /* Ook dicht door ernaast te tikken en met Escape: anders is de greep de
@@ -146,11 +147,13 @@
         if(e.target.closest('.cmd-bank')||e.target.closest('.cmd-lade'))return;
         sluit();});
       d.addEventListener('keydown',opEscape);
+      if(!dicht&&w.RTGInterfaceSecondScreen)second=w.RTGInterfaceSecondScreen({root:root,open:o.open,vraag:function(){if(w.RTGCommand)w.RTGCommand.rahul()}});
     }
     function opEscape(e){
       if(e.key!=='Escape'||!root||!root.classList.contains('bank-open'))return;
+      if(second)return;
       var k=root.querySelector('.cmd-lade');sluit();if(k)k.focus();
     }
-    return{bouw:bouw,sluit:sluit,vul:vul};
+    return{bouw:bouw,sluit:sluit,vul:vul,stop:function(){d.removeEventListener('keydown',opEscape);if(second)second.destroy()}};
   };
 })(window,document);

@@ -94,7 +94,12 @@ function stempelBouw() {
   const js = path.join(PUB, 'apps', 'app-main.js');
   const sandbox = path.join(PUB, 'apps', 'magnaat-sandbox.js');
   const magnaatData = path.join(PUB, 'apps', 'magnaat-data.js');
-  const commandDelen = ['shared/command/werktafel.js', 'shared/command/console.js', 'shared/rtg-schil.js']
+  const commandDelen = ['shared/command.js', 'shared/command/catalog.js', 'shared/command/console.js',
+    'shared/command/verdeler.js', 'shared/command/bank.js', 'shared/command/praat.js',
+    'shared/command/inlogpoort.js', 'shared/command/bladhaak.js', 'shared/command/romp.js',
+    'shared/command/geheugen.js', 'shared/command/werktafel.js', 'shared/command.css', 'shared/rtg-schil.js',
+    'shared/interface/second-screen.js', 'shared/interface/second-screen-modules.js',
+    'shared/interface/second-screen.css']
     .map(p => path.join(PUB, p));
   if (!fs.existsSync(html) || !fs.existsSync(js)) return;
   let s = fs.readFileSync(js, 'utf8');
@@ -120,8 +125,12 @@ function stempelBouw() {
     /(\/shared\/command(?:\/[^"?]+)?\.js)(?:\?v=[^"]*)?/g,
     '$1?v=' + hash
   );
+  const nieuwHMetInterface = nieuwHMetCommand.replace(
+    /(\/shared\/interface\/second-screen(?:-modules)?\.(?:js|css))(?:\?v=[^"]*)?/g,
+    '$1?v=' + hash
+  );
   if (nieuwJs !== s) fs.writeFileSync(js, nieuwJs);
-  if (nieuwHMetCommand !== h) fs.writeFileSync(html, nieuwHMetCommand);
+  if (nieuwHMetInterface !== h) fs.writeFileSync(html, nieuwHMetInterface);
   const werkruimte = path.join(PUB, 'apps', 'werkruimte.html');
   if (fs.existsSync(werkruimte)) {
     const wr = fs.readFileSync(werkruimte, 'utf8');

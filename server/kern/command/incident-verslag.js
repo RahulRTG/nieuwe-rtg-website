@@ -24,7 +24,7 @@
 const klok = require('../../lib/klok');
 
 const { impactVan } = require('./incident-impact');
-const { NIVEAUS } = require('./risico');
+const { NIVEAUS } = require('../frictie');
 
 const DICHT = 'gesloten';
 

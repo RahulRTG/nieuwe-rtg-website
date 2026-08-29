@@ -16,6 +16,9 @@ const envelop = require('../../opzet/envelop');
 
 function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
+  /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
+     maar een eigen grens, en hij werd hier de druppel over keuringsregel 13. */
+  const kluisAuth = require('./kluispoort')({ officeAuth, sessionFor });
 
   function officeAuth(req, res, next) {
     const header = req.get('authorization') || '';
@@ -177,7 +180,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
     });
   }
 
-  return { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
+  return { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications };
 }
 
 module.exports = { maakKantoor };

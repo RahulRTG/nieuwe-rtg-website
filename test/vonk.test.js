@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-vonk-'));
@@ -45,7 +45,7 @@ async function nieuwLid(verifieer = true) {
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_ENC_KEY: 'test-encryptiesleutel-1234567890' } });
   base = srv.base;
-  office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  office = await kantoorAlsPersoon(base, 'RTG-OFFICE');
   A = await nieuwLid(); B = await nieuwLid();
   assert.ok(office && A.token && B.token, 'backoffice en twee geverifieerde leden');
 });

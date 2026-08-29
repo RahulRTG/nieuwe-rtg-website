@@ -114,7 +114,7 @@ test('3. de machine sluit niet: hersteld is geen gesloten', () => {
   /* EN HET JOURNAAL ZEGT DAT DE MACHINE HET DEED, niet een mens. De trede in een
      journaalregel is het verschil tussen "de gezondheidskaart herstelde dit
      zelf" en "iemand heeft dit met de hand gedaan" -- precies het onderscheid
-     waar RTG Command op gebouwd is (zie de kop van server/kern/command/risico.js).
+     waar RTG Command op gebouwd is (zie de kop van server/kern/frictie/motor.js).
 
      DE VERWACHTE WAARDE STAAT HIER LETTERLIJK en wordt met opzet NIET uit
      NIVEAUS gelezen: dan zou de toets met de schaal meebewegen en elke waarde

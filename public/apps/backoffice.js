@@ -109,7 +109,8 @@
 
   async function loadVerify(){
     let pend = [];
-    try { pend = (await call('/office/verifications')).pending || []; } catch(e){ return; }
+    try { pend = (await call('/office/verifications')).pending || []; }
+    catch(e){ kluisDicht($('#verify'), e); return; }
     $('#verify').innerHTML = pend.length ? pend.map(v =>
       '<div class="vrow" data-id="'+v.id+'">' +
         '<div class="vi"><div class="nm">'+escHtml(v.name)+' <span style="color:var(--soft);font-weight:400;font-size:0.72rem;">· '+escHtml(v.codename)+'</span></div>' +
@@ -162,6 +163,25 @@
      achter elkaar geplakt, dus het resultaat is letter voor letter hetzelfde
      bestand. Geknipt omdat deel 01 door de 10 KB van keuringsregel 13 ging
      nadat de bewaarverzoek-knop erbij kwam. */
+  /* EEN DICHTE DEUR MET DE REDEN ERBIJ, en niet een paneel dat leeg blijft.
+
+     De kluisdeuren (identiteitsverificaties, vakbewijzen) staan sinds
+     kern/kantoor/kluispoort.js achter een kantoorsessie OP NAAM: de gedeelde
+     backoffice-code komt er niet meer door, want wat erachter gebeurt komt in
+     het inzagejournaal en daar hoort een mens bij.
+
+     Zonder dit hulpje deed `catch(e){ return; }` precies wat GRAMMATICA.md
+     verbiedt: een verhindering zonder reden. De keurder zag een leeg paneel en
+     kon nergens uit opmaken dat er niets mis was met de gegevens, alleen met
+     zijn inlog. */
+  function kluisDicht(el, e){
+    if (!el || !e || e.status !== 403 || !(e.data && e.data.poort === 'kluis')) return false;
+    el.innerHTML = '<div class="empty" style="padding:1.25rem;line-height:1.6;">' +
+      '<strong>' + T('bo.kluis.kop','Hiervoor is een kantoorsessie op naam nodig') + '</strong><br>' +
+      escHtml(e.data.error || '') + '</div>';
+    return true;
+  }
+
   // ---- aanmeldingen per pas: de AI deed alles, alleen ja/nee is aan het personeel ----
   async function loadAanmeldingen(){
     const el = document.getElementById('aanmeldingen'); if (!el) return;
@@ -308,7 +328,12 @@
   async function loadVakbewijzen(){
     const el = document.getElementById('vakbewijzen'); if (!el) return;
     let r = null;
-    try { r = await call('/office/vakbewijzen'); } catch(e){ return; }
+    /* De stapel zelf staat niet achter de kluispoort (hij toont codenamen en
+       geen nummers), maar aftekenen en het nummer openen wel. Gaat er hier toch
+       een kluisdeur dicht, dan zegt het paneel waarom -- zie kluisDicht in deel 01b,
+       want deze delen zitten in een gedeeld bereik. */
+    try { r = await call('/office/vakbewijzen'); }
+    catch(e){ kluisDicht(el, e); return; }
     if (r.soorten) VAK_SOORTEN = r.soorten;
     const open = r.open || [], verlopend = r.verlopend || [];
     const rij = v =>

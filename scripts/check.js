@@ -1813,7 +1813,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      namen hier doen -- alleen is het bewijs een sleutel van de tafel in plaats
      van een sessie van een account, omdat een gast aan tafel 12 geen lid hoeft
      te zijn. */
-  const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
+  const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth',
+    /* de kluispoort (kern/kantoor/kluispoort.js): officeAuth PLUS identiteit.
+       Een gedeelde backoffice-code komt er niet door, want wat erachter gebeurt
+       komt in het inzagejournaal en daar hoort een mens bij. Hij staat hier als
+       eigen naam en niet als variant van officeAuth: dat is precies het
+       onderscheid dat deze regel zichtbaar hoort te maken. */
+    'kluisAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort', 'gastAuth',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden

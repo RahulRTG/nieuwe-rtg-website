@@ -14,13 +14,13 @@ const klok = require('../../lib/klok');
    LAT.md regel 4 over gaat. */
 module.exports = (octx, gedeeld) => {
   const { kern } = octx;
-  const { UPLOAD_DIR, accounts, app, mail, notify, officeAuth, pendingVerifications } = kern;
+  const { UPLOAD_DIR, accounts, app, mail, notify, kluisAuth, pendingVerifications } = kern;
   const { wieKijkt } = gedeeld;
   const inzagelog = require('../../inzagelog');  // dezelfde als kern/kantoor: een boek, geen kopie
 
-  app.post('/api/office/verifications', officeAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
+  app.post('/api/office/verifications', kluisAuth, (req, res) => res.json({ pending: pendingVerifications(wieKijkt(req)) }));
 
-  app.post('/api/office/verify', officeAuth, (req, res) => {
+  app.post('/api/office/verify', kluisAuth, (req, res) => {
     const user = accounts.getUserById(Number(req.body.userId));
     if (!user) return res.status(404).json({ error: 'Account niet gevonden.' });
     const status = req.body.decision === 'approve' ? 'verified' : 'rejected';

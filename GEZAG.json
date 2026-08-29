@@ -17,14 +17,14 @@
       "bestuurt": "de AI over HTTP-routes, per rol (member/supplier/staff)"
     },
     {
-      "bestand": "server/kern/command/risico.js",
+      "bestand": "server/kern/frictie/motor.js",
       "schaal": [
         "hand",
         "assist",
         "auto"
       ],
       "beslisser": "beoordeel",
-      "bestuurt": "handelingen in RTG Command, met een risicoscore per geval"
+      "bestuurt": "handelingen die de machine kan raken, met een frictiescore per geval en een bodem eronder"
     },
     {
       "bestand": "server/kern/geldbeleid/regels.js",

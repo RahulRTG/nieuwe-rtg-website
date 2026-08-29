@@ -33,7 +33,7 @@
 const klok = require('../../lib/klok');
 
 const { impactVan, aanleidingen } = require('./incident-impact');
-const { NIVEAUS } = require('./risico');
+const { NIVEAUS } = require('../frictie');
 
 const OPEN = 'open', BEZIG = 'in behandeling', HERSTELD = 'hersteld', DICHT = 'gesloten';
 

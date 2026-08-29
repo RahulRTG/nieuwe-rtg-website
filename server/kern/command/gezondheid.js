@@ -33,7 +33,7 @@
 const klok = require('../../lib/klok');
 
 const { VERMOGENS, OP_ID, ketenVan, vermogenVanAlarm } = require('./vermogens');
-const { NIVEAUS } = require('./risico');
+const { NIVEAUS } = require('../frictie');
 const { maakBronnen } = require('./gezondheid-bronnen');
 const { draaiProef, PROEVEN, vanProef } = require('./gezondheid-proef');
 const { taal, NIET } = require('./gezondheid-taal');

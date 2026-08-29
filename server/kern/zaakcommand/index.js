@@ -66,7 +66,7 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
 
     const journaal = require('../command/journaal').maakJournaal({ db, save, crypto, vak });
     const beleid = require('../command/beleid').maakBeleid({ db, save, crypto, journaal, vak, start: ZAAK_BELEID });
-    const risico = require('../command/risico').maakRisico({ beleid });
+    const risico = require('../frictie').maakRisico({ beleid });
     const zaken = require('../command/zaken').maakZaken({ db, save, crypto, journaal, beleid, vak });
     const catalogus = require('./runbooks');
     const runbooks = require('../command/runbooks').maakRunbooks({

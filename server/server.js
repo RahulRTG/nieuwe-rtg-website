@@ -2099,7 +2099,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
     } });
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
-const { officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
+const { officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications } = maakKantoor({
   db, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
@@ -2137,7 +2137,7 @@ const kern = {
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
-  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
+  noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
   runItem, runKey, salonNaarVolgers, salonProfielCompleet, salonZichtbaar, salonItemsVan, ...ondernemerpoort, save, scheduleFor, schoon, sectiesForOrder, sendPush,

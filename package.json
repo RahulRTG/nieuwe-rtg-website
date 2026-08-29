@@ -98,6 +98,7 @@
     "samenhang:vast": "node scripts/samenhang.js --vastleggen",
     "kaart": "node scripts/kaart.js",
     "wereldlijst": "node scripts/wereldlijst.js",
+    "functielijst": "node scripts/functielijst.js",
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",
     "objectmodel": "node scripts/objectmodel.js",

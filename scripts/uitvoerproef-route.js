@@ -35,6 +35,11 @@ const { spawn } = require('child_process');
 const { draaiUitvoerproef, maakKanaries, kanarieLijst } = require('./lib/uitvoerproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'UITVOERPROEF.json');
@@ -189,6 +194,7 @@ async function wacht(basis, ms) {
   for (const b of uit.bevindingen.lekken.slice(0, 20)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens ' +
       'van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat ' +
       'is niet beproefd. Een route met uitvoer:"poort" gaf nooit een 2xx en is ONGEMETEN, geen groen. ' +

@@ -32,6 +32,11 @@ const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 const { gereedschapsomgeving } = require('./lib/wegwerpserver');
 const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'AUDITPROEF.json');
@@ -179,6 +184,7 @@ async function wachtOpServer(basis, ms) {
   if (gezakt.length > 20) console.log('      ... en nog ' + (gezakt.length - 20));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per schrijfroute: is er na een geslaagde oproep een regel bijgekomen in het API-spoor ' +
       '(server/opzet/auditspoor.js), gelezen via dezelfde kantoorroute die een auditor gebruikt. ' +
       '"gezakt" is hier WEL een defect-oordeel: een handeling die lukt zonder spoor is achteraf niet ' +

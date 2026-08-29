@@ -69,6 +69,11 @@ const WORTEL = path.join(__dirname, '..');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m', vet: '\x1b[1m' };
 const { alleRoutes } = require('./lib/routes');
 const proefserver = require('./lib/proefserver');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const arg = (naam, std) => { const i = process.argv.indexOf(naam); return i > 0 ? process.argv[i + 1] : std; };
 const BASIS_EXTERN = arg('--basis', null);
@@ -712,6 +717,7 @@ async function main() {
   const uitslag = { gaten: gaten.length, gecontroleerd, onbewaakt: onbewaaktOnverklaard.length };
   try {
     fs.writeFileSync(UITSLAGBESTAND, JSON.stringify({
+      stempel: stempel(),
       uitleg: 'De gluurronde: de HORIZONTALE scheiding tussen twee leden. gaten MAG ALLEEN DALEN en proeven mag ' +
         'ALLEEN STIJGEN -- zie scripts/gluurronde.js. De dekking hangt aan wat lid B kan aanleggen (bezitStukken); ' +
         'daalt dat, dan is er minder beproefd en niet minder mis.',

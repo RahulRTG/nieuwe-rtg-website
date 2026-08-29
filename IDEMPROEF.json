@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T22:52:37.700Z",
-  "commit": "9494bcce",
+  "op": "2026-08-29T23:47:40.620Z",
+  "commit": "b81f58a5",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -64,10 +64,10 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 3777,
-  "beoordeeld": 1105,
-  "beschermd": 1104,
+  "beoordeeld": 1106,
+  "beschermd": 1105,
   "onbeschermd": 1,
-  "ongemeten": 2672,
+  "ongemeten": 2671,
   "oproepen": 11353,
   "tokensHernieuwd": 22,
   "uitOpslag": 0,
@@ -91,7 +91,7 @@
    }
   ],
   "blindeRondes": 0,
-  "begrenzing": 0,
+  "begrenzing": 8000,
   "wereldKlaargezet": [
    "iban",
    "aan",
@@ -35919,12 +35919,12 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/werklijst",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 500)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    500,
-    500,
-    500
+    200,
+    200,
+    200
    ]
   },
   {

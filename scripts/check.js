@@ -3981,6 +3981,32 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
    Waarom dit ernaast moet en test/wereldregister.test.js niet volstaat: die
    toets meet dat elk item ergens OP UITKOMT. Hij zegt niets over de vraag of het
    document dat mensen lezen nog dezelfde inhoud beschrijft. */
+/* 53b) FUNCTIES.md LOOPT NIET ACHTER OP DE REGISTERS.
+
+   Zelfde vorm als de wereldlijst hiernaast, en om dezelfde reden nodig: dit
+   document OPENDE met de belofte dat het "niet met de hand opgeschreven maar
+   afgelezen uit de bron" is, en was met de hand bijgehouden. Het stond op 145
+   schakelaars waar er 204 zijn, en op 83 apps waar er 84 zijn. Een document dat
+   zijn eigen betrouwbaarheid belooft en het niet waarmaakt, wordt geloofd.
+
+   Alleen de drie LIJSTEN worden afgeleid; de inleiding en alles vanaf hoofdstuk
+   4 zijn met de hand geschreven en blijven staan (zie scripts/functielijst.js). */
+console.log('\n53b) FUNCTIES.md loopt niet achter op de registers');
+{
+  try {
+    const fl = require('./functielijst');
+    const opSchijf = fs.existsSync(fl.DOEL) ? fs.readFileSync(fl.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('FUNCTIES.md bestaat niet -- draai: npm run functielijst');
+    else if (opSchijf !== fl.bouw()) fout('FUNCTIES.md loopt achter op de registers -- draai: npm run functielijst');
+    else {
+      const n = require('../server/functies/register').FUNCTIES.length;
+      ok(n + ' functieschakelaars, en FUNCTIES.md is daar gelijk aan');
+    }
+  } catch (e) {
+    fout('FUNCTIES.md kon niet worden opgebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log('\n53) WERELDLIJST.md loopt niet achter op het wereldregister');
 {
   try {

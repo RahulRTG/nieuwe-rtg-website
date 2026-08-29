@@ -51,6 +51,11 @@ const { spawn } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
 const { gereedschapsomgeving } = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
+/* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
+   te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
+   er niets over zeggen. Zeven registers misten hem; zie de kop van
+   scripts/lib/stempel.js. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'HANDELINGPROEF.json');
@@ -176,6 +181,7 @@ async function wacht(basis, ms) {
   console.log('  keten van het spoor       : ' + (ketenOk ? 'klopt' : 'GEBROKEN'));
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
+    stempel: stempel(),
     uitleg: 'Per schrijfroute: liet een geslaagde oproep een geketende regel na in het handelingsspoor? ' +
       'Een route die hier NIET in staat is niet beproefd, en dat is ongemeten en geen groen. ' +
       '"ongemeten" betekent hier: de oproep gaf geen 2xx, dus er is niets gebeurd en er hoort geen regel te zijn.',

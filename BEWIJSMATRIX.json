@@ -1,106 +1,106 @@
 {
   "stempel": {
-    "op": "2026-08-20T15:47:51.090Z",
-    "commit": "fcba02e",
+    "op": "2026-08-29T23:50:35.253Z",
+    "commit": "b81f58a5",
     "boomVuil": true,
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
-  "journaalGelezen": ".routejournaal",
-  "routes": 4188,
+  "journaalGelezen": null,
+  "routes": 4738,
   "schakels": 11,
-  "cellen": 46068,
+  "cellen": 52118,
   "telling": {
-    "bewezen": 16475,
+    "bewezen": 24700,
     "verklaard": 0,
-    "nvt": 272,
-    "ongemeten": 29205,
-    "gezakt": 116
+    "nvt": 308,
+    "ongemeten": 27094,
+    "gezakt": 16
   },
   "perSchakel": {
     "AUTH": {
-      "bewezen": 4187,
+      "bewezen": 4410,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 297,
-      "gezakt": 0
+      "ongemeten": 321,
+      "gezakt": 7
     },
     "ACL": {
-      "bewezen": 3079,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 918,
       "gezakt": 0
     },
     "INPUT": {
-      "bewezen": 2632,
+      "bewezen": 3265,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1556,
+      "ongemeten": 1473,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 4157,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4188,
+      "ongemeten": 581,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 266,
+      "bewezen": 385,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4276,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 266,
+      "bewezen": 385,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3854,
+      "nvt": 77,
+      "ongemeten": 4276,
       "gezakt": 0
     },
     "AUDIT": {
-      "bewezen": 575,
+      "bewezen": 709,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3613,
+      "ongemeten": 4029,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 175,
+      "bewezen": 1153,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 3840,
-      "gezakt": 105
+      "nvt": 77,
+      "ongemeten": 3502,
+      "gezakt": 6
     },
     "FAILURE": {
       "bewezen": 2,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 4186,
+      "ongemeten": 4736,
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2214,
+      "bewezen": 2594,
       "verklaard": 0,
-      "nvt": 68,
-      "ongemeten": 1896,
-      "gezakt": 10
+      "nvt": 77,
+      "ongemeten": 2064,
+      "gezakt": 3
     },
     "PRIVACY": {
-      "bewezen": 3079,
+      "bewezen": 3820,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1117,
+      "ongemeten": 918,
       "gezakt": 0
     }
   },
   "verslechteringToegestaan": {
-    "reden": "De routeset groeide van 3987 naar 4188 (+201, waaronder de uitrol-routes en wat er met main meekwam), dus het aantal cellen van 43857 naar 46068. Absoluut staat er daardoor meer ongemeten, maar PROPORTIONEEL is elke kolom gelijk gebleven of vooruitgegaan, en AUDIT ging van 0 naar 13,7 procent (575 routes) doordat scripts/handelingproef-route.js nu bestaat. Alle vijf de meetrondes zijn ruimer gedraaid dan de vorige vastlegging: rolproef 2937->3081, invoerproef 2510->2634, staatproef 2338->2491.",
-    "cellenVoor": 43857,
-    "cellenNa": 46068
+    "reden": "De matrix ging van 4153 naar 4708 routes (+555): de vier bewijsproeven konden negen dagen lang niet starten (RTG_DEMO=1 werd een no-op, zie scripts/lib/proefsleutels.js) en bereiken sinds de reparatie 3777 in plaats van 3092 routes met een rol, plus de routes die er sindsdien bij kwamen. Elke nieuwe route begint in de meeste kolommen op ongemeten, dus stijgt dat getal absoluut terwijl de dekking verbetert: bewezen 16475 -> 24700 (+50%), ongemeten 29205 -> 27094. Geen enkele kolom leverde bewezen cellen in. De AUDIT-kolom stond bovendien op 0 door een defect in deze matrix zelf (de eerste AUDIT-tak claimde de cel ook als zijn bron leeg was, waardoor de handelingproef nooit aan de beurt kwam); die is in deze ronde gerepareerd en staat weer op 709.",
+    "cellenVoor": 46068,
+    "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

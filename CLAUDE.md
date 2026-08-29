@@ -263,7 +263,7 @@ schijnzekerheid — niet 100% idempotent.** Een route die met opzet een tweede
 handeling uitvoert is KLAAR zodra dat vaststaat en bewezen is; wie dat omdraait,
 verbouwt de architectuur om een percentage. Vijf assen met elk precies één huis
 (semantiek → `kern/mutatie.js`, duplicaatgedrag → `lib/idemsleutels.js`, bewijs →
-`IDEMPROEF.json`, en toegang + stand → `kern/mutatiecontract.js`), zes standen
+`IDEMPROEF.json`, en toegang + stand → `kern/mutatiecontract/klassen.js`), zes standen
 waarvan er maar één naar nul moet (`LEGACY_PENDING_CLASSIFICATION`), en zes
 toegangsklassen zodat "geen rol" ophoudt een restpost te zijn. Drie dingen die
 niet mogen sneuvelen: **een stand wordt nooit afgeleid uit bewijs** (het bewijs

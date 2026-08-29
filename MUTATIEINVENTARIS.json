@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T21:57:49.204Z",
-  "commit": "bcc05d0b",
+  "op": "2026-08-29T22:07:09.092Z",
+  "commit": "eee7c02e",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -14,7 +14,7 @@
   "idempotentieAanroepbaar": 4643,
   "werkelijkAangeroepen": 4643,
   "bewijsMetSleutel": 1384,
-  "bewijsZonderSleutel": 190,
+  "bewijsZonderSleutel": 187,
   "verklaard": 182
  },
  "autorisatie": {

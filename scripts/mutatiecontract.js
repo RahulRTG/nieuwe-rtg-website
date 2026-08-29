@@ -141,6 +141,23 @@ function voorstelUitBewijs(m) {
       return { voorstel: null, grond: 'kale ronde: de herhaling werd GEWEIGERD (' + (z.statussen || []).join('/') +
         ') -- dat is een toestandscontrole en geen idempotentie; welke van de twee dit is, leest geen meter af' };
     }
+    if (z.grond === 'opslag') {
+      /* EEN VERSCHIL IN DE OPSLAG IS NIET ALTIJD WERK. Gemeten geval:
+         POST /api/metier/zoek is een pure zoekroute, en toch bewoog er bij de
+         eerste kale oproep iets ("wacht") en bij de tweede niet. Dat was geen
+         gededupliceerde handeling maar een REM die zijn emmer bijwerkte. Een
+         voorstel PROTECTED zou daar de verkeerde semantiek vastleggen: die route
+         is NOT_APPLICABLE, hij verandert niets.
+
+         De ruisijking van de idemproef vangt alleen wat bij ELKE oproep beweegt;
+         een rem die alleen de eerste keer aanslaat glipt er per definitie langs.
+         Daarom draagt dit voorstel de collecties met zich mee, zodat de mens die
+         bevestigt ziet WAARIN het verschil zat. */
+      const waar = Object.keys((z.opslag && z.opslag.d) || {}).join(', ');
+      return { voorstel: 'PROTECTED', grond: 'kale ronde (opslag): het verschil zat in ' + (waar || 'onbekend') +
+        '. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? ' +
+        'In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED.' };
+    }
     return { voorstel: 'PROTECTED', grond: 'kale ronde (' + (z.grond || 'grond niet vastgelegd') + '): ' + z.reden };
   }
   if (z.stand === 'onbeschermd') {

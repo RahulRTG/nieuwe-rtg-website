@@ -2,8 +2,8 @@
 
 *Wat dit huis van elke schrijfroute weet — en hoe hard dat is.*
 
-Dit document hoort bij `server/kern/mutatiecontract.js` (de vocabulaires en de
-keuring), `server/lib/mutatiecontracten.js` (de bedoeling per route — het enige
+Dit document hoort bij `server/kern/mutatiecontract/klassen.js` (de twee
+woordenlijsten) en `server/kern/mutatiecontract/index.js` (de keuring), `server/lib/mutatiecontracten.js` (de bedoeling per route — het enige
 mensenwerk) en `scripts/mutatiecontract.js` (de afleiding). Lees het met
 `CONTROLPLANE.md` ernaast: dat gaat over wie iets **mag**, dit over wat een
 tweede aanroep **doet**.
@@ -37,8 +37,8 @@ as precies waar hij woont, en herhaalt het contract er geen enkele.
 | 1 | **semantiek** | wat *is* deze mutatie? | `server/kern/mutatie.js` |
 | 2 | **duplicaatgedrag** | wat is "hetzelfde verzoek"? | `server/lib/idemsleutels.js` |
 | 3 | **bewijs** | wat is er gemeten? | `IDEMPROEF.json` |
-| 4 | **toegang** | wie mag hier binnen? | `kern/mutatiecontract.js` — **nieuw** |
-| 5 | **stand** | hoe hard is onze kennis? | `kern/mutatiecontract.js` — **nieuw** |
+| 4 | **toegang** | wie mag hier binnen? | `kern/mutatiecontract/klassen.js` — **nieuw** |
+| 5 | **stand** | hoe hard is onze kennis? | `kern/mutatiecontract/klassen.js` — **nieuw** |
 
 As 1 t/m 3 bestonden al. Het contract voegt er twee toe en brengt de vijf samen
 in één afgeleid register.
@@ -152,11 +152,17 @@ dubbeltik — en alleen díé telt voor het contract.
 En binnen die ronde zijn er nog drie gronden waarvan er maar twee idempotentie
 zijn:
 
-| grond | betekenis | voorstel |
-|---|---|---|
-| `opslag` | eerste oproep deed werk, herhaling niet | `PROTECTED` |
-| `gemerkt` | de server zei zelf `herhaald: true` zonder sleutel — dat kan alleen de idem-poort zijn | `PROTECTED` |
-| `geweigerd` | de herhaling kreeg een 409 of 403 | **geen** — dat is een toestandscontrole, geen herkende herhaling |
+| grond | betekenis | gemeten 29-08-2026 | voorstel |
+|---|---|---|---|
+| `opslag` | eerste oproep deed werk, herhaling niet | **2** | `PROTECTED` |
+| `gemerkt` | de server zei zelf `herhaald: true` zonder sleutel — dat kan alleen de idem-poort zijn, op grond van een verklaring | **24** | `PROTECTED` |
+| `geweigerd` | de herhaling kreeg een 409 of 403 | 0 | **geen** — dat is een toestandscontrole, geen herkende herhaling |
+
+Die kolom is het scherpste getal in dit document. Van **4.653 schrijfroutes**
+vangen er **26** een echte dubbeltik op, en **24 daarvan alleen omdat iemand een
+verklaring heeft geschreven**. Het mechanisme werkt dus precies waar het is
+verteld, en nergens anders. Zonder de grond stond hier "1.382 beschermd" — de
+platformlaag die de proef zelf voedde.
 
 Die laatste rij komt uit een fout die dit huis al eens 16 zakkende toetsen kostte:
 een `zelfdeVerzoek` legt daar het eerste antwoord over een bewuste weigering heen.
@@ -175,6 +181,37 @@ moet slagen. Dit huis doet het andersom, precies zoals `kern/mutatie.js` dat aan
 de rand van het platform al deed: **alles wat nieuw is, noemt zijn contract.** Zo
 groeit de dekking mee met wat er bijkomt, terwijl de erfenis van achteren wordt
 opgeruimd.
+
+---
+
+## 6b. De eerste drieëntwintig
+
+Het register staat op **23 van 4.653 geclassificeerd (0,5%)**, en alle 23 op
+`PROTECTED`. Ze zijn niet door een script ingedeeld: voor elk van hen stond de
+*bedoeling* al in `idemsleutels.js` als `zelfdeVerzoek` — geschreven door iemand
+die vond dat een woordelijk gelijk verzoek binnen vijf seconden een dubbeltik is.
+Wat ontbrak was het **bewijs dat het ook zo gebeurt**, en dat is nu van de
+scherpste soort die deze proef kent: de kale ronde stuurde geen sleutel mee en
+kreeg toch `herhaald: true` terug. Dat kán alleen de idem-poort zijn, en die
+handelt uitsluitend op een verklaring. Bedoeling en gedrag vallen aantoonbaar
+samen.
+
+**Drie routes zijn er met opzet niet bij**, en ze zijn leerzamer dan de 23:
+
+- `POST /api/overheid/water/meld` gaf `herhaald: true` zonder sleutel én zonder
+  verklaring. Dat hoort niet te kunnen. Ergens doet een laag iets dat niemand
+  heeft opgeschreven — eerst uitzoeken welke.
+- `POST /api/metier/zoek` en `POST /api/bedrijf/apparaten` kwamen als
+  `grond: opslag` binnen: bij de eerste kale oproep bewoog er iets, bij de tweede
+  niet. Maar `/api/metier/zoek` is een **zoekroute** — hij verandert niets. Wat
+  daar bewoog was `wacht`, de emmer van een rem. Een voorstel `PROTECTED` zou daar
+  de verkeerde semantiek vastleggen; de juiste stand is `NOT_APPLICABLE`.
+
+Dat laatste is een echte zwakte van deze meetweg en staat sindsdien in het
+voorstel zelf: de ruisijking vangt alleen wat bij *elke* oproep beweegt, dus een
+rem die alleen de eerste keer aanslaat glipt er per definitie langs. Het voorstel
+noemt daarom de collecties waarin het verschil zat, zodat de mens die bevestigt
+kan zien of dat werk van de route was of van een meter.
 
 ---
 

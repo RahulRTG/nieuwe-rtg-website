@@ -135,7 +135,7 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
      schrijfroute bijgekomen zonder contract -- en dat is precies wat deze poort
      tegenhoudt. Wie het getal legitiem ziet stijgen (een heel domein erbij),
      verhoogt de grens BEWUST in dit bestand, met de reden in de commit. */
-  const GRENS = 4653;
+  const GRENS = 4630;
   const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
   assert.ok(nu <= GRENS,
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +

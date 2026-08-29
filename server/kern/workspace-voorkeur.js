@@ -20,7 +20,7 @@ function lijst(v, naam) {
   return uit;
 }
 
-function normaliseer(invoer, op) {
+function normaliseerWorkspace(invoer, op) {
   const x = invoer && typeof invoer === 'object' && !Array.isArray(invoer) ? invoer : {};
   const order = lijst(x.order, 'order'); if (order.error) return order;
   const hidden = lijst(x.hidden, 'hidden'); if (hidden.error) return hidden;
@@ -34,16 +34,16 @@ function normaliseer(invoer, op) {
 
 function lees(md) {
   const opgeslagen = md && md.interface && md.interface.workspace;
-  const w = normaliseer(opgeslagen || {}, opgeslagen && opgeslagen.updatedAt);
-  return w.error ? normaliseer({}, null) : w;
+  const w = normaliseerWorkspace(opgeslagen || {}, opgeslagen && opgeslagen.updatedAt);
+  return w.error ? normaliseerWorkspace({}, null) : w;
 }
 
 function zet(md, invoer, op) {
-  const w = normaliseer(invoer, op || new Date().toISOString());
+  const w = normaliseerWorkspace(invoer, op || new Date().toISOString());
   if (w.error) return w;
   if (!md.interface || typeof md.interface !== 'object' || Array.isArray(md.interface)) md.interface = {};
   md.interface.workspace = w;
   return w;
 }
 
-module.exports = { normaliseer, lees, zet, ID, MAX };
+module.exports = { normaliseer: normaliseerWorkspace, lees, zet, ID, MAX };

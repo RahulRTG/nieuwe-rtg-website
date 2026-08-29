@@ -1,4 +1,12 @@
 {
+  "stempel": {
+    "op": "2026-08-29T18:34:57.241Z",
+    "commit": "5adb8de8",
+    "boomVuil": true,
+    "node": "v24.18.0"
+  },
+  "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
+  "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -6403,6 +6411,14 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "toegang-contract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/toegang-contract.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "toegangprefix.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7221,6 +7237,37 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "workspace-contract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/workspace-contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "workspace-platform.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/interface/module-sdk.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "workspace-server-platform.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "workspace-voorkeur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "zaaihash.test.js": {
       "soort": "server",

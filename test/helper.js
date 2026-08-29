@@ -1076,30 +1076,51 @@ async function veegDoor(page, doos, opties) {
        van de regel die we opnieuw wilden bewegen. */
     await page.waitForFunction(() => !document.querySelector('.gb-blad,.gb-lade,[data-gb]'), null,
       { timeout: 5000 }).catch(() => {});
-    const rendererPoging = await page.evaluate(({ x0, y, px, stappen, eerste }) => {
+    const rendererPoging = await page.evaluate(({
+      x0, y, px, stappen, eerste, kiezer, startFractie, afstand, vanBoven
+    }) => {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
-         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt. */
-      const doel = [...document.querySelectorAll('.gb-rij')].find((rij) => {
+         dialoog liggen; de rij zelf is de ingang die deze proef bedoelt.
+
+         Een proef die zijn rij kent geeft bovendien een kiezer mee. Onder
+         runnerdruk kan de lijst tussen de eerste browserpoging en deze poging
+         opnieuw zijn getekend. Dan zijn de oude coordinaten geen identiteit:
+         zoek de nieuwe rij op en meet haar opnieuw. */
+      const gekozen = kiezer ? document.querySelector(kiezer) : null;
+      const doel = (gekozen && gekozen.closest('.gb-rij')) || [...document.querySelectorAll('.gb-rij')].find((rij) => {
         const r = rij.getBoundingClientRect();
         return x0 >= r.left && x0 <= r.right && y >= r.top && y <= r.bottom;
       });
       if (!doel) return false;
+      let beginX = x0, middenY = y, verschuiving = px, eersteStap = eerste;
+      if (gekozen) {
+        const r = doel.getBoundingClientRect();
+        const fractie = Number.isFinite(startFractie) ? startFractie : 0.8;
+        beginX = r.left + r.width * fractie;
+        middenY = r.top + (Number.isFinite(vanBoven) ? Math.min(vanBoven, r.height / 2) : r.height / 2);
+        verschuiving = Number.isFinite(afstand) ? afstand : -(r.width * 0.62 + 90);
+        eersteStap = Math.sign(verschuiving || 1) * Math.max(10, Math.abs(verschuiving / stappen));
+      }
       const pid = 917;
       const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
         bubbles: true, cancelable: true, view: window, pointerId: pid,
         pointerType: 'mouse', isPrimary: true, button: type === 'pointermove' ? -1 : 0,
-        buttons, clientX: x, clientY: y
+        buttons, clientX: x, clientY: middenY
       }));
-      stuur('pointerdown', x0, 1);
-      stuur('pointermove', x0 + eerste, 1);
+      stuur('pointerdown', beginX, 1);
+      stuur('pointermove', beginX + eersteStap, 1);
       const begon = doel.hasAttribute('data-gb');
       if (begon) {
-        for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
+        for (let i = 2; i <= stappen; i++)
+          stuur('pointermove', beginX + (verschuiving * i) / stappen, 1);
       }
-      stuur('pointerup', x0 + (begon ? px : eerste), 0);
+      stuur('pointerup', beginX + (begon ? verschuiving : eersteStap), 0);
       return begon;
-    }, { x0, y, px, stappen, eerste });
+    }, {
+      x0, y, px, stappen, eerste, kiezer: o.kiezer || null,
+      startFractie: o.startFractie, afstand: o.afstand, vanBoven: o.vanBoven
+    });
     if (!rendererPoging) {
       throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling; ' +
         'dan is de gebaarbedrading zelf stuk.');

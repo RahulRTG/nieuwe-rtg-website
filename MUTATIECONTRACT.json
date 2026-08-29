@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T23:22:34.000Z",
-  "commit": "45a81557",
+  "op": "2026-08-29T23:27:24.440Z",
+  "commit": "fa9edcbc",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 3049,
+  "geclassificeerd": 3059,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 2953,
-   "LEGACY_PENDING_CLASSIFICATION": 1604,
+   "BLOCKED_BY_TEST_FIXTURE": 2963,
+   "LEGACY_PENDING_CLASSIFICATION": 1594,
    "NOT_APPLICABLE": 40,
    "PROTECTED": 24,
    "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
-  "vastgesteldDoorMens": 96,
+  "vastgesteldDoorMens": 106,
   "afgeleidDoorScript": 2953,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
@@ -9013,19 +9013,21 @@
   {
    "mutatieId": "cluster.actie",
    "route": "POST /api/cluster/:actie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SYSTEM_INTERNAL",
     "bewakers": []
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "code.dyn",
@@ -83053,62 +83055,68 @@
   {
    "mutatieId": "scim.v2.Groups.id",
    "route": "DELETE /api/scim/v2/Groups/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Groups.id",
    "route": "PATCH /api/scim/v2/Groups/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Groups.id",
    "route": "PUT /api/scim/v2/Groups/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Users",
@@ -83139,62 +83147,68 @@
   {
    "mutatieId": "scim.v2.Users.id",
    "route": "DELETE /api/scim/v2/Users/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Users.id",
    "route": "PATCH /api/scim/v2/Users/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Users.id",
    "route": "PUT /api/scim/v2/Users/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "site.ai",
@@ -112809,22 +112823,24 @@
   {
    "mutatieId": "techniek.sso.org",
    "route": "DELETE /api/techniek/sso/:org",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.sso.proef",
@@ -112941,22 +112957,24 @@
   {
    "mutatieId": "techniek.sso.scimsleutel.org",
    "route": "DELETE /api/techniek/sso/scimsleutel/:org",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.tenant",
@@ -114140,22 +114158,24 @@
   {
    "mutatieId": "theater.upload.id",
    "route": "POST /api/theater/upload/:id",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "mw",
      "auth"
     ]
    },
    "bewijs": null,
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "niet gemeten"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "theater.verwijder",

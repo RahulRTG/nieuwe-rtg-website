@@ -257,16 +257,16 @@ opgeruimd.
 
 ```
 Mutation inventory                4.653
-Classified                        3.049   65,5%
-  vastgesteld door een mens          96   (een uitspraak over gedrag)
+Classified                        3.059   65,7%
+  vastgesteld door een mens         106   (een uitspraak over gedrag)
   afgeleid door een script        2.953   (alleen: wij weten het niet, en waarom)
 
   PROTECTED                          24
   INTENTIONALLY_NON_IDEMPOTENT       32
   NOT_APPLICABLE                     40
   UNTESTABLE_WITH_JUSTIFIED_REASON    0
-  BLOCKED_BY_TEST_FIXTURE         2.953   hoort te slinken
-LEGACY_PENDING_CLASSIFICATION     1.604   moet naar nul
+  BLOCKED_BY_TEST_FIXTURE         2.963   hoort te slinken
+LEGACY_PENDING_CLASSIFICATION     1.594   moet naar nul
 ```
 
 **De 32 `INTENTIONALLY_NON_IDEMPOTENT` komen uit een register dat er al was.**
@@ -342,7 +342,23 @@ Elke bak heeft een eigen remedie, en dat is de hele reden om ze te scheiden:
 | 1.194 | twee geslaagde kale oproepen die **niets** achterlieten — `NOT_APPLICABLE`-kandidaten die op bevestiging wachten | een tweede bewijslijn, of een mens |
 | 271 | hindernis wél, maar de **toegang** is niet af te leiden | de bewaking zit in de handler — zie par. 7.2 |
 | 161 | de dubbeltik **deed het werk opnieuw** | een menselijk besluit: dubbeltik of tweede handeling? |
-| 10 | niet gemeten (pad-parameter) | de lifecycle-opstelling uit par. 8 |
+| ~~10~~ 0 | niet gemeten (pad-parameter) | **gedaan** — zie hieronder |
+
+**De tien met een pad-parameter zijn uit de restpost.** De proef slaat `/api/x/:id`
+met opzet over: zo'n pad is geen adres maar een vorm, en een verzonnen id levert
+een 404 op die niets meet — maar die 404 leest in een register hetzelfde als een
+route die werkelijk niets doet. Ze waren dus in beide richtingen onzichtbaar:
+nergens een probleem, nergens een besluit.
+
+Ze staan nu in `mutatiecontracten-padparameter.js` op `BLOCKED_BY_TEST_FIXTURE`,
+elk met het adres van het werk. Bij vier ervan bestaat de halve opstelling al —
+de proefsleutelbos draait een SCIM-sleutel, en `idemwereld.js` maakt tijdens de
+schoolketen een SSO-koppeling `proefkoppeling` aan. Bij die twee wissers zit er
+een volgorde in: eerst de sleutel, dan de koppeling, anders meet de tweede een
+404 in plaats van een handeling. En één is de vreemde eend: `POST /api/cluster/:actie`
+draagt geen object-id maar een **handelingsnaam** — daar valt niets aan te maken,
+alleen op te sommen. Een toets zakt nu zodra er weer een route is die noch gemeten
+is, noch een contract draagt.
 
 **Waarom die 1.194 niet machinaal te bevestigen zijn, en dat is een uitspraak
 over de architectuur en niet over de meter.** De statische analyse is uitgebreid

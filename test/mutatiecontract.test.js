@@ -187,7 +187,7 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
      schrijfroute bijgekomen zonder contract -- en dat is precies wat deze poort
      tegenhoudt. Wie het getal legitiem ziet stijgen (een heel domein erbij),
      verhoogt de grens BEWUST in dit bestand, met de reden in de commit. */
-  const GRENS = 1604;
+  const GRENS = 1594;
   const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
   assert.ok(nu <= GRENS,
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +
@@ -226,4 +226,15 @@ test('geen enkele UITSPRAAK OVER GEDRAG is door een script gezet', () => {
       'server/lib/mutatiecontracten.js');
     assert.strictEqual(r.herkomst, 'mens', r.route + ' doet een uitspraak over gedrag met herkomst ' + r.herkomst);
   }
+});
+
+test('elke route in de inventaris is OF gemeten OF heeft een contract dat zegt waarom niet', () => {
+  /* De bak "niet gemeten" hoort leeg te zijn. Een route die de proef nooit heeft
+     aangeroepen EN geen contract draagt, is onzichtbaar: hij staat nergens als
+     probleem en nergens als besluit. Tien routes met een pad-parameter zaten zo
+     in het register -- de proef slaat die met opzet over, want een verzonnen id
+     meet niets, en daarmee viel er ook nooit iets over te zeggen. */
+  const zonderBeide = register.rijen.filter(r => !r.bewijs && r.stand === 'LEGACY_PENDING_CLASSIFICATION');
+  assert.deepStrictEqual(zonderBeide.map(r => r.route), [],
+    'deze routes zijn nooit gemeten en dragen geen contract: ze zijn onzichtbaar in beide richtingen');
 });

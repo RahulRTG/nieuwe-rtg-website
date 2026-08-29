@@ -14,7 +14,8 @@
   "instelling": "Een waarde zetten of bewaren. Twee keer dezelfde waarde zetten geeft dezelfde eindstand -- effectief idempotent. Dat de proef verschil ziet, komt van een tijdstempel of een volgnummer in het antwoord, niet van een tweede effect.",
   "tebeslissen": "HIER IS NOG GEEN BESLUIT OVER GENOMEN. Staat met naam in deze lijst zodat het niet als \"afgehandeld\" meetelt.",
   "beschermd": "Liep hier onbeschermd en dat kostte iets wat niet mocht: geld, of dubbel werk bij een behandelaar, of een open deur. Sinds de reparatie is de herhaling afgevangen; ze blijven in dit register staan zodat de geschiedenis zichtbaar is.",
-  "teller": "Een teller die telt. Een tweede oproep hoort hem op te hogen -- zou hij dat niet doen, dan klopt de telling niet. Anders dan een code-maker levert hij niets NIEUWS op; anders dan een instelling is de eindstand na twee oproepen wel degelijk anders, en dat is precies de bedoeling."
+  "teller": "Een teller die telt. Een tweede oproep hoort hem op te hogen -- zou hij dat niet doen, dan klopt de telling niet. Anders dan een code-maker levert hij niets NIEUWS op; anders dan een instelling is de eindstand na twee oproepen wel degelijk anders, en dat is precies de bedoeling.",
+  "gebeurtenis": "Een handeling die zelf een GEBEURTENIS is: hij levert geen nieuw ding op en zet geen waarde, maar het feit DAT hij is uitgevoerd hoort te worden vastgelegd. Een export van een dataset is het voorbeeld: twee keer exporteren hoort twee auditregels op te leveren, want dat is precies wat een auditlog van een export moet kunnen laten zien. Een laag die de tweede opslikt, maakt een export onzichtbaar -- en dat is erger dan het dubbeltik-ongemak dat zo'n laag oplost. Anders dan een 'berekening', die niets blijvends achterlaat; anders dan een 'teller', die een getal ophoogt."
  },
  "telling": {
   "creatie": 45,
@@ -22,7 +23,8 @@
   "instelling": 19,
   "beschermd": 15,
   "code-maker": 4,
-  "teller": 1
+  "teller": 1,
+  "gebeurtenis": 1
  },
  "routes": {
   "/api/agenda/toevoegen": {
@@ -438,6 +440,10 @@
   "/api/wereld/profiel/van": {
    "klasse": "teller",
    "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een profiel bekijken. De eerste keer komt er een bezoekregel bij, daarna gaat `keer` omhoog en schuift `at` mee (kern/wereld/bezoek.js). Dat is geen neveneffect maar de belofte: er is geen sluipstand, en dat staat ook in het antwoord zodat het scherm het niet kan verzwijgen. Zou een tweede blik NIET meetellen, dan klopte de telling niet meer."
+  },
+  "/api/office/aidata/export": {
+   "klasse": "gebeurtenis",
+   "waarom": "de export schrijft een auditregel per keer; zie server/lib/idemsleutels.js voor dezelfde beslissing aan de idem-kant"
   }
  }
 }

@@ -296,19 +296,92 @@ function meldZonderRol(verdeling) {
   }
 }
 
-/* DE GROTE HENDEL. De platformbrede schakelkast zet functies aan en uit voor de
-   HELE server. Een proef die daar rommel heen stuurt, zet onderweg iets uit en
-   meet daarna een platform dat hij zelf half heeft afgebroken -- elke bevinding
-   erna is dan een gevolg van de proef en niet van de code.
+/* DE GROTE HENDEL -- WAAR EEN PROEF NOOIT AAN MAG KOMEN.
+
+   De platformbrede schakelkast zet functies aan en uit voor de HELE server. Een
+   proef die daar rommel heen stuurt, zet onderweg iets uit en meet daarna een
+   platform dat hij zelf half heeft afgebroken -- elke bevinding erna is dan een
+   gevolg van de proef en niet van de code.
 
    Deze lijst stond in scripts/beproeving.js en had de invoerproef net zo hard
    nodig. Twee kopieen van "wat mag je niet omzetten" lopen uiteen, en de eerste
-   die achterloopt vergiftigt stil een hele ronde (LAT.md, regel 4). */
-const SCHAKELPADEN = [
-  '/api/office/boardroom/alles', '/api/office/boardroom/fase', '/api/office/boardroom/functie',
-  '/api/office/boardroom/functie/zet', '/api/office/leveranciers', '/api/office/geld'
+   die achterloopt vergiftigt stil een hele ronde (LAT.md, regel 4).
+
+   ------------------------------------------------------------------------
+   WAT ER MIS WAS, EN WAAROM HET NIET OPVIEL
+
+   De lijst noemde zes paden, en alle zes gingen over de BOARDROOM-deur naar de
+   schakelkast. De techniek-deur naar diezelfde kast (/api/techniek/functie,
+   /api/techniek/zekering) stond er niet op. Dat viel niet op omdat geen enkele
+   proef een sleutel had voor die deuren: alles achter boardroomAuth en
+   techAuth was onbereikbaar, dus onschadelijk.
+
+   Die sleutel is er nu wel (scripts/lib/proefsleutels.js geeft de proeven de
+   eigenaarssessie, zodat 156 routes eindelijk beproefbaar worden), en daarmee
+   werd de onvolledigheid van deze lijst opeens gevaarlijk. Vandaar de volgorde
+   waarin dat is gebeurd: eerst deze lijst afmaken, dan pas de sleutel uitdelen.
+
+   ELK PAD DRAAGT NU EEN REDEN. Een verbodslijst zonder redenen wordt bij de
+   eerste die hem in de weg vindt zitten ingekort, want dan lijkt elk item
+   willekeurig. De vier soorten:
+
+     schakelkast   zet functies uit voor het hele platform
+     onomkeerbaar  wist, vernietigt of veegt iets weg
+     gezag         verlegt wie er ergens bij mag
+     stand         verandert een juridische of operationele stand van het huis
+
+   DE BANK-STAND IS DE SCHERPSTE. /api/office/bank/terugstorting is volgens
+   CLAUDE.md niet zomaar een schakelaar: die stand IS de juridische positie van
+   RTG (gesloten circuit tegenover uitgever van elektronisch geld). Een proef
+   die hem omzet, verandert waar dit huis vergunningplichtig is. */
+const NIET_AANRAKEN = [
+  // -- de schakelkast, langs alle drie zijn deuren --
+  { pad: '/api/office/boardroom/alles', soort: 'schakelkast', waarom: 'zet in een keer alles om' },
+  { pad: '/api/office/boardroom/fase', soort: 'schakelkast', waarom: 'verschuift de uitrolfase van het hele platform' },
+  { pad: '/api/office/boardroom/functie', soort: 'schakelkast', waarom: 'zet een functie uit voor iedereen' },
+  { pad: '/api/office/boardroom/functie/zet', soort: 'schakelkast', waarom: 'idem, fijnmazig' },
+  { pad: '/api/office/boardroom/schakel', soort: 'schakelkast', waarom: 'dezelfde kast, andere deur -- stond hier niet op' },
+  { pad: '/api/office/boardroom/schakel-fijn', soort: 'schakelkast', waarom: 'idem, per pas of land' },
+  { pad: '/api/techniek/functie', soort: 'schakelkast', waarom: 'de techniek-deur naar dezelfde kast -- stond hier niet op' },
+  { pad: '/api/techniek/zekering', soort: 'schakelkast', waarom: 'de zekeringen van het platform' },
+  { pad: '/api/office/leveranciers', soort: 'schakelkast', waarom: 'zet partners in en uit bedrijf' },
+  { pad: '/api/office/geld', soort: 'schakelkast', waarom: 'de geldkant van het hele huis' },
+
+  // -- onomkeerbaar --
+  { pad: '/api/techniek/bewaren/veeg', soort: 'onomkeerbaar', waarom: 'de bewaarveger; hij wist wat over de termijn is' },
+  { pad: '/api/techniek/tenant/vernietig', soort: 'onomkeerbaar', waarom: 'vernietigt de omgeving van een klant' },
+  { pad: '/api/techniek/fouten/wis', soort: 'onomkeerbaar', waarom: 'wist het foutenlogboek waarop de proef zelf leunt' },
+  { pad: '/api/boardroom/reset', soort: 'onomkeerbaar', waarom: 'zet de boardroom terug naar begin' },
+
+  // -- gezag --
+  { pad: '/api/office/boardroom/toegang', soort: 'gezag', waarom: 'wie er in de kamer van de eigenaar mag' },
+  { pad: '/api/techniek/toegang', soort: 'gezag', waarom: 'wie de technische pagina mag openen' },
+  { pad: '/api/techniek/eigenaar', soort: 'gezag', waarom: 'wie de eigenaar IS' },
+  { pad: '/api/techniek/sso/schakel', soort: 'gezag', waarom: 'zet de inlogfederatie van een klant om' },
+
+  // -- stand --
+  { pad: '/api/office/bank/terugstorting', soort: 'stand',
+    waarom: 'deze stand IS de juridische positie van RTG (CLAUDE.md, de terugstortstand); omzetten verandert de vergunningplicht' },
+  { pad: '/api/techniek/wacht/lastafworp', soort: 'stand', waarom: 'werpt last af: de server gaat bewust minder doen' },
+  { pad: '/api/office/techniek/lastafworp', soort: 'stand', waarom: 'dezelfde hendel, andere deur' },
+  { pad: '/api/techniek/wacht/quarantaine', soort: 'stand', waarom: 'zet verkeer in quarantaine' },
+  { pad: '/api/techniek/moderniseer', soort: 'stand', waarom: 'draait een migratie over de echte gegevens' }
 ];
+
+/* De platte lijst blijft bestaan: zes instrumenten lezen hem als tekenreeksen.
+   Hij wordt AFGELEID en niet apart bijgehouden -- dat is precies de dubbeling
+   die deze module bestaat om te voorkomen. */
+const SCHAKELPADEN = NIET_AANRAKEN.map(x => x.pad);
+
+/* Waarom mag een proef hier niet aan komen? Voor de uitslagbestanden: een route
+   die wordt overgeslagen zonder reden is niet te onderscheiden van een route die
+   iemand vergeten is. */
+const waaromNietAanraken = (pad) => {
+  const t = NIET_AANRAKEN.find(x => String(pad || '').startsWith(x.pad));
+  return t ? t.soort + ': ' + t.waarom : null;
+};
+
 const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
 
-module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, isSchakel,
+module.exports = { alleRoutes, routesInBron, WORTEL, loopMap, SCHAKELPADEN, NIET_AANRAKEN, waaromNietAanraken, isSchakel,
   rolVan, redenZonderRol, verdeelOpRol, meldZonderRol, bewakerskaart };

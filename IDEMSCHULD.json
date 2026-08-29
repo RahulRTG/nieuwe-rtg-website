@@ -1,15 +1,15 @@
 {
  "stempel": {
-  "op": "2026-08-29T22:00:46.013Z",
-  "commit": "5ab7dcbb",
+  "op": "2026-08-29T22:55:29.127Z",
+  "commit": "9494bcce",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",
  "gemeten": {
   "schrijfroutes": 4661,
-  "verklaard": 182,
-  "schuld": 4479,
+  "verklaard": 184,
+  "schuld": 4477,
   "weesverklaringen": 0
  },
  "weesverklaringen": [],
@@ -138,7 +138,6 @@
   "POST /api/bank/pas/uitgeven",
   "POST /api/bank/passen",
   "POST /api/bank/rekening",
-  "POST /api/bank/rekening/open",
   "POST /api/bank/rente-voorbeeld",
   "POST /api/bank/salaris",
   "POST /api/bank/sepa",
@@ -1871,7 +1870,6 @@
   "POST /api/office/afdelingshotel/zet",
   "POST /api/office/ai/tegoed",
   "POST /api/office/aidata",
-  "POST /api/office/aidata/export",
   "POST /api/office/architect",
   "POST /api/office/architect/bouwstaat",
   "POST /api/office/architect/concept",

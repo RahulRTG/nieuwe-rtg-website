@@ -102,6 +102,21 @@ const KAART = new Map([
   // ---- eigenrol: identiteit met een rol buiten het drietal ----
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
+  /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst
+     officeAuth en eist daarna een IDENTITEIT: de gedeelde backoffice-code komt
+     er niet door, een kantoorsessie op naam wel.
+
+     Waarom een eigen rolnaam en niet 'office': met het office-token van de
+     gedeelde code komt de proef hier nooit binnen, dus zou elke route erachter
+     als "geweigerd" tellen -- en dat is geen meting van idempotentie maar van
+     de deur. En niet 'boardroom': de kluis staat open voor elke kantoorsessie
+     op naam, niet alleen voor de eigenaar. In de PROEFopstelling is de eigenaar
+     toevallig het enige lid met zo'n sessie; in productie zijn dat er meer.
+
+     Gevonden door de idemproef zelf, die hem meldde als "bewaker van onbekende
+     soort" -- precies waar die melding voor is. */
+  ['kluisAuth', ['eigenrol', 'kantoor-op-naam',
+    'officeAuth plus identiteit: een kantoorsessie met een sleutel. De gedeelde backoffice-code komt er niet door']],
   ['techAuth', ['eigenrol', 'techniek',
     'verifieert het token als ECHT account en toetst daarna magInzien(); een geldig lid krijgt 403 en een kritieke melding op het veiligheidsbord']],
   ['baasAuth', ['eigenrol', 'werkplekbaas',

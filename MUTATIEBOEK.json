@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T22:05:21.068Z",
-  "commit": "5ab7dcbb",
+  "op": "2026-08-29T22:55:33.060Z",
+  "commit": "9494bcce",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -10,16 +10,16 @@
  "gemeten": {
   "routesTotaal": 4748,
   "mutaties": 4661,
-  "mutatiesVerklaard": 182,
-  "mutatiesOnverklaard": 4479,
-  "beproefbaar": 3637,
-  "beproefbaarVerklaard": 142,
+  "mutatiesVerklaard": 184,
+  "mutatiesOnverklaard": 4477,
+  "beproefbaar": 3777,
+  "beproefbaarVerklaard": 173,
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3495,
-  "metBesluitOverDuplicaat": 182,
-  "zonderBesluitOverDuplicaat": 4479,
+  "nogNietGeclassificeerd": 3604,
+  "metBesluitOverDuplicaat": 184,
+  "zonderBesluitOverDuplicaat": 4477,
   "somVanDeBakken": 4748,
   "sluit": true
  },
@@ -49,12 +49,12 @@
   {
    "id": "schakelpad",
    "uitleg": "Een schakelpad (de techniek- of functiekast). Een proef die hieraan draait, zet het huis onderuit terwijl hij meet.",
-   "aantal": 8,
+   "aantal": 29,
    "eind": true,
    "voorbeelden": [
-    "POST /api/office/boardroom/alles",
-    "POST /api/office/boardroom/fase",
-    "POST /api/office/geld"
+    "POST /api/boardroom/reset",
+    "POST /api/office/bank/terugstorting",
+    "POST /api/office/boardroom/alles"
    ]
   },
   {
@@ -71,7 +71,7 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 1006,
+   "aantal": 845,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmeld/start",
@@ -82,7 +82,7 @@
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 142,
+   "aantal": 173,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -93,7 +93,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3495,
+   "aantal": 3604,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -106,19 +106,19 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 80,
+   "aantal": 81,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
-    "POST /api/office/economie/relatie/weg",
-    "POST /api/office/economie/relatie/zet",
-    "POST /api/office/instelling/aansluiten"
+    "POST /api/rtf/social/pin/connect",
+    "POST /api/rtf/social/pin/live/verbind",
+    "POST /api/rtf/social/pin/uit"
    ]
   },
   {
    "id": "BEWUST_NIET_IDEMPOTENT",
    "uitleg": "Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.",
-   "aantal": 21,
+   "aantal": 22,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -135,20 +135,20 @@
    "semantiek": true,
    "voorbeelden": [
     "POST /api/foundation/kosten",
-    "POST /api/office/economie/journaal",
-    "POST /api/office/economie/proef"
+    "POST /api/reis/uitnodiging/open",
+    "POST /api/rtf/social/pin"
    ]
   },
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 802,
+   "aantal": 691,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
+    "POST /api/boardroom/reset",
     "POST /api/office/boardroom/alles",
-    "POST /api/office/boardroom/fase",
-    "POST /api/office/geld"
+    "POST /api/office/boardroom/fase"
    ]
   },
   {
@@ -166,7 +166,7 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3495,
+   "aantal": 3604,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
@@ -187,30 +187,12 @@
    ]
   },
   {
-   "reden": "rol \"boardroom\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
-   "aantal": 95,
-   "voorbeelden": [
-    "POST /api/office/aidata/export",
-    "POST /api/office/balie/zetel",
-    "POST /api/office/balie/zetels"
-   ]
-  },
-  {
    "reden": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
    "aantal": 62,
    "voorbeelden": [
     "POST /api/werkplek/bureau/architect",
     "POST /api/werkplek/bureau/architect/bouwstaat",
     "POST /api/werkplek/bureau/architect/concept"
-   ]
-  },
-  {
-   "reden": "rol \"techniek\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
-   "aantal": 61,
-   "voorbeelden": [
-    "POST /api/boardroom/ai",
-    "POST /api/boardroom/betalingen/keuze",
-    "POST /api/boardroom/betalingen/proef"
    ]
   },
   {
@@ -268,15 +250,6 @@
    ]
   },
   {
-   "reden": "bewaker van onbekende soort: kluisAuth -- deel hem in in scripts/lib/bewakers.js",
-   "aantal": 5,
-   "voorbeelden": [
-    "POST /api/office/vakbewijs/intrek",
-    "POST /api/office/vakbewijs/nummer",
-    "POST /api/office/vakbewijs/teken"
-   ]
-  },
-  {
    "reden": "rol \"werkplekbaas\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
    "aantal": 3,
    "voorbeelden": [
@@ -331,24 +304,24 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesGevonden",
-   "vastgelegd": 4103,
-   "vastgelegdOp": "2026-08-20",
-   "nu": 4643,
+   "vastgelegd": 4622,
+   "vastgelegdOp": "2026-08-29",
+   "nu": 4622,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
-   "verschil": 540,
-   "gelijk": false,
-   "duiding": "de vastlegging is van 2026-08-20; sindsdien zijn er routes bijgekomen"
+   "verschil": 0,
+   "gelijk": true,
+   "duiding": "gelijk"
   },
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 3092,
-   "nu": 3637,
-   "vastgelegdOp": "2026-08-20",
+   "vastgelegd": 3777,
+   "nu": 3777,
+   "vastgelegdOp": "2026-08-29",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": 545,
-   "gelijk": false,
-   "duiding": "de vastlegging is van 2026-08-20; sindsdien zijn er routes bijgekomen"
+   "verschil": 0,
+   "gelijk": true,
+   "duiding": "gelijk"
   }
  ]
 }

@@ -61,10 +61,18 @@ const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
 const { stempel } = require('./lib/stempel');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
 
-/* De rollen waarvoor de proeven werkelijk een token hebben. Staat hier omdat de
-   idemproef dezelfde grens hanteert en het boek anders een andere waarheid over
-   hetzelfde zou vertellen; zie de uitleg bij verdeelOpRol in lib/routes.js. */
-const ROLLEN_MET_TOKEN = ['member', 'office', 'supplier'];
+/* De rollen die de proeven kunnen aannemen. Uit ./lib/proefsleutels.js en niet
+   als eigen lijst: het boek zou anders een andere waarheid over hetzelfde
+   vertellen dan de instrumenten die het beschrijft -- en dat is exact het
+   probleem dat dit boek bestaat om op te lossen.
+
+   LET OP HET VERSCHIL MET DE PROEVEN ZELF. Dit boek start geen server en weet
+   dus niet of een inlog vandaag LUKT; het rekent met de rollen waarvoor een
+   sleutel BESTAAT. Een proef rekent met de sleutels die hij werkelijk in handen
+   heeft. Lukt de eigenaarslogin niet, dan telt het boek 156 routes als
+   beproefbaar die de proef die dag overslaat -- met de reden erbij in zijn eigen
+   uitslag. Dat verschil is echt en hoort hier te staan in plaats van gladgestreken. */
+const { ROLLEN: ROLLEN_MET_TOKEN } = require('./lib/proefsleutels');
 
 const sleutelVan = (r) => r.methode.toUpperCase() + ' ' + r.pad;
 

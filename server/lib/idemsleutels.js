@@ -79,6 +79,13 @@ const SLEUTELS = {
      body dat bepaalt WAT er ontstaat (een naam, een titel, een datum). Twee
      woordelijk gelijke verzoeken binnen vijf seconden zijn dan een dubbeltik en
      geen tweede bedoeling. */
+  /* GEVONDEN DOOR DE IDEMPROEF, en de tegenhanger van de export hierboven: hier
+     is een tweede oproep WEL een dubbeltik. kern/bank/rekeningen.js maakt bij
+     elke oproep een verse IBAN aan; twee identieke verzoeken binnen het venster
+     leveren twee rekeningen op dezelfde naam met dezelfde soort. Er is een dak
+     van twaalf rekeningen per lid, dus het loopt niet weg -- maar een rekening
+     die je niet hebt aangevraagd is er een te veel, en dit is de geldkant. */
+  'POST /api/bank/rekening/open': { zelfdeVerzoek: true },        // codenaam + soort + naam
   'POST /api/concern/nieuw': { zelfdeVerzoek: true },              // naam
   'POST /api/concern/entiteit/nieuw': { zelfdeVerzoek: true },     // naam + rechtsvorm
   'POST /api/gewoonten/maak': { zelfdeVerzoek: true },             // naam
@@ -93,51 +100,10 @@ const SLEUTELS = {
   'POST /api/office/hardware/maak': { zelfdeVerzoek: true },       // naam, verplicht (kern/hardwarelab/index.js)
   'POST /api/office/ideeen/maak': { zelfdeVerzoek: true },         // titel, verplicht (kern/ideeen.js)
 
-  /* ---- bewust NIET idempotent, met de reden erbij ----
-
-     /api/muziek/maak stond hier eerst als "zelfde verzoek is een herhaling", en
-     dat was fout. Hij maakt uit een LEGE body elke keer een nieuw stuk; twee
-     oproepen zijn twee stukken. test/mediaos.test.js ving het meteen.
-
-     Dat is precies de fout waar de kop van dit bestand voor waarschuwt, en ik
-     liep er zelf in: de verklaring was op de NAAM van de route gebaseerd ("maak"
-     klinkt als aanmaken met inhoud) en niet op de handler. Een verklaring die je
-     niet hebt nagelezen, is een gok met een net gezicht. */
-  'POST /api/muziek/maak': { nietIdempotent: true,
-    waarom: 'maakt uit een lege body elke keer een NIEUW stuk; twee oproepen zijn twee stukken, ' +
-      'en een laag die de tweede opslikt laat werk verdwijnen zonder dat iemand het merkt' },
-  'POST /api/command/sonde/draai': { nietIdempotent: true,
-    waarom: 'een sonde draaien is een MEETHANDELING: twee keer draaien hoort twee metingen op te leveren, ' +
-      'anders meet de tweede ronde de eerste' },
-  'POST /api/command/puls': { nietIdempotent: true,
-    waarom: 'de puls is een momentopname; twee keer vragen hoort twee momenten te geven' },
-  'POST /api/live/start': { nietIdempotent: true,
-    waarom: 'een tweede start is een nieuwe uitzending, niet dezelfde nog eens' },
-
-  /* Dezelfde toets als hierboven, andere uitkomst: bij deze vier staat er GEEN
-     verplicht veld in de body dat bepaalt wat er ontstaat. Wie zonder inhoud
-     een tweede maakt, krijgt met recht een tweede -- en een laag die dat
-     opslikt, laat werk verdwijnen. */
-  'POST /api/office/kantoorpakket/maak': { nietIdempotent: true,
-    waarom: 'de titel is optioneel en valt terug op "Nieuw document"; twee lege oproepen zijn ' +
-      'twee verse documenten, niet dezelfde nog eens (kern/office/docs.js)' },
-  'POST /api/meet/maak': { nietIdempotent: true,
-    waarom: 'zonder agendaId ontstaat er elke keer een verse kamer met een eigen toegangscode; ' +
-      'MET agendaId dedupliceert de route zelf al (kern/meet.js geeft dan bestond:true terug), ' +
-      'dus er valt hier niets te winnen en wel iets te verliezen' },
-  'POST /api/concern/opname/maak': { nietIdempotent: true,
-    waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
-      'twee momenten op te leveren, anders is de tweede opname stil de eerste' },
-
-  /* ---- routes die niets veranderen ----
-
-     Een POST die alleen leest. Herhalen is per definitie veilig, en er valt
-     niets te dedupliceren: de poort doet hier dan ook niets. Ze staan hier
-     omdat "geen verklaring" en "verklaard als leesroute" twee verschillende
-     dingen zijn, en de schuldteller dat verschil hoort te zien. */
-  'POST /api/office/anker': { leest: true },
-  'POST /api/office/anker/reken': { leest: true },
-  'POST /api/office/handelingen': { leest: true }
+  /* De twee groepen hieronder staan in ./idemsleutels-deel2.js: handelingen die
+     met opzet een tweede effect hebben, en POSTs die niets veranderen. Zie de
+     kop van dat bestand voor waar de snede loopt en waarom. */
+  ...require('./idemsleutels-deel2')
 };
 
 function sleutelVoor(methode, pad) {

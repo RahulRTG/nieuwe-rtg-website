@@ -49,6 +49,7 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { alleRoutes } = require('./lib/routes');
+const { gereedschapsomgeving } = require('./lib/wegwerpserver');
 const { plausibelLijf } = require('./lib/rolproef');
 
 const WORTEL = path.join(__dirname, '..');
@@ -96,8 +97,12 @@ async function wacht(basis, ms) {
     /* RTG_DEMO=1 mint alleen de TOKENS; de routes die daarna worden beproefd
        zijn de echte, met hun echte bewakers ervoor. Zelfde afweging als in
        rolproef-route.js, en om dezelfde reden daar uitgelegd. */
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
+    /* De omgeving komt uit lib/wegwerpserver: RTG_DEMO=1 is op zichzelf een
+       no-op geworden (server/testomgeving.js), en deze twee instrumenten hebben
+       nog hun eigen spawn en zouden die reparatie dus mislopen. Dat is precies
+       hoe de andere elf hem wel kregen en deze twee niet. */
+    env: gereedschapsomgeving({ poort, datamap },
+      { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' })
   });
 
   const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };

@@ -25,6 +25,7 @@ const path = require('path');
 const { start } = require('./lib/wegwerpserver');
 const { draaiInvoerproef } = require('./lib/invoerproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
+const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels');
 const { maakTeller, maakRommel } = require('./lib/rommel');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
@@ -75,14 +76,13 @@ if (require.main !== module) { module.exports = {}; return; }
   };
 
   /* De drie inlogwegen, elk apart, zodat een token onderweg opnieuw te halen is. */
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const ontbreekt = Object.keys(inlog).filter(r => !tokens[r]);
+  /* De sleutelbos staat in ./lib/proefsleutels.js: zes instrumenten hadden hier
+     dezelfde drie rollen staan, en dus alle zes dezelfde blinde vlek voor alles
+     achter boardroomAuth en techAuth. */
+  const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
+  const inlog = bos.inlog;
+  const { tokens, mislukt } = await haalSleutels(bos);
+  const ontbreekt = ONMISBAAR.filter(r => !tokens[r]);
   if (ontbreekt.length) {
     console.error('geen token voor: ' + ontbreekt.join(', ') +
       ' -- de proef zou dan doen alsof die routes zijn beproefd');
@@ -115,7 +115,13 @@ if (require.main !== module) { module.exports = {}; return; }
      geen sleutel voor bestaat: de invoerproef stuurt rommel MET de juiste rol; zonder token voor die rol
      meet hij de voordeur en niet de invoercontrole.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const verdeling = verdeelOpRol(kandidaten, Object.keys(tokens));
+  /* DE ROLLEN WAARVOOR ER WERKELIJK EEN SLEUTEL IS, en niet de rollen die dit
+     instrument kon PROBEREN. Hier stond Object.keys(inlog), en dat is subtiel
+     iets anders: mislukt een inlog (geen demo-eigenaar in deze database), dan
+     zou die rol toch als "beproefbaar" tellen, zonder token worden aangeroepen,
+     401 krijgen en dat als uitslag opleveren. Een meting zonder invoer die toch
+     een cijfer geeft -- LAT.md regel 3. */
   const routes = verdeling.metRol;
 
   console.log('\n=== DE INVOER-ROBUUSTHEID PER ROUTE ===\n');

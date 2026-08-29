@@ -30,6 +30,8 @@ const { spawn } = require('child_process');
 const { draaiAuditproef } = require('./lib/auditproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
+const { gereedschapsomgeving } = require('./lib/wegwerpserver');
+const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'AUDITPROEF.json');
@@ -69,8 +71,12 @@ async function wachtOpServer(basis, ms) {
 
   const kind = spawn(process.execPath, [path.join(WORTEL, 'server', 'server.js')], {
     cwd: WORTEL, stdio: 'ignore',
-    env: { ...process.env, PORT: String(poort), RTG_DATA_DIR: datamap, SMTP_URL: '', STUN_UIT: '1',
-      RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' }
+    /* De omgeving komt uit lib/wegwerpserver: RTG_DEMO=1 is op zichzelf een
+       no-op geworden (server/testomgeving.js), en deze twee instrumenten hebben
+       nog hun eigen spawn en zouden die reparatie dus mislopen. Dat is precies
+       hoe de andere elf hem wel kregen en deze twee niet. */
+    env: gereedschapsomgeving({ poort, datamap },
+      { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' })
   });
 
   const klaar = () => { try { kind.kill('SIGKILL'); } catch (e) {} try { fs.rmSync(datamap, { recursive: true, force: true }); } catch (e) {} };
@@ -89,14 +95,13 @@ async function wachtOpServer(basis, ms) {
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const ontbreekt = Object.keys(inlog).filter(r => !tokens[r]);
+  /* De sleutelbos staat in ./lib/proefsleutels.js: zes instrumenten hadden hier
+     dezelfde drie rollen staan, en dus alle zes dezelfde blinde vlek voor alles
+     achter boardroomAuth en techAuth. */
+  const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
+  const inlog = bos.inlog;
+  const { tokens, mislukt } = await haalSleutels(bos);
+  const ontbreekt = ONMISBAAR.filter(r => !tokens[r]);
   if (ontbreekt.length) {
     console.error('geen token voor: ' + ontbreekt.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
     klaar(); process.exit(2);

@@ -323,7 +323,16 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
       const d = await kaal(); const dD = staatVan ? staatVan(d) : null;
       const e = await kaal(); const dE = staatVan ? staatVan(e) : null;
       const oz = weegZonderSleutel(d, e, staatVan ? { a: dD, b: dE } : null);
-      zonder = { stand: oz.stand, reden: oz.reden, statussen: [d.status, e.status] };
+      /* DE GROND MOET MEE, EN DAT VERGAT DEZE REGEL. Zonder hem staat er alleen
+         'beschermd', en dan zijn drie heel verschillende dingen niet meer uit
+         elkaar te houden: de route herkende de herhaling (opslag), de server
+         merkte hem zelf (gemerkt), of de herhaling werd botweg GEWEIGERD met een
+         409. Dat laatste is geen idempotentie maar een toestandscontrole, en wie
+         daar `zelfdeVerzoek` op plakt legt het eerste antwoord over een bewuste
+         weigering heen. Gemeten: van de 29 'beschermd' in de ronde van 29
+         augustus 2026 had er geen ENKELE een spoor in de opslag -- ze kwamen
+         allemaal uit de andere twee gronden, en het register liet dat niet zien. */
+      zonder = { stand: oz.stand, grond: oz.grond || null, reden: oz.reden, statussen: [d.status, e.status] };
       if (staatVan) zonder.opslag = { d: dD, e: dE };
       /* De laag die het deed, voor zover van buiten te zien: `herhaald: true`
          zonder dat de proef een sleutel stuurde, komt van de idem-poort op grond

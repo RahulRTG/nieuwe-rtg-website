@@ -4879,5 +4879,60 @@ console.log('\n63) elke gedeclareerde collectie heeft een eigenaar, en die schri
   else if (!indringers) ok(eigenaarVan.size + ' collecties met een eigenaar, en niemand schrijft in die van een ander');
 }
 
+/* ============================================================================
+   64) EEN NIEUWE SCHRIJFROUTE HEEFT EEN MUTATIECONTRACT.
+
+   MUTATIECONTRACT.json draagt per schrijfroute vijf assen: wat de mutatie is,
+   wat "hetzelfde verzoek" betekent, wat er gemeten is, wie er binnen mag, en hoe
+   hard die kennis is. Vier daarvan worden afgeleid; de vijfde -- de BEDOELING --
+   staat in server/lib/mutatiecontracten.js, want die is geen waarneming.
+
+   Deze regel bewaakt het getal dat ertoe doet: LEGACY_PENDING_CLASSIFICATION,
+   de routes waarvan dit huis formeel niet weet wat een tweede aanroep hoort te
+   doen. Hij MAG ALLEEN KRIMPEN -- dezelfde vorm als IDEMSCHULD.json en
+   BEWIJSSCHULD.json, en om dezelfde reden: een lijst onbekenden die vanzelf
+   meegroeit met de code is geen schuld maar een decor.
+
+   WAT DIT NIET IS: een eis dat alles idempotent wordt. Vijf van de zes standen
+   zijn EINDSTANDEN. Een route die met opzet een tweede handeling uitvoert is
+   klaar zodra dat is vastgesteld en bewezen; wie dat omdraait, verbouwt de
+   architectuur om een percentage mooi te krijgen.
+
+   De grens staat in test/mutatiecontract.test.js en niet hier, zodat er een plek
+   is waar een BEWUSTE verhoging (een heel domein erbij) met een reden in de
+   commit staat. Deze regel meldt alleen wanneer het register achterloopt op de
+   code -- dan is er een schrijfroute bijgekomen die nog niet geteld is.
+   ========================================================================== */
+console.log('\n64) het mutatiecontractregister loopt niet achter op de code');
+{
+  const REG = path.join(ROOT, 'MUTATIECONTRACT.json');
+  if (!fs.existsSync(REG)) {
+    fout('MUTATIECONTRACT.json ontbreekt -- draai: node scripts/mutatiecontract.js --vastleggen');
+  } else {
+    let reg = null;
+    try { reg = JSON.parse(fs.readFileSync(REG, 'utf8')); } catch (e) { fout('MUTATIECONTRACT.json is onleesbaar: ' + e.message); }
+    if (reg) {
+      let telling = null;
+      try {
+        const uit = cp.execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'mutatiecontract.js')],
+          { cwd: ROOT, encoding: 'utf8', timeout: 300000, maxBuffer: 32 * 1024 * 1024 });
+        const m = /^\s*(\d+)\s+schrijfroutes in de mutatie-inventaris/m.exec(uit);
+        telling = m ? Number(m[1]) : null;
+      } catch (e) { fout('de contracttelling kon niet draaien: ' + e.message); }
+      if (telling != null) {
+        if (telling !== reg.gemeten.totaal) {
+          fout('MUTATIECONTRACT.json kent ' + reg.gemeten.totaal + ' schrijfroutes en de code heeft er ' +
+            telling + ' -- draai: node scripts/mutatiecontract.js --vastleggen, en geef de nieuwe route ' +
+            'een contract in server/lib/mutatiecontracten.js');
+        } else {
+          const open = reg.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
+          ok(reg.gemeten.totaal + ' schrijfroutes geteld, ' + (reg.gemeten.totaal - open) + ' geclassificeerd, ' +
+            open + ' nog te verklaren');
+        }
+      }
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

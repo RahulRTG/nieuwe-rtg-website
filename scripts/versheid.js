@@ -61,7 +61,12 @@ const REGISTERS = [
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
-  ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden']
+  ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
+  /* De twee boekhoudkundige registers. Ze meten geen gedrag maar TELLINGEN, en
+     juist daar doet veroudering pijn: een schuldgetal van vorige maand naast een
+     routelijst van vandaag leest als vooruitgang. */
+  ['IDEMSCHULD.json', 'npm run idemschuld:vast', 'welke schrijfroutes nog geen besluit over duplicaatgedrag dragen'],
+  ['MUTATIEBOEK.json', 'npm run mutatieboek:vast', 'in welke bak elke route valt, en of de optelling sluit']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

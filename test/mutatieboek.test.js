@@ -1,0 +1,136 @@
+/* ============================================================================
+   HET MUTATIEBOEK SLUIT.
+
+   WAT HIER BEWAAKT WORDT, EN WAAROM HET GEEN GETAL IS. Over de schrijfroutes van
+   dit huis lopen vier tellers die alle vier "routes" heten en alle vier iets
+   anders tellen. Zolang de verschillen niet zijn uitgelegd, is elk percentage
+   erover onbruikbaar -- en erger: een route kan uit alle vier de tellingen
+   vallen en dan nergens rood maken. Dat leest als groen.
+
+   scripts/mutatieboek.js laat elke route van de router in precies EEN bak
+   vallen, met de reden waarom hij niet verder komt in de keten. Deze toets
+   bewaakt de IDENTITEIT: de optelling van de bakken is gelijk aan het totaal.
+
+   Waarom een identiteit en geen drempel: getallen bewegen mee met elke route die
+   erbij komt, en een toets op een getal dwingt dan een nieuwe vastlegging af bij
+   elke commit. Een identiteit is stil zolang de boekhouding klopt en luid zodra
+   iemand een filter toevoegt dat routes laat verdwijnen. Dat tweede is precies
+   het gevaar.
+
+   DE MUTATIES VOOR DIT BESTAND, elk een keer gedraaid en zien zakken:
+     1. laat in mutatieboek.js een bak weg uit de optelling (zet ('leest', ...)
+        niet in `bakken`) -> "de boekhouding sluit" zakt;
+     2. filter in de padparameter-stap zonder de eruit gevallen routes in een bak
+        te zetten -> dezelfde toets zakt;
+     3. geef in verzoen() een vastgelegd getal terug zonder duiding
+        -> "elke afwijking draagt een duiding" zakt.
+   ========================================================================== */
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const { meet } = require('../scripts/mutatieboek');
+const { alleRoutes } = require('../scripts/lib/routes');
+
+const boek = meet();
+
+test('de boekhouding sluit: elke route valt in precies een bak', () => {
+  const som = boek.bakken.reduce((n, b) => n + b.aantal, 0);
+  assert.equal(som, boek.gemeten.routesTotaal,
+    'de optelling van de bakken (' + som + ') wijkt af van het totaal (' + boek.gemeten.routesTotaal + '); ' +
+    'er vallen routes buiten de boekhouding');
+  assert.equal(boek.gemeten.sluit, true);
+  assert.equal(boek.gemeten.somVanDeBakken, boek.gemeten.routesTotaal);
+});
+
+test('het totaal is dat van de gedeelde routelijst, en niet een eigen telling', () => {
+  /* Een boek dat zijn eigen routes zoekt, is de vijfde teller in plaats van de
+     verzoening van de vier die er al zijn. */
+  assert.equal(boek.gemeten.routesTotaal, alleRoutes().length);
+});
+
+test('elke bak draagt een uitgeschreven reden', () => {
+  for (const b of boek.bakken) {
+    assert.ok(b.uitleg && b.uitleg.length > 40, b.id + ' mist een uitleg');
+    assert.ok(Array.isArray(b.voorbeelden), b.id + ' mist voorbeelden');
+  }
+});
+
+test('de mutaties zijn de som van de bakken die erna komen', () => {
+  /* De keten moet als keten kloppen en niet alleen als optelling: alles wat na
+     "leest" en "geen-api" overblijft, is het mutatieboek. */
+  const na = ['schakelpad', 'padparameter', 'geen-rol-met-token',
+    'beproefbaar-verklaard', 'beproefbaar-onverklaard'];
+  const som = boek.bakken.filter(b => na.includes(b.id)).reduce((n, b) => n + b.aantal, 0);
+  assert.equal(som, boek.gemeten.mutaties,
+    'de mutatiebakken tellen op tot ' + som + ' en het mutatieboek zegt ' + boek.gemeten.mutaties);
+});
+
+test('geclassificeerd is iets anders dan beproefbaar, en het boek houdt dat uit elkaar', () => {
+  /* DE KERN VAN DE OPZET. Een route met een :parameter kan prima een besluit
+     over duplicaatgedrag dragen; hij is alleen niet met twee kale HTTP-oproepen
+     te beproeven. Wie die twee door elkaar haalt, gaat de architectuur vervormen
+     om een percentage mooi te maken. */
+  assert.ok(boek.gemeten.mutatiesVerklaard >= boek.gemeten.beproefbaarVerklaard,
+    'er kunnen niet meer beproefbare verklaringen zijn dan verklaringen');
+  assert.equal(boek.gemeten.mutatiesVerklaard + boek.gemeten.mutatiesOnverklaard, boek.gemeten.mutaties);
+});
+
+test('elke afwijking met een vastgelegde teller draagt een duiding', () => {
+  /* Een verschil zonder duiding leest als een fout, terwijl het meestal
+     veroudering is -- en dat zijn tegengestelde conclusies. */
+  for (const r of boek.verzoening) {
+    assert.ok(r.zelfdeVraag && r.zelfdeVraag.length > 10, r.bron + ' zegt niet welke vraag hij stelt');
+    if (!r.gelijk) assert.ok(r.duiding && r.duiding.length > 20,
+      r.bron + ' ' + r.veld + ' wijkt af zonder duiding');
+  }
+});
+
+test('elke mutatie draagt precies een formele status', () => {
+  const som = boek.statussen.reduce((n, st) => n + st.aantal, 0);
+  assert.equal(som, boek.gemeten.mutaties,
+    'de statussen tellen op tot ' + som + ' en er zijn ' + boek.gemeten.mutaties + ' mutaties');
+  assert.equal(boek.gemeten.statusSluit, true);
+  for (const st of boek.statussen) assert.ok(st.uitleg && st.uitleg.length > 30, st.id + ' mist een uitleg');
+});
+
+test('precies een status hoort naar nul, en dat is de onverklaarde', () => {
+  const naarNul = boek.statussen.filter(st => st.moetNaarNul).map(st => st.id);
+  assert.deepEqual(naarNul, ['NOG_NIET_GECLASSIFICEERD'],
+    'bewust niet-idempotent is KLAAR en geen tekort; wie die ook naar nul wil, vervormt de architectuur');
+});
+
+test('een status over beproefbaarheid is geen besluit over duplicaatgedrag', () => {
+  /* DE TOETS TEGEN SCHIJNZEKERHEID. "4661 mutaties, 4661 met een status" mag
+     nooit gelezen worden als "4661 verklaard": van bijna duizend daarvan is
+     alleen bekend dat de proef er niet bij kan, en dat is een uitspraak over
+     het instrument en niet over de route. */
+  const metSemantiek = boek.statussen.filter(st => st.semantiek).reduce((n, st) => n + st.aantal, 0);
+  assert.equal(metSemantiek, boek.gemeten.metBesluitOverDuplicaat);
+  assert.equal(metSemantiek, boek.gemeten.mutatiesVerklaard,
+    'de semantische statussen horen exact de verklaringen uit idemsleutels.js te zijn');
+  assert.equal(boek.gemeten.zonderBesluitOverDuplicaat,
+    boek.gemeten.mutaties - boek.gemeten.mutatiesVerklaard);
+  assert.ok(boek.gemeten.zonderBesluitOverDuplicaat > boek.gemeten.nogNietGeclassificeerd,
+    'er horen mutaties te zijn die wel een status maar geen besluit dragen; anders vervaagt het onderscheid');
+});
+
+test('de statustelling klopt met IDEMSCHULD.json, of zegt waarom niet', () => {
+  /* Twee registers over hetzelfde huis. Ze horen hetzelfde getal te geven; doen
+     ze dat niet, dan draagt de verzoening de duiding. */
+  const rij = boek.verzoening.find(r => r.bron === 'IDEMSCHULD.json');
+  assert.ok(rij, 'IDEMSCHULD.json hoort in de verzoening te staan');
+  if (!rij.gelijk) assert.ok(rij.duiding.length > 20, 'een afwijking zonder duiding');
+});
+
+test('de redenen zonder proefsleutel komen uit de gedeelde bewakerskaart', () => {
+  /* Niet uit een tweede berekening in dit boek: de eerste versie deed dat wel en
+     gaf voor alle duizend dezelfde generieke zin, terwijl er drie verschillende
+     reparaties achter zitten. */
+  const redenen = boek.zonderRolPerReden;
+  assert.ok(redenen.length >= 3,
+    'er horen meerdere soorten redenen te zijn, gevonden: ' + redenen.length);
+  const totaal = redenen.reduce((n, r) => n + r.aantal, 0);
+  const bak = boek.bakken.find(b => b.id === 'geen-rol-met-token');
+  assert.equal(totaal, bak.aantal, 'de redenen tellen niet op tot de bak');
+});

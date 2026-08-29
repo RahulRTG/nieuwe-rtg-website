@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T23:15:04.751Z",
-  "commit": "55e4a311",
+  "op": "2026-08-29T23:22:34.000Z",
+  "commit": "45a81557",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,14 +9,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 3017,
+  "geclassificeerd": 3049,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 2953,
-   "LEGACY_PENDING_CLASSIFICATION": 1636,
+   "LEGACY_PENDING_CLASSIFICATION": 1604,
    "NOT_APPLICABLE": 40,
-   "PROTECTED": 24
+   "PROTECTED": 24,
+   "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
-  "vastgesteldDoorMens": 64,
+  "vastgesteldDoorMens": 96,
   "afgeleidDoorScript": 2953,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
@@ -3542,12 +3543,14 @@
   {
    "mutatieId": "bank.rekening.open",
    "route": "POST /api/bank/rekening/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3559,10 +3562,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.rente-voorbeeld",
@@ -7216,12 +7219,14 @@
   {
    "mutatieId": "bijles.vraag",
    "route": "POST /api/bijles/vraag",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -7233,10 +7238,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "boardroom.ai",
@@ -11965,12 +11970,14 @@
   {
    "mutatieId": "command.zaak.open",
    "route": "POST /api/command/zaak/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -11982,10 +11989,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.zaken",
@@ -13424,12 +13431,14 @@
   {
    "mutatieId": "concern.opname.maak",
    "route": "POST /api/concern/opname/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -13441,10 +13450,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "concern.opnames",
@@ -14420,12 +14429,14 @@
   {
    "mutatieId": "drm.report",
    "route": "POST /api/drm/report",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -14437,10 +14448,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "event.rsvp",
@@ -32862,12 +32873,14 @@
   {
    "mutatieId": "live.start",
    "route": "POST /api/live/start",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -32879,10 +32892,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "live.state",
@@ -35182,12 +35195,14 @@
   {
    "mutatieId": "mediaos.samen.start",
    "route": "POST /api/mediaos/samen/start",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -35199,10 +35214,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "mediaos.samen.uit",
@@ -35550,12 +35565,14 @@
   {
    "mutatieId": "meet.maak",
    "route": "POST /api/meet/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -35567,10 +35584,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "meet.mijn",
@@ -38960,12 +38977,14 @@
   {
    "mutatieId": "member.leren.schrijf-bewaar",
    "route": "POST /api/member/leren/schrijf-bewaar",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38977,10 +38996,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.leren.schrijf-feedback",
@@ -40561,12 +40580,14 @@
   {
    "mutatieId": "member.pin.live",
    "route": "POST /api/member/pin/live",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40578,10 +40599,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.pin.live.kijk",
@@ -48250,12 +48271,14 @@
   {
    "mutatieId": "muziek.maak",
    "route": "POST /api/muziek/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -48267,10 +48290,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "muziek.mijn",
@@ -49562,12 +49585,14 @@
   {
    "mutatieId": "office.architect.project",
    "route": "POST /api/office/architect/project",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -49579,10 +49604,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.architect.verwijder",
@@ -49768,12 +49793,14 @@
   {
    "mutatieId": "office.atelier.collectie",
    "route": "POST /api/office/atelier/collectie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -49785,10 +49812,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.atelier.concept",
@@ -53520,12 +53547,14 @@
   {
    "mutatieId": "office.kamer.taak",
    "route": "POST /api/office/kamer/taak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -53537,10 +53566,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.kamer.taak-zet",
@@ -53811,12 +53840,14 @@
   {
    "mutatieId": "office.kantoorpakket.maak",
    "route": "POST /api/office/kantoorpakket/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -53828,10 +53859,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.kantoorpakket.mijn",
@@ -57851,12 +57882,14 @@
   {
    "mutatieId": "office.redactie.artikel.maak",
    "route": "POST /api/office/redactie/artikel/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -57868,10 +57901,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.redactie.artikel.status",
@@ -59444,12 +59477,14 @@
   {
    "mutatieId": "office.studio.collectie",
    "route": "POST /api/office/studio/collectie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -59461,10 +59496,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.studio.concept",
@@ -59548,12 +59583,14 @@
   {
    "mutatieId": "office.studio.maak",
    "route": "POST /api/office/studio/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -59565,10 +59602,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.studio.specsheet",
@@ -62366,12 +62403,14 @@
   {
    "mutatieId": "office.weefsel.werk.maak",
    "route": "POST /api/office/weefsel/werk/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -62383,10 +62422,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.weefsel.werk.zet",
@@ -62653,12 +62692,14 @@
   {
    "mutatieId": "office.werkplaats.maak",
    "route": "POST /api/office/werkplaats/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -62670,10 +62711,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.werkplaats.publiceer",
@@ -63844,12 +63885,14 @@
   {
    "mutatieId": "onderneming.nieuw",
    "route": "POST /api/onderneming/nieuw",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -63861,10 +63904,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "onderneming.ontwerp",
@@ -68136,12 +68179,14 @@
   {
    "mutatieId": "pay.kascode",
    "route": "POST /api/pay/kascode",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "een echt account",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -68153,10 +68198,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.oplaad",
@@ -68496,12 +68541,14 @@
   {
    "mutatieId": "pay.tikcode",
    "route": "POST /api/pay/tikcode",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -68513,10 +68560,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.tiks",
@@ -82446,12 +82493,14 @@
   {
    "mutatieId": "salon.plaats",
    "route": "POST /api/salon/plaats",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -82463,10 +82512,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "salon.poll.stem",
@@ -82818,12 +82867,14 @@
   {
    "mutatieId": "samen.maak",
    "route": "POST /api/samen/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -82835,10 +82886,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "samen.mee",
@@ -86882,12 +86933,14 @@
   {
    "mutatieId": "supplier.agenda.toevoegen",
    "route": "POST /api/supplier/agenda/toevoegen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -86899,10 +86952,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.agenda.verwijder",
@@ -94434,12 +94487,14 @@
   {
    "mutatieId": "supplier.horeca.bon.maak",
    "route": "POST /api/supplier/horeca/bon/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -94451,10 +94506,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.club.band",
@@ -96659,12 +96714,14 @@
   {
    "mutatieId": "supplier.horeca.rekening.open",
    "route": "POST /api/supplier/horeca/rekening/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96676,10 +96733,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.rekening.regel",
@@ -96923,12 +96980,14 @@
   {
    "mutatieId": "supplier.horeca.simulatie.maak",
    "route": "POST /api/supplier/horeca/simulatie/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96940,10 +96999,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.simulatie.voorstellen",
@@ -98596,12 +98655,14 @@
   {
    "mutatieId": "supplier.kantoorpakket.maak",
    "route": "POST /api/supplier/kantoorpakket/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98613,10 +98674,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.kantoorpakket.mijn",
@@ -117515,12 +117576,14 @@
   {
    "mutatieId": "wallet.voeg",
    "route": "POST /api/wallet/voeg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "geenGast"
@@ -117533,10 +117596,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "wallet.weg",
@@ -118143,12 +118206,14 @@
   {
    "mutatieId": "wereld.profiel.van",
    "route": "POST /api/wereld/profiel/van",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -118160,10 +118225,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "wereld.profiel.zicht",

@@ -257,17 +257,40 @@ opgeruimd.
 
 ```
 Mutation inventory                4.653
-Classified                        3.017   64,8%
-  vastgesteld door een mens          64   (een uitspraak over gedrag)
+Classified                        3.049   65,5%
+  vastgesteld door een mens          96   (een uitspraak over gedrag)
   afgeleid door een script        2.953   (alleen: wij weten het niet, en waarom)
 
   PROTECTED                          24
+  INTENTIONALLY_NON_IDEMPOTENT       32
   NOT_APPLICABLE                     40
-  INTENTIONALLY_NON_IDEMPOTENT        0
   UNTESTABLE_WITH_JUSTIFIED_REASON    0
   BLOCKED_BY_TEST_FIXTURE         2.953   hoort te slinken
-LEGACY_PENDING_CLASSIFICATION     1.636   moet naar nul
+LEGACY_PENDING_CLASSIFICATION     1.604   moet naar nul
 ```
+
+**De 32 `INTENTIONALLY_NON_IDEMPOTENT` komen uit een register dat er al was.**
+`IDEMBESLUIT.json` draagt 127 besluiten van een mens over waarom een herhaling
+daar mag: een code-maker *hoort* elke keer iets nieuws te geven, een teller hoort
+op te hogen, en bij een `creatie` is besloten dat een tweede item hinderlijk is
+maar geen geld raakt. Dat is de reden die deze stand eist; wat ontbrak was de
+meting, en de kale ronde levert die.
+
+Twee dingen die daarbij eerlijk moeten blijven staan:
+
+- **Van de 127 besluiten halen er 32 deze lijst.** Vierenveertig zijn `berekening`
+  of `instelling` — die horen bij een andere stand — en de rest is niet gemeten.
+  Een besluit zonder meting is hier geen contract, hoe goed het besluit ook is.
+- **Zeven dragen een reden over déze route; vijfentwintig alleen de reden van hun
+  klasse.** Dat tweede is nog steeds een besluit — iemand heeft die route daar
+  bewust in gezet — maar het is een zwakkere grond, en het contract zegt dat er
+  met zoveel woorden bij.
+
+Het contract leest die reden bij het opbouwen **op uit `IDEMBESLUIT.json`** in
+plaats van hem over te typen: twee plekken met dezelfde reden lopen uiteen, en dan
+draagt dit register een reden die niemand meer meent. Verdwijnt een route daar,
+dan valt de bouw om. (De eerste versie viel stil terug op de klassetekst, en toen
+liet de mutatieproef niets zakken — dat is precies waar een mutatieproef voor is.)
 
 Die 59,9% is met opzet niet het getal om trots op te zijn — de 64 is dat. Wat de
 2.722 waard zijn is dit: ze zijn niet meer *onbekend*, ze zijn *geblokkeerd, met

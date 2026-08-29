@@ -46,6 +46,7 @@ const CONTRACTEN = Object.assign({},
      bestand dat ook nog de vorm en de regels uitlegt. Dezelfde vorm als
      ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
-  require('./mutatiecontracten-leest').CONTRACTEN);
+  require('./mutatiecontracten-leest').CONTRACTEN,
+  require('./mutatiecontracten-tweedehandeling').CONTRACTEN);
 
 module.exports = { CONTRACTEN };

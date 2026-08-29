@@ -25,6 +25,7 @@ const { start } = require('./lib/wegwerpserver');
 const { draaiIdemproef } = require('./lib/idemproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
+const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
 const { stempel } = require('./lib/stempel');
@@ -57,7 +58,22 @@ if (require.main !== module) { module.exports = {}; return; }
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'idemproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  /* RTG_MAGNAAT_TEST=1 EN NIET ALLEEN RTG_DEMO=1.
+
+     server/testomgeving.js: RTG_DEMO telt uitsluitend binnen NODE_ENV=test, en
+     die zet dit script niet. De proef hing dus aan een omgevingsvariabele van de
+     OPERATOR: wie hem toevallig had, kreeg tokens; wie hem niet had, kreeg
+     exit(2) op "geen token voor member, office, supplier". RTG_MAGNAAT_TEST is
+     de expliciete, gedocumenteerde vlag voor synthetische data en staat niet in
+     productie -- de opstelling zegt nu zelf wat ze nodig heeft. */
+  const server = await start({ naam: 'idemproef',
+    env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF',
+      /* Het TWEEDE meetpunt (de opslag) hing aan dezelfde toevalligheid: zonder
+         RTG_STAATLOG draagt geen antwoord een X-RTG-Staat-kop en meet de proef
+         alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
+         want alleen die ziet ook een wijziging OP ZIJN PLAATS (gelijke lengte,
+         andere inhoud). Zie server/staatlog.js. */
+      RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
   const post = async (pad, lijf, tok) => {
@@ -71,23 +87,17 @@ if (require.main !== module) { module.exports = {}; return; }
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const ontbreekt = Object.keys(inlog).filter(r => !tokens[r]);
-  if (ontbreekt.length) {
-    console.error('geen token voor: ' + ontbreekt.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
+  /* De sleutelbos staat in ./lib/proefsleutels.js -- zeven rollen op een plek.
+     Hij stond hier woordelijk, en in vijf andere instrumenten nog eens; die zes
+     kopieen kenden alleen member/office/supplier, en daardoor bleven 111 routes
+     met een eigenrol (boardroom, techniek, werkplekbaas, scim) ongemeten. */
+  const bos = await haalSleutels({ post });
+  const { tokens, tokenVoor, hernieuw } = bos;
+  const basisMist = BASISROLLEN.filter(r => !tokens[r]);
+  if (basisMist.length) {
+    console.error('geen token voor: ' + basisMist.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
     klaar(); process.exit(2);
   }
-  const tokenVoor = (rol) => tokens[rol];
-  const hernieuw = async (rol) => {
-    try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {}
-    return false;
-  };
 
   const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
@@ -102,10 +112,11 @@ if (require.main !== module) { module.exports = {}; return; }
      geen sleutel voor bestaat: de idemproef herhaalt een oproep MET de juiste rol; zonder token voor die rol
      wordt elke herhaling even hard geweigerd en zegt de gelijkheid niets.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const verdeling = verdeelOpRol(kandidaten, bos.rollen);
   const routes = verdeling.metRol;
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
+  meldSleutels(bos);
   console.log('  routes gevonden                      : ' + kandidaten.length);
   console.log('  routes met een herkenbare rol        : ' + routes.length);
   meldZonderRol(verdeling);
@@ -121,7 +132,7 @@ if (require.main !== module) { module.exports = {}; return; }
      en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
      route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
   const { zetWereldKlaar } = require('./lib/idemwereld');
-  const { extra, perRoute: geldLijven } = await zetWereldKlaar({ post, tokens, login: inlog });
+  const { extra, perRoute: geldLijven } = await zetWereldKlaar({ post, tokens });
   console.log('  wereld klaargezet                    : ' +
     (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
   console.log('  geldroutes met een eigen lijf        : ' + Object.keys(geldLijven).length);

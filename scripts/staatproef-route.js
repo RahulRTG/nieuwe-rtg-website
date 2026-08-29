@@ -33,6 +33,7 @@ const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/ro
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
 const { stempel } = require('./lib/stempel');
+const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'STAATPROEF.json');
@@ -61,7 +62,7 @@ if (require.main !== module) { module.exports = {}; return; }
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'staatproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const server = await start({ naam: 'staatproef', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
   /* De objectpool oogst in de post-wikkel: elk geslaagd antwoord op DEZE
@@ -81,14 +82,13 @@ if (require.main !== module) { module.exports = {}; return; }
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const mist = Object.keys(inlog).filter(r => !tokens[r]);
+  /* De sleutelbos: ./lib/proefsleutels.js, zeven rollen op een plek. Deze drie
+     regels stonden in zes instrumenten en kenden alleen member/office/supplier;
+     routes met een eigenrol bleven daardoor overal ongemeten. */
+  const bos = await haalSleutels({ post });
+  const { tokens } = bos;
+  meldSleutels(bos);
+  const mist = BASISROLLEN.filter(r => !tokens[r]);
   if (mist.length) { console.error('geen token voor: ' + mist.join(', ')); klaar(); process.exit(2); }
 
   /* DE EIGENAAR, voor de vingerafdruk. Hij staat in de seed; dit is een gewone
@@ -140,7 +140,7 @@ if (require.main !== module) { module.exports = {}; return; }
      geen sleutel voor bestaat: de staatproef roept aan MET de rol van de route; zonder token voor die rol
      klopt hij zonder sleutel aan en meet hij niets.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const verdeling = verdeelOpRol(kandidaten, bos.rollen);
   /* DE RONDE STAPELT, NET ALS DE OUTPUT-BAND. Een volle ronde duurt uren en
      een container haalt dat niet; met --max=N mat hij vroeger telkens DEZELFDE
      eerste N routes en gooide de rest van het register weg. Nu: wat er al
@@ -276,7 +276,7 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  eenmalig bewogen (WEL beoordeeld)    : ' + (eenmalig.length ? eenmalig.join(', ') : 'geen') + '\n');
 
   const uit = await draaiStaatproef({ post, vingerafdruk, routes, tokenVoor: (r) => tokens[r],
-    hernieuw: async (rol) => { try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {} return false; },
+    hernieuw: bos.hernieuw,
     lijfVoor: (r) => pool.verrijk(plausibelLijf(r.pad), r.pad).lijf, verschilVan, ruis, maxRoutes: MAX });
 
   if (uit.meterStuk) { console.error('\n  DE METER IS BLIND: ' + uit.meterStuk); klaar(); process.exit(2); }

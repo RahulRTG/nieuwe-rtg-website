@@ -57,6 +57,7 @@ const { start } = require('./lib/wegwerpserver');
 const { alleRoutes, rolVan } = require('./lib/routes');
 const { plausibelLijf } = require('./lib/rolproef');
 const { stempel } = require('./lib/stempel');
+const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INHOUDSKAART.json');
@@ -140,7 +141,7 @@ if (require.main !== module) return;
   console.log('  blinde + onbesliste routes (geen deur): ' + doel.size);
   console.log('  bereikbaar (publiek of bekende rol)   : ' + verdeling.metRol.length);
 
-  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const server = await start({ naam: 'inhoudskaart', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
   const doe = async (methode, pad, lijf, tok) => {
     try {
@@ -151,13 +152,11 @@ if (require.main !== module) return;
       return { status: r.status, data };
     } catch (e) { return { status: 0, data: null }; }
   };
-  const inlog = {
-    member: async () => (await doe('POST', '/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await doe('POST', '/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await doe('POST', '/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
+  /* De sleutelbos: ./lib/proefsleutels.js. `doe` heeft de methode vooraan, dus
+     de bos krijgt hier een post() die daarop aansluit -- geen tweede kopie. */
+  const bos = await haalSleutels({ post: (pad, lijf, tok) => doe('POST', pad, lijf, tok) });
+  const { tokens } = bos;
+  meldSleutels(bos);
 
   /* Vaste volgorde: de wacht roept straks in dezelfde volgorde aan, zodat de
      opgebouwde toestand (route A maakte iets dat route B ziet) gelijk loopt. */

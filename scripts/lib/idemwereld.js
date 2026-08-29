@@ -38,7 +38,7 @@
    voorbeeld-IBAN uit de ISO-documentatie, geen rekening van iemand. */
 const BUITEN_IBAN = 'NL91ABNA0417164300';
 
-async function zetWereldKlaar({ post, tokens, login }) {
+async function zetWereldKlaar({ post, tokens }) {
   const w = {};
   const stil = async (pad, lijf, tok) => { try { return await post(pad, lijf, tok); } catch (e) { return { status: 0, data: {} }; } };
   const veld = (r, ...pad) => { let v = r && r.data; for (const k of pad) { if (!v) return null; v = v[k]; } return v || null; };

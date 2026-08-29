@@ -18,7 +18,7 @@
  },
  "telling": {
   "creatie": 45,
-  "berekening": 42,
+  "berekening": 43,
   "instelling": 19,
   "beschermd": 15,
   "code-maker": 4,
@@ -438,6 +438,10 @@
   "/api/wereld/profiel/van": {
    "klasse": "teller",
    "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een profiel bekijken. De eerste keer komt er een bezoekregel bij, daarna gaat `keer` omhoog en schuift `at` mee (kern/wereld/bezoek.js). Dat is geen neveneffect maar de belofte: er is geen sluipstand, en dat staat ook in het antwoord zodat het scherm het niet kan verzwijgen. Zou een tweede blik NIET meetellen, dan klopte de telling niet meer."
+  },
+  "/api/office/aidata/export": {
+   "klasse": "berekening",
+   "reden": "Bouwt de AI-dataset uit de stand van dat moment en stuurt hem als JSONL terug; er wordt niets blijvends aangemaakt (de opslagdelta van alle drie de oproepen is leeg). Een tweede export hoort dus een VERSE uitkomst te geven -- dat de proef verschil ziet, is precies goed. Het enige wat hij achterlaat is een regel in kantoorAudit, en dat is een aantekening van de handeling en niet de handeling zelf (zie vastleggingUitleg). Gevonden op 29 augustus 2026, in de eerste ronde waarin dit instrument een boardroom-sleutel had; daarvoor was deze route ONGEMETEN en niet groen."
   }
  }
 }

@@ -21,463 +21,65 @@
    ========================================================================== */
 'use strict';
 
-const CONTRACTEN = {
-  'POST /api/aanmelding/contracten': {
-    mutatieId: 'aanmelding.contracten',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/aanmeldingen.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
+/* HETZELFDE BEWIJS, ZEVENENDERTIG KEER -- dus EEN keer, met de bestandsnaam als
+   enige variabele. Zie ./mutatiecontracten-beschermd.js voor waarom dat meer is
+   dan een besparing: een reeks bijna-gelijke zinnen is de vorm waarin een
+   verschil onopgemerkt insluipt. */
+const leest = (route, mutatieId, bestand) => [route, {
+  mutatieId, herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' },
+  stand: 'NOT_APPLICABLE',
+  bewijs: {
+    gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de ' +
+      'gemeten collecties',
+    op: '2026-08-29'
   },
-  'POST /api/aanmelding/lijst': {
-    mutatieId: 'aanmelding.lijst',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/aanmeldingen.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/boardroom/betalingen/status': {
-    mutatieId: 'boardroom.betalingen.status',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/techniek/betalingen.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/command/overname': {
-    mutatieId: 'command.overname',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/command/inrichten.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/command/runbooks': {
-    mutatieId: 'command.runbooks',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/command/herstel.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/command/tijdlijn': {
-    mutatieId: 'command.tijdlijn',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/command/bestuur.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/command/zandbak': {
-    mutatieId: 'command.zandbak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/command/meten.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/contracten/mijn': {
-    mutatieId: 'contracten.mijn',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/member/handel/winkel.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/giftcards/mine': {
-    mutatieId: 'giftcards.mine',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/member/cadeaukaart.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/member/huis/map': {
-    mutatieId: 'member.huis.map',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/huis.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/notifications': {
-    mutatieId: 'notifications',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/server.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/atelierweb/lijst': {
-    mutatieId: 'office.atelierweb.lijst',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/atelierweb.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/bank/regels': {
-    mutatieId: 'office.bank.regels',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/bankhart.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/bank/regels/zzp': {
-    mutatieId: 'office.bank.regels.zzp',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/bankhart.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/boardroom/rahul': {
-    mutatieId: 'office.boardroom.rahul',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/kantoren/regie.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/merk/lijst': {
-    mutatieId: 'office.merk.lijst',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/webmerk.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/onderzoeker': {
-    mutatieId: 'office.onderzoeker',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/rtgkantoor.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/partner/regels': {
-    mutatieId: 'office.partner.regels',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/office/partneraanvragen.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/payroll/run/lijst': {
-    mutatieId: 'office.payroll.run.lijst',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/payroll-os-run.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/rechtsvormwacht': {
-    mutatieId: 'office.rechtsvormwacht',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/office/ondernemers.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/reisbureau/uitnodigingen': {
-    mutatieId: 'office.reisbureau.uitnodigingen',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/kantoren/reisbureau.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/rtgai': {
-    mutatieId: 'office.rtgai',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/rtgkantoor.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/salon/belang': {
-    mutatieId: 'office.salon.belang',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/kantoren/salon.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/trust': {
-    mutatieId: 'office.trust',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/office/partners/kantoorlijsten.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/uitgifte': {
-    mutatieId: 'office.uitgifte',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/uitgifte.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/office/zelfzorg': {
-    mutatieId: 'office.zelfzorg',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/kantoren/zelfzorg.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/onboarding/status': {
-    mutatieId: 'onboarding.status',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/onboarding.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/onderneming/ontwerp/opdrachten': {
-    mutatieId: 'onderneming.ontwerp.opdrachten',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/member/onderneming-bestuur.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/reis/uitnodiging/mijn': {
-    mutatieId: 'reis.uitnodiging.mijn',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/reis.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/contracten': {
-    mutatieId: 'supplier.contracten',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/supplier/contract.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/payroll/runs': {
-    mutatieId: 'supplier.payroll.runs',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/payroll-os-zaak.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/salon/stats': {
-    mutatieId: 'supplier.salon.stats',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/supplier/salon/profiel.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/uitgifte': {
-    mutatieId: 'supplier.uitgifte',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/uitgifte.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/werkmail/adressen': {
-    mutatieId: 'supplier.werkmail.adressen',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/werkmail.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/supplier/werkmail/overzicht': {
-    mutatieId: 'supplier.werkmail.overzicht',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/werkmail.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/verify/status': {
-    mutatieId: 'verify.status',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/auth/verificatie.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/vertaal/talen': {
-    mutatieId: 'vertaal.talen',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/vertaal.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
-  'POST /api/wallet': {
-    mutatieId: 'wallet',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets ' +
-      'achter in de gemeten collecties', op: '2026-08-29' },
-    nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen server/routes/zorgwallet.js ' +
-      'herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat ' +
-      'sluit dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
-  },
+  nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen ' + bestand +
+    ' herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat sluit ' +
+    'dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
+}];
+
+const CONTRACTEN = Object.assign(Object.fromEntries([
+  leest('POST /api/aanmelding/contracten', 'aanmelding.contracten', 'server/routes/aanmeldingen.js'),
+  leest('POST /api/aanmelding/lijst', 'aanmelding.lijst', 'server/routes/aanmeldingen.js'),
+  leest('POST /api/boardroom/betalingen/status', 'boardroom.betalingen.status', 'server/routes/techniek/betalingen.js'),
+  leest('POST /api/command/overname', 'command.overname', 'server/routes/command/inrichten.js'),
+  leest('POST /api/command/runbooks', 'command.runbooks', 'server/routes/command/herstel.js'),
+  leest('POST /api/command/tijdlijn', 'command.tijdlijn', 'server/routes/command/bestuur.js'),
+  leest('POST /api/command/zandbak', 'command.zandbak', 'server/routes/command/meten.js'),
+  leest('POST /api/contracten/mijn', 'contracten.mijn', 'server/routes/member/handel/winkel.js'),
+  leest('POST /api/giftcards/mine', 'giftcards.mine', 'server/routes/member/cadeaukaart.js'),
+  leest('POST /api/member/huis/map', 'member.huis.map', 'server/routes/huis.js'),
+  leest('POST /api/notifications', 'notifications', 'server/server.js'),
+  leest('POST /api/office/atelierweb/lijst', 'office.atelierweb.lijst', 'server/routes/atelierweb.js'),
+  leest('POST /api/office/bank/regels', 'office.bank.regels', 'server/routes/bankhart.js'),
+  leest('POST /api/office/bank/regels/zzp', 'office.bank.regels.zzp', 'server/routes/bankhart.js'),
+  leest('POST /api/office/boardroom/rahul', 'office.boardroom.rahul', 'server/routes/kantoren/regie.js'),
+  leest('POST /api/office/merk/lijst', 'office.merk.lijst', 'server/routes/webmerk.js'),
+  leest('POST /api/office/onderzoeker', 'office.onderzoeker', 'server/routes/rtgkantoor.js'),
+  leest('POST /api/office/partner/regels', 'office.partner.regels', 'server/routes/office/partneraanvragen.js'),
+  leest('POST /api/office/payroll/run/lijst', 'office.payroll.run.lijst', 'server/routes/payroll-os-run.js'),
+  leest('POST /api/office/rechtsvormwacht', 'office.rechtsvormwacht', 'server/routes/office/ondernemers.js'),
+  leest('POST /api/office/reisbureau/uitnodigingen', 'office.reisbureau.uitnodigingen', 'server/routes/kantoren/reisbureau.js'),
+  leest('POST /api/office/rtgai', 'office.rtgai', 'server/routes/rtgkantoor.js'),
+  leest('POST /api/office/salon/belang', 'office.salon.belang', 'server/routes/kantoren/salon.js'),
+  leest('POST /api/office/trust', 'office.trust', 'server/routes/office/partners/kantoorlijsten.js'),
+  leest('POST /api/office/uitgifte', 'office.uitgifte', 'server/routes/uitgifte.js'),
+  leest('POST /api/office/zelfzorg', 'office.zelfzorg', 'server/routes/kantoren/zelfzorg.js'),
+  leest('POST /api/onboarding/status', 'onboarding.status', 'server/routes/onboarding.js'),
+  leest('POST /api/onderneming/ontwerp/opdrachten', 'onderneming.ontwerp.opdrachten', 'server/routes/member/onderneming-bestuur.js'),
+  leest('POST /api/reis/uitnodiging/mijn', 'reis.uitnodiging.mijn', 'server/routes/reis.js'),
+  leest('POST /api/supplier/contracten', 'supplier.contracten', 'server/routes/supplier/contract.js'),
+  leest('POST /api/supplier/payroll/runs', 'supplier.payroll.runs', 'server/routes/payroll-os-zaak.js'),
+  leest('POST /api/supplier/salon/stats', 'supplier.salon.stats', 'server/routes/supplier/salon/profiel.js'),
+  leest('POST /api/supplier/uitgifte', 'supplier.uitgifte', 'server/routes/uitgifte.js'),
+  leest('POST /api/supplier/werkmail/adressen', 'supplier.werkmail.adressen', 'server/routes/werkmail.js'),
+  leest('POST /api/supplier/werkmail/overzicht', 'supplier.werkmail.overzicht', 'server/routes/werkmail.js'),
+  leest('POST /api/verify/status', 'verify.status', 'server/routes/auth/verificatie.js'),
+  leest('POST /api/vertaal/talen', 'vertaal.talen', 'server/routes/vertaal.js'),
+  leest('POST /api/wallet', 'wallet', 'server/routes/zorgwallet.js'),
+]), {
   'POST /api/metier/zoek': {
     mutatieId: 'metier.zoek',
     herkomst: 'mens',
@@ -501,6 +103,6 @@ const CONTRACTEN = {
     nagekeken: 'met de hand, 2026-08-29: server/bedrijf/it.js regel 77 leest Object.values(A(g.w)), ' +
       'filtert en telt -- geen save(), geen toewijzing'
   },
-};
+});
 
 module.exports = { CONTRACTEN };

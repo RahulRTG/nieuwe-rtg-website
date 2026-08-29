@@ -16,224 +16,52 @@
    ========================================================================== */
 'use strict';
 
-const CONTRACTEN = {
-  'POST /api/agenda/toevoegen': {
-    mutatieId: 'agenda.toevoegen',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/commerce/mand/leeg': {
-    mutatieId: 'commerce.mand.leeg',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/concern/entiteit/nieuw': {
-    mutatieId: 'concern.entiteit.nieuw',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/concern/nieuw': {
-    mutatieId: 'concern.nieuw',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/gemeente/meld': {
-    mutatieId: 'gemeente.meld',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/genootschap/richt-op': {
-    mutatieId: 'genootschap.richt-op',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/gewoonten/maak': {
-    mutatieId: 'gewoonten.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/kosten/grens/zet': {
-    mutatieId: 'kosten.grens.zet',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/mall/lijst/nieuw': {
-    mutatieId: 'mall.lijst.nieuw',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/mediaos/lijst/maak': {
-    mutatieId: 'mediaos.lijst.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/member/leren/project-maak': {
-    mutatieId: 'member.leren.project-maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/member/pin/uit': {
-    mutatieId: 'member.pin.uit',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/architect/maak': {
-    mutatieId: 'office.architect.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/atelier/maak': {
-    mutatieId: 'office.atelier.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/hardware/maak': {
-    mutatieId: 'office.hardware.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/ideeen/maak': {
-    mutatieId: 'office.ideeen.maak',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/kosten/peil': {
-    mutatieId: 'office.kosten.peil',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/office/kosten/vrijgeven': {
-    mutatieId: 'office.kosten.vrijgeven',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/onboarding/bedrijf': {
-    mutatieId: 'onboarding.bedrijf',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/onboarding/salonpost': {
-    mutatieId: 'onboarding.salonpost',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/reis/invoer/lees': {
-    mutatieId: 'reis.invoer.lees',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/supplier/activiteit/sluit': {
-    mutatieId: 'supplier.activiteit.sluit',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/supplier/pay/treasury/zet': {
-    mutatieId: 'supplier.pay.treasury.zet',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, ' +
-      'wat alleen de idem-poort kan zijn -- die handelt op de zelfdeVerzoek-verklaring hierboven', op: '2026-08-29' }
-  },
-  'POST /api/overheid/water/meld': {
-    mutatieId: 'overheid.water.meld',
-    herkomst: 'mens',
-    semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' },
-    stand: 'PROTECTED',
-    bewijs: { gemeten: 'kale ronde zonder sleutel: de herhaling kwam terug met `herhaald: true` en de ' +
-      'bestaande melding; nagelezen in server/kern/overheid/regio.js -- zelfdeMeldingKortGeleden() uit ' +
-      'kern/dubbelemelding.js, venster van een minuut op melder + soort + tekst', op: '2026-08-29' }
-  },
+/* HET BEWIJS IS VOOR ALLE VIERENTWINTIG HETZELFDE, dus staat het EEN keer.
+
+   Vierentwintig keer dezelfde zin overtypen is niet alleen lang -- het is de
+   vorm waarin een verschil onopgemerkt insluipt. Wie er straks een toevoegt met
+   een net andere formulering, suggereert een ander soort bewijs dan er is. */
+const BEWIJS = {
+  gemeten: 'kale ronde zonder enige sleutel: de herhaling kwam terug met `herhaald: true`, wat alleen de ' +
+    'idem-poort kan zijn -- en die handelt op de zelfdeVerzoek-verklaring in ./idemsleutels.js',
+  op: '2026-08-29'
 };
+
+/* De vorm is voor alle vierentwintig gelijk: een ingelogde identiteit, een
+   herhaling die wordt herkend, en een mens die dat eerder al vond. */
+const beschermd = (route, mutatieId) => [route, {
+  mutatieId, herkomst: 'mens',
+  semantiek: { klasse: 'idempotent' },
+  toegang: { klasse: 'AUTHENTICATED' },
+  stand: 'PROTECTED',
+  bewijs: BEWIJS
+}];
+
+const CONTRACTEN = Object.fromEntries([
+  beschermd('POST /api/agenda/toevoegen', 'agenda.toevoegen'),
+  beschermd('POST /api/commerce/mand/leeg', 'commerce.mand.leeg'),
+  beschermd('POST /api/concern/entiteit/nieuw', 'concern.entiteit.nieuw'),
+  beschermd('POST /api/concern/nieuw', 'concern.nieuw'),
+  beschermd('POST /api/gemeente/meld', 'gemeente.meld'),
+  beschermd('POST /api/genootschap/richt-op', 'genootschap.richt-op'),
+  beschermd('POST /api/gewoonten/maak', 'gewoonten.maak'),
+  beschermd('POST /api/kosten/grens/zet', 'kosten.grens.zet'),
+  beschermd('POST /api/mall/lijst/nieuw', 'mall.lijst.nieuw'),
+  beschermd('POST /api/mediaos/lijst/maak', 'mediaos.lijst.maak'),
+  beschermd('POST /api/member/leren/project-maak', 'member.leren.project-maak'),
+  beschermd('POST /api/member/pin/uit', 'member.pin.uit'),
+  beschermd('POST /api/office/architect/maak', 'office.architect.maak'),
+  beschermd('POST /api/office/atelier/maak', 'office.atelier.maak'),
+  beschermd('POST /api/office/hardware/maak', 'office.hardware.maak'),
+  beschermd('POST /api/office/ideeen/maak', 'office.ideeen.maak'),
+  beschermd('POST /api/office/kosten/peil', 'office.kosten.peil'),
+  beschermd('POST /api/office/kosten/vrijgeven', 'office.kosten.vrijgeven'),
+  beschermd('POST /api/onboarding/bedrijf', 'onboarding.bedrijf'),
+  beschermd('POST /api/onboarding/salonpost', 'onboarding.salonpost'),
+  beschermd('POST /api/reis/invoer/lees', 'reis.invoer.lees'),
+  beschermd('POST /api/supplier/activiteit/sluit', 'supplier.activiteit.sluit'),
+  beschermd('POST /api/supplier/pay/treasury/zet', 'supplier.pay.treasury.zet'),
+  beschermd('POST /api/overheid/water/meld', 'overheid.water.meld'),
+]);
 
 module.exports = { CONTRACTEN };

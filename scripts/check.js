@@ -3956,6 +3956,12 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
       ' bestanden, en OBJECTMODEL.json is daar in elk blok gelijk aan'
   });
   afdrukGelijk({
+    bestand: 'GRAAFAS.json', meter: () => require('./graafas').meet(),
+    vast: 'npm run graafas:vast',
+    zeg: (v) => v.gemeten.grafen + ' grafen, ' + v.gemeten.metEenEigenEenheid + ' met een eigen eenheid, ' +
+      v.gemeten.verschillendeAssen + ' verschillende dringendheidsassen, en GRAAFAS.json is daar in elk blok gelijk aan'
+  });
+  afdrukGelijk({
     bestand: 'COMMERCE.json', meter: () => require('./commerce').meet(),
     vast: 'npm run commerce:vast',
     zeg: (v) => v.gemeten.koopbareVormen + ' koopbare vormen in ' + v.gemeten.koopbareDomeinen +

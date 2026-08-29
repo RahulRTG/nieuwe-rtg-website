@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-f3c3ba70';
+const CACHE = 'rtg-app-0cd2d98a';
 const SHELL = ['/apps/app.html',
   /* De drie installeerbare passen starten met een betekenisvolle query. Die
      adressen staan daarom exact in de schil: ze mogen offline niet naar de

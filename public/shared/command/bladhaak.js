@@ -49,9 +49,16 @@
       /* Een gewone link kan hetzelfde werkblad naar een andere RTG-app sturen.
          Het meubel bewaart dan de werkelijke canonieke URL en titel, anders
          zou Continuity na Reizen & Veilig opnieuw het oude LivingOS openen. */
-      function route(meld){var loc=p.frame.contentWindow.location;
+      function route(meld){var loc=p.frame.contentWindow.location,oudPad='';
         if(loc.origin!==w.location.origin)return;
-        p.url=loc.pathname+loc.search+loc.hash;p.titel=doc.title||p.titel;p.frame.title=p.titel;
+        try{oudPad=new URL(p.url,w.location.href).pathname}catch(e){}
+        p.url=loc.pathname+loc.search+loc.hash;
+        /* Een lokale hash/tabwissel verandert de taak niet en mag een korte
+           docknaam als Vandaag niet vervangen door de documenttitel
+           Vandaag · RTG. Alleen echte navigatie naar een andere app neemt de
+           nieuwe titel over. */
+        if(oudPad!==loc.pathname&&doc.title)p.titel=doc.title;
+        p.frame.title=p.titel;
         if(meld&&verander)verander()}
       route(false);
       /* pushState en replaceState geven geen browser-event. Door de twee

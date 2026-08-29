@@ -15,6 +15,7 @@
     var root=o.root,bank=root&&root.querySelector('.cmd-bank'),nav=bank&&bank.querySelector('.cmd-nav');
     if(!bank||!nav||!w.RTGInterfaceSecondScreenModules)return null;
     var state='peek',vorige='panel',editing=false,returnFocus=null,focusTerug=null,layout,mq=w.matchMedia('(min-width:1000px)'),uitvoerKijk=null;
+    var eerste=mq.matches?'workspace':'peek';
     var modules=w.RTGInterfaceSecondScreenModules({nav:nav,open:function(url,title){
       if(w.matchMedia('(max-width:999px)').matches)zet('peek');o.open(url,title);
     }});
@@ -29,7 +30,11 @@
     var acties=el('div','rtg-ss-actions');acties.appendChild(knop('Module toevoegen','edit'));acties.appendChild(knop('Zelf invullen','ask'));shell.appendChild(acties);
     bank.insertBefore(shell,bank.querySelector('.cmd-bankvoet'));
     bank.id=bank.id||'rtgSecondScreen';var greep=root.querySelector('.cmd-lade');if(greep)greep.setAttribute('aria-controls',bank.id);
-    root.classList.add('rtg-interface-second-screen');root.dataset.rtgSecondScreen='peek';
+    /* De beginstand staat in dezelfde DOM-mutatie als de runtimeklasse. Anders
+       ziet de browser heel even een zichtbaar paneel en animeert hij dat bij
+       de eerste mobiele paint naar buiten: functioneel dicht, visueel een
+       flits. Peek en Workspace worden zo meteen in hun echte eindstand gezet. */
+    state=eerste;root.classList.add('rtg-interface-second-screen','rtg-ss-'+eerste);root.dataset.rtgSecondScreen=eerste;
     if(w.RTGUitvoer&&w.RTGUitvoer.mount)w.RTGUitvoer.mount(head,bank);
     function merkUitvoer(){var b=head.querySelector('.rtguitvoer-knop');if(!b||b.dataset.ssOutput)return;b.dataset.ssOutput='1';b.setAttribute('aria-label','Gegevens meenemen');glyf(b,'logboek')}
     merkUitvoer();if(w.MutationObserver){uitvoerKijk=new MutationObserver(merkUitvoer);uitvoerKijk.observe(root,{childList:true,subtree:true})}
@@ -61,7 +66,7 @@
       if(a==='close')zet('peek');else if(a==='panel'||a==='workspace'||a==='focus')zet(a);else if(a==='edit'){editing=!editing;teken()}else if(a==='edit-done'){editing=false;teken()}else if(a==='ask'){if(o.vraag)o.vraag()}else if(a==='up')verplaats(id,-1);else if(a==='down')verplaats(id,1);else if(a==='hide')verberg(id,true);else if(a==='show')verberg(id,false)}
     function toets(e){if(e.defaultPrevented||(w.RTGUitvoer&&w.RTGUitvoer.zichtbaar&&w.RTGUitvoer.zichtbaar()))return;if(e.key==='Escape'&&state!=='peek'){e.preventDefault();zet(state==='focus'?vorige:'peek');return}if(e.key!=='Tab'||state!=='focus')return;var f=focusbaar(bank);if(!f.length)return;var eerste=f[0],laatste=f[f.length-1];if(e.shiftKey&&d.activeElement===eerste){e.preventDefault();laatste.focus()}else if(!e.shiftKey&&d.activeElement===laatste){e.preventDefault();eerste.focus()}}
     function vorm(e){if(e.matches&&state==='peek')zet('workspace');else if(!e.matches&&state==='workspace')zet('peek')}
-    bank.addEventListener('click',klik);d.addEventListener('keydown',toets);if(mq.addEventListener)mq.addEventListener('change',vorm);else mq.addListener(vorm);teken();zet(mq.matches?'workspace':'peek');
+    bank.addEventListener('click',klik);d.addEventListener('keydown',toets);if(mq.addEventListener)mq.addEventListener('change',vorm);else mq.addListener(vorm);teken();zet(eerste);
     var api={get state(){return state},setState:zet,refresh:modules.refresh,destroy:function(){d.removeEventListener('keydown',toets);bank.removeEventListener('click',klik);if(mq.removeEventListener)mq.removeEventListener('change',vorm);else mq.removeListener(vorm);if(uitvoerKijk)uitvoerKijk.disconnect();modules.destroy();aria('peek');
       var uit=head.querySelector('.rtguitvoer-knop');if(uit){delete uit.dataset.ssOutput;uit.removeAttribute('aria-label');var gg=uit.querySelector('.rtg-ss-mode-glyf');if(gg)gg.remove()}
       if(w.RTGUitvoer&&w.RTGUitvoer.unmount)w.RTGUitvoer.unmount();if(nav&&nav.parentNode!==bank)bank.insertBefore(nav,bank.querySelector('.cmd-bankvoet'));shell.remove();root.classList.remove('rtg-interface-second-screen','rtg-ss-'+state);delete root.dataset.rtgSecondScreen;delete root.__rtgSecondScreen;}};

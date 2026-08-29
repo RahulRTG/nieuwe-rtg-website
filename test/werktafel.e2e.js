@@ -86,12 +86,15 @@ const stand = () => {
     })(),
     klok: document.querySelectorAll('.os-app').length,
     commandActief: !!(window.RTGCommand && window.RTGCommand.actief()),
-    // de lade: `inBeeld` is de echte vraag, want dicht staat hij onder de rand
-    // en niet op display:none -- hij schuift, dus meten we waar hij staat
+    // de lade: `inBeeld` is de echte vraag, want dicht staat hij buiten de rand
+    // en niet op display:none. De klassieke lade schoof omlaag; het Second
+    // Screen schuift zijwaarts. Daarom meten we beide assen en visibility.
     lade: (() => {
       const bank = document.querySelector('.cmd-bank'); if (!bank) return null;
-      const r = bank.getBoundingClientRect();
-      return { inBeeld: r.top < window.innerHeight - 40, werelden: document.querySelectorAll('.cmd-nav button[data-url]').length };
+      const r = bank.getBoundingClientRect(), s = getComputedStyle(bank);
+      const inBeeld = s.visibility !== 'hidden' && r.right > 40 && r.left < window.innerWidth - 40 &&
+        r.bottom > 40 && r.top < window.innerHeight - 40;
+      return { inBeeld, werelden: document.querySelectorAll('.cmd-nav button[data-url]').length };
     })(),
     // #gate is de INLOG. Wordt hij bij het opruimen niet teruggezet, dan gaat
     // hij met de werktafel mee en kan er niemand meer naar binnen.
@@ -309,7 +312,9 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        bewering hieronder gebruikt. */
     await wachtTot(page, () => {
       const bank = document.querySelector('.cmd-bank');
-      return !!bank && bank.getBoundingClientRect().top < window.innerHeight - 40;
+      if (!bank || getComputedStyle(bank).visibility === 'hidden') return false;
+      const r = bank.getBoundingClientRect();
+      return r.right > 40 && r.left < window.innerWidth - 40 && r.bottom > 40 && r.top < window.innerHeight - 40;
     }, null, { wat: 'de bank die in beeld schuift' });
     const laOpen = await page.evaluate(stand);
     assert.equal(laOpen.lade.inBeeld, true, 'de greep hoort de lade te openen');
@@ -321,8 +326,10 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
     await page.keyboard.press('Escape');
     await wachtTot(page, () => {
       const bank = document.querySelector('.cmd-bank');
-      return !bank || bank.getBoundingClientRect().top >= window.innerHeight - 40;
-    }, null, { wat: 'de bank die weer onder de rand zakt' });
+      if (!bank || getComputedStyle(bank).visibility === 'hidden') return true;
+      const r = bank.getBoundingClientRect();
+      return r.right <= 40 || r.left >= window.innerWidth - 40 || r.bottom <= 40 || r.top >= window.innerHeight - 40;
+    }, null, { wat: 'de bank die weer buiten de rand schuift' });
     const laDicht = await page.evaluate(stand);
     assert.equal(laDicht.lade.inBeeld, false, 'Escape hoort de lade te sluiten');
     assert.equal(await page.getAttribute('.cmd-lade', 'aria-expanded'), 'false', 'en de stand hoort mee te gaan');

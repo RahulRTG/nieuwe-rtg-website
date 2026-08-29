@@ -27,7 +27,7 @@
   position: fixed;
   top: 0;
   transform: translateX(0);
-  transition: transform .24s ease, visibility .24s, width .24s ease;
+  transition: transform .24s ease, visibility 0s, width .24s ease;
   visibility: visible;
   width: var(--rtg-ss-width);
   z-index: 44;
@@ -36,6 +36,9 @@
 .rtg-interface-second-screen.rtg-ss-peek .cmd-bank {
   pointer-events: none;
   transform: translateX(-102%);
+  /* Bij openen meteen focusbaar; bij sluiten pas na de uitschuifbeweging
+     onzichtbaar. Een .24s visibility-overgang liet focus op de greep staan. */
+  transition: transform .24s ease, visibility 0s .24s, width .24s ease;
   visibility: hidden;
 }
 

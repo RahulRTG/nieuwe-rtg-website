@@ -1144,7 +1144,12 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.setViewportSize({ width: 393, height: 852 });
     await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'peek');
     await page.evaluate(() => document.getElementById('rtgCommand').__rtgSecondScreen.destroy());
-    await page.waitForTimeout(20);
+    await page.waitForFunction(() => {
+      const r = document.getElementById('rtgCommand'), out = document.querySelector('.rtguitvoer-knop');
+      return !r.__rtgSecondScreen && !r.querySelector('.rtg-ss-shell') &&
+        r.querySelector('.cmd-nav').parentElement === r.querySelector('.cmd-bank') && !r.querySelector('.cmd-werk').inert &&
+        !!(out && out.isConnected);
+    }, null, { timeout: 10000 });
     assert.equal(await page.evaluate(() => {
       const r = document.getElementById('rtgCommand'), out = document.querySelector('.rtguitvoer-knop');
       return !r.__rtgSecondScreen && !r.querySelector('.rtg-ss-shell') &&

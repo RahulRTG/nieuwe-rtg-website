@@ -153,10 +153,7 @@ module.exports = function intentEngine(opslag) {
     return { ok: true, replay: false, intent: publiek(intent) };
   }
 
-  function publiek(intent) {
-    if (!intent) return null;
-    return kopie(intent);
-  }
+  const publiek = intent => kopie(intent);
 
   return { registreerVerdeling, herbereken, publiek };
 };

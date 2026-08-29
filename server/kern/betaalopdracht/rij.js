@@ -10,6 +10,7 @@
 
 module.exports = (ctx) => {
   const { rij, save, nu, STATUS, AF, OPEN, publiek, zet, klacht, ramMax } = ctx;
+  const { maakOpenstaandOverzicht } = require('./status');
   // dienIn wordt door ./index pas NA dit bestand op de ctx gezet (de twee delen
   // kennen elkaar over en weer), dus lezen we hem per aanroep en niet hier
   const dienIn = (o) => ctx.dienIn(o);
@@ -131,25 +132,7 @@ module.exports = (ctx) => {
     return publiek(o);
   }
 
-  /* De reconciliatie: wat staat er in het grootboek als "weg" terwijl de rail
-     het nog niet heeft afgerond? Dat getal hoort bij een gezonde bank klein te
-     zijn en vanzelf leeg te lopen. Loopt het op, dan is er iets met de rail --
-     en dat is precies wat de sluitcontrole NIET kan zien, want een boeking naar
-     extern:sepa sluit ook als er buiten RTG niets is gebeurd. */
-  function openstaand() {
-    const uit = { status: 200, aantal: 0, centen: 0, perStatus: {}, oudsteAt: null, mislukt: 0,
-      mislukteCenten: 0, zonderTerugboeking: 0, zonderAfwikkeling: 0 };
-    for (const o of rij()) {
-      uit.perStatus[o.status] = (uit.perStatus[o.status] || 0) + 1;
-      if (o.status === STATUS.AFGEWIKKELD && o.afwikkelingNodig && !o.afwikkelingVerwerktAt)
-        uit.zonderAfwikkeling++;
-      if (!OPEN.has(o.status)) continue;
-      uit.aantal++; uit.centen += o.centen;
-      if (uit.oudsteAt === null || o.at < uit.oudsteAt) uit.oudsteAt = o.at;
-      if (o.status === STATUS.MISLUKT) { uit.mislukt++; uit.mislukteCenten += o.centen; if (o.terugboekFout) uit.zonderTerugboeking++; }
-    }
-    return uit;
-  }
+  function openstaand() { return maakOpenstaandOverzicht(rij()); }
 
   function vind(id) { return rij().find(o => o.id === String(id || '')) || null; }
   /* Opzoeken op de referentie van de rail. NIEUWSTE EERST, en dat is het enige

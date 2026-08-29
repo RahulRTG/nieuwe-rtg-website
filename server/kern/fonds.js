@@ -28,7 +28,7 @@ function maakFonds(state) {
   const runtime = state.economicRuntime || maakEconomicRuntime({ db, save, bijeen: state.bijeen,
     inBundel: state.inBundel, crypto, nu: state.nu });
   const economie = require('./fonds/economie')({ runtime, crypto, env });
-  const bewijsVenster = require('./fonds/bewijs-voor')({ db, runtime, actorRef: economie.actorRef });
+  const bewijsVenster = require('./fonds/bewijs-voor')({ runtime, actorRef: economie.actorRef });
   const { bewijzenVoor, bewijzenVoorRef } = bewijsVenster;
   const allocatie = require('./commercie/allocatie').maakAllocatie({ db, save, nu: state.nu || (() => Date.now()) });
   const eigen = require('./eigencollectie')({ db, domein: 'kern/fonds', bezit: { fondsAfdrachten: 'lijst' } });
@@ -63,6 +63,7 @@ function maakFonds(state) {
     return { iban: b.foundation.iban, begunstigde: b.foundation.begunstigde,
       lokaal: b.lokaal, foundation: b.foundation };
   }
+  const projecties = require('./fonds/projecties')({ lijst, bestemming, runtime });
 
   const bundel = async fn => {
     if (typeof state.inBundel === 'function' && state.inBundel()) return fn();
@@ -111,49 +112,6 @@ function maakFonds(state) {
     return afdracht;
   }
 
-  function overzicht() {
-    let totaal = 0, teStorten = 0, gestort = 0, ingepland = 0, afwikkelingNodig = 0;
-    for (const a of lijst()) {
-      totaal += a.centen || 0;
-      if (Array.isArray(a.legs)) {
-        for (const l of a.legs) {
-          if (l.status === 'gestort') gestort += l.centen || 0;
-          else if (l.status === 'ingepland' || l.status === 'gepland') ingepland += l.centen || 0;
-          else { teStorten += l.centen || 0; if (l.status === 'afwikkeling_nodig') afwikkelingNodig += l.centen || 0; }
-        }
-      } else if (a.status === 'gestort') gestort += a.centen || 0;
-      else if (a.status === 'ingepland') ingepland += a.centen || 0;
-      else teStorten += a.centen || 0;
-    }
-    return { aantal: lijst().length, totaalCenten: totaal, teStortenCenten: teStorten,
-      ingeplandCenten: ingepland, gestortCenten: gestort, afwikkelingNodigCenten: afwikkelingNodig,
-      bestemming: bestemming(), economicRuntime: runtime.overzicht(),
-      recent: lijst().slice(-12).reverse().map(a => ({ id: a.id, economicIntentId: a.economicIntentId || null,
-        invoiceId: a.invoiceId, centen: a.centen, status: a.status, legs: a.legs || null, at: a.at })) };
-  }
-
-  function socialeStand() {
-    const intents = Object.values((db.data.economischeRuntime || {}).intents || {})
-      .filter(i => i.purpose === 'MEMBERSHIP.CONTRIBUTION');
-    const claims = Object.values((db.data.economischeRuntime || {}).claims || {})
-      .filter(c => intents.some(i => i.id === c.intentId) && (c.component === 'local-fund' || c.component === 'foundation'));
-    const settlements = Object.values((db.data.economischeRuntime || {}).settlements || {});
-    const perDeel = {};
-    let open = 0, af = 0;
-    for (const c of claims) {
-      const p = perDeel[c.component] = perDeel[c.component] || { label: c.component, gereserveerd: 0, betaalbaar: 0, afgewikkeld: 0 };
-      const ss = settlements.filter(s => s.claimId === c.id);
-      if (c.status === 'SETTLED' || c.status === 'SATISFIED') { p.afgewikkeld += c.amountMinor; af += c.amountMinor; }
-      else if (ss.some(s => s.status === 'READY' || s.status === 'IN_PROGRESS')) { p.betaalbaar += c.amountMinor; open += c.amountMinor; }
-      else { p.gereserveerd += c.amountMinor; open += c.amountMinor; }
-    }
-    return { ok: true, aantal: intents.length,
-      basisCenten: intents.reduce((s, i) => s + i.requestedValue.amountMinor, 0),
-      totaalCenten: claims.reduce((s, c) => s + c.amountMinor, 0), openCenten: open,
-      afgewikkeldCenten: af, vervallenCenten: 0, perDeel,
-      bewijs: runtime.overzicht() };
-  }
-
   async function reconcileSettlement(input) { return runtime.reconcileSettlement(input); }
   function proof(intentId) { return runtime.proof(intentId); }
 
@@ -172,8 +130,10 @@ function maakFonds(state) {
     return { ok: true, afdracht, settlement: runtime.settlement(leg.settlementId) };
   }
 
-  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht, overzicht, bestemming,
-    koppelBank, socialeStand, allocatie, runtime, proof, bewijzenVoor, bewijzenVoorRef,
+  return { isAbonnement, aandeelCenten, aandeelEuro, boekAfdracht,
+    overzicht: projecties.overzicht, bestemming,
+    koppelBank, socialeStand: projecties.socialeStand, allocatie, runtime, proof,
+    bewijzenVoor, bewijzenVoorRef,
     reconcileSettlement, herstel, AANDEEL };
 }
 

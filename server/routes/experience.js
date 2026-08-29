@@ -2,8 +2,7 @@
    Action Broker; projections blijven alleen-lezen. */
 'use strict';
 
-module.exports = kern => {
-  const { app, auth, experience } = kern;
+module.exports = (app, auth, experience) => {
   const { principalVoorSession } = require('../kern/economie/identiteit');
   const lid = (req, res, next) => req.session.tier === 'guest'
     ? res.status(403).json({ error: 'Het persoonlijke Experience Platform is voor ingelogde leden.' })

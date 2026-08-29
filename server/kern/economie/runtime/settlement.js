@@ -111,7 +111,7 @@ module.exports = function settlementEngine(opslag, intentEngine) {
     return { ok: true, settlement: kopie(s) };
   }
 
-  function mislukt({ settlementId, reason, operationId, retryable = true }) {
+  function settlementMislukt({ settlementId, reason, operationId, retryable = true }) {
     const s = zoek(settlementId); if (s.error) return s;
     if (s.status === SETTLEMENT_STATUS.RECONCILED) return fout('SETTLEMENT_ALREADY_RECONCILED', 'Een gereconcilieerde settlement kan niet mislukken.', 409);
     if (s.status === SETTLEMENT_STATUS.FAILED)
@@ -133,5 +133,5 @@ module.exports = function settlementEngine(opslag, intentEngine) {
     return { ok: true, settlement: kopie(s), case: kopie(c) };
   }
 
-  return { plan, ingediend, bevestigd, mislukt, zoek };
+  return { plan, ingediend, bevestigd, mislukt: settlementMislukt, zoek };
 };

@@ -1,4 +1,12 @@
 {
+  "stempel": {
+    "op": "2026-08-29T20:22:06.814Z",
+    "commit": "80401964",
+    "boomVuil": true,
+    "node": "v24.18.0"
+  },
+  "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
+  "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -1399,6 +1407,14 @@
       "operator": "!==->===",
       "gezakt": 2
     },
+    "economic-runtime.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/economie/runtime/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
     "edge-system.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1514,6 +1530,28 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "experience-platform.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "experience-platform.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/experience/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "experience-surface.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "facturatie.test.js": {

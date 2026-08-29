@@ -21,6 +21,7 @@ test.before(async () => {
 test.after(() => stop(server && server.child));
 
 test('de vier echte serversprojecties delen één contract zonder domeinwaarheid te kopiëren', async () => {
+  let workContext;
   for (const world of ['living', 'travel', 'work', 'foundation']) {
     const r = await post('/api/experience/bootstrap', { world }, token);
     assert.equal(r.status, 200, world + ': ' + JSON.stringify(r.body).slice(0, 200));
@@ -29,7 +30,15 @@ test('de vier echte serversprojecties delen één contract zonder domeinwaarheid
     assert.equal(r.body.projection.provenance.ownsSourceData, false);
     assert.ok(r.body.currentContext.id.startsWith('ctx_'));
     assert.match(r.body.projection.snapshotHash, /^[a-f0-9]{64}$/);
+    if (world === 'work') workContext = r.body.currentContext.id;
   }
+  const resume = await post('/api/experience/resume', { world: 'work',
+    contextId: workContext, surface: '/apps/kantoor.html',
+    navigationState: ['operations', 'attention'] }, token);
+  assert.equal(resume.status, 200);
+  assert.equal(resume.body.resume.contextId, workContext);
+  const heropend = await post('/api/experience/bootstrap', { world: 'work' }, token);
+  assert.equal(heropend.body.resume.surface, '/apps/kantoor.html');
 });
 
 test('een echte agendaregel wordt attention en loopt gebrokerd naar evidence', async () => {

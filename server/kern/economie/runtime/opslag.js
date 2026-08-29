@@ -35,7 +35,7 @@ function maakOpslag({ db, save, crypto, nu }) {
   const sha = value => crypto.createHash('sha256').update(hashInvoer(value)).digest('hex');
   const id = (prefix, sleutel) => prefix + sha(String(sleutel)).slice(0, 24).toUpperCase();
 
-  function wortel() {
+  function economischeWortel() {
     const r = eigen.bak('economischeRuntime');
     if (!r.schemaVersion) r.schemaVersion = SCHEMA_VERSIE;
     if (r.schemaVersion !== SCHEMA_VERSIE)
@@ -57,7 +57,7 @@ function maakOpslag({ db, save, crypto, nu }) {
 
   function idem(sleutel, fingerprint, intentId) {
     const k = String(sleutel || '');
-    const r = wortel();
+    const r = economischeWortel();
     const bestaand = r.idempotency[k];
     if (bestaand) return veiligGelijk(bestaand.fingerprint, fingerprint)
       ? { replay: true, intentId: bestaand.intentId }
@@ -68,7 +68,7 @@ function maakOpslag({ db, save, crypto, nu }) {
   }
 
   function fact(intentId, type, payload, sleutel, clock) {
-    const r = wortel();
+    const r = economischeWortel();
     const intent = r.intents[intentId];
     if (!intent) throw new Error('Fact zonder economic intent: ' + intentId);
     const factId = id('EF', intentId + ':' + sleutel);
@@ -91,7 +91,7 @@ function maakOpslag({ db, save, crypto, nu }) {
   function ledger(intentId, kind, key, lijst, refs, clock) {
     const bezwaar = toetsPostings(lijst);
     if (bezwaar) return bezwaar;
-    const r = wortel();
+    const r = economischeWortel();
     const txId = id('EL', intentId + ':' + kind + ':' + key);
     if (r.ledgerTransactions[txId]) return r.ledgerTransactions[txId];
     const body = {
@@ -107,8 +107,8 @@ function maakOpslag({ db, save, crypto, nu }) {
   /* Evidence bewaart geen bankafschrift of persoonsgegevens. Het bewaart de
      herkomst, de authenticiteitsklasse en de hash van het bronmateriaal; het
      document zelf blijft in de bewijs-/documentkluis. */
-  function bewijs(intentId, kind, key, input, clock) {
-    const r = wortel();
+  function bewaarEconomicBewijs(intentId, kind, key, input, clock) {
+    const r = economischeWortel();
     const evidenceId = id('EV', intentId + ':' + kind + ':' + key);
     if (r.evidence[evidenceId]) return r.evidence[evidenceId];
     const body = {
@@ -127,13 +127,15 @@ function maakOpslag({ db, save, crypto, nu }) {
   }
 
   function factLijst(intentId) {
-    return Object.values(wortel().facts).filter(f => f.intentId === intentId).sort((a, b) => a.sequence - b.sequence);
+    return Object.values(economischeWortel().facts).filter(f => f.intentId === intentId)
+      .sort((a, b) => a.sequence - b.sequence);
   }
-  const pak = (vak, objectId) => wortel()[vak][objectId] || null;
-  const zet = (vak, objectId, waarde) => { wortel()[vak][objectId] = waarde; save(); return waarde; };
-  const waarden = vak => Object.values(wortel()[vak]);
+  const pak = (vak, objectId) => economischeWortel()[vak][objectId] || null;
+  const zet = (vak, objectId, waarde) => { economischeWortel()[vak][objectId] = waarde; save(); return waarde; };
+  const waarden = vak => Object.values(economischeWortel()[vak]);
 
-  return { wortel, tijd, sha, id, canon, kopie, klok, idem, fact, ledger, bewijs, factLijst, pak, zet, waarden };
+  return { wortel: economischeWortel, tijd, sha, id, canon, kopie, klok, idem, fact,
+    ledger, bewijs: bewaarEconomicBewijs, factLijst, pak, zet, waarden };
 }
 
 module.exports = { maakOpslag, canon, kopie };

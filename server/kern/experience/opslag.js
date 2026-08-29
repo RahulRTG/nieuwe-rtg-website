@@ -6,12 +6,13 @@ const { hash, kopie } = require('./canon');
 
 module.exports = function maakOpslag({ db, save, crypto, nu }) {
   const tijd = () => (nu ? nu() : new Date().toISOString());
-  function wortel() {
-    if (!db.data.experiencePlatform || typeof db.data.experiencePlatform !== 'object') {
-      db.data.experiencePlatform = { version: 2, resume: {}, attention: {}, previews: {},
-        idempotency: {}, evidence: [], lastEvidenceHashByActor: {}, evidenceCheckpointByActor: {} };
-    }
-    const r = db.data.experiencePlatform;
+  const eigen = require('../eigencollectie')({ db, domein: 'kern/experience',
+    bezit: { experiencePlatform: 'kaart' } });
+  function experienceWortel() {
+    const r = eigen.bak('experiencePlatform', bak => Object.assign(bak, {
+      version: 2, resume: {}, attention: {}, previews: {}, idempotency: {},
+      evidence: [], lastEvidenceHashByActor: {}, evidenceCheckpointByActor: {}
+    }));
     for (const n of ['resume', 'attention', 'previews', 'idempotency'])
       if (!r[n] || typeof r[n] !== 'object') r[n] = {};
     if (!Array.isArray(r.evidence)) r.evidence = [];
@@ -37,25 +38,25 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
   const actor = key => 'actor_' + hash(crypto, String(key || '')).slice(0, 20);
   const bewaar = () => save();
 
-  function resumeLees(key) { return kopie(wortel().resume[actor(key)] || null); }
+  function resumeLees(key) { return kopie(experienceWortel().resume[actor(key)] || null); }
   function resumeZet(key, waarde) {
     const v = { ...kopie(waarde), updatedAt: tijd() };
-    wortel().resume[actor(key)] = v; bewaar(); return kopie(v);
+    experienceWortel().resume[actor(key)] = v; bewaar(); return kopie(v);
   }
   function attentionLees(key, id) {
-    const a = wortel().attention[actor(key)] || {};
+    const a = experienceWortel().attention[actor(key)] || {};
     return kopie(a[id] || null);
   }
   function attentionZet(key, id, waarde) {
-    const r = wortel(), a = r.attention[actor(key)] || (r.attention[actor(key)] = {});
+    const r = experienceWortel(), a = r.attention[actor(key)] || (r.attention[actor(key)] = {});
     a[id] = { ...kopie(waarde), updatedAt: tijd() }; bewaar(); return kopie(a[id]);
   }
   function previewZet(key, waarde) {
-    const r = wortel(); r.previews[waarde.id] = { ...kopie(waarde), actor: actor(key) };
+    const r = experienceWortel(); r.previews[waarde.id] = { ...kopie(waarde), actor: actor(key) };
     ruimPreviews(r); bewaar(); return kopie(r.previews[waarde.id]);
   }
   function previewLees(key, id) {
-    const p = wortel().previews[id];
+    const p = experienceWortel().previews[id];
     return p && p.actor === actor(key) ? kopie(p) : null;
   }
   function ruimPreviews(r) {
@@ -67,13 +68,13 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
     });
   }
   function idemLees(key, idemKey) {
-    return kopie(wortel().idempotency[actor(key) + ':' + String(idemKey || '')] || null);
+    return kopie(experienceWortel().idempotency[actor(key) + ':' + String(idemKey || '')] || null);
   }
   /* Preview, evidence en idem-resultaat zijn één Experience-mutatie. Alle
      willekeur en hashing gebeurt vóór de toestand verandert; daarna volgt één
      save binnen de duurzame bundel van de broker. */
   function actieAfronden(key, previewId, idemKey, fingerprint, inhoud, basisResultaat) {
-    const r = wortel(), p = r.previews[previewId], wie = actor(key);
+    const r = experienceWortel(), p = r.previews[previewId], wie = actor(key);
     if (!p || p.actor !== wie) return null;
     if (!r.lastEvidenceHashByActor[wie]) {
       const laatste = r.evidence.slice().reverse().find(e => e.actor === wie && e.version === 2);
@@ -98,30 +99,30 @@ module.exports = function maakOpslag({ db, save, crypto, nu }) {
   }
   function bewijsVoor(key, limiet) {
     const n = Math.min(100, Math.max(1, Number(limiet) || 25));
-    return wortel().evidence.filter(e => e.actor === actor(key)).slice(-n).map(kopie);
+    return experienceWortel().evidence.filter(e => e.actor === actor(key)).slice(-n).map(kopie);
   }
 
   function bewijsIntegriteitVoor(key) {
-    const wie = actor(key), r = wortel(), eigen = r.evidence.filter(e => e.actor === wie);
+    const wie = actor(key), r = experienceWortel(), actorBewijs = r.evidence.filter(e => e.actor === wie);
     let vorigV2 = r.evidenceCheckpointByActor[wie] || null, gezienV2 = false;
     const checkpoint = !!vorigV2;
-    for (const e of eigen) {
+    for (const e of actorBewijs) {
       const body = kopie(e), ontvangen = body.hash;
       delete body.hash;
       if (!ontvangen || hash(crypto, body) !== ontvangen)
-        return { status: 'INVALID', valid: false, actor: wie, count: eigen.length,
+        return { status: 'INVALID', valid: false, actor: wie, count: actorBewijs.length,
           failedEvidenceId: e.id || null, reason: 'HASH_MISMATCH' };
       if (e.version === 2) {
         if (e.previousHash !== vorigV2)
-          return { status: 'INVALID', valid: false, actor: wie, count: eigen.length,
+          return { status: 'INVALID', valid: false, actor: wie, count: actorBewijs.length,
             failedEvidenceId: e.id || null, reason: 'CHAIN_MISMATCH' };
         gezienV2 = true; vorigV2 = ontvangen;
       }
     }
-    return { status: eigen.length ? (checkpoint ? 'VERIFIED_FROM_CHECKPOINT' : 'VERIFIED')
+    return { status: actorBewijs.length ? (checkpoint ? 'VERIFIED_FROM_CHECKPOINT' : 'VERIFIED')
       : (checkpoint ? 'VERIFIED_FROM_CHECKPOINT' : 'EMPTY'),
-      valid: true, actor: wie, count: eigen.length,
-      chainVersion: gezienV2 ? 2 : (eigen.length ? 1 : null), headHash: vorigV2,
+      valid: true, actor: wie, count: actorBewijs.length,
+      chainVersion: gezienV2 ? 2 : (actorBewijs.length ? 1 : null), headHash: vorigV2,
       checkpointed: checkpoint, verifiedAt: tijd() };
   }
 

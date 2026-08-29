@@ -3,12 +3,11 @@
    uitlegbare status, componenten en integriteitsmetadata terug. */
 'use strict';
 
-module.exports = function maakBewijsVoor({ db, runtime, actorRef }) {
+module.exports = function maakBewijsVoor({ runtime, actorRef }) {
   function verzamel(principal, limiet) {
     if (!/^[A-Za-z][A-Za-z0-9:_-]{1,119}$/.test(String(principal || '')))
       return { ok: false, proofs: [], error: 'Ongeldige economic principal reference.' };
-    const intents = Object.values((db.data.economischeRuntime || {}).intents || {})
-      .filter(i => i.principalRef === principal)
+    const intents = runtime.intentsVoorPrincipal(principal)
       .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0))
       .slice(0, Math.min(25, Math.max(1, Number(limiet) || 6)));
     const proofs = intents.map(intent => {

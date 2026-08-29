@@ -2,8 +2,8 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-29",
   "gemeten": {
-    "bestanden": 1905,
-    "domeinenTotaal": 537,
+    "bestanden": 1908,
+    "domeinenTotaal": 539,
     "koopbareVormen": 517,
     "koopbareDomeinen": 108,
     "envelopDrempel": 7,
@@ -17,9 +17,9 @@
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 21,
-    "optellingen": 104,
+    "optellingen": 105,
     "optelDomeinen": 53,
-    "optelCenten": 55,
+    "optelCenten": 56,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -619,7 +619,7 @@
       },
       "bewijs": {
         "toon": "lijst",
-        "beschikbaarheid": "openstaand",
+        "beschikbaarheid": "maakOpenstaandOverzicht",
         "bevestig": "bevestig",
         "retour": "terugboeken"
       },
@@ -698,7 +698,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "lijst",
+        "toon": "fondsOverzicht",
         "prijs": "bereken",
         "bevestig": "boekAfdracht",
         "lever": "verstuurLeg"
@@ -2362,6 +2362,14 @@
       ]
     },
     {
+      "domein": "kern/fonds",
+      "plekken": 2,
+      "waar": [
+        "server/kern/fonds/projecties.js",
+        "server/kern/fonds.js"
+      ]
+    },
+    {
       "domein": "kern/groothandel",
       "plekken": 2,
       "waar": [
@@ -2445,13 +2453,6 @@
       "plekken": 1,
       "waar": [
         "server/kern/assets/winkel.js"
-      ]
-    },
-    {
-      "domein": "kern/avond",
-      "plekken": 1,
-      "waar": [
-        "server/kern/avond/plan.js"
       ]
     }
   ]

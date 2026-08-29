@@ -27,14 +27,14 @@ function maakRef(item, crypto, wereld) {
   return Object.freeze({ domain, type: soort, id: schoonDeel(id, 'unknown') });
 }
 
-function sleutel(ref) {
-  if (!geldig(ref)) return '';
+function objectRefSleutel(ref) {
+  if (!geldigeObjectRef(ref)) return '';
   return ref.domain + ':' + ref.type + ':' + ref.id;
 }
 
-function geldig(ref) {
+function geldigeObjectRef(ref) {
   return !!(ref && /^[a-z0-9._-]+$/.test(ref.domain || '') &&
     /^[a-z0-9._-]+$/.test(ref.type || '') && /^[a-z0-9._-]+$/.test(ref.id || ''));
 }
 
-module.exports = { maakRef, sleutel, geldig, DOMEIN_PER_SOORT };
+module.exports = { maakRef, sleutel: objectRefSleutel, geldig: geldigeObjectRef, DOMEIN_PER_SOORT };

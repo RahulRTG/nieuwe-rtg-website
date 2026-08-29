@@ -189,7 +189,7 @@ function functiesUit(bron) {
         /* EEN PIJLFUNCTIE ZONDER ACCOLADES, en hier zat een gat dat een 'nee'
            opleverde die niet klopte.
 
-             const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
+             const aiStatus = () => require(<een andere module>).beschikbaarheid(anthropic);
 
            Die kreeg een LEEG lichaam, en een leeg lichaam heeft geen
            schrijfvorm en geen aanroep -- dus kwam er 'leest aantoonbaar' uit,

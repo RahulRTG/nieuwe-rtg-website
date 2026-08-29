@@ -60,7 +60,9 @@ try { bedoelingen = require('../server/lib/mutatiecontracten').CONTRACTEN; } cat
    bestand. Wie het opent moet meteen zien dat er geen mens over heeft nagedacht;
    ze door elkaar zetten zou de twee soorten kennis laten versmelten. */
 let afgeleid = {};
-try { afgeleid = require('../server/lib/mutatiecontracten-afgeleid').CONTRACTEN; } catch (e) {}
+try {
+  afgeleid = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), 'utf8')).contracten || {};
+} catch (e) {}
 const alleBedoelingen = Object.assign({}, afgeleid, bedoelingen);   // een mens wint van een script
 
 let proef = { perRoute: [] };
@@ -326,16 +328,16 @@ if (toonOpen) {
    uitspraak over gedrag -- zie de kop van kern/mutatiecontract/index.js.
    ------------------------------------------------------------------------- */
 if (process.argv.includes('--afleiden')) {
-  const regels = [];
+  const uitContracten = {};
   for (const r of rijen) {
     /* NIET OP `stand` KIJKEN, MAAR OP DE MENSELIJKE LIJST -- en dit is een
        valstrik die deze gang stilletjes leeg zou maken.
 
-       Na de eerste afleidgang staan die 2722 routes op BLOCKED_BY_TEST_FIXTURE.
-       Een tweede gang die op `stand === LEGACY` filtert, slaat ze dus allemaal
-       over, schrijft nul regels, en OVERSCHRIJFT het bestand met een lege lijst.
-       Het register zou dan in een klap 2722 regels kwijt zijn zonder dat er iets
-       veranderde -- en de volgende meting zou het als vooruitgang lezen.
+       Na de eerste afleidgang staan die routes op BLOCKED_BY_TEST_FIXTURE. Een
+       tweede gang die op `stand === LEGACY` filtert, slaat ze dus allemaal over,
+       schrijft nul regels, en OVERSCHRIJFT het register met een lege lijst -- 2722
+       regels weg zonder dat er iets veranderde, en de volgende meting zou het als
+       vooruitgang lezen.
 
        De juiste vraag is dus niet "staat hij nog op LEGACY" maar "heeft een MENS
        hem al vastgesteld". Een afgeleide regel mag zichzelf opnieuw schrijven; een
@@ -345,21 +347,35 @@ if (process.argv.includes('--afleiden')) {
     if (!h) continue;
     const toeg = r.toegang.waargenomen;
     if (!toeg) continue;                       // zonder waargenomen deur geen geldig contract
-    const veld = toeg === 'OBJECT_SCOPED' ? ", objectVeld: 'nog af te leiden uit de handler'" : '';
-    regels.push("  '" + r.route + "': {\n" +
-      "    mutatieId: '" + r.mutatieId + "',\n" +
-      "    herkomst: 'afgeleid',\n" +
-      "    semantiek: { klasse: 'onbekend' },\n" +
-      "    toegang: { klasse: '" + toeg + "'" + veld + " },\n" +
-      "    stand: 'BLOCKED_BY_TEST_FIXTURE',\n" +
-      "    watErMoetKomen: " + JSON.stringify('de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
-        'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.') + "\n" +
-      "  },");
+    const toegang = { klasse: toeg };
+    if (toeg === 'OBJECT_SCOPED') toegang.objectVeld = 'nog af te leiden uit de handler';
+    uitContracten[r.route] = {
+      mutatieId: r.mutatieId,
+      herkomst: 'afgeleid',
+      semantiek: { klasse: 'onbekend' },
+      toegang,
+      stand: 'BLOCKED_BY_TEST_FIXTURE',
+      watErMoetKomen: 'de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
+        'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.'
+    };
   }
-  const kop = fs.readFileSync(path.join(WORTEL, 'scripts', 'sjabloon-afgeleid.txt'), 'utf8');
-  fs.writeFileSync(path.join(WORTEL, 'server', 'lib', 'mutatiecontracten-afgeleid.js'),
-    kop + '\nconst CONTRACTEN = {\n' + regels.join('\n') + '\n};\n\nmodule.exports = { CONTRACTEN };\n');
-  console.log('\n  server/lib/mutatiecontracten-afgeleid.js geschreven: ' + regels.length + ' regels.');
+  fs.writeFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), JSON.stringify({
+    stempel: stempel(),
+    uitleg: 'Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door ' +
+      'node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.',
+    grens: 'Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en ' +
+      'die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet ' +
+      'de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond ' +
+      'is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar ' +
+      'server/lib/mutatiecontracten.js -- een mens wint van een script.',
+    waardeloosVoor: 'Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze ' +
+      'route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij ' +
+      'iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld ' +
+      'op een hoop onder LEGACY.',
+    aantal: Object.keys(uitContracten).length,
+    contracten: uitContracten
+  }, null, 1) + '\n');
+  console.log('\n  MUTATIECONTRACT-AFGELEID.json geschreven: ' + Object.keys(uitContracten).length + ' regels.');
   console.log('  Draai daarna opnieuw met --vastleggen om ze in het register te krijgen.');
 }
 

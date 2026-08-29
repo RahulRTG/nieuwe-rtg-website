@@ -29,8 +29,13 @@ const path = require('path');
 const contract = require('../server/kern/mutatiecontract');
 const mutatie = require('../server/kern/mutatie');
 const { CONTRACTEN } = require('../server/lib/mutatiecontracten');
+/* De afgeleide helft is een REGISTER en geen broncode: 2722 gegenereerde
+   regels JavaScript zijn 1,1 MB die niemand leest, en scripts/check.js hield ze
+   terecht tegen op de bestandsgrens. Data hoort in een register. */
 let AFGELEID = {};
-try { AFGELEID = require('../server/lib/mutatiecontracten-afgeleid').CONTRACTEN; } catch (e) {}
+try {
+  AFGELEID = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'MUTATIECONTRACT-AFGELEID.json'), 'utf8')).contracten || {};
+} catch (e) {}
 
 const WORTEL = path.join(__dirname, '..');
 const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT.json'), 'utf8'));

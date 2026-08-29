@@ -310,6 +310,65 @@ kan zien of dat werk van de route was of van een meter.
 
 ---
 
+## 6d. De 1.867 die nog open staan, in vier bakken
+
+Elke bak heeft een eigen remedie, en dat is de hele reden om ze te scheiden:
+
+| | wat | remedie |
+|---|---|---|
+| 1.194 | geen uitspraak en geen hindernis — de oproep slaagde, maar er was niets waarneembaars | een rijkere wereld, of een mens die de handler leest |
+| 502 | hindernis wél, maar de **toegang** is niet af te leiden | de bewaking zit in de handler — zie par. 7.2 |
+| 161 | de dubbeltik **deed het werk opnieuw** | een menselijk besluit: dubbeltik of tweede handeling? |
+| 10 | niet gemeten (pad-parameter) | de lifecycle-opstelling uit par. 8 |
+
+Die 161 zijn de irreducibele kern: geen meting beantwoordt of twee identieke
+overboekingen één dubbeltik zijn of twee betalingen. Maar het zijn er 161 en geen
+4.653, en elk draagt zijn gemeten opslagverschil — dat is een middag werk voor
+iemand die de domeinen kent, geen jarenlang project.
+
+---
+
+## 7.2 De bewaking die in de handler zit
+
+Van de 660 routes zonder af te leiden toegang draagt een deel zijn poort níét in
+de router maar in het lichaam:
+
+```js
+app.post('/api/rtf/samen/maak', (req, res) => {
+  const s = samenSess(req, res); if (!s) return;
+  ...
+});
+```
+
+Voor de router is dat een route zonder enige bewaking.
+`scripts/handlerbewakers.js` meet die vorm — een aanroep met `(req, res)` waarvan
+de uitkomst meteen tot een `return` leidt — en de uitkomst is:
+
+- over alle handlers: **60 verschillende poortvormen**, samen **1.220 routes**;
+- binnen de 660 die vastzitten: **9 vormen**, samen **97 routes**.
+
+**En drie van die negen dragen een naam die in dit huis ook iets anders
+betekent.** `profiel` is in `routes/rtfschool.js` een gezinsprofiel-poort en in
+`kern/spellen/magnaat/bankprofiel.js` een functie die cijfers uitrekent.
+`beheerVan` is in `server/bedrijf/` een poort op een beheertoken en in
+`kern/office/samen.js` een helper die een classificatie normaliseert. `lidVan` is
+in `bedrijf/deuren.js` een poort en in `kern/agenda-pro.js` een functie die een
+prefix van een string knipt.
+
+Een map van naam naar toegangsklasse zou die drie verkeerd indelen, en het ergste
+geval is stil: **een rekenfunctie die als bewaker wordt geteld, maakt van een open
+route een `AUTHENTICATED`-route in het register.** Dat is dezelfde fout die
+`SEMANTIEK.json` 78 keer vond, nu in de beveiligingslaag. Wie deze routes
+indeelt, doet dat daarom per **bestand én naam**. Het script levert die lijst en
+vult zelf niets in.
+
+Dat is meteen het antwoord op de vraag of hier een uniform authority contract
+moet komen: zolang de bewaking alleen uit handlercode te lezen is, kan geen
+statische verificatie er iets hards over zeggen — en 60 vormen over 1.220 routes
+is de prijskaart van die keuze.
+
+---
+
 ## 7. Wat er vandaag níét is
 
 Eerlijk, met de reden:

@@ -53,6 +53,25 @@ const MUNTERS = [
   ['member', 'de gewone leden-deur; auth() accepteert deze sessie',
     async (post) => tok(await post('/api/login', { tier: 'rtg' }))],
 
+  /* DE PAS IS EEN TWEEDE SLOT, EN HIJ ZAT DE METING IN DE WEG.
+
+     `member` hierboven is een RTG Pass. Honderden routes weigeren die met een
+     403 die niets met de rol te maken heeft: "Deze app is onderdeel van de
+     Lifestyle Pass", "Het Privekantoor is onderdeel van de Lifestyle Pass".
+     Gemeten in de ronde van 29 augustus 2026: 154 routes strandden daarop, en
+     ze kwamen allemaal terug als ONGEMETEN -- terwijl er niets mis is met de
+     route en niets mis met de proef. Er lag alleen de verkeerde pas op tafel.
+
+     Ze staan er alle drie, want de ladder is geen ladder: Lifestyle is een
+     deelverzameling van Business OP DRIE DINGEN NA (De Rechterhand, RTG
+     Zakelijk, het Privekantoor -- zie GROEPEN.md). Een Business-token opent die
+     drie dus NIET, en "gewoon de hoogste pas nemen" zou 67 Privekantoor-routes
+     stil ongemeten laten. Vandaar drie sleutels en niet een. */
+  ['lid-lifestyle', 'dezelfde leden-deur met een Lifestyle Pass: opent De Rechterhand, RTG Zakelijk en het Privekantoor',
+    async (post) => tok(await post('/api/login', { tier: 'lifestyle' }))],
+  ['lid-business', 'dezelfde leden-deur met een Business Pass: opent de WorkOS-kant',
+    async (post) => tok(await post('/api/login', { tier: 'business' }))],
+
   ['office', 'de backoffice-code; officeAuth() accepteert deze sessie, de boardroom NIET (zie hieronder)',
     async (post) => tok(await post('/api/office/login', { code: OFFICE_CODE }))],
 
@@ -106,10 +125,15 @@ const MUNTERS = [
     }],
 ];
 
-/* De rollen die een BEWAKER zijn (en dus in verdeelOpRol horen). `eigenaar` is
-   een opstapje en geen deur; hij hoort niet in die lijst, anders zou een proef
-   routes gaan verdelen op een rol die geen enkele route draagt. */
-const GEEN_BEWAKER = new Set(['eigenaar']);
+/* Rollen die geen DEUR zijn en dus niet in de rollenlijst horen. `eigenaar` is
+   een opstapje naar de eigenrollen; de twee passen zijn hetzelfde slot als
+   `member` met een ander abonnement erachter -- geen enkele route draagt ze als
+   bewaker, en ze in de verdeling opnemen zou routes toewijzen aan een rol die
+   niet bestaat. Ze zijn er om te KUNNEN uitwijken, niet om op te verdelen. */
+const GEEN_BEWAKER = new Set(['eigenaar', 'lid-lifestyle', 'lid-business']);
+
+/* De passen in de volgorde waarin een 403 wordt herprobeerd. */
+const PASLADDER = ['member', 'lid-lifestyle', 'lid-business'];
 
 /* Munt alles wat te munten valt.
 
@@ -168,4 +192,4 @@ function meldSleutels(bos, log) {
    een uitgeklede omgeving ontbreken, en dan is 'ongemeten' het eerlijke woord. */
 const BASISROLLEN = ['member', 'office', 'supplier'];
 
-module.exports = { haalSleutels, meldSleutels, BASISROLLEN, OFFICE_CODE, DEMO_PASS, MUNTERS };
+module.exports = { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER, OFFICE_CODE, DEMO_PASS, MUNTERS };

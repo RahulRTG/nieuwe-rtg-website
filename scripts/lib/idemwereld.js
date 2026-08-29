@@ -38,7 +38,7 @@
    voorbeeld-IBAN uit de ISO-documentatie, geen rekening van iemand. */
 const BUITEN_IBAN = 'NL91ABNA0417164300';
 
-async function zetWereldKlaar({ post, tokens }) {
+async function zetWereldKlaar({ post, tokens, datamap }) {
   const w = {};
   const stil = async (pad, lijf, tok) => { try { return await post(pad, lijf, tok); } catch (e) { return { status: 0, data: {} }; } };
   const veld = (r, ...pad) => { let v = r && r.data; for (const k of pad) { if (!v) return null; v = v[k]; } return v || null; };
@@ -108,7 +108,201 @@ async function zetWereldKlaar({ post, tokens }) {
   const open = facturen.find(f => f && f.status === 'open');
   w.factuurId = (open && open.id) || null;
 
-  return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w) };
+  /* ============================================================================
+     11. DE WERELDEN MET EEN EIGEN SLEUTEL IN HET LIJF.
+
+     De ronde van 29 augustus 2026 legde per route vast WAT hem tegenhield, en
+     toen bleek de grootste post geen raadsel maar een ontbrekend voorwerp. De
+     vier zwaarste zinnen, met hun aantal:
+
+        208  "Log opnieuw in bij je gezin."
+        122  "Dit gezin kennen we niet. Klopt de gezinscode?"
+        105  "Onbekende werkruimte of verkeerd lid-token."
+         82  "Dit bedrijf kennen we niet."
+
+     Geen van vieren gaat over idempotentie. Het zijn deuren die om een sleutel
+     in het LIJF vragen (scripts/lib/bewakers.js noemt dat een lichaamssleutel),
+     en die sleutel bestond in deze wereld gewoon niet. Vierhonderdzeventien
+     routes stonden daardoor als ONGEMETEN in het register.
+
+     Dus maken we ze hier: een gezin, een werkruimte met een toegelaten lid, en
+     het bestaande werkplek-huis. Echt aangemaakt via de gewone routes -- niet
+     in de database gezet, want dan meet de proef straks een toestand die langs
+     de eigen deuren van het huis is binnengekomen. */
+
+  /* 11a. EEN GEZIN. `bevoegdGezin` en `privacyAkkoord` zijn buiten NODE_ENV=test
+          verplicht, en dat hoort ook: het zijn de twee verklaringen waarmee een
+          volwassene zegt dat hij dit gezin mag aanmaken. De proef zet ze dus
+          netjes, in plaats van de server in de teststand te zetten om eronderuit
+          te komen -- dan zou hij een andere server meten dan er draait. */
+  const gez = await stil('/api/foundation/gezin/maak', {
+    gezinsnaam: 'Proefgezin', naam: 'Proefbeheerder', pin: '1234',
+    bevoegdGezin: true, privacyAkkoord: true
+  });
+  w.gezinCode = veld(gez, 'code');
+  w.gezinToken = veld(gez, 'token');
+
+  /* 11b. EEN WERKRUIMTE MET EEN TOEGELATEN LID. Twee sleutels en met opzet twee:
+          `beheerToken` opent de beheerdeur, `lidToken` de ledendeur. Een lid is
+          na aanmelden nog 'wacht' en zijn token werkt dan nergens voor -- er moet
+          dus eerst een besluit overheen. Zonder die derde oproep waren de 105
+          routes achter lidVan() blijven staan. */
+  const wr = await stil('/api/bedrijf/werkruimte/maak', { naam: 'Proefwerkruimte' });
+  w.werkruimte = veld(wr, 'werkruimte');
+  w.beheerToken = veld(wr, 'beheerToken');
+  if (w.werkruimte) {
+    const lid = await stil('/api/bedrijf/lid/aanmeld', { werkruimte: w.werkruimte, naam: 'Proeflid', functie: 'proef' });
+    const lidId = veld(lid, 'lidId');
+    w.lidToken = veld(lid, 'lidToken');
+    if (lidId && w.beheerToken) {
+      await stil('/api/bedrijf/lid/besluit', { werkruimte: w.werkruimte, beheerToken: w.beheerToken, lidId, akkoord: true });
+    }
+  }
+
+  /* 11c. EEN SCHOOL, EN ALLEEN LANGS DE ECHTE WEG.
+
+          server/school/beheer.js heeft een snelle deur (/school/school/maak) die
+          buiten NODE_ENV=test een 410 geeft, met de reden erbij: die zou voor de
+          BRIN- en privacycontrole langs een beheersleutel uitgeven. De
+          verleiding is om de proefserver dan maar in de teststand te zetten.
+          Dat doen we niet -- dan meet de proef een server die op meer plekken
+          anders is dan deze ene, en het verschil staat nergens.
+
+          Dus loopt de proef de hele registratiebalie af, precies zoals een
+          echte school dat zou doen:
+
+            1. aanvragen        (open achter een rem; een school heeft nog geen account)
+            2. per controle-eis een uitkomst vastleggen  -- BOARDROOM
+            3. besluit: goedkeuren                        -- BOARDROOM
+            4. activeren met het eenmalige geheim         (open, met een rem)
+
+          Stap 2 is de reden dat dit pas nu kan: zonder boardroom-sleutel was er
+          geen weg naar goedkeuring, en dus geen school. Het is meteen de eerste
+          keer dat deze keten van buiten helemaal is doorlopen.
+
+          EN HET GEHEIM KOMT NIET TERUG OVER DE API -- met opzet. Het besluit
+          antwoordt "De persoonlijke activatielink is naar het gecontroleerde
+          schooladres gestuurd", en meer niet. De proef leest die link dus uit de
+          POSTBUS van het adres dat hij zelf heeft opgegeven: de outbox in zijn
+          eigen wegwerpmap (server/mail-outbox.js). Dat is geen omweg om de deur
+          heen maar precies wat de echte directeur doet -- zijn mail openen. Wat
+          de proef daarbij NIET doet is in de database kijken: het geheim staat
+          daar als hash, en die is niet te gebruiken. */
+  const brin = '0' + Math.random().toString(36).slice(2, 6).toUpperCase().replace(/[^0-9A-Z]/g, 'X');
+  const aanvraag = await stil('/api/foundation/registratie/aanvragen', {
+    type: 'school', naam: 'Proefschool', plaats: 'Proefstad', contactNaam: 'Proefdirecteur',
+    email: 'proefschool@example.invalid', brin,
+    bevoegd: true, waarheidsgetrouw: true, privacyAkkoord: true
+  });
+  const regId = veld(aanvraag, 'id');
+  if (regId && tokens.boardroom) {
+    /* Welke eisen er open staan, staat in het antwoord zelf -- niet in een
+       lijst hier. Zou die lijst hier staan, dan loopt hij achter zodra er een
+       controle bijkomt, en dan slaagt de proef stil niet meer. */
+    const eisen = ((aanvraag.data && aanvraag.data.aanvraag && aanvraag.data.aanvraag.controles) || []).map(c => c.id);
+    for (const onderdeel of eisen) {
+      await stil('/api/office/foundation/registratie/controle', {
+        id: regId, onderdeel, uitkomst: 'geverifieerd',
+        referentie: 'proefronde idemwereld: synthetische registratie, geen echte instelling'
+      }, tokens.boardroom);
+    }
+    await stil('/api/office/foundation/registratie/besluit',
+      { id: regId, action: 'goedkeuren' }, tokens.boardroom);
+    const activatie = await uitPostbus(datamap, 'activeren=');
+    if (activatie) {
+      const act = await stil('/api/foundation/school/school/activeren', { activatie });
+      w.schoolCode = veld(act, 'schoolCode');
+      w.schoolBeheerToken = veld(act, 'beheerToken');
+    }
+  }
+
+  return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
+}
+
+/* De postbus van de wegwerpserver. Zonder SMTP legt server/mail-outbox.js elk
+   bericht neer als bestand in <datamap>/outbox; dat is de brievenbus van de
+   adressen die deze proef zelf heeft aangemaakt. We zoeken het NIEUWSTE bericht
+   met het gevraagde merk erin en halen de waarde eruit.
+
+   De grens: alleen lezen, alleen in de wegwerpmap, en alleen naar een adres dat
+   de proef zelf heeft opgegeven. Zou hier ooit een echte datamap onder liggen,
+   dan leest dit mee met de post van echte mensen -- vandaar dat de aanroeper de
+   map expliciet meegeeft en deze functie er zelf geen kiest. */
+async function uitPostbus(datamap, merk) {
+  if (!datamap) return null;
+  /* WACHTEN OP DE POSTBODE. De route antwoordt voordat het bericht op schijf
+     staat -- mailVeilig() wordt niet afgewacht. Een keer kijken vond dus niets,
+     en de school bleef stil ongemaakt; dat is precies het soort race dat een
+     proef zwijgend zwakker maakt. Vandaar een korte poging-lus met een grens:
+     tien keer een vijfde seconde, en daarna eerlijk niets. */
+  for (let poging = 0; poging < 10; poging++) {
+    const gevonden = zoekInPostbus(datamap, merk);
+    if (gevonden) return gevonden;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return null;
+}
+
+function zoekInPostbus(datamap, merk) {
+  try {
+    const fs = require('fs'); const path = require('path');
+    const map = path.join(datamap, 'outbox');
+    if (!fs.existsSync(map)) return null;
+    const bestanden = fs.readdirSync(map).sort().reverse();
+    for (const b of bestanden) {
+      const tekst = fs.readFileSync(path.join(map, b), 'utf8');
+      const i = tekst.indexOf(merk);
+      if (i < 0) continue;
+      const rest = tekst.slice(i + merk.length);
+      const waarde = rest.split(/[\s'"<>]/)[0];
+      if (waarde) { try { return decodeURIComponent(waarde); } catch (e) { return waarde; } }
+    }
+  } catch (e) { /* geen postbus is geen fout: dan blijft de school ongemaakt */ }
+  return null;
+}
+
+/* ---------------------------------------------------------------------------
+   HET LIJF PER VOORVOEGSEL, en waarom dit geen gedeeld lijf mag zijn.
+
+   `gedeeldLijf` gaat over ELKE route. Daar horen alleen namen in die nergens
+   anders iets betekenen. `code` staat er al in als KASCODE, en een gezinscode
+   heet ook `code` -- die twee over drieduizend routes heen mengen zou van elke
+   betaalroute een gezinsroute maken en andersom.
+
+   Een voorvoegsel is de juiste maat: binnen /api/foundation/ betekent `code`
+   onmiskenbaar de gezinscode, en daarbuiten raakt hij niets. `rol` mag er ook
+   in: sommige van deze deuren willen niet alleen een sleutel in het lijf maar
+   ook een bepaald token in de kop (het werkplek-huis laat alleen de eigenaar
+   binnen, via boardroomBaas).
+   ------------------------------------------------------------------------- */
+function voorvoegselLijf(w) {
+  const uit = [];
+  if (w.gezinCode && w.gezinToken) {
+    /* /api/foundation/ EN /api/school/: de schoolkant hangt aan hetzelfde
+       gezinsprofiel (server/school/poorten.js leest gezinVan/profielVan). */
+    /* LET OP DE VOLGORDE: de eerste treffer wint, en /api/foundation/school/ is
+       een SPECIALER geval van /api/foundation/. Stond de brede regel voorop, dan
+       kregen 225 schoolroutes het gezinslijf zonder schoolcode -- en dat is
+       precies het soort stille halvering waar dit register voor bestaat.
+
+       De schoolkant hangt onder de foundation-router (server/opzet/poortwachters.js
+       mount hem op /api/foundation) en heet dus NIET /api/school. Die aanname
+       kostte hier een ronde: de regel matchte nul routes en zei niets. */
+    uit.push({ voorvoegsel: '/api/foundation/school/',
+      lijf: { code: w.gezinCode, token: w.gezinToken,
+        schoolCode: w.schoolCode || undefined, beheerToken: w.schoolBeheerToken || undefined } });
+    uit.push({ voorvoegsel: '/api/foundation/', lijf: { code: w.gezinCode, token: w.gezinToken } });
+
+  }
+  if (w.werkruimte) {
+    uit.push({ voorvoegsel: '/api/bedrijf/',
+      lijf: { werkruimte: w.werkruimte, beheerToken: w.beheerToken || undefined, lidToken: w.lidToken || undefined } });
+  }
+  /* Het werkplek-huis is niet aan te maken: server/kern/werkplek.js kent twee
+     vaste codes ('rtg', 'rtf') en geen route die er een derde bij zet. `magIn`
+     laat de BAAS overal in, en dat is de eigenaar -- dus de boardroom-sleutel. */
+  uit.push({ voorvoegsel: '/api/werkplek/', lijf: { bedrijf: 'rtg' }, rol: 'boardroom' });
+  return uit;
 }
 
 /* Wat over ELK lijf heen gaat. Alleen namen die nergens anders iets betekenen:
@@ -168,4 +362,4 @@ function geldLijf(w) {
   return uit;
 }
 
-module.exports = { zetWereldKlaar, gedeeldLijf, geldLijf, BUITEN_IBAN };
+module.exports = { zetWereldKlaar, gedeeldLijf, geldLijf, voorvoegselLijf, BUITEN_IBAN };

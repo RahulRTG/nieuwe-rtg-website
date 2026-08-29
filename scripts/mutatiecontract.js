@@ -34,6 +34,8 @@
 const fs = require('fs');
 const path = require('path');
 const { alleRoutes, isSchakel, bewakerskaart } = require('./lib/routes');
+const { handlersUit } = require('./lib/schrijfanalyse');
+const handlerpoorten = require('../server/kern/handlerpoorten');
 const contract = require('../server/kern/mutatiecontract');
 const { stempel } = require('./lib/stempel');
 
@@ -101,9 +103,63 @@ const SOORT_NAAR_TOEGANG = {
   omgeving: 'SYSTEM_INTERNAL'
 };
 
+/* DE POORTEN DIE IN DE HANDLER STAAN.
+
+   Voor 660 schrijfroutes staat de deur niet in de router maar in het lichaam, en
+   dan ziet `r.bewakers` niets. server/kern/handlerpoorten.js draagt wat die
+   poorten werkelijk doen -- gelezen, niet geraden -- en de sleutel is BESTAND EN
+   NAAM, want `profiel`, `beheerVan` en `lidVan` betekenen elders iets anders.
+   Een map op naam alleen zou een rekenfunctie als bewaker tellen. */
+const uitHandler = new Map();
+let meerdereTreffers = 0;
+{
+  const volledigePaden = routes.map(r => ({ methode: String(r.methode).toUpperCase(), pad: r.pad }));
+  const VORMEN = [
+    /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*;\s*if\s*\(\s*!/,
+    /if\s*\(\s*!\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
+    /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/
+  ];
+  const loop = (map) => {
+    for (const naam of fs.readdirSync(map)) {
+      const pad = path.join(map, naam);
+      const st = fs.statSync(pad);
+      if (st.isDirectory()) { if (naam !== 'data' && naam !== 'node_modules') loop(pad); continue; }
+      if (!naam.endsWith('.js')) continue;
+      let hs = [];
+      try { hs = handlersUit(fs.readFileSync(pad, 'utf8')); } catch (e) { continue; }
+      const rel = path.relative(WORTEL, pad);
+      for (const h of hs) {
+        let g = null;
+        for (const re of VORMEN) { const m = re.exec(h.lichaam); if (m) { g = m[1]; break; } }
+        if (!g) continue;
+        const poort = handlerpoorten.poortVan(rel, g);
+        if (!poort) continue;
+        /* HET PAD IN DE BRON IS NIET HET PAD IN DE ROUTER, en dat kostte hier
+           een ronde. Een submodule schrijft `router.post('/school/aandacht')` en
+           hangt via app.use('/api/foundation', ...) op
+           /api/foundation/school/aandacht. De sleutel matchte dus 627 keer niet.
+
+           Koppelen op ACHTERVOEGSEL, en alleen als er precies EEN route zo
+           eindigt. Twee treffers betekent dat we niet weten welke het is, en dan
+           is niets toewijzen het enige eerlijke -- een verkeerde toegangsklasse
+           is erger dan geen. */
+        const kandidaten = volledigePaden.filter(v =>
+          v.methode === h.methode && (v.pad === h.pad || v.pad.endsWith(h.pad)));
+        if (kandidaten.length === 1) uitHandler.set(kandidaten[0].methode + ' ' + kandidaten[0].pad, poort);
+        else if (kandidaten.length > 1) meerdereTreffers++;
+      }
+    }
+  };
+  try { loop(path.join(WORTEL, 'server')); } catch (e) {}
+}
+
 function waargenomenToegang(r) {
   const namen = Array.isArray(r.bewakers) ? r.bewakers : [];
-  if (!r.bewakersBekend || !namen.length) return null;
+  if (!r.bewakersBekend || !namen.length) {
+    /* Geen deur in de router: staat hij in de handler? */
+    const p = uitHandler.get(String(r.methode || 'POST').toUpperCase() + ' ' + r.pad);
+    return (p && p.toegang) || null;
+  }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
      eigen geheim per organisatie. Die uitzondering staat hier bij naam, want een
      kaart die hem als 'gewone rol' doorgeeft laat een koppeling eruitzien als
@@ -236,6 +292,8 @@ for (const r of routes) {
     /* AS 4 -- waarneming en bedoeling apart, zodat een verschil opvalt. */
     toegang: {
       waargenomen,
+      uitHandler: uitHandler.has(sleutel) ? (uitHandler.get(sleutel).veld ? 'object: ' + uitHandler.get(sleutel).veld :
+        (uitHandler.get(sleutel).versmalt || uitHandler.get(sleutel).genre || 'ja')) : null,
       bedoeld: (bedoeld && bedoeld.toegang && bedoeld.toegang.klasse) || null,
       bewakers: Array.isArray(r.bewakers) ? r.bewakers : []
     },
@@ -285,7 +343,10 @@ for (const naam of contract.STATUSNAMEN) {
   console.log(rij(n, naam + (d.naarNul ? '   <- de enige stand die naar NUL moet' : (d.eindstand ? '' : '   <- hoort te slinken'))));
 }
 
-console.log('\n  TOEGANG (waargenomen aan de router, niet verklaard)\n');
+console.log('\n  TOEGANG (waargenomen aan de router OF in de handler)\n');
+console.log(rij(uitHandler.size, 'daarvan uit een poort IN de handler (server/kern/handlerpoorten.js)'));
+if (meerdereTreffers) console.log(rij(meerdereTreffers, 'niet toegewezen: het bronpad past op meer dan een route'));
+console.log('');
 const waarTelling = {};
 for (const r of rijen) { const k = r.toegang.waargenomen || '(niet af te leiden -- vraagt een verklaring)'; waarTelling[k] = (waarTelling[k] || 0) + 1; }
 for (const [k, n] of Object.entries(waarTelling).sort((a, b) => b[1] - a[1])) console.log(rij(n, k));
@@ -348,7 +409,10 @@ if (process.argv.includes('--afleiden')) {
     const toeg = r.toegang.waargenomen;
     if (!toeg) continue;                       // zonder waargenomen deur geen geldig contract
     const toegang = { klasse: toeg };
-    if (toeg === 'OBJECT_SCOPED') toegang.objectVeld = 'nog af te leiden uit de handler';
+    if (toeg === 'OBJECT_SCOPED') {
+      const p = uitHandler.get(r.route);
+      toegang.objectVeld = (p && p.veld) || 'nog af te leiden uit de handler';
+    }
     uitContracten[r.route] = {
       mutatieId: r.mutatieId,
       herkomst: 'afgeleid',

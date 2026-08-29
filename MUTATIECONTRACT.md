@@ -257,16 +257,16 @@ opgeruimd.
 
 ```
 Mutation inventory                4.653
-Classified                        2.786   59,9%
+Classified                        3.017   64,8%
   vastgesteld door een mens          64   (een uitspraak over gedrag)
-  afgeleid door een script        2.722   (alleen: wij weten het niet, en waarom)
+  afgeleid door een script        2.953   (alleen: wij weten het niet, en waarom)
 
   PROTECTED                          24
   NOT_APPLICABLE                     40
   INTENTIONALLY_NON_IDEMPOTENT        0
   UNTESTABLE_WITH_JUSTIFIED_REASON    0
-  BLOCKED_BY_TEST_FIXTURE         2.722   hoort te slinken
-LEGACY_PENDING_CLASSIFICATION     1.867   moet naar nul
+  BLOCKED_BY_TEST_FIXTURE         2.953   hoort te slinken
+LEGACY_PENDING_CLASSIFICATION     1.636   moet naar nul
 ```
 
 Die 59,9% is met opzet niet het getal om trots op te zijn — de 64 is dat. Wat de
@@ -316,10 +316,25 @@ Elke bak heeft een eigen remedie, en dat is de hele reden om ze te scheiden:
 
 | | wat | remedie |
 |---|---|---|
-| 1.194 | geen uitspraak en geen hindernis — de oproep slaagde, maar er was niets waarneembaars | een rijkere wereld, of een mens die de handler leest |
-| 502 | hindernis wél, maar de **toegang** is niet af te leiden | de bewaking zit in de handler — zie par. 7.2 |
+| 1.194 | twee geslaagde kale oproepen die **niets** achterlieten — `NOT_APPLICABLE`-kandidaten die op bevestiging wachten | een tweede bewijslijn, of een mens |
+| 271 | hindernis wél, maar de **toegang** is niet af te leiden | de bewaking zit in de handler — zie par. 7.2 |
 | 161 | de dubbeltik **deed het werk opnieuw** | een menselijk besluit: dubbeltik of tweede handeling? |
 | 10 | niet gemeten (pad-parameter) | de lifecycle-opstelling uit par. 8 |
+
+**Waarom die 1.194 niet machinaal te bevestigen zijn, en dat is een uitspraak
+over de architectuur en niet over de meter.** De statische analyse is uitgebreid
+met een resolver die één hop over de modulegrens gaat. Gemeten resultaat: `ja`
+ging van 938 naar 979, `onbekend` van 3.441 naar 3.413 — **achtentwintig routes
+van vierenveertighonderd**. De reden is structureel: de routelaag krijgt zijn
+modules niet via `require` maar via één contextobject dat in `server/opzet/`
+wordt samengesteld (`module.exports = (kern) => { const { bank, save } = kern; … }`).
+Een resolver die requires volgt, kán `bank.bankOverboek()` daar niet vinden.
+
+Dat is de prijs van injectie via een gedeelde context: soepele code, blinde
+statische analyse. Wie deze bak wil legen, doet dat met een **runtime**-meting —
+tellen wat een verzoek werkelijk aanraakt buiten de gemeten collecties (een
+bestand, een bericht, een externe aanroep) — en niet met meer statisch turen. De
+choke points daarvoor bestaan al, want de kostenlaag hangt er zijn meters aan.
 
 Die 161 zijn de irreducibele kern: geen meting beantwoordt of twee identieke
 overboekingen één dubbeltik zijn of twee betalingen. Maar het zijn er 161 en geen
@@ -346,6 +361,23 @@ de uitkomst meteen tot een `return` leidt — en de uitkomst is:
 
 - over alle handlers: **60 verschillende poortvormen**, samen **1.220 routes**;
 - binnen de 660 die vastzitten: **9 vormen**, samen **97 routes**.
+
+**Die zestig zijn gelezen.** `server/kern/handlerpoorten/` draagt per poort wat
+hij werkelijk doet: 30 `OBJECT_SCOPED` (met het veld dat het object aanwijst),
+27 `AUTHENTICATED` (identiteitsversmallingen: geen gast, echt account, manager,
+personeel) en 2 die **geen deur** zijn maar alleen een rem. Resultaat: de routes
+zonder af te leiden toegang gingen van **660 naar 366**, en `OBJECT_SCOPED` van
+215 naar 474.
+
+**De sleutel was eerst fout, en dat is leerzaam.** Om de drie homoniemen uit
+elkaar te houden leek `bestand:naam` veilig. Het werkte precies verkeerd om: een
+poort wordt *gedefinieerd* in één bestand en *gebruikt* in tientallen —
+`familieVan` staat in `server/foundation.js` en wordt in negen andere aangeroepen.
+Van de 300 herkende poortvormen matchten er nog 41. De juiste lezing is dat geen
+van de drie homoniemen in een **routebestand** staat: `bankprofiel.js`,
+`office/samen.js` en `agenda-pro.js` registreren geen enkele route. De sleutel mag
+dus de naam zijn, met `NIET_IN` voor de uitzondering — en een toets die zakt zodra
+een van die drie bestanden alsnog een route krijgt.
 
 **En drie van die negen dragen een naam die in dit huis ook iets anders
 betekent.** `profiel` is in `routes/rtfschool.js` een gezinsprofiel-poort en in

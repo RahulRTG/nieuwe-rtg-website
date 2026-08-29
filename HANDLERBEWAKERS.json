@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-29T22:53:51.186Z",
-  "commit": "721b9ebb",
+  "op": "2026-08-29T23:10:05.053Z",
+  "commit": "55e4a311",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -11,9 +11,9 @@
   "handlers": 4441,
   "metPoortvorm": 1220,
   "vormen": 60,
-  "zonderAfTeLeidenToegang": 660,
-  "daarvanMetPoortvorm": 97,
-  "vormenInDeBak": 9
+  "zonderAfTeLeidenToegang": 366,
+  "daarvanMetPoortvorm": 6,
+  "vormenInDeBak": 2
  },
  "naambotsingen": [
   {
@@ -465,64 +465,6 @@
  ],
  "inDeBak": [
   {
-   "naam": "werkPoort",
-   "bestanden": [
-    "server/bedrijf/aansluiting.js",
-    "server/bedrijf/gevolg.js",
-    "server/bedrijf/handeling.js",
-    "server/bedrijf/inzicht-graaf.js",
-    "server/bedrijf/inzicht.js",
-    "server/bedrijf/mijnwerk.js",
-    "server/bedrijf/regelpoort.js",
-    "server/bedrijf/rollen.js",
-    "server/bedrijf/start.js",
-    "server/bedrijf/toen.js"
-   ],
-   "routes": [
-    "POST /api/bedrijf/koppeling",
-    "POST /api/bedrijf/gevolg",
-    "POST /api/bedrijf/handeling/plan",
-    "POST /api/bedrijf/handeling/doe",
-    "POST /api/bedrijf/handeling/bonnen",
-    "POST /api/bedrijf/samenhang",
-    "POST /api/bedrijf/wandel",
-    "POST /api/bedrijf/zoek",
-    "POST /api/bedrijf/dossier",
-    "POST /api/bedrijf/mijnwerk",
-    "POST /api/bedrijf/keur",
-    "POST /api/bedrijf/keuring",
-    "POST /api/bedrijf/rollen",
-    "POST /api/bedrijf/start",
-    "POST /api/bedrijf/toen",
-    "POST /api/bedrijf/toen/object",
-    "POST /api/bedrijf/verloop"
-   ]
-  },
-  {
-   "naam": "beheerVan",
-   "bestanden": [
-    "server/bedrijf/index.js",
-    "server/bedrijf/leden.js",
-    "server/bedrijf/rollen.js"
-   ],
-   "routes": [
-    "POST /api/bedrijf/werkruimte",
-    "POST /api/bedrijf/lid/besluit",
-    "POST /api/bedrijf/lid/uit-dienst",
-    "POST /api/bedrijf/leden",
-    "POST /api/bedrijf/lid/rollen"
-   ]
-  },
-  {
-   "naam": "lidVan",
-   "bestanden": [
-    "server/bedrijf/rollen.js"
-   ],
-   "routes": [
-    "POST /api/bedrijf/mijn-rechten"
-   ]
-  },
-  {
    "naam": "doosSleutelOk",
    "bestanden": [
     "server/routes/doos.js"
@@ -542,110 +484,6 @@
    "routes": [
     "POST /api/gast/tafel",
     "POST /api/gast/aanschuiven"
-   ]
-  },
-  {
-   "naam": "profiel",
-   "bestanden": [
-    "server/routes/geloofbieb.js",
-    "server/routes/rtfbieb.js",
-    "server/routes/rtfschool.js"
-   ],
-   "routes": [
-    "POST /api/rtf/geloof",
-    "POST /api/rtf/geloof/catalogus",
-    "POST /api/rtf/geloof/installeer",
-    "POST /api/rtf/geloof/weg",
-    "POST /api/rtf/geloof/mijn",
-    "POST /api/rtf/geloof/lees",
-    "POST /api/rtf/geloof/ai",
-    "POST /api/rtf/bieb",
-    "POST /api/rtf/bieb/catalogus",
-    "POST /api/rtf/bieb/installeer",
-    "POST /api/rtf/bieb/weg",
-    "POST /api/rtf/bieb/mijn",
-    "POST /api/rtf/toegang",
-    "POST /api/rtf/bieb/ai",
-    "POST /api/rtf/school",
-    "POST /api/rtf/school/catalogus",
-    "POST /api/rtf/school/installeer",
-    "POST /api/rtf/school/weg",
-    "POST /api/rtf/school/mijn",
-    "POST /api/rtf/beroepen",
-    "POST /api/rtf/beroepen/catalogus",
-    "POST /api/rtf/beroepen/installeer",
-    "POST /api/rtf/beroepen/weg",
-    "POST /api/rtf/beroepen/mijn",
-    "POST /api/rtf/rahul"
-   ]
-  },
-  {
-   "naam": "samenSess",
-   "bestanden": [
-    "server/routes/rtfschool.js"
-   ],
-   "routes": [
-    "POST /api/rtf/samen/maak",
-    "POST /api/rtf/samen/mee",
-    "POST /api/rtf/samen/zet",
-    "POST /api/rtf/samen/chat",
-    "POST /api/rtf/samen/weg",
-    "POST /api/rtf/samen/staat"
-   ]
-  },
-  {
-   "naam": "rtfSociaal",
-   "bestanden": [
-    "server/routes/social/gezinnen/toezicht.js",
-    "server/routes/social/gezinnen/vrienden.js"
-   ],
-   "routes": [
-    "POST /api/rtf/social/call",
-    "POST /api/rtf/social/block",
-    "POST /api/rtf/social/unblock",
-    "POST /api/rtf/social/report",
-    "POST /api/rtf/social/kind/contacten",
-    "POST /api/rtf/social/kind/verwijder",
-    "POST /api/rtf/social/kind/boardroom",
-    "POST /api/rtf/social/kind/boardroom/zet",
-    "POST /api/rtf/social/kind/boardroom/zetveel",
-    "POST /api/rtf/social/kind/boardroom/herstel",
-    "POST /api/rtf/onboarding/status",
-    "POST /api/rtf/onboarding/opslaan",
-    "POST /api/rtf/onboarding/teken",
-    "POST /api/rtf/social/find",
-    "POST /api/rtf/social/connect",
-    "POST /api/rtf/social/oudervoeg",
-    "POST /api/rtf/social/respond",
-    "POST /api/rtf/social/connections",
-    "POST /api/rtf/social/dm",
-    "POST /api/rtf/social/dm/send",
-    "POST /api/rtf/social/goedkeuren",
-    "POST /api/rtf/social/snap/send",
-    "POST /api/rtf/social/snaps",
-    "POST /api/rtf/social/snap/view",
-    "POST /api/rtf/social/story/post",
-    "POST /api/rtf/social/opdracht",
-    "POST /api/rtf/social/stories",
-    "POST /api/rtf/social/story/view"
-   ]
-  },
-  {
-   "naam": "viaBeheerOfDirectie",
-   "bestanden": [
-    "server/routes/tenant/bijstand.js",
-    "server/routes/tenant.js"
-   ],
-   "routes": [
-    "POST /api/tenant/bijstand/niveaus",
-    "POST /api/tenant/bijstand",
-    "POST /api/tenant/bijstand/dossier",
-    "POST /api/tenant/bijstand/vraag",
-    "POST /api/tenant/bijstand/intrekken",
-    "POST /api/tenant/bijstand/besluit",
-    "POST /api/tenant/bijstand/inhoud",
-    "POST /api/tenant/status",
-    "POST /api/tenant/herstelproef"
    ]
   }
  ]

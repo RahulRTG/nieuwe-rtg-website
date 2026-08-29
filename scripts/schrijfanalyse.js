@@ -6,19 +6,25 @@
 
    De eerste opzet was: bewijs statisch dat een handler niets schrijft, en
    gebruik dat als tweede bewijslijn onder NOT_APPLICABLE. Dat werkt niet, en de
-   meting laat precies zien waarom. Over 4441 routes in de bron:
+   meting laat precies zien waarom. Over 4441 routes in de bron, MET de
+   modulegrens-resolver erbij:
 
-       938  schrijft aantoonbaar
-        63  leest aantoonbaar
-      3440  ONBEKEND
+       979  schrijft aantoonbaar
+        49  leest aantoonbaar
+      3413  ONBEKEND
 
-   Die 3440 is geen tekortkoming van de analyse maar de vorm van dit huis: bijna
-   elke handler is drie regels die doorverwijzen naar de kern, en
-   `res.json(metier.zoek(...))` zegt in zichzelf niets. Volgen over
-   modulegrenzen heen zou dat oplossen, maar een resolver over 2861 bestanden die
-   er ergens EEN mist, levert een 'nee' die niet klopt -- en die 'nee' zou dan
-   onder een contract komen te staan als bewijs. Dat is precies het soort
-   zekerheid waar dit register tegen is gebouwd.
+   Die 3413 is geen tekortkoming van de analyse maar de vorm van dit huis, en dat
+   is zelf de bevinding: de routelaag krijgt zijn modules NIET via `require` maar
+   via een contextobject dat in server/opzet/ wordt samengesteld
+   (`module.exports = (kern) => { const { bank, save } = kern; ... }`). Een
+   resolver die requires volgt kan `bank.bankOverboek()` dus niet vinden. Hij is
+   gebouwd en gemeten: 'ja' ging van 938 naar 979, 'onbekend' van 3441 naar 3413.
+   Achtentwintig routes op vierenveertighonderd.
+
+   Dat is de prijs van injectie via een gedeelde context -- soepele code,
+   blinde statische analyse. Wie deze bak echt wil legen doet dat met een
+   RUNTIME-meting (tellen wat een verzoek werkelijk aanraakt), niet met meer
+   statisch turen.
 
    DUS DRAAIEN WE HET OM. De schrijfvormenlijst in ./lib/schrijfanalyse.js is met
    opzet TE RUIM: elke vorm die ook maar zou kunnen schrijven telt mee. Een lijst
@@ -39,13 +45,31 @@
 
 const fs = require('fs');
 const path = require('path');
-const { analyseer } = require('./lib/schrijfanalyse');
+const { analyseer, analyseerDiep, maakIndex } = require('./lib/schrijfanalyse');
 const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const SERVER = path.join(WORTEL, 'server');
 const UITSLAG = path.join(WORTEL, 'SCHRIJFANALYSE.json');
 const vastleggen = process.argv.includes('--vastleggen');
+
+/* De projectindex: hij maakt EEN hop over de modulegrens mogelijk. Zie de kop
+   van ./lib/schrijfanalyse.js voor de vier regels die voorkomen dat daar een
+   'nee' uit komt die niet klopt.
+
+   WAT HIJ IN DIT HUIS OPLEVERT, EERLIJK: bijna niets. Gemeten op 29 augustus
+   2026 ging 'ja' van 938 naar 979 en 'onbekend' van 3441 naar 3413. De reden is
+   structureel en zelf een bevinding: de routelaag krijgt zijn modules niet via
+   `require` maar via EEN CONTEXTOBJECT dat in server/opzet/ wordt samengesteld
+   (`module.exports = (kern) => { const { bank, save } = kern; ... }`). Een
+   resolver die requires volgt, kan `bank.bankOverboek()` dus niet vinden -- niet
+   omdat hij tekortschiet, maar omdat de afhankelijkheid daar niet staat.
+
+   Dat is de prijs van injectie via een gedeelde context: het maakt de code
+   soepel en statische analyse blind. Wie deze bak echt wil legen, doet dat met
+   een RUNTIME-meting (tellen wat een verzoek werkelijk aanraakt) en niet met
+   meer statisch turen. */
+const idx = maakIndex(WORTEL);
 
 /* De hele serverboom af. `data/` blijft eruit: dat is runtime en geen bron. */
 const gevonden = new Map();
@@ -56,7 +80,9 @@ const gevonden = new Map();
     if (st.isDirectory()) { if (naam === 'data' || naam === 'node_modules') continue; loop(p); continue; }
     if (!naam.endsWith('.js')) continue;
     let rijen = [];
-    try { rijen = analyseer(fs.readFileSync(p, 'utf8')); } catch (e) { continue; }
+    try { rijen = analyseerDiep(p, idx, 4); } catch (e) {
+      try { rijen = analyseer(fs.readFileSync(p, 'utf8')); } catch (x) { continue; }
+    }
     for (const r of rijen) {
       const sleutel = r.methode + ' ' + r.pad;
       /* EEN ROUTE KAN IN MEER DAN EEN BESTAND STAAN (een submodule die op een

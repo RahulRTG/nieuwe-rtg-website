@@ -285,3 +285,171 @@ function analyseer(bron) {
 }
 
 module.exports = { analyseer, handlersUit, weegLichaam, functiesUit, weegNaam, SCHRIJFVORMEN, LEESVORMEN };
+
+/* ============================================================================
+   DE PROJECTINDEX -- een hop over de modulegrens, en niet meer dan een.
+
+   WAAROM DIT ER TOCH KOMT. De analyse hierboven volgt alleen aanroepen binnen
+   hetzelfde bestand, en dat liet 3441 van de 4441 routes op ONBEKEND staan. Die
+   3441 zijn geen meetfout maar de vorm van dit huis: bijna elke handler is drie
+   regels die doorverwijzen naar de kern. Zonder die grens over te steken blijft
+   de tweede bewijslijn een veto en wordt hij nooit een bevestiging.
+
+   WAAROM HET GEVAARLIJK IS, EN HOE DAT WORDT INGEDAMD. Een resolver die er
+   ergens EEN mist, levert een 'nee' die niet klopt -- en die 'nee' komt als
+   bewijs onder een contract te staan. Vier regels houden dat tegen:
+
+     1. ELKE NIET-OPGELOSTE NAAM MAAKT DE UITKOMST ONBEKEND. Niet 'nee'. Er is
+        geen enkele weg waarlangs "ik kon het niet vinden" als "het is veilig"
+        uitkomt.
+     2. DE ROOSTER LOOPT EEN KANT OP: ja > onbekend > nee. Een keten is pas 'nee'
+        als ELKE schakel 'nee' is.
+     3. EEN NAAM DIE IN EEN BESTAND MEER DAN EEN KEER BESTAAT, WEEGT ALS DE
+        ZWAARSTE. Twee functies met dezelfde naam is precies waar een resolver
+        stil de verkeerde kiest.
+     4. DE DIEPTE IS BEGRENSD en kringen worden onthouden. Buiten de grens:
+        onbekend.
+
+   WAT HIJ NIET DOET: dynamische aanroepen (`obj[naam]()`), functies die als
+   waarde worden doorgegeven, en alles wat via een context-object binnenkomt dat
+   ergens anders is gevuld. Die komen allemaal uit op onbekend, en dat is de
+   bedoeling.
+   ========================================================================== */
+
+const _fs = require('fs');
+const _path = require('path');
+
+/* De requires van een bestand: welke naam wijst naar welk bestand.
+
+   Twee vormen, en meer kent dit huis niet in de routelaag:
+     const x = require('./y')          -> x wijst naar y
+     const { a, b } = require('./y')   -> a en b wijzen naar y  */
+function requiresUit(bron, bestand) {
+  const schoon = zonderCommentaar(bron);
+  const uit = new Map();
+  const los = /(?:const|let|var)\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*=\s*require\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+  const stel = /(?:const|let|var)\s*\{([^}]*)\}\s*=\s*require\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+  const oplossen = (verwijzing) => {
+    if (!verwijzing.startsWith('.')) return null;                 // node: of npm: niet volgen
+    const basis = _path.resolve(_path.dirname(bestand), verwijzing);
+    for (const kandidaat of [basis, basis + '.js', _path.join(basis, 'index.js')]) {
+      try { if (_fs.statSync(kandidaat).isFile()) return kandidaat; } catch (e) { /* volgende */ }
+    }
+    return null;
+  };
+  let m;
+  while ((m = los.exec(schoon))) { const p = oplossen(m[2]); if (p) uit.set(m[1], p); }
+  while ((m = stel.exec(schoon))) {
+    const p = oplossen(m[2]); if (!p) continue;
+    for (const stuk of m[1].split(',')) {
+      const naam = stuk.split(':').pop().trim();
+      if (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(naam)) uit.set(naam, p);
+    }
+  }
+  return uit;
+}
+
+/* De index: per bestand zijn functies en zijn requires, een keer gelezen. */
+function maakIndex(wortel) {
+  const index = new Map();
+  const lees = (bestand) => {
+    if (index.has(bestand)) return index.get(bestand);
+    let bron = '';
+    try { bron = _fs.readFileSync(bestand, 'utf8'); } catch (e) { /* leeg */ }
+    const d = { functies: functiesUit(bron), requires: requiresUit(bron, bestand) };
+    index.set(bestand, d);
+    return d;
+  };
+  return { lees, index, wortel };
+}
+
+/* Het oordeel over een naam, nu MET de modulegrens erbij.
+
+   `plek` is het bestand waarin de naam voorkomt. Een naam kan drie dingen zijn:
+   een functie in dit bestand, iets dat uit een require komt, of onbekend. */
+function weegNaamDiep(naam, plek, idx, gezien, diepte) {
+  if (diepte <= 0) return { schrijft: 'onbekend', waarom: 'te diep om te volgen' };
+  const merk = plek + ':' + naam;
+  if (gezien.has(merk)) return { schrijft: 'nee', waarom: 'kring: al gewogen in deze keten' };
+  gezien.add(merk);
+
+  const hier = idx.lees(plek);
+
+  /* 1. Een functie in dit bestand. */
+  if (hier.functies.has(naam)) {
+    const lichaam = hier.functies.get(naam);
+    const direct = SCHRIJFVORMEN.filter(v => v.re.test(lichaam));
+    if (direct.length) return { schrijft: 'ja', waarom: '"' + naam + '" in ' + plek + ' schrijft: ' + direct.map(v => v.naam).join(', ') };
+    for (const kind of aanroepenUit(lichaam)) {
+      const o = weegNaamDiep(kind, plek, idx, gezien, diepte - 1);
+      if (o.schrijft !== 'nee') return o;
+    }
+    return { schrijft: 'nee', waarom: '"' + naam + '" en alles wat het aanroept veranderen niets' };
+  }
+
+  /* 2. Een naam die uit een require komt: volg hem naar dat bestand. Daar zoeken
+        we de functie op NAAM en niet via module.exports -- dit huis bouwt zijn
+        modules als fabrieken (`module.exports = (ctx) => { ... return {a,b} }`)
+        en dan staat de naam wel in het bestand maar niet in een exportlijst. */
+  if (hier.requires.has(naam)) {
+    const doel = hier.requires.get(naam);
+    const daar = idx.lees(doel);
+    if (daar.functies.has(naam)) return weegNaamDiep(naam, doel, idx, gezien, diepte - 1);
+    return { schrijft: 'onbekend', waarom: '"' + naam + '" komt uit ' + doel + ' maar is daar niet als functie te vinden' };
+  }
+
+  return { schrijft: 'onbekend', waarom: '"' + naam + '" is in ' + plek + ' niet te herleiden' };
+}
+
+/* Een aanroep van de vorm `mod.fn(...)`: los `mod` op naar een bestand en weeg
+   `fn` daar. */
+function moduleAanroepen(lichaam) {
+  const uit = [];
+  const re = /([A-Za-z_$][A-Za-z0-9_$]*)\s*\.\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/g;
+  let m;
+  while ((m = re.exec(lichaam))) {
+    if (LEESVORMEN.has(m[2])) continue;
+    uit.push({ mod: m[1], fn: m[2] });
+  }
+  return uit;
+}
+
+/* De diepe variant van analyseer(): zelfde uitkomsten, maar met de index erbij.
+   Zonder index gedraagt hij zich exact als analyseer(). */
+function analyseerDiep(bestand, idx, maxDiepte) {
+  const bron = (() => { try { return _fs.readFileSync(bestand, 'utf8'); } catch (e) { return ''; } })();
+  const diepte = maxDiepte || 4;
+  const hier = idx.lees(bestand);
+  return handlersUit(bron).map(h => {
+    const eerste = weegLichaam(h.lichaam);
+    if (eerste.schrijft === 'ja') return { methode: h.methode, pad: h.pad, ...eerste };
+
+    const redenen = [];
+    let zwaarste = eerste.schrijft;
+    /* Kale aanroepen: `fn(...)`. */
+    for (const naam of aanroepenUit(h.lichaam)) {
+      const o = weegNaamDiep(naam, bestand, idx, new Set(), diepte);
+      if (o.schrijft === 'ja') return { methode: h.methode, pad: h.pad, schrijft: 'ja', waarom: 'via ' + o.waarom };
+      if (o.schrijft === 'onbekend') { zwaarste = 'onbekend'; redenen.push(o.waarom); }
+    }
+    /* Modulaanroepen: `mod.fn(...)`. */
+    for (const { mod, fn } of moduleAanroepen(h.lichaam)) {
+      const doel = hier.requires.get(mod);
+      if (!doel) { zwaarste = 'onbekend'; redenen.push('"' + mod + '" is geen bekende module in ' + bestand); continue; }
+      const o = weegNaamDiep(fn, doel, idx, new Set(), diepte);
+      if (o.schrijft === 'ja') return { methode: h.methode, pad: h.pad, schrijft: 'ja', waarom: 'via ' + o.waarom };
+      if (o.schrijft === 'onbekend') { zwaarste = 'onbekend'; redenen.push(o.waarom); }
+    }
+    if (zwaarste === 'onbekend') {
+      return { methode: h.methode, pad: h.pad, schrijft: 'onbekend', waarom: redenen[0] || 'niet te herleiden' };
+    }
+    return { methode: h.methode, pad: h.pad, schrijft: 'nee',
+      waarom: 'geen schrijfvorm, en elke aanroep is herleid tot iets dat niets verandert' };
+  });
+}
+
+module.exports.requiresUit = requiresUit;
+module.exports.maakIndex = maakIndex;
+module.exports.weegNaamDiep = weegNaamDiep;
+module.exports.analyseerDiep = analyseerDiep;
+module.exports.moduleAanroepen = moduleAanroepen;

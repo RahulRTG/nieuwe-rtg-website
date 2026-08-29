@@ -1,37 +1,19 @@
-/* De inhoud van RTG Second Screen. Alleen echte bronnen of een eerlijke lege
-   stand: profiel, berichten, levende context en bestaande RTG-deuren. De
-   toestandsmachine en persoonlijke ordening staan in second-screen.js. */
+/* DE EERSTE RTG LIVING MODULES.
+
+   Alle definities lopen door Module SDK. De Workspace Runtime tekent de kaart,
+   titel, state en aanpasbediening; hier staat alleen domeininhoud. Travel,
+   Veiligheid, Contacten en Dashboard beginnen eerlijk via de legacy-adapter en
+   kunnen later onder hetzelfde id native worden zonder iemands ruimte te breken. */
 (function (w, d) {
   'use strict';
-  var IDS = ['profile', 'context', 'messages', 'navigation', 'doors'];
+  var SDK = w.RTGModuleSDK, legacy = w.RTGWorkspaceLegacy;
+  if (!SDK || !legacy) return;
 
-  function el(tag, cls, text) {
+  function el(tag, cls, tekst) {
     var n = d.createElement(tag); if (cls) n.className = cls;
-    if (text != null) n.textContent = text; return n;
+    if (tekst != null) n.textContent = tekst; return n;
   }
-  function button(text, cls, action) {
-    var n = el('button', cls, text); n.type = 'button';
-    if (action) n.dataset.ssAction = action; return n;
-  }
-  function post(url, signal) {
-    var token = '';
-    try { token = w.localStorage.getItem('rtg_member_token') || ''; } catch (e) {}
-    if (!token) return Promise.reject(new Error('signed-out'));
-    return w.fetch(url, { method: 'POST', credentials: 'same-origin', signal: signal,
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
-        if (!r.ok) throw new Error(j.error || 'request-failed'); return j;
-      }); });
-  }
-  function maakModule(id, title) {
-    var vak = el('section', 'rtg-ss-module'); vak.dataset.ssModule = id;
-    var kop = el('div', 'rtg-ss-module-head'); kop.appendChild(el('h3', '', title));
-    var regie = el('div', 'rtg-ss-module-controls');
-    [['Omhoog','up'],['Omlaag','down'],['Verberg','hide']].forEach(function (x) {
-      var b = button(x[0], '', x[1]); b.setAttribute('aria-label', title + ' ' + x[0].toLowerCase()); regie.appendChild(b);
-    });
-    kop.appendChild(regie); vak.appendChild(kop); return vak;
-  }
+  function button(tekst, cls) { var b = el('button', cls, tekst); b.type = 'button'; return b; }
   function initialen(u) {
     var t = u.full || u.name || u.codename || u.email || '';
     return t.split(/\s+/).filter(Boolean).slice(0, 2).map(function (x) { return x.charAt(0); }).join('').toUpperCase() || 'RTG';
@@ -41,69 +23,137 @@
     try { return new Date(at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; }
   }
 
-  w.RTGInterfaceSecondScreenModules = function (o) {
-    var dead = false, stop = typeof AbortController === 'function' ? new AbortController() : null, afContext = null;
-    var profile = maakModule('profile', 'Profiel'), profileBody = el('div', 'rtg-ss-profile');
-    profileBody.appendChild(el('p', 'rtg-ss-quiet', 'Profiel laden…')); profile.appendChild(profileBody);
-    var context = maakModule('context', 'Nu relevant'), contextBody = el('div', 'rtg-ss-context');
-    contextBody.appendChild(el('p', 'rtg-ss-quiet', 'Context wordt bepaald…')); context.appendChild(contextBody);
-    var messages = maakModule('messages', 'Berichten'), messagesBody = el('div', 'rtg-ss-messages');
-    messagesBody.appendChild(el('p', 'rtg-ss-quiet', 'Berichten laden…')); messages.appendChild(messagesBody);
-    var navigation = maakModule('navigation', 'Werelden');
-    navigation.appendChild(o.nav || el('p', 'rtg-ss-quiet', 'Navigatie niet beschikbaar.'));
-    var doors = maakModule('doors', 'Direct openen'), grid = el('div', 'rtg-ss-doors');
-    [['Contacten','/apps/comm.html'],['Dashboard','/apps/pulse.html'],
-      ['Reizen','/apps/reizen.html#reizen'],['RTG Veilig','/apps/veilig.html']].forEach(function (x) {
-      var b = button(x[0], 'rtg-ss-door'); b.dataset.ssUrl = x[1]; grid.appendChild(b);
-    });
-    doors.appendChild(grid);
-    var byId = { profile: profile, context: context, messages: messages, navigation: navigation, doors: doors };
-
-    function profiel() {
-      post('/api/auth/me', stop && stop.signal).then(function (j) {
-        if (dead || !j.user) return; var u = j.user; profileBody.textContent = '';
-        profileBody.appendChild(el('span', 'rtg-ss-avatar', initialen(u)));
+  SDK.add(SDK.define({
+    id: 'profile', title: 'Profiel', version: 1, source: 'native', priority: 10,
+    states: SDK.states, capabilities: ['identity.read'], services: ['tg-account'], permissions: [], actions: [],
+    events: { publishes: ['profile.loaded'], subscribes: [] }
+  }, function (ctx) {
+    var root, geladen = false, bezig = false, stop = typeof AbortController === 'function' ? new AbortController() : null;
+    function laad() {
+      if (geladen || bezig) return; bezig = true; ctx.setStatus('laden', 'busy');
+      ctx.request('/api/auth/me', {}, { signal: stop && stop.signal }).then(function (j) {
+        if (!root || !j.user) return; var u = j.user; root.textContent = '';
+        root.appendChild(el('span', 'rtg-ss-avatar', initialen(u)));
         var tekst = el('div', 'rtg-ss-profile-copy');
         tekst.appendChild(el('strong', '', u.full || u.name || u.codename || 'RTG-lid'));
         var sub = [u.codename, u.tier].filter(Boolean).join(' · '); if (sub) tekst.appendChild(el('span', '', sub));
         if (u.emailVerified === true) tekst.appendChild(el('span', 'rtg-ss-ok', 'Profiel geverifieerd'));
-        profileBody.appendChild(tekst);
-      }).catch(function (e) { if (!dead && e.name !== 'AbortError') { profileBody.textContent = ''; profileBody.appendChild(el('p', 'rtg-ss-quiet', 'Profielstatus niet beschikbaar.')); } });
+        root.appendChild(tekst); geladen = true; ctx.setStatus('live', 'ok');
+        ctx.events.publish('profile.loaded', { verified: u.emailVerified === true, tier: u.tier || null });
+      }).catch(function (e) {
+        if (!root || e.name === 'AbortError') return; root.textContent = '';
+        root.appendChild(el('p', 'rtg-ss-quiet', 'Profielstatus niet beschikbaar.')); ctx.setStatus('offline', 'warning');
+      }).finally(function () { bezig = false; });
     }
-    function inbox() {
-      post('/api/comm/inbox', stop && stop.signal).then(function (j) {
-        if (dead) return; var lijst = Array.isArray(j.gesprekken) ? j.gesprekken.slice(0, 3) : [];
-        messagesBody.textContent = '';
-        if (!lijst.length) messagesBody.appendChild(el('p', 'rtg-ss-quiet', 'Nog geen gesprekken.'));
-        lijst.forEach(function (x) {
-          var b = button('', 'rtg-ss-message'); b.dataset.ssUrl = x.link || '/apps/comm.html';
-          b.appendChild(el('strong', '', x.titel || 'Gesprek'));
-          if (x.laatste) b.appendChild(el('span', '', x.laatste));
-          var meta = [tijd(x.at), x.ongelezen ? x.ongelezen + ' ongelezen' : ''].filter(Boolean).join(' · ');
-          if (meta) b.appendChild(el('small', '', meta)); messagesBody.appendChild(b);
-        });
-        var alles = button('Alle berichten', 'rtg-ss-more'); alles.dataset.ssUrl = '/apps/comm.html'; messagesBody.appendChild(alles);
-      }).catch(function (e) { if (!dead && e.name !== 'AbortError') { messagesBody.textContent = ''; messagesBody.appendChild(el('p', 'rtg-ss-quiet', 'Berichten niet beschikbaar.')); } });
-    }
-    function contextNu(ctx) {
-      if (dead) return; contextBody.textContent = '';
-      if (ctx && ctx.titel) contextBody.appendChild(el('strong', '', ctx.titel));
-      var A = w.RTGAdaptief, items = A && A.voorNu ? A.voorNu() : [];
+    return {
+      mount: function (body) { root = el('div', 'rtg-ss-profile'); root.appendChild(el('p', 'rtg-ss-quiet', 'Profiel wordt zichtbaar wanneer u de werklaag opent.')); body.appendChild(root); },
+      render: function (state) { if (state !== 'peek') laad(); },
+      destroy: function () { root = null; if (stop) stop.abort(); }
+    };
+  }));
+
+  SDK.add(SDK.define({
+    id: 'context', title: 'Nu relevant', version: 1, source: 'native', priority: 20,
+    states: SDK.states, capabilities: ['context.read', 'context.execute'], permissions: [],
+    actions: ['context.execute'], events: { publishes: ['context.updated'], subscribes: [] }
+  }, function (ctx) {
+    var root, laatste = null, af = null, A = w.RTGAdaptief;
+    function teken(c) {
+      laatste = c || {}; if (!root) return; root.textContent = '';
+      if (laatste.titel) root.appendChild(el('strong', '', laatste.titel));
+      var items = A && A.voorNu ? A.voorNu() : [];
       (Array.isArray(items) ? items : []).slice(0, 4).forEach(function (x) {
         if (!x || !(x.label || x.naam)) return;
-        var b = button(x.label || x.naam, 'rtg-ss-context-action'); b.dataset.ssContextId = x.id; contextBody.appendChild(b);
+        var b = button(x.label || x.naam, 'rtg-ss-context-action'); b.dataset.ssContextId = x.id; root.appendChild(b);
       });
-      if (!contextBody.childNodes.length) contextBody.appendChild(el('p', 'rtg-ss-quiet', 'Geen actuele context.'));
+      if (!root.childNodes.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Geen actuele context.'));
+      ctx.setStatus(items.length ? 'actueel' : 'rustig', items.length ? 'ok' : 'quiet');
+      ctx.events.publish('context.updated', { title: laatste.titel || null, source: laatste.bron || null,
+        actions: (laatste.acties || []).slice(0, 12) });
     }
-    function handel(target) {
-      var url = target && target.dataset && target.dataset.ssUrl;
-      if (url) { o.open(url, (target.querySelector('strong') || target).textContent.trim()); return true; }
-      var id = target && target.dataset && target.dataset.ssContextId, A = w.RTGAdaptief;
-      if (id && A && A.doe) { A.doe(id); return true; } return false;
+    function laatsteContext() { return (A && A.context && A.context()) || laatste || {}; }
+    return {
+      actions: { 'context.execute': { run: function (p) { if (A && A.doe) return A.doe(String(p.id || '')); } } },
+      mount: function (body) {
+        root = el('div', 'rtg-ss-context'); body.appendChild(root); teken(laatsteContext());
+        if (A && A.opContext) af = A.opContext(teken);
+      },
+      render: function () { teken(laatsteContext()); },
+      handle: function (target) {
+        var b = target && target.closest && target.closest('[data-ss-context-id]'); if (!b || !root.contains(b)) return false;
+        ctx.actions.run('context.execute', { id: b.dataset.ssContextId }).catch(function () {}); return true;
+      },
+      destroy: function () { if (af) af(); root = null; }
+    };
+  }));
+
+  SDK.add(SDK.define({
+    id: 'messages', title: 'Berichten', version: '2.0.0', source: 'native', maturity: 'L4', priority: 30,
+    runtime: { minVersion: '0.1.0' }, states: SDK.states, capabilities: ['messages.read', 'messages.open'], permissions: [],
+    actions: ['messages.open'], services: ['kern-comm'], state: { persistence: 'session', schema: 'messages.state.v1' },
+    performance: { peekBudgetKb: 30, panelBudgetKb: 120 },
+    events: { publishes: ['messages.loaded', 'messages.driver-details.detected'], subscribes: ['context.updated'] }
+  }, function (ctx) {
+    var root, geladen = false, bezig = false, state = 'panel';
+    var stop = typeof AbortController === 'function' ? new AbortController() : null, gesprekken = [];
+    function teken() {
+      if (!root) return; root.textContent = '';
+      if (!geladen) { root.appendChild(el('p', 'rtg-ss-quiet', bezig ? 'Berichten laden…' : 'Open de werklaag om berichten te laden.')); return; }
+      var max = state === 'panel' ? 3 : 6, lijst = gesprekken.slice(0, max);
+      if (!lijst.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Nog geen gesprekken.'));
+      lijst.forEach(function (x) {
+        var b = button('', 'rtg-ss-message'); b.dataset.ssUrl = x.link || '/apps/comm.html';
+        b.appendChild(el('strong', '', x.titel || 'Gesprek'));
+        if (x.laatste) b.appendChild(el('span', '', x.laatste));
+        var meta = [tijd(x.at), x.ongelezen ? x.ongelezen + ' ongelezen' : ''].filter(Boolean).join(' · ');
+        if (meta) b.appendChild(el('small', '', meta)); root.appendChild(b);
+      });
+      var alles = button(state === 'focus' ? 'Open volledige Messenger' : 'Alle berichten', 'rtg-ss-more');
+      alles.dataset.ssUrl = '/apps/comm.html'; root.appendChild(alles);
     }
-    function laad() { profiel(); inbox(); contextNu(w.RTGAdaptief && w.RTGAdaptief.context()); }
-    laad(); if (w.RTGAdaptief && w.RTGAdaptief.opContext) afContext = w.RTGAdaptief.opContext(contextNu);
-    return { ids: IDS.slice(), byId: byId, handel: handel, refresh: laad,
-      destroy: function () { dead = true; if (stop) stop.abort(); if (afContext) afContext(); } };
-  };
+    function laad() {
+      if (geladen || bezig) return; bezig = true; teken(); ctx.setStatus('laden', 'busy');
+      ctx.request('/api/comm/inbox', {}, { signal: stop && stop.signal }).then(function (j) {
+        gesprekken = Array.isArray(j.gesprekken) ? j.gesprekken : []; geladen = true;
+        ctx.setStatus(gesprekken.length ? 'live' : 'leeg', gesprekken.length ? 'ok' : 'quiet');
+        ctx.events.publish('messages.loaded', { count: gesprekken.length, unread: Number(j.ongelezen) || 0 });
+        var rit = gesprekken.find(function (x) { return /chauffeur|driver|kenteken|ophalen/i.test(String(x.laatste || '')); });
+        if (rit) ctx.events.publish('messages.driver-details.detected', {
+          conversationId: String(rit.id || rit.ref || rit.link || ''), preview: String(rit.laatste || '').slice(0, 180)
+        });
+        teken();
+      }).catch(function (e) {
+        if (e.name === 'AbortError') return; geladen = true; gesprekken = []; ctx.setStatus('offline', 'warning'); teken();
+      }).finally(function () { bezig = false; });
+    }
+    return {
+      actions: { 'messages.open': { run: function (p) { return ctx.open(p.url || '/apps/comm.html', p.title || 'Berichten'); } } },
+      mount: function (body) { root = el('div', 'rtg-ss-messages'); body.appendChild(root); teken(); },
+      render: function (s) { state = s; if (s !== 'peek') laad(); teken(); },
+      onEvent: function () { /* Context mag rangschikken, niet zonder keuze een gesprek openen. */ },
+      handle: function (target) {
+        var b = target && target.closest && target.closest('[data-ss-url]'); if (!b || !root.contains(b)) return false;
+        ctx.actions.run('messages.open', { url: b.dataset.ssUrl, title: (b.querySelector('strong') || b).textContent.trim() }).catch(function () {}); return true;
+      },
+      destroy: function () { root = null; if (stop) stop.abort(); }
+    };
+  }));
+
+  SDK.add(SDK.define({
+    id: 'navigation', title: 'Werelden', version: 1, source: 'native', priority: 40,
+    states: SDK.states, capabilities: ['navigation.read'], permissions: [], actions: [],
+    events: { publishes: [], subscribes: [] }
+  }, function (ctx) {
+    return { mount: function (body) { var nav = ctx.services.navigation;
+      body.appendChild(nav || el('p', 'rtg-ss-quiet', 'Navigatie niet beschikbaar.')); } };
+  }));
+
+  [
+    [{ id: 'contacts', title: 'Contacten', version: 1, priority: 70, defaultHidden: true, states: SDK.states,
+      capabilities: ['contacts.read'], permissions: [], events: { publishes: [], subscribes: [] } },
+      { url: '/apps/comm.html', label: 'Open Contacten', description: 'Uw netwerk en gesprekken als onderdeel van dezelfde werkruimte.' }],
+    [{ id: 'dashboard', title: 'Dashboard', version: 1, priority: 80, defaultHidden: true, states: SDK.states,
+      capabilities: ['dashboard.read'], permissions: [], events: { publishes: [], subscribes: [] } },
+      { url: '/apps/pulse.html', label: 'Open Dashboard', description: 'De actuele stand van RTG, op dezelfde plek en in dezelfde interactietaal.' }]
+  ].forEach(function (x) { SDK.add(legacy(x[0], x[1])); });
 })(window, document);

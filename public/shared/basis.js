@@ -41,6 +41,16 @@
     (document.head || document.documentElement).appendChild(taalScript);
   }
 
+  /* De Workspace Runtime begint pas NA identiteit, maar de weg naar binnen is
+     ook productervaring. Iedere bestaande en toekomstige app met deze basis
+     krijgt daarom dezelfde RTG Access Experience; de laag wordt alleen
+     zichtbaar wanneer zij werkelijk een toegangspoort vindt. */
+  if (!window.RTGAccessExperience && !document.querySelector('script[src^="/shared/toegang.js"]')) {
+    var toegangScript = document.createElement('script');
+    toegangScript.src = '/shared/toegang.js'; toegangScript.async = false;
+    (document.head || document.documentElement).appendChild(toegangScript);
+  }
+
   /* In een SPLIT-paneel (same-origin iframe uit shared/split.js) staat de app
      in een halve breedte naast een andere app. De vensterbeheerder en het
      desktopframe die deze class ook zetten bestaan niet meer -- het OS is iOS

@@ -146,6 +146,20 @@ loop(path.join(ROOT, 'public'), /^sw\.js$/, f => {
 });
 if (!shellFout) ok('service-worker-shells kloppen');
 
+console.log('4b) RTG Workspace Runtime-contract en platformcatalogus');
+try {
+  const wr = require('./workspace-contract').controleer(ROOT);
+  for (const melding of wr.fouten) fout(melding);
+  if (!wr.fouten.length) ok(wr.modules.length + ' Living Modules volgen dezelfde hostgrens');
+} catch (e) { fout('workspace-contract kon niet worden gecontroleerd: ' + e.message); }
+
+console.log('4c) RTG Access Experience voor inloggen en aanmelden');
+try {
+  const toegang = require('./toegang-contract').controleer(ROOT);
+  for (const melding of toegang.fouten) fout(melding);
+  if (!toegang.fouten.length) ok(toegang.schermen.length + ' toegangsschermen volgen dezelfde pre-auth laag');
+} catch (e) { fout('toegang-contract kon niet worden gecontroleerd: ' + e.message); }
+
 console.log('5) statische toegankelijkheid (altijd, ook zonder browser)');
 // a) elke pagina heeft een taal; b) elke <img> heeft alt; deze gelden overal.
 let a11y = 0;

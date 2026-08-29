@@ -56,15 +56,17 @@
       }
     }
     const pkKnop = doos.querySelector('#agPasskey');
+    const pkKaart = doos.querySelector('.ag-passkey-kaart');
     const andersKnop = doos.querySelector('#agAnders');
     const antwoordRij = inp.closest('.ag-rij');
     let passkeyBezig = false, passkeyAbort = null;
     function toonPasskey(aan){
       if (!pkKnop) return;
       pkKnop.hidden = !aan;
+      if (pkKaart) pkKaart.hidden = !aan;
       // het label pas hier vertalen: bij het bouwen van de poort is de i18n
       // soms nog niet geladen
-      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.open','Open met Face ID of passkey'); }
+      if (aan){ const s = pkKnop.querySelector('span'); if (s) s.textContent = T('ag.pk.veilig','Veilig openen'); }
     }
     function wachtwoordVeld(placeholder){
       inp.type = 'password';

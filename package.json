@@ -180,6 +180,8 @@
     "idemvoorstel": "node scripts/idemvoorstel.js",
     "mutatieinventaris": "node scripts/mutatieinventaris.js",
     "mutatiecontract": "node scripts/mutatiecontract.js",
+    "mutatiecontract:afleiden": "node scripts/mutatiecontract.js --afleiden",
+    "schrijfanalyse": "node scripts/schrijfanalyse.js",
     "idemschuld:vast": "node scripts/idemschuld.js --vastleggen",
     "handelingproef": "node scripts/handelingproef-route.js",
     "meetronde": "node scripts/meetronde.js",

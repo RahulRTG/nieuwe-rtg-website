@@ -29,6 +29,8 @@ const path = require('path');
 const contract = require('../server/kern/mutatiecontract');
 const mutatie = require('../server/kern/mutatie');
 const { CONTRACTEN } = require('../server/lib/mutatiecontracten');
+let AFGELEID = {};
+try { AFGELEID = require('../server/lib/mutatiecontracten-afgeleid').CONTRACTEN; } catch (e) {}
 
 const WORTEL = path.join(__dirname, '..');
 const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT.json'), 'utf8'));
@@ -70,9 +72,54 @@ test('dit bestand definieert geen tweede semantiek-woordenlijst', () => {
    ------------------------------------------------------------------------- */
 
 const basis = {
-  mutatieId: 'proef.handeling', route: 'POST /api/proef',
+  mutatieId: 'proef.handeling', route: 'POST /api/proef', herkomst: 'mens',
   semantiek: { klasse: 'idempotent' }, toegang: { klasse: 'AUTHENTICATED' }
 };
+
+/* ---------------------------------------------------------------------------
+   DE HERKOMST: wat een script mag zeggen, en wat niet
+   ------------------------------------------------------------------------- */
+
+test('een contract zonder herkomst wordt geweigerd', () => {
+  const zonder = { ...basis, stand: 'PROTECTED', bewijs: { gemeten: 'x', op: 'y' } };
+  delete zonder.herkomst;
+  assert.ok(contract.keur(zonder).some(x => /geen herkomst/.test(x)));
+});
+
+test('alleen BLOCKED_BY_TEST_FIXTURE mag door een script zijn geschreven', () => {
+  /* Dit is de grens tussen een register dat iets waard is en een dat vol staat.
+     Vijf standen doen een uitspraak over GEDRAG, en geen meting leest de
+     bedoeling van een handeling af. Zonder deze regel schrijft een script in een
+     middag 4653 contracten en betekent "100% geclassificeerd" niets meer. */
+  for (const stand of ['PROTECTED', 'INTENTIONALLY_NON_IDEMPOTENT', 'NOT_APPLICABLE',
+    'UNTESTABLE_WITH_JUSTIFIED_REASON']) {
+    const f = contract.keur({ ...basis, herkomst: 'afgeleid', stand,
+      waarom: 'x', nagekeken: 'een methode met een naam en een datum', watErMoetKomen: 'x',
+      bewijs: { gemeten: 'x', op: 'y' } });
+    assert.ok(f.some(x => /herkomst "afgeleid"/.test(x)), stand + ' mag niet afgeleid zijn');
+  }
+  const blocked = contract.keur({ ...basis, herkomst: 'afgeleid', stand: 'BLOCKED_BY_TEST_FIXTURE',
+    watErMoetKomen: 'een gezin met een geldige code' });
+  assert.deepStrictEqual(blocked, [], 'BLOCKED zegt juist dat we het NIET weten, en dat mag een script zeggen');
+});
+
+test('elk afgeleid contract staat op BLOCKED en deugt', () => {
+  const rijen = Object.entries(AFGELEID).map(([route, c]) => ({ route, ...c }));
+  const fouten = rijen.flatMap(c => contract.keur(c));
+  assert.deepStrictEqual(fouten.slice(0, 3), [], fouten.slice(0, 3).join('\n  '));
+  for (const r of rijen) {
+    assert.strictEqual(r.stand, 'BLOCKED_BY_TEST_FIXTURE', r.route + ' is afgeleid maar staat op ' + r.stand);
+    assert.strictEqual(r.herkomst, 'afgeleid');
+  }
+});
+
+test('geen enkele route staat in beide lijsten', () => {
+  /* Een mens wint van een script, maar twee regels voor dezelfde route is een
+     bron van verwarring die je niet wilt uitleggen. De afleidgang slaat alles
+     over wat al een menselijk contract heeft; deze toets bewaakt dat. */
+  const dubbel = Object.keys(AFGELEID).filter(r => CONTRACTEN[r]);
+  assert.deepStrictEqual(dubbel, [], 'staat in beide: ' + dubbel.slice(0, 5).join(', '));
+});
 
 test('PROTECTED zonder meting wordt geweigerd', () => {
   const f = contract.keur({ ...basis, stand: 'PROTECTED' });
@@ -135,7 +182,7 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
      schrijfroute bijgekomen zonder contract -- en dat is precies wat deze poort
      tegenhoudt. Wie het getal legitiem ziet stijgen (een heel domein erbij),
      verhoogt de grens BEWUST in dit bestand, met de reden in de commit. */
-  const GRENS = 4630;
+  const GRENS = 1867;
   const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
   assert.ok(nu <= GRENS,
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +
@@ -152,15 +199,26 @@ test('het register telt hetzelfde als de mutatie-inventaris', () => {
     inv.inventarissen.mutatieBuitenSchakel + '; een percentage tussen twee zulke noemers is fictie');
 });
 
-test('geen enkele stand is afgeleid uit bewijs', () => {
-  /* De grens die het register eerlijk houdt: een rij zonder verklaring in
-     mutatiecontracten.js staat op LEGACY, hoe overtuigend de meting ook was.
-     Zou dit script zelf mogen indelen, dan stond er binnen een uur 100%. */
-  const verklaard = new Set(Object.keys(CONTRACTEN));
+test('geen enkele UITSPRAAK OVER GEDRAG is door een script gezet', () => {
+  /* De grens die het register eerlijk houdt. Een rij die beweert dat een route
+     beschermd is, niets verandert, of met opzet een tweede handeling doet, moet
+     in server/lib/mutatiecontracten.js staan -- door een mens. Alleen
+     BLOCKED_BY_TEST_FIXTURE mag uit de afleidgang komen, want die zegt juist dat
+     we het NIET weten.
+
+     Zonder deze toets stond het register binnen een uur op 100% en wist niemand
+     meer wat dat betekende. */
+  const doorMens = new Set(Object.keys(CONTRACTEN));
   for (const r of register.rijen) {
-    if (r.stand !== 'LEGACY_PENDING_CLASSIFICATION') {
-      assert.ok(verklaard.has(r.route),
-        r.route + ' staat op ' + r.stand + ' zonder verklaring in server/lib/mutatiecontracten.js');
+    if (r.stand === 'LEGACY_PENDING_CLASSIFICATION') continue;
+    if (r.stand === 'BLOCKED_BY_TEST_FIXTURE') {
+      assert.ok(r.herkomst === 'afgeleid' || doorMens.has(r.route),
+        r.route + ' staat op BLOCKED zonder herkomst');
+      continue;
     }
+    assert.ok(doorMens.has(r.route),
+      r.route + ' staat op ' + r.stand + ' -- een uitspraak over gedrag -- zonder verklaring in ' +
+      'server/lib/mutatiecontracten.js');
+    assert.strictEqual(r.herkomst, 'mens', r.route + ' doet een uitspraak over gedrag met herkomst ' + r.herkomst);
   }
 });

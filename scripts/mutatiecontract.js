@@ -56,9 +56,25 @@ try { verklaringen = require('../server/lib/idemsleutels').SLEUTELS; } catch (e)
 
 let bedoelingen = {};
 try { bedoelingen = require('../server/lib/mutatiecontracten').CONTRACTEN; } catch (e) {}
+/* De afgeleide helft: alleen BLOCKED_BY_TEST_FIXTURE, en met opzet in een eigen
+   bestand. Wie het opent moet meteen zien dat er geen mens over heeft nagedacht;
+   ze door elkaar zetten zou de twee soorten kennis laten versmelten. */
+let afgeleid = {};
+try { afgeleid = require('../server/lib/mutatiecontracten-afgeleid').CONTRACTEN; } catch (e) {}
+const alleBedoelingen = Object.assign({}, afgeleid, bedoelingen);   // een mens wint van een script
 
 let proef = { perRoute: [] };
 try { proef = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); } catch (e) {}
+
+/* DE TWEEDE BEWIJSLIJN, EN ALLEEN ALS VETO. SCHRIJFANALYSE.json zegt per route
+   of de CODE kan schrijven. Zijn schrijfvormenlijst is met opzet te ruim, dus
+   een 'ja' bewijst niets over wat er gebeurde -- maar hij weerlegt wel dat een
+   route niets verandert. Zie de kop van scripts/schrijfanalyse.js. */
+let statisch = new Map();
+try {
+  const sa = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SCHRIJFANALYSE.json'), 'utf8'));
+  statisch = new Map((sa.perRoute || []).map(r => [r.route, r]));
+} catch (e) {}
 const meting = new Map((proef.perRoute || []).map(r => [sleutelVan(r.methode, r.pad), r]));
 const gemetenOp = (proef.stempel && proef.stempel.op) || null;
 
@@ -120,7 +136,7 @@ function mutatieIdVan(pad) {
    /api-POST: daar "beschermd" uit lezen is de platformlaag verwarren met de
    route (nagemeten op 29 augustus 2026; zie scripts/idemvoorstel.js).
    ------------------------------------------------------------------------- */
-function voorstelUitBewijs(m) {
+function voorstelUitBewijs(m, sleutel) {
   if (!m) return { voorstel: null, grond: 'niet gemeten' };
   const z = m.zonderSleutel;
   if (!z) return { voorstel: null, grond: 'geen kale ronde in deze meting' };
@@ -172,8 +188,22 @@ function voorstelUitBewijs(m) {
   const kaalOk = st.length === 2 && st.every(x => x >= 200 && x < 300);
   const leeg = (d) => !d || !Object.keys(d).length;
   if (kaalOk && z.opslag && leeg(z.opslag.d) && leeg(z.opslag.e)) {
-    return { voorstel: 'NOT_APPLICABLE', grond: 'kale ronde: twee geslaagde oproepen zonder spoor in de opslag ' +
-      '(na te kijken: schrijft de handler buiten de gemeten collecties?)' };
+    /* HET VETO. Twee onafhankelijke methodes die elkaar tegenspreken is een
+       BEVINDING en geen voorstel: de opslagmeter zag niets veranderen, en de
+       code zegt dat er wel iets kan veranderen. Dan gebeurt er iets dat de meter
+       NIET ziet -- een bestand, een bericht, een teller buiten de gemeten
+       collecties -- en dat is precies het gat waar NOT_APPLICABLE om `nagekeken`
+       vraagt. Gemeten op 29 augustus 2026: 185 routes. */
+    const sa = statisch.get(sleutel);
+    if (sa && sa.schrijft === 'ja') {
+      return { voorstel: null, grond: 'TEGENSPRAAK: de opslagmeter zag niets, maar ' + sa.bestand +
+        ' bevat een schrijfvorm (' + sa.waarom.replace(/^schrijfvorm gevonden: /, '') + '). ' +
+        'Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is.' };
+    }
+    return { voorstel: 'NOT_APPLICABLE', grond: 'kale ronde: twee geslaagde oproepen zonder spoor in de opslag' +
+      (sa && sa.schrijft === 'nee' ? ', EN de statische analyse vindt geen enkele schrijfvorm in de handler ' +
+        '(twee onafhankelijke methodes, dezelfde uitkomst)' : ', en de statische analyse kon de handler niet ' +
+        'volgen -- na te kijken of hij buiten de gemeten collecties schrijft') };
   }
   if (m.hindernis) {
     return { voorstel: 'BLOCKED_BY_TEST_FIXTURE', grond: 'de proef kwam er niet bij: "' + m.hindernis + '"' };
@@ -189,11 +219,11 @@ const tegenspraken = [];
 
 for (const r of routes) {
   const sleutel = sleutelVan(r.methode, r.pad);
-  const bedoeld = bedoelingen[sleutel] || null;
+  const bedoeld = alleBedoelingen[sleutel] || null;
   const m = meting.get(sleutel) || null;
   const dup = verklaringen[sleutel] || null;
   const waargenomen = waargenomenToegang(r);
-  const { voorstel, grond } = voorstelUitBewijs(m);
+  const { voorstel, grond } = voorstelUitBewijs(m, sleutel);
 
   const rij = {
     mutatieId: (bedoeld && bedoeld.mutatieId) || mutatieIdVan(r.pad),
@@ -217,6 +247,7 @@ for (const r of routes) {
     } : null,
     /* AS 5 -- alleen uit een verklaring. Nooit uit bewijs. */
     stand: (bedoeld && bedoeld.stand) || 'LEGACY_PENDING_CLASSIFICATION',
+    herkomst: (bedoeld && bedoeld.herkomst) || null,
     voorstel: bedoeld ? null : voorstel,
     voorstelGrond: bedoeld ? null : grond
   };
@@ -239,8 +270,12 @@ const pct = (n) => (t.totaal ? (100 * n / t.totaal).toFixed(1) : '0.0') + '%';
 
 console.log('\n=== HET MUTATIECONTRACTREGISTER ===\n');
 console.log(rij(t.totaal, 'schrijfroutes in de mutatie-inventaris'));
-console.log(rij(t.totaal - (t.perStand.LEGACY_PENDING_CLASSIFICATION || 0),
-  'GECLASSIFICEERD  (' + pct(t.totaal - (t.perStand.LEGACY_PENDING_CLASSIFICATION || 0)) + ')'));
+const openLegacy = t.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
+const doorMens = rijen.filter(r => r.herkomst === 'mens').length;
+const doorScript = rijen.filter(r => r.herkomst === 'afgeleid').length;
+console.log(rij(t.totaal - openLegacy, 'GECLASSIFICEERD  (' + pct(t.totaal - openLegacy) + ')'));
+console.log(rij(doorMens, '   waarvan VASTGESTELD door een mens (een uitspraak over gedrag)'));
+console.log(rij(doorScript, '   waarvan AFGELEID door een script (alleen: wij weten het niet, en waarom)'));
 console.log('');
 for (const naam of contract.STATUSNAMEN) {
   const n = t.perStand[naam] || 0;
@@ -285,6 +320,49 @@ if (toonOpen) {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   DE AFLEIDGANG: schrijf BLOCKED_BY_TEST_FIXTURE uit voor elke route waar de
+   proef aantoonbaar niet bij kwam. Alleen die stand, want alleen die doet geen
+   uitspraak over gedrag -- zie de kop van kern/mutatiecontract/index.js.
+   ------------------------------------------------------------------------- */
+if (process.argv.includes('--afleiden')) {
+  const regels = [];
+  for (const r of rijen) {
+    /* NIET OP `stand` KIJKEN, MAAR OP DE MENSELIJKE LIJST -- en dit is een
+       valstrik die deze gang stilletjes leeg zou maken.
+
+       Na de eerste afleidgang staan die 2722 routes op BLOCKED_BY_TEST_FIXTURE.
+       Een tweede gang die op `stand === LEGACY` filtert, slaat ze dus allemaal
+       over, schrijft nul regels, en OVERSCHRIJFT het bestand met een lege lijst.
+       Het register zou dan in een klap 2722 regels kwijt zijn zonder dat er iets
+       veranderde -- en de volgende meting zou het als vooruitgang lezen.
+
+       De juiste vraag is dus niet "staat hij nog op LEGACY" maar "heeft een MENS
+       hem al vastgesteld". Een afgeleide regel mag zichzelf opnieuw schrijven; een
+       menselijke nooit overschrijven. */
+    if (bedoelingen[r.route]) continue;
+    const h = r.bewijs && r.bewijs.hindernis;
+    if (!h) continue;
+    const toeg = r.toegang.waargenomen;
+    if (!toeg) continue;                       // zonder waargenomen deur geen geldig contract
+    const veld = toeg === 'OBJECT_SCOPED' ? ", objectVeld: 'nog af te leiden uit de handler'" : '';
+    regels.push("  '" + r.route + "': {\n" +
+      "    mutatieId: '" + r.mutatieId + "',\n" +
+      "    herkomst: 'afgeleid',\n" +
+      "    semantiek: { klasse: 'onbekend' },\n" +
+      "    toegang: { klasse: '" + toeg + "'" + veld + " },\n" +
+      "    stand: 'BLOCKED_BY_TEST_FIXTURE',\n" +
+      "    watErMoetKomen: " + JSON.stringify('de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
+        'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.') + "\n" +
+      "  },");
+  }
+  const kop = fs.readFileSync(path.join(WORTEL, 'scripts', 'sjabloon-afgeleid.txt'), 'utf8');
+  fs.writeFileSync(path.join(WORTEL, 'server', 'lib', 'mutatiecontracten-afgeleid.js'),
+    kop + '\nconst CONTRACTEN = {\n' + regels.join('\n') + '\n};\n\nmodule.exports = { CONTRACTEN };\n');
+  console.log('\n  server/lib/mutatiecontracten-afgeleid.js geschreven: ' + regels.length + ' regels.');
+  console.log('  Draai daarna opnieuw met --vastleggen om ze in het register te krijgen.');
+}
+
 if (vastleggen) {
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -299,6 +377,8 @@ if (vastleggen) {
       totaal: t.totaal,
       geclassificeerd: t.totaal - (t.perStand.LEGACY_PENDING_CLASSIFICATION || 0),
       perStand: t.perStand,
+      vastgesteldDoorMens: doorMens,
+      afgeleidDoorScript: doorScript,
       toegangWaargenomen: waarTelling,
       bewijs: bewijsTelling,
       voorstellen: voorstelTelling,

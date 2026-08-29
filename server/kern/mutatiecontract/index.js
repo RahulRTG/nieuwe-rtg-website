@@ -85,6 +85,33 @@ function keur(c) {
     }
   }
 
+  /* WIE HEEFT DIT VASTGESTELD -- en dit veld is de grens tussen een register dat
+     iets waard is en een dat vol staat.
+
+     Vijf van de zes standen doen een UITSPRAAK OVER GEDRAG: hij is beschermd, hij
+     verandert niets, hij hoort een tweede handeling te zijn. Die mag alleen een
+     mens zetten, want geen enkele meting kan de BEDOELING van een handeling
+     aflezen -- twee keer {} naar een dobbelworp zijn twee worpen.
+
+     BLOCKED_BY_TEST_FIXTURE doet die uitspraak juist NIET. Hij zegt: wij weten het
+     niet, en dit is waarom de proef er niet bij kwam. Dat is een werkopdracht met
+     een adres, en die mag een machine schrijven -- de route heeft zijn eigen
+     hindernis tenslotte zelf teruggegeven ("Dit gezin kennen we niet"). Vandaar
+     dat `afgeleid` alleen daar mag staan.
+
+     Zonder dit onderscheid zou een script in een middag 4653 contracten kunnen
+     schrijven en zou "100% geclassificeerd" niets meer betekenen. */
+  if (!c.herkomst) {
+    fouten.push(naam + ': geen herkomst. Zet `herkomst: \'mens\'` (iemand heeft dit vastgesteld) of ' +
+      '\'afgeleid\' (een script schreef het uit een meting).');
+  } else if (!['mens', 'afgeleid'].includes(c.herkomst)) {
+    fouten.push(naam + ': herkomst "' + c.herkomst + '" bestaat niet; het is \'mens\' of \'afgeleid\'.');
+  } else if (c.herkomst === 'afgeleid' && c.stand !== 'BLOCKED_BY_TEST_FIXTURE') {
+    fouten.push(naam + ': stand ' + c.stand + ' met herkomst "afgeleid". Die stand doet een uitspraak over ' +
+      'GEDRAG, en die mag geen script zetten -- alleen BLOCKED_BY_TEST_FIXTURE mag afgeleid zijn, want die ' +
+      'zegt juist dat we het niet weten.');
+  }
+
   /* AS 5 */
   if (!c.stand) {
     fouten.push(naam + ': geen stand. De standen zijn: ' + STATUSNAMEN.join(', ') + '.');
@@ -105,9 +132,14 @@ function keur(c) {
     }
     if (c.stand === 'NOT_APPLICABLE') {
       if (!heeftMeting) fouten.push(naam + ': NOT_APPLICABLE zonder meting.');
-      if (!c.nagekeken) fouten.push(naam + ': NOT_APPLICABLE zonder `nagekeken`. De meter ziet alleen ' +
-        'de collecties in de database -- een bestand, een externe dienst of een teller daarbuiten ziet ' +
-        'hij niet. Een mens moet de handler hebben gelezen.');
+      if (!c.nagekeken) fouten.push(naam + ': NOT_APPLICABLE zonder `nagekeken`. De opslagmeter ziet ' +
+        'alleen de collecties in de database -- een bestand, een externe dienst of een teller daarbuiten ' +
+        'ziet hij niet. Noem wie of wat dat gat heeft gesloten: een mens die de handler las, of een ' +
+        'herhaalbare methode die elke aanroep erin heeft herleid.');
+      /* En het veld moet iets ZEGGEN. "ja" of "gecontroleerd" sluit geen gat; het
+         verplaatst alleen de vraag naar wie dat dan vond. */
+      if (c.nagekeken && String(c.nagekeken).length < 15) fouten.push(naam + ': `nagekeken` zegt te weinig ' +
+        '("' + c.nagekeken + '"). Noem de methode of de persoon, anders is het een vinkje.');
     }
     if (c.stand === 'UNTESTABLE_WITH_JUSTIFIED_REASON' && !c.waarom) {
       fouten.push(naam + ': UNTESTABLE zonder reden. De reden IS de rechtvaardiging; zonder haar is ' +

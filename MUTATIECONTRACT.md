@@ -128,15 +128,84 @@ kunstmatig laag). Beide staan vandaag op 0.
 
 ---
 
-## 5. Wat een machine hier nooit mag
+## 5. Wat een machine hier wel en niet mag
 
-**Een stand wordt nooit afgeleid uit bewijs.** Het bewijs draagt hooguit een
-*voorstel*; de stand komt uit een verklaring van een mens in
-`server/lib/mutatiecontracten.js`. Zou het afleidscript zelf mogen indelen, dan
-stond het register binnen een uur op 100% en wist niemand meer wat dat betekende.
+**Een uitspraak over gedrag wordt nooit door een script gezet.** Vijf van de zes
+standen doen zo'n uitspraak — hij is beschermd, hij verandert niets, hij hoort
+een tweede handeling te zijn — en geen enkele meting leest de *bedoeling* van een
+handeling af. Twee keer `{}` naar een dobbelworp zijn twee legitieme worpen.
 
-`test/mutatiecontract.test.js` dwingt dat af: elke rij met een andere stand dan
-`LEGACY` moet een verklaring hebben.
+`BLOCKED_BY_TEST_FIXTURE` doet precies de omgekeerde uitspraak: **wij weten het
+niet, en dit is waarom de proef er niet bij kwam.** Dat is een werkopdracht met
+een adres, en de grond ervoor is hard — de route gaf zijn eigen hindernis terug
+("Dit gezin kennen we niet. Klopt de gezinscode?"). Die mag een script schrijven.
+
+Daarom draagt elk contract een **`herkomst`**: `'mens'` of `'afgeleid'`, en
+`'afgeleid'` is alleen toegestaan bij die ene stand. De twee wonen ook in
+verschillende bestanden — `mutatiecontracten.js` tegenover
+`mutatiecontracten-afgeleid.js` — zodat wie er een opent meteen ziet of er iemand
+over heeft nagedacht. Een mens wint altijd van een script; de afleidgang slaat
+over wat al een menselijk contract heeft.
+
+Het dashboard telt ze apart, en dat is geen detail: 2.722 afgeleide regels
+meetellen als "vastgesteld" zou van dit register precies de schijnzekerheid maken
+die het moet voorkomen.
+
+**Eén valstrik die de afleidgang bijna stil leegmaakte.** De eerste versie
+filterde op `stand === LEGACY`. Na de eerste gang staan die 2.722 routes op
+`BLOCKED`, dus een tweede gang sloeg ze allemaal over, schreef nul regels en
+overschreef het bestand met een lege lijst — 2.722 regels weg zonder dat er iets
+veranderde, en de volgende meting had dat als vooruitgang gelezen. De juiste vraag
+is niet "staat hij nog op LEGACY" maar "heeft een **mens** hem al vastgesteld".
+
+---
+
+## 5b. De tweede bewijslijn, en waarom hij alleen mag weerleggen
+
+`NOT_APPLICABLE` eist bewijs dat er niets verandert, en de opslagmeter alleen is
+daar te zwak voor: hij ziet de collecties in de database, dus niet een bestand,
+een bericht of een teller daarbuiten. "Geen spoor" is uit die ene meter een
+gevolgtrekking uit *afwezig* bewijs.
+
+`scripts/schrijfanalyse.js` kijkt uit de andere richting: niet wat er gebeurde,
+maar wat er in de code *kan* gebeuren. De uitkomst over 4.441 routes:
+
+| | |
+|---|---|
+| schrijft aantoonbaar | 938 |
+| leest aantoonbaar | 62 |
+| **onbekend** | **3.441** |
+
+Die 3.441 is geen meetfout maar de vorm van dit huis: bijna elke handler
+verwijst door naar de kern, en `res.json(metier.zoek(...))` zegt in zichzelf
+niets. Volgen over modulegrenzen zou dat oplossen, maar een resolver over 2.861
+bestanden die er ergens één mist, levert een `nee` die niet klopt — en die zou
+hier als bewijs onder een contract belanden.
+
+**Dus wordt de analyse alleen als veto gebruikt.** Zijn schrijfvormenlijst is met
+opzet te ruim, wat hem waardeloos maakt om iets te bewijzen en uitstekend om iets
+te weerleggen. Resultaat: **185 routes** waar de opslagmeter niets zag maar de
+code wél kan schrijven. Die zijn geen `NOT_APPLICABLE`-kandidaat meer — er
+verandert iets dat de meter niet ziet, en dat is exact het gat waarvoor die stand
+om `nagekeken` vraagt.
+
+Waar beide methodes hetzelfde zeggen (39 routes) is het bewijs juist sterker dan
+één mens die één keer keek, want het is herhaalbaar. Daarom mag `nagekeken` ook
+een **noembare methode** zijn in plaats van een persoon — maar nooit leeg, en
+nooit "gecontroleerd": het veld moet zeggen wie of wát er heeft gekeken, en de
+keuring weigert een waarde onder de vijftien tekens.
+
+**Een gat in die analyse, gevonden door drie treffers met de hand na te kijken.**
+Een pijlfunctie zonder accolades kreeg een leeg lichaam:
+
+```js
+const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
+```
+
+Leeg betekent geen schrijfvorm en geen aanroep, dus kwam er *bewezen leesroute*
+uit — terwijl de functie een andere module aanroept. `POST /api/ai/status` stond
+zo als bewijs in de uitslag. Geen enkele meter had dat gevonden;
+`test/schrijfanalyse.test.js` doet het nu wel.
 
 Er is één plek waar dat pijnlijk concreet werd. Het eerste voorstelmechanisme las
 `beschermd` uit de ronde **mét** idempotentiesleutel en stelde daar 1.087 keer een
@@ -184,10 +253,30 @@ opgeruimd.
 
 ---
 
-## 6b. De eerste drieëntwintig
+## 6b. De stand
 
-Het register staat op **23 van 4.653 geclassificeerd (0,5%)**, en alle 23 op
-`PROTECTED`. Ze zijn niet door een script ingedeeld: voor elk van hen stond de
+```
+Mutation inventory                4.653
+Classified                        2.786   59,9%
+  vastgesteld door een mens          64   (een uitspraak over gedrag)
+  afgeleid door een script        2.722   (alleen: wij weten het niet, en waarom)
+
+  PROTECTED                          24
+  NOT_APPLICABLE                     40
+  INTENTIONALLY_NON_IDEMPOTENT        0
+  UNTESTABLE_WITH_JUSTIFIED_REASON    0
+  BLOCKED_BY_TEST_FIXTURE         2.722   hoort te slinken
+LEGACY_PENDING_CLASSIFICATION     1.867   moet naar nul
+```
+
+Die 59,9% is met opzet niet het getal om trots op te zijn — de 64 is dat. Wat de
+2.722 waard zijn is dit: ze zijn niet meer *onbekend*, ze zijn *geblokkeerd, met
+per stuk de reden en het adres van het werk*. Dat is het verschil tussen een hoop
+en een wachtrij.
+
+## 6c. De eerste vierenzestig
+
+**Drieëntwintig op `PROTECTED`.** Ze zijn niet door een script ingedeeld: voor elk van hen stond de
 *bedoeling* al in `idemsleutels.js` als `zelfdeVerzoek` — geschreven door iemand
 die vond dat een woordelijk gelijk verzoek binnen vijf seconden een dubbeltik is.
 Wat ontbrak was het **bewijs dat het ook zo gebeurt**, en dat is nu van de
@@ -196,7 +285,13 @@ kreeg toch `herhaald: true` terug. Dat kán alleen de idem-poort zijn, en die
 handelt uitsluitend op een verklaring. Bedoeling en gedrag vallen aantoonbaar
 samen.
 
-**Drie routes zijn er met opzet niet bij**, en ze zijn leerzamer dan de 23:
+**Veertig op `NOT_APPLICABLE`**, elk met twee onafhankelijke lijnen eronder: de
+kale ronde mat twee geslaagde oproepen zonder spoor, én de statische analyse
+herleidde elke aanroep in de handler en vond geen schrijfvorm. Het zijn er maar
+veertig van 1.030 kandidaten, en dat is de eerlijke prijs van de regel dat de
+analyse geen modulegrens oversteekt.
+
+**Drie routes zijn er met opzet niet bij**, en ze zijn leerzamer dan de rest:
 
 - `POST /api/overheid/water/meld` gaf `herhaald: true` zonder sleutel én zonder
   verklaring. Dat hoort niet te kunnen. Ergens doet een laag iets dat niemand

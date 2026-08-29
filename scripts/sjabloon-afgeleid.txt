@@ -1,0 +1,31 @@
+/* ============================================================================
+   AFGELEIDE MUTATIECONTRACTEN -- GEEN MENS HEEFT HIER OVER NAGEDACHT.
+
+   Dit bestand wordt geschreven door `node scripts/mutatiecontract.js --afleiden`
+   en mag NIET met de hand worden bijgewerkt: de volgende gang overschrijft het.
+   Wie een regel hier wil verbeteren, verhuist hem naar ./mutatiecontracten.js --
+   daar staan de contracten die iemand heeft vastgesteld, en een mens wint van
+   een script.
+
+   WAAROM EEN SCRIPT DIT MAG SCHRIJVEN, EN ALLEEN DIT.
+
+   Vijf van de zes standen doen een uitspraak over GEDRAG: hij is beschermd, hij
+   verandert niets, hij hoort een tweede handeling te zijn. Die mag geen script
+   zetten, want geen meting leest de bedoeling van een handeling af -- twee keer
+   {} naar een dobbelworp zijn twee legitieme worpen.
+
+   BLOCKED_BY_TEST_FIXTURE doet precies de omgekeerde uitspraak: WIJ WETEN HET
+   NIET, en dit is waarom de proef er niet bij kwam. Dat is een werkopdracht met
+   een adres, en de grond ervoor is hard: de route heeft zijn eigen hindernis
+   teruggegeven ("Dit gezin kennen we niet. Klopt de gezinscode?").
+
+   server/kern/mutatiecontract/index.js dwingt dat af: `herkomst: 'afgeleid'` is
+   alleen toegestaan bij deze ene stand.
+
+   WAT ELKE REGEL HIER WAARD IS. Niets over veiligheid, niets over idempotentie.
+   Alleen: deze route bestaat, hij is niet gemeten, en dit is wat er in
+   scripts/lib/idemwereld.js moet worden gebouwd voordat hij iets kan zeggen. Het
+   is de wachtrij, met per regel de reden -- en dat is beter dan diezelfde routes
+   ongeteld op een hoop onder LEGACY.
+   ========================================================================== */
+'use strict';

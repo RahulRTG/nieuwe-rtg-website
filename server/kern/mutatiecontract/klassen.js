@@ -70,9 +70,13 @@ const STATUS = {
   },
   NOT_APPLICABLE: {
     uitleg: 'Deze route verandert niets. Een POST die rekent of opzoekt.',
-    eist: 'bewijs dat er niets verandert: een gemeten ronde zonder spoor in de opslag, ' +
-      'en een mens die de handler heeft nagekeken op wat de meter NIET ziet ' +
-      '(een bestand, een externe dienst, een teller buiten de gemeten collecties).',
+    eist: 'bewijs dat er niets verandert: een gemeten ronde zonder spoor in de opslag, EN een ' +
+      'tweede, onafhankelijke afdekking van wat die meter NIET ziet -- een bestand, een externe ' +
+      'dienst, een teller buiten de gemeten collecties. Dat mag een mens zijn die de handler heeft ' +
+      'gelezen, of een NOEMBARE en herhaalbare methode die hetzelfde gat sluit (scripts/schrijfanalyse.js ' +
+      'doet dat wanneer hij elke aanroep in de handler heeft kunnen herleiden en geen schrijfvorm vond). ' +
+      'Wat NIET mag is het veld leeg laten of er "gecontroleerd" in zetten: `nagekeken` moet zeggen WIE ' +
+      'of WAT er heeft gekeken, anders is het een vinkje.',
     eindstand: true
   },
   UNTESTABLE_WITH_JUSTIFIED_REASON: {

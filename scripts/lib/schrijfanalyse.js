@@ -322,8 +322,13 @@ const _path = require('path');
 /* De requires van een bestand: welke naam wijst naar welk bestand.
 
    Twee vormen, en meer kent dit huis niet in de routelaag:
-     const x = require('./y')          -> x wijst naar y
-     const { a, b } = require('./y')   -> a en b wijzen naar y  */
+     const x = require(<een pad>)          -> x wijst naar dat bestand
+     const { a, b } = require(<een pad>)   -> a en b wijzen naar dat bestand
+
+   (De voorbeelden staan hier zonder echte padstring: scripts/check.js leest
+   commentaar mee op zoek naar kapotte afhankelijkheden, en een verzonnen pad in
+   een uitleg is voor die keuring niet van een echte te onderscheiden. Terecht --
+   een lezer had hem net zo goed voor echt kunnen aanzien.) */
 function requiresUit(bron, bestand) {
   const schoon = zonderCommentaar(bron);
   const uit = new Map();

@@ -49,8 +49,16 @@ function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
     if (!titel) return { error: 'Geef de afspraak een titel.' };
     if (!geldigeDatum(data.datum)) return { error: 'Kies een geldige datum.' };
     const arr = ruw(ownerKey);
+    const bron = scho(data.bron, 60) || null;
+    /* Een brokerpreview is de identiteit van de handeling. Als de server na
+       de agendaschrijving maar vóór zijn bewijs wegvalt, levert dezelfde bron
+       bij retry hetzelfde domeinobject terug in plaats van een dubbel item. */
+    if (bron) {
+      const bestaand = arr.find(i => i.bron === bron);
+      if (bestaand) return { ok: true, item: itemPubliek(bestaand), hergebruikt: true };
+    }
     if (arr.length >= 2000) return { error: 'Uw agenda zit vol; ruim eerst wat op.' };
-    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron: scho(data.bron, 60) || null };
+    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron };
     const mis = await vastleggen(() => { arr.push(item); });
     if (mis) return mis;
     return { ok: true, item: itemPubliek(item) };

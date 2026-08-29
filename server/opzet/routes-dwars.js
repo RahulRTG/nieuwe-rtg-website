@@ -51,6 +51,9 @@ module.exports = function hangDwarseRoutersOp(grens) {
      het kantoor ziet iedereen en beslist). Zelfde domeingrens: een tweede lezer
      van dezelfde kern is geen tweede domein. */
   require('../routes/kosten-kantoor')(grens('kosten'));
+  /* De gedeelde Experience Plane boven alle vier werelden: projections lezen,
+     mutaties uitsluitend via zijn Action Broker. */
+  require('../routes/experience')(grens('experience'));
   /* De economielaag eronder (kern/economie/, ECONOMIE.md): de vier werelden en
      de firewall ertussen. Na de kosten, want de werelden-route toont de
      verdeling van de nota's die daar wordt gerekend. */

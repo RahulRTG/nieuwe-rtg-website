@@ -1,16 +1,16 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-28",
+  "vastgelegd": "2026-08-29",
   "gemeten": {
-    "bestanden": 1880,
-    "vormen": 1291,
-    "velden": 1841,
-    "modules": 691,
-    "domeinen": 245,
+    "bestanden": 1905,
+    "vormen": 1302,
+    "velden": 1901,
+    "modules": 698,
+    "domeinen": 246,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1292,
-    "veldenGedeeldVanafVier": 184,
+    "envelop": 31,
+    "veldenDomeineigen": 1348,
+    "veldenGedeeldVanafVier": 187,
     "gelijkendeVormparen": 19
   },
   "envelop": [
@@ -44,8 +44,7 @@
     "tot",
     "uitleg",
     "van",
-    "wat",
-    "wie"
+    "wat"
   ],
   "gedeeld": [
     {
@@ -70,6 +69,18 @@
         "kern/commercie",
         "kern/concern",
         "kern/eten"
+      ]
+    },
+    {
+      "veld": "wie",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent",
+        "kern/livinglab",
+        "kern/onderzoekslab"
       ]
     },
     {
@@ -397,6 +408,18 @@
       ]
     },
     {
+      "veld": "actor",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/envelop",
+        "kern/experience",
+        "kern/magnaat-controle"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 10,
       "waar": [
@@ -481,18 +504,6 @@
       ]
     },
     {
-      "veld": "actor",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/envelop",
-        "kern/magnaat-controle",
-        "kern/magnaatwereld"
-      ]
-    },
-    {
       "veld": "pas",
       "domeinen": 8,
       "waar": [
@@ -514,18 +525,6 @@
         "kern/kosten",
         "kern/overheid",
         "kern/payroll"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 8,
-      "waar": [
-        "kern/agent",
-        "kern/commerce",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall"
       ]
     }
   ],

@@ -1,5 +1,5 @@
-/* RTFoundation-afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw)
-   automatisch naar de foundation. We toetsen drie lagen:
+/* Sociale afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw)
+   als twee formele claims naar 20% lokaal en 10% RTFoundation. We toetsen drie lagen:
    1. de uitbetaal-naad (betaal.maakUitbetaling): zonder IBAN reserveren, met IBAN
       inplannen, altijd idempotent;
    2. het afdracht-grootboek (kern/fonds.js): juiste 30%-ex-btw-berekening, alleen
@@ -76,6 +76,8 @@ test('fonds: 30% ex btw, alleen abonnementen, idempotent per factuur', async () 
   assert.ok(a, 'abonnement draagt af');
   assert.equal(a.centen, 1950);
   assert.equal(a.status, 'te_storten', 'zonder IBAN: gereserveerd');
+  assert.equal(a.legs.find(l => l.component === 'local-fund').centen, 1300);
+  assert.equal(a.legs.find(l => l.component === 'foundation').centen, 650);
 
   const weer = await fonds.boekAfdracht({ invoiceId: 'INV-1', wie: 'acc:1', bijdrage: 78.65, betaalId: 'b1', omschrijving: 'Maandbijdrage lidmaatschap juli' });
   assert.equal(db.data.fondsAfdrachten.length, 1, 'zelfde factuur boekt nooit twee keer');
@@ -93,16 +95,41 @@ test('fonds: 30% ex btw, alleen abonnementen, idempotent per factuur', async () 
 
 test('fonds: met IBAN wordt de afdracht meteen ingepland als uitbetaling', async () => {
   const db = nepDb();
-  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: { RTF_IBAN: 'NL11FOUND0000000001', RTF_BEGUNSTIGDE: 'Stichting RTFoundation' } });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: {
+    RTF_LOKAAL_IBAN: 'NL11LOCAL0000000001', RTF_LOKAAL_BEGUNSTIGDE: 'Lokaal sociaal fonds',
+    RTF_IBAN: 'NL11FOUND0000000001', RTF_BEGUNSTIGDE: 'Stichting RTFoundation'
+  } });
   const a = await fonds.boekAfdracht({ invoiceId: 'INV-2', wie: 'acc:2', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
-  assert.equal(a.status, 'ingepland', 'met IBAN: ingepland');
+  assert.equal(a.status, 'ingepland', 'met beide IBANs: beide claims ingepland');
+  assert.equal(a.legs.filter(l => l.status === 'ingepland').length, 2);
   assert.ok(a.uitbetaalId, 'er is een uitbetaal-referentie');
   assert.equal(a.iban, 'NL11FOUND0000000001');
 });
 
+test('Economic Proof-projectie toont uitsluitend de intents van de eigen principal', async () => {
+  const db = nepDb();
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: {} });
+  await fonds.boekAfdracht({ invoiceId: 'INV-proof-1', wie: 'acc:proof-1', bijdrage: 78.65,
+    betaalId: 'pay-proof-1', omschrijving: 'Maandbijdrage lidmaatschap' });
+  await fonds.boekAfdracht({ invoiceId: 'INV-proof-2', wie: 'acc:proof-2', bijdrage: 78.65,
+    betaalId: 'pay-proof-2', omschrijving: 'Maandbijdrage lidmaatschap' });
+
+  const eigen = fonds.bewijzenVoor('acc:proof-1', 10);
+  assert.equal(eigen.ok, true);
+  assert.equal(eigen.proofs.length, 1, 'proofs van een andere principal blijven buiten beeld');
+  assert.equal(eigen.proofs[0].purpose, 'MEMBERSHIP.CONTRIBUTION');
+  assert.equal(eigen.proofs[0].requestedValue.amountMinor, 6500);
+  assert.equal(eigen.proofs[0].status, 'NOT_RECONCILED');
+  assert.equal(eigen.proofs[0].proof.integrity, true);
+  assert.deepEqual(eigen.proofs[0].components.map(c => [c.component, c.amountMinor]),
+    [['platform', 4550], ['local-fund', 1300], ['foundation', 650]]);
+});
+
 test('fonds: op de eigen rails (bank-naad) boekt de afdracht meteen als gestort', async () => {
   const db = nepDb();
-  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: {
+    RTF_LOKAAL_IBAN: 'NL11LOCAL0000000001', RTF_IBAN: 'NL11FOUND0000000001'
+  } });
   // de bank-naad zoals server.js hem koppelt: alleen als de knop effectief op
   // "eigen" staat een boeking, anders null -> terugval op de betaal-naad
   let eigen = false; const boekingen = [];
@@ -115,16 +142,16 @@ test('fonds: op de eigen rails (bank-naad) boekt de afdracht meteen als gestort'
   // stand partner: de naad geeft null en de betaal-naad plant gewoon in
   const a = await fonds.boekAfdracht({ invoiceId: 'INV-3', wie: 'acc:3', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
   assert.equal(a.status, 'ingepland', 'buiten de eigen-stand verandert er niets');
-  assert.equal(a.via, undefined);
+  assert.ok(a.legs.every(l => !l.via));
 
   // stand eigen: dezelfde soort factuur gaat als boeking door het eigen grootboek
   eigen = true;
   const b = await fonds.boekAfdracht({ invoiceId: 'INV-4', wie: 'acc:3', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
   assert.equal(b.status, 'gestort', 'op de eigen rails is de afdracht per direct afgewikkeld');
-  assert.equal(b.via, 'eigen-bank');
-  assert.equal(b.boekingId, 'BB-TEST');
-  assert.equal(boekingen.length, 1);
-  assert.equal(boekingen[0].centen, 1950, 'exact het 30%-ex-btw-bedrag');
+  assert.ok(b.legs.every(l => l.via === 'eigen-bank'));
+  assert.ok(b.legs.every(l => l.boekingId === 'BB-TEST'));
+  assert.equal(boekingen.length, 2);
+  assert.equal(boekingen.reduce((s, x) => s + x.centen, 0), 1950, 'beide claims zijn samen exact 30% ex btw');
   assert.equal(fonds.overzicht().gestortCenten, 1950);
 
   // een kapotte bank-naad laat de afdracht nooit zoekraken: terugval
@@ -167,6 +194,15 @@ test('e2e: een betaalde maandfactuur boekt 30% en de backoffice ziet het te stor
   assert.equal(af.aantal, 1, 'precies een afdracht geboekt (geen dubbele)');
   assert.equal(af.teStorten, foundation, 'het te storten bedrag is exact het teruggemelde foundation-deel');
   assert.equal(af.iban, '', 'IBAN nog niet ingesteld in deze omgeving');
+
+  const living = await api(base, '/api/experience/bootstrap', { world: 'living' }, lid);
+  assert.equal(living.status, 200);
+  const proofs = living.body.projection.view.valueProofs;
+  assert.equal(proofs.length, 1, 'LivingOS toont alleen het Economic Proof van deze principal');
+  assert.equal(proofs[0].purpose, 'MEMBERSHIP.CONTRIBUTION');
+  assert.equal(proofs[0].proof.integrity, true);
+  assert.ok(living.body.projection.objects.some(o =>
+    o.ref.domain === 'economic' && o.ref.id === proofs[0].intentId.toLowerCase()));
 });
 
 /* HET GEVAL WAAR 4.22 OM DRAAIT. De afdracht ging rechtstreeks naar de
@@ -204,7 +240,8 @@ test('fonds: blijft de rail weigeren, dan valt de afdracht terug op te_storten M
   assert.equal(op.status, 'TERUGGEBOEKT', 'opgegeven, en de teruggang is gedraaid');
   const bewaard = db.data.fondsAfdrachten.find(x => x.id === a.id);
   assert.equal(bewaard.status, 'te_storten', 'de afdracht wacht weer op een bestemming');
-  assert.match(bewaard.fout, /onbereikbaar/, 'met de reden erbij, niet als lege terugval');
+  assert.match(bewaard.legs.find(l => l.component === 'foundation').fout, /onbereikbaar/,
+    'de reden blijft bij de mislukte claim, niet als globale gok');
   assert.equal(rij.openstaand().aantal, 0, 'en de reconciliatie is leeg: er staat niets meer af');
 });
 
@@ -224,5 +261,5 @@ test('fonds: geeft de rij het al bij de eerste poging op, dan vindt de teruggang
   assert.equal(rij.vind(a.opdrachtId).terugboekFout, null, 'en hij liep niet stuk op een afdracht die nog niet bestond');
   const bewaard = db.data.fondsAfdrachten.find(x => x.id === a.id);
   assert.equal(bewaard.status, 'te_storten');
-  assert.match(bewaard.fout, /onbereikbaar/);
+  assert.match(bewaard.legs.find(l => l.component === 'foundation').fout, /onbereikbaar/);
 });

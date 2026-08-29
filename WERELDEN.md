@@ -11,6 +11,10 @@ pas zichtbaar werd toen de functies geteld waren. Wat er misging staat verderop,
 onder *Wat de vorige kaart fout had*, want een kaart die zijn eigen fouten
 weggummt leert niemand iets.
 
+De uitvoerbare contracten, projections, Action Broker en Evidence-laag die deze
+kaart inmiddels dragen staan in [`EXPERIENCE.md`](EXPERIENCE.md). Dit document
+blijft eigenaar van de indeling; `EXPERIENCE.md` van de werkende platformnaad.
+
 ## Vier begrippen die niet langer door elkaar lopen
 
 Dit is de kern van deze versie, en de reden dat de vorige kaart wankelde. Er

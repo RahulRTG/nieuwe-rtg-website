@@ -95,6 +95,11 @@ module.exports = (ctx) => {
         if ((o.status === STATUS.INGEDIEND || o.status === STATUS.AFGEWIKKELD) && voor === STATUS.GEBOEKT) gelukt++;
         if (o.status === STATUS.MISLUKT || o.status === STATUS.TERUGGEBOEKT) opgegeven++;
       }
+      /* Crash tussen externe bevestiging en de interne claim-/ledgerfinalisatie:
+         AFGEWIKKELD blijft waar over de rail, maar is pas klaar als ook de hook
+         duurzaam is verwerkt. De ronde herstelt precies die naad. */
+      for (const o of rij().filter(x => x.status === STATUS.AFGEWIKKELD && x.afwikkelingNodig && !x.afwikkelingVerwerktAt))
+        await ctx.verwerkAfwikkeling(o);
     } finally { bezig = false; }
     return { ok: true, gedaan, gelukt, opgegeven };
   }
@@ -115,7 +120,11 @@ module.exports = (ctx) => {
   async function bevestig({ id, settlementRef, gelukt = true, reden }) {
     const o = id ? vind(id) : vindOpSettlement(settlementRef);
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
-    if (gelukt) { zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef }); save(); return publiek(o); }
+    if (gelukt) {
+      zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef }); save();
+      await ctx.verwerkAfwikkeling(o);
+      return publiek(o);
+    }
     const week = zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
     save();
     if (week) await ctx.draaiTerug(o);   // alleen als hij ECHT naar mislukt ging
@@ -128,9 +137,12 @@ module.exports = (ctx) => {
      en dat is precies wat de sluitcontrole NIET kan zien, want een boeking naar
      extern:sepa sluit ook als er buiten RTG niets is gebeurd. */
   function openstaand() {
-    const uit = { status: 200, aantal: 0, centen: 0, perStatus: {}, oudsteAt: null, mislukt: 0, mislukteCenten: 0, zonderTerugboeking: 0 };
+    const uit = { status: 200, aantal: 0, centen: 0, perStatus: {}, oudsteAt: null, mislukt: 0,
+      mislukteCenten: 0, zonderTerugboeking: 0, zonderAfwikkeling: 0 };
     for (const o of rij()) {
       uit.perStatus[o.status] = (uit.perStatus[o.status] || 0) + 1;
+      if (o.status === STATUS.AFGEWIKKELD && o.afwikkelingNodig && !o.afwikkelingVerwerktAt)
+        uit.zonderAfwikkeling++;
       if (!OPEN.has(o.status)) continue;
       uit.aantal++; uit.centen += o.centen;
       if (uit.oudsteAt === null || o.at < uit.oudsteAt) uit.oudsteAt = o.at;

@@ -1,25 +1,25 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-08-28",
+  "vastgelegd": "2026-08-29",
   "gemeten": {
-    "bestanden": 1880,
-    "domeinenTotaal": 536,
-    "koopbareVormen": 513,
+    "bestanden": 1905,
+    "domeinenTotaal": 537,
+    "koopbareVormen": 517,
     "koopbareDomeinen": 108,
     "envelopDrempel": 7,
-    "envelop": 44,
-    "veldenDomeineigen": 698,
-    "veldenNietEnvelop": 907,
-    "gelijkendeVormparen": 7,
+    "envelop": 45,
+    "veldenDomeineigen": 705,
+    "veldenNietEnvelop": 920,
+    "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
-    "wagenVormen": 31,
-    "wagenVormenUniek": 28,
-    "wagenDomeinen": 20,
-    "optellingen": 103,
-    "optelDomeinen": 52,
-    "optelCenten": 54,
+    "wagenVormen": 32,
+    "wagenVormenUniek": 29,
+    "wagenDomeinen": 21,
+    "optellingen": 104,
+    "optelDomeinen": 53,
+    "optelCenten": 55,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -62,6 +62,7 @@
     "supplierCode",
     "titel",
     "totaal",
+    "totaalCenten",
     "type",
     "uitleg",
     "valuta",
@@ -72,7 +73,7 @@
   ],
   "perWerkwoord": {
     "toon": 86,
-    "prijs": 34,
+    "prijs": 35,
     "beschikbaarheid": 49,
     "reserveer": 26,
     "bevestig": 50,
@@ -685,6 +686,26 @@
       "telt": 4
     },
     {
+      "domein": "kern/fonds",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijst",
+        "prijs": "bereken",
+        "bevestig": "boekAfdracht",
+        "lever": "verstuurLeg"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/handelsketen",
       "heeft": {
         "toon": true,
@@ -995,25 +1016,6 @@
         "toon": "zoek",
         "prijs": "bereken",
         "beschikbaarheid": "capaciteitVan"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/fonds",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "bevestig": "boekAfdracht",
-        "lever": "verstuur"
       },
       "telt": 3
     },
@@ -2196,6 +2198,20 @@
         "sub",
         "zoek"
       ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/fonds/uitbetalen.js",
+      "b": "server/kern/pay/terug.js",
+      "domeinA": "kern/fonds",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
+      ]
     }
   ],
   "wagens": [
@@ -2206,6 +2222,7 @@
     "kern/commercie",
     "kern/eten",
     "kern/fiscaal",
+    "kern/fonds",
     "kern/gast",
     "kern/geldgraaf",
     "kern/horeca",

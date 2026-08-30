@@ -9,8 +9,8 @@
   "verdeling": {
     "0": 1,
     "2": 64,
-    "3": 102,
-    "4": 69,
+    "3": 105,
+    "4": 66,
     "5": 6
   },
   "metReden": 34,
@@ -171,10 +171,10 @@
     },
     {
       "pad": "/apps/cercle.html",
-      "tikken": 4,
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> VOHet VooruitzichtLivingOS [verborgen]",
-        "/apps/living-os.html -> CercleLifestyle [verborgen]"
+        "/apps/app.html -> OntdekkenLivingOS [verborgen]",
+        "/apps/rtg.html -> CercleLifestyle"
       ]
     },
     {
@@ -268,10 +268,10 @@
     },
     {
       "pad": "/apps/entourage.html",
-      "tikken": 4,
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> VOHet VooruitzichtLivingOS [verborgen]",
-        "/apps/living-os.html -> EntourageLifestyle [verborgen]"
+        "/apps/app.html -> OntdekkenLivingOS [verborgen]",
+        "/apps/rtg.html -> EntourageLifestyle"
       ]
     },
     {
@@ -1663,10 +1663,10 @@
     },
     {
       "pad": "/apps/rendezvous.html",
-      "tikken": 4,
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> VOHet VooruitzichtLivingOS [verborgen]",
-        "/apps/living-os.html -> Rendez-vousLifestyle [verborgen]"
+        "/apps/app.html -> OntdekkenLivingOS [verborgen]",
+        "/apps/rtg.html -> Rendez-vousLifestyle"
       ]
     },
     {

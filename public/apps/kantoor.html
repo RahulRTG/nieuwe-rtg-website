@@ -222,6 +222,11 @@
 
   <div class="regkop"><h2>De kantoorwereld</h2></div>
   <div class="poorten" id="poorten"></div>
+  <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
+       geschreven: shared/wereldrooster.js vult het uit shared/sprongindex.json,
+       dat uit MAPPEN komt. Het redactionele rooster hierboven blijft staan --
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md). -->
+  <section class="hero" aria-labelledby="allesWorkOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesWorkOS">Alles wat in WorkOS hangt.</h2><div class="grid" data-wereldrooster="WorkOS"></div></section>
 </main>
 
 <!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
@@ -451,5 +456,6 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+  <script src="/shared/wereldrooster.js" defer></script>
 </body>
 </html>

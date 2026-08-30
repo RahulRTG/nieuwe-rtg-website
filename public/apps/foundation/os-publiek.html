@@ -66,6 +66,11 @@
   </div>
   <div id="uit"></div>
   <div class="kaart" id="campagnes"></div>
+  <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
+       geschreven: shared/wereldrooster.js vult het uit shared/sprongindex.json,
+       dat uit MAPPEN komt. Het redactionele rooster hierboven blijft staan --
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md). -->
+  <section class="hero" aria-labelledby="allesFoundationOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesFoundationOS">Alles wat in FoundationOS hangt.</h2><div class="grid" data-wereldrooster="FoundationOS"></div></section>
 </main>
 
 <script>
@@ -163,5 +168,6 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
 <script src="premium.js" defer></script>
+  <script src="/shared/wereldrooster.js" defer></script>
 </body>
 </html>

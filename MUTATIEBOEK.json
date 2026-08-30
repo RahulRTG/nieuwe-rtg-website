@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T08:54:28.481Z",
-  "commit": "52b87234",
+  "op": "2026-08-30T09:03:33.911Z",
+  "commit": "e7ac56a1",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -17,17 +17,17 @@
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 31,
+  "nogNietGeclassificeerd": 27,
   "metBesluitOverDuplicaat": 184,
   "zonderBesluitOverDuplicaat": 4477,
-  "metGemetenDuplicaatgedrag": 1016,
+  "metGemetenDuplicaatgedrag": 1020,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 52b87234, schone boom",
-  "metingGemetenOp": "2026-08-30T08:51:24.339Z",
+  "metingReden": "gemeten op commit e7ac56a1, schone boom",
+  "metingGemetenOp": "2026-08-30T09:03:13.407Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -40,7 +40,7 @@
    },
    {
     "id": "gemeten",
-    "aantal": 3573,
+    "aantal": 3577,
     "voorbeelden": [
      "POST /api/aandacht",
      "POST /api/aanmelding/beslis",
@@ -49,7 +49,7 @@
    },
    {
     "id": "onbekend",
-    "aantal": 31,
+    "aantal": 27,
     "voorbeelden": [
      "POST /api/bank/advies",
      "POST /api/bank/afschrift",
@@ -82,6 +82,18 @@
    {
     "reden": "gemeten: de herhaling werd geweigerd (status N)",
     "aantal": 4
+   },
+   {
+    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
+    "aantal": 2
+   },
+   {
+    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankRekeningen en de herhaling niets",
+    "aantal": 1
+   },
+   {
+    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
+    "aantal": 1
    }
   ]
  },
@@ -168,7 +180,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1097,
+   "aantal": 1101,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -228,7 +240,7 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 31,
+   "aantal": 27,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [

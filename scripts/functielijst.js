@@ -99,6 +99,27 @@ function genres() {
     uit.push('- **' + sector + '** (' + lijst.length + ') ' + STREEP + ' ' +
       lijst.map(g => (g.label || g.id) + ' (`' + g.id + '`)').join(', '));
   }
+
+  /* DE CAPS-OPSOMMING, EN WAAROM HIJ HIER NIET MOCHT SNEUVELEN.
+
+     test/genrecap.test.js regel 7 leest deze zin en de regel eronder, en
+     vergelijkt de opgesomde caps met het register. Die toets bestaat omdat de
+     lijst ooit met de hand naast het register stond en niemand ernaar keek.
+
+     De eerste versie van dit script liet hem weg -- niet uit een besluit maar
+     omdat ik hem niet had gezien. De keuring bleef groen (die draait deze toets
+     niet) en de sabotageronde meldde hem als "al rood voordat er iets
+     gesaboteerd was": twee wachters die daardoor niets meer bewezen. Zo kost
+     een weggevallen regel geen zichtbare fout maar een blind gat in de
+     handhaving, en dat is precies het soort schade dat deze hele ronde moest
+     opsporen. */
+  const caps = new Set();
+  Object.values(GENRES).forEach(g => (g.caps || []).forEach(c => caps.add(c)));
+  const capLijst = [...caps].sort();
+  uit.push('');
+  uit.push('De ' + capLijst.length + ' genre-caps waar de apps naar kijken (nooit naar het genre zelf):');
+  uit.push('');
+  uit.push(capLijst.map(c => '`' + c + '`').join(', '));
   uit.push('');
   return uit.join('\n');
 }

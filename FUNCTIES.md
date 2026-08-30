@@ -23,7 +23,7 @@ het?**
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **1800** |
 | App-pagina's (`public/apps/**.html`) | **276** |
-| Testbestanden | **1416** |
+| Testbestanden | **1417** |
 
 ## De vier werelden
 
@@ -661,6 +661,10 @@ is de reden dat er geen 130 losse apps zijn.
 - **technology** (1) — IT-hulp aan huis (`ithulp`)
 - **veterinary** (2) — Dierenartspraktijk (`dierenarts`), Petcare & pension (`petcare`)
 - **wholesale** (1) — Groothandel & markt (`groothandel`)
+
+De 40 genre-caps waar de apps naar kijken (nooit naar het genre zelf):
+
+`advies`, `alpine`, `beauty`, `beveiliging`, `bezorgen`, `boerderij`, `bookings`, `care`, `charter`, `creator`, `doors`, `fitclub`, `fleet`, `gebouw`, `gemeente`, `golf`, `groothandel`, `huur`, `location`, `luchthaven`, `marechaussee`, `marina`, `menu`, `opvang`, `orders`, `ov`, `petcare`, `polis`, `pricing`, `redactie`, `reservations`, `retail`, `rides`, `rijk`, `services`, `sportclub`, `tickets`, `vastgoed`, `vracht`, `weddings`
 
 # 4. De lagen die overal doorheen lopen
 

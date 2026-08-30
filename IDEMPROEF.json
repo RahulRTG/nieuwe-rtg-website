@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T13:22:07.488Z",
-  "commit": "35445acc",
+  "op": "2026-08-30T14:44:18.107Z",
+  "commit": "4424c6ec",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -44,11 +44,11 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1388,
-  "beschermd": 1387,
+  "beoordeeld": 1507,
+  "beschermd": 1506,
   "onbeschermd": 1,
-  "ongemeten": 3233,
-  "oproepen": 13892,
+  "ongemeten": 3114,
+  "oproepen": 13895,
   "tokensHernieuwd": 22,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -63,11 +63,11 @@
    },
    {
     "collectie": "commandJournaal",
-    "families": 4
+    "families": 3
    },
    {
     "collectie": "securityLog",
-    "families": 9
+    "families": 10
    },
    {
     "collectie": "supplierActivity",
@@ -84,6 +84,8 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
+  "objectenGemaakt": 69,
+  "objectTakken": 68,
   "lijfsleutelsGebouwd": [
    "werkruimte",
    "school",
@@ -104,7 +106,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 7,
+ "vermoedensVerworpen": 10,
  "perRoute": [
   {
    "methode": "POST",
@@ -145,19 +147,18 @@
    "methode": "POST",
    "pad": "/api/aanmeld/zeg",
    "rol": "eigen-poort",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gesprek ken ik niet (meer). Begin gerust opnieuw."
+   }
   },
   {
    "methode": "POST",
@@ -181,11 +182,11 @@
    "pad": "/api/aanmelding/beslis",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {
@@ -194,7 +195,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze aanmelding bestaat niet."
+   "blokkade": "Kies accepteren of afwijzen."
   },
   {
    "methode": "POST",
@@ -218,18 +219,18 @@
    "pad": "/api/aanmelding/bewijs",
    "rol": "openbaar",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze aanmelding bestaat niet."
+   "blokkade": "Voor dit genre is geen bewijs nodig."
   },
   {
    "methode": "POST",
@@ -252,37 +253,36 @@
    "methode": "POST",
    "pad": "/api/aanmelding/bewijs/stand",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze aanmelding bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/aanmelding/bewijs/teken",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze aanmelding bestaat niet."
+   "blokkade": "Voor dit genre is geen bewijs nodig."
   },
   {
    "methode": "POST",
@@ -305,19 +305,18 @@
    "methode": "POST",
    "pad": "/api/aanmelding/een",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze aanmelding bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -370,7 +369,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze aanmelding bestaat niet."
+   "blokkade": "Geen betaalschema voor deze aanmelding."
   },
   {
    "methode": "POST",
@@ -741,7 +740,7 @@
    ],
    "opslag": {
     "a": {
-     "appstore": 7
+     "appstore": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -1733,7 +1732,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "b": {},
     "c": {}
    }
@@ -1803,9 +1805,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -3313,10 +3313,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "techniek": 1,
-     "wacht": 6
-    }
+    "c": {}
    }
   },
   {
@@ -3976,9 +3973,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "ledenSites": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -4065,9 +4060,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "careAanbieders": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -4174,9 +4167,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "carePakketten": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -4459,9 +4450,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -4974,8 +4968,7 @@
    ],
    "opslag": {
     "a": {
-     "commandAgents": 1,
-     "commandBeleid": 9
+     "commandAgents": 1
     },
     "b": {},
     "c": {}
@@ -5064,7 +5057,7 @@
    ],
    "opslag": {
     "a": {
-     "commandAlarmen": 1
+     "commandAlarmen": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -5248,7 +5241,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: proef-xlxwno"
+   "blokkade": "Die regel bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
   },
   {
    "methode": "POST",
@@ -5266,7 +5259,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: proef-7tbd2n"
+   "blokkade": "Die regel bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
   },
   {
    "methode": "POST",
@@ -5480,7 +5473,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: proef-hc99h3"
+   "blokkade": "Onbekende functie: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
   },
   {
    "methode": "POST",
@@ -6271,7 +6264,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: proef-3h6awz"
+   "blokkade": "Dat runbook bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
   },
   {
    "methode": "POST",
@@ -6653,36 +6646,39 @@
    "pad": "/api/command/zaak/besluit",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Die zaak bestaat niet."
+   "blokkade": "Een besluit vraagt een keuze."
   },
   {
    "methode": "POST",
    "pad": "/api/command/zaak/neem",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandZaken": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Die zaak bestaat niet."
+    "c": {
+     "commandZaken": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -6743,38 +6739,36 @@
    "methode": "POST",
    "pad": "/api/command/zandbak/kwaliteit",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/maak",
+   "rol": "office",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Die zandbak bestaat niet."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/command/zandbak/maak",
-   "rol": "office",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
-   "statussen": [
-    200,
-    200,
-    409
-   ],
-   "opslag": {
-    "a": {
-     "zandbakken": 1
-    },
-    "b": {},
-    "c": {}
-   }
+   "blokkade": "Er is al een zandbak met die naam."
   },
   {
    "methode": "POST",
@@ -7088,9 +7082,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "concern": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -7253,7 +7245,7 @@
    ],
    "opslag": {
     "a": {
-     "concern": 1
+     "concern": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -7291,9 +7283,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze entiteit staat niet op uw naam."
   },
@@ -7452,9 +7442,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "concern": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -7633,7 +7621,7 @@
    ],
    "opslag": {
     "a": {
-     "concern": 1
+     "concern": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -7669,9 +7657,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "concern": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -9652,7 +9638,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -9854,9 +9842,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "rtfos": 3
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -10504,8 +10490,7 @@
    ],
    "opslag": {
     "a": {
-     "accountRollen": 1,
-     "labFonds": 3
+     "accountRollen": 1
     },
     "b": {},
     "c": {}
@@ -10864,12 +10849,15 @@
    "opslag": {
     "a": {
      "supplierNotifications": 1,
-     "gemeenteMeldingen": 1,
-     "weefsel": 4
+     "weefsel": "gewijzigd",
+     "gemeenteMeldingen": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -11646,37 +11634,37 @@
    "methode": "POST",
    "pad": "/api/gewoonten/reeks",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze gewoonte staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/gewoonten/stop",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "gewoonten": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze gewoonte staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -11851,7 +11839,7 @@
    ],
    "opslag": {
     "a": {
-     "homekit": 1
+     "homekit": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -12283,7 +12271,7 @@
    ],
    "opslag": {
     "a": {
-     "rtgid": 4
+     "rtgid": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -12311,10 +12299,10 @@
    "pad": "/api/kantoor/gesprek/zeg",
    "rol": "openbaar",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    404,
-    404,
+    401,
+    401,
     404
    ],
    "opslag": {
@@ -12322,7 +12310,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gesprek ken ik niet meer. Begin gerust opnieuw."
+   "blokkade": "Dat klopt niet. Begin gerust opnieuw."
   },
   {
    "methode": "POST",
@@ -12348,108 +12336,113 @@
    "pad": "/api/kantoorpakket/aanwezig",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/ai",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze opdracht kent RTG Office niet."
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/beheer",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/bewaar",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/deel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/fase",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
   {
    "methode": "POST",
@@ -12493,75 +12486,75 @@
    "methode": "POST",
    "pad": "/api/kantoorpakket/open",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/opmerking",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/samen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/ster",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -12579,79 +12572,79 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze versie bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/uitslag",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/versies",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/vul",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/kantoorpakket/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -12665,9 +12658,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "klets": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -13980,9 +13971,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit lab bestaat niet."
   },
@@ -14680,9 +14669,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "labFonds": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -15324,9 +15311,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "veilig": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -15391,18 +15376,18 @@
    "pad": "/api/live/door",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    409,
-    409,
-    409
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "U bent niet onderweg."
+   "blokkade": "Deze bestemming heeft geen digitale deuren."
   },
   {
    "methode": "POST",
@@ -15417,7 +15402,7 @@
    ],
    "opslag": {
     "a": {
-     "live": 1
+     "live": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -16193,7 +16178,7 @@
    ],
    "opslag": {
     "a": {
-     "mallLijsten": 1
+     "mallLijsten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -16344,19 +16329,18 @@
    "methode": "POST",
    "pad": "/api/mall/lijst",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Lijst niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -16393,7 +16377,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Lijst niet gevonden."
+   "blokkade": "Deze regel staat niet in de lijst."
   },
   {
    "methode": "POST",
@@ -16411,25 +16395,26 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Lijst niet gevonden."
+   "blokkade": "Dit aanbod bestaat niet (meer) in de Mall."
   },
   {
    "methode": "POST",
    "pad": "/api/mall/lijst/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mallLijsten": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Lijst niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -16789,39 +16774,36 @@
    "methode": "POST",
    "pad": "/api/mediaos/lijst",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "mediaLijsten": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze lijst bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/mediaos/lijst/deel",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze lijst bestaat niet."
+   "blokkade": "U kunt alleen delen met iemand met wie u verbonden bent."
   },
   {
    "methode": "POST",
@@ -16847,36 +16829,39 @@
    "pad": "/api/mediaos/lijst/stuk",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze lijst bestaat niet."
+   "blokkade": "Dit is geen geldig stuk-id."
   },
   {
    "methode": "POST",
    "pad": "/api/mediaos/lijst/zet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaLijsten": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze lijst bestaat niet."
+    "c": {
+     "mediaLijsten": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -16891,12 +16876,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -16938,19 +16920,22 @@
    "methode": "POST",
    "pad": "/api/mediaos/samen/in",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaKamers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze luisterkamer bestaat niet (meer)."
+    "c": {
+     "mediaKamers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -16974,18 +16959,18 @@
    "pad": "/api/mediaos/samen/nodig",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze luisterkamer bestaat niet (meer)."
+   "blokkade": "U kunt alleen mensen uitnodigen met wie u verbonden bent."
   },
   {
    "methode": "POST",
@@ -17000,7 +16985,7 @@
    ],
    "opslag": {
     "a": {
-     "mediaKamers": 1
+     "mediaKamers": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -17092,7 +17077,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Kies: meer, minder, nooit, verras of reset."
   },
@@ -17224,19 +17211,22 @@
    "methode": "POST",
    "pad": "/api/meet/kom",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "meetKamers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Die kamercode bestaat niet (meer)."
+    "c": {
+     "meetKamers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -17281,18 +17271,18 @@
    "pad": "/api/meet/sein",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Die kamer bestaat niet (meer)."
+   "blokkade": "Dat sein kent de kamer niet."
   },
   {
    "methode": "POST",
@@ -17306,28 +17296,33 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "meetKamers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "meetKamers": "gewijzigd"
+    }
    }
   },
   {
    "methode": "POST",
    "pad": "/api/meet/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "meetKamers": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Die kamer bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -18523,7 +18518,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -20081,9 +20078,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "magnaatWereld": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -20266,9 +20261,7 @@
    ],
    "opslag": {
     "a": {
-     "magnaatWereld": "gewijzigd",
-     "magnaatPartnerstudio": 4,
-     "magnaatTrainingslobbies": 2
+     "magnaatWereld": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -20573,9 +20566,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "redactie": 3
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -20628,10 +20619,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "contactPins": 1,
-     "contactPinSecurity": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -21238,9 +21226,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
   },
@@ -21580,7 +21566,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -22758,7 +22746,6 @@
     },
     "b": {},
     "c": {
-     "wacht": "gewijzigd",
      "rtmailRecht": "gewijzigd"
     }
    }
@@ -23353,31 +23340,30 @@
     400
    ],
    "opslag": {
-    "a": {
-     "rtmailTeams": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit team bestaat niet."
+   "blokkade": "Welk bericht?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rtmail/team/bevestiging",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit team bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -23395,25 +23381,26 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit team bestaat niet."
+   "blokkade": "Dit bericht bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rtmail/team/hef",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
+    200,
+    200,
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit team bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -23801,9 +23788,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "spellen": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -25209,14 +25194,11 @@
     "a": {
      "metier": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "metier": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -25495,7 +25477,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -25931,19 +25915,22 @@
    "methode": "POST",
    "pad": "/api/muziek/bewaar",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "muziek": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+    "c": {
+     "muziek": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -25987,19 +25974,18 @@
    "methode": "POST",
    "pad": "/api/muziek/open",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -26022,19 +26008,18 @@
    "methode": "POST",
    "pad": "/api/muziek/samen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -26052,61 +26037,63 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit stuk bestaat niet."
+   "blokkade": "Die staat hier niet bij."
   },
   {
    "methode": "POST",
    "pad": "/api/muziek/samen/nodig",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "muziek": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/muziek/samen/rol",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "muziek": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/muziek/samen/verlaat",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit stuk bestaat niet."
+   "blokkade": "U bent de eigenaar; draag het over of hef het op."
   },
   {
    "methode": "POST",
@@ -26237,36 +26224,37 @@
    "pad": "/api/muziek/uitgeven",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit stuk bestaat niet."
+   "blokkade": "Noem het stuk eerst klaar."
   },
   {
    "methode": "POST",
    "pad": "/api/muziek/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "muziek": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit stuk bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -26439,9 +26427,12 @@
     "a": {
      "noodkaarten": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -26613,9 +26604,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kantoorTaken": 26
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -26747,57 +26736,52 @@
    "methode": "POST",
    "pad": "/api/office/architect/bouwstaat",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "architect": 3
-    },
+    "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/architect/concept",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/architect/kritiek",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -26869,7 +26853,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "architect": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26992,7 +26978,7 @@
    ],
    "opslag": {
     "a": {
-     "atelier": 3
+     "atelier": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -27004,37 +26990,39 @@
    "methode": "POST",
    "pad": "/api/office/atelier/concept",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelier": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Ontwerp niet gevonden."
+    "c": {
+     "atelier": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/atelier/kritiek",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Ontwerp niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -27059,19 +27047,18 @@
    "methode": "POST",
    "pad": "/api/office/atelier/techpack",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Ontwerp niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -27085,7 +27072,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelier": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -27133,19 +27122,20 @@
    "methode": "POST",
    "pad": "/api/office/atelierweb/etalage",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelierSites": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Sjabloon niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -27203,19 +27193,18 @@
    "methode": "POST",
    "pad": "/api/office/atelierweb/haal",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Sjabloon niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -27263,7 +27252,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelierSites": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -28039,9 +28030,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies betaalinstelling, elektronischgeldinstelling, bank."
   },
@@ -28112,9 +28101,12 @@
     "a": {
      "boardroom": 2
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -28610,9 +28602,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -28935,39 +28925,39 @@
    "methode": "POST",
    "pad": "/api/office/hardware/concept",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {
-     "hardware": 3
+     "hardware": "gewijzigd"
     },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+    "c": {
+     "hardware": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/hardware/kritiek",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -29031,19 +29021,18 @@
    "methode": "POST",
    "pad": "/api/office/hardware/stuklijst",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -29057,7 +29046,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hardware": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29146,7 +29137,7 @@
    ],
    "opslag": {
     "a": {
-     "ideeen": 2
+     "ideeen": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -29156,55 +29147,57 @@
    "methode": "POST",
    "pad": "/api/office/ideeen/reactie",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ideeen": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Idee niet gevonden."
+    "c": {
+     "ideeen": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/ideeen/spinoff",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Idee niet gevonden."
+   "blokkade": "Kies een geldig bureau."
   },
   {
    "methode": "POST",
    "pad": "/api/office/ideeen/uitwerken",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Idee niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -29218,7 +29211,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ideeen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -29485,9 +29480,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kantoorTaken": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -29550,108 +29543,113 @@
    "pad": "/api/office/kantoorpakket/aanwezig",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/ai",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze opdracht kent RTG Office niet."
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/beheer",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/bewaar",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/deel",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/fase",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
   {
    "methode": "POST",
@@ -29695,73 +29693,75 @@
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/open",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/opmerking",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/samen",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/ster",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -29779,79 +29779,79 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze versie bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/uitslag",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/versies",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/vul",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/office/kantoorpakket/weg",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -30564,9 +30564,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -30679,19 +30682,18 @@
    "methode": "POST",
    "pad": "/api/office/merk/haal",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Merk niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -30714,20 +30716,19 @@
    "methode": "POST",
    "pad": "/api/office/merk/maak",
    "rol": "office",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    200,
-    200,
+    409,
+    409,
     409
    ],
    "opslag": {
-    "a": {
-     "webMerken": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
-   }
+   },
+   "blokkade": "Dit merk bestaat al."
   },
   {
    "methode": "POST",
@@ -32387,19 +32388,18 @@
    "methode": "POST",
    "pad": "/api/office/redactie/ai/redactie",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Artikel niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -32445,18 +32445,18 @@
    "pad": "/api/office/redactie/artikel/status",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Artikel niet gevonden."
+   "blokkade": "Onbekende status."
   },
   {
    "methode": "POST",
@@ -32470,7 +32470,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redactie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -32612,12 +32614,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -32861,9 +32860,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rendezvous": 5
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -32881,7 +32878,7 @@
    ],
    "opslag": {
     "a": {
-     "rendezvous": 1
+     "rendezvous": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -32893,19 +32890,21 @@
    "methode": "POST",
    "pad": "/api/office/rendezvous/tafel/nodig",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "notifications": "gewijzigd",
+     "rendezvous": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze tafel bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -33517,7 +33516,7 @@
    ],
    "opslag": {
     "a": {
-     "studio": 3
+     "studio": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -33529,37 +33528,39 @@
    "methode": "POST",
    "pad": "/api/office/studio/concept",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+    "c": {
+     "studio": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/studio/kritiek",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -33573,7 +33574,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -33603,19 +33606,18 @@
    "methode": "POST",
    "pad": "/api/office/studio/specsheet",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -33629,7 +33631,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34637,7 +34641,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -35114,9 +35120,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -35458,19 +35468,20 @@
    "methode": "POST",
    "pad": "/api/office/weefsel/werk/klaar",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselWerk": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende werkorder."
+   }
   },
   {
    "methode": "POST",
@@ -35498,18 +35509,18 @@
    "pad": "/api/office/weefsel/werk/zet",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende werkorder."
+   "blokkade": "Deze werkorder is al afgerond."
   },
   {
    "methode": "POST",
@@ -35637,39 +35648,40 @@
    "methode": "POST",
    "pad": "/api/office/werkplaats/introk",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {
-     "werkplaats": 2
+     "werkplaats": "gewijzigd"
     },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Opdracht niet gevonden."
+    "c": {
+     "werkplaats": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/office/werkplaats/kritiek",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Opdracht niet gevonden."
+   "blokkade": "Werk het idee eerst uit."
   },
   {
    "methode": "POST",
@@ -35697,36 +35709,39 @@
    "pad": "/api/office/werkplaats/publiceer",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Opdracht niet gevonden."
+   "blokkade": "Werk de opdracht eerst uit voordat je hem publiceert."
   },
   {
    "methode": "POST",
    "pad": "/api/office/werkplaats/uitwerken",
    "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkplaats": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Opdracht niet gevonden."
+    "c": {
+     "werkplaats": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -35740,7 +35755,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkplaats": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -35878,9 +35895,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "ondernemingen": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -35897,7 +35912,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ondernemingen": 2
+    },
     "b": {},
     "c": {}
    },
@@ -35970,9 +35987,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -36096,120 +36116,117 @@
    ],
    "opslag": {
     "a": {
-     "onboarding": "gewijzigd"
+     "onboarding": "gewijzigd",
+     "ondernemingen": "gewijzigd"
     },
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Dit belang staat niet in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/aandeel/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Een onderneming zonder rechtsvorm kent geen aandelen."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/aanvraag",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Leg eerst uw ondernemingsplan vast."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/aanvraag/stand",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/beeld",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/belasting",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/bestuur",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -36227,223 +36244,217 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Deze bestuurder staat niet in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/bestuur/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Deze rechtsvorm heeft geen bestuur."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/capaciteit",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/contracten",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/crediteuren",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/dagbeeld",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/debiteuren",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/eersteklant",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/ingeschreven",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Welk KvK-nummer hoort bij deze onderneming?"
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/intake",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/kas",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/kas/saldo",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ondernemingen": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+    "c": {
+     "ondernemingen": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/klussen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -36461,25 +36472,24 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Deze zaak bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/mallprofiel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -36524,18 +36534,18 @@
    "pad": "/api/onderneming/ontwerp",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Stel een vraag of geef een opdracht."
   },
   {
    "methode": "POST",
@@ -36558,181 +36568,175 @@
    "methode": "POST",
    "pad": "/api/onderneming/oprichting",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/oprichting/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Kies eerst een rechtsvorm."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/pijplijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/plan/vastleggen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Het plan is nog niet compleet."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/rechtsvorm",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Deze rechtsvorm kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/relaties",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/relaties/notitie",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Er is nog geen zaak gekoppeld."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/toegang",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/verkenning",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/voorraad",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -36750,25 +36754,24 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   "blokkade": "Deze werkruimte bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/onderneming/werving",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze onderneming staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -37672,9 +37675,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -38267,10 +38268,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Alleen voor het rijk."
   },
@@ -38936,9 +38934,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -39062,12 +39063,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -39295,9 +39293,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Factuur niet gevonden."
   },
@@ -40182,7 +40178,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -40246,12 +40244,12 @@
      "contactPinSecurity": -1,
      "memberDir": -1,
      "ledenBoard": -1,
+     "spellen": "gewijzigd",
      "bestanden": -1,
      "fluister": -1,
      "lifestyle": -1,
      "appInstallaties": -1,
      "reisInstallaties": -1,
-     "spellen": "gewijzigd",
      "spelTeams": -2
     },
     "b": {},
@@ -41545,7 +41543,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Vul eerst de geboortedatum in; zonder leeftijdspas blijft het leerpaspoort dicht."
   },
@@ -41561,9 +41561,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -42355,9 +42353,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "rtfos": 22
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -43343,9 +43339,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -45250,9 +45244,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen."
   },
@@ -45398,7 +45390,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Welke belofte is gedaan?"
   },
@@ -46037,19 +46031,22 @@
    "methode": "POST",
    "pad": "/api/samen/chat",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "samenKamers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze samen-code bestaat niet (meer)."
+    "c": {
+     "samenKamers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -46076,55 +46073,56 @@
    "methode": "POST",
    "pad": "/api/samen/mee",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze samen-code bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/samen/muziek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "samenKamers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze samen-code bestaat niet (meer)."
+    "c": {
+     "samenKamers": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/samen/staat",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze samen-code bestaat niet (meer)."
+   }
   },
   {
    "methode": "POST",
@@ -46138,7 +46136,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "samenKamers": -1
+    },
     "b": {},
     "c": {}
    }
@@ -46619,7 +46619,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48176,9 +48178,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
@@ -48427,9 +48427,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -48592,9 +48595,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "suppliers": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -48795,9 +48796,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "suppliers": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -49173,9 +49172,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "zaakCommand": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -49357,9 +49354,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -50887,7 +50882,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: proef-njgitz"
+   "blokkade": "Die regel bestaat niet: doc311accda47f3"
   },
   {
    "methode": "POST",
@@ -50905,7 +50900,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: proef-gpucag"
+   "blokkade": "Die regel bestaat niet: doc311accda47f3"
   },
   {
    "methode": "POST",
@@ -50953,9 +50948,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "zaakCommand": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -51080,9 +51073,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "zaakCommand": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51104,7 +51095,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: proef-837qng"
+   "blokkade": "Dat runbook bestaat niet: doc311accda47f3"
   },
   {
    "methode": "POST",
@@ -51221,9 +51212,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51506,7 +51495,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -52236,19 +52227,18 @@
    "methode": "POST",
    "pad": "/api/supplier/facturen/betaald",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze factuur bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -52262,11 +52252,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "notifications": "gewijzigd",
-     "rtmail": "gewijzigd",
-     "facturen": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -52283,11 +52269,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "notifications": "gewijzigd",
-     "rtmail": "gewijzigd",
-     "facturen": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -52297,18 +52279,17 @@
    "pad": "/api/supplier/facturen/pdf",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Factuur niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -52356,7 +52337,11 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "notifications": "gewijzigd",
+     "rtmail": "gewijzigd",
+     "facturen": 2
+    },
     "b": {},
     "c": {}
    },
@@ -52823,7 +52808,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -53870,57 +53857,61 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/club/band",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {
      "horeca": "gewijzigd"
     },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Welk bandnummer? (het nummer dat op de band staat, geen naam)"
+    "c": {
+     "horeca": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/club/band/betaal",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze band kennen we niet."
+    "c": {
+     "horeca": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/horeca/club/band/terug",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze band kennen we niet."
+   "blokkade": "Er staat niets meer op deze band."
   },
   {
    "methode": "POST",
@@ -54111,8 +54102,7 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd",
-     "kosten": "gewijzigd"
+     "horeca": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -54238,9 +54228,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "horeca": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -54453,7 +54441,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -55045,9 +55035,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -55585,19 +55573,18 @@
    "methode": "POST",
    "pad": "/api/supplier/horeca/simulatie/voorstellen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Simulatiebrug niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -56574,9 +56561,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -56604,108 +56589,113 @@
    "pad": "/api/supplier/kantoorpakket/aanwezig",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/ai",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze opdracht kent RTG Office niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/beheer",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/bewaar",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/deel",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/fase",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
   {
    "methode": "POST",
@@ -56749,73 +56739,75 @@
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/open",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/opmerking",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/samen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/ster",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -56833,79 +56825,79 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze versie bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/uitslag",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/versies",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/vul",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/kantoorpakket/weg",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -56956,7 +56948,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -57674,9 +57668,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "magnaatPartnerstudio": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -58039,7 +58031,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze zaak is geen jachthaven."
   },
@@ -59263,12 +59257,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -59768,7 +59759,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -60148,9 +60141,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -61564,9 +61555,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze retouraanvraag bestaat niet."
   },
@@ -62177,13 +62166,9 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rtmailRecht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {
-     "rtmailRecht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -62198,7 +62183,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRecht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -62325,7 +62312,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -63148,7 +63137,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze functie is tijdelijk uitgeschakeld door de beheerder."
   },
@@ -63704,9 +63695,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze talentmatch is niet meer beschikbaar."
   },
@@ -64746,11 +64735,12 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "verkoopwegen": 1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze verkoopweg bestaat niet."
   },
@@ -66072,14 +66062,11 @@
     "a": {
      "techniek": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "techniek": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -67075,7 +67062,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -67310,19 +67299,20 @@
    "methode": "POST",
    "pad": "/api/toestellen/intrek",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "toestellen": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit toestel staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -67856,7 +67846,8 @@
    ],
    "opslag": {
     "a": {
-     "veilig": 5
+     "veilig": 4,
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -68195,7 +68186,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -68619,9 +68613,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -68979,7 +68971,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -69088,9 +69082,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -69233,7 +69225,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -69507,10 +69501,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70333,10 +70324,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd",
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70424,9 +70412,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70622,9 +70608,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70876,12 +70860,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -70931,9 +70912,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70968,9 +70947,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70988,9 +70965,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -71008,9 +70983,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -71224,9 +71197,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -71404,9 +71375,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -71589,11 +71558,11 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Die release kennen we niet."
   },
@@ -71681,9 +71650,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -71717,9 +71684,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "werkruimtes": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -72305,9 +72270,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -73049,8 +73017,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "wacht": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -74043,9 +74010,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "foundation": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74081,9 +74046,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74121,9 +74084,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Onbekende klas of verkeerd token."
   },
@@ -74285,7 +74246,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Onbekende klas of verkeerd token."
   },
@@ -74614,9 +74577,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -76516,7 +76477,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit personeelslid is niet gevonden."
   },
@@ -77218,9 +77181,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -78354,9 +78315,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -78818,108 +78777,110 @@
    "pad": "/api/rtf/kantoorpakket/aanwezig",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/ai",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze opdracht kent RTG Office niet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/beheer",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/bewaar",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/fase",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/gezin",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies uit, lezen of bewerken."
   },
   {
    "methode": "POST",
@@ -78963,73 +78924,75 @@
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/open",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/opmerking",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/samen",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/ster",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -79047,79 +79010,79 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze versie bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/uitslag",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/versies",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/vul",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/weg",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -80600,7 +80563,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Een RTG PIN heeft acht of tien tekens, bijvoorbeeld 7K2M9-XPQH3."
   },
@@ -80971,9 +80936,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -82931,37 +82894,39 @@
    "methode": "POST",
    "pad": "/api/werkplek/bureau/studio/concept",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+    "c": {
+     "studio": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/bureau/studio/kritiek",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -82975,7 +82940,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -83005,19 +82972,18 @@
    "methode": "POST",
    "pad": "/api/werkplek/bureau/studio/specsheet",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Concept niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -83031,7 +82997,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -83076,90 +83044,92 @@
    "pad": "/api/werkplek/kantoorpakket/aanwezig",
    "rol": "boardroom",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/ai",
    "rol": "boardroom",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze opdracht kent RTG Office niet."
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/beheer",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/bewaar",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/fase",
    "rol": "boardroom",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
   {
    "methode": "POST",
@@ -83203,73 +83173,75 @@
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/open",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/opmerking",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+    "c": {
+     "officeDocs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/samen",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/ster",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
@@ -83287,79 +83259,79 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Document niet gevonden."
+   "blokkade": "Deze versie bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/uitslag",
    "rol": "boardroom",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/versies",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/vul",
    "rol": "boardroom",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Formulier niet gevonden."
+   "blokkade": "Dit document is geen formulier."
   },
   {
    "methode": "POST",
    "pad": "/api/werkplek/kantoorpakket/weg",
    "rol": "boardroom",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Document niet gevonden."
+   }
   },
   {
    "methode": "POST",

@@ -370,9 +370,27 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **796** |
-| `NOT_APPLICABLE` | 40 | 828 |
-| geclassificeerd | 3.069 | 3.857 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **681** |
+| `NOT_APPLICABLE` | 40 | 844 |
+| geclassificeerd | 3.069 | 3.972 van 4.653 |
+
+### Een derde argument, en 147 deuren
+
+Dezelfde ronde legde een gat in de detectie bloot dat groter was dan het bewijs
+zelf. `const g = werkPoort(req, res, 'it');` is een gewone poort met een derde
+argument dat zegt *welk recht* binnen die werkruimte — en de `const`-vorm eiste
+precies `(req, res)`. Vrijwel heel `/api/bedrijf` viel daardoor buiten beeld, en
+kreeg in het register "geen deur" in plaats van zijn werkelijke klasse.
+
+`werkPoort` stónd al in het handgelezen register; alleen de vorm zag hem niet.
+Eén teken in de reguliere expressie: **niet af te leiden 362 → 215**,
+`OBJECT_SCOPED` 478 → 625. De naam wordt nog steeds tegen het register gehouden,
+dus een rekenfunctie die toevallig `req` en `res` krijgt wordt hier geen deur —
+dat is precies waarom die twee dingen gescheiden zijn.
+
+Dat is ook waarom de deurloze bak zo lang groot bleef: hij zag eruit als een
+lijst routes die publiek zijn, en was voor 147 stuks een lijst routes waarvan we
+de poort niet herkenden.
 
 ## 6. De poort
 

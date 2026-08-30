@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 788,
- "zonderWaargenomenDeur": 60,
+ "aantal": 804,
+ "zonderWaargenomenDeur": 44,
  "routes": [
   {
    "route": "POST /api/aanmelding/betalingen",
@@ -183,6 +183,12 @@
    "route": "POST /api/bank/veeg",
    "mutatieId": "bank.veeg",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/bedrijf/besluiten",
+   "mutatieId": "bedrijf.besluiten",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "werkruimte"
   },
   {
    "route": "POST /api/bedrijf/koppeling",
@@ -625,10 +631,28 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/foundation/school/bezoeker/lijst",
+   "mutatieId": "foundation.school.bezoeker.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/bijles/gesprek",
    "mutatieId": "foundation.school.bijles.gesprek",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "code"
+  },
+  {
+   "route": "POST /api/foundation/school/dashboard",
+   "mutatieId": "foundation.school.dashboard",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/debiteuren",
+   "mutatieId": "foundation.school.debiteuren",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
   },
   {
    "route": "POST /api/foundation/school/directie/bewaking",
@@ -643,14 +667,38 @@
    "objectVeld": "schoolCode"
   },
   {
+   "route": "POST /api/foundation/school/financien/rapport",
+   "mutatieId": "foundation.school.financien.rapport",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/herinneringen",
    "mutatieId": "foundation.school.herinneringen",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
   {
+   "route": "POST /api/foundation/school/hr/overzicht",
+   "mutatieId": "foundation.school.hr.overzicht",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/journaal",
+   "mutatieId": "foundation.school.journaal",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/koppelingen",
    "mutatieId": "foundation.school.koppelingen",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/machtiging/lijst",
+   "mutatieId": "foundation.school.machtiging.lijst",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
@@ -673,10 +721,34 @@
    "objectVeld": "schoolCode"
   },
   {
+   "route": "POST /api/foundation/school/overdracht/kaart",
+   "mutatieId": "foundation.school.overdracht.kaart",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/overdracht/klaarstaand",
+   "mutatieId": "foundation.school.overdracht.klaarstaand",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/pas/lijst",
+   "mutatieId": "foundation.school.pas.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/peiling/mijn",
    "mutatieId": "foundation.school.peiling.mijn",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "code"
+  },
+  {
+   "route": "POST /api/foundation/school/peiling/uitslag",
+   "mutatieId": "foundation.school.peiling.uitslag",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
   },
   {
    "route": "POST /api/foundation/school/personeel/uitnodigingen",
@@ -715,10 +787,34 @@
    "objectVeld": "schoolCode"
   },
   {
+   "route": "POST /api/foundation/school/signalen",
+   "mutatieId": "foundation.school.signalen",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/toestemming/overzicht",
+   "mutatieId": "foundation.school.toestemming.overzicht",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
+   "route": "POST /api/foundation/school/verlof/lijst",
+   "mutatieId": "foundation.school.verlof.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/verlof/mijn",
    "mutatieId": "foundation.school.verlof.mijn",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "code"
+  },
+  {
+   "route": "POST /api/foundation/school/webhook/lijst",
+   "mutatieId": "foundation.school.webhook.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
   },
   {
    "route": "POST /api/galerij/mijn",

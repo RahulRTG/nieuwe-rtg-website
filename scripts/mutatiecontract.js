@@ -121,7 +121,14 @@ let meerdereTreffers = 0;
        RTFoundation (server/foundation/leden-mail.js). Vier is weinig, en een
        poort die je niet ziet is er een die als "geen deur" in het register
        belandt -- dat is de dure kant van deze fout, niet het aantal. */
-    /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*[;,]\s*(?:if\s*\(\s*!|\w)/,
+    /* EN MET MEER DAN TWEE ARGUMENTEN. `const g = werkPoort(req, res, 'it');`
+       is dezelfde poort met een derde argument dat zegt WELK recht binnen die
+       werkruimte -- en die viel buiten deze vorm, want die eiste precies
+       (req, res). Gemeten: 171 handlers erbij, waaronder vrijwel heel
+       /api/bedrijf. De naam wordt nog steeds tegen het handgelezen register
+       gehouden, dus een rekenfunctie die toevallig req en res krijgt, wordt
+       hier geen deur. */
+    /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*[;,]\s*(?:if\s*\(\s*!|\w)/,
     /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*;\s*if\s*\(\s*!/,
     /if\s*\(\s*!\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
     /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/

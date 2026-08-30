@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **633** |
-| `NOT_APPLICABLE` | 40 | 857 |
-| geclassificeerd | 3.069 | 4.020 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **594** |
+| `NOT_APPLICABLE` | 40 | 865 |
+| geclassificeerd | 3.069 | 4.059 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -411,10 +411,18 @@ Dat weigeren gebeurde ook meteen: dertien contracten uit
 houdt dat nu vast op de plek waar ze *ontstaan*, niet alleen waar ze worden
 gekeurd.
 
+**Een rem lijkt een deur, en daarom hoort die vraag als laatste te komen.** De
+eerste versie raadpleegde de publieke lijst alleen wanneer er *geen* bewaker
+stond. `/api/rtf/club/portaal` heeft er twee — en het zijn allebei
+snelheidsremmen (`ipRem`, `codeRem`). Die tellen als bewaker, dus de publieke
+controle werd nooit bereikt en de route bleef "toegang niet af te leiden",
+terwijl zijn reden op regel 116 van diezelfde lijst staat. De vraag staat nu op
+allebei de takken.
+
 | | voor | na |
 |---|---:|---:|
-| toegang niet af te leiden | 215 | **159** |
-| `PUBLIC` | 0 | 56 |
+| toegang niet af te leiden | 215 | **116** |
+| `PUBLIC` | 0 | 99 |
 
 ## 6. De poort
 

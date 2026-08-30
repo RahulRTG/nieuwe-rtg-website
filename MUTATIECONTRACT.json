@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T03:12:44.737Z",
-  "commit": "ce78a5bd",
+  "op": "2026-08-30T03:16:42.909Z",
+  "commit": "18941a22",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,20 +9,20 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4020,
+  "geclassificeerd": 4059,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3107,
-   "LEGACY_PENDING_CLASSIFICATION": 633,
-   "NOT_APPLICABLE": 857,
+   "BLOCKED_BY_TEST_FIXTURE": 3138,
+   "LEGACY_PENDING_CLASSIFICATION": 594,
+   "NOT_APPLICABLE": 865,
    "PROTECTED": 24,
    "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
-  "vastgesteldDoorMens": 923,
-  "afgeleidDoorScript": 3097,
+  "vastgesteldDoorMens": 931,
+  "afgeleidDoorScript": 3128,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
-   "PUBLIC": 56,
-   "(niet af te leiden -- vraagt een verklaring)": 159,
+   "PUBLIC": 99,
+   "(niet af te leiden -- vraagt een verklaring)": 116,
    "OBJECT_SCOPED": 625,
    "SERVICE_TO_SERVICE": 8,
    "SYSTEM_INTERNAL": 1
@@ -34,8 +34,8 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 133,
-   "NOT_APPLICABLE": 34,
+   "BLOCKED_BY_TEST_FIXTURE": 102,
+   "NOT_APPLICABLE": 26,
    "PROTECTED": 6
   },
   "metingVan": "2026-08-30T02:11:24.317Z"
@@ -2285,12 +2285,14 @@
   {
    "mutatieId": "arrival.interpret",
    "route": "POST /api/arrival/interpret",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -2302,10 +2304,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "arrival.pass",
@@ -2366,12 +2368,14 @@
   {
    "mutatieId": "arrival.request",
    "route": "POST /api/arrival/request",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -2383,10 +2387,10 @@
     "grond": null,
     "hindernis": "Vernieuw de pagina en probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Vernieuw de pagina en probeer het opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "asset.document",
@@ -7212,7 +7216,7 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": null,
     "bewakers": [
@@ -7259,12 +7263,14 @@
   {
    "mutatieId": "betaal.webhook.mollie",
    "route": "POST /api/betaal/webhook/mollie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -7276,10 +7282,10 @@
     "grond": null,
     "hindernis": "Ongeldige Mollie-terugmelding."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Ongeldige Mollie-terugmelding.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "betaaldiensttarief",
@@ -19415,12 +19421,14 @@
   {
    "mutatieId": "foundation.registratie.aanvragen",
    "route": "POST /api/foundation/registratie/aanvragen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -19432,10 +19440,10 @@
     "grond": null,
     "hindernis": "Kies gezin, school, vrijwilliger of partnerstichting."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Kies gezin, school, vrijwilliger of partnerstichting.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.registratie.catalogus",
@@ -19468,12 +19476,14 @@
   {
    "mutatieId": "foundation.registratie.status",
    "route": "POST /api/foundation/registratie/status",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -19485,10 +19495,10 @@
     "grond": null,
     "hindernis": "De registratielink is ongeldig."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"De registratielink is ongeldig.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.reis.aanvraag",
@@ -30693,12 +30703,14 @@
   {
    "mutatieId": "lab2.bewoner.kader",
    "route": "POST /api/lab2/bewoner/kader",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30710,20 +30722,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.klacht",
    "route": "POST /api/lab2/bewoner/klacht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30735,20 +30749,22 @@
     "grond": null,
     "hindernis": "Dit onderzoek bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit onderzoek bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.labs",
    "route": "POST /api/lab2/bewoner/labs",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30760,20 +30776,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.overzicht",
    "route": "POST /api/lab2/bewoner/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30785,20 +30803,22 @@
     "grond": null,
     "hindernis": "Dit lab bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit lab bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.paspoort",
    "route": "POST /api/lab2/bewoner/paspoort",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -30811,20 +30831,22 @@
     "grond": null,
     "hindernis": "Dit labpaspoort bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit labpaspoort bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.paspoort-maak",
    "route": "POST /api/lab2/bewoner/paspoort-maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30836,20 +30858,22 @@
     "grond": null,
     "hindernis": "Dit lab bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit lab bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.stem",
    "route": "POST /api/lab2/bewoner/stem",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30861,20 +30885,22 @@
     "grond": null,
     "hindernis": "Dit thema bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit thema bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.studie",
    "route": "POST /api/lab2/bewoner/studie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30886,20 +30912,22 @@
     "grond": null,
     "hindernis": "Dit onderzoek bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit onderzoek bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.thema",
    "route": "POST /api/lab2/bewoner/thema",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30911,20 +30939,22 @@
     "grond": null,
     "hindernis": "Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Even rustig aan: te veel verzoeken. Probeer het over een minuut opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.bewoner.themas",
    "route": "POST /api/lab2/bewoner/themas",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -30936,10 +30966,10 @@
     "grond": null,
     "hindernis": "Dit lab bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit lab bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.coach",
@@ -31538,12 +31568,14 @@
   {
    "mutatieId": "lab2.mijn",
    "route": "POST /api/lab2/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -31556,20 +31588,22 @@
     "grond": null,
     "hindernis": "Deze labpas kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze labpas kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.mijn.observatie",
    "route": "POST /api/lab2/mijn/observatie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -31582,20 +31616,22 @@
     "grond": null,
     "hindernis": "Deze labpas kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze labpas kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.mijn.reflectie",
    "route": "POST /api/lab2/mijn/reflectie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -31608,20 +31644,22 @@
     "grond": null,
     "hindernis": "Deze labpas kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze labpas kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.mijn.terugtrekken",
    "route": "POST /api/lab2/mijn/terugtrekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -31634,10 +31672,10 @@
     "grond": null,
     "hindernis": "Deze labpas kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze labpas kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lab2.opbrengst",
@@ -49211,7 +49249,7 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": null,
     "bewakers": [
@@ -73109,12 +73147,14 @@
   {
    "mutatieId": "rtf.club.bericht",
    "route": "POST /api/rtf/club/bericht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -73127,20 +73167,22 @@
     "grond": null,
     "hindernis": "Deze clubcode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze clubcode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.club.portaal",
    "route": "POST /api/rtf/club/portaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -73153,10 +73195,10 @@
     "grond": null,
     "hindernis": "Deze clubcode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze clubcode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.geloof",
@@ -75598,12 +75640,14 @@
   {
    "mutatieId": "rtf.partner.raad",
    "route": "POST /api/rtf/partner/raad",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -75616,10 +75660,10 @@
     "grond": null,
     "hindernis": "Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze raadcode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.partner.stem",
@@ -81038,12 +81082,14 @@
   {
    "mutatieId": "rtfos.portaal.deelnemer",
    "route": "POST /api/rtfos/portaal/deelnemer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81056,20 +81102,22 @@
     "grond": null,
     "hindernis": "Deze code kennen we niet. Vraag er een nieuwe aan bij de RTF-afdeling in uw stad."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze code kennen we niet. Vraag er een nieuwe aan bij de RTF-afdeling in uw stad.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.deelnemer.intrekken",
    "route": "POST /api/rtfos/portaal/deelnemer/intrekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81082,20 +81130,22 @@
     "grond": null,
     "hindernis": "Deze code kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze code kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.donateur",
    "route": "POST /api/rtfos/portaal/donateur",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81108,20 +81158,22 @@
     "grond": null,
     "hindernis": "Deze code kennen we niet. Vraag de stichting om een nieuwe."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze code kennen we niet. Vraag de stichting om een nieuwe.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.donateur.bewijs",
    "route": "POST /api/rtfos/portaal/donateur/bewijs",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81134,20 +81186,22 @@
     "grond": null,
     "hindernis": "Deze code kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze code kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.gemeente",
    "route": "POST /api/rtfos/portaal/gemeente",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81160,20 +81214,22 @@
     "grond": null,
     "hindernis": "Deze gemeentecode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze gemeentecode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.ondernemer",
    "route": "POST /api/rtfos/portaal/ondernemer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81186,20 +81242,22 @@
     "grond": null,
     "hindernis": "Deze bedrijfscode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze bedrijfscode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.partner",
    "route": "POST /api/rtfos/portaal/partner",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81212,20 +81270,22 @@
     "grond": null,
     "hindernis": "Deze partnercode kennen we niet. Vraag het RTF-kantoor om de code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze partnercode kennen we niet. Vraag het RTF-kantoor om de code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.vrijwilliger",
    "route": "POST /api/rtfos/portaal/vrijwilliger",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81238,20 +81298,22 @@
     "grond": null,
     "hindernis": "Deze vrijwilligerscode kennen we niet. Vraag uw coördinator om een nieuwe."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze vrijwilligerscode kennen we niet. Vraag uw coördinator om een nieuwe.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.vrijwilliger.uren",
    "route": "POST /api/rtfos/portaal/vrijwilliger/uren",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81264,20 +81326,22 @@
     "grond": null,
     "hindernis": "Deze vrijwilligerscode kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze vrijwilligerscode kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.portaal.vrijwilliger.zet",
    "route": "POST /api/rtfos/portaal/vrijwilliger/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -81290,10 +81354,10 @@
     "grond": null,
     "hindernis": "Deze vrijwilligerscode kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze vrijwilligerscode kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.project.activiteit",
@@ -81541,12 +81605,14 @@
   {
    "mutatieId": "rtfos.publiek.campagnes",
    "route": "POST /api/rtfos/publiek/campagnes",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -81558,20 +81624,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.publiek.jaarverslagen",
    "route": "POST /api/rtfos/publiek/jaarverslagen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -81583,20 +81651,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.publiek.stad",
    "route": "POST /api/rtfos/publiek/stad",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -81608,20 +81678,22 @@
     "grond": null,
     "hindernis": "Deze stadsafdeling kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze stadsafdeling kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.publiek.steden",
    "route": "POST /api/rtfos/publiek/steden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -81633,10 +81705,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtfos.rapport",
@@ -86423,12 +86495,14 @@
   {
    "mutatieId": "sso.saml.acs",
    "route": "POST /api/sso/saml/acs",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "formulier"
@@ -86441,10 +86515,10 @@
     "grond": null,
     "hindernis": "Er kwam geen SAML-antwoord mee."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Er kwam geen SAML-antwoord mee.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sso.waarheen",
@@ -86452,7 +86526,7 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": null,
     "bewakers": [
@@ -113942,12 +114016,14 @@
   {
    "mutatieId": "talen",
    "route": "POST /api/talen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -113959,10 +114035,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.ai",
@@ -117146,12 +117222,14 @@
   {
    "mutatieId": "translate",
    "route": "POST /api/translate",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -117163,10 +117241,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "uitgaan",
@@ -118844,7 +118922,7 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "PUBLIC",
     "uitHandler": null,
     "bedoeld": null,
     "bewakers": [

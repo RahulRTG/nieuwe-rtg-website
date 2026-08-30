@@ -174,18 +174,7 @@ function waargenomenToegang(r) {
     /* Geen deur in de router: staat hij in de handler? */
     const p = uitHandler.get(String(r.methode || 'POST').toUpperCase() + ' ' + r.pad);
     if (p && p.toegang) return p.toegang;
-    /* EN ANDERS: STAAT HIJ MET REDEN OP DE PUBLIEKE LIJST?
-
-       Geen poort is twee heel verschillende dingen: een gat, of een bewuste
-       publieke deur. ./lib/publiekeroutes.js kent het verschil -- die lijst is
-       door een mens geschreven, per route met de reden erbij, en keuringsregel
-       28 dwingt hem af. Een route die daar staat is niet "toegang onbekend"
-       maar PUBLIC, en de reden is er al.
-
-       Zonder dit stonden 99 routes in het register als "niet af te leiden"
-       terwijl er twee mappen verderop een gelezen verklaring lag. */
-    if (PUBLIEK.has(r.pad)) return 'PUBLIC';
-    return null;
+    return publiekOfNiets(r);
   }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
      eigen geheim per organisatie. Die uitzondering staat hier bij naam, want een
@@ -195,7 +184,25 @@ function waargenomenToegang(r) {
   const RANG = { rol: 6, eigenrol: 5, lichaamssleutel: 4, objectpoort: 3, omgeving: 2, geenBewaker: 1, verfijner: 0, onbekend: 0 };
   const soorten = namen.map(n => bewakerskaart.soortVan(n));
   const zwaarste = soorten.slice().sort((a, b) => (RANG[b] || 0) - (RANG[a] || 0))[0];
-  return SOORT_NAAR_TOEGANG[zwaarste] || null;
+  return SOORT_NAAR_TOEGANG[zwaarste] || publiekOfNiets(r);
+}
+
+/* STAAT HIJ MET REDEN OP DE PUBLIEKE LIJST?
+
+   Geen poort is twee heel verschillende dingen: een gat, of een bewuste publieke
+   deur. ./lib/publiekeroutes.js kent het verschil -- die lijst is door een mens
+   geschreven, per route met de reden erbij, en keuringsregel 28 dwingt hem af.
+   Een route die daar staat is niet "toegang onbekend" maar PUBLIC.
+
+   HIJ STAAT OP ALLEBEI DE TAKKEN, en dat was eerst niet zo. De eerste versie
+   keek alleen als er GEEN bewaker was -- maar /api/rtf/club/portaal heeft er
+   twee, en het zijn allebei snelheidsremmen (ipRem, codeRem). Die tellen als
+   bewaker, dus de publieke controle werd nooit bereikt en de route bleef
+   "toegang niet af te leiden" terwijl zijn reden op regel 116 van die lijst
+   staat. Een rem is geen deur; dat het er een LIJKT, is precies waarom deze
+   vraag als laatste hoort te worden gesteld en niet als eerste. */
+function publiekOfNiets(r) {
+  return PUBLIEK.has(r.pad) ? 'PUBLIC' : null;
 }
 
 /* ---------------------------------------------------------------------------

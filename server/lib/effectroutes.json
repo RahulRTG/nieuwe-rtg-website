@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 817,
- "zonderWaargenomenDeur": 31,
+ "aantal": 825,
+ "zonderWaargenomenDeur": 23,
  "routes": [
   {
    "route": "POST /api/aanmelding/betalingen",
@@ -93,6 +93,12 @@
    "route": "POST /api/appstore/naslag",
    "mutatieId": "appstore.naslag",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/arrival/interpret",
+   "mutatieId": "arrival.interpret",
+   "toegang": "PUBLIC",
+   "waarom": "publieke wensontleding zonder opslag of uitvoering (met rem per ip)"
   },
   {
    "route": "POST /api/asset/mijn",
@@ -1025,6 +1031,18 @@
    "route": "POST /api/lab/overzicht",
    "mutatieId": "lab.overzicht",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/lab2/bewoner/kader",
+   "mutatieId": "lab2.bewoner.kader",
+   "toegang": "PUBLIC",
+   "waarom": "de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn"
+  },
+  {
+   "route": "POST /api/lab2/bewoner/labs",
+   "mutatieId": "lab2.bewoner.labs",
+   "toegang": "PUBLIC",
+   "waarom": "welke Living Labs er zijn; zonder budget, tekenaars en partners"
   },
   {
    "route": "POST /api/lab2/kader",
@@ -3050,6 +3068,24 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/rtfos/publiek/campagnes",
+   "mutatieId": "rtfos.publiek.campagnes",
+   "toegang": "PUBLIC",
+   "waarom": "idem: welke landelijke campagnes lopen, zonder opgehaalde bedragen"
+  },
+  {
+   "route": "POST /api/rtfos/publiek/jaarverslagen",
+   "mutatieId": "rtfos.publiek.jaarverslagen",
+   "toegang": "PUBLIC",
+   "waarom": "de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers"
+  },
+  {
+   "route": "POST /api/rtfos/publiek/steden",
+   "mutatieId": "rtfos.publiek.steden",
+   "toegang": "PUBLIC",
+   "waarom": "de buurt-app: alleen wat op een poster in het buurthuis zou hangen, geen enkel getal over hulpvragen"
+  },
+  {
    "route": "POST /api/rtfos/risicos",
    "mutatieId": "rtfos.risicos",
    "toegang": "AUTHENTICATED"
@@ -3808,6 +3844,12 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/talen",
+   "mutatieId": "talen",
+   "toegang": "PUBLIC",
+   "waarom": "de talenlijst voedt de kiezer op het inlogscherm"
+  },
+  {
    "route": "POST /api/techniek/archief",
    "mutatieId": "techniek.archief",
    "toegang": "AUTHENTICATED"
@@ -3936,6 +3978,12 @@
    "route": "POST /api/training",
    "mutatieId": "training",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/translate",
+   "mutatieId": "translate",
+   "toegang": "PUBLIC",
+   "waarom": "het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js"
   },
   {
    "route": "POST /api/uitgaan",

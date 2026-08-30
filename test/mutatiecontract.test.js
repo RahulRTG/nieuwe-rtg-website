@@ -277,3 +277,40 @@ test('de aftekening liegt niet over wie er heeft gekeken', () => {
       route + ' is afgetekend met alleen een naam ("' + door + '"); zeg erbij waarop dat oordeel rust');
   }
 });
+
+test('de 788 onder het bewijsbesluit deugen, en overschrijven niets', () => {
+  /* Besluit van de eigenaar, 30 augustus 2026: twee onafhankelijke
+     runtime-metingen die allebei nul lezen is voldoende grond voor
+     NOT_APPLICABLE. Deze toets bewaakt de drie dingen die dat besluit eerlijk
+     houden.
+
+     MUTATIEPROEF: zet een van de drie asserts om -- geef een route een tweede
+     stand, haal `nagekeken` weg, of laat effectroutes.json een route dragen die
+     al in ./mutatiecontracten-leest.js staat -- en deze toets zakt. */
+  const effect = require('../server/lib/mutatiecontracten-effect');
+  const namen = Object.keys(effect);
+  assert.ok(namen.length > 700, 'de lijst is niet leeggelopen: ' + namen.length);
+
+  // 1. elk contract komt door dezelfde keuring als alle andere
+  const fouten = namen.flatMap(route => contract.keur({ route, ...effect[route] }));
+  assert.deepStrictEqual(fouten.slice(0, 3), [], fouten.slice(0, 3).join('\n  '));
+
+  // 2. ze staan allemaal op NOT_APPLICABLE en noemen wat de meter NIET ziet
+  for (const route of namen) {
+    const c = effect[route];
+    assert.strictEqual(c.stand, 'NOT_APPLICABLE', route);
+    assert.match(c.nagekeken, /effectmeter/, route + ': het bewijs noemt de meter niet');
+    assert.match(c.nagekeken, /NIET ziet/, route + ': het contract zegt niet waarover de meter zwijgt');
+    assert.match(c.afgetekend.door, /bewijsstandaard/,
+      route + ': de aftekening verzwijgt dat dit een besluit over een standaard is');
+  }
+
+  // 3. geen van hen overschrijft een specifieker contract
+  const eerder = Object.assign({},
+    require('../server/lib/mutatiecontracten-beschermd').CONTRACTEN,
+    require('../server/lib/mutatiecontracten-leest').CONTRACTEN,
+    require('../server/lib/mutatiecontracten-tweedehandeling').CONTRACTEN,
+    require('../server/lib/mutatiecontracten-padparameter').CONTRACTEN);
+  const botsing = namen.filter(n => n in eerder);
+  assert.deepStrictEqual(botsing, [], 'een besluit over een standaard mag nooit over een gelezen contract heen');
+});

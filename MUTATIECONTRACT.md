@@ -334,6 +334,46 @@ van paden naast de aanroepplek loopt binnen een jaar uiteen. De verklaring staat
 waar de handeling staat. `test/geldroutes.test.js` houdt de twaalf vast en zakt
 zodra er een zijn `{ geld: … }` verliest.
 
+## 5e. Het bewijsbesluit van 30 augustus 2026
+
+De 851 `NOT_APPLICABLE`-voorstellen lagen klaar met twee onafhankelijke
+runtime-metingen eronder, en bleven op `LEGACY` staan omdat een stand nooit uit
+bewijs wordt afgeleid. Dat is geen impasse maar een vraag aan de eigenaar, en die
+is beantwoord:
+
+> **Twee onafhankelijke runtime-metingen die allebei nul lezen, met genoemd
+> waarover zij zwijgen, is voldoende grond voor `NOT_APPLICABLE`.**
+
+Dat is een besluit over de **bewijsstandaard**, niet over 788 losse routes — en de
+aftekening zegt dat ook zo: *"besluit van de eigenaar over de bewijsstandaard;
+niet route voor route door een mens gelezen"*. Dat verschil hoort te blijven
+staan. Wie er later een naleest en zijn eigen naam eronder wil zetten, haalt die
+route hier weg en zet hem met zijn naam in een van de andere contractbestanden:
+een mens wint van een besluit over een standaard, net zoals een mens van een
+script wint.
+
+**Van de 848 voorstellen zijn er 788 afgetekend.** De overige 60 haalden de vier
+eisen wel maar hebben geen waargenomen toegangsklasse. Een contract zonder deur
+bestaat niet, en een verzonnen deur is erger dan een route die op `LEGACY` blijft
+staan; ze wachten op de vraag welke deur zij hebben.
+
+De routes staan in `server/lib/effectroutes.json` — alleen hun naam en hun deur.
+De redenering, het bewijs en de aftekening staan één keer, in
+`server/lib/mutatiecontracten-effect.js`. 788 keer dezelfde zin uitschrijven is de
+vorm waarin een verschil onopgemerkt insluipt.
+
+**Drie dingen houden dit besluit eerlijk**, en `test/mutatiecontract.test.js` zakt
+zodra er één sneuvelt: elk contract komt door dezelfde keuring als alle andere;
+elk noemt de meter én waarover die zwijgt; en geen van hen overschrijft een
+contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
+"zou niet moeten" is geen handhaving).
+
+| | voor | na |
+|---|---:|---:|
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **796** |
+| `NOT_APPLICABLE` | 40 | 828 |
+| geclassificeerd | 3.069 | 3.857 van 4.653 |
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

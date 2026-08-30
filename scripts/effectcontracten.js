@@ -9,18 +9,25 @@
    schaalt daarom wel waar scripts/schrijfanalyse.js bleef steken op veertig
    routes (die volgt met opzet geen aanroep over een modulegrens).
 
-   WAAROM DIT GEEN CONTRACTEN SCHRIJFT, en dat is de kern van dit bestand.
+   WAT DIT SCRIPT WEL EN NIET MAG, en dat is de kern van dit bestand.
 
-   Een eerdere versie schreef 848 kant-en-klare NOT_APPLICABLE-contracten weg.
-   server/kern/mutatiecontract/keuring.js verbiedt dat, en zegt er de reden bij:
-   vijf van de zes standen doen een uitspraak over GEDRAG, en die mag geen script
-   zetten. "Zonder dit onderscheid zou een script in een middag 4653 contracten
-   kunnen schrijven en zou 100% geclassificeerd niets meer betekenen."
+   Een eerdere versie schreef 848 kant-en-klare NOT_APPLICABLE-contracten weg op
+   eigen gezag. server/kern/mutatiecontract/keuring.js verbiedt dat, en zegt er de
+   reden bij: vijf van de zes standen doen een uitspraak over GEDRAG, en die mag
+   geen script zetten. "Zonder dit onderscheid zou een script in een middag 4653
+   contracten kunnen schrijven en zou 100% geclassificeerd niets meer betekenen."
 
-   Dat is precies wat hier dreigde. Twee meters die allebei nul lezen is sterk
-   bewijs, maar bewijs draagt een VOORSTEL en een mens draagt het besluit. Dus
-   levert dit script een WACHTRIJ met per route het bewijs eronder, en niets dat
-   zich als vastgesteld voordoet.
+   Twee meters die allebei nul lezen is sterk bewijs -- en bewijs draagt een
+   VOORSTEL. Het besluit of dat bewijs GENOEG is, is van de eigenaar, en dat
+   besluit is op 30 augustus 2026 genomen: twee onafhankelijke runtime-metingen
+   die allebei nul lezen, met genoemd waarover ze zwijgen, is voldoende grond voor
+   NOT_APPLICABLE.
+
+   Dit script schrijft daarom twee dingen, en het verschil staat in de bestanden
+   zelf: de WACHTRIJ (MUTATIECONTRACT-VOORSTEL.json, alles wat de vier eisen
+   haalt) en de LIJST DIE ONDER DAT BESLUIT VALT (./lib/effectroutes.json, alleen
+   wat OOK een waargenomen toegangsklasse heeft -- want een contract zonder deur
+   bestaat niet, en die verzint dit script niet).
 
    EEN ROUTE STAAT HIER ALLEEN ALS ALLE VIER WAAR IS:
 
@@ -52,8 +59,20 @@ const bestaand = (() => {
      eerste versie las daardoor precies EEN sleutel ('CONTRACTEN') en vond dus
      nooit een bestaande verklaring -- een dubbele definitie zou er stil in zijn
      geslopen. Vandaar de controle eronder. */
-  const m = require(path.join(WORTEL, 'server/lib/mutatiecontracten.js'));
-  const c = m.CONTRACTEN || m;
+  /* DE VIER SPECIFIEKE BESTANDEN, en NIET het samengestelde register.
+
+     Dat las hij eerst, en dat is een lus: mutatiecontracten.js gooit zodra
+     ./mutatiecontracten-effect een specifieker contract overschrijft -- precies
+     de fout die dit script moet kunnen repareren. Wie dan opnieuw draait om hem
+     recht te zetten, krijgt de fout in plaats van de reparatie. Gemeten met een
+     mutatieproef: de generator liep vast op zijn eigen uitvoer.
+
+     Hier staan de vier bestanden dus met naam. Ze staan ook in
+     server/lib/mutatiecontracten.js; die tweede plek is bewust en de toets
+     test/mutatiecontract.test.js houdt ze gelijk. */
+  const DELEN = ['beschermd', 'leest', 'tweedehandeling', 'padparameter'];
+  const c = Object.assign({}, ...DELEN.map(d =>
+    require(path.join(WORTEL, 'server/lib/mutatiecontracten-' + d + '.js')).CONTRACTEN));
   const s = new Set(Object.keys(c));
   if (s.size < 50) {
     console.error('server/lib/mutatiecontracten.js leverde ' + s.size + ' contracten op; dat kan niet kloppen.');
@@ -143,5 +162,48 @@ fs.writeFileSync(DOEL, JSON.stringify({
   voorstellen
 }, null, 1) + '\n');
 
-console.log('MUTATIECONTRACT-VOORSTEL.json geschreven: ' + rijen.length + ' voorstellen (GEEN contracten).');
+console.log('MUTATIECONTRACT-VOORSTEL.json geschreven: ' + rijen.length + ' voorstellen.');
+
+/* ---------------------------------------------------------------------------
+   DE LIJST DIE ONDER HET BESLUIT VALT.
+
+   Alleen de routes die naast de vier eisen OOK een waargenomen toegangsklasse
+   hebben. Een contract zonder deur bestaat niet (de keuring weigert het), en dit
+   script verzint er geen -- een verzonnen toegangsklasse is erger dan een route
+   die op LEGACY blijft staan.
+
+   Alleen de NAMEN en de deur staan hier. De redenering, het bewijs en de
+   aftekening staan EEN keer, in server/lib/mutatiecontracten-effect.js. Data in
+   JSON, betekenis in JS: 848 keer dezelfde zin uitschrijven is de vorm waarin
+   een verschil onopgemerkt insluipt.
+   ------------------------------------------------------------------------- */
+const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT.json'), 'utf8'));
+const regRij = new Map((register.rijen || []).map(x => [x.route, x]));
+const uitDeur = [];
+let zonderDeur = 0;
+for (const r of rijen) {
+  const x = regRij.get(r.sleutel);
+  const klasse = x && x.toegang && x.toegang.waargenomen;
+  if (!klasse) { zonderDeur++; continue; }
+  const rij = { route: r.sleutel, mutatieId: mutatieId(r.pad), toegang: klasse };
+  if (klasse === 'OBJECT_SCOPED') {
+    const uh = String((x.toegang && x.toegang.uitHandler) || '');
+    const veld = uh.startsWith('object: ') ? uh.slice(8) : null;
+    if (!veld) { zonderDeur++; continue; }   // OBJECT_SCOPED zonder veld is geen contract
+    rij.objectVeld = veld;
+  }
+  uitDeur.push(rij);
+}
+fs.writeFileSync(path.join(WORTEL, 'server/lib/effectroutes.json'), JSON.stringify({
+  uitleg: 'De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke ' +
+    'runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de ' +
+    'aftekening staan een keer, in ./mutatiecontracten-effect.js.',
+  geschrevenDoor: 'scripts/effectcontracten.js',
+  aantal: uitDeur.length,
+  zonderWaargenomenDeur: zonderDeur,
+  routes: uitDeur
+}, null, 1) + '\n');
+
+console.log('server/lib/effectroutes.json geschreven: ' + uitDeur.length + ' routes onder het besluit.');
+console.log('  zonder waargenomen deur, dus NIET meegenomen: ' + zonderDeur);
 console.log('afgewezen, en waarom: ' + JSON.stringify(afgewezen));

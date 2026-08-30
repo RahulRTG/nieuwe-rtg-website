@@ -48,6 +48,28 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
-  require('./mutatiecontracten-padparameter').CONTRACTEN);
+  require('./mutatiecontracten-padparameter').CONTRACTEN,
+  /* ALS LAATSTE, en dat is geen willekeur. Deze 788 vallen onder een BESLUIT
+     over de bewijsstandaard en niet onder een mens die ze een voor een las. De
+     vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus
+     zou deze een van hen overschrijven -- vandaar de controle eronder, want
+     "zou niet moeten" is geen handhaving. */
+  require('./mutatiecontracten-effect'));
+
+{
+  const effect = require('./mutatiecontracten-effect');
+  const eerder = Object.assign({},
+    require('./mutatiecontracten-beschermd').CONTRACTEN,
+    require('./mutatiecontracten-leest').CONTRACTEN,
+    require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
+    require('./mutatiecontracten-padparameter').CONTRACTEN);
+  const overschreven = Object.keys(effect).filter(k => k in eerder);
+  if (overschreven.length) {
+    throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +
+      'contract: ' + overschreven.slice(0, 5).join(', ') + (overschreven.length > 5 ? ' (+' +
+      (overschreven.length - 5) + ')' : '') + '. Haal die route uit scripts/effectcontracten.js zijn ' +
+      'uitkomst -- een besluit over een standaard mag nooit over een gelezen contract heen.');
+  }
+}
 
 module.exports = { CONTRACTEN };

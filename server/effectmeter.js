@@ -104,8 +104,19 @@ function haak(app) {
   if (!aan || !app || typeof app.use !== 'function') return false;
   app.use((req, res, next) => {
     perVerzoek((teller) => {
-      const echt = res.json;
-      res.json = function (...args) {
+      /* AAN res.end EN NIET AAN res.json.
+
+         Hij hing eerst aan res.json, zoals de opslagmeter. Dat is de gangbare
+         uitgang maar niet de enige: 282 routes die de kale ronde met 200
+         beantwoordde droegen geen kop, want zij antwoorden via res.send, een
+         redirect of een bestand -- en die gaan in server/web/verrijk.js niet
+         langs res.json. Gemeten, niet bedacht: het contractregister moest die
+         282 als ONGEMETEN afwijzen terwijl de meter gewoon had geteld.
+
+         res.end is de ene uitgang waar alle andere doorheen lopen (res.json
+         roept hem aan, res.send ook, een redirect ook). Vandaar hier. */
+      const echt = res.end;
+      res.end = function (...args) {
         try {
           if (!res.headersSent) {
             /* De teller van DIT verzoek, meegegeven en niet opgevraagd. Een

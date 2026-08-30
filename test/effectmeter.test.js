@@ -92,14 +92,19 @@ test('de haak doet niets zonder de vlag', () => {
   assert.equal(gebruikt, 0, 'uit betekent: geen middleware in de keten');
 });
 
-test('de haak zet beide koppen op het antwoord', () => {
+test('de haak zet beide koppen op het antwoord, en hangt aan res.end', () => {
+  /* MUTATIEPROEF: hang hem terug aan res.json en deze toets zakt. res.end is de
+     ENE uitgang: res.json en res.send lopen er allebei doorheen (zie
+     server/web/verrijk.js). Aan res.json droegen 282 routes die met 200
+     antwoordden geen kop -- gemeten, en dat is precies het soort stilte waar
+     deze meter voor bestaat. */
   meter.begin('1');
   let mw = null;
   meter.haak({ use: (f) => { mw = f; } });
   const koppen = {};
-  const res = { headersSent: false, setHeader: (k, v) => { koppen[k] = v; }, json: () => 'antwoord' };
+  const res = { headersSent: false, setHeader: (k, v) => { koppen[k] = v; }, end: () => 'antwoord' };
   mw({}, res, () => { meter.tel('sms'); });
-  assert.equal(res.json(), 'antwoord', 'de wikkel geeft het echte antwoord door');
+  assert.equal(res.end(), 'antwoord', 'de wikkel geeft het echte antwoord door');
   assert.equal(koppen['X-RTG-Effect'], 'sms=1');
   assert.equal(koppen['X-RTG-Effect-Niet-Gemeten'], 'bestand,externe-aanroep');
   meter.begin('');

@@ -104,6 +104,30 @@ const SLEUTELS = {
   'POST /api/supplier/bezorg/terug': { zelfdeVerzoek: true },          // verwijdert de eigen rit
   'POST /api/techniek/fouten/wis': { zelfdeVerzoek: true },            // wist de storingslijst
   'POST /api/foundation/school/calamiteit': { zelfdeVerzoek: true },   // zet of heft het alarm
+
+  /* ---- de laatste ronde: het kantoorbord en wat erop lijkt ----
+
+     Schakelaars die een STAND zetten. Een tweede identieke tik zet dezelfde
+     stand, en het ding blijft een -- maar er komt wel een tweede regel in het
+     auditspoor van de afdelingen. Dat spoor hoort te zeggen hoe vaak een MENS op
+     de knop drukte, en niet hoe vaak het verzoek aankwam. Vandaar dat ook deze
+     dedupliceren. */
+  'POST /api/office/bank/nood': { zelfdeVerzoek: true },              // de reden
+  'POST /api/office/bank/herstel': { zelfdeVerzoek: true },
+  'POST /api/office/bank/leden': { zelfdeVerzoek: true },             // aan: true/false
+  'POST /api/office/bank/operationeel': { zelfdeVerzoek: true },      // aan: true/false
+  'POST /api/office/bank/instellingen': { zelfdeVerzoek: true },      // de instellingen zelf
+  'POST /api/office/bank/autoriseer/annuleer': { zelfdeVerzoek: true },
+  'POST /api/office/bank/rekening/bevries': { zelfdeVerzoek: true },  // iban + aan
+  'POST /api/office/bank/mislukking': { zelfdeVerzoek: true },        // reden + sleutel
+  'POST /api/command/agent/stop': { zelfdeVerzoek: true },            // naam + reden
+  'POST /api/command/agent/hervat': { zelfdeVerzoek: true },          // naam + reden
+  'POST /api/command/agent/rechten': { zelfdeVerzoek: true },         // naam + mag + reden
+  'POST /api/appstore/wis-opslag': { zelfdeVerzoek: true },           // de sleutel
+  'POST /api/supplier/mall/sync': { zelfdeVerzoek: true },            // de stand die gemeld wordt
+  'POST /api/supplier/horeca/folio/nacht': { zelfdeVerzoek: true },   // de datum
+  'POST /api/member/lifestyle/gezondheid/dossier': { zelfdeVerzoek: true },
+  'POST /api/member/rechterhand/maison/log': { zelfdeVerzoek: true }
 };
 
 module.exports = { SLEUTELS };

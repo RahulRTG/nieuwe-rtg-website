@@ -51,6 +51,10 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const proef = require(path.join(WORTEL, 'IDEMPROEF.json'));
 const { PUBLIEK } = require('./lib/publiekeroutes');
+/* De routes die een duplicaatregel dragen -- zie het veto verderop. */
+const verklaard = new Set(Object.entries(
+  require(path.join(__dirname, '..', 'server/lib/idemsleutels')).SLEUTELS)
+  .filter(([, v]) => v && !v.leest).map(([k]) => k));
 const handlerpoorten = require(path.join(__dirname, '..', 'server/kern/handlerpoorten'));
 const DOEL = path.join(WORTEL, 'MUTATIECONTRACT-VOORSTEL.json');
 
@@ -115,7 +119,7 @@ let statisch = new Map();
 const leeg = (d) => !d || !Object.keys(d).length;
 const rijen = [];
 const aantekening = { tegenspraakGenegeerd: 0 };
-const afgewezen = { geenKaleRonde: 0, spoorInOpslag: 0, effectGeteld: 0, geenEffectmeter: 0, tegenspraak: 0, alVerklaard: 0 };
+const afgewezen = { heeftDuplicaatregel: 0, geenKaleRonde: 0, spoorInOpslag: 0, effectGeteld: 0, geenEffectmeter: 0, tegenspraak: 0, alVerklaard: 0 };
 
 for (const r of Object.values(proef.perRoute)) {
   const sleutel = (r.methode || 'POST') + ' ' + r.pad;
@@ -133,6 +137,24 @@ for (const r of Object.values(proef.perRoute)) {
      nog de enige is die het gat afdekt -- daar is zij hierboven al toegepast
      doordat een route zonder effect-kop hier niet komt. Wat de effectmeter
      NIET ziet, staat in elk contract met naam. */
+  /* EEN ROUTE MET EEN DUPLICAATREGEL IS GEEN NOT_APPLICABLE-KANDIDAAT, en dat
+     was bijna een dure fout.
+
+     /api/office/bank/nood -- de NOODSTOP van de bank -- kwam hier als
+     "deze route verandert niets" uit. De reden is een val die niets met deze
+     lijst te maken heeft: een route waarvan de stand AL op de doelwaarde staat,
+     ziet er voor beide meters precies zo uit als een route die nooit iets
+     verandert. De proef had de noodstop in een eerdere ronde al gezet; de
+     tweede keer viel er niets meer te schrijven, en beide meters lazen nul.
+
+     De verklaring in lib/idemsleutels.js is hier het tegenbewijs, en een hard
+     tegenbewijs: wie een route een duplicaatregel geeft, zegt daarmee dat een
+     herhaling WEL iets zou doen. Anders viel er niets te dedupliceren.
+
+     Dit veto staat hier bewust boven de meting, want het is geen zwakker
+     signaal dat door een sterker wordt overstemd -- het is een uitspraak van een
+     mens over de betekenis van de handeling, en die wint van elke meter. */
+  if (verklaard.has(sleutel)) { afgewezen.heeftDuplicaatregel++; continue; }
   const sa = statisch.get(sleutel);
   if (sa && sa.schrijft === 'ja') aantekening.tegenspraakGenegeerd++;
   rijen.push({ sleutel, pad: r.pad, methode: r.methode || 'POST',

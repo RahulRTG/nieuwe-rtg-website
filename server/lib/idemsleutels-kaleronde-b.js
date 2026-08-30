@@ -117,7 +117,28 @@ const SLEUTELS = {
     waarom: 'zelfde route als /api/office/kantoorpakket/maak hierboven: de titel is optioneel en valt ' +
       'terug op "Nieuw document", dus twee lege oproepen zijn twee verse documenten' },
   'POST /api/werkplek/kantoorpakket/maak': { nietIdempotent: true,
-    waarom: 'zelfde reden als de twee andere kantoorpakket-routes' }
+    waarom: 'zelfde reden als de twee andere kantoorpakket-routes' },
+
+  /* ---- en de laatste die het NIET zijn ---- */
+  'POST /api/office/bank/draai': { nietIdempotent: true,
+    waarom: 'de bankknop gaat een SLAG verder (of terug); twee keer drukken is twee slagen, en een ' +
+      'laag die de tweede opslikt laat de stand achter waar hij niet hoort' },
+  'POST /api/overheid/rijbewijs/verleng': { nietIdempotent: true,
+    waarom: 'verlengen schuift de geldigheid op; twee keer verlengen is twee termijnen, niet dezelfde ' +
+      'nog eens' },
+  'POST /api/supplier/horeca/rahul/doe': { nietIdempotent: true,
+    waarom: 'een handeling laten uitvoeren met een reden; twee keer vragen is twee keer doen, en welke ' +
+      'handeling dat is staat in de body en niet in deze laag' },
+  'POST /api/foundation/gezin/bericht': { nietIdempotent: true,
+    waarom: 'twee keer hetzelfde sturen is twee berichten -- mensen herhalen zichzelf, en een laag die ' +
+      'dat opslikt laat een bericht verdwijnen dat iemand bewust nog eens stuurde' },
+  'POST /api/kosten/grens': { nietIdempotent: true,
+    waarom: 'de grens opvragen is een raadpleging die zelf verbruik kost en dus wordt geteld; twee keer ' +
+      'vragen is twee raadplegingen, ook al is het antwoord gelijk' },
+  'POST /api/kosten/vooruitblik': { nietIdempotent: true,
+    waarom: 'zelfde reden als de grens: een vooruitblik wordt op het moment zelf berekend en geteld' },
+  'POST /api/supplier/kosten/vooruitblik': { nietIdempotent: true,
+    waarom: 'zelfde reden, aan de zaakkant' }
 };
 
 module.exports = { SLEUTELS };

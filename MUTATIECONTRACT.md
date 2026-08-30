@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **99** |
-| `NOT_APPLICABLE` | 40 | 1.055 |
-| geclassificeerd | 3.069 | 4.554 van 4.653 (97,9%) |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **85** |
+| `NOT_APPLICABLE` | 40 | 1.054 |
+| geclassificeerd | 3.069 | 4.568 van 4.653 (98,2%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -744,6 +744,49 @@ route een kandidaat voor `NOT_APPLICABLE`, en zou `BLOCKED` hem daar wegkapen.
 | `BLOCKED_BY_TEST_FIXTURE` | 3.218 | **3.359** |
 | `LEGACY_PENDING_CLASSIFICATION` | 240 | **99** |
 | geclassificeerd | 4.413 | **4.554 van 4.653 (97,9%)** |
+
+## 5i. De val waarin de noodstop van de bank "niets verandert"
+
+De laatste 23 routes uit de kale ronde kregen dezelfde behandeling: de
+kantoorschakelaars (`bank/nood`, `bank/leden`, `rekening/bevries`,
+`agent/stop`) een duplicaatregel, en zeven een reden waarom ze er juist géén
+krijgen — waaronder `/api/office/bank/draai`, want die knop gaat een **slag
+verder** en twee keer drukken is twee slagen.
+
+Toen de proef opnieuw draaide, kwam er iets veel ernstigers boven.
+**`/api/office/bank/nood` — de noodstop van de bank — werd geclassificeerd als
+`NOT_APPLICABLE`: "deze route verandert niets".** Dat is niet een beetje mis, dat
+is het tegenovergestelde van waar.
+
+De oorzaak lag niet in de verklaringen maar in de regel zelf, en het is een val
+die niets met deze lijst te maken heeft: **een route waarvan de stand al op de
+doelwaarde staat, ziet er voor beide meters precies zo uit als een route die
+nooit iets verandert.** De proef had de noodstop in een eerdere ronde al gezet;
+de tweede keer viel er niets te schrijven, en opslagmeter én effectmeter lazen
+allebei nul. Twee onafhankelijke runtime-metingen, allebei correct, samen een
+verkeerde conclusie.
+
+Het tegenbewijs stond al in huis: **een route met een duplicaatregel is per
+definitie geen `NOT_APPLICABLE`-kandidaat.** Wie een route dedupliceert, zegt
+daarmee dat een herhaling wél iets zou doen — anders viel er niets te
+dedupliceren. Dat veto staat bewust *boven* de meting, en dat is geen
+inconsequentie: het is geen zwakker signaal dat door een sterker wordt
+overstemd, maar een uitspraak van een mens over de **betekenis** van de
+handeling, en die wint van elke meter.
+
+Achttien routes werden erdoor tegengehouden. `LEGACY` ging daardoor van 84 terug
+naar 101 — en dat is winst: een lager percentage met een register dat klopt, is
+meer waard dan een hoger percentage waarin de noodstop van de bank niets doet.
+Zestien ervan kregen daarna het contract dat ze wél verdienen (`PROTECTED`,
+gemeten na de reparatie).
+
+| | voor | na |
+|---|---:|---:|
+| dubbeltik opgevangen | 86 | **101** |
+| dubbeltik deed het werk opnieuw | 93 | **77** |
+| `PROTECTED` | 78 | **94** |
+| `LEGACY_PENDING_CLASSIFICATION` | 99 | **85** |
+| geclassificeerd | 4.554 | **4.568 van 4.653 (98,2%)** |
 
 ## 6. De poort
 

@@ -61,6 +61,9 @@ const dicht = (route, mutatieId, toegang) => [route, {
 const werkruimte = { klasse: 'OBJECT_SCOPED', objectVeld: 'werkruimte' };
 const gezin = { klasse: 'OBJECT_SCOPED', objectVeld: 'code' };
 const school = { klasse: 'OBJECT_SCOPED', objectVeld: 'schoolCode' };
+/* De bewaker staat op de router (officeAuth, boardroomAuth, auth, supplierAuth);
+   de identiteit staat dus al vast als de handler begint. */
+const kantoor = { klasse: 'AUTHENTICATED' };
 
 const CONTRACTEN = Object.fromEntries([
   dicht('POST /api/bank/pas/uitgeven', 'bank.pas.uitgeven',
@@ -89,7 +92,33 @@ const CONTRACTEN = Object.fromEntries([
       'toelating (test/bedrijfkern.test.js)' }),
   dicht('POST /api/bedrijf/werkruimte/maak', 'bedrijf.werkruimte.maak', { klasse: 'PUBLIC',
     waarom: 'een organisatie die nog geen werkruimte heeft, heeft ook nog geen sleutel; de maker ' +
-      'krijgt het beheer-token' })
+      'krijgt het beheer-token' }),
+
+  /* ---- de tweede ronde: het kantoorbord en wat erop lijkt ----
+
+     Schakelaars die een STAND zetten en een auditregel schrijven. Hier was de
+     dubbele tik geen dubbel DING maar een dubbele regel in het auditspoor van de
+     afdelingen, en dat spoor hoort te zeggen hoe vaak een MENS op de knop drukte.
+
+     LET OP WAT DEZE ROUTES ZIJN: de noodstop van de bank, de leden-bank live
+     zetten, een rekening bevriezen, een agent stoppen. Juist bij zulke knoppen is
+     "hoe vaak drukte iemand" geen boekhoudkundig detail. */
+  dicht('POST /api/office/bank/nood', 'office.bank.nood', kantoor),
+  dicht('POST /api/office/bank/herstel', 'office.bank.herstel', kantoor),
+  dicht('POST /api/office/bank/leden', 'office.bank.leden', kantoor),
+  dicht('POST /api/office/bank/operationeel', 'office.bank.operationeel', kantoor),
+  dicht('POST /api/office/bank/instellingen', 'office.bank.instellingen', kantoor),
+  dicht('POST /api/office/bank/autoriseer/annuleer', 'office.bank.autoriseer.annuleer', kantoor),
+  dicht('POST /api/office/bank/rekening/bevries', 'office.bank.rekening.bevries', kantoor),
+  dicht('POST /api/office/bank/mislukking', 'office.bank.mislukking', kantoor),
+  dicht('POST /api/command/agent/stop', 'command.agent.stop', kantoor),
+  dicht('POST /api/command/agent/hervat', 'command.agent.hervat', kantoor),
+  dicht('POST /api/command/agent/rechten', 'command.agent.rechten', kantoor),
+  dicht('POST /api/appstore/wis-opslag', 'appstore.wis-opslag', kantoor),
+  dicht('POST /api/supplier/mall/sync', 'supplier.mall.sync', kantoor),
+  dicht('POST /api/supplier/horeca/folio/nacht', 'supplier.horeca.folio.nacht', kantoor),
+  dicht('POST /api/member/lifestyle/gezondheid/dossier', 'member.lifestyle.gezondheid.dossier', kantoor),
+  dicht('POST /api/member/rechterhand/maison/log', 'member.rechterhand.maison.log', kantoor)
 ]);
 
 module.exports = { CONTRACTEN };

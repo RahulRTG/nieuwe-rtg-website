@@ -1,14 +1,14 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:40:40.821Z",
-  "commit": "9a146913",
+  "op": "2026-08-30T09:57:44.367Z",
+  "commit": "02adf894",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.",
  "grens": "Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar server/lib/mutatiecontracten.js -- een mens wint van een script.",
  "waardeloosVoor": "Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld op een hoop onder LEGACY.",
- "aantal": 3349,
+ "aantal": 3348,
  "contracten": {
   "POST /api/aandacht": {
    "mutatieId": "aandacht",
@@ -4052,7 +4052,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-bqn0o5\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-shzytu\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/command/beleid/zet": {
    "mutatieId": "command.beleid.zet",
@@ -4068,7 +4068,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-xm73bt\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-usyfdr\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/command/bijstand/betreed": {
    "mutatieId": "command.bijstand.betreed",
@@ -4228,7 +4228,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende functie: proef-55qrca\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende functie: proef-pouslr\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/command/canary/terug": {
    "mutatieId": "command.canary.terug",
@@ -4692,7 +4692,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Dat runbook bestaat niet: proef-bhif1t\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dat runbook bestaat niet: proef-0hhli7\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/command/stad": {
    "mutatieId": "command.stad",
@@ -7949,23 +7949,6 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Gesprek niet gevonden.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
-  },
-  "POST /api/foundation/markt/blokkeer": {
-   "mutatieId": "foundation.markt.blokkeer",
-   "herkomst": "afgeleid",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "toegang": {
-    "klasse": "OBJECT_SCOPED",
-    "objectVeld": "code"
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "afgetekend": {
-    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
-    "op": "2026-08-30"
-   },
-   "watErMoetKomen": "de route antwoordde 200 en de effectmeter telde een schrijfpoging (opslag=1), maar er veranderde niets in de gemeten collecties -- het proeflijf gaf hem geen bestaand object om op te werken. Geef hem er een in scripts/lib/idemwereld.js -- pas dan zegt een herhaling iets over zijn duplicaatgedrag."
   },
   "POST /api/foundation/markt/chat": {
    "mutatieId": "foundation.markt.chat",
@@ -40504,7 +40487,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-n74cbt\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-bkhuex\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/supplier/command/beleid/zet": {
    "mutatieId": "supplier.command.beleid.zet",
@@ -40520,7 +40503,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-et8q74\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Die regel bestaat niet: proef-ren5lq\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/supplier/command/object": {
    "mutatieId": "supplier.command.object",
@@ -40584,7 +40567,7 @@
     "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
     "op": "2026-08-30"
    },
-   "watErMoetKomen": "de proef kwam hier niet bij: \"Dat runbook bestaat niet: proef-bl2tum\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dat runbook bestaat niet: proef-p5p6l0\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/supplier/command/signaal/oppakken": {
    "mutatieId": "supplier.command.signaal.oppakken",

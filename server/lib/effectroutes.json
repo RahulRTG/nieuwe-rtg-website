@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 1015,
- "zonderWaargenomenDeur": 8,
+ "aantal": 1014,
+ "zonderWaargenomenDeur": 7,
  "routes": [
   {
    "route": "POST /api/aanmeld/start",
@@ -671,11 +671,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/command/puls",
-   "mutatieId": "command.puls",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/command/rechten",
    "mutatieId": "command.rechten",
    "toegang": "AUTHENTICATED"
@@ -1092,14 +1087,14 @@
    "objectVeld": "schoolCode"
   },
   {
-   "route": "POST /api/foundation/school/signalen",
-   "mutatieId": "foundation.school.signalen",
+   "route": "POST /api/foundation/school/school/overzicht",
+   "mutatieId": "foundation.school.school.overzicht",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
   {
-   "route": "POST /api/foundation/school/toestemming/overzicht",
-   "mutatieId": "foundation.school.toestemming.overzicht",
+   "route": "POST /api/foundation/school/signalen",
+   "mutatieId": "foundation.school.signalen",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
@@ -1175,11 +1170,6 @@
   {
    "route": "POST /api/geld/actielog",
    "mutatieId": "geld.actielog",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/geld/beleid",
-   "mutatieId": "geld.beleid",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -1510,6 +1500,11 @@
   {
    "route": "POST /api/mall/plekken",
    "mutatieId": "mall.plekken",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/mall/reis",
+   "mutatieId": "mall.reis",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -1993,6 +1988,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/member/rtmail/instellingen",
+   "mutatieId": "member.rtmail.instellingen",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/member/rtmail/journaal",
    "mutatieId": "member.rtmail.journaal",
    "toegang": "AUTHENTICATED"
@@ -2105,6 +2105,11 @@
   {
    "route": "POST /api/member/sport/plattegrond",
    "mutatieId": "member.sport.plattegrond",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/member/sport/sponsors",
+   "mutatieId": "member.sport.sponsors",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -3125,6 +3130,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/office/weefsel/simulaties",
+   "mutatieId": "office.weefsel.simulaties",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/office/weefsel/sociaalgrenzen",
    "mutatieId": "office.weefsel.sociaalgrenzen",
    "toegang": "AUTHENTICATED"
@@ -3270,6 +3280,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/overheid/kvk/mijn",
+   "mutatieId": "overheid.kvk.mijn",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/overheid/rijbewijs",
    "mutatieId": "overheid.rijbewijs",
    "toegang": "AUTHENTICATED"
@@ -3402,11 +3417,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/privacy/inzage",
-   "mutatieId": "privacy.inzage",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/punten",
    "mutatieId": "punten",
    "toegang": "AUTHENTICATED"
@@ -3528,11 +3538,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/rtfos/beleid",
-   "mutatieId": "rtfos.beleid",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/rtfos/boom",
    "mutatieId": "rtfos.boom",
    "toegang": "AUTHENTICATED"
@@ -3618,11 +3623,6 @@
   {
    "route": "POST /api/samen/weg",
    "mutatieId": "samen.weg",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/site/ai",
-   "mutatieId": "site.ai",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4115,11 +4115,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/supplier/horeca/missions/voorstel",
-   "mutatieId": "supplier.horeca.missions.voorstel",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/supplier/horeca/pas/gereed",
    "mutatieId": "supplier.horeca.pas.gereed",
    "toegang": "AUTHENTICATED"
@@ -4300,11 +4295,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/supplier/mode/bezorg/overzicht",
-   "mutatieId": "supplier.mode.bezorg.overzicht",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/supplier/mode/bezorg/route",
    "mutatieId": "supplier.mode.bezorg.route",
    "toegang": "AUTHENTICATED"
@@ -4445,6 +4435,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/supplier/retail/bon",
+   "mutatieId": "supplier.retail.bon",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/supplier/retour/lijst",
    "mutatieId": "supplier.retour.lijst",
    "toegang": "AUTHENTICATED"
@@ -4565,6 +4560,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/supplier/site/ai",
+   "mutatieId": "supplier.site.ai",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/supplier/site/genereer",
    "mutatieId": "supplier.site.genereer",
    "toegang": "AUTHENTICATED"
@@ -4647,11 +4647,6 @@
   {
    "route": "POST /api/supplier/verkoopweg/lijst",
    "mutatieId": "supplier.verkoopweg.lijst",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/supplier/vertaal",
-   "mutatieId": "supplier.vertaal",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4967,11 +4962,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/verkoop/mijn",
-   "mutatieId": "verkoop.mijn",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/verkoop/showroom",
    "mutatieId": "verkoop.showroom",
    "toegang": "AUTHENTICATED"
@@ -5044,6 +5034,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/wereld/profiel",
+   "mutatieId": "wereld.profiel",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/wereld/state",
    "mutatieId": "wereld.state",
    "toegang": "AUTHENTICATED"
@@ -5056,6 +5051,12 @@
   {
    "route": "POST /api/werkplek/bureau/architect",
    "mutatieId": "werkplek.bureau.architect",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/architect/portfolio",
+   "mutatieId": "werkplek.bureau.architect.portfolio",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "bedrijf"
   },
@@ -5154,11 +5155,6 @@
   {
    "route": "POST /api/werkvloer/tafels",
    "mutatieId": "werkvloer.tafels",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/zakelijk/feed",
-   "mutatieId": "zakelijk.feed",
    "toegang": "AUTHENTICATED"
   },
   {

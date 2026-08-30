@@ -39,6 +39,9 @@ const handlerpoorten = require('../server/kern/handlerpoorten');
 const contract = require('../server/kern/mutatiecontract');
 const { stempel } = require('./lib/stempel');
 const { PUBLIEK } = require('./lib/publiekeroutes');
+/* De routes met een duplicaatregel; zie het veto in de NOT_APPLICABLE-regel. */
+const duplicaatregel = new Set(Object.entries(
+  require('../server/lib/idemsleutels').SLEUTELS).filter(([, v]) => v && !v.leest).map(([k]) => k));
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'MUTATIECONTRACT.json');
@@ -398,6 +401,21 @@ function voorstelUitBewijs(m, sleutel) {
        Dus: heeft de effectmeter een METING, dan wint die van een vorm. Zwijgt
        hij (geen kop), dan blijft het veto onverkort staan -- dan is de analyse
        weer de enige die het gat afdekt. */
+    /* EEN DUPLICAATREGEL SLUIT NOT_APPLICABLE UIT. Wie een route in
+       lib/idemsleutels.js een duplicaatregel geeft, zegt daarmee dat een
+       herhaling WEL iets zou doen -- anders viel er niets te dedupliceren. Dat
+       is een uitspraak van een mens over de betekenis van de handeling, en die
+       wint van elke meter.
+
+       Zonder deze regel kwam /api/office/bank/nood -- de noodstop van de bank --
+       hier als "deze route verandert niets" uit: de proef had de stand in een
+       eerdere ronde al gezet, en een route waarvan de stand AL op de doelwaarde
+       staat ziet er voor beide meters uit als een route die nooit iets doet. */
+    if (duplicaatregel.has(sleutel)) {
+      return { voorstel: null, grond: 'deze route draagt een duplicaatregel in lib/idemsleutels.js; ' +
+        'dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten ' +
+        '-- de meters zagen niets omdat de stand al op de doelwaarde stond' };
+    }
     const sa = statisch.get(sleutel);
     if (sa && sa.schrijft === 'ja' && !kaalEffect) {
       return { voorstel: null, grond: 'TEGENSPRAAK: de opslagmeter zag niets, maar ' + sa.bestand +

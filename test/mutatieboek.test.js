@@ -195,3 +195,47 @@ test('de meting kan de belofte "elke mutatie heeft een bekende semantiek" niet o
   assert.ok(u.gemeten.metBesluitOverDuplicaat <= Object.keys(SLEUTELS).length,
     'er kunnen nooit meer besluiten zijn dan verklaringen in idemsleutels.js');
 });
+
+/* ============================================================================
+   DE RESTBAK STAAT OP NUL, EN DAT MAG NIET STIL TERUGGROEIEN.
+
+   NOG_NIET_GECLASSIFICEERD is de enige status die naar nul hoort, en hij staat
+   er. Zonder grendel groeit dat getal terug zodra iemand een schrijfroute
+   toevoegt: precies zoals IDEMSCHULD.json dat voor de verklaringen bewaakt.
+
+   WAAROM DEZE TOETS EEN VOORWAARDE HEEFT, en waarom dat geen ontsnapping is.
+   De classificatie leunt op twee gronden: de verklaring in idemsleutels.js, en
+   de METING in IDEMPROEF.json. Die tweede komt door een versheidspoort
+   (scripts/lib/idemmeting.js) die fail-closed is: op een vuile boom of een
+   oudere commit levert zij niets, en dan springt dit getal terug naar enkele
+   duizenden. Dat is geen defect maar het ontwerp -- liever een eerlijk hoog
+   getal dan een status op verouderd bewijs.
+
+   Een harde `=== 0` zou daarom rood staan bij elke ongecommitte wijziging, en
+   een toets die om de verkeerde reden rood staat leert iedereen hem weg te
+   kijken (LAT.md regel 9). De toets eist dus nul ZODRA de poort open staat, en
+   zegt anders waarom hij niets kan eisen -- dat is een uitspraak over de
+   opstelling en niet over de routes.
+
+   DE MUTATIE: haal een regel uit server/lib/idemsleutels-restbak.js en meet
+   opnieuw -> deze toets zakt.
+   ========================================================================== */
+test('geen enkele mutatie is onverklaard EN ongemeten (als de meting vers is)', () => {
+  const g = boek.gemeten;
+  if (!boek.bewijsgraad.metingGebruikt) {
+    /* Geen stille overslag: de reden hoort in de uitvoer te staan, zodat een
+       groene ronde zonder meting te onderscheiden is van een met meting. */
+    assert.ok(boek.bewijsgraad.metingReden && boek.bewijsgraad.metingReden.length > 20,
+      'een gesloten poort hoort te zeggen waarom, anders is groen niet te lezen');
+    return;
+  }
+  assert.equal(g.nogNietGeclassificeerd, 0,
+    'er staan ' + g.nogNietGeclassificeerd + ' mutaties zonder besluit en zonder waarneming; ' +
+    'elke nieuwe schrijfroute hoort een verklaring te krijgen in server/lib/idemsleutels*.js');
+});
+
+test('elke mutatie draagt precies een status, en de optelling sluit', () => {
+  const g = boek.gemeten;
+  assert.equal(g.statusSluit, true,
+    'de statussen tellen op tot ' + g.statusSom + ' en er zijn ' + g.mutaties + ' mutaties');
+});

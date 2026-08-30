@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:03:33.911Z",
-  "commit": "e7ac56a1",
+  "op": "2026-08-30T09:14:18.934Z",
+  "commit": "89a36fca",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -10,24 +10,24 @@
  "gemeten": {
   "routesTotaal": 4748,
   "mutaties": 4661,
-  "mutatiesVerklaard": 184,
-  "mutatiesOnverklaard": 4477,
+  "mutatiesVerklaard": 211,
+  "mutatiesOnverklaard": 4450,
   "beproefbaar": 3777,
-  "beproefbaarVerklaard": 173,
+  "beproefbaarVerklaard": 200,
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 27,
-  "metBesluitOverDuplicaat": 184,
-  "zonderBesluitOverDuplicaat": 4477,
+  "nogNietGeclassificeerd": 0,
+  "metBesluitOverDuplicaat": 211,
+  "zonderBesluitOverDuplicaat": 4450,
   "metGemetenDuplicaatgedrag": 1020,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit e7ac56a1, schone boom",
-  "metingGemetenOp": "2026-08-30T09:03:13.407Z",
+  "metingReden": "gemeten op commit 89a36fca, schone boom",
+  "metingGemetenOp": "2026-08-30T09:14:14.780Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -48,17 +48,8 @@
     ]
    },
    {
-    "id": "onbekend",
-    "aantal": 27,
-    "voorbeelden": [
-     "POST /api/bank/advies",
-     "POST /api/bank/afschrift",
-     "POST /api/bank/afschrift.csv"
-    ]
-   },
-   {
     "id": "verklaard",
-    "aantal": 184,
+    "aantal": 211,
     "voorbeelden": [
      "POST /api/office/bank/terugstorting",
      "POST /api/foundation/kosten",
@@ -156,7 +147,7 @@
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 173,
+   "aantal": 200,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -167,7 +158,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3604,
+   "aantal": 3577,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -180,7 +171,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1101,
+   "aantal": 1106,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -204,7 +195,7 @@
   {
    "id": "NIET_VAN_TOEPASSING",
    "uitleg": "Een POST die niets verandert. Er valt niets te dedupliceren.",
-   "aantal": 81,
+   "aantal": 103,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -240,14 +231,10 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 27,
+   "aantal": 0,
    "moetNaarNul": true,
    "semantiek": false,
-   "voorbeelden": [
-    "POST /api/bank/advies",
-    "POST /api/bank/afschrift",
-    "POST /api/bank/afschrift.csv"
-   ]
+   "voorbeelden": []
   }
  ],
  "zonderRolPerReden": [
@@ -369,7 +356,7 @@
    "veld": "schrijfroutes",
    "vastgelegd": 4661,
    "nu": 4661,
-   "vastgelegdOp": "2026-08-29",
+   "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "API-paden die niet GET zijn",
    "verschil": 0,
    "gelijk": true,

@@ -183,6 +183,8 @@
     "idemschuld:vast": "node scripts/idemschuld.js --vastleggen",
     "mutatieboek": "node scripts/mutatieboek.js",
     "mutatieboek:vast": "node scripts/mutatieboek.js --vastleggen",
+    "handlerwacht": "node scripts/handlerwacht.js",
+    "handlerwacht:vast": "node scripts/handlerwacht.js --vastleggen",
     "handelingproef": "node scripts/handelingproef-route.js",
     "meetronde": "node scripts/meetronde.js",
     "meetronde:snel": "node scripts/meetronde.js --snel",

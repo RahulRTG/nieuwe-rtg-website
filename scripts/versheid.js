@@ -85,7 +85,8 @@ const REGISTERS = [
      juist daar doet veroudering pijn: een schuldgetal van vorige maand naast een
      routelijst van vandaag leest als vooruitgang. */
   ['IDEMSCHULD.json', 'npm run idemschuld:vast', 'welke schrijfroutes nog geen besluit over duplicaatgedrag dragen'],
-  ['MUTATIEBOEK.json', 'npm run mutatieboek:vast', 'in welke bak elke route valt, en of de optelling sluit']
+  ['MUTATIEBOEK.json', 'npm run mutatieboek:vast', 'in welke bak elke route valt, en of de optelling sluit'],
+  ['HANDLERWACHT.json', 'npm run handlerwacht:vast', 'wie de routes bewaakt waar de router geen bewakerslaag ziet']
 ];
 
 /* Het stempel van een register. Twee vormen, en dat is historie en geen smaak:

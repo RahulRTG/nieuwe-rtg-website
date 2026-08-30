@@ -1,0 +1,3980 @@
+{
+ "stempel": {
+  "op": "2026-08-30T04:03:55.449Z",
+  "commit": "d1a1d99d",
+  "boomVuil": true,
+  "node": "v22.22.2"
+ },
+ "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
+ "gemeten": {
+  "zonderBewakerslaag": 612,
+  "bewaakt": 488,
+  "openbaarMetReden": 46,
+  "eigenControle": 15,
+  "sleutelDoorgegeven": 12,
+  "zonderWachtMetReden": 8,
+  "laat": 0,
+  "onbewaakt": 0,
+  "nietGelezen": 43,
+  "gezagsfuncties": 26,
+  "publiekeLijstenVerschillen": 89
+ },
+ "tweePubliekeLijsten": {
+  "alleenInPoortwacht": [
+   "/api/sso/terug",
+   "/api/sso/wissel",
+   "/api/auth/reset",
+   "/api/auth/resend",
+   "/api/aanmeld/zeg",
+   "/api/foundation/school/school/maak",
+   "/api/account/start",
+   "/api/salon/promo",
+   "/api/config",
+   "/api/i18n",
+   "/api/metrics",
+   "/api/metrics/kort",
+   "/api/sat/ping",
+   "/api/foundation/health",
+   "/api/foundation/impact",
+   "/api/foundation/tip",
+   "/api/foundation/bespaartip",
+   "/api/foundation/gesprekskaart",
+   "/api/foundation/les/maak",
+   "/api/doos/rapport"
+  ],
+  "alleenInDeKeuring": [
+   "/api/mail/ses",
+   "/api/webauthn/login",
+   "/api/pin/herstel",
+   "/api/foundation/registratie/aanvragen",
+   "/api/foundation/registratie/status",
+   "/api/aanmelding/bewijs",
+   "/api/gast/tafel",
+   "/api/gast/aanschuiven",
+   "/api/arrival/request",
+   "/api/supplier/apply",
+   "/api/supplier/staff/join",
+   "/api/werving/kijk",
+   "/api/rtgid/start",
+   "/api/kantoor/gesprek/zeg",
+   "/api/bedrijf/lid/aanmeld",
+   "/api/rtf/club/portaal",
+   "/api/rtf/club/bericht",
+   "/api/rtf/partner/raad",
+   "/api/lab2/mijn",
+   "/api/lab2/mijn/observatie",
+   "/api/lab2/mijn/reflectie",
+   "/api/lab2/mijn/terugtrekken",
+   "/api/lab2/bewoner/themas",
+   "/api/lab2/bewoner/thema",
+   "/api/lab2/bewoner/stem",
+   "/api/lab2/bewoner/overzicht",
+   "/api/lab2/bewoner/studie",
+   "/api/lab2/bewoner/klacht",
+   "/api/lab2/bewoner/paspoort",
+   "/api/lab2/bewoner/paspoort-maak",
+   "/api/rtfos/portaal/partner",
+   "/api/rtfos/portaal/gemeente",
+   "/api/rtfos/portaal/ondernemer",
+   "/api/rtfos/portaal/vrijwilliger",
+   "/api/rtfos/portaal/vrijwilliger/zet",
+   "/api/rtfos/portaal/vrijwilliger/uren",
+   "/api/rtfos/portaal/deelnemer",
+   "/api/rtfos/portaal/deelnemer/intrekken",
+   "/api/rtfos/publiek/stad",
+   "/api/rtfos/portaal/donateur",
+   "/api/rtfos/portaal/donateur/bewijs",
+   "/api/claims",
+   "/api/betaaldiensttarief",
+   "/api/sociaalbeleid",
+   "/api/krant/open",
+   "/api/krant/artikel",
+   "/api/partner",
+   "/api/book",
+   "/api/reis/uitnodiging/open",
+   "/api/projectie/:code",
+   "/api/supplier/roster",
+   "/api/betaal/webhook/mollie",
+   "/api/cluster/:actie",
+   "/api/werkmail/bezorg",
+   "/api/mail/binnen",
+   "/api/stad/doos/hartslag",
+   "/api/stad/doos/meting",
+   "/api/rtgid/status",
+   "/api/rtgid/wie",
+   "/api/vracht/volg",
+   "/api/les/maak",
+   "/api/les/leraar",
+   "/api/les/volgende",
+   "/api/les/sluit",
+   "/api/les/mee",
+   "/api/les/kijk",
+   "/api/les/antwoord",
+   "/api/test/bug",
+   "/api/test/crash"
+  ]
+ },
+ "klachten": [],
+ "perWacht": [
+  {
+   "naam": "werkPoort",
+   "aantal": 92
+  },
+  {
+   "naam": "poort",
+   "aantal": 86
+  },
+  {
+   "naam": "familieVan",
+   "aantal": 60
+  },
+  {
+   "naam": "klasVan",
+   "aantal": 55
+  },
+  {
+   "naam": "gezinSessie",
+   "aantal": 37
+  },
+  {
+   "naam": "rtfSociaal",
+   "aantal": 28
+  },
+  {
+   "naam": "profiel",
+   "aantal": 25
+  },
+  {
+   "naam": "gezinVan",
+   "aantal": 14
+  },
+  {
+   "naam": "personeelVan",
+   "aantal": 13
+  },
+  {
+   "naam": "schoolVan",
+   "aantal": 11
+  },
+  {
+   "naam": "lesVan",
+   "aantal": 10
+  },
+  {
+   "naam": "beheerVan",
+   "aantal": 9
+  },
+  {
+   "naam": "viaBeheerOfDirectie",
+   "aantal": 9
+  },
+  {
+   "naam": "sessieVan",
+   "aantal": 7
+  },
+  {
+   "naam": "samenSess",
+   "aantal": 6
+  },
+  {
+   "naam": "sessie",
+   "aantal": 5
+  },
+  {
+   "naam": "mijn -> personeelVan",
+   "aantal": 5
+  },
+  {
+   "naam": "rtf.verifieerProfiel",
+   "aantal": 5
+  },
+  {
+   "naam": "doosSleutelOk",
+   "aantal": 4
+  },
+  {
+   "naam": "lidVan",
+   "aantal": 3
+  },
+  {
+   "naam": "appSessie",
+   "aantal": 2
+  },
+  {
+   "naam": "wieScant",
+   "aantal": 2
+  }
+ ],
+ "gezag": [
+  {
+   "naam": "rtf.verifieerProfiel",
+   "argReq": false,
+   "waar": "server/kern/rtf.js",
+   "stelt": "gezinscode plus profieltoken uit het lijf: dit is dit profiel van dit gezin"
+  },
+  {
+   "naam": "verifieerProfiel",
+   "argReq": false,
+   "waar": "server/kern/rtf.js",
+   "stelt": "zelfde functie, aangeroepen zonder de rtf-prefix"
+  },
+  {
+   "naam": "werkPoort",
+   "argReq": false,
+   "waar": "server/bedrijf/",
+   "stelt": "de werkruimtesleutel: dit lid hoort bij deze werkruimte en mag deze handeling"
+  },
+  {
+   "naam": "profielVan",
+   "argReq": false,
+   "waar": "server/foundation.js",
+   "stelt": "het profiel binnen het gezin, aan de hand van het token uit het verzoek"
+  },
+  {
+   "naam": "gezinVan",
+   "argReq": true,
+   "waar": "server/foundation.js",
+   "stelt": "het gezin achter de code in het lijf"
+  },
+  {
+   "naam": "sessieVan",
+   "argReq": true,
+   "waar": "server/foundation.js",
+   "stelt": "gezin plus profiel: de foundation-sessie uit het lijf"
+  },
+  {
+   "naam": "familieVan",
+   "argReq": true,
+   "waar": "server/foundation.js",
+   "stelt": "zelfde sessie, maar een gast (oppas, opa, familie) wordt geweigerd -- voor privezaken van het gezin"
+  },
+  {
+   "naam": "sessie",
+   "argReq": true,
+   "waar": "server/foundation/leden-mail.js",
+   "stelt": "sessieVan plus de eis dat het geen gast is; lokale naam in de mailmodule"
+  },
+  {
+   "naam": "lesVan",
+   "argReq": true,
+   "waar": "server/foundation/onderwijs/",
+   "stelt": "de les uit het lijf EN of deze sessie er toegang toe heeft"
+  },
+  {
+   "naam": "docentCheck",
+   "argReq": false,
+   "waar": "server/foundation/onderwijs/",
+   "stelt": "of de aanroeper de docent van deze les is"
+  },
+  {
+   "naam": "adultCheck",
+   "argReq": false,
+   "waar": "server/foundation/",
+   "stelt": "of er een volwassene achter deze sessie zit"
+  },
+  {
+   "naam": "rtfSociaal",
+   "argReq": true,
+   "waar": "server/routes/social.js",
+   "stelt": "het gezinsprofiel, met gasten geweigerd -- de sociale kant van de RTFoundation"
+  },
+  {
+   "naam": "profiel",
+   "argReq": true,
+   "waar": "server/routes/rtfschool.js, server/routes/geloofbieb.js",
+   "stelt": "het gezinsprofiel uit code plus token; lokale naam in twee routebestanden"
+  },
+  {
+   "naam": "samenSess",
+   "argReq": true,
+   "waar": "server/routes/rtfschool.js",
+   "stelt": "de sessie voor het samen-deel van RTF School"
+  },
+  {
+   "naam": "poort",
+   "argReq": true,
+   "waar": "server/school/rollen.js",
+   "stelt": "school plus personeelstoken of directietoken, met het gevraagde RECHT erbij"
+  },
+  {
+   "naam": "klasVan",
+   "argReq": true,
+   "waar": "server/school/poorten.js",
+   "stelt": "de klas uit het lijf en of dit token er de leraar, een teamlid of de waarnemer van is"
+  },
+  {
+   "naam": "personeelVan",
+   "argReq": true,
+   "waar": "server/school/poorten.js",
+   "stelt": "het schoolpersoneelslid achter het token"
+  },
+  {
+   "naam": "gezinSessie",
+   "argReq": true,
+   "waar": "server/school/poorten.js",
+   "stelt": "de gezinssessie zoals de schoolkant hem kent"
+  },
+  {
+   "naam": "schoolVan",
+   "argReq": true,
+   "waar": "server/school/",
+   "stelt": "de school uit het lijf met de toets of deze sessie erbij hoort"
+  },
+  {
+   "naam": "personeelToegang",
+   "argReq": false,
+   "waar": "server/school/personeelstoegang.js",
+   "stelt": "de toegang van een schoolmedewerker"
+  },
+  {
+   "naam": "doosSleutelOk",
+   "argReq": true,
+   "waar": "server/routes/doos.js",
+   "stelt": "de gedeelde sleutel van een zaakdoos: dit verzoek komt van de doos zelf"
+  },
+  {
+   "naam": "wieScant",
+   "argReq": true,
+   "waar": "server/kern/link/wie.js",
+   "stelt": "wie er scant: de sessie achter het token in de kop, of niets"
+  },
+  {
+   "naam": "appSessie",
+   "argReq": true,
+   "waar": "server/kern/link/wie.js",
+   "stelt": "dezelfde functie onder de naam die routes/code.js hem geeft"
+  },
+  {
+   "naam": "lidVan",
+   "argReq": true,
+   "waar": "server/bedrijf/",
+   "stelt": "het lid van de werkruimte achter de sleutel in het lijf"
+  },
+  {
+   "naam": "viaBeheerOfDirectie",
+   "argReq": true,
+   "waar": "server/routes/tenant/poort.js",
+   "stelt": "of dit verzoek van het beheer of de directie van de werkruimte komt"
+  },
+  {
+   "naam": "beheerVan",
+   "argReq": false,
+   "waar": "server/kern/office/samen.js",
+   "stelt": "de beheerder achter een gedeeld dossier"
+  }
+ ],
+ "zonderWacht": {
+  "POST /api/foundation/gezin/maak": "een gezin aanmaken kan per definitie niet achter een gezinssessie; er is een rem per IP-adres (8 per half uur)",
+  "POST /api/foundation/gezin/uitnodiging/bekijk": "de uitnodigingscode uit het lijf IS de geloofsbrief; een onbekende of verlopen code geeft 404 en verklapt niets",
+  "POST /api/foundation/gezin/uitnodiging/accepteer": "zelfde code, zelfde reden; accepteren verbruikt hem eenmalig",
+  "POST /api/foundation/school/personeel/uitnodiging/bekijk": "de personeelsuitnodiging uit het lijf is de geloofsbrief, met een rem per IP-adres erop",
+  "POST /api/foundation/school/personeel/uitnodiging/accepteer": "zelfde uitnodiging; accepteren verbruikt hem eenmalig",
+  "POST /api/foundation/les/maak": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen",
+  "POST /api/foundation/reis/aanvraag": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit",
+  "POST /api/foundation/school/school/maak": "alleen in NODE_ENV=test; in productie geeft hij 410 en verwijst naar de registratiebalie"
+ },
+ "perRoute": [
+  {
+   "sleutel": "POST /api/aanmeld/start",
+   "bestand": "server/routes/aanmeldgesprek.js:57",
+   "staat": "openbaar",
+   "reden": "het aanmeldgesprek begint voor er een account is; rem van 40 berichten per minuut per ip"
+  },
+  {
+   "sleutel": "POST /api/aanmeld/zeg",
+   "bestand": "server/routes/aanmeldgesprek.js:64",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/aanmelding/aanvraag",
+   "bestand": "server/routes/aanmeldingen.js:39",
+   "staat": "openbaar",
+   "reden": "een aanstaande aanvrager is nog geen lid (met rem per ip)"
+  },
+  {
+   "sleutel": "POST /api/aanmelding/bewijs",
+   "bestand": "server/routes/aanmeldingen.js:83",
+   "staat": "openbaar",
+   "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
+  },
+  {
+   "sleutel": "POST /api/auth/forgot",
+   "bestand": "server/routes/auth/herstel.js:104",
+   "staat": "openbaar",
+   "reden": "wachtwoord vergeten: wie buitengesloten is heeft geen token"
+  },
+  {
+   "sleutel": "POST /api/auth/login",
+   "bestand": "server/routes/auth/inlog.js:26",
+   "staat": "openbaar",
+   "reden": "dit IS de deur: wie inlogt heeft nog geen sessie; drie remmen, een vertraging bij een belaagd account en het beveiligingsjournaal beschermen hem"
+  },
+  {
+   "sleutel": "POST /api/auth/register",
+   "bestand": "server/routes/auth/account.js:9",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/auth/reset",
+   "bestand": "server/routes/auth/herstel.js:126",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/auth/verify-email",
+   "bestand": "server/routes/auth/account.js:69",
+   "staat": "openbaar",
+   "reden": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/apparaat/innemen",
+   "bestand": "server/bedrijf/it.js:66",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/apparaat/uitgeven",
+   "bestand": "server/bedrijf/it.js:51",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/apparaat/zet",
+   "bestand": "server/bedrijf/it.js:33",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/apparaten",
+   "bestand": "server/bedrijf/it.js:77",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/beeld",
+   "bestand": "server/bedrijf/beeld.js:116",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/advies",
+   "bestand": "server/bedrijf/besluit.js:63",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/evaluatie",
+   "bestand": "server/bedrijf/geheugen.js:111",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/geheugen",
+   "bestand": "server/bedrijf/geheugenlezen.js:48",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/maak",
+   "bestand": "server/bedrijf/besluit.js:42",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/raakt",
+   "bestand": "server/bedrijf/geheugen.js:60",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/raakt-terug",
+   "bestand": "server/bedrijf/geheugen.js:94",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/sluit",
+   "bestand": "server/bedrijf/besluit.js:110",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/stem",
+   "bestand": "server/bedrijf/besluit.js:92",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluit/stemronde",
+   "bestand": "server/bedrijf/besluit.js:77",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluiten",
+   "bestand": "server/bedrijf/besluitlijst.js:29",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/besluiten/zonder-koppeling",
+   "bestand": "server/bedrijf/geheugenlezen.js:97",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/contract/opzeggen",
+   "bestand": "server/bedrijf/contract.js:110",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/contract/teken",
+   "bestand": "server/bedrijf/contract.js:84",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/contract/zet",
+   "bestand": "server/bedrijf/contract.js:39",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/contracten",
+   "bestand": "server/bedrijf/contract.js:128",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/dagbeeld",
+   "bestand": "server/bedrijf/gezondheid.js:100",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/dossier",
+   "bestand": "server/bedrijf/inzicht.js:112",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/geconsolideerd",
+   "bestand": "server/bedrijf/beeld.js:125",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/gevolg",
+   "bestand": "server/bedrijf/gevolg.js:151",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/gezondheid",
+   "bestand": "server/bedrijf/gezondheid.js:89",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/handeling/bonnen",
+   "bestand": "server/bedrijf/handeling.js:188",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/handeling/doe",
+   "bestand": "server/bedrijf/handeling.js:124",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/handeling/plan",
+   "bestand": "server/bedrijf/handeling.js:80",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/herkomst",
+   "bestand": "server/bedrijf/herkomst.js:128",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/herkomst/zet",
+   "bestand": "server/bedrijf/herkomst.js:86",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/indienst",
+   "bestand": "server/bedrijf/indienst.js:87",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/indienst/stap",
+   "bestand": "server/bedrijf/indienst.js:100",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/issue/maak",
+   "bestand": "server/bedrijf/bouw.js:63",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/issue/stand",
+   "bestand": "server/bedrijf/bouw.js:92",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/journaal",
+   "bestand": "server/bedrijf/rollen.js:133",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kans/fase",
+   "bestand": "server/bedrijf/klant.js:120",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kans/maak",
+   "bestand": "server/bedrijf/klant.js:103",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kennis/controlelijst",
+   "bestand": "server/bedrijf/kennis.js:126",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kennis/lees",
+   "bestand": "server/bedrijf/kennis.js:98",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kennis/nagekeken",
+   "bestand": "server/bedrijf/kennis.js:85",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kennis/schrijf",
+   "bestand": "server/bedrijf/kennis.js:46",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/kennis/zoek",
+   "bestand": "server/bedrijf/kennis.js:110",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/keur",
+   "bestand": "server/bedrijf/regelpoort.js:96",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/keuring",
+   "bestand": "server/bedrijf/regelpoort.js:134",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/klant",
+   "bestand": "server/bedrijf/klant.js:87",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/klant/product",
+   "bestand": "server/bedrijf/klant.js:71",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/klant/zet",
+   "bestand": "server/bedrijf/klant.js:46",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/koppeling",
+   "bestand": "server/bedrijf/aansluiting.js:62",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/leden",
+   "bestand": "server/bedrijf/leden.js:63",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/licentie/toewijzen",
+   "bestand": "server/bedrijf/it.js:101",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/licentie/zet",
+   "bestand": "server/bedrijf/it.js:87",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/licenties",
+   "bestand": "server/bedrijf/it.js:119",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/lid/aanmeld",
+   "bestand": "server/bedrijf/leden.js:17",
+   "staat": "openbaar",
+   "reden": "aanmelden bij een werkruimte kan zonder sleutel -- het token dat je krijgt werkt pas na toelating (test/bedrijfkern.test.js)"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/lid/besluit",
+   "bestand": "server/bedrijf/leden.js:31",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/lid/ontkoppel",
+   "bestand": "server/bedrijf/aansluiting.js:54",
+   "staat": "bewaakt",
+   "wacht": "lidVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/lid/rollen",
+   "bestand": "server/bedrijf/rollen.js:85",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/lid/uit-dienst",
+   "bestand": "server/bedrijf/leden.js:49",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/mijn-rechten",
+   "bestand": "server/bedrijf/rollen.js:122",
+   "staat": "bewaakt",
+   "wacht": "lidVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/mijnwerk",
+   "bestand": "server/bedrijf/mijnwerk.js:36",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/pijplijn",
+   "bestand": "server/bedrijf/klant.js:147",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project",
+   "bestand": "server/bedrijf/project.js:150",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project/maak",
+   "bestand": "server/bedrijf/project.js:65",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project/mijlpaal",
+   "bestand": "server/bedrijf/project.js:122",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project/risico",
+   "bestand": "server/bedrijf/project.js:135",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project/waarom",
+   "bestand": "server/bedrijf/waarom.js:77",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/project/wijzig",
+   "bestand": "server/bedrijf/project.js:99",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/regel/weg",
+   "bestand": "server/bedrijf/regels.js:136",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/regel/zet",
+   "bestand": "server/bedrijf/regels.js:78",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/regels",
+   "bestand": "server/bedrijf/regels.js:125",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/release/maak",
+   "bestand": "server/bedrijf/bouw.js:110",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/release/terug",
+   "bestand": "server/bedrijf/bouw.js:145",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/releases",
+   "bestand": "server/bedrijf/bouw.js:158",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/repo/zet",
+   "bestand": "server/bedrijf/bouw.js:44",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/rollen",
+   "bestand": "server/bedrijf/rollen.js:78",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/samenhang",
+   "bestand": "server/bedrijf/inzicht-graaf.js:32",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/service/beeld",
+   "bestand": "server/bedrijf/storing.js:65",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/start",
+   "bestand": "server/bedrijf/start.js:81",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/storing/evalueer",
+   "bestand": "server/bedrijf/storing.js:48",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/storing/koppel",
+   "bestand": "server/bedrijf/storing.js:36",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/storing/meld",
+   "bestand": "server/bedrijf/storing.js:23",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/taak/kolom",
+   "bestand": "server/bedrijf/taak.js:76",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/taak/maak",
+   "bestand": "server/bedrijf/taak.js:30",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/taak/uren",
+   "bestand": "server/bedrijf/taak.js:97",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/taak/wacht-op",
+   "bestand": "server/bedrijf/taak.js:55",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/taken",
+   "bestand": "server/bedrijf/taak.js:112",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/ticket/maak",
+   "bestand": "server/bedrijf/service.js:61",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/ticket/reageer",
+   "bestand": "server/bedrijf/service.js:81",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/ticket/sluit",
+   "bestand": "server/bedrijf/service.js:95",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/ticket/waardeer",
+   "bestand": "server/bedrijf/storing.js:88",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/toen",
+   "bestand": "server/bedrijf/toen.js:65",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/toen/object",
+   "bestand": "server/bedrijf/toen.js:102",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitdienst",
+   "bestand": "server/bedrijf/uitdienst.js:41",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitdienst/stap",
+   "bestand": "server/bedrijf/uitdienst.js:61",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/uitval",
+   "bestand": "server/bedrijf/uitval.js:44",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/verloop",
+   "bestand": "server/bedrijf/toen.js:135",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/vlag/weg",
+   "bestand": "server/bedrijf/vlag.js:65",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/vlag/zet",
+   "bestand": "server/bedrijf/vlag.js:23",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/vlaggen",
+   "bestand": "server/bedrijf/vlag.js:55",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/wandel",
+   "bestand": "server/bedrijf/inzicht-graaf.js:47",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte",
+   "bestand": "server/bedrijf/index.js:92",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/werkruimte/maak",
+   "bestand": "server/bedrijf/index.js:70",
+   "staat": "openbaar",
+   "reden": "een organisatie die nog geen werkruimte heeft, heeft ook nog geen sleutel; de maker krijgt het beheer-token"
+  },
+  {
+   "sleutel": "POST /api/bedrijf/zoek",
+   "bestand": "server/bedrijf/inzicht.js:93",
+   "staat": "bewaakt",
+   "wacht": "werkPoort"
+  },
+  {
+   "sleutel": "POST /api/betaaldiensttarief",
+   "bestand": "server/routes/kantoren/geld.js:31",
+   "staat": "openbaar",
+   "reden": "het betaaldiensttarief staat in de partnervoorwaarden"
+  },
+  {
+   "sleutel": "POST /api/book",
+   "bestand": "server/routes/member/partnerkanaal.js:20",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/claims",
+   "bestand": "server/routes/kantoren/geld.js:59",
+   "staat": "openbaar",
+   "reden": "de publieke claims voeden de voorwaardenpagina's, die je zonder inlog leest"
+  },
+  {
+   "sleutel": "POST /api/cluster/:actie",
+   "bestand": "server/server.js:869",
+   "staat": "openbaar",
+   "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
+  },
+  {
+   "sleutel": "POST /api/code/dyn",
+   "bestand": "server/routes/code.js:30",
+   "staat": "bewaakt",
+   "wacht": "appSessie"
+  },
+  {
+   "sleutel": "POST /api/code/scan",
+   "bestand": "server/routes/code.js:42",
+   "staat": "bewaakt",
+   "wacht": "appSessie"
+  },
+  {
+   "sleutel": "POST /api/doos/buurmelding",
+   "bestand": "server/routes/doos.js:140",
+   "staat": "bewaakt",
+   "wacht": "doosSleutelOk"
+  },
+  {
+   "sleutel": "POST /api/doos/meting",
+   "bestand": "server/routes/doos.js:64",
+   "staat": "bewaakt",
+   "wacht": "doosSleutelOk"
+  },
+  {
+   "sleutel": "POST /api/doos/rapport",
+   "bestand": "server/routes/doos.js:149",
+   "staat": "bewaakt",
+   "wacht": "doosSleutelOk"
+  },
+  {
+   "sleutel": "POST /api/doos/update/status",
+   "bestand": "server/routes/doos.js:120",
+   "staat": "bewaakt",
+   "wacht": "doosSleutelOk"
+  },
+  {
+   "sleutel": "POST /api/foundation/agenda",
+   "bestand": "server/foundation/onderwijs/schrift.js:65",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/agenda/verwijder",
+   "bestand": "server/foundation/onderwijs/schrift.js:73",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/ai",
+   "bestand": "server/foundation/onderwijs/schrift.js:83",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/bord/stroke",
+   "bestand": "server/foundation/onderwijs/les.js:55",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/bord/undo",
+   "bestand": "server/foundation/onderwijs/les.js:75",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/bord/wis",
+   "bestand": "server/foundation/onderwijs/les.js:71",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/agenda",
+   "bestand": "server/foundation/gasten/gezinsleven.js:22",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/agenda/bereik",
+   "bestand": "server/foundation/gasten/gezinsleven.js:54",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/agenda/verwijder",
+   "bestand": "server/foundation/gasten/gezinsleven.js:86",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/agenda/wijzig",
+   "bestand": "server/foundation/gasten/gezinsleven.js:37",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/bel",
+   "bestand": "server/foundation/berichten.js:84",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/bericht",
+   "bestand": "server/foundation/gezin.js:126",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/bericht/gelezen",
+   "bestand": "server/foundation/gezin.js:154",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/chat",
+   "bestand": "server/foundation/berichten.js:45",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/droom/behaald",
+   "bestand": "server/foundation/vooruit.js:67",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/droom/maak",
+   "bestand": "server/foundation/vooruit.js:47",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/droom/moedig",
+   "bestand": "server/foundation/vooruit.js:57",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/droom/verwijder",
+   "bestand": "server/foundation/vooruit.js:77",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/geldschool",
+   "bestand": "server/foundation/gasten/geldschool.js:29",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/geldschool/verzilver",
+   "bestand": "server/foundation/gasten/geldschool.js:60",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/geldschool/weekgeld",
+   "bestand": "server/foundation/gasten/geldschool.js:44",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak",
+   "bestand": "server/foundation/gasten/gezondheid.js:77",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/afspraak/verwijder",
+   "bestand": "server/foundation/gasten/gezondheid.js:90",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn",
+   "bestand": "server/foundation/gasten/gezondheid.js:47",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/gegeven",
+   "bestand": "server/foundation/gasten/gezondheid.js:65",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/medicijn/verwijder",
+   "bestand": "server/foundation/gasten/gezondheid.js:58",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/meting",
+   "bestand": "server/foundation/gasten/gezondheid.js:99",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/gezondheid/meting/verwijder",
+   "bestand": "server/foundation/gasten/gezondheid.js:113",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/inloggen",
+   "bestand": "server/foundation/gezinstoegang.js:7",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/idee",
+   "bestand": "server/foundation/gasten/keuken.js:49",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst",
+   "bestand": "server/foundation/gasten/keuken.js:59",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/af",
+   "bestand": "server/foundation/gasten/keuken.js:71",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/opruim",
+   "bestand": "server/foundation/gasten/keuken.js:85",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/lijst/verwijder",
+   "bestand": "server/foundation/gasten/keuken.js:79",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/menu",
+   "bestand": "server/foundation/gasten/keuken.js:32",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/menu/wis",
+   "bestand": "server/foundation/gasten/keuken.js:43",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/vast",
+   "bestand": "server/foundation/gasten/keuken.js:93",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/keuken/vast/verwijder",
+   "bestand": "server/foundation/gasten/keuken.js:102",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/klus",
+   "bestand": "server/foundation/gasten/gezinsleven.js:106",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/klus/gedaan",
+   "bestand": "server/foundation/gasten/gezinsleven.js:119",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/klus/keur",
+   "bestand": "server/foundation/gasten/gezinsleven.js:129",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/klus/verwijder",
+   "bestand": "server/foundation/gasten/gezinsleven.js:140",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/locatie",
+   "bestand": "server/foundation/zorg.js:15",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/locatie/stop",
+   "bestand": "server/foundation/zorg.js:36",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/maak",
+   "bestand": "server/foundation/gezin.js:8",
+   "staat": "zonderWachtMetReden",
+   "reden": "een gezin aanmaken kan per definitie niet achter een gezinssessie; er is een rem per IP-adres (8 per half uur)"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/ochtend/stap",
+   "bestand": "server/foundation/gasten/ochtend.js:48",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/ochtend/stap/verwijder",
+   "bestand": "server/foundation/gasten/ochtend.js:61",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/ochtend/vink",
+   "bestand": "server/foundation/gasten/ochtend.js:72",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/oppasinfo",
+   "bestand": "server/foundation/zorg.js:65",
+   "staat": "bewaakt",
+   "wacht": "sessieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/profiel/kies",
+   "bestand": "server/foundation/gezinstoegang.js:33",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/profiel/maak",
+   "bestand": "server/foundation/gezin.js:48",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/profiel/verwijder",
+   "bestand": "server/foundation/gezin.js:114",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/profiel/wijzig",
+   "bestand": "server/foundation/gezin.js:78",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/sollicitaties",
+   "bestand": "server/foundation/sollicitaties.js:34",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/spaardoel/bijdrage",
+   "bestand": "server/foundation/vooruit.js:21",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/spaardoel/maak",
+   "bestand": "server/foundation/vooruit.js:9",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/spaardoel/verwijder",
+   "bestand": "server/foundation/vooruit.js:35",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/uitnodiging/accepteer",
+   "bestand": "server/foundation/gezinsuitnodiging.js:127",
+   "staat": "zonderWachtMetReden",
+   "reden": "zelfde code, zelfde reden; accepteren verbruikt hem eenmalig"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/uitnodiging/bekijk",
+   "bestand": "server/foundation/gezinsuitnodiging.js:126",
+   "staat": "zonderWachtMetReden",
+   "reden": "de uitnodigingscode uit het lijf IS de geloofsbrief; een onbekende of verlopen code geeft 404 en verklapt niets"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/uitnodiging/intrek",
+   "bestand": "server/foundation/gezinsuitnodiging.js:125",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/uitnodiging/maak",
+   "bestand": "server/foundation/gezinsuitnodiging.js:123",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/uitnodigingen",
+   "bestand": "server/foundation/gezinsuitnodiging.js:124",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/persoon",
+   "bestand": "server/foundation/gasten/verjaardagen.js:31",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/persoon/verwijder",
+   "bestand": "server/foundation/gasten/verjaardagen.js:48",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/potje/bijdrage",
+   "bestand": "server/foundation/gasten/verjaardagen.js:98",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/potje/doel",
+   "bestand": "server/foundation/gasten/verjaardagen.js:111",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/wens",
+   "bestand": "server/foundation/gasten/verjaardagen.js:61",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/wens/claim",
+   "bestand": "server/foundation/gasten/verjaardagen.js:79",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/verjaardag/wens/verwijder",
+   "bestand": "server/foundation/gasten/verjaardagen.js:73",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/wissen",
+   "bestand": "server/foundation/zorg.js:92",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/wissen/bevestig",
+   "bestand": "server/foundation/zorg.js:99",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/gezin/wissen/intrekken",
+   "bestand": "server/foundation/zorg.js:107",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/hulp/ai",
+   "bestand": "server/foundation/buddy.js:27",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/kosten",
+   "bestand": "server/foundation/kosten.js:29",
+   "staat": "bewaakt",
+   "wacht": "gezinVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/join",
+   "bestand": "server/foundation/onderwijs/les.js:17",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/les/maak",
+   "bestand": "server/foundation/onderwijs/les.js:10",
+   "staat": "zonderWachtMetReden",
+   "reden": "een les openen is als een kamer openen: wie hem maakt krijgt de docenttoken terug, en zonder lescode komt er niemand binnen"
+  },
+  {
+   "sleutel": "POST /api/foundation/mail/inbox",
+   "bestand": "server/foundation/leden-mail.js:45",
+   "staat": "bewaakt",
+   "wacht": "sessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/mail/lees",
+   "bestand": "server/foundation/leden-mail.js:55",
+   "staat": "bewaakt",
+   "wacht": "sessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/mail/overzicht",
+   "bestand": "server/foundation/leden-mail.js:36",
+   "staat": "bewaakt",
+   "wacht": "sessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/mail/stuur",
+   "bestand": "server/foundation/leden-mail.js:61",
+   "staat": "bewaakt",
+   "wacht": "sessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/mail/verzonden",
+   "bestand": "server/foundation/leden-mail.js:50",
+   "staat": "bewaakt",
+   "wacht": "sessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/ai",
+   "bestand": "server/foundation/markt.js:125",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/antwoord",
+   "bestand": "server/foundation/markt.js:66",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/blokkeer",
+   "bestand": "server/foundation/markt.js:118",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/chat",
+   "bestand": "server/foundation/markt.js:79",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/deal/betaal",
+   "bestand": "server/foundation/markt.js:103",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/deal/hier",
+   "bestand": "server/foundation/markt.js:95",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/deal/voorstel",
+   "bestand": "server/foundation/markt.js:87",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/detail",
+   "bestand": "server/foundation/markt.js:24",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/lijst",
+   "bestand": "server/foundation/markt.js:19",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/meld",
+   "bestand": "server/foundation/markt.js:111",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/mijn",
+   "bestand": "server/foundation/markt.js:31",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/plaats",
+   "bestand": "server/foundation/markt.js:36",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/postvak",
+   "bestand": "server/foundation/markt.js:74",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/reageer",
+   "bestand": "server/foundation/markt.js:58",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/status",
+   "bestand": "server/foundation/markt.js:44",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/markt/verwijder",
+   "bestand": "server/foundation/markt.js:51",
+   "staat": "bewaakt",
+   "wacht": "familieVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/opgave",
+   "bestand": "server/foundation/onderwijs/schrift.js:39",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/opgave/inleveren",
+   "bestand": "server/foundation/onderwijs/schrift.js:48",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/reis/aanvraag",
+   "bestand": "server/foundation/onderwijs/schrift.js:123",
+   "staat": "zonderWachtMetReden",
+   "reden": "een open aanvraagformulier voor gezinnen zonder foundation-account -- dat is het punt ervan. Sinds deze meting met een rem per IP-adres, want de lijst kapt op duizend en een vloed duwde echte aanvragen eruit"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/aandacht",
+   "bestand": "server/school/aandacht.js:79",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/aanwezigheid/klas",
+   "bestand": "server/school/aanwezigheid.js:61",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/aanwezigheid/leerling",
+   "bestand": "server/school/aanwezigheid.js:83",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/aanwezigheid/zet",
+   "bestand": "server/school/aanwezigheid.js:29",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/absentie/afhandelen",
+   "bestand": "server/school/klas.js:135",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/absentie/meld",
+   "bestand": "server/school/gezin.js:149",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/afspraak/boek",
+   "bestand": "server/school/ouderportaal.js:94",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/afspraak/momenten",
+   "bestand": "server/school/ouderportaal.js:78",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bel",
+   "bestand": "server/school/bellen.js:56",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/belasting/klas",
+   "bestand": "server/school/belasting.js:59",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/belasting/mij",
+   "bestand": "server/school/belasting.js:67",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bericht/controleer",
+   "bestand": "server/school/taalpoort.js:63",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bericht/gezin",
+   "bestand": "server/school/gezin.js:113",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bericht/leraar",
+   "bestand": "server/school/gezin.js:132",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bericht/verstuur",
+   "bestand": "server/school/taalpoort.js:87",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bewijs/leerling",
+   "bestand": "server/school/bewijs.js:55",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bewijs/observatie",
+   "bestand": "server/school/bewijs.js:37",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bezoeker/aanmeld",
+   "bestand": "server/school/veiligheid.js:84",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bezoeker/lijst",
+   "bestand": "server/school/veiligheid.js:127",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bezoeker/uit",
+   "bestand": "server/school/veiligheid.js:95",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijdrage/betaal",
+   "bestand": "server/school/bijdrage.js:27",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijdrage/maak",
+   "bestand": "server/school/bijdrage.js:14",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijdrage/mijn",
+   "bestand": "server/school/bijdrage.js:41",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijdrage/overzicht",
+   "bestand": "server/school/bijdrage.js:56",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijles/gesprek",
+   "bestand": "server/school/bijles.js:39",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/bijles/vraag",
+   "bestand": "server/school/bijles.js:31",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/budget/zet",
+   "bestand": "server/school/financien-beheer.js:50",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/calamiteit",
+   "bestand": "server/school/veiligheid-incident.js:105",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/cijfer/geef",
+   "bestand": "server/school/klas.js:112",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/dag",
+   "bestand": "server/school/dag.js:23",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/dashboard",
+   "bestand": "server/school/analyse.js:70",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/debiteuren",
+   "bestand": "server/school/financien.js:97",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/denkfout/besproken",
+   "bestand": "server/school/denkfout.js:55",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/denkfout/klas",
+   "bestand": "server/school/denkfout.js:41",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/directie/bewaking",
+   "bestand": "server/school/opvolging.js:113",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/directie/cockpit",
+   "bestand": "server/school/directie.js:29",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/directie/mededeling",
+   "bestand": "server/school/directie.js:56",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/document/voeg",
+   "bestand": "server/school/dossier.js:91",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/dossier",
+   "bestand": "server/school/dossier.js:27",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/dossier/contact",
+   "bestand": "server/school/dossier.js:68",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/gps",
+   "bestand": "server/school/excursie.js:74",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/kaart",
+   "bestand": "server/school/excursie.js:112",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/lijst",
+   "bestand": "server/school/excursie.js:103",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/maak",
+   "bestand": "server/school/excursie.js:24",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/mijn",
+   "bestand": "server/school/excursie.js:125",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/start",
+   "bestand": "server/school/excursie.js:52",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/stop",
+   "bestand": "server/school/excursie.js:63",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/excursie/toestemming",
+   "bestand": "server/school/excursie.js:38",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/export",
+   "bestand": "server/school/koppelingen.js:124",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/factuur/boek",
+   "bestand": "server/school/financien.js:74",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/factuur/herinner",
+   "bestand": "server/school/financien.js:110",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/factuur/maak",
+   "bestand": "server/school/financien.js:39",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/financien/rapport",
+   "bestand": "server/school/financien-beheer.js:83",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/herinnering/verstuur",
+   "bestand": "server/school/omroep.js:112",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/herinneringen",
+   "bestand": "server/school/omroep.js:100",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/afwezig",
+   "bestand": "server/school/hr-verlof.js:21",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/dossier",
+   "bestand": "server/school/hr.js:57",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/gesprek",
+   "bestand": "server/school/hr-verlof.js:102",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/gesprek/reactie",
+   "bestand": "server/school/hr-verlof.js:119",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/mijn",
+   "bestand": "server/school/hr.js:69",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/overzicht",
+   "bestand": "server/school/hr-verlof.js:135",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/uren",
+   "bestand": "server/school/hr-verlof.js:83",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/verlof/besluit",
+   "bestand": "server/school/hr-verlof.js:43",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/vervanging",
+   "bestand": "server/school/hr-verlof.js:62",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hr/zet",
+   "bestand": "server/school/hr.js:30",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/huiswerk/af",
+   "bestand": "server/school/gezin.js:65",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/huiswerk/maak",
+   "bestand": "server/school/klas.js:98",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/huiswerk/oefen",
+   "bestand": "server/school/verbonden.js:111",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/huiswerk/oefen-antwoord",
+   "bestand": "server/school/verbonden.js:128",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn",
+   "bestand": "server/school/hulplijn.js:20",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/afronden",
+   "bestand": "server/school/opvolging.js:79",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/afspraak",
+   "bestand": "server/school/opvolging.js:67",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/bewaking",
+   "bestand": "server/school/opvolging.js:94",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/klas",
+   "bestand": "server/school/hulplijn.js:38",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/mijn",
+   "bestand": "server/school/hulplijn.js:62",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/oppakken",
+   "bestand": "server/school/hulplijn.js:45",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/toewijzen",
+   "bestand": "server/school/opvolging.js:56",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/hulplijn/wens",
+   "bestand": "server/school/opvolging.js:40",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/incident/handel-af",
+   "bestand": "server/school/veiligheid-incident.js:53",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/incident/lijst",
+   "bestand": "server/school/veiligheid-incident.js:41",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/incident/meld",
+   "bestand": "server/school/veiligheid-incident.js:23",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/journaal",
+   "bestand": "server/school/rollen.js:131",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/kantine/saldo",
+   "bestand": "server/school/financien-beheer.js:23",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas",
+   "bestand": "server/school/klas.js:14",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/leraar-koppel",
+   "bestand": "server/school/verbonden.js:42",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/leraar-weg",
+   "bestand": "server/school/verbonden.js:55",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/overname",
+   "bestand": "server/school/verbonden.js:68",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/overname-stop",
+   "bestand": "server/school/verbonden.js:85",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/team",
+   "bestand": "server/school/verbonden.js:37",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/klas/vestiging",
+   "bestand": "server/school/organisatie.js:78",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/koppel",
+   "bestand": "server/school/klas.js:46",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/koppeling/zet",
+   "bestand": "server/school/koppelingen.js:51",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/koppelingen",
+   "bestand": "server/school/koppelingen.js:70",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leerling/aanmeld",
+   "bestand": "server/school/inschrijving.js:37",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leerling/besluit",
+   "bestand": "server/school/inschrijving.js:65",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leerling/lijst",
+   "bestand": "server/school/inschrijving.js:111",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leerling/overstap",
+   "bestand": "server/school/inschrijving-mutatie.js:40",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leerling/uitschrijf",
+   "bestand": "server/school/inschrijving-mutatie.js:20",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leraar/klas/maak",
+   "bestand": "server/school/beheer.js:129",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/leraar/overzicht",
+   "bestand": "server/school/beheer.js:156",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/les/concept",
+   "bestand": "server/school/les.js:78",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/les/geheugen",
+   "bestand": "server/school/les.js:116",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/les/rond-af",
+   "bestand": "server/school/les.js:100",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/les/start",
+   "bestand": "server/school/verbonden.js:92",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/les/stop",
+   "bestand": "server/school/verbonden.js:100",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/machtiging/intrek",
+   "bestand": "server/school/machtiging.js:80",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/machtiging/lijst",
+   "bestand": "server/school/machtiging.js:71",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/machtiging/mijn",
+   "bestand": "server/school/machtiging.js:94",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/machtiging/stop",
+   "bestand": "server/school/machtiging.js:106",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/machtiging/zet",
+   "bestand": "server/school/machtiging.js:44",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/mededeling",
+   "bestand": "server/school/klas.js:125",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/mijn",
+   "bestand": "server/school/gezin.js:18",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/mijn-rechten",
+   "bestand": "server/school/rollen.js:142",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/nieuwsbrief",
+   "bestand": "server/school/omroep.js:30",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/nieuwsbrief/lijst",
+   "bestand": "server/school/omroep.js:62",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/ontruiming",
+   "bestand": "server/school/veiligheid-incident.js:93",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/opleiding/zet",
+   "bestand": "server/school/organisatie.js:40",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/organisatie",
+   "bestand": "server/school/organisatie.js:56",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/inlezen",
+   "bestand": "server/school/overdracht.js:80",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/kaart",
+   "bestand": "server/school/overdracht.js:40",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/klaarstaand",
+   "bestand": "server/school/overdracht.js:155",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/klaarzetten",
+   "bestand": "server/school/overdracht.js:103",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/ophalen",
+   "bestand": "server/school/overdracht.js:131",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/overdracht/pakket",
+   "bestand": "server/school/overdracht.js:54",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/pas/blokkeer",
+   "bestand": "server/school/veiligheid.js:52",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/pas/geef",
+   "bestand": "server/school/veiligheid.js:27",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/pas/lijst",
+   "bestand": "server/school/veiligheid.js:114",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/pas/passeer",
+   "bestand": "server/school/veiligheid.js:66",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/antwoord",
+   "bestand": "server/school/peiling-antwoord.js:52",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/antwoord-personeel",
+   "bestand": "server/school/peiling-antwoord.js:85",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/maak",
+   "bestand": "server/school/peiling.js:56",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/mijn",
+   "bestand": "server/school/peiling-antwoord.js:20",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/mijn-personeel",
+   "bestand": "server/school/peiling-antwoord.js:75",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/sluit",
+   "bestand": "server/school/peiling.js:76",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/peiling/uitslag",
+   "bestand": "server/school/peiling.js:85",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/aanmeld",
+   "bestand": "server/school/beheer.js:56",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/besluit",
+   "bestand": "server/school/beheer.js:114",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/inlog/accepteer",
+   "bestand": "server/school/personeel-inlog.js:36",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/inloglink",
+   "bestand": "server/school/personeel-inlog.js:14",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/mail/inbox",
+   "bestand": "server/school/personeel-mail.js:69",
+   "staat": "bewaakt",
+   "wacht": "mijn -> personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/mail/lees",
+   "bestand": "server/school/personeel-mail.js:77",
+   "staat": "bewaakt",
+   "wacht": "mijn -> personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/mail/overzicht",
+   "bestand": "server/school/personeel-mail.js:60",
+   "staat": "bewaakt",
+   "wacht": "mijn -> personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/mail/stuur",
+   "bestand": "server/school/personeel-mail.js:82",
+   "staat": "bewaakt",
+   "wacht": "mijn -> personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/mail/verzonden",
+   "bestand": "server/school/personeel-mail.js:73",
+   "staat": "bewaakt",
+   "wacht": "mijn -> personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/rollen",
+   "bestand": "server/school/rollen.js:116",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/start",
+   "bestand": "server/school/instap.js:107",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/status",
+   "bestand": "server/school/beheer.js:72",
+   "staat": "bewaakt",
+   "wacht": "personeelVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/toegang/intrek",
+   "bestand": "server/school/personeel-inlog.js:50",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/uitnodig",
+   "bestand": "server/school/personeelstoegang.js:67",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/uitnodiging/accepteer",
+   "bestand": "server/school/personeelstoegang.js:116",
+   "staat": "zonderWachtMetReden",
+   "reden": "zelfde uitnodiging; accepteren verbruikt hem eenmalig"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/uitnodiging/bekijk",
+   "bestand": "server/school/personeelstoegang.js:108",
+   "staat": "zonderWachtMetReden",
+   "reden": "de personeelsuitnodiging uit het lijf is de geloofsbrief, met een rem per IP-adres erop"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/uitnodiging/intrek",
+   "bestand": "server/school/personeelstoegang.js:98",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/personeel/uitnodigingen",
+   "bestand": "server/school/personeelstoegang.js:93",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/planner",
+   "bestand": "server/school/planner.js:56",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/portaal",
+   "bestand": "server/school/ouderportaal-mijn.js:20",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/lijst",
+   "bestand": "server/school/rapport.js:71",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/maak",
+   "bestand": "server/school/rapport.js:41",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/mijn",
+   "bestand": "server/school/rapport-tekst.js:103",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/stel-vast",
+   "bestand": "server/school/rapport-tekst.js:86",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/tekst",
+   "bestand": "server/school/rapport-tekst.js:29",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rapport/tekst/zet",
+   "bestand": "server/school/rapport-tekst.js:69",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rollen",
+   "bestand": "server/school/rollen.js:103",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/rooster/zet",
+   "bestand": "server/school/klas.js:87",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/school/activeren",
+   "bestand": "server/school/beheer.js:11",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/school/maak",
+   "bestand": "server/school/beheer.js:31",
+   "staat": "zonderWachtMetReden",
+   "reden": "alleen in NODE_ENV=test; in productie geeft hij 410 en verwijst naar de registratiebalie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/school/overzicht",
+   "bestand": "server/school/beheer.js:104",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/schooljaar/voer-uit",
+   "bestand": "server/school/schooljaar.js:60",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/schooljaar/voorstel",
+   "bestand": "server/school/schooljaar.js:32",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/signalen",
+   "bestand": "server/school/analyse-signalen.js:33",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/subsidie/zet",
+   "bestand": "server/school/financien-beheer.js:67",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/taal",
+   "bestand": "server/school/taal.js:13",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/taalbeleid",
+   "bestand": "server/school/taalpoort.js:35",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/taalbeleid/zet",
+   "bestand": "server/school/taalpoort.js:46",
+   "staat": "bewaakt",
+   "wacht": "schoolVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/taalcheck/antwoord",
+   "bestand": "server/school/taalcheck.js:48",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/taalcheck/start",
+   "bestand": "server/school/taalcheck.js:28",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom",
+   "bestand": "server/school/bijdrage.js:144",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom/doorgegeven",
+   "bestand": "server/school/bijdrage.js:132",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom/maak",
+   "bestand": "server/school/bijdrage.js:91",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom/mijn",
+   "bestand": "server/school/bijdrage.js:119",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom/nummer",
+   "bestand": "server/school/bijdrage.js:78",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/telefoonboom/start",
+   "bestand": "server/school/bijdrage.js:107",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toestemming/antwoord",
+   "bestand": "server/school/ouderportaal.js:39",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toestemming/overzicht",
+   "bestand": "server/school/ouderportaal.js:59",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toestemming/vraag",
+   "bestand": "server/school/ouderportaal.js:24",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/antwoord",
+   "bestand": "server/school/toets-leerling.js:52",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/bibliotheek",
+   "bestand": "server/school/toetsbieb.js:17",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/cijfer",
+   "bestand": "server/school/toets.js:126",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/keuring",
+   "bestand": "server/school/toetskeuring.js:28",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/lijst",
+   "bestand": "server/school/toets.js:82",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/maak",
+   "bestand": "server/school/toets.js:61",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/mo",
+   "bestand": "server/school/toets.js:104",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/mo-invoer",
+   "bestand": "server/school/toets.js:114",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/sluit",
+   "bestand": "server/school/toets.js:95",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/spiegel",
+   "bestand": "server/school/toetskeuring.js:51",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/start",
+   "bestand": "server/school/toets-leerling.js:36",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/toets/voor-mij",
+   "bestand": "server/school/toets-leerling.js:21",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/uitnodiging/antwoord",
+   "bestand": "server/school/klas.js:72",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/vakgroep",
+   "bestand": "server/school/omroep.js:139",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/verlof/aanvraag",
+   "bestand": "server/school/verlof.js:15",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/verlof/besluit",
+   "bestand": "server/school/verlof.js:53",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/verlof/lijst",
+   "bestand": "server/school/verlof.js:68",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/verlof/mijn",
+   "bestand": "server/school/verlof.js:39",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/vervanging/briefing",
+   "bestand": "server/school/instap.js:70",
+   "staat": "bewaakt",
+   "wacht": "klasVan"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/vestiging/zet",
+   "bestand": "server/school/organisatie.js:21",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/voortgang",
+   "bestand": "server/school/rapport-tekst.js:122",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/webhook/lijst",
+   "bestand": "server/school/koppelingen.js:102",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/webhook/proef",
+   "bestand": "server/school/webhook.js:108",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/webhook/weg",
+   "bestand": "server/school/koppelingen.js:110",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/webhook/wek",
+   "bestand": "server/school/webhook.js:121",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/webhook/zet",
+   "bestand": "server/school/koppelingen.js:81",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/ziekmelden",
+   "bestand": "server/school/gezin.js:83",
+   "staat": "bewaakt",
+   "wacht": "gezinSessie"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/zorg/deel",
+   "bestand": "server/school/zorg.js:75",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/zorg/sessie",
+   "bestand": "server/school/zorg.js:57",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/school/zorg/zet",
+   "bestand": "server/school/zorg.js:29",
+   "staat": "bewaakt",
+   "wacht": "poort"
+  },
+  {
+   "sleutel": "POST /api/foundation/schrift/opslaan",
+   "bestand": "server/foundation/onderwijs/schrift.js:10",
+   "staat": "bewaakt",
+   "wacht": "lesVan"
+  },
+  {
+   "sleutel": "POST /api/fout/client",
+   "bestand": "server/routes/fout.js:27",
+   "staat": "openbaar",
+   "reden": "een fout uit de browser: JUIST zonder poort, want een fout die het inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden (zie server/routes/fout.js voor wat er wel en niet meegaat)"
+  },
+  {
+   "sleutel": "POST /api/gast/aanschuiven",
+   "bestand": "server/routes/gast/tafel.js:70",
+   "staat": "openbaar",
+   "reden": "aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)"
+  },
+  {
+   "sleutel": "POST /api/gast/tafel",
+   "bestand": "server/routes/gast/tafel.js:45",
+   "staat": "openbaar",
+   "reden": "de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)"
+  },
+  {
+   "sleutel": "POST /api/gids/app",
+   "bestand": "server/routes/gids.js:8",
+   "staat": "openbaar",
+   "reden": "de app-gids is openbaar"
+  },
+  {
+   "sleutel": "POST /api/kantoor/gesprek/start",
+   "bestand": "server/routes/kantoorgesprek.js:12",
+   "staat": "openbaar",
+   "reden": "het kantoorgesprek begint voor er een account is"
+  },
+  {
+   "sleutel": "POST /api/kantoor/gesprek/zeg",
+   "bestand": "server/routes/kantoorgesprek.js:17",
+   "staat": "openbaar",
+   "reden": "loopt verder op het gespreks-id dat bij de start is uitgegeven"
+  },
+  {
+   "sleutel": "POST /api/krant/artikel",
+   "bestand": "server/routes/journalistiek.js:64",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/krant/gids",
+   "bestand": "server/routes/journalistiek.js:62",
+   "staat": "openbaar",
+   "reden": "de krant is openbaar; er is een toets die dat vastlegt"
+  },
+  {
+   "sleutel": "POST /api/krant/open",
+   "bestand": "server/routes/journalistiek.js:63",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/les/antwoord",
+   "bestand": "server/routes/lesmaker.js:45",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/les/apps",
+   "bestand": "server/routes/lesmaker.js:26",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/les/kijk",
+   "bestand": "server/routes/lesmaker.js:44",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/les/leraar",
+   "bestand": "server/routes/lesmaker.js:38",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/les/maak",
+   "bestand": "server/routes/lesmaker.js:11",
+   "staat": "openbaar",
+   "reden": "de lesmaker werkt op een meegestuurd profiel"
+  },
+  {
+   "sleutel": "POST /api/les/mee",
+   "bestand": "server/routes/lesmaker.js:43",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/les/sluit",
+   "bestand": "server/routes/lesmaker.js:40",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/les/volgende",
+   "bestand": "server/routes/lesmaker.js:39",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/link/koppelingen",
+   "bestand": "server/routes/link.js:46",
+   "staat": "bewaakt",
+   "wacht": "wieScant"
+  },
+  {
+   "sleutel": "POST /api/link/los",
+   "bestand": "server/routes/link.js:29",
+   "staat": "bewaakt",
+   "wacht": "wieScant"
+  },
+  {
+   "sleutel": "POST /api/login",
+   "bestand": "server/routes/auth/inlog-pas.js:18",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/mail/binnen",
+   "bestand": "server/routes/mailpost.js:56",
+   "staat": "openbaar",
+   "reden": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
+  },
+  {
+   "sleutel": "POST /api/mail/ses",
+   "bestand": "server/routes/mailpost.js:80",
+   "staat": "openbaar",
+   "reden": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
+  },
+  {
+   "sleutel": "POST /api/munt/opties",
+   "bestand": "server/routes/member/betalen-munt.js:13",
+   "staat": "openbaar",
+   "reden": "welke munten er aan staan is prijslijst-informatie, net als /api/pasprijzen"
+  },
+  {
+   "sleutel": "POST /api/office/login",
+   "bestand": "server/routes/office/toegang.js:8",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/partner",
+   "bestand": "server/routes/member/kopen/bezorg.js:12",
+   "staat": "openbaar",
+   "reden": "het partnerkanaal is bedoeld voor niet-leden"
+  },
+  {
+   "sleutel": "POST /api/partner/applications/mijn",
+   "bestand": "server/routes/member/partneraanmelding.js:77",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/partner/apply",
+   "bestand": "server/routes/member/partneraanmelding-aanvraag.js:20",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/partner/types",
+   "bestand": "server/routes/member/partneraanmelding.js:60",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/partnertrips",
+   "bestand": "server/routes/member/partnerkanaal.js:11",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/pasprijzen",
+   "bestand": "server/routes/kantoren/geld.js:16",
+   "staat": "openbaar",
+   "reden": "de prijslijst is publieke informatie"
+  },
+  {
+   "sleutel": "POST /api/pin/herstel",
+   "bestand": "server/routes/algpin.js:51",
+   "staat": "openbaar",
+   "reden": "pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset"
+  },
+  {
+   "sleutel": "POST /api/reis/uitnodiging/open",
+   "bestand": "server/routes/reis.js:77",
+   "staat": "openbaar",
+   "reden": "een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)"
+  },
+  {
+   "sleutel": "POST /api/rtf/apply/chat",
+   "bestand": "server/routes/member/werk/rtf.js:11",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/apply/chat/send",
+   "bestand": "server/routes/member/werk/rtf.js:20",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/beroepen",
+   "bestand": "server/routes/rtfschool.js:43",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/beroepen/catalogus",
+   "bestand": "server/routes/rtfschool.js:47",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/beroepen/installeer",
+   "bestand": "server/routes/rtfschool.js:53",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/beroepen/mijn",
+   "bestand": "server/routes/rtfschool.js:63",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/beroepen/weg",
+   "bestand": "server/routes/rtfschool.js:58",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb",
+   "bestand": "server/routes/rtfbieb.js:16",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb/ai",
+   "bestand": "server/routes/rtfbieb.js:81",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb/catalogus",
+   "bestand": "server/routes/rtfbieb.js:20",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb/installeer",
+   "bestand": "server/routes/rtfbieb.js:24",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb/mijn",
+   "bestand": "server/routes/rtfbieb.js:34",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/bieb/weg",
+   "bestand": "server/routes/rtfbieb.js:29",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof",
+   "bestand": "server/routes/geloofbieb.js:18",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/ai",
+   "bestand": "server/routes/geloofbieb.js:48",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/catalogus",
+   "bestand": "server/routes/geloofbieb.js:22",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/installeer",
+   "bestand": "server/routes/geloofbieb.js:26",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/lees",
+   "bestand": "server/routes/geloofbieb.js:41",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/mijn",
+   "bestand": "server/routes/geloofbieb.js:36",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/geloof/weg",
+   "bestand": "server/routes/geloofbieb.js:31",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/onboarding/opslaan",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:16",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/onboarding/status",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:12",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/onboarding/teken",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:20",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/rahul",
+   "bestand": "server/routes/rtfschool.js:86",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/chat",
+   "bestand": "server/routes/rtfschool.js:77",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/maak",
+   "bestand": "server/routes/rtfschool.js:74",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/mee",
+   "bestand": "server/routes/rtfschool.js:75",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/staat",
+   "bestand": "server/routes/rtfschool.js:79",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/weg",
+   "bestand": "server/routes/rtfschool.js:78",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/samen/zet",
+   "bestand": "server/routes/rtfschool.js:76",
+   "staat": "bewaakt",
+   "wacht": "samenSess"
+  },
+  {
+   "sleutel": "POST /api/rtf/school",
+   "bestand": "server/routes/rtfschool.js:17",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/school/catalogus",
+   "bestand": "server/routes/rtfschool.js:21",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/school/installeer",
+   "bestand": "server/routes/rtfschool.js:25",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/school/mijn",
+   "bestand": "server/routes/rtfschool.js:35",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/school/weg",
+   "bestand": "server/routes/rtfschool.js:30",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/block",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:46",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/call",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:28",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/connect",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:33",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/connections",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:66",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/dm",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:89",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/dm/send",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:95",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/find",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:28",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/goedkeuren",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:101",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/boardroom",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:74",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/boardroom/herstel",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:99",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/boardroom/zet",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:81",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/boardroom/zetveel",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:91",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/contacten",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:50",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/kind/verwijder",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:56",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/opdracht",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:127",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/oudervoeg",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:42",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/report",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:48",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/respond",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:60",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/snap/send",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:108",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/snap/view",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:115",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/snaps",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:114",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/stories",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:128",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/story/post",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:121",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/story/view",
+   "bestand": "server/routes/social/gezinnen/vrienden.js:129",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/social/unblock",
+   "bestand": "server/routes/social/gezinnen/toezicht.js:47",
+   "staat": "bewaakt",
+   "wacht": "rtfSociaal"
+  },
+  {
+   "sleutel": "POST /api/rtf/solliciteer",
+   "bestand": "server/routes/member/werk/rtf.js:46",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/antwoord",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/arcade-bord",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/arcade-score",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/dag",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/dag-klaar",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/dag-start",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/kijk",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/klasgenoten",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/mijn",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/nabespreking",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/naspelen",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/nieuw",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/online",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/opgeven",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/praat",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/praat-stuur",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/prestaties",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/projectie-open",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/projectie-sluit",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/rahul",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/random",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/replay",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/sneek-bord",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/sneek-score",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/staat",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/stand",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/sudoku-klaar",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/sudoku-nieuw",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/team-antwoord",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/team-mijn",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/team-nieuw",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/team-nodig",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/team-verlaat",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/toernooi-antwoord",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/toernooi-mijn",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/toernooi-nieuw",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/toernooi-staat",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/toewijzen",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/uitslagen",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/varianten",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/zet",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/zichtbaar",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/spel/zichtbaar-zet",
+   "staat": "nietGelezen",
+   "reden": "de bron van deze route is niet gevonden"
+  },
+  {
+   "sleutel": "POST /api/rtf/talent/interesse",
+   "bestand": "server/routes/member/werk/talent.js:10",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/talent/mijn",
+   "bestand": "server/routes/member/werk/talent.js:47",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/toegang",
+   "bestand": "server/routes/rtfbieb.js:43",
+   "staat": "bewaakt",
+   "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/vacatures",
+   "bestand": "server/routes/member/werk/rtf.js:32",
+   "staat": "openbaar",
+   "reden": "openstaande vacatures zijn openbaar"
+  },
+  {
+   "sleutel": "POST /api/rtgid/start",
+   "bestand": "server/routes/rtgid.js:41",
+   "staat": "openbaar",
+   "reden": "de identiteitsstroom begint voordat er een sessie is"
+  },
+  {
+   "sleutel": "POST /api/rtgid/status",
+   "bestand": "server/routes/rtgid.js:42",
+   "staat": "openbaar",
+   "reden": "RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie"
+  },
+  {
+   "sleutel": "POST /api/rtgid/wie",
+   "bestand": "server/routes/rtgid.js:43",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/sociaalbeleid",
+   "bestand": "server/routes/kantoren/geld.js:48",
+   "staat": "openbaar",
+   "reden": "de sociale afdracht is een publieke belofte (RTFoundation)"
+  },
+  {
+   "sleutel": "POST /api/stad/algoritmes",
+   "bestand": "server/routes/stad.js:31",
+   "staat": "openbaar",
+   "reden": "het openbare algoritmeregister: beschrijft regels, geen personen"
+  },
+  {
+   "sleutel": "POST /api/stad/besluiten",
+   "bestand": "server/routes/stad.js:40",
+   "staat": "openbaar",
+   "reden": "het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen"
+  },
+  {
+   "sleutel": "POST /api/stad/doos/hartslag",
+   "bestand": "server/routes/kantoren/stad.js:91",
+   "staat": "openbaar",
+   "reden": "de stadsdoos stuurt zijn apparaatsleutel mee"
+  },
+  {
+   "sleutel": "POST /api/stad/doos/meting",
+   "bestand": "server/routes/kantoren/stad.js:94",
+   "staat": "openbaar",
+   "reden": "idem"
+  },
+  {
+   "sleutel": "POST /api/staff",
+   "bestand": "server/routes/staff.js:38",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/supplier/apply",
+   "bestand": "server/routes/supplier/werving/sollicitaties.js:12",
+   "staat": "openbaar",
+   "reden": "solliciteren bij een zaak kan zonder account"
+  },
+  {
+   "sleutel": "POST /api/supplier/login",
+   "bestand": "server/routes/supplier/toegang.js:22",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/supplier/mijn/login",
+   "bestand": "server/routes/supplier/pda/posities.js:99",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/supplier/roster",
+   "bestand": "server/routes/supplier/toegang.js:153",
+   "staat": "openbaar",
+   "reden": "de PDA-inlog toont de namenlijst voor de pincode; met een eigen rem"
+  },
+  {
+   "sleutel": "POST /api/supplier/staff/join",
+   "bestand": "server/routes/supplier/werving/personeel.js:100",
+   "staat": "openbaar",
+   "reden": "personeel meldt zich aan met een uitnodigingscode"
+  },
+  {
+   "sleutel": "POST /api/techniek/inloggen",
+   "bestand": "server/routes/techniek/inlog.js:29",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand",
+   "bestand": "server/routes/tenant/bijstand.js:61",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/besluit",
+   "bestand": "server/routes/tenant/bijstand.js:99",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/dossier",
+   "bestand": "server/routes/tenant/bijstand.js:69",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/inhoud",
+   "bestand": "server/routes/tenant/bijstand.js:106",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/intrekken",
+   "bestand": "server/routes/tenant/bijstand.js:93",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/niveaus",
+   "bestand": "server/routes/tenant/bijstand.js:52",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bijstand/vraag",
+   "bestand": "server/routes/tenant/bijstand.js:83",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/bootstrap",
+   "bestand": "server/routes/tenant.js:32",
+   "staat": "bewaakt",
+   "wacht": "lidVan"
+  },
+  {
+   "sleutel": "POST /api/tenant/export",
+   "bestand": "server/routes/tenant.js:74",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/tenant/groep",
+   "bestand": "server/routes/tenant.js:58",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/tenant/groepen",
+   "bestand": "server/routes/tenant.js:143",
+   "staat": "bewaakt",
+   "wacht": "beheerVan"
+  },
+  {
+   "sleutel": "POST /api/tenant/herstelproef",
+   "bestand": "server/routes/tenant.js:131",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/tenant/status",
+   "bestand": "server/routes/tenant.js:113",
+   "staat": "bewaakt",
+   "wacht": "viaBeheerOfDirectie"
+  },
+  {
+   "sleutel": "POST /api/toestel/meting",
+   "bestand": "server/routes/toestellen.js:24",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/vracht/volg",
+   "bestand": "server/routes/vracht.js:39",
+   "staat": "openbaar",
+   "reden": "volgen op een meegestuurde vrachtcode, zoals elke track-and-trace"
+  },
+  {
+   "sleutel": "POST /api/webauthn/login",
+   "bestand": "server/routes/auth/webauthn.js:47",
+   "staat": "openbaar",
+   "reden": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
+  },
+  {
+   "sleutel": "POST /api/webauthn/opties",
+   "bestand": "server/routes/auth/webauthn.js:40",
+   "staat": "openbaar",
+   "reden": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
+  },
+  {
+   "sleutel": "POST /api/werkmail/bezorg",
+   "bestand": "server/routes/werkmail.js:58",
+   "staat": "openbaar",
+   "reden": "inkomende post van de mailserver, met een eigen venster-rem per minuut"
+  },
+  {
+   "sleutel": "POST /api/werkplek/mijn",
+   "bestand": "server/routes/werkplek.js:50",
+   "staat": "eigenControle"
+  },
+  {
+   "sleutel": "POST /api/werving/kijk",
+   "bestand": "server/routes/werving.js:49",
+   "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/zegel/controleer",
+   "bestand": "server/server.js:1313",
+   "staat": "openbaar",
+   "reden": "controleert een handtekening; het bewijs zit in het verzoek"
+  }
+ ]
+}

@@ -65,7 +65,11 @@ const FAMILIES = [
     naam: 'werkruimte',
     /* Alle werkPoort-, beheerVan- en lidVan-routes van het Werk OS wonen onder
        dit voorvoegsel; gemeten met scripts/handlerwacht.js. */
-    prefixen: ['/api/bedrijf/'],
+    /* /api/tenant/ hangt aan dezelfde sleutel: viaBeheerOfDirectie
+       (server/routes/tenant/poort.js) leest `beheerToken` uit het lijf en valt
+       anders terug op een lid-token met het recht "werkruimte". Zelfde deur,
+       ander voorvoegsel -- dus hier erbij en niet als tweede familie. */
+    prefixen: ['/api/bedrijf/', '/api/tenant/'],
     velden: ['beheerToken', 'werkruimte'],
     waarom: 'werkPoort en beheerVan lezen `beheerToken` uit het lijf; de werkruimte ' +
       'ontstaat pas bij het aanmaken en het token wordt daar EEN keer getoond',
@@ -159,7 +163,7 @@ const FAMILIES = [
        daarom bij gezet in plaats van als eigen familie -- twee families met
        dezelfde sleutel lopen uiteen zodra er iets aan verandert. */
     prefixen: ['/api/foundation/gezin/', '/api/rtf/',
-      '/api/foundation/markt/', '/api/foundation/hulp/'],
+      '/api/foundation/markt/', '/api/foundation/hulp/', '/api/foundation/mail/'],
     velden: ['code', 'token'],
     waarom: 'de RTF-kant draait op een gezinscode plus een profieltoken uit het lijf ' +
       '(server/foundation/sollicitaties.js, verifieerProfiel); een gezin ontstaat aan de ' +

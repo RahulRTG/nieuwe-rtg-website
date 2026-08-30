@@ -61,7 +61,8 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
-const ROLLEN = ['member', 'office', 'supplier', 'boardroom', 'techniek', 'kantoor-op-naam', 'openbaar'];
+const ROLLEN = ['member', 'office', 'supplier', 'boardroom', 'techniek', 'kantoor-op-naam',
+  'werkplekbaas', 'scim', 'openbaar'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
    zijn eigen basis-URL en foutafhandeling); `officeCode` de backoffice-code van
@@ -105,7 +106,40 @@ function maakSleutels({ post, officeCode, eigen }) {
        Vandaar dezelfde bron en toch een eigen naam: de bewakerskaart kent hem
        als eigen rol, en een proef die 'kantoor-op-naam' vraagt hoort niet te
        hoeven weten wie dat vandaag is. */
-    'kantoor-op-naam': haalEigenaar
+    'kantoor-op-naam': haalEigenaar,
+    /* DE WERKPLEKBAAS IS DE EIGENAAR, en dat is geen aanname maar wat baasAuth
+       doet: `if (!wie(req).baas)` met wie() = boardroomBaas(boardroomWie(req))
+       (server/routes/werkplek.js). Er valt hier dus niets in te loggen wat er
+       niet al is -- wel om een eigen NAAM te houden, precies zoals hierboven bij
+       kantoor-op-naam: de bewakerskaart kent werkplekbaas als eigen rol, en een
+       proef die erom vraagt hoort niet te hoeven weten wie dat vandaag is.
+
+       En het is een SMALLERE rol dan boardroom: een boardroom-gebruiker die niet
+       de eigenaar is, hoort baasAuth NIET te passeren. Dat ze in deze opstelling
+       dezelfde sleutel delen, komt doordat de proefdatabase een eigenaar heeft
+       en verder niemand. */
+    werkplekbaas: haalEigenaar,
+    /* SCIM IS EEN EIGEN KETEN, en de enige rol hier die er echt een vraagt. De
+       sleutel laat de IdP van een klant accounts aanmaken en uitzetten; hij
+       wordt EEN keer getoond en hangt aan een bestaande SSO-koppeling. Dus:
+       eerst een koppeling zetten (techniek, alleen de eigenaar), dan de sleutel
+       draaien. Beide langs de echte routes -- een verzonnen bearer zou hier
+       niets bewijzen, want de hele vraag IS of die sleutel toegang geeft.
+
+       Lukt een van de twee stappen niet, dan komt er geen token en meldt
+       haalSleutels() dat met de reden. Deze rol staat niet in ONMISBAAR: een
+       database zonder SSO-koppeling is een geldige database. */
+    scim: async () => {
+      const tech = await haalEigenaar();
+      if (!tech) return null;
+      const org = 'proef-scim';
+      const k = await post('/api/techniek/sso', { org, naam: 'Proef IdP',
+        issuer: 'https://idp.voorbeeld.test', clientId: 'proef', clientSecret: 'proefgeheim',
+        domeinen: ['voorbeeld.test'], actief: true }, tech);
+      if (!k || !k.data || !k.data.ok) return null;
+      const r = await post('/api/techniek/sso/scimsleutel', { org }, tech);
+      return (r && r.data && r.data.sleutel) || null;
+    }
   }, eigen || {});
 
   /* Geen aanroep: er valt niets in te loggen. De lege string is de sleutel, en

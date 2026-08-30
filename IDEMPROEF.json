@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-30T19:41:12.036Z",
-  "commit": "c48755e5",
-  "boomVuil": false,
+  "op": "2026-08-30T20:02:31.334Z",
+  "commit": "9ca9af93",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
@@ -44,11 +44,11 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1665,
-  "beschermd": 1664,
+  "beoordeeld": 1748,
+  "beschermd": 1747,
   "onbeschermd": 1,
-  "ongemeten": 2956,
-  "oproepen": 13899,
+  "ongemeten": 2873,
+  "oproepen": 13897,
   "tokensHernieuwd": 22,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -71,7 +71,7 @@
    },
    {
     "collectie": "supplierActivity",
-    "families": 16
+    "families": 17
    }
   ],
   "blindeRondes": 0,
@@ -84,8 +84,8 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
-  "objectenGemaakt": 126,
-  "objectTakken": 77,
+  "objectenGemaakt": 131,
+  "objectTakken": 83,
   "schoolwereld": true,
   "horecawereld": true,
   "rolOpgewaardeerd": 171,
@@ -143,7 +143,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 14,
+ "vermoedensVerworpen": 12,
  "perRoute": [
   {
    "methode": "POST",
@@ -1032,7 +1032,9 @@
      "appstore": 1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit teruggaverecht bestaat niet."
   },
@@ -2336,9 +2338,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -2485,7 +2485,9 @@
      "bankPassen": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -2579,7 +2581,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "bankRekeningen": 1
     },
     "b": {},
@@ -5039,7 +5040,9 @@
      "commandAgents": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -5233,9 +5236,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -5275,7 +5276,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 25eb2881-59d0-4852-b2aa-8018016ffa29"
+   "blokkade": "Die regel bestaat niet: 7b5c09fc-5649-4f92-b743-94eb5a9130b9"
   },
   {
    "methode": "POST",
@@ -5293,7 +5294,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 25eb2881-59d0-4852-b2aa-8018016ffa29"
+   "blokkade": "Die regel bestaat niet: 7b5c09fc-5649-4f92-b743-94eb5a9130b9"
   },
   {
    "methode": "POST",
@@ -5507,7 +5508,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: 25eb2881-59d0-4852-b2aa-8018016ffa29"
+   "blokkade": "Onbekende functie: 7b5c09fc-5649-4f92-b743-94eb5a9130b9"
   },
   {
    "methode": "POST",
@@ -6010,11 +6011,14 @@
     "a": {
      "commandPlannen": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "commandPlannen": 1
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -6298,7 +6302,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: 25eb2881-59d0-4852-b2aa-8018016ffa29"
+   "blokkade": "Dat runbook bestaat niet: 7b5c09fc-5649-4f92-b743-94eb5a9130b9"
   },
   {
    "methode": "POST",
@@ -7152,9 +7156,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -8172,7 +8174,6 @@
    ],
    "opslag": {
     "a": {
-     "beauty": 1,
      "dagmetingen": 1,
      "gemoed": 1
     },
@@ -9556,7 +9557,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -9759,9 +9762,7 @@
      "fluister": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -10677,20 +10678,19 @@
   {
    "methode": "POST",
    "pad": "/api/gemeente/afspraken",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:GEMEENTE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
+   }
   },
   {
    "methode": "POST",
@@ -10729,20 +10729,23 @@
   {
    "methode": "POST",
    "pad": "/api/gemeente/bekendmaking",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:GEMEENTE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "gemeenteBekend": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
+    "c": {
+     "gemeenteBekend": 1
+    }
+   }
   },
   {
    "methode": "POST",
@@ -10874,43 +10877,25 @@
   {
    "methode": "POST",
    "pad": "/api/gemeente/melding/zet",
-   "rol": "supplier",
+   "rol": "zaak:GEMEENTE",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de gemeente."
+   "blokkade": "Melding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/gemeente/meldingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/gemeente/meldingen/mijn",
-   "rol": "member",
+   "rol": "zaak:GEMEENTE",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -10926,39 +10911,56 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/gemeente/regie",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "pad": "/api/gemeente/meldingen/mijn",
+   "rol": "member",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "wacht": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/regie",
+   "rol": "zaak:GEMEENTE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/gemeente/triage",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:GEMEENTE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
+   }
   },
   {
    "methode": "POST",
@@ -10981,38 +10983,37 @@
   {
    "methode": "POST",
    "pad": "/api/gemeente/vergunning/beslis",
-   "rol": "supplier",
+   "rol": "zaak:GEMEENTE",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de gemeente."
+   "blokkade": "Vergunning niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/gemeente/vergunningen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:GEMEENTE",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de gemeente."
+   }
   },
   {
    "methode": "POST",
@@ -12158,7 +12159,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Alleen voor leden met een eigen account."
   },
@@ -12600,9 +12603,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit document is geen formulier."
   },
@@ -12788,146 +12789,146 @@
   {
    "methode": "POST",
    "pad": "/api/kmar/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:KMAR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de marechaussee."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:KMAR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de marechaussee."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/controle/lijst",
-   "rol": "supplier",
+   "rol": "zaak:KMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de marechaussee."
+   "blokkade": "Vlucht niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/controle/zet",
-   "rol": "supplier",
+   "rol": "zaak:KMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de marechaussee."
+   "blokkade": "Geen ingecheckte reiziger met dit nummer."
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/incident",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:KMAR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kmar": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de marechaussee."
+    "c": {
+     "kmar": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/incident/sluit",
-   "rol": "supplier",
+   "rol": "zaak:KMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de marechaussee."
+   "blokkade": "Incident niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/incidenten",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:KMAR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de marechaussee."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/kmar/patrouille",
-   "rol": "supplier",
+   "rol": "zaak:KMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de marechaussee."
+   "blokkade": "Kies een zone (Terminal, Security-filters, Luchtzijde, Platform, Koninklijke Vleugel, Landzijde)."
   },
   {
    "methode": "POST",
@@ -13016,7 +13017,6 @@
    "opslag": {
     "a": {
      "kosten": 2,
-     "wacht": "gewijzigd",
      "economie": 2
     },
     "b": {},
@@ -14774,7 +14774,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Begin eerst een oefensessie."
   },
@@ -15568,364 +15570,355 @@
   {
    "methode": "POST",
    "pad": "/api/lucht/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/bagage",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/bagage/zet",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Koffer niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/bord",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/charter/beslis",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Charteraanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/charters",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/draai/taak",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Deze platformtaak hoort niet bij een lijn (brandstof, catering, schoonmaak, bagage-laden, water-en-afval, pushback-gereed)."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/lounge",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/lounge/in",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Kies een lounge (salon of royal)."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/lounge/uit",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Gast niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/security/zet",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Filter niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/toren/klaring",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Klaring volgt pas als de kist aan het boarden is."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vip/lijst",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LUCHT",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vip/maak",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Geef de gast een protocolnaam (nooit de echte naam)."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vip/taak",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Vip-protocol niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vlucht/gate",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Kies een bestaande gate (A1, A2, A3, B1, B2, C1)."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vlucht/maak",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "A1 is op dat moment al bezet."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vlucht/status",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Onbekende status voor deze vlucht (gepland -> inchecken -> boarding -> vertrokken)."
   },
   {
    "methode": "POST",
    "pad": "/api/lucht/vlucht/vertraag",
-   "rol": "supplier",
+   "rol": "zaak:LUCHT",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het luchthavenpersoneel."
+   "blokkade": "Een vertraging is 5 tot 720 minuten."
   },
   {
    "methode": "POST",
@@ -15994,7 +15987,8 @@
    "opslag": {
     "a": {
      "suppliers": 3,
-     "sessions": 1
+     "sessions": 1,
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -16493,7 +16487,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -17456,9 +17452,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Partner niet gevonden."
   },
@@ -17757,9 +17751,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -18151,7 +18143,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -19233,7 +19227,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -19520,9 +19516,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -19631,7 +19625,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -19880,11 +19877,14 @@
     "a": {
      "lifestyle": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "lifestyle": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -20276,7 +20276,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -21181,9 +21183,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -21324,9 +21324,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -21430,8 +21433,7 @@
    ],
    "opslag": {
     "a": {
-     "lifestyle": "gewijzigd",
-     "wacht": "gewijzigd"
+     "lifestyle": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -21734,13 +21736,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -21986,7 +21984,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -22872,9 +22872,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -22909,7 +22907,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Welke rechten? Kies uit: metadata, lezen, antwoorden, verzenden, namens, verwijderen, vernietigen, exporteren, regels, delegatie, bewaarbeleid, zoekenBreed, inz"
   },
@@ -22960,9 +22960,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -24564,7 +24562,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -24860,9 +24860,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Boeking niet gevonden."
   },
@@ -25019,9 +25017,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "De zzp-belastingtool is onderdeel van de Business Pass."
   },
@@ -25289,7 +25285,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26019,7 +26017,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -26464,9 +26464,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -27382,7 +27380,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -27673,7 +27673,6 @@
     },
     "b": {},
     "c": {
-     "kosten": "gewijzigd",
      "bankregie": "gewijzigd"
     }
    }
@@ -27803,14 +27802,11 @@
     "a": {
      "fiscaalRegels": 2
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "fiscaalRegels": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -28020,7 +28016,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Kies betaalinstelling, elektronischgeldinstelling, bank."
   },
@@ -33321,7 +33319,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Onbekend domein."
   },
@@ -33497,7 +33497,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "studio": "gewijzigd"
     },
     "b": {},
@@ -36086,6 +36085,7 @@
    "opslag": {
     "a": {
      "onboarding": "gewijzigd",
+     "wacht": "gewijzigd",
      "ondernemingen": "gewijzigd"
     },
     "b": {},
@@ -36247,7 +36247,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -36313,9 +36316,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -36896,7 +36897,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -37145,7 +37148,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37198,9 +37203,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -37369,362 +37372,359 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/aanslagen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/btw",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/btw/aansluiting",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/herinnering",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanslag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/kwijt/besluit",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanslag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/kwijt/voordracht",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanslag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/aanmaning",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/beslag",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/bezwaar/beslis",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/dwangbevel",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/intrek",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/maak",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze zaak heeft over 2026K2 niets gefactureerd en niets aangegeven."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/regeling",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/stelvast",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffing/stop",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze naheffing kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/naheffingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bd/regeling",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanslag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bekendmaking",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rijkBekend": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+    "c": {
+     "rijkBekend": 1
+    }
+   }
   },
   {
    "methode": "POST",
@@ -37834,38 +37834,37 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/bezwaar/beslis",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Bezwaar niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bezwaren",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -37887,92 +37886,91 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/bieb",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bieb/catalogus",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bieb/installeer",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze app bestaat niet in de Rijks-Bibliotheek."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bieb/mijn",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rijksInstallaties": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/bieb/weg",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Deze app staat niet bij uw werk-apps."
   },
   {
    "methode": "POST",
@@ -37997,20 +37995,19 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/kvk/lijst",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38032,398 +38029,398 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/ai",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/bezoeker/in",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/bezoeker/uit",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "overheidPda": 4
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Bezoeker niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/bezoekers",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/incident",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/incident/sluit",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Incident niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/incidenten",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/klaarzet",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Zitting niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/overzicht",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/ronde",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/taak/extra",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/taak/klaar",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Taak niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/taken",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een geldige locatie."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/pda/zittingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/beroep",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Bezwaar niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/rol",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/uitspraak",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Zaak niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/zaak",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rijkZaken": 1
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+    "c": {
+     "rijkZaken": 1
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/zaken",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/zitting",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Zaak niet gevonden."
   },
   {
    "methode": "POST",
@@ -38446,20 +38443,19 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/regie",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38499,7 +38495,8 @@
     "b": {},
     "c": {
      "rijkBerichten": 1,
-     "rijkRijbewijzen": "gewijzigd"
+     "rijkRijbewijzen": "gewijzigd",
+     "kosten": "gewijzigd"
     }
    }
   },
@@ -38542,20 +38539,20 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/subsidie/beslis",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
@@ -38577,20 +38574,19 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/subsidies/lijst",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38630,38 +38626,37 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/toeslag/beslis",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/toeslagen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38683,74 +38678,76 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/uitgifte",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/uitgifte/bundel",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Uitgifte niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/uitgifte/start",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Kies een bron: aanslagen, bezwaren."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/uitgifte/teken",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Uitgifte niet gevonden."
   },
   {
    "methode": "POST",
@@ -38773,38 +38770,37 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/uitkering/beslis",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/uitkeringen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38843,20 +38839,23 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/verkiezing/sluit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rijkVerkiezing": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+    "c": {
+     "rijkVerkiezing": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -38933,38 +38932,37 @@
   {
    "methode": "POST",
    "pad": "/api/overheid/water/melding/zet",
-   "rol": "supplier",
+   "rol": "zaak:RIJK",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor het rijk."
+   "blokkade": "Melding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/water/meldingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:RIJK",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor het rijk."
+   }
   },
   {
    "methode": "POST",
@@ -38980,9 +38978,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -39384,9 +39380,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Hiervoor is een echt account nodig."
   },
@@ -39601,13 +39595,12 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "payTikCodes": 1
     },
     "b": {},
     "c": {
-     "payTikCodes": 1,
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
+     "payTikCodes": 1
     }
    }
   },
@@ -40191,12 +40184,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -40288,9 +40278,7 @@
      "punten": 1
     },
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -40879,11 +40867,14 @@
     "a": {
      "residentie": 1
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "residentie": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -41105,7 +41096,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -41624,9 +41617,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -42206,9 +42197,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -42707,7 +42696,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -43407,8 +43398,7 @@
    ],
    "opslag": {
     "a": {
-     "sessions": 1,
-     "kosten": "gewijzigd"
+     "sessions": 1
     },
     "b": {
      "sessions": 1
@@ -44573,7 +44563,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -45660,7 +45652,6 @@
     },
     "b": {},
     "c": {
-     "wacht": "gewijzigd",
      "salon": "gewijzigd"
     }
    }
@@ -46526,9 +46517,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -46542,9 +46536,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -46908,398 +46900,396 @@
   {
    "methode": "POST",
    "pad": "/api/sport/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/financien",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/kamp/vraag",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Waar wil het team heen?"
   },
   {
    "methode": "POST",
    "pad": "/api/sport/kampen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/moment/maak",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "sportclubs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+    "c": {
+     "sportclubs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/momenten",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/plattegrond",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/plattegrond/zet",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/programma",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/scan",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/speler",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Team niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/sport/sponsor/beslis",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Pakket niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/sport/sponsor/maak",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Omschrijf het sponsorpakket."
   },
   {
    "methode": "POST",
    "pad": "/api/sport/sponsors",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/stand",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/team/maak",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "sportclubs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+    "c": {
+     "sportclubs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/teams",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+    "c": {
+     "wacht": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/uitslag",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Wedstrijd niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/sport/veld/zet",
-   "rol": "supplier",
+   "rol": "zaak:FCRTG",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor de sportclub."
+   "blokkade": "Veld niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/sport/velden",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/sport/wedstrijd/maak",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FCRTG",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "sportclubs": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Alleen voor de sportclub."
+    "c": {
+     "sportclubs": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -47597,7 +47587,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Alleen met een persoonlijke login."
   },
@@ -48063,9 +48055,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
@@ -48440,7 +48430,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "aanwezig": "gewijzigd"
     },
     "b": {},
@@ -48598,74 +48587,75 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/advies",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:LEXNOVA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "advies": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen professionele praktijk."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/advies/afspraak",
-   "rol": "supplier",
+   "rol": "zaak:LEXNOVA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen professionele praktijk."
+   "blokkade": "Deze adviseur werkt hier niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/advies/dossier",
-   "rol": "supplier",
+   "rol": "zaak:LEXNOVA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen professionele praktijk."
+   "blokkade": "Voor wie is het dossier, en waar gaat het over?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/advies/dossier/status",
-   "rol": "supplier",
+   "rol": "zaak:LEXNOVA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen professionele praktijk."
+   "blokkade": "Dossier niet gevonden."
   },
   {
    "methode": "POST",
@@ -48790,7 +48780,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Voorstel niet gevonden."
   },
@@ -48850,200 +48842,201 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:VALAURA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/chalet",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "alpine": 1
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Dit chalet bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/groep/in",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Deze les staat niet op het bord."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/huur",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Huren kan 1 tot 21 dagen."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/huur/in",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Verhuur niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/lawine",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Het lawineniveau loopt van 1 tot 5."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/lift",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Deze lift bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/pas",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Een pas geldt 1 tot 14 dagen."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/piste",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Deze piste bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/prive",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Deze instructeur werkt hier niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/alpine/prive/klaar",
-   "rol": "supplier",
+   "rol": "zaak:VALAURA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wintersportresort."
+   "blokkade": "Les niet gevonden."
   },
   {
    "methode": "POST",
@@ -49173,110 +49166,110 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:VELVET",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty/boek",
-   "rol": "supplier",
+   "rol": "zaak:VELVET",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   "blokkade": "Kies een behandeling en een stoel."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty/status",
-   "rol": "supplier",
+   "rol": "zaak:VELVET",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   "blokkade": "Afspraak niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty/uren",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:VELVET",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "beauty": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty/walkin",
-   "rol": "supplier",
+   "rol": "zaak:VELVET",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   "blokkade": "Kies een behandeling."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/beauty/walkin/status",
-   "rol": "supplier",
+   "rol": "zaak:VELVET",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen beauty-salon."
+   "blokkade": "Deze walk-in staat niet in de rij."
   },
   {
    "methode": "POST",
@@ -49745,9 +49738,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Geen geldige positie."
   },
@@ -49961,7 +49952,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit is geen boerderij."
   },
@@ -50410,7 +50403,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Geef een periode als 2026K3 (kwartaal) of 2026-07 (maand)."
   },
@@ -50859,7 +50854,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc4089f3094920"
+   "blokkade": "Die regel bestaat niet: doc5496f99e4079"
   },
   {
    "methode": "POST",
@@ -50877,7 +50872,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc4089f3094920"
+   "blokkade": "Die regel bestaat niet: doc5496f99e4079"
   },
   {
    "methode": "POST",
@@ -51072,7 +51067,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc4089f3094920"
+   "blokkade": "Dat runbook bestaat niet: doc5496f99e4079"
   },
   {
    "methode": "POST",
@@ -51330,9 +51325,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51584,9 +51577,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit is geen defensie-organisatie."
   },
@@ -51870,7 +51861,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -52307,150 +52299,150 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:FORTIA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {
      "notifications": "gewijzigd",
      "rtmail": "gewijzigd",
-     "facturen": 2
+     "facturen": 2,
+     "fitclub": 1
     },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/baan",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Deze baan bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/checkin",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Dit lid staat niet in het bestand."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/checkout",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Dit lid staat niet in het bestand."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/les/in",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Deze les staat niet op het rooster."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/lid",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Kies dag, maand of jaar."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/pt",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Wie wil trainen, en met welk doel?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/fitclub/pt/status",
-   "rol": "supplier",
+   "rol": "zaak:FORTIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen fitnessclub."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
@@ -52580,241 +52572,240 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:MERIDIAAN",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/badge",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Naam en huurder horen bij elke pas."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/badge/zet",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Pas niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/bezoeker",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Wie komt er, en voor welke huurder?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/bezoeker/status",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Bezoeker niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/jetset",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Kies concierge, chauffeur, jet-transfer of lounge."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/jetset/status",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/melding",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Kies een verdieping (1 tot 14)."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/melding/status",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Melding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/valet",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Voor wie rijden we de wagen voor?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/valet/status",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Valet-aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/zaal",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Deze zaal bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouw/zaal/weg",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen kantoorgebouw-partner."
+   "blokkade": "Boeking niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/bhv",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -52835,7 +52826,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/installatie",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -52853,7 +52844,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/installatie/keuring",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -52862,7 +52853,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -52871,7 +52864,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/overzicht",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -52888,7 +52881,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/parkeer",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -52906,7 +52899,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/post",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -52924,7 +52917,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwpand/post/opgehaald",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -52942,7 +52935,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/contract",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -52951,9 +52944,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52962,7 +52953,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/contract/zet",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -52980,7 +52971,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/energie",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -52998,7 +52989,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/lead",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -53019,7 +53010,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/lead/fase",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -53030,14 +53021,17 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    },
    "blokkade": "Lead niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/gebouwplus/overzicht",
-   "rol": "supplier",
+   "rol": "zaak:MERIDIAAN",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -53167,128 +53161,130 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/golf",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:SAROCA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "golfclub": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen golfclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/baan",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:SAROCA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen golfclub."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/les",
-   "rol": "supplier",
+   "rol": "zaak:SAROCA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen golfclub."
+   "blokkade": "Deze pro staat niet op de club."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/les/klaar",
-   "rol": "supplier",
+   "rol": "zaak:SAROCA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen golfclub."
+   "blokkade": "Les niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/tee",
-   "rol": "supplier",
+   "rol": "zaak:SAROCA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen golfclub."
+   "blokkade": "Een flight is 1 tot 4 spelers."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/tee/weg",
-   "rol": "supplier",
+   "rol": "zaak:SAROCA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen golfclub."
+   "blokkade": "Teetime niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/golf/wedstrijd/in",
-   "rol": "supplier",
+   "rol": "zaak:SAROCA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen golfclub."
+   "blokkade": "Deze wedstrijd staat niet op de kalender."
   },
   {
    "methode": "POST",
@@ -53773,7 +53769,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -54369,9 +54367,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Er staat niets meer open in gang 0."
   },
@@ -54481,7 +54477,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -54515,9 +54513,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -55251,7 +55247,8 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd"
+     "horeca": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -55566,13 +55563,12 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {
+    "a": {
      "kosten": "gewijzigd"
     },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -56807,7 +56803,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -56917,9 +56915,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -57054,7 +57050,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/bericht",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -57063,9 +57059,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "hulp": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -57074,7 +57068,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/beslis",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -57092,7 +57086,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/gesprek",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -57110,81 +57104,79 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/groep/maak",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen hulpdiensten en zorg-zaken maken ketengroepen."
+   "blokkade": "Een groep heeft minstens twee leden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/rampbeeld",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
-   "blokkade": "Alleen hulpdiensten, zorg en defensie delen het rampbeeld."
+   "blokkade": "Verbind eerst met een ander korps in de keten; daarna deelt u het rampbeeld."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/rampbeeld/ai",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen hulpdiensten, zorg en defensie delen het rampbeeld."
+   "blokkade": "Verbind eerst met een ander korps in de keten; daarna deelt u het rampbeeld."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/rampbeeld/evaluatie",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen hulpdiensten, zorg en defensie zien de evaluatie."
+   "blokkade": "Verbind eerst met een ander korps in de keten."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/rampbeeld/schaal",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -57202,38 +57194,37 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/status",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:URGENCIA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen hulpdiensten en zorg-zaken zitten in de keten."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/keten/verzoek",
-   "rol": "supplier",
+   "rol": "zaak:URGENCIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen hulpdiensten en zorg-zaken zitten in de keten."
+   "blokkade": "Dit korps of deze zorg-zaak kennen we niet."
   },
   {
    "methode": "POST",
@@ -57406,13 +57397,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -57680,7 +57667,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Onbekend type bouwsteen."
   },
@@ -57958,164 +57947,167 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/marina",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:PORTELL",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen jachthaven."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/brandstof",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "marina": 1
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Voor welke boot is het?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/brandstof/klaar",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Order niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/concierge",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Kies tender, catering, crew of charter-transfer."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/concierge/status",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/passant",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "De naam van de boot en de eigenaar horen erbij."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/service",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Welke boot, en wat moet er gebeuren?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/service/status",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Verzoek niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/marina/vertrek",
-   "rol": "supplier",
+   "rol": "zaak:PORTELL",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen jachthaven."
+   "blokkade": "Deze ligplaats bestaat niet."
   },
   {
    "methode": "POST",
@@ -58129,9 +58121,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -58257,9 +58247,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -59358,6 +59346,7 @@
    "opslag": {
     "a": {
      "onboarding": "gewijzigd",
+     "kosten": "gewijzigd",
      "directOntvangsten": 1
     },
     "b": {},
@@ -59385,110 +59374,109 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:NIDO",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang/kind",
-   "rol": "supplier",
+   "rol": "zaak:NIDO",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   "blokkade": "Deze groep bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang/kind/ophaal",
-   "rol": "supplier",
+   "rol": "zaak:NIDO",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   "blokkade": "Deze groep bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang/nanny",
-   "rol": "supplier",
+   "rol": "zaak:NIDO",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   "blokkade": "Voor welk gezin is de nanny?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang/nanny/zet",
-   "rol": "supplier",
+   "rol": "zaak:NIDO",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/opvang/verslag",
-   "rol": "supplier",
+   "rol": "zaak:NIDO",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen kinderopvang."
+   "blokkade": "Voor wie is het verslagje, en wat is er beleefd?"
   },
   {
    "methode": "POST",
@@ -59647,12 +59635,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -59794,9 +59779,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit lid heeft geen RTG-geverifieerd paspoort."
   },
@@ -59942,7 +59925,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -60227,7 +60212,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -60320,164 +60307,168 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AMICS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "petcare": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/checkin",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Hoe heet het dier, en van wie is het?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/checkuit",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Deze gast logeert hier niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/notitie",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Deze gast logeert hier niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/ronde",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AMICS",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "petcare": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+    "c": {
+     "petcare": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/ronde/hond",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Ronde niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/ronde/klaar",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Ronde niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/trim",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Welk dier komt er, en van wie is het?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/petcare/trim/klaar",
-   "rol": "supplier",
+   "rol": "zaak:AMICS",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen petcare-bedrijf."
+   "blokkade": "Afspraak niet gevonden."
   },
   {
    "methode": "POST",
@@ -60517,56 +60508,55 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/polis",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:SEGUR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen verzekeringsadviseur."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/polis/vraag",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeringsadviseur."
+   "blokkade": "Kies een van onze adviesproducten."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/polis/zet",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeringsadviseur."
+   "blokkade": "Aanvraag niet gevonden."
   },
   {
    "methode": "POST",
@@ -60868,9 +60858,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -61443,7 +61431,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -62218,7 +62208,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -62277,9 +62269,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -62383,9 +62373,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -62524,7 +62512,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -63443,9 +63433,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -63515,7 +63503,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -64154,7 +64144,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -64237,254 +64229,256 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit dashboard is voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/bord",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit dashboard is voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/capaciteit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/dienst/herhaal",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Deze dienst bestaat niet (meer)."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/klantnotitie",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "vakKlantNotities": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/offerte/antwoord",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Offerte niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/offerte/weiger",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Offerte niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/onderhoud/herinner",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Deze klant staat niet in de onderhoudslijst."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/pro",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/ritme/stop",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Deze vaste afspraak is niet gevonden of al gestopt."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/uren",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/uren-zet",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AYAKA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/wachtlijst/uitnodig",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Deze wachtende is niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vak/werkbon",
-   "rol": "supplier",
+   "rol": "zaak:AYAKA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen voor dienstverlenende zaken."
+   "blokkade": "Boeking niet gevonden."
   },
   {
    "methode": "POST",
@@ -64573,9 +64567,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Verblijf niet gevonden."
   },
@@ -64703,9 +64695,7 @@
      "suppliers": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -64959,110 +64949,109 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:TERRAMAR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/afleveren",
-   "rol": "supplier",
+   "rol": "zaak:TERRAMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   "blokkade": "Zending niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/douane",
-   "rol": "supplier",
+   "rol": "zaak:TERRAMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   "blokkade": "Zending niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/etappe",
-   "rol": "supplier",
+   "rol": "zaak:TERRAMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   "blokkade": "Zending niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/maak",
-   "rol": "supplier",
+   "rol": "zaak:TERRAMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   "blokkade": "Geef bij herkomst een plaats en een land op."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/vracht/melding",
-   "rol": "supplier",
+   "rol": "zaak:TERRAMAR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit is geen vracht- of expeditiepartner."
+   "blokkade": "Zending niet gevonden."
   },
   {
    "methode": "POST",
@@ -65085,92 +65074,93 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/weddings",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:AURELIA",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weddings": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen wedding- en eventplanner."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/weddings/event",
-   "rol": "supplier",
+   "rol": "zaak:AURELIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wedding- en eventplanner."
+   "blokkade": "Voor wie is de dag?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/weddings/event/status",
-   "rol": "supplier",
+   "rol": "zaak:AURELIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wedding- en eventplanner."
+   "blokkade": "Dit draaiboek bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/weddings/taak",
-   "rol": "supplier",
+   "rol": "zaak:AURELIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wedding- en eventplanner."
+   "blokkade": "Dit draaiboek bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/weddings/taak/klaar",
-   "rol": "supplier",
+   "rol": "zaak:AURELIA",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen wedding- en eventplanner."
+   "blokkade": "Dit draaiboek bestaat niet."
   },
   {
    "methode": "POST",
@@ -65436,7 +65426,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -65531,7 +65523,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/afspraak/maak",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -65549,7 +65541,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/afspraak/zet",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -65567,43 +65559,44 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/overzicht",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:CANMISSES",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak hoort niet bij de zorgketen."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/recept/maak",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen de huisarts, het ziekenhuis of de specialist schrijft voor."
+   "blokkade": "Deze apotheek kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/recept/zet",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -65621,25 +65614,25 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/receptie/aan",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen een spreekkamer-zaak heeft een medische receptie."
+   "blokkade": "Wie meldt zich (een korte aanduiding, geen volledige naam nodig)?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/receptie/klaar",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -65648,9 +65641,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "hulp": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -65659,7 +65650,7 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/receptie/roep",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -65677,61 +65668,61 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/seh/binnen",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen het ziekenhuis heeft een eerste hulp."
+   "blokkade": "Waarmee komt de patient binnen?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/seh/zet",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen het ziekenhuis heeft een eerste hulp."
+   "blokkade": "Deze patient staat niet in de rij."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/verwijs/maak",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen de huisarts of het ziekenhuis verwijst door."
+   "blokkade": "Verwijzen kan naar een medisch specialist of een beauty medical-kliniek."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorg/verwijs/zet",
-   "rol": "supplier",
+   "rol": "zaak:CANMISSES",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -65749,112 +65740,109 @@
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "zaak:SEGUR",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis/declaratie",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    403,
-    403,
-    403
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   "blokkade": "Geen actieve zorgpas met dit nummer."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis/declaratie/beslis",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   "blokkade": "Declaratie niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis/inschrijf",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   "blokkade": "Kies basis, plus of top."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis/pas",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   "blokkade": "Onbekend pasnummer."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/zorgpolis/stop",
-   "rol": "supplier",
+   "rol": "zaak:SEGUR",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze zaak is geen verzekeraar."
+   "blokkade": "Verzekerde niet gevonden."
   },
   {
    "methode": "POST",
@@ -66065,7 +66053,8 @@
     },
     "b": {},
     "c": {
-     "techniek": "gewijzigd"
+     "techniek": "gewijzigd",
+     "wacht": "gewijzigd"
     }
    }
   },
@@ -66173,7 +66162,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -66440,7 +66432,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -66726,9 +66720,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -67046,12 +67043,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -67119,12 +67113,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -67370,7 +67361,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit soort toestemming kent RTG niet."
   },
@@ -67991,9 +67984,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -68097,9 +68093,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies minstens één verbonden persoon of betrokken bedrijf."
   },
@@ -68417,6 +68411,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "rijkVoertuigen": 6
     },
     "b": {},
@@ -69312,9 +69307,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit hoort bij de Lifestyle en Business Pass."
   },
@@ -69387,7 +69380,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit hoort bij de Lifestyle en Business Pass."
   },
@@ -69441,9 +69436,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze wereld hoort bij een andere pas."
   },
@@ -70037,7 +70030,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -70428,7 +70423,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -70574,9 +70571,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -71736,9 +71731,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -71955,8 +71948,7 @@
    ],
    "opslag": {
     "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -72416,9 +72408,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Onbekend gezinslid."
   },
@@ -73039,7 +73029,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Geef je gezin een naam."
   },
@@ -73150,9 +73142,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Vul voor een kind de geboortedatum in, zodat de leeftijdspas automatisch klopt."
   },
@@ -73476,9 +73466,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -73528,9 +73521,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -73853,7 +73844,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -74069,9 +74062,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74659,7 +74650,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -75007,12 +75000,11 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
-    "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+    "b": {},
+    "c": {
+     "wacht": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -75334,12 +75326,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -75520,7 +75509,8 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd"
+     "foundation": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -75961,12 +75951,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -76222,7 +76209,9 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -76574,7 +76563,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -76611,7 +76602,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    },
    "blokkade": "Vul een ontvanger en een bericht in."
   },
@@ -76804,12 +76798,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -77020,7 +77011,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -77035,9 +77028,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -77074,9 +77065,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -77741,12 +77735,9 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -77983,7 +77974,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -78299,7 +78292,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -78589,9 +78584,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -78864,12 +78857,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -79981,7 +79971,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -80766,9 +80758,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Bedrijf niet gevonden."
   },
@@ -81733,9 +81723,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -82583,7 +82576,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "ideeen": "gewijzigd"
     },
     "b": {},
@@ -82767,10 +82759,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -83174,6 +83163,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "officeDocs": 1
     },
     "b": {},
@@ -83211,9 +83201,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }

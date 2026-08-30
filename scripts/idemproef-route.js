@@ -157,6 +157,19 @@ wachtOpSchoneBoom();
     return false;
   };
 
+  /* DE GENREWERELD -- ./lib/wereld-genre.js. Twintig zaaksessies, elk bij de
+     juiste soort bedrijf, want 235 routes worden niet op de ROL geweigerd maar
+     op wat de zaak IS. Zie ./lib/genrezaken.js voor waarom dat een eigen rol
+     wordt en geen variant van `supplier`. */
+  const { zetGenreKlaar } = require('./lib/wereld-genre');
+  const { genreRolVoor, rolVanZaak: genreRolVanZaak } = require('./lib/genrezaken');
+  const genreWereld = await zetGenreKlaar({ post });
+  for (const [code, tok] of Object.entries(genreWereld.tokens)) tokens[genreRolVanZaak(code)] = tok;
+  console.log('  genrewereld                          : ' +
+    (genreWereld.klaar ? 'klaar   (' + Object.keys(genreWereld.tokens).length + ' zaken)'
+                       : 'NIET klaar -- ' + genreWereld.reden));
+  for (const st of genreWereld.stappen) if (!st.ok || st.waarom) console.log('      ' + st.zaak + ': ' + st.waarom);
+
   const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
@@ -207,7 +220,15 @@ wachtOpSchoneBoom();
   const { magOpwaarderen } = require('./lib/lijfsleutels');
   const opgewaardeerd = [];
   const geweigerd = [];
+  const naarGenre = [];
   const metRol = verdeling.metRol.map(r => {
+    /* EERST DE GENREZAAK. Die verfijnt `supplier` naar EEN bepaalde zaak en
+       staat los van de lijfsleutelfamilies: hij zegt niet welke pas de sessie
+       draagt maar bij welk soort bedrijf zij hoort. Alleen als er ook
+       werkelijk een sessie voor die zaak is opgehaald -- anders zou de proef
+       aankloppen zonder sleutel en dat meet niets. */
+    const g = genreRolVoor(r.rol, r.pad);
+    if (g.rol && tokens[g.rol]) { naarGenre.push({ pad: r.pad, naar: g.rol }); return { ...r, rol: g.rol, rolVan: r.rol }; }
     const familieRol = lijfsleutels.rolVoor(r.pad);
     const oordeel = magOpwaarderen(r.rol, familieRol);
     if (!familieRol || familieRol === r.rol) return r;
@@ -215,6 +236,10 @@ wachtOpSchoneBoom();
     opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
     return { ...r, rol: familieRol, rolVan: r.rol };
   });
+  if (naarGenre.length) {
+    console.log('  routes naar een genrezaak            : ' + naarGenre.length +
+      '   (' + new Set(naarGenre.map(x => x.naar)).size + ' zaken)');
+  }
   if (geweigerd.length) {
     console.log('  opwaardering GEWEIGERD                : ' + geweigerd.length +
       '   (' + [...new Set(geweigerd.map(x => x.van + ' blijft ' + x.van))].join(', ') + ')');
@@ -277,6 +302,7 @@ wachtOpSchoneBoom();
   const { zetHorecaKlaar } = require('./lib/wereld-horeca');
   const horecaWereld = await zetHorecaKlaar({ post, sleutels: schoolSleutels, tokens });
   console.log('  horecawereld                         : ' + (horecaWereld.klaar ? 'klaar' : 'NIET klaar -- ' + horecaWereld.reden));
+
 
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({

@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 196cf7db, schone boom",
+  "metingReden": "gemeten op commit a2d3aa8f, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:57:48.143Z",
-    "commit": "196cf7db",
+    "op": "2026-08-30T12:05:35.284Z",
+    "commit": "a2d3aa8f",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 196cf7db, schone boom"
+    "metingReden": "gemeten op commit a2d3aa8f, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1491,
-    "onbewezen": 3170,
+    "metBewijs": 1496,
+    "onbewezen": 3165,
     "sluit": true
   },
   "bakken": [
@@ -48,7 +48,7 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 21,
+      "aantal": 15,
       "voorbeelden": [
         "POST /api/arrival/pass",
         "POST /api/arrival/pulse",
@@ -81,7 +81,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1632,
+      "aantal": 1633,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmeld/zeg",
@@ -207,12 +207,6 @@
       "POST /api/betaal/webhook/adyen",
       "POST /api/code/dyn",
       "POST /api/code/scan",
-      "POST /api/doos/buurmelding",
-      "POST /api/doos/meting",
-      "POST /api/doos/rapport",
-      "POST /api/doos/update/status",
-      "POST /api/foundation/agenda",
-      "POST /api/foundation/opgave",
       "POST /api/foundation/reis/aanvraag",
       "POST /api/link/koppelingen",
       "POST /api/link/los",
@@ -1193,6 +1187,7 @@
       "POST /api/doelen/meet",
       "POST /api/doelen/stop",
       "POST /api/doelen/verzet",
+      "POST /api/doos/buurmelding",
       "POST /api/event/rsvp",
       "POST /api/event/rsvp/annuleer",
       "POST /api/facturen/classificeer",

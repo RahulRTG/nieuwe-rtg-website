@@ -29,7 +29,20 @@ const { maakSleutels, haalSleutels, ONMISBAAR } = require('./lib/proefsleutels')
 const { maakTeller, maakRommel } = require('./lib/rommel');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zie de kop van ./lib/stempel.js voor de
+   drie rondes die daar in een zitting aan zijn opgegaan. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de invoerproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INVOERPROEF.json');
@@ -54,6 +67,7 @@ const RONDES = Number((argv.find(a => a.startsWith('--rondes=')) || '').slice(9)
    meenam. Dezelfde wacht hoort op elk instrument dat bij het draaien een register
    OVERSCHRIJFT. */
 if (require.main !== module) { module.exports = {}; return; }
+wachtOpSchoneBoom();
 
 (async () => {
   /* DE GEDEELDE WEGWERPSERVER. Hier stond de eigen kopie die de kop al een

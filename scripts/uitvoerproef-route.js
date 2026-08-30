@@ -39,7 +39,20 @@ const { alleRoutes, isSchakel } = require('./lib/routes');
    te lopen: verouderd ziet er identiek uit aan vers, en scripts/versheid.js kan
    er niets over zeggen. Zeven registers misten hem; zie de kop van
    scripts/lib/stempel.js. */
-const { stempel } = require('./lib/stempel');
+const { stempel, eisSchoneBoom } = require('./lib/stempel');
+
+/* WEIGEREN VOOR HET BEGINT. Deze ronde duurt minuten en levert een register op
+   dat NERGENS meetelt zodra er ongecommit werk in de boom staat -- boomVuil
+   wordt pas aan het eind vastgesteld. Zie de kop van ./lib/stempel.js voor de
+   drie rondes die daar in een zitting aan zijn opgegaan. */
+function wachtOpSchoneBoom() {
+  const b = eisSchoneBoom('de uitvoerproef');
+  if (b.ok) return;
+  console.error('\n  DEZE RONDE ZOU NIET MEETELLEN\n');
+  console.error('  ' + b.reden);
+  for (const r of (b.bestanden || [])) console.error('    ' + r);
+  process.exit(3);
+}
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'UITVOERPROEF.json');
@@ -72,6 +85,8 @@ async function wacht(basis, ms) {
   }
   return false;
 }
+
+wachtOpSchoneBoom();
 
 (async () => {
   const poort = await vrijePoort();

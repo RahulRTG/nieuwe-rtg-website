@@ -58,6 +58,44 @@ function stempel(extra) {
   }, extra || {});
 }
 
+/* ============================================================================
+   DE POORT VOORAF -- weiger te beginnen aan een meting die toch niet telt.
+
+   HET PROBLEEM. `stempel()` wordt aan het EIND van een ronde genomen. Staat er
+   dan ongecommit werk in de boom, dan draagt het register `boomVuil: true` en
+   is de hele meting waardeloos: hij hoort bij een stand die nergens is
+   vastgelegd. Dat is precies wat het veld moet melden, en het meldt het te
+   laat -- de tien minuten zijn dan al op.
+
+   Gemeten in één zitting: drie rondes verspild. Twee keer omdat ik tijdens de
+   ronde een script bewerkte, een keer omdat een ander instrument ondertussen
+   een register wegschreef. Aan de uitvoer was tot het einde niets te zien.
+
+   WAT DEZE POORT DOET. Hij kijkt VOORAF of de boom schoon is en laat het
+   instrument stoppen voordat het begint. `sta toe` is geen vlag maar een
+   uitgeschreven besluit: RTG_METEN_OP_VUILE_BOOM=1 zegt "ik weet dat deze
+   uitslag niet telt" -- bijvoorbeeld bij het uitproberen van een nieuwe familie,
+   waar de vorige meting toch al wordt weggegooid.
+
+   WAT HIJ NIET DOET. Hij kijkt niet of de boom schoon BLIJFT. Wie halverwege
+   een bestand aanraakt, krijgt nog steeds `boomVuil: true` aan het eind -- en
+   dat hoort ook zo, want dat is wat er dan echt aan de hand is. Deze poort
+   voorkomt de verspilling die vooraf te zien was, niet die van later. */
+function eisSchoneBoom(naam) {
+  const commit = git(['rev-parse', '--short', 'HEAD']);
+  if (!commit) return { ok: true, reden: 'geen git; er valt niets te ijken' };
+  if (process.env.RTG_METEN_OP_VUILE_BOOM === '1') {
+    return { ok: true, reden: 'toegestaan met RTG_METEN_OP_VUILE_BOOM=1; deze uitslag telt niet als bewijs' };
+  }
+  const status = git(['status', '--porcelain']);
+  if (!status) return { ok: true, reden: 'schone boom op ' + commit };
+  const regels = status.split('\n').filter(Boolean);
+  return { ok: false, commit, bestanden: regels.slice(0, 8).map(r => r.trim()),
+    reden: (naam || 'deze meting') + ' zou een uitslag opleveren met boomVuil: true, en die telt nergens mee. ' +
+      regels.length + ' bestand(en) niet gecommit. Commit ze eerst, of zet RTG_METEN_OP_VUILE_BOOM=1 ' +
+      'als u weet dat deze ronde niet als bewijs hoeft te tellen.' };
+}
+
 /* Is dit stempel nog van deze code? Geeft een REDEN terug en niet alleen een
    ja/nee, want "verouderd" zonder waarom leidt tot een tweede onderzoek. */
 function versheid(gemeten, huidigeCommit) {
@@ -99,4 +137,4 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, versheid, nuCommit, WORTEL };
+module.exports = { stempel, eisSchoneBoom, versheid, nuCommit, WORTEL };

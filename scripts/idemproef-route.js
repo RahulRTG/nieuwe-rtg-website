@@ -218,6 +218,11 @@ if (require.main !== module) { module.exports = {}; return; }
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
+    /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
+       niet meer beweren dat een wijziging op zijn plaats onzichtbaar is. Uit
+       staatlog zelf en niet uit de env-string hier -- de module beslist of hij
+       aanstaat, en een tweede lezing daarvan loopt uit de pas (LAT.md regel 4). */
+    staatDiep: staatlog.diep,
     vastlegging: register.vastlegging });
 
   if (uit.meterStuk) {

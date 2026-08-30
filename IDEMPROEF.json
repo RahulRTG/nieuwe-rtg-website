@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T08:56:12.434Z",
-  "commit": "89595a43",
+  "op": "2026-08-30T08:59:01.741Z",
+  "commit": "ce0a8430",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -64,15 +64,17 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 3777,
-  "beoordeeld": 1106,
-  "beschermd": 1105,
+  "beoordeeld": 1111,
+  "beschermd": 1110,
   "onbeschermd": 1,
-  "ongemeten": 2671,
-  "oproepen": 11353,
+  "ongemeten": 2666,
+  "oproepen": 11357,
   "tokensHernieuwd": 22,
-  "uitOpslag": 0,
+  "uitOpslag": 5,
   "ruisGeijkt": [
-   "handelingLog"
+   "rtgai",
+   "handelingLog",
+   "apiSpoor"
   ],
   "vastlegging": [
    {
@@ -89,7 +91,7 @@
    },
    {
     "collectie": "supplierActivity",
-    "families": 0
+    "families": 16
    }
   ],
   "blindeRondes": 0,
@@ -107,7 +109,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 0,
+ "vermoedensVerworpen": 4,
  "perRoute": [
   {
    "methode": "POST",
@@ -410,7 +412,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": 1
+    },
     "b": {},
     "c": {}
    }
@@ -529,7 +533,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -648,7 +654,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": 7
+    },
     "b": {},
     "c": {}
    }
@@ -699,7 +707,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd",
+     "appstore": 1
+    },
     "b": {},
     "c": {}
    }
@@ -801,7 +812,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": 1
+    },
     "b": {},
     "c": {}
    }
@@ -835,9 +848,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "appstore": "gewijzigd"
+    }
    }
   },
   {
@@ -886,7 +903,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": 1
+    },
     "b": {},
     "c": {}
    }
@@ -1022,7 +1041,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd",
+     "appstore": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -1243,7 +1265,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": 1
+    },
     "b": {},
     "c": {}
    }
@@ -1464,9 +1488,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appstore": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "appstore": "gewijzigd"
+    }
    }
   },
   {
@@ -1926,11 +1954,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": 1,
+     "bankBoekingen": 1,
+     "bankIdem": 2,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2032,13 +2066,21 @@
    ],
    "opslag": {
     "a": {
+     "bankSaldi": 1,
      "bankBoekingen": 1,
-     "payBoekingen": 1
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "payBoekingen": 1,
+     "paySaldi": 2
     },
     "b": {},
     "c": {
      "payBoekingen": 1,
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "paySaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2055,11 +2097,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2093,11 +2141,19 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": 1,
+     "bankBoekingen": 1,
+     "bankPassen": "gewijzigd",
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankPassen": "gewijzigd",
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2105,15 +2161,18 @@
    "methode": "POST",
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -2122,15 +2181,18 @@
    "methode": "POST",
    "pad": "/api/bank/pas/limiet",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -2147,7 +2209,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankPassen": -1
+    },
     "b": {},
     "c": {}
    }
@@ -2164,9 +2228,17 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "bankPassen": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankPassen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
+    }
    }
   },
   {
@@ -2215,7 +2287,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankRekeningen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -2250,11 +2324,17 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2271,13 +2351,23 @@
    ],
    "opslag": {
     "a": {
+     "betaalIdem": 1,
+     "bankSaldi": 1,
      "bankBoekingen": 1,
-     "betaalOpdrachten": 1
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "betaalOpdrachten": 1,
+     "capGezondheid": 1
     },
     "b": {},
     "c": {
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
      "bankBoekingen": 1,
-     "betaalOpdrachten": 1
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1,
+     "betaalOpdrachten": 1,
+     "capGezondheid": "gewijzigd"
     }
    }
   },
@@ -2285,15 +2375,18 @@
    "methode": "POST",
    "pad": "/api/bank/spaardoel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankRekeningen en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankRekeningen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -2311,11 +2404,19 @@
    ],
    "opslag": {
     "a": {
-     "bankBoekingen": 1
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankBoekingen": 1
+     "betaalIdem": 1,
+     "bankSaldi": "gewijzigd",
+     "bankBoekingen": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2340,15 +2441,18 @@
    "methode": "POST",
    "pad": "/api/bank/terugkerend/stop",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "bankTerugkerend": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -2366,11 +2470,15 @@
    ],
    "opslag": {
     "a": {
-     "bankTerugkerend": 1
+     "bankTerugkerend": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "bankTerugkerend": 1
+     "bankTerugkerend": 1,
+     "bankIdem": 1,
+     "bankIdemAfdruk": 1
     }
    }
   },
@@ -2539,7 +2647,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bestanden": 1
+    },
     "b": {},
     "c": {}
    }
@@ -2998,7 +3108,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bijles": 1
+    },
     "b": {},
     "c": {}
    }
@@ -3015,9 +3127,14 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bijles": "gewijzigd",
+     "onderwijs": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bijles": "gewijzigd"
+    }
    }
   },
   {
@@ -3032,7 +3149,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 4
+    },
     "b": {},
     "c": {}
    }
@@ -3066,7 +3185,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalRegie": 2
+    },
     "b": {},
     "c": {}
    }
@@ -3185,7 +3306,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "b": {},
     "c": {}
    }
@@ -3338,7 +3462,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "boeken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -3423,7 +3549,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": 2
+    },
     "b": {},
     "c": {}
    }
@@ -4362,7 +4490,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAgents": 1,
+     "commandBeleid": 9
+    },
     "b": {},
     "c": {}
    }
@@ -4396,7 +4527,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAgents": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -4447,7 +4580,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -4464,7 +4599,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "apiPoort": 2
+    },
     "b": {},
     "c": {}
    }
@@ -4889,7 +5026,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -5042,9 +5181,13 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -5076,9 +5219,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -5849,7 +5996,10 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -5900,7 +6050,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -5934,7 +6086,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -6074,9 +6228,13 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zandbakken": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": 1
+    }
    }
   },
   {
@@ -6108,7 +6266,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zandbakken": -1
+    },
     "b": {},
     "c": {}
    }
@@ -6380,7 +6540,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6533,7 +6695,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6720,7 +6884,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 2
+    },
     "b": {},
     "c": {}
    }
@@ -6890,7 +7056,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6924,7 +7092,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -6941,9 +7111,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "concern": "gewijzigd"
+    }
    }
   },
   {
@@ -7009,7 +7183,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    }
@@ -7383,7 +7559,12 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "medicatie": 1,
+     "beauty": 1,
+     "dagmetingen": 1,
+     "gemoed": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8237,9 +8418,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "festivals": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "festivals": 1
+    }
    }
   },
   {
@@ -8832,7 +9017,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8849,7 +9036,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": 1
+    },
     "b": {},
     "c": {}
    }
@@ -8866,7 +9055,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -8883,7 +9074,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -8934,7 +9127,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -8968,7 +9163,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": 3,
+     "galerij": 1
+    },
     "b": {},
     "c": {}
    }
@@ -9240,7 +9438,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": 6
+    },
     "b": {},
     "c": {}
    }
@@ -9431,7 +9631,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "geldbeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -9465,7 +9667,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "geldbeleid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -9499,7 +9703,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "accountRollen": 1,
+     "labFonds": 3
+    },
     "b": {},
     "c": {}
    }
@@ -9516,7 +9723,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "geldbeleid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -9842,7 +10051,9 @@
    ],
    "opslag": {
     "a": {
-     "gemeenteMeldingen": 1
+     "gemeenteMeldingen": 1,
+     "supplierNotifications": 1,
+     "weefsel": 4
     },
     "b": {},
     "c": {}
@@ -10081,7 +10292,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "genootschap": 3
+    },
     "b": {},
     "c": {}
    }
@@ -10438,7 +10651,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "genootschap": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -10729,7 +10944,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -10763,7 +10980,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "homekit": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11122,7 +11341,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "instantReality": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11173,7 +11394,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgid": 4
+    },
     "b": {},
     "c": {}
    }
@@ -11190,10 +11413,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
+    "a": {
+     "notities": 1
+    },
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -11309,9 +11537,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "officeDocs": 1
+    }
    }
   },
   {
@@ -11496,7 +11728,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "klets": 2
+    },
     "b": {},
     "c": {}
    }
@@ -11564,7 +11798,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "klok": 1
+    },
     "b": {},
     "c": {}
    }
@@ -11751,9 +11987,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 3
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -11819,9 +12059,14 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 2,
+     "economie": 2
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -13111,7 +13356,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -13366,7 +13613,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "levensbanden": 2
+    },
     "b": {},
     "c": {}
    }
@@ -13451,7 +13700,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "levensbeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -13485,7 +13736,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "metier": 5,
+     "lifestyle": 1
+    },
     "b": {},
     "c": {}
    }
@@ -13587,7 +13841,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -13672,9 +13928,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "live": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "live": "gewijzigd"
+    }
    }
   },
   {
@@ -13690,9 +13950,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -13706,7 +13969,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "live": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -13791,7 +14056,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "sessions": -1
+    },
     "b": {},
     "c": {}
    }
@@ -14166,7 +14433,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": 3
+     "suppliers": 3,
+     "sessions": 1
     },
     "b": {},
     "c": {}
@@ -14286,7 +14554,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "appInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14354,7 +14624,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mallLijsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14524,7 +14796,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mallLijsten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -14711,7 +14985,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "reisInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14796,7 +15072,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfAppInstallaties": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14898,7 +15176,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaBieb": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14932,7 +15212,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaLijsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -14966,7 +15248,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaLijsten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -15051,7 +15335,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaMeldingen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -15119,9 +15405,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mediaKamers": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "mediaKamers": "gewijzigd"
+    }
    }
   },
   {
@@ -15463,7 +15753,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -15531,7 +15823,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "aiTegoed": 1
+    },
     "b": {},
     "c": {}
    }
@@ -15633,7 +15927,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmail": 1
+    },
     "b": {},
     "c": {}
    }
@@ -15786,7 +16082,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenBoard": 1
+    },
     "b": {},
     "c": {}
    }
@@ -17282,7 +17580,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "leren": 4
+    },
     "b": {},
     "c": {}
    }
@@ -17486,7 +17786,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "leren": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -17571,9 +17873,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "leren": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "leren": "gewijzigd"
+    }
    }
   },
   {
@@ -18047,7 +18353,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -18115,7 +18423,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -18149,7 +18459,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -18217,7 +18529,11 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd",
+     "magnaatPartnerstudio": 4,
+     "magnaatTrainingslobbies": 2
+    },
     "b": {},
     "c": {}
    }
@@ -18506,7 +18822,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redactie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -18557,7 +18875,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": 1,
+     "contactPinSecurity": 1
+    },
     "b": {},
     "c": {}
    }
@@ -18608,9 +18929,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPinSecurity": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "contactPinSecurity": "gewijzigd"
+    }
    }
   },
   {
@@ -18659,9 +18984,17 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": "gewijzigd",
+     "contactPinSecurity": "gewijzigd",
+     "contactPinRetired": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "contactPins": "gewijzigd",
+     "contactPinRetired": 1,
+     "contactPinSecurity": "gewijzigd"
+    }
    }
   },
   {
@@ -18676,7 +19009,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": "gewijzigd",
+     "contactPinSecurity": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -18744,7 +19080,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "pulse": 4
+    },
     "b": {},
     "c": {}
    }
@@ -18846,7 +19184,10 @@
     429
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "pulse": "gewijzigd",
+     "wauw": 1
+    },
     "b": {},
     "c": {}
    }
@@ -20412,7 +20753,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -20461,7 +20804,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": 2
+    },
     "b": {},
     "c": {}
    }
@@ -20478,7 +20823,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -20529,7 +20876,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailBewaar": 2
+    },
     "b": {},
     "c": {}
    }
@@ -20546,9 +20895,14 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailBewaar": "gewijzigd",
+     "rtmailRecht": 2
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rtmailRecht": "gewijzigd"
+    }
    }
   },
   {
@@ -20580,7 +20934,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailBijlagen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -20784,9 +21140,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRecht": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rtmailRecht": "gewijzigd"
+    }
    }
   },
   {
@@ -20818,7 +21178,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -20852,7 +21214,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailSleutels": 1
+    },
     "b": {},
     "c": {}
    }
@@ -20869,9 +21233,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailSleutels": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "mailSleutels": "gewijzigd"
+    }
    }
   },
   {
@@ -21005,7 +21373,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRegels": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21107,7 +21477,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21209,7 +21581,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailTeams": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -21532,7 +21906,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": 2
+    },
     "b": {},
     "c": {}
    }
@@ -21821,7 +22197,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21974,7 +22352,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -21991,9 +22371,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "spellen": "gewijzigd"
+    }
    }
   },
   {
@@ -22165,7 +22549,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -22233,7 +22619,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "spellen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -22658,7 +23046,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "postdatums": 1
+    },
     "b": {},
     "c": {}
    }
@@ -22879,9 +23269,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "metier": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "metier": "gewijzigd"
+    }
    }
   },
   {
@@ -23236,7 +23630,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mobFavorieten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -23920,7 +24316,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -24022,7 +24420,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "noodkaarten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -24192,7 +24592,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kantoorTaken": 26
+    },
     "b": {},
     "c": {}
    }
@@ -24328,7 +24730,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "architect": 3
+    },
     "b": {},
     "c": {}
    }
@@ -24379,7 +24783,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "architect": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -24413,9 +24819,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "architect": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "architect": "gewijzigd"
+    }
    }
   },
   {
@@ -24549,9 +24959,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelier": 3
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "atelier": "gewijzigd"
+    }
    }
   },
   {
@@ -24600,7 +25014,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelier": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -24668,9 +25084,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "atelierSites": 2
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "atelierSites": "gewijzigd"
+    }
    }
   },
   {
@@ -25042,9 +25462,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankregie": "gewijzigd"
+    }
    }
   },
   {
@@ -25161,7 +25585,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -25178,9 +25604,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankregie": "gewijzigd"
+    }
    }
   },
   {
@@ -25212,9 +25642,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bankregie": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "bankregie": "gewijzigd"
+    }
    }
   },
   {
@@ -25263,9 +25697,15 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -25331,9 +25771,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fiscaalRegels": 2
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "fiscaalRegels": "gewijzigd"
+    }
    }
   },
   {
@@ -25348,7 +25792,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fiscaalJaargangen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -25603,7 +26049,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "boardroom": 2
+    },
     "b": {},
     "c": {}
    }
@@ -25637,7 +26085,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatLeren": 5
+    },
     "b": {},
     "c": {}
    }
@@ -25688,9 +26138,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rahulProfiel": 3
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rahulProfiel": "gewijzigd"
+    }
    }
   },
   {
@@ -25705,9 +26159,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "boardroom": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "boardroom": "gewijzigd"
+    }
    }
   },
   {
@@ -26181,7 +26639,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26300,7 +26760,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "capGezondheid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -26402,7 +26864,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hardware": 3
+    },
     "b": {},
     "c": {}
    }
@@ -26436,7 +26900,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hardware": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26470,9 +26936,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hardware": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "hardware": "gewijzigd"
+    }
    }
   },
   {
@@ -26589,7 +27059,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ideeen": 2
+    },
     "b": {},
     "c": {}
    }
@@ -26895,9 +27367,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kantoorTaken": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kantoorTaken": "gewijzigd"
+    }
    }
   },
   {
@@ -26912,7 +27388,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kantoorTaken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27082,9 +27560,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "officeDocs": 1
+    }
    }
   },
   {
@@ -27388,7 +27870,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27439,7 +27923,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27473,7 +27959,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27609,7 +28097,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -27626,7 +28116,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -27711,7 +28203,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -27847,7 +28341,10 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatWereld": "gewijzigd",
+     "mailQ": 2
+    },
     "b": {},
     "c": {}
    }
@@ -27864,7 +28361,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailIn": 1
+    },
     "b": {},
     "c": {}
    }
@@ -28000,7 +28499,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mallVraag": 1
+    },
     "b": {},
     "c": {}
    }
@@ -28068,7 +28569,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "webMerken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -28085,9 +28588,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "webMerken": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "webMerken": "gewijzigd"
+    }
    }
   },
   {
@@ -28306,7 +28813,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ondernemersregie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -28340,7 +28849,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onderzoeker": 5
+    },
     "b": {},
     "c": {}
    }
@@ -28374,9 +28885,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onderzoeker": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "onderzoeker": "gewijzigd"
+    }
    }
   },
   {
@@ -28765,7 +29280,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "handelsRegelwacht": 2
+    },
     "b": {},
     "c": {}
    }
@@ -28782,9 +29299,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "handelsRegelwacht": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "handelsRegelwacht": "gewijzigd"
+    }
    }
   },
   {
@@ -29003,7 +29524,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payrollComponenten": 12
+    },
     "b": {},
     "c": {}
    }
@@ -29037,7 +29560,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payrollRegels": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29518,7 +30043,10 @@
    ],
    "opslag": {
     "a": {
-     "stadMetingen": 35
+     "weefsel": 1,
+     "stadNodes": 9,
+     "stadMetingen": 35,
+     "stadRegie": 2
     },
     "b": {},
     "c": {}
@@ -29587,7 +30115,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "aiTegoed": 1
+    },
     "b": {},
     "c": {}
    }
@@ -29604,9 +30134,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rechtsvormRegels": 2
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rechtsvormRegels": "gewijzigd"
+    }
    }
   },
   {
@@ -29689,9 +30223,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "redactie": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "redactie": "gewijzigd"
+    }
    }
   },
   {
@@ -30097,7 +30635,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rendezvous": 5
+    },
     "b": {},
     "c": {}
    }
@@ -30114,9 +30654,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rendezvous": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rendezvous": "gewijzigd"
+    }
    }
   },
   {
@@ -30335,7 +30879,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": 1
+    },
     "b": {},
     "c": {}
    }
@@ -30641,7 +31187,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "stadPaspoort": 9
+    },
     "b": {},
     "c": {}
    }
@@ -30726,9 +31274,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": 3
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "studio": "gewijzigd"
+    }
    }
   },
   {
@@ -30794,9 +31346,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "studio": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "studio": "gewijzigd"
+    }
    }
   },
   {
@@ -30930,7 +31486,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "integratiekamer": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -31017,7 +31575,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -31287,7 +31847,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "vonk": 4
+    },
     "b": {},
     "c": {}
    }
@@ -31406,7 +31968,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselKenmerk": 6
+    },
     "b": {},
     "c": {}
    }
@@ -31765,7 +32329,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselPanden": 2
+    },
     "b": {},
     "c": {}
    }
@@ -31884,7 +32450,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselTerugval": 6
+    },
     "b": {},
     "c": {}
    }
@@ -32530,7 +33098,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "weefselZorg": 2
+    },
     "b": {},
     "c": {}
    }
@@ -32772,7 +33342,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkplaats": 2
+    },
     "b": {},
     "c": {}
    }
@@ -32806,9 +33378,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkplaats": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "werkplaats": "gewijzigd"
+    }
    }
   },
   {
@@ -32891,7 +33467,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": 2
+    },
     "b": {},
     "c": {}
    }
@@ -32908,9 +33486,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -32925,9 +33507,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -32942,9 +33528,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -32959,9 +33549,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zelfzorg": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "zelfzorg": "gewijzigd"
+    }
    }
   },
   {
@@ -33114,9 +33708,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "onboarding": "gewijzigd"
+    }
    }
   },
   {
@@ -33132,7 +33730,8 @@
    ],
    "opslag": {
     "a": {
-     "posts": 1
+     "posts": 1,
+     "salon": 4
     },
     "b": {},
     "c": {}
@@ -33184,7 +33783,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34344,7 +34945,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ovRegie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -35489,11 +36092,13 @@
    ],
    "opslag": {
     "a": {
-     "rijkBerichten": 1
+     "rijkBerichten": 1,
+     "rijkRijbewijzen": "gewijzigd"
     },
     "b": {},
     "c": {
-     "rijkBerichten": 1
+     "rijkBerichten": 1,
+     "rijkRijbewijzen": "gewijzigd"
     }
    }
   },
@@ -35972,7 +36577,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -36185,15 +36792,18 @@
    "methode": "POST",
    "pad": "/api/pay/graaf",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "idempotentie": "beschermd",
+   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in wacht en de herhaling niets",
    "statussen": [
     200,
     200,
     200
    ],
+   "bron": "opslag",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36232,11 +36842,19 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "betaalIdem": 1,
+     "payBoekingen": 1,
+     "paySaldi": 1,
+     "payIdem": 2,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payBoekingen": 1
+     "betaalIdem": 1,
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -36304,7 +36922,12 @@
    ],
    "opslag": {
     "a": {
+     "invoices": "gewijzigd",
+     "betaalIdem": 1,
      "payBoekingen": 2,
+     "paySaldi": 1,
+     "payIdem": 2,
+     "payIdemAfdruk": 2,
      "fondsAfdrachten": 1,
      "socialeAfdrachten": 1
     },
@@ -36325,11 +36948,17 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "paySaldi": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -36364,11 +36993,17 @@
    "opslag": {
     "a": {
      "payBoekingen": 1,
+     "paySaldi": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1,
      "payTegoed": 1
     },
     "b": {},
     "c": {
      "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1,
      "payTegoed": 1
     }
    }
@@ -36454,11 +37089,18 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payBoekingen": 2
+     "betaalIdem": 1,
+     "payBoekingen": 2,
+     "paySaldi": "gewijzigd",
+     "payIdem": 2,
+     "payIdemAfdruk": 2
     }
    }
   },
@@ -36477,11 +37119,15 @@
     "a": {
      "payTikCodes": 1
     },
-    "b": {},
+    "b": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "c": {
      "payTikCodes": 1
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -36513,11 +37159,15 @@
    ],
    "opslag": {
     "a": {
-     "payVerzoeken": 1
+     "payVerzoeken": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "payVerzoeken": 1
+     "payVerzoeken": 1,
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     }
    }
   },
@@ -36534,7 +37184,11 @@
    ],
    "opslag": {
     "a": {
-     "payBoekingen": 1
+     "payBoekingen": 1,
+     "payVerzoeken": "gewijzigd",
+     "paySaldi": "gewijzigd",
+     "payIdem": 1,
+     "payIdemAfdruk": 1
     },
     "b": {},
     "c": {}
@@ -36552,7 +37206,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payVerzoeken": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37030,6 +37686,21 @@
    "opslag": {
     "a": {
      "posts": -1,
+     "accountRollen": -1,
+     "betaalIdem": -4,
+     "sessions": -1,
+     "supplierNotifications": "gewijzigd",
+     "live": -1,
+     "contactPins": -1,
+     "contactPinSecurity": -1,
+     "memberDir": -1,
+     "ledenBoard": -1,
+     "bestanden": -1,
+     "fluister": -1,
+     "lifestyle": -1,
+     "appInstallaties": -1,
+     "reisInstallaties": -1,
+     "spellen": "gewijzigd",
      "spelTeams": -2
     },
     "b": {},
@@ -37065,7 +37736,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "sessions": 1,
+     "memberDir": 1
+    },
     "b": {},
     "c": {}
    }
@@ -37082,7 +37756,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "punten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -37167,7 +37843,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rahulStemming": 5
+    },
     "b": {},
     "c": {}
    }
@@ -37184,7 +37862,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "reisInvoer": 2
+    },
     "b": {},
     "c": {}
    }
@@ -37201,7 +37881,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "reisInvoer": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37269,7 +37951,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd",
+     "lifestyle": 1
+    },
     "b": {},
     "c": {}
    }
@@ -37609,7 +38294,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 3
+    },
     "b": {},
     "c": {}
    }
@@ -37626,9 +38313,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
@@ -37643,9 +38334,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
@@ -37677,7 +38372,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37694,7 +38391,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37728,7 +38427,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -37779,9 +38480,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "residentie": "gewijzigd"
+    }
    }
   },
   {
@@ -37796,7 +38501,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": 1
+    },
     "b": {},
     "c": {}
    }
@@ -37898,7 +38605,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37932,7 +38641,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "residentie": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -38002,7 +38713,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -38544,7 +39257,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfKantoorTaken": 16
+    },
     "b": {},
     "c": {}
    }
@@ -38765,7 +39480,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfKantoorTaken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -38816,7 +39533,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "stadsraad": 2
+    },
     "b": {},
     "c": {}
    }
@@ -38918,7 +39637,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": 22
+    },
     "b": {},
     "c": {}
    }
@@ -39292,9 +40013,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -39428,9 +40155,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -39734,9 +40467,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -39921,9 +40660,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -39938,9 +40683,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -40023,9 +40774,15 @@
     401
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "sessions": 1
+    },
+    "b": {
+     "sessions": 1
+    },
+    "c": {
+     "sessions": 1
+    }
    }
   },
   {
@@ -41317,7 +42074,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -41417,7 +42176,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgOne": 9
+    },
     "b": {},
     "c": {}
    }
@@ -41485,9 +42246,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgOne": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rtgOne": "gewijzigd"
+    }
    }
   },
   {
@@ -41621,7 +42386,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -41740,9 +42507,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "salon": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "salon": "gewijzigd"
+    }
    }
   },
   {
@@ -42101,9 +42872,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "samenKamers": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "samenKamers": 1
+    }
    }
   },
   {
@@ -42220,9 +42995,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "ledenSites": "gewijzigd"
+    }
    }
   },
   {
@@ -42424,7 +43203,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -42628,7 +43409,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "socialebeleid": 1
+    },
     "b": {},
     "c": {}
    }
@@ -42645,7 +43428,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "genootschap": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -42764,7 +43549,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": 1
+    },
     "b": {},
     "c": {}
    }
@@ -42781,7 +43568,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fluister": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44109,7 +44898,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -44158,7 +44949,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "aanwezig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -44175,9 +44968,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "aanwezig": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "aanwezig": "gewijzigd"
+    }
    }
   },
   {
@@ -44243,7 +45040,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "fiscaalJaargangen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -44277,7 +45076,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44294,7 +45095,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44311,7 +45114,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44396,7 +45201,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": 1
+    },
     "b": {},
     "c": {}
    }
@@ -44430,9 +45237,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "agendas": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "agendas": "gewijzigd"
+    }
    }
   },
   {
@@ -44481,7 +45292,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -44821,7 +45634,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": 1
+    },
     "b": {},
     "c": {}
    }
@@ -45845,7 +46660,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "borden": 1
+    },
     "b": {},
     "c": {}
    }
@@ -46508,7 +47325,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -46576,9 +47395,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "zaakCommand": "gewijzigd"
+    }
    }
   },
   {
@@ -46627,7 +47450,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zaakCommand": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -46848,7 +47673,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47069,7 +47896,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47409,7 +48238,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47494,7 +48325,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47511,7 +48344,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -47750,6 +48585,8 @@
    ],
    "opslag": {
     "a": {
+     "notifications": "gewijzigd",
+     "rtmail": "gewijzigd",
      "facturen": 1
     },
     "b": {},
@@ -47769,7 +48606,9 @@
    ],
    "opslag": {
     "a": {
-     "facturen": 1
+     "notifications": "gewijzigd",
+     "facturen": 1,
+     "rtmail": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -47974,7 +48813,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48314,9 +49155,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "gebouwPand": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "gebouwPand": "gewijzigd"
+    }
    }
   },
   {
@@ -48484,9 +49329,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "gebouwPlus": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "gebouwPlus": "gewijzigd"
+    }
    }
   },
   {
@@ -48621,11 +49470,15 @@
    ],
    "opslag": {
     "a": {
-     "giftcards": 1
+     "giftcards": 1,
+     "kassaIdem": 2,
+     "kassaIdemAfdruk": 1
     },
     "b": {},
     "c": {
-     "giftcards": 1
+     "giftcards": 1,
+     "kassaIdem": 1,
+     "kassaIdemAfdruk": 1
     }
    }
   },
@@ -49049,7 +49902,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49083,7 +49938,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd",
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49134,7 +49992,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49253,9 +50113,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -49270,7 +50134,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49321,7 +50187,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49491,7 +50359,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49610,7 +50480,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd",
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49780,7 +50653,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49831,7 +50706,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49848,7 +50725,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -49950,7 +50829,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50256,7 +51137,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50273,7 +51156,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50324,7 +51209,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horecaMissies": 1
+    },
     "b": {},
     "c": {}
    }
@@ -50528,7 +51415,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50562,7 +51451,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50596,9 +51487,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -50613,7 +51508,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50647,7 +51544,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -50698,9 +51597,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -50868,9 +51771,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatBrug": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "magnaatBrug": 1
+    }
    }
   },
   {
@@ -50919,9 +51826,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -50938,7 +51849,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -50953,7 +51866,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51038,7 +51953,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51191,9 +52108,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "horeca": "gewijzigd"
+    }
    }
   },
   {
@@ -51208,7 +52129,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "horeca": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51242,7 +52165,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "certificaten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -51276,7 +52201,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "groeigesprekken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -51293,7 +52220,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "inwerk": 1
+    },
     "b": {},
     "c": {}
    }
@@ -51871,7 +52800,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51939,9 +52870,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "officeDocs": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "officeDocs": 1
+    }
    }
   },
   {
@@ -52058,7 +52993,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -52126,7 +53063,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -52262,7 +53201,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kassaWachtbonnen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52279,7 +53220,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 1
+    },
     "b": {},
     "c": {}
    }
@@ -52653,7 +53596,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -52670,9 +53615,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -52823,7 +53772,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "magnaatPartnerstudio": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -52859,7 +53810,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "magnaatPartnerstudio": "gewijzigd"
+    }
    }
   },
   {
@@ -53095,9 +54048,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "suppliers": "gewijzigd"
+    }
    }
   },
   {
@@ -53282,7 +54239,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "markt": 4
+    },
     "b": {},
     "c": {}
    }
@@ -53554,7 +54513,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -53571,9 +54532,13 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "metier": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "metier": "gewijzigd"
+    }
    }
   },
   {
@@ -54149,7 +55114,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -54202,7 +55169,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -54404,7 +55373,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "onboarding": "gewijzigd",
+     "directOntvangsten": 1
+    },
     "b": {},
     "c": {}
    }
@@ -54746,7 +55718,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -54865,9 +55839,15 @@
     402
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
+    "a": {
+     "waardePosities": 1
+    },
+    "b": {
+     "waardePosities": 1
+    },
+    "c": {
+     "waardePosities": 1
+    }
    }
   },
   {
@@ -55018,7 +55998,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "waardeOormerken": 1
+    },
     "b": {},
     "c": {}
    }
@@ -55052,7 +56034,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "payTreasury": 1
+    },
     "b": {},
     "c": {}
    }
@@ -55596,7 +56580,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -55613,7 +56599,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "posSales": 1
+    },
     "b": {},
     "c": {}
    }
@@ -55681,7 +56669,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "campagnes": 1
+    },
     "b": {},
     "c": {}
    }
@@ -56463,7 +57453,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -56651,9 +57643,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -56735,7 +57730,10 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd",
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -56752,7 +57750,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -56820,9 +57820,14 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailBewaar": "gewijzigd",
+     "rtmailRecht": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rtmailRecht": "gewijzigd"
+    }
    }
   },
   {
@@ -57041,9 +58046,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRecht": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rtmailRecht": "gewijzigd"
+    }
    }
   },
   {
@@ -57075,7 +58084,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -57126,9 +58137,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "mailSleutels": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "mailSleutels": "gewijzigd"
+    }
    }
   },
   {
@@ -57844,9 +58859,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "supplierNotifications": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "supplierNotifications": "gewijzigd"
+    }
    }
   },
   {
@@ -57861,7 +58880,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -57929,9 +58950,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "ledenSites": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "ledenSites": "gewijzigd"
+    }
    }
   },
   {
@@ -58201,9 +59226,17 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wervingIdem": 2,
+     "wervingIdemAfdruk": 1,
+     "staffInvites": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "wervingIdem": 1,
+     "wervingIdemAfdruk": 1,
+     "staffInvites": "gewijzigd"
+    }
    }
   },
   {
@@ -58422,7 +59455,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -58830,7 +59865,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "training": 1
+    },
     "b": {},
     "c": {}
    }
@@ -58864,7 +59901,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "training": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -58966,7 +60005,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "vacatures": 1
+    },
     "b": {},
     "c": {}
    }
@@ -59255,7 +60296,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 1
+    },
     "b": {},
     "c": {}
    }
@@ -59425,7 +60468,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -59459,7 +60504,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "verkoopwegen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -59663,7 +60710,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "postdatums": 1
+    },
     "b": {},
     "c": {}
    }
@@ -59884,7 +60933,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "bedrijfsWensen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -59969,7 +61020,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "werkbeleid": 1,
+     "werkmail": 2
+    },
     "b": {},
     "c": {}
    }
@@ -60105,7 +61159,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -60241,7 +61297,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 4
+    },
     "b": {},
     "c": {}
    }
@@ -60326,7 +61384,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "hulp": 1
+    },
     "b": {},
     "c": {}
    }
@@ -60600,7 +61660,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -60700,9 +61762,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "techniek": "gewijzigd"
+    }
    }
   },
   {
@@ -60734,7 +61800,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -61091,7 +62159,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -61947,7 +63017,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "training": 1
+    },
     "b": {},
     "c": {}
    }
@@ -62066,7 +63138,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -62372,7 +63446,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "veilig": 5
+    },
     "b": {},
     "c": {}
    }
@@ -62610,7 +63686,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -63054,7 +64132,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "suppliers": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -63190,7 +64270,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "voeding": 1
+    },
     "b": {},
     "c": {}
    }
@@ -63428,7 +64510,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wallet": 1
+    },
     "b": {},
     "c": {}
    }
@@ -63479,9 +64563,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wallet": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "wallet": "gewijzigd"
+    }
    }
   },
   {
@@ -63751,7 +64839,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -63836,7 +64926,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wereld": 1
+    },
     "b": {},
     "c": {}
    }
@@ -63853,9 +64945,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wereld": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "wereld": "gewijzigd"
+    }
    }
   },
   {
@@ -63938,7 +65034,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "tafelWensen": 1
+    },
     "b": {},
     "c": {}
    }
@@ -64499,7 +65597,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "zorgProfielen": 1
+    },
     "b": {},
     "c": {}
    }

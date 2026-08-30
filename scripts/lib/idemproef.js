@@ -121,8 +121,11 @@ function staatOordeel(staat) {
 
 /* HET OORDEEL, apart en puur -- los toetsbaar in test/idemproef.test.js.
    `a`, `b` en `c` zijn de drie antwoorden uit de kop; `staat` is optioneel en
-   draagt het per-oproep verschil in de opslag (zie hierboven). */
-function weegHerhaling(a, b, c, staat) {
+   draagt het per-oproep verschil in de opslag (zie hierboven). `diepeStaat`
+   zegt of dat verschil met een INHOUDSAFDRUK is gemeten (RTG_STAATLOG=2) of
+   alleen met de lengte (=1); dat verandert wat een uitblijvend verschil
+   betekent, en dus wat de reden mag beweren. */
+function weegHerhaling(a, b, c, staat, diepeStaat) {
   if (!isOk(a)) {
     return { stand: 'ongemeten', reden: 'de eerste oproep deed geen werk (status ' + ((a && a.status) || 0) + ')' };
   }
@@ -147,10 +150,33 @@ function weegHerhaling(a, b, c, staat) {
        die ook niets kan zeggen, blijft het ongemeten. */
     const s = staatOordeel(staat);
     if (s) return s;
-    return { stand: 'ongemeten', reden: staat
-      ? 'het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: ' +
-        'een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet'
-      : 'het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn' };
+    /* WAT DIT MEETPUNT WEL EN NIET ZIET, EN DAT VERSCHILT PER STAND.
+
+       Stand 1 telt alleen de LENGTE van de arrays. Een leesroute en een route
+       die een bestaande rij OP ZIJN PLAATS bijwerkt zien er dan identiek uit, en
+       dat hoort de reden te zeggen.
+
+       Stand 2 neemt ook een inhoudsafdruk, en dan ziet hij dat verschil wel. De
+       reden mag dan niet meer beweren dat hij blind is -- dat zou een grens
+       melden die er niet meer is, en dat is net zo misleidend als een grens
+       verzwijgen. Wat er in stand 2 overblijft is een echte waarneming: deze
+       oproep slaagde en veranderde niets. Of dat BETEKENT dat de route leest,
+       is een besluit en geen waarneming: een route die niets te doen had (een
+       lege veegopdracht) ziet er precies zo uit. Vandaar dat het ongemeten
+       blijft, met een andere reden. */
+    if (!staat) {
+      return { stand: 'ongemeten',
+        reden: 'het antwoord verandert niet per oproep; een tweede effect zou hier niet te zien zijn' };
+    }
+    if (!diepeStaat) {
+      return { stand: 'ongemeten',
+        reden: 'het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: ' +
+          'een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet' };
+    }
+    return { stand: 'ongemeten',
+      reden: 'het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet ' +
+        '(gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is ' +
+        'of een die deze keer niets te doen had, is een besluit en geen waarneming' };
   }
   if (gelijk(a.data, b.data)) {
     return { stand: 'beschermd', grond: 'gelijk', reden: 'de herhaling gaf hetzelfde antwoord terwijl een verse sleutel ' +
@@ -159,7 +185,7 @@ function weegHerhaling(a, b, c, staat) {
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging, staatDiep }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -191,7 +217,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const b = await doe(k1); const dB = staatVan ? staatVan(b) : null;
     const c = await doe(k2); const dC = staatVan ? staatVan(c) : null;
     const staat = staatVan ? { a: dA, b: dB, c: dC } : null;
-    const o = weegHerhaling(a, b, c, staat);
+    const o = weegHerhaling(a, b, c, staat, staatDiep);
     if (o.bron === 'opslag') uitOpslag++;
     tel[o.stand]++;
     const rij = { methode, pad: r.pad, rol: r.rol,

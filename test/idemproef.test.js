@@ -402,3 +402,49 @@ test('alleen de collectie die het OPNIEUW deed telt mee', async () => {
   assert.match(t, /\+1 in orders/);
   assert.doesNotMatch(t, /ruisje|seed/, 'de rest was niet herhaalbaar en hoort er niet in');
 });
+
+/* ============================================================================
+   DE REDEN MAG GEEN BLINDHEID MELDEN DIE ER NIET MEER IS.
+
+   Het opslag-meetpunt heeft twee standen (server/staatlog.js): stand 1 telt
+   alleen de LENGTE van de arrays, stand 2 neemt ook een inhoudsafdruk. Dat
+   verschil bepaalt wat een UITBLIJVEND verschil betekent:
+
+     stand 1  een leesroute en een route die een rij OP ZIJN PLAATS bijwerkt
+              zien er identiek uit -- de reden hoort dat te zeggen
+     stand 2  dat verschil is wel te zien -- de reden mag dan niet meer beweren
+              dat hij blind is
+
+   Een grens melden die er niet meer is, is net zo misleidend als een grens
+   verzwijgen: de lezer laat een route liggen omdat de uitslag zegt dat er niets
+   over te zeggen valt.
+
+   WAT HET IN GEEN VAN BEIDE STANDEN WORDT: een oordeel. Een oproep die slaagde
+   en niets veranderde kan een leesroute zijn of een route die deze keer niets
+   te doen had (een lege veegopdracht). Dat verschil is een besluit en geen
+   waarneming, dus het blijft ongemeten.
+
+   DE MUTATIE: laat weegHerhaling de diepe stand negeren -> de tweede toets
+   zakt.
+   ========================================================================== */
+test('stand 1 meldt zijn blinde vlek, stand 2 niet', () => {
+  const zelfde = { ok: true, stand: 1 };
+  const leeg = { a: {}, b: {}, c: {} };
+  const ondiep = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde), leeg, false);
+  assert.equal(ondiep.stand, 'ongemeten');
+  assert.match(ondiep.reden, /op zijn plaats/, 'stand 1 hoort zijn blinde vlek te noemen');
+
+  const diep = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde), leeg, true);
+  assert.equal(diep.stand, 'ongemeten', 'ook in stand 2 blijft dit een besluit en geen waarneming');
+  assert.doesNotMatch(diep.reden, /dat verschil ziet dit meetpunt niet/,
+    'stand 2 hoort geen blindheid te melden die hij niet heeft');
+  assert.match(diep.reden, /inhoudsafdruk/, 'en hoort te zeggen waarmee hij gemeten heeft');
+});
+
+test('zonder opslag-meetpunt blijft de oude, zwakkere reden staan', () => {
+  const zelfde = { ok: true };
+  const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde), null, true);
+  assert.equal(o.stand, 'ongemeten');
+  assert.match(o.reden, /een tweede effect zou hier niet te zien zijn/,
+    'zonder meetpunt hoort er niets over de opslag beweerd te worden');
+});

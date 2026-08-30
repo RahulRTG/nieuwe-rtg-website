@@ -197,6 +197,9 @@ function namenVan(soort) {
    extra slot -- het kantoortoken is dan de juiste rol en member/supplier zijn
    fout, en dat is de scherpere meting). Verfijners doen nooit mee. */
 const { PUBLIEK } = require('./publiek');
+/* Een route zonder middleware waarvan de HANDLER zelf oordeelt. Zie de kop van
+   ./eigenpoort.js voor waarom dat een eigen lijst is en niet de openbaar-lijst. */
+const { EIGEN_POORT } = require('./eigenpoort');
 
 function beoordeel(route) {
   const r = route || {};
@@ -217,6 +220,9 @@ function beoordeel(route) {
        twee lijsten van wat openbaar mag zijn lopen uiteen (LAT.md regel 4), en
        dat is met deze lijst al een keer gebeurd. */
     if (r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
+    /* De poort staat in de handler: geen token mee, en dat is de bedoeling.
+       Een inlogdeur die een sessie eist, laat niemand inloggen. */
+    if (r.pad && EIGEN_POORT.has(r.pad)) return { rol: 'eigen-poort', reden: null };
     return { rol: null, reden: 'geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)' };
   }
 
@@ -285,6 +291,7 @@ function beoordeel(route) {
      bewering mag de sterkste niet overschrijven -- dezelfde regel als die van
      de rangorde hierboven, en om dezelfde reden. */
   if (soort === 'geenBewaker' && r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
+  if (soort === 'geenBewaker' && r.pad && EIGEN_POORT.has(r.pad)) return { rol: 'eigen-poort', reden: null };
   /* DE OPSTELLING BESLIST, EN DAT IS EEN ROL EN GEEN GAT.
 
      `meetpoort` (server/meetpoort.js) laat binnen op ADRES: met

@@ -22,8 +22,6 @@ const PUBLIEK = new Map([
   ['/api/auth/register', 'registreren kan alleen zonder account'],
   ['/api/mail/ses', 'AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht'],
   ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
-  ['/api/auth/reset', 'herstel met een token uit de e-mail; wie zijn wachtwoord kwijt is heeft geen sessie'],
-  ['/api/aanmeld/zeg', 'het ballotagegesprek loopt voor de inlog, dus voor het account bestaat'],
   /* DE INLOGDEUR ZELF, en waarom hij hier hoort te staan in plaats van op de
      heuristiek te leunen.
 
@@ -279,30 +277,6 @@ const PUBLIEK = new Map([
   ['/api/les/sluit', 'idem'], ['/api/les/mee', 'idem'], ['/api/les/kijk', 'idem'],
   ['/api/les/antwoord', 'idem'],
 
-  /* ---- DE OVERIGE INLOGDEUREN, en waarom ze hier pas laat bij komen ----
-
-     /api/auth/login staat hierboven al bij naam, met de uitleg waarom een
-     groen dat aan TEKSTAFSTAND hangt geen groen is: keuringsregel 28 telt "geeft
-     ergens binnen achthonderd tekens een 401 terug" ook als poort, en die
-     afstand schuift zodra er een rem of een hash-opwaardering bij komt.
-
-     Deze vijf leunden nog wel op die heuristiek. Het zijn alle vijf deuren waar
-     per definitie nog geen sessie kan zijn, elk met een eigen rem per adres --
-     nagelopen in de bron voor ze hier kwamen te staan. Ze bij naam noemen is
-     strikt beter dan ze laten drijven op een tekstvenster. */
-  ['/api/login', 'de pas-inlog: hier ontstaat de sessie, dus er kan er nog geen zijn. Eigen rem per adres'],
-  ['/api/office/login', 'de backoffice-code inwisselen voor een sessie; tijd-veilig vergeleken en met een rem'],
-  ['/api/supplier/login', 'de zaak logt in met code en wachtwoord, of een medewerker met een pincode'],
-  ['/api/supplier/mijn/login', 'idem voor het persoonlijke deel van een medewerker'],
-  ['/api/techniek/inloggen', 'de techniekdeur; eigen rem per adres en per login, en een gelijk antwoord op elke mislukking'],
-  ['/api/staff', 'de personeelsdeur: een medewerker wisselt een code in voor een sessie, dus er kan er nog geen zijn'],
-
-  /* Nog drie die met reden open staan en er niet op stonden. Alle drie
-     nagelopen in de bron, en alle drie van een soort die hierboven al vertegen-
-     woordigd is -- ze waren gewoon overgeslagen. */
-  ['/api/betaal/webhook/adyen', 'de derde kaartwebhook, naast die van de betaalprovider en de munt hierboven; ondertekend, met een eigen rem'],
-  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen voor een sessie: dat IS de inlog, dus er kan er nog geen zijn'],
-  ['/api/foundation/reis/aanvraag', 'wie een reis aanvraagt of iemand voordraagt heeft geen foundation-account; dat is het punt ervan. Eigen rem per adres (test/foundation-reisrem.test.js)'],
 
   // ---- bestaan alleen in NODE_ENV=test ----
   ['/api/test/bug', 'alleen geregistreerd als NODE_ENV=test; bestaat in productie niet'],
@@ -360,6 +334,9 @@ const ALLEEN_ANONIEM = new Map([
 
   // ---- deuren: hier kan per definitie nog geen sessie zijn ----
   ['/api/sso/terug', 'de provider stuurt de bezoeker hierheen terug, zonder onze sessie'],
+  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen: dat IS de inlog'],
+  ['/api/aanmeld/zeg', 'het ballotagegesprek loopt voor de inlog'],
+  ['/api/auth/reset', 'herstel met een token uit de e-mail'],
   ['/api/auth/resend', 'bevestigingsmail opnieuw sturen; de `auth` ervoor stelt niets als eis'],
   ['/api/account/start', 'accountherkenning aan de poort; de `auth` ervoor stelt niets als eis'],
 

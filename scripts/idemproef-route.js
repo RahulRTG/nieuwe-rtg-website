@@ -141,7 +141,7 @@ wachtOpSchoneBoom();
      het LIJF, bij de tweede beslist het ADRES waar vandaan wordt aangeklopt.
      Allebei horen ze geen Authorization-kop op te leveren, en dat moet met
      opzet zo staan en niet per ongeluk. */
-  const tokenVoor = (rol) => (rol === 'lijfsleutel' || rol === 'omgeving' ? '' : tokens[rol]);
+  const tokenVoor = (rol) => (['lijfsleutel', 'omgeving', 'eigen-poort'].includes(rol) ? '' : tokens[rol]);
   /* DE LIJFSLEUTELS -- deuren waar de sleutel in het LICHAAM reist en niet in de
      kop. Die hebben geen rol (zie scripts/lib/bewakers.js) en vielen daarmee uit
      elke proef, terwijl er wel degelijk een sleutel te MAKEN is. Zie de kop van

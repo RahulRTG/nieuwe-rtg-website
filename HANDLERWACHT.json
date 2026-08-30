@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:07:55.595Z",
-  "commit": "6a55f0f9",
+  "op": "2026-08-30T12:29:34.001Z",
+  "commit": "29eda3e9",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "gemeten": {
   "zonderBewakerslaag": 612,
   "bewaakt": 531,
-  "openbaarMetReden": 54,
-  "eigenControle": 7,
+  "openbaarMetReden": 46,
+  "eigenControle": 15,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 15
+  "publiekeLijstenVerschillen": 18
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -32,6 +32,9 @@
    "/api/foundation/gesprekskaart",
    "/api/salon/promo",
    "/api/sso/terug",
+   "/api/sso/wissel",
+   "/api/aanmeld/zeg",
+   "/api/auth/reset",
    "/api/auth/resend",
    "/api/account/start",
    "/api/foundation/school/school/maak",
@@ -312,8 +315,7 @@
   {
    "sleutel": "POST /api/aanmeld/zeg",
    "bestand": "server/routes/aanmeldgesprek.js:64",
-   "staat": "openbaar",
-   "reden": "het ballotagegesprek loopt voor de inlog, dus voor het account bestaat"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/aanmelding/aanvraag",
@@ -347,8 +349,7 @@
   {
    "sleutel": "POST /api/auth/reset",
    "bestand": "server/routes/auth/herstel.js:126",
-   "staat": "openbaar",
-   "reden": "herstel met een token uit de e-mail; wie zijn wachtwoord kwijt is heeft geen sessie"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/auth/verify-email",
@@ -3025,8 +3026,7 @@
   {
    "sleutel": "POST /api/login",
    "bestand": "server/routes/auth/inlog-pas.js:18",
-   "staat": "openbaar",
-   "reden": "de pas-inlog: hier ontstaat de sessie, dus er kan er nog geen zijn. Eigen rem per adres"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/mail/binnen",
@@ -3049,8 +3049,7 @@
   {
    "sleutel": "POST /api/office/login",
    "bestand": "server/routes/office/toegang.js:8",
-   "staat": "openbaar",
-   "reden": "de backoffice-code inwisselen voor een sessie; tijd-veilig vergeleken en met een rem"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/partner",
@@ -3794,8 +3793,7 @@
   {
    "sleutel": "POST /api/staff",
    "bestand": "server/routes/staff.js:38",
-   "staat": "openbaar",
-   "reden": "de personeelsdeur: een medewerker wisselt een code in voor een sessie, dus er kan er nog geen zijn"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/supplier/apply",
@@ -3806,14 +3804,12 @@
   {
    "sleutel": "POST /api/supplier/login",
    "bestand": "server/routes/supplier/toegang.js:22",
-   "staat": "openbaar",
-   "reden": "de zaak logt in met code en wachtwoord, of een medewerker met een pincode"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/supplier/mijn/login",
    "bestand": "server/routes/supplier/pda/posities.js:99",
-   "staat": "openbaar",
-   "reden": "idem voor het persoonlijke deel van een medewerker"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/supplier/roster",
@@ -3830,8 +3826,7 @@
   {
    "sleutel": "POST /api/techniek/inloggen",
    "bestand": "server/routes/techniek/inlog.js:29",
-   "staat": "openbaar",
-   "reden": "de techniekdeur; eigen rem per adres en per login, en een gelijk antwoord op elke mislukking"
+   "staat": "eigenControle"
   },
   {
    "sleutel": "POST /api/tenant/bijstand",

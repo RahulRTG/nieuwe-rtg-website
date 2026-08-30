@@ -62,7 +62,7 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
 const ROLLEN = ['member', 'member-zakelijk', 'office', 'supplier', 'boardroom', 'techniek',
-  'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving'];
+  'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving', 'eigen-poort'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
    zijn eigen basis-URL en foutafhandeling); `officeCode` de backoffice-code van
@@ -158,6 +158,10 @@ function maakSleutels({ post, officeCode, eigen }) {
      dus dit is geen openbare route, en het register hoort dat verschil te
      dragen in plaats van het glad te strijken. */
   inlog.omgeving = async () => '';
+  /* En de derde lege sleutel, met weer een eigen reden: de poort staat in de
+     HANDLER (scripts/lib/eigenpoort.js). Een inlogdeur die een sessie eist,
+     laat niemand inloggen -- dus hoort er geen token mee. */
+  inlog['eigen-poort'] = async () => '';
   return { inlog, ROLLEN, OWNER_EMAIL };
 }
 
@@ -178,7 +182,7 @@ async function haalSleutels(bos) {
          betekent het dat er geen token HOORT te zijn. Die twee op `if (t)` over
          een kam scheren zou de openbare routes stil uit elke proef laten
          vallen -- en dat is hoe ze eerder als instrumenttekort telden. */
-      if (rol === 'openbaar' || rol === 'omgeving') tokens[rol] = '';
+      if (['openbaar', 'omgeving', 'eigen-poort'].includes(rol)) tokens[rol] = '';
       else if (t) tokens[rol] = t;
       else mislukt.push({ rol, reden: 'de inlog gaf geen token terug' });
     } catch (e) { mislukt.push({ rol, reden: String(e && e.message || e).slice(0, 120) }); }

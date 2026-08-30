@@ -287,6 +287,33 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, h
        Dus wordt een vermoeden nu NAGETROKKEN in plaats van gemeld: nog een keer
        dezelfde sleutel, en alleen als de opslag dan wéér beweegt is het van deze
        route. Dat kost een oproep per vermoeden en er zijn er een handvol. */
+    /* HETZELFDE NATREKKEN, MAAR DAN DE ANDERE KANT OP.
+
+       Hierboven staat het al voor `beschermd`: een verschil dat aan B wordt
+       toegeschreven kan van achtergrondwerk komen, dus wordt het nagetrokken
+       met een vierde oproep. Voor `onbeschermd` gebeurde dat NIET -- en juist
+       daar is de prijs van een vals alarm het hoogst: dat is de bak waaruit
+       iemand een reparatie gaat schrijven.
+
+       Deze ronde leverde precies zo'n vals alarm op (/api/bank/pas/bevries,
+       zie de kop van staatOordeel). De statische regel daar -- de herhaling
+       moet DEZELFDE collectie raken -- vangt het geval waarin er iets heel
+       anders bewoog. Dit vangt het geval waarin toevallig dezelfde collectie
+       bewoog: dan is een vierde oproep het verschil tussen een vermoeden en
+       een bevinding. */
+    if (staat && o.stand === 'onbeschermd' && o.bron === 'opslag' && dB && Object.keys(dB).length) {
+      const nog = await doe(k1);
+      const dD = staatVan(nog);
+      const weer = Object.keys(dB).filter(k => dD && dD[k] !== undefined && k in (staat.a || {}));
+      if (!weer.length) {
+        o.stand = 'ongemeten';
+        o.reden = 'bij de herhaling bewoog ' + beschrijfDelta(dB) + ', maar een vierde oproep met ' +
+          'dezelfde sleutel deed dat niet opnieuw: niet van deze route';
+        rij.idempotentie = o.stand;
+        rij.reden = o.reden;
+        verworpen++;
+      }
+    }
     if (staat && o.stand === 'beschermd' && dB && Object.keys(dB).length) {
       const nog = await doe(k1);
       const dD = staatVan(nog);
@@ -305,6 +332,27 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, h
           ', maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route';
         verworpen++;
       }
+    }
+    /* DE FOUTMELDING VAN DE EERSTE OPROEP, en waarom die erbij hoort.
+
+       Een route die met 404 wordt geweigerd, staat in de trechter onder
+       "het object bestaat niet". Dat is de juiste bak en het zegt niet WELK
+       object -- en dat is nu juist het enige dat je nodig hebt om er een
+       fixture voor te bouwen. De server zegt het zelf, elke keer, in zijn
+       eigen woorden: "Deze lescode kennen we niet", "De rekening bestaat
+       niet", "Deze zaak is geen beauty-salon".
+
+       Zonder dit veld moet iemand voor elk van de 1635 geblokkeerde routes de
+       bron induiken om te vinden wat er ontbreekt. Met dit veld valt er te
+       GROEPEREN op wat de server vraagt, en dan blijkt vermoedelijk dat
+       honderden routes om hetzelfde object vragen.
+
+       Alleen bij een geblokkeerde eerste oproep, en afgekapt: dit is een
+       aanwijzing voor wie een fixture bouwt, geen logboek. */
+    if (!isOk(a) && a && a.data) {
+      const tekst = typeof a.data === 'string' ? a.data
+        : (a.data.error || a.data.melding || a.data.reden || '');
+      if (tekst) rij.blokkade = String(tekst).slice(0, 160);
     }
     perRoute[methode + ' ' + r.pad] = rij;
   }

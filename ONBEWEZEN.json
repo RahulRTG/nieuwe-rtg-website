@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 9883c24a, schone boom",
+  "metingReden": "gemeten op commit 467683ed, schone boom",
   "stempel": {
-    "op": "2026-08-30T12:23:44.828Z",
-    "commit": "9883c24a",
+    "op": "2026-08-30T13:16:14.737Z",
+    "commit": "467683ed",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 9883c24a, schone boom"
+    "metingReden": "gemeten op commit 467683ed, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1499,
-    "onbewezen": 3162,
+    "metBewijs": 1500,
+    "onbewezen": 3161,
     "sluit": true
   },
   "bakken": [
@@ -48,13 +48,17 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 0,
-      "voorbeelden": []
+      "aantal": 3,
+      "voorbeelden": [
+        "POST /api/aanmeld/zeg",
+        "POST /api/auth/reset",
+        "POST /api/sso/wissel"
+      ]
     },
     {
       "id": "FIXTURE_401",
       "uitleg": "de eerste oproep gaf 401 -- er is een authenticatiefixture nodig",
-      "aantal": 14,
+      "aantal": 13,
       "voorbeelden": [
         "POST /api/auth/login",
         "POST /api/office/login",
@@ -76,12 +80,12 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1635,
+      "aantal": 1634,
       "voorbeelden": [
         "POST /api/aandacht",
-        "POST /api/aanmeld/zeg",
         "POST /api/aanmelding/beslis",
-        "POST /api/aanmelding/bewijs"
+        "POST /api/aanmelding/bewijs",
+        "POST /api/aanmelding/bewijs/stand"
       ]
     },
     {
@@ -98,7 +102,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 520,
+      "aantal": 519,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -148,10 +152,8 @@
     {
       "id": "ECHT_DEFECT",
       "uitleg": "fixture klopt, effect treedt op, en een herhaling doet het werk gewoon nog een keer",
-      "aantal": 1,
-      "voorbeelden": [
-        "POST /api/bank/pas/bevries"
-      ]
+      "aantal": 0,
+      "voorbeelden": []
     }
   ],
   "perRoute": {
@@ -198,7 +200,11 @@
       "DELETE /api/techniek/sso/scimsleutel/:org",
       "POST /api/theater/upload/:id"
     ],
-    "GEEN_PROEFSLEUTEL": [],
+    "GEEN_PROEFSLEUTEL": [
+      "POST /api/aanmeld/zeg",
+      "POST /api/auth/reset",
+      "POST /api/sso/wissel"
+    ],
     "FIXTURE_401": [
       "POST /api/auth/login",
       "POST /api/office/login",
@@ -208,7 +214,6 @@
       "POST /api/rtfos/koppel/nog-niet",
       "POST /api/rtfos/koppelbord",
       "POST /api/rtfos/melding/maak",
-      "POST /api/sso/wissel",
       "POST /api/stad/doos/hartslag",
       "POST /api/stad/doos/meting",
       "POST /api/supplier/login",
@@ -941,7 +946,6 @@
     ],
     "FIXTURE_404": [
       "POST /api/aandacht",
-      "POST /api/aanmeld/zeg",
       "POST /api/aanmelding/beslis",
       "POST /api/aanmelding/bewijs",
       "POST /api/aanmelding/bewijs/stand",
@@ -2753,7 +2757,6 @@
       "POST /api/arrival/pulse",
       "POST /api/arrival/request",
       "POST /api/auth/register",
-      "POST /api/auth/reset",
       "POST /api/auth/verify-email",
       "POST /api/avond/voorkeuren/zaak",
       "POST /api/avond/voorstel",
@@ -3339,8 +3342,6 @@
     "STAAT_NIET_ZICHTBAAR": [],
     "BIJWERKING_ALLEEN": [],
     "SEMANTIEK_NODIG": [],
-    "ECHT_DEFECT": [
-      "POST /api/bank/pas/bevries"
-    ]
+    "ECHT_DEFECT": []
   }
 }

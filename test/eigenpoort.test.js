@@ -36,12 +36,33 @@ test('elke route met een eigen poort draagt een uitgeschreven reden', () => {
   }
 });
 
-test('geen enkele staat OOK op de openbaar-lijst', () => {
+test('geen enkele staat OOK op de openbaar-lijst van de keuring', () => {
   /* Dat is precies wat keuringsregel 28 afwijst: een uitzondering die
      overbodig is, dekt straks een poort die iemand weghaalt. */
   for (const pad of EIGEN_POORT.keys()) {
     assert.ok(!PUBLIEK.has(pad), pad + ' staat in EIGEN_POORT en op de openbaar-lijst');
-    assert.ok(!ALLEEN_ANONIEM.has(pad), pad + ' staat in EIGEN_POORT en in ALLEEN_ANONIEM');
+  }
+});
+
+test('maar ALLEEN_ANONIEM mag wel overlappen, en dat is geen slordigheid', () => {
+  /* TWEE VERSCHILLENDE VRAGEN, en ik had ze eerst als elkaars tegendeel
+     getoetst.
+
+       PUBLIEK        mag deze SCHRIJFroute zonder gezagsfunctie bestaan?
+       ALLEEN_ANONIEM mag deze route 2xx antwoorden aan een anonieme klopper?
+       EIGEN_POORT    zit de controle in de handler in plaats van ervoor?
+
+     Een wachtwoordherstel antwoordt gewoon 2xx aan iemand zonder sessie -- dat
+     IS de bedoeling -- en rekent tegelijk zelf een hersteltoken na. Beide waar,
+     en de poortwacht heeft die eerste nodig om hem niet als bevinding te
+     melden. Ze uit elkaar houden zou een van de twee instrumenten laten liegen.
+
+     Wat NIET mag is de overlap met PUBLIEK hierboven: die lijst gaat over het
+     ONTBREKEN van een poort, en daar is er hier juist wel een. */
+  const overlap = [...EIGEN_POORT.keys()].filter(p => ALLEEN_ANONIEM.has(p));
+  for (const pad of overlap) {
+    assert.ok(EIGEN_POORT.get(pad).length > 30,
+      pad + ' staat in twee lijsten en hoort dan zeker een uitgeschreven reden te dragen');
   }
 });
 

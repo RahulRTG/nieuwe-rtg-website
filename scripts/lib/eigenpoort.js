@@ -41,6 +41,17 @@ const EIGEN_POORT = new Map([
   ['/api/techniek/inloggen', 'eigen rem per adres en per login, en een gelijk antwoord op elke mislukking'],
   ['/api/staff', 'de personeelsdeur: een medewerker wisselt een code in voor een sessie'],
 
+  /* ---- het bewijs komt uit een EERDERE stap en wordt hier nagerekend ----
+
+     Deze drie stonden in ALLEEN_ANONIEM (de lijst van scripts/poortwacht.js) en
+     daarmee wel op de anonieme-klop-lijst maar niet in de bewakerskaart -- die
+     leest PUBLIEK. Toen ik ze uit PUBLIEK haalde na keuringsregel 28, vielen ze
+     terug in "geen proefsleutel". De eindpoort ving dat binnen een minuut; ze
+     horen hier, want alle drie rekenen ze zelf iets na. */
+  ['/api/auth/reset', 'zoekt het lid op het hersteltoken en eist daarna een tweede code; ongeldig of verlopen geeft 400'],
+  ['/api/sso/wissel', 'verifieert het overdrachtsbewijs en trekt het meteen in -- een bewijs is voor een keer'],
+  ['/api/aanmeld/zeg', 'werkt op een gespreks-id uit een eerdere stap, met een rem per adres; een onbekend id komt niet verder'],
+
   // ---- machine naar machine: het bewijs zit in het verzoek zelf ----
   ['/api/betaal/webhook/adyen', 'de derde kaartwebhook; hij telt een handtekening na en weigert zonder secret'],
 

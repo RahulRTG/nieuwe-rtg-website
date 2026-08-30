@@ -448,3 +448,63 @@ test('zonder opslag-meetpunt blijft de oude, zwakkere reden staan', () => {
   assert.match(o.reden, /een tweede effect zou hier niet te zien zijn/,
     'zonder meetpunt hoort er niets over de opslag beweerd te worden');
 });
+
+/* ============================================================================
+   EEN HERHALING DIE IETS ANDERS RAAKT, IS GEEN HERHALING.
+
+   WAT ER MIS WAS, en het kostte precies een valse bevinding. Het
+   opslag-meetpunt oordeelde "de herhaling deed het opnieuw" zodra er bij de
+   TWEEDE oproep iets in de opslag bewoog -- ongeacht WAT.
+
+   /api/bank/pas/bevries kwam er zo uit als het enige ECHT_DEFECT van de hele
+   ronde: eerste oproep een wijziging in `bankPassen`, herhaling +1 in
+   `techniek` en +6 in `wacht`. Geisoleerd nagemeten -- drie keer bevriezen op
+   een verse server -- raakt de herhaling `bankPassen` helemaal niet. De pas
+   wordt op een waarde gezet (`p.bevroren = aan === true`), en dat is per
+   constructie idempotent.
+
+   Wat er wel bewoog kwam van ASYNCHROON werk van andere routes dat in dat
+   venster landde. De ijking aan het begin van een ronde vangt alleen wat bij
+   ELKE oproep groeit; wat af en toe binnenvalt, komt op het conto van de route
+   die op dat moment aan de beurt is.
+
+   DE REGEL DIE DAT WEGNEEMT: een herhaling die het werk opnieuw doet, raakt
+   DEZELFDE collectie als de eerste keer. Beweegt er bij B alleen iets wat bij A
+   niet bewoog, dan is dat geen bewijs -- en dan hoort de uitslag ongemeten te
+   zijn, met de waarneming erbij, in plaats van een defect dat iemand gaat
+   repareren.
+
+   WAT HET NIET WEGPOETST: raakt B dezelfde collectie als A, dan blijft het
+   onbeschermd. Dat is wat de tweede toets vastlegt.
+
+   DE MUTATIE: haal de zelfdeCollectie-controle uit staatOordeel -> de eerste
+   toets zakt.
+   ========================================================================== */
+test('een herhaling die ANDERE collecties raakt, is geen bewijs van herhaald werk', () => {
+  const zelfde = { ok: true };
+  /* c GELIJK aan a: dat is de stand waarin het opslag-meetpunt gaat spreken --
+     het antwoord reageert niet op een verse sleutel, dus alleen de opslag kan
+     nog iets zeggen. Precies de situatie van /api/bank/pas/bevries. */
+  const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde),
+    { a: { bankPassen: 'gewijzigd' }, b: { techniek: 1, wacht: 6 }, c: {} }, true);
+  assert.equal(o.stand, 'ongemeten',
+    'dit was de valse bevinding op /api/bank/pas/bevries; het kan asynchroon werk van elders zijn');
+  assert.match(o.reden, /ANDERE collecties/);
+});
+
+test('maar dezelfde collectie opnieuw IS onbeschermd, en dat blijft zo', () => {
+  const zelfde = { ok: true };
+  const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde),
+    { a: { orders: 1 }, b: { orders: 1 }, c: {} }, true);
+  assert.equal(o.stand, 'onbeschermd', 'twee keer dezelfde collectie is wel degelijk werk dat zich herhaalt');
+  assert.match(o.reden, /orders/);
+});
+
+test('en de reden noemt alleen wat er OPNIEUW bewoog, niet wat er langskwam', () => {
+  const zelfde = { ok: true };
+  const o = weegHerhaling(ok(zelfde), ok(zelfde), ok(zelfde),
+    { a: { orders: 1 }, b: { orders: 1, handelingLog: 9 }, c: {} }, true);
+  assert.match(o.reden, /orders/);
+  assert.doesNotMatch(o.reden, /handelingLog/,
+    'de ruis die toevallig meeliep hoort niet in het verwijt te staan');
+});

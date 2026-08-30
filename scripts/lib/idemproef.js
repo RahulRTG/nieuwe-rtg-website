@@ -114,9 +114,48 @@ function staatOordeel(staat) {
       reden: 'het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: ' +
       'de eerste oproep gaf ' + beschrijfDelta(staat.a) + ' en de herhaling niets' };
   }
+  /* DE HERHALING MOET DEZELFDE COLLECTIE RAKEN, anders is het geen herhaling.
+
+     Hier stond alleen "b is niet leeg, dus hij deed het opnieuw". Dat leverde
+     precies een bevinding op, en die was VALS: /api/bank/pas/bevries gaf bij de
+     eerste oproep een wijziging in `bankPassen` en bij de herhaling +1 in
+     `techniek` en +6 in `wacht`. Geisoleerd nagemeten -- drie keer bevriezen op
+     een verse server -- raakt de herhaling `bankPassen` helemaal niet. De pas
+     wordt gezet op een waarde (`p.bevroren = aan === true`) en dat is per
+     constructie idempotent.
+
+     Wat er wel bewoog, kwam van ASYNCHROON werk van andere routes dat in dat
+     venster landde: een seintje, een journaalregel, een wachtrij. De ijking aan
+     het begin van de ronde vangt alleen wat bij ELKE oproep groeit; wat af en
+     toe binnenvalt, komt op het conto van de route die op dat moment toevallig
+     aan de beurt is.
+
+     De regel die dat wegneemt en niets echts verbergt: een herhaling die het
+     werk OPNIEUW doet, raakt dezelfde collectie als de eerste keer. Beweegt er
+     bij B alleen iets wat bij A niet bewoog, dan is dat geen bewijs dat het
+     werk is herhaald -- en dan hoort de uitslag ONGEMETEN te zijn, met de
+     waarneming erbij, in plaats van een defect dat iemand gaat repareren.
+
+     Wat dit NIET wegpoetst: als B dezelfde collectie raakt als A, blijft het
+     onbeschermd. Precies zoals het hoort. */
+  const zelfdeCollectie = Object.keys(staat.b).filter(k => k in staat.a);
+  if (!zelfdeCollectie.length) {
+    return { stand: 'ongemeten',
+      reden: 'de eerste oproep gaf ' + beschrijfDelta(staat.a) + ' en bij de herhaling bewoog ' +
+        beschrijfDelta(staat.b) + ' -- ANDERE collecties dan de eerste keer. Dat is geen bewijs dat ' +
+        'het werk is herhaald; het kan asynchroon werk van een andere route zijn dat in dit venster landde' };
+  }
   return { stand: 'onbeschermd', bron: 'opslag',
     reden: 'gezien aan de opslag: de eerste oproep gaf ' + beschrijfDelta(staat.a) +
-    ' en de herhaling opnieuw ' + beschrijfDelta(staat.b) };
+    ' en de herhaling opnieuw ' + beschrijfDelta(pak(staat.b, zelfdeCollectie)) };
+}
+
+/* Alleen de sleutels die er toe doen, voor een reden die precies zegt WAT er
+   opnieuw bewoog en niet ook wat er toevallig langskwam. */
+function pak(d, sleutels) {
+  const uit = {};
+  for (const k of sleutels) uit[k] = d[k];
+  return uit;
 }
 
 /* HET OORDEEL, apart en puur -- los toetsbaar in test/idemproef.test.js.

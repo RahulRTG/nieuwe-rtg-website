@@ -105,10 +105,24 @@ test('een status over beproefbaarheid is geen besluit over duplicaatgedrag', () 
      nooit gelezen worden als "4661 verklaard": van bijna duizend daarvan is
      alleen bekend dat de proef er niet bij kan, en dat is een uitspraak over
      het instrument en niet over de route. */
+  /* DEZE TOETS IS BIJGESTELD TOEN DE METING ERBIJ KWAM, en het is belangrijk
+     waarom hij eerst zakte in plaats van meeschoof.
+
+     Hij legde vast: de semantische statussen ZIJN de verklaringen. Dat was waar
+     zolang een status maar een grond kon hebben. Sinds IDEMPROEF.json als tweede
+     grond meetelt, dragen ook gemeten routes een semantische status -- en toen
+     zakte deze toets met 1200 !== 184. Dat was precies goed: hij ving de
+     samenvouwing waar de nieuwe code op mikte.
+
+     De identiteit die overblijft is strenger dan de oude, want hij noemt de
+     grond: het BESLUITgetal is exact het aantal verklaringen, en de gemeten
+     routes staan ernaast in een eigen getal. */
   const metSemantiek = boek.statussen.filter(st => st.semantiek).reduce((n, st) => n + st.aantal, 0);
-  assert.equal(metSemantiek, boek.gemeten.metBesluitOverDuplicaat);
-  assert.equal(metSemantiek, boek.gemeten.mutatiesVerklaard,
-    'de semantische statussen horen exact de verklaringen uit idemsleutels.js te zijn');
+  assert.equal(boek.gemeten.metBesluitOverDuplicaat, boek.gemeten.mutatiesVerklaard,
+    'het besluitgetal hoort exact de verklaringen uit idemsleutels.js te zijn');
+  assert.equal(metSemantiek,
+    boek.gemeten.metBesluitOverDuplicaat + boek.gemeten.metGemetenDuplicaatgedrag,
+    'een semantische status komt uit een besluit OF uit een waarneming, en die twee horen op te tellen tot het geheel');
   assert.equal(boek.gemeten.zonderBesluitOverDuplicaat,
     boek.gemeten.mutaties - boek.gemeten.mutatiesVerklaard);
   assert.ok(boek.gemeten.zonderBesluitOverDuplicaat > boek.gemeten.nogNietGeclassificeerd,
@@ -133,4 +147,51 @@ test('de redenen zonder proefsleutel komen uit de gedeelde bewakerskaart', () =>
   const totaal = redenen.reduce((n, r) => n + r.aantal, 0);
   const bak = boek.bakken.find(b => b.id === 'geen-rol-met-token');
   assert.equal(totaal, bak.aantal, 'de redenen tellen niet op tot de bak');
+});
+
+/* ============================================================================
+   EEN GEMETEN STATUS IS GEEN BESLUIT.
+
+   WAT ER MIS GING, en het ging mis in dezelfde wijziging die de regel
+   opschreef. Toen de meting als tweede grond onder een formele status kwam,
+   telde `metBesluitOverDuplicaat` nog steeds de STATUS en niet de GROND. Zolang
+   een status alleen uit een verklaring kon komen was dat hetzelfde getal; daarna
+   niet meer. Het boek meldde in een klap "1200 van de 4661 dragen een besluit
+   over duplicaatgedrag" terwijl er over 1012 daarvan alleen was WAARGENOMEN dat
+   de server een herhaling merkte.
+
+   Dat is exact de samenvouwing die de kop van scripts/lib/idemmeting.js
+   verbiedt. Hij glipte erlangs omdat de regel wel in de tekst stond en de
+   telling niet meebewoog -- LAT.md regel 10: een meter die je niet hebt zien
+   zakken is geen meter.
+
+   DE MUTATIE: laat semantiekVan('verklaard') weer over alle graden tellen ->
+   deze toets zakt.
+   ========================================================================== */
+test('metBesluitOverDuplicaat telt alleen VERKLAARDE routes, nooit gemeten', () => {
+  const u = boek;
+  const g = u.gemeten;
+  const verklaard = u.bewijsgraad.perGraad.find(x => x.id === 'verklaard');
+  assert.ok(verklaard, 'de bewijsgraad hoort een verklaarde bak te hebben');
+  assert.ok(g.metBesluitOverDuplicaat <= verklaard.aantal,
+    'er kunnen nooit meer besluiten zijn dan verklaarde routes: ' +
+    g.metBesluitOverDuplicaat + ' > ' + verklaard.aantal);
+  const gemeten = u.bewijsgraad.perGraad.find(x => x.id === 'gemeten');
+  if (gemeten && gemeten.aantal) {
+    assert.ok(g.metGemetenDuplicaatgedrag > 0,
+      'waargenomen duplicaatgedrag hoort een EIGEN getal te hebben, niet op te gaan in het besluitgetal');
+    assert.notEqual(g.metBesluitOverDuplicaat, g.metBesluitOverDuplicaat + g.metGemetenDuplicaatgedrag,
+      'besluit en waarneming horen twee getallen te blijven');
+  }
+});
+
+test('de meting kan de belofte "elke mutatie heeft een bekende semantiek" niet opblazen', () => {
+  /* Het getal dat die belofte draagt mag niet stijgen doordat er gemeten is.
+     Meten zegt iets over het INSTRUMENT en niets over de semantiek van de route. */
+  const u = boek;
+  const { SLEUTELS } = require('../server/lib/idemsleutels');
+  assert.equal(u.gemeten.metBesluitOverDuplicaat + u.gemeten.zonderBesluitOverDuplicaat,
+    u.gemeten.mutaties, 'de twee helften horen samen het aantal mutaties te zijn');
+  assert.ok(u.gemeten.metBesluitOverDuplicaat <= Object.keys(SLEUTELS).length,
+    'er kunnen nooit meer besluiten zijn dan verklaringen in idemsleutels.js');
 });

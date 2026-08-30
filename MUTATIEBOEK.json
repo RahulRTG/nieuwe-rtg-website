@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T08:50:17.569Z",
-  "commit": "da163d90",
+  "op": "2026-08-30T08:54:28.481Z",
+  "commit": "52b87234",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -17,16 +17,17 @@
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3604,
+  "nogNietGeclassificeerd": 31,
   "metBesluitOverDuplicaat": 184,
   "zonderBesluitOverDuplicaat": 4477,
+  "metGemetenDuplicaatgedrag": 1016,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
-  "metingGebruikt": false,
-  "metingReden": "de meting is gemaakt met ongecommit werk in de boom (commit b81f58a5); zij hoort bij een stand die nergens is vastgelegd",
-  "metingGemetenOp": "2026-08-29T23:47:40.620Z",
+  "metingGebruikt": true,
+  "metingReden": "gemeten op commit 52b87234, schone boom",
+  "metingGemetenOp": "2026-08-30T08:51:24.339Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -38,12 +39,21 @@
     ]
    },
    {
-    "id": "onbekend",
-    "aantal": 3604,
+    "id": "gemeten",
+    "aantal": 3573,
     "voorbeelden": [
      "POST /api/aandacht",
      "POST /api/aanmelding/beslis",
      "POST /api/aanmelding/betalingen"
+    ]
+   },
+   {
+    "id": "onbekend",
+    "aantal": 31,
+    "voorbeelden": [
+     "POST /api/bank/advies",
+     "POST /api/bank/afschrift",
+     "POST /api/bank/afschrift.csv"
     ]
    },
    {
@@ -56,7 +66,24 @@
     ]
    }
   ],
-  "gemetenGronden": []
+  "gemetenGronden": [
+   {
+    "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
+    "aantal": 2496
+   },
+   {
+    "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
+    "aantal": 1012
+   },
+   {
+    "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
+    "aantal": 61
+   },
+   {
+    "reden": "gemeten: de herhaling werd geweigerd (status N)",
+    "aantal": 4
+   }
+  ]
  },
  "bakken": [
   {
@@ -141,7 +168,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 81,
+   "aantal": 1097,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -177,7 +204,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 691,
+   "aantal": 752,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -189,7 +216,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 182,
+   "aantal": 2678,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -201,13 +228,13 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3604,
+   "aantal": 31,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
-    "POST /api/aandacht",
-    "POST /api/aanmelding/beslis",
-    "POST /api/aanmelding/betalingen"
+    "POST /api/bank/advies",
+    "POST /api/bank/afschrift",
+    "POST /api/bank/afschrift.csv"
    ]
   }
  ],
@@ -340,7 +367,7 @@
    "bron": "IDEMPROEF.json",
    "veld": "routesGevonden",
    "vastgelegd": 4622,
-   "vastgelegdOp": "2026-08-29",
+   "vastgelegdOp": "2026-08-30",
    "nu": 4622,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
    "verschil": 0,
@@ -352,7 +379,7 @@
    "veld": "routesMetRol",
    "vastgelegd": 3777,
    "nu": 3777,
-   "vastgelegdOp": "2026-08-29",
+   "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
    "verschil": 0,
    "gelijk": true,

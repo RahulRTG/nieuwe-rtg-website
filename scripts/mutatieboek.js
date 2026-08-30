@@ -280,8 +280,31 @@ function boek() {
   /* Over hoeveel mutaties is er GEEN besluit over duplicaatgedrag, ongeacht of
      ze te beproeven zijn? Dit is hetzelfde getal dat IDEMSCHULD.json bewaakt,
      en het hoort naast de statustabel te staan zodat niemand de ene voor de
-     andere aanziet. */
-  const metSemantiek = statussen.filter(st => st.semantiek).reduce((n, st) => n + st.aantal, 0);
+     andere aanziet.
+
+     EN HET TELT ALLEEN VERKLAARDE ROUTES. Hier stond `statussen.filter(semantiek)`,
+     over de STATUS en niet over de grond. Zolang een status alleen uit een
+     verklaring kon komen was dat hetzelfde getal. Zodra de meting erbij kwam,
+     was het dat niet meer: 1012 gemeten BESCHERMD schoven mee, en dan meldt dit
+     boek "1200 dragen een besluit over duplicaatgedrag" terwijl er over 1012
+     daarvan alleen is WAARGENOMEN dat de server een herhaling merkte. Dat is
+     exact de samenvouwing die de kop van scripts/lib/idemmeting.js verbiedt, en
+     hij glipte er langs omdat ik de regel wel opschreef en de telling niet
+     meebewoog.
+
+     Het gemeten getal staat er apart naast, want het is echt iets waard -- maar
+     het is een ander ding en draagt een andere naam. */
+  const SEMANTIEK = new Set(['BESCHERMD', 'BEWUST_NIET_IDEMPOTENT', 'NIET_VAN_TOEPASSING']);
+  const semantiekVan = (graad) => {
+    let n = 0;
+    for (const [r, bakId] of bakVan) {
+      const st = statusVan(r, bakId);
+      if (SEMANTIEK.has(st) && graadVan(r, st) === graad) n++;
+    }
+    return n;
+  };
+  const metSemantiek = semantiekVan('verklaard');
+  const metGemetenSemantiek = semantiekVan('gemeten');
 
   /* DE IDENTITEIT. Alles wat de router aanbiedt zit in precies een bak. */
   const som = bakken.reduce((n, b) => n + b.aantal, 0);
@@ -316,6 +339,9 @@ function boek() {
          besluiten maken. Zie de kop van scripts/lib/idemmeting.js. */
       metBesluitOverDuplicaat: metSemantiek,
       zonderBesluitOverDuplicaat: mutaties.length - metSemantiek,
+      /* Waargenomen duplicaatgedrag: echt bewijs, en geen besluit. Apart geteld
+         zodat het de regel hierboven niet stilletjes kan verruimen. */
+      metGemetenDuplicaatgedrag: metGemetenSemantiek,
       somVanDeBakken: som,
       sluit: som === alles.length
     },
@@ -407,11 +433,16 @@ function toon(u) {
   console.log('    ' + String(g.statusSom).padStart(5) + '  ' + 'SOM'.padEnd(26) +
     (g.statusSluit ? 'gelijk aan het aantal mutaties -- elke mutatie heeft een status'
                    : 'WIJKT AF VAN HET AANTAL MUTATIES (' + g.mutaties + ')'));
-  console.log('\n    En dat is iets anders dan verklaard zijn: ' + g.metBesluitOverDuplicaat +
-    ' van de ' + g.mutaties + ' dragen een besluit over duplicaatgedrag,');
-  console.log('    ' + g.zonderBesluitOverDuplicaat + ' niet. Bij ' +
-    (g.zonderBesluitOverDuplicaat - g.nogNietGeclassificeerd) +
-    ' daarvan is alleen bekend dat de proef er niet bij kan.');
+  /* DRIE GETALLEN DIE NIET IN ELKAAR MOGEN SCHUIVEN. Een status hebben is niet
+     hetzelfde als waargenomen zijn, en waargenomen zijn is niet hetzelfde als
+     verklaard zijn. Ze staan daarom als drie regels en niet als een percentage. */
+  console.log('\n    Een status hebben is niet hetzelfde als verklaard zijn:');
+  console.log('      ' + String(g.metBesluitOverDuplicaat).padStart(5) +
+    '  dragen een BESLUIT over duplicaatgedrag (server/lib/idemsleutels.js)');
+  console.log('      ' + String(g.metGemetenDuplicaatgedrag).padStart(5) +
+    '  daarnaast WAARGENOMEN duplicaatgedrag -- bewijs, geen besluit');
+  console.log('      ' + String(g.nogNietGeclassificeerd).padStart(5) +
+    '  geen van beide: geen besluit en niets waargenomen');
 
   console.log('\n  WAAROM ER GEEN PROEFSLEUTEL IS');
   for (const r of u.zonderRolPerReden.slice(0, 8)) console.log('    ' + String(r.aantal).padStart(5) + '  ' + r.reden.slice(0, 84));

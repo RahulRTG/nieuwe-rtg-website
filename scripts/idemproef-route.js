@@ -58,7 +58,34 @@ if (require.main !== module) { module.exports = {}; return; }
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'idemproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  /* HET TWEEDE MEETPUNT AANZETTEN, en waarom dat hier moest.
+
+     Deze proef heeft twee meetpunten: het ANTWOORD, en de stand van de opslag
+     via de kop X-RTG-Staat (server/staatlog.js). Het tweede is er niet voor de
+     sier -- hij bestaat juist voor de routes waarvan het antwoord niet per
+     oproep verandert, en die zijn met het eerste meetpunt per definitie niet te
+     beoordelen. Er staat hieronder zelfs een hele ijking om de ruis eruit te
+     halen.
+
+     Alleen: staatlog gaat aan met RTG_STAATLOG, en die vlag stond hier nergens.
+     De ijking draaide dus altijd op niets, het meetpunt meldde zichzelf als UIT,
+     en 34 routes bleven "ongemeten" met de reden "het antwoord verandert niet
+     per oproep; een tweede effect zou hier niet te zien zijn" -- terwijl het
+     gereedschap om het wel te zien in dit bestand klaarlag. Zelfde soort gat als
+     RTG_DEMO dat een no-op was geworden: de opstelling belooft iets wat de
+     omgeving niet aanzet, en aan de uitslag is dat niet te zien.
+
+     EN WAAROM STAND 2 EN NIET 1. Stand 1 telt alleen de LENGTE van de arrays;
+     stand 2 telt ook de sleutels van objecten en neemt van allebei een
+     inhoudsafdruk (server/staatlog.js). Dat verschil is precies het verschil dat
+     hier overbleef: met stand 1 zien een LEESroute en een route die een bestaande
+     rij OP ZIJN PLAATS bijwerkt er identiek uit -- de lengte beweegt in geen van
+     beide gevallen -- en de proef zei dat ook eerlijk ("dat verschil ziet dit
+     meetpunt niet"). Stand 2 ziet het wel, want de afdruk verandert. Hij kost
+     een hash over de opslag per antwoord; dat is de prijs van een meetpunt dat
+     iets kan zeggen in plaats van niets. */
+  const server = await start({ naam: 'idemproef',
+    env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
   const post = async (pad, lijf, tok) => {

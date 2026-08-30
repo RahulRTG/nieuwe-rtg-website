@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T19:16:10.615Z",
-  "commit": "2cb21c82",
+  "op": "2026-08-30T19:33:49.313Z",
+  "commit": "10d3961c",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -44,13 +44,13 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1592,
-  "beschermd": 1591,
+  "beoordeeld": 1665,
+  "beschermd": 1664,
   "onbeschermd": 1,
-  "ongemeten": 3029,
-  "oproepen": 13901,
+  "ongemeten": 2956,
+  "oproepen": 13900,
   "tokensHernieuwd": 22,
-  "uitOpslag": 6,
+  "uitOpslag": 4,
   "ruisGeijkt": [
    "rtgai",
    "handelingLog",
@@ -84,10 +84,12 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
-  "objectenGemaakt": 124,
-  "objectTakken": 76,
+  "objectenGemaakt": 126,
+  "objectTakken": 77,
   "schoolwereld": true,
   "horecawereld": true,
+  "rolOpgewaardeerd": 171,
+  "rolOpwaarderingGeweigerd": 5,
   "schoolwereldStappen": [
    {
     "naam": "kind in het gezin",
@@ -141,7 +143,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 16,
+ "vermoedensVerworpen": 15,
  "perRoute": [
   {
    "methode": "POST",
@@ -2162,7 +2164,7 @@
    "pad": "/api/bank/afschrift",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2171,7 +2173,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -2179,7 +2183,7 @@
    "pad": "/api/bank/afschrift.csv",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2256,18 +2260,15 @@
    "methode": "POST",
    "pad": "/api/bank/hart",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in wacht en de herhaling niets",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -2277,7 +2278,7 @@
    "pad": "/api/bank/inzichten",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2406,7 +2407,7 @@
    "pad": "/api/bank/overzicht",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2503,7 +2504,9 @@
      "bankPassen": -1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -2536,7 +2539,7 @@
    "pad": "/api/bank/passen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2553,7 +2556,7 @@
    "pad": "/api/bank/rekening",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2589,7 +2592,7 @@
    "pad": "/api/bank/rente-voorbeeld",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2715,7 +2718,7 @@
    "pad": "/api/bank/terugkerend",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -2766,7 +2769,6 @@
     },
     "b": {},
     "c": {
-     "kosten": "gewijzigd",
      "bankTerugkerend": 1,
      "bankIdem": 1,
      "bankIdemAfdruk": 1
@@ -2796,7 +2798,7 @@
    "pad": "/api/bank/vastelasten",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -3338,7 +3340,7 @@
    "pad": "/api/betaal/mijn",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -3373,7 +3375,7 @@
    "pad": "/api/betaal/verzoeken",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -3390,7 +3392,7 @@
    "pad": "/api/betaal/webhook",
    "rol": "openbaar",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -5038,7 +5040,9 @@
      "commandAgents": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -5126,9 +5130,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -5274,7 +5276,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 0f05e4e9-f54c-4e1d-882d-39afe7be16e2"
+   "blokkade": "Die regel bestaat niet: 1ef4b1af-05a4-412d-9778-68ed98013c3d"
   },
   {
    "methode": "POST",
@@ -5292,7 +5294,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 0f05e4e9-f54c-4e1d-882d-39afe7be16e2"
+   "blokkade": "Die regel bestaat niet: 1ef4b1af-05a4-412d-9778-68ed98013c3d"
   },
   {
    "methode": "POST",
@@ -5506,7 +5508,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: 0f05e4e9-f54c-4e1d-882d-39afe7be16e2"
+   "blokkade": "Onbekende functie: 1ef4b1af-05a4-412d-9778-68ed98013c3d"
   },
   {
    "methode": "POST",
@@ -6297,7 +6299,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: 0f05e4e9-f54c-4e1d-882d-39afe7be16e2"
+   "blokkade": "Dat runbook bestaat niet: 1ef4b1af-05a4-412d-9778-68ed98013c3d"
   },
   {
    "methode": "POST",
@@ -6907,7 +6909,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -7062,9 +7066,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -8418,7 +8420,7 @@
    "pad": "/api/facturen/overzicht",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -9286,7 +9288,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -9626,9 +9630,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -9894,7 +9896,7 @@
    "pad": "/api/fout/client",
    "rol": "openbaar",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     204,
     204,
@@ -11727,7 +11729,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Partner niet gevonden."
   },
@@ -11778,7 +11782,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -12265,12 +12271,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -12452,9 +12455,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -15024,9 +15025,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Geef eerst een onderwerp (of kies een app uit de bibliotheek)."
   },
@@ -16528,7 +16527,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -16603,7 +16604,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -16742,9 +16745,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16875,7 +16876,6 @@
     },
     "b": {},
     "c": {
-     "wacht": "gewijzigd",
      "mediaLijsten": "gewijzigd"
     }
    }
@@ -17786,1208 +17786,1193 @@
   {
    "methode": "POST",
    "pad": "/api/member/bureau/ai",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/digitaal",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Wat controleren wij?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/digitaal/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/incident",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Wat is er gebeurd?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/post",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Waar staat of hangt het?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/post/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/risico",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Over welke bestemming gaat het?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/beveiliging/risico/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/briefing",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/bruikleen",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/conditie",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/herkomst",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/herkomst/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/taxatie",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/taxatie/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/collectie/terug",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet als kunst, horloge of sieraad in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/delegatie",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/delegatie/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Onbekend domein."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/dier",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit dier staat er niet."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/dier/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/document",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit dier staat niet in uw kantoor."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/document/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/zorg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit dier staat niet in uw kantoor."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/dieren/zorg/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/graaf",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/kamers",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/knoop",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit staat niet in uw kantoor."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/nu",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/overzicht",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/raakvlak",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/bon",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/gevolg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/punten",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/vergeten",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/verstoring",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reisdek/verstoring/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw reisboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties/band",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Een relatie is geen band met zichzelf."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties/band/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze relatie staat niet in uw Attenties."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties/context",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze relatie staat niet in uw Attenties."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties/ontmoeting",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze relatie staat niet in uw Attenties."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/relaties/ontmoeting/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze relatie staat niet in uw Attenties."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/lijn",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Over welk onderwerp?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/lijn/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/optreden",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Waar gaat het optreden over?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/optreden/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/vermelding",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Waar is het verschenen?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/vermelding/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/woordvoerder",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/reputatie/woordvoerder/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/termijnen",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/tower",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin/beurt",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Onbekende woning."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin/installatie",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze woning staat niet in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin/installatie/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Onbekende woning."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin/ruimte",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze woning staat niet in uw register. Leg hem daar eerst vast."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/twin/ruimte/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   "blokkade": "Onbekende woning."
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/zaak/beslis",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+    "c": {
+     "lifestyle": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/zaak/intrek",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/zaak/open",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/bureau/zaken",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het Privékantoor is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
@@ -19001,7 +18986,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -19248,9 +19235,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -19779,272 +19764,268 @@
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/ai",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/bezit",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/bezit/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/bezit/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit object staat niet in uw register."
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/concierge",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/concierge/intrek",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit verzoek vinden wij niet terug."
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/concierge/vraag",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+    "c": {
+     "lifestyle": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/gezondheid",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/gezondheid/afspraak",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   "blokkade": "Wat voor afspraak betreft het?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/gezondheid/afspraak/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/gezondheid/dossier",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+    "c": {
+     "lifestyle": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/gezondheid/dossier/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/overzicht",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/voorkeuren",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/lifestyle/voorkeuren/zet",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "De Rechterhand is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
@@ -20276,7 +20257,9 @@
    ],
    "opslag": {
     "a": {
-     "magnaatWereld": "gewijzigd"
+     "magnaatWereld": "gewijzigd",
+     "kosten": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -20771,7 +20754,9 @@
    "opslag": {
     "a": {
      "contactPins": "gewijzigd",
-     "contactPinSecurity": "gewijzigd"
+     "contactPinSecurity": "gewijzigd",
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -21049,1253 +21034,1233 @@
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/ai",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Onbekende app."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/attenties",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/attenties/gift",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Kies eerst een relatie."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/attenties/gift/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/attenties/relatie",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/attenties/relatie/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cellier",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cellier/schenk",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze fles staat niet in uw kelder."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cellier/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cellier/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze fles staat niet in uw kelder."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/club",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze club staat niet in uw Cercle."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/club/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/gast",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze club staat niet in uw Cercle."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/gast/terug",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/cercle/waarheen",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/doc",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze persoon staat niet in uw Entourage."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/doc/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/gezelschap",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Kies eerst wie er meegaat."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/persoon",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/entourage/persoon/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/garderobe",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/garderobe/stuk",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit stuk staat niet in uw garderobe."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/garderobe/stuk/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/garderobe/vakman",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/garderobe/vakman/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar/toestel",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit toestel staat niet in uw hangar."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar/toestel/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar/vlucht",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Kies eerst een toestel."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/hangar/vlucht/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/logboek",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/logboek/object",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit object staat niet in uw logboek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/logboek/object/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/logboek/regel",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Kies eerst een object."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/logboek/regel/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/log",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+    "c": {
+     "lifestyle": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/log/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/staf",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/staf/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/taak",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Wat moet er gebeuren?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/taak/klaar",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Taak niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/maison/taak/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/mecenaat",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/mecenaat/betaald",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze gift staat niet in uw dossier."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/mecenaat/gift",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Welk goed doel steunt u?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/mecenaat/gift/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "lifestyle": "gewijzigd"
+    },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/contact",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/contact/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/doc",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Dit document staat niet in uw dossier."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/doc/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/wens",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/nalatenschap/wens/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/reis/item",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw boek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/reis/item/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/reis/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/reis/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze reis staat niet in uw boek."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/reisboek",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/gast",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze gelegenheid bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/gast/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/gast/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Gast niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/menu",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze gelegenheid bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/menu/weg",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/weg",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "member-lifestyle",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/member/rechterhand/table/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze app is onderdeel van de Lifestyle Pass."
+   "blokkade": "Deze gelegenheid bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/aanwezig/wis",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22308,12 +22273,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/akkoord",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22326,12 +22291,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/arrange",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22344,12 +22309,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/blokkeer",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22362,12 +22327,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/date",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22380,12 +22345,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/encounter",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22398,12 +22363,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/introductie/antwoord",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22416,12 +22381,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/introducties",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22434,12 +22399,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/kandidaten",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22452,12 +22417,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/like",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22470,12 +22435,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/matches",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22488,12 +22453,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/pas",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22506,12 +22471,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/profiel",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22524,12 +22489,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/profiel/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22542,12 +22507,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/samen",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22560,12 +22525,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/samen/zet",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22578,12 +22543,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/tafel/antwoord",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22596,12 +22561,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
    "pad": "/api/member/rendezvous/tafels",
-   "rol": "member",
+   "rol": "member-lifestyle",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -22614,7 +22579,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Rendez-vous is voor Signature-members met een Lifestyle Pass of Business Pass."
+   "blokkade": "Verifieer eerst uw identiteit. Zo weet ieder lid dat de ander echt is."
   },
   {
    "methode": "POST",
@@ -22852,10 +22817,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -23915,9 +23877,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -24024,9 +23984,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -24115,7 +24078,9 @@
      "spellen": 1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit potje bestaat niet (meer)."
   },
@@ -24222,9 +24187,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -25732,7 +25695,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -25919,18 +25884,15 @@
    "methode": "POST",
    "pad": "/api/munt/webhook",
    "rol": "openbaar",
-   "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in kosten en de herhaling niets",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag",
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -26007,12 +25969,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -27098,6 +27057,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "atelier": "gewijzigd"
     },
     "b": {},
@@ -27137,11 +27097,14 @@
     "a": {
      "atelierSites": 2
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "atelierSites": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -27314,9 +27277,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -28641,9 +28602,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -28706,7 +28665,7 @@
    "pad": "/api/office/export.csv",
    "rol": "office",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -29875,9 +29834,12 @@
     "a": {
      "officeDocs": -1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -30513,7 +30475,6 @@
    "opslag": {
     "a": {
      "magnaatWereld": "gewijzigd",
-     "wacht": "gewijzigd",
      "mailQ": 2
     },
     "b": {},
@@ -32165,7 +32126,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -33009,9 +32972,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -34979,9 +34940,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -35786,9 +35750,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -37256,7 +37218,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -37365,12 +37329,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -37781,7 +37742,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -38154,7 +38117,10 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -39020,9 +38986,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -39055,7 +39024,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "waterAanslagen": 2
     },
     "b": {},
@@ -39075,9 +39043,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -39120,7 +39091,7 @@
    "pad": "/api/pakket/typen",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39170,7 +39141,7 @@
   {
    "methode": "POST",
    "pad": "/api/partner/chat/history",
-   "rol": "member",
+   "rol": "member-zakelijk",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -39188,7 +39159,7 @@
   {
    "methode": "POST",
    "pad": "/api/partner/chat/send",
-   "rol": "member",
+   "rol": "member-zakelijk",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -39232,9 +39203,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -39316,7 +39285,7 @@
    "pad": "/api/pay/graaf",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39325,10 +39294,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -39386,7 +39352,7 @@
    "pad": "/api/pay/overzicht",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39403,7 +39369,7 @@
    "pad": "/api/pay/portefeuille",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39491,7 +39457,7 @@
    "pad": "/api/pay/tegoed",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39591,7 +39557,7 @@
    "pad": "/api/pay/terugstand",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39657,7 +39623,7 @@
    "pad": "/api/pay/tiks",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -39981,9 +39947,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "blokkade": "Kanaal niet gevonden."
@@ -40155,7 +40119,7 @@
    "pad": "/api/podium/mijn",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -40198,7 +40162,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
    },
    "blokkade": "Kanaal niet gevonden."
@@ -40473,9 +40439,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -40581,9 +40550,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze uitnodiging kennen we niet. Controleer de link."
   },
@@ -41502,7 +41469,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -42008,9 +41977,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -42314,9 +42281,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -43249,7 +43214,8 @@
      "sessions": 1
     },
     "c": {
-     "sessions": 1
+     "sessions": 1,
+     "kosten": "gewijzigd"
     }
    },
    "blokkade": "Log in om de gezamenlijke inkoop te zien."
@@ -43662,7 +43628,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -45750,9 +45718,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -46584,7 +46550,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Sleutelwoorden horen bij een echt RTG-account."
   },
@@ -46672,9 +46640,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dat soort voorstel bestaat niet."
   },
@@ -46871,7 +46837,9 @@
      "fluister": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -48140,7 +48108,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
   },
@@ -48425,12 +48395,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -48776,9 +48743,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -49841,7 +49806,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Geen van deze leveringen is nog vrij."
   },
@@ -50089,9 +50056,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -50127,7 +50092,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -50901,7 +50868,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doce801d12c8034"
+   "blokkade": "Die regel bestaat niet: doce000656408ff"
   },
   {
    "methode": "POST",
@@ -50919,7 +50886,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doce801d12c8034"
+   "blokkade": "Die regel bestaat niet: doce000656408ff"
   },
   {
    "methode": "POST",
@@ -51114,7 +51081,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doce801d12c8034"
+   "blokkade": "Dat runbook bestaat niet: doce000656408ff"
   },
   {
    "methode": "POST",
@@ -51356,7 +51323,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit is geen content-creator-account."
   },
@@ -51490,7 +51459,7 @@
    "pad": "/api/supplier/dagrapport.csv",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -51837,9 +51806,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52298,7 +52265,7 @@
    "pad": "/api/supplier/facturen/pdf",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -52332,7 +52299,7 @@
    "pad": "/api/supplier/finance/export",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -52359,7 +52326,6 @@
     "a": {
      "notifications": "gewijzigd",
      "rtmail": "gewijzigd",
-     "wacht": "gewijzigd",
      "facturen": 2
     },
     "b": {},
@@ -52940,7 +52906,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Welke plek (bijv. P1-04)?"
   },
@@ -53138,9 +53106,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -53485,9 +53456,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54265,7 +54234,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -54806,12 +54777,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -55129,12 +55097,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -55406,7 +55371,8 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd"
+     "horeca": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -55572,9 +55538,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -55771,7 +55740,9 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd"
+     "horeca": "gewijzigd",
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -56033,12 +56004,9 @@
     "a": {
      "groeigesprekken": 1
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -56590,7 +56558,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -56682,7 +56652,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -57463,9 +57435,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Gesprek niet gevonden."
   },
@@ -57896,7 +57866,7 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd"
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -58024,7 +57994,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -58060,10 +58032,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -58840,9 +58809,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
@@ -58859,9 +58826,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -59222,9 +59187,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -60226,9 +60194,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -60335,9 +60301,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -60353,9 +60322,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -60496,7 +60463,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -61625,9 +61594,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -61709,7 +61676,7 @@
    "pad": "/api/supplier/rides.csv",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet (gemeten met een inhoudsafdruk, dus ook geen wijziging op zijn plaats). Of dit een LEESroute is of een die deze keer niets te doen had, is een besluit en geen waarneming",
    "statussen": [
     200,
     200,
@@ -61753,7 +61720,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Kamer niet gevonden."
   },
@@ -62792,12 +62761,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -62863,7 +62829,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -62899,12 +62867,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -62975,7 +62940,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -63964,7 +63931,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -63999,9 +63968,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -65207,7 +65174,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze zaak is geen wedding- en eventplanner."
   },
@@ -65312,13 +65281,15 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "werkbeleid": "gewijzigd",
      "werkmail": 2
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -65423,9 +65394,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Verstuur vanaf een actief adres van de zaak."
   },
@@ -66412,7 +66381,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Die tenant kennen we niet."
   },
@@ -66571,9 +66542,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Alleen de leiding van de zaak zet de huisstijl."
   },
@@ -67531,7 +67500,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -67564,7 +67535,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -67653,9 +67625,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -67743,9 +67713,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -68617,7 +68585,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -68652,12 +68622,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -69644,7 +69611,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -69700,7 +69669,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -69825,12 +69796,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -69880,11 +69848,12 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit verzoek bestaat niet."
   },
@@ -70524,7 +70493,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -70810,7 +70781,9 @@
      "werkruimtes": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -70916,9 +70889,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -71799,11 +71770,14 @@
     "a": {
      "werkruimtes": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "werkruimtes": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -71961,9 +71935,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit object bestaat niet."
   },
@@ -72089,10 +72061,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -72495,9 +72464,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -73156,8 +73123,7 @@
     },
     "b": {},
     "c": {
-     "foundation": "gewijzigd",
-     "kosten": "gewijzigd"
+     "foundation": "gewijzigd"
     }
    }
   },
@@ -73191,7 +73157,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -73569,7 +73537,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -73626,14 +73596,11 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "foundation": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -74079,9 +74046,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -74171,7 +74136,9 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dat moment kennen we niet."
   },
@@ -75323,7 +75290,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "De hulplijn is van het kind zelf: open hem vanuit je eigen klas."
   },
@@ -75464,9 +75433,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -75912,7 +75879,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -75963,8 +75932,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "kosten": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -76735,7 +76703,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -76826,12 +76796,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -77006,7 +76973,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -77183,9 +77152,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -77709,9 +77676,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -77780,12 +77750,9 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -78538,7 +78505,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -78685,9 +78654,7 @@
      "rtfAppInstallaties": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -78827,7 +78794,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -79051,12 +79020,9 @@
     "a": {
      "officeDocs": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -80716,7 +80682,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -80895,7 +80863,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    },
    "blokkade": "Dit spel heeft geen dagopgave."
   },
@@ -80931,9 +80902,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit potje bestaat niet (meer)."
   },
@@ -81397,7 +81366,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -82495,7 +82466,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -82748,9 +82721,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -82862,10 +82833,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Editie niet gevonden."
   },
@@ -83273,7 +83241,6 @@
     },
     "b": {},
     "c": {
-     "commandAlarmen": "gewijzigd",
      "officeDocs": "gewijzigd"
     }
    }

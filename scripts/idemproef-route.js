@@ -98,8 +98,14 @@ wachtOpSchoneBoom();
      meetpunt niet"). Stand 2 ziet het wel, want de afdruk verandert. Hij kost
      een hash over de opslag per antwoord; dat is de prijs van een meetpunt dat
      iets kan zeggen in plaats van niets. */
+  /* RTG_DOOS_SLEUTEL hoort bij de OPSTELLING, net als OFFICE_CODE: zonder die
+     variabele bestaat de doosdeur helemaal niet, ook niet in productie
+     (server/routes/doos.js). Hem hier zetten opent geen deur die anders dicht
+     zou zijn -- het maakt de opstelling compleet. */
+  const DOOS_SLEUTEL = 'proef-doos-sleutel-0123456789abcdef';
   const server = await start({ naam: 'idemproef',
-    env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' } });
+    env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2',
+      RTG_DOOS_SLEUTEL: DOOS_SLEUTEL } });
   const { basis, klaar } = server;
 
   /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en

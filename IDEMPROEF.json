@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T14:44:18.107Z",
-  "commit": "4424c6ec",
+  "op": "2026-08-30T14:57:06.601Z",
+  "commit": "f9057a80",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -44,11 +44,11 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1507,
-  "beschermd": 1506,
+  "beoordeeld": 1557,
+  "beschermd": 1556,
   "onbeschermd": 1,
-  "ongemeten": 3114,
-  "oproepen": 13895,
+  "ongemeten": 3064,
+  "oproepen": 13897,
   "tokensHernieuwd": 22,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -84,8 +84,36 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
-  "objectenGemaakt": 69,
-  "objectTakken": 68,
+  "objectenGemaakt": 122,
+  "objectTakken": 75,
+  "schoolwereld": true,
+  "schoolwereldStappen": [
+   {
+    "naam": "kind in het gezin",
+    "ok": true,
+    "waarom": null
+   },
+   {
+    "naam": "leraar uitnodigen",
+    "ok": true,
+    "waarom": null
+   },
+   {
+    "naam": "leraar accepteert",
+    "ok": true,
+    "waarom": null
+   },
+   {
+    "naam": "klas op de school",
+    "ok": true,
+    "waarom": null
+   },
+   {
+    "naam": "kind aansluiten bij de klas",
+    "ok": true,
+    "waarom": null
+   }
+  ],
   "lijfsleutelsGebouwd": [
    "werkruimte",
    "school",
@@ -106,7 +134,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 10,
+ "vermoedensVerworpen": 12,
  "perRoute": [
   {
    "methode": "POST",
@@ -365,7 +393,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "b": {},
     "c": {}
    },
@@ -490,9 +521,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "agendas": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -1732,10 +1761,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "techniek": 1,
-     "wacht": 6
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -2616,7 +2642,9 @@
      "betaalOpdrachten": 1,
      "capGezondheid": 1
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "betaalIdem": 1,
      "bankSaldi": "gewijzigd",
@@ -2626,7 +2654,8 @@
      "betaalOpdrachten": 1,
      "capGezondheid": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -4450,12 +4479,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -5241,7 +5267,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
+   "blokkade": "Die regel bestaat niet: 65b1455f-eca5-43b3-b5e4-bae48021c534"
   },
   {
    "methode": "POST",
@@ -5259,7 +5285,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
+   "blokkade": "Die regel bestaat niet: 65b1455f-eca5-43b3-b5e4-bae48021c534"
   },
   {
    "methode": "POST",
@@ -5473,7 +5499,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
+   "blokkade": "Onbekende functie: 65b1455f-eca5-43b3-b5e4-bae48021c534"
   },
   {
    "methode": "POST",
@@ -6264,7 +6290,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: d69f9a04-7edf-4b5a-b8a3-5e3032b797ca"
+   "blokkade": "Dat runbook bestaat niet: 65b1455f-eca5-43b3-b5e4-bae48021c534"
   },
   {
    "methode": "POST",
@@ -6731,9 +6757,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -8144,7 +8173,6 @@
    ],
    "opslag": {
     "a": {
-     "medicatie": 1,
      "beauty": 1,
      "dagmetingen": 1,
      "gemoed": 1
@@ -8597,7 +8625,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit festival staat niet op naam van uw zaak."
   },
@@ -9638,9 +9668,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -9895,9 +9923,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "galerij": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -10415,9 +10441,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "geldbeleid": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -10451,9 +10475,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "geldbeleid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -10508,9 +10530,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "geldbeleid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -10849,15 +10869,11 @@
    "opslag": {
     "a": {
      "supplierNotifications": 1,
-     "weefsel": "gewijzigd",
      "gemeenteMeldingen": 1
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -11803,7 +11819,8 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -12928,7 +12945,7 @@
    ],
    "opslag": {
     "a": {
-     "kosten": 3
+     "kosten": 2
     },
     "b": {},
     "c": {
@@ -15078,9 +15095,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "levensbanden": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -15168,9 +15183,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "levensbeleid": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -16301,7 +16314,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -17077,9 +17092,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies: meer, minder, nooit, verras of reset."
   },
@@ -17299,11 +17312,14 @@
     "a": {
      "meetKamers": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "meetKamers": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -18518,9 +18534,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -20261,7 +20275,8 @@
    ],
    "opslag": {
     "a": {
-     "magnaatWereld": "gewijzigd"
+     "magnaatWereld": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -20936,8 +20951,7 @@
    ],
    "opslag": {
     "a": {
-     "pulse": "gewijzigd",
-     "wauw": 1
+     "pulse": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -21566,9 +21580,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -24545,9 +24557,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -25477,9 +25492,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -25516,9 +25529,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -26398,19 +26414,20 @@
    "methode": "POST",
    "pad": "/api/noodkaart/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
+    200,
+    200,
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "noodkaarten": -1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "U heeft geen noodkaart."
+   }
   },
   {
    "methode": "POST",
@@ -26427,12 +26444,9 @@
     "a": {
      "noodkaarten": 1
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -27255,9 +27269,12 @@
     "a": {
      "atelierSites": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -28101,12 +28118,9 @@
     "a": {
      "boardroom": 2
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -28193,7 +28207,7 @@
    ],
    "opslag": {
     "a": {
-     "rahulProfiel": 3
+     "rahulProfiel": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -30042,9 +30056,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -30346,7 +30358,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -30564,12 +30578,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -32249,8 +32260,8 @@
    ],
    "opslag": {
     "a": {
+     "stadNodes": "gewijzigd",
      "weefsel": 1,
-     "stadNodes": 9,
      "stadMetingen": 35,
      "stadRegie": 2
     },
@@ -34641,9 +34652,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -34729,9 +34738,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "weefselTerugval": 6
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -34802,7 +34809,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -35120,13 +35129,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -35264,9 +35269,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -35404,9 +35413,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "weefselZorg": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -35987,12 +35994,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -36045,7 +36049,8 @@
     },
     "b": {},
     "c": {
-     "onboarding": "gewijzigd"
+     "onboarding": "gewijzigd",
+     "commandAlarmen": "gewijzigd"
     }
    }
   },
@@ -37316,7 +37321,7 @@
    ],
    "opslag": {
     "a": {
-     "ovRegie": 1
+     "ovRegie": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -38809,7 +38814,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -38934,12 +38941,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -40178,11 +40182,11 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Kanaal niet gevonden."
   },
@@ -40245,6 +40249,8 @@
      "memberDir": -1,
      "ledenBoard": -1,
      "spellen": "gewijzigd",
+     "wallet": -1,
+     "zorgProfielen": -1,
      "bestanden": -1,
      "fluister": -1,
      "lifestyle": -1,
@@ -40877,9 +40883,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "residentie": 3
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -40975,9 +40979,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "residentie": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -41199,9 +41201,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "residentie": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -41310,7 +41310,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Modepartner niet gevonden."
   },
@@ -41543,9 +41545,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Vul eerst de geboortedatum in; zonder leeftijdspas blijft het leerpaspoort dicht."
   },
@@ -44867,7 +44867,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -45390,9 +45392,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Welke belofte is gedaan?"
   },
@@ -46601,7 +46601,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -46619,9 +46621,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -46655,9 +46655,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "socialebeleid": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -48105,7 +48103,9 @@
     503
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -48427,12 +48427,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -50882,7 +50879,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc311accda47f3"
+   "blokkade": "Die regel bestaat niet: docdb805b2245ea"
   },
   {
    "methode": "POST",
@@ -50900,7 +50897,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc311accda47f3"
+   "blokkade": "Die regel bestaat niet: docdb805b2245ea"
   },
   {
    "methode": "POST",
@@ -51095,7 +51092,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc311accda47f3"
+   "blokkade": "Dat runbook bestaat niet: docdb805b2245ea"
   },
   {
    "methode": "POST",
@@ -51320,7 +51317,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -51495,9 +51494,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52772,7 +52769,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -52808,9 +52807,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54228,7 +54225,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -54441,9 +54440,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -55210,9 +55207,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "horeca": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -55655,9 +55650,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "horeca": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -56712,11 +56705,14 @@
     "a": {
      "officeDocs": 1
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "officeDocs": 1
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -56948,9 +56944,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -57866,7 +57860,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -58031,9 +58027,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze zaak is geen jachthaven."
   },
@@ -59438,7 +59432,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze zaak is geen kinderopvang."
   },
@@ -59759,9 +59755,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -60051,9 +60045,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "payTreasury": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -62006,7 +61998,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -62312,9 +62306,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -62953,7 +62945,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dit land kennen we niet: "
   },
@@ -63137,9 +63131,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze functie is tijdelijk uitgeschakeld door de beheerder."
   },
@@ -64157,7 +64149,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Uitgifte niet gevonden."
   },
@@ -64738,9 +64732,7 @@
      "verkoopwegen": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze verkoopweg bestaat niet."
   },
@@ -65272,7 +65264,7 @@
    ],
    "opslag": {
     "a": {
-     "werkbeleid": 1,
+     "werkbeleid": "gewijzigd",
      "werkmail": 2
     },
     "b": {},
@@ -65557,9 +65549,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "hulp": 4
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -66538,20 +66528,19 @@
    "methode": "POST",
    "pad": "/api/theater/kanaal/aanmeld",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    200,
-    200,
+    409,
+    409,
     409
    ],
    "opslag": {
-    "a": {
-     "theaterKanalen": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
-   }
+   },
+   "blokkade": "U heeft al een kanaal."
   },
   {
    "methode": "POST",
@@ -66795,7 +66784,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -67062,9 +67053,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -67382,9 +67371,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "training": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -67758,9 +67745,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -67846,8 +67836,7 @@
    ],
    "opslag": {
     "a": {
-     "veilig": 4,
-     "wacht": "gewijzigd"
+     "veilig": 4
     },
     "b": {},
     "c": {}
@@ -68078,9 +68067,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -68186,10 +68179,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -68717,9 +68707,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "voeding": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -68846,7 +68834,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Vonk is voor RTG-leden met een eigen account."
   },
@@ -68971,9 +68961,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -69064,7 +69052,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -69225,9 +69215,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -71540,7 +71528,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -71560,9 +71550,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die release kennen we niet."
   },
@@ -72270,12 +72258,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -72363,9 +72348,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -74002,37 +73990,37 @@
    "methode": "POST",
    "pad": "/api/foundation/school/aandacht",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/aanwezigheid/klas",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Die klas hoort niet bij deze school."
+   }
   },
   {
    "methode": "POST",
@@ -74057,6 +74045,24 @@
    "pad": "/api/foundation/school/aanwezigheid/zet",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Geef per leerling een stand door."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/absentie/afhandelen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
     404,
@@ -74068,43 +74074,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die klas hoort niet bij deze school."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/absentie/afhandelen",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Ziekmelding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/absentie/meld",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze leerling zit niet in jouw klas."
   },
   {
    "methode": "POST",
@@ -74118,29 +74106,31 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Dat moment kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/afspraak/momenten",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Die klas hoort niet bij deze school."
+   "blokkade": "Geef minstens een moment op (datum en tijd)."
   },
   {
    "methode": "POST",
@@ -74158,49 +74148,67 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Klas niet gevonden."
+   "blokkade": "Dit doel hoort niet bij deze klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/belasting/klas",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/belasting/mij",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bericht/controleer",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {
+     "kosten": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Kies de taal van het gezin."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/bericht/gezin",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -74212,11 +74220,11 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit kind zit niet in deze klas."
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/bericht/gezin",
+   "pad": "/api/foundation/school/bericht/leraar",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -74230,81 +74238,61 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/bericht/leraar",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze leerling zit niet in jouw klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bericht/verstuur",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Zet uw naam erbij; een bericht aan een gezin gaat op naam de deur uit."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bewijs/leerling",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze leerling heeft geen eigen leerlingprofiel."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bewijs/observatie",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze leerling heeft geen eigen leerlingprofiel; er is dus geen paspoort om in te schrijven."
   },
   {
    "methode": "POST",
@@ -74367,24 +74355,6 @@
    "pad": "/api/foundation/school/bijdrage/betaal",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/bijdrage/maak",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -74396,31 +74366,34 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit kind zit niet in deze klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/bijdrage/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bijdrage/mijn",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/bijdrage/overzicht",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -74432,43 +74405,64 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Geen kind van jullie in deze klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/bijdrage/overzicht",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bijles/gesprek",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": 1
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/bijles/vraag",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -74515,24 +74509,6 @@
    "pad": "/api/foundation/school/cijfer/geef",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/dag",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
     404,
@@ -74544,7 +74520,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Deze leerling zit niet in jouw klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/dag",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Dit kind zit niet in deze klas."
   },
   {
    "methode": "POST",
@@ -74587,36 +74581,35 @@
    "pad": "/api/foundation/school/denkfout/besproken",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit patroon staat niet (meer) open in deze klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/denkfout/klas",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
@@ -74664,9 +74657,13 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "foundation": "gewijzigd"
+    }
    }
   },
   {
@@ -74746,114 +74743,80 @@
    "pad": "/api/foundation/school/excursie/kaart",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze excursie is niet actief; er zijn geen locaties."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/excursie/lijst",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/excursie/maak",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/excursie/mijn",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Geen kind van jullie in deze klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/excursie/start",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/excursie/stop",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/excursie/toestemming",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
     404,
@@ -74865,7 +74828,43 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Excursie niet gevonden."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/excursie/stop",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Deze excursie is niet actief."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/excursie/toestemming",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Dit kind zit niet in deze klas."
   },
   {
    "methode": "POST",
@@ -74954,9 +74953,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -75002,18 +74999,18 @@
    "pad": "/api/foundation/school/hr/afwezig",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Kies ziek, verlof of beter."
   },
   {
    "methode": "POST",
@@ -75056,36 +75053,37 @@
    "pad": "/api/foundation/school/hr/gesprek/reactie",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Dat gesprek staat niet in uw dossier."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hr/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
@@ -75108,19 +75106,18 @@
    "methode": "POST",
    "pad": "/api/foundation/school/hr/uren",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
@@ -75144,19 +75141,18 @@
    "methode": "POST",
    "pad": "/api/foundation/school/hr/vervanging",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Die klas hoort niet bij deze school."
+   }
   },
   {
    "methode": "POST",
@@ -75181,24 +75177,6 @@
    "pad": "/api/foundation/school/huiswerk/af",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/huiswerk/maak",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -75210,139 +75188,106 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit kind zit niet in deze klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/huiswerk/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/huiswerk/oefen",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Je zit niet in deze klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/huiswerk/oefen-antwoord",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Begin eerst met oefenen."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hulplijn",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "De hulplijn is van het kind zelf: open hem vanuit je eigen klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hulplijn/afronden",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Melding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hulplijn/afspraak",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn/bewaking",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn/klas",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn/mijn",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
     404,
@@ -75354,47 +75299,82 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Melding niet gevonden."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn/bewaking",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn/klas",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hulplijn/oppakken",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Melding niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/hulplijn/toewijzen",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/hulplijn/wens",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -75408,7 +75388,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Melding niet gevonden."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/hulplijn/wens",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Dit is van het kind zelf: open het vanuit je eigen klas."
   },
   {
    "methode": "POST",
@@ -75508,109 +75506,108 @@
    "methode": "POST",
    "pad": "/api/foundation/school/klas",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/klas/leraar-koppel",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit personeelslid staat niet actief bij deze school."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/klas/leraar-weg",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Een klas houdt altijd minstens een vaste leraar."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/klas/overname",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Je staat al vast op deze klas; overnemen hoeft niet."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/klas/overname-stop",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/klas/team",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
@@ -75628,25 +75625,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die klas hoort niet bij deze school."
+   "blokkade": "Die vestiging kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/koppel",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Er staat al een uitnodiging voor dit kind klaar."
   },
   {
    "methode": "POST",
@@ -75780,127 +75777,129 @@
    "methode": "POST",
    "pad": "/api/foundation/school/leraar/klas/maak",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/leraar/overzicht",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/les/concept",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/les/geheugen",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/les/rond-af",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Een les wordt afgerond door een mens die bevestigt, niet vanzelf."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/les/start",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/les/stop",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
@@ -75943,19 +75942,18 @@
    "methode": "POST",
    "pad": "/api/foundation/school/machtiging/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
@@ -75973,7 +75971,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Die machtiging kennen we niet."
   },
   {
    "methode": "POST",
@@ -75997,73 +75995,80 @@
    "methode": "POST",
    "pad": "/api/foundation/school/mededeling",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/mijn-rechten",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+    "c": {
+     "kosten": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/nieuwsbrief",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Daar zijn geen klassen voor gevonden."
+    "c": {
+     "foundation": "gewijzigd",
+     "wacht": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -76134,9 +76139,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -76336,25 +76339,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Die peiling kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/peiling/antwoord-personeel",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Die peiling kennen we niet."
   },
   {
    "methode": "POST",
@@ -76378,37 +76381,35 @@
    "methode": "POST",
    "pad": "/api/foundation/school/peiling/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/peiling/mijn-personeel",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
@@ -76477,9 +76478,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit personeelslid is niet gevonden."
   },
@@ -76522,91 +76521,88 @@
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/mail/inbox",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/mail/lees",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Dit bericht staat niet in dit postvak."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/mail/overzicht",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/mail/stuur",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   "blokkade": "Vul een ontvanger en een bericht in."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/mail/verzonden",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
@@ -76630,37 +76626,35 @@
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/start",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/personeel/status",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende school of verkeerd personeel-token."
+   }
   },
   {
    "methode": "POST",
@@ -76746,9 +76740,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -76775,41 +76767,22 @@
    "methode": "POST",
    "pad": "/api/foundation/school/planner",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/portaal",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/rapport/lijst",
    "rol": "lijfsleutel",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
@@ -76828,39 +76801,55 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/foundation/school/rapport/lijst",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
    "pad": "/api/foundation/school/rapport/maak",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Die klas hoort niet bij deze school."
+   "blokkade": "Welke periode is dit rapport? (bijvoorbeeld \"Periode 2\" of \"2026-2027 T1\")"
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/rapport/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
@@ -76937,19 +76926,18 @@
    "methode": "POST",
    "pad": "/api/foundation/school/rooster/zet",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
@@ -77083,24 +77071,6 @@
    "pad": "/api/foundation/school/taal",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/taalbeleid",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -77112,7 +77082,24 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Dit kind zit niet in deze klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/taalbeleid",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
@@ -77126,9 +77113,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -77138,58 +77123,22 @@
    "pad": "/api/foundation/school/taalcheck/antwoord",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Begin eerst een vergelijking."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/taalcheck/start",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/telefoonboom",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/telefoonboom/doorgegeven",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
@@ -77203,25 +77152,63 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Deze leerling zit niet in deze klas."
   },
   {
    "methode": "POST",
-   "pad": "/api/foundation/school/telefoonboom/maak",
+   "pad": "/api/foundation/school/telefoonboom",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/telefoonboom/doorgegeven",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Er loopt geen telefoonboom-alarm."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/telefoonboom/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -77239,29 +77226,11 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Jullie staan (nog) niet in de telefoonboom; vraag de leraar hem opnieuw te maken."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/telefoonboom/nummer",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/telefoonboom/start",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
@@ -77275,7 +77244,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Geen kind van jullie in deze klas."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/telefoonboom/start",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Maak eerst de telefoonboom."
   },
   {
    "methode": "POST",
@@ -77293,7 +77280,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Die vraag kennen we niet."
   },
   {
    "methode": "POST",
@@ -77307,9 +77294,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -77337,168 +77322,186 @@
    "pad": "/api/foundation/school/toets/antwoord",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "foundation": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Start deze toets eerst."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/bibliotheek",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/cijfer",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Deze leerling heeft de toets nog niet af."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/keuring",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Kies de leerdoelen die u wilt meten."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/lijst",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/maak",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Kies so, mo, proefwerk of examen."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/mo",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Geen mondelinge toets met dit id."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/mo-invoer",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Neem eerst het mondeling af via /toets/mo."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/sluit",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
+   "blokkade": "Toets niet gevonden."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/spiegel",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "Toets niet gevonden."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/school/toets/start",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
     403,
@@ -77510,43 +77513,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende klas of verkeerd token."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/toets/start",
-   "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Je zit niet in deze klas."
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/toets/voor-mij",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Dit kind zit niet in deze klas."
   },
   {
    "methode": "POST",
@@ -77564,7 +77549,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Er staat geen uitnodiging voor je klaar bij deze klas."
   },
   {
    "methode": "POST",
@@ -77589,18 +77574,18 @@
    "pad": "/api/foundation/school/verlof/aanvraag",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Dit kind zit niet in die klas."
   },
   {
    "methode": "POST",
@@ -77643,37 +77628,35 @@
    "methode": "POST",
    "pad": "/api/foundation/school/verlof/mijn",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/foundation/school/vervanging/briefing",
    "rol": "lijfsleutel",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Onbekende klas of verkeerd token."
+   }
   },
   {
    "methode": "POST",
@@ -77687,9 +77670,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "foundation": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -77710,7 +77691,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die klas hoort niet bij deze school."
+   "blokkade": "Die leerling zit niet in deze klas."
   },
   {
    "methode": "POST",
@@ -77808,18 +77789,18 @@
    "pad": "/api/foundation/school/ziekmelden",
    "rol": "lijfsleutel",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit gezin kennen we niet. Klopt de gezinscode?"
+   "blokkade": "Dit kind zit niet in deze klas."
   },
   {
    "methode": "POST",
@@ -77924,7 +77905,8 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd"
+     "horeca": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -79687,9 +79669,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "levensbeleid": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -79706,7 +79686,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -80190,7 +80172,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "contactPins": 1,
+     "contactPinSecurity": 1
+    },
     "b": {},
     "c": {}
    }
@@ -80563,9 +80548,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Een RTG PIN heeft acht of tien tekens, bijvoorbeeld 7K2M9-XPQH3."
   },
@@ -83239,9 +83222,12 @@
     "a": {
      "officeDocs": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",

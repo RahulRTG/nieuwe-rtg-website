@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T14:44:29.838Z",
-  "commit": "4424c6ec",
+  "op": "2026-08-30T14:57:18.948Z",
+  "commit": "f9057a80",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -20,14 +20,14 @@
   "nogNietGeclassificeerd": 4,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1408,
+  "metGemetenDuplicaatgedrag": 1458,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 4424c6ec, schone boom",
-  "metingGemetenOp": "2026-08-30T14:44:18.107Z",
+  "metingReden": "gemeten op commit f9057a80, schone boom",
+  "metingGemetenOp": "2026-08-30T14:57:06.601Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -69,11 +69,11 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 2935
+    "aantal": 2885
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1400
+    "aantal": 1450
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -180,7 +180,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1494,
+   "aantal": 1544,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -228,7 +228,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 2946,
+   "aantal": 2896,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [

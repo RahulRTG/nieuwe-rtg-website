@@ -128,6 +128,14 @@ const SLEUTELS = {
   'POST /api/supplier/horeca/folio/nacht': { zelfdeVerzoek: true },   // de datum
   'POST /api/member/lifestyle/gezondheid/dossier': { zelfdeVerzoek: true },
   'POST /api/member/rechterhand/maison/log': { zelfdeVerzoek: true }
+,
+
+  /* ---- de laatste twaalf uit de kale ronde, gelezen op 30 augustus 2026 ----
+
+     Overschrijvingen: de tweede identieke oproep zet dezelfde waarde. */
+  'POST /api/member/rtmail/bewaartermijn': { zelfdeVerzoek: true },   // doel + dagen + reden
+  'POST /api/supplier/rtmail/bewaartermijn': { zelfdeVerzoek: true }, // zelfde route, zaakkant
+  'POST /api/member/spel/sudoku-nieuw': { zelfdeVerzoek: true }       // niveau; overschrijft het lopende potje
 };
 
 module.exports = { SLEUTELS };

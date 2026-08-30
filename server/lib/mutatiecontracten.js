@@ -57,6 +57,7 @@ const CONTRACTEN = Object.assign({},
      vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus
      zou deze een van hen overschrijven -- vandaar de controle eronder, want
      "zou niet moeten" is geen handhaving. */
+  require('./mutatiecontracten-kaleronde-c'),
   require('./mutatiecontracten-effect'));
 
 {

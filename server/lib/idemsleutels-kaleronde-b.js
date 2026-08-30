@@ -13,15 +13,12 @@
 
    Drie soorten staan hieronder, en ze verschillen echt:
 
-     RONDES        een controle, een opruiming, een bijwerkronde. De tweede ronde
-                   hoort met recht iets anders te vinden dan de eerste -- dat is
-                   niet toevallig, dat is het BEWIJS dat de eerste werkte.
-     INZAGE        een raadpleging die een journaalregel schrijft. Twee keer in
-                   een leerlingdossier kijken is twee keer kijken, en het
-                   inzagejournaal hoort dat allebei te dragen. Dedupliceren maakt
-                   daar van een privacywaarborg een gemiddelde.
-     MOMENTEN      een pols, een alarm, een locatiemelding, een vraag aan de AI.
-                   Twee keer is twee keer, ook als de inhoud gelijk is.
+     RONDES     een controle of opruiming. De tweede ronde hoort met recht iets
+                anders te vinden -- dat is het BEWIJS dat de eerste werkte.
+     INZAGE     een raadpleging die een journaalregel schrijft. Twee keer in een
+                leerlingdossier kijken is twee keer kijken; dedupliceren maakt
+                van een privacywaarborg een gemiddelde.
+     MOMENTEN   een pols, een alarm, een locatiemelding, een vraag aan de AI.
 
    Dat laatste is niet theoretisch: /api/supplier/security is een alarmknop, en
    een laag die de tweede druk opslikt kan iemand in nood stil laten staan.
@@ -132,11 +129,22 @@ const SLEUTELS = {
   'POST /api/foundation/gezin/bericht': { nietIdempotent: true,
     waarom: 'twee keer hetzelfde sturen is twee berichten -- mensen herhalen zichzelf, en een laag die ' +
       'dat opslikt laat een bericht verdwijnen dat iemand bewust nog eens stuurde' },
-  /* DRIE KOSTEN-ROUTES STONDEN HIER EN ZIJN ERAF, want ze waren dubbel en fout.
-     Ze stonden al in ./idemsleutels-kosten.js als `leest` (de laatste won stil --
-     zie ./idemsleutels-eenmaal.js), en de reden hier is achterhaald: besluit van
-     de eigenaar, 30 augustus 2026, een tik van de kostenmeter is RUIS en geen
-     werk. Anders wordt elke leesroute niet-idempotent zodra de meter hem raakt. */
+  /* Drie kosten-routes stonden hier en zijn eraf: ze stonden al in
+     ./idemsleutels-kosten.js als `leest` (zie ./idemsleutels-eenmaal.js), en een
+     tik van de kostenmeter is RUIS -- besluit van de eigenaar, 30 augustus 2026. */
+
+  /* ---- en de laatste die met opzet geen duplicaatregel krijgen ---- */
+  'POST /api/member/rtmail/export': { nietIdempotent: true,
+    waarom: 'een export is een uitgifte MET een reden, en die reden wordt vastgelegd; twee keer ' +
+      'exporteren is twee keer gegevens meenemen en hoort twee sporen te geven' },
+  'POST /api/member/rtmail/imap/sleutel': { nietIdempotent: true,
+    waarom: 'maakt elke keer een VERSE imap-sleutel met een eigen naam; de tweede opslikken zou een ' +
+      'sleutel laten verdwijnen die het lid net heeft gekregen' },
+  'POST /api/supplier/rtmail/imap/sleutel': { nietIdempotent: true,
+    waarom: 'zelfde route, zaakkant' },
+  'POST /api/member/spel/team-nieuw': { nietIdempotent: true,
+    waarom: 'twee teams met dezelfde naam zijn twee teams; de kern begrenst dat zelf op tien per lid ' +
+      'en met een eigen rem, dus een dubbeltik kost hoogstens een teamplek en geen werk' }
 };
 
 module.exports = { SLEUTELS };

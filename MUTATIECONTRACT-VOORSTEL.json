@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:44:40.194Z",
+  "op": "2026-08-30T11:56:19.418Z",
   "node": "v22.22.2"
  },
  "uitleg": "VOORSTELLEN, GEEN CONTRACTEN. Elke regel hier is een route waar twee onafhankelijke runtime-metingen allebei nul lezen en de statische analyse dat niet tegenspreekt. Dat is sterk bewijs voor NOT_APPLICABLE -- en bewijs draagt een voorstel, geen stand.",
  "grens": "Een stand wordt hier NOOIT uit afgeleid. server/kern/mutatiecontract/keuring.js laat herkomst \"afgeleid\" alleen toe bij BLOCKED_BY_TEST_FIXTURE, en zegt de reden erbij: vijf van de zes standen doen een uitspraak over GEDRAG, en die mag geen script zetten. Wie een regel hier accepteert, zet hem met de hand in server/lib/mutatiecontracten.js -- met een aftekening die zegt wie er keek.",
  "nietGemeten": "bestand,externe-aanroep -- daarover zwijgt de effectmeter, en dat blijft ook na acceptatie waar",
- "aantal": 1028,
+ "aantal": 1026,
  "afgewezen": {
-  "heeftDuplicaatregel": 2,
+  "heeftDuplicaatregel": 5,
   "geenKaleRonde": 3253,
-  "spoorInOpslag": 15,
+  "spoorInOpslag": 14,
   "effectGeteld": 145,
   "geenEffectmeter": 4,
   "tegenspraak": 0,
@@ -3537,17 +3537,6 @@
    },
    "nietGemeten": "bestand,externe-aanroep"
   },
-  "POST /api/member/borden": {
-   "mutatieId": "member.borden",
-   "voorstel": "NOT_APPLICABLE",
-   "bewijs": {
-    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
-    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
-    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
-    "op": "2026-08-30"
-   },
-   "nietGemeten": "bestand,externe-aanroep"
-  },
   "POST /api/member/bureau/ai": {
    "mutatieId": "member.bureau.ai",
    "voorstel": "NOT_APPLICABLE",
@@ -4342,6 +4331,17 @@
   },
   "POST /api/member/rtmail/vak": {
    "mutatieId": "member.rtmail.vak",
+   "voorstel": "NOT_APPLICABLE",
+   "bewijs": {
+    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
+    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
+    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
+    "op": "2026-08-30"
+   },
+   "nietGemeten": "bestand,externe-aanroep"
+  },
+  "POST /api/member/rtmail/vernietigingen": {
+   "mutatieId": "member.rtmail.vernietigingen",
    "voorstel": "NOT_APPLICABLE",
    "bewijs": {
     "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
@@ -5365,6 +5365,17 @@
   },
   "POST /api/office/doos/regie": {
    "mutatieId": "office.doos.regie",
+   "voorstel": "NOT_APPLICABLE",
+   "bewijs": {
+    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
+    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
+    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
+    "op": "2026-08-30"
+   },
+   "nietGemeten": "bestand,externe-aanroep"
+  },
+  "POST /api/office/economie/journaal": {
+   "mutatieId": "office.economie.journaal",
    "voorstel": "NOT_APPLICABLE",
    "bewijs": {
     "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
@@ -7156,17 +7167,6 @@
    },
    "nietGemeten": "bestand,externe-aanroep"
   },
-  "POST /api/overheid/uitkeringen/mijn": {
-   "mutatieId": "overheid.uitkeringen.mijn",
-   "voorstel": "NOT_APPLICABLE",
-   "bewijs": {
-    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
-    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
-    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
-    "op": "2026-08-30"
-   },
-   "nietGemeten": "bestand,externe-aanroep"
-  },
   "POST /api/overheid/verkiezing": {
    "mutatieId": "overheid.verkiezing",
    "voorstel": "NOT_APPLICABLE",
@@ -8190,17 +8190,6 @@
    },
    "nietGemeten": "bestand,externe-aanroep"
   },
-  "POST /api/supplier/accountant/adviezen": {
-   "mutatieId": "supplier.accountant.adviezen",
-   "voorstel": "NOT_APPLICABLE",
-   "bewijs": {
-    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
-    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
-    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
-    "op": "2026-08-30"
-   },
-   "nietGemeten": "bestand,externe-aanroep"
-  },
   "POST /api/supplier/accountant/vragen": {
    "mutatieId": "supplier.accountant.vragen",
    "voorstel": "NOT_APPLICABLE",
@@ -8665,17 +8654,6 @@
   },
   "POST /api/supplier/handel/mijn": {
    "mutatieId": "supplier.handel.mijn",
-   "voorstel": "NOT_APPLICABLE",
-   "bewijs": {
-    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
-    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
-    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
-    "op": "2026-08-30"
-   },
-   "nietGemeten": "bestand,externe-aanroep"
-  },
-  "POST /api/supplier/horeca/arrivals": {
-   "mutatieId": "supplier.horeca.arrivals",
    "voorstel": "NOT_APPLICABLE",
    "bewijs": {
     "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
@@ -9479,17 +9457,6 @@
   },
   "POST /api/supplier/pay/budget/lijst": {
    "mutatieId": "supplier.pay.budget.lijst",
-   "voorstel": "NOT_APPLICABLE",
-   "bewijs": {
-    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
-    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
-    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
-    "op": "2026-08-30"
-   },
-   "nietGemeten": "bestand,externe-aanroep"
-  },
-  "POST /api/supplier/pay/graaf": {
-   "mutatieId": "supplier.pay.graaf",
    "voorstel": "NOT_APPLICABLE",
    "bewijs": {
     "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
@@ -10766,6 +10733,17 @@
   },
   "POST /api/veiligheid/kring/verwijderen": {
    "mutatieId": "veiligheid.kring.verwijderen",
+   "voorstel": "NOT_APPLICABLE",
+   "bewijs": {
+    "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",
+    "effectmeter": "op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging via save(), geen mail, geen sms",
+    "statischeAnalyse": "scripts/schrijfanalyse.js spreekt dat niet tegen",
+    "op": "2026-08-30"
+   },
+   "nietGemeten": "bestand,externe-aanroep"
+  },
+  "POST /api/veiligheid/moment": {
+   "mutatieId": "veiligheid.moment",
    "voorstel": "NOT_APPLICABLE",
    "bewijs": {
     "opslagmeter": "kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de gemeten collecties",

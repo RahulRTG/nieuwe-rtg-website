@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 1021,
- "zonderWaargenomenDeur": 7,
+ "aantal": 1020,
+ "zonderWaargenomenDeur": 6,
  "routes": [
   {
    "route": "POST /api/aanmeld/start",
@@ -1659,11 +1659,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/member/borden",
-   "mutatieId": "member.borden",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/member/bureau/ai",
    "mutatieId": "member.bureau.ai",
    "toegang": "AUTHENTICATED"
@@ -2026,6 +2021,11 @@
   {
    "route": "POST /api/member/rtmail/vak",
    "mutatieId": "member.rtmail.vak",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/member/rtmail/vernietigingen",
+   "mutatieId": "member.rtmail.vernietigingen",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -2493,6 +2493,11 @@
   {
    "route": "POST /api/office/doos/regie",
    "mutatieId": "office.doos.regie",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/office/economie/journaal",
+   "mutatieId": "office.economie.journaal",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -3306,11 +3311,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/overheid/uitkeringen/mijn",
-   "mutatieId": "overheid.uitkeringen.mijn",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/overheid/verkiezing",
    "mutatieId": "overheid.verkiezing",
    "toegang": "AUTHENTICATED"
@@ -3786,11 +3786,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/supplier/accountant/adviezen",
-   "mutatieId": "supplier.accountant.adviezen",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/supplier/accountant/vragen",
    "mutatieId": "supplier.accountant.vragen",
    "toegang": "AUTHENTICATED"
@@ -4003,11 +3998,6 @@
   {
    "route": "POST /api/supplier/handel/mijn",
    "mutatieId": "supplier.handel.mijn",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/supplier/horeca/arrivals",
-   "mutatieId": "supplier.horeca.arrivals",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4373,11 +4363,6 @@
   {
    "route": "POST /api/supplier/pay/budget/lijst",
    "mutatieId": "supplier.pay.budget.lijst",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/supplier/pay/graaf",
-   "mutatieId": "supplier.pay.graaf",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4963,6 +4948,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/veiligheid/moment",
+   "mutatieId": "veiligheid.moment",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/veiligheid/rust",
    "mutatieId": "veiligheid.rust",
    "toegang": "AUTHENTICATED"
@@ -5150,6 +5140,11 @@
    "mutatieId": "werkplek.kantoorpakket.mijn",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/mijn",
+   "mutatieId": "werkplek.mijn",
+   "toegang": "AUTHENTICATED"
   },
   {
    "route": "POST /api/werkplek/overzicht",

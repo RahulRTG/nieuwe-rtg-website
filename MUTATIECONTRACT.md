@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **51** |
-| `NOT_APPLICABLE` | 40 | 1.061 |
-| geclassificeerd | 3.069 | 4.602 van 4.653 (98,9%) |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **40** |
+| `NOT_APPLICABLE` | 40 | 1.060 |
+| geclassificeerd | 3.069 | 4.613 van 4.653 (99,1%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -901,6 +901,42 @@ een aanroeper bedoelt — maar de vier doos-routes dragen nu
 | toegang niet af te leiden | 366 | **0** |
 | `LEGACY_PENDING_CLASSIFICATION` | 74 | **51** |
 | geclassificeerd | 4.579 | **4.602 van 4.653 (98,9%)** |
+
+## 5m. De laatste twaalf, en een reden die maar op één plek mag staan
+
+De laatste twaalf uit de kale ronde zijn gelezen en splitsten scherp langs de
+vraag die er werkelijk toe doet: wat zou een tweede identieke oproep *doen*?
+
+Drie **overschrijven** (een bewaartermijn zetten, een verse sudoku die het lopende
+potje vervangt) en kregen een duplicaatregel; ze meten nu `beschermd`. Negen
+kregen er met opzet géén — en dat is de kant waar dedupliceren schade doet:
+
+- een **imap-sleutel** is elke keer vers; de tweede opslikken laat een sleutel
+  verdwijnen die het lid net gekregen heeft;
+- een **export** legt een reden vast: twee keer exporteren is twee keer gegevens
+  meenemen en hoort twee sporen te geven;
+- `/api/office/bank/draai` gaat een **slag verder**; twee keer drukken is twee
+  slagen.
+
+**De reden staat op één plek en wordt opgehaald, niet overgetypt.** In de
+sleutellijst stuurt zij de idem-poort; in het contract verantwoordt zij een stand.
+Twee kopieën lopen uiteen, en dan staat er in het register iets anders dan wat de
+poort werkelijk doet. Ontbreekt de reden, dan **gooit** het contractbestand — een
+`INTENTIONALLY_NON_IDEMPOTENT` met een lege `waarom` is precies het vinkje waar
+die stand voor waarschuwt.
+
+Die controle wees bij haar eerste run meteen een aanname van mij aan: ik haalde de
+reden op uit het bestand waar ik *hoopte* dat hij stond, en
+`/api/command/sonde/draai` staat al veel langer in het hoofdbestand. Nu komt hij
+uit de samengevoegde lijst — waar hij ook staat.
+
+| | voor | na |
+|---|---:|---:|
+| dubbeltik deed het werk opnieuw | 148 (begin) | **71** |
+| `PROTECTED` | 24 | **97** |
+| `INTENTIONALLY_NON_IDEMPOTENT` | 32 | **71** |
+| `LEGACY_PENDING_CLASSIFICATION` | 51 | **40** |
+| geclassificeerd | 4.602 | **4.613 van 4.653 (99,1%)** |
 
 ## 6. De poort
 

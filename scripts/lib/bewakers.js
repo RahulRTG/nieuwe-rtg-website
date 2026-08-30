@@ -285,6 +285,19 @@ function beoordeel(route) {
      bewering mag de sterkste niet overschrijven -- dezelfde regel als die van
      de rangorde hierboven, en om dezelfde reden. */
   if (soort === 'geenBewaker' && r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
+  /* DE OPSTELLING BESLIST, EN DAT IS EEN ROL EN GEEN GAT.
+
+     `meetpoort` (server/meetpoort.js) laat binnen op ADRES: met
+     RTG_METRICS_TOKEN gezet moet dat token mee, en zonder token gaat de deur
+     alleen open vanaf een intern adres. De proeven kloppen aan vanaf 127.0.0.1
+     en dat IS zo'n adres -- de weg die de opstelling bedoelt.
+
+     Zolang dit `rol: null` gaf, stond /api/sonde/melding als instrumenttekort
+     geboekt terwijl de proef er gewoon bij kan. Hij heet daarom `omgeving` en
+     niet `openbaar`: van buiten geeft deze deur 404, en dat verschil hoort in
+     het register te staan in plaats van gladgestreken te worden. */
+  if (soort === 'omgeving') return { rol: 'omgeving', reden: null };
+
   return { rol: null, reden: soort + ': ' + dragend.join('+') + ' -- ' + uitleg };
 }
 

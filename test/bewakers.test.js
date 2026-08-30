@@ -280,3 +280,27 @@ test('de openbaar-lijst overschrijft nooit een ECHTE deur', () => {
       bewaker + ' is een deur; de openbaar-lijst hoort die niet weg te schrijven');
   }
 });
+
+/* ============================================================================
+   DE OPSTELLING BESLIST -- EN DAT IS EEN ROL, GEEN GAT.
+
+   `meetpoort` (server/meetpoort.js) laat binnen op ADRES: met
+   RTG_METRICS_TOKEN gezet moet dat token mee, zonder token gaat de deur alleen
+   open vanaf een intern adres. De proeven kloppen aan vanaf 127.0.0.1, en dat
+   IS zo'n adres -- de weg die de opstelling bedoelt.
+
+   Zolang dit `rol: null` gaf, stond /api/sonde/melding als instrumenttekort
+   geboekt terwijl de proef er gewoon bij kan. Het was de laatste van de 873.
+
+   EN HIJ HEET `omgeving` EN NIET `openbaar`, met opzet: van buiten geeft deze
+   deur 404. Dat verschil hoort in het register te staan in plaats van
+   gladgestreken te worden -- anders leest een route die alleen intern open is
+   straks als een route die voor iedereen open staat.
+   ========================================================================== */
+test('een route achter de meetpoort krijgt de rol omgeving, niet openbaar', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['meetpoort'],
+    pad: '/api/sonde/melding', methode: 'POST' });
+  assert.equal(u.rol, 'omgeving');
+  assert.notEqual(u.rol, 'openbaar', 'van buiten geeft deze deur 404; dat is niet openbaar');
+  assert.equal(u.reden, null);
+});

@@ -137,7 +137,11 @@ wachtOpSchoneBoom();
   /* `lijfsleutel` is geen inlog: de sleutel zit in het LIJF. Een undefined token
      hier zou de proef een Authorization-kop laten weglaten, en dat is precies
      goed -- maar het moet met opzet zo staan en niet per ongeluk. */
-  const tokenVoor = (rol) => (rol === 'lijfsleutel' ? '' : tokens[rol]);
+  /* `lijfsleutel` en `omgeving` zijn geen inlog: bij de eerste zit de sleutel in
+     het LIJF, bij de tweede beslist het ADRES waar vandaan wordt aangeklopt.
+     Allebei horen ze geen Authorization-kop op te leveren, en dat moet met
+     opzet zo staan en niet per ongeluk. */
+  const tokenVoor = (rol) => (rol === 'lijfsleutel' || rol === 'omgeving' ? '' : tokens[rol]);
   /* DE LIJFSLEUTELS -- deuren waar de sleutel in het LICHAAM reist en niet in de
      kop. Die hebben geen rol (zie scripts/lib/bewakers.js) en vielen daarmee uit
      elke proef, terwijl er wel degelijk een sleutel te MAKEN is. Zie de kop van

@@ -62,7 +62,7 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
 const ROLLEN = ['member', 'member-zakelijk', 'office', 'supplier', 'boardroom', 'techniek',
-  'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar'];
+  'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
    zijn eigen basis-URL en foutafhandeling); `officeCode` de backoffice-code van
@@ -152,6 +152,12 @@ function maakSleutels({ post, officeCode, eigen }) {
   /* Geen aanroep: er valt niets in te loggen. De lege string is de sleutel, en
      `haalSleutels` bewaart hem dan ook expliciet -- zie de uitzondering daar. */
   inlog.openbaar = async () => '';
+  /* `omgeving` is net als `openbaar` een LEGE sleutel, en toch een andere naam.
+     De meetpoort laat binnen op ADRES: de proeven kloppen vanaf 127.0.0.1 en
+     dat is het interne adres dat zij bedoelt. Van BUITEN geeft die deur 404 --
+     dus dit is geen openbare route, en het register hoort dat verschil te
+     dragen in plaats van het glad te strijken. */
+  inlog.omgeving = async () => '';
   return { inlog, ROLLEN, OWNER_EMAIL };
 }
 
@@ -172,7 +178,7 @@ async function haalSleutels(bos) {
          betekent het dat er geen token HOORT te zijn. Die twee op `if (t)` over
          een kam scheren zou de openbare routes stil uit elke proef laten
          vallen -- en dat is hoe ze eerder als instrumenttekort telden. */
-      if (rol === 'openbaar') tokens[rol] = '';
+      if (rol === 'openbaar' || rol === 'omgeving') tokens[rol] = '';
       else if (t) tokens[rol] = t;
       else mislukt.push({ rol, reden: 'de inlog gaf geen token terug' });
     } catch (e) { mislukt.push({ rol, reden: String(e && e.message || e).slice(0, 120) }); }

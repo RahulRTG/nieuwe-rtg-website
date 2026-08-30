@@ -4,10 +4,17 @@
    foundation/onderwijs.js. */
 module.exports = (octx) => {
   const { router, F, save, nu, rid, schoon, crypto, anthropic, LETTERS, SYSTEM, DEMO, TIPS,
-    nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek } = octx;
+    nieuweCode, sse, stuur, online, presentie, lesVan, docentCheck, leerlingVan, lesPubliek,
+    teVaak, misluktePoging, ipVan } = octx;
 
   /* ---------- les maken / meedoen ---------- */
+  /* Bewust zonder inlog: een quizbord in de klas. De rem hangt daarom hier,
+     op de route zelf -- de gelijknamige route van de lesmaker
+     (server/routes/lesmaker.js) heeft een eigen teller en dekt deze niet. */
   router.post('/les/maak', (req, res) => {
+    const bucket = 'lesmaak:' + ipVan(req);
+    if (teVaak(res, bucket)) return;
+    misluktePoging(bucket, 20, 60);   // hooguit twintig lessen per adres per uur
     const code = nieuweCode();
     const les = { code, vak: schoon(req.body.vak, 40) || 'Les', docentNaam: schoon(req.body.naam, 40) || 'Begeleider',
       teacherToken: rid(24), bord: { strokes: [] }, leerlingen: {}, opgaven: [], agenda: [], at: nu() };

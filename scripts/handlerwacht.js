@@ -373,39 +373,45 @@ function keurRegister() {
   return klachten;
 }
 
-/* TWEE LIJSTEN VAN WAT OPENBAAR MAG ZIJN, en ze zijn het oneens.
+/* TWEE LIJSTEN VAN WAT OPENBAAR MAG ZIJN -- inmiddels een bron.
 
-   scripts/poortwacht.js draagt zijn eigen PUBLIEK-map, naast die van
-   keuringsregel 28 (nu ./lib/publiek.js). Ze stellen dezelfde vraag -- welke
-   routes horen zonder token open te gaan -- en ze verschillen: paden die de een
-   kent en de ander niet, in beide richtingen.
+   scripts/poortwacht.js droeg zijn eigen PUBLIEK-map naast die van
+   keuringsregel 28. Ze stelden bijna dezelfde vraag en verschilden op twintig
+   paden; twee daarvan bestonden niet eens meer als route, en een beloofde een
+   rem die op een gelijknamige route van een ander domein stond.
 
-   DEZE METER GEBRUIKT ALLEEN DE STRENGSTE, en meldt het verschil apart. De
-   lijsten samenvoegen zou keuringsregel 28 RUIMER maken, en dat is precies de
-   gevaarlijke richting bij een poortregel: een gemiste melding is stil. Wat er
-   moet gebeuren is een besluit per pad, niet een samenvoeging door een script.
+   Ze zijn NIET samengevoegd -- dat zou keuringsregel 28 met achttien paden
+   verruimen, en dat is bij een poortregel de gevaarlijke richting. In plaats
+   daarvan draagt ./lib/publiek.js ze allebei, uit elkaar gehouden: PUBLIEK
+   (welke SCHRIJFroute mag zonder gezagsfunctie -- wat deze meter gebruikt) en
+   ALLEEN_ANONIEM (het verschil: wat alleen voor de anonieme klop van de
+   poortwacht openbaar heet). Deze meter blijft de strengste van de twee
+   gebruiken en meldt het verschil apart, zodat het zichtbaar blijft in plaats
+   van weg te vallen in een som.
 
-   Hij leest de tweede lijst uit de brontekst en niet via require: poortwacht.js
-   start bij het laden een meetronde (zie de wacht in dat bestand). */
+   Wat hij daarnaast bewaakt: dat poortwacht.js geen DERDE lijst begint. Zodra
+   dat bestand weer een eigen `new Map([` met paden krijgt, is dit een klacht en
+   niet een verschil. */
 function tweedeLijst() {
   try {
     const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'poortwacht.js'), 'utf8');
-    const start = bron.indexOf('const PUBLIEK = new Map([');
-    if (start < 0) return null;
-    const eind = bron.indexOf('\n]);', start);
-    const blok = bron.slice(start, eind);
-    return [...blok.matchAll(/\['([^']+)'/g)].map(m => m[1]);
+    if (/const PUBLIEK = new Map\(\[/.test(bron)) return { eigenKopie: true, paden: null };
+    if (!/require\('\.\/lib\/publiek'\)/.test(bron)) return null;
+    const { POORTWACHT } = require('./lib/publiek');
+    return { eigenKopie: false, paden: [...POORTWACHT.keys()] };
   } catch (e) { return null; }
 }
 
 function meet() {
   const klachten = keurRegister();
   const tweede = tweedeLijst();
-  const verschil = tweede ? {
-    alleenInPoortwacht: tweede.filter(p => !PUBLIEK.has(p)),
-    alleenInDeKeuring: [...PUBLIEK.keys()].filter(p => !tweede.includes(p))
+  const verschil = (tweede && tweede.paden) ? {
+    alleenInPoortwacht: tweede.paden.filter(p => !PUBLIEK.has(p)),
+    alleenInDeKeuring: [...PUBLIEK.keys()].filter(p => !tweede.paden.includes(p))
   } : null;
-  if (!tweede) klachten.push('de tweede publieke lijst in scripts/poortwacht.js is niet te lezen');
+  if (!tweede) klachten.push('de publieke lijst van scripts/poortwacht.js is niet te lezen');
+  else if (tweede.eigenKopie) klachten.push(
+    'scripts/poortwacht.js draagt weer een eigen PUBLIEK-map; de openbaar-lijst hoort in scripts/lib/publiek.js te wonen');
   const zonderLaag = alleRoutes().filter(r =>
     r.pad.startsWith('/api/') && r.methode !== 'GET' &&
     r.bewakersBekend && Array.isArray(r.bewakers) && r.bewakers.length === 0);
@@ -503,11 +509,12 @@ function toon(u) {
   }
   if (u.tweePubliekeLijsten) {
     const v = u.tweePubliekeLijsten;
-    console.log('\n  TWEE PUBLIEKE LIJSTEN, EN ZE VERSCHILLEN');
-    console.log('    alleen in poortwacht.js : ' + v.alleenInPoortwacht.length +
+    console.log('\n  TWEE VRAGEN, EEN BRON (scripts/lib/publiek.js)');
+    console.log('    alleen voor de anonieme klop : ' + v.alleenInPoortwacht.length +
       (v.alleenInPoortwacht.length ? '   ' + v.alleenInPoortwacht.slice(0, 4).join(', ') : ''));
-    console.log('    alleen in de keuring    : ' + v.alleenInDeKeuring.length);
-    console.log('    (deze meter rekent met de keuringslijst; samenvoegen is een besluit per pad)');
+    console.log('    alleen voor de keuring       : ' + v.alleenInDeKeuring.length +
+      '   (hoort 0 te zijn: de poortwacht rekent met de som)');
+    console.log('    deze meter rekent met PUBLIEK, de strengste van de twee');
   }
   if (u.klachten.length) { console.log('\n  DE METER ZAKT:'); for (const k of u.klachten) console.log('    ! ' + k); }
   console.log('');

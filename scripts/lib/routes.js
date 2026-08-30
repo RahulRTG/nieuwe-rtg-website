@@ -106,7 +106,24 @@ function routekaart() {
    en op de STAART (een route op een sub-router staat daar met zijn pad binnen de
    mount: `/les/maak` voor `/api/foundation/les/maak`). Die tweede accepteren we
    alleen bij precies EEN treffer -- een verkeerd toegewezen bronbestand is erger
-   dan geen bronbestand, want dan wijst een melding je naar het verkeerde bestand. */
+   dan geen bronbestand, want dan wijst een melding je naar het verkeerde bestand.
+
+   DERDE INGANG: HET SAMENGESTELDE PAD. Een registratie hoeft geen letterlijk pad
+   te dragen. `app.post('/api/rtf/spel/' + naam, ...)` in een lus over een
+   actietabel registreert drieenveertig echte routes waarvan er geen enkele
+   letterlijk in de bron staat -- en die vielen alle drieenveertig uit de bron,
+   met `bestand: null`. Dat is geen randgeval: het was in een keer de grootste
+   blinde vlek van alle vier de bewijsproeven, want zonder bronbestand kan geen
+   van hen de handler lezen. Erger nog: zonder deze ingang werd
+   `'/api/rtf/spel/'` als EXACT pad opgeslagen, dus de blinde vlek droeg ook nog
+   een verkeerde regel in de index.
+
+   Een aanroep waarvan het eerste argument een string is die verdergaat (`+`),
+   levert daarom geen pad maar een VOORVOEGSEL. Wie geen exacte en geen
+   staarttreffer heeft, krijgt het langste voorvoegsel dat op zijn pad past --
+   en, net als bij de staart, alleen bij precies EEN kandidaat. Wat zo'n plek
+   oplevert is de regel van de REGISTRATIE en niet van de handler-body per
+   actie; dat is precies wat er te weten valt, en het is meer dan niets. */
 const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]+)\3([^\n]*)/g;
 
 let _bron = null;
@@ -114,6 +131,7 @@ function bronIndex() {
   if (_bron) return _bron;
   const exact = new Map();
   const perStaart = new Map();
+  const voorvoegsels = new Map();
   loopMap(path.join(WORTEL, 'server'), /\.js$/, f => {
     const tekst = fs.readFileSync(f, 'utf8');
     let m;
@@ -121,6 +139,8 @@ function bronIndex() {
     while ((m = ROUTE_RE.exec(tekst))) {
       const pad = m[4];
       if (!pad.startsWith('/')) continue;
+      /* Gaat de string verder met `+`? Dan is dit een voorvoegsel en geen pad. */
+      const isVoorvoegsel = (m[5] || '').trim().startsWith('+');
       const plek = {
         bestand: path.relative(WORTEL, f).replace(/\\/g, '/'),
         regel: tekst.slice(0, m.index).split('\n').length,
@@ -128,18 +148,24 @@ function bronIndex() {
         rauw: (m[5] || '').trim().slice(0, 160)
       };
       const sleutel = m[2].toUpperCase() + ' ' + pad;
+      if (isVoorvoegsel) {
+        const vv = voorvoegsels.get(sleutel) || [];
+        vv.push(plek);
+        voorvoegsels.set(sleutel, vv);
+        continue;
+      }
       if (!exact.has(sleutel)) exact.set(sleutel, plek);
       const lijst = perStaart.get(sleutel) || [];
       lijst.push(plek);
       perStaart.set(sleutel, lijst);
     }
   });
-  _bron = { exact, perStaart };
+  _bron = { exact, perStaart, voorvoegsels };
   return _bron;
 }
 
 function plekVan(methode, pad) {
-  const { exact, perStaart } = bronIndex();
+  const { exact, perStaart, voorvoegsels } = bronIndex();
   const heel = exact.get(methode + ' ' + pad);
   if (heel) return heel;
   /* De staart: loop de padgrenzen af van lang naar kort, en neem de eerste
@@ -150,6 +176,19 @@ function plekVan(methode, pad) {
     const kandidaten = perStaart.get(methode + ' ' + staart);
     if (kandidaten && kandidaten.length === 1) return kandidaten[0];
   }
+  /* Het samengestelde pad: het LANGSTE voorvoegsel dat past, en alleen als er
+     precies een registratie op dat voorvoegsel staat. `samengesteld: true` gaat
+     mee, zodat een lezer weet dat hij de regel van de LUS krijgt en niet die
+     van een handler die per actie ergens anders staat. */
+  let besteLengte = -1, beste = null;
+  for (const [sleutel, kandidaten] of voorvoegsels) {
+    const spatie = sleutel.indexOf(' ');
+    if (sleutel.slice(0, spatie) !== methode) continue;
+    const vv = sleutel.slice(spatie + 1);
+    if (!pad.startsWith(vv)) continue;
+    if (vv.length > besteLengte) { besteLengte = vv.length; beste = kandidaten; }
+  }
+  if (beste && beste.length === 1) return Object.assign({ samengesteld: true }, beste[0]);
   return null;
 }
 
@@ -190,6 +229,8 @@ function alleRoutes() {
         viaRouter: plek ? plek.viaRouter : null,
         bestand: plek ? plek.bestand : null,
         regel: plek ? plek.regel : null,
+        // de plek is de REGISTRATIE (een lus over een actietabel), niet de handler
+        samengesteld: plek ? !!plek.samengesteld : false,
         rauw: plek ? plek.rauw : ''
       });
     }

@@ -282,4 +282,78 @@ const PUBLIEK = new Map([
   ['/api/test/crash', 'idem']
 ]);
 
-module.exports = { PUBLIEK };
+/* ============================================================================
+   DE TWEEDE VRAAG, EN WAAROM HIJ EEN EIGEN LIJST HEEFT.
+
+   PUBLIEK hierboven beantwoordt de vraag van keuringsregel 28 en van
+   scripts/handlerwacht.js: welke SCHRIJFroute mag zonder gezagsfunctie. De
+   poortwacht (scripts/poortwacht.js) stelt een andere vraag: welke route mag
+   2xx antwoorden aan een anonieme klopper -- ook een GET, ook een route die
+   wel degelijk een bewaker heeft maar die bewaker niet als eis stelt.
+
+   Die twee vragen overlappen grotendeels en zijn niet hetzelfde. Ze zijn
+   daarom ook NIET samengevoegd tot een lijst: dat zou keuringsregel 28
+   verruimen met achttien paden die daar niets te zoeken hebben, en tegelijk de
+   poortwacht laten leunen op een lijst die over schrijfroutes gaat. Wat wel
+   moest verdwijnen is de tweede BRON: de poortwacht droeg zijn eigen
+   overgetypte kopie, en twee lijsten van wat openbaar mag zijn lopen uiteen --
+   met de losse van de twee als de ruimere (LAT.md regel 4).
+
+   Hieronder staat daarom precies het verschil: de paden die ALLEEN voor de
+   anonieme klop openbaar heten. POORTWACHT is de som, en er is er nog steeds
+   maar een plek waar iemand een pad toevoegt.
+
+   Nagemeten op 30 augustus 2026, tegen scripts/routekaart.js:
+     8  GET-only, zonder bewaker    (sat/ping, foundation/health, impact, tip,
+                                     bespaartip, gesprekskaart, doos/rapport)
+     3  GET-only, met bewaker       (sso/terug, metrics, metrics/kort)
+     3  POST met een `auth` die niets eist (auth/resend, account/start,
+                                     salon/promo) -- ze staan hier als
+                                     tolerantie van de anonieme klop, niet als
+                                     bewering dat ze geen bewaker hebben
+     6  POST-deuren die op de anonieme weg horen te antwoorden
+     2  VERVALLEN: /api/config en /api/i18n bestonden niet meer als route. Een
+        openbaar-lijst die paden noemt die er niet zijn, verrot: de volgende
+        lezer neemt aan dat de rest wel klopt.
+   ========================================================================== */
+const ALLEEN_ANONIEM = new Map([
+  // ---- gezondheid en telemetrie, alleen te lezen ----
+  ['/api/sat/ping', 'leven-teken voor de satellietverbinding'],
+  ['/api/foundation/health', 'leven-teken van de RTF (zonder cijfers, zie server/foundation.js)'],
+  ['/api/metrics', 'de Prometheus-scrape: van buiten 404, alleen intern of met RTG_METRICS_TOKEN. De ronde klopt zelf vanaf 127.0.0.1 aan, en dat adres mag'],
+  ['/api/metrics/kort', 'dezelfde poort, in JSON, voor het techniekbord'],
+  ['/api/doos/rapport', 'de zaakdoos meldt zijn dagrapport op het eigen net; bedrijfstelemetrie, geen ledengegevens'],
+
+  // ---- publieke verantwoording en vaste teksten ----
+  ['/api/foundation/impact', 'de RTFoundation legt haar impact juist publiek af'],
+  ['/api/foundation/tip', 'een opvoedtip; vaste tekst, geen gegevens'],
+  ['/api/foundation/bespaartip', 'een bespaartip; vaste tekst, geen gegevens'],
+  ['/api/foundation/gesprekskaart', 'een gesprekskaart; vaste tekst, geen gegevens'],
+  ['/api/salon/promo', 'uitgelichte Salon-posts zijn het publieke campagnebeeld'],
+
+  // ---- deuren: hier kan per definitie nog geen sessie zijn ----
+  ['/api/sso/terug', 'de provider stuurt de bezoeker hierheen terug, zonder onze sessie'],
+  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen: dat IS de inlog'],
+  ['/api/auth/reset', 'herstel met een token uit de e-mail'],
+  ['/api/auth/resend', 'bevestigingsmail opnieuw sturen; de `auth` ervoor stelt niets als eis'],
+  ['/api/account/start', 'accountherkenning aan de poort; de `auth` ervoor stelt niets als eis'],
+  ['/api/aanmeld/zeg', 'het ballotagegesprek loopt voor de inlog'],
+  ['/api/foundation/school/school/maak', 'een school meldt zich aan voor er een login bestaat; hij start op "wacht" tot RTG goedkeurt, met een rem per afzender'],
+  /* De reden die hier stond wees naar de uurgrens in server/routes/lesmaker.js
+     -- en dat is een ANDERE route (/api/les/maak). Deze route maakte onbeperkt
+     lessen aan. De rem staat nu op de route zelf; zie
+     test/foundation-lesrem.test.js. */
+  ['/api/foundation/les/maak', 'bewust zonder inlog: een quizbord in de klas. Met een eigen uurgrens per IP op de route zelf -- zie server/foundation/onderwijs/les.js']
+]);
+
+/* De som, voor de poortwacht. Een pad dat in beide lijsten zou staan is een
+   dubbeling: ALLEEN_ANONIEM heet niet voor niets zo. */
+for (const pad of ALLEEN_ANONIEM.keys()) {
+  if (PUBLIEK.has(pad)) {
+    throw new Error('lib/publiek.js: ' + pad + ' staat in PUBLIEK en in ALLEEN_ANONIEM; ' +
+      'ALLEEN_ANONIEM is het VERSCHIL en niet de som -- haal hem uit een van de twee.');
+  }
+}
+const POORTWACHT = new Map([...PUBLIEK, ...ALLEEN_ANONIEM]);
+
+module.exports = { PUBLIEK, ALLEEN_ANONIEM, POORTWACHT };

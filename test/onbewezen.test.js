@@ -139,3 +139,45 @@ test('een lijfsleutel telt pas als de meting hem heeft GEBOUWD', () => {
       'GEEN_PROEFSLEUTEL -- dan is de trechter op de declaratie gaan tellen in plaats van op de meting');
   }
 });
+
+/* ============================================================================
+   "NIET AANRAKEN" IS GEEN ONTBREKENDE SLEUTEL.
+
+   Dertig routes stonden in GEEN_PROEFSLEUTEL terwijl er niets ontbrak. Het zijn
+   schakelkasten (/api/office/boardroom/alles zet in een keer alles om) en
+   onomkeerbare handelingen (/api/boardroom/reset, de bewaarveger die wist wat
+   over de termijn is). scripts/lib/routes.js houdt ze bij naam tegen, met een
+   uitgeschreven reden per route.
+
+   WAAROM DIT ERTOE DOET. Zolang ze onder "geen sleutel" vielen, was die bak
+   niet leeg te krijgen: je kunt geen sleutel bouwen voor een deur waar je met
+   opzet niet aan mag komen. Iemand zou blijven zoeken naar een sleutel die niet
+   hoort te bestaan -- en het doel "GEEN_PROEFSLEUTEL = 0" was onhaalbaar om de
+   verkeerde reden.
+
+   Dit is de "aantoonbaar niet-beproefbaar" die als eindtoestand mag bestaan:
+   niet een bak waar iets stil in verdwijnt, maar een lijst met per route een
+   reden die iemand kan nalopen.
+   ========================================================================== */
+test('een niet-aanraakbare route staat niet onder "geen sleutel"', () => {
+  if (!u.metingGebruikt) { assert.ok(u.metingReden.length > 20); return; }
+  const { waaromNietAanraken } = require('../scripts/lib/routes');
+  const geen = u.perRoute.GEEN_PROEFSLEUTEL || [];
+  for (const s of geen) {
+    const pad = s.split(' ')[1];
+    assert.ok(!waaromNietAanraken(pad),
+      pad + ' mag met opzet niet worden aangeroepen (' + waaromNietAanraken(pad) + ') ' +
+      'en staat toch onder "geen sleutel" -- daar is geen sleutel voor te bouwen');
+  }
+});
+
+test('elke niet-aanraakbare route draagt een uitgeschreven reden', () => {
+  if (!u.metingGebruikt) { assert.ok(u.metingReden.length > 20); return; }
+  const { waaromNietAanraken } = require('../scripts/lib/routes');
+  const bak = u.perRoute.NIET_AANRAAKBAAR || [];
+  for (const s of bak) {
+    const reden = waaromNietAanraken(s.split(' ')[1]);
+    assert.ok(reden && reden.length > 10,
+      s + ' staat in NIET_AANRAAKBAAR zonder reden; dan is het een restbak en geen uitgang');
+  }
+});

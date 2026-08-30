@@ -59,7 +59,7 @@ const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'ONBEWEZEN.json');
-const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
+const { alleRoutes, isSchakel, verdeelOpRol, waaromNietAanraken } = require('./lib/routes');
 const { ROLLEN: ROLLEN_MET_TOKEN } = require('./lib/proefsleutels');
 /* Een deur waarvan de sleutel in het LIJF reist heeft geen rol en is toch te
    openen; zie de kop van ./lib/lijfsleutels.js.
@@ -87,6 +87,7 @@ const KLAAR = new Set(['BESCHERMD', 'BEWUST_NIET_IDEMPOTENT', 'NIET_VAN_TOEPASSI
 
 const BAKKEN = [
   ['STALE_BEWIJS', 'de meting hoort niet meer bij deze code -- opnieuw meten, geen handwerk'],
+  ['NIET_AANRAAKBAAR', 'de proef MAG hier niet aankloppen -- een schakelkast of een onomkeerbare handeling, met de reden per route'],
   ['GEEN_PROEFSLEUTEL', 'dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets'],
   ['FIXTURE_401', 'de eerste oproep gaf 401 -- er is een authenticatiefixture nodig'],
   ['FIXTURE_403', 'de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht'],
@@ -127,6 +128,22 @@ function laatstGewijzigd(bestand) {
 }
 
 function bakVan(r, m, metingOp, geenSleutel) {
+  /* NIET AANRAKEN IS GEEN ONTBREKENDE SLEUTEL, en dat verschil is groot genoeg
+     om als eerste te staan.
+
+     Dertig routes stonden in GEEN_PROEFSLEUTEL terwijl er niets ontbrak: het
+     zijn schakelkasten (`/api/office/boardroom/alles` zet in een keer alles om)
+     en onomkeerbare handelingen (`/api/boardroom/reset`, de bewaarveger die
+     wist wat over de termijn is). scripts/lib/routes.js houdt ze bij naam
+     tegen, MET een uitgeschreven reden per route -- dat is precies de
+     "aantoonbaar niet-beproefbaar" die als eindtoestand mag bestaan.
+
+     Zolang ze onder "geen sleutel" vielen, was de bak niet leeg te krijgen: je
+     kunt geen sleutel bouwen voor een deur waar je met opzet niet aan mag
+     komen, en iemand zou eindeloos zoeken naar een sleutel die niet hoort te
+     bestaan. */
+  const nietAanraken = waaromNietAanraken && waaromNietAanraken(r.pad);
+  if (nietAanraken) return 'NIET_AANRAAKBAAR';
   /* EERST DE OPSTELLING, DAN PAS HET REGISTER. Een route waarvoor dit
      instrument geen sleutel heeft, staat niet in IDEMPROEF.json -- en die
      afwezigheid las de eerste versie als "de meting hoort niet meer bij deze

@@ -37,6 +37,7 @@
    niet, dan hoort het als heel pad. test/accountroutes.test.js zakt op een
    voorvoegsel dat een ander domein overlapt. */
 'use strict';
+const { dekt } = require('./padgrens');
 
 /* De domeinen die in hun geheel een account vragen. Per regel het aantal
    accountweigeringen dat gemeten is, zodat een latere ronde kan zien of de
@@ -66,7 +67,7 @@ const PADENSET = new Set(PADEN);
 function dektPad(pad) {
   const p = String(pad || '');
   if (PADENSET.has(p)) return true;
-  return VOORVOEGSELS.some(v => p === v.pad || p.startsWith(v.pad.endsWith('/') ? v.pad : v.pad + '/'));
+  return VOORVOEGSELS.some(v => dekt(p, v.pad));
 }
 
 /* MAG DEZE ROUTE NAAR EEN ACCOUNTSESSIE. Alleen vanaf `member` -- dat is

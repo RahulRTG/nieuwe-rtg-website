@@ -164,6 +164,7 @@ wachtOpSchoneBoom();
   const { zetGenreKlaar } = require('./lib/wereld-genre');
   const { genreRolVoor, rolVanZaak: genreRolVanZaak } = require('./lib/genrezaken');
   const { accountRolVoor } = require('./lib/accountroutes');
+  const { persoonsRolVoor } = require('./lib/persoonsroutes');
   const genreWereld = await zetGenreKlaar({ post });
   for (const [code, tok] of Object.entries(genreWereld.tokens)) tokens[genreRolVanZaak(code)] = tok;
   console.log('  genrewereld                          : ' +
@@ -223,6 +224,7 @@ wachtOpSchoneBoom();
   const geweigerd = [];
   const naarGenre = [];
   const naarAccount = [];
+  const naarPersoon = [];
   const metRol = verdeling.metRol.map(r => {
     /* EERST DE GENREZAAK. Die verfijnt `supplier` naar EEN bepaalde zaak en
        staat los van de lijfsleutelfamilies: hij zegt niet welke pas de sessie
@@ -236,6 +238,11 @@ wachtOpSchoneBoom();
        plaats van alleen een pas. Zie ./lib/accountroutes.js. */
     const a = accountRolVoor(r.rol, r.pad);
     if (a.rol && tokens[a.rol]) { naarAccount.push({ pad: r.pad }); return { ...r, rol: a.rol, rolVan: r.rol }; }
+    /* EN DE PERSOONLIJKE LOGIN. Zelfde vorm nog een keer: niet welke zaak en
+       niet welke pas, maar of er een PERSOON achter de sessie hoort te staan.
+       Zie ./lib/persoonsroutes.js. */
+    const w = persoonsRolVoor(r.rol, r.pad);
+    if (w.rol && tokens[w.rol]) { naarPersoon.push({ pad: r.pad }); return { ...r, rol: w.rol, rolVan: r.rol }; }
     const familieRol = lijfsleutels.rolVoor(r.pad);
     const oordeel = magOpwaarderen(r.rol, familieRol);
     if (!familieRol || familieRol === r.rol) return r;
@@ -243,6 +250,9 @@ wachtOpSchoneBoom();
     opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
     return { ...r, rol: familieRol, rolVan: r.rol };
   });
+  if (naarPersoon.length) {
+    console.log('  routes naar een persoonlijke login   : ' + naarPersoon.length);
+  }
   if (naarAccount.length) {
     console.log('  routes naar een accountsessie        : ' + naarAccount.length);
   }

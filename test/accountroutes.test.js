@@ -4,6 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { VOORVOEGSELS, PADEN, dektPad, accountRolVoor } = require('../scripts/lib/accountroutes');
+const { ligtBinnen } = require('../scripts/lib/padgrens');
 
 test('elk voorvoegsel draagt een meting en een reden', () => {
   for (const v of VOORVOEGSELS) {
@@ -18,8 +19,7 @@ test('elk voorvoegsel draagt een meting en een reden', () => {
 test('geen voorvoegsel ligt binnen een ander', () => {
   for (const a of VOORVOEGSELS) for (const b of VOORVOEGSELS) {
     if (a === b) continue;
-    assert.ok(!a.pad.startsWith(b.pad.endsWith('/') ? b.pad : b.pad + '/'),
-      a.pad + ' ligt binnen ' + b.pad);
+    assert.ok(!ligtBinnen(a.pad, b.pad), a.pad + ' ligt binnen ' + b.pad);
   }
 });
 
@@ -29,8 +29,7 @@ test('geen voorvoegsel ligt binnen een ander', () => {
 test('geen los pad ligt onder een voorvoegsel', () => {
   for (const p of PADEN) {
     for (const v of VOORVOEGSELS) {
-      assert.ok(!p.startsWith(v.pad.endsWith('/') ? v.pad : v.pad + '/'),
-        p + ' ligt al onder het voorvoegsel ' + v.pad);
+      assert.ok(!ligtBinnen(p, v.pad), p + ' ligt al onder het voorvoegsel ' + v.pad);
     }
   }
 });

@@ -61,7 +61,7 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
-const ROLLEN = ['member', 'member-account', 'member-zakelijk', 'member-lifestyle', 'office', 'supplier', 'boardroom', 'techniek',
+const ROLLEN = ['member', 'member-account', 'member-zakelijk', 'member-lifestyle', 'office', 'supplier', 'zaak-persoonlijk', 'boardroom', 'techniek',
   'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving', 'eigen-poort'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
@@ -152,6 +152,31 @@ function maakSleutels({ post, officeCode, eigen }) {
     'member-lifestyle': async () => (await post('/api/login', { tier: 'lifestyle' })).data.token,
     office: async () => (await post('/api/office/login', { code: officeCode })).data.token,
     supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token,
+    /* DEZELFDE ZAAK, MAAR OP NAAM. De demo-inlog hierboven levert een sessie
+       met actor { name: 'Beheer', manager: true } en GEEN staffId -- een
+       bedrijfsaccount, geen persoon. Tweeendertig routes weigeren precies
+       daarop: "Alleen met een persoonlijke login", "Alleen vanaf een
+       persoonlijke PDA", "Dit postvak hoort niet bij uw persoonlijke inlog".
+       De poort leest `req.actor.staffId` (routes/staff/inzetbaarheid.js), en
+       die is bij de demo-inlog leeg.
+
+       Dit is dus geen sterkere sessie maar een andere: een medewerker die op
+       zijn eigen naam inlogt met zijn eigen pincode, langs dezelfde
+       verifyStaffPin en hetzelfde werkvenster als in de leverancier-app. Wat
+       de proef wint is dat een handeling op een PERSOON staat, en dat is
+       precies wat deze routes eisen.
+
+       Waarom niet gewoon `supplier` zo maken: dat is een tweede vraag met een
+       eigen antwoord, en zolang de demo-inlog bestaat hoort er iets te meten
+       of hij nog werkt. Twee rollen, zoals bij member en member-account. */
+    'zaak-persoonlijk': async () => {
+      const code = process.env.DEMO_SUPPLIER || 'KIKUNOI';
+      const rooster = await post('/api/supplier/roster', { code }, null);
+      const mgr = ((rooster && rooster.data && rooster.data.staff) || []).find(x => x.role === 'manager');
+      if (!mgr) return null;
+      const l = await post('/api/supplier/login', { code, staffId: mgr.id, pin: '1234' });
+      return (l && l.data && l.data.token) || null;
+    },
     /* Beide via de eigenaar; zie de kop waarom dat twee namen blijven. */
     boardroom: haalEigenaar,
     techniek: haalEigenaar,

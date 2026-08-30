@@ -112,20 +112,68 @@ const SLEUTELS = {
      auditspoor van de afdelingen. Dat spoor hoort te zeggen hoe vaak een MENS op
      de knop drukte, en niet hoe vaak het verzoek aankwam. Vandaar dat ook deze
      dedupliceren. */
-  'POST /api/office/bank/nood': { zelfdeVerzoek: true },              // de reden
-  'POST /api/office/bank/herstel': { zelfdeVerzoek: true },
+  /* /api/office/bank/nood EN /api/office/bank/herstel STONDEN HIER EN ZIJN ERAF
+     (30 augustus 2026). Dit is dezelfde fout als bij ./idemsleutels-kaleronde-b.js
+     bij /api/supplier/security, maar dan aan de HERSTELKANT -- en die had ik
+     daar wel gezien en hier niet.
+
+     De noodstop en het herstel dragen allebei een lijf dat leeg mag zijn (bij
+     `nood` is `reden` optioneel, bij `herstel` staat er niets in). Twee keer
+     drukken geeft dus twee keer dezelfde vingerafdruk, en de tweede druk werd
+     opgeslikt met het antwoord van de eerste. Dat leest als "gelukt" terwijl er
+     niets is gebeurd.
+
+     Wat het kost: een tweede noodstop na een herstel zet de bank NIET stil, en
+     een tweede herstel na een tweede noodstop haalt hem er NIET uit -- terwijl
+     de knop wel "ok" zegt. test/bank.test.js liep er precies in: het herstel op
+     regel 158 werd opgeslikt, de bank bleef in nood, en drie toetsen verderop
+     ging de foundation-afdracht via de kaart in plaats van het eigen grootboek.
+     Het duurde drie toetsen voordat het zichtbaar werd, en dat is nu juist het
+     gevaarlijke: op een echte bank was het een stand die niemand terugdraait.
+
+     Een noodknop en een herstelknop krijgen hier geen duplicaatlaag. Wie ze twee
+     keer indrukt, meent het. */
   'POST /api/office/bank/leden': { zelfdeVerzoek: true },             // aan: true/false
   'POST /api/office/bank/operationeel': { zelfdeVerzoek: true },      // aan: true/false
   'POST /api/office/bank/instellingen': { zelfdeVerzoek: true },      // de instellingen zelf
   'POST /api/office/bank/autoriseer/annuleer': { zelfdeVerzoek: true },
   'POST /api/office/bank/rekening/bevries': { zelfdeVerzoek: true },  // iban + aan
-  'POST /api/office/bank/mislukking': { zelfdeVerzoek: true },        // reden + sleutel
+  /* /api/office/bank/mislukking STOND HIER EN IS ERAF (30 augustus 2026).
+
+     Ik gaf hem `zelfdeVerzoek` met de aantekening "reden + sleutel", en allebei
+     die velden zijn OPTIONEEL. Drie mislukte clearings achter elkaar melden gaat
+     in de praktijk met een leeg lijf, en dan is de vingerafdruk drie keer
+     dezelfde: de teller kwam op 1 in plaats van 3 en de bank sloeg NIET
+     automatisch in nood. Precies de fout waar de kop van ./idemsleutels.js voor
+     waarschuwt -- twee keer `{}` naar een dobbelworp zijn twee worpen -- en
+     test/bank.test.js zakte erop.
+
+     De route ontdubbelt bovendien al zelf, en beter: kern.bankClearingMislukt()
+     krijgt de sleutel van de mislukte CLEARING mee, en dat is het ding dat
+     werkelijk een keer telt. Een tweede rem erboven die de sleutel niet eens
+     ziet, kan alleen maar in de weg zitten. */
   'POST /api/command/agent/stop': { zelfdeVerzoek: true },            // naam + reden
   'POST /api/command/agent/hervat': { zelfdeVerzoek: true },          // naam + reden
   'POST /api/command/agent/rechten': { zelfdeVerzoek: true },         // naam + mag + reden
   'POST /api/appstore/wis-opslag': { zelfdeVerzoek: true },           // de sleutel
   'POST /api/supplier/mall/sync': { zelfdeVerzoek: true },            // de stand die gemeld wordt
-  'POST /api/supplier/horeca/folio/nacht': { zelfdeVerzoek: true },   // de datum
+  /* /api/supplier/horeca/folio/nacht STOND HIER EN IS ERAF (30 augustus 2026).
+
+     De nachtrun ontdubbelt al zelf, en beter dan deze laag kan: hij houdt per
+     folio bij welke NACHTEN er geboekt zijn en slaat over wat er al staat. Het
+     antwoord vertelt dat ook -- `geboekt: 0, overgeslagen: 1`.
+
+     Met een duplicaatregel erboven kreeg de tweede oproep het antwoord van de
+     eerste terug: `geboekt: 1`. Er werd niets dubbel geboekt (daar zorgt de
+     handler voor), maar het ANTWOORD loog over wat er gebeurd was, en een
+     nachtrun die zegt dat hij een nacht boekte terwijl hij hem oversloeg, is
+     precies het soort verschil dat een hotel pas op de rekening van de gast
+     terugvindt. test/horeca-hotel-event.test.js zakte hierop.
+
+     Dit is de derde van dezelfde soort in een ronde (na /api/office/bank/mislukking
+     en het paar nood/herstel hierboven), en samen vormen ze een regel: EEN ROUTE
+     DIE ZELF AL WEET DAT ZE HET AL GEDAAN HEEFT, KRIJGT HIER NIETS. Deze laag is
+     er voor routes die dat niet weten. */
   'POST /api/member/lifestyle/gezondheid/dossier': { zelfdeVerzoek: true },
   'POST /api/member/rechterhand/maison/log': { zelfdeVerzoek: true }
 ,

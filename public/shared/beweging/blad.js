@@ -100,8 +100,11 @@
         return wrap;
       },
       bewegingen: [
-        { element: 'tekst', y: { van: 40, naar: 0, start: 0, eind: 0.35 },
-          opacity: { van: 0, naar: 1, start: 0, eind: 0.25 } },
+        /* De tekst is er bijna meteen. Een binnenkomende scene die zijn eerste
+           kwart leeg is, leest als een gat in de pagina en niet als opbouw --
+           dat gat stond er, en dit is de maat waarop het weg is. */
+        { element: 'tekst', y: { van: 40, naar: 0, start: 0, eind: 0.22 },
+          opacity: { van: 0, naar: 1, start: 0, eind: 0.12 } },
         { element: 'beeld', x: { van: 160, naar: 0, start: 0.05, eind: 0.55 },
           schaal: { van: 0.86, naar: 1.12, start: 0.15, eind: 0.9 },
           opacity: { van: 0, naar: 1, start: 0.05, eind: 0.3 } }
@@ -143,10 +146,10 @@
         return wrap;
       },
       bewegingen: [
-        { element: 'beeld', draai: { van: -9, naar: 0, start: 0, eind: 0.7 },
-          schaal: { van: 0.82, naar: 1.04, start: 0, eind: 0.8 },
+        { element: 'beeld', kantel: { van: -14, naar: 0, start: 0, eind: 0.7 },
+          schaal: { van: 0.86, naar: 1.02, start: 0, eind: 0.8 },
           y: { van: 60, naar: 0, start: 0, eind: 0.5 } },
-        { element: 'tekst', opacity: { van: 0, naar: 1, start: 0, eind: 0.2 } }
+        { element: 'tekst', opacity: { van: 0, naar: 1, start: 0, eind: 0.1 } }
       ]
     },
 
@@ -185,7 +188,7 @@
       },
       bewegingen: [
         { element: 'beeld', schaal: { van: 1.12, naar: 1, start: 0, eind: 1 } },
-        { element: 'tekst', opacity: { van: 0, naar: 1, start: 0.1, eind: 0.35 } }
+        { element: 'tekst', opacity: { van: 0, naar: 1, start: 0, eind: 0.15 } }
       ]
     }
   };

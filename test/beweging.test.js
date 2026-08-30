@@ -209,6 +209,41 @@ test('op zwart is lopende tekst wit en geen bordeaux', () => {
   assert.ok(!/burgundy/.test(blok[1]));
 });
 
+test('het kleefpaneel is precies een venster hoog en niet MINSTENS een venster', () => {
+  /* DE MUTATIE: zet .bw-kleef terug op min-height:100vh. Een sticky element dat
+     HOGER is dan het venster plakt niet -- het schuift gewoon mee naar boven.
+     De hele scene doet dan niets, zonder foutmelding, en alleen bij de schermen
+     waar de kop toevallig over twee regels loopt. Gemeten: 1128px paneel in een
+     venster van 800. */
+  const kleef = CSS.match(/\.bw-kleef\s*\{([^}]*)\}/);
+  assert.ok(kleef, '.bw-kleef staat niet in het blad');
+  assert.match(kleef[1], /(^|[^-])height:\s*100vh/m);
+  assert.ok(!/min-height:\s*100vh/.test(kleef[1]),
+    'min-height:100vh laat het paneel groeien tot het niet meer plakt');
+});
+
+test('een kantelende scene zet zijn perspective op de ouder', () => {
+  /* DE MUTATIE: zet `perspective(1400px)` terug in de transform van
+     .bw-toestelrand, zoals bijna elk voorbeeld doet. De motor schrijft de hele
+     transform van dat element, dus de perspective is bij de eerste frame weg
+     en een kantelend toestel wordt een scheve rechthoek -- zonder foutmelding,
+     en op de eerste frame ziet het er nog goed uit. */
+  const kantelers = [...BLAD.matchAll(/kantel:/g)];
+  assert.ok(kantelers.length > 0, 'geen enkele soort kantelt');
+  assert.ok(!/\.bw-toestelrand\s*\{[^}]*transform:[^;}]*perspective/.test(CSS),
+    'perspective staat in de transform van het bewegende element zelf');
+  assert.match(CSS, /\.bw-toestel\s*\{[^}]*perspective:/);
+});
+
+test('een toestel past binnen de scene waar het in kleeft', () => {
+  /* DE MUTATIE: haal max-height van .bw-toestelrand weg. De scene kleeft op
+     100vh met overflow:hidden, dus een toestel van 900x600 plus een kop loopt
+     op een laptop onder de rand door en wordt afgesneden. */
+  const rand = CSS.match(/\.bw-toestelrand\s*\{([^}]*)\}/);
+  assert.ok(rand, '.bw-toestelrand staat niet in het blad');
+  assert.match(rand[1], /max-height:\s*min\(/);
+});
+
 /* ============================== het proefblad ============================== */
 
 test('elke soort uit het register staat op het proefblad', () => {

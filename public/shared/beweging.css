@@ -16,7 +16,12 @@
 .bw-kleef {
   position: sticky;
   top: 0;
-  min-height: 100vh;
+  /* HOOGTE EN NIET MIN-HOOGTE. Een sticky element dat HOGER is dan het venster
+     blijft niet plakken -- het schuift gewoon mee naar boven, en dan doet de
+     hele scene niets meer terwijl er geen fout is. Dat gebeurde hier: een
+     lange kop maakte het paneel 1128px in een venster van 800. De inhoud past
+     dus binnen het venster, of hij wordt kleiner. */
+  height: 100vh;
   display: grid;
   align-items: center;
   gap: clamp(24px, 5vw, 72px);
@@ -64,9 +69,14 @@
 }
 
 /* ---------------------------------------------------------- de soorten -- */
-.bw-hero { grid-template-rows: auto 1fr; text-align: left; }
+.bw-hero { grid-template-rows: auto minmax(0, 1fr); text-align: left; }
+.bw-hero .bw-beeld { min-height: 0; height: 100%; overflow: hidden; }
+.bw-hero .bw-beeld img, .bw-hero .bw-beeld video { height: 100%; object-fit: cover; }
 .bw-split { grid-template-columns: 1fr; }
 @media (min-width: 900px) { .bw-split { grid-template-columns: 5fr 7fr; } }
+.bw-split .bw-beeld { max-height: 72vh; overflow: hidden; }
+.bw-split .bw-beeld img, .bw-split .bw-beeld video { max-height: 72vh; object-fit: cover; }
+.bw-split .bw-tekst, .bw-wissel .bw-tekst { min-height: 0; }
 
 .bw-onthulling, .bw-vol, .bw-wissel { position: relative; }
 .bw-onthulling .bw-beeld, .bw-vol .bw-beeld {
@@ -77,6 +87,11 @@
   width: 100%; height: 100%; object-fit: cover;
 }
 .bw-over { position: relative; z-index: 1; }
+/* Tekst OP een beeld draagt een kleinere maat dan een kop met zijn eigen
+   vlak: hij concurreert met wat eronder ligt, en moet binnen het venster
+   blijven -- de scene knipt af op 100vh. */
+.bw-over .bw-titel { font-size: clamp(28px, 4.4vw, 56px); }
+.bw-over .bw-lopend { margin-top: 14px; }
 .bw-vol { background: var(--black, #0C0C0B); }
 /* Op zwart is kleine tekst WIT en geen bordeaux: --burgundy-on-dark haalt
    3,78:1 en dat is te weinig voor lopende tekst (CLAUDE.md). */
@@ -89,15 +104,33 @@
 .bw-wissel > .bw-tekst { grid-area: 1 / 1; }
 
 /* Het toestel: diepte uit perspectief en schaduw, niet uit een rand. */
-.bw-toestel { justify-items: center; }
+.bw-toestel {
+  justify-items: center;
+  align-content: center;
+  grid-template-rows: auto auto;
+  gap: clamp(20px, 3vw, 40px);
+  /* De perspective staat op de OUDER. De motor schrijft de hele `transform`
+     van het bewegende element; een perspective die in diezelfde eigenschap
+     staat, is bij de eerste frame weg -- dan kantelt er niets en ziet een
+     toestel eruit als een scheve rechthoek. */
+  perspective: 1400px;
+}
 .bw-toestelrand {
   width: min(76vw, 900px);
+  /* En hij past binnen de scene. Een toestel dat onder de vouw doorloopt is
+     geen ontwerp maar een overloop: de scene kleeft op 100vh, dus alles wat
+     hoger is dan dat wordt weggeknipt door de overflow. */
+  max-height: min(52vh, 560px);
+  aspect-ratio: 3 / 2;
   padding: 10px;
   background: var(--black, #0C0C0B);
   box-shadow: 0 40px 100px rgba(12, 12, 11, .18);
-  transform: perspective(1200px);
+  transform-style: preserve-3d;
 }
-.bw-toestelscherm { background: var(--white, #fff); overflow: hidden; }
+.bw-toestelscherm { height: 100%; background: var(--white, #fff); overflow: hidden; }
+.bw-toestelscherm .bw-beeld, .bw-toestelscherm img, .bw-toestelscherm video {
+  height: 100%; width: 100%; object-fit: cover;
+}
 
 /* ------------------------------------------------------- de onthulling --
    Voor het eenvoudige werk: komt het in beeld, dan komt het op. Dat hoeft
@@ -115,7 +148,7 @@
    maakt van elke onthulling meteen een zichtbaar element. */
 @media (prefers-reduced-motion: reduce) {
   .bw-scene { min-height: 0 !important; }
-  .bw-kleef { position: relative; min-height: 0; }
+  .bw-kleef { position: relative; height: auto; min-height: 0; }
   .onthul { opacity: 1; transform: none; transition: none; }
   .bw-beeld img, .bw-beeld video { transform: none !important; }
 }

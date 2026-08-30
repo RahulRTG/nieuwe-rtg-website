@@ -125,6 +125,7 @@
     y: { eenheid: 'px', vorm: 'transform' },
     schaal: { eenheid: '', vorm: 'transform' },
     draai: { eenheid: 'deg', vorm: 'transform' },
+    kantel: { eenheid: 'deg', vorm: 'transform' },
     opacity: { eenheid: '', vorm: 'opacity' },
     onthul: { eenheid: '%', vorm: 'clip-path' }
   };
@@ -160,6 +161,12 @@
     if (s != null) stukken.push('scale(' + rond(1 + (s - 1) * demping) + ')');
     var d = baan(decl.draai, p);
     if (d != null) stukken.push('rotate(' + rond(d * demping) + 'deg)');
+    /* Kantelen is rotateY en dus diepte. De `perspective` hoort daarbij op de
+       OUDER en niet hier: deze laag schrijft de hele transform van het element,
+       dus een perspective die het blad in diezelfde eigenschap zet, is bij de
+       eerste frame weg. Dat is precies wat er gebeurde. */
+    var k = baan(decl.kantel, p);
+    if (k != null) stukken.push('rotateY(' + rond(k * demping) + 'deg)');
 
     var stand = {};
     /* Rustig krijgt geen transform mee. Een eindstand van scale(1.25) is nog

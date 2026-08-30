@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit e9d6ec5b, schone boom",
+  "metingReden": "gemeten op commit 9883c24a, schone boom",
   "stempel": {
-    "op": "2026-08-30T12:18:48.920Z",
-    "commit": "e9d6ec5b",
+    "op": "2026-08-30T12:23:44.828Z",
+    "commit": "9883c24a",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit e9d6ec5b, schone boom"
+    "metingReden": "gemeten op commit 9883c24a, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1500,
-    "onbewezen": 3161,
+    "metBewijs": 1499,
+    "onbewezen": 3162,
     "sluit": true
   },
   "bakken": [
@@ -48,10 +48,8 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 1,
-      "voorbeelden": [
-        "POST /api/sonde/melding"
-      ]
+      "aantal": 0,
+      "voorbeelden": []
     },
     {
       "id": "FIXTURE_401",
@@ -100,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 519,
+      "aantal": 520,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -150,8 +148,10 @@
     {
       "id": "ECHT_DEFECT",
       "uitleg": "fixture klopt, effect treedt op, en een herhaling doet het werk gewoon nog een keer",
-      "aantal": 0,
-      "voorbeelden": []
+      "aantal": 1,
+      "voorbeelden": [
+        "POST /api/bank/pas/bevries"
+      ]
     }
   ],
   "perRoute": {
@@ -198,9 +198,7 @@
       "DELETE /api/techniek/sso/scimsleutel/:org",
       "POST /api/theater/upload/:id"
     ],
-    "GEEN_PROEFSLEUTEL": [
-      "POST /api/sonde/melding"
-    ],
+    "GEEN_PROEFSLEUTEL": [],
     "FIXTURE_401": [
       "POST /api/auth/login",
       "POST /api/office/login",
@@ -3103,6 +3101,7 @@
       "POST /api/scim/v2/Users",
       "POST /api/site/foto",
       "POST /api/sociaal/beleid/zet",
+      "POST /api/sonde/melding",
       "POST /api/sso/saml/acs",
       "POST /api/stad/melding",
       "POST /api/supplier/aanwezig/pas",
@@ -3340,6 +3339,8 @@
     "STAAT_NIET_ZICHTBAAR": [],
     "BIJWERKING_ALLEEN": [],
     "SEMANTIEK_NODIG": [],
-    "ECHT_DEFECT": []
+    "ECHT_DEFECT": [
+      "POST /api/bank/pas/bevries"
+    ]
   }
 }

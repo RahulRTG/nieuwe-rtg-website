@@ -24,5 +24,8 @@
        "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
        een lid; de andere twee zijn deuren BINNEN de wereld. */
     { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
-      'link:rtfbuurt', 'link:rtfportaal'] }
+      'link:rtfbuurt', 'link:rtfportaal',
+    /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
+       bestonden en hingen nergens aan. */
+      'link:rtfbord', 'link:rtfschrift'] }
   ];

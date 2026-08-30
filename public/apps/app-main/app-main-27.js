@@ -76,6 +76,16 @@
   function zoekRij(icoonNode, label, meta, doe, sleutel) {
     const b = document.createElement('button');
     if (sleutel) b.dataset.sleutel = sleutel;
+    /* HET ADRES OP DE RIJ. Een rij die alleen in een klikafhandelaar weet waar
+       hij heen gaat, bestaat niet voor scripts/tikken.js -- de meter die telt
+       hoeveel tikken een functie van het beginscherm af ligt, en die met opzet
+       alleen ECHTE bestemmingen telt (anders is hij op te poetsen met een
+       belofte). Zwijgt deze lijst, dan meet het huis zich dieper dan het is.
+       De klik blijft lopen via openItem(): dit is een etiket en geen tweede weg. */
+    if (sleutel && sleutel.indexOf('link:') === 0) {
+      const l = LINKS[sleutel.slice(5)];
+      if (l && l.url) b.dataset.url = l.url;
+    }
     const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
     b.appendChild(zi);
     b.appendChild(document.createTextNode(label));
@@ -127,5 +137,10 @@
     }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
+  /* EEN KEER VOORAF OPBOUWEN. De lade blijft dicht; wat verandert is dat de
+     lijst er al IN staat. Twee redenen: hij staat er meteen als u hem opent, en
+     hij is meetbaar -- een korte weg die pas na een tik bestaat, telt in geen
+     enkele meting mee (zie de opmerking bij zoekRij hierboven). */
+  if (zoekLijst) setTimeout(zoek, 800);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 

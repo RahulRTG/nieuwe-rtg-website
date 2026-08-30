@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **275** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **271** |
 | `NOT_APPLICABLE` | 40 | 1.042 |
-| geclassificeerd | 3.069 | 4.378 van 4.653 (94,1%) |
+| geclassificeerd | 3.069 | 4.382 van 4.653 (94,2%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -618,8 +618,26 @@ die alleen klopt in volgorde, is geen reden.*
 |---|---:|---:|
 | routes onder het bewijsbesluit | 804 | **1.002** |
 | `NOT_APPLICABLE` | 865 | **1.042** |
-| `LEGACY_PENDING_CLASSIFICATION` | 452 | **275** |
-| geclassificeerd | 4.201 | **4.378 van 4.653 (94,1%)** |
+| `LEGACY_PENDING_CLASSIFICATION` | 452 | **271** |
+| geclassificeerd | 4.201 | **4.382 van 4.653 (94,2%)** |
+
+### De vierde vorm, en waar de opbrengst ophoudt
+
+`const wie = wieScant(req); if (!wie) return res.status(401)…` — een poort die
+alleen `req` krijgt, want hij leest de kop zelf en antwoordt niet zelf. **136
+handlers**, waarvan er 90 een poort noemen die het register al kende.
+
+Dat is ook waar dit ophoudt: die 136 leverden **vier** routes op in de deurloze
+bak. De 90 hadden hun klasse allang van de bewaker op de router; ze waren alleen
+niet zichtbaar als poort *in* de handler. De reeks vormen is daarmee uitgeput —
+de eerste leverde honderden, deze vier.
+
+**Bij deze vorm telt de naamcontrole het zwaarst**, en dat is geen theorie.
+`(req)` nemen doet elke hulpfunctie. `mij` uit `server/routes/veiligheid.js` is
+`(req) => req.session.key`: hij *leest* de sessiesleutel en controleert niets — de
+deur staat op de router. Hij ziet er precies zo uit als een poort, en zonder een
+regel die zegt dat hij er geen is, kregen 23 routes hun toegangsklasse van een
+leesfunctie. Hij staat daarom in het register, als `geen-deur`.
 
 ## 6. De poort
 

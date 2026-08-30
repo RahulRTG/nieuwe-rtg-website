@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:11:52.381Z",
-  "commit": "84d74474",
+  "op": "2026-08-30T09:18:10.264Z",
+  "commit": "8b3eec61",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,20 +9,20 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4378,
+  "geclassificeerd": 4382,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3196,
+   "BLOCKED_BY_TEST_FIXTURE": 3200,
    "NOT_APPLICABLE": 1042,
-   "LEGACY_PENDING_CLASSIFICATION": 275,
+   "LEGACY_PENDING_CLASSIFICATION": 271,
    "PROTECTED": 78,
    "INTENTIONALLY_NON_IDEMPOTENT": 62
   },
   "vastgesteldDoorMens": 1192,
-  "afgeleidDoorScript": 3186,
+  "afgeleidDoorScript": 3190,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3804,
+   "AUTHENTICATED": 3808,
    "PUBLIC": 99,
-   "(niet af te leiden -- vraagt een verklaring)": 53,
+   "(niet af te leiden -- vraagt een verklaring)": 49,
    "OBJECT_SCOPED": 688,
    "SERVICE_TO_SERVICE": 8,
    "SYSTEM_INTERNAL": 1
@@ -34,7 +34,7 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 44,
+   "BLOCKED_BY_TEST_FIXTURE": 40,
    "NOT_APPLICABLE": 23,
    "PROTECTED": 7
   },
@@ -9399,12 +9399,14 @@
   {
    "mutatieId": "code.dyn",
    "route": "POST /api/code/dyn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een geldige sessie uit de Bearer-kop",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -9414,20 +9416,22 @@
     "grond": null,
     "hindernis": "Niet ingelogd."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Niet ingelogd.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "code.scan",
    "route": "POST /api/code/scan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een geldige sessie uit de Bearer-kop",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -9437,10 +9441,10 @@
     "grond": null,
     "hindernis": "Niet ingelogd."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Niet ingelogd.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "comm.ai",
@@ -13028,7 +13032,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13055,7 +13059,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13136,7 +13140,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13163,7 +13167,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13190,7 +13194,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13217,7 +13221,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13271,7 +13275,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13298,7 +13302,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13325,7 +13329,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13379,7 +13383,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13406,7 +13410,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13433,7 +13437,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13514,7 +13518,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13568,7 +13572,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13595,7 +13599,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13622,7 +13626,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13649,7 +13653,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13676,7 +13680,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13757,7 +13761,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13838,7 +13842,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13946,7 +13950,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -13973,7 +13977,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14027,7 +14031,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14054,7 +14058,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14081,7 +14085,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14108,7 +14112,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14135,7 +14139,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14162,7 +14166,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14243,7 +14247,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14270,7 +14274,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14297,7 +14301,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -14405,7 +14409,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -15199,7 +15203,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15253,7 +15257,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15388,7 +15392,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15523,7 +15527,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15604,7 +15608,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15658,7 +15662,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -15820,7 +15824,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16117,7 +16121,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16252,7 +16256,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16441,7 +16445,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16495,7 +16499,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16549,7 +16553,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16576,7 +16580,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16603,7 +16607,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16630,7 +16634,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16657,7 +16661,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16684,7 +16688,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16711,7 +16715,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16738,7 +16742,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16765,7 +16769,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16792,7 +16796,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16819,7 +16823,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -16846,7 +16850,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -33717,12 +33721,14 @@
   {
    "mutatieId": "link.koppelingen",
    "route": "POST /api/link/koppelingen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een geldige sessie uit de Bearer-kop",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -33732,20 +33738,22 @@
     "grond": null,
     "hindernis": "Niet ingelogd."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Niet ingelogd.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "link.los",
    "route": "POST /api/link/los",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "een geldige sessie uit de Bearer-kop",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -33755,10 +33763,10 @@
     "grond": null,
     "hindernis": "Niet ingelogd."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Niet ingelogd.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "live.door",
@@ -64927,7 +64935,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -64954,7 +64962,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -64981,7 +64989,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65008,7 +65016,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65035,7 +65043,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65062,7 +65070,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65089,7 +65097,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65116,7 +65124,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65143,7 +65151,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65170,7 +65178,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65197,7 +65205,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65224,7 +65232,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65251,7 +65259,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65278,7 +65286,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65305,7 +65313,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65332,7 +65340,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65359,7 +65367,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65386,7 +65394,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65413,7 +65421,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65440,7 +65448,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65467,7 +65475,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65494,7 +65502,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65575,7 +65583,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65629,7 +65637,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65656,7 +65664,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65683,7 +65691,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65710,7 +65718,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65737,7 +65745,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65764,7 +65772,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65791,7 +65799,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65818,7 +65826,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65845,7 +65853,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65872,7 +65880,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65899,7 +65907,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -65926,7 +65934,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: schoolCode",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118347,7 +118355,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118374,7 +118382,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118401,7 +118409,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118428,7 +118436,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118455,7 +118463,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118482,7 +118490,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118509,7 +118517,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118534,7 +118542,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": null,
     "bewakers": [
      "auth"
@@ -118561,7 +118569,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118588,7 +118596,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118615,7 +118623,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118642,7 +118650,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118669,7 +118677,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118696,7 +118704,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118858,7 +118866,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118885,7 +118893,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118912,7 +118920,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118939,7 +118947,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118966,7 +118974,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -118993,7 +119001,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -119020,7 +119028,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -119047,7 +119055,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -119074,7 +119082,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

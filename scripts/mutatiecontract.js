@@ -144,7 +144,18 @@ let meerdereTreffers = 0;
        hem. Gemeten: 39 handlers, drie poorten -- en 36 daarvan zitten al achter
        een bewaker op de router, dus dit levert er drie op. Weinig, maar een poort
        die je niet ziet, belandt als "geen deur" in het register. */
-    /\)\s*=>\s*(?:\{\s*(?:return\s+)?)?(\w+)\s*\(\s*req\s*,\s*res\s*,/
+    /\)\s*=>\s*(?:\{\s*(?:return\s+)?)?(\w+)\s*\(\s*req\s*,\s*res\s*,/,
+    /* EN EEN POORT DIE ALLEEN `req` KRIJGT. `const wie = wieScant(req); if (!wie)
+       return res.status(401)...` -- de poort leest de kop zelf en antwoordt niet
+       zelf, dus hij heeft geen `res` nodig. Gemeten: 136 handlers, waarvan 90 een
+       poort noemen die het register al kent.
+
+       Dit is de vorm waar de naamcontrole het zwaarst telt: `(req)` nemen doet
+       elke hulpfunctie. `mij` uit routes/veiligheid.js is er zo een -- die LEEST
+       req.session.key en controleert niets -- en staat daarom als `geen-deur` in
+       het register. Zonder die regel kregen 23 routes hun klasse van een
+       leesfunctie. */
+    /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*\)\s*;\s*if\s*\(\s*!/
   ];
   /* Het voorvoegsel waarmee dit bestand gemount is, afgeleid uit zijn EIGEN
      handlers die wel uniek matchen. Eén uitkomst of niets: twee verschillende

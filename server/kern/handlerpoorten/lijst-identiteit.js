@@ -102,6 +102,22 @@ const POORTEN = {
      geboortedatum) en stelt geen identiteit vast -- die staat al vast als hij
      draait. Hem als deur tellen geeft 22 routes een klasse die zij niet aan hem
      ontlenen. Zie kern/gegevenspoort.js, stop(). */
+  /* DEZELFDE FUNCTIE, TWEE NAMEN. server/kern/link/wie.js levert een resolver
+     die uit de Bearer-kop een sessie haalt of null geeft; routes/link.js noemt
+     hem `wieScant` en routes/code.js `appSessie`. Allebei 401'en bij null, dus
+     allebei zijn ze een deur. */
+  'wieScant': { toegang: 'AUTHENTICATED', versmalt: 'een geldige sessie uit de Bearer-kop',
+    wat: 'kern/link/wie.js: token uit de Authorization-kop naar { soort, code?, key? }, of null' },
+  'appSessie': { toegang: 'AUTHENTICATED', versmalt: 'een geldige sessie uit de Bearer-kop',
+    wat: 'dezelfde resolver als wieScant, onder de naam die routes/code.js hem geeft' },
+
+  /* GEEN DEUR, EN DAT SCHEELT EEN VERKEERDE KLASSE OP 23 ROUTES. `mij` is
+     `(req) => req.session.key`: hij LEEST de sessiesleutel en controleert niets.
+     De deur staat op de router (auth). Hij ziet eruit als een poort omdat hij
+     `(req)` neemt en bovenin de handler staat, en juist daarom hoort hij hier. */
+  'mij': { toegang: null, soort: 'geen-deur',
+    wat: 'leest req.session.key en controleert niets; de deur is de bewaker op de router' },
+
   'gegevensStop': { toegang: null, soort: 'geen-deur',
     wat: 'volledigheidscontrole op de sessiegegevens; stelt geen identiteit vast en versmalt er geen' }
 };

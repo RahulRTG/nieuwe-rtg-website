@@ -119,7 +119,8 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
-  require('./idemsleutels-commerce').SLEUTELS);
+  require('./idemsleutels-commerce').SLEUTELS,
+  require('./idemsleutels-restbak'));
 
 /* De verklaring nakijken bij het laden: een `nietIdempotent` zonder reden is
    geen verklaring maar een ontsnapping, en een lege veldenlijst zegt niets. */

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:58:11.324Z",
-  "commit": "27b24f4f",
+  "op": "2026-08-30T12:02:25.775Z",
+  "commit": "b0a81882",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4613,
+  "geclassificeerd": 4619,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3385,
    "NOT_APPLICABLE": 1060,
-   "PROTECTED": 97,
+   "PROTECTED": 103,
    "INTENTIONALLY_NON_IDEMPOTENT": 71,
-   "LEGACY_PENDING_CLASSIFICATION": 40
+   "LEGACY_PENDING_CLASSIFICATION": 34
   },
-  "vastgesteldDoorMens": 1238,
+  "vastgesteldDoorMens": 1244,
   "afgeleidDoorScript": 3375,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3818,
@@ -3813,12 +3813,14 @@
   {
    "mutatieId": "bank.storten",
    "route": "POST /api/bank/storten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3830,10 +3832,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.terugkerend",
@@ -3892,12 +3894,14 @@
   {
    "mutatieId": "bank.terugkerend.zet",
    "route": "POST /api/bank/terugkerend/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3909,10 +3913,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.van-wallet",
@@ -70251,12 +70255,14 @@
   {
    "mutatieId": "pay.oplaad",
    "route": "POST /api/pay/oplaad",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "een echt account",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70268,10 +70274,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.overzicht",
@@ -70384,12 +70390,14 @@
   {
    "mutatieId": "pay.stuur",
    "route": "POST /api/pay/stuur",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70401,10 +70409,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.tegoed",
@@ -70436,12 +70444,14 @@
   {
    "mutatieId": "pay.tegoed.koop",
    "route": "POST /api/pay/tegoed/koop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70453,10 +70463,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.tegoed.terug",
@@ -70569,12 +70579,14 @@
   {
    "mutatieId": "pay.tik",
    "route": "POST /api/pay/tik",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70586,10 +70598,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.tikcode",

@@ -246,6 +246,38 @@ const FAMILIES = [
       if (!d || !d.code || !d.token) return null;
       return { code: d.code, token: d.token };
     }
+  },
+  {
+    naam: 'gast',
+    /* De gastenkant van de horeca: bestellen, de rekening, de pols, verzoeken.
+       Zestien routes achter gastAuth, dat `sleutel` uit het lijf leest
+       (server/routes/gast.js). */
+    prefixen: ['/api/gast/'],
+    velden: ['sleutel'],
+    waarom: 'gastAuth herkent een TAFELSESSIE aan `sleutel` uit het lijf; die ontstaat pas ' +
+      'als iemand aan een tafel aanschuift, en die tafel bestaat pas als de zaak er een QR voor uitgaf',
+    /* DRIE ECHTE STAPPEN, en geen ervan is over te slaan:
+         1. de zaak geeft een QR uit voor een tafel (supplier)
+         2. de gast wisselt die QR-token voor de tafel in (openbaar -- dat is
+            wat er gebeurt als je de sticker scant)
+         3. de gast schuift aan en krijgt DAAR pas zijn sessiesleutel
+
+       De actor is hier een TAFEL en geen persoon: een gast hoeft zich niet te
+       identificeren om te bestellen, en de envelop zegt dat met zoveel woorden
+       ('anoniem'). Een fixture die dat overslaat en een sleutel verzint, zou
+       precies het ding omzeilen dat deze routes beschermt. */
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.supplier) return null;
+      const qr = await post('/api/supplier/horeca/gast/qr', { tafel: 'Proeftafel' }, tokens.supplier);
+      const token = qr && qr.data && qr.data.token;
+      if (!token) return null;
+      const tafel = await post('/api/gast/tafel', { token }, null);
+      if (!tafel || tafel.status !== 200) return null;
+      const aan = await post('/api/gast/aanschuiven', { token, naam: 'Proefgast' }, null);
+      const sleutel = aan && aan.data && aan.data.sleutel;
+      if (!sleutel) return null;
+      return { sleutel };
+    }
   }
 ];
 

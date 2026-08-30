@@ -325,6 +325,14 @@ wachtOpSchoneBoom();
   console.log('  rtfos-wereld                         : ' + (rtfosWereld.klaar ? 'klaar' : 'NIET klaar -- ' + rtfosWereld.reden));
   for (const st of rtfosWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
+  /* DE FESTIVALWERELD -- ./lib/wereld-festival.js. Een editie als wortel; de
+     oogst kon er niet bij omdat de deur naar zijn OBJECT heet en niet naar
+     zijn werkwoord. */
+  const { zetFestivalKlaar } = require('./lib/wereld-festival');
+  const festivalWereld = await zetFestivalKlaar({ post, tokens });
+  console.log('  festivalwereld                       : ' + (festivalWereld.klaar ? 'klaar' : 'NIET klaar -- ' + festivalWereld.reden));
+  for (const st of festivalWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
@@ -332,6 +340,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
+      ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
@@ -415,6 +424,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
+      ...(r.pad.startsWith('/api/festival/') ? festivalWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

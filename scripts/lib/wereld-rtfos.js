@@ -59,44 +59,17 @@ async function zetRtfosKlaar({ post, tokens }) {
     status: st ? st.status : 0, ok: !!stOk,
     waarom: stOk ? null : ((st && st.data && st.data.error) || 'geen antwoord') });
 
-  /* EN EEN ZETEL VOOR DE SESSIE DIE DE ROUTES STRAKS GEBRUIKEN.
+  /* EN GEEN ZETEL. Hier stond een stap die de office-sessie een zetel gaf,
+     want met alleen een stad werd "Deze stadsafdeling bestaat niet" meteen "U
+     heeft in RTF Proefstad geen bevoegdheid". Die stap kon niet werken en
+     meldde dat ook elke ronde: `boardroomWie` geeft voor een kantoorsessie
+     `sess.lidKey`, en dat is bij een GEDEELDE kantoorcode leeg -- dus er is
+     geen sleutel om een zetel aan te hangen.
 
-     Dit was de tweede muur, en hij werd pas zichtbaar toen de eerste weg was:
-     met alleen een stad werd "Deze stadsafdeling bestaat niet" meteen "U heeft
-     in RTF Proefstad geen bevoegdheid voor deze handeling". De routes dragen
-     rol `office` (officeAuth), en `magRecht` vraagt een ZETEL in die stad --
-     of het landelijke bestuur. Het bestuur is de boardroom, en die gebruikt de
-     proef niet voor deze routes.
-
-     De weg is de echte: het landelijke bestuur kent een zetel toe. Daarvoor is
-     de accountsleutel van de ontvanger nodig, en die vraagt de office-sessie
-     op over zichzelf (/api/rtfos/ik geeft `key`). Raden kon hier niet: de
-     sleutel is per installatie anders. */
-  const off = (tokens || {}).office;
-  if (off) {
-    let ik = null;
-    try { ik = await post('/api/rtfos/ik', {}, off); } catch (e) { ik = null; }
-    const key = ik && ik.data && ik.data.key;
-    if (!key) {
-      stappen.push({ naam: 'de sleutel van de office-sessie opvragen', pad: '/api/rtfos/ik',
-        status: ik ? ik.status : 0, ok: false,
-        waarom: (ik && ik.data && ik.data.error) || 'geen key in het antwoord' });
-    } else {
-      let z = null;
-      try {
-        z = await post('/api/rtfos/zetel',
-          { stad, key, naam: 'Proefzetel', rol: 'stadsbestuur' }, brd);
-      } catch (e) { z = null; }
-      const zOk = z && z.status >= 200 && z.status < 300;
-      stappen.push({ naam: 'een zetel toekennen aan de office-sessie', pad: '/api/rtfos/zetel',
-        status: z ? z.status : 0, ok: !!zOk,
-        waarom: zOk ? null : ((z && z.data && z.data.error) || 'geen antwoord') });
-    }
-  } else {
-    stappen.push({ naam: 'een zetel toekennen aan de office-sessie', pad: '/api/rtfos/zetel',
-      status: 0, ok: false,
-      waarom: 'er is geen office-sessie; zonder die sleutel is er niemand om een zetel aan te geven' });
-  }
+     De echte reparatie zat een laag hoger en staat in ./kantoorroutes.js: deze
+     routes horen bij een kantoorsessie OP NAAM, en die is landelijk. Een stap
+     die elke ronde met dezelfde reden faalt, is geen waarschuwing meer maar
+     ruis, en dan wordt hij niet meer gelezen. Weg dus, met de reden hier. */
 
   return { klaar: true, extra: { stad }, stappen, reden: null };
 }

@@ -73,6 +73,9 @@ const { SLEUTELS } = require('../server/lib/idemsleutels');
    beproefbaar die de proef die dag overslaat -- met de reden erbij in zijn eigen
    uitslag. Dat verschil is echt en hoort hier te staan in plaats van gladgestreken. */
 const { ROLLEN: ROLLEN_MET_TOKEN } = require('./lib/proefsleutels');
+/* DE METING NAAST DE VERKLARING -- zie `meting()` verderop voor waarom dit
+   binnenkomt met een versheidspoort ervoor en niet als gewone require. */
+const { meting } = require('./lib/idemmeting');
 
 const sleutelVan = (r) => r.methode.toUpperCase() + ' ' + r.pad;
 
@@ -81,6 +84,11 @@ const sleutelVan = (r) => r.methode.toUpperCase() + ' ' + r.pad;
    keten voor deze route, en dat is geen tekort maar een vaststelling. */
 function boek() {
   const alles = alleRoutes();
+  /* De meting komt door een versheidspoort; staat die dicht, dan is GEMETEN leeg
+     en valt het boek terug op alleen de verklaringen -- met de reden erbij in de
+     uitslag, zodat een lager cijfer te duiden is. Zie scripts/lib/idemmeting.js. */
+  const METING = meting();
+  const GEMETEN = METING.perRoute;
   const bakken = [];
   const zet = (id, uitleg, routes, eind) =>
     bakken.push({ id, uitleg, aantal: routes.length, eind: !!eind,
@@ -179,6 +187,15 @@ function boek() {
     if (v && (v.zelfdeVerzoek || v.velden)) return 'BESCHERMD';
     if (bakId === 'padparameter') return 'WACHT_OP_FIXTURE';
     if (bakId === 'schakelpad') return 'NIET_BEPROEFBAAR';
+    /* DE METING, en pas hier -- na elke VERKLARING en voor de restbak.
+
+       Een verklaring gaat voor: die zegt wat een herhaling BETEKENT, en dat is
+       een besluit. Een meting zegt wat er die ene keer GEBEURDE, en dat is
+       zwakker. Ze staan daarom niet naast elkaar maar onder elkaar, en de graad
+       reist mee (zie graadVan) zodat een gemeten BESCHERMD nooit als een
+       verklaarde leest. */
+    const m = GEMETEN[sleutelVan(r)];
+    if (m && m.status) return m.status;
     if (bakId === 'geen-rol-met-token') {
       /* Twee soorten binnen een bak, en het verschil bepaalt de reparatie: een
          objectpoort of een lichaamssleutel VRAAGT een fixture (die is te
@@ -192,6 +209,27 @@ function boek() {
     return 'NOG_NIET_GECLASSIFICEERD';
   };
 
+  /* DE BEWIJSGRAAD, en waarom hij naast de status staat en niet erin.
+
+     BESTUUR.md: elke bewering in dit huis draagt een graad. Een status die uit
+     server/lib/idemsleutels.js komt is VERKLAARD -- een mens heeft opgeschreven
+     wat "hetzelfde verzoek" hier betekent. Een status die uit IDEMPROEF.json
+     komt is GEMETEN -- een instrument heeft een keer gezien wat er gebeurde,
+     met deze invoer, in deze opstelling. Dat is echt bewijs en het is niet
+     hetzelfde bewijs.
+
+     Ze in een status samenvouwen zou precies de schijnzekerheid maken die dit
+     boek moet voorkomen: "1016 beschermd" leest dan als "1016 keer is
+     opgeschreven hoe een herhaling wordt herkend", terwijl er staat "1016 keer
+     antwoordde de server herhaald: true op een tweede oproep". Vandaar
+     `metBesluitOverDuplicaat`, dat hieronder ALLEEN verklaarde routes telt. */
+  const graadVan = (r, st) => {
+    if (SLEUTELS[sleutelVan(r)]) return 'verklaard';
+    if (GEMETEN[sleutelVan(r)]) return 'gemeten';
+    if (st === 'NIET_BEPROEFBAAR' || st === 'WACHT_OP_FIXTURE') return 'afgeleid';
+    return 'onbekend';
+  };
+
   const STATUSUITLEG = {
     BESCHERMD: 'Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.',
     BEWUST_NIET_IDEMPOTENT: 'Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.',
@@ -202,6 +240,8 @@ function boek() {
   };
 
   const perStatus = {};
+  const perGraad = {};
+  const gronden = {};
   const bakVan = new Map();
   for (const b of [['schakelpad', schakels], ['padparameter', params],
     ['geen-rol-met-token', zonderRol], ['beproefbaar-verklaard', verklaard],
@@ -209,6 +249,13 @@ function boek() {
   for (const [r, bakId] of bakVan) {
     const st = statusVan(r, bakId);
     (perStatus[st] = perStatus[st] || []).push(sleutelVan(r));
+    const graad = graadVan(r, st);
+    (perGraad[graad] = perGraad[graad] || []).push(sleutelVan(r));
+    const m = GEMETEN[sleutelVan(r)];
+    if (graad === 'gemeten' && m) {
+      const k = m.waarom.replace(/\d+/g, 'N');
+      gronden[k] = (gronden[k] || 0) + 1;
+    }
   }
   const statussen = Object.keys(STATUSUITLEG).map(id => ({
     id, uitleg: STATUSUITLEG[id], aantal: (perStatus[id] || []).length,
@@ -264,10 +311,26 @@ function boek() {
       statusSom: statussen.reduce((n, x) => n + x.aantal, 0),
       statusSluit: statussen.reduce((n, x) => n + x.aantal, 0) === mutaties.length,
       nogNietGeclassificeerd: (perStatus.NOG_NIET_GECLASSIFICEERD || []).length,
+      /* ALLEEN VERKLAARDE ROUTES. Een gemeten BESCHERMD is een waarneming en
+         geen besluit; hem hier meetellen zou van 1016 waarnemingen 1016
+         besluiten maken. Zie de kop van scripts/lib/idemmeting.js. */
       metBesluitOverDuplicaat: metSemantiek,
       zonderBesluitOverDuplicaat: mutaties.length - metSemantiek,
       somVanDeBakken: som,
       sluit: som === alles.length
+    },
+    /* DE GROND ONDER ELKE STATUS. Zonder dit veld is niet te zien of een status
+       is opgeschreven of waargenomen, en dat is precies het verschil dat deze
+       uitslag moet dragen. */
+    bewijsgraad: {
+      metingGebruikt: METING.klaar,
+      metingReden: METING.reden,
+      metingGemetenOp: METING.gemetenOp || null,
+      perGraad: Object.keys(perGraad).sort().map(id => ({
+        id, aantal: perGraad[id].length, voorbeelden: perGraad[id].slice(0, 3)
+      })),
+      gemetenGronden: Object.entries(gronden).map(([reden, aantal]) => ({ reden, aantal }))
+        .sort((a, b) => b.aantal - a.aantal)
     },
     bakken,
     statussen,
@@ -327,6 +390,15 @@ function toon(u) {
   for (const b of u.bakken) console.log('    ' + String(b.aantal).padStart(5) + '  ' + b.id.padEnd(24) + b.uitleg.slice(0, 76));
   console.log('    ' + String(g.somVanDeBakken).padStart(5) + '  ' + 'SOM'.padEnd(24) +
     (g.sluit ? 'gelijk aan het totaal -- de boekhouding sluit' : 'WIJKT AF VAN HET TOTAAL (' + g.routesTotaal + ')'));
+  console.log('\n  DE GROND ONDER DE STATUS');
+  if (!u.bewijsgraad.metingGebruikt) {
+    console.log('    de meting is NIET gebruikt: ' + u.bewijsgraad.metingReden);
+    console.log('    herstel: npm run idemproef  (en daarna dit boek opnieuw)');
+  } else {
+    console.log('    ' + u.bewijsgraad.metingReden);
+  }
+  for (const g of u.bewijsgraad.perGraad) console.log('    ' + String(g.aantal).padStart(5) + '  ' + g.id);
+  for (const g of u.bewijsgraad.gemetenGronden) console.log('      ' + String(g.aantal).padStart(5) + '  ' + g.reden.slice(0, 90));
   console.log('\n  DE FORMELE STATUS VAN ELKE MUTATIE');
   for (const st of u.statussen) {
     console.log('    ' + String(st.aantal).padStart(5) + '  ' + st.id.padEnd(26) +

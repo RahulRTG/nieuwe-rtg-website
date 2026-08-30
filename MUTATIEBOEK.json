@@ -1,12 +1,12 @@
 {
  "stempel": {
-  "op": "2026-08-29T23:50:54.745Z",
-  "commit": "b81f58a5",
+  "op": "2026-08-30T08:50:17.569Z",
+  "commit": "da163d90",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Elke route van de router valt in precies een bak, met de reden waarom hij niet verder komt in de keten. De optelling van de bakken is gelijk aan het totaal; dat is de toets, en niet een van de getallen. Zie de kop van scripts/mutatieboek.js. Dit boek beoordeelt geen enkele route.",
- "vastgelegd": "2026-08-29",
+ "vastgelegd": "2026-08-30",
  "gemeten": {
   "routesTotaal": 4748,
   "mutaties": 4661,
@@ -22,6 +22,41 @@
   "zonderBesluitOverDuplicaat": 4477,
   "somVanDeBakken": 4748,
   "sluit": true
+ },
+ "bewijsgraad": {
+  "metingGebruikt": false,
+  "metingReden": "de meting is gemaakt met ongecommit werk in de boom (commit b81f58a5); zij hoort bij een stand die nergens is vastgelegd",
+  "metingGemetenOp": "2026-08-29T23:47:40.620Z",
+  "perGraad": [
+   {
+    "id": "afgeleid",
+    "aantal": 873,
+    "voorbeelden": [
+     "POST /api/boardroom/reset",
+     "POST /api/office/boardroom/alles",
+     "POST /api/office/boardroom/fase"
+    ]
+   },
+   {
+    "id": "onbekend",
+    "aantal": 3604,
+    "voorbeelden": [
+     "POST /api/aandacht",
+     "POST /api/aanmelding/beslis",
+     "POST /api/aanmelding/betalingen"
+    ]
+   },
+   {
+    "id": "verklaard",
+    "aantal": 184,
+    "voorbeelden": [
+     "POST /api/office/bank/terugstorting",
+     "POST /api/foundation/kosten",
+     "POST /api/reis/uitnodiging/open"
+    ]
+   }
+  ],
+  "gemetenGronden": []
  },
  "bakken": [
   {

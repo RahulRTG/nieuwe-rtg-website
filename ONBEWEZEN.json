@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit a74e18e3, schone boom",
+  "metingReden": "gemeten op commit 196cf7db, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:51:07.275Z",
-    "commit": "a74e18e3",
+    "op": "2026-08-30T11:57:48.143Z",
+    "commit": "196cf7db",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit a74e18e3, schone boom"
+    "metingReden": "gemeten op commit 196cf7db, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1490,
-    "onbewezen": 3171,
+    "metBewijs": 1491,
+    "onbewezen": 3170,
     "sluit": true
   },
   "bakken": [
@@ -35,25 +35,36 @@
       ]
     },
     {
+      "id": "WACHT_OP_OBJECT",
+      "uitleg": "het pad draagt een :parameter -- de sleutel is er, het OBJECT waar hij naar wijst niet",
+      "aantal": 10,
+      "voorbeelden": [
+        "POST /api/cluster/:actie",
+        "DELETE /api/scim/v2/Groups/:id",
+        "PATCH /api/scim/v2/Groups/:id",
+        "PUT /api/scim/v2/Groups/:id"
+      ]
+    },
+    {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 38,
+      "aantal": 21,
       "voorbeelden": [
-        "POST /api/aanmeld/zeg",
         "POST /api/arrival/pass",
         "POST /api/arrival/pulse",
-        "POST /api/auth/reset"
+        "POST /api/betaal/webhook/adyen",
+        "POST /api/code/dyn"
       ]
     },
     {
       "id": "FIXTURE_401",
       "uitleg": "de eerste oproep gaf 401 -- er is een authenticatiefixture nodig",
-      "aantal": 9,
+      "aantal": 13,
       "voorbeelden": [
         "POST /api/auth/login",
+        "POST /api/office/login",
         "POST /api/rtfos/blauwdrukken",
-        "POST /api/rtfos/campagnes",
-        "POST /api/rtfos/inkoop"
+        "POST /api/rtfos/campagnes"
       ]
     },
     {
@@ -70,12 +81,12 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1631,
+      "aantal": 1632,
       "voorbeelden": [
         "POST /api/aandacht",
+        "POST /api/aanmeld/zeg",
         "POST /api/aanmelding/beslis",
-        "POST /api/aanmelding/bewijs",
-        "POST /api/aanmelding/bewijs/stand"
+        "POST /api/aanmelding/bewijs"
       ]
     },
     {
@@ -92,7 +103,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 511,
+      "aantal": 513,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -142,10 +153,8 @@
     {
       "id": "ECHT_DEFECT",
       "uitleg": "fixture klopt, effect treedt op, en een herhaling doet het werk gewoon nog een keer",
-      "aantal": 1,
-      "voorbeelden": [
-        "POST /api/bank/terugkerend/stop"
-      ]
+      "aantal": 0,
+      "voorbeelden": []
     }
   ],
   "perRoute": {
@@ -180,13 +189,22 @@
       "POST /api/techniek/wacht/quarantaine",
       "POST /api/techniek/zekering"
     ],
+    "WACHT_OP_OBJECT": [
+      "POST /api/cluster/:actie",
+      "DELETE /api/scim/v2/Groups/:id",
+      "PATCH /api/scim/v2/Groups/:id",
+      "PUT /api/scim/v2/Groups/:id",
+      "DELETE /api/scim/v2/Users/:id",
+      "PATCH /api/scim/v2/Users/:id",
+      "PUT /api/scim/v2/Users/:id",
+      "DELETE /api/techniek/sso/:org",
+      "DELETE /api/techniek/sso/scimsleutel/:org",
+      "POST /api/theater/upload/:id"
+    ],
     "GEEN_PROEFSLEUTEL": [
-      "POST /api/aanmeld/zeg",
       "POST /api/arrival/pass",
       "POST /api/arrival/pulse",
-      "POST /api/auth/reset",
       "POST /api/betaal/webhook/adyen",
-      "POST /api/cluster/:actie",
       "POST /api/code/dyn",
       "POST /api/code/scan",
       "POST /api/doos/buurmelding",
@@ -198,30 +216,17 @@
       "POST /api/foundation/reis/aanvraag",
       "POST /api/link/koppelingen",
       "POST /api/link/los",
-      "POST /api/login",
-      "POST /api/office/login",
       "POST /api/partner/applications/mijn",
       "POST /api/partner/apply",
       "POST /api/partner/types",
-      "DELETE /api/scim/v2/Groups/:id",
-      "PATCH /api/scim/v2/Groups/:id",
-      "PUT /api/scim/v2/Groups/:id",
-      "DELETE /api/scim/v2/Users/:id",
-      "PATCH /api/scim/v2/Users/:id",
-      "PUT /api/scim/v2/Users/:id",
       "POST /api/sonde/melding",
       "POST /api/sso/wissel",
       "POST /api/staff",
-      "POST /api/supplier/login",
-      "POST /api/supplier/mijn/login",
-      "POST /api/techniek/inloggen",
-      "DELETE /api/techniek/sso/:org",
-      "DELETE /api/techniek/sso/scimsleutel/:org",
-      "POST /api/theater/upload/:id",
       "POST /api/toestel/meting"
     ],
     "FIXTURE_401": [
       "POST /api/auth/login",
+      "POST /api/office/login",
       "POST /api/rtfos/blauwdrukken",
       "POST /api/rtfos/campagnes",
       "POST /api/rtfos/inkoop",
@@ -229,7 +234,10 @@
       "POST /api/rtfos/koppelbord",
       "POST /api/rtfos/melding/maak",
       "POST /api/stad/doos/hartslag",
-      "POST /api/stad/doos/meting"
+      "POST /api/stad/doos/meting",
+      "POST /api/supplier/login",
+      "POST /api/supplier/mijn/login",
+      "POST /api/techniek/inloggen"
     ],
     "FIXTURE_403": [
       "POST /api/account/koppel",
@@ -956,6 +964,7 @@
     ],
     "FIXTURE_404": [
       "POST /api/aandacht",
+      "POST /api/aanmeld/zeg",
       "POST /api/aanmelding/beslis",
       "POST /api/aanmelding/bewijs",
       "POST /api/aanmelding/bewijs/stand",
@@ -2763,6 +2772,7 @@
       "POST /api/appstore/koop",
       "POST /api/arrival/request",
       "POST /api/auth/register",
+      "POST /api/auth/reset",
       "POST /api/auth/verify-email",
       "POST /api/avond/voorkeuren/zaak",
       "POST /api/avond/voorstel",
@@ -2893,6 +2903,7 @@
       "POST /api/les/maak",
       "POST /api/leven/band/vraag",
       "POST /api/leven/deel/zet",
+      "POST /api/login",
       "POST /api/mail/binnen",
       "POST /api/mail/ses",
       "POST /api/mall/aanvraag",
@@ -3341,8 +3352,6 @@
     "STAAT_NIET_ZICHTBAAR": [],
     "BIJWERKING_ALLEEN": [],
     "SEMANTIEK_NODIG": [],
-    "ECHT_DEFECT": [
-      "POST /api/bank/terugkerend/stop"
-    ]
+    "ECHT_DEFECT": []
   }
 }

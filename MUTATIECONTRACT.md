@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **576** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **561** |
 | `NOT_APPLICABLE` | 40 | 868 |
-| geclassificeerd | 3.069 | 4.077 van 4.653 |
+| geclassificeerd | 3.069 | 4.092 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -462,6 +462,39 @@ klasse bevat ongeveer de helft geen enkele aanroep met `(req, res)` — die hebb
 werkelijk geen poort. Dat is geen gebrek in de meting maar een eigenschap van die
 routes, en de vraag die overblijft (is dit een bewuste publieke deur of een gat?)
 is er een die een mens beantwoordt, per route, met een reden.
+
+## 5f. Eerst repareren, dan classificeren
+
+De kale ronde vond **116 routes** waar een woordelijk gelijke herhaling zónder
+sleutel het werk gewoon opnieuw deed. Dat is geen classificatievraag maar een
+bevinding: een dubbeltik op een trage verbinding maakte daar een tweede project,
+een tweede leerling, een tweede werkruimte, een tweede bankpas.
+
+Van zestien is de handler nagelezen — de handler, niet de naam, want dat is de
+fout waar `/api/muziek/maak` in `idemsleutels.js` het litteken van draagt. Bij elk
+stond er een veld in de body dat bepaalt wát er ontstaat, dus is een tweede
+identiek verzoek binnen het dubbeltikvenster een dubbeltik en geen tweede
+bedoeling. De verklaringen staan in `server/lib/idemsleutels-kaleronde.js`, met
+per regel het veld dat de identiteit draagt.
+
+**De volgorde is hier het punt.** `PROTECTED` betekent "een herhaling doet het
+werk niet nog een keer — vastgesteld, niet aangenomen". Dat etiket mag er dus pas
+op als de meting het laat zien. Dus eerst de verklaring, dan de proef opnieuw
+(zestien van de zestien gemeten als `beschermd`), en pas daarna het contract in
+`server/lib/mutatiecontracten-kaleronde.js`.
+
+Twee routes staan er bewust níét in. `/api/foundation/les/maak` is wél
+gerepareerd en meet ook als beschermd, maar heeft geen waargenomen
+toegangsklasse — een contract zonder deur bestaat niet.
+`/api/supplier/bezorg/overzicht` meet als beschermd zonder dat zijn handler is
+gelezen; die hoort er niet bij, want dan zou de aftekening niet kloppen.
+
+| | voor | na |
+|---|---:|---:|
+| dubbeltik opgevangen | 33 | **43** |
+| dubbeltik deed het werk opnieuw | 148 | 132 |
+| `PROTECTED` | 24 | **39** |
+| `LEGACY_PENDING_CLASSIFICATION` | 576 | **561** |
 
 ## 6. De poort
 

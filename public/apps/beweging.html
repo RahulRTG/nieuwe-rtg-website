@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Beweging · proefblad</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/beweging.css" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#fff;color:#0C0C0B;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  .uitleg{max-width:52ch;margin:0 auto;padding:14vh 24px;}
+  .uitleg p{color:#4D4A45;line-height:1.65;margin-top:14px;}
+  .uitleg h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;font-size:clamp(28px,5vw,54px);line-height:1.05;}
+  .stand{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8A8680;margin-top:28px;}
+</style>
+</head>
+<body>
+
+<!-- HET PROEFBLAD, en niet een pagina die iets verkoopt. Dit scherm bestaat om
+     de bewegingslaag te KUNNEN ZIEN: elke soort uit het register een keer, met
+     de vlakken als beeld zodat er geen beeldmateriaal aan hangt dat er nog niet
+     is. Wie een scene toevoegt aan het register, zet hem hier ook neer --
+     anders is de eerste keer dat iemand hem ziet in productie. -->
+
+<div class="uitleg">
+  <h1>Beweging, als laag.</h1>
+  <p>Hieronder staat elke bewegingsvorm die het register kent, opgebouwd uit
+     één configuratie. De pagina eronder is data en geen animatiecode.</p>
+  <p class="stand" id="stand">stand wordt gemeten…</p>
+</div>
+
+<main id="blad"></main>
+
+<div class="uitleg">
+  <p class="stand">einde van het proefblad</p>
+</div>
+
+<script src="/shared/beweging.js"></script>
+<script src="/shared/beweging/motor.js"></script>
+<script src="/shared/beweging/blad.js"></script>
+<script>
+(function () {
+  /* Vlakken in plaats van foto's: het proefblad meet beweging en niet beeld. */
+  function vlak(kleur, tekst) {
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">' +
+      '<rect width="1200" height="800" fill="' + kleur + '"/>' +
+      '<text x="60" y="740" font-family="Inter,sans-serif" font-size="34" fill="#ffffff" opacity=".7">' +
+      tekst + '</text></svg>');
+  }
+
+  var pagina = [
+    { soort: 'hero', bovenschrift: 'RTG Beweging', titel: 'Eén motor, één getal.',
+      tekst: 'Scrollpositie wordt voortgang, en voortgang bestuurt alles.',
+      beeld: vlak('#0C0C0B', 'hero') },
+    { soort: 'split', bovenschrift: 'split', titel: 'Tekst staat, beeld komt binnen.',
+      tekst: 'Dezelfde declaratie geeft op een telefoon een kleinere uitslag; ' +
+             'de scene is niet twee keer geschreven.',
+      beeld: vlak('#7F1634', 'split') },
+    { soort: 'onthulling', bovenschrift: 'onthulling', titel: 'Uit een snede.',
+      tekst: 'Een strakke snede en geen gordijn met ronde hoeken.',
+      beeld: vlak('#4D4A45', 'onthulling') },
+    { soort: 'toestel', bovenschrift: 'toestel', titel: 'Het product draait naar u toe.',
+      tekst: 'Diepte uit perspectief en schaduw.',
+      beeld: vlak('#857007', 'toestel') },
+    { soort: 'tekstwissel', bovenschrift: 'tekstwissel', titel: 'Eén platform.',
+      tweedeTitel: 'Alles verbonden.',
+      tekst: 'De eerste boodschap gaat weg omdat de tweede haar overneemt — ' +
+             'en dat staat in de declaratie, anders zakt de keuring.',
+      beeld: vlak('#9E1C40', 'tekstwissel') },
+    { soort: 'volscherm', bovenschrift: 'volscherm', titel: 'Beeldvullend.',
+      tekst: 'De rustigste vorm: hier doet het beeld het werk.',
+      beeld: vlak('#0C0C0B', 'volscherm') }
+  ];
+
+  RTGBewegingBlad.bouw(document.getElementById('blad'), pagina);
+
+  var s = RTGBeweging.stand();
+  document.getElementById('stand').textContent =
+    s.scenes + ' scenes · vorm ' + s.omgeving.vorm +
+    (s.omgeving.rustig ? ' · rustige weergave (beweging staat uit)' : '');
+})();
+</script>
+</body>
+</html>

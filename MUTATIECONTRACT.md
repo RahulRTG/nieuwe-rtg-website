@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **492** |
-| `NOT_APPLICABLE` | 40 | 868 |
-| geclassificeerd | 3.069 | 4.161 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **452** |
+| `NOT_APPLICABLE` | 40 | 865 |
+| geclassificeerd | 3.069 | 4.201 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -528,6 +528,56 @@ in plaats van een lege string te dragen.
 | `PROTECTED` | 24 | **78** |
 | `INTENTIONALLY_NON_IDEMPOTENT` | 32 | **62** |
 | `LEGACY_PENDING_CLASSIFICATION` | 576 | **492** |
+
+### Drie soorten blindheid, en de derde was de sluipendste
+
+De bak "geen deur" leverde over drie rondes drie structurele oorzaken op, elk met
+een ander soort blindheid:
+
+| | wat de detectie niet zag |
+|---|---|
+| namespace | `sctx.lidVan(req, res)` — de naam die telt staat ná de punt |
+| omhulling | `(req, res) => metPartner(req, res, p => …)` — de handler heeft geen eigen lichaam |
+| **lus** | `app.post('/api/rtf/spel/' + naam, …)` — het **pad staat niet in de brontekst** |
+
+Die laatste kostte 43 routes. De poort was er wel degelijk (`rtfSpeler`, en die
+stond al in het register), maar geen enkele lezer die de brontekst op routepaden
+afzoekt vindt een route waarvan het pad een expressie is. In het register stond
+"geen deur" bij routes die er een hebben.
+
+`FAMILIES` in `server/kern/handlerpoorten/index.js` beschrijft zo'n lus: een
+voorvoegsel plus de poort die hij aanroept, met het bestand en de regel erbij —
+want dat is waar een volgende lezer moet kijken als de lus verandert. Het is
+uitdrukkelijk *geen* raadpartij: de lus staat op één plek, roept één poort aan, en
+elke route die eruit komt loopt er langs. Voor een voorvoegsel met verschillende
+poorten eronder is het onbruikbaar, en dat staat er ook zo.
+
+**Het voorvoegsel staat er in segmenten** (`['api', 'rtf', 'spel']`) en niet als
+pad. Twee keuringsregels lezen elk `'/api/…'` in `server/` als een *registratie*
+van die route — terecht, want zo vind je een pad dat twee keer wordt aangemaakt.
+Een lijst die routes beschrijft ziet er voor die regels precies zo uit als een
+lijst die ze aanmaakt, en ging er meteen op af. Segmenten maken het verschil
+zichtbaar in de code zelf.
+
+### En een fout van mijn eigen makelij
+
+`scripts/effectcontracten.js` sloeg routes over die al een contract hadden, en las
+daarvoor een **hardgecodeerde lijst van vier zijbestanden**. Toen er drie
+bijkwamen, groeide die lijst niet mee: het script schreef generieke contracten
+over routes die inmiddels met de hand waren gelezen.
+
+De overschrijfcontrole in `mutatiecontracten.js` gooide daarop — precies waarvoor
+zij is gemaakt. Maar een controle die achteraf gooit is de *tweede* verdediging;
+de eerste is dat zo'n lijst niet kán achterlopen. Hij wordt nu **gevonden in
+plaats van getypt** (met een ondergrens die stopt als er te weinig ligt), en het
+aantal overgeslagen contracten sprong van 96 naar 180 — precies de contracten die
+het script overheen wilde schrijven.
+
+| | voor | na |
+|---|---:|---:|
+| toegang niet af te leiden | 96 | **53** |
+| `LEGACY_PENDING_CLASSIFICATION` | 492 | **452** |
+| geclassificeerd | 4.161 | **4.201 van 4.653** |
 
 ## 6. De poort
 

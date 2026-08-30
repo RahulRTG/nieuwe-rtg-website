@@ -222,6 +222,12 @@ function waargenomenToegang(r) {
     /* Geen deur in de router: staat hij in de handler? */
     const p = uitHandler.get(String(r.methode || 'POST').toUpperCase() + ' ' + r.pad);
     if (p && p.toegang) return p.toegang;
+    /* EN DE LUSSEN. Een route die in een for-lus wordt aangemaakt heeft geen
+       routeliteral in de brontekst, dus de lezer hierboven vindt hem niet -- ook
+       al roept die lus wel degelijk een poort aan. Zie FAMILIES in
+       server/kern/handlerpoorten/index.js: 43 routes stonden er zonder deur door. */
+    const fam = handlerpoorten.poortVanRoute(r.pad);
+    if (fam && fam.toegang) return fam.toegang;
     return publiekOfNiets(r);
   }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
@@ -524,7 +530,7 @@ if (process.argv.includes('--afleiden')) {
        dus die reist mee in plaats van dat er hier een nieuwe wordt bedacht. */
     if (toeg === 'PUBLIC') toegang.waarom = PUBLIEK.get(r.route.replace(/^\S+ /, '')) || null;
     if (toeg === 'OBJECT_SCOPED') {
-      const p = uitHandler.get(r.route);
+      const p = uitHandler.get(r.route) || handlerpoorten.poortVanRoute(r.pad);
       toegang.objectVeld = (p && p.veld) || 'nog af te leiden uit de handler';
     }
     uitContracten[r.route] = {

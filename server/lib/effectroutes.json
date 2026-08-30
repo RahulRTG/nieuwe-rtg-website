@@ -1,7 +1,7 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 828,
+ "aantal": 825,
  "zonderWaargenomenDeur": 20,
  "routes": [
   {
@@ -644,6 +644,12 @@
    "objectVeld": "code"
   },
   {
+   "route": "POST /api/foundation/markt/lijst",
+   "mutatieId": "foundation.markt.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "code"
+  },
+  {
    "route": "POST /api/foundation/markt/mijn",
    "mutatieId": "foundation.markt.mijn",
    "toegang": "OBJECT_SCOPED",
@@ -805,6 +811,12 @@
    "objectVeld": "code"
   },
   {
+   "route": "POST /api/foundation/school/rapport/lijst",
+   "mutatieId": "foundation.school.rapport.lijst",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "schoolCode"
+  },
+  {
    "route": "POST /api/foundation/school/rapport/mijn",
    "mutatieId": "foundation.school.rapport.mijn",
    "toegang": "OBJECT_SCOPED",
@@ -813,12 +825,6 @@
   {
    "route": "POST /api/foundation/school/rollen",
    "mutatieId": "foundation.school.rollen",
-   "toegang": "OBJECT_SCOPED",
-   "objectVeld": "schoolCode"
-  },
-  {
-   "route": "POST /api/foundation/school/school/overzicht",
-   "mutatieId": "foundation.school.school.overzicht",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "schoolCode"
   },
@@ -1193,11 +1199,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/mall/reis",
-   "mutatieId": "mall.reis",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/mall/reis/catalogus",
    "mutatieId": "mall.reis.catalogus",
    "toegang": "AUTHENTICATED"
@@ -1220,6 +1221,11 @@
   {
    "route": "POST /api/mall/rtf/mijn",
    "mutatieId": "mall.rtf.mijn",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/mall/wijzigingen",
+   "mutatieId": "mall.wijzigingen",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -1330,6 +1336,11 @@
   {
    "route": "POST /api/member/bureau/beveiliging",
    "mutatieId": "member.bureau.beveiliging",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/member/bureau/briefing",
+   "mutatieId": "member.bureau.briefing",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -1648,11 +1659,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/member/rtmail/instellingen",
-   "mutatieId": "member.rtmail.instellingen",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/member/rtmail/journaal",
    "mutatieId": "member.rtmail.journaal",
    "toegang": "AUTHENTICATED"
@@ -1765,11 +1771,6 @@
   {
    "route": "POST /api/member/sport/plattegrond",
    "mutatieId": "member.sport.plattegrond",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/member/sport/sponsors",
-   "mutatieId": "member.sport.sponsors",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -2669,11 +2670,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/office/weefsel/simulaties",
-   "mutatieId": "office.weefsel.simulaties",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/office/weefsel/sociaalgrenzen",
    "mutatieId": "office.weefsel.sociaalgrenzen",
    "toegang": "AUTHENTICATED"
@@ -2819,11 +2815,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/overheid/kvk/mijn",
-   "mutatieId": "overheid.kvk.mijn",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/overheid/rijbewijs",
    "mutatieId": "overheid.rijbewijs",
    "toegang": "AUTHENTICATED"
@@ -2938,6 +2929,11 @@
   {
    "route": "POST /api/podium/mijn",
    "mutatieId": "podium.mijn",
+   "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/podium/weg",
+   "mutatieId": "podium.weg",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -3297,6 +3293,11 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/supplier/agent",
+   "mutatieId": "supplier.agent",
+   "toegang": "AUTHENTICATED"
+  },
+  {
    "route": "POST /api/supplier/btw/aangiftes",
    "mutatieId": "supplier.btw.aangiftes",
    "toegang": "AUTHENTICATED"
@@ -3637,11 +3638,6 @@
    "toegang": "AUTHENTICATED"
   },
   {
-   "route": "POST /api/supplier/retail/bon",
-   "mutatieId": "supplier.retail.bon",
-   "toegang": "AUTHENTICATED"
-  },
-  {
    "route": "POST /api/supplier/retour/lijst",
    "mutatieId": "supplier.retour.lijst",
    "toegang": "AUTHENTICATED"
@@ -3744,11 +3740,6 @@
   {
    "route": "POST /api/supplier/shift",
    "mutatieId": "supplier.shift",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/supplier/site/ai",
-   "mutatieId": "supplier.site.ai",
    "toegang": "AUTHENTICATED"
   },
   {
@@ -4142,11 +4133,6 @@
   {
    "route": "POST /api/wereld/introductie",
    "mutatieId": "wereld.introductie",
-   "toegang": "AUTHENTICATED"
-  },
-  {
-   "route": "POST /api/wereld/profiel",
-   "mutatieId": "wereld.profiel",
    "toegang": "AUTHENTICATED"
   },
   {

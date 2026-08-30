@@ -91,6 +91,56 @@ const NIET_IN = {
   lidVan: ['server/kern/agenda-pro.js']
 };
 
+/* ---------------------------------------------------------------------------
+   DE GEGENEREERDE FAMILIES.
+
+   Een handvol routes wordt in een LUS aangemaakt: `app.post('/api/rtf/spel/' +
+   naam, ...)`. Het pad is daar een expressie, dus geen enkele lezer die de
+   brontekst afzoekt op routeliterals vindt ze -- en dan staat er in het register
+   "geen deur" bij een route die er wel degelijk een heeft. Drieenveertig routes
+   stonden zo op LEGACY.
+
+   Een familie is een VOORVOEGSEL plus de poort die de lus aanroept, en dat is
+   iets anders dan een raadpartij: de lus staat op EEN plek, roept EEN poort aan,
+   en elke route die eruit komt loopt er langs. Wie er een toevoegt, schrijft het
+   bestand en de regel erbij -- dat is waar een volgende lezer moet kijken als de
+   lus verandert.
+
+   NIET GEBRUIKEN voor een voorvoegsel waar routes met VERSCHILLENDE poorten
+   onder hangen. Dan is het geen familie maar een gok, en een verkeerde
+   toegangsklasse is erger dan geen.
+   ------------------------------------------------------------------------- */
+/* HET VOORVOEGSEL STAAT IN SEGMENTEN EN NIET ALS PAD, en dat is geen gril.
+
+   Twee keuringsregels lezen elk `'/api/...'` in server/ als een REGISTRATIE van
+   die route, en terecht: dat is hoe je vindt dat een pad twee keer wordt
+   aangemaakt, of dat er een wordt opgebouwd waar de schakelkast niets van weet.
+   Een lijst die routes BESCHRIJFT ziet er voor die regels precies zo uit als een
+   lijst die ze aanmaakt. Zo geschreven ging deze lijst er ook meteen op af.
+
+   Segmenten maken het verschil zichtbaar in de code zelf: dit is een voorvoegsel
+   om op te vergelijken, geen pad om op te hangen. */
+const FAMILIES = [
+  { segmenten: ['api', 'rtf', 'spel'], poort: 'rtfSpeler',
+    bron: 'server/routes/spellen.js regel 139: een lus over ACTIES hangt elke actie onder dat ' +
+      'voorvoegsel op, en alle krijgen dezelfde poort' }
+];
+
+const voorvoegselVan = (f) => '/' + f.segmenten.join('/') + '/';
+
+/* De poort van een route die uit een lus komt, of null. */
+function poortVanRoute(pad) {
+  const p = String(pad || '');
+  for (const f of FAMILIES) {
+    if (!p.startsWith(voorvoegselVan(f))) continue;
+    const poort = POORTEN[f.poort];
+    if (!poort) throw new Error('handlerpoorten: familie ' + voorvoegselVan(f) + ' noemt poort "' +
+      f.poort + '" die niet in de lijst staat');
+    return poort;
+  }
+  return null;
+}
+
 /* De poort achter een naam, of null. `bestand` is het pad vanaf de wortel van
    het project en dient alleen om de homoniemen uit te sluiten. */
 function poortVan(bestand, naam) {
@@ -100,4 +150,4 @@ function poortVan(bestand, naam) {
   return POORTEN[n] || null;
 }
 
-module.exports = { POORTEN, poortVan, NIET_IN };
+module.exports = { POORTEN, poortVan, poortVanRoute, NIET_IN, FAMILIES };

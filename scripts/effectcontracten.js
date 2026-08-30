@@ -68,12 +68,24 @@ const bestaand = (() => {
      recht te zetten, krijgt de fout in plaats van de reparatie. Gemeten met een
      mutatieproef: de generator liep vast op zijn eigen uitvoer.
 
-     Hier staan de vier bestanden dus met naam. Ze staan ook in
-     server/lib/mutatiecontracten.js; die tweede plek is bewust en de toets
-     test/mutatiecontract.test.js houdt ze gelijk. */
-  const DELEN = ['beschermd', 'leest', 'tweedehandeling', 'padparameter'];
-  const c = Object.assign({}, ...DELEN.map(d =>
-    require(path.join(WORTEL, 'server/lib/mutatiecontracten-' + d + '.js')).CONTRACTEN));
+     DE LIJST WORDT GEVONDEN EN NIET GETYPT, en dat is met een fout geleerd. Hij
+     stond hier als vier namen; toen er drie zijbestanden bij kwamen, groeide hij
+     niet mee. Dit script schreef daarop contracten voor routes die inmiddels met
+     de hand waren gelezen -- en de overschrijfcontrole in mutatiecontracten.js
+     ving dat, precies waarvoor zij is gemaakt. Maar een controle die achteraf
+     gooit is de tweede verdediging; de eerste is dat de lijst niet kan
+     achterlopen. Vandaar: lezen wat er ligt. */
+  const map = path.join(WORTEL, 'server/lib');
+  const delen = fs.readdirSync(map)
+    .filter(n => /^mutatiecontracten-.+\.js$/.test(n) && n !== 'mutatiecontracten-effect.js');
+  if (delen.length < 4) {
+    console.error('server/lib draagt maar ' + delen.length + ' contractbestanden; dat kan niet kloppen.');
+    process.exit(2);
+  }
+  const c = Object.assign({}, ...delen.map(n => {
+    const m = require(path.join(map, n));
+    return m.CONTRACTEN || m;
+  }));
   const s = new Set(Object.keys(c));
   if (s.size < 50) {
     console.error('server/lib/mutatiecontracten.js leverde ' + s.size + ' contracten op; dat kan niet kloppen.');

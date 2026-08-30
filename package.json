@@ -184,6 +184,8 @@
     "mutatieboek": "node scripts/mutatieboek.js",
     "mutatieboek:vast": "node scripts/mutatieboek.js --vastleggen",
     "handlerwacht": "node scripts/handlerwacht.js",
+    "onbewezen": "node scripts/onbewezen.js",
+    "onbewezen:vast": "node scripts/onbewezen.js --vastleggen",
     "handlerwacht:vast": "node scripts/handlerwacht.js --vastleggen",
     "handelingproef": "node scripts/handelingproef-route.js",
     "meetronde": "node scripts/meetronde.js",

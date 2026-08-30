@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T03:42:36.149Z",
-  "commit": "aeff560e",
+  "op": "2026-08-30T03:48:01.936Z",
+  "commit": "7ad51ff1",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,21 +9,21 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4073,
+  "geclassificeerd": 4077,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3149,
-   "LEGACY_PENDING_CLASSIFICATION": 580,
+   "BLOCKED_BY_TEST_FIXTURE": 3153,
+   "LEGACY_PENDING_CLASSIFICATION": 576,
    "NOT_APPLICABLE": 868,
    "PROTECTED": 24,
    "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
   "vastgesteldDoorMens": 934,
-  "afgeleidDoorScript": 3139,
+  "afgeleidDoorScript": 3143,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
    "PUBLIC": 99,
-   "(niet af te leiden -- vraagt een verklaring)": 102,
-   "OBJECT_SCOPED": 639,
+   "(niet af te leiden -- vraagt een verklaring)": 96,
+   "OBJECT_SCOPED": 645,
    "SERVICE_TO_SERVICE": 8,
    "SYSTEM_INTERNAL": 1
   },
@@ -34,7 +34,7 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 91,
+   "BLOCKED_BY_TEST_FIXTURE": 87,
    "NOT_APPLICABLE": 23,
    "PROTECTED": 6
   },
@@ -2846,7 +2846,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -4499,8 +4499,8 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
     "bedoeld": null,
     "bewakers": []
    },
@@ -5307,7 +5307,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: werkruimte",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -5331,8 +5331,8 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
     "bedoeld": null,
     "bewakers": []
    },
@@ -5505,7 +5505,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: werkruimte",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -5532,7 +5532,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: werkruimte",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -25047,7 +25047,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -25155,7 +25155,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -25552,7 +25552,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -75620,7 +75620,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
-    "uitHandler": null,
+    "uitHandler": "object: code",
     "bedoeld": null,
     "bewakers": [
      "mw",
@@ -75646,7 +75646,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
-    "uitHandler": null,
+    "uitHandler": "object: code",
     "bedoeld": null,
     "bewakers": [
      "mw",
@@ -75700,7 +75700,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": null,
-    "uitHandler": null,
+    "uitHandler": "object: code",
     "bedoeld": null,
     "bewakers": [
      "mw",
@@ -98586,7 +98586,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "object: rekeningId",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -115553,12 +115553,14 @@
   {
    "mutatieId": "tenant.bootstrap",
    "route": "POST /api/tenant/bootstrap",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -115568,10 +115570,10 @@
     "grond": null,
     "hindernis": "Onbekende werkruimte of verkeerd lid-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende werkruimte of verkeerd lid-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "tenant.bootstrap.mijn",
@@ -115603,12 +115605,14 @@
   {
    "mutatieId": "tenant.export",
    "route": "POST /api/tenant/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -115618,20 +115622,22 @@
     "grond": null,
     "hindernis": "Onbekende werkruimte of verkeerd beheer-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "tenant.groep",
    "route": "POST /api/tenant/groep",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -115641,20 +115647,22 @@
     "grond": null,
     "hindernis": "Onbekende werkruimte of verkeerd beheer-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "tenant.groepen",
    "route": "POST /api/tenant/groepen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: werkruimte",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -115664,10 +115672,10 @@
     "grond": null,
     "hindernis": "Onbekende werkruimte of verkeerd beheer-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "tenant.herstelproef",

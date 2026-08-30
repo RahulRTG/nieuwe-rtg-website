@@ -64,6 +64,16 @@ const POORTEN = {
     wat: 'beheerToken van een werkruimte -- NIET kern/office/samen.js:beheerVan, die normaliseert velden' },
   'viaBeheerOfDirectie': { toegang: 'OBJECT_SCOPED', veld: 'werkruimte',
     wat: 'beheerToken van de werkruimte, of de directie erboven' },
+  /* DEZELFDE FUNCTIE, EEN ANDERE NAAM. rekening.js zet zijn rekVan op de
+     gedeelde kern als `kern.horecaRekVan`, en drie andere horecabestanden roepen
+     hem zo aan. Een register op NAAM ziet dat als een tweede poort; hij staat er
+     daarom met dezelfde omschrijving bij in plaats van dat de aanroepers hun
+     naam veranderen -- dat laatste is een verbouwing, dit is een register. */
+  'horecaRekVan': { toegang: 'OBJECT_SCOPED', veld: 'rekeningId',
+    wat: 'de rekening bij req.body.rekeningId binnen de eigen zaak; 404 als hij daar niet bestaat ' +
+      '(dezelfde functie als rekVan hieronder, via de gedeelde kern)' },
+  'metPartner': { toegang: 'OBJECT_SCOPED', veld: 'code',
+    wat: 'de raadpartner bij req.body.code (stadsraad.vindCode); 404 op een onbekende raadcode' },
   'rekVan': { toegang: 'OBJECT_SCOPED', veld: 'rekeningId',
     wat: 'de rekening bij rekeningId, binnen de eigen zaak' },
   'rekeningVan': { toegang: 'OBJECT_SCOPED', veld: 'rekeningId',

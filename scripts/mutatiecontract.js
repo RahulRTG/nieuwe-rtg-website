@@ -132,7 +132,19 @@ let meerdereTreffers = 0;
     /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*[;,]\s*(?:if\s*\(\s*!|\w)/,
     /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*;\s*if\s*\(\s*!/,
     /if\s*\(\s*!\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
-    /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/
+    /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
+    /* EEN POORT VIA EEN NAMESPACE. `const s = sctx.lidVan(req, res); if (!s) return;`
+       is dezelfde poort, alleen bereikt via het gedeelde contextobject. De naam
+       die telt is die NA de punt; de namespace zelf zegt niets. Gemeten: veertien
+       handlers, waarvan er dertien een poort noemen die het register al kent. */
+    /\w+\.(\w+)\s*\(\s*req\s*,\s*res[^)]*\)/,
+    /* EEN POORT DIE HET WERK OMHULT. `(req, res) => metPartner(req, res, p => ...)`:
+       de poort controleert eerst en roept dan het werk aan met wat hij vond. De
+       handler heeft geen eigen lichaam, dus geen van de vormen hierboven ziet
+       hem. Gemeten: 39 handlers, drie poorten -- en 36 daarvan zitten al achter
+       een bewaker op de router, dus dit levert er drie op. Weinig, maar een poort
+       die je niet ziet, belandt als "geen deur" in het register. */
+    /\)\s*=>\s*(?:\{\s*(?:return\s+)?)?(\w+)\s*\(\s*req\s*,\s*res\s*,/
   ];
   /* Het voorvoegsel waarmee dit bestand gemount is, afgeleid uit zijn EIGEN
      handlers die wel uniek matchen. Eén uitkomst of niets: twee verschillende

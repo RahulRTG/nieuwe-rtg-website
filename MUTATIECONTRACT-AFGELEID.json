@@ -1,14 +1,14 @@
 {
  "stempel": {
-  "op": "2026-08-30T03:42:29.656Z",
-  "commit": "aeff560e",
+  "op": "2026-08-30T03:47:55.401Z",
+  "commit": "7ad51ff1",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.",
  "grens": "Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar server/lib/mutatiecontracten.js -- een mens wint van een script.",
  "waardeloosVoor": "Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld op een hoop onder LEGACY.",
- "aantal": 3139,
+ "aantal": 3143,
  "contracten": {
   "POST /api/aandacht": {
    "mutatieId": "aandacht",
@@ -47812,6 +47812,74 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende werkruimte of verkeerd lid-token.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/tenant/bootstrap": {
+   "mutatieId": "tenant.bootstrap",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "werkruimte"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende werkruimte of verkeerd lid-token.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/tenant/export": {
+   "mutatieId": "tenant.export",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "werkruimte"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/tenant/groep": {
+   "mutatieId": "tenant.groep",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "werkruimte"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/tenant/groepen": {
+   "mutatieId": "tenant.groepen",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "OBJECT_SCOPED",
+    "objectVeld": "werkruimte"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende werkruimte of verkeerd beheer-token.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/tenant/herstelproef": {
    "mutatieId": "tenant.herstelproef",

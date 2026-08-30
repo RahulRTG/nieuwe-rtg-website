@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **580** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **576** |
 | `NOT_APPLICABLE` | 40 | 868 |
-| geclassificeerd | 3.069 | 4.073 van 4.653 |
+| geclassificeerd | 3.069 | 4.077 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -421,7 +421,7 @@ allebei de takken.
 
 | | voor | na |
 |---|---:|---:|
-| toegang niet af te leiden | 215 | **102** |
+| toegang niet af te leiden | 215 | **96** |
 | `PUBLIC` | 0 | 99 |
 
 ### Het montagepad hoeft niet geraden te worden
@@ -442,6 +442,26 @@ dubbelzinnig zijn. De afleiding kiest dus nooit tussen twee kandidaten — hij
 vindt er precies één of geen. De zeven die overblijven zijn bestanden waarvan het
 voorvoegsel niet uit hun eigen handlers volgt.
 
+
+### Waar de detectie ophoudt, en waarom dat hier is
+
+Twee laatste vormen erbij, allebei eerst gemeten: een poort via een **namespace**
+(`sctx.lidVan(req, res)` — de naam die telt staat na de punt) en een poort die het
+**werk omhult** (`(req, res) => metPartner(req, res, p => …)`, waarbij de handler
+geen eigen lichaam heeft). Samen tien routes, en dat is het eerlijke beeld: de
+eerste vormen leverden er honderden, deze tien.
+
+Ook toegevoegd: `horecaRekVan` als **alias**. `rekening.js` zet zijn `rekVan` op
+de gedeelde kern onder die naam, en drie andere horecabestanden roepen hem zo aan
+— een register op naam ziet dat als een tweede poort. Hij staat er met dezelfde
+omschrijving bij, in plaats van dat de aanroepers hun naam veranderen: dat laatste
+is een verbouwing, dit is een register.
+
+**Hierna is de deurloze bak geen detectieprobleem meer.** Van de routes zonder
+klasse bevat ongeveer de helft geen enkele aanroep met `(req, res)` — die hebben
+werkelijk geen poort. Dat is geen gebrek in de meting maar een eigenschap van die
+routes, en de vraag die overblijft (is dit een bewuste publieke deur of een gat?)
+is er een die een mens beantwoordt, per route, met een reden.
 
 ## 6. De poort
 

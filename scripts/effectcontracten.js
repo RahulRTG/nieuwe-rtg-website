@@ -113,6 +113,7 @@ let statisch = new Map();
 
 const leeg = (d) => !d || !Object.keys(d).length;
 const rijen = [];
+const aantekening = { tegenspraakGenegeerd: 0 };
 const afgewezen = { geenKaleRonde: 0, spoorInOpslag: 0, effectGeteld: 0, geenEffectmeter: 0, tegenspraak: 0, alVerklaard: 0 };
 
 for (const r of Object.values(proef.perRoute)) {
@@ -125,8 +126,14 @@ for (const r of Object.values(proef.perRoute)) {
   if (!z.opslag || !leeg(z.opslag.d) || !leeg(z.opslag.e)) { afgewezen.spoorInOpslag++; continue; }
   if (!z.effect || z.effect.d == null || z.effect.e == null) { afgewezen.geenEffectmeter++; continue; }
   if (z.effect.d !== 'geen' || z.effect.e !== 'geen') { afgewezen.effectGeteld++; continue; }
+  /* HET STATISCHE VETO WEEGT HIER NIET MEER, om dezelfde reden als in
+     scripts/mutatiecontract.js: deze routes hebben een METING van de
+     effectmeter, en die wint van een vorm. De analyse blijft staan waar zij
+     nog de enige is die het gat afdekt -- daar is zij hierboven al toegepast
+     doordat een route zonder effect-kop hier niet komt. Wat de effectmeter
+     NIET ziet, staat in elk contract met naam. */
   const sa = statisch.get(sleutel);
-  if (sa && sa.schrijft === 'ja') { afgewezen.tegenspraak++; continue; }
+  if (sa && sa.schrijft === 'ja') aantekening.tegenspraakGenegeerd++;
   rijen.push({ sleutel, pad: r.pad, methode: r.methode || 'POST',
     nietGemeten: z.effect.nietGemeten || 'onbekend' });
 }
@@ -229,3 +236,4 @@ fs.writeFileSync(path.join(WORTEL, 'server/lib/effectroutes.json'), JSON.stringi
 console.log('server/lib/effectroutes.json geschreven: ' + uitDeur.length + ' routes onder het besluit.');
 console.log('  zonder waargenomen deur, dus NIET meegenomen: ' + zonderDeur);
 console.log('afgewezen, en waarom: ' + JSON.stringify(afgewezen));
+console.log('statische tegenspraak genegeerd omdat de effectmeter mat: ' + aantekening.tegenspraakGenegeerd);

@@ -17,6 +17,13 @@
    andere een poort heeft. Dus woont hij hier, en lezen check.js en
    scripts/mutatiecontract.js hem allebei.
 
+   ELKE REDEN STAAT OP ZICHZELF, en `idem` bestaat hier niet meer. Elf regels
+   verwezen naar de regel erboven -- leesbaar zolang je de lijst van boven naar
+   beneden leest, en betekenisloos zodra hij ergens anders wordt gebruikt. Dat
+   gebeurde ook: het mutatiecontractregister neemt deze reden over in het contract
+   van die route, en daar stond toen "idem" onder een route waar niets boven
+   staat. Een reden die alleen klopt in volgorde, is geen reden.
+
    Het formaat is bewust een Map en geen object: de sleutel is een routepad en
    die kan alles bevatten, ook een naam die op een prototype-eigenschap lijkt.
    ========================================================================== */
@@ -199,8 +206,8 @@ const PUBLIEK = new Map([
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
     ['/api/gids/app', 'de app-gids is openbaar'],
     ['/api/krant/gids', 'de krant is openbaar; er is een toets die dat vastlegt'],
-    ['/api/krant/open', 'idem'],
-    ['/api/krant/artikel', 'idem'],
+    ['/api/krant/open', 'de krant is openbaar; er is een toets die dat vastlegt'],
+    ['/api/krant/artikel', 'de krant is openbaar; er is een toets die dat vastlegt'],
     ['/api/partner', 'het partnerkanaal is bedoeld voor niet-leden'],
     ['/api/partnertrips', 'idem: het aanbod van het partnerkanaal'],
     ['/api/book', 'idem: boeken via het partnerkanaal is de hele opzet'],
@@ -266,7 +273,7 @@ const PUBLIEK = new Map([
     ['/api/werkmail/bezorg', 'inkomende post van de mailserver, met een eigen venster-rem per minuut'],
     ['/api/mail/binnen', 'de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)'],
     ['/api/stad/doos/hartslag', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
-    ['/api/stad/doos/meting', 'idem'],
+    ['/api/stad/doos/meting', 'de stadsdoos stuurt zijn apparaatsleutel mee'],
     ['/api/rtgid/status', 'RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie'],
     ['/api/rtgid/wie', 'idem; de kluis geeft alleen attributen op een geldig idToken'],
     ['/api/vracht/volg', 'volgen op een meegestuurde vrachtcode, zoals elke track-and-trace'],
@@ -274,17 +281,21 @@ const PUBLIEK = new Map([
     // ---- gezondheid: moet juist bereikbaar zijn als de rest dat niet is ----
     ['/api/health', 'de gezondheidscheck'],
     ['/api/ready', 'de load balancer moet dit kunnen lezen terwijl de opslagpoort dicht staat'],
-    ['/api/pay/gezond', 'idem voor de betaallaag'],
+    ['/api/pay/gezond', 'de gezondheidscheck van de betaallaag: die moet juist bereikbaar zijn als de rest dat niet is'],
 
     // ---- de lesmaker: werkt op een meegestuurd profiel, niet op een sessie ----
     ['/api/les/maak', 'de lesmaker werkt op een meegestuurd profiel'],
-    ['/api/les/leraar', 'idem'], ['/api/les/apps', 'idem'], ['/api/les/volgende', 'idem'],
-    ['/api/les/sluit', 'idem'], ['/api/les/mee', 'idem'], ['/api/les/kijk', 'idem'],
-    ['/api/les/antwoord', 'idem'],
+    ['/api/les/leraar', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/apps', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/volgende', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/sluit', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/mee', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/kijk', 'de lesmaker werkt op een meegestuurd profiel'],
+    ['/api/les/antwoord', 'de lesmaker werkt op een meegestuurd profiel'],
 
     // ---- bestaan alleen in NODE_ENV=test ----
     ['/api/test/bug', 'alleen geregistreerd als NODE_ENV=test; bestaat in productie niet'],
-    ['/api/test/crash', 'idem']
+    ['/api/test/crash', 'alleen geregistreerd als NODE_ENV=test; bestaat in productie niet']
   ]);
 
 module.exports = { PUBLIEK };

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T08:46:41.926Z",
-  "commit": "81de76ab",
+  "op": "2026-08-30T09:11:52.381Z",
+  "commit": "84d74474",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4201,
+  "geclassificeerd": 4378,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3196,
-   "LEGACY_PENDING_CLASSIFICATION": 452,
-   "NOT_APPLICABLE": 865,
+   "NOT_APPLICABLE": 1042,
+   "LEGACY_PENDING_CLASSIFICATION": 275,
    "PROTECTED": 78,
    "INTENTIONALLY_NON_IDEMPOTENT": 62
   },
-  "vastgesteldDoorMens": 1015,
+  "vastgesteldDoorMens": 1192,
   "afgeleidDoorScript": 3186,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
@@ -35,7 +35,7 @@
   },
   "voorstellen": {
    "BLOCKED_BY_TEST_FIXTURE": 44,
-   "NOT_APPLICABLE": 22,
+   "NOT_APPLICABLE": 23,
    "PROTECTED": 7
   },
   "metingVan": "2026-08-30T04:33:05.678Z"
@@ -79,12 +79,14 @@
   {
    "mutatieId": "aanmeld.start",
    "route": "POST /api/aanmeld/start",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -94,10 +96,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/aanmeldgesprek.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "aanmeld.zeg",
@@ -578,12 +580,14 @@
   {
    "mutatieId": "adres.zoek",
    "route": "POST /api/adres/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "mw"
@@ -596,10 +600,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/adres.js bevat een schrijfvorm (via \"antwoord\" in /home/user/nieuwe-rtg-website/server/kern/adresopzoek.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "agenda.ai",
@@ -1034,12 +1038,14 @@
   {
    "mutatieId": "appstore.bon",
    "route": "POST /api/appstore/bon",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1051,20 +1057,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/kopen.js bevat een schrijfvorm (via \"landkeuze\" in /home/user/nieuwe-rtg-website/server/kern/fiscaal/digitaal.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.bonnen",
    "route": "POST /api/appstore/bonnen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1076,10 +1084,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/kopen.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.brug",
@@ -1543,12 +1551,14 @@
   {
    "mutatieId": "appstore.landen",
    "route": "POST /api/appstore/landen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1560,10 +1570,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/kopen.js bevat een schrijfvorm (via \"landkeuze\" in /home/user/nieuwe-rtg-website/server/kern/fiscaal/digitaal.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.mijn",
@@ -1649,12 +1659,14 @@
   {
    "mutatieId": "appstore.persoon",
    "route": "POST /api/appstore/persoon",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1666,10 +1678,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/persoon.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.persoon.aanvraag",
@@ -1836,12 +1848,14 @@
   {
    "mutatieId": "appstore.persoon.naslag",
    "route": "POST /api/appstore/persoon/naslag",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1853,10 +1867,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/persoon.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.persoon.omzet",
@@ -1888,12 +1902,14 @@
   {
    "mutatieId": "appstore.persoon.proef",
    "route": "POST /api/appstore/persoon/proef",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1905,20 +1921,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/persoon.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.tijdlijn",
    "route": "POST /api/appstore/tijdlijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -1930,10 +1948,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/appstore/lid.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "appstore.uitgever",
@@ -2613,12 +2631,14 @@
   {
    "mutatieId": "auth.forgot",
    "route": "POST /api/auth/forgot",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -2628,10 +2648,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/auth/herstel.js bevat een schrijfvorm (via \"herstelStart\" in /home/user/nieuwe-rtg-website/server/routes/auth/herstel.js schrijft: save(), netwerk uit). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "auth.login",
@@ -2923,12 +2943,14 @@
   {
    "mutatieId": "avond.pols",
    "route": "POST /api/avond/pols",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -2940,10 +2962,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/avond.js bevat een schrijfvorm (via \"pols\" in /home/user/nieuwe-rtg-website/server/kern/horeca/pols.js schrijft: save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "avond.voorkeuren",
@@ -4058,12 +4080,14 @@
   {
    "mutatieId": "bedrijf.beeld",
    "route": "POST /api/bedrijf/beeld",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4073,10 +4097,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/beeld.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.besluit.advies",
@@ -4331,12 +4355,14 @@
   {
    "mutatieId": "bedrijf.besluiten.zonder-koppeling",
    "route": "POST /api/bedrijf/besluiten/zonder-koppeling",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4346,10 +4372,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/geheugenlezen.js bevat een schrijfvorm (lijst-mutatie, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.contract.opzeggen",
@@ -4429,12 +4455,14 @@
   {
    "mutatieId": "bedrijf.contracten",
    "route": "POST /api/bedrijf/contracten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4444,20 +4472,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/contract.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.dagbeeld",
    "route": "POST /api/bedrijf/dagbeeld",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4467,10 +4497,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/gezondheid.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.dossier",
@@ -4500,12 +4530,14 @@
   {
    "mutatieId": "bedrijf.geconsolideerd",
    "route": "POST /api/bedrijf/geconsolideerd",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4515,10 +4547,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/beeld.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.gevolg",
@@ -4548,12 +4580,14 @@
   {
    "mutatieId": "bedrijf.gezondheid",
    "route": "POST /api/bedrijf/gezondheid",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4563,20 +4597,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/gezondheid.js bevat een schrijfvorm (Object.assign, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.handeling.bonnen",
    "route": "POST /api/bedrijf/handeling/bonnen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4586,10 +4622,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/handeling.js bevat een schrijfvorm (via \"B\" in /home/user/nieuwe-rtg-website/server/bedrijf/handeling.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.handeling.doe",
@@ -4819,12 +4855,14 @@
   {
    "mutatieId": "bedrijf.journaal",
    "route": "POST /api/bedrijf/journaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4834,10 +4872,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/rollen.js bevat een schrijfvorm (via \"werkPoort\" in /home/user/nieuwe-rtg-website/server/bedrijf/rollen.js schrijft: save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.kans.fase",
@@ -4892,12 +4930,14 @@
   {
    "mutatieId": "bedrijf.kennis.controlelijst",
    "route": "POST /api/bedrijf/kennis/controlelijst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4907,10 +4947,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/kennis.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.kennis.lees",
@@ -4990,12 +5030,14 @@
   {
    "mutatieId": "bedrijf.kennis.zoek",
    "route": "POST /api/bedrijf/kennis/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5005,10 +5047,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/kennis.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.keur",
@@ -5063,12 +5105,14 @@
   {
    "mutatieId": "bedrijf.klant",
    "route": "POST /api/bedrijf/klant",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5078,10 +5122,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/klant.js bevat een schrijfvorm (via \"K\" in /home/user/nieuwe-rtg-website/server/bedrijf/klant.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.klant.product",
@@ -5236,12 +5280,14 @@
   {
    "mutatieId": "bedrijf.licenties",
    "route": "POST /api/bedrijf/licenties",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5251,10 +5297,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/it.js bevat een schrijfvorm (via \"L\" in /home/user/nieuwe-rtg-website/server/bedrijf/it.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.lid.aanmeld",
@@ -5409,12 +5455,14 @@
   {
    "mutatieId": "bedrijf.mijn",
    "route": "POST /api/bedrijf/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -5426,10 +5474,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/mijn.js bevat een schrijfvorm (save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.mijn-rechten",
@@ -5484,12 +5532,14 @@
   {
    "mutatieId": "bedrijf.pijplijn",
    "route": "POST /api/bedrijf/pijplijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5499,10 +5549,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/klant.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.post.context",
@@ -5588,12 +5638,14 @@
   {
    "mutatieId": "bedrijf.project",
    "route": "POST /api/bedrijf/project",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5603,10 +5655,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/project.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.project.maak",
@@ -5786,12 +5838,14 @@
   {
    "mutatieId": "bedrijf.regels",
    "route": "POST /api/bedrijf/regels",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5801,10 +5855,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/regels.js bevat een schrijfvorm (Object.assign, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.release.maak",
@@ -5859,12 +5913,14 @@
   {
    "mutatieId": "bedrijf.releases",
    "route": "POST /api/bedrijf/releases",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5874,10 +5930,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/bouw.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.repo.zet",
@@ -5907,12 +5963,14 @@
   {
    "mutatieId": "bedrijf.rollen",
    "route": "POST /api/bedrijf/rollen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5922,10 +5980,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/rollen.js bevat een schrijfvorm (via \"werkPoort\" in /home/user/nieuwe-rtg-website/server/bedrijf/rollen.js schrijft: save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.samenhang",
@@ -5955,12 +6013,14 @@
   {
    "mutatieId": "bedrijf.service.beeld",
    "route": "POST /api/bedrijf/service/beeld",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5970,20 +6030,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/storing.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.start",
    "route": "POST /api/bedrijf/start",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5993,10 +6055,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/start.js bevat een schrijfvorm (lijst-mutatie, toewijzing aan een veld, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.storing.evalueer",
@@ -6176,12 +6238,14 @@
   {
    "mutatieId": "bedrijf.taken",
    "route": "POST /api/bedrijf/taken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6191,10 +6255,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/taak.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.ticket.maak",
@@ -6299,12 +6363,14 @@
   {
    "mutatieId": "bedrijf.toen",
    "route": "POST /api/bedrijf/toen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6314,10 +6380,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/toen.js bevat een schrijfvorm (via \"maakWerkRegister\" in /home/user/nieuwe-rtg-website/server/kern/werkcommand/register.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.toen.object",
@@ -6420,12 +6486,14 @@
   {
    "mutatieId": "bedrijf.verloop",
    "route": "POST /api/bedrijf/verloop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6435,10 +6503,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/toen.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.vlag.weg",
@@ -6493,12 +6561,14 @@
   {
    "mutatieId": "bedrijf.vlaggen",
    "route": "POST /api/bedrijf/vlaggen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6508,10 +6578,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/vlag.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.wandel",
@@ -6541,12 +6611,14 @@
   {
    "mutatieId": "bedrijf.werkruimte",
    "route": "POST /api/bedrijf/werkruimte",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6556,10 +6628,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/index.js bevat een schrijfvorm (via \"W\" in /home/user/nieuwe-rtg-website/server/bedrijf/index.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.werkruimte.maak",
@@ -6589,12 +6661,14 @@
   {
    "mutatieId": "bedrijf.zoek",
    "route": "POST /api/bedrijf/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6604,10 +6678,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/bedrijf/inzicht.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bestanden.deel",
@@ -7229,12 +7303,14 @@
   {
    "mutatieId": "betaal.webhook",
    "route": "POST /api/betaal/webhook",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -7246,10 +7322,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/opzet/kaartwebhooks.js bevat een schrijfvorm (via \"settleWachtend\" in /home/user/nieuwe-rtg-website/server/opzet/kaartwebhooks.js schrijft: save(), delete). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "betaal.webhook.adyen",
@@ -7739,12 +7815,14 @@
   {
    "mutatieId": "boardroom.status",
    "route": "POST /api/boardroom/status",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth"
     ]
@@ -7756,10 +7834,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/techniek/boardroom/index.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "boardroom.storing",
@@ -8251,12 +8329,14 @@
   {
    "mutatieId": "browser.zoek",
    "route": "POST /api/browser/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -8268,10 +8348,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/webbrowser.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "care",
@@ -9473,12 +9553,14 @@
   {
    "mutatieId": "comm.inbox",
    "route": "POST /api/comm/inbox",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -9490,10 +9572,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/comm.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "comm.lees",
@@ -12535,12 +12617,14 @@
   {
    "mutatieId": "command.zoek",
    "route": "POST /api/command/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -12552,10 +12636,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/command/index.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "comment",
@@ -13451,12 +13535,14 @@
   {
    "mutatieId": "concern.impact",
    "route": "POST /api/concern/impact",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -13468,10 +13554,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/concern/verandering.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "concern.kwalificatie.zet",
@@ -14891,12 +14977,14 @@
   {
    "mutatieId": "facturen.ai",
    "route": "POST /api/facturen/ai",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -14908,10 +14996,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/facturatie.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "facturen.classificeer",
@@ -14970,12 +15058,14 @@
   {
    "mutatieId": "facturen.overzicht",
    "route": "POST /api/facturen/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -14987,10 +15077,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/betalen.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "facturen.pdf",
@@ -16129,12 +16219,14 @@
   {
    "mutatieId": "festival.partner.inbox",
    "route": "POST /api/festival/partner/inbox",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -16146,10 +16238,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/festival/partner.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "festival.partner.lijst",
@@ -16962,12 +17054,14 @@
   {
    "mutatieId": "fluister.profiel",
    "route": "POST /api/fluister/profiel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -16979,10 +17073,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/persoonlijk.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "fluister.vergeet",
@@ -25363,12 +25457,14 @@
   {
    "mutatieId": "gast.bezorg.mijn",
    "route": "POST /api/gast/bezorg/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -25380,10 +25476,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/gast/mijn-buiten.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "gast.bezorg.rekening",
@@ -25496,12 +25592,14 @@
   {
    "mutatieId": "gast.eten.concierge",
    "route": "POST /api/gast/eten/concierge",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -25513,20 +25611,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/gast/eten.js bevat een schrijfvorm (via \"resultaat\" in /home/user/nieuwe-rtg-website/server/routes/gast/eten.js schrijft: lijst-mutatie, Object.assign, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "gast.eten.ontdekken",
    "route": "POST /api/gast/eten/ontdekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -25538,10 +25638,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/gast/eten.js bevat een schrijfvorm (via \"resultaat\" in /home/user/nieuwe-rtg-website/server/routes/gast/eten.js schrijft: lijst-mutatie, Object.assign, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "gast.eten.probleem",
@@ -25573,12 +25673,14 @@
   {
    "mutatieId": "gast.eten.zoeken",
    "route": "POST /api/gast/eten/zoeken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -25590,10 +25692,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/gast/eten.js bevat een schrijfvorm (via \"resultaat\" in /home/user/nieuwe-rtg-website/server/routes/gast/eten.js schrijft: lijst-mutatie, Object.assign, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "gast.foodcourt.bestel",
@@ -26271,12 +26373,14 @@
   {
    "mutatieId": "geld.cockpit",
    "route": "POST /api/geld/cockpit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -26288,10 +26392,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/geld.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "geld.grens",
@@ -26458,12 +26562,14 @@
   {
    "mutatieId": "geld.rahul",
    "route": "POST /api/geld/rahul",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -26475,10 +26581,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/geldrahul.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "gemeente.afspraak",
@@ -32977,12 +33083,14 @@
   {
    "mutatieId": "les.apps",
    "route": "POST /api/les/apps",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -32992,10 +33100,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/lesmaker.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "les.kijk",
@@ -33312,12 +33420,14 @@
   {
    "mutatieId": "leven.cockpit",
    "route": "POST /api/leven/cockpit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -33329,10 +33439,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/leven.js bevat een schrijfvorm (via \"doe\" in /home/user/nieuwe-rtg-website/server/routes/leven.js schrijft: Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "leven.deel.in",
@@ -33418,12 +33528,14 @@
   {
    "mutatieId": "leven.lijn",
    "route": "POST /api/leven/lijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -33435,20 +33547,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/leven.js bevat een schrijfvorm (via \"doe\" in /home/user/nieuwe-rtg-website/server/routes/leven.js schrijft: Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "leven.mentor",
    "route": "POST /api/leven/mentor",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -33460,10 +33574,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/levenmentor.js bevat een schrijfvorm (via \"bronregels\" in /home/user/nieuwe-rtg-website/server/routes/levenmentor.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "life",
@@ -36704,12 +36818,14 @@
   {
    "mutatieId": "member.ai.tegoed",
    "route": "POST /api/member/ai/tegoed",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -36721,10 +36837,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/aitegoed.js bevat een schrijfvorm (via \"rijVan\" in /home/user/nieuwe-rtg-website/server/kern/commercie/tegoed.js schrijft: save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.apply",
@@ -36864,12 +36980,14 @@
   {
    "mutatieId": "member.berichten",
    "route": "POST /api/member/berichten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -36881,10 +36999,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/berichten.js bevat een schrijfvorm (lijst-mutatie, Object.assign, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.berichten.afspraken",
@@ -37211,12 +37329,14 @@
   {
    "mutatieId": "member.borden",
    "route": "POST /api/member/borden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "Business Pass",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37228,10 +37348,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/borden.js bevat een schrijfvorm (via \"lidBak\" in /home/user/nieuwe-rtg-website/server/routes/borden.js schrijft: eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.ai",
@@ -44531,12 +44651,14 @@
   {
    "mutatieId": "member.rtmail.assist",
    "route": "POST /api/member/rtmail/assist",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -44548,10 +44670,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/rtmail.js bevat een schrijfvorm (via \"vatSamen\" in /home/user/nieuwe-rtg-website/server/routes/rtmail.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rtmail.bewaarbeleid",
@@ -47668,12 +47790,14 @@
   {
    "mutatieId": "member.vacatures",
    "route": "POST /api/member/vacatures",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -47685,10 +47809,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/werk.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vluchten.boek",
@@ -47828,12 +47952,14 @@
   {
    "mutatieId": "member.vooruit",
    "route": "POST /api/member/vooruit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -47845,20 +47971,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/vooruit.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vooruit.post",
    "route": "POST /api/member/vooruit/post",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -47870,10 +47998,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/vooruit.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vooruit.post.neem",
@@ -49332,12 +49460,14 @@
   {
    "mutatieId": "munt.webhook",
    "route": "POST /api/munt/webhook",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -49349,10 +49479,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/opzet/webhooks.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "muziek.bewaar",
@@ -50512,12 +50642,14 @@
   {
    "mutatieId": "office.anker",
    "route": "POST /api/office/anker",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -50529,10 +50661,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/toegang.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.anker.reken",
@@ -52862,12 +52994,14 @@
   {
    "mutatieId": "office.boardroom.toegang.geef",
    "route": "POST /api/office/boardroom/toegang/geef",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -52879,20 +53013,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kantoren/regie.js bevat een schrijfvorm (save(), lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.boardroom.toegang.weg",
    "route": "POST /api/office/boardroom/toegang/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -52904,10 +53040,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kantoren/regie.js bevat een schrijfvorm (save(), db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.boardroom.verbeter",
@@ -52939,12 +53075,14 @@
   {
    "mutatieId": "office.briefing",
    "route": "POST /api/office/briefing",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -52956,10 +53094,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/werk.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.bureau",
@@ -53313,12 +53451,14 @@
   {
    "mutatieId": "office.conversations",
    "route": "POST /api/office/conversations",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -53330,10 +53470,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/werk.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.dienst",
@@ -53608,12 +53748,14 @@
   {
    "mutatieId": "office.economie.werelden",
    "route": "POST /api/office/economie/werelden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -53625,10 +53767,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/economie.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.export.csv",
@@ -53901,12 +54043,14 @@
   {
    "mutatieId": "office.handelingen",
    "route": "POST /api/office/handelingen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -53918,10 +54062,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/toegang.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.handhaving",
@@ -55380,12 +55524,14 @@
   {
    "mutatieId": "office.kernjournaal",
    "route": "POST /api/office/kernjournaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -55397,10 +55543,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kantoren/geld/capgezondheid.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.koppel",
@@ -55729,12 +55875,14 @@
   {
    "mutatieId": "office.kosten.periode",
    "route": "POST /api/office/kosten/periode",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -55746,10 +55894,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kosten-kantoor.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.kosten.periode.heropen",
@@ -55889,12 +56037,14 @@
   {
    "mutatieId": "office.kosten.voorstel",
    "route": "POST /api/office/kosten/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -55906,20 +56056,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kosten-kantoor.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.kosten.vooruitblik",
    "route": "POST /api/office/kosten/vooruitblik",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -55931,10 +56083,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kosten-kantoor.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.kosten.vrijgeven",
@@ -56392,12 +56544,14 @@
   {
    "mutatieId": "office.mail.wachtrij",
    "route": "POST /api/office/mail/wachtrij",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -56409,10 +56563,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/mailpost.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.mail.werk",
@@ -58172,12 +58326,14 @@
   {
    "mutatieId": "office.payroll.dekking",
    "route": "POST /api/office/payroll/dekking",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -58189,10 +58345,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/payroll-os-dekking.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.payroll.dekking.land",
@@ -58845,12 +59001,14 @@
   {
    "mutatieId": "office.prijsgarantie",
    "route": "POST /api/office/prijsgarantie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -58862,10 +59020,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/prijsgarantie.js bevat een schrijfvorm (via \"rij\" in /home/user/nieuwe-rtg-website/server/kern/commercie/prijsmelding.js schrijft: eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.prijsgarantie.afwijzen",
@@ -59113,12 +59271,14 @@
   {
    "mutatieId": "office.rechtsvormwacht.zet",
    "route": "POST /api/office/rechtsvormwacht/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -59130,10 +59290,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/ondernemers.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.redactie",
@@ -60158,12 +60318,14 @@
   {
    "mutatieId": "office.salon-naleving",
    "route": "POST /api/office/salon-naleving",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60175,10 +60337,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/veiligheid.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.salon.belang",
@@ -60264,12 +60426,14 @@
   {
    "mutatieId": "office.schools",
    "route": "POST /api/office/schools",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60281,10 +60445,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/partners/kantoorlijsten.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.securitylog",
@@ -61097,12 +61261,14 @@
   {
    "mutatieId": "office.techniek.integraties",
    "route": "POST /api/office/techniek/integraties",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -61114,10 +61280,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/kantoren/integraties.js bevat een schrijfvorm (via \"beeld\" in /home/user/nieuwe-rtg-website/server/routes/kantoren/integraties.js schrijft: lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.techniek.integraties.besluit",
@@ -61415,12 +61581,14 @@
   {
    "mutatieId": "office.timeline",
    "route": "POST /api/office/timeline",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -61432,10 +61600,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/office/toegang.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.trust",
@@ -61683,12 +61851,14 @@
   {
    "mutatieId": "office.vakbewijzen",
    "route": "POST /api/office/vakbewijzen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -61700,10 +61870,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/vakbewijs-kantoor.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.verifications",
@@ -70368,12 +70538,14 @@
   {
    "mutatieId": "plaats.dienst",
    "route": "POST /api/plaats/dienst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70385,10 +70557,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/plaats.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "plaats.hekken",
@@ -78463,12 +78635,14 @@
   {
    "mutatieId": "rtf.vacatures",
    "route": "POST /api/rtf/vacatures",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -78478,10 +78652,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/werk/rtf.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.welzijn.dagboek",
@@ -85752,12 +85926,14 @@
   {
    "mutatieId": "sociaal.lijn",
    "route": "POST /api/sociaal/lijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -85769,10 +85945,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/sociaal.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sociaal.object",
@@ -85804,12 +85980,14 @@
   {
    "mutatieId": "sociaal.rahul",
    "route": "POST /api/sociaal/rahul",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -85821,10 +85999,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/socialerahul.js bevat een schrijfvorm (lijst-mutatie, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sociaal.voorstel.bevestig",
@@ -86741,12 +86919,14 @@
   {
    "mutatieId": "sso.waarheen",
    "route": "POST /api/sso/waarheen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw"
     ]
@@ -86758,10 +86938,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/sso.js bevat een schrijfvorm (via \"rem\" in /home/user/nieuwe-rtg-website/server/rem.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sso.wissel",
@@ -88318,12 +88498,14 @@
   {
    "mutatieId": "supplier.aandacht",
    "route": "POST /api/supplier/aandacht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -88335,20 +88517,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.aandacht.klaar",
    "route": "POST /api/supplier/aandacht/klaar",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -88360,20 +88544,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer.js bevat een schrijfvorm (save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.aanwezig",
    "route": "POST /api/supplier/aanwezig",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -88385,10 +88571,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/server.js bevat een schrijfvorm (via \"aanwezigVan\" in /home/user/nieuwe-rtg-website/server/server.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.aanwezig.leeg",
@@ -89440,12 +89626,14 @@
   {
    "mutatieId": "supplier.backoffice",
    "route": "POST /api/supplier/backoffice",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -89457,10 +89645,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/backoffice.js bevat een schrijfvorm (lijst-mutatie, toewijzing aan een veld, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.bank.zakelijk",
@@ -90437,12 +90625,14 @@
   {
    "mutatieId": "supplier.bezorg.overzicht",
    "route": "POST /api/supplier/bezorg/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -90454,10 +90644,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/bezorg.js bevat een schrijfvorm (via \"bezorgVan\" in /home/user/nieuwe-rtg-website/server/routes/supplier/bezorg.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.bezorg.pakcheck",
@@ -91083,12 +91273,14 @@
   {
    "mutatieId": "supplier.borden",
    "route": "POST /api/supplier/borden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -91100,10 +91292,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/borden.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.btw.aangifte",
@@ -91810,12 +92002,14 @@
   {
    "mutatieId": "supplier.comm.inbox",
    "route": "POST /api/supplier/comm/inbox",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "een zaak in de sessie",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -91827,10 +92021,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/comm.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.comm.lees",
@@ -91916,12 +92110,14 @@
   {
    "mutatieId": "supplier.comm.zoek",
    "route": "POST /api/supplier/comm/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "een zaak in de sessie",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -91933,10 +92129,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/comm.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.command.beleid",
@@ -92589,12 +92785,14 @@
   {
    "mutatieId": "supplier.command.zoek",
    "route": "POST /api/supplier/command/zoek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -92606,10 +92804,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/zaakcommand/index.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.contract.maak",
@@ -93665,12 +93863,14 @@
   {
    "mutatieId": "supplier.eten.capaciteit",
    "route": "POST /api/supplier/eten/capaciteit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -93682,10 +93882,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/eten.js bevat een schrijfvorm (save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.eten.instellingen",
@@ -93744,12 +93944,14 @@
   {
    "mutatieId": "supplier.eten.werkblad",
    "route": "POST /api/supplier/eten/werkblad",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -93761,10 +93963,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/eten.js bevat een schrijfvorm (via \"werkbladVan\" in /home/user/nieuwe-rtg-website/server/kern/eten/partnerwerk.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.event",
@@ -94012,12 +94214,14 @@
   {
    "mutatieId": "supplier.facturen.ai",
    "route": "POST /api/supplier/facturen/ai",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -94029,10 +94233,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/facturatie.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.facturen.betaald",
@@ -94170,12 +94374,14 @@
   {
    "mutatieId": "supplier.finance.export",
    "route": "POST /api/supplier/finance/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -94187,10 +94393,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/financien.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.fitclub",
@@ -95032,12 +95238,14 @@
   {
    "mutatieId": "supplier.gebouwpand.overzicht",
    "route": "POST /api/supplier/gebouwpand/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -95049,10 +95257,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/gebouwpand.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.gebouwpand.parkeer",
@@ -95273,12 +95481,14 @@
   {
    "mutatieId": "supplier.gebouwplus.overzicht",
    "route": "POST /api/supplier/gebouwplus/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -95290,10 +95500,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/gebouwplus.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.gemeente.bekendmakingen",
@@ -96135,12 +96345,14 @@
   {
    "mutatieId": "supplier.horeca.arrivals",
    "route": "POST /api/supplier/horeca/arrivals",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96152,20 +96364,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/invisible-arrival.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.autopilot",
    "route": "POST /api/supplier/horeca/autopilot",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96177,20 +96391,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/dish-twin.js bevat een schrijfvorm (lijst-mutatie, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.bar",
    "route": "POST /api/supplier/horeca/bar",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96202,10 +96418,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/bar.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.betaal",
@@ -96345,12 +96561,14 @@
   {
    "mutatieId": "supplier.horeca.bezorg.sloten",
    "route": "POST /api/supplier/horeca/bezorg/sloten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96362,10 +96580,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/bezorging.js bevat een schrijfvorm (save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.bezorg.zone",
@@ -96636,12 +96854,14 @@
   {
    "mutatieId": "supplier.horeca.club.tafel.stand",
    "route": "POST /api/supplier/horeca/club/tafel/stand",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96653,20 +96873,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/club.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.dagbeeld",
    "route": "POST /api/supplier/horeca/dagbeeld",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96678,20 +96900,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/dashboard.js bevat een schrijfvorm (lijst-mutatie, toewijzing aan een veld, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.dienstmeting",
    "route": "POST /api/supplier/horeca/dienstmeting",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96703,10 +96927,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/dashboard.js bevat een schrijfvorm (Object.assign, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.dish-twin.concept",
@@ -96765,12 +96989,14 @@
   {
    "mutatieId": "supplier.horeca.dish-twins",
    "route": "POST /api/supplier/horeca/dish-twins",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96782,10 +97008,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/dish-twin.js bevat een schrijfvorm (via \"doos\" in /home/user/nieuwe-rtg-website/server/routes/supplier/horeca/dish-twin.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.event.aanbetaling",
@@ -96871,12 +97097,14 @@
   {
    "mutatieId": "supplier.horeca.event.lijst",
    "route": "POST /api/supplier/horeca/event/lijst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96888,10 +97116,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/event.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.event.nacalculatie",
@@ -96977,12 +97205,14 @@
   {
    "mutatieId": "supplier.horeca.folio",
    "route": "POST /api/supplier/horeca/folio",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96994,10 +97224,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/folio.js bevat een schrijfvorm (via \"F\" in /home/user/nieuwe-rtg-website/server/kern/horeca/foliolaag.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.folio.afrekenen",
@@ -97189,12 +97419,14 @@
   {
    "mutatieId": "supplier.horeca.fooienpot.lijst",
    "route": "POST /api/supplier/horeca/fooienpot/lijst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97206,10 +97438,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/personeel.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.gang.vrij",
@@ -97266,12 +97498,14 @@
   {
    "mutatieId": "supplier.horeca.gast.beleid",
    "route": "POST /api/supplier/horeca/gast/beleid",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97283,10 +97517,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/gastbeheer.js bevat een schrijfvorm (save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.gast.bevestig",
@@ -97372,12 +97606,14 @@
   {
    "mutatieId": "supplier.horeca.gast.wachtrij",
    "route": "POST /api/supplier/horeca/gast/wachtrij",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97389,20 +97625,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/gastbeheer.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.gasten",
    "route": "POST /api/supplier/horeca/gasten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97414,10 +97652,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/gasten.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.gezelschap",
@@ -97584,12 +97822,14 @@
   {
    "mutatieId": "supplier.horeca.haccp.batches",
    "route": "POST /api/supplier/horeca/haccp/batches",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97601,20 +97841,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/haccp.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.haccp.lijst",
    "route": "POST /api/supplier/horeca/haccp/lijst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97626,20 +97868,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/haccp-lijsten.js bevat een schrijfvorm (save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.haccp.logboek",
    "route": "POST /api/supplier/horeca/haccp/logboek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97651,10 +97895,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/haccp.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.haccp.meting",
@@ -97819,12 +98063,14 @@
   {
    "mutatieId": "supplier.horeca.journey",
    "route": "POST /api/supplier/horeca/journey",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97836,20 +98082,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/journey.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.kaart",
    "route": "POST /api/supplier/horeca/kaart",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97861,20 +98109,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/rekening.js bevat een schrijfvorm (via \"kaartPerGroep\" in /home/user/nieuwe-rtg-website/server/kern/horeca/kaart.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.keuken.bord",
    "route": "POST /api/supplier/horeca/keuken/bord",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97886,20 +98136,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/keuken.js bevat een schrijfvorm (lijst-mutatie, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.keuken.druk",
    "route": "POST /api/supplier/horeca/keuken/druk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97911,20 +98163,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/keuken-regie.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.keuken.regie",
    "route": "POST /api/supplier/horeca/keuken/regie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97936,10 +98190,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/keuken-regie.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.keuken.stand",
@@ -97971,12 +98225,14 @@
   {
    "mutatieId": "supplier.horeca.keuken.stappen",
    "route": "POST /api/supplier/horeca/keuken/stappen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97988,10 +98244,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/keuken-regie.js bevat een schrijfvorm (save(), Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.keuken.tijden",
@@ -98075,12 +98331,14 @@
   {
    "mutatieId": "supplier.horeca.missions",
    "route": "POST /api/supplier/horeca/missions",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98092,10 +98350,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer-missies.js bevat een schrijfvorm (via \"missies\" in /home/user/nieuwe-rtg-website/server/routes/supplier/pda/vloer-missies.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.missions.activeer",
@@ -98154,12 +98412,14 @@
   {
    "mutatieId": "supplier.horeca.missions.voorstel",
    "route": "POST /api/supplier/horeca/missions/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98171,10 +98431,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer-missies.js bevat een schrijfvorm (via \"beste\" in /home/user/nieuwe-rtg-website/server/routes/supplier/pda/vloer-missies.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.offline.handelingen",
@@ -98260,12 +98520,14 @@
   {
    "mutatieId": "supplier.horeca.pas.gereed",
    "route": "POST /api/supplier/horeca/pas/gereed",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98277,10 +98539,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/pas.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.pas.los",
@@ -98393,12 +98655,14 @@
   {
    "mutatieId": "supplier.horeca.pols",
    "route": "POST /api/supplier/horeca/pols",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98410,10 +98674,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/pols.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.pols.zet",
@@ -98470,12 +98734,14 @@
   {
    "mutatieId": "supplier.horeca.rahul.bonnen",
    "route": "POST /api/supplier/horeca/rahul/bonnen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98487,10 +98753,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/rahul.js bevat een schrijfvorm (via \"doos\" in /home/user/nieuwe-rtg-website/server/kern/horeca/rahul-recht.js schrijft: toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.rahul.doe",
@@ -98547,12 +98813,14 @@
   {
    "mutatieId": "supplier.horeca.rahul.register",
    "route": "POST /api/supplier/horeca/rahul/register",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98564,10 +98832,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/rahul.js bevat een schrijfvorm (via \"register\" in /home/user/nieuwe-rtg-website/server/kern/horeca/rahul-register.js schrijft: Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.recovery.beslis",
@@ -98869,12 +99137,14 @@
   {
    "mutatieId": "supplier.horeca.rekeningen",
    "route": "POST /api/supplier/horeca/rekeningen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98886,20 +99156,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/rekening.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.signalen",
    "route": "POST /api/supplier/horeca/signalen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98911,10 +99183,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/dashboard.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.simulatie.maak",
@@ -99052,12 +99324,14 @@
   {
    "mutatieId": "supplier.horeca.verzoeken",
    "route": "POST /api/supplier/horeca/verzoeken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99069,10 +99343,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/verzoeken.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.verzoeken.zet",
@@ -99131,12 +99405,14 @@
   {
    "mutatieId": "supplier.horeca.wave.voorstel",
    "route": "POST /api/supplier/horeca/wave/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99148,10 +99424,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/spatial-command.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.werklijst",
@@ -99453,12 +99729,14 @@
   {
    "mutatieId": "supplier.horeca.wijken",
    "route": "POST /api/supplier/horeca/wijken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99470,10 +99748,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/horeca/wijk.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.hr.certificaat",
@@ -99559,12 +99837,14 @@
   {
    "mutatieId": "supplier.hr.gesprekken",
    "route": "POST /api/supplier/hr/gesprekken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99576,10 +99856,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/hrplus.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.hr.inwerk.stap",
@@ -99665,12 +99945,14 @@
   {
    "mutatieId": "supplier.hr.mijn",
    "route": "POST /api/supplier/hr/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99682,20 +99964,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/hrplus.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.hr.overzicht",
    "route": "POST /api/supplier/hr/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99707,10 +99991,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/hrplus.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.hulp.ai",
@@ -100930,12 +101214,14 @@
   {
    "mutatieId": "supplier.kassa.dagrapport",
    "route": "POST /api/supplier/kassa/dagrapport",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -100947,10 +101233,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kassa/premium.js bevat een schrijfvorm (increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.kassa.derving",
@@ -100982,12 +101268,14 @@
   {
    "mutatieId": "supplier.kassa.instel",
    "route": "POST /api/supplier/kassa/instel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -100999,10 +101287,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kassa/modus.js bevat een schrijfvorm (save(), lijst-mutatie, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.kassa.kasopmaak",
@@ -101867,12 +102155,14 @@
   {
    "mutatieId": "supplier.location",
    "route": "POST /api/supplier/location",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -101884,10 +102174,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/vervoer.js bevat een schrijfvorm (save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.login",
@@ -101942,12 +102232,14 @@
   {
    "mutatieId": "supplier.lost.done",
    "route": "POST /api/supplier/lost/done",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -101959,10 +102251,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kamers/huishouding.js bevat een schrijfvorm (save(), toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.lucht.pass",
@@ -103280,12 +103572,14 @@
   {
    "mutatieId": "supplier.mijn.taal",
    "route": "POST /api/supplier/mijn/taal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -103297,10 +103591,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/moedertaal.js bevat een schrijfvorm (save(), delete, eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mijn.wissel",
@@ -103386,12 +103680,14 @@
   {
    "mutatieId": "supplier.minibar.item.remove",
    "route": "POST /api/supplier/minibar/item/remove",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -103403,10 +103699,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kamers/voorzieningen.js bevat een schrijfvorm (save(), lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mob.akkoord",
@@ -104383,12 +104679,14 @@
   {
    "mutatieId": "supplier.net.lijst",
    "route": "POST /api/supplier/net/lijst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -104400,10 +104698,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/netwerk.js bevat een schrijfvorm (via \"netState\" in /home/user/nieuwe-rtg-website/server/routes/supplier/pda/netwerk.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.net.verzoek",
@@ -106265,12 +106563,14 @@
   {
    "mutatieId": "supplier.photo.remove",
    "route": "POST /api/supplier/photo/remove",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106282,10 +106582,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kamers/voorzieningen.js bevat een schrijfvorm (save(), lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.polis",
@@ -106558,12 +106858,14 @@
   {
    "mutatieId": "supplier.pr.overzicht",
    "route": "POST /api/supplier/pr/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106575,10 +106877,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/prplus.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.pr.plan",
@@ -106664,12 +106966,14 @@
   {
    "mutatieId": "supplier.prijsgarantie",
    "route": "POST /api/supplier/prijsgarantie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106681,10 +106985,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/prijsgarantie.js bevat een schrijfvorm (via \"rij\" in /home/user/nieuwe-rtg-website/server/kern/commercie/prijsmelding.js schrijft: eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.prijsgarantie.betwist",
@@ -106743,12 +107047,14 @@
   {
    "mutatieId": "supplier.programma",
    "route": "POST /api/supplier/programma",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106760,10 +107066,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/tickets.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.puls",
@@ -106795,12 +107101,14 @@
   {
    "mutatieId": "supplier.puls.blik",
    "route": "POST /api/supplier/puls/blik",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106812,20 +107120,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/genreblik.js bevat een schrijfvorm (lijst-mutatie, eigen bak zetten, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.puls.plan",
    "route": "POST /api/supplier/puls/plan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106837,10 +107147,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/genreplan.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.puls.plan.klaar",
@@ -107923,12 +108233,14 @@
   {
    "mutatieId": "supplier.ride.history",
    "route": "POST /api/supplier/ride/history",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -107940,10 +108252,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/vervoer.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.ride.status",
@@ -108081,12 +108393,14 @@
   {
    "mutatieId": "supplier.room.remove",
    "route": "POST /api/supplier/room/remove",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -108098,10 +108412,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/kamers/voorzieningen.js bevat een schrijfvorm (save(), lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.room.toggle",
@@ -108316,12 +108630,14 @@
   {
    "mutatieId": "supplier.rtmail.assist",
    "route": "POST /api/supplier/rtmail/assist",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -108333,10 +108649,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/rtmail.js bevat een schrijfvorm (via \"vatSamen\" in /home/user/nieuwe-rtg-website/server/routes/rtmail.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.bewaarbeleid",
@@ -110192,12 +110508,14 @@
   {
    "mutatieId": "supplier.site.genereer",
    "route": "POST /api/supplier/site/genereer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -110209,10 +110527,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/zaakweb.js bevat een schrijfvorm (toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.site.haal",
@@ -110863,12 +111181,14 @@
   {
    "mutatieId": "supplier.table.remove",
    "route": "POST /api/supplier/table/remove",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -110880,10 +111200,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/tafels-team.js bevat een schrijfvorm (save(), lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.table.status",
@@ -111534,12 +111854,14 @@
   {
    "mutatieId": "supplier.training",
    "route": "POST /api/supplier/training",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -111551,10 +111873,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer.js bevat een schrijfvorm (via \"tipsVoor\" in /home/user/nieuwe-rtg-website/server/training.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.training.add",
@@ -111584,12 +111906,14 @@
   {
    "mutatieId": "supplier.training.gelezen",
    "route": "POST /api/supplier/training/gelezen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -111601,10 +111925,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/pda/vloer.js bevat een schrijfvorm (save(), db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.training.remove",
@@ -112498,12 +112822,14 @@
   {
    "mutatieId": "supplier.verkoop.overzicht",
    "route": "POST /api/supplier/verkoop/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112515,10 +112841,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/autoverkoop.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.verkoopweg.lijst",
@@ -112631,12 +112957,14 @@
   {
    "mutatieId": "supplier.vertaal",
    "route": "POST /api/supplier/vertaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112648,20 +112976,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/luchthaven.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.vertaal.ui",
    "route": "POST /api/supplier/vertaal/ui",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112673,10 +113003,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/moedertaal.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.verzuim.planning",
@@ -112789,12 +113119,14 @@
   {
    "mutatieId": "supplier.vooruit",
    "route": "POST /api/supplier/vooruit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112806,20 +113138,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/vooruit.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.vooruit.post",
    "route": "POST /api/supplier/vooruit/post",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112831,10 +113165,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/vooruit.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.vooruit.post.neem",
@@ -113217,12 +113551,14 @@
   {
    "mutatieId": "supplier.wensen",
    "route": "POST /api/supplier/wensen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -113234,10 +113570,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/wensen.js bevat een schrijfvorm (eigen bak zetten). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.wensen.klaar",
@@ -114320,12 +114656,14 @@
   {
    "mutatieId": "techniek.alarm.proef",
    "route": "POST /api/techniek/alarm/proef",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -114338,10 +114676,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/techniek/knoppen.js bevat een schrijfvorm (Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.archief",
@@ -114510,12 +114848,14 @@
   {
    "mutatieId": "techniek.bewaren.veeg",
    "route": "POST /api/techniek/bewaren/veeg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -114528,10 +114868,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/techniek/bewaren.js bevat een schrijfvorm (save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.controle.incident",
@@ -115360,12 +115700,14 @@
   {
    "mutatieId": "techniek.vingerafdruk",
    "route": "POST /api/techniek/vingerafdruk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth"
     ]
@@ -115377,10 +115719,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/techniek/vingerafdruk.js bevat een schrijfvorm (via \"vingerafdruk\" in /home/user/nieuwe-rtg-website/server/lib/vingerafdruk.js schrijft: lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.vingerafdruk.verschil",
@@ -117891,12 +118233,14 @@
   {
    "mutatieId": "vastgoed.aanbod",
    "route": "POST /api/vastgoed/aanbod",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -117908,10 +118252,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/member/handel/vastgoed.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "vastgoed.bod",
@@ -119183,12 +119527,14 @@
   {
    "mutatieId": "vertaal.ui",
    "route": "POST /api/vertaal/ui",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": [
      "mw",
      "mw"
@@ -119201,10 +119547,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/server.js bevat een schrijfvorm (via \"translateBatch\" in /home/user/nieuwe-rtg-website/server/translate.js schrijft: lijst-mutatie, increment). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "verzorging",
@@ -120259,12 +120605,14 @@
   {
    "mutatieId": "wereld.bezoekers",
    "route": "POST /api/wereld/bezoekers",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -120276,20 +120624,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/wereld/profiel.js bevat een schrijfvorm (save()). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "wereld.feed",
    "route": "POST /api/wereld/feed",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -120301,10 +120651,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/wereld.js bevat een schrijfvorm (via \"W\" in /home/user/nieuwe-rtg-website/server/routes/wereld.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "wereld.gesprek",
@@ -120550,12 +120900,14 @@
   {
    "mutatieId": "wereld.state",
    "route": "POST /api/wereld/state",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -120567,10 +120919,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/wereld.js bevat een schrijfvorm (via \"W\" in /home/user/nieuwe-rtg-website/server/routes/wereld.js schrijft: db.data toewijzing, toewijzing aan een veld). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "wereld.zoek",
@@ -122654,8 +123006,8 @@
    },
    "stand": "LEGACY_PENDING_CLASSIFICATION",
    "herkomst": null,
-   "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/werkplek-bureaus-b.js bevat een schrijfvorm (lijst-mutatie, Object.assign). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "werkplek.taak",
@@ -123388,12 +123740,14 @@
   {
    "mutatieId": "zakelijk.gids",
    "route": "POST /api/zakelijk/gids",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth",
      "pro"
@@ -123406,10 +123760,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/zakelijk/netwerk.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "zakelijk.kans",

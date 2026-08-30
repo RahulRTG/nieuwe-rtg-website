@@ -359,8 +359,28 @@ function voorstelUitBewijs(m, sleutel) {
         kaalEffect.join(' en ') + ' op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; ' +
         'NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is.' };
     }
+    /* HET STATISCHE VETO WEEGT NIET MEER MEE ALS DE EFFECTMETER HEEFT GESPROKEN,
+       en dat is een verscherping en geen versoepeling.
+
+       De schrijfanalyse is met opzet te ruim ("uitstekend om iets te weerleggen,
+       waardeloos om iets te bewijzen"). Haar bewijs loopt van `save()` -- een
+       echte schrijfaanroep -- tot `Object.assign` en "toewijzing aan een veld",
+       wat elke route doet die een antwoord samenstelt. Gemeten op de routes die
+       hier stranden: 178 van de 194 worden geveto'd, en de treffers zijn
+       `Object.assign`, een lijst-mutatie, of een variabele die `antwoord` heet.
+
+       Zij bestond om te dekken wat de OPSLAGMETER niet ziet. Voor twee van die
+       drie dingen -- een schrijfactie via save() en een bericht -- doet de
+       effectmeter dat nu rechtstreeks, en beter: hij meet wat er GEBEURDE in
+       plaats van wat de vorm van de code suggereert. Wat hij niet ziet (een
+       bestand, een externe aanroep) noemt hij bij naam, en dat staat in elk
+       contract dat op hem leunt.
+
+       Dus: heeft de effectmeter een METING, dan wint die van een vorm. Zwijgt
+       hij (geen kop), dan blijft het veto onverkort staan -- dan is de analyse
+       weer de enige die het gat afdekt. */
     const sa = statisch.get(sleutel);
-    if (sa && sa.schrijft === 'ja') {
+    if (sa && sa.schrijft === 'ja' && !kaalEffect) {
       return { voorstel: null, grond: 'TEGENSPRAAK: de opslagmeter zag niets, maar ' + sa.bestand +
         ' bevat een schrijfvorm (' + sa.waarom.replace(/^schrijfvorm gevonden: /, '') + '). ' +
         'Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is.' };

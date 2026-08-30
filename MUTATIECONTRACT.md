@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **452** |
-| `NOT_APPLICABLE` | 40 | 865 |
-| geclassificeerd | 3.069 | 4.201 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **275** |
+| `NOT_APPLICABLE` | 40 | 1.042 |
+| geclassificeerd | 3.069 | 4.378 van 4.653 (94,1%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -578,6 +578,48 @@ het script overheen wilde schrijven.
 | toegang niet af te leiden | 96 | **53** |
 | `LEGACY_PENDING_CLASSIFICATION` | 492 | **452** |
 | geclassificeerd | 4.161 | **4.201 van 4.653** |
+
+## 5g. Een meting wint van een vorm
+
+`scripts/schrijfanalyse.js` mocht als **veto** dienen: te ruim om iets te
+bewijzen, uitstekend om iets te weerleggen. Dat klopte toen de opslagmeter de
+enige andere lijn was. Het klopt niet meer.
+
+Gemeten op de routes die erop stranden: **178 van de 194** werden geveto'd, en het
+bewijs daaronder is `Object.assign`, een lijst-mutatie, en op één plek een
+variabele die `antwoord` heet. De schrijfvormenlijst loopt van `save()` — een
+echte schrijfaanroep — tot dingen die elke route doet die een antwoord
+samenstelt.
+
+Die analyse bestond om te dekken wat de opslagmeter niet ziet. Voor twee van die
+drie dingen (een schrijfactie via `save()`, een bericht) doet `server/effectmeter.js`
+dat nu **rechtstreeks**, en beter: hij meet wat er *gebeurde* in plaats van wat de
+vorm van de code suggereert. Wat hij niet ziet — een bestand, een externe aanroep
+— noemt hij bij naam, en dat staat in elk contract dat op hem leunt.
+
+**De regel is dus: heeft de effectmeter een meting, dan wint die van een vorm.
+Zwijgt hij, dan blijft het veto onverkort staan** — want dan is de analyse weer de
+enige die het gat afdekt. Dat is een verscherping en geen versoepeling: er komt
+een sterker bewijs in de plaats van een zwakker, niet minder bewijs.
+
+### En elf redenen die alleen in volgorde klopten
+
+De toets die eist dat een `PUBLIC`-contract een reden draagt, ving iets anders:
+elf regels in de publieke lijst zeiden letterlijk **`'idem'`** — een verwijzing
+naar de regel erboven. Leesbaar zolang je de lijst van boven naar beneden leest,
+betekenisloos zodra hij ergens anders wordt gebruikt. En dat gebeurde: het
+contractregister neemt die reden over in het contract van die route, en zette
+"idem" onder een route waar niets boven staat.
+
+Alle elf staan nu uitgeschreven, en de kop van dat bestand zegt waarom: *een reden
+die alleen klopt in volgorde, is geen reden.*
+
+| | voor | na |
+|---|---:|---:|
+| routes onder het bewijsbesluit | 804 | **1.002** |
+| `NOT_APPLICABLE` | 865 | **1.042** |
+| `LEGACY_PENDING_CLASSIFICATION` | 452 | **275** |
+| geclassificeerd | 4.201 | **4.378 van 4.653 (94,1%)** |
 
 ## 6. De poort
 

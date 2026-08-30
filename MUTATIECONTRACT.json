@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T13:55:43.689Z",
-  "commit": "7ed1d9db",
+  "op": "2026-08-30T15:26:18.596Z",
+  "commit": "3d6d8959",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -11,13 +11,13 @@
   "totaal": 4653,
   "geclassificeerd": 4653,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3402,
+   "BLOCKED_BY_TEST_FIXTURE": 3401,
    "NOT_APPLICABLE": 1073,
    "PROTECTED": 104,
-   "INTENTIONALLY_NON_IDEMPOTENT": 74
+   "INTENTIONALLY_NON_IDEMPOTENT": 75
   },
-  "vastgesteldDoorMens": 1278,
-  "afgeleidDoorScript": 3375,
+  "vastgesteldDoorMens": 1279,
+  "afgeleidDoorScript": 3374,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3818,
    "PUBLIC": 104,
@@ -5330,7 +5330,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
@@ -47259,7 +47259,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -49471,7 +49471,7 @@
    "mutatieId": "mob.reis.boek",
    "route": "POST /api/mob/reis/boek",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -49489,8 +49489,8 @@
     "grond": null,
     "hindernis": "Vertrekpunt: Geef een vertrekpunt en een bestemming op."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

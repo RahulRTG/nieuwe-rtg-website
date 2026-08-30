@@ -83,23 +83,6 @@ module.exports = (ctx) => {
           kaartje: null, instructie: 'Check in het voertuig in met uw RTG-app.', reden: e.kaartReden });
         continue;
       }
-      /* DE SLEUTEL MAG HIER NIET ONTBREKEN, want sinds de geldgrens weigert de
-         geldlaag een geldhandeling zonder sleutel -- en dan is een zakelijke
-         reis met een OV-etappe niet meer te boeken (test/zakelijkvervoer.test.js
-         kreeg een 400 op "de reis is geboekt").
-
-         Een reiziger kan onmogelijk per ETAPPE een sleutel bedenken, dus die
-         hoort uit de boeking te komen. Stuurt de aanroeper er zelf een mee, dan
-         wint die; anders is het de boeking zelf (r.id), aangevuld met de lijn,
-         zodat de kaartjes binnen een boeking uit elkaar blijven.
-
-         WAT DIT WEL EN NIET DOET, eerlijk gezegd. Wel: binnen een boeking koopt
-         een herhaalde poging -- na een hapering, of na de terugdraai van stap 1
-         -- geen tweede kaartje voor dezelfde lijn. Niet: twee keer op "boek"
-         drukken. Dat maakt twee reizen met twee eigen id's, en dus twee
-         kaartjes. Dat was voor de geldgrens ook al zo en het is een apart gat;
-         wie het wil dichten, stuurt `idem` mee -- dan wint de regel hierboven en
-         is de tweede druk dezelfde reis. */
       const k = await kaartKoop(session, { vervoerder: e.vervoerder, lijnId: e.lijnId,
         van: e.van.id, naar: e.naar.id, product: 'enkel',
         idem: 'reis:' + (body.idem ? schoon(body.idem, 40) : r.id) + ':' + e.lijnId,

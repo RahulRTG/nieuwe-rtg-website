@@ -164,8 +164,14 @@ const FAMILIES = [
        gezin ook doet; ze weglaten zou de fixture laten stranden op een 400 en
        daarmee 187 routes ongemeten laten. */
     async bouw({ post }) {
+      /* DE VELDNAMEN KOMEN UIT DE ROUTE EN NIET UIT DE VERWACHTING. Hier stond
+         `naam` voor de gezinsnaam en `beheerder` voor de persoon; de route leest
+         `gezinsnaam` en `naam` (server/foundation/gezin.js). De bouwer kreeg
+         netjes "Geef je gezin een naam" terug en meldde zich als mislukt -- maar
+         de trechter telde de 187 routes toen al als gedekt, want die keek naar
+         de DECLARATIE en niet naar de uitkomst. Zie de kop van dit bestand. */
       const r = await post('/api/foundation/gezin/maak', {
-        naam: 'Proefgezin', beheerder: 'Proef Beheerder', pin: '1234',
+        gezinsnaam: 'Proefgezin', naam: 'Proef Beheerder', pin: '1234',
         bevoegdGezin: true, privacyAkkoord: true
       }, null);
       const d = r && r.data;

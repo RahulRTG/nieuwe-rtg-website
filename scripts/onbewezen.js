@@ -62,9 +62,19 @@ const UITSLAG = path.join(WORTEL, 'ONBEWEZEN.json');
 const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
 const { ROLLEN: ROLLEN_MET_TOKEN } = require('./lib/proefsleutels');
 /* Een deur waarvan de sleutel in het LIJF reist heeft geen rol en is toch te
-   openen; zie de kop van ./lib/lijfsleutels.js. Zonder deze kennis telt zo'n
-   route hier als instrumenttekort terwijl er een sleutel voor te maken is. */
-const { dektPad } = require('./lib/lijfsleutels');
+   openen; zie de kop van ./lib/lijfsleutels.js.
+
+   MAAR: een familie DECLAREREN is iets anders dan hem HEBBEN. De eerste versie
+   las hier de declaratie (`dektPad`), en meldde daarmee 255 routes minder in
+   GEEN_PROEFSLEUTEL terwijl de gezinsfamilie in de meting was STUKGELOPEN op
+   twee veldnamen. De uitslag zei "heeft een sleutel" over routes waar geen
+   sleutel voor bestond -- precies de schijnzekerheid die deze trechter moet
+   voorkomen, en door mij zelf ingebouwd.
+
+   Daarom telt hier alleen wat de METING heeft gebouwd, uit
+   IDEMPROEF.json (`lijfsleutelsGebouwd`). Staat de versheidspoort dicht of is
+   een familie mislukt, dan dekt hij niets. */
+const { FAMILIES } = require('./lib/lijfsleutels');
 const { stempel } = require('./lib/stempel');
 const { meting } = require('./lib/idemmeting');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
@@ -166,8 +176,10 @@ function meet() {
      de STATUS die idemmeting.js eruit afleidt. Zelfde bestand, andere vraag. */
   let ruw = {};
   let metingOp = null;
+  let jRuw = null;
   try {
     const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8'));
+    jRuw = j;
     for (const r of (j.perRoute || [])) ruw[r.methode.toUpperCase() + ' ' + r.pad] = r;
     metingOp = j.stempel && j.stempel.op ? Date.parse(j.stempel.op) : null;
   } catch (e) {}
@@ -185,8 +197,12 @@ function meet() {
      verdeling die het mutatieboek gebruikt, en niet uit een eigen afleiding. */
   const beproefbaar = mutaties.filter(r => !isSchakel(r.pad) && !r.pad.includes(':'));
   const zonderSleutel = new Set();
+  /* De voorvoegsels van de families die in DEZE meting werkelijk zijn gebouwd. */
+  const gebouwd = new Set(((jRuw && jRuw.gemeten && jRuw.gemeten.lijfsleutelsGebouwd) || []));
+  const dekkendePrefixen = FAMILIES.filter(f => gebouwd.has(f.naam)).flatMap(f => f.prefixen);
+  const heeftLijfsleutel = (pad) => dekkendePrefixen.some(p => String(pad).startsWith(p));
   for (const x of verdeelOpRol(beproefbaar, ROLLEN_MET_TOKEN).zonderRol) {
-    if (dektPad(x.pad)) continue;   // een lijfsleutel is ook een sleutel
+    if (heeftLijfsleutel(x.pad)) continue;   // een GEBOUWDE lijfsleutel is ook een sleutel   // een GEBOUWDE lijfsleutel is ook een sleutel
     zonderSleutel.add(x.methode.toUpperCase() + ' ' + x.pad);
   }
   for (const r of mutaties) {

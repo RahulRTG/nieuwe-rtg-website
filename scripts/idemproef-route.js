@@ -324,6 +324,15 @@ if (require.main !== module) { module.exports = {}; return; }
       uitOpslag: uit.uitOpslag || 0, ruisGeijkt: [...ruis], vastlegging: uit.vastleggingGemeten || [],
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
+      /* WELKE LIJFSLEUTELS ER WERKELIJK ZIJN GEBOUWD, en welke niet. Een familie
+         DECLAREREN is iets anders dan hem HEBBEN: de gezinsfamilie liep stuk op
+         twee veldnamen en meldde zich netjes als mislukt, terwijl
+         scripts/onbewezen.js zijn 187 routes toen al als "heeft een sleutel"
+         telde -- die keek naar de declaratie. Sindsdien leest de trechter dit
+         veld, en een familie die niet is gebouwd dekt niets. */
+      lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
+      lijfsleutelsMislukt: lijfsleutels.mislukt,
+      routesOpLijfsleutel: metLijf.length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length },
     zonderBesluit, tegenspraken: uit.tegenspraken || [], vastleggingVerdacht: uit.vastleggingVerdacht || [],
     vermoedensVerworpen: uit.vermoedensVerworpen || 0,

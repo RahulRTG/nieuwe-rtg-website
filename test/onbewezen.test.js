@@ -80,3 +80,48 @@ test('NIET_BEPROEFBAAR telt niet als bewijs', () => {
   assert.ok(!KLAAR.has('WACHT_OP_FIXTURE'));
   assert.ok(!KLAAR.has('NOG_NIET_GECLASSIFICEERD'));
 });
+
+/* ============================================================================
+   EEN FAMILIE DECLAREREN IS IETS ANDERS DAN HEM HEBBEN.
+
+   WAT ER MIS GING, en het was mijn eigen inbouw. De trechter las of een route
+   onder het voorvoegsel van een lijfsleutel-familie viel -- de DECLARATIE -- en
+   trok hem dan uit GEEN_PROEFSLEUTEL. In de meting daarna liep de gezinsfamilie
+   stuk op twee veldnamen (`gezinsnaam` en `naam`, niet `naam` en `beheerder`).
+   De bouwer meldde zich netjes als mislukt, de proef schreef "mislukt: gezin"
+   in zijn uitvoer... en de trechter meldde 255 routes minder in
+   GEEN_PROEFSLEUTEL. De uitslag zei "heeft een sleutel" over 187 routes waar
+   geen sleutel voor bestond.
+
+   Dat is exact de schijnzekerheid die deze trechter moet voorkomen, en ik had
+   hem er zelf in gezet. Sindsdien telt hier alleen wat de METING heeft
+   gebouwd (`gemeten.lijfsleutelsGebouwd` in IDEMPROEF.json). Ontbreekt dat veld
+   -- een ouder register -- dan wordt er niets gecrediteerd: fail-closed, en
+   liever een te hoog getal dan een te laag.
+
+   DE MUTATIE: laat de trechter weer op de declaratie tellen -> deze toets
+   zakt zodra een familie mislukt of het veld ontbreekt.
+   ========================================================================== */
+test('een lijfsleutel telt pas als de meting hem heeft GEBOUWD', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const { FAMILIES } = require('../scripts/lib/lijfsleutels');
+  let reg = null;
+  try { reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'IDEMPROEF.json'), 'utf8')); } catch (e) {}
+  const gebouwd = new Set(((reg && reg.gemeten && reg.gemeten.lijfsleutelsGebouwd) || []));
+  const geen = new Set(u.perRoute.GEEN_PROEFSLEUTEL || []);
+
+  for (const f of FAMILIES) {
+    if (gebouwd.has(f.naam)) continue;
+    /* Een familie die NIET is gebouwd, mag geen enkele route uit de bak halen.
+       Als er routes onder zijn voorvoegsel bestaan, horen die er nog in te staan. */
+    const onderPrefix = (u.perRoute.GEEN_PROEFSLEUTEL || [])
+      .concat(...Object.values(u.perRoute))
+      .filter(s => f.prefixen.some(p => s.split(' ')[1].startsWith(p)));
+    if (!onderPrefix.length) continue;
+    const nogInDeBak = onderPrefix.some(s => geen.has(s));
+    assert.ok(nogInDeBak,
+      'familie "' + f.naam + '" is niet gebouwd, en toch staat geen van zijn routes nog in ' +
+      'GEEN_PROEFSLEUTEL -- dan is de trechter op de declaratie gaan tellen in plaats van op de meting');
+  }
+});

@@ -158,7 +158,9 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-kaleronde').SLEUTELS,
   /* En de andere kant van diezelfde ronde: wat je met opzet NIET dedupliceert,
      elk met een reden. Zie de kop van dat bestand. */
-  require('./idemsleutels-kaleronde-b').SLEUTELS);
+  require('./idemsleutels-kaleronde-b').SLEUTELS,
+  /* De zesentwintig die de uitgebreide proefopstelling zichtbaar maakte. */
+  require('./idemsleutels-proefronde').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

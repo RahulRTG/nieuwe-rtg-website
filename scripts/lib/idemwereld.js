@@ -256,8 +256,12 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
       const klas = await stil('/api/foundation/school/leraar/klas/maak', {
         schoolCode: w.schoolCode, personeelToken: w.personeelToken, naam: 'Proefklas'
       });
-      w.klasCode = veld(klas, 'klas', 'code') || veld(klas, 'klasCode');
-      w.klasToken = veld(klas, 'klas', 'token') || veld(klas, 'klasToken');
+      /* De klascode staat op het HOOGSTE niveau van het antwoord ({ok, code,
+         naam, fase, trap}) en niet onder `klas`. Die aanname kostte een ronde:
+         w.klasCode bleef null, de 54 routes bleven staan, en niets zei er iets
+         over -- precies waarom de proef zijn voorvoegsels met hun velden
+         afdrukt. */
+      w.klasCode = veld(klas, 'code');
     }
   }
 
@@ -276,10 +280,12 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     ['kp', '/api/kantoorpakket/maak', tokens.member],
     ['kpOffice', '/api/office/kantoorpakket/maak', tokens.office],
     ['kpSupplier', '/api/supplier/kantoorpakket/maak', tokens.supplier],
-    ['kpWerkplek', '/api/werkplek/kantoorpakket/maak', tokens.boardroom]
+    /* De werkplekkant wil ook weten WELK huis: /api/werkplek/ hangt aan
+       kern/werkplek.js met twee vaste codes, en de baas mag overal in. */
+    ['kpWerkplek', '/api/werkplek/kantoorpakket/maak', tokens.boardroom, { bedrijf: 'rtg' }]
   ];
-  for (const [sleutel, pad, tok] of doosjes) {
-    const d = await stil(pad, { titel: 'Proefdocument' }, tok);
+  for (const [sleutel, pad, tok, extraLijf] of doosjes) {
+    const d = await stil(pad, { titel: 'Proefdocument', ...(extraLijf || {}) }, tok);
     w[sleutel] = veld(d, 'document', 'id') || veld(d, 'id') || veld(d, 'doc', 'id');
   }
 

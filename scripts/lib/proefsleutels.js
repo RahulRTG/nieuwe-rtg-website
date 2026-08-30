@@ -61,8 +61,8 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
-const ROLLEN = ['member', 'office', 'supplier', 'boardroom', 'techniek', 'kantoor-op-naam',
-  'werkplekbaas', 'scim', 'openbaar'];
+const ROLLEN = ['member', 'member-zakelijk', 'office', 'supplier', 'boardroom', 'techniek',
+  'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
    zijn eigen basis-URL en foutafhandeling); `officeCode` de backoffice-code van
@@ -96,6 +96,13 @@ function maakSleutels({ post, officeCode, eigen }) {
 
   const inlog = Object.assign({
     member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
+    /* EEN LID MET EEN ZAKELIJKE PAS, en dat is een andere rol dan `member`.
+       Het partnerkanaal eist de capability `can_be_partner`, en die zit op de
+       zakelijke treden en niet op RTG Pass (kern/commercie/capaciteiten.js).
+       Met het gewone lid-token geeft /api/partner/types keurig 403 -- en dat is
+       geen gat maar de scheiding die werkt; alleen kon de proef er daardoor
+       niets over zeggen. Gemeten met tier=business: 200. */
+    'member-zakelijk': async () => (await post('/api/login', { tier: 'business' })).data.token,
     office: async () => (await post('/api/office/login', { code: officeCode })).data.token,
     supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token,
     /* Beide via de eigenaar; zie de kop waarom dat twee namen blijven. */

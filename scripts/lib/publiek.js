@@ -295,6 +295,14 @@ const PUBLIEK = new Map([
   ['/api/supplier/login', 'de zaak logt in met code en wachtwoord, of een medewerker met een pincode'],
   ['/api/supplier/mijn/login', 'idem voor het persoonlijke deel van een medewerker'],
   ['/api/techniek/inloggen', 'de techniekdeur; eigen rem per adres en per login, en een gelijk antwoord op elke mislukking'],
+  ['/api/staff', 'de personeelsdeur: een medewerker wisselt een code in voor een sessie, dus er kan er nog geen zijn'],
+
+  /* Nog drie die met reden open staan en er niet op stonden. Alle drie
+     nagelopen in de bron, en alle drie van een soort die hierboven al vertegen-
+     woordigd is -- ze waren gewoon overgeslagen. */
+  ['/api/betaal/webhook/adyen', 'de derde kaartwebhook, naast die van de betaalprovider en de munt hierboven; ondertekend, met een eigen rem'],
+  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen voor een sessie: dat IS de inlog, dus er kan er nog geen zijn'],
+  ['/api/foundation/reis/aanvraag', 'wie een reis aanvraagt of iemand voordraagt heeft geen foundation-account; dat is het punt ervan. Eigen rem per adres (test/foundation-reisrem.test.js)'],
 
   // ---- bestaan alleen in NODE_ENV=test ----
   ['/api/test/bug', 'alleen geregistreerd als NODE_ENV=test; bestaat in productie niet'],
@@ -352,7 +360,6 @@ const ALLEEN_ANONIEM = new Map([
 
   // ---- deuren: hier kan per definitie nog geen sessie zijn ----
   ['/api/sso/terug', 'de provider stuurt de bezoeker hierheen terug, zonder onze sessie'],
-  ['/api/sso/wissel', 'het overdrachtsbewijs omruilen: dat IS de inlog'],
   ['/api/auth/resend', 'bevestigingsmail opnieuw sturen; de `auth` ervoor stelt niets als eis'],
   ['/api/account/start', 'accountherkenning aan de poort; de `auth` ervoor stelt niets als eis'],
 

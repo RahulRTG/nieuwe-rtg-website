@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:54:00.651Z",
-  "commit": "735b06e0",
+  "op": "2026-08-30T12:07:55.595Z",
+  "commit": "6a55f0f9",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "gemeten": {
   "zonderBewakerslaag": 612,
   "bewaakt": 531,
-  "openbaarMetReden": 53,
-  "eigenControle": 8,
+  "openbaarMetReden": 54,
+  "eigenControle": 7,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 16
+  "publiekeLijstenVerschillen": 15
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -32,7 +32,6 @@
    "/api/foundation/gesprekskaart",
    "/api/salon/promo",
    "/api/sso/terug",
-   "/api/sso/wissel",
    "/api/auth/resend",
    "/api/account/start",
    "/api/foundation/school/school/maak",
@@ -3795,7 +3794,8 @@
   {
    "sleutel": "POST /api/staff",
    "bestand": "server/routes/staff.js:38",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "de personeelsdeur: een medewerker wisselt een code in voor een sessie, dus er kan er nog geen zijn"
   },
   {
    "sleutel": "POST /api/supplier/apply",

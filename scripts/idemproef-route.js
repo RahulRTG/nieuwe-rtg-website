@@ -119,7 +119,7 @@ if (require.main !== module) { module.exports = {}; return; }
      elke proef, terwijl er wel degelijk een sleutel te MAKEN is. Zie de kop van
      ./lib/lijfsleutels.js voor waarom dat een tweede begrip is en geen rol. */
   const { bouwLijfsleutels } = require('./lib/lijfsleutels');
-  const lijfsleutels = await bouwLijfsleutels({ post, tokens });
+  const lijfsleutels = await bouwLijfsleutels({ post, tokens, datamap: server.datamap });
   console.log('  lijfsleutels gebouwd                 : ' +
     (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
     (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));

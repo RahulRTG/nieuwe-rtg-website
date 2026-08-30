@@ -75,3 +75,48 @@ test('lijfsleutel staat NIET in de rol-woordenlijst van de bewakerskaart', () =>
   assert.ok(!rollen.has('lijfsleutel'),
     'de rolproef zou deze deuren dan gaan kruisen, en daar bewijst kruisen niets');
 });
+
+/* ============================================================================
+   DE SCHOOLFAMILIE LOOPT DE ECHTE WEG, EN DAT IS EEN BESLUIT.
+
+   Er bestaat een snelle deur: /api/foundation/school/school/maak maakt in een
+   keer een school met een beheersleutel. Die geeft buiten NODE_ENV=test een
+   410, en die vlag aanzetten zou 165 routes in een klap ontsluiten -- maar dan
+   meet de proef een server die het product niet is. Dat is precies het soort
+   groen waar dit huis niets aan heeft.
+
+   Dus loopt de bouwer de productieweg: registratie aanvragen, vijf
+   toelatingscontroles aftekenen met het boardroom-token, besluit nemen,
+   activeren.
+
+   EN ER IS EEN STAP DIE BUITEN HET HTTP-VLAK VALT. Het besluit geeft de
+   activatielink NIET terug -- die gaat naar het gecontroleerde schooladres. Dat
+   is het ontwerp: wie goedkeurt, hoort de sleutel niet in handen te krijgen. De
+   bouwer leest hem uit de outbox van de wegwerpserver, langs dezelfde weg die
+   test/foundationregistratie.test.js al gebruikt.
+
+   Die afhankelijkheid hoort zichtbaar te zijn en niet weggemoffeld: zonder
+   datamap is deze familie niet te bouwen, en dan meldt hij zich als mislukt in
+   plaats van een sleutel te verzinnen. Dat is wat de laatste toets vastlegt.
+   ========================================================================== */
+test('de schoolfamilie gebruikt NIET de snelle testdeur', () => {
+  const school = FAMILIES.find(f => f.naam === 'school');
+  assert.ok(school, 'de schoolfamilie hoort te bestaan');
+  const bron = String(school.bouw);
+  assert.ok(!/school\/school\/maak/.test(bron),
+    'de snelle deur werkt alleen met NODE_ENV=test; die vlag zou de hele server een andere server maken');
+  assert.match(bron, /registratie\/aanvragen/, 'de echte weg begint bij de registratie');
+  assert.match(bron, /registratie\/besluit/, 'en loopt langs het besluit');
+});
+
+test('zonder datamap bouwt de schoolfamilie niets, in plaats van iets te verzinnen', async () => {
+  /* De activatiesleutel komt uit de outbox op schijf. Ontbreekt die map, dan is
+     er geen sleutel -- en dan hoort de familie te ontbreken en niet te doen
+     alsof. */
+  const school = FAMILIES.find(f => f.naam === 'school');
+  const uit = await school.bouw({
+    post: async () => ({ status: 200, data: { ok: true, id: 'x', aanvraag: { controles: [{ id: 'brin' }] } } }),
+    tokens: { boardroom: 'nep' }
+  });
+  assert.equal(uit, null, 'zonder datamap hoort er geen sleutel uit te komen');
+});

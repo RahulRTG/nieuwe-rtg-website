@@ -216,6 +216,32 @@ const FAMILIES = [
       if (!r || r.status < 200 || r.status >= 300) return null;
       return { bedrijf: 'rtg' };
     }
+  },
+  {
+    naam: 'les',
+    /* De onderwijskant van de RTFoundation: het digitale schoolbord, de agenda,
+       de opgaven en het schrift. Tien routes achter lesVan/docentCheck. */
+    prefixen: ['/api/foundation/les/', '/api/foundation/bord/', '/api/foundation/agenda/',
+      '/api/foundation/opgave/', '/api/foundation/schrift/', '/api/foundation/ai'],
+    velden: ['code', 'token'],
+    waarom: 'lesVan leest de lescode uit het lijf en docentCheck de docentsleutel via ' +
+      'tokenUit(req), die ook het lijfveld `token` accepteert (server/foundation/basis.js)',
+    /* Bewust zonder inlog -- een quizbord in de klas -- en dus geeft de deur
+       code en sleutel gewoon terug. Wel met de uurgrens per IP die er sinds
+       kort op zit (test/foundation-lesrem.test.js); een fixture die er een
+       maakt, past ruim binnen die twintig.
+
+       LET OP DE VELDNAMEN: `code` en `token` heten hier hetzelfde als bij het
+       gezin, en dat is geen dubbeling maar toeval. De voorvoegsels overlappen
+       niet, en de eerste treffer wint -- maar wie hier een pad toevoegt dat ook
+       onder /api/foundation/gezin/ of /api/rtf/ valt, krijgt stil de verkeerde
+       sleutel. Dat is de reden dat de prefixen expliciet en smal staan. */
+    async bouw({ post }) {
+      const r = await post('/api/foundation/les/maak', { vak: 'Proefles', naam: 'Proef Begeleider' }, null);
+      const d = r && r.data;
+      if (!d || !d.code || !d.token) return null;
+      return { code: d.code, token: d.token };
+    }
   }
 ];
 

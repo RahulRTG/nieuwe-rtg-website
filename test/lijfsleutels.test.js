@@ -171,3 +171,31 @@ test('een bouwer die 403 krijgt, meldt zich als mislukt', async () => {
     tokens: { boardroom: 'nep' }
   }), null);
 });
+
+/* ============================================================================
+   GEEN TWEE FAMILIES OVER HETZELFDE PAD.
+
+   De families worden op VOORVOEGSEL gekozen en de eerste treffer wint. Zolang
+   geen voorvoegsel onder een ander valt, is dat eenduidig. Valt er wel een
+   onder -- iemand zet '/api/foundation/' ergens neer -- dan krijgt een route
+   stil de sleutel van de verkeerde familie, en dat is niet aan de uitslag te
+   zien: hij loopt gewoon op 403 of 404 stuk en belandt in een fixture-bak.
+
+   Dat risico is niet theoretisch. De gezinsfamilie en de lesfamilie gebruiken
+   allebei de veldnamen `code` en `token`, en ze wonen allebei onder
+   /api/foundation/. Ze overlappen nu niet, en deze toets houdt dat zo.
+   ========================================================================== */
+test('geen enkel voorvoegsel valt onder dat van een andere familie', () => {
+  for (const a of FAMILIES) {
+    for (const b of FAMILIES) {
+      if (a === b) continue;
+      for (const pa of a.prefixen) {
+        for (const pb of b.prefixen) {
+          assert.ok(!pa.startsWith(pb) && !pb.startsWith(pa),
+            'familie "' + a.naam + '" (' + pa + ') overlapt met "' + b.naam + '" (' + pb + '); ' +
+            'de eerste treffer wint, dus een van de twee krijgt stil de verkeerde sleutel');
+        }
+      }
+    }
+  }
+});

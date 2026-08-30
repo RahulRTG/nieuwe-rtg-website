@@ -1,11 +1,11 @@
 {
-  "catalogi": 982,
-  "verschillendeNamen": 588,
+  "catalogi": 988,
+  "verschillendeNamen": 590,
   "namenInMeerDomeinen": 111,
   "woordenMetMeerBetekenissen": 94,
-  "betekenissenTotaal": 344,
+  "betekenissenTotaal": 347,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 44,
+  "ergsteAantal": 45,
   "dubbelingen": 30,
   "dubbelingLijst": [
     {
@@ -158,7 +158,7 @@
     },
     {
       "naam": "STATUS",
-      "betekenissenVanDitWoord": 11,
+      "betekenissenVanDitWoord": 12,
       "waar": [
         "server/kern/architect/bank.js",
         "server/kern/atelier/bank.js",
@@ -255,7 +255,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 44,
+      "betekenissenVanDitWoord": 45,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -438,7 +438,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 44,
+      "betekenissenVanDitWoord": 45,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -785,8 +785,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 46,
-      "betekenissen": 44,
+      "domeinen": 47,
+      "betekenissen": 45,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -800,6 +800,17 @@
             "leverancier",
             "arbeid",
             "huur"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/effectmeter.js"
+          ],
+          "leden": 3,
+          "voorbeeld": [
+            "opslag",
+            "mail",
+            "sms"
           ]
         },
         {
@@ -1492,8 +1503,8 @@
     },
     {
       "naam": "STATUS",
-      "domeinen": 14,
-      "betekenissen": 11,
+      "domeinen": 15,
+      "betekenissen": 12,
       "hoogsteOverlap": 1,
       "soort": "gemengd",
       "waar": [
@@ -1558,6 +1569,18 @@
             "ingediend",
             "toegekend",
             "afgewezen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mutatiecontract/klassen.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "PROTECTED",
+            "INTENTIONALLY_NON_IDEMPOTENT",
+            "NOT_APPLICABLE",
+            "UNTESTABLE_WITH_JUSTIFIED_REASON"
           ]
         },
         {
@@ -3348,5 +3371,5 @@
       ]
     }
   ],
-  "bestanden": 2839
+  "bestanden": 2868
 }

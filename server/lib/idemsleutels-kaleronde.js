@@ -29,7 +29,6 @@ const SLEUTELS = {
      Bij deze staat er wel degelijk een veld in de body dat bepaalt WAT er
      ontstaat, en een tweede identiek verzoek binnen het dubbeltikvenster is dus
      een dubbeltik en geen tweede bedoeling. Het veld staat er per regel bij. */
-  'POST /api/bedrijf/lid/aanmeld': { zelfdeVerzoek: true },            // naam + functie + afdeling
   'POST /api/bedrijf/project/maak': { zelfdeVerzoek: true },           // naam + werkvorm
   'POST /api/bedrijf/taak/maak': { zelfdeVerzoek: true },              // titel + projectId
   'POST /api/bedrijf/werkruimte/maak': { zelfdeVerzoek: true },        // naam + moeder
@@ -133,7 +132,6 @@ const SLEUTELS = {
      Overschrijvingen: de tweede identieke oproep zet dezelfde waarde. */
   'POST /api/member/rtmail/bewaartermijn': { zelfdeVerzoek: true },   // doel + dagen + reden
   'POST /api/supplier/rtmail/bewaartermijn': { zelfdeVerzoek: true }, // zelfde route, zaakkant
-  'POST /api/member/spel/sudoku-nieuw': { zelfdeVerzoek: true }       // niveau; overschrijft het lopende potje
 };
 
 module.exports = { SLEUTELS };

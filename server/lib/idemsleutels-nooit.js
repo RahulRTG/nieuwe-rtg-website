@@ -33,7 +33,22 @@
       kern.bankClearingMislukt() krijgt de sleutel van de mislukte CLEARING mee,
       en dat is het ding dat werkelijk een keer telt.
 
-   3. /api/supplier/horeca/folio/nacht. De nachtrun houdt per folio bij welke
+   3. /api/bedrijf/lid/aanmeld. Ik gaf hem een regel op naam + functie +
+      afdeling, en daarmee was de aanname dat twee mensen met dezelfde naam in
+      dezelfde werkruimte dezelfde mens zijn. Dat zijn ze niet -- de tweede Pia
+      werd niet aangemeld en kreeg het lidmaatschap van de eerste terug. In
+      test/werkgrens.test.js viel daardoor precies de toets om die er is om te
+      bewijzen dat het huis bij twee naamgenoten GEEN id gokt: er was maar een
+      Pia, dus er viel niets te gokken. Wie zich aanmeldt, meldt zich aan; de
+      werkruimte laat hem daarna wel of niet toe.
+
+   4. /api/member/spel/sudoku-nieuw. Mijn aantekening erbij luidde "overschrijft
+      het lopende potje", en dat is precies de reden dat hij hier NIET hoort: wie
+      twee keer op "nieuwe puzzel" drukt, wil een nieuwe puzzel. Met de regel
+      erop kreeg hij de vorige terug -- de toets die bewijst dat je geen voorraad
+      puzzels kunt aanleggen, kon zo niet eens meer zakken.
+
+   5. /api/supplier/horeca/folio/nacht. De nachtrun houdt per folio bij welke
       nachten geboekt zijn en meldt eerlijk `geboekt: 0, overgeslagen: 1`. Met
       een regel erboven kreeg de tweede oproep `geboekt: 1` terug: er werd niets
       dubbel geboekt, maar het ANTWOORD loog over wat er gebeurd was -- en dat
@@ -48,6 +63,11 @@ const NOOIT = {
     'een herstelknop met een leeg lijf: een opgeslikte tweede druk laat de bank in nood staan en zegt "ok"',
   'POST /api/office/bank/mislukking':
     'een leeg lijf per melding, en de route telt zelf op de sleutel van de mislukte clearing',
+  'POST /api/bedrijf/lid/aanmeld':
+    'twee mensen met dezelfde naam in dezelfde werkruimte zijn twee mensen; de tweede kreeg het ' +
+    'lidmaatschap van de eerste terug',
+  'POST /api/member/spel/sudoku-nieuw':
+    'wie twee keer op "nieuwe puzzel" drukt, wil een nieuwe puzzel',
   'POST /api/supplier/horeca/folio/nacht':
     'de nachtrun weet zelf welke nachten al geboekt zijn en zegt dat ook -- een cache maakt van dat antwoord een leugen'
 };

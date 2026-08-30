@@ -84,3 +84,38 @@ test('de snelle testdeuren worden NIET gebruikt', () => {
   assert.match(bron, /personeel\/uitnodig/, 'de echte weg loopt via een uitnodiging');
   assert.match(bron, /uitnodiging\/accepteer/);
 });
+
+/* ============================================================================
+   EEN KIND IN EEN KLAS EN EEN LEERLING IN DE ADMINISTRATIE ZIJN TWEE DINGEN.
+
+   Ik dacht eerst dat stap 8 dubbel was en gaf het gezinsprofiel-id door als
+   leerlingId. Veertien routes bleven "Deze leerling staat niet in de
+   administratie" geven -- terecht, want daar stond hij ook niet.
+
+   Het zijn twee dingen in dit huis: een kind in een klas is een gezinsprofiel
+   dat via een klascode is aangesloten; een leerling is een rij in de
+   leerlingenlijst van de school, met een eigen id, een status (aanmelding,
+   wachtlijst, ingeschreven) en een dossier dat jaren blijft staan. Ze zijn
+   niet los te koppelen -- de aanmelding draagt gezinCode en profielId, zodat
+   het dossier weet over wie het gaat -- en ze zijn ook niet hetzelfde.
+
+   DE MUTATIE: zet extra.leerlingId weer op profielId -> deze toets zakt.
+   ========================================================================== */
+test('leerlingId is het administratie-id en niet het gezinsprofiel', async () => {
+  let n = 0;
+  const u = await zetSchoolKlaar({
+    post: async (pad) => {
+      n++;
+      if (/leerling\/aanmeld/.test(pad)) return { status: 200, data: { ok: true, leerling: { id: 'ADM-1' } } };
+      if (/profiel\/maak/.test(pad)) return { status: 200, data: { profiel: { id: 'PROF-9' } } };
+      if (/klas\/maak/.test(pad)) return { status: 200, data: { klas: { code: 'K1' } } };
+      if (/uitnodiging\/accepteer/.test(pad)) return { status: 200, data: { personeelToken: 'P1' } };
+      return { status: 200, data: { ok: true } };
+    },
+    sleutels: { school: { schoolCode: 'S1', beheerToken: 'T1' }, gezin: { code: 'G1', token: 'T2' } },
+    datamap: null
+  });
+  assert.equal(u.extra.profielId, 'PROF-9', 'het gezinsprofiel hoort mee te gaan');
+  assert.notEqual(u.extra.leerlingId, 'PROF-9',
+    'maar NIET als leerlingId -- daar staat hij niet in de administratie');
+});

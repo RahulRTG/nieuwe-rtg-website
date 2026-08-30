@@ -30,9 +30,22 @@
      6. de leraar maakt een KLAS -- de beheersleutel van de school kan dat
         niet, en dat is geen omissie maar het ontwerp
      7. het gezin sluit het kind aan bij die klas met de klascode
+     8. de administratie schrijft de leerling IN -- en dat is een ander ding
+        dan het kind uit stap 7
 
    Pas na stap 7 kent de school dat gezin, en dat is precies wat die 36 routes
    missen.
+
+   STAP 8 VERDIENT UITLEG, want ik dacht eerst dat hij dubbel was. Een kind in
+   een klas en een leerling in de administratie zijn TWEE dingen in dit huis:
+   het eerste is een gezinsprofiel dat via een klascode is aangesloten, het
+   tweede een rij in de leerlingenlijst van de school, met een eigen id, een
+   status (aanmelding, wachtlijst, ingeschreven) en een dossier dat jaren
+   blijft staan. Veertien routes vroegen om dat tweede en kregen "Deze leerling
+   staat niet in de administratie", terwijl het kind gewoon in de klas zat.
+
+   Ze zijn niet los te koppelen: de aanmelding draagt gezinCode en profielId,
+   zodat het dossier weet over wie het gaat.
 
    TWEE DEUREN DIE IK HEB LATEN LIGGEN. /school/personeel/aanmeld maakt in een
    keer een personeelslid met alleen een schoolcode -- en geeft buiten
@@ -158,15 +171,32 @@ async function zetSchoolKlaar({ post, sleutels, datamap }) {
      Ik heb hier eerst `gezinscode` meegegeven, en dat was raden: de route
      leest `code`. Zesendertig routes bleven daardoor 404 terwijl de wereld al
      klaarstond. */
+  /* De administratieve leerling. `poort(req,res,'leerling.schrijf')` -- dus met
+     de personeelssleutel, niet met de beheersleutel; dezelfde les als bij de
+     klas. */
+  let leerlingId = null;
+  if (personeelToken) {
+    const aanmelding = await doe('leerling in de administratie', '/api/foundation/school/leerling/aanmeld',
+      { schoolCode: school.schoolCode, personeelToken, naam: 'Proefkind',
+        geboren: jaartal + '-06-15', gezinCode: gezin.code, profielId: profielId || undefined }, null);
+    leerlingId = aanmelding && aanmelding.leerling && aanmelding.leerling.id;
+  }
+
   const extra = {};
   if (school.schoolCode) { extra.schoolCode = school.schoolCode; extra.beheerToken = school.beheerToken; }
   if (gezin.code) { extra.code = gezin.code; extra.token = gezin.token; }
   if (klasCode) { extra.klasCode = klasCode; }
   if (personeelToken) { extra.personeelToken = personeelToken; }
-  if (profielId) { extra.profielId = profielId; extra.leerlingId = profielId; }
+  if (profielId) { extra.profielId = profielId; }
+  /* `leerlingId` is het administratie-id en NIET het gezinsprofiel. Dat heb ik
+     eerst wel gelijkgesteld, en toen bleven veertien routes 404 geven met
+     "Deze leerling staat niet in de administratie" -- terecht, want daar stond
+     hij ook niet. */
+  if (leerlingId) { extra.leerlingId = leerlingId; }
 
-  return { klaar: !!(klasCode && profielId), stappen, extra,
-    reden: klasCode && profielId ? null : 'niet elke stap kwam door; zie stappen' };
+  const klaar = !!(klasCode && profielId && leerlingId);
+  return { klaar, stappen, extra,
+    reden: klaar ? null : 'niet elke stap kwam door; zie stappen' };
 }
 
 module.exports = { zetSchoolKlaar };

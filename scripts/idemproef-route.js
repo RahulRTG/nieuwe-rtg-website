@@ -235,11 +235,19 @@ wachtOpSchoneBoom();
     '   (' + schoolWereld.stappen.filter(x => x.ok).length + '/' + schoolWereld.stappen.length + ' stappen)');
   for (const st of schoolWereld.stappen.filter(x => !x.ok)) console.log('      niet gelukt: ' + st.naam + ' -- ' + st.waarom);
 
+  /* DE HORECAWERELD -- ./lib/wereld-horeca.js. Geen nieuwe keten maar een
+     oogst op de gastfamilie: bij het aanschuiven ontstaat een rekening, en
+     twintig zaakroutes vragen om precies dat id. */
+  const { zetHorecaKlaar } = require('./lib/wereld-horeca');
+  const horecaWereld = await zetHorecaKlaar({ post, sleutels: schoolSleutels, tokens });
+  console.log('  horecawereld                         : ' + (horecaWereld.klaar ? 'klaar' : 'NIET klaar -- ' + horecaWereld.reden));
+
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra,
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
+      ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
@@ -311,6 +319,7 @@ wachtOpSchoneBoom();
        deur hoort. */
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...objecten.voor(r.pad),
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
+      ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
@@ -404,7 +413,7 @@ wachtOpSchoneBoom();
          telde -- die keek naar de declaratie. Sindsdien leest de trechter dit
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
-      schoolwereld: schoolWereld.klaar,
+      schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       lijfsleutelsMislukt: lijfsleutels.mislukt,

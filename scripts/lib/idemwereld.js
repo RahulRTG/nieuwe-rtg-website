@@ -518,6 +518,27 @@ function voorvoegselLijf(w) {
     uit.push({ voorvoegsel: '/api/supplier/ov/', lijf: {}, rol: 'ov' });
   }
 
+  /* De kantoorpakketten, elk met het document van HUN kring. Deze staan hier
+     onderaan maar zijn SPECIALER dan /api/werkplek/ en /api/supplier/ hierboven,
+     dus ze moeten ervoor -- de eerste treffer wint (zie de waarschuwing bij
+     /api/foundation/school/). Vandaar unshift en geen push.
+
+     DIT BLOK IS EEN KEER WEGGEWEEST, op 30 augustus 2026: bij het weghalen van
+     de taxiketen sneed ik van "de mobiliteitskant" tot "return uit" weg, en dit
+     stond daartussen. Gevolg: vier documenten werden nog wel AANGEMAAKT maar
+     nergens meer meegegeven, "Document niet gevonden" sprong van 14 terug naar
+     64, en ik las die terugval eerst als variatie in de wereldopbouw. Wat hem
+     aanwees was de regel die de proef zelf afdrukt -- de voorvoegsels met hun
+     velden -- want daar stonden ze ineens niet meer bij. */
+  for (const [voorvoegsel, id, rol] of [
+    ['/api/kantoorpakket/', w.kp],
+    ['/api/office/kantoorpakket/', w.kpOffice],
+    ['/api/supplier/kantoorpakket/', w.kpSupplier],
+    ['/api/werkplek/kantoorpakket/', w.kpWerkplek, 'boardroom']
+  ]) {
+    if (id) uit.unshift(rol ? { voorvoegsel, lijf: { id }, rol } : { voorvoegsel, lijf: { id } });
+  }
+
   return uit;
 }
 

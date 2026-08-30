@@ -65,6 +65,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-hindernis'),
   require('./mutatiecontracten-reis'),
   require('./mutatiecontracten-proefronde-lijst'),
+  require('./mutatiecontracten-ovronde'),
   require('./mutatiecontracten-effect'));
 
 {

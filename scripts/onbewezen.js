@@ -193,6 +193,41 @@ function meet() {
   for (const st of boek.statussen) for (const s of (st.leden || st.voorbeelden || [])) statusVan.set(s, st.id);
 
   const mutaties = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET');
+
+  /* FAIL-CLOSED, EN NU OOK ECHT. De eerste versie printte alleen een
+     waarschuwing en deelde daarna gewoon in -- met als gevolg dat een gesloten
+     poort 1205 routes in SEMANTIEK_NODIG zette, de DUURSTE bak, precies de
+     routes waarvan de meting zegt dat ze BESCHERMD zijn. De toets ernaast keek
+     of die bak niet ALLES bevatte, en dat was hij ook niet; hij ving de fout
+     dus niet.
+
+     Nu is er geen indeling zonder geldige meting. Alles wat geen bewijs heeft,
+     valt in STALE_BEWIJS -- de goedkoopste bak, want opnieuw meten IS de
+     reparatie. Dat is geen truc om een getal te verplaatsen: het is letterlijk
+     wat er aan de hand is, en de reden staat erbij. */
+  if (!M.klaar) {
+    const zonder = [];
+    for (const r of mutaties) {
+      const v = SLEUTELS[r.methode + ' ' + r.pad];
+      if (v && (v.leest || v.nietIdempotent || v.zelfdeVerzoek || v.velden)) continue;
+      zonder.push(r.methode + ' ' + r.pad);
+    }
+    const leeg = {};
+    for (const [id] of BAKKEN) leeg[id] = [];
+    leeg.STALE_BEWIJS = zonder;
+    return {
+      metingGebruikt: false,
+      metingReden: M.reden,
+      stempel: stempel({ metingGebruikt: false, metingReden: M.reden }),
+      uitleg: 'GEEN GELDIGE METING: er valt geen blokkadereden te noemen, dus staat alles in ' +
+        'STALE_BEWIJS. Opnieuw meten is de reparatie. Zie de kop van scripts/onbewezen.js.',
+      gemeten: { mutaties: mutaties.length, metBewijs: mutaties.length - zonder.length,
+        onbewezen: zonder.length, sluit: true },
+      bakken: BAKKEN.map(([id, uitleg]) => ({ id, uitleg, aantal: leeg[id].length,
+        voorbeelden: leeg[id].slice(0, 4) })),
+      perRoute: leeg
+    };
+  }
   /* Voor welke routes bestaat er uberhaupt een proefsleutel? Uit dezelfde
      verdeling die het mutatieboek gebruikt, en niet uit een eigen afleiding. */
   const beproefbaar = mutaties.filter(r => !isSchakel(r.pad) && !r.pad.includes(':'));

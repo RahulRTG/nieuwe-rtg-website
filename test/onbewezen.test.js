@@ -38,16 +38,29 @@ test('zonder geldige meting deelt de trechter niet stilzwijgend in', () => {
   assert.equal(typeof u.metingGebruikt, 'boolean', 'de uitslag hoort te zeggen of hij op een meting leunt');
   assert.ok(u.metingReden && u.metingReden.length > 10, 'en met welke reden');
   if (!u.metingGebruikt) {
-    /* Bij een gesloten poort mag de duurste bak niet vollopen: dat is precies
-       de fout die deze toets vasthoudt. */
-    const duur = u.bakken.find(b => b.id === 'SEMANTIEK_NODIG');
-    const totaal = u.gemeten.onbewezen;
-    assert.ok(duur.aantal < totaal,
-      'met een gesloten poort hoort niet alles in SEMANTIEK_NODIG te belanden');
+    /* WAT DEZE TOETS EERST DEED, EN WAAROM DAT TE ZWAK WAS. Hij keek of de
+       duurste bak niet ALLES bevatte -- en dat was hij ook niet, dus hij ving
+       de fout niet. Ondertussen zette een gesloten poort 1205 routes in
+       SEMANTIEK_NODIG: de duurste bak, en precies de routes waarvan de meting
+       zegt dat ze BESCHERMD zijn. De uitslag zag er volkomen normaal uit.
+
+       Zonder geldige meting valt er GEEN blokkadereden te noemen. Alles wat
+       geen bewijs heeft hoort dan in STALE_BEWIJS -- de goedkoopste bak, want
+       opnieuw meten IS de reparatie. Elke andere bak hoort leeg te zijn. */
+    for (const b of u.bakken) {
+      if (b.id === 'STALE_BEWIJS') continue;
+      assert.equal(b.aantal, 0,
+        'met een gesloten poort staat er ' + b.aantal + ' in ' + b.id + '; zonder meting ' +
+        'valt er geen blokkadereden te noemen en hoort alles in STALE_BEWIJS');
+    }
   }
 });
 
 test('een route zonder proefsleutel is geen verouderde meting', () => {
+  /* Zonder geldige meting staat alles met opzet in STALE_BEWIJS (zie de toets
+     hierboven); dan valt er over deze bak niets te zeggen. Geen stille
+     overslag: de reden hoort in de uitslag te staan. */
+  if (!u.metingGebruikt) { assert.ok(u.metingReden.length > 20); return; }
   const geen = u.bakken.find(b => b.id === 'GEEN_PROEFSLEUTEL');
   const stale = u.bakken.find(b => b.id === 'STALE_BEWIJS');
   assert.ok(geen, 'de bak GEEN_PROEFSLEUTEL hoort te bestaan');
@@ -103,6 +116,7 @@ test('NIET_BEPROEFBAAR telt niet als bewijs', () => {
    zakt zodra een familie mislukt of het veld ontbreekt.
    ========================================================================== */
 test('een lijfsleutel telt pas als de meting hem heeft GEBOUWD', () => {
+  if (!u.metingGebruikt) { assert.ok(u.metingReden.length > 20); return; }
   const fs = require('fs');
   const path = require('path');
   const { FAMILIES } = require('../scripts/lib/lijfsleutels');

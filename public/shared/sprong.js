@@ -228,11 +228,33 @@
     veld.type = 'search'; veld.placeholder = 'Waar wilt u heen?';
     veld.setAttribute('aria-label', 'Zoek een functie');
     veld.addEventListener('input', function () { teken(veld.value); });
+    /* PIJLTJES EN ENTER, want op een bureau is dit een toetsenbordding. De
+       eerste rij staat al klaar: wie typt en meteen Enter drukt, opent de beste
+       treffer zonder de muis aan te raken -- dat is de hele reden dat zo'n lade
+       op een computer sneller voelt dan een menu.
+
+       Op een telefoon verandert er niets: daar is er geen toetsenbordfocus om
+       te verplaatsen en blijft tikken tikken. */
+    veld.addEventListener('keydown', function (e) {
+      var rijen = lijst.querySelectorAll('.rtgsprong-rij');
+      if (!rijen.length) return;
+      if (e.key === 'Enter') { e.preventDefault(); rijen[0].click(); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); rijen[0].focus(); }
+    });
     var dicht = d.createElement('button');
     dicht.type = 'button'; dicht.textContent = 'Sluiten';
     dicht.addEventListener('click', sluit);
     kop.appendChild(veld); kop.appendChild(dicht);
     lijst = d.createElement('div'); lijst.className = 'rtgsprong-lijst';
+    lijst.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      var rijen = [].slice.call(lijst.querySelectorAll('.rtgsprong-rij'));
+      var i = rijen.indexOf(d.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      var volgende = e.key === 'ArrowDown' ? rijen[i + 1] : rijen[i - 1];
+      if (volgende) volgende.focus(); else veld.focus();
+    });
     luik.appendChild(kop); luik.appendChild(lijst);
     d.body.appendChild(luik);
   }

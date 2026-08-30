@@ -147,6 +147,28 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
       assert.equal(new URL(page.url()).pathname, '/apps/pay.html',
         'zoeken op de SLEUTEL (pay) hoort RTG Pay te openen, ook al heet de rij "Betalen"');
     });
+    await t.test('op een toetsenbord: typen en Enter opent de beste treffer', async () => {
+      /* Op een bureau is dit een toetsenbordding: wie typt en meteen Enter
+         drukt, hoort de bovenste treffer te openen zonder de muis aan te raken.
+         Deze toets ving ook een echte fout: de pijltjes werden aangehangen
+         voordat de lijst bestond, en toen tekende de lade helemaal niets meer. */
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+      await page.waitForTimeout(1600);
+      await page.locator('.rtgsprong-greep').click();
+      await page.waitForTimeout(400);
+      await page.fill('.rtgsprong-kop input', 'wallet');
+      await page.waitForTimeout(250);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1500);
+      /* Wallet woont als STAND in RTG Geld (/apps/geld.html#wallet) en niet op
+         een eigen adres; dat is precies waarom deze toets het adres uit de index
+         haalt in plaats van er een te verzinnen. */
+      const wallet = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'public/shared/sprongindex.json'), 'utf8'))
+        .items.find(i => /^wallet$/i.test(i.naam));
+      assert.equal(new URL(page.url()).pathname, new URL(wallet.url, 'http://x').pathname,
+        'typen en Enter hoort de bovenste treffer te openen');
+    });
+
     await ctx.close();
   } finally {
     await browser.close();

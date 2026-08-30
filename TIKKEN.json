@@ -35,21 +35,9 @@
     "3": 82,
     "4": 25
   },
-  "metReden": 34,
+  "metReden": 23,
   "zonderReden": [],
-  "verlopenReden": [
-    "/apps/appstore-kantoor.html",
-    "/apps/appstore-uitgever.html",
-    "/apps/architect-pda.html",
-    "/apps/hardware-pda.html",
-    "/apps/studio-pda.html",
-    "/apps/zaakkosten.html",
-    "/apps/websitestudio.html",
-    "/apps/klankwerk-kantoor.html",
-    "/apps/platformregister.html",
-    "/apps/techniek.html",
-    "/apps/stadsdoos.html"
-  ],
+  "verlopenReden": [],
   "perScherm": [
     {
       "pad": "/apps/agenda.html",

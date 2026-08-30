@@ -15,7 +15,22 @@
    routes, met de gewone poorten ervoor. Wat er daarna gemeten wordt, is
    onaangeraakt: doet een tweede oproep met dezelfde sleutel het nog een keer?
 
-   EN WAT HET NADRUKKELIJK NIET DOET: de drie kredietroutes forceren. Die geven
+   EN WAT HET NADRUKKELIJK NIET DOET -- twee dingen, en de tweede is er op
+   30 augustus 2026 bij gekomen.
+
+   GEEN RIJKSOVERHEID. Vierenzestig routes onder /api/overheid/ antwoorden
+   "Alleen voor het rijk.": `magBehandelen` vraagt een leverancier van het genre
+   `rijk`, en dat genre staat in de seed als `status: 'intern'` -- er is er geen,
+   met opzet. De proef zou er een kunnen aanvragen langs de gewone aanmeldbalie
+   en hem door het kantoor laten goedkeuren. Dat gebeurt hier niet. Een
+   Rijksoverheid-account is geen voorwerp maar een IDENTITEIT, en de goedkeuring
+   ervan leunt op een vergunning die een mens heeft gezien
+   (kern/aanmeldingen/bewijs.js). Een proef die zichzelf tot overheid benoemt om
+   vierenzestig regels uit de kolom `ongemeten` te halen, meet zijn eigen fixture.
+   Ze blijven ongemeten, en dat is de eerlijke uitslag -- geen gat dat nog
+   gevuld moet worden.
+
+   En het oudere geval: de drie kredietroutes forceren. Die geven
    503 met "hiervoor is een vergunning nodig die nog niet is vastgelegd" -- een
    bewuste, eerlijke stop. Een proef die zijn eigen meetobject openbreekt om een
    getal te halen, meet niets meer. Ze blijven ongemeten, en dat hoort.
@@ -216,6 +231,58 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     }
   }
 
+  /* 11d. EEN LERAAR EN EEN KLAS -- de tweede grote post na /api/rtf/.
+          54 routes stonden op "Onbekende klas of verkeerd token."; de wereld had
+          wel een school maar geen klas, en een klas maakt alleen een GOEDGEKEURDE
+          leraar.
+
+          Ook hier de echte weg en niet de snelle. `/school/personeel/aanmeld`
+          geeft buiten NODE_ENV=test een 410 met de reden erbij ("vraag de directie
+          om een persoonlijke uitnodiging op uw schoolmail"), dus loopt de proef
+          precies dat af: de directie nodigt uit, het geheim komt per mail, en de
+          medewerker accepteert. Dezelfde postbus als bij de school hierboven --
+          de proef opent de mail die hij zelf heeft laten sturen. */
+  if (w.schoolCode && w.schoolBeheerToken) {
+    await stil('/api/foundation/school/personeel/uitnodig', {
+      schoolCode: w.schoolCode, beheerToken: w.schoolBeheerToken,
+      naam: 'Proefleraar', email: 'proefleraar@example.invalid', rollen: ['leraar']
+    });
+    const uitnodiging = await uitPostbus(datamap, 'uitnodiging=');
+    if (uitnodiging) {
+      const acc = await stil('/api/foundation/school/personeel/uitnodiging/accepteer', { uitnodiging });
+      w.personeelToken = veld(acc, 'personeelToken');
+    }
+    if (w.personeelToken) {
+      const klas = await stil('/api/foundation/school/leraar/klas/maak', {
+        schoolCode: w.schoolCode, personeelToken: w.personeelToken, naam: 'Proefklas'
+      });
+      w.klasCode = veld(klas, 'klas', 'code') || veld(klas, 'klasCode');
+      w.klasToken = veld(klas, 'klas', 'token') || veld(klas, 'klasToken');
+    }
+  }
+
+  /* 11e. EEN DOCUMENT PER KANTOORPAKKET, en dat is met opzet vier keer.
+          51 routes stonden op "Document niet gevonden." De laag eronder is een
+          en dezelfde (kern/office/docs.js), maar de DOOS verschilt per kring:
+          een lid, het kantoor, een zaak en de werkplek hebben elk hun eigen
+          documenten. Een document dat het kantoor aanmaakt, vindt het lid niet
+          -- en dat hoort ook zo.
+
+          Dus maakt de proef er een per kring, met het token van die kring, en
+          geeft hem alleen door aan routes met datzelfde voorvoegsel. `id` is een
+          te algemene naam om in het gedeelde lijf te zetten: dan zouden
+          drieduizend andere routes er ineens een krijgen. */
+  const doosjes = [
+    ['kp', '/api/kantoorpakket/maak', tokens.member],
+    ['kpOffice', '/api/office/kantoorpakket/maak', tokens.office],
+    ['kpSupplier', '/api/supplier/kantoorpakket/maak', tokens.supplier],
+    ['kpWerkplek', '/api/werkplek/kantoorpakket/maak', tokens.boardroom]
+  ];
+  for (const [sleutel, pad, tok] of doosjes) {
+    const d = await stil(pad, { titel: 'Proefdocument' }, tok);
+    w[sleutel] = veld(d, 'document', 'id') || veld(d, 'id') || veld(d, 'doc', 'id');
+  }
+
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
 }
 
@@ -288,11 +355,34 @@ function voorvoegselLijf(w) {
        De schoolkant hangt onder de foundation-router (server/opzet/poortwachters.js
        mount hem op /api/foundation) en heet dus NIET /api/school. Die aanname
        kostte hier een ronde: de regel matchte nul routes en zei niets. */
+    /* `klasCode` erbij: de directie mag met haar beheerToken bij alle klassen
+       (server/school/poorten.js klasVan), dus de klascode is het enige dat nog
+       ontbrak. Een eigen tokenveld is niet nodig en zou botsen met de gezinssleutel. */
     uit.push({ voorvoegsel: '/api/foundation/school/',
       lijf: { code: w.gezinCode, token: w.gezinToken,
-        schoolCode: w.schoolCode || undefined, beheerToken: w.schoolBeheerToken || undefined } });
+        schoolCode: w.schoolCode || undefined, beheerToken: w.schoolBeheerToken || undefined,
+        klasCode: w.klasCode || undefined } });
     uit.push({ voorvoegsel: '/api/foundation/', lijf: { code: w.gezinCode, token: w.gezinToken } });
 
+    /* EN /api/rtf/, DE GROOTSTE POST VAN ALLEMAAL -- 208 routes.
+
+       Hetzelfde gezinsprofiel, een ander adres. server/routes/baby.js en zijn
+       buren doen `rtf.verifieerProfiel(req.body.code, req.body.token)` en
+       antwoorden anders "Log opnieuw in bij je gezin." Dat was met afstand de
+       meest gehoorde zin in het register: 208 van de 3402 geblokkeerde routes,
+       en de nummer twee stond op 64.
+
+       Ze stonden er niet omdat de wereld geen gezin had -- dat maakt hij hierboven
+       netjes aan -- maar omdat de regel alleen /api/foundation/ noemde. Sterker:
+       zonder deze regel kregen ze `code` uit het GEDEELDE lijf, en dat is de
+       KASCODE. Een gezinspoort die een kascode voorgeschoteld krijgt, weigert
+       terecht.
+
+       Dezelfde soort vergissing als de /api/school/-regel die hierboven wordt
+       beschreven: een aanname over waar iets hangt, die nul routes raakte en
+       daarover zweeg. Een voorvoegsel dat niets matcht, hoort iets te zeggen --
+       zie de telling die scripts/idemproef-route.js hierna afdrukt. */
+    uit.push({ voorvoegsel: '/api/rtf/', lijf: { code: w.gezinCode, token: w.gezinToken } });
   }
   if (w.werkruimte) {
     uit.push({ voorvoegsel: '/api/bedrijf/',
@@ -302,6 +392,20 @@ function voorvoegselLijf(w) {
      vaste codes ('rtg', 'rtf') en geen route die er een derde bij zet. `magIn`
      laat de BAAS overal in, en dat is de eigenaar -- dus de boardroom-sleutel. */
   uit.push({ voorvoegsel: '/api/werkplek/', lijf: { bedrijf: 'rtg' }, rol: 'boardroom' });
+
+  /* De kantoorpakketten, elk met het document van HUN kring. Deze staan na het
+     werkplek-voorvoegsel maar zijn specialer, dus ze moeten ervoor -- de eerste
+     treffer wint (zie de waarschuwing bij /api/foundation/school/ hierboven).
+     Vandaar unshift en niet push. */
+  const kp = [
+    ['/api/kantoorpakket/', w.kp],
+    ['/api/office/kantoorpakket/', w.kpOffice],
+    ['/api/supplier/kantoorpakket/', w.kpSupplier],
+    ['/api/werkplek/kantoorpakket/', w.kpWerkplek, 'boardroom']
+  ];
+  for (const [voorvoegsel, id, rol] of kp) {
+    if (id) uit.unshift(rol ? { voorvoegsel, lijf: { id }, rol } : { voorvoegsel, lijf: { id } });
+  }
   return uit;
 }
 

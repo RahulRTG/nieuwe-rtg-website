@@ -63,6 +63,26 @@ const SLEUTELS = {
   'POST /api/rtf/kantoorpakket/maak': { zelfdeVerzoek: true },     // zelfde reden als de andere kantoorpakketten
   'POST /api/rtf/social/pin/live': { zelfdeVerzoek: true },
 
+  /* ---- 4. DE RIJKSOVERHEID, aangesloten op 30 augustus 2026 ----
+
+     Toen het genre `rijk` in de proefwereld kwam (besluit van de eigenaar), gaven
+     97 overheidsroutes voor het eerst een uitslag. Drie ervan deden zonder
+     sleutel het werk opnieuw, en het zijn precies de drie waar dat het meest
+     uitmaakt. Alle drie eisen een verplicht veld of zetten een toestand, dus de
+     valkuil uit ./idemsleutels-nooit.js is hier niet aan de orde -- en geen van
+     drieen antwoordt bij een herhaling met een BESLUIT, wat de andere valkuil
+     was. */
+  'POST /api/overheid/bekendmaking': { zelfdeVerzoek: true },
+  // titel + tekst verplicht; een tweede publicatie zet dezelfde bekendmaking
+  // nog een keer in het register van 500
+  'POST /api/overheid/rb/zaak': { zelfdeVerzoek: true },
+  // titel verplicht; een dubbeltik brengt dezelfde zaak twee keer aan, met twee
+  // zaaknummers -- en een zaaknummer is waar de rest van de keten aan hangt
+  'POST /api/overheid/verkiezing/sluit': { zelfdeVerzoek: true },
+  // zet een stand, dus twee keer laat dezelfde stand achter. Wat er wel beweegt
+  // is `gesloten: nu()`: het MOMENT waarop een verkiezing sloot wordt dan
+  // overschreven, en dat is een feit en geen tijdstempel
+
   /* En de drie die met opzet GEEN duplicaatregel krijgen -- de moeilijke helft,
      en alle drie met een precedent in dit huis. */
   'POST /api/rtf/spel/sudoku-nieuw': { nietIdempotent: true,

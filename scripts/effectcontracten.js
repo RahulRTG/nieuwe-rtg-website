@@ -1,34 +1,40 @@
 #!/usr/bin/env node
 /* ============================================================================
-   DE CONTRACTEN DIE OP DE EFFECTMETER LEUNEN.
+   DE VOORSTELLEN DIE OP TWEE METERS RUSTEN -- EN HET ZIJN VOORSTELLEN.
 
    NOT_APPLICABLE eist bewijs dat er niets verandert. De opslagmeter alleen is
-   daar te zwak voor -- hij ziet de collecties en dus geen mail, geen sms en geen
-   schrijfactie daarbuiten. server/lib/mutatiecontracten-leest.js vult dat gat met
-   scripts/schrijfanalyse.js, en dat lukte veertig keer: die analyse volgt met
-   opzet geen aanroep naar een andere module, en in dit huis gaat bijna elke
-   handler meteen de kern in.
+   daar te zwak voor: hij ziet de collecties, dus geen mail, geen sms en geen
+   schrijfactie daarbuiten. server/effectmeter.js sluit dat gat van de andere
+   kant -- hij meet niet wat de code KAN maar wat het verzoek HEEFT gedaan, en
+   schaalt daarom wel waar scripts/schrijfanalyse.js bleef steken op veertig
+   routes (die volgt met opzet geen aanroep over een modulegrens).
 
-   server/effectmeter.js sluit hetzelfde gat vanaf de andere kant: hij meet niet
-   wat de code KAN maar wat het verzoek HEEFT gedaan, op drie choke points. Twee
-   kale oproepen die allebei `geen` melden zijn daarmee een tweede, onafhankelijke
-   meting -- en anders dan de statische analyse schaalt hij wel, want hij hangt
-   aan de aanroep en niet aan de brontekst.
+   WAAROM DIT GEEN CONTRACTEN SCHRIJFT, en dat is de kern van dit bestand.
 
-   WAT DIT SCRIPT NIET DOET. Het verzint geen stand. Het schrijft alleen de routes
-   op waar ALLE VIER waar is:
+   Een eerdere versie schreef 848 kant-en-klare NOT_APPLICABLE-contracten weg.
+   server/kern/mutatiecontract/keuring.js verbiedt dat, en zegt er de reden bij:
+   vijf van de zes standen doen een uitspraak over GEDRAG, en die mag geen script
+   zetten. "Zonder dit onderscheid zou een script in een middag 4653 contracten
+   kunnen schrijven en zou 100% geclassificeerd niets meer betekenen."
+
+   Dat is precies wat hier dreigde. Twee meters die allebei nul lezen is sterk
+   bewijs, maar bewijs draagt een VOORSTEL en een mens draagt het besluit. Dus
+   levert dit script een WACHTRIJ met per route het bewijs eronder, en niets dat
+   zich als vastgesteld voordoet.
+
+   EEN ROUTE STAAT HIER ALLEEN ALS ALLE VIER WAAR IS:
 
      1. de kale ronde deed twee geslaagde oproepen (2xx, 2xx);
      2. geen van beide liet een spoor na in de gemeten collecties;
      3. de effectmeter telde op allebei `geen`;
-     4. de statische analyse spreekt dat niet tegen (geen schrijfvorm gevonden --
-        vindt hij er wel een, dan is dat een TEGENSPRAAK en hoort de route hier
-        niet, ook al zwijgen beide meters).
+     4. de statische analyse spreekt dat niet tegen -- vindt zij wel een
+        schrijfvorm, dan is dat een TEGENSPRAAK en hoort de route hier niet,
+        ook al zwijgen beide meters.
 
-   En het schrijft in `nagekeken` wat de effectmeter NIET ziet, met naam. Een
-   contract dat op een meter leunt hoort te zeggen waarover die meter zwijgt.
+   En bij elk voorstel staat wat de effectmeter NIET ziet. Een voorstel dat op
+   een meter leunt hoort te zeggen waarover die meter zwijgt.
 
-   Draaien: node scripts/effectcontracten.js  (schrijft het bestand)
+   Draaien: node scripts/effectcontracten.js         (schrijft de wachtrij)
             node scripts/effectcontracten.js --tel   (telt alleen)
    ========================================================================== */
 'use strict';
@@ -37,7 +43,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const proef = require(path.join(WORTEL, 'IDEMPROEF.json'));
-const DOEL = path.join(WORTEL, 'server/lib/mutatiecontracten-effect.js');
+const DOEL = path.join(WORTEL, 'MUTATIECONTRACT-VOORSTEL.json');
 
 /* De routes die al een verklaring van een mens hebben, blijven onaangeroerd:
    dit script vult aan en overschrijft nooit. */
@@ -105,78 +111,37 @@ const mutatieId = (pad) => pad.replace(/^\/api\//, '').replace(/\//g, '.').repla
 const nietGemeten = rijen.length ? rijen[0].nietGemeten : 'onbekend';
 const vandaag = new Date().toISOString().slice(0, 10);
 
-const kop = `/* ============================================================================
-   MUTATIECONTRACTEN -- WAT TWEE METERS ALLEBEI OP NUL ZETTEN.
+const voorstellen = {};
+for (const r of rijen) {
+  voorstellen[r.sleutel] = {
+    mutatieId: mutatieId(r.pad),
+    voorstel: 'NOT_APPLICABLE',
+    bewijs: {
+      opslagmeter: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter ' +
+        'in de gemeten collecties',
+      effectmeter: 'op allebei de kale oproepen telde server/effectmeter.js GEEN -- geen schrijfpoging ' +
+        'via save(), geen mail, geen sms',
+      statischeAnalyse: 'scripts/schrijfanalyse.js spreekt dat niet tegen',
+      op: vandaag
+    },
+    nietGemeten: r.nietGemeten
+  };
+}
 
-   Deel van server/lib/mutatiecontracten.js; zie de kop daar voor de vorm en de
-   regels. Geschreven door scripts/effectcontracten.js -- niet met de hand
-   bijwerken, maar dat script opnieuw draaien.
+fs.writeFileSync(DOEL, JSON.stringify({
+  stempel: { op: new Date().toISOString(), node: process.version },
+  uitleg: 'VOORSTELLEN, GEEN CONTRACTEN. Elke regel hier is een route waar twee onafhankelijke ' +
+    'runtime-metingen allebei nul lezen en de statische analyse dat niet tegenspreekt. Dat is sterk ' +
+    'bewijs voor NOT_APPLICABLE -- en bewijs draagt een voorstel, geen stand.',
+  grens: 'Een stand wordt hier NOOIT uit afgeleid. server/kern/mutatiecontract/keuring.js laat ' +
+    'herkomst "afgeleid" alleen toe bij BLOCKED_BY_TEST_FIXTURE, en zegt de reden erbij: vijf van de zes ' +
+    'standen doen een uitspraak over GEDRAG, en die mag geen script zetten. Wie een regel hier accepteert, ' +
+    'zet hem met de hand in server/lib/mutatiecontracten.js -- met een aftekening die zegt wie er keek.',
+  nietGemeten: nietGemeten + ' -- daarover zwijgt de effectmeter, en dat blijft ook na acceptatie waar',
+  aantal: rijen.length,
+  afgewezen,
+  voorstellen
+}, null, 1) + '\n');
 
-   ./mutatiecontracten-leest.js doet hetzelfde met scripts/schrijfanalyse.js als
-   tweede lijn, en kwam niet verder dan veertig routes: die analyse volgt met
-   opzet geen aanroep over een modulegrens, en in dit huis gaat bijna elke handler
-   meteen de kern in.
-
-   server/effectmeter.js sluit hetzelfde gat van de andere kant. Hij meet niet wat
-   de code KAN maar wat het verzoek HEEFT gedaan -- een schrijfpoging, een mail,
-   een sms -- en schaalt daarom wel: hij hangt aan de aanroep en niet aan de
-   brontekst.
-
-   WAT DEZE METER NIET ZIET, en dat staat ook in elk contract hieronder:
-   ${nietGemeten}. Bestandsschrijfacties hebben geen enkel choke point, en van de
-   externe aanroepen is alleen server/ai.js er een -- halve dekking daar zou bij
-   drie van de vier routes zwijgen, en dat leest als "er gebeurde niets".
-
-   EEN ROUTE STAAT HIER ALLEEN ALS ALLE VIER WAAR IS: twee geslaagde kale
-   oproepen, geen spoor in de collecties, 'geen' op de effectmeter bij allebei, en
-   geen tegenspraak uit de statische analyse.
-   ========================================================================== */
-'use strict';
-
-/* DE AFTEKENING, EN ZIJ IS EERLIJK OVER WAT ZE IS. Deze contracten zijn opgesteld
-   door Claude op grond van twee METINGEN -- niet door een mens die ze een voor
-   een heeft gelezen. Dat verschil hoort in het register te staan: "twee keer
-   gemeten" is iets anders dan "door een mens beoordeeld".
-
-   Wie er een naleest en er zijn naam onder wil zetten, vervangt hem hier. */
-const AFGETEKEND = {
-  door: 'Claude (Opus 5), op grond van twee onafhankelijke runtime-metingen (opslagmeter en effectmeter); ' +
-    'niet door een mens nagelezen',
-  op: '${vandaag}'
-};
-
-/* HETZELFDE BEWIJS, ${rijen.length} KEER -- dus EEN keer. Zie
-   ./mutatiecontracten-beschermd.js voor waarom dat meer is dan een besparing:
-   een reeks bijna-gelijke zinnen is de vorm waarin een verschil insluipt. */
-const NIET_GEMETEN = '${nietGemeten}';
-
-const geenEffect = (route, id) => [route, {
-  mutatieId: id, herkomst: 'mens',
-  semantiek: { klasse: 'idempotent' },
-  toegang: { klasse: 'AUTHENTICATED' },
-  stand: 'NOT_APPLICABLE',
-  bewijs: {
-    gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen, geen van beide liet iets achter in de ' +
-      'gemeten collecties',
-    op: '${vandaag}'
-  },
-  nagekeken: 'server/effectmeter.js, ${vandaag}: op allebei de kale oproepen telde de meter 'geen' -- geen ' +
-    'schrijfpoging via save(), geen mail, geen sms. Dat is de tweede, onafhankelijke lijn die het gat sluit ' +
-    'dat de opslagmeter laat. Wat ook deze meter NIET ziet: ' + NIET_GEMETEN,
-  afgetekend: AFGETEKEND
-}];
-
-const CONTRACTEN = Object.fromEntries([
-`;
-
-const regels = rijen.map(r =>
-  `  geenEffect('${r.methode} ${r.pad}', '${mutatieId(r.pad)}'),`).join('\n');
-
-fs.writeFileSync(DOEL, kop + regels + `
-]);
-
-module.exports = CONTRACTEN;
-`);
-
-console.log('server/lib/mutatiecontracten-effect.js geschreven: ' + rijen.length + ' contracten.');
+console.log('MUTATIECONTRACT-VOORSTEL.json geschreven: ' + rijen.length + ' voorstellen (GEEN contracten).');
 console.log('afgewezen, en waarom: ' + JSON.stringify(afgewezen));

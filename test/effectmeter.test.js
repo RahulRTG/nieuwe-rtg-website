@@ -111,8 +111,8 @@ test('de haak zet beide koppen op het antwoord, en hangt aan res.end', () => {
 });
 
 test('de drie choke points roepen hem werkelijk aan', () => {
-  // MUTATIEPROEF: haal effectmeter.tel uit een van deze drie bestanden en deze
-  // toets zakt. Zonder deze toets is de meter een module die niemand aanroept.
+  /* MUTATIEPROEF: haal effectmeter.tel uit een van deze drie bestanden en deze
+     toets zakt. Zonder deze toets is de meter een module die niemand aanroept. */
   const fs = require('fs');
   const plekken = {
     'server/db/index.js': "effectmeter.tel('opslag')",

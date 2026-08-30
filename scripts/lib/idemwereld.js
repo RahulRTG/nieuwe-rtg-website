@@ -361,10 +361,39 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
           te halen, verzint bewijs voor een gereguleerd beroep. Ze blijven
           ongemeten, en dat is de eerlijke uitslag.
 
-          Wat hier WEL zou kunnen: `ov` is een intern genre en gaat dus net als
-          de Rijksoverheid via /api/office/instelling/aansluiten. Dat dekt zeven
-          van de eenenvijftig; de andere vierenveertig hangen aan `mob`, `oog` en
-          `flits`, en die vragen alle drie om een taxi- of vervoersgenre. */
+          Wat hier WEL kan, en hieronder gebeurt: `ov` is een INTERN genre --
+          dezelfde stand als `rijk` -- en gaat dus via
+          /api/office/instelling/aansluiten en niet langs de aanmeldbalie. Dat
+          dekt zeven van de eenenvijftig. De andere vierenveertig hangen aan
+          `mob`, `oog` en `flits` en vragen alle drie een taxi- of vervoersgenre;
+          die blijven dicht. */
+
+  /* 11h. HET OPENBAAR VERVOER, langs dezelfde interne weg als de Rijksoverheid.
+
+          Zeven routes (/api/staff/ov/*, /api/supplier/ov/overzicht) hangen aan
+          de genre-schakelaar. `ov` staat in seed/genres-lijst-a.js als
+          `status: 'intern'`, precies zoals `rijk`, dus geldt hier hetzelfde: dit
+          genre wordt niet door een partner aangevraagd maar door RTG zelf
+          aangesloten, en er komt geen vergunningreferentie aan te pas.
+
+          DIT IS EEN UITBREIDING VAN HET BESLUIT OVER `rijk` naar een tweede
+          intern genre, op dezelfde grond en langs dezelfde route. Het staat er
+          zo bij zodat het terug te draaien is als de eigenaar dat anders ziet. */
+  if (tokens.boardroom) {
+    const ov = await stil('/api/office/instelling/aansluiten', {
+      genre: 'ov', naam: 'Proefvervoerder (idemproef)', plaats: 'Proefstad', beheerder: 'Proefbeheerder'
+    }, tokens.boardroom);
+    const ovCode = veld(ov, 'code'), ovPin = veld(ov, 'pin');
+    if (ovCode && ovPin) {
+      const rooster = await stil('/api/supplier/roster', { code: ovCode });
+      const eerste = ((rooster.data && rooster.data.staff) || [])[0];
+      if (eerste) {
+        const login = await stil('/api/supplier/login', { code: ovCode, staffId: eerste.id, pin: ovPin });
+        w.ovToken = veld(login, 'token');
+        if (w.ovToken) tokens.ov = w.ovToken;   // zelfde reden als bij `rijk`
+      }
+    }
+  }
 
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
 }
@@ -480,6 +509,14 @@ function voorvoegselLijf(w) {
      routes willen geen extra veld, ze willen een zaak van het genre `rijk`. Het
      voorvoegsel geeft dus de sleutel mee en verder niets. */
   if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk' });
+
+  /* De OV-kant, om dezelfde reden een ROL en geen lijf. Smal gehouden: alleen de
+     twee ov-voorvoegsels, want /api/staff/ of /api/supplier/ in zijn geheel zou
+     honderden routes van de ene zaak naar de andere verhuizen. */
+  if (w.ovToken) {
+    uit.push({ voorvoegsel: '/api/staff/ov/', lijf: {}, rol: 'ov' });
+    uit.push({ voorvoegsel: '/api/supplier/ov/', lijf: {}, rol: 'ov' });
+  }
 
   return uit;
 }

@@ -788,6 +788,37 @@ gemeten na de reparatie).
 | `LEGACY_PENDING_CLASSIFICATION` | 99 | **85** |
 | geclassificeerd | 4.554 | **4.568 van 4.653 (98,2%)** |
 
+## 5j. Waar ik gestopt ben, en waarom daar
+
+De laatste tien routes met een voorstel zijn gelezen, en bij **drie ervan ben ik
+het niet eens met het voorstel**: `/api/foundation/school/toestemming/overzicht`
+en `/api/geld/beleid` staan als `PROTECTED` voorgesteld terwijl het
+raadplegingen zijn. De grond van het voorstel zegt het zelf: *"het verschil zat
+in kosten. NA TE KIJKEN: is dat werk van deze route, of een meter die alleen de
+eerste keer aansloeg?"*
+
+Dat is de vraag, en het antwoord is de tweede: bij die twee is het **enige** dat
+verandert de kostenmeter van het huis — de boekhouding van het verzoek, niet het
+werk van de route. Dat geldt voor **14 routes**.
+
+Ik teken ze niet af. Een voorstel dat "na te kijken" zegt met een snelle blik
+overschrijven is precies de schijnzekerheid waar dit register tegen bestaat, en
+of een kostentik als werk telt, is een besluit over wat dit huis onder "werk"
+verstaat — niet iets wat uit deze meting volgt.
+
+### Wel gerepareerd: een grens van de meter die op een storing leek
+
+Vier geslaagde routes droegen geen `X-RTG-Effect`-kop, en dat zag eruit als een
+gebrek. Het is een **vorm**-grens en geen soort-grens: een stromend antwoord
+(`res.setHeader` + `res.write`, zoals de drie `.csv`-uitvoeren) heeft zijn koppen
+al verstuurd voordat `res.end` langskomt.
+
+Dat is niet te repareren, en de kop van `server/effectmeter.js` zegt nu waarom:
+de kop forceren kan niet (hij is weg) en eerder zetten kan ook niet (het getal is
+pas aan het eind bekend). Die vier komen daardoor binnen als **ongemeten** in
+plaats van als "geen effect" — precies het onderscheid waarvoor deze meter
+bestaat, nu op zichzelf toegepast.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

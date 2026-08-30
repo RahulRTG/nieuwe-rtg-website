@@ -51,6 +51,18 @@
                             maar de betaalrails niet. Halve dekking is hier
                             erger dan geen: hij zou bij drie van de vier routes
                             zwijgen en dat leest als "niets gebeurd".
+
+   EN EEN GRENS DIE GEEN SOORT IS MAAR EEN VORM: een STROMEND antwoord draagt
+   geen kop. Een route die zelf `res.setHeader` en `res.write` doet -- de drie
+   .csv-uitvoeren, bijvoorbeeld -- heeft zijn koppen al verstuurd voordat
+   `res.end` hier langskomt, dus `headersSent` staat aan en er komt niets bij.
+
+   Dat is met opzet zo gelaten. De kop alsnog forceren kan niet (hij is weg), en
+   hem eerder zetten kan ook niet: het getal is pas bekend als het verzoek klaar
+   is. Wat wel kan, en wat er gebeurt: die routes komen in de proef binnen als
+   ONGEMETEN in plaats van als "geen effect". Dat is precies het onderscheid
+   waar deze meter voor bestaat, nu op zichzelf toegepast -- vier routes op
+   4.653, en ze staan liever eerlijk ongemeten dan onterecht stil.
    ========================================================================== */
 'use strict';
 

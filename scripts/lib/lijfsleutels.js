@@ -142,6 +142,36 @@ const FAMILIES = [
       if (!d || !d.beheerToken) return null;
       return { schoolCode: d.schoolCode, beheerToken: d.beheerToken };
     }
+  },
+  {
+    naam: 'gezin',
+    /* Gemeten met scripts/handlerwacht.js over de wachten familieVan, gezinVan,
+       gezinSessie, rtfSpeler, rtfSociaal, profiel, samenSess en sessieVan: 187
+       routes, verdeeld over deze twee voorvoegsels. Ze lezen allemaal dezelfde
+       twee velden -- de gezinscode en het profieltoken. */
+    prefixen: ['/api/foundation/gezin/', '/api/rtf/'],
+    velden: ['code', 'token'],
+    waarom: 'de RTF-kant draait op een gezinscode plus een profieltoken uit het lijf ' +
+      '(server/foundation/sollicitaties.js, verifieerProfiel); een gezin ontstaat aan de ' +
+      'openbare deur en geeft die twee daar meteen terug',
+    /* Deze deur is met opzet openbaar (een gezin heeft nog geen account) en
+       geeft code en token in het antwoord -- anders dan bij de school, waar de
+       sleutel naar het gecontroleerde adres gaat. Er is hier dus niets uit een
+       outbox te lezen en geen omweg nodig.
+
+       De twee verklaringen gaan mee omdat de route ze buiten NODE_ENV=test
+       verplicht stelt. Ze meesturen is geen omzeiling maar precies wat een echt
+       gezin ook doet; ze weglaten zou de fixture laten stranden op een 400 en
+       daarmee 187 routes ongemeten laten. */
+    async bouw({ post }) {
+      const r = await post('/api/foundation/gezin/maak', {
+        naam: 'Proefgezin', beheerder: 'Proef Beheerder', pin: '1234',
+        bevoegdGezin: true, privacyAkkoord: true
+      }, null);
+      const d = r && r.data;
+      if (!d || !d.code || !d.token) return null;
+      return { code: d.code, token: d.token };
+    }
   }
 ];
 

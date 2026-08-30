@@ -1,42 +1,79 @@
 {
   "stempel": "2026-08-30",
-  "uitleg": "Hoeveel tikken elk scherm van het beginscherm af ligt, gemeten in een echte browser op telefoonformaat met een gewone ledensessie. Een zichtbare bestemming kost 1 tik, een bestemming achter een tabblad of lade 2. Typen telt niet. Een knop die zonder href of data-url navigeert ziet deze meter niet, dus dit is een BOVENgrens.",
+  "uitleg": "Hoeveel tikken elk scherm van een beginscherm af ligt, gemeten in een echte browser op telefoonformaat, per rol met een echte sessie. Een zichtbare bestemming kost 1 tik, een bestemming achter een tabblad of lade 2. Typen telt niet. Een knop die zonder href of data-url navigeert ziet deze meter niet, dus dit is een BOVENgrens.",
   "grens": 5,
-  "start": "/apps/app.html",
+  "rollen": [
+    {
+      "naam": "lid",
+      "start": "/apps/app.html",
+      "uitleg": "een gewoon lid met een RTG Pass, op de werktafel"
+    },
+    {
+      "naam": "zaak",
+      "start": "/apps/leverancier.html",
+      "uitleg": "de manager van een zaak in de leverancier-app"
+    },
+    {
+      "naam": "kantoor",
+      "start": "/apps/backoffice.html",
+      "uitleg": "een medewerker van RTG met een kantoortoken"
+    }
+  ],
+  "overgeslagen": [],
   "schermen": 276,
-  "bereikt": 242,
-  "buitenBereik": 34,
+  "bereikt": 253,
+  "buitenBereik": 23,
+  "bereiktPerRol": {
+    "lid": 243,
+    "zaak": 208,
+    "kantoor": 251
+  },
   "verdeling": {
-    "0": 1,
-    "2": 64,
-    "3": 105,
-    "4": 66,
-    "5": 6
+    "0": 3,
+    "1": 23,
+    "2": 120,
+    "3": 82,
+    "4": 25
   },
   "metReden": 34,
   "zonderReden": [],
-  "verlopenReden": [],
+  "verlopenReden": [
+    "/apps/appstore-kantoor.html",
+    "/apps/appstore-uitgever.html",
+    "/apps/architect-pda.html",
+    "/apps/hardware-pda.html",
+    "/apps/studio-pda.html",
+    "/apps/zaakkosten.html",
+    "/apps/websitestudio.html",
+    "/apps/klankwerk-kantoor.html",
+    "/apps/platformregister.html",
+    "/apps/techniek.html",
+    "/apps/stadsdoos.html"
+  ],
   "perScherm": [
     {
       "pad": "/apps/agenda.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> AgendaAlt+5"
+        "/apps/backoffice.html -> AgendaAlt+5"
       ]
     },
     {
       "pad": "/apps/app.html",
+      "rol": "lid",
       "tikken": 0,
       "via": []
     },
     {
       "pad": "/apps/appcel.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/appstore-dossier.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> APApp-dossierLivingOS [verborgen]"
@@ -44,21 +81,32 @@
     },
     {
       "pad": "/apps/appstore-kantoor.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 1,
+      "via": [
+        "/apps/backoffice.html -> App Store"
+      ]
     },
     {
       "pad": "/apps/appstore-uitgever.html",
-      "tikken": null,
-      "via": []
+      "rol": "zaak",
+      "tikken": 2,
+      "via": [
+        "/apps/leverancier.html -> Open het uitgeversbureau [verborgen]"
+      ]
     },
     {
       "pad": "/apps/architect-pda.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Onderweg? Open de RTG Architect PDA → [verborgen]"
+      ]
     },
     {
       "pad": "/apps/arrival.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> AAAankomstTravelOS [verborgen]"
@@ -66,6 +114,7 @@
     },
     {
       "pad": "/apps/attenties.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> ABAlles bij elkaarLivingOS [verborgen]",
@@ -74,6 +123,7 @@
     },
     {
       "pad": "/apps/avond.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> ABAlles bij elkaarLivingOS [verborgen]",
@@ -82,14 +132,13 @@
     },
     {
       "pad": "/apps/backoffice.html",
-      "tikken": 3,
-      "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> BackofficeAlt+8"
-      ]
+      "rol": "kantoor",
+      "tikken": 0,
+      "via": []
     },
     {
       "pad": "/apps/balans.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -98,6 +147,7 @@
     },
     {
       "pad": "/apps/bank.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -106,27 +156,30 @@
     },
     {
       "pad": "/apps/belastingkantoor.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Belastingkantoor [verborgen]"
       ]
     },
     {
       "pad": "/apps/berichten.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/bestanden.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> BestandenAlt+7"
+        "/apps/backoffice.html -> BestandenAlt+7"
       ]
     },
     {
       "pad": "/apps/bestellen.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -136,26 +189,30 @@
     },
     {
       "pad": "/apps/boardroom.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/boeken.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> TravelOS [verborgen]",
+        "/apps/backoffice.html -> TravelOS",
         "/apps/reizen.html -> BoekenLezen voor onderweg [verborgen]"
       ]
     },
     {
       "pad": "/apps/browser.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> WebWorkOS [verborgen]"
+        "/apps/backoffice.html -> 10Web→"
       ]
     },
     {
       "pad": "/apps/camera.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> CameraLivingOS [verborgen]"
@@ -163,6 +220,7 @@
     },
     {
       "pad": "/apps/cellier.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
@@ -171,6 +229,7 @@
     },
     {
       "pad": "/apps/cercle.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -179,6 +238,7 @@
     },
     {
       "pad": "/apps/chauffeur.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OVOV-routesTravelOS [verborgen]",
@@ -187,6 +247,7 @@
     },
     {
       "pad": "/apps/clips.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VideoLivingOS [verborgen]"
@@ -194,11 +255,13 @@
     },
     {
       "pad": "/apps/codewoord.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/comm.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> BerichtenLivingOS [verborgen]"
@@ -206,29 +269,32 @@
     },
     {
       "pad": "/apps/command.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> RTG CommandAlt+9"
+        "/apps/backoffice.html -> RTG CommandAlt+9"
       ]
     },
     {
       "pad": "/apps/commerce.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> CommerceLivingOS [verborgen]"
+        "/apps/backoffice.html -> 13Commerce→"
       ]
     },
     {
       "pad": "/apps/concern.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Mijn concernMeerdere bedrijven, vestigingen en mensen onder  [verborgen]"
       ]
     },
     {
       "pad": "/apps/concierge.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -238,19 +304,22 @@
     },
     {
       "pad": "/apps/defensie.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Defensie [verborgen]"
       ]
     },
     {
       "pad": "/apps/dispatch.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/doelen.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -260,14 +329,16 @@
     },
     {
       "pad": "/apps/doos.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Zaakdoos [verborgen]"
       ]
     },
     {
       "pad": "/apps/entourage.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -276,16 +347,19 @@
     },
     {
       "pad": "/apps/festival-gast.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/festival.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/flits.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VerkeerTravelOS [verborgen]"
@@ -293,6 +367,7 @@
     },
     {
       "pad": "/apps/foodcourt.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> FCFood CourtLivingOS [verborgen]"
@@ -300,54 +375,61 @@
     },
     {
       "pad": "/apps/foundation/agenda.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> GezinsagendaAlt+4"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Elke dag"
       ]
     },
     {
       "pad": "/apps/foundation/arena.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 23De Arena→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 23De Arena→"
       ]
     },
     {
       "pad": "/apps/foundation/babyboek.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 29Babyboek→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 29Babyboek→"
       ]
     },
     {
       "pad": "/apps/foundation/beheer.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> Gezin & beheerAlt+7"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Beheer"
       ]
     },
     {
       "pad": "/apps/foundation/beroepen.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 08Beroepen→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 08Beroepen→"
       ]
     },
     {
       "pad": "/apps/foundation/bieb.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 05Bibliotheek→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 05Bibliotheek→"
       ]
     },
     {
       "pad": "/apps/foundation/bord.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> BOHet bordFoundationOS [verborgen]"
@@ -355,160 +437,178 @@
     },
     {
       "pad": "/apps/foundation/budget.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 37Budget→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 37Budget→"
       ]
     },
     {
       "pad": "/apps/foundation/campus.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> CampusAlt+1"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Campus"
       ]
     },
     {
       "pad": "/apps/foundation/club.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 27Club→"
       ]
     },
     {
       "pad": "/apps/foundation/clubswerk.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→",
-        "/apps/foundation/club.html -> Clubs [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor",
+        "/apps/foundation/kantoor.html -> Clubs & steden"
       ]
     },
     {
       "pad": "/apps/foundation/contact.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 39Contact→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 39Contact→"
       ]
     },
     {
       "pad": "/apps/foundation/cv.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 49CV→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 49CV→"
       ]
     },
     {
       "pad": "/apps/foundation/dromen.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 46Dromen→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 46Dromen→"
       ]
     },
     {
       "pad": "/apps/foundation/geld.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 54Geld→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 54Geld→"
       ]
     },
     {
       "pad": "/apps/foundation/geloofbieb.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 06Geloofsbibliotheek→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 06Geloofsbibliotheek→"
       ]
     },
     {
       "pad": "/apps/foundation/gevoel.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 21Hoe voel je je?→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 21Hoe voel je je?→"
       ]
     },
     {
       "pad": "/apps/foundation/gezondheid.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> GezondheidAlt+5"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> GezondheidAlt+5"
       ]
     },
     {
       "pad": "/apps/foundation/hulpwijzer.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> HulpwijzerAlt+8"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> HulpwijzerAlt+8"
       ]
     },
     {
       "pad": "/apps/foundation/index.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
-        "/apps/leven.html -> RTFoundation"
+        "/apps/backoffice.html -> RTFoundation"
       ]
     },
     {
       "pad": "/apps/foundation/kantoor.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 60Living Lab→",
-        "/apps/livinglab.html -> RTF-kantoor"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor"
       ]
     },
     {
       "pad": "/apps/foundation/keuken.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 31Keuken→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 31Keuken→"
       ]
     },
     {
       "pad": "/apps/foundation/klas.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 28Klas→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 28Klas→"
       ]
     },
     {
       "pad": "/apps/foundation/kleuren.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 17Kleuren en vormen→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 17Kleuren en vormen→"
       ]
     },
     {
       "pad": "/apps/foundation/klusjes.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 50Klusjes→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 50Klusjes→"
       ]
     },
     {
       "pad": "/apps/foundation/kompas.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 42Kompas→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Steun"
       ]
     },
     {
       "pad": "/apps/foundation/leerpaspoort.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> MAMallLivingOS [verborgen]",
@@ -517,103 +617,116 @@
     },
     {
       "pad": "/apps/foundation/leren.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> LerenAlt+2"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> LerenAlt+2"
       ]
     },
     {
       "pad": "/apps/foundation/liedjes.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 20Liedjes en versjes→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 20Liedjes en versjes→"
       ]
     },
     {
       "pad": "/apps/foundation/magazine.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 55Magazine→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 55Magazine→"
       ]
     },
     {
       "pad": "/apps/foundation/mail.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> MAMallLivingOS [verborgen]",
-        "/apps/mall.html -> Openen [verborgen]"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Mail [verborgen]"
       ]
     },
     {
       "pad": "/apps/foundation/markt.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 40Markt→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 40Markt→"
       ]
     },
     {
       "pad": "/apps/foundation/mediawijs.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 45Mediawijs→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 45Mediawijs→"
       ]
     },
     {
       "pad": "/apps/foundation/memorie.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 18Memorie→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 18Memorie→"
       ]
     },
     {
       "pad": "/apps/foundation/mijnbanden.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 35Mijn banden→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 35Mijn banden→"
       ]
     },
     {
       "pad": "/apps/foundation/ochtend.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 32Ochtend→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 32Ochtend→"
       ]
     },
     {
       "pad": "/apps/foundation/oppasinfo.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 41Oppasinformatie→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 41Oppasinformatie→"
       ]
     },
     {
       "pad": "/apps/foundation/opvoeden.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 52Opvoeden→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 52Opvoeden→"
       ]
     },
     {
       "pad": "/apps/foundation/os-bestuur.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→",
-        "/apps/foundation/club.html -> Bestuur [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor",
+        "/apps/foundation/kantoor.html -> Bestuur"
       ]
     },
     {
       "pad": "/apps/foundation/os-deelnemer.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
@@ -622,6 +735,7 @@
     },
     {
       "pad": "/apps/foundation/os-donateur.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
@@ -630,6 +744,7 @@
     },
     {
       "pad": "/apps/foundation/os-portaal.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> RPRTFoundation portaalFoundationOS [verborgen]"
@@ -637,6 +752,7 @@
     },
     {
       "pad": "/apps/foundation/os-publiek.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]"
@@ -644,15 +760,17 @@
     },
     {
       "pad": "/apps/foundation/os-veld.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→",
-        "/apps/foundation/club.html -> Veld [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor",
+        "/apps/foundation/kantoor.html -> Veld"
       ]
     },
     {
       "pad": "/apps/foundation/os-vrijwilliger.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
@@ -661,113 +779,126 @@
     },
     {
       "pad": "/apps/foundation/os.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→",
-        "/apps/foundation/club.html -> Overzicht [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor",
+        "/apps/foundation/kantoor.html -> Foundation OS"
       ]
     },
     {
       "pad": "/apps/foundation/overhoren.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 10Overhoren→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 10Overhoren→"
       ]
     },
     {
       "pad": "/apps/foundation/partner.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 27Club→",
-        "/apps/foundation/club.html -> Partners [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> RTF-kantoor",
+        "/apps/foundation/kantoor.html -> Stadsraad-portaal"
       ]
     },
     {
       "pad": "/apps/foundation/pesten.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 57Pesten→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 57Pesten→"
       ]
     },
     {
       "pad": "/apps/foundation/presenteren.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 14Presenteren→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 14Presenteren→"
       ]
     },
     {
       "pad": "/apps/foundation/privacy.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 58Privacy & veiligheid→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 58Privacy & veiligheid→"
       ]
     },
     {
       "pad": "/apps/foundation/projecten.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 12Projecten→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 12Projecten→"
       ]
     },
     {
       "pad": "/apps/foundation/rechten.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 38Rechten→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 38Rechten→"
       ]
     },
     {
       "pad": "/apps/foundation/registreren.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
-        "/apps/leven.html -> RTFoundation",
+        "/apps/backoffice.html -> RTFoundation",
         "/apps/foundation/index.html -> School, vrijwilliger of stichting"
       ]
     },
     {
       "pad": "/apps/foundation/reis.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 51Reis→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 51Reis→"
       ]
     },
     {
       "pad": "/apps/foundation/rust.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 43Rust→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 43Rust→"
       ]
     },
     {
       "pad": "/apps/foundation/school.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 09School→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 09School→"
       ]
     },
     {
       "pad": "/apps/foundation/schoolbieb.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 07Schoolbibliotheek→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 07Schoolbibliotheek→"
       ]
     },
     {
       "pad": "/apps/foundation/schrift.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> SCHet schriftFoundationOS [verborgen]"
@@ -775,94 +906,106 @@
     },
     {
       "pad": "/apps/foundation/schrijven.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 11Schrijven→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 11Schrijven→"
       ]
     },
     {
       "pad": "/apps/foundation/societeit.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 24De Sociëteit→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 24De Sociëteit→"
       ]
     },
     {
       "pad": "/apps/foundation/speelhal.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> De SpeelhalAlt+3"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> De SpeelhalAlt+3"
       ]
     },
     {
       "pad": "/apps/foundation/speeltuin.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 15De Speeltuin→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 15De Speeltuin→"
       ]
     },
     {
       "pad": "/apps/foundation/steun.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 53Steun→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 53Steun→"
       ]
     },
     {
       "pad": "/apps/foundation/studie.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 48Studie→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 48Studie→"
       ]
     },
     {
       "pad": "/apps/foundation/tellen.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 16Tellen tot tien→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 16Tellen tot tien→"
       ]
     },
     {
       "pad": "/apps/foundation/toetsen.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 13Toetsen→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 13Toetsen→"
       ]
     },
     {
       "pad": "/apps/foundation/veilig.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> Veilig thuisAlt+6"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> Veilig thuisAlt+6"
       ]
     },
     {
       "pad": "/apps/foundation/verhaaltje.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 19Voorleesverhaaltjes→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 19Voorleesverhaaltjes→"
       ]
     },
     {
       "pad": "/apps/foundation/verjaardagen.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 33Verjaardagen→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 33Verjaardagen→"
       ]
     },
     {
       "pad": "/apps/foundation/vrienden.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VriendenLivingOS [verborgen]"
@@ -870,22 +1013,25 @@
     },
     {
       "pad": "/apps/foundation/werk.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 47Werk→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 47Werk→"
       ]
     },
     {
       "pad": "/apps/foundation/zakgeld.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 36Zakgeld→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 36Zakgeld→"
       ]
     },
     {
       "pad": "/apps/galerij.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -894,6 +1040,7 @@
     },
     {
       "pad": "/apps/garderobe.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
@@ -902,11 +1049,13 @@
     },
     {
       "pad": "/apps/gast.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/gedachten.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -916,6 +1065,7 @@
     },
     {
       "pad": "/apps/geld-command.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> GEGeldLivingOS [verborgen]"
@@ -923,6 +1073,7 @@
     },
     {
       "pad": "/apps/geld.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> WalletLivingOS [verborgen]"
@@ -930,30 +1081,34 @@
     },
     {
       "pad": "/apps/gemeente.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Gemeente [verborgen]"
       ]
     },
     {
       "pad": "/apps/gemeenteloket.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Gemeenteloket [verborgen]"
       ]
     },
     {
       "pad": "/apps/gemeentepda.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Gemeente-PDA [verborgen]"
       ]
     },
     {
       "pad": "/apps/genootschap.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -962,37 +1117,46 @@
     },
     {
       "pad": "/apps/gereedschap.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Gereedschap [verborgen]"
       ]
     },
     {
       "pad": "/apps/ghost.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/handel.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/hangar.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> MAMallLivingOS [verborgen]",
-        "/apps/mall.html -> Jets & charters"
+        "/apps/backoffice.html -> TravelOS",
+        "/apps/reizen.html -> HangarCharter en eigen toestel"
       ]
     },
     {
       "pad": "/apps/hardware-pda.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Onderweg? Open de RTG Hardware PDA → [verborgen]"
+      ]
     },
     {
       "pad": "/apps/home.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1002,6 +1166,7 @@
     },
     {
       "pad": "/apps/horeca-bar.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> HorecaWorkOS [verborgen]",
@@ -1010,6 +1175,7 @@
     },
     {
       "pad": "/apps/horeca-beheer.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> HorecaWorkOS [verborgen]",
@@ -1018,54 +1184,61 @@
     },
     {
       "pad": "/apps/horeca-bezorg.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> HorecaWorkOS [verborgen]",
-        "/apps/horeca.html -> Bezorging [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1",
+        "/apps/kantoor.html -> Bezorging [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-club.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> HorecaWorkOS [verborgen]",
-        "/apps/horeca.html -> Club [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1",
+        "/apps/kantoor.html -> Club [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-events.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> HorecaWorkOS [verborgen]",
-        "/apps/horeca.html -> Events [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1",
+        "/apps/kantoor.html -> Events [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-expeditie.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Expeditie [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-haccp.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> HorecaWorkOS [verborgen]",
-        "/apps/horeca.html -> HACCP [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1",
+        "/apps/kantoor.html -> HACCP [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-hotel.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> HorecaWorkOS [verborgen]",
-        "/apps/horeca.html -> Hotel [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1",
+        "/apps/kantoor.html -> Hotel [verborgen]"
       ]
     },
     {
       "pad": "/apps/horeca-pda.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> HorecaWorkOS [verborgen]",
@@ -1074,6 +1247,7 @@
     },
     {
       "pad": "/apps/horeca-vloer.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> HorecaWorkOS [verborgen]",
@@ -1082,6 +1256,7 @@
     },
     {
       "pad": "/apps/horeca.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> HorecaWorkOS [verborgen]"
@@ -1089,14 +1264,16 @@
     },
     {
       "pad": "/apps/hotels.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> MAMallLivingOS [verborgen]",
-        "/apps/mall.html -> Verblijven"
+        "/apps/backoffice.html -> TravelOS",
+        "/apps/reizen.html -> VerblijvenHotels, appart. en villa’s"
       ]
     },
     {
       "pad": "/apps/ik.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> WBWie ben ikInstellingen [verborgen]"
@@ -1104,6 +1281,7 @@
     },
     {
       "pad": "/apps/juridisch.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> JuridischInstellingen [verborgen]"
@@ -1111,6 +1289,7 @@
     },
     {
       "pad": "/apps/juridisch/partnervoorwaarden.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> JuridischInstellingen [verborgen]",
@@ -1119,6 +1298,7 @@
     },
     {
       "pad": "/apps/juridisch/privacy.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> JuridischInstellingen [verborgen]",
@@ -1127,6 +1307,7 @@
     },
     {
       "pad": "/apps/juridisch/voorwaarden.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> JuridischInstellingen [verborgen]",
@@ -1135,55 +1316,64 @@
     },
     {
       "pad": "/apps/kantoor.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]"
+        "/apps/backoffice.html -> VandaagAlt+1"
       ]
     },
     {
       "pad": "/apps/kantoorpda.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Kantoor-PDA [verborgen]"
       ]
     },
     {
       "pad": "/apps/kantoren.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> AfdelingenAlt+2"
+        "/apps/backoffice.html -> AfdelingenAlt+2"
       ]
     },
     {
       "pad": "/apps/kassa.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Kassa [verborgen]"
       ]
     },
     {
       "pad": "/apps/klankwerk-kantoor.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 1,
+      "via": [
+        "/apps/backoffice.html -> RTG-naam"
+      ]
     },
     {
       "pad": "/apps/klankwerk.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Klankwerk [verborgen]"
       ]
     },
     {
       "pad": "/apps/kosten.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/krant.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> KrantLivingOS [verborgen]"
@@ -1191,15 +1381,16 @@
     },
     {
       "pad": "/apps/lab.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 60Living Lab→",
-        "/apps/livinglab.html -> Onderzoekslab"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Onderzoekslab"
       ]
     },
     {
       "pad": "/apps/labfonds.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1208,6 +1399,7 @@
     },
     {
       "pad": "/apps/labpas.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> VERTG VeiligInstellingen [verborgen]",
@@ -1216,14 +1408,16 @@
     },
     {
       "pad": "/apps/lesmaker.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Lesmaker [verborgen]"
       ]
     },
     {
       "pad": "/apps/leven.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]"
@@ -1231,32 +1425,34 @@
     },
     {
       "pad": "/apps/leverancier-aanvragen.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Aanvragen [verborgen]"
       ]
     },
     {
       "pad": "/apps/leverancier-commerce.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/leverancier-rtmail.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/leverancier.html",
-      "tikken": 4,
-      "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
-        "/apps/kantoor.html -> Bedrijf beheren [verborgen]"
-      ]
+      "rol": "zaak",
+      "tikken": 0,
+      "via": []
     },
     {
       "pad": "/apps/life.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1266,6 +1462,7 @@
     },
     {
       "pad": "/apps/lifestyle.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1274,21 +1471,24 @@
     },
     {
       "pad": "/apps/living-os.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> VOHet VooruitzichtLivingOS [verborgen]"
+        "/apps/backoffice.html -> LivingOS"
       ]
     },
     {
       "pad": "/apps/livinglab.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> RIRTFoundation in uw buurtFoundationOS [verborgen]",
-        "/apps/foundation/os-publiek.html -> 60Living Lab→"
+        "/apps/backoffice.html -> RTFoundation",
+        "/apps/foundation/index.html -> 60Living Lab→"
       ]
     },
     {
       "pad": "/apps/logboek.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1297,13 +1497,15 @@
     },
     {
       "pad": "/apps/loonstrook.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> LoonWorkOS [verborgen]"
+        "/apps/backoffice.html -> 05Mijn loon→"
       ]
     },
     {
       "pad": "/apps/luchthaven.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OVOV-routesTravelOS [verborgen]",
@@ -1312,6 +1514,7 @@
     },
     {
       "pad": "/apps/magnaat-kantoor.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> MAMagnaatWorkOS [verborgen]",
@@ -1320,21 +1523,23 @@
     },
     {
       "pad": "/apps/magnaat-partnerstudio.html",
-      "tikken": 4,
+      "rol": "zaak",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> MAMagnaatWorkOS [verborgen]",
-        "/apps/magnaat.html -> Mijn bedrijf bouwen [verborgen]"
+        "/apps/leverancier.html -> Open Partnerstudio [verborgen]"
       ]
     },
     {
       "pad": "/apps/magnaat.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> MAMagnaatWorkOS [verborgen]"
+        "/apps/backoffice.html -> 14Magnaat→"
       ]
     },
     {
       "pad": "/apps/maison.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
@@ -1343,6 +1548,7 @@
     },
     {
       "pad": "/apps/mall.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> MAMallLivingOS [verborgen]"
@@ -1350,14 +1556,16 @@
     },
     {
       "pad": "/apps/marechaussee.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Marechaussee [verborgen]"
       ]
     },
     {
       "pad": "/apps/mecenaat.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1366,6 +1574,7 @@
     },
     {
       "pad": "/apps/media.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> MERTG MediaLivingOS [verborgen]"
@@ -1373,6 +1582,7 @@
     },
     {
       "pad": "/apps/medicijnen.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1382,6 +1592,7 @@
     },
     {
       "pad": "/apps/meet.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -1391,11 +1602,13 @@
     },
     {
       "pad": "/apps/meldkamer.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/memo.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1405,19 +1618,22 @@
     },
     {
       "pad": "/apps/merken.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Merken [verborgen]"
       ]
     },
     {
       "pad": "/apps/metier.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/mijnmall.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> BEMijn bestellingenLivingOS [verborgen]"
@@ -1425,6 +1641,7 @@
     },
     {
       "pad": "/apps/muziek.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> MuziekLivingOS [verborgen]"
@@ -1432,6 +1649,7 @@
     },
     {
       "pad": "/apps/nalatenschap.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1440,6 +1658,7 @@
     },
     {
       "pad": "/apps/navigatie.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> NavigatieTravelOS [verborgen]"
@@ -1447,6 +1666,7 @@
     },
     {
       "pad": "/apps/nieuws.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> NieuwsLivingOS [verborgen]"
@@ -1454,33 +1674,38 @@
     },
     {
       "pad": "/apps/notities.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> NotitiesAantekeningen en taken"
       ]
     },
     {
       "pad": "/apps/office.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> DocumentenWorkOS [verborgen]"
+        "/apps/backoffice.html -> Presentaties & OfficeAlt+4"
       ]
     },
     {
       "pad": "/apps/onderneming.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> ONOndernemingWorkOS [verborgen]"
+        "/apps/backoffice.html -> 12Onderneming→"
       ]
     },
     {
       "pad": "/apps/oog.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/ov.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> Openbaar vervoerTravelOS [verborgen]"
@@ -1488,6 +1713,7 @@
     },
     {
       "pad": "/apps/ovcontrol.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OVOV-routesTravelOS [verborgen]",
@@ -1496,6 +1722,7 @@
     },
     {
       "pad": "/apps/ovdienst.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OVOV-routesTravelOS [verborgen]",
@@ -1504,22 +1731,25 @@
     },
     {
       "pad": "/apps/overheid.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Overheidsloket [verborgen]"
       ]
     },
     {
       "pad": "/apps/overheidspda.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Overheid-PDA [verborgen]"
       ]
     },
     {
       "pad": "/apps/ovroutes.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> OVOV-routesTravelOS [verborgen]"
@@ -1527,14 +1757,16 @@
     },
     {
       "pad": "/apps/pakketten.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Pakketten [verborgen]"
       ]
     },
     {
       "pad": "/apps/partner-network.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> PNPartner NetworkWorkOS [verborgen]"
@@ -1542,14 +1774,16 @@
     },
     {
       "pad": "/apps/partner-worden.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
-        "/apps/kantoor.html -> Bedrijf aanmelden [verborgen]"
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Partner worden"
       ]
     },
     {
       "pad": "/apps/passkeys.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> PasskeysInstellingen [verborgen]"
@@ -1557,6 +1791,7 @@
     },
     {
       "pad": "/apps/pay.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> BEBetalenLivingOS [verborgen]"
@@ -1564,24 +1799,31 @@
     },
     {
       "pad": "/apps/payroll.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/personeel.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]",
-        "/apps/rtmail.html -> PersoneelAlt+3"
+        "/apps/backoffice.html -> PersoneelAlt+3"
       ]
     },
     {
       "pad": "/apps/platformregister.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> TravelOS",
+        "/apps/reizen.html -> Routedossier",
+        "/apps/routedossier.html -> Platformregister ->"
+      ]
     },
     {
       "pad": "/apps/podium.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> LiveLivingOS [verborgen]"
@@ -1589,6 +1831,7 @@
     },
     {
       "pad": "/apps/pulse.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VandaagLivingOS [verborgen]"
@@ -1596,59 +1839,67 @@
     },
     {
       "pad": "/apps/rechtbank.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Rechtbank [verborgen]"
       ]
     },
     {
       "pad": "/apps/redactie-pda.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Redactie-PDA [verborgen]"
       ]
     },
     {
       "pad": "/apps/redactie.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Redactie [verborgen]"
       ]
     },
     {
       "pad": "/apps/redactiekantoor.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/reisboek.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> Reizen & VeiligTravelOS [verborgen]",
-        "/apps/reizen-veilig.html -> Reisboek"
+        "/apps/backoffice.html -> TravelOS",
+        "/apps/reizen.html -> ReisboekUw reizen, bij elkaar"
       ]
     },
     {
       "pad": "/apps/reisbureau.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> MAMallLivingOS [verborgen]",
-        "/apps/mall.html -> Reis aanvragen →"
+        "/apps/backoffice.html -> TravelOS",
+        "/apps/reizen.html -> ReisbureauReizen met ledenprijzen"
       ]
     },
     {
       "pad": "/apps/reisuitnodiging.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 2,
       "via": [
-        "/apps/app.html -> TravelOS [verborgen]",
+        "/apps/backoffice.html -> TravelOS",
         "/apps/reizen.html -> Bekijk of trek uw uitnodigingen in"
       ]
     },
     {
       "pad": "/apps/reizen-veilig.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> Reizen & VeiligTravelOS [verborgen]"
@@ -1656,13 +1907,15 @@
     },
     {
       "pad": "/apps/reizen.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> TravelOS [verborgen]"
+        "/apps/backoffice.html -> TravelOS"
       ]
     },
     {
       "pad": "/apps/rendezvous.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1671,6 +1924,7 @@
     },
     {
       "pad": "/apps/residentie.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VEVerblijvenTravelOS [verborgen]"
@@ -1678,30 +1932,34 @@
     },
     {
       "pad": "/apps/rijksloket.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Rijksloket [verborgen]"
       ]
     },
     {
       "pad": "/apps/rit.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Rit [verborgen]"
       ]
     },
     {
       "pad": "/apps/routedekking.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Routedekking [verborgen]"
       ]
     },
     {
       "pad": "/apps/routedossier.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> RORoutedossierTravelOS [verborgen]"
@@ -1709,6 +1967,7 @@
     },
     {
       "pad": "/apps/rtg.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]"
@@ -1716,6 +1975,7 @@
     },
     {
       "pad": "/apps/rtgcode.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1724,6 +1984,7 @@
     },
     {
       "pad": "/apps/rtgid.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> VERTG VeiligInstellingen [verborgen]",
@@ -1732,6 +1993,7 @@
     },
     {
       "pad": "/apps/rtgkantoor.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> ONRTG OneWorkOS [verborgen]",
@@ -1740,27 +2002,31 @@
     },
     {
       "pad": "/apps/rtgone.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> ONRTG OneWorkOS [verborgen]"
+        "/apps/backoffice.html -> 11RTG One→"
       ]
     },
     {
       "pad": "/apps/rtgschool.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> SCSchoolWorkOS [verborgen]"
+        "/apps/backoffice.html -> 17RTG School→"
       ]
     },
     {
       "pad": "/apps/rtmail.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> RTRTMailWorkOS [verborgen]"
+        "/apps/backoffice.html -> RTG MailAlt+6"
       ]
     },
     {
       "pad": "/apps/salon.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -1769,14 +2035,16 @@
     },
     {
       "pad": "/apps/scanner.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Scanner [verborgen]"
       ]
     },
     {
       "pad": "/apps/scherm.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> TSTweede schermLivingOS [verborgen]"
@@ -1784,21 +2052,24 @@
     },
     {
       "pad": "/apps/schoolpartner.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Schoolpartner [verborgen]"
       ]
     },
     {
       "pad": "/apps/sitemaker.html",
-      "tikken": 2,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> WebsiteWorkOS [verborgen]"
+        "/apps/backoffice.html -> 09Website→"
       ]
     },
     {
       "pad": "/apps/sociaal-prive.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -1807,6 +2078,7 @@
     },
     {
       "pad": "/apps/sociaal.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]"
@@ -1814,6 +2086,7 @@
     },
     {
       "pad": "/apps/spelen.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> SpelenLivingOS [verborgen]"
@@ -1821,6 +2094,7 @@
     },
     {
       "pad": "/apps/spelscherm.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> GNGame NightLivingOS [verborgen]"
@@ -1828,6 +2102,7 @@
     },
     {
       "pad": "/apps/sport.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> SportLivingOS [verborgen]"
@@ -1835,6 +2110,7 @@
     },
     {
       "pad": "/apps/sportclub.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -1843,6 +2119,7 @@
     },
     {
       "pad": "/apps/stad.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> StadTravelOS [verborgen]"
@@ -1850,16 +2127,25 @@
     },
     {
       "pad": "/apps/stadsdoos.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Veld-app voor buiten [verborgen]"
+      ]
     },
     {
       "pad": "/apps/studio-pda.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Onderweg? Open de RTG Studio PDA → [verborgen]"
+      ]
     },
     {
       "pad": "/apps/table.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
@@ -1868,11 +2154,15 @@
     },
     {
       "pad": "/apps/techniek.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 1,
+      "via": [
+        "/apps/backoffice.html -> Techniek"
+      ]
     },
     {
       "pad": "/apps/theater.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> Films en seriesLivingOS [verborgen]"
@@ -1880,6 +2170,7 @@
     },
     {
       "pad": "/apps/thuis.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> THThuisLivingOS [verborgen]"
@@ -1887,16 +2178,19 @@
     },
     {
       "pad": "/apps/thuisrust.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/thuiswacht.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/tijdlijn.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1906,6 +2200,7 @@
     },
     {
       "pad": "/apps/toestemming.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1915,6 +2210,7 @@
     },
     {
       "pad": "/apps/training.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1924,6 +2220,7 @@
     },
     {
       "pad": "/apps/uitgaan.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> UIUitgaanLivingOS [verborgen]"
@@ -1931,6 +2228,7 @@
     },
     {
       "pad": "/apps/vandaag.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VAVandaagLivingOS [verborgen]"
@@ -1938,6 +2236,7 @@
     },
     {
       "pad": "/apps/veilig.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VERTG VeiligInstellingen [verborgen]"
@@ -1945,6 +2244,7 @@
     },
     {
       "pad": "/apps/vertaler.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> SOSociaalLivingOS [verborgen]",
@@ -1953,6 +2253,7 @@
     },
     {
       "pad": "/apps/vitaal.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
@@ -1961,6 +2262,7 @@
     },
     {
       "pad": "/apps/vluchten.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> VluchtenTravelOS [verborgen]"
@@ -1968,6 +2270,7 @@
     },
     {
       "pad": "/apps/voeding.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -1977,14 +2280,16 @@
     },
     {
       "pad": "/apps/voertuig.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Voertuig [verborgen]"
       ]
     },
     {
       "pad": "/apps/vonk.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> DatenLivingOS [verborgen]"
@@ -1992,6 +2297,7 @@
     },
     {
       "pad": "/apps/wallet.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -2000,6 +2306,7 @@
     },
     {
       "pad": "/apps/wbw.html",
+      "rol": "lid",
       "tikken": 3,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",
@@ -2008,11 +2315,16 @@
     },
     {
       "pad": "/apps/websitestudio.html",
-      "tikken": null,
-      "via": []
+      "rol": "kantoor",
+      "tikken": 3,
+      "via": [
+        "/apps/backoffice.html -> AfdelingenAlt+2",
+        "/apps/kantoren.html -> Bouw met de muis een eigen website-sjabloon in de Website-st [verborgen]"
+      ]
     },
     {
       "pad": "/apps/wereld.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> ABAlles bij elkaarLivingOS [verborgen]"
@@ -2020,6 +2332,7 @@
     },
     {
       "pad": "/apps/werk.html",
+      "rol": "lid",
       "tikken": 2,
       "via": [
         "/apps/app.html -> WORTG Werk OSWorkOS [verborgen]"
@@ -2027,51 +2340,60 @@
     },
     {
       "pad": "/apps/werkplek.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/werkruimte.html",
-      "tikken": 3,
+      "rol": "kantoor",
+      "tikken": 1,
       "via": [
-        "/apps/app.html -> LEMijn levenLivingOS [verborgen]",
-        "/apps/leven.html -> WorkOS"
+        "/apps/backoffice.html -> RTG"
       ]
     },
     {
       "pad": "/apps/zaakkosten.html",
-      "tikken": null,
-      "via": []
+      "rol": "zaak",
+      "tikken": 2,
+      "via": [
+        "/apps/leverancier.html -> Wat uw zaak ons kost → [verborgen]"
+      ]
     },
     {
       "pad": "/apps/zaakpay.html",
-      "tikken": 4,
+      "rol": "kantoor",
+      "tikken": 3,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> RTG Pay [verborgen]"
       ]
     },
     {
       "pad": "/apps/zaakweb.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/zaal.html",
-      "tikken": 5,
+      "rol": "kantoor",
+      "tikken": 4,
       "via": [
-        "/apps/app.html -> WorkOS [verborgen]",
+        "/apps/backoffice.html -> VandaagAlt+1",
         "/apps/kantoor.html -> Klankwerk [verborgen]",
         "/apps/klankwerk.html -> De zaal"
       ]
     },
     {
       "pad": "/apps/zakelijk.html",
+      "rol": null,
       "tikken": null,
       "via": []
     },
     {
       "pad": "/apps/zorgbalie.html",
+      "rol": "lid",
       "tikken": 4,
       "via": [
         "/apps/app.html -> OntdekkenLivingOS [verborgen]",

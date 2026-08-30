@@ -8,16 +8,30 @@ betekent.
 
 ## De belofte
 
-> **Elke functie van een lid ligt binnen vijf tikken van het beginscherm, en
-> elk scherm dat er niet ligt, draagt een uitgeschreven reden.**
+> **Elk scherm ligt binnen vijf tikken van het beginscherm van de mens die er
+> hoort te komen, en elk scherm dat er niet ligt, draagt een uitgeschreven
+> reden.**
 
-Dat tweede deel is de helft van de belofte. Een meldkamer, het loonkantoor of
-de PDA van een hardwarelab hoort niet op het beginscherm van een lid te staan;
-wie daar werkt komt er via zijn zaak. Zou de belofte "alle 276 schermen" zijn,
-dan dwong hij het huis om deuren te tekenen die de meeste leden niet mogen
-opendoen. De lijst met redenen staat in `scripts/tikken.js` (`MET_REDEN`), per
-scherm, in drie soorten: **ROL** (een scherm van een rol), **LANDING** (je landt
-er via een code of een link, zie `scripts/lib/bereik.js`) en **STAND** (een adres
+Die eerste helft is op 30 augustus 2026 aangescherpt. De meter kende eerst
+alleen het LID, en zette daarmee tweeëndertig schermen weg als "met reden
+onbereikbaar: dat is een rolscherm". Dat klopte als verdediging, niet als
+belofte: een medewerker met een PDA, een leverancier en het kantoor van RTG
+verdienen dezelfde vijf tikken vanaf *hun* beginscherm. De meter meet daarom per
+rol, elk met een echte sessie langs de server:
+
+| rol | beginscherm | dat is |
+|---|---|---|
+| `lid` | `/apps/app.html` | een gewoon lid met een RTG Pass, op de werktafel |
+| `zaak` | `/apps/leverancier.html` | de manager van een zaak |
+| `kantoor` | `/apps/backoffice.html` | een medewerker van RTG met een kantoortoken |
+
+Een rol die niet ingelogd kon worden wordt **overgeslagen met de reden erbij** en
+laat `--controle` zakken: niet gemeten mag nooit als "in orde" langskomen.
+
+Die tweede helft is even hard als de eerste. De lijst met redenen staat in
+`scripts/tikken.js` (`MET_REDEN`), per scherm, in drie soorten: **ROL** (een
+scherm van een rol die deze meter nog niet nabootst), **LANDING** (je landt er
+via een code of een link, zie `scripts/lib/bereik.js`) en **STAND** (een adres
 dat een stand van een andere app is geworden).
 
 `node scripts/tikken.js --controle` zakt zodra er een scherm onbereikbaar is
@@ -81,20 +95,51 @@ hoort te komen.
 3. **De rijen dragen hun adres** -- in de sprong én in de zoeklade van de
    leden-app -- zodat de korte weg meetbaar is en niet stilletjes kan verdwijnen.
 
-## De stand na die ingreep
+## Wat er daarna nog bij kwam
+
+**De huizen komen uit dezelfde bron.** Elk wereldhuis droeg een handgeschreven
+rooster diensten dat uit de pas liep met `MAPPEN` -- precies waardoor Passkeys en
+de wereldlaag onbereikbaar waren terwijl ze wél in een wereld hingen.
+`shared/wereldrooster.js` vult per huis een blok *Alles in deze wereld* uit
+dezelfde index. Het redactionele rooster blijft ernaast staan: dat verleidt, dit
+is compleet.
+
+**De sprong springt ook naar een handeling.** Bovenaan staat *Hier*: wat je op
+dít scherm kunt doen, gelezen uit `RTGAppMenu.functies()` -- dezelfde lijst die
+het app-menu toont. En wie typt, vindt ook handelingen die in een ándere app
+wonen ("fooi" → *Fooi erop, in Horeca*), uit `shared/handelingindex.json`, dat
+uit de knoppen van de schermen zelf wordt gelezen. Een tik brengt je erheen en
+voert niets uit: klaarzetten mag, doen doet de mens (`GRAMMATICA.md`).
+
+**Vindbaarheid wordt gemeten.** `scripts/vindbaar.js` vraagt of je een functie
+terugvindt met het woord dat er zelf op staat. Eerste uitslag: **21%** -- en de
+gemiste woorden waren bijna allemaal handelingen. Na de handelingindex: **68%**,
+met een vloer van 60% die omhoog gaat en nooit omlaag. Wat blijft missen is
+proza ("rustig", "alsof"), en dat hoort ook nergens heen te leiden.
+
+**Elke rol krijgt zijn eigen belofte.** De meter loopt het huis nu drie keer af:
+als lid, als zaak en als kantoor, elk met een echte sessie. Daarmee vervielen elf
+"met reden onbereikbaar"-regels: die schermen liggen gewoon binnen vijf tikken --
+alleen niet vanaf het beginscherm van een lid.
+
+## De stand nu
 
 | tikken | schermen |
 |---|---|
-| 0 | 1 |
-| 2 | 64 |
-| 3 | 102 |
-| 4 | 69 |
-| 5 | 6 |
-| met reden buiten bereik | 34 |
+| 0 (de drie beginschermen zelf) | 3 |
+| 1 | 23 |
+| 2 | 120 |
+| 3 | 82 |
+| 4 | 25 |
+| 5 | 0 |
+| met reden buiten bereik | 23 |
 
-Vierenzestig schermen op twee tikken (was vier), zes op vijf (was
-vierentwintig), en van de tweeënvijftig losse schermen zijn er nog
-vierendertig -- allemaal met een uitgeschreven reden.
+Bereikt per rol: lid 243, zaak 208, kantoor 251 van de 276 schermen.
+
+Waar het begon met 119 schermen op drie tikken, 24 op vijf en 52 buiten bereik,
+ligt nu **niets meer op vijf tikken** en zijn de 52 losse schermen er 23 --
+allemaal met een uitgeschreven reden, en per stuk na te lopen in `TIKKEN.json`
+mét de route en de rol die hem loopt.
 
 ## Wat hier niet staat, en eerlijk gezegd moet worden
 

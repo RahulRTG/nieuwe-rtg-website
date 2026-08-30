@@ -132,13 +132,11 @@ const SLEUTELS = {
   'POST /api/foundation/gezin/bericht': { nietIdempotent: true,
     waarom: 'twee keer hetzelfde sturen is twee berichten -- mensen herhalen zichzelf, en een laag die ' +
       'dat opslikt laat een bericht verdwijnen dat iemand bewust nog eens stuurde' },
-  'POST /api/kosten/grens': { nietIdempotent: true,
-    waarom: 'de grens opvragen is een raadpleging die zelf verbruik kost en dus wordt geteld; twee keer ' +
-      'vragen is twee raadplegingen, ook al is het antwoord gelijk' },
-  'POST /api/kosten/vooruitblik': { nietIdempotent: true,
-    waarom: 'zelfde reden als de grens: een vooruitblik wordt op het moment zelf berekend en geteld' },
-  'POST /api/supplier/kosten/vooruitblik': { nietIdempotent: true,
-    waarom: 'zelfde reden, aan de zaakkant' }
+  /* DRIE KOSTEN-ROUTES STONDEN HIER EN ZIJN ERAF, want ze waren dubbel en fout.
+     Ze stonden al in ./idemsleutels-kosten.js als `leest` (de laatste won stil --
+     zie ./idemsleutels-eenmaal.js), en de reden hier is achterhaald: besluit van
+     de eigenaar, 30 augustus 2026, een tik van de kostenmeter is RUIS en geen
+     werk. Anders wordt elke leesroute niet-idempotent zodra de meter hem raakt. */
 };
 
 module.exports = { SLEUTELS };

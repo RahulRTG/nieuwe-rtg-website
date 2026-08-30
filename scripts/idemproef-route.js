@@ -205,13 +205,53 @@ if (require.main !== module) { module.exports = {}; return; }
   const ruis = new Set();
   let ijkStand = null, staatWerkt = false;
   {
-    const eerste = await post('/api/pay/overzicht', {}, tokens.member);
-    ijkStand = eerste.staat || null;
-    for (let i = 0; i < 6 && ijkStand != null; i++) {
-      const nu = await post('/api/pay/overzicht', {}, tokens.member);
-      if (nu.staat == null) break;
-      for (const k of Object.keys(staatlog.verschil(ijkStand, nu.staat))) ruis.add(k);
-      ijkStand = nu.staat;
+    /* OP MEER DAN EEN ROUTE, en dat kostte veertien routes voordat het opviel.
+
+       De ijking liep alleen op /api/pay/overzicht. Wat daar niet groeit, komt
+       niet in de ruislijst -- en `kosten` groeide daar niet, want de kostenmeter
+       tikt op de poorten die een DRAGER kennen en niet op elke route. Veertien
+       leesroutes kwamen daardoor binnen als "er veranderde iets": het enige dat
+       veranderde was de boekhouding van het huis over het verzoek zelf.
+
+       Besluit van de eigenaar, 30 augustus 2026: een tik van de kostenmeter is
+       RUIS en geen werk. Zou het wel werk zijn, dan wordt elke leesroute
+       niet-idempotent zodra de meter hem raakt, en dat is bijna elke leesroute.
+
+       Het blijft een MEETPUNT en geen lijst: `kosten` staat hier nergens met
+       naam. Er komt een tweede leesroute bij die wel langs een dragende poort
+       gaat, en wat er dan bij ELKE oproep groeit is per definitie ruis. Een
+       handgeschreven lijst zou stil verouderen zodra er een teller bij komt. */
+    const IJKROUTES = ['/api/pay/overzicht', '/api/geld/beleid'];
+    /* EN EEN DIE DE IJKING NIET KAN VINDEN, met naam en met de reden.
+
+       `kosten` is de kostprijsboekhouding (kern/kosten/meter.js). Hij wordt
+       NOOIT door een handler geschreven -- alleen door de meter, over het
+       verzoek zelf. Voor de vraag "deed deze route werk" is dat per definitie
+       ruis: het is de boekhouding van het huis en niet de handeling.
+
+       Waarom hij hier met naam staat terwijl de rest gemeten wordt: de ijking
+       zoekt wat bij ELKE oproep groeit, en de kostenmeter tikt niet bij elke
+       oproep -- hij hangt aan de poorten die een drager kennen. Twee ijkroutes
+       vonden hem daarom evenmin (gemeten: de lijst bleef rtgai, handelingLog,
+       apiSpoor). Wat niet altijd groeit, kan een altijd-groeit-ijking niet
+       vinden; dat is geen tekortkoming van de ijking maar haar definitie.
+
+       Besluit van de eigenaar, 30 augustus 2026. De prijs staat erbij: zou een
+       handler ooit zelf in `kosten` schrijven, dan ziet deze proef dat niet meer.
+       Dat mag niet gebeuren en KOSTEN.md zegt dat ook -- de meter is de enige
+       schrijver. */
+    ruis.add('kosten');
+    for (const pad of IJKROUTES) {
+      const eerste = await post(pad, {}, tokens.member);
+      let stand = eerste.staat || null;
+      if (stand == null) continue;
+      for (let i = 0; i < 6; i++) {
+        const nu = await post(pad, {}, tokens.member);
+        if (nu.staat == null) break;
+        for (const k of Object.keys(staatlog.verschil(stand, nu.staat))) ruis.add(k);
+        stand = nu.staat;
+      }
+      ijkStand = stand;
     }
     staatWerkt = ijkStand != null;
   }

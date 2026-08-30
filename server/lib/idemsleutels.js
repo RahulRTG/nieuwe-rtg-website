@@ -154,12 +154,15 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-geld').SLEUTELS,
   require('./idemsleutels-kosten').SLEUTELS,
   require('./idemsleutels-commerce').SLEUTELS,
-  /* De kale ronde van 30 augustus 2026: zestien routes waar een dubbeltik een
-     tweede ding maakte, met per regel het veld dat de identiteit draagt. */
+  /* De kale ronde van 30 augustus 2026, met per regel het identiteitsveld. */
   require('./idemsleutels-kaleronde').SLEUTELS,
   /* En de andere kant van diezelfde ronde: wat je met opzet NIET dedupliceert,
      elk met een reden. Zie de kop van dat bestand. */
   require('./idemsleutels-kaleronde-b').SLEUTELS);
+
+// Geen route in twee zijbestanden -- ./idemsleutels-eenmaal.js gooit.
+require('./idemsleutels-eenmaal')();
+
 
 /* De verklaring nakijken bij het laden: een `nietIdempotent` zonder reden is
    geen verklaring maar een ontsnapping, en een lege veldenlijst zegt niets. */

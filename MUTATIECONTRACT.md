@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **85** |
-| `NOT_APPLICABLE` | 40 | 1.054 |
-| geclassificeerd | 3.069 | 4.568 van 4.653 (98,2%) |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **74** |
+| `NOT_APPLICABLE` | 40 | 1.061 |
+| geclassificeerd | 3.069 | 4.579 van 4.653 (98,4%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -818,6 +818,51 @@ de kop forceren kan niet (hij is weg) en eerder zetten kan ook niet (het getal i
 pas aan het eind bekend). Die vier komen daardoor binnen als **ongemeten** in
 plaats van als "geen effect" — precies het onderscheid waarvoor deze meter
 bestaat, nu op zichzelf toegepast.
+
+## 5k. De kostentik is ruis — en de fout die dat blootlegde
+
+**Besluit van de eigenaar, 30 augustus 2026: een tik van de kostenmeter is ruis
+en geen werk.** Het is de boekhouding van het *huis* over het verzoek, niet de
+handeling van de route. Zou het wel werk zijn, dan wordt elke leesroute
+niet-idempotent zodra de meter hem raakt — en dat is bijna elke leesroute.
+
+Elf routes werden daardoor gemeten alsof ze werk deden terwijl het enige dat
+bewoog `kosten` was. Dat maakte de meting op die punten niet onvolledig maar
+**verkeerd**.
+
+**De ruisijking kan hem niet vinden, en dat is haar definitie.** Zij zoekt wat bij
+*elke* oproep groeit; de kostenmeter tikt alleen op poorten die een drager kennen.
+Een tweede ijkroute toevoegen hielp dan ook niet — gemeten: de lijst bleef
+`rtgai, handelingLog, apiSpoor`. Daarom staat `kosten` er met naam bij, met de
+reden erbij dat hij niet meetbaar is, en met de prijs: zou een handler ooit zélf
+in `kosten` schrijven, dan ziet deze proef dat niet meer. Nagekeken — vandaag
+schrijft niets buiten `kern/kosten/` erin, en `KOSTEN.md` zegt dat de meter de
+enige schrijver is.
+
+### Twee verklaringen over dezelfde route is een loterij
+
+Bij het uitvoeren van dit besluit bleek dat ik zelf een fout had gemaakt.
+`/api/kosten/grens`, `/api/kosten/vooruitblik` en
+`/api/supplier/kosten/vooruitblik` stonden **twee keer** verklaard: als
+`{ leest: true }` in `idemsleutels-kosten.js` en als `nietIdempotent` in mijn
+`idemsleutels-kaleronde-b.js`. `Object.assign` laat de laatste winnen — stil —
+dus welke verklaring gold hing af van de volgorde van de `require`s.
+
+Dat is geen verklaring meer maar een loterij, en het is ernstiger dan een
+slordigheid: een duplicaatregel stuurt de idem-poort, en een poort die van een
+require-volgorde afhangt is erger dan geen poort.
+
+`server/lib/idemsleutels-eenmaal.js` gooit nu bij het laden zodra een route in
+twee zijbestanden staat. De lijst met delen staat dáár en niet in de aanroeper —
+dezelfde les als de vier hardgecodeerde contractbestanden in
+`scripts/effectcontracten.js`: een lijst die op twee plekken moet meegroeien,
+groeit op één plek niet mee.
+
+| | voor | na |
+|---|---:|---:|
+| dubbeltik deed het werk opnieuw | 77 | **74** |
+| `LEGACY_PENDING_CLASSIFICATION` | 85 | **74** |
+| geclassificeerd | 4.568 | **4.579 van 4.653 (98,4%)** |
 
 ## 6. De poort
 

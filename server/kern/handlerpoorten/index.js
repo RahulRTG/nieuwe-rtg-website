@@ -64,7 +64,21 @@
    ========================================================================== */
 'use strict';
 
-const { POORTEN } = require('./lijst');
+/* DE LIJST STAAT IN TWEE BESTANDEN EN IS EEN LIJST. ./lijst.js draagt de
+   objectpoorten, ./lijst-identiteit.js de rest (identiteit, genre, geen-deur);
+   de naad is die uit het bestand zelf, gemaakt toen het over keuringsregel 13
+   ging. Hier komen ze weer bij elkaar, want wie een poort opzoekt hoort er EEN
+   te vinden -- twee lijsten die de aanroeper zelf moet kennen, is precies hoe
+   een poort in de ene wel en de andere niet belandt. */
+const { POORTEN: OBJECTPOORTEN } = require('./lijst');
+const { POORTEN: IDENTITEITSPOORTEN } = require('./lijst-identiteit');
+const POORTEN = Object.assign({}, OBJECTPOORTEN, IDENTITEITSPOORTEN);
+{
+  /* Een naam in allebei zou er stil een overschrijven. Dat kan niet gebeuren
+     zolang de naad blijft waar hij is -- maar 'blijft' is geen handhaving. */
+  const dubbel = Object.keys(OBJECTPOORTEN).filter(k => k in IDENTITEITSPOORTEN);
+  if (dubbel.length) throw new Error('handlerpoorten: dezelfde naam in beide lijsten: ' + dubbel.join(', '));
+}
 
 /* naam -> { toegang, veld?, versmalt?, genre?, wat } */
 

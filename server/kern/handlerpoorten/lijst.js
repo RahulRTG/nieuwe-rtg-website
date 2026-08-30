@@ -1,11 +1,21 @@
 /* ============================================================================
-   DE LIJST -- negenenvijftig poorten, elk gelezen.
+   DE LIJST, DEEL EEN -- DE OBJECTPOORTEN.
+
+   Een code of token uit het LICHAAM wijst het object aan: een gezin, een school,
+   een klas, een doos. De identiteit komt hier niet uit een kop maar uit wat de
+   aanroeper meestuurt, en daarom is de klasse OBJECT_SCOPED -- rollen kruisen
+   meet hier niets.
+
+   Deel twee staat in ./lijst-identiteit.js: de poorten die een REEDS vaststaande
+   identiteit versmallen, de genre-eisen, en de dingen die eruitzien als een deur
+   maar er geen zijn. Gesplitst omdat dit bestand over de grens van keuringsregel
+   13 ging, en langs DEZE naad omdat het de naad is die er al in stond -- niet
+   langs een willekeurige regel. ./index.js voegt de twee weer samen, zodat er
+   voor wie een poort opzoekt nog steeds EEN lijst is.
 
    De uitleg staat in ./index.js: waarom deze lijst bestaat, waarom de sleutel de
    NAAM is (en niet bestand:naam, wat de eerste poging was), en waarom een
-   genre-eis hier geen CAPABILITY_GATED heet. Hier alleen wat elke poort DOET --
-   dat is de tekst die je erbij pakt als je een route indeelt, en die hoort niet
-   weggestopt onder drie pagina's uitleg.
+   genre-eis hier geen CAPABILITY_GATED heet.
 
    naam -> { toegang, veld?, versmalt?, genre?, soort?, wat }
    ========================================================================== */
@@ -79,84 +89,7 @@ const POORTEN = {
   'dmCollega': { toegang: 'OBJECT_SCOPED', veld: 'staffId',
     wat: 'een collega bij staffId, binnen dezelfde zaak en niet jezelf' },
   'eigenPostvak': { toegang: 'OBJECT_SCOPED', veld: 'adres',
-    wat: 'het postvak uit het lichaam moet bij de persoonlijke inlog horen' },
-
-  /* ---- AUTHENTICATED: de identiteit staat al vast, deze poort versmalt hem ---- */
-
-  'geenGast': { toegang: 'AUTHENTICATED', versmalt: 'geen anonieme demo-gast',
-    wat: 'een echt account mag, ook de gratis laag; alleen een anonieme gast niet' },
-  'eisAccount': { toegang: 'AUTHENTICATED', versmalt: 'een eigen RTG-account',
-    wat: 'req.session.account moet bestaan' },
-  'managerOnly': { toegang: 'AUTHENTICATED', versmalt: 'manager',
-    wat: 'req.actor.manager, gezet door supplierAuth' },
-  'managerOf': { toegang: 'AUTHENTICATED', versmalt: 'manager',
-    wat: 'req.actor.manager, gezet door supplierAuth' },
-  'actor': { toegang: 'AUTHENTICATED', versmalt: 'een zaak in de sessie',
-    wat: 'wie.vanZaak(req); 401 zonder zaak' },
-  'alleenPersoneel': { toegang: 'AUTHENTICATED', versmalt: 'personeelslogin',
-    wat: 'req.actor.staffId moet bestaan voor het personeelsstuur' },
-  'alleenBaas': { toegang: 'AUTHENTICATED', versmalt: 'de eigenaar',
-    wat: 'isBaas(req) -- alleen de eigenaar komt bij het papierwerk' },
-  'eigenaarAlleen': { toegang: 'AUTHENTICATED', versmalt: 'de eigenaar',
-    wat: 'eigenaar.isEigenaar(accounts, req.session.account) -- alleen de eigenaar beheert de platform-onboarding' },
-  'lid': { toegang: 'AUTHENTICATED', versmalt: 'geen gast',
-    wat: 'req.session.tier !== guest' },
-  'gast': { toegang: 'AUTHENTICATED', versmalt: 'geen gast',
-    wat: 'RTG Bank is voor leden' },
-  'gate': { toegang: 'AUTHENTICATED', versmalt: 'geen gast, en de bank moet live zijn',
-    wat: 'gast() plus dicht(): een schakelaar en een identiteit in een poort' },
-  'geenEchtAccount': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'een anonieme gast kan niet met RTG Pay betalen' },
-  'geenEchtAccount': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'een anonieme gast kan niet met RTG Pay betalen' },
-  'echtAccount': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'de algemene pin hoort bij een echt RTG-account' },
-  'echtAccount': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'de rollenkoppeling hoort bij een echt RTG-account' },
-  'eigenSleutel': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'een vakbewijs hoort bij een echt RTG-account' },
-  'echtLid': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'meedoen aan het Lab-fonds vraagt een gratis RTG-account' },
-  'ontmoetKey': { toegang: 'AUTHENTICATED', versmalt: 'een echt account',
-    wat: 'eisAccount() en dan de eigen sessiesleutel' },
-  'lidOk': { toegang: 'AUTHENTICATED', versmalt: 'Business Pass',
-    wat: 'borden zijn onderdeel van de Business Pass' },
-  'eis': { toegang: 'AUTHENTICATED', versmalt: 'Lifestyle of Business Pass',
-    wat: 'deze app is onderdeel van de Lifestyle Pass' },
-  'eis': { toegang: 'AUTHENTICATED', versmalt: 'Lifestyle of Business Pass',
-    wat: 'Rendez-vous is voor Signature-members' },
-  'kyc': { toegang: 'AUTHENTICATED', versmalt: 'kyc afgerond',
-    wat: 'onboarding.payGate(req.session)' },
-
-  /* ---- genre-cap: WAT VOOR SOORT ZAAK is dit. Geen capability -- zie de kop ---- */
-
-  'eisRetail': { toegang: 'AUTHENTICATED', genre: 'retail',
-    wat: "db.capsVan(req.supplier).includes('retail')" },
-  'eisVracht': { toegang: 'AUTHENTICATED', genre: 'vracht',
-    wat: "db.capsVan(req.supplier).includes('vracht')" },
-  'eisVak': { toegang: 'AUTHENTICATED', genre: 'vak',
-    wat: 'vak().isVak(req.supplier) -- alleen voor dienstverlenende zaken' },
-  'eisDorp': { toegang: 'AUTHENTICATED', genre: 'verblijf-afdelingen',
-    wat: 'dorpKan(req.supplier) -- heeft deze zaak een afdelingenbord' },
-  'eisBeveiliging': { toegang: 'AUTHENTICATED', genre: 'beveiliging',
-    wat: 'bevIsBeveiliging(req.supplier)' },
-  'eisGroothandel': { toegang: 'AUTHENTICATED', genre: 'groothandel',
-    wat: 'de zaak moet een groothandel zijn' },
-  'ovZaakOnly': { toegang: 'AUTHENTICATED', genre: 'ov',
-    wat: "req.supplier.type !== 'ov'" },
-  'ovZaakOnly': { toegang: 'AUTHENTICATED', genre: 'ov',
-    wat: "req.supplier.type !== 'ov'" },
-  'eisSalonProfiel': { toegang: 'AUTHENTICATED', genre: 'salon',
-    wat: 'de zaak moet een salonprofiel hebben' },
-  'eisSalonProfiel': { toegang: 'AUTHENTICATED', genre: 'salon',
-    wat: 'de zaak moet een salonprofiel hebben' },
-
-  /* ---- geen deur: wel een rem, geen identiteit ---- */
-
-  'geremd': { toegang: null, soort: 'geen-deur',
-    wat: 'uitsluitend een snelheidsrem per IP; stelt geen identiteit vast' },
-  'doosSleutelOk': { toegang: null, soort: 'geen-deur',
-    wat: 'telt afketsers per IP voordat de sleutel wordt gecontroleerd; de rem, niet de deur' }
+    wat: 'het postvak uit het lichaam moet bij de persoonlijke inlog horen' }
 };
 
 module.exports = { POORTEN };

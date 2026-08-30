@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T02:13:11.477Z",
-  "commit": "faa6d3a0",
+  "op": "2026-08-30T02:22:25.892Z",
+  "commit": "96ad8f32",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,20 +9,20 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 3059,
+  "geclassificeerd": 3069,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 2963,
-   "LEGACY_PENDING_CLASSIFICATION": 1594,
+   "BLOCKED_BY_TEST_FIXTURE": 2973,
+   "LEGACY_PENDING_CLASSIFICATION": 1584,
    "NOT_APPLICABLE": 40,
    "PROTECTED": 24,
    "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
   "vastgesteldDoorMens": 106,
-  "afgeleidDoorScript": 2953,
+  "afgeleidDoorScript": 2963,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
-   "(niet af te leiden -- vraagt een verklaring)": 366,
-   "OBJECT_SCOPED": 474,
+   "(niet af te leiden -- vraagt een verklaring)": 362,
+   "OBJECT_SCOPED": 478,
    "SERVICE_TO_SERVICE": 8,
    "SYSTEM_INTERNAL": 1
   },
@@ -33,7 +33,7 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 278,
+   "BLOCKED_BY_TEST_FIXTURE": 267,
    "NOT_APPLICABLE": 851,
    "PROTECTED": 6
   },
@@ -3136,12 +3136,14 @@
   {
    "mutatieId": "bank.bulk",
    "route": "POST /api/bank/bulk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3153,10 +3155,10 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte voor de hele batch."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte voor de hele batch.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.hart",
@@ -3292,12 +3294,14 @@
   {
    "mutatieId": "bank.naar-wallet",
    "route": "POST /api/bank/naar-wallet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3309,20 +3313,22 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.overboek",
    "route": "POST /api/bank/overboek",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3334,10 +3340,10 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.overzicht",
@@ -3367,12 +3373,14 @@
   {
    "mutatieId": "bank.pas.betaal",
    "route": "POST /api/bank/pas/betaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3384,10 +3392,10 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.pas.bevries",
@@ -3596,12 +3604,14 @@
   {
    "mutatieId": "bank.salaris",
    "route": "POST /api/bank/salaris",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3613,20 +3623,22 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte voor de hele batch."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte voor de hele batch.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.sepa",
    "route": "POST /api/bank/sepa",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3638,10 +3650,10 @@
     "grond": null,
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onvoldoende saldo of rood-staan-ruimte.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.spaardoel",
@@ -3721,12 +3733,14 @@
   {
    "mutatieId": "bank.terugkerend.stop",
    "route": "POST /api/bank/terugkerend/stop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3738,10 +3752,10 @@
     "grond": null,
     "hindernis": "Deze vaste betaling bestaat niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze vaste betaling bestaat niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.terugkerend.zet",
@@ -7095,7 +7109,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -7839,7 +7853,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -8101,7 +8115,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -8234,7 +8248,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -8494,7 +8508,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -22471,12 +22485,14 @@
   {
    "mutatieId": "foundation.school.personeel.mail.inbox",
    "route": "POST /api/foundation/school/personeel/mail/inbox",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: schoolCode",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22486,20 +22502,22 @@
     "grond": null,
     "hindernis": "Onbekende school of verkeerd personeel-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende school of verkeerd personeel-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.mail.lees",
    "route": "POST /api/foundation/school/personeel/mail/lees",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: schoolCode",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22509,10 +22527,10 @@
     "grond": null,
     "hindernis": "Onbekende school of verkeerd personeel-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende school of verkeerd personeel-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.mail.overzicht",
@@ -22542,12 +22560,14 @@
   {
    "mutatieId": "foundation.school.personeel.mail.stuur",
    "route": "POST /api/foundation/school/personeel/mail/stuur",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: schoolCode",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22557,20 +22577,22 @@
     "grond": null,
     "hindernis": "Onbekende school of verkeerd personeel-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende school of verkeerd personeel-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.mail.verzonden",
    "route": "POST /api/foundation/school/personeel/mail/verzonden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: schoolCode",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22580,10 +22602,10 @@
     "grond": null,
     "hindernis": "Onbekende school of verkeerd personeel-token."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende school of verkeerd personeel-token.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.rollen",
@@ -27506,7 +27528,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -27872,7 +27894,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -33979,7 +34001,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -34239,7 +34261,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -48099,7 +48121,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -64723,7 +64745,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -67788,7 +67810,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -68621,14 +68643,12 @@
   {
    "mutatieId": "pay.verzoek.betaal",
    "route": "POST /api/pay/verzoek/betaal",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -68640,10 +68660,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
   },
   {
    "mutatieId": "pay.verzoek.intrek",
@@ -70151,7 +70171,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -70257,7 +70277,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83744,7 +83764,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account, geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83771,7 +83791,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account, geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -83798,7 +83818,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "een eigen RTG-account, geen gast",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -92594,7 +92614,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "manager",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -92621,7 +92641,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "manager",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
@@ -92646,7 +92666,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "manager",
     "bedoeld": null,
     "bewakers": [
      "supplierAuth"
@@ -92671,7 +92691,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "manager",
     "bedoeld": null,
     "bewakers": [
      "supplierAuth"
@@ -114898,7 +114918,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -116547,7 +116567,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -116759,7 +116779,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -116786,7 +116806,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -116838,7 +116858,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
@@ -117047,7 +117067,7 @@
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
+    "uitHandler": "ja",
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"

@@ -115,6 +115,13 @@ let meerdereTreffers = 0;
 {
   const volledigePaden = routes.map(r => ({ methode: String(r.methode).toUpperCase(), pad: r.pad }));
   const VORMEN = [
+    /* `const s = poort(req, res), t = ...` -- een samengestelde declaratie. Die
+       eindigt op een KOMMA en niet op een puntkomma, en viel daarmee buiten de
+       eerste vorm. Gemeten: vier handlers, waaronder de mailpoort van de
+       RTFoundation (server/foundation/leden-mail.js). Vier is weinig, en een
+       poort die je niet ziet is er een die als "geen deur" in het register
+       belandt -- dat is de dure kant van deze fout, niet het aantal. */
+    /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*[;,]\s*(?:if\s*\(\s*!|\w)/,
     /const\s+\w+\s*=\s*(\w+)\s*\(\s*req\s*,\s*res\s*\)\s*;\s*if\s*\(\s*!/,
     /if\s*\(\s*!\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
     /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/

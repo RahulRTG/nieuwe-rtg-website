@@ -38,6 +38,7 @@ const { handlersUit } = require('./lib/schrijfanalyse');
 const handlerpoorten = require('../server/kern/handlerpoorten');
 const contract = require('../server/kern/mutatiecontract');
 const { stempel } = require('./lib/stempel');
+const { PUBLIEK } = require('./lib/publiekeroutes');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'MUTATIECONTRACT.json');
@@ -172,7 +173,19 @@ function waargenomenToegang(r) {
   if (!r.bewakersBekend || !namen.length) {
     /* Geen deur in de router: staat hij in de handler? */
     const p = uitHandler.get(String(r.methode || 'POST').toUpperCase() + ' ' + r.pad);
-    return (p && p.toegang) || null;
+    if (p && p.toegang) return p.toegang;
+    /* EN ANDERS: STAAT HIJ MET REDEN OP DE PUBLIEKE LIJST?
+
+       Geen poort is twee heel verschillende dingen: een gat, of een bewuste
+       publieke deur. ./lib/publiekeroutes.js kent het verschil -- die lijst is
+       door een mens geschreven, per route met de reden erbij, en keuringsregel
+       28 dwingt hem af. Een route die daar staat is niet "toegang onbekend"
+       maar PUBLIC, en de reden is er al.
+
+       Zonder dit stonden 99 routes in het register als "niet af te leiden"
+       terwijl er twee mappen verderop een gelezen verklaring lag. */
+    if (PUBLIEK.has(r.pad)) return 'PUBLIC';
+    return null;
   }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
      eigen geheim per organisatie. Die uitzondering staat hier bij naam, want een
@@ -451,6 +464,10 @@ if (process.argv.includes('--afleiden')) {
     const toeg = r.toegang.waargenomen;
     if (!toeg) continue;                       // zonder waargenomen deur geen geldig contract
     const toegang = { klasse: toeg };
+    /* PUBLIC ZONDER REDEN IS EEN GAT, en de keuring weigert het terecht. De
+       reden staat al geschreven, door een mens, in ./lib/publiekeroutes.js --
+       dus die reist mee in plaats van dat er hier een nieuwe wordt bedacht. */
+    if (toeg === 'PUBLIC') toegang.waarom = PUBLIEK.get(r.route.replace(/^\S+ /, '')) || null;
     if (toeg === 'OBJECT_SCOPED') {
       const p = uitHandler.get(r.route);
       toegang.objectVeld = (p && p.veld) || 'nog af te leiden uit de handler';

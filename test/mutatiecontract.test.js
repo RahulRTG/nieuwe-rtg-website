@@ -278,7 +278,7 @@ test('de aftekening liegt niet over wie er heeft gekeken', () => {
   }
 });
 
-test('de 788 onder het bewijsbesluit deugen, en overschrijven niets', () => {
+test('de routes onder het bewijsbesluit deugen, en overschrijven niets', () => {
   /* Besluit van de eigenaar, 30 augustus 2026: twee onafhankelijke
      runtime-metingen die allebei nul lezen is voldoende grond voor
      NOT_APPLICABLE. Deze toets bewaakt de drie dingen die dat besluit eerlijk
@@ -290,6 +290,15 @@ test('de 788 onder het bewijsbesluit deugen, en overschrijven niets', () => {
   const effect = require('../server/lib/mutatiecontracten-effect');
   const namen = Object.keys(effect);
   assert.ok(namen.length > 700, 'de lijst is niet leeggelopen: ' + namen.length);
+
+  /* PUBLIC ZONDER REDEN IS EEN GAT. Dertien contracten uit dit script kwamen er
+     zo uit toen de publieke lijst als toegangsbron werd toegevoegd; de keuring
+     ving ze. Deze assert houdt dat vast op de plek waar het ontstaat. */
+  for (const route of namen) {
+    const t = effect[route].toegang;
+    if (t.klasse === 'PUBLIC') assert.ok(t.waarom && t.waarom.length > 10,
+      route + ': PUBLIC zonder reden -- de reden staat in scripts/lib/publiekeroutes.js en hoort mee te reizen');
+  }
 
   // 1. elk contract komt door dezelfde keuring als alle andere
   const fouten = namen.flatMap(route => contract.keur({ route, ...effect[route] }));

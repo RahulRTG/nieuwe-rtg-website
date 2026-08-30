@@ -84,6 +84,10 @@ const CONTRACTEN = {};
 for (const r of routes) {
   const toegang = { klasse: r.toegang };
   if (r.objectVeld) toegang.objectVeld = r.objectVeld;
+  /* De reden bij PUBLIC komt uit scripts/lib/publiekeroutes.js -- door een mens
+     geschreven, over deze route. Open is een besluit; zonder reden is het een
+     gat dat toevallig nog niemand heeft gedicht, en de keuring weigert het. */
+  if (r.waarom) toegang.waarom = r.waarom;
   CONTRACTEN[r.route] = {
     mutatieId: r.mutatieId,
     herkomst: 'mens',

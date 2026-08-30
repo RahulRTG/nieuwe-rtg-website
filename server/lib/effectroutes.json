@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 804,
- "zonderWaargenomenDeur": 44,
+ "aantal": 817,
+ "zonderWaargenomenDeur": 31,
  "routes": [
   {
    "route": "POST /api/aanmelding/betalingen",
@@ -230,6 +230,12 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/betaaldiensttarief",
+   "mutatieId": "betaaldiensttarief",
+   "toegang": "PUBLIC",
+   "waarom": "het betaaldiensttarief staat in de partnervoorwaarden"
+  },
+  {
    "route": "POST /api/bezorg/partners",
    "mutatieId": "bezorg.partners",
    "toegang": "AUTHENTICATED"
@@ -313,6 +319,12 @@
    "route": "POST /api/chat/history",
    "mutatieId": "chat.history",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/claims",
+   "mutatieId": "claims",
+   "toegang": "PUBLIC",
+   "waarom": "de publieke claims voeden de voorwaardenpagina's, die je zonder inlog leest"
   },
   {
    "route": "POST /api/clips/aanwezig",
@@ -817,6 +829,12 @@
    "objectVeld": "schoolCode"
   },
   {
+   "route": "POST /api/fout/client",
+   "mutatieId": "fout.client",
+   "toegang": "PUBLIC",
+   "waarom": "een fout uit de browser: JUIST zonder poort, want een fout die het inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden (zie server/routes/fout.js voor wat er wel en niet meegaat)"
+  },
+  {
    "route": "POST /api/galerij/mijn",
    "mutatieId": "galerij.mijn",
    "toegang": "AUTHENTICATED"
@@ -962,6 +980,12 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/kantoor/gesprek/start",
+   "mutatieId": "kantoor.gesprek.start",
+   "toegang": "PUBLIC",
+   "waarom": "het kantoorgesprek begint voor er een account is"
+  },
+  {
    "route": "POST /api/kantoor/wereld",
    "mutatieId": "kantoor.wereld",
    "toegang": "AUTHENTICATED"
@@ -980,6 +1004,12 @@
    "route": "POST /api/klok/mijn",
    "mutatieId": "klok.mijn",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/krant/gids",
+   "mutatieId": "krant.gids",
+   "toegang": "PUBLIC",
+   "waarom": "de krant is openbaar; er is een toets die dat vastlegt"
   },
   {
    "route": "POST /api/lab/ai",
@@ -1810,6 +1840,12 @@
    "route": "POST /api/mode/bezorg/mijn",
    "mutatieId": "mode.bezorg.mijn",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/munt/opties",
+   "mutatieId": "munt.opties",
+   "toegang": "PUBLIC",
+   "waarom": "welke munten er aan staan is prijslijst-informatie, net als /api/pasprijzen"
   },
   {
    "route": "POST /api/muziek/mijn",
@@ -2812,9 +2848,21 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/partnertrips",
+   "mutatieId": "partnertrips",
+   "toegang": "PUBLIC",
+   "waarom": "idem: het aanbod van het partnerkanaal"
+  },
+  {
    "route": "POST /api/paspoort/mijn",
    "mutatieId": "paspoort.mijn",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/pasprijzen",
+   "mutatieId": "pasprijzen",
+   "toegang": "PUBLIC",
+   "waarom": "de prijslijst is publieke informatie"
   },
   {
    "route": "POST /api/pay/graaf",
@@ -3107,6 +3155,12 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/sociaalbeleid",
+   "mutatieId": "sociaalbeleid",
+   "toegang": "PUBLIC",
+   "waarom": "de sociale afdracht is een publieke belofte (RTFoundation)"
+  },
+  {
    "route": "POST /api/spar/lijst",
    "mutatieId": "spar.lijst",
    "toegang": "AUTHENTICATED"
@@ -3120,6 +3174,18 @@
    "route": "POST /api/splitsen/mijn",
    "mutatieId": "splitsen.mijn",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/stad/algoritmes",
+   "mutatieId": "stad.algoritmes",
+   "toegang": "PUBLIC",
+   "waarom": "het openbare algoritmeregister: beschrijft regels, geen personen"
+  },
+  {
+   "route": "POST /api/stad/besluiten",
+   "mutatieId": "stad.besluiten",
+   "toegang": "PUBLIC",
+   "waarom": "het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen"
   },
   {
    "route": "POST /api/stad/bewoner",
@@ -3997,6 +4063,12 @@
    "toegang": "AUTHENTICATED"
   },
   {
+   "route": "POST /api/webauthn/opties",
+   "mutatieId": "webauthn.opties",
+   "toegang": "PUBLIC",
+   "waarom": "de uitdaging moet er zijn VOOR je hem kunt beantwoorden; het bewijs volgt bij /login"
+  },
+  {
    "route": "POST /api/wereld/bereik",
    "mutatieId": "wereld.bereik",
    "toegang": "AUTHENTICATED"
@@ -4055,6 +4127,12 @@
    "route": "POST /api/zakelijk/profiel",
    "mutatieId": "zakelijk.profiel",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/zegel/controleer",
+   "mutatieId": "zegel.controleer",
+   "toegang": "PUBLIC",
+   "waarom": "controleert een handtekening; het bewijs zit in het verzoek"
   },
   {
    "route": "POST /api/zegel/maak",

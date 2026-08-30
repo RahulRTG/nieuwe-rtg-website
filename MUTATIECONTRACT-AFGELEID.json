@@ -1,14 +1,14 @@
 {
  "stempel": {
-  "op": "2026-08-30T03:03:30.205Z",
-  "commit": "26bb9cd7",
+  "op": "2026-08-30T03:11:41.048Z",
+  "commit": "ce78a5bd",
   "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Afgeleide mutatiecontracten -- GEEN MENS HEEFT HIER OVER NAGEDACHT. Geschreven door node scripts/mutatiecontract.js --afleiden, en overschreven bij elke volgende gang.",
  "grens": "Alleen BLOCKED_BY_TEST_FIXTURE. Vijf van de zes standen doen een uitspraak over GEDRAG en die mag geen script zetten -- geen meting leest de bedoeling van een handeling af. Deze stand doet de omgekeerde uitspraak: wij weten het niet, en dit is waarom de proef er niet bij kwam. De grond is hard: de route gaf zijn eigen hindernis terug. Wie een regel wil verbeteren, verhuist hem naar server/lib/mutatiecontracten.js -- een mens wint van een script.",
  "waardeloosVoor": "Een regel hier zegt NIETS over veiligheid en niets over idempotentie. Alleen: deze route bestaat, hij is niet gemeten, en dit moet er in scripts/lib/idemwereld.js komen voordat hij iets kan zeggen. Het is de wachtrij met per regel de reden -- beter dan diezelfde routes ongeteld op een hoop onder LEGACY.",
- "aantal": 3062,
+ "aantal": 3097,
  "contracten": {
   "POST /api/aandacht": {
    "mutatieId": "aandacht",
@@ -34,6 +34,23 @@
    },
    "toegang": {
     "klasse": "AUTHENTICATED"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze aanmelding bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/aanmelding/bewijs": {
+   "mutatieId": "aanmelding.bewijs",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "afgetekend": {
@@ -908,6 +925,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Object niet gevonden.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/auth/login": {
+   "mutatieId": "auth.login",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "dit IS de deur: wie inlogt heeft nog geen sessie; drie remmen, een vertraging bij een belaagd account en het beveiligingsjournaal beschermen hem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onjuiste inloggegevens.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/auth/password": {
    "mutatieId": "auth.password",
    "herkomst": "afgeleid",
@@ -924,6 +958,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Alleen voor accounts.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/auth/register": {
+   "mutatieId": "auth.register",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "registreren kan alleen zonder account"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Vul uw naam in.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/auth/resend": {
    "mutatieId": "auth.resend",
    "herkomst": "afgeleid",
@@ -939,6 +990,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Alleen voor accounts.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/auth/verify-email": {
+   "mutatieId": "auth.verify-email",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de bevestigingslink IS de geloofsbrief (verifyActionToken); ongeldig of verlopen geeft 400"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Ongeldige of verlopen bevestigingslink.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/avond": {
    "mutatieId": "avond",
@@ -2873,6 +2941,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Welk boek lees je?\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/book": {
+   "mutatieId": "book",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem: boeken via het partnerkanaal is de hele opzet"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Reis niet gevonden.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/booking/pay": {
    "mutatieId": "booking.pay",
@@ -10102,6 +10187,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Dat album bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/gast/aanschuiven": {
+   "mutatieId": "gast.aanschuiven",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze code hoort niet bij een tafel die wij kennen.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/gast/afhaal/bestel": {
    "mutatieId": "gast.afhaal.bestel",
    "herkomst": "afgeleid",
@@ -10480,6 +10582,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze tafelsessie is niet meer geldig. Scan de QR op tafel opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/gast/tafel": {
+   "mutatieId": "gast.tafel",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze code hoort niet bij een tafel of kamer die wij kennen.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/gast/verdeel": {
    "mutatieId": "gast.verdeel",
@@ -11414,6 +11533,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze gewoonte staat niet op uw naam.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/gids/app": {
+   "mutatieId": "gids.app",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de app-gids is openbaar"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Voor deze pagina is geen gids.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/giftcard/buy": {
    "mutatieId": "giftcard.buy",
    "herkomst": "afgeleid",
@@ -11749,6 +11885,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende gebeurtenis.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/kantoor/gesprek/zeg": {
+   "mutatieId": "kantoor.gesprek.zeg",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "loopt verder op het gespreks-id dat bij de start is uitgegeven"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Dit gesprek ken ik niet meer. Begin gerust opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/kantoorpakket/aanwezig": {
    "mutatieId": "kantoorpakket.aanwezig",
@@ -12197,6 +12350,40 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende kostensoort.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/krant/artikel": {
+   "mutatieId": "krant.artikel",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Geen krant op dit adres.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/krant/open": {
+   "mutatieId": "krant.open",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Geen krant op dit adres.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/lab/project/bevinding": {
    "mutatieId": "lab.project.bevinding",
@@ -13478,6 +13665,125 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Kies een groep van 1 tot en met 8, of een fase uit de ladder.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/les/antwoord": {
+   "mutatieId": "les.antwoord",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Doe eerst mee met de klascode en je naam.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/kijk": {
+   "mutatieId": "les.kijk",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Doe eerst mee met de klascode en je naam.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/leraar": {
+   "mutatieId": "les.leraar",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende les of verkeerde leraarsleutel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/maak": {
+   "mutatieId": "les.maak",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de lesmaker werkt op een meegestuurd profiel"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Geef eerst een onderwerp (of kies een app uit de bibliotheek).\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/mee": {
+   "mutatieId": "les.mee",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze klascode bestaat niet (meer). Vraag de juf of meester om de code op het bord.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/sluit": {
+   "mutatieId": "les.sluit",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende les of verkeerde leraarsleutel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/les/volgende": {
+   "mutatieId": "les.volgende",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende les of verkeerde leraarsleutel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/leven/band/bevestig": {
    "mutatieId": "leven.band.bevestig",
    "herkomst": "afgeleid",
@@ -14005,6 +14311,40 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Alleen voor het luchthavenpersoneel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/mail/binnen": {
+   "mutatieId": "mail.binnen",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de buitenpoort voor echte RFC 5322-post; een vreemde mailserver heeft geen inlog bij ons. Eigen venster-rem per minuut, alles landt in de ONBETROUWDE baan, en de ontvanger komt uit de To-kop en niet uit een parameter (anders was het een open relay)"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Er kwam een leeg bericht binnen.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/mail/ses": {
+   "mutatieId": "mail.ses",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "AWS SES bewijst bezit met een verse HMAC over envelop, controles en exacte berichtbytes; zonder 32+ teken geheim blijft de route dicht"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Ongeldige SES-envelop.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/mall/aanvraag": {
    "mutatieId": "mall.aanvraag",
@@ -26246,6 +26586,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Dit pakket is niet (meer) beschikbaar.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/partner": {
+   "mutatieId": "partner",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "het partnerkanaal is bedoeld voor niet-leden"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze partnercode kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/partner/chat/history": {
    "mutatieId": "partner.chat.history",
    "herkomst": "afgeleid",
@@ -26437,6 +26794,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"De algemene pin hoort bij een echt RTG-account.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/pin/herstel": {
+   "mutatieId": "pin.herstel",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze herstellink is verlopen of al gebruikt. Vraag een nieuwe aan.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/pin/status": {
    "mutatieId": "pin.status",
@@ -26933,6 +27307,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Zet eerst minstens één reisonderdeel klaar (met een naam en een datum).\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/reis/uitnodiging/open": {
+   "mutatieId": "reis.uitnodiging.open",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "een klaargezette reis openen kan per definitie nog zonder account (met rem per ip)"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze uitnodiging kennen we niet. Controleer de link.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/reis/uitnodiging/weg": {
    "mutatieId": "reis.uitnodiging.weg",
@@ -32725,6 +33116,40 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/rtgid/start": {
+   "mutatieId": "rtgid.start",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de identiteitsstroom begint voordat er een sessie is"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Welke dienst vraagt de inlog?\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/rtgid/status": {
+   "mutatieId": "rtgid.status",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "RTG iD draagt zijn bewijs als idToken in het LIJF, niet als sessie"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze inlog bestaat niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/rtgid/weiger": {
    "mutatieId": "rtgid.weiger",
    "herkomst": "afgeleid",
@@ -32740,6 +33165,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/rtgid/wie": {
+   "mutatieId": "rtgid.wie",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem; de kluis geeft alleen attributen op een geldig idToken"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze iD-sessie is niet (meer) geldig.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/rtgone/automatisering/herstel": {
    "mutatieId": "rtgone.automatisering.herstel",
@@ -33973,6 +34415,40 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Alleen voor de sportclub.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/stad/doos/hartslag": {
+   "mutatieId": "stad.doos.hartslag",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de stadsdoos stuurt zijn apparaatsleutel mee"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende doos of verkeerde sleutel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/stad/doos/meting": {
+   "mutatieId": "stad.doos.meting",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "idem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekende doos of verkeerde sleutel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/stad/melding": {
    "mutatieId": "stad.melding",
    "herkomst": "afgeleid",
@@ -35076,6 +35552,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze zaak is geen wintersportresort.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/supplier/apply": {
+   "mutatieId": "supplier.apply",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "solliciteren bij een zaak kan zonder account"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Bedrijf niet gevonden.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/supplier/apply/chat": {
    "mutatieId": "supplier.apply.chat",
@@ -43589,6 +44082,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Er ligt geen roostervoorstel.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/supplier/roster": {
+   "mutatieId": "supplier.roster",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de PDA-inlog toont de namenlijst voor de pincode; met een eigen rem"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze leverancierscode kennen we niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/supplier/rtmail/afwezig": {
    "mutatieId": "supplier.rtmail.afwezig",
    "herkomst": "afgeleid",
@@ -44404,6 +44914,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze uitnodiging bestaat niet (meer).\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/supplier/staff/join": {
+   "mutatieId": "supplier.staff.join",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "personeel meldt zich aan met een uitnodigingscode"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Vul de bedrijfsnaam en de kassacode in.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/supplier/staff/reset-pin": {
    "mutatieId": "supplier.staff.reset-pin",
@@ -47998,6 +48525,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Vonk is voor RTG-leden met een eigen account.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/vracht/volg": {
+   "mutatieId": "vracht.volg",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "volgen op een meegestuurde vrachtcode, zoals elke track-and-trace"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Geen zending gevonden op deze volgcode.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/wachtlijst": {
    "mutatieId": "wachtlijst",
    "herkomst": "afgeleid",
@@ -48158,6 +48702,23 @@
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Passkeys horen bij een eigen RTG-account.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
+  "POST /api/webauthn/login": {
+   "mutatieId": "webauthn.login",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"De aanvraag is verlopen; probeer het opnieuw.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
   "POST /api/webauthn/registreer": {
    "mutatieId": "webauthn.registreer",
    "herkomst": "afgeleid",
@@ -48317,6 +48878,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze vraag ken ik niet.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/werkmail/bezorg": {
+   "mutatieId": "werkmail.bezorg",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "inkomende post van de mailserver, met een eigen venster-rem per minuut"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Onbekend adres.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/werkplek/bureau/architect/bouwstaat": {
    "mutatieId": "werkplek.bureau.architect.bouwstaat",
@@ -49322,6 +49900,23 @@
     "op": "2026-08-30"
    },
    "watErMoetKomen": "de proef kwam hier niet bij: \"Deze tafel staat niet op de lijst.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
+  },
+  "POST /api/werving/kijk": {
+   "mutatieId": "werving.kijk",
+   "herkomst": "afgeleid",
+   "semantiek": {
+    "klasse": "onbekend"
+   },
+   "toegang": {
+    "klasse": "PUBLIC",
+    "waarom": "wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip"
+   },
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "afgetekend": {
+    "door": "scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; geen mens heeft deze route gelezen",
+    "op": "2026-08-30"
+   },
+   "watErMoetKomen": "de proef kwam hier niet bij: \"Deze uitnodiging bestaat niet, is al gebruikt of is verlopen. Vraag uw werkgever om een nieuwe.\". Bouw die toestand in scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen."
   },
   "POST /api/werving/verbind": {
    "mutatieId": "werving.verbind",

@@ -50,6 +50,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const proef = require(path.join(WORTEL, 'IDEMPROEF.json'));
+const { PUBLIEK } = require('./lib/publiekeroutes');
 const DOEL = path.join(WORTEL, 'MUTATIECONTRACT-VOORSTEL.json');
 
 /* De routes die al een verklaring van een mens hebben, blijven onaangeroerd:
@@ -186,6 +187,15 @@ for (const r of rijen) {
   const klasse = x && x.toegang && x.toegang.waargenomen;
   if (!klasse) { zonderDeur++; continue; }
   const rij = { route: r.sleutel, mutatieId: mutatieId(r.pad), toegang: klasse };
+  /* PUBLIC ZONDER REDEN IS EEN GAT, zegt de keuring, en zij heeft gelijk. De
+     reden staat al geschreven in ./lib/publiekeroutes.js; die reist mee in
+     plaats van dat hier een nieuwe wordt bedacht. Zonder dit kwamen er dertien
+     contracten uit dit script die de keuring terecht afwees. */
+  if (klasse === 'PUBLIC') {
+    const waarom = PUBLIEK.get(r.pad);
+    if (!waarom) { zonderDeur++; continue; }   // publiek zonder reden is geen contract
+    rij.waarom = waarom;
+  }
   if (klasse === 'OBJECT_SCOPED') {
     const uh = String((x.toegang && x.toegang.uitHandler) || '');
     const veld = uh.startsWith('object: ') ? uh.slice(8) : null;

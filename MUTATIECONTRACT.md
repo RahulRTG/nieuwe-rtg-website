@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **681** |
-| `NOT_APPLICABLE` | 40 | 844 |
-| geclassificeerd | 3.069 | 3.972 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **633** |
+| `NOT_APPLICABLE` | 40 | 857 |
+| geclassificeerd | 3.069 | 4.020 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -391,6 +391,30 @@ dat is precies waarom die twee dingen gescheiden zijn.
 Dat is ook waarom de deurloze bak zo lang groot bleef: hij zag eruit als een
 lijst routes die publiek zijn, en was voor 147 stuks een lijst routes waarvan we
 de poort niet herkenden.
+
+### De verklaring die al bestond, twee mappen verderop
+
+Van de routes zonder afleidbare toegangsklasse stonden er **99 al op een
+mensgelezen lijst met een reden**: `PUBLIEK` in `scripts/check.js`, die
+keuringsregel 28 afdwingt. Geen poort is namelijk twee heel verschillende
+dingen — een gat, of een bewuste publieke deur — en die lijst kent het verschil
+al. Ze stonden niettemin in het register als "toegang niet af te leiden".
+
+Die lijst is verhuisd naar `scripts/lib/publiekeroutes.js` en wordt nu door
+`check.js` én het contractregister gelezen. Twee kopieën zouden uiteenlopen, en
+dan noemt de ene lijst een route publiek die op de andere een poort heeft
+(LAT.md regel 4). De **reden reist mee in het contract**: `PUBLIC` zonder reden
+is een gat dat toevallig nog niemand heeft gedicht, en de keuring weigert het.
+
+Dat weigeren gebeurde ook meteen: dertien contracten uit
+`scripts/effectcontracten.js` kwamen er zonder reden uit. `test/mutatiecontract.test.js`
+houdt dat nu vast op de plek waar ze *ontstaan*, niet alleen waar ze worden
+gekeurd.
+
+| | voor | na |
+|---|---:|---:|
+| toegang niet af te leiden | 215 | **159** |
+| `PUBLIC` | 0 | 56 |
 
 ## 6. De poort
 

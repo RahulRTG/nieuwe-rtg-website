@@ -211,6 +211,25 @@ wachtOpSchoneBoom();
     (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
   console.log('  geldroutes met een eigen lijf        : ' + Object.keys(geldLijven).length);
 
+  /* DE OBJECTEN DIE DE ROUTES NODIG HEBBEN -- ./lib/objectoogst.js.
+
+     1635 routes strandden op 404: het ding waar ze over gaan bestaat niet. Deze
+     stap draait eerst de MAAKroutes van het huis en geeft het teruggegeven id
+     mee aan de zusterroutes in dezelfde tak. Gemeten levert dat er 121 op 2xx
+     en nog eens 53 voorbij de 404 -- ongeveer een op de tien, en geen
+     vervanging voor domeinwerk.
+
+     Hij draait NA de wereldopzet en de lijfsleutels, want een maakroute heeft
+     die zelf nodig. */
+  const { oogstObjecten } = require('./lib/objectoogst');
+  const objecten = await oogstObjecten({
+    post, routes, tokenVoor,
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
+    koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
+  });
+  console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
+    objecten.geprobeerd + ' maakroutes, in ' + objecten.takken + ' takken');
+
   /* ============================================================================
      HET TWEEDE MEETPUNT IJKEN.
 
@@ -269,8 +288,13 @@ wachtOpSchoneBoom();
   const besluiten = register.routes || {};
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
-    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(lijfsleutels.lijfVoor(r.pad) || {}),
-      ...(geldLijven[r.pad] || {}) }),
+    /* DE VOLGORDE IS EEN BESLUIT. Het geoogste object staat NA het plausibele
+       lijf (dat raadt) en VOOR het geldlijf en de lijfsleutel (die weten het
+       zeker). Een id dat de applicatie zelf heeft uitgegeven, hoort te winnen
+       van een verzonnen waarde en te verliezen van een sleutel die bij deze
+       deur hoort. */
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...objecten.voor(r.pad),
+      ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
        niet meer beweren dat een wijziging op zijn plaats onzichtbaar is. Uit
@@ -362,6 +386,7 @@ wachtOpSchoneBoom();
          scripts/onbewezen.js zijn 187 routes toen al als "heeft een sleutel"
          telde -- die keek naar de declaratie. Sindsdien leest de trechter dit
          veld, en een familie die niet is gebouwd dekt niets. */
+      objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       lijfsleutelsMislukt: lijfsleutels.mislukt,
       routesOpLijfsleutel: metLijf.length,

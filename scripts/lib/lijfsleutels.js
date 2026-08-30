@@ -488,4 +488,47 @@ function dektPad(pad) {
   return FAMILIES.some(f => f.prefixen.some(p => String(pad).startsWith(p)));
 }
 
-module.exports = { FAMILIES, bouwLijfsleutels, dektPad };
+/* ============================================================================
+   MAG EEN FAMILIE DE ROL VAN DE BEWAKERSKAART OVERSCHRIJVEN?
+
+   Apart en puur, zodat het los te toetsen is -- dezelfde vorm als
+   weegHerhaling() in ./idemproef.js, en om dezelfde reden: dit is een OORDEEL
+   en geen plumbing.
+
+   De eerste versie liet een familie altijd winnen, en de eerstvolgende meting
+   liet zien waarom dat te grof is:
+
+     169  member -> member-lifestyle   de bedoeling: de kaart zegt welke
+                                       SESSIE nodig is, de familie welke PAS
+                                       die sessie moet dragen
+       3  werkplekbaas -> boardroom    gooit de SMALLERE rol weg. Een
+                                       boardroom-gebruiker die niet de eigenaar
+                                       is, hoort baasAuth niet te passeren; na
+                                       deze ruil kan de rolproef dat niet meer
+                                       zien
+       2  openbaar -> member-zakelijk  roept een BEWUST OPENBARE route aan met
+                                       een token. Geen vals groen, maar wel de
+                                       verkeerde meting: hij bewijst niet meer
+                                       dat de route zonder sleutel opengaat
+
+   Twee grendels dus. Een route die met reden zonder sessie werkt (openbaar,
+   omgeving, eigen-poort) wordt nooit opgewaardeerd -- dat is geen zwakkere rol
+   maar een andere VRAAG. En een eigenrol uit de bewakerskaart (werkplekbaas,
+   scim, kantoor-op-naam) blijft staan: die is smaller dan wat een familie op
+   een heel voorvoegsel kan weten.
+
+   Dezelfde regel als in scripts/lib/bewakers.js: de zwakste bewering mag de
+   sterkste niet overschrijven. */
+const NOOIT_OPWAARDEREN = new Set(['openbaar', 'omgeving', 'eigen-poort',
+  'werkplekbaas', 'scim', 'kantoor-op-naam']);
+
+function magOpwaarderen(huidigeRol, familieRol) {
+  if (!familieRol || familieRol === huidigeRol) return { mag: false, reden: 'de familie vraagt dezelfde rol' };
+  if (NOOIT_OPWAARDEREN.has(huidigeRol)) {
+    return { mag: false, reden: '`' + huidigeRol + '` is geen zwakkere rol maar een andere vraag; ' +
+      'een familie op een heel voorvoegsel weet niet beter dan de bewakerskaart' };
+  }
+  return { mag: true, reden: null };
+}
+
+module.exports = { FAMILIES, bouwLijfsleutels, dektPad, magOpwaarderen, NOOIT_OPWAARDEREN };

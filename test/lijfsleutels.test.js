@@ -273,3 +273,58 @@ test('de Lifestyle-familie dekt routes die al een rol hebben', () => {
     opwaardeerbaar + '. Staat dit op 0, dan zit de opwaardering er niet meer in en doet ' +
     'de Lifestyle-familie stilzwijgend niets');
 });
+
+/* ============================================================================
+   OPWAARDEREN IS NIET HETZELFDE ALS OVERSCHRIJVEN.
+
+   De eerste versie van de opwaardering liet een familie ALTIJD winnen. De
+   uitvoer van de eerstvolgende meting liet meteen zien waarom dat te grof is:
+
+     169  member -> member-lifestyle   de bedoeling: de kaart zegt welke
+                                       SESSIE, de familie welke PAS
+       3  werkplekbaas -> boardroom    gooit de SMALLERE rol weg. Een
+                                       boardroom-gebruiker die niet de eigenaar
+                                       is, hoort baasAuth niet te passeren; met
+                                       deze ruil kan de rolproef dat niet meer
+                                       zien
+       2  openbaar -> member-zakelijk  roept een BEWUST OPENBARE route aan met
+                                       een token. Geen vals groen, maar wel de
+                                       verkeerde meting: hij bewijst niet meer
+                                       dat de route zonder sleutel open is
+
+   Twee grendels. Een route die met reden zonder sessie werkt (openbaar,
+   omgeving, eigen-poort) wordt nooit opgewaardeerd -- dat is geen zwakkere rol
+   maar een andere VRAAG. En een eigenrol uit de bewakerskaart (werkplekbaas,
+   scim, kantoor-op-naam) blijft staan: die is smaller dan wat een familie op
+   een heel voorvoegsel kan weten.
+
+   Het is dezelfde regel als een paar honderd regels hoger in bewakers.js: de
+   zwakste bewering mag de sterkste niet overschrijven.
+   ========================================================================== */
+test('een familie waardeert nooit een openbare of een eigen rol op', () => {
+  const { magOpwaarderen } = require('../scripts/lib/lijfsleutels');
+  /* De bedoeling: de kaart zegt welke SESSIE, de familie welke PAS. */
+  assert.equal(magOpwaarderen('member', 'member-lifestyle').mag, true);
+
+  /* Een route die met reden zonder sessie werkt, is geen zwakkere rol maar een
+     andere vraag -- hem met een token aanroepen bewijst niet meer dat hij
+     zonder sleutel opengaat. */
+  for (const rol of ['openbaar', 'omgeving', 'eigen-poort']) {
+    const u = magOpwaarderen(rol, 'member-zakelijk');
+    assert.equal(u.mag, false, rol + ' hoort niet opgewaardeerd te worden');
+    assert.ok(u.reden && u.reden.length > 20, rol + ': een weigering zonder reden is niet na te lopen');
+  }
+
+  /* En een eigenrol is SMALLER dan wat een familie op een heel voorvoegsel kan
+     weten; hem overschrijven maakt de rolproef blind voor de scheiding die hij
+     juist moet meten. */
+  for (const rol of ['werkplekbaas', 'scim', 'kantoor-op-naam']) {
+    assert.equal(magOpwaarderen(rol, 'boardroom').mag, false, rol + ' is smaller dan boardroom');
+  }
+});
+
+test('dezelfde rol is geen opwaardering, en geen familie is ook geen opwaardering', () => {
+  const { magOpwaarderen } = require('../scripts/lib/lijfsleutels');
+  assert.equal(magOpwaarderen('member', 'member').mag, false);
+  assert.equal(magOpwaarderen('member', null).mag, false);
+});

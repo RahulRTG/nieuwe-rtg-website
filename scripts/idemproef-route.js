@@ -202,13 +202,23 @@ wachtOpSchoneBoom();
      welke PAS die sessie moet dragen. Dat is geen tegenspraak maar een
      verfijning, en hij staat expliciet in het uitslagbestand zodat niemand
      denkt dat de kaart iets anders vond. */
+  /* Het OORDEEL of een familie mag winnen, woont in ./lib/lijfsleutels.js
+     (magOpwaarderen) en is daar los getoetst. Hier alleen de boekhouding. */
+  const { magOpwaarderen } = require('./lib/lijfsleutels');
   const opgewaardeerd = [];
+  const geweigerd = [];
   const metRol = verdeling.metRol.map(r => {
     const familieRol = lijfsleutels.rolVoor(r.pad);
+    const oordeel = magOpwaarderen(r.rol, familieRol);
     if (!familieRol || familieRol === r.rol) return r;
+    if (!oordeel.mag) { geweigerd.push({ pad: r.pad, van: r.rol, naar: familieRol, reden: oordeel.reden }); return r; }
     opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
     return { ...r, rol: familieRol, rolVan: r.rol };
   });
+  if (geweigerd.length) {
+    console.log('  opwaardering GEWEIGERD                : ' + geweigerd.length +
+      '   (' + [...new Set(geweigerd.map(x => x.van + ' blijft ' + x.van))].join(', ') + ')');
+  }
   if (opgewaardeerd.length) {
     console.log('  rol opgewaardeerd door een familie    : ' + opgewaardeerd.length +
       '   (' + [...new Set(opgewaardeerd.map(x => x.van + ' -> ' + x.naar))].join(', ') + ')');
@@ -440,7 +450,7 @@ wachtOpSchoneBoom();
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
-      rolOpgewaardeerd: opgewaardeerd.length,
+      rolOpgewaardeerd: opgewaardeerd.length, rolOpwaarderingGeweigerd: geweigerd.length,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       lijfsleutelsMislukt: lijfsleutels.mislukt,

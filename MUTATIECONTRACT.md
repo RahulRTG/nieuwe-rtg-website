@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **240** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **99** |
 | `NOT_APPLICABLE` | 40 | 1.055 |
-| geclassificeerd | 3.069 | 4.413 van 4.653 (94,8%) |
+| geclassificeerd | 3.069 | 4.554 van 4.653 (97,9%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -715,6 +715,35 @@ verdient moet eraf — is wat dit ving.
 | toegang niet af te leiden | 49 | **30** |
 | `LEGACY_PENDING_CLASSIFICATION` | 258 | **240** |
 | geclassificeerd | 4.395 | **4.413 van 4.653 (94,8%)** |
+
+## 5h. De stille hindernis
+
+Er zijn twee manieren waarop de proef er niet bij komt, en de tweede zag niemand.
+
+**De luidruchtige** is bekend: de route geeft een hindernis terug — *"Dit gezin
+kennen we niet"* — en de afleidgang schrijft die als `BLOCKED_BY_TEST_FIXTURE`
+met de reden erbij.
+
+**De stille** ziet er heel anders uit: de route antwoordt `200`, de effectmeter
+telt een schrijfpoging, en de opslagmeter ziet niets veranderen. Alle drie de
+metingen kloppen — de handler riep `save()` aan en er viel niets te schrijven. Zo
+gedraagt zich een `/verwijder`-route die geen bestaand object meekreeg. Van de 141
+routes die hierop strandden eindigen er **58 op `/weg` of `/verwijder`** en 14 op
+`/zet`.
+
+Dat is geen onbekend *gedrag* maar een gat in de **proefopstelling**, en daar is
+die stand precies voor. Ze stonden op `LEGACY` — "niet ingedeeld" — terwijl we
+exact wisten wat eraan ontbrak.
+
+**De grens die deze regel eerlijk houdt:** hij mag alleen aanslaan als de
+effectmeter wél iets telde. Telde hij niets en veranderde er niets, dan is de
+route een kandidaat voor `NOT_APPLICABLE`, en zou `BLOCKED` hem daar wegkapen.
+
+| | voor | na |
+|---|---:|---:|
+| `BLOCKED_BY_TEST_FIXTURE` | 3.218 | **3.359** |
+| `LEGACY_PENDING_CLASSIFICATION` | 240 | **99** |
+| geclassificeerd | 4.413 | **4.554 van 4.653 (97,9%)** |
 
 ## 6. De poort
 

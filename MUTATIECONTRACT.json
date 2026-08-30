@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:32:42.847Z",
-  "commit": "0469ab29",
+  "op": "2026-08-30T09:41:12.196Z",
+  "commit": "9a146913",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,16 +9,16 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4413,
+  "geclassificeerd": 4554,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3218,
+   "BLOCKED_BY_TEST_FIXTURE": 3359,
    "NOT_APPLICABLE": 1055,
-   "LEGACY_PENDING_CLASSIFICATION": 240,
    "PROTECTED": 78,
-   "INTENTIONALLY_NON_IDEMPOTENT": 62
+   "INTENTIONALLY_NON_IDEMPOTENT": 62,
+   "LEGACY_PENDING_CLASSIFICATION": 99
   },
   "vastgesteldDoorMens": 1205,
-  "afgeleidDoorScript": 3208,
+  "afgeleidDoorScript": 3349,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3814,
    "PUBLIC": 99,
@@ -129,12 +129,14 @@
   {
    "mutatieId": "aanmelding.aanvraag",
    "route": "POST /api/aanmelding/aanvraag",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -144,10 +146,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "aanmelding.beslis",
@@ -853,12 +855,14 @@
   {
    "mutatieId": "agenda.verwijder",
    "route": "POST /api/agenda/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -870,10 +874,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "agenda.wijzig",
@@ -3188,12 +3192,14 @@
   {
    "mutatieId": "bank.akkoord",
    "route": "POST /api/bank/akkoord",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3205,20 +3211,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.bevries",
    "route": "POST /api/bank/bevries",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3230,10 +3238,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.bulk",
@@ -3508,12 +3516,14 @@
   {
    "mutatieId": "bank.pas.bevries",
    "route": "POST /api/bank/pas/bevries",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3525,20 +3535,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.pas.limiet",
    "route": "POST /api/bank/pas/limiet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3550,10 +3562,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.pas.sluit",
@@ -3774,12 +3786,14 @@
   {
    "mutatieId": "bank.spaardoel",
    "route": "POST /api/bank/spaardoel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3791,10 +3805,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.storten",
@@ -4761,12 +4775,14 @@
   {
    "mutatieId": "bedrijf.indienst",
    "route": "POST /api/bedrijf/indienst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -4776,10 +4792,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.indienst.stap",
@@ -6417,12 +6433,14 @@
   {
    "mutatieId": "bedrijf.uitdienst",
    "route": "POST /api/bedrijf/uitdienst",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -6432,10 +6450,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.uitdienst.stap",
@@ -6771,12 +6789,14 @@
   {
    "mutatieId": "bestanden.leeg",
    "route": "POST /api/bestanden/leeg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -6788,10 +6808,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bestanden.map",
@@ -7793,12 +7813,14 @@
   {
    "mutatieId": "boardroom.reset",
    "route": "POST /api/boardroom/reset",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -7811,10 +7833,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "boardroom.status",
@@ -7929,12 +7951,14 @@
   {
    "mutatieId": "boardroom.toepassen",
    "route": "POST /api/boardroom/toepassen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -7947,10 +7971,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "boardroom.wachter",
@@ -12226,12 +12250,14 @@
   {
    "mutatieId": "command.uitrol.pauze",
    "route": "POST /api/command/uitrol/pauze",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -12243,10 +12269,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.uitrol.zet",
@@ -17010,12 +17036,14 @@
   {
    "mutatieId": "fluister.focus",
    "route": "POST /api/fluister/focus",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -17027,10 +17055,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "fluister.onthoud",
@@ -17370,12 +17398,14 @@
   {
    "mutatieId": "foundation.gezin.agenda.verwijder",
    "route": "POST /api/foundation/gezin/agenda/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17385,10 +17415,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.agenda.wijzig",
@@ -17466,12 +17496,14 @@
   {
    "mutatieId": "foundation.gezin.bericht.gelezen",
    "route": "POST /api/foundation/gezin/bericht/gelezen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17481,10 +17513,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.chat",
@@ -17714,12 +17746,14 @@
   {
    "mutatieId": "foundation.gezin.gezondheid.afspraak.verwijder",
    "route": "POST /api/foundation/gezin/gezondheid/afspraak/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17729,10 +17763,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.gezondheid.medicijn",
@@ -17787,12 +17821,14 @@
   {
    "mutatieId": "foundation.gezin.gezondheid.medicijn.verwijder",
    "route": "POST /api/foundation/gezin/gezondheid/medicijn/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17802,10 +17838,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.gezondheid.meting",
@@ -17835,12 +17871,14 @@
   {
    "mutatieId": "foundation.gezin.gezondheid.meting.verwijder",
    "route": "POST /api/foundation/gezin/gezondheid/meting/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17850,10 +17888,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.inloggen",
@@ -17958,12 +17996,14 @@
   {
    "mutatieId": "foundation.gezin.keuken.lijst.opruim",
    "route": "POST /api/foundation/gezin/keuken/lijst/opruim",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17973,20 +18013,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.lijst.verwijder",
    "route": "POST /api/foundation/gezin/keuken/lijst/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17996,10 +18038,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.menu",
@@ -18029,12 +18071,14 @@
   {
    "mutatieId": "foundation.gezin.keuken.menu.wis",
    "route": "POST /api/foundation/gezin/keuken/menu/wis",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18044,10 +18088,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.keuken.vast",
@@ -18077,12 +18121,14 @@
   {
    "mutatieId": "foundation.gezin.keuken.vast.verwijder",
    "route": "POST /api/foundation/gezin/keuken/vast/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18092,10 +18138,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.klus",
@@ -18175,12 +18221,14 @@
   {
    "mutatieId": "foundation.gezin.klus.verwijder",
    "route": "POST /api/foundation/gezin/klus/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18190,10 +18238,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.locatie",
@@ -18223,12 +18271,14 @@
   {
    "mutatieId": "foundation.gezin.locatie.stop",
    "route": "POST /api/foundation/gezin/locatie/stop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18238,10 +18288,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.maak",
@@ -18294,12 +18344,14 @@
   {
    "mutatieId": "foundation.gezin.ochtend.stap.verwijder",
    "route": "POST /api/foundation/gezin/ochtend/stap/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18309,10 +18361,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.ochtend.vink",
@@ -18542,12 +18594,14 @@
   {
    "mutatieId": "foundation.gezin.spaardoel.verwijder",
    "route": "POST /api/foundation/gezin/spaardoel/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18557,10 +18611,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.uitnodiging.accepteer",
@@ -18830,12 +18884,14 @@
   {
    "mutatieId": "foundation.gezin.verjaardag.wens.verwijder",
    "route": "POST /api/foundation/gezin/verjaardag/wens/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18845,10 +18901,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.wissen",
@@ -19187,12 +19243,14 @@
   {
    "mutatieId": "foundation.markt.blokkeer",
    "route": "POST /api/foundation/markt/blokkeer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: code",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19202,10 +19260,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.chat",
@@ -20340,12 +20398,14 @@
   {
    "mutatieId": "foundation.school.budget.zet",
    "route": "POST /api/foundation/school/budget/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -20355,10 +20415,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.calamiteit",
@@ -20588,12 +20648,14 @@
   {
    "mutatieId": "foundation.school.directie.mededeling",
    "route": "POST /api/foundation/school/directie/mededeling",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -20603,10 +20665,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.document.voeg",
@@ -21011,12 +21073,14 @@
   {
    "mutatieId": "foundation.school.herinnering.verstuur",
    "route": "POST /api/foundation/school/herinnering/verstuur",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -21026,10 +21090,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.herinneringen",
@@ -22584,12 +22648,14 @@
   {
    "mutatieId": "foundation.school.opleiding.zet",
    "route": "POST /api/foundation/school/opleiding/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22599,10 +22665,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.organisatie",
@@ -23974,12 +24040,14 @@
   {
    "mutatieId": "foundation.school.taalbeleid.zet",
    "route": "POST /api/foundation/school/taalbeleid/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23989,10 +24057,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.taalcheck.antwoord",
@@ -24747,12 +24815,14 @@
   {
    "mutatieId": "foundation.school.vestiging.zet",
    "route": "POST /api/foundation/school/vestiging/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -24762,10 +24832,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.voortgang",
@@ -28420,12 +28490,14 @@
   {
    "mutatieId": "home.alles-uit",
    "route": "POST /api/home/alles-uit",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -28437,10 +28509,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "home.merk.ontkoppel",
@@ -29727,12 +29799,14 @@
   {
    "mutatieId": "klets.zet",
    "route": "POST /api/klets/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -29744,10 +29818,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "klok.mijn",
@@ -30136,12 +30210,14 @@
   {
    "mutatieId": "kosten.mij",
    "route": "POST /api/kosten/mij",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -30153,10 +30229,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "kosten.vooruitblik",
@@ -33864,12 +33940,14 @@
   {
    "mutatieId": "live.stop",
    "route": "POST /api/live/stop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -33881,10 +33959,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "live.update",
@@ -36086,12 +36164,14 @@
   {
    "mutatieId": "mediaos.meldingen",
    "route": "POST /api/mediaos/meldingen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -36103,10 +36183,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "mediaos.samen.in",
@@ -37218,12 +37298,14 @@
   {
    "mutatieId": "member.boardroom.herstel",
    "route": "POST /api/member/boardroom/herstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37235,10 +37317,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.boardroom.logboek",
@@ -37459,12 +37541,14 @@
   {
    "mutatieId": "member.bureau.beveiliging.digitaal.weg",
    "route": "POST /api/member/bureau/beveiliging/digitaal/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37476,10 +37560,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.beveiliging.incident",
@@ -37538,12 +37622,14 @@
   {
    "mutatieId": "member.bureau.beveiliging.post.weg",
    "route": "POST /api/member/bureau/beveiliging/post/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37555,10 +37641,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.beveiliging.risico",
@@ -37590,12 +37676,14 @@
   {
    "mutatieId": "member.bureau.beveiliging.risico.weg",
    "route": "POST /api/member/bureau/beveiliging/risico/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37607,10 +37695,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.briefing",
@@ -37966,12 +38054,14 @@
   {
    "mutatieId": "member.bureau.dieren.dier.weg",
    "route": "POST /api/member/bureau/dieren/dier/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37983,10 +38073,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.dieren.document",
@@ -38666,12 +38756,14 @@
   {
    "mutatieId": "member.bureau.reputatie.lijn.weg",
    "route": "POST /api/member/bureau/reputatie/lijn/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38683,10 +38775,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.reputatie.optreden",
@@ -38718,12 +38810,14 @@
   {
    "mutatieId": "member.bureau.reputatie.optreden.weg",
    "route": "POST /api/member/bureau/reputatie/optreden/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38735,10 +38829,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.reputatie.vermelding",
@@ -38770,12 +38864,14 @@
   {
    "mutatieId": "member.bureau.reputatie.vermelding.weg",
    "route": "POST /api/member/bureau/reputatie/vermelding/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38787,10 +38883,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.reputatie.woordvoerder",
@@ -38822,12 +38918,14 @@
   {
    "mutatieId": "member.bureau.reputatie.woordvoerder.weg",
    "route": "POST /api/member/bureau/reputatie/woordvoerder/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -38839,10 +38937,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.termijnen",
@@ -39117,12 +39215,14 @@
   {
    "mutatieId": "member.bureau.zaak.open",
    "route": "POST /api/member/bureau/zaak/open",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -39134,10 +39234,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.zaken",
@@ -40411,12 +40511,14 @@
   {
    "mutatieId": "member.lifestyle.bezit.weg",
    "route": "POST /api/member/lifestyle/bezit/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40428,10 +40530,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.lifestyle.bezit.zet",
@@ -40598,12 +40700,14 @@
   {
    "mutatieId": "member.lifestyle.gezondheid.afspraak.weg",
    "route": "POST /api/member/lifestyle/gezondheid/afspraak/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40615,10 +40719,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.lifestyle.gezondheid.dossier",
@@ -40648,12 +40752,14 @@
   {
    "mutatieId": "member.lifestyle.gezondheid.dossier.weg",
    "route": "POST /api/member/lifestyle/gezondheid/dossier/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40665,10 +40771,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.lifestyle.overzicht",
@@ -40727,12 +40833,14 @@
   {
    "mutatieId": "member.lifestyle.voorkeuren.zet",
    "route": "POST /api/member/lifestyle/voorkeuren/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40744,10 +40852,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.loonstroken",
@@ -40941,12 +41049,14 @@
   {
    "mutatieId": "member.magnaat.economie.beslis",
    "route": "POST /api/member/magnaat/economie/beslis",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -40958,10 +41068,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.magnaat.economie.schok",
@@ -42314,12 +42424,14 @@
   {
    "mutatieId": "member.rechterhand.attenties.gift.weg",
    "route": "POST /api/member/rechterhand/attenties/gift/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42331,10 +42443,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.attenties.relatie",
@@ -42366,12 +42478,14 @@
   {
    "mutatieId": "member.rechterhand.attenties.relatie.weg",
    "route": "POST /api/member/rechterhand/attenties/relatie/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42383,10 +42497,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.cellier",
@@ -42445,12 +42559,14 @@
   {
    "mutatieId": "member.rechterhand.cellier.weg",
    "route": "POST /api/member/rechterhand/cellier/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42462,10 +42578,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.cellier.zet",
@@ -42551,12 +42667,14 @@
   {
    "mutatieId": "member.rechterhand.cercle.club.weg",
    "route": "POST /api/member/rechterhand/cercle/club/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42568,10 +42686,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.cercle.gast",
@@ -42792,12 +42910,14 @@
   {
    "mutatieId": "member.rechterhand.entourage.persoon.weg",
    "route": "POST /api/member/rechterhand/entourage/persoon/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42809,10 +42929,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.garderobe",
@@ -42871,12 +42991,14 @@
   {
    "mutatieId": "member.rechterhand.garderobe.stuk.weg",
    "route": "POST /api/member/rechterhand/garderobe/stuk/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42888,10 +43010,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.garderobe.vakman",
@@ -42923,12 +43045,14 @@
   {
    "mutatieId": "member.rechterhand.garderobe.vakman.weg",
    "route": "POST /api/member/rechterhand/garderobe/vakman/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -42940,10 +43064,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.hangar",
@@ -43002,12 +43126,14 @@
   {
    "mutatieId": "member.rechterhand.hangar.toestel.weg",
    "route": "POST /api/member/rechterhand/hangar/toestel/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43019,10 +43145,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.hangar.vlucht",
@@ -43054,12 +43180,14 @@
   {
    "mutatieId": "member.rechterhand.hangar.vlucht.weg",
    "route": "POST /api/member/rechterhand/hangar/vlucht/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43071,10 +43199,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.logboek",
@@ -43133,12 +43261,14 @@
   {
    "mutatieId": "member.rechterhand.logboek.object.weg",
    "route": "POST /api/member/rechterhand/logboek/object/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43150,10 +43280,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.logboek.regel",
@@ -43185,12 +43315,14 @@
   {
    "mutatieId": "member.rechterhand.logboek.regel.weg",
    "route": "POST /api/member/rechterhand/logboek/regel/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43202,10 +43334,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.maison",
@@ -43262,12 +43394,14 @@
   {
    "mutatieId": "member.rechterhand.maison.log.weg",
    "route": "POST /api/member/rechterhand/maison/log/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43279,10 +43413,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.maison.staf",
@@ -43314,12 +43448,14 @@
   {
    "mutatieId": "member.rechterhand.maison.staf.weg",
    "route": "POST /api/member/rechterhand/maison/staf/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43331,10 +43467,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.maison.taak",
@@ -43393,12 +43529,14 @@
   {
    "mutatieId": "member.rechterhand.maison.taak.weg",
    "route": "POST /api/member/rechterhand/maison/taak/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43410,10 +43548,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.mecenaat",
@@ -43499,12 +43637,14 @@
   {
    "mutatieId": "member.rechterhand.mecenaat.gift.weg",
    "route": "POST /api/member/rechterhand/mecenaat/gift/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43516,10 +43656,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.nalatenschap",
@@ -43578,12 +43718,14 @@
   {
    "mutatieId": "member.rechterhand.nalatenschap.contact.weg",
    "route": "POST /api/member/rechterhand/nalatenschap/contact/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43595,10 +43737,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.nalatenschap.doc",
@@ -43630,12 +43772,14 @@
   {
    "mutatieId": "member.rechterhand.nalatenschap.doc.weg",
    "route": "POST /api/member/rechterhand/nalatenschap/doc/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43647,10 +43791,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.nalatenschap.wens",
@@ -43682,12 +43826,14 @@
   {
    "mutatieId": "member.rechterhand.nalatenschap.wens.weg",
    "route": "POST /api/member/rechterhand/nalatenschap/wens/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43699,10 +43845,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.reis.item",
@@ -43761,12 +43907,14 @@
   {
    "mutatieId": "member.rechterhand.reis.weg",
    "route": "POST /api/member/rechterhand/reis/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -43778,10 +43926,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.reis.zet",
@@ -44002,12 +44150,14 @@
   {
    "mutatieId": "member.rechterhand.table.weg",
    "route": "POST /api/member/rechterhand/table/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -44019,10 +44169,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rechterhand.table.zet",
@@ -44621,12 +44771,14 @@
   {
    "mutatieId": "member.rtmail.alias",
    "route": "POST /api/member/rtmail/alias",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -44638,10 +44790,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rtmail.antwoord",
@@ -45155,12 +45307,14 @@
   {
    "mutatieId": "member.rtmail.handtekening",
    "route": "POST /api/member/rtmail/handtekening",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -45172,10 +45326,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.rtmail.hulp",
@@ -47413,12 +47567,14 @@
   {
    "mutatieId": "member.spel.zichtbaar-zet",
    "route": "POST /api/member/spel/zichtbaar-zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -47430,10 +47586,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.sport.bord",
@@ -47787,12 +47943,14 @@
   {
    "mutatieId": "member.unblock",
    "route": "POST /api/member/unblock",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -47804,10 +47962,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.vacatures",
@@ -48109,12 +48267,14 @@
   {
    "mutatieId": "member.wauw.stemming.zet",
    "route": "POST /api/member/wauw/stemming/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -48126,10 +48286,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.wauw.terugblik",
@@ -50265,12 +50425,14 @@
   {
    "mutatieId": "noodkaart.zet",
    "route": "POST /api/noodkaart/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -50282,10 +50444,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "notifications",
@@ -50317,12 +50479,14 @@
   {
    "mutatieId": "notifications.read",
    "route": "POST /api/notifications/read",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -50334,10 +50498,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "notities.bewaar",
@@ -50639,12 +50803,14 @@
   {
    "mutatieId": "office.aidata.export",
    "route": "POST /api/office/aidata/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -50656,10 +50822,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.anker",
@@ -50907,12 +51073,14 @@
   {
    "mutatieId": "office.architect.verwijder",
    "route": "POST /api/office/architect/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -50924,10 +51092,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.architect.zet",
@@ -50959,12 +51127,14 @@
   {
    "mutatieId": "office.asset.fees",
    "route": "POST /api/office/asset/fees",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -50976,10 +51146,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.asset.overzicht",
@@ -51227,12 +51397,14 @@
   {
    "mutatieId": "office.atelier.verwijder",
    "route": "POST /api/office/atelier/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -51244,10 +51416,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.atelier.zet",
@@ -51360,12 +51532,14 @@
   {
    "mutatieId": "office.atelierweb.foto-weg",
    "route": "POST /api/office/atelierweb/foto-weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -51377,10 +51551,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.atelierweb.fotos",
@@ -51493,12 +51667,14 @@
   {
    "mutatieId": "office.atelierweb.verwijder",
    "route": "POST /api/office/atelierweb/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -51510,10 +51686,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.balie.abo",
@@ -51950,12 +52126,14 @@
   {
    "mutatieId": "office.bank.incasso",
    "route": "POST /api/office/bank/incasso",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -51967,10 +52145,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.bank.instellingen",
@@ -53340,12 +53518,14 @@
   {
    "mutatieId": "office.commercie.ronde",
    "route": "POST /api/office/commercie/ronde",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -53357,10 +53537,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=2 en opslag=2 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.commercie.zaakabonnement.zet",
@@ -54335,12 +54515,14 @@
   {
    "mutatieId": "office.hardware.verwijder",
    "route": "POST /api/office/hardware/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -54352,10 +54534,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.hardware.winkel",
@@ -54576,12 +54758,14 @@
   {
    "mutatieId": "office.ideeen.verwijder",
    "route": "POST /api/office/ideeen/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -54593,10 +54777,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.ideeen.zet",
@@ -56435,12 +56619,14 @@
   {
    "mutatieId": "office.magnaat.scan",
    "route": "POST /api/office/magnaat/scan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -56452,10 +56638,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.magnaat.status",
@@ -56595,12 +56781,14 @@
   {
    "mutatieId": "office.mail.werk",
    "route": "POST /api/office/mail/werk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -56612,10 +56800,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.mall",
@@ -59457,12 +59645,14 @@
   {
    "mutatieId": "office.redactie.artikel.verwijder",
    "route": "POST /api/office/redactie/artikel/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -59474,10 +59664,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.redactie.artikel.zet",
@@ -60317,12 +60507,14 @@
   {
    "mutatieId": "office.rtgai.train",
    "route": "POST /api/office/rtgai/train",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60334,10 +60526,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.salon-naleving",
@@ -61206,12 +61398,14 @@
   {
    "mutatieId": "office.studio.verwijder",
    "route": "POST /api/office/studio/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -61223,10 +61417,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.studio.zet",
@@ -61339,12 +61533,14 @@
   {
    "mutatieId": "office.techniek.integraties.noodstop",
    "route": "POST /api/office/techniek/integraties/noodstop",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -61356,10 +61552,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.techniek.integraties.schakel",
@@ -61445,12 +61641,14 @@
   {
    "mutatieId": "office.techniek.lastafworp",
    "route": "POST /api/office/techniek/lastafworp",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]
@@ -61462,10 +61660,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.terugval",
@@ -64438,12 +64636,14 @@
   {
    "mutatieId": "office.werkplaats.verwijder",
    "route": "POST /api/office/werkplaats/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -64455,10 +64655,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.werkplaats.zet",
@@ -64814,12 +65014,14 @@
   {
    "mutatieId": "onboarding.opslaan",
    "route": "POST /api/onboarding/opslaan",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -64831,10 +65033,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "onboarding.paspoort",
@@ -64920,12 +65122,14 @@
   {
    "mutatieId": "onboarding.teken",
    "route": "POST /api/onboarding/teken",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -64937,10 +65141,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "onderneming.aandeel.weg",
@@ -66754,12 +66958,14 @@
   {
    "mutatieId": "ov.regie.zet",
    "route": "POST /api/ov/regie/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -66771,10 +66977,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "ov.uit",
@@ -72583,12 +72789,14 @@
   {
    "mutatieId": "residentie.suite.zet",
    "route": "POST /api/residentie/suite/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -72600,10 +72808,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "residentie.vraag",
@@ -85343,12 +85551,14 @@
   {
    "mutatieId": "site.foto-weg",
    "route": "POST /api/site/foto-weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -85360,10 +85570,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "site.fotos",
@@ -85719,12 +85929,14 @@
   {
    "mutatieId": "site.verwijder",
    "route": "POST /api/site/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -85736,10 +85948,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "sleutelwoorden.status",
@@ -89047,12 +89259,14 @@
   {
    "mutatieId": "supplier.agenda.verwijder",
    "route": "POST /api/supplier/agenda/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -89064,10 +89278,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.agenda.wijzig",
@@ -89153,12 +89367,14 @@
   {
    "mutatieId": "supplier.agent.koppel",
    "route": "POST /api/supplier/agent/koppel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -89170,10 +89386,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.agent.voorstel",
@@ -94304,12 +94520,14 @@
   {
    "mutatieId": "supplier.facturen.maak",
    "route": "POST /api/supplier/facturen/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -94321,10 +94539,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=4 en opslag=4 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.facturen.mijn",
@@ -96624,12 +96842,14 @@
   {
    "mutatieId": "supplier.horeca.bezorg.zone",
    "route": "POST /api/supplier/horeca/bezorg/zone",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96641,10 +96861,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.bon",
@@ -96784,12 +97004,14 @@
   {
    "mutatieId": "supplier.horeca.club.deur",
    "route": "POST /api/supplier/horeca/club/deur",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96801,10 +97023,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.club.gastenlijst",
@@ -97509,12 +97731,14 @@
   {
    "mutatieId": "supplier.horeca.gast",
    "route": "POST /api/supplier/horeca/gast",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -97526,10 +97750,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.gast.beleid",
@@ -98074,12 +98298,14 @@
   {
    "mutatieId": "supplier.horeca.instel",
    "route": "POST /api/supplier/horeca/instel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98091,10 +98317,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.journey",
@@ -98288,12 +98514,14 @@
   {
    "mutatieId": "supplier.horeca.keuken.tijden",
    "route": "POST /api/supplier/horeca/keuken/tijden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98305,10 +98533,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.korting",
@@ -98718,12 +98946,14 @@
   {
    "mutatieId": "supplier.horeca.pols.zet",
    "route": "POST /api/supplier/horeca/pols/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -98735,10 +98965,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.rahul.bevestig",
@@ -102033,12 +102263,14 @@
   {
    "mutatieId": "supplier.kosten",
    "route": "POST /api/supplier/kosten",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -102050,10 +102282,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.kosten.herkomst",
@@ -103481,12 +103713,14 @@
   {
    "mutatieId": "supplier.mep.daily",
    "route": "POST /api/supplier/mep/daily",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -103498,10 +103732,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=2 en opslag=2 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mep.daily.done",
@@ -104773,12 +105007,14 @@
   {
    "mutatieId": "supplier.notifications.read",
    "route": "POST /api/supplier/notifications/read",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -104790,10 +105026,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.onboarding.ai",
@@ -104852,12 +105088,14 @@
   {
    "mutatieId": "supplier.onboarding.zet",
    "route": "POST /api/supplier/onboarding/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -104869,10 +105107,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.ontvangsten",
@@ -106738,12 +106976,14 @@
   {
    "mutatieId": "supplier.poort.online",
    "route": "POST /api/supplier/poort/online",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106755,10 +106995,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=2 en opslag=2 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.poort.rondleiding",
@@ -108541,12 +108781,14 @@
   {
    "mutatieId": "supplier.rooster.voorstel",
    "route": "POST /api/supplier/rooster/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -108558,10 +108800,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.roster",
@@ -108618,12 +108860,14 @@
   {
    "mutatieId": "supplier.rtmail.alias",
    "route": "POST /api/supplier/rtmail/alias",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -108635,10 +108879,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.antwoord",
@@ -109073,12 +109317,14 @@
   {
    "mutatieId": "supplier.rtmail.export",
    "route": "POST /api/supplier/rtmail/export",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -109090,10 +109336,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.gesprekken",
@@ -109125,12 +109371,14 @@
   {
    "mutatieId": "supplier.rtmail.handtekening",
    "route": "POST /api/supplier/rtmail/handtekening",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -109142,10 +109390,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.rtmail.hulp",
@@ -110390,12 +110638,14 @@
   {
    "mutatieId": "supplier.settings",
    "route": "POST /api/supplier/settings",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -110407,10 +110657,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.shift",
@@ -111869,12 +112119,14 @@
   {
    "mutatieId": "supplier.tijdzone",
    "route": "POST /api/supplier/tijdzone",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -111886,10 +112138,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.training",
@@ -113699,12 +113951,14 @@
   {
    "mutatieId": "supplier.werkbeleid.zet",
    "route": "POST /api/supplier/werkbeleid/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -113716,10 +113970,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.werkmail.adressen",
@@ -114862,12 +115116,14 @@
   {
    "mutatieId": "techniek.beveiliging.auto",
    "route": "POST /api/techniek/beveiliging/auto",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -114880,10 +115136,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.bewaren.veeg",
@@ -115880,12 +116136,14 @@
   {
    "mutatieId": "techniek.wacht.lastafworp",
    "route": "POST /api/techniek/wacht/lastafworp",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -115898,20 +116156,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.wacht.opruimen",
    "route": "POST /api/techniek/wacht/opruimen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth",
      "eigenaarAlleen"
@@ -115924,10 +116184,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.wacht.quarantaine",
@@ -118574,12 +118834,14 @@
   {
    "mutatieId": "veiligheid.codewoord.wis",
    "route": "POST /api/veiligheid/codewoord/wis",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "ja",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -118591,10 +118853,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "veiligheid.codewoord.zet",
@@ -119842,12 +120104,14 @@
   {
    "mutatieId": "vonk.blokkeer",
    "route": "POST /api/vonk/blokkeer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -119859,10 +120123,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "vonk.halfweg",
@@ -121210,12 +121474,14 @@
   {
    "mutatieId": "werkplek.bureau.architect.verwijder",
    "route": "POST /api/werkplek/bureau/architect/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121227,10 +121493,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.architect.zet",
@@ -121424,12 +121690,14 @@
   {
    "mutatieId": "werkplek.bureau.atelier.verwijder",
    "route": "POST /api/werkplek/bureau/atelier/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121441,10 +121709,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.atelier.zet",
@@ -121719,12 +121987,14 @@
   {
    "mutatieId": "werkplek.bureau.hardware.verwijder",
    "route": "POST /api/werkplek/bureau/hardware/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121736,10 +122006,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.hardware.zet",
@@ -121906,12 +122176,14 @@
   {
    "mutatieId": "werkplek.bureau.ideeen.verwijder",
    "route": "POST /api/werkplek/bureau/ideeen/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121923,10 +122195,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.ideeen.zet",
@@ -122093,12 +122365,14 @@
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.verwijder",
    "route": "POST /api/werkplek/bureau/redactie/artikel/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122110,10 +122384,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.redactie.artikel.zet",
@@ -122442,12 +122716,14 @@
   {
    "mutatieId": "werkplek.bureau.studio.verwijder",
    "route": "POST /api/werkplek/bureau/studio/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122459,10 +122735,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.studio.zet",
@@ -122953,12 +123229,14 @@
   {
    "mutatieId": "werkplek.mens",
    "route": "POST /api/werkplek/mens",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122970,10 +123248,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.mens-weg",
@@ -123082,12 +123360,14 @@
   {
    "mutatieId": "werkplek.taak",
    "route": "POST /api/werkplek/taak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -123099,10 +123379,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.taak-zet",
@@ -124170,12 +124450,14 @@
   {
    "mutatieId": "zorgprofiel.zet",
    "route": "POST /api/zorgprofiel/zet",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -124187,10 +124469,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde opslag=1 en opslag=1 op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   }
  ]
 }

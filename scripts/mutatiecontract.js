@@ -544,6 +544,9 @@ if (toonOpen) {
    uitspraak over gedrag -- zie de kop van kern/mutatiecontract/index.js.
    ------------------------------------------------------------------------- */
 if (process.argv.includes('--afleiden')) {
+  /* De kale ronde per route, om de STILLE hindernis te herkennen (zie hieronder). */
+  const proefRij = new Map(Object.values(proef.perRoute || {})
+    .map(x => [String(x.methode || 'POST').toUpperCase() + ' ' + x.pad, x]));
   const uitContracten = {};
   for (const r of rijen) {
     /* NIET OP `stand` KIJKEN, MAAR OP DE MENSELIJKE LIJST -- en dit is een
@@ -559,8 +562,41 @@ if (process.argv.includes('--afleiden')) {
        hem al vastgesteld". Een afgeleide regel mag zichzelf opnieuw schrijven; een
        menselijke nooit overschrijven. */
     if (bedoelingen[r.route]) continue;
+    /* TWEE MANIEREN WAAROP DE PROEF ER NIET BIJ KOMT, en de tweede zag niemand.
+
+       De eerste is luidruchtig: de route geeft een hindernis terug ("Dit gezin
+       kennen we niet"). Die stond hier al.
+
+       De tweede is stil. De route antwoordt 200, de effectmeter telt een
+       schrijfpoging, en de opslagmeter ziet niets veranderen. Alle drie kloppen:
+       de handler riep save() aan en er viel niets te schrijven. Zo gedraagt zich
+       een /verwijder-route die geen bestaand object meekreeg -- en van de 141
+       routes die hier stranden, eindigen er 58 op /weg of /verwijder.
+
+       Dat is geen onbekend GEDRAG maar een gat in de PROEFOPSTELLING, en daar is
+       deze stand voor. Wat er moet komen staat er per route bij: een bestaand
+       object om op te werken. Zonder deze regel bleven ze op LEGACY staan, wat
+       "niet ingedeeld" betekent -- terwijl we precies weten wat eraan ontbreekt.
+
+       DE GRENS: dit mag alleen als de effectmeter WEL iets telde. Telde hij niets
+       en veranderde er niets, dan is de route een kandidaat voor NOT_APPLICABLE
+       en zou BLOCKED hem daar wegkapen. */
     const h = r.bewijs && r.bewijs.hindernis;
-    if (!h) continue;
+    const stilGeenWerk = !h && (() => {
+      const q = proefRij.get(r.route);
+      const z = q && q.zonderSleutel;
+      if (!z || z.stand !== 'ongemeten') return null;
+      const st = (z.statussen || []);
+      if (!(st.length === 2 && st.every(x => x >= 200 && x < 300))) return null;
+      if (!z.effect || z.effect.d === 'geen' || z.effect.e === 'geen') return null;
+      const leegSpoor = z.opslag && !Object.keys(z.opslag.d || {}).length &&
+        !Object.keys(z.opslag.e || {}).length;
+      if (!leegSpoor) return null;
+      return 'de route antwoordde 200 en de effectmeter telde een schrijfpoging (' + z.effect.d +
+        '), maar er veranderde niets in de gemeten collecties -- het proeflijf gaf hem geen bestaand ' +
+        'object om op te werken';
+    })();
+    if (!h && !stilGeenWerk) continue;
     const toeg = r.toegang.waargenomen;
     if (!toeg) continue;                       // zonder waargenomen deur geen geldig contract
     const toegang = { klasse: toeg };
@@ -590,8 +626,11 @@ if (process.argv.includes('--afleiden')) {
          de menselijke contracten wonen. */
       afgetekend: { door: 'scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; ' +
         'geen mens heeft deze route gelezen', op: new Date().toISOString().slice(0, 10) },
-      watErMoetKomen: 'de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
-        'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.'
+      watErMoetKomen: h
+        ? 'de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
+          'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.'
+        : stilGeenWerk + '. Geef hem er een in scripts/lib/idemwereld.js -- pas dan zegt een ' +
+          'herhaling iets over zijn duplicaatgedrag.'
     };
   }
   fs.writeFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), JSON.stringify({

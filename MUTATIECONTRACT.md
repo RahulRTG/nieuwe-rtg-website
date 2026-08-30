@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **74** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **51** |
 | `NOT_APPLICABLE` | 40 | 1.061 |
-| geclassificeerd | 3.069 | 4.579 van 4.653 (98,4%) |
+| geclassificeerd | 3.069 | 4.602 van 4.653 (98,9%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -863,6 +863,44 @@ groeit op één plek niet mee.
 | dubbeltik deed het werk opnieuw | 77 | **74** |
 | `LEGACY_PENDING_CLASSIFICATION` | 85 | **74** |
 | geclassificeerd | 4.568 | **4.579 van 4.653 (98,4%)** |
+
+## 5l. Nul routes zonder deur — en een rem die er voor de derde keer als een deur uitzag
+
+De bak "toegang niet af te leiden" blokkeerde vanaf het begin alles: een contract
+zonder deur bestaat niet, dus elke andere uitspraak over die routes bleef liggen.
+Hij staat nu op **nul**, van 366.
+
+De laatste 25 zijn met de hand gelezen en staan in
+`server/kern/handlerpoorten/buiten-routes-b.js`, in vier groepen die geen ordening
+zijn maar vier verschillende soorten toegang: een **apparaatsleutel** (de vier
+doos-routes), een **gezinscode** (de uitnodigingen, de post, de kosten), een
+**bewuste publieke deur** (een gezin of les die nog niet bestaat), en een **pas
+die iets mág zijn** (`partnerSessie`).
+
+**En voor de derde keer dezelfde fout.** De handgelezen lijst stond in de tak
+"geen bewaker op de router". `/api/betaal/webhook/adyen` heeft er twee — allebei
+snelheidsremmen — dus die tak werd nooit bereikt, en de route bleef "geen deur"
+terwijl er zwart-op-wit stond dat Adyen zich met een HMAC legitimeert. Eerder
+gebeurde dat al bij de publieke lijst en bij de familie-lus.
+
+De volgorde is nu principieel in plaats van toevallig: **een uitspraak van een
+mens over één route is het meest specifieke wat dit register heeft, en gaat vóór
+elke afleiding uit een vorm.**
+
+### Een correctie op mezelf
+
+`doosSleutelOk` stond als `geen-deur` in het register, omdat ik hem als
+snelheidsrem had gelezen. Hij is allebei: hij telt afketsers per IP **en**
+vergelijkt daarna de doossleutel uit `x-doos-sleutel` in constante tijd. De
+naam-ingang blijft `geen-deur` — aan een naam alleen is niet te zien welke helft
+een aanroeper bedoelt — maar de vier doos-routes dragen nu
+`SERVICE_TO_SERVICE` met wat er werkelijk gebeurt.
+
+| | voor | na |
+|---|---:|---:|
+| toegang niet af te leiden | 366 | **0** |
+| `LEGACY_PENDING_CLASSIFICATION` | 74 | **51** |
+| geclassificeerd | 4.579 | **4.602 van 4.653 (98,9%)** |
 
 ## 6. De poort
 

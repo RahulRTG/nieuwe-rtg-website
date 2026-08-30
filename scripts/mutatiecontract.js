@@ -231,6 +231,21 @@ let meerdereTreffers = 0;
 }
 
 function waargenomenToegang(r) {
+  /* DE HANDGELEZEN VERKLARING GAAT VOOROP, en dat is met dezelfde fout voor de
+     derde keer geleerd.
+
+     Hij stond in de tak "geen bewaker op de router". /api/betaal/webhook/adyen
+     heeft er twee -- allebei snelheidsremmen -- dus die tak werd nooit bereikt en
+     de route bleef "geen deur", terwijl iemand zijn handler had gelezen en
+     opgeschreven dat Adyen zich met een HMAC legitimeert.
+
+     Een rem ZIET eruit als een deur; dat is precies waarom de volgorde hier
+     telt. Een uitspraak van een mens over EEN route is het meest specifieke wat
+     dit register heeft, en gaat dus voor elke afleiding uit een vorm. */
+  const hand = handlerpoorten.poortVanRouteHand(r.route ||
+    (String(r.methode || 'POST').toUpperCase() + ' ' + r.pad));
+  if (hand && hand.toegang) return hand.toegang;
+
   const namen = Array.isArray(r.bewakers) ? r.bewakers : [];
   if (!r.bewakersBekend || !namen.length) {
     /* Geen deur in de router: staat hij in de handler? */
@@ -247,9 +262,6 @@ function waargenomenToegang(r) {
        opgeschreven wat er staat. Zie ROUTEPOORTEN in
        server/kern/handlerpoorten/buiten.js, en de reden dat die lijst apart van
        de publieke lijst woont. */
-    const hand = handlerpoorten.poortVanRouteHand(r.route ||
-      (String(r.methode || 'POST').toUpperCase() + ' ' + r.pad));
-    if (hand && hand.toegang) return hand.toegang;
     return publiekOfNiets(r);
   }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
@@ -621,7 +633,14 @@ if (process.argv.includes('--afleiden')) {
     /* PUBLIC ZONDER REDEN IS EEN GAT, en de keuring weigert het terecht. De
        reden staat al geschreven, door een mens, in ./lib/publiekeroutes.js --
        dus die reist mee in plaats van dat er hier een nieuwe wordt bedacht. */
-    if (toeg === 'PUBLIC') toegang.waarom = PUBLIEK.get(r.route.replace(/^\S+ /, '')) || null;
+    if (toeg === 'PUBLIC') {
+      /* De reden komt uit de publieke lijst OF uit de handgelezen routelijst --
+         allebei door een mens geschreven over deze route. Zonder de tweede bron
+         kwamen drie foundation-routes hier als "PUBLIC zonder reden" uit, en de
+         keuring wees ze terecht af: open is een besluit. */
+      const hand = handlerpoorten.poortVanRouteHand(r.route);
+      toegang.waarom = PUBLIEK.get(r.route.replace(/^\S+ /, '')) || (hand && hand.waarom) || null;
+    }
     if (toeg === 'OBJECT_SCOPED') {
       const p = uitHandler.get(r.route) || handlerpoorten.poortVanRoute(r.pad);
       /* En anders: staat de objectpoort op de ROUTER? De bewakerskaart weet dat

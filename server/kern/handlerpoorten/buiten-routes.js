@@ -93,5 +93,4 @@ const ROUTEPOORTEN = {
     wat: 'het gespreks-id uit het lichaam; zonder bestaand gesprek is er niets, plus een rem per IP' }
 };
 
-
 module.exports = { ROUTEPOORTEN };

@@ -335,6 +335,54 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     }
   }
 
+  /* 11g. EEN TAXIBEDRIJF, want een genre is geen rol maar een SCHAKELAAR.
+
+          Eenenvijftig routes onder /api/supplier/mob, /api/staff/mob, /oog, /ov
+          en /flits antwoorden "Deze functie is voor dit genre zaken
+          uitgeschakeld door RTG." Dat is geen bevoegdheid maar een
+          functieschakelaar per genre (middleware/schakelaar-antwoord.js), en de
+          demozaak van de proef is een hotel.
+
+          `taxi` is een OPEN genre en staat niet in BEWIJS_EISEN: er hoort geen
+          vergunning bij die een mens moet hebben gezien. Een taxibedrijf
+          aanmelden is dus de gewone partnerweg, en die loopt de proef af:
+
+            1. aanvragen   /api/partner/apply, als lid met een ZAKELIJKE pas --
+                           de route eist dat met zoveel woorden.
+            2. besluiten   /api/office/partner/decide (boardroom) -- geeft de
+                           bedrijfscode en de manager-PIN terug.
+            3. wie is er   /api/supplier/roster, dezelfde inlogkiezer als bij de
+                           Rijksoverheid.
+            4. inloggen    /api/supplier/login.
+
+          Er staat al een taxibedrijf in de seed (MKKX), maar dat heeft geen
+          personeelsinlog: de demo-inlog komt altijd op DEMO_SUPPLIER uit. Een
+          eigen zaak aanmelden is dus geen omweg maar de enige weg. */
+  if (tokens['lid-business'] && tokens.boardroom) {
+    const aanvraag = await stil('/api/partner/apply', {
+      company: 'Proeftaxi (idemproef)', type: 'taxi', city: 'Proefstad',
+      contactName: 'Proefbeheerder', email: 'proeftaxi@example.invalid',
+      landCode: 'NL', kvkNummer: '87654321',
+      akkoord: true, bevoegd: true, waarheidsgetrouw: true
+    }, tokens['lid-business']);
+    const aanvraagId = veld(aanvraag, 'id');
+    if (aanvraagId) {
+      const besluit = await stil('/api/office/partner/decide',
+        { id: aanvraagId, besluit: 'goedkeuren', akkoord: true }, tokens.boardroom);
+      const code = veld(besluit, 'code'), pin = veld(besluit, 'pin');
+      if (code && pin) {
+        const rooster = await stil('/api/supplier/roster', { code });
+        const eerste = ((rooster.data && rooster.data.staff) || [])[0];
+        if (eerste) {
+          const login = await stil('/api/supplier/login', { code, staffId: eerste.id, pin });
+          w.taxiToken = veld(login, 'token');
+          w.taxiCode = code;
+          if (w.taxiToken) tokens.taxi = w.taxiToken;   // zelfde reden als bij `rijk`
+        }
+      }
+    }
+  }
+
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
 }
 
@@ -449,6 +497,16 @@ function voorvoegselLijf(w) {
      routes willen geen extra veld, ze willen een zaak van het genre `rijk`. Het
      voorvoegsel geeft dus de sleutel mee en verder niets. */
   if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk' });
+
+  /* En de mobiliteitskant, om dezelfde reden een ROL en geen lijf. Deze
+     voorvoegsels zijn smal gehouden: /api/supplier/ in zijn geheel omzetten zou
+     honderden routes van de hotelzaak naar de taxizaak verhuizen, en dan meet de
+     volgende ronde iets anders zonder dat iemand het ziet. */
+  if (w.taxiToken) {
+    for (const vv of ['/api/supplier/mob/', '/api/staff/mob/', '/api/staff/oog/',
+      '/api/staff/ov/', '/api/staff/flits/', '/api/supplier/ov/', '/api/supplier/oog/',
+      '/api/supplier/ghost/']) uit.push({ voorvoegsel: vv, lijf: {}, rol: 'taxi' });
+  }
 
   /* De kantoorpakketten, elk met het document van HUN kring. Deze staan na het
      werkplek-voorvoegsel maar zijn specialer, dus ze moeten ervoor -- de eerste

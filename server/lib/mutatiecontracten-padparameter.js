@@ -32,7 +32,10 @@ const geblokkeerd = (route, mutatieId, toegang, watErMoetKomen) => [route, {
   semantiek: { klasse: 'onbekend' },
   toegang,
   stand: 'BLOCKED_BY_TEST_FIXTURE',
-  watErMoetKomen
+  watErMoetKomen,
+  /* Deze tien zijn gelezen: wat er moet komen staat er per stuk in, en dat komt
+     niet uit een meting maar uit de handler. */
+  afgetekend: { door: 'Claude (Opus 5), handler gelezen om de ontbrekende fixture te benoemen', op: '2026-08-30' }
 }];
 
 const SCIM = { klasse: 'SERVICE_TO_SERVICE' };

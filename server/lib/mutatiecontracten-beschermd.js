@@ -16,6 +16,21 @@
    ========================================================================== */
 'use strict';
 
+/* DE AFTEKENING, EN ZIJ IS EERLIJK OVER WAT ZE IS. Deze contracten zijn opgesteld
+   door Claude op grond van een MEETING plus een bestaand besluit -- niet door een
+   mens die ze een voor een heeft gelezen. Dat verschil hoort in het register te
+   staan en niet gladgestreken te worden: "gemeten en voorgesteld" is iets anders
+   dan "door een mens beoordeeld", en dat onderscheid houdt de rest van dit
+   register overeind.
+
+   Wie er een naleest en er zijn naam onder wil zetten, vervangt hem hier. */
+const AFGETEKEND = {
+  door: 'Claude (Opus 5), op grond van de gemeten kale ronde plus het bestaande besluit; ' +
+    'niet door een mens nagelezen',
+  op: '2026-08-30'
+};
+
+
 /* HET BEWIJS IS VOOR ALLE VIERENTWINTIG HETZELFDE, dus staat het EEN keer.
 
    Vierentwintig keer dezelfde zin overtypen is niet alleen lang -- het is de
@@ -34,7 +49,8 @@ const beschermd = (route, mutatieId) => [route, {
   semantiek: { klasse: 'idempotent' },
   toegang: { klasse: 'AUTHENTICATED' },
   stand: 'PROTECTED',
-  bewijs: BEWIJS
+  bewijs: BEWIJS,
+  afgetekend: AFGETEKEND
 }];
 
 const CONTRACTEN = Object.fromEntries([

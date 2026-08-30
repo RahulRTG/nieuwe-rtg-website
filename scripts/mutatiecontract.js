@@ -419,6 +419,12 @@ if (process.argv.includes('--afleiden')) {
       semantiek: { klasse: 'onbekend' },
       toegang,
       stand: 'BLOCKED_BY_TEST_FIXTURE',
+      /* De aftekening zegt hier precies wat zij is: een script, op grond van de
+         hindernis die de route zelf teruggaf. Geen mens heeft gekeken, en dat
+         hoort te blijven staan -- het is de hele reden dat deze regels apart van
+         de menselijke contracten wonen. */
+      afgetekend: { door: 'scripts/mutatiecontract.js --afleiden, op grond van de gemeten hindernis; ' +
+        'geen mens heeft deze route gelezen', op: new Date().toISOString().slice(0, 10) },
       watErMoetKomen: 'de proef kwam hier niet bij: "' + h + '". Bouw die toestand in ' +
         'scripts/lib/idemwereld.js voordat deze route iets over zijn duplicaatgedrag kan zeggen.'
     };

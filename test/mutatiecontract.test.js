@@ -78,7 +78,8 @@ test('dit bestand definieert geen tweede semantiek-woordenlijst', () => {
 
 const basis = {
   mutatieId: 'proef.handeling', route: 'POST /api/proef', herkomst: 'mens',
-  semantiek: { klasse: 'idempotent' }, toegang: { klasse: 'AUTHENTICATED' }
+  semantiek: { klasse: 'idempotent' }, toegang: { klasse: 'AUTHENTICATED' },
+  afgetekend: { door: 'de toets zelf, als vaste invulling', op: '2026-08-30' }
 };
 
 /* ---------------------------------------------------------------------------
@@ -237,4 +238,42 @@ test('elke route in de inventaris is OF gemeten OF heeft een contract dat zegt w
   const zonderBeide = register.rijen.filter(r => !r.bewijs && r.stand === 'LEGACY_PENDING_CLASSIFICATION');
   assert.deepStrictEqual(zonderBeide.map(r => r.route), [],
     'deze routes zijn nooit gemeten en dragen geen contract: ze zijn onzichtbaar in beide richtingen');
+});
+
+/* ---------------------------------------------------------------------------
+   DE AFTEKENING -- besluit van de eigenaar, 30 augustus 2026
+   ------------------------------------------------------------------------- */
+
+test('een contract zonder aftekening wordt geweigerd', () => {
+  const zonder = { ...basis, stand: 'PROTECTED', bewijs: { gemeten: 'x', op: '2026-08-30' } };
+  delete zonder.afgetekend;
+  assert.ok(contract.keur(zonder).some(x => /geen aftekening/.test(x)));
+});
+
+test('een aftekening zonder datum, of met een initiaal, telt niet', () => {
+  const met = (afgetekend) => contract.keur({ ...basis, stand: 'PROTECTED',
+    bewijs: { gemeten: 'x', op: '2026-08-30' }, afgetekend });
+  assert.ok(met({ door: 'Claude (Opus 5), gemeten', op: 'gisteren' }).some(x => /geen datum/.test(x)));
+  assert.ok(met({ door: 'CI', op: '2026-08-30' }).some(x => /te weinig/.test(x)),
+    'een initiaal is geen aftekening; het veld moet zeggen WIE of WAT');
+});
+
+test('elk contract in het register draagt een aftekening met een datum', () => {
+  for (const [route, c] of Object.entries(CONTRACTEN)) {
+    assert.ok(c.afgetekend && c.afgetekend.door, route + ' is niet afgetekend');
+    assert.match(String(c.afgetekend.op), /^\d{4}-\d{2}-\d{2}$/, route + ' heeft geen datum');
+  }
+});
+
+test('de aftekening liegt niet over wie er heeft gekeken', () => {
+  /* De 106 die er staan zijn opgesteld door Claude op grond van een meting plus
+     een bestaand besluit -- niet door een mens die ze een voor een las. Zou daar
+     een menselijke naam onder staan, dan verdwijnt precies het onderscheid dat
+     de rest van dit register overeind houdt. Wie er een naleest, vervangt hem. */
+  for (const [route, c] of Object.entries(CONTRACTEN)) {
+    const door = String(c.afgetekend.door);
+    if (/Claude/.test(door)) continue;
+    assert.ok(!/^[A-Z][a-z]+$/.test(door),
+      route + ' is afgetekend met alleen een naam ("' + door + '"); zeg erbij waarop dat oordeel rust');
+  }
 });

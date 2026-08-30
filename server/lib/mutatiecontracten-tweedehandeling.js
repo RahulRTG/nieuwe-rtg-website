@@ -23,6 +23,21 @@
    ========================================================================== */
 'use strict';
 
+/* DE AFTEKENING, EN ZIJ IS EERLIJK OVER WAT ZE IS. Deze contracten zijn opgesteld
+   door Claude op grond van een MEETING plus een bestaand besluit -- niet door een
+   mens die ze een voor een heeft gelezen. Dat verschil hoort in het register te
+   staan en niet gladgestreken te worden: "gemeten en voorgesteld" is iets anders
+   dan "door een mens beoordeeld", en dat onderscheid houdt de rest van dit
+   register overeind.
+
+   Wie er een naleest en er zijn naam onder wil zetten, vervangt hem hier. */
+const AFGETEKEND = {
+  door: 'Claude (Opus 5), op grond van de gemeten kale ronde plus het bestaande besluit; ' +
+    'niet door een mens nagelezen',
+  op: '2026-08-30'
+};
+
+
 /* DE REDEN STAAT AL IN IDEMBESLUIT.json, DUS HIER NIET NOG EENS.
 
    Tweeendertig keer een reden overtypen is niet alleen lang -- het is twee
@@ -79,7 +94,8 @@ const tweedeHandeling = (pad, mutatieId, klasse) => {
     waarom: reden + (eigen ? ' (eigen reden bij deze route in IDEMBESLUIT.json, klasse "' + klasse + '")'
       : ' (de reden van de KLASSE "' + klasse + '" in IDEMBESLUIT.json; deze route heeft daar geen eigen ' +
         'reden, dus de grond is de indeling en niet een uitspraak over juist deze handeling)'),
-    bewijs: BEWIJS
+    bewijs: BEWIJS,
+    afgetekend: AFGETEKEND
   }];
 };
 

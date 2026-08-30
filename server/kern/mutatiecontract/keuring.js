@@ -85,6 +85,34 @@ function keur(c) {
       'zegt juist dat we het niet weten.');
   }
 
+  /* DE AFTEKENING. Besluit van de eigenaar, 30 augustus 2026: verplicht vanaf
+     nu, op elk contract.
+
+     WAAROM HIJ ER EERST NIET WAS. Met een handvol contracten levert een
+     verplicht veld een handvol lege velden op, en een leeg verplicht veld leert
+     mensen invullen zonder kijken -- dan is het over een jaar een vinkje in
+     plaats van een handtekening. Bij ruim honderd contracten kantelt dat: nu is
+     het de gewoonte die je wilt vestigen voordat het er duizenden zijn.
+
+     `door` moet ZEGGEN wie of wat. De 106 die er stonden zijn opgesteld door
+     Claude op grond van een meting plus een bestaand besluit, en dat staat er
+     dan ook zo -- niet op naam van een mens die ze niet heeft gelezen. Het
+     verschil tussen "gemeten en voorgesteld" en "door een mens beoordeeld" is
+     precies het onderscheid dat de rest van dit register overeind houdt. */
+  if (!c.afgetekend || !c.afgetekend.door) {
+    fouten.push(naam + ': geen aftekening. Zet `afgetekend: { door: \'...\', op: \'JJJJ-MM-DD\' }` -- ' +
+      'en laat `door` zeggen WIE of WAT dit heeft vastgesteld.');
+  } else {
+    if (String(c.afgetekend.door).length < 10) {
+      fouten.push(naam + ': `afgetekend.door` zegt te weinig ("' + c.afgetekend.door + '"). ' +
+        'Een naam of een methode, geen initiaal.');
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(c.afgetekend.op || ''))) {
+      fouten.push(naam + ': `afgetekend.op` ontbreekt of is geen datum (JJJJ-MM-DD). Zonder datum is ' +
+        'niet te zien of een aftekening nog over deze code gaat.');
+    }
+  }
+
   /* AS 5 */
   if (!c.stand) {
     fouten.push(naam + ': geen stand. De standen zijn: ' + STATUSNAMEN.join(', ') + '.');

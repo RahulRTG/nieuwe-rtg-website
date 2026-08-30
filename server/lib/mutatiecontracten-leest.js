@@ -21,6 +21,21 @@
    ========================================================================== */
 'use strict';
 
+/* DE AFTEKENING, EN ZIJ IS EERLIJK OVER WAT ZE IS. Deze contracten zijn opgesteld
+   door Claude op grond van een MEETING plus een bestaand besluit -- niet door een
+   mens die ze een voor een heeft gelezen. Dat verschil hoort in het register te
+   staan en niet gladgestreken te worden: "gemeten en voorgesteld" is iets anders
+   dan "door een mens beoordeeld", en dat onderscheid houdt de rest van dit
+   register overeind.
+
+   Wie er een naleest en er zijn naam onder wil zetten, vervangt hem hier. */
+const AFGETEKEND = {
+  door: 'Claude (Opus 5), op grond van de gemeten kale ronde plus het bestaande besluit; ' +
+    'niet door een mens nagelezen',
+  op: '2026-08-30'
+};
+
+
 /* HETZELFDE BEWIJS, ZEVENENDERTIG KEER -- dus EEN keer, met de bestandsnaam als
    enige variabele. Zie ./mutatiecontracten-beschermd.js voor waarom dat meer is
    dan een besparing: een reeks bijna-gelijke zinnen is de vorm waarin een
@@ -37,7 +52,8 @@ const leest = (route, mutatieId, bestand) => [route, {
   },
   nagekeken: 'scripts/schrijfanalyse.js, 2026-08-29: elke aanroep in de handler is binnen ' + bestand +
     ' herleid en geen enkele bevat een schrijfvorm -- de tweede, onafhankelijke lijn die het gat sluit ' +
-    'dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)'
+    'dat de opslagmeter laat (bestand, externe dienst, teller daarbuiten)',
+  afgetekend: AFGETEKEND
 }];
 
 const CONTRACTEN = Object.assign(Object.fromEntries([
@@ -91,6 +107,8 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
     nagekeken: 'met de hand, 2026-08-29: server/routes/member/metier.js regel 55 geeft metier.zoek() ' +
       'terug, en server/kern/metier/zoek.js filtert profielen en bouwt een antwoord -- geen save(), ' +
       'geen toewijzing'
+  ,
+    afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen', op: '2026-08-29' }
   },
   'POST /api/bedrijf/apparaten': {
     mutatieId: 'bedrijf.apparaten',
@@ -102,6 +120,8 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
       'verzoek meetelt) en niet in een collectie van deze route', op: '2026-08-29' },
     nagekeken: 'met de hand, 2026-08-29: server/bedrijf/it.js regel 77 leest Object.values(A(g.w)), ' +
       'filtert en telt -- geen save(), geen toewijzing'
+  ,
+    afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen', op: '2026-08-29' }
   },
 });
 

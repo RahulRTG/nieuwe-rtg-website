@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:05:20.318Z",
-  "commit": "a2d3aa8f",
+  "op": "2026-08-30T12:11:29.461Z",
+  "commit": "d6e2320b",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -12,7 +12,7 @@
   "mutaties": 4661,
   "mutatiesVerklaard": 211,
   "mutatiesOnverklaard": 4450,
-  "beproefbaar": 3887,
+  "beproefbaar": 3891,
   "beproefbaarVerklaard": 201,
   "bakken": 7,
   "statusSom": 4661,
@@ -26,12 +26,12 @@
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit a2d3aa8f, schone boom",
-  "metingGemetenOp": "2026-08-30T12:05:02.072Z",
+  "metingReden": "gemeten op commit d6e2320b, schone boom",
+  "metingGemetenOp": "2026-08-30T12:11:16.714Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 57,
+    "aantal": 53,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -40,7 +40,7 @@
    },
    {
     "id": "gemeten",
-    "aantal": 4390,
+    "aantal": 4394,
     "voorbeelden": [
      "POST /api/bedrijf/apparaat/innemen",
      "POST /api/bedrijf/apparaat/uitgeven",
@@ -69,7 +69,7 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 3044
+    "aantal": 3048
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
@@ -145,7 +145,7 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 735,
+   "aantal": 731,
    "eind": true,
    "voorbeelden": [
     "POST /api/arrival/pass",
@@ -167,7 +167,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3686,
+   "aantal": 3690,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -216,7 +216,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 105,
+   "aantal": 101,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -228,7 +228,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 3057,
+   "aantal": 3061,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -253,7 +253,7 @@
  "zonderRolPerReden": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 549,
+   "aantal": 547,
    "voorbeelden": [
     "POST /api/bedrijf/apparaat/innemen",
     "POST /api/bedrijf/apparaat/uitgeven",
@@ -323,14 +323,6 @@
    ]
   },
   {
-   "reden": "geenBewaker: mw -- geen autorisatielaag -- alleen een rem of cache",
-   "aantal": 2,
-   "voorbeelden": [
-    "POST /api/betaal/webhook/adyen",
-    "POST /api/sso/wissel"
-   ]
-  },
-  {
    "reden": "omgeving: meetpoort -- de opstelling beslist (configuratie), niet de bezoeker",
    "aantal": 1,
    "voorbeelden": [
@@ -364,8 +356,8 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 4606,
-   "nu": 3887,
+   "vastgelegd": 4610,
+   "nu": 3891,
    "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
    "verschil": -719,

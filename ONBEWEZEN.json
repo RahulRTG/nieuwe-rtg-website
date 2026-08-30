@@ -1,13 +1,13 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit a2d3aa8f, schone boom",
+  "metingReden": "gemeten op commit d6e2320b, schone boom",
   "stempel": {
-    "op": "2026-08-30T12:05:35.284Z",
-    "commit": "a2d3aa8f",
+    "op": "2026-08-30T12:11:44.460Z",
+    "commit": "d6e2320b",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit a2d3aa8f, schone boom"
+    "metingReden": "gemeten op commit d6e2320b, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
@@ -48,18 +48,18 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 15,
+      "aantal": 11,
       "voorbeelden": [
         "POST /api/arrival/pass",
         "POST /api/arrival/pulse",
-        "POST /api/betaal/webhook/adyen",
-        "POST /api/code/dyn"
+        "POST /api/code/dyn",
+        "POST /api/code/scan"
       ]
     },
     {
       "id": "FIXTURE_401",
       "uitleg": "de eerste oproep gaf 401 -- er is een authenticatiefixture nodig",
-      "aantal": 13,
+      "aantal": 14,
       "voorbeelden": [
         "POST /api/auth/login",
         "POST /api/office/login",
@@ -81,7 +81,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1633,
+      "aantal": 1634,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmeld/zeg",
@@ -103,7 +103,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 513,
+      "aantal": 515,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -204,18 +204,14 @@
     "GEEN_PROEFSLEUTEL": [
       "POST /api/arrival/pass",
       "POST /api/arrival/pulse",
-      "POST /api/betaal/webhook/adyen",
       "POST /api/code/dyn",
       "POST /api/code/scan",
-      "POST /api/foundation/reis/aanvraag",
       "POST /api/link/koppelingen",
       "POST /api/link/los",
       "POST /api/partner/applications/mijn",
       "POST /api/partner/apply",
       "POST /api/partner/types",
       "POST /api/sonde/melding",
-      "POST /api/sso/wissel",
-      "POST /api/staff",
       "POST /api/toestel/meting"
     ],
     "FIXTURE_401": [
@@ -227,6 +223,7 @@
       "POST /api/rtfos/koppel/nog-niet",
       "POST /api/rtfos/koppelbord",
       "POST /api/rtfos/melding/maak",
+      "POST /api/sso/wissel",
       "POST /api/stad/doos/hartslag",
       "POST /api/stad/doos/meting",
       "POST /api/supplier/login",
@@ -2196,6 +2193,7 @@
       "POST /api/splits",
       "POST /api/splits/betaal",
       "POST /api/stad/raadpleging/reageer",
+      "POST /api/staff",
       "POST /api/staff/klok/correctie",
       "POST /api/supplier/agent/beslis",
       "POST /api/supplier/apply",
@@ -2792,6 +2790,7 @@
       "POST /api/bedrijf/vlag/zet",
       "POST /api/bestanden/pdf/redigeer",
       "POST /api/bestanden/pdf/samenvoegen",
+      "POST /api/betaal/webhook/adyen",
       "POST /api/betaal/webhook/mollie",
       "POST /api/bieb/ai",
       "POST /api/boardroom/ai",
@@ -2837,6 +2836,7 @@
       "POST /api/foundation/mail/stuur",
       "POST /api/foundation/markt/plaats",
       "POST /api/foundation/registratie/aanvragen",
+      "POST /api/foundation/reis/aanvraag",
       "POST /api/foundation/school/excursie/gps",
       "POST /api/foundation/school/incident/meld",
       "POST /api/foundation/school/koppeling/zet",

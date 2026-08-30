@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 1a9be257, schone boom",
+  "metingReden": "gemeten op commit a74e18e3, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:47:20.395Z",
-    "commit": "1a9be257",
+    "op": "2026-08-30T11:51:07.275Z",
+    "commit": "a74e18e3",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 1a9be257, schone boom"
+    "metingReden": "gemeten op commit a74e18e3, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1480,
-    "onbewezen": 3181,
+    "metBewijs": 1490,
+    "onbewezen": 3171,
     "sluit": true
   },
   "bakken": [
@@ -37,7 +37,7 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 54,
+      "aantal": 38,
       "voorbeelden": [
         "POST /api/aanmeld/zeg",
         "POST /api/arrival/pass",
@@ -70,7 +70,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1630,
+      "aantal": 1631,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/beslis",
@@ -92,7 +92,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 508,
+      "aantal": 511,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -103,7 +103,7 @@
     {
       "id": "FIXTURE_OVERIG",
       "uitleg": "de eerste oproep kwam niet door om een andere reden (o.a. 402, 503)",
-      "aantal": 65,
+      "aantal": 66,
       "voorbeelden": [
         "POST /api/bank/krediet",
         "POST /api/bank/krediet/aanvraag",
@@ -142,8 +142,10 @@
     {
       "id": "ECHT_DEFECT",
       "uitleg": "fixture klopt, effect treedt op, en een herhaling doet het werk gewoon nog een keer",
-      "aantal": 0,
-      "voorbeelden": []
+      "aantal": 1,
+      "voorbeelden": [
+        "POST /api/bank/terugkerend/stop"
+      ]
     }
   ],
   "perRoute": {
@@ -194,22 +196,6 @@
       "POST /api/foundation/agenda",
       "POST /api/foundation/opgave",
       "POST /api/foundation/reis/aanvraag",
-      "POST /api/gast/band",
-      "POST /api/gast/bestel",
-      "POST /api/gast/betaal",
-      "POST /api/gast/club/tafel",
-      "POST /api/gast/concierge",
-      "POST /api/gast/fooi",
-      "POST /api/gast/kaart",
-      "POST /api/gast/logboek",
-      "POST /api/gast/pols",
-      "POST /api/gast/pols/meld",
-      "POST /api/gast/rekening",
-      "POST /api/gast/verdeel",
-      "POST /api/gast/verzoek",
-      "POST /api/gast/verzoek/intrekken",
-      "POST /api/gast/verzoek/soorten",
-      "POST /api/gast/waarom",
       "POST /api/link/koppelingen",
       "POST /api/link/los",
       "POST /api/login",
@@ -1402,6 +1388,7 @@
       "POST /api/gast/eten/beoordeel",
       "POST /api/gast/eten/probleem",
       "POST /api/gast/tafel",
+      "POST /api/gast/verzoek/intrekken",
       "POST /api/gedachten/weg",
       "POST /api/gegevens/zeg",
       "POST /api/geld/beleid/weg",
@@ -2858,8 +2845,11 @@
       "POST /api/foundation/school/vakgroep",
       "POST /api/foundation/school/webhook/zet",
       "POST /api/galerij/favoriet",
+      "POST /api/gast/band",
+      "POST /api/gast/bestel",
       "POST /api/gast/foodcourt/bestel",
       "POST /api/gast/foodcourt/mandje",
+      "POST /api/gast/verzoek",
       "POST /api/gemeente/afspraak",
       "POST /api/gemeente/burgerzaken/slots",
       "POST /api/gemeente/grofvuil",
@@ -3282,6 +3272,7 @@
       "POST /api/foundation/school/personeel/aanmeld",
       "POST /api/foundation/school/school/activeren",
       "POST /api/foundation/school/school/maak",
+      "POST /api/gast/betaal",
       "POST /api/metier/ai/oefen",
       "POST /api/munt/direct",
       "POST /api/munt/verzoek",
@@ -3350,6 +3341,8 @@
     "STAAT_NIET_ZICHTBAAR": [],
     "BIJWERKING_ALLEEN": [],
     "SEMANTIEK_NODIG": [],
-    "ECHT_DEFECT": []
+    "ECHT_DEFECT": [
+      "POST /api/bank/terugkerend/stop"
+    ]
   }
 }

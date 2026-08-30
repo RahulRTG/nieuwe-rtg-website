@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:47:05.765Z",
-  "commit": "1a9be257",
+  "op": "2026-08-30T11:50:52.951Z",
+  "commit": "a74e18e3",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -17,21 +17,21 @@
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3,
+  "nogNietGeclassificeerd": 4,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1269,
+  "metGemetenDuplicaatgedrag": 1279,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 1a9be257, schone boom",
-  "metingGemetenOp": "2026-08-30T11:46:51.470Z",
+  "metingReden": "gemeten op commit a74e18e3, schone boom",
+  "metingGemetenOp": "2026-08-30T11:50:39.762Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 85,
+    "aantal": 70,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -40,7 +40,7 @@
    },
    {
     "id": "gemeten",
-    "aantal": 4362,
+    "aantal": 4376,
     "voorbeelden": [
      "POST /api/bedrijf/apparaat/innemen",
      "POST /api/bedrijf/apparaat/uitgeven",
@@ -49,11 +49,11 @@
    },
    {
     "id": "onbekend",
-    "aantal": 3,
+    "aantal": 4,
     "voorbeelden": [
+     "POST /api/bank/terugkerend/stop",
      "POST /api/betaal/webhook",
-     "POST /api/fout/client",
-     "POST /api/munt/webhook"
+     "POST /api/fout/client"
     ]
    },
    {
@@ -69,11 +69,11 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 3032
+    "aantal": 3036
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1261
+    "aantal": 1272
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -89,10 +89,6 @@
    },
    {
     "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankRekeningen en de herhaling niets",
-    "aantal": 1
-   },
-   {
-    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
     "aantal": 1
    }
   ]
@@ -180,7 +176,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1355,
+   "aantal": 1365,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -228,7 +224,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 3060,
+   "aantal": 3049,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -240,13 +236,13 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3,
+   "aantal": 4,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
+    "POST /api/bank/terugkerend/stop",
     "POST /api/betaal/webhook",
-    "POST /api/fout/client",
-    "POST /api/munt/webhook"
+    "POST /api/fout/client"
    ]
   }
  ],
@@ -364,11 +360,11 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 4577,
+   "vastgelegd": 4593,
    "nu": 3880,
    "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": -697,
+   "verschil": -713,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-08-30; sindsdien zijn er routes bijgekomen"
   }

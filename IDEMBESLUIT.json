@@ -442,6 +442,10 @@
   "/api/wereld/profiel/van": {
    "klasse": "teller",
    "reden": "Gevonden op 24 augustus door stand 2 van het tweede meetpunt (server/staatlog.js): een WIJZIGING OP ZIJN PLAATS verandert geen enkele lengte, dus met alleen lengtes stond deze route op ongemeten. Een profiel bekijken. De eerste keer komt er een bezoekregel bij, daarna gaat `keer` omhoog en schuift `at` mee (kern/wereld/bezoek.js). Dat is geen neveneffect maar de belofte: er is geen sluipstand, en dat staat ook in het antwoord zodat het scherm het niet kan verzwijgen. Zou een tweede blik NIET meetellen, dan klopte de telling niet meer."
+  },
+  "/api/bank/spaardoel": {
+   "klasse": "instelling",
+   "reden": "Het spaardoel van een spaarrekening zetten. spaardoelZet() in kern/bank/sparen.js doet `m.doelCenten = centen` en verder niets: twee keer hetzelfde doel zetten laat exact dezelfde stand achter. Gevonden op 30 augustus 2026, en de MANIER waarop is de moeite waard. De opslagmeter noemde hem onbeschermd met als grond \"de eerste oproep gaf een wijziging in bankRekeningen en de herhaling opnieuw +1 in techniek, +6 in wacht\". Lees dat nog eens: de herhaling raakte bankRekeningen NIET. Wat er bewoog waren het techniekjournaal en de wachtrij -- collecties die van het KIJKEN groeien, niet van het werk. Zelfde valstrik als bij de drie routes in lib/mutatiecontracten-wachtrij.js, nu aan de meetkant. De ruisijking van scripts/idemproef-route.js kan ze niet vinden, want die zoekt wat bij ELKE oproep groeit en deze twee tikken alleen op bepaalde poorten -- precies de reden die daar bij `kosten` staat. Ze hier tot ruis verklaren zou echt werk kunnen verbergen: een wachtrij waar een baan in wordt gezet IS werk. Dus blijft de meter tellen en staat het oordeel hier, gelezen uit de handler."
   }
  }
 }

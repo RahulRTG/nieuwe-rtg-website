@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:14:18.934Z",
-  "commit": "89a36fca",
+  "op": "2026-08-30T09:48:32.530Z",
+  "commit": "6695effc",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -12,26 +12,26 @@
   "mutaties": 4661,
   "mutatiesVerklaard": 211,
   "mutatiesOnverklaard": 4450,
-  "beproefbaar": 3777,
-  "beproefbaarVerklaard": 200,
+  "beproefbaar": 3832,
+  "beproefbaarVerklaard": 201,
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 0,
+  "nogNietGeclassificeerd": 1,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1020,
+  "metGemetenDuplicaatgedrag": 1038,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 89a36fca, schone boom",
-  "metingGemetenOp": "2026-08-30T09:14:14.780Z",
+  "metingReden": "gemeten op commit 6695effc, schone boom",
+  "metingGemetenOp": "2026-08-30T09:48:28.658Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 873,
+    "aantal": 819,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -40,11 +40,18 @@
    },
    {
     "id": "gemeten",
-    "aantal": 3577,
+    "aantal": 3630,
     "voorbeelden": [
      "POST /api/aandacht",
-     "POST /api/aanmelding/beslis",
-     "POST /api/aanmelding/betalingen"
+     "POST /api/aanmeld/start",
+     "POST /api/aanmelding/aanvraag"
+    ]
+   },
+   {
+    "id": "onbekend",
+    "aantal": 1,
+    "voorbeelden": [
+     "POST /api/fout/client"
     ]
    },
    {
@@ -53,18 +60,18 @@
     "voorbeelden": [
      "POST /api/office/bank/terugstorting",
      "POST /api/foundation/kosten",
-     "POST /api/reis/uitnodiging/open"
+     "POST /api/rtf/social/pin"
     ]
    }
   ],
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 2496
+    "aantal": 2531
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1012
+    "aantal": 1030
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -136,18 +143,18 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 845,
+   "aantal": 790,
    "eind": true,
    "voorbeelden": [
-    "POST /api/aanmeld/start",
     "POST /api/aanmeld/zeg",
-    "POST /api/aanmelding/aanvraag"
+    "POST /api/arrival/interpret",
+    "POST /api/arrival/pass"
    ]
   },
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 200,
+   "aantal": 201,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
@@ -158,12 +165,12 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3577,
+   "aantal": 3631,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
-    "POST /api/aanmelding/beslis",
-    "POST /api/aanmelding/betalingen"
+    "POST /api/aanmeld/start",
+    "POST /api/aanmelding/aanvraag"
    ]
   }
  ],
@@ -171,7 +178,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1106,
+   "aantal": 1124,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -200,14 +207,14 @@
    "semantiek": true,
    "voorbeelden": [
     "POST /api/foundation/kosten",
-    "POST /api/reis/uitnodiging/open",
-    "POST /api/rtf/social/pin"
+    "POST /api/rtf/social/pin",
+    "POST /api/rtf/social/pin/live/kijk"
    ]
   },
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 752,
+   "aantal": 698,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -219,7 +226,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 2678,
+   "aantal": 2713,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -231,20 +238,22 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 0,
+   "aantal": 1,
    "moetNaarNul": true,
    "semantiek": false,
-   "voorbeelden": []
+   "voorbeelden": [
+    "POST /api/fout/client"
+   ]
   }
  ],
  "zonderRolPerReden": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 611,
+   "aantal": 556,
    "voorbeelden": [
-    "POST /api/aanmeld/start",
     "POST /api/aanmeld/zeg",
-    "POST /api/aanmelding/aanvraag"
+    "POST /api/auth/reset",
+    "POST /api/bedrijf/apparaat/innemen"
    ]
   },
   {
@@ -376,8 +385,8 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 3777,
-   "nu": 3777,
+   "vastgelegd": 3832,
+   "nu": 3832,
    "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
    "verschil": 0,

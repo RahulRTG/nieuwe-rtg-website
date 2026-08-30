@@ -1,23 +1,23 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:04:16.581Z",
-  "commit": "97a51356",
-  "boomVuil": false,
+  "op": "2026-08-30T11:54:00.651Z",
+  "commit": "735b06e0",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
   "zonderBewakerslaag": 612,
   "bewaakt": 531,
-  "openbaarMetReden": 46,
-  "eigenControle": 15,
+  "openbaarMetReden": 53,
+  "eigenControle": 8,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
   "laat": 0,
   "onbewaakt": 0,
   "nietGelezen": 0,
   "gezagsfuncties": 26,
-  "publiekeLijstenVerschillen": 18
+  "publiekeLijstenVerschillen": 16
  },
  "tweePubliekeLijsten": {
   "alleenInPoortwacht": [
@@ -33,10 +33,8 @@
    "/api/salon/promo",
    "/api/sso/terug",
    "/api/sso/wissel",
-   "/api/auth/reset",
    "/api/auth/resend",
    "/api/account/start",
-   "/api/aanmeld/zeg",
    "/api/foundation/school/school/maak",
    "/api/foundation/les/maak"
   ],
@@ -315,7 +313,8 @@
   {
    "sleutel": "POST /api/aanmeld/zeg",
    "bestand": "server/routes/aanmeldgesprek.js:64",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "het ballotagegesprek loopt voor de inlog, dus voor het account bestaat"
   },
   {
    "sleutel": "POST /api/aanmelding/aanvraag",
@@ -349,7 +348,8 @@
   {
    "sleutel": "POST /api/auth/reset",
    "bestand": "server/routes/auth/herstel.js:126",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "herstel met een token uit de e-mail; wie zijn wachtwoord kwijt is heeft geen sessie"
   },
   {
    "sleutel": "POST /api/auth/verify-email",
@@ -3026,7 +3026,8 @@
   {
    "sleutel": "POST /api/login",
    "bestand": "server/routes/auth/inlog-pas.js:18",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "de pas-inlog: hier ontstaat de sessie, dus er kan er nog geen zijn. Eigen rem per adres"
   },
   {
    "sleutel": "POST /api/mail/binnen",
@@ -3049,7 +3050,8 @@
   {
    "sleutel": "POST /api/office/login",
    "bestand": "server/routes/office/toegang.js:8",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "de backoffice-code inwisselen voor een sessie; tijd-veilig vergeleken en met een rem"
   },
   {
    "sleutel": "POST /api/partner",
@@ -3804,12 +3806,14 @@
   {
    "sleutel": "POST /api/supplier/login",
    "bestand": "server/routes/supplier/toegang.js:22",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "de zaak logt in met code en wachtwoord, of een medewerker met een pincode"
   },
   {
    "sleutel": "POST /api/supplier/mijn/login",
    "bestand": "server/routes/supplier/pda/posities.js:99",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "idem voor het persoonlijke deel van een medewerker"
   },
   {
    "sleutel": "POST /api/supplier/roster",
@@ -3826,7 +3830,8 @@
   {
    "sleutel": "POST /api/techniek/inloggen",
    "bestand": "server/routes/techniek/inlog.js:29",
-   "staat": "eigenControle"
+   "staat": "openbaar",
+   "reden": "de techniekdeur; eigen rem per adres en per login, en een gelijk antwoord op elke mislukking"
   },
   {
    "sleutel": "POST /api/tenant/bijstand",

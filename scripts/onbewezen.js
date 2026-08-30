@@ -88,6 +88,7 @@ const KLAAR = new Set(['BESCHERMD', 'BEWUST_NIET_IDEMPOTENT', 'NIET_VAN_TOEPASSI
 const BAKKEN = [
   ['STALE_BEWIJS', 'de meting hoort niet meer bij deze code -- opnieuw meten, geen handwerk'],
   ['NIET_AANRAAKBAAR', 'de proef MAG hier niet aankloppen -- een schakelkast of een onomkeerbare handeling, met de reden per route'],
+  ['WACHT_OP_OBJECT', 'het pad draagt een :parameter -- de sleutel is er, het OBJECT waar hij naar wijst niet'],
   ['GEEN_PROEFSLEUTEL', 'dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets'],
   ['FIXTURE_401', 'de eerste oproep gaf 401 -- er is een authenticatiefixture nodig'],
   ['FIXTURE_403', 'de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht'],
@@ -127,7 +128,7 @@ function laatstGewijzigd(bestand) {
   return t;
 }
 
-function bakVan(r, m, metingOp, geenSleutel) {
+function bakVan(r, m, metingOp, geenSleutel, wachtOpObject) {
   /* NIET AANRAKEN IS GEEN ONTBREKENDE SLEUTEL, en dat verschil is groot genoeg
      om als eerste te staan.
 
@@ -144,6 +145,7 @@ function bakVan(r, m, metingOp, geenSleutel) {
      bestaan. */
   const nietAanraken = waaromNietAanraken && waaromNietAanraken(r.pad);
   if (nietAanraken) return 'NIET_AANRAAKBAAR';
+  if (wachtOpObject) return 'WACHT_OP_OBJECT';
   /* EERST DE OPSTELLING, DAN PAS HET REGISTER. Een route waarvoor dit
      instrument geen sleutel heeft, staat niet in IDEMPROEF.json -- en die
      afwezigheid las de eerste versie als "de meting hoort niet meer bij deze
@@ -257,11 +259,22 @@ function meet() {
     if (heeftLijfsleutel(x.pad)) continue;   // een GEBOUWDE lijfsleutel is ook een sleutel   // een GEBOUWDE lijfsleutel is ook een sleutel
     zonderSleutel.add(x.methode.toUpperCase() + ' ' + x.pad);
   }
+  /* EEN :PARAMETER IS GEEN ONTBREKENDE SLEUTEL, en dat label had ik zelf fout
+     gezet. `/api/scim/v2/Users/:id` heeft een prima sleutel -- de SCIM-bearer --
+     en wat ontbreekt is het OBJECT waar de :id naar wijst. Dat is precies de
+     definitie van WACHT_OP_FIXTURE, en het is een heel andere reparatie: een
+     levensloop opbouwen, geen inlog zoeken.
+
+     Negen routes stonden zo onder "geen sleutel" (zes SCIM, twee SSO, een
+     theater-upload) en zouden daar nooit uit komen: er valt geen sleutel te
+     bouwen voor een probleem dat geen sleutelprobleem is. Zelfde fout als bij
+     de niet-aanraakbare routes, en dezelfde reparatie: het juiste label.
+
+     Schakelpaden gaan hierboven al naar NIET_AANRAAKBAAR, met hun eigen reden. */
+  const wachtOpObject = new Set();
   for (const r of mutaties) {
-    /* Een schakelpad of een :parameter heeft geen sleutel-probleem maar een
-       ander probleem, en die staan al in het mutatieboek met hun eigen reden;
-       hier tellen ze mee als "geen sleutel" want dit instrument komt er niet. */
-    if (isSchakel(r.pad) || r.pad.includes(':')) zonderSleutel.add(r.methode + ' ' + r.pad);
+    if (r.pad.includes(':')) wachtOpObject.add(r.methode + ' ' + r.pad);
+    else if (isSchakel(r.pad)) zonderSleutel.add(r.methode + ' ' + r.pad);
   }
   const uit = {};
   for (const [id] of BAKKEN) uit[id] = [];
@@ -273,7 +286,8 @@ function meet() {
     const heeftBewijs = (v && (v.leest || v.nietIdempotent || v.zelfdeVerzoek || v.velden)) ||
       (st && KLAAR.has(st)) || (perRoute[sleutel] && perRoute[sleutel].status === 'BESCHERMD');
     if (heeftBewijs) { klaar++; continue; }
-    const bak = bakVan(r, ruw[sleutel], metingOp, zonderSleutel.has(sleutel));
+    const bak = bakVan(r, ruw[sleutel], metingOp, zonderSleutel.has(sleutel),
+      wachtOpObject.has(sleutel));
     uit[bak].push(sleutel);
   }
 

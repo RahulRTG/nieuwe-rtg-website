@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LivingOS</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/beweging.css" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#fff;color:#0C0C0B;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  .slot{max-width:56ch;margin:0 auto;padding:16vh 24px;}
+  .slot p{color:#4D4A45;line-height:1.65;}
+  .slot .fijn{font-size:13px;color:#8A8680;margin-top:18px;}
+  .slot a{color:#7F1634;}
+  .springlink{position:absolute;left:-9999px;}
+  .springlink:focus{left:24px;top:16px;position:fixed;z-index:9;background:#0C0C0B;color:#fff;padding:12px 18px;}
+</style>
+</head>
+<body>
+<a class="springlink" href="#blad">Naar de inhoud</a>
+
+<!-- LIVINGOS, ALS BEWEGEND BLAD.
+
+     WAT DIT WEL EN NIET IS. Dit is GEEN marketingpagina en geen tweede
+     beginscherm -- die zijn er bewust uit (CLAUDE.md), en de enige lijst
+     werelden blijft MAPPEN in app-main. Dit is de bewegingslaag met ECHTE
+     inhoud in plaats van gekleurde vlakken: zes van de vijftig onderdelen van
+     LivingOS, elk met de naam en het adres die in het wereldregister staan.
+
+     DAAROM STAAN HIER GEEN VERZONNEN NAMEN. Elke `sleutel` hieronder wordt door
+     test/beweging.test.js tegen scripts/lib/wereldregister.js gehouden: bestaat
+     de sleutel niet in LivingOS, of heet hij daar anders, dan zakt de bouw.
+     Anders is dit blad binnen een half jaar een folder die naar schermen wijst
+     die niet meer zo heten.
+
+     De toon is die van RTG Pass -- ingetogen, en "je". -->
+
+<div class="slot">
+  <p style="font-family:'Bodoni Moda',Georgia,serif;font-size:clamp(28px,5vw,54px);line-height:1.05;color:#0C0C0B;">
+    LivingOS</p>
+  <p class="fijn">Vijftig onderdelen, één context. Scrol.</p>
+</div>
+
+<main id="blad"></main>
+
+<div class="slot">
+  <p>Alle vijftig onderdelen staan bij elkaar in het huis van deze wereld:
+     <a href="/apps/rtg.html">/apps/rtg.html</a>.</p>
+  <p class="fijn">De namen en adressen op dit blad komen uit het wereldregister
+     (<code>MAPPEN</code> in app-main). Wie daar iets hernoemt, laat dit blad
+     zakken in plaats van het stil verkeerd te laten staan.</p>
+</div>
+
+<script src="/shared/beweging.js"></script>
+<script src="/shared/beweging/motor.js"></script>
+<script src="/shared/beweging/blad.js"></script>
+<script>
+(function () {
+  /* Het beeld is voorlopig materiaal en geen foto: De Salon levert het beeld
+     (CLAUDE.md), en tot een gecureerde post hier hangt, is een verzonnen
+     stockbeeld erger dan geen beeld. Dit zijn de huismaterialen als vlak --
+     Onyx, Bordeaux, Gold -- met de scene-naam klein in de hoek. */
+  function materiaal(kleur, naam) {
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">' +
+      '<rect width="1200" height="800" fill="' + kleur + '"/>' +
+      '<text x="56" y="746" font-family="Inter,sans-serif" font-size="28" ' +
+      'fill="#ffffff" opacity=".45">' + naam + '</text></svg>');
+  }
+
+  var ONYX = '#0C0C0B', BORDEAUX = '#7F1634', GOUD = '#857007', GRIJS = '#4D4A45';
+
+  /* De sleutels zijn die uit MAPPEN; naam en adres worden hier herhaald zodat
+     het blad zonder de app-bundel werkt, en de toets houdt ze gelijk. */
+  var pagina = [
+    { soort: 'hero', sleutel: 'link:vooruitzicht',
+      bovenschrift: 'LivingOS', titel: 'Je leven, niet je apps.',
+      tekst: 'Vijftig onderdelen die je op een gewone dag gebruikt, in één ' +
+             'context. Je opent geen programma — je opent een moment.',
+      deur: 'Het Vooruitzicht', adres: '/apps/living-os.html',
+      beeld: materiaal(ONYX, 'Het Vooruitzicht') },
+
+    { soort: 'split', sleutel: 'link:leven',
+      bovenschrift: 'Mijn leven', titel: 'Alles wat van jou is.',
+      tekst: 'Je huis, je papieren, je gezondheid, je afspraken. Niet ' +
+             'zeventien mappen, maar één plek die weet waar iets hoort.',
+      deur: 'Mijn leven openen', adres: '/apps/leven.html',
+      beeld: materiaal(BORDEAUX, 'Mijn leven') },
+
+    { soort: 'tekstwissel', sleutel: 'link:sociaal',
+      bovenschrift: 'Sociaal', titel: 'Mensen zijn geen tijdlijn.',
+      tweedeTitel: 'Het leven tússen mensen.',
+      tekst: 'Wat je samen doet staat voorop; wat je in je eentje kijkt of ' +
+             'luistert staat bij Media. Er komt geen score op.',
+      deur: 'Sociaal openen', adres: '/apps/sociaal.html',
+      beeld: materiaal(GRIJS, 'Sociaal') },
+
+    { soort: 'toestel', sleutel: 'link:geldcommand',
+      bovenschrift: 'Geld', titel: 'Overzicht, geen dashboard.',
+      tekst: 'Betalen, sparen, factureren en beheren — en geld verlaat het ' +
+             'huis nooit vanzelf.',
+      deur: 'Geld openen', adres: '/apps/geld-command.html',
+      beeld: materiaal(GOUD, 'Geld') },
+
+    { soort: 'onthulling', sleutel: 'link:mediaos',
+      bovenschrift: 'RTG Media', titel: 'Muziek, film, live.',
+      tekst: 'Wat je alleen kijkt en luistert, bij elkaar.',
+      deur: 'RTG Media openen', adres: '/apps/media.html',
+      beeld: materiaal(BORDEAUX, 'RTG Media') },
+
+    { soort: 'volscherm', sleutel: 'link:pulse',
+      bovenschrift: 'Vandaag', titel: 'En morgen begint hier.',
+      tekst: 'Wat er vandaag speelt, op één scherm.',
+      deur: 'Vandaag openen', adres: '/apps/pulse.html',
+      beeld: materiaal(ONYX, 'Vandaag') }
+  ];
+
+  RTGBewegingBlad.bouw(document.getElementById('blad'), pagina);
+})();
+</script>
+</body>
+</html>

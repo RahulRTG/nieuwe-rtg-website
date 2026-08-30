@@ -195,8 +195,10 @@ test('de bewegingslaag kent geen ronde hoeken', () => {
      over heel public/. */
   const waarden = [...CSS.matchAll(/border-radius\s*:\s*([^;}\n]+)/g)].map((m) => m[1].trim());
   waarden.forEach((w) => assert.ok(w === '0' || w === '50%', 'ronde hoek: ' + w));
-  assert.ok(!/round\s+\d/.test(CSS), 'clip-path met ronde hoeken in het blad');
-  assert.ok(!/round\s+\d/.test(leer.rekenStand({ onthul: { van: 100, naar: 0 } }, 0.5).clipPath));
+  /* \b, want `background 200ms` bevat letterlijk "round 200ms" -- zonder die
+     grens weigert deze toets een overgang op een achtergrond. */
+  assert.ok(!/\bround\s+\d/.test(CSS), 'clip-path met ronde hoeken in het blad');
+  assert.ok(!/\bround\s+\d/.test(leer.rekenStand({ onthul: { van: 100, naar: 0 } }, 0.5).clipPath));
 });
 
 test('op zwart is lopende tekst wit en geen bordeaux', () => {
@@ -255,4 +257,58 @@ test('elke soort uit het register staat op het proefblad', () => {
   soorten.forEach((s) => {
     assert.match(proef, new RegExp("soort:\\s*'" + s + "'"), 'ontbreekt op het proefblad: ' + s);
   });
+});
+
+/* ======================================== het LivingOS-blad ================ */
+
+test('elk onderdeel op het LivingOS-blad bestaat echt, en heet daar zo', () => {
+  /* DE MUTATIE: zet op het blad `sleutel: 'link:medias'` of hernoem "Mijn
+     leven" in MAPPEN. Dan wijst een blad met echte adressen naar een onderdeel
+     dat niet bestaat of anders heet -- en dat merkt niemand, want de link doet
+     het gewoon tot het scherm verdwijnt. Dit is precies het soort blad dat
+     binnen een half jaar een folder wordt.
+
+     Wat deze toets NIET doet is de teksten keuren: of "Je leven, niet je apps"
+     de goede zin is, blijft mensenwerk. */
+  const reg = require('../scripts/lib/wereldregister');
+  const blad = lees('public/apps/livingos-blad.html');
+  const wereld = reg.WERELDEN.find((w) => w.naam === 'LivingOS');
+  assert.ok(wereld, 'LivingOS staat niet meer in het wereldregister');
+
+  const sleutels = [...blad.matchAll(/sleutel:\s*'([^']+)'/g)].map((m) => m[1]);
+  assert.ok(sleutels.length >= 6, 'geen sleutels op het blad gevonden');
+  sleutels.forEach((s) => {
+    assert.ok(wereld.items.includes(s), s + ' zit niet in LivingOS');
+    const kort = s.split(':')[1];
+    const link = reg.LINKS[kort];
+    assert.ok(link, s + ' is geen link in het register');
+    assert.ok(blad.includes("adres: '" + link.url + "'"),
+      s + ' wijst niet naar ' + link.url + ' zoals het register zegt');
+  });
+
+  /* Het getal in de kop is GEMETEN en niet overgetypt. Een blad dat "vijftig
+     onderdelen" belooft terwijl het er 47 zijn, is precies de belofte zonder
+     bron die dit huis nergens accepteert. */
+  const woord = { 50: 'ijftig', 40: 'eertig', 60: 'estig' }[wereld.items.length];
+  assert.ok(woord && blad.toLowerCase().includes(woord),
+    'het blad noemt niet het gemeten aantal onderdelen (' + wereld.items.length + ')');
+});
+
+test('elke deur op het blad is een echte link met een raakbaar vlak', () => {
+  /* DE MUTATIE: maak van .bw-deur een <span> met een klikhandler, of zet
+     min-height op 30px. Het eerste haalt hem uit de toetsenbordvolgorde, het
+     tweede maakt hem op een telefoon lastig te raken -- en allebei zie je op
+     een muisscherm niets. */
+  assert.match(BLAD, /el\('a', 'bw-deur'/);
+  assert.match(BLAD, /a\.href = scene\.adres/);
+  /* En elke soort die een deur KAN dragen, geeft `adres` ook door aan het blok
+     dat op het scherm blijft staan. DE MUTATIE: haal `adres: scene.adres` weg
+     bij de tekstwissel. De configuratie noemt dan een adres dat nergens
+     verschijnt -- gemeten: 5 deuren op een blad met 6 scenes. */
+  const wissel = BLAD.split("tekstwissel:")[1].split(/^\s{4}\w+:\s*\{$/m)[0];
+  assert.match(wissel, /adres:\s*scene\.adres/);
+  const deur = CSS.match(/\.bw-deur\s*\{([^}]*)\}/);
+  assert.ok(deur, '.bw-deur staat niet in het blad');
+  const min = deur[1].match(/min-height:\s*(\d+)px/);
+  assert.ok(min && Number(min[1]) >= 44, 'de deur is kleiner dan 44px');
 });

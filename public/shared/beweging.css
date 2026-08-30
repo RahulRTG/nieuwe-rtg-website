@@ -68,6 +68,37 @@
   margin: 20px 0 0;
 }
 
+/* De deur van een scene. Raakvlak minstens 44px hoog: TOEGANKELIJK.md houdt
+   24x24 als harde poort aan, ADAPTIEF.md 44 als de maat waarop een duim hem
+   werkelijk raakt -- en dit is een element dat op een telefoon wordt gebruikt. */
+.bw-deur {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 26px;
+  padding: 0 22px;
+  border: 1px solid var(--black, #0C0C0B);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  letter-spacing: .04em;
+  color: var(--black, #0C0C0B);
+  text-decoration: none;
+  background: transparent;
+  transition: background 200ms ease, color 200ms ease;
+}
+.bw-deur:hover, .bw-deur:focus-visible {
+  background: var(--black, #0C0C0B);
+  color: var(--white, #fff);
+}
+.bw-vol .bw-deur {
+  border-color: var(--white, #fff);
+  color: var(--white, #fff);
+}
+.bw-vol .bw-deur:hover, .bw-vol .bw-deur:focus-visible {
+  background: var(--white, #fff);
+  color: var(--black, #0C0C0B);
+}
+
 /* ---------------------------------------------------------- de soorten -- */
 .bw-hero { grid-template-rows: auto minmax(0, 1fr); text-align: left; }
 .bw-hero .bw-beeld { min-height: 0; height: 100%; overflow: hidden; }

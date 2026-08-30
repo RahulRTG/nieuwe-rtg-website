@@ -64,6 +64,14 @@
       blok.appendChild(h);
     }
     if (scene.tekst) blok.appendChild(el('p', 'bw-lopend', scene.tekst));
+    /* EEN SCENE MAG EEN DEUR HEBBEN. Zonder dit is een bewegend scherm een
+       folder: mooi, en je kunt er niets vanaf. De deur is een echte link met
+       een echt adres -- geen knop die iets belooft dat er niet is. */
+    if (scene.adres) {
+      var a = el('a', 'bw-deur', scene.deur || 'Openen');
+      a.href = scene.adres;
+      blok.appendChild(a);
+    }
     return blok;
   }
 
@@ -161,7 +169,12 @@
       bouw: function (scene) {
         var wrap = el('div', 'bw-kleef bw-wissel');
         var a = kop({ titel: scene.titel, bovenschrift: scene.bovenschrift });
-        var b = kop({ titel: scene.tweedeTitel, tekst: scene.tekst });
+        /* De deur hoort bij de TWEEDE boodschap: die blijft staan. Zat hij op
+           de eerste, dan verdwijnt hij met dat blok mee -- de scene had dan een
+           adres in zijn configuratie en geen link op het scherm, en dat viel
+           alleen op door de gerenderde pagina te tellen. */
+        var b = kop({ titel: scene.tweedeTitel, tekst: scene.tekst,
+          adres: scene.adres, deur: scene.deur });
         b.setAttribute('data-beweeg', 'tekst2');
         wrap.appendChild(a); wrap.appendChild(b);
         var v = visueel(scene); if (v) wrap.appendChild(v);

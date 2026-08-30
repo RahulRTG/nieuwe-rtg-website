@@ -110,7 +110,20 @@ if (require.main !== module) { module.exports = {}; return; }
     console.error('geen token voor: ' + ontbreekt.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
     klaar(); process.exit(2);
   }
-  const tokenVoor = (rol) => tokens[rol];
+  /* `lijfsleutel` is geen inlog: de sleutel zit in het LIJF. Een undefined token
+     hier zou de proef een Authorization-kop laten weglaten, en dat is precies
+     goed -- maar het moet met opzet zo staan en niet per ongeluk. */
+  const tokenVoor = (rol) => (rol === 'lijfsleutel' ? '' : tokens[rol]);
+  /* DE LIJFSLEUTELS -- deuren waar de sleutel in het LICHAAM reist en niet in de
+     kop. Die hebben geen rol (zie scripts/lib/bewakers.js) en vielen daarmee uit
+     elke proef, terwijl er wel degelijk een sleutel te MAKEN is. Zie de kop van
+     ./lib/lijfsleutels.js voor waarom dat een tweede begrip is en geen rol. */
+  const { bouwLijfsleutels } = require('./lib/lijfsleutels');
+  const lijfsleutels = await bouwLijfsleutels({ post, tokens });
+  console.log('  lijfsleutels gebouwd                 : ' +
+    (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
+    (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));
+
   const hernieuw = async (rol) => {
     try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {}
     return false;
@@ -136,7 +149,15 @@ if (require.main !== module) { module.exports = {}; return; }
      zou die rol toch als "beproefbaar" tellen, zonder token worden aangeroepen,
      401 krijgen en dat als uitslag opleveren. Een meting zonder invoer die toch
      een cijfer geeft -- LAT.md regel 3. */
-  const routes = verdeling.metRol;
+  /* De routes met een LIJFSLEUTEL komen erbij. Ze dragen geen rol -- dat is
+     juist -- maar deze proef kan ze wel openen. Ze krijgen rol `lijfsleutel`
+     zodat ze in het uitslagbestand te herkennen zijn en niet stilzwijgend als
+     een gewone rolroute meetellen. */
+  const metLijf = verdeling.zonderRol
+    .filter(r => lijfsleutels.dekt(r.pad))
+    .map(r => ({ methode: r.methode, pad: r.pad, rol: 'lijfsleutel' }));
+  const routes = verdeling.metRol.concat(metLijf);
+  console.log('  routes op een lijfsleutel            : ' + metLijf.length);
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
   console.log('  routes gevonden                      : ' + kandidaten.length);
@@ -217,7 +238,8 @@ if (require.main !== module) { module.exports = {}; return; }
   const besluiten = register.routes || {};
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
-    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(lijfsleutels.lijfVoor(r.pad) || {}),
+      ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
        niet meer beweren dat een wijziging op zijn plaats onzichtbaar is. Uit
        staatlog zelf en niet uit de env-string hier -- de module beslist of hij

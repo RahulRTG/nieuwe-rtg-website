@@ -61,6 +61,10 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'ONBEWEZEN.json');
 const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
 const { ROLLEN: ROLLEN_MET_TOKEN } = require('./lib/proefsleutels');
+/* Een deur waarvan de sleutel in het LIJF reist heeft geen rol en is toch te
+   openen; zie de kop van ./lib/lijfsleutels.js. Zonder deze kennis telt zo'n
+   route hier als instrumenttekort terwijl er een sleutel voor te maken is. */
+const { dektPad } = require('./lib/lijfsleutels');
 const { stempel } = require('./lib/stempel');
 const { meting } = require('./lib/idemmeting');
 const { SLEUTELS } = require('../server/lib/idemsleutels');
@@ -182,6 +186,7 @@ function meet() {
   const beproefbaar = mutaties.filter(r => !isSchakel(r.pad) && !r.pad.includes(':'));
   const zonderSleutel = new Set();
   for (const x of verdeelOpRol(beproefbaar, ROLLEN_MET_TOKEN).zonderRol) {
+    if (dektPad(x.pad)) continue;   // een lijfsleutel is ook een sleutel
     zonderSleutel.add(x.methode.toUpperCase() + ' ' + x.pad);
   }
   for (const r of mutaties) {

@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-30T16:04:49.121Z",
-  "commit": "9e1e0e58",
-  "boomVuil": false,
+  "op": "2026-08-30T17:10:54.423Z",
+  "commit": "58e3ec40",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "De laatste VOLLE testronde: wanneer, waartegen, en of hij groen was. scripts/versheid.js leest dit als elk ander register, zodat een suite die achterloopt net zo hard opvalt als een register dat achterloopt.",
@@ -10,7 +10,7 @@
  "hoe": "npm test",
  "gemeten": {
   "bestanden": 1242,
-  "afsluitcode": 1,
-  "groen": false
+  "afsluitcode": 0,
+  "groen": true
  }
 }

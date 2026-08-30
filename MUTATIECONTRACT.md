@@ -1083,6 +1083,60 @@ Eén ding om niet te herhalen: ik had eerst `test/bank.test.js` aangepast om een
 van de zakkers op te lossen. Dat was symptoombestrijding — na de echte reparatie
 bleek de aanpassing niet nodig, en ze is teruggedraaid.
 
+## 5r. De ronde is groen — en wat de weg ernaartoe liet zien
+
+Na de reparaties: **9.870 toetsen, 0 zakkers**, en `SUITE.json` staat op
+`groen: true`. Voor het eerst in de vastgelegde geschiedenis van dat bestand.
+
+De weg erheen is leerzamer dan het getal. Vier volle rondes:
+
+| ronde | zakkers | wat het waren |
+|---|---:|---|
+| 1 | 20 | acht bestaande + de zeven duplicaatregels die ik verkeerd had gezet + vijf ongemeten registers |
+| 2 | 15 | de zeven bank-, betaalverzoek- en nachtrunzakkers weg |
+| 3 | 3 | alleen nog registers die achterliepen op mijn eigen nieuwe bestanden |
+| 4 | 4 | **vier ándere**, allemaal proces- en clustertoetsen |
+| 5 | 0 | — |
+
+Ronde 4 is het stukje dat je niet mag overslaan. Vier zakkers die in ronde 3
+niet bestonden, en die los gedraaid alle vier groen zijn: `migratierace`,
+`trio-wees` en `vloot` starten elk zes processen tegelijk, en in deze container
+naast een dozijn andere bestanden is dat te veel. Twee opeenvolgende rondes met
+**volledig verschillende** zakkers is de handtekening van belastingsgevoeligheid,
+niet van kapotte code. Ronde 5 bevestigde dat.
+
+Dat betekent ook iets minder prettigs: **groen in één ronde is hier geen bewijs
+dat alles goed is.** Wie deze suite als poort gebruikt, moet weten dat een handvol
+procestoetsen onder druk kan omvallen. Dat staat hier zodat de volgende die een
+rode uitslag ziet, eerst kijkt of het steeds dezelfde is.
+
+### Wat er in totaal is gerepareerd
+
+**Zeven routes** hadden een duplicaatregel van mij die er niet hoorde. Ze staan nu
+in `lib/idemsleutels-nooit.js` als grendel die bij het laden gooit, met per stuk
+wat hij kostte:
+
+| route | wat de regel deed |
+|---|---|
+| `bank/nood`, `bank/herstel` | zeiden "ok" zonder iets te doen — de bank bleef in nood |
+| `bank/mislukking` | teller bleef op 1, de bank sloeg niet automatisch in nood |
+| `folio/nacht` | loog over wat de nachtrun deed (`geboekt: 1` in plaats van `0`) |
+| `bedrijf/lid/aanmeld` | twee naamgenoten werden één mens |
+| `spel/sudoku-nieuw` | je kreeg de vorige puzzel terug |
+
+**Eén oorzaak zat in de poort zelf**: die keek alleen naar de header, terwijl dit
+huis zijn sleutel in het lijf draagt. Een verse sleutel werd genegeerd.
+
+**Twee breuken uit de geldgrens** zijn gedicht (Rahuls Tik na "ja", en een
+zakelijke reis met een OV-etappe).
+
+**Zes registers** liepen achter en zijn opnieuw vastgelegd.
+
+En **twee toetsen deugden zelf niet**: vijf journaal-toetsen draaiden helemaal
+niet (de loper meldde ze als *cancelled*, niet als *fail*), en toen ze eenmaal
+liepen bleek de belangrijkste ervan niet te kunnen zakken. Die meet nu wat zijn
+naam zegt.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

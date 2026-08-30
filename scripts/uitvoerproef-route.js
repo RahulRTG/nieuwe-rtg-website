@@ -185,6 +185,11 @@ async function wacht(basis, ms) {
   const schoon = rijen.filter(r => r.uitvoer === 'schoon');
   const gezakt = rijen.filter(r => r.uitvoer === 'GEZAKT');
   const poortRijen = rijen.filter(r => r.uitvoer === 'poort');
+  /* Verklaard staat APART van schoon: hier zag de proef werkelijk een geheim en
+     heeft een mens opgeschreven waarom dat daar hoort (VERKLAARD in
+     lib/uitvoerproef.js). Onder schoon wegstrepen zou de lijst een plek maken
+     waar bevindingen verdwijnen. */
+  const verklaardRijen = rijen.filter(r => r.uitvoer === 'verklaard');
 
   console.log('  verzoeken                            : ' + uit.pogingen);
   console.log('  gaf een 2xx (echt gemeten)           : ' + uit.gemeten + ' / ' + routes.length);
@@ -192,6 +197,8 @@ async function wacht(basis, ms) {
   console.log('  tokens onderweg opnieuw gehaald      : ' + uit.hernieuwd);
   console.log('  antwoord met gegevens van een ander  : ' + gezakt.length);
   for (const b of uit.bevindingen.lekken.slice(0, 20)) console.log('      ' + b);
+  console.log('  geheim dat er hoort (verklaard)      : ' + verklaardRijen.length);
+  for (const b of (uit.bevindingen.verklaard || []).slice(0, 10)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
@@ -201,8 +208,10 @@ async function wacht(basis, ms) {
       'Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.',
     kanariekenmerk: kenmerk,
     gemeten: { routesMetRol: routes.length, gemeten: uit.gemeten, pogingen: uit.pogingen,
-      schoon: schoon.length, gezakt: gezakt.length, achterEenPoort: poortRijen.length,
+      schoon: schoon.length, gezakt: gezakt.length, verklaard: verklaardRijen.length,
+      achterEenPoort: poortRijen.length,
       tokensHernieuwd: uit.hernieuwd, begrenzing: MAX },
+    verklaringen: uit.bevindingen.verklaard || [],
     perRoute: rijen
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in UITVOERPROEF.json');

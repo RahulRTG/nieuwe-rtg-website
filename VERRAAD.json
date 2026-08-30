@@ -1,14 +1,20 @@
 {
+  "stempel": {
+    "op": "2026-08-30T01:03:57.661Z",
+    "commit": "4e583324",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
   "uitleg": "De Verraadronde meldt nooit alleen PASS. TOEGEDIEND min WAARGENOMEN is het belangrijkste getal: dat zijn blinde injecties, en daar is niets geleerd. De ronde zakt op blindheid en op onherhaalbaarheid, niet op een bevinding -- een bevinding is winst.",
   "seed": "20260811",
   "gemeten": {
-    "verklaard": 2,
-    "toegediend": 2,
-    "waargenomen": 2,
-    "invariantschendingen": 1,
+    "verklaard": 3,
+    "toegediend": 3,
+    "waargenomen": 3,
+    "invariantschendingen": 0,
     "blindeInjecties": 0,
     "onherhaalbareRondes": 0,
-    "inCatalogus": 8
+    "inCatalogus": 9
   },
   "rondes": [
     {
@@ -16,6 +22,7 @@
       "toegediend": true,
       "waargenomen": true,
       "gezien": [
+        "schrijfStatus: 200 -> 503",
         "terugNaHerstart: true -> false"
       ],
       "herhaalbaar": true
@@ -31,6 +38,15 @@
         "eersteStartLukte: true -> false",
         "registratieLukte: true -> undefined",
         "inlogNaHerstart: true -> undefined"
+      ],
+      "herhaalbaar": true
+    },
+    {
+      "verraad": "sterf-na-commit",
+      "toegediend": true,
+      "waargenomen": true,
+      "gezien": [
+        "schrijfStatus: 200 -> 0"
       ],
       "herhaalbaar": true
     }

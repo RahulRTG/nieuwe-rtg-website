@@ -126,6 +126,60 @@ test('draaiUitvoerproef: schoon, lek en ongemeten komen elk in het register', as
   assert.match(uit.bevindingen.lekken[0], /e-mailadres van een ander/);
 });
 
+/* ============================================================================
+   DE VERKLAARDE GEHEIMEN.
+
+   Twee soorten routes tonen met opzet iets dat er als een geheim uitziet: een
+   route die een sleutel MINT (die moet hem een keer laten zien, anders bestaat
+   hij nergens) en een route die een KETENHASH toont (die hash is het
+   bewijsmiddel van de auditketen, niet het geheim).
+
+   Ze staan bij naam in VERKLAARD met een reden. Deze toetsen bewaken dat die
+   lijst niet stilletjes breder wordt dan hij is: hij geldt per route EN per
+   veldnaam, en 'verklaard' is een eigen stand en geen synoniem van 'schoon'.
+
+   DE MUTATIE: laat verklaringVoor() de veldnaam niet vergelijken -> "een
+   verklaring geldt alleen voor het veld waarvoor hij is gegeven" zakt.
+   ========================================================================== */
+test('een verklaring geldt alleen voor de route EN het veld waarvoor hij is gegeven', () => {
+  const { VERKLAARD, verklaringVoor } = require('../scripts/lib/uitvoerproef');
+  const sleutel = 'POST /api/office/anker';
+  assert.ok(VERKLAARD[sleutel], 'de proefroute hoort in de lijst te staan');
+  assert.match(verklaringVoor(sleutel, 'geheim veld (hash)'), /bewijsmiddel/);
+  assert.equal(verklaringVoor(sleutel, 'geheim veld (wachtwoord)'), null,
+    'een route die zijn ketenhash mag tonen, mag daarmee nog geen wachtwoord tonen');
+  assert.equal(verklaringVoor('POST /api/iets/anders', 'geheim veld (hash)'), null,
+    'de verklaring is van EEN route en geldt nergens anders');
+  assert.equal(verklaringVoor(sleutel, 'echte naam van een ander'), null,
+    'een kanarie van een ander is nooit verklaard: dat is data van iemand anders');
+});
+
+test('elke verklaring draagt een uitgeschreven reden en een veldnaam', () => {
+  const { VERKLAARD } = require('../scripts/lib/uitvoerproef');
+  for (const [route, v] of Object.entries(VERKLAARD)) {
+    assert.ok(v.veld, route + ' mist de veldnaam waarvoor de verklaring geldt');
+    assert.ok(v.reden && v.reden.length > 30, route + ' mist een uitgeschreven reden');
+    assert.match(route, /^(POST|PUT|PATCH|DELETE|GET) \/api\//, route + ' is geen routesleutel');
+  }
+});
+
+test('verklaard telt apart van schoon, zodat een bevinding niet kan verdwijnen', async () => {
+  const { draaiUitvoerproef, maakKanaries } = require('../scripts/lib/uitvoerproef');
+  const kan = maakKanaries('99');
+  const uit = await draaiUitvoerproef({
+    post: async (pad) => pad === '/api/office/anker'
+      ? { status: 200, data: { ok: true, blok: { hash: 'a'.repeat(32) } } }
+      : { status: 200, data: { ok: true } },
+    routes: [{ method: 'POST', pad: '/api/office/anker', rol: 'office' },
+      { method: 'POST', pad: '/api/gewoon', rol: 'member' }],
+    tokenVoor: () => 't', lijfVoor: () => ({}), kanaries: kan
+  });
+  assert.equal(uit.perRoute['POST /api/office/anker'].uitvoer, 'verklaard');
+  assert.equal(uit.perRoute['POST /api/gewoon'].uitvoer, 'schoon');
+  assert.equal(uit.bevindingen.lekken.length, 0, 'een verklaarde route is geen lek');
+  assert.equal(uit.bevindingen.verklaard.length, 1, 'maar hij blijft wel zichtbaar');
+});
+
 test('draaiUitvoerproef: een verlopen token wordt eenmaal opnieuw gehaald', async () => {
   let ingelogd = false;
   const post = async () => (ingelogd ? { status: 200, data: { ok: true } } : { status: 401, data: {} });

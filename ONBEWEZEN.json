@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 0e067089, schone boom",
+  "metingReden": "gemeten op commit 0734118c, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:27:13.639Z",
-    "commit": "0e067089",
+    "op": "2026-08-30T11:36:48.881Z",
+    "commit": "0734118c",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 0e067089, schone boom"
+    "metingReden": "gemeten op commit 0734118c, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1463,
-    "onbewezen": 3198,
+    "metBewijs": 1470,
+    "onbewezen": 3191,
     "sluit": true
   },
   "bakken": [
@@ -26,7 +26,7 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 142,
+      "aantal": 122,
       "voorbeelden": [
         "POST /api/aanmeld/zeg",
         "POST /api/arrival/interpret",
@@ -48,7 +48,7 @@
     {
       "id": "FIXTURE_403",
       "uitleg": "de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht",
-      "aantal": 719,
+      "aantal": 720,
       "voorbeelden": [
         "POST /api/account/koppel",
         "POST /api/account/ontkoppel",
@@ -59,7 +59,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1599,
+      "aantal": 1607,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/beslis",
@@ -70,7 +70,7 @@
     {
       "id": "FIXTURE_409",
       "uitleg": "de eerste oproep gaf 409 -- de toestand is niet voorbereid",
-      "aantal": 162,
+      "aantal": 163,
       "voorbeelden": [
         "POST /api/appstore/uitgever",
         "POST /api/appstore/uitgever/aanvraag",
@@ -81,7 +81,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 501,
+      "aantal": 504,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -154,11 +154,6 @@
       "POST /api/doos/rapport",
       "POST /api/doos/update/status",
       "POST /api/foundation/agenda",
-      "POST /api/foundation/mail/inbox",
-      "POST /api/foundation/mail/lees",
-      "POST /api/foundation/mail/overzicht",
-      "POST /api/foundation/mail/stuur",
-      "POST /api/foundation/mail/verzonden",
       "POST /api/foundation/opgave",
       "POST /api/foundation/registratie/aanvragen",
       "POST /api/foundation/registratie/status",
@@ -229,11 +224,9 @@
       "POST /api/rtfos/publiek/jaarverslagen",
       "POST /api/rtfos/publiek/stad",
       "POST /api/rtfos/publiek/steden",
-      "POST /api/scim/v2/Groups",
       "DELETE /api/scim/v2/Groups/:id",
       "PATCH /api/scim/v2/Groups/:id",
       "PUT /api/scim/v2/Groups/:id",
-      "POST /api/scim/v2/Users",
       "DELETE /api/scim/v2/Users/:id",
       "PATCH /api/scim/v2/Users/:id",
       "PUT /api/scim/v2/Users/:id",
@@ -261,19 +254,6 @@
       "POST /api/techniek/wacht/lastafworp",
       "POST /api/techniek/wacht/quarantaine",
       "POST /api/techniek/zekering",
-      "POST /api/tenant/bijstand",
-      "POST /api/tenant/bijstand/besluit",
-      "POST /api/tenant/bijstand/dossier",
-      "POST /api/tenant/bijstand/inhoud",
-      "POST /api/tenant/bijstand/intrekken",
-      "POST /api/tenant/bijstand/niveaus",
-      "POST /api/tenant/bijstand/vraag",
-      "POST /api/tenant/bootstrap",
-      "POST /api/tenant/export",
-      "POST /api/tenant/groep",
-      "POST /api/tenant/groepen",
-      "POST /api/tenant/herstelproef",
-      "POST /api/tenant/status",
       "POST /api/theater/upload/:id",
       "POST /api/toestel/meting",
       "POST /api/translate",
@@ -971,6 +951,7 @@
       "POST /api/supplier/zorgpolis/inschrijf",
       "POST /api/supplier/zorgpolis/pas",
       "POST /api/supplier/zorgpolis/stop",
+      "POST /api/tenant/bootstrap",
       "POST /api/theater/huisstijl",
       "POST /api/theater/kijkplicht/stand",
       "POST /api/theater/kijkplicht/zet",
@@ -1333,6 +1314,7 @@
       "POST /api/foundation/gezin/verjaardag/potje/doel",
       "POST /api/foundation/gezin/verjaardag/wens",
       "POST /api/foundation/gezin/verjaardag/wens/claim",
+      "POST /api/foundation/mail/lees",
       "POST /api/foundation/markt/antwoord",
       "POST /api/foundation/markt/chat",
       "POST /api/foundation/markt/deal/betaal",
@@ -2488,6 +2470,13 @@
       "POST /api/techniek/tenant/contract",
       "POST /api/techniek/tenant/levensloop",
       "POST /api/techniek/tenant/merk",
+      "POST /api/tenant/bijstand",
+      "POST /api/tenant/bijstand/besluit",
+      "POST /api/tenant/bijstand/dossier",
+      "POST /api/tenant/bijstand/inhoud",
+      "POST /api/tenant/bijstand/intrekken",
+      "POST /api/tenant/bijstand/niveaus",
+      "POST /api/tenant/bijstand/vraag",
       "POST /api/theater/abonneer",
       "POST /api/theater/kijkplicht/gedaan",
       "POST /api/theater/meld",
@@ -2774,7 +2763,8 @@
       "POST /api/supplier/vastgoed/overzicht",
       "POST /api/supplier/verkoop/aan",
       "POST /api/supplier/verkoop/auto",
-      "POST /api/supplier/verkoop/auto/weg"
+      "POST /api/supplier/verkoop/auto/weg",
+      "POST /api/tenant/groep"
     ],
     "FIXTURE_422": [
       "POST /api/agenda/antwoord",
@@ -2851,6 +2841,7 @@
       "POST /api/foundation/gezin/uitnodiging/maak",
       "POST /api/foundation/gezin/verjaardag/persoon",
       "POST /api/foundation/gezin/wissen/bevestig",
+      "POST /api/foundation/mail/stuur",
       "POST /api/foundation/markt/plaats",
       "POST /api/foundation/school/excursie/gps",
       "POST /api/foundation/school/incident/meld",
@@ -3117,6 +3108,8 @@
       "POST /api/salon/verberg",
       "POST /api/salon/volg-lid",
       "POST /api/salon/weg",
+      "POST /api/scim/v2/Groups",
+      "POST /api/scim/v2/Users",
       "POST /api/site/foto",
       "POST /api/sociaal/beleid/zet",
       "POST /api/stad/melding",

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:26:59.685Z",
-  "commit": "0e067089",
+  "op": "2026-08-30T11:36:34.811Z",
+  "commit": "0734118c",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -12,7 +12,7 @@
   "mutaties": 4661,
   "mutatiesVerklaard": 211,
   "mutatiesOnverklaard": 4450,
-  "beproefbaar": 3832,
+  "beproefbaar": 3837,
   "beproefbaarVerklaard": 201,
   "bakken": 7,
   "statusSom": 4661,
@@ -20,18 +20,18 @@
   "nogNietGeclassificeerd": 1,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1252,
+  "metGemetenDuplicaatgedrag": 1259,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 0e067089, schone boom",
-  "metingGemetenOp": "2026-08-30T11:26:40.623Z",
+  "metingReden": "gemeten op commit 0734118c, schone boom",
+  "metingGemetenOp": "2026-08-30T11:36:22.559Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 145,
+    "aantal": 125,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -40,7 +40,7 @@
    },
    {
     "id": "gemeten",
-    "aantal": 4304,
+    "aantal": 4324,
     "voorbeelden": [
      "POST /api/bedrijf/apparaat/innemen",
      "POST /api/bedrijf/apparaat/uitgeven",
@@ -67,11 +67,11 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 2991
+    "aantal": 3004
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1244
+    "aantal": 1251
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -143,7 +143,7 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 790,
+   "aantal": 785,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmeld/zeg",
@@ -165,7 +165,7 @@
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3631,
+   "aantal": 3636,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -178,7 +178,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1338,
+   "aantal": 1345,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -214,7 +214,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 178,
+   "aantal": 158,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -226,7 +226,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 3019,
+   "aantal": 3032,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -320,28 +320,11 @@
    ]
   },
   {
-   "reden": "rol \"werkplekbaas\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
-   "aantal": 3,
-   "voorbeelden": [
-    "POST /api/werkplek/toegang",
-    "POST /api/werkplek/toegang-geef",
-    "POST /api/werkplek/toegang-weg"
-   ]
-  },
-  {
    "reden": "lichaamssleutel: mw+arrivalPassAuth -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "aantal": 2,
    "voorbeelden": [
     "POST /api/arrival/pass",
     "POST /api/arrival/pulse"
-   ]
-  },
-  {
-   "reden": "rol \"scim\", maar dit instrument heeft daar geen token voor; zonder sleutel aankloppen meet niets over deze route",
-   "aantal": 2,
-   "voorbeelden": [
-    "POST /api/scim/v2/Groups",
-    "POST /api/scim/v2/Users"
    ]
   },
   {
@@ -385,11 +368,11 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 4517,
-   "nu": 3832,
+   "vastgelegd": 4537,
+   "nu": 3837,
    "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": -685,
+   "verschil": -700,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-08-30; sindsdien zijn er routes bijgekomen"
   }

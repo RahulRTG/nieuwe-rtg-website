@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T19:15:37.630Z",
-  "commit": "2c638861",
+  "op": "2026-08-30T20:11:13.803Z",
+  "commit": "c754165b",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -59,11 +59,11 @@
   "routesAangeroepen": 4643,
   "routesMetRol": 3803,
   "routesZonderRol": 840,
-  "beoordeeld": 1501,
-  "beschermd": 1499,
+  "beoordeeld": 1507,
+  "beschermd": 1505,
   "onbeschermd": 2,
-  "ongemeten": 3142,
-  "oproepen": 25324,
+  "ongemeten": 3136,
+  "oproepen": 25290,
   "tokensHernieuwd": 27,
   "uitOpslag": 3,
   "ruisGeijkt": [
@@ -102,16 +102,16 @@
   "geldroutesMetEigenLijf": 19,
   "onbeschermdMetBesluit": 2,
   "zonderSleutel": {
-   "beschermd": 119,
-   "onbeschermd": 79,
-   "ongemeten": 4445
+   "beschermd": 116,
+   "onbeschermd": 85,
+   "ongemeten": 4442
   },
   "pasGewisseld": 183
  },
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 5,
+ "vermoedensVerworpen": 4,
  "perRoute": [
   {
    "methode": "POST",
@@ -5300,11 +5300,11 @@
     200
    ],
    "opslag": {
-    "a": {
+    "a": {},
+    "b": {
      "techniek": 1,
      "wacht": 6
     },
-    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -5324,7 +5324,8 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog +1 in techniek, +6 in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -9620,7 +9621,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-tzbak3",
+   "hindernis": "Die regel bestaat niet: proef-yu80ch",
    "opslag": {
     "a": {},
     "b": {},
@@ -9656,7 +9657,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-49t7rt",
+   "hindernis": "Die regel bestaat niet: proef-jc459q",
    "opslag": {
     "a": {},
     "b": {},
@@ -10086,7 +10087,7 @@
     404,
     404
    ],
-   "hindernis": "Onbekende functie: proef-w34okc",
+   "hindernis": "Onbekende functie: proef-cgfhxk",
    "opslag": {
     "a": {},
     "b": {},
@@ -11681,7 +11682,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-1442ty",
+   "hindernis": "Dat runbook bestaat niet: proef-z5h7rj",
    "opslag": {
     "a": {},
     "b": {},
@@ -15741,9 +15742,7 @@
    ],
    "hindernis": "Geen content opgegeven.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16049,7 +16048,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -23652,23 +23653,26 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
-     "e": {}
+     "d": {
+      "officeDocs": "gewijzigd"
+     },
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -23729,23 +23733,26 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
-     "e": {}
+     "d": {
+      "officeDocs": "gewijzigd"
+     },
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -24094,9 +24101,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -24116,8 +24121,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -24206,6 +24210,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "klets": 2
     },
     "b": {},
@@ -24400,9 +24405,7 @@
      400
     ],
     "opslag": {
-     "d": {
-      "veilig": 1
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -24749,7 +24752,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "veilig": 1
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -24769,7 +24774,8 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog +1 in veilig, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -31329,9 +31335,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -31345,7 +31349,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -37130,10 +37136,10 @@
     ],
     "opslag": {
      "d": {
-      "wacht": "gewijzigd",
       "leren": "gewijzigd"
      },
      "e": {
+      "wacht": "gewijzigd",
       "leren": "gewijzigd"
      }
     },
@@ -41958,7 +41964,9 @@
    "viaPas": "lid-lifestyle",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -41978,7 +41986,8 @@
      "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -42103,9 +42112,7 @@
    ],
    "viaPas": "lid-lifestyle",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -43266,11 +43273,11 @@
    ],
    "hindernis": "Wie wil je melden?",
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -47441,9 +47448,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -47550,7 +47555,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -52898,9 +52905,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -53045,7 +53050,8 @@
    ],
    "opslag": {
     "a": {
-     "bankregie": "gewijzigd"
+     "bankregie": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -57488,9 +57494,9 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
@@ -57499,14 +57505,15 @@
      "d": {
       "officeDocs": "gewijzigd"
      },
-     "e": {}
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
-     "e": "geen",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -57567,9 +57574,9 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
@@ -57578,14 +57585,15 @@
      "d": {
       "officeDocs": "gewijzigd"
      },
-     "e": {}
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
-     "e": "geen",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -58009,9 +58017,7 @@
     "a": {
      "officeDocs": -1
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -58031,8 +58037,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -58095,7 +58100,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -61500,9 +61507,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -61522,8 +61527,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -61913,7 +61917,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -65841,9 +65847,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -66343,7 +66347,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -70187,9 +70193,7 @@
      "d": {
       "ondernemingen": 3
      },
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -70650,7 +70654,9 @@
    ],
    "hindernis": "Deze onderneming staat niet op uw naam.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -71012,9 +71018,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -71809,7 +71813,9 @@
    ],
    "hindernis": "Deze onderneming staat niet op uw naam.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -73093,13 +73099,14 @@
    "pad": "/api/overheid/aangifte",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Vul je bruto jaarinkomen in.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -73108,10 +73115,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -73128,6 +73135,117 @@
    "methode": "POST",
    "pad": "/api/overheid/aangifte/advies",
    "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/aanslag/betaal",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/aanslagen/mijn",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/aanslagen",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -73135,6 +73253,7 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -73161,8 +73280,152 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/aanslag/betaal",
-   "rol": "member",
+   "pad": "/api/overheid/bd/ai",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/btw",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/btw/aansluiting",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/cockpit",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/herinnering",
+   "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -73170,6 +73433,7 @@
     404,
     404
    ],
+   "viaPas": "rijk",
    "hindernis": "Aanslag niet gevonden.",
    "opslag": {
     "a": {},
@@ -73197,833 +73461,8 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/aanslagen/mijn",
-   "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
-   "statussen": [
-    200,
-    200,
-    200
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
-    "statussen": [
-     200,
-     200
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/aanslagen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/ai",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/btw",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/btw/aansluiting",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/cockpit",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/herinnering",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
    "pad": "/api/overheid/bd/kwijt/besluit",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/kwijt/voordracht",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/aanmaning",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/beslag",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/bezwaar/beslis",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/dwangbevel",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/intrek",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/maak",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/regeling",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/stelvast",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffing/stop",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/naheffingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bd/regeling",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bekendmaking",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bekendmakingen",
-   "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
-   "statussen": [
-    200,
-    200,
-    200
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
-    "statussen": [
-     200,
-     200
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/belasting/bereken",
-   "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
-   "statussen": [
-    200,
-    200,
-    200
-   ],
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
-    "statussen": [
-     200,
-     200
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bericht/gelezen",
-   "rol": "member",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -74031,7 +73470,8 @@
     404,
     404
    ],
-   "hindernis": "Bericht niet gevonden.",
+   "viaPas": "rijk",
+   "hindernis": "Aanslag niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74058,8 +73498,378 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/berichten",
-   "rol": "member",
+   "pad": "/api/overheid/bd/kwijt/voordracht",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Aanslag niet gevonden.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/aanmaning",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/beslag",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/bezwaar/beslis",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/dwangbevel",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/intrek",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/maak",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze zaak heeft over 2026K2 niets gefactureerd en niets aangegeven.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/regeling",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/stelvast",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffing/stop",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Deze naheffing kennen we niet.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bd/naheffingen",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -74067,6 +73877,7 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -74093,8 +73904,8 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/beroep",
-   "rol": "member",
+   "pad": "/api/overheid/bd/regeling",
+   "rol": "supplier",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -74102,6 +73913,309 @@
     404,
     404
    ],
+   "viaPas": "rijk",
+   "hindernis": "Aanslag niet gevonden.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bekendmaking",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {
+     "rijkBekend": 1
+    },
+    "b": {},
+    "c": {
+     "rijkBekend": 1
+    }
+   },
+   "zonderSleutel": {
+    "stand": "beschermd",
+    "grond": "gemerkt",
+    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {
+      "rijkBekend": 1
+     },
+     "e": {}
+    },
+    "effect": {
+     "d": "opslag=1",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    },
+    "laag": "idem-poort (verklaring in idemsleutels.js)"
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bekendmakingen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/belasting/bereken",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bericht/gelezen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/berichten",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/beroep",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bezwaar",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bezwaar/beslis",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "viaPas": "rijk",
    "hindernis": "Bezwaar niet gevonden.",
    "opslag": {
     "a": {},
@@ -74129,116 +74243,8 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/bezwaar",
-   "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
-   "statussen": [
-    400,
-    400,
-    400
-   ],
-   "hindernis": "Vul in waartegen je bezwaar maakt en waarom.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
-    "statussen": [
-     400,
-     400
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bezwaar/beslis",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
    "pad": "/api/overheid/bezwaren",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/bezwaren/mijn",
-   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -74246,10 +74252,9 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74274,16 +74279,17 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/bieb",
-   "rol": "supplier",
+   "pad": "/api/overheid/bezwaren/mijn",
+   "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    403,
-    403,
-    403
+    401,
+    401,
+    401
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74292,10 +74298,46 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     403,
-     403
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/bieb",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -74312,14 +74354,14 @@
    "methode": "POST",
    "pad": "/api/overheid/bieb/catalogus",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -74328,10 +74370,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -74349,13 +74391,14 @@
    "pad": "/api/overheid/bieb/installeer",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Deze app bestaat niet in de Rijks-Bibliotheek.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74364,10 +74407,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74384,26 +74427,28 @@
    "methode": "POST",
    "pad": "/api/overheid/bieb/mijn",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
-    "a": {},
+    "a": {
+     "rijksInstallaties": 1
+    },
     "b": {},
     "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -74421,13 +74466,14 @@
    "pad": "/api/overheid/bieb/weg",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Deze app staat niet bij uw werk-apps.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74436,10 +74482,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74457,28 +74503,26 @@
    "pad": "/api/overheid/kvk/inschrijven",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 409)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    409,
-    409,
-    409
+    401,
+    401,
+    401
    ],
-   "hindernis": "Er staat al een inschrijving op jouw naam. Vraag een uittreksel op.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
-    "a": {
-     "rijkBerichten": 1,
-     "rijkKvk": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 409)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     409,
-     409
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -74495,14 +74539,14 @@
    "methode": "POST",
    "pad": "/api/overheid/kvk/lijst",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -74511,10 +74555,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -74531,13 +74575,15 @@
    "methode": "POST",
    "pad": "/api/overheid/kvk/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74546,10 +74592,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -74567,13 +74613,14 @@
    "pad": "/api/overheid/pda/ai",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74582,10 +74629,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74603,13 +74650,14 @@
    "pad": "/api/overheid/pda/bezoeker/in",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74618,10 +74666,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74639,25 +74687,28 @@
    "pad": "/api/overheid/pda/bezoeker/uit",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Bezoeker niet gevonden.",
    "opslag": {
-    "a": {},
+    "a": {
+     "overheidPda": 4
+    },
     "b": {},
     "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74675,13 +74726,14 @@
    "pad": "/api/overheid/pda/bezoekers",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74690,10 +74742,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74711,13 +74763,14 @@
    "pad": "/api/overheid/pda/incident",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74726,10 +74779,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74747,13 +74800,14 @@
    "pad": "/api/overheid/pda/incident/sluit",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Incident niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74762,10 +74816,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74783,13 +74837,14 @@
    "pad": "/api/overheid/pda/incidenten",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74798,10 +74853,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74819,13 +74874,14 @@
    "pad": "/api/overheid/pda/klaarzet",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Zitting niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74834,10 +74890,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74855,13 +74911,14 @@
    "pad": "/api/overheid/pda/overzicht",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74870,10 +74927,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74891,13 +74948,14 @@
    "pad": "/api/overheid/pda/ronde",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74906,10 +74964,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74927,13 +74985,14 @@
    "pad": "/api/overheid/pda/taak/extra",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74942,10 +75001,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -74963,13 +75022,14 @@
    "pad": "/api/overheid/pda/taak/klaar",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Taak niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -74978,10 +75038,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -74999,13 +75059,14 @@
    "pad": "/api/overheid/pda/taken",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een geldige locatie.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75014,10 +75075,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -75034,14 +75095,14 @@
    "methode": "POST",
    "pad": "/api/overheid/pda/zittingen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75050,10 +75111,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75070,14 +75131,14 @@
    "methode": "POST",
    "pad": "/api/overheid/rb/ai",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75086,10 +75147,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75107,13 +75168,14 @@
    "pad": "/api/overheid/rb/beroep",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Bezwaar niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75122,10 +75184,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75142,14 +75204,14 @@
    "methode": "POST",
    "pad": "/api/overheid/rb/cockpit",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75158,10 +75220,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75178,14 +75240,14 @@
    "methode": "POST",
    "pad": "/api/overheid/rb/rol",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75194,14 +75256,16 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -75215,13 +75279,14 @@
    "pad": "/api/overheid/rb/uitspraak",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Zaak niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75230,10 +75295,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75250,50 +75315,57 @@
    "methode": "POST",
    "pad": "/api/overheid/rb/zaak",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
-    "a": {},
+    "a": {
+     "rijkZaken": 1
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rijkZaken": 1
+    }
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "stand": "beschermd",
+    "grond": "gemerkt",
+    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rijkZaken": 1
+     },
      "e": {}
     },
     "effect": {
-     "d": "geen",
+     "d": "opslag=1",
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
-    }
+    },
+    "laag": "idem-poort (verklaring in idemsleutels.js)"
    }
   },
   {
    "methode": "POST",
    "pad": "/api/overheid/rb/zaken",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75302,10 +75374,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75323,13 +75395,14 @@
    "pad": "/api/overheid/rb/zitting",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Zaak niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75338,10 +75411,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75359,13 +75432,14 @@
    "pad": "/api/overheid/rdw/check",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Vul een geldig kenteken in.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75374,10 +75448,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75394,42 +75468,6 @@
    "methode": "POST",
    "pad": "/api/overheid/regie",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/rijbewijs",
-   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -75437,10 +75475,9 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
-    "a": {
-     "rijkRijbewijzen": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -75465,47 +75502,74 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/rijbewijs/verleng",
+   "pad": "/api/overheid/rijbewijs",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
-    "a": {
-     "rijkBerichten": 2,
-     "rijkRijbewijzen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {
-     "rijkBerichten": 1,
-     "rijkRijbewijzen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
-    "stand": "onbeschermd",
+    "stand": "ongemeten",
     "grond": null,
-    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
-     "d": {
-      "rijkBerichten": 1,
-      "rijkRijbewijzen": "gewijzigd"
-     },
-     "e": {
-      "rijkBerichten": 1,
-      "rijkRijbewijzen": "gewijzigd"
-     }
+     "d": {},
+     "e": {}
     },
     "effect": {
-     "d": "opslag=1",
-     "e": "opslag=1",
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/rijbewijs/verleng",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -75515,13 +75579,14 @@
    "pad": "/api/overheid/stem",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Kies een geldige optie.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75530,10 +75595,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75551,13 +75616,14 @@
    "pad": "/api/overheid/subsidie",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Kies een geldige subsidieregeling.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75566,10 +75632,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75587,13 +75653,14 @@
    "pad": "/api/overheid/subsidie/beslis",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Aanvraag niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75602,10 +75669,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75622,13 +75689,15 @@
    "methode": "POST",
    "pad": "/api/overheid/subsidies",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75637,10 +75706,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75657,14 +75726,14 @@
    "methode": "POST",
    "pad": "/api/overheid/subsidies/lijst",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75673,10 +75742,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75693,13 +75762,15 @@
    "methode": "POST",
    "pad": "/api/overheid/subsidies/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75708,10 +75779,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75729,13 +75800,14 @@
    "pad": "/api/overheid/toeslag",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Kies een geldige toeslag.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75744,10 +75816,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -75765,13 +75837,14 @@
    "pad": "/api/overheid/toeslag/beslis",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Aanvraag niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75780,10 +75853,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75800,42 +75873,6 @@
    "methode": "POST",
    "pad": "/api/overheid/toeslagen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/toeslagen/mijn",
-   "rol": "member",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -75843,6 +75880,7 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -75869,16 +75907,17 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/uitgifte",
-   "rol": "supplier",
+   "pad": "/api/overheid/toeslagen/mijn",
+   "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    403,
-    403,
-    403
+    401,
+    401,
+    401
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75887,10 +75926,46 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     403,
-     403
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/uitgifte",
+   "rol": "supplier",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "viaPas": "rijk",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -75908,13 +75983,14 @@
    "pad": "/api/overheid/uitgifte/bundel",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Uitgifte niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75923,10 +75999,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -75944,13 +76020,14 @@
    "pad": "/api/overheid/uitgifte/start",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Kies een bron: aanslagen, bezwaren.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75959,10 +76036,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 400)",
     "statussen": [
-     403,
-     403
+     400,
+     400
     ],
     "opslag": {
      "d": {},
@@ -75980,13 +76057,14 @@
    "pad": "/api/overheid/uitgifte/teken",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Uitgifte niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -75995,10 +76073,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -76016,13 +76094,14 @@
    "pad": "/api/overheid/uitkering",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Kies een geldige regeling.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76031,10 +76110,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76052,13 +76131,14 @@
    "pad": "/api/overheid/uitkering/beslis",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
+   "hindernis": "Aanvraag niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76067,10 +76147,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
     "statussen": [
-     403,
-     403
+     404,
+     404
     ],
     "opslag": {
      "d": {},
@@ -76087,14 +76167,14 @@
    "methode": "POST",
    "pad": "/api/overheid/uitkeringen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -76103,10 +76183,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
      "d": {},
@@ -76123,13 +76203,15 @@
    "methode": "POST",
    "pad": "/api/overheid/uitkeringen/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76138,10 +76220,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76158,13 +76240,15 @@
    "methode": "POST",
    "pad": "/api/overheid/verkiezing",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76173,10 +76257,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76193,36 +76277,43 @@
    "methode": "POST",
    "pad": "/api/overheid/verkiezing/sluit",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
-   "hindernis": "Alleen voor het rijk.",
+   "viaPas": "rijk",
    "opslag": {
-    "a": {},
+    "a": {
+     "rijkVerkiezing": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "rijkVerkiezing": "gewijzigd"
+    }
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
+    "stand": "beschermd",
+    "grond": "gemerkt",
+    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
     "statussen": [
-     403,
-     403
+     200,
+     200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rijkVerkiezing": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
-     "d": "geen",
+     "d": "opslag=1",
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
-    }
+    },
+    "laag": "idem-poort (verklaring in idemsleutels.js)"
    }
   },
   {
@@ -76230,13 +76321,14 @@
    "pad": "/api/overheid/voertuig/meld",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    400,
-    400,
-    400
+    401,
+    401,
+    401
    ],
-   "hindernis": "Vul een geldig kenteken in.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76245,10 +76337,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 400)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     400,
-     400
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76266,13 +76358,125 @@
    "pad": "/api/overheid/voertuig/schors",
    "rol": "member",
    "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/voertuigen",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/water/meld",
+   "rol": "member",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
+   "statussen": [
+    401,
+    401,
+    401
+   ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
+    "statussen": [
+     401,
+     401
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/overheid/water/melding/zet",
+   "rol": "supplier",
+   "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
     404,
     404,
     404
    ],
-   "hindernis": "Voertuig niet gevonden.",
+   "viaPas": "rijk",
+   "hindernis": "Melding niet gevonden.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76299,8 +76503,8 @@
   },
   {
    "methode": "POST",
-   "pad": "/api/overheid/voertuigen",
-   "rol": "member",
+   "pad": "/api/overheid/water/meldingen",
+   "rol": "supplier",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -76308,6 +76512,7 @@
     200,
     200
    ],
+   "viaPas": "rijk",
    "opslag": {
     "a": {},
     "b": {},
@@ -76320,116 +76525,6 @@
     "statussen": [
      200,
      200
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/water/meld",
-   "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
-   "statussen": [
-    200,
-    200,
-    200
-   ],
-   "opslag": {
-    "a": {
-     "waterMeldingen": 1
-    },
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
-    "statussen": [
-     200,
-     200
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/water/melding/zet",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
-    ],
-    "opslag": {
-     "d": {},
-     "e": {}
-    },
-    "effect": {
-     "d": "geen",
-     "e": "geen",
-     "nietGemeten": "bestand,externe-aanroep"
-    }
-   }
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/overheid/water/meldingen",
-   "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
-   "statussen": [
-    403,
-    403,
-    403
-   ],
-   "hindernis": "Alleen voor het rijk.",
-   "opslag": {
-    "a": {},
-    "b": {},
-    "c": {}
-   },
-   "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 403)",
-    "statussen": [
-     403,
-     403
     ],
     "opslag": {
      "d": {},
@@ -76446,13 +76541,15 @@
    "methode": "POST",
    "pad": "/api/overheid/water/meldingen/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76461,10 +76558,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76482,13 +76579,14 @@
    "pad": "/api/overheid/waterschap/betaal",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    404,
-    404,
-    404
+    401,
+    401,
+    401
    ],
-   "hindernis": "Aanslag niet gevonden.",
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76497,10 +76595,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     404,
-     404
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76517,27 +76615,27 @@
    "methode": "POST",
    "pad": "/api/overheid/waterschap/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
-    "a": {
-     "waterAanslagen": 2
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -76554,13 +76652,15 @@
    "methode": "POST",
    "pad": "/api/overheid/zaken/mijn",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 401)",
    "statussen": [
-    200,
-    200,
-    200
+    401,
+    401,
+    401
    ],
+   "viaPas": "rijk",
+   "hindernis": "Niet ingelogd als lid.",
    "opslag": {
     "a": {},
     "b": {},
@@ -76569,10 +76669,10 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "reden": "de eerste kale oproep deed geen werk (status 401)",
     "statussen": [
-     200,
-     200
+     401,
+     401
     ],
     "opslag": {
      "d": {},
@@ -77787,9 +77887,7 @@
    ],
    "hindernis": "De algemene pin hoort bij een echt RTG-account.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -78885,7 +78983,9 @@
    ],
    "hindernis": "Verzilveren kan per 100 punten (= € 10 tegoed).",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -80965,9 +81065,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -82564,7 +82662,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -85610,9 +85710,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -87948,7 +88046,9 @@
    ],
    "hindernis": "RTG iD hoort bij een eigen RTG-account. Een gratis account is genoeg; een demo-gast heeft er geen.",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -90088,9 +90188,7 @@
    ],
    "hindernis": "Website niet gevonden.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -91240,7 +91338,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -94131,9 +94231,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -94750,17 +94848,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "commandAlarmen": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -95554,7 +95650,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -96739,15 +96837,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "commandAlarmen": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -98818,7 +98918,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-ta2soq",
+   "hindernis": "Die regel bestaat niet: proef-r6ib48",
    "opslag": {
     "a": {},
     "b": {},
@@ -98854,7 +98954,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-qhv00c",
+   "hindernis": "Die regel bestaat niet: proef-9z4iml",
    "opslag": {
     "a": {},
     "b": {},
@@ -98962,7 +99062,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "zaakCommand": "gewijzigd"
     },
     "b": {},
@@ -99256,7 +99355,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-yl9rkh",
+   "hindernis": "Dat runbook bestaat niet: proef-sgm8g3",
    "opslag": {
     "a": {},
     "b": {},
@@ -100433,7 +100532,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -103324,9 +103425,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -103346,8 +103445,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -104939,15 +105037,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -107141,9 +107241,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -108397,7 +108495,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -110384,9 +110484,9 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
@@ -110395,14 +110495,15 @@
      "d": {
       "officeDocs": "gewijzigd"
      },
-     "e": {}
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
-     "e": "geen",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -110463,9 +110564,9 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
@@ -110474,14 +110575,15 @@
      "d": {
       "officeDocs": "gewijzigd"
      },
-     "e": {}
+     "e": {
+      "officeDocs": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
-     "e": "geen",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -110979,9 +111081,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -112176,7 +112276,9 @@
      400
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -115173,9 +115275,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -116144,7 +116244,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -118793,9 +118895,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -119729,9 +119829,7 @@
    ],
    "hindernis": "Dit is geen mode-/retailpartner.",
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -119913,7 +120011,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -120769,7 +120869,9 @@
    ],
    "hindernis": "Dit bericht bestaat niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -122535,9 +122637,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -122557,8 +122657,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -123199,15 +123298,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -125844,9 +125945,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -126701,15 +126800,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -129285,9 +129386,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -129884,7 +129983,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -132214,17 +132315,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -132548,7 +132647,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -135002,9 +135103,7 @@
    ],
    "hindernis": "Vonk is voor RTG-leden met een eigen account.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -135221,7 +135320,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -137625,9 +137726,7 @@
    "viaPas": "lid-lifestyle",
    "hindernis": "Maak eerst je zakelijke profiel aan.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -137771,7 +137870,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -137791,7 +137892,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -138067,9 +138169,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -138106,7 +138206,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -140587,9 +140689,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -140776,7 +140876,9 @@
      400
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -143893,9 +143995,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -143919,7 +144019,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -150076,7 +150178,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -150153,17 +150257,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "wacht": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -152842,7 +152944,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -153181,9 +153285,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -156474,7 +156576,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "wacht": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -156909,9 +157013,7 @@
    "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
    "hindernis": "Dit momentje staat er niet meer.",
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -157078,7 +157180,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "commandAlarmen": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -157435,9 +157539,7 @@
      "rtfAppInstallaties": 1
     },
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -159664,7 +159766,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -160192,9 +160296,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -160262,9 +160364,9 @@
     }
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "gemerkt",
-    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
      200,
      200
@@ -160273,14 +160375,15 @@
      "d": {
       "samenRtfKamers": 1
      },
-     "e": {}
+     "e": {
+      "samenRtfKamers": 1
+     }
     },
     "effect": {
      "d": "opslag=1",
-     "e": "geen",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
-    },
-    "laag": "idem-poort (verklaring in idemsleutels.js)"
+    }
    }
   },
   {
@@ -162825,7 +162928,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Dit potje bestaat niet (meer).",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -163476,9 +163581,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -165910,15 +166013,17 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
-    "grond": null,
-    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "stand": "beschermd",
+    "grond": "opslag",
+    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "wacht": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -166731,9 +166836,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "wacht": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -169025,7 +169128,9 @@
    "zonderRol": "objectpoort: huisAuth -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
    "viaPas": "boardroom",
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },

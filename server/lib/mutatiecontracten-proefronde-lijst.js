@@ -132,5 +132,6 @@ tweedeHandeling('POST /api/rtf/baby/moment-ai', 'rtf.baby.moment-ai');
 tweedeHandeling('POST /api/rtf/spel/sudoku-nieuw', 'rtf.spel.sudoku-nieuw');
 tweedeHandeling('POST /api/rtf/spel/team-nieuw', 'rtf.spel.team-nieuw');
 
+require('./mutatiecontracten-proefronde-rijk');
 
 module.exports = CONTRACTEN;

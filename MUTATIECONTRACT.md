@@ -1137,6 +1137,78 @@ niet (de loper meldde ze als *cancelled*, niet als *fail*), en toen ze eenmaal
 liepen bleek de belangrijkste ervan niet te kunnen zakken. Die meet nu wat zijn
 naam zegt.
 
+## 5s. Taak 4: de proefopstelling erbij laten kunnen
+
+Van de 4.653 schrijfroutes kwam de proef er bij 325 niet eens binnen, en dan is
+"ongemeten" geen bevinding maar een dichte deur. Vier voorwerpen erbij, en die
+deuren gingen open.
+
+| wat er ontbrak | routes | wat het was |
+|---|---:|---|
+| het gezin op `/api/rtf/` | 208 | de regel noemde alleen `/api/foundation/`, en zonder haar kregen ze `code` uit het gedeelde lijf -- de **kascode** |
+| een klas | 54 | de wereld had een school maar geen klas, en een klas maakt alleen een goedgekeurde leraar |
+| een document | 37 | per kring een eigen doos: een document van het kantoor vindt het lid niet |
+| de Rijksoverheid | 64 | een leverancier van het genre `rijk` |
+
+**Resultaat: ongemeten 3.265 → 3.136, beschermd 1.376 → 1.505.** Honderdnegenentwintig
+routes die voor het eerst iets zeggen over hun duplicaatgedrag.
+
+### De Rijksoverheid, en waarom mijn eerste antwoord fout was
+
+Ik liet die 64 eerst liggen, met de redenering dat een overheidsaccount een
+identiteit is en dat de goedkeuring ervan leunt op een vergunning die een mens
+heeft gezien. Die redenering ging over de verkeerde deur. `status: 'intern'`
+betekent in `seed/genres.js` letterlijk: *"dit genre hoort bij de wereld zelf en
+wordt niet door een partner aangevraagd"*. Een intern genre gaat dus nooit langs
+de aanmeldbalie — het wordt door RTG zelf aangesloten, via
+`/api/office/instelling/aansluiten` achter de boardroom-sleutel. De eigenaar wees
+daarop; de proef loopt nu die weg af en geen andere.
+
+Eén detail dat stil mis had kunnen gaan: die routes willen geen extra veld maar
+een **rol**. Het voorvoegsel geeft dus alleen die rol door, en de sleutel moet in
+de sleutelbos terecht — anders wijst `rol: 'rijk'` naar een token dat niet bestaat
+en worden 64 routes aangeroepen met helemaal géén sleutel. Stiller mis dan met de
+verkeerde.
+
+### Wat erachter lag: 29 echte dubbeltikken
+
+Mét sleutel opgevangen, zónder sleutel het werk opnieuw. Nooit eerder te zien,
+niet omdat niemand keek maar omdat de proef er niet bij kwam. Zesentwintig achter
+de eerste drie deuren (mededelingen aan ouders, het kantoorpakket, de rtf-kant) en
+drie achter de vierde — en die drie zijn de scherpste van de hele reeks:
+
+- **een bekendmaking** die twee keer in het officiële register belandt;
+- **een rechtszaak** die twee keer wordt aangebracht, met twee zaaknummers — en
+  daar hangt de rest van de keten aan;
+- **een verkiezing** waarvan de sluitingstijd wordt overschreven. De stand blijft
+  gelijk; wat beweegt is `gesloten: nu()`, en dat is een feit en geen tijdstempel.
+
+### En zeven regels die ik moest terugdraaien
+
+Bij de eerste ronde declaraties zaten er zeven fout, en beide fouten zijn precies
+waar `idemsleutels-nooit.js` voor is gebouwd:
+
+- **`kantoorpakket/deel` en `/beheer`** (zes). Ik noemde ze "een toestand die bij
+  een tweede oproep hetzelfde achterlaat". Verkeerd om: hun antwoord op een
+  herhaling is een **besluit**. Een document op `strikt` weigert opnieuw gedeeld
+  te worden — en mijn cache gaf de 200 van de eerste keer terug. Daaronder zat een
+  weigering op een strikt document die stil werd overschreven.
+- **`/api/rtf/samen/maak`**. De handler leest *niets* uit het lijf, dus twee
+  oproepen zijn altijd woordelijk gelijk. Twee keer `{}` zijn twee kamers — de
+  fout waar dat bestand met zoveel woorden voor waarschuwt, en ik maakte hem toch.
+
+De grendel telt er nu dertien, elk met wat hij kostte. Het patroon is duidelijk
+genoeg voor één zin: **een route die nee kan zeggen, moet nee kunnen zeggen.**
+
+### En wat de poort twee keer deed
+
+Beide keren dat de meting beter werd, viel het register terug — eerst van 100% op
+97,5% (116 routes), daarna op 99,4% (26). Die stonden op
+`BLOCKED_BY_TEST_FIXTURE`, en dat betekent "wij weten het niet, en dit is waarom
+de proef er niet bij kwam". Zodra er wél gemeten is, geldt die stand niet meer.
+**Een betere meting hoort classificatiewerk zichtbaar te maken in plaats van het
+stil te laten verdwijnen** — en dat is precies waarvoor de grens op nul staat.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:22:58.248Z",
-  "commit": "378d6d7d",
+  "op": "2026-08-30T09:32:42.847Z",
+  "commit": "0469ab29",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,22 +9,22 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4395,
+  "geclassificeerd": 4413,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3200,
+   "BLOCKED_BY_TEST_FIXTURE": 3218,
    "NOT_APPLICABLE": 1055,
-   "LEGACY_PENDING_CLASSIFICATION": 258,
+   "LEGACY_PENDING_CLASSIFICATION": 240,
    "PROTECTED": 78,
    "INTENTIONALLY_NON_IDEMPOTENT": 62
   },
   "vastgesteldDoorMens": 1205,
-  "afgeleidDoorScript": 3190,
+  "afgeleidDoorScript": 3208,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3808,
+   "AUTHENTICATED": 3814,
    "PUBLIC": 99,
-   "(niet af te leiden -- vraagt een verklaring)": 49,
-   "OBJECT_SCOPED": 688,
-   "SERVICE_TO_SERVICE": 8,
+   "OBJECT_SCOPED": 700,
+   "(niet af te leiden -- vraagt een verklaring)": 30,
+   "SERVICE_TO_SERVICE": 9,
    "SYSTEM_INTERNAL": 1
   },
   "bewijs": {
@@ -34,8 +34,8 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 40,
    "NOT_APPLICABLE": 10,
+   "BLOCKED_BY_TEST_FIXTURE": 22,
    "PROTECTED": 7
   },
   "metingVan": "2026-08-30T04:33:05.678Z"
@@ -104,12 +104,14 @@
   {
    "mutatieId": "aanmeld.zeg",
    "route": "POST /api/aanmeld/zeg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -119,10 +121,10 @@
     "grond": null,
     "hindernis": "Dit gesprek ken ik niet (meer). Begin gerust opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Dit gesprek ken ik niet (meer). Begin gerust opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "aanmelding.aanvraag",
@@ -2787,12 +2789,14 @@
   {
    "mutatieId": "auth.reset",
    "route": "POST /api/auth/reset",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -2802,10 +2806,10 @@
     "grond": null,
     "hindernis": "Ongeldige of verlopen herstel-link."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Ongeldige of verlopen herstel-link.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "auth.verify-email",
@@ -23101,12 +23105,14 @@
   {
    "mutatieId": "foundation.school.personeel.inlog.accepteer",
    "route": "POST /api/foundation/school/personeel/inlog/accepteer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23116,10 +23122,10 @@
     "grond": null,
     "hindernis": "Deze personeelsinlog is ongeldig, gebruikt of verlopen."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze personeelsinlog is ongeldig, gebruikt of verlopen.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.inloglink",
@@ -23127,7 +23133,7 @@
    "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
     "bedoeld": null,
     "bewakers": []
@@ -23397,12 +23403,14 @@
   {
    "mutatieId": "foundation.school.personeel.uitnodiging.accepteer",
    "route": "POST /api/foundation/school/personeel/uitnodiging/accepteer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23412,20 +23420,22 @@
     "grond": null,
     "hindernis": "Deze personeelsuitnodiging is ongeldig, gebruikt of verlopen."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze personeelsuitnodiging is ongeldig, gebruikt of verlopen.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.uitnodiging.bekijk",
    "route": "POST /api/foundation/school/personeel/uitnodiging/bekijk",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23435,10 +23445,10 @@
     "grond": null,
     "hindernis": "Deze personeelsuitnodiging is ongeldig, gebruikt of verlopen."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze personeelsuitnodiging is ongeldig, gebruikt of verlopen.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.uitnodiging.intrek",
@@ -23743,12 +23753,14 @@
   {
    "mutatieId": "foundation.school.school.activeren",
    "route": "POST /api/foundation/school/school/activeren",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23758,10 +23770,10 @@
     "grond": null,
     "hindernis": "Er ging iets mis. Probeer het opnieuw."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Er ging iets mis. Probeer het opnieuw.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.school.maak",
@@ -33985,12 +33997,14 @@
   {
    "mutatieId": "login",
    "route": "POST /api/login",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -34000,10 +34014,10 @@
     "grond": null,
     "hindernis": "Onbekende pas."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onbekende pas.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "logout",
@@ -56153,12 +56167,14 @@
   {
    "mutatieId": "office.login",
    "route": "POST /api/office/login",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -56168,10 +56184,10 @@
     "grond": null,
     "hindernis": "Onjuiste backoffice-code."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onjuiste backoffice-code.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.magnaat.beslis",
@@ -72889,12 +72905,14 @@
   {
    "mutatieId": "rtf.apply.chat",
    "route": "POST /api/rtf/apply/chat",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -72904,20 +72922,22 @@
     "grond": null,
     "hindernis": "Log opnieuw in bij je gezin."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Log opnieuw in bij je gezin.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.apply.chat.send",
    "route": "POST /api/rtf/apply/chat/send",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -72927,10 +72947,10 @@
     "grond": null,
     "hindernis": "Log opnieuw in bij je gezin."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Log opnieuw in bij je gezin.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.baby.boek",
@@ -77204,12 +77224,14 @@
   {
    "mutatieId": "rtf.solliciteer",
    "route": "POST /api/rtf/solliciteer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -77219,10 +77241,10 @@
     "grond": null,
     "hindernis": "Log opnieuw in bij je gezin om te solliciteren."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Log opnieuw in bij je gezin om te solliciteren.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.spel.antwoord",
@@ -78302,12 +78324,14 @@
   {
    "mutatieId": "rtf.talent.interesse",
    "route": "POST /api/rtf/talent/interesse",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -78317,20 +78341,22 @@
     "grond": null,
     "hindernis": "Log opnieuw in bij je gezin."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Log opnieuw in bij je gezin.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.talent.mijn",
    "route": "POST /api/rtf/talent/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -78340,10 +78366,10 @@
     "grond": null,
     "hindernis": "Log opnieuw in bij je gezin."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Log opnieuw in bij je gezin.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "rtf.tiener.boek",
@@ -87187,12 +87213,14 @@
   {
    "mutatieId": "staff",
    "route": "POST /api/staff",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -87202,10 +87230,10 @@
     "grond": null,
     "hindernis": "Deze personeelscode kennen we niet."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze personeelscode kennen we niet.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "staff.balans",
@@ -102190,12 +102218,14 @@
   {
    "mutatieId": "supplier.login",
    "route": "POST /api/supplier/login",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -102205,10 +102235,10 @@
     "grond": null,
     "hindernis": "Kies wie u bent en voer uw persoonlijke pincode in."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Kies wie u bent en voer uw persoonlijke pincode in.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.lost.add",
@@ -103530,12 +103560,14 @@
   {
    "mutatieId": "supplier.mijn.login",
    "route": "POST /api/supplier/mijn/login",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -103545,10 +103577,10 @@
     "grond": null,
     "hindernis": "Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onjuiste RTG-inloggegevens. Log in met uw eigen RTG-account.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.mijn.opties",
@@ -115078,12 +115110,14 @@
   {
    "mutatieId": "techniek.inloggen",
    "route": "POST /api/techniek/inloggen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": []
    },
    "bewijs": {
@@ -115093,10 +115127,10 @@
     "grond": null,
     "hindernis": "Onjuiste inloggegevens."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Onjuiste inloggegevens.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "techniek.moderniseer",
@@ -117516,12 +117550,14 @@
   {
    "mutatieId": "toestel.meting",
    "route": "POST /api/toestel/meting",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
+    "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": []
    },
    "bewijs": {
@@ -117531,10 +117567,10 @@
     "grond": null,
     "hindernis": "Geen geldige toestelsleutel."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Geen geldige toestelsleutel.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "toestellen",

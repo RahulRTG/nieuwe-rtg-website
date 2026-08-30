@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **258** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **240** |
 | `NOT_APPLICABLE` | 40 | 1.055 |
-| geclassificeerd | 3.069 | 4.395 van 4.653 (94,5%) |
+| geclassificeerd | 3.069 | 4.413 van 4.653 (94,8%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -671,6 +671,50 @@ bewaker zelf, met het bestand erbij:
 | routes onder het bewijsbesluit | 1.002 | **1.015** |
 | `LEGACY_PENDING_CLASSIFICATION` | 271 | **258** |
 | geclassificeerd | 4.382 | **4.395 van 4.653 (94,5%)** |
+
+### De poort die niet te zien is, en de fout die ik daarbij maakte
+
+Er blijft een rest waar geen enkele detectievorm bij kan, en niet door
+slordigheid: de poort staat **inline in de handler, zonder de vorm van een
+poort**. `rtf.verifieerProfiel(req.body.code, req.body.token)` krijgt geen `req`
+en geen `res` maar twee velden uit het lichaam; een vorm die dát vangt, vangt
+elke functie met twee argumenten.
+
+Voor die routes is er één eerlijke weg: iemand leest de handler en schrijft op
+wat hij ziet. Dat is `ROUTEPOORTEN` in
+`server/kern/handlerpoorten/buiten-routes.js` — 24 routes, elk gelezen, elk met
+de reden in de bewoording van die handler.
+
+`buiten.js` draagt daarmee drie registers, en het zijn drie **verschillende**
+redenen waarom een lezer niets vindt:
+
+| | waarom onzichtbaar |
+|---|---|
+| `ROUTEPOORTEN` | de poort staat inline, zonder poortvorm |
+| `ROUTERPOORTEN` | de poort hangt op de router; het objectveld staat nergens |
+| `FAMILIES` | de route komt uit een lus, dus zijn pad staat niet in de bron |
+
+**En dan de fout.** Ik zette `/api/login`, `/api/office/login` en de andere
+inlogdeuren op de *publieke* lijst — er is bij het inloggen immers nog geen
+sessie. Keuringsregel 28 wees dat terug: *"staat op de publieke lijst maar heeft
+inmiddels een eigen poort — haal de uitzondering weg"*, twaalf keer.
+
+Zij heeft gelijk, en het is precies het onderscheid dat ik zelf bovenaan
+`buiten.js` had opgeschreven en vervolgens overtrad. **Een inlogroute is niet
+"publiek want zonder poort" — de poort ís de wachtwoordcontrole.** Wie de
+gegevens niet heeft komt er niet door; dat is wat een deur doet. `PUBLIC` zegt
+dat er *niets* tussen staat, en dat is een besluit met andere gevolgen. Ze staan
+nu als `AUTHENTICATED` in de handgelezen lijst, met de reden dat de identiteit
+daar wordt *vastgesteld* in plaats van verondersteld.
+
+Dat die regel in twee richtingen kijkt — een route die de lijst niet (meer)
+verdient moet eraf — is wat dit ving.
+
+| | voor | na |
+|---|---:|---:|
+| toegang niet af te leiden | 49 | **30** |
+| `LEGACY_PENDING_CLASSIFICATION` | 258 | **240** |
+| geclassificeerd | 4.395 | **4.413 van 4.653 (94,8%)** |
 
 ## 6. De poort
 

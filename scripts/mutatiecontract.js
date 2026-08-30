@@ -239,6 +239,14 @@ function waargenomenToegang(r) {
        server/kern/handlerpoorten/index.js: 43 routes stonden er zonder deur door. */
     const fam = handlerpoorten.poortVanRoute(r.pad);
     if (fam && fam.toegang) return fam.toegang;
+    /* EN DE HANDGELEZEN REST. Waar geen vorm de poort vindt omdat hij inline
+       staat zonder de vorm van een poort, heeft iemand de handler gelezen en
+       opgeschreven wat er staat. Zie ROUTEPOORTEN in
+       server/kern/handlerpoorten/buiten.js, en de reden dat die lijst apart van
+       de publieke lijst woont. */
+    const hand = handlerpoorten.poortVanRouteHand(r.route ||
+      (String(r.methode || 'POST').toUpperCase() + ' ' + r.pad));
+    if (hand && hand.toegang) return hand.toegang;
     return publiekOfNiets(r);
   }
   /* scimAuth is een eigenrol in de bewakerskaart, maar het is geen mens: een
@@ -566,7 +574,9 @@ if (process.argv.includes('--afleiden')) {
          het er een is, maar niet welk veld het object aanwijst. Zie
          ROUTERPOORTEN in server/kern/handlerpoorten/index.js. */
       const viaBewaker = (r.bewakers || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean);
-      toegang.objectVeld = (p && p.veld) || viaBewaker || 'nog af te leiden uit de handler';
+      const hand = handlerpoorten.poortVanRouteHand(r.route);
+      toegang.objectVeld = (p && p.veld) || viaBewaker || (hand && hand.veld) ||
+        'nog af te leiden uit de handler';
     }
     uitContracten[r.route] = {
       mutatieId: r.mutatieId,

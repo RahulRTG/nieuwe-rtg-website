@@ -100,3 +100,60 @@ test('de vorm van een maakroute en een id-veld staat vast', () => {
   assert.ok(!MAAK.test('/api/x/lijst'), 'een lijstroute maakt niets');
   assert.ok(IDVELD.test('id') && IDVELD.test('iban') && !IDVELD.test('naam'));
 });
+
+/* ============================================================================
+   HET VELD HEET NAAR HET OBJECT, EN NIET `id`.
+
+   Dit verklaart waarom de eerste versie maar een op de tien haalde. Het huis
+   noemt zijn verwijzingen naar het DING, niet naar de vorm:
+
+     /api/festival/bewijs     leest req.body.festival
+     /api/concern/bulk/lees   leest req.body.entiteit
+     /api/lab2/app/lijst      leest req.body.lab
+
+   Een geoogste `id` uit /api/festival/nieuw komt dus nooit aan bij
+   /api/festival/bewijs, hoe goed de tak ook klopt. Gemeten: 1313 van de 1450
+   geblokkeerde routes hebben een maakroute in hun tak -- ze konden elkaar
+   alleen niet vinden.
+
+   TWEE GRENZEN DIE ERBIJ HOREN:
+   - de naam uit het pad staat NAAST de oorspronkelijke en nooit eroverheen, dus
+     een route die wel `id` leest blijft werken;
+   - het werkwoord aan het eind is geen object: `nieuw`, `maak` en `zet` horen
+     er niet in.
+
+   DE MUTATIE: haal de objectNamen-lus uit bewaar() -> de eerste toets zakt.
+   ========================================================================== */
+test('een geoogst id gaat ook mee onder de naam van het object', async () => {
+  const u = await oogstObjecten({
+    post: async (pad) => (pad === '/api/festival/nieuw'
+      ? { status: 200, data: { id: 'FEST-1' } } : { status: 404, data: null }),
+    routes: [{ methode: 'POST', pad: '/api/festival/nieuw', rol: 'supplier' }],
+    tokenVoor: () => '', lijfVoor: () => ({})
+  });
+  const v = u.voor('/api/festival/bewijs');
+  assert.equal(v.festival, 'FEST-1',
+    'de route leest req.body.festival; een `id` komt daar nooit aan');
+  assert.equal(v.id, 'FEST-1', 'en de oorspronkelijke naam hoort te blijven staan');
+});
+
+test('twee segmenten diep geeft twee namen, want welke de route leest verschilt', async () => {
+  const u = await oogstObjecten({
+    post: async () => ({ status: 200, data: { id: 'E-1' } }),
+    routes: [{ methode: 'POST', pad: '/api/concern/entiteit/nieuw', rol: 'member' }],
+    tokenVoor: () => '', lijfVoor: () => ({})
+  });
+  const v = u.voor('/api/concern/bulk/lees');
+  assert.equal(v.concern, 'E-1');
+  assert.equal(v.entiteit, 'E-1', 'concern/bulk/lees leest req.body.entiteit');
+});
+
+test('het werkwoord aan het eind is geen object', async () => {
+  const u = await oogstObjecten({
+    post: async () => ({ status: 200, data: { id: 'X-1' } }),
+    routes: [{ methode: 'POST', pad: '/api/festival/nieuw', rol: 'supplier' }],
+    tokenVoor: () => '', lijfVoor: () => ({})
+  });
+  const v = u.voor('/api/festival/bewijs');
+  assert.ok(!('nieuw' in v), '`nieuw` is een werkwoord en geen ding');
+});

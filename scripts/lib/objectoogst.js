@@ -30,9 +30,26 @@
       botst in ronde twee op een bestaand ding. Een ronde is dus genoeg, en een
       tweede kost alleen tijd.
 
-   DE GRENS. Deze module raadt niet welk VELD een route verwacht; hij geeft mee
-   wat de maakroute in dezelfde tak teruggaf, onder dezelfde naam. Past dat niet,
-   dan blijft het 404 -- en dat is de eerlijke uitkomst, geen groen. */
+   HET VELD HEET NAAR HET OBJECT, EN NIET `id`. Dat is de tweede meting, en hij
+   verklaart waarom de eerste versie maar een op de tien haalde:
+
+     /api/festival/bewijs     leest req.body.festival
+     /api/concern/bulk/lees   leest req.body.entiteit
+     /api/lab2/app/lijst      leest req.body.lab
+
+   Het huis noemt zijn verwijzingen naar het DING, niet naar de vorm. Een
+   geoogste `id` uit /api/festival/nieuw komt dus nooit aan bij
+   /api/festival/bewijs, hoe goed de tak ook klopt.
+
+   Daarom gaat elke geoogste waarde nu ook mee onder de naam van het PADSEGMENT
+   waar hij vandaan komt -- `festival`, `entiteit`, `lab`. Gemeten: 1313 van de
+   1450 geblokkeerde routes hebben een maakroute in hun tak, en dat is de vorm
+   waarin die twee elkaar kunnen vinden.
+
+   DE GRENS BLIJFT. Er wordt niets geraden over de BETEKENIS: als de route iets
+   anders bedoelt met dat veld, komt er gewoon 404 terug. Dat is de eerlijke
+   uitkomst, geen groen. En de naam uit het pad staat NAAST de oorspronkelijke,
+   nooit eroverheen -- een route die wel `id` leest, blijft werken. */
 'use strict';
 
 /* Wat is een maakroute? Aan de STAART van het pad te zien, en dat is een
@@ -55,7 +72,16 @@ async function oogstObjecten({ post, routes, tokenVoor, lijfVoor, koppenVoor }) 
       for (const [k, v] of Object.entries(obj)) {
         const w = typeof v === 'number' ? String(v) : v;
         if (typeof w === 'string' && w.length >= 3 && w.length <= 64 && IDVELD.test(k)) {
-          for (const d of DIEPTES) { const t = tak(pad, d); (oogst[t] = oogst[t] || {})[k] = w; }
+          for (const d of DIEPTES) {
+            const t = tak(pad, d);
+            const bak = (oogst[t] = oogst[t] || {});
+            bak[k] = w;
+            /* En onder de naam van het object zelf. `/api/festival/nieuw` levert
+               ook `festival`, `/api/concern/entiteit/nieuw` ook `entiteit`. Zie
+               de kop: het huis noemt zijn verwijzingen naar het DING. */
+            for (const naam of objectNamen(pad)) if (!bak[naam]) bak[naam] = w;
+
+          }
         }
       }
     };
@@ -81,6 +107,25 @@ async function oogstObjecten({ post, routes, tokenVoor, lijfVoor, koppenVoor }) 
   }
   return { oogst, geprobeerd: maakRoutes.length, gelukt: door,
     takken: Object.keys(oogst).length, voor: (pad) => uitOogst(oogst, pad) };
+}
+
+/* De namen waaronder een route dit ding zou kunnen aanspreken: het tweede en
+   derde padsegment. `/api/concern/entiteit/nieuw` geeft `concern` en
+   `entiteit`; welke van de twee de route leest, hangt van de route af en het
+   kost niets om ze allebei aan te bieden -- een route die geen van beide leest,
+   negeert ze.
+
+   Het WERKWOORD aan het eind gaat er niet in: `nieuw`, `maak` en `zet` zijn
+   geen objecten. */
+function objectNamen(pad) {
+  const d = String(pad).split('/').filter(Boolean);   // api, <domein>, <sub>, <werkwoord>
+  const uit = [];
+  for (const i of [1, 2]) {
+    const n = d[i];
+    if (!n || MAAK.test('/' + n) || /^v\d+$/.test(n)) continue;
+    if (n.length >= 3 && /^[a-z][a-z0-9-]*$/.test(n)) uit.push(n);
+  }
+  return uit;
 }
 
 /* De diepste tak wint: een oogst uit /api/supplier/festival is specifieker dan

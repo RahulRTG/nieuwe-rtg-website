@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T14:57:18.948Z",
-  "commit": "f9057a80",
+  "op": "2026-08-30T15:11:09.799Z",
+  "commit": "6916cf81",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -17,21 +17,21 @@
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 4,
+  "nogNietGeclassificeerd": 3691,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1458,
+  "metGemetenDuplicaatgedrag": 0,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
-  "metingGebruikt": true,
-  "metingReden": "gemeten op commit f9057a80, schone boom",
-  "metingGemetenOp": "2026-08-30T14:57:06.601Z",
+  "metingGebruikt": false,
+  "metingReden": "de meting is gemaakt met ongecommit werk in de boom (commit 6916cf81); zij hoort bij een stand die nergens is vastgelegd",
+  "metingGemetenOp": "2026-08-30T15:10:49.856Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 42,
+    "aantal": 759,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -39,21 +39,12 @@
     ]
    },
    {
-    "id": "gemeten",
-    "aantal": 4404,
-    "voorbeelden": [
-     "POST /api/arrival/pass",
-     "POST /api/arrival/pulse",
-     "POST /api/bedrijf/apparaat/innemen"
-    ]
-   },
-   {
     "id": "onbekend",
-    "aantal": 4,
+    "aantal": 3691,
     "voorbeelden": [
-     "POST /api/betaal/webhook",
-     "POST /api/fout/client",
-     "POST /api/munt/webhook"
+     "POST /api/aandacht",
+     "POST /api/aanmeld/start",
+     "POST /api/aanmeld/zeg"
     ]
    },
    {
@@ -66,36 +57,7 @@
     ]
    }
   ],
-  "gemetenGronden": [
-   {
-    "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 2885
-   },
-   {
-    "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1450
-   },
-   {
-    "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
-    "aantal": 61
-   },
-   {
-    "reden": "gemeten: de herhaling werd geweigerd (status N)",
-    "aantal": 4
-   },
-   {
-    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankPassen en de herhaling niets",
-    "aantal": 2
-   },
-   {
-    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankRekeningen en de herhaling niets",
-    "aantal": 1
-   },
-   {
-    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
-    "aantal": 1
-   }
-  ]
+  "gemetenGronden": []
  },
  "bakken": [
   {
@@ -180,13 +142,13 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1544,
+   "aantal": 86,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
-    "POST /api/arrival/pass",
-    "POST /api/bedrijf/apparaten",
-    "POST /api/bedrijf/beeld"
+    "POST /api/rtf/social/pin/connect",
+    "POST /api/rtf/social/pin/live/verbind",
+    "POST /api/rtf/social/pin/uit"
    ]
   },
   {
@@ -216,7 +178,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 92,
+   "aantal": 577,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -228,7 +190,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 2896,
+   "aantal": 182,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -240,13 +202,13 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 4,
+   "aantal": 3691,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
-    "POST /api/betaal/webhook",
-    "POST /api/fout/client",
-    "POST /api/munt/webhook"
+    "POST /api/aandacht",
+    "POST /api/aanmeld/start",
+    "POST /api/aanmeld/zeg"
    ]
   }
  ],

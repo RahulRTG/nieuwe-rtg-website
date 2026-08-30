@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T10:05:49.863Z",
-  "commit": "a1ca9d29",
+  "op": "2026-08-30T10:11:28.679Z",
+  "commit": "9e16cf48",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -63,12 +63,12 @@
  ],
  "routesGevonden": 4622,
  "gemeten": {
-  "routesMetRol": 4146,
-  "beoordeeld": 1209,
-  "beschermd": 1208,
+  "routesMetRol": 4409,
+  "beoordeeld": 1304,
+  "beschermd": 1303,
   "onbeschermd": 1,
-  "ongemeten": 2937,
-  "oproepen": 12470,
+  "ongemeten": 3105,
+  "oproepen": 13254,
   "tokensHernieuwd": 22,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -104,12 +104,19 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
+  "lijfsleutelsGebouwd": [
+   "werkruimte",
+   "school",
+   "gezin"
+  ],
+  "lijfsleutelsMislukt": [],
+  "routesOpLijfsleutel": 577,
   "onbeschermdMetBesluit": 1
  },
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 10,
+ "vermoedensVerworpen": 5,
  "perRoute": [
   {
    "methode": "POST",
@@ -976,9 +983,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": 1
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog +1 in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -1492,9 +1502,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": 1
-    }
+    "c": {}
    }
   },
   {
@@ -1737,9 +1745,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog +1 in techniek, +6 in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -2533,10 +2545,7 @@
      "bankIdem": 1,
      "bankIdemAfdruk": 1
     },
-    "b": {
-     "techniek": 1,
-     "wacht": 6
-    },
+    "b": {},
     "c": {
      "betaalIdem": 1,
      "bankSaldi": "gewijzigd",
@@ -2544,8 +2553,7 @@
      "bankIdem": 1,
      "bankIdemAfdruk": 1
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog +1 in techniek, +6 in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -6215,6 +6223,7 @@
    "opslag": {
     "a": {
      "techniek": 1,
+     "kosten": "gewijzigd",
      "commandAlarmen": "gewijzigd"
     },
     "b": {},
@@ -6378,7 +6387,6 @@
     },
     "b": {},
     "c": {
-     "kosten": "gewijzigd",
      "commandZaken": 1
     }
    }
@@ -11857,11 +11865,14 @@
     "a": {
      "officeDocs": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "officeDocs": 1
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -12467,12 +12478,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -15524,6 +15532,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "reisInstallaties": 1
     },
     "b": {},
@@ -15681,12 +15690,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -16466,9 +16472,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rtmail": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -19418,9 +19422,12 @@
      "contactPins": 1,
      "contactPinSecurity": 1
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -19528,16 +19535,13 @@
      "contactPinSecurity": "gewijzigd",
      "contactPinRetired": 1
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "contactPins": "gewijzigd",
      "contactPinRetired": 1,
      "contactPinSecurity": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -19763,7 +19767,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -20664,9 +20670,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -21347,7 +21351,7 @@
    ],
    "opslag": {
     "a": {
-     "rtmailSchrijf": 2
+     "rtmailSchrijf": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -21915,9 +21919,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "rtmailRegels": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -23196,12 +23198,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -23249,7 +23248,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -25902,12 +25903,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -26024,7 +26022,8 @@
    ],
    "opslag": {
     "a": {
-     "bankregie": "gewijzigd"
+     "bankregie": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -26150,7 +26149,9 @@
      "bankregie": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -26282,12 +26283,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -29860,6 +29858,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "handelsRegelwacht": "gewijzigd"
     },
     "b": {},
@@ -29880,9 +29879,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -33522,7 +33519,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -33834,9 +33833,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -33959,7 +33956,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34200,10 +34200,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -34915,7 +34912,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -35389,9 +35388,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -36987,7 +36984,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -37054,12 +37053,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -38279,7 +38275,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -38750,9 +38748,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -39018,6 +39014,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "residentie": "gewijzigd"
     },
     "b": {},
@@ -39289,12 +39286,9 @@
     "a": {
      "residentie": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -41596,7 +41590,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -42380,9 +42376,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -43345,11 +43339,14 @@
     "a": {
      "posts": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {
      "posts": 1
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -44556,9 +44553,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -45067,7 +45062,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
    }
   },
@@ -45406,9 +45403,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -47529,7 +47524,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48142,6 +48139,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "zaakCommand": "gewijzigd"
     },
     "b": {},
@@ -48216,7 +48214,6 @@
     },
     "b": {},
     "c": {
-     "kosten": "gewijzigd",
      "zaakCommand": "gewijzigd"
     }
    }
@@ -49420,8 +49417,8 @@
    "opslag": {
     "a": {
      "notifications": "gewijzigd",
-     "facturen": 1,
-     "rtmail": "gewijzigd"
+     "rtmail": "gewijzigd",
+     "facturen": 1
     },
     "b": {},
     "c": {}
@@ -49851,7 +49848,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -49917,9 +49916,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -50811,9 +50808,7 @@
      "horeca": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -51921,7 +51916,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -52381,7 +52378,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -52770,7 +52769,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "horeca": "gewijzigd"
     },
     "b": {},
@@ -53948,7 +53946,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -54190,9 +54190,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -54884,9 +54882,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -56001,7 +55997,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -56484,7 +56482,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -56853,9 +56853,7 @@
      "payTreasury": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -58117,7 +58115,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -58185,9 +58185,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -58900,12 +58898,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -60044,7 +60039,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -60530,7 +60527,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -60596,9 +60595,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -60946,7 +60943,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -61615,9 +61615,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -61875,6 +61873,7 @@
    ],
    "opslag": {
     "a": {
+     "commandAlarmen": "gewijzigd",
      "werkbeleid": 1,
      "werkmail": 2
     },
@@ -61930,10 +61929,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -62037,7 +62033,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -62224,9 +62222,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -62657,9 +62653,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -63857,9 +63851,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -63948,7 +63940,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -64394,7 +64388,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -64819,9 +64815,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -65407,9 +65401,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -65823,7 +65815,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -67099,9 +67093,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -67699,7 +67691,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -68040,9 +68034,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -68091,7 +68083,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -68312,6 +68306,1168 @@
     200,
     200,
     200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda/bereik",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/agenda/wijzig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bel",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bericht",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/bericht/gelezen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/chat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/droom/behaald",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/droom/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/droom/moedig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/droom/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/geldschool",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/geldschool/verzilver",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/geldschool/weekgeld",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/afspraak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/afspraak/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/medicijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/medicijn/gegeven",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/medicijn/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/meting",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/gezondheid/meting/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/inloggen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/idee",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/lijst",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/lijst/af",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/lijst/opruim",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/lijst/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/menu",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/menu/wis",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/vast",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/keuken/vast/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/klus",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/klus/gedaan",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/klus/keur",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/klus/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/locatie",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/locatie/stop",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/ochtend/stap",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/ochtend/stap/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/ochtend/vink",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/oppasinfo",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/profiel/kies",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/profiel/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/profiel/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/profiel/wijzig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/sollicitaties",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/bijdrage",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/spaardoel/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodiging/accepteer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodiging/bekijk",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodiging/intrek",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodiging/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/uitnodigingen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/persoon",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/persoon/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/potje/bijdrage",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/potje/doel",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/wens",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/wens/claim",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/verjaardag/wens/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/wissen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/wissen/bevestig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foundation/gezin/wissen/intrekken",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
@@ -68645,7 +69801,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -70188,7 +71346,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -71315,9 +72475,7 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -72018,6 +73176,3426 @@
     404,
     404,
     404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/apply/chat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/apply/chat/send",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/boek",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/entry-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/entry-weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/favoriet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/gezin-zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/instellen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/moment-ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/baby/tijdlijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/beroepen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/beroepen/catalogus",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/beroepen/installeer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/beroepen/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "beroepenInstallaties": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/beroepen/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb/ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb/catalogus",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb/installeer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "rtfAppInstallaties": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/bieb/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/club/bericht",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/club/portaal",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/catalogus",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/installeer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/lees",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "geloofInstallaties": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/geloof/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/aanwezig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/beheer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/bewaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/fase",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/gezin",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "officeDocs": 1
+    },
+    "b": {},
+    "c": {
+     "officeDocs": 1
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/open",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/opmerking",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/samen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/ster",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/terug",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/uitslag",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/versies",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/vul",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/kantoorpakket/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/herhaal",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/herhaal-antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/herhaal-stand",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/lijst-ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/lijst-haal",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/lijst-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/lijst-weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/lijsten",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/notitie",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/overhoor-klaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-ai",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "leren": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "leren": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-staat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-uitnodig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/project-weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/projecten",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/schrijf-bewaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "leren": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "leren": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/schrijf-feedback",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/schrijf-opdracht",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/schrijfsels",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/sessie-antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/sessie-staat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/sessie-start",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/sessie-zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/sessies",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/taak-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leren/taak-zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/band/bevestig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/band/verbreek",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/band/vraag",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/beeindigd",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/beleid",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/beleid/zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "levensbeleid": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/deel/in",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/deel/zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/leven/kring",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/link/koppelingen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/link/los",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 422)",
+   "statussen": [
+    422,
+    422,
+    422
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/onboarding/opslaan",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/onboarding/status",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/onboarding/teken",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/partner/besluit-sluit",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {
+     "onboarding": "gewijzigd",
+     "wacht": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/partner/besluit-start",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/partner/raad",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/partner/stem",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/rahul",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/chat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "samenRtfKamers": 1
+    },
+    "b": {},
+    "c": {
+     "samenRtfKamers": 1
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/mee",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/staat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/samen/zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/school",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/school/catalogus",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/school/installeer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/school/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "schoolInstallaties": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/school/weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/block",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/call",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/connect",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/connect/intrek",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/connections",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/dm",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/dm/send",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/find",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/goedkeuren",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/boardroom",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/boardroom/herstel",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/boardroom/zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/boardroom/zetveel",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/contacten",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/kind/verwijder",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/opdracht",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/oudervoeg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "contactPins": 1,
+     "contactPinSecurity": 1
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/connect",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "contactPinSecurity": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "contactPinSecurity": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live/kijk",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/live/verbind",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/nieuw",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "contactPins": "gewijzigd",
+     "contactPinRetired": 1,
+     "contactPinSecurity": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "contactPins": "gewijzigd",
+     "contactPinRetired": 1,
+     "contactPinSecurity": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/uit",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "contactPins": "gewijzigd",
+     "contactPinSecurity": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/pin/zoek",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/report",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/respond",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/snap/send",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/snap/view",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/snaps",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/stories",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/story/post",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/story/view",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/social/unblock",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/solliciteer",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/arcade-bord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/arcade-score",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/dag",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/dag-klaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/dag-start",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/kijk",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/klasgenoten",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/nabespreking",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/naspelen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/nieuw",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/online",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/opgeven",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/praat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/praat-stuur",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/prestaties",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/projectie-open",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/projectie-sluit",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/rahul",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/random",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/replay",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/sneek-bord",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/sneek-score",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/staat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/stand",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/sudoku-klaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 409)",
+   "statussen": [
+    409,
+    409,
+    409
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/sudoku-nieuw",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "spellen": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "spellen": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/team-antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/team-mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/team-nieuw",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "spelTeams": 1
+    },
+    "b": {},
+    "c": {
+     "spelTeams": 1
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/team-nodig",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/team-verlaat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/toernooi-antwoord",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/toernooi-mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/toernooi-nieuw",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/toernooi-staat",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/toewijzen",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/uitslagen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/varianten",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/zichtbaar",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/spel/zichtbaar-zet",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/talent/interesse",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/talent/mijn",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/boek",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "foundation": "gewijzigd"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/doel-inleg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/doel-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/doel-weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/potje",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/toets-maak",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/toets-stap",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/toets-weg",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/tiener/toetsen",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/toegang",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/welzijn/dagboek",
+   "rol": "lijfsleutel",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {
+     "foundation": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/welzijn/stemming",
+   "rol": "lijfsleutel",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},

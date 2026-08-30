@@ -20,7 +20,11 @@
 
    WAT EEN FAMILIE IS. Een naam, de paden waar hij over gaat, en een BOUWER die
    de wereld werkelijk aanmaakt en de velden teruggeeft die daarna in elk lijf
-   meegaan. Geen verzonnen tokens: de bouwer loopt door de echte deur van het
+   meegaan. Optioneel ook een ROL: sommige deuren vragen allebei -- een
+   bestaande sessie in de KOP en een aanwijzing in het LIJF welk object je
+   bedoelt. `huisAuth` van de werkplek is daar het voorbeeld van: hij leest de
+   boardroom-sessie en daarnaast `bedrijf` uit het lijf, en zonder allebei is
+   het 404 of 403. Een familie zonder rol stuurt geen Authorization-kop mee. Geen verzonnen tokens: de bouwer loopt door de echte deur van het
    product, want een sleutel die niet uit de applicatie komt bewijst niets over
    de applicatie.
 
@@ -178,6 +182,34 @@ const FAMILIES = [
       if (!d || !d.code || !d.token) return null;
       return { code: d.code, token: d.token };
     }
+  },
+  {
+    naam: 'werkplek',
+    /* 71 routes onder deze twee voorvoegsels, alle achter huisAuth
+       (server/routes/werkplek.js). */
+    prefixen: ['/api/werkplek/'],
+    velden: ['bedrijf'],
+    rol: 'boardroom',
+    waarom: 'huisAuth leest de boardroom-sessie uit de KOP en daarnaast `bedrijf` uit het ' +
+      'LIJF; zonder allebei is het 404 (onbekend bedrijf) of 403 (geen sleutel voor dit huis)',
+    /* HIER VALT NIETS TE BOUWEN, en dat is het punt. De twee huizen (rtg en rtf)
+       staan vast in server/kern/werkplek.js -- ze worden niet aangemaakt, ze
+       BESTAAN. Wat ontbrak was niet een sleutel maar de wetenschap welk veld je
+       moet meesturen; de eigenaar mag in beide huizen (magIn geeft true zodra
+       `baas`), en de boardroom-sleutel van de proefopstelling IS de eigenaar.
+
+       De bouwer controleert dat ook echt in plaats van het aan te nemen: hij
+       klopt een keer aan met het veld erbij. Komt daar geen 2xx uit, dan meldt
+       de familie zich als mislukt in plaats van 71 routes als "gedekt" te laten
+       tellen terwijl ze allemaal op 403 stuklopen. Dat is dezelfde les als bij
+       de gezinsfamilie, die op twee veldnamen strandde terwijl de trechter hem
+       al meetelde. */
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.boardroom) return null;
+      const r = await post('/api/werkplek/mijn', { bedrijf: 'rtg' }, tokens.boardroom);
+      if (!r || r.status < 200 || r.status >= 300) return null;
+      return { bedrijf: 'rtg' };
+    }
   }
 ];
 
@@ -192,15 +224,20 @@ async function bouwLijfsleutels(ctx) {
     let uit = null;
     try { uit = await f.bouw(ctx); } catch (e) { uit = null; }
     if (!uit) { mislukt.push({ naam: f.naam, reden: 'de bouwer kreeg geen sleutel terug' }); continue; }
-    gebouwd.push({ naam: f.naam, velden: Object.keys(uit) });
-    for (const p of f.prefixen) velden.set(p, uit);
+    gebouwd.push({ naam: f.naam, velden: Object.keys(uit), rol: f.rol || null });
+    for (const p of f.prefixen) velden.set(p, { velden: uit, rol: f.rol || null });
   }
-  const lijfVoor = (pad) => {
+  const vind = (pad) => {
     for (const [p, v] of velden) if (String(pad).startsWith(p)) return v;
     return null;
   };
-  const dekt = (pad) => !!lijfVoor(pad);
-  return { gebouwd, mislukt, lijfVoor, dekt, families: FAMILIES.map(f => f.naam) };
+  const lijfVoor = (pad) => { const v = vind(pad); return v ? v.velden : null; };
+  /* Welke rol deze route nodig heeft NAAST het lijf. `null` betekent: geen kop.
+     Dat onderscheid hoort expliciet te zijn -- een undefined die toevallig geen
+     kop oplevert, is niet te onderscheiden van een vergeten rol. */
+  const rolVoor = (pad) => { const v = vind(pad); return v ? v.rol : null; };
+  const dekt = (pad) => !!vind(pad);
+  return { gebouwd, mislukt, lijfVoor, rolVoor, dekt, families: FAMILIES.map(f => f.naam) };
 }
 
 /* Voor wie alleen wil weten WELKE paden een familie zou dekken, zonder een

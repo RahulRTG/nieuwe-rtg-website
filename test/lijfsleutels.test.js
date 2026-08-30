@@ -120,3 +120,54 @@ test('zonder datamap bouwt de schoolfamilie niets, in plaats van iets te verzinn
   });
   assert.equal(uit, null, 'zonder datamap hoort er geen sleutel uit te komen');
 });
+
+/* ============================================================================
+   SOMMIGE DEUREN VRAGEN ALLEBEI: EEN SESSIE EN EEN AANWIJZING.
+
+   `huisAuth` van de werkplek (server/routes/werkplek.js) leest de
+   boardroom-sessie uit de KOP en daarnaast `bedrijf` uit het LIJF. Zonder
+   allebei is het 404 (onbekend bedrijf) of 403 (geen sleutel voor dit huis).
+
+   Een familie mag daarom een ROL declareren. Doet hij dat niet, dan gaat er
+   geen Authorization-kop mee -- en dat verschil hoort expliciet te zijn: een
+   `undefined` die toevallig geen kop oplevert, is niet te onderscheiden van een
+   vergeten rol.
+
+   EN ER VALT HIER NIETS TE BOUWEN, wat precies het punt is. De twee huizen (rtg
+   en rtf) staan vast in server/kern/werkplek.js; ze worden niet aangemaakt, ze
+   bestaan. Wat ontbrak was de wetenschap welk veld je moet meesturen. De bouwer
+   controleert dat toch echt door een keer aan te kloppen -- anders zouden 71
+   routes als "gedekt" tellen terwijl ze allemaal op 403 stuklopen. Dezelfde les
+   als de gezinsfamilie, die op twee veldnamen strandde terwijl de trechter hem
+   al meetelde.
+   ========================================================================== */
+test('een familie mag een rol declareren, en die reist mee naar de proef', async () => {
+  const wp = FAMILIES.find(f => f.naam === 'werkplek');
+  assert.ok(wp, 'de werkplekfamilie hoort te bestaan');
+  assert.equal(wp.rol, 'boardroom', 'huisAuth leest een boardroom-sessie uit de kop');
+
+  const uit = await bouwLijfsleutels({
+    post: async () => ({ status: 200, data: { ok: true } }),
+    tokens: { boardroom: 'nep' }
+  });
+  assert.equal(uit.rolVoor('/api/werkplek/bureau/architect'), 'boardroom',
+    'de rol hoort per pad opvraagbaar te zijn, anders gaat de proef zonder kop aankloppen');
+  assert.equal(uit.rolVoor('/api/bedrijf/besluit/maak'), null,
+    'een familie zonder rol hoort expliciet null te geven en niet undefined');
+});
+
+test('zonder de sessie die de familie vraagt, bouwt hij niets', async () => {
+  const wp = FAMILIES.find(f => f.naam === 'werkplek');
+  assert.equal(await wp.bouw({ post: async () => ({ status: 200, data: {} }), tokens: {} }), null,
+    'zonder boardroom-sleutel hoort er niets uit te komen');
+});
+
+test('een bouwer die 403 krijgt, meldt zich als mislukt', async () => {
+  /* De gevaarlijkste uitkomst: 71 routes als gedekt tellen terwijl ze
+     allemaal op 403 stuklopen. */
+  const wp = FAMILIES.find(f => f.naam === 'werkplek');
+  assert.equal(await wp.bouw({
+    post: async () => ({ status: 403, data: { error: 'niet van u' } }),
+    tokens: { boardroom: 'nep' }
+  }), null);
+});

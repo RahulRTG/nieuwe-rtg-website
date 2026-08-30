@@ -155,7 +155,10 @@ if (require.main !== module) { module.exports = {}; return; }
      een gewone rolroute meetellen. */
   const metLijf = verdeling.zonderRol
     .filter(r => lijfsleutels.dekt(r.pad))
-    .map(r => ({ methode: r.methode, pad: r.pad, rol: 'lijfsleutel' }));
+    /* Vraagt de familie ook een SESSIE, dan krijgt de route die rol -- anders
+       `lijfsleutel`, wat geen Authorization-kop oplevert. Dat verschil moet uit
+       de familie komen en niet uit een gok hier. */
+    .map(r => ({ methode: r.methode, pad: r.pad, rol: lijfsleutels.rolVoor(r.pad) || 'lijfsleutel' }));
   const routes = verdeling.metRol.concat(metLijf);
   console.log('  routes op een lijfsleutel            : ' + metLijf.length);
 

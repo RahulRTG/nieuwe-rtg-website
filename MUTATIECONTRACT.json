@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:02:25.775Z",
-  "commit": "b0a81882",
+  "op": "2026-08-30T12:46:41.298Z",
+  "commit": "5a5212b3",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,14 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4619,
+  "geclassificeerd": 4653,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3385,
-   "NOT_APPLICABLE": 1060,
-   "PROTECTED": 103,
-   "INTENTIONALLY_NON_IDEMPOTENT": 71,
-   "LEGACY_PENDING_CLASSIFICATION": 34
+   "BLOCKED_BY_TEST_FIXTURE": 3402,
+   "NOT_APPLICABLE": 1073,
+   "PROTECTED": 104,
+   "INTENTIONALLY_NON_IDEMPOTENT": 74
   },
-  "vastgesteldDoorMens": 1244,
+  "vastgesteldDoorMens": 1278,
   "afgeleidDoorScript": 3375,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3818,
@@ -32,10 +31,7 @@
    "kale ronde: geen uitspraak": 4471,
    "niet gemeten": 10
   },
-  "voorstellen": {
-   "NOT_APPLICABLE": 9,
-   "PROTECTED": 4
-  },
+  "voorstellen": {},
   "metingVan": "2026-08-30T11:56:02.826Z"
  },
  "tegenspraken": [
@@ -3167,12 +3163,14 @@
   {
    "mutatieId": "bank.afschrift.csv",
    "route": "POST /api/bank/afschrift.csv",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3184,10 +3182,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, en de statische analyse kon de handler niet volgen -- na te kijken of hij buiten de gemeten collecties schrijft"
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bank.akkoord",
@@ -5406,12 +5404,14 @@
   {
    "mutatieId": "bedrijf.lid.ontkoppel",
    "route": "POST /api/bedrijf/lid/ontkoppel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: werkruimte",
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -5421,10 +5421,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bedrijf.lid.rollen",
@@ -7090,12 +7090,14 @@
   {
    "mutatieId": "bestanden.upstart",
    "route": "POST /api/bestanden/upstart",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -7107,10 +7109,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 429)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "bestanden.versies",
@@ -11643,12 +11645,14 @@
   {
    "mutatieId": "command.puls",
    "route": "POST /api/command/puls",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -11660,10 +11664,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "deze route draagt een duplicaatregel in lib/idemsleutels.js; dat zegt dat een herhaling WEL iets zou doen, en dus is NOT_APPLICABLE hier uitgesloten -- de meters zagen niets omdat de stand al op de doelwaarde stond"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.recht.geef",
@@ -12559,12 +12563,14 @@
   {
    "mutatieId": "command.zandbak.maak",
    "route": "POST /api/command/zandbak/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -12576,10 +12582,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.zandbak.runbook",
@@ -12611,12 +12617,14 @@
   {
    "mutatieId": "command.zandbak.weg",
    "route": "POST /api/command/zandbak/weg",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -12628,10 +12636,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 404)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "command.zandbak.zoek",
@@ -18743,12 +18751,14 @@
   {
    "mutatieId": "foundation.gezin.uitnodigingen",
    "route": "POST /api/foundation/gezin/uitnodigingen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -18758,10 +18768,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.gezin.verjaardag.persoon",
@@ -19016,12 +19026,14 @@
   {
    "mutatieId": "foundation.hulp.ai",
    "route": "POST /api/foundation/hulp/ai",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19031,10 +19043,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.kosten",
@@ -19089,12 +19101,14 @@
   {
    "mutatieId": "foundation.les.maak",
    "route": "POST /api/foundation/les/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "PUBLIC",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "PUBLIC",
     "bewakers": []
    },
    "bewijs": {
@@ -19104,20 +19118,22 @@
     "grond": "gemerkt",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (gemerkt): de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js"
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.mail.inbox",
    "route": "POST /api/foundation/mail/inbox",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19127,10 +19143,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.mail.lees",
@@ -19160,12 +19176,14 @@
   {
    "mutatieId": "foundation.mail.overzicht",
    "route": "POST /api/foundation/mail/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19175,10 +19193,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.mail.stuur",
@@ -19208,12 +19226,14 @@
   {
    "mutatieId": "foundation.mail.verzonden",
    "route": "POST /api/foundation/mail/verzonden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19223,10 +19243,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.ai",
@@ -23238,12 +23258,14 @@
   {
    "mutatieId": "foundation.school.personeel.inloglink",
    "route": "POST /api/foundation/school/personeel/inloglink",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "nietHerhaalbaar"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -23253,10 +23275,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.personeel.mail.inbox",
@@ -34150,12 +34172,14 @@
   {
    "mutatieId": "logout",
    "route": "POST /api/logout",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -34167,10 +34191,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 401)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "lucht.ai",
@@ -37485,12 +37509,14 @@
   {
    "mutatieId": "member.borden",
    "route": "POST /api/member/borden",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "Business Pass",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -37502,10 +37528,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.bureau.ai",
@@ -41938,12 +41964,14 @@
   {
    "mutatieId": "member.pin.nieuw",
    "route": "POST /api/member/pin/nieuw",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -41955,10 +41983,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 429)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "member.pin.uit",
@@ -54063,12 +54091,14 @@
   {
    "mutatieId": "office.export.csv",
    "route": "POST /api/office/export.csv",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -54080,10 +54110,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, en de statische analyse kon de handler niet volgen -- na te kijken of hij buiten de gemeten collecties schrijft"
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.foundation.registratie.besluit",
@@ -57110,12 +57140,14 @@
   {
    "mutatieId": "office.merk.maak",
    "route": "POST /api/office/merk/maak",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -57127,10 +57159,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.merk.sjabloon",
@@ -60568,12 +60600,14 @@
   {
    "mutatieId": "office.rtgai.roer.terug",
    "route": "POST /api/office/rtgai/roer/terug",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "officeAuth"
     ]
@@ -60585,10 +60619,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "office.rtgai.train",
@@ -69429,12 +69463,14 @@
   {
    "mutatieId": "overheid.uitkeringen.mijn",
    "route": "POST /api/overheid/uitkeringen/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -69446,10 +69482,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "overheid.verkiezing",
@@ -70687,12 +70723,14 @@
   {
    "mutatieId": "pay.verzoek.betaal",
    "route": "POST /api/pay/verzoek/betaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -70704,10 +70742,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "pay.verzoek.intrek",
@@ -71493,12 +71531,14 @@
   {
    "mutatieId": "privacy.delete",
    "route": "POST /api/privacy/delete",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -71510,10 +71550,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 401)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "privacy.export",
@@ -85340,14 +85380,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "scim.v2.Groups",
+   "mutatieId": "scim.v2.groups",
    "route": "POST /api/scim/v2/Groups",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
@@ -85360,10 +85402,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Groups.id",
@@ -85432,14 +85474,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "scim.v2.Users",
+   "mutatieId": "scim.v2.users",
    "route": "POST /api/scim/v2/Users",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "SERVICE_TO_SERVICE",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
     "bewakers": [
      "mw",
      "scimAuth"
@@ -85452,10 +85496,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 400)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "scim.v2.Users.id",
@@ -89047,12 +89091,14 @@
   {
    "mutatieId": "supplier.accountant.adviezen",
    "route": "POST /api/supplier/accountant/adviezen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -89064,10 +89110,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.accountant.vragen",
@@ -93471,12 +93517,14 @@
   {
    "mutatieId": "supplier.dagrapport.csv",
    "route": "POST /api/supplier/dagrapport.csv",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -93488,10 +93536,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, en de statische analyse kon de handler niet volgen -- na te kijken of hij buiten de gemeten collecties schrijft"
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.def.ai",
@@ -96709,12 +96757,14 @@
   {
    "mutatieId": "supplier.horeca.arrivals",
    "route": "POST /api/supplier/horeca/arrivals",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -96726,10 +96776,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.autopilot",
@@ -99677,12 +99727,14 @@
   {
    "mutatieId": "supplier.horeca.venue.publiceer",
    "route": "POST /api/supplier/horeca/venue/publiceer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -99694,10 +99746,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 404)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.horeca.verzoeken",
@@ -102751,12 +102803,14 @@
   {
    "mutatieId": "supplier.magnaat.studio.importeer",
    "route": "POST /api/supplier/magnaat/studio/importeer",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -102768,10 +102822,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.magnaat.studio.indienen",
@@ -105636,12 +105690,14 @@
   {
    "mutatieId": "supplier.overheid.kvk.inschrijven",
    "route": "POST /api/supplier/overheid/kvk/inschrijven",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -105653,10 +105709,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.overheid.kvk.mijn",
@@ -106012,12 +106068,14 @@
   {
    "mutatieId": "supplier.pay.graaf",
    "route": "POST /api/supplier/pay/graaf",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -106029,10 +106087,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "PROTECTED",
-   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.pay.in",
@@ -108710,12 +108768,14 @@
   {
    "mutatieId": "supplier.rides.csv",
    "route": "POST /api/supplier/rides.csv",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -108727,10 +108787,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "TEGENSPRAAK: de opslagmeter zag niets, maar server/routes/supplier/vervoer.js bevat een schrijfvorm (lijst-mutatie). Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is."
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.room.add",
@@ -112295,12 +112355,14 @@
   {
    "mutatieId": "supplier.training.add",
    "route": "POST /api/supplier/training/add",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112312,10 +112374,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.training.gelezen",
@@ -112347,12 +112409,14 @@
   {
    "mutatieId": "supplier.training.remove",
    "route": "POST /api/supplier/training/remove",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112364,10 +112428,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "mens",
    "voorstel": null,
-   "voorstelGrond": "de eerste kale oproep deed geen werk (status 404)"
+   "voorstelGrond": null
   },
   {
    "mutatieId": "supplier.transfer",

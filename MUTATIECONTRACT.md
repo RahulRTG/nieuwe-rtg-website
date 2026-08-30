@@ -938,6 +938,95 @@ uit de samengevoegde lijst — waar hij ook staat.
 | `LEGACY_PENDING_CLASSIFICATION` | 51 | **40** |
 | geclassificeerd | 4.602 | **4.613 van 4.653 (99,1%)** |
 
+## 5n. De laatste tweeënveertig, en vier keer dat het voorstel niet klopte
+
+Hierna stond het register op nul onverklaarde routes. Het waren er nog
+tweeënveertig, en ze zijn alle tweeënveertig **gelezen** in plaats van
+overgenomen — dat was het besluit van de eigenaar (30 augustus 2026: waar mijn
+lezing van het voorstel afwijkt, volgt de lezing en wordt de afwijking
+opgeschreven). Vier keer week de lezing af, en die vier zijn samen de beste
+verdediging van de regel dat een stand nooit uit bewijs wordt afgeleid.
+
+**Een wachtrij is geen werk.** Drie routes maten twee keer `beschermd` en de
+meter stelde `PROTECTED` voor. Het enige verschil in de opslag zat in `wacht` —
+de wachtrij van de AI-laag en de rem, en die groeit van het *kijken*. `PROTECTED`
+doet een uitspraak over gedrag bij een herhaling; een route die geen werk doet
+heeft dat gedrag niet, en een leeg `PROTECTED` is precies de schijnzekerheid waar
+dit register tegen is aangelegd. Een meter die de rem meetelt, verklaart elke
+bevraagde lezer tot schrijver.
+
+**Twee zwijgende meters zijn geen bewijs van stilte.** Acht routes lieten geen
+spoor in de opslag *én* de effectmeter telde op allebei de oproepen `geen`. Zes
+keer klopt dat. Twee keer niet:
+
+- `/api/foundation/school/personeel/inloglink` schrijft een verse eenmalige
+  inloghash en verstuurt een mail — maar alleen als het schoolaccount bestaat. In
+  de kale ronde bestond het niet, en dan loopt de route met opzet door de
+  anti-enumeratietak: hetzelfde antwoord, dezelfde antwoordtijd, geen effect.
+  Beide meters keken naar de tak die niets doet.
+- `/api/foundation/hulp/ai` schrijft werkelijk niets, en is toch niet
+  `NOT_APPLICABLE`: de tweede oproep stelt de vraag echt opnieuw aan het model —
+  een tweede antwoord en een tweede rekening. Een externe aanroep staat in
+  `NIET_GEMETEN` van `server/effectmeter.js`, dus de meter zweeg over iets dat hij
+  niet kán zien. **Zwijgen is daar geen nul.**
+
+**`ongemeten` kan een vorm zijn in plaats van een storing.** De vier CSV-uitvoeren
+antwoorden streamend; bij `res.end` zijn de koppen al de deur uit, en dat is de
+grens die in de kop van `server/effectmeter.js` staat opgeschreven. Hun handlers
+zijn gelezen: bezit controleren, lezen, regel voor regel wegschrijven. De gemelde
+lijst-mutatie in `rides.csv` is een valse treffer — `.filter` geeft een nieuwe
+lijst en `.sort` raakt die kopie — en de melding blijft als *weerlegging* staan in
+plaats van weggelaten te worden.
+
+**En de grootste groep: zestien die de proefopstelling nooit aan het werk kreeg.**
+Een 409 omdat het ding er al was, een 404 omdat het er niet was, een 429 omdat de
+rem aansloeg, een 401 omdat er geen sessie was, een 400 omdat de body niet klopte.
+De kale ronde meldde ze als `beschermd`, en dat leest als "de herhaling deed
+niets" — maar wat er gebeurde is dat de **eerste** oproep niets deed, en dan is de
+tweede niet beschermd maar irrelevant. Zij staan op `BLOCKED_BY_TEST_FIXTURE` met
+per route de voorwaarde die `scripts/lib/idemwereld.js` moet klaarzetten: niet
+"kreeg 409" maar *wat er had moeten bestaan*. Hun `semantiek.klasse` is `onbekend`
+en niet een van de vijf andere — een klasse invullen zou de uitspraak zijn die de
+meting niet draagt.
+
+Bij de geldroutes viel diezelfde valstrik de andere kant op: daar wás de weigering
+de bescherming (5o hieronder). Het verschil is niet te raden, alleen te meten.
+
+## 5o. De omkering bij het geld
+
+Zes geldroutes stonden op `LEGACY` met de reden *ongemeten* — de kale ronde kon
+niets meten omdát de route weigerde. Dat las als onwetendheid en was het
+tegendeel: **de weigering ís de bescherming.** Sinds het besluit van de eigenaar
+weigert `lib/idem.js` een geldhandeling zonder sleutel, dus een keyloze dubbeltik
+kan daar niet eens ontstaan; mét sleutel vangt de duurzame geldlaag hem op. Het
+bewijs is daarom tweezijdig, en pas dan is `PROTECTED` waar.
+
+`/api/pay/verzoek/betaal` bleef er bewust buiten: die meet mét sleutel een 409
+("er is geen schuld meer"), en dat is een **toestandscontrole** en geen
+idempotentie.
+
+## 5p. De poort staat op nul
+
+`test/mutatiecontract.test.js` hield `LEGACY_PENDING_CLASSIFICATION` op een
+bovengrens die alleen mocht krimpen. Die grens stond op 1.594 en staat nu op **0**.
+Vanaf hier is de poort niet meer "het mag niet groeien" maar **"het mag niet
+bestaan"**: een nieuwe schrijfroute zonder contract laat de bouw meteen zakken.
+
+| | begin | nu |
+|---|---:|---:|
+| geclassificeerd | 3.059 (65,7%) | **4.653 van 4.653 (100%)** |
+| vastgesteld door een mens | 106 | **1.278** |
+| `PROTECTED` | 24 | **104** |
+| `INTENTIONALLY_NON_IDEMPOTENT` | 32 | **74** |
+| `NOT_APPLICABLE` | 40 | **1.073** |
+| `BLOCKED_BY_TEST_FIXTURE` | 2.963 | **3.402** (hoort te slinken) |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.594 | **0** |
+
+**100% geclassificeerd is niet 100% idempotent, en dat was ook de opdracht niet.**
+De 3.402 geblokkeerde routes zijn geen dekking maar een wachtrij met per stuk een
+adres; het werk daaraan heeft één plek, `scripts/lib/idemwereld.js`, en paragraaf 8
+beschrijft wat daar moet komen.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

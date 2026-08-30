@@ -59,6 +59,10 @@ const CONTRACTEN = Object.assign({},
      "zou niet moeten" is geen handhaving. */
   require('./mutatiecontracten-kaleronde-c'),
   require('./mutatiecontracten-geldgrens'),
+  require('./mutatiecontracten-wachtrij'),
+  require('./mutatiecontracten-effectmeter'),
+  require('./mutatiecontracten-uitvoer'),
+  require('./mutatiecontracten-hindernis'),
   require('./mutatiecontracten-effect'));
 
 {

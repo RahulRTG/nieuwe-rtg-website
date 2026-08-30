@@ -187,8 +187,15 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
   /* Het getal in het register is de bovengrens. Groeit hij, dan is er een
      schrijfroute bijgekomen zonder contract -- en dat is precies wat deze poort
      tegenhoudt. Wie het getal legitiem ziet stijgen (een heel domein erbij),
-     verhoogt de grens BEWUST in dit bestand, met de reden in de commit. */
-  const GRENS = 1594;
+     verhoogt de grens BEWUST in dit bestand, met de reden in de commit.
+
+     SINDS 30 AUGUSTUS 2026 STAAT HIJ OP NUL. Alle 4653 schrijfroutes dragen een
+     contract, en dan is elke andere bovengrens een marge voor iets waarvan
+     niemand kan zeggen wat het is. Vanaf hier is de poort niet meer "het mag
+     niet groeien" maar "het mag niet BESTAAN": een nieuwe schrijfroute zonder
+     contract laat deze toets meteen zakken, en dat is het besluit van de
+     eigenaar over de releasepoort. */
+  const GRENS = 0;
   const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
   assert.ok(nu <= GRENS,
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +

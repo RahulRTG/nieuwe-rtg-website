@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 7dcee981, schone boom",
+  "metingReden": "gemeten op commit f8b48254, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:12:08.228Z",
-    "commit": "7dcee981",
+    "op": "2026-08-30T11:22:37.106Z",
+    "commit": "f8b48254",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 7dcee981, schone boom"
+    "metingReden": "gemeten op commit f8b48254, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1451,
-    "onbewezen": 3210,
+    "metBewijs": 1457,
+    "onbewezen": 3204,
     "sluit": true
   },
   "bakken": [
@@ -26,7 +26,7 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 168,
+      "aantal": 151,
       "voorbeelden": [
         "POST /api/aanmeld/zeg",
         "POST /api/arrival/interpret",
@@ -59,7 +59,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1589,
+      "aantal": 1599,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/beslis",
@@ -81,7 +81,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 499,
+      "aantal": 500,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -159,7 +159,6 @@
       "POST /api/foundation/bord/stroke",
       "POST /api/foundation/bord/undo",
       "POST /api/foundation/bord/wis",
-      "POST /api/foundation/hulp/ai",
       "POST /api/foundation/les/join",
       "POST /api/foundation/les/maak",
       "POST /api/foundation/mail/inbox",
@@ -167,22 +166,6 @@
       "POST /api/foundation/mail/overzicht",
       "POST /api/foundation/mail/stuur",
       "POST /api/foundation/mail/verzonden",
-      "POST /api/foundation/markt/ai",
-      "POST /api/foundation/markt/antwoord",
-      "POST /api/foundation/markt/blokkeer",
-      "POST /api/foundation/markt/chat",
-      "POST /api/foundation/markt/deal/betaal",
-      "POST /api/foundation/markt/deal/hier",
-      "POST /api/foundation/markt/deal/voorstel",
-      "POST /api/foundation/markt/detail",
-      "POST /api/foundation/markt/lijst",
-      "POST /api/foundation/markt/meld",
-      "POST /api/foundation/markt/mijn",
-      "POST /api/foundation/markt/plaats",
-      "POST /api/foundation/markt/postvak",
-      "POST /api/foundation/markt/reageer",
-      "POST /api/foundation/markt/status",
-      "POST /api/foundation/markt/verwijder",
       "POST /api/foundation/opgave",
       "POST /api/foundation/opgave/inleveren",
       "POST /api/foundation/registratie/aanvragen",
@@ -1357,6 +1340,16 @@
       "POST /api/foundation/gezin/verjaardag/potje/doel",
       "POST /api/foundation/gezin/verjaardag/wens",
       "POST /api/foundation/gezin/verjaardag/wens/claim",
+      "POST /api/foundation/markt/antwoord",
+      "POST /api/foundation/markt/chat",
+      "POST /api/foundation/markt/deal/betaal",
+      "POST /api/foundation/markt/deal/hier",
+      "POST /api/foundation/markt/deal/voorstel",
+      "POST /api/foundation/markt/detail",
+      "POST /api/foundation/markt/meld",
+      "POST /api/foundation/markt/reageer",
+      "POST /api/foundation/markt/status",
+      "POST /api/foundation/markt/verwijder",
       "POST /api/foundation/school/aanwezigheid/klas",
       "POST /api/foundation/school/aanwezigheid/leerling",
       "POST /api/foundation/school/aanwezigheid/zet",
@@ -2864,6 +2857,7 @@
       "POST /api/foundation/gezin/uitnodiging/maak",
       "POST /api/foundation/gezin/verjaardag/persoon",
       "POST /api/foundation/gezin/wissen/bevestig",
+      "POST /api/foundation/markt/plaats",
       "POST /api/foundation/school/excursie/gps",
       "POST /api/foundation/school/incident/meld",
       "POST /api/foundation/school/koppeling/zet",

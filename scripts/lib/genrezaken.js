@@ -85,12 +85,26 @@ const ZAKEN = [
   { code: 'CANMISSES', genre: 'ziekenhuis',    prefixen: ['/api/supplier/zorg'],
     waarom: 'het ziekenhuis; alleen daar bestaat een eerste hulp (kern/zorgketen)' },
   { code: 'URGENCIA',  genre: 'ambulance',     prefixen: ['/api/supplier/keten'],
-    waarom: 'de hulpdienst; de zorgketen en het rampbeeld zijn voor hulpdiensten, zorg en defensie' }
+    waarom: 'de hulpdienst; de zorgketen en het rampbeeld zijn voor hulpdiensten, zorg en defensie' },
+  /* Deze twee kwamen niet uit de 403-bak maar uit de objectoogst: hun poort
+     antwoordt 409 en niet 403 (routes/supplier/defensie.js en hulpdienst.js),
+     terwijl de kern voor hetzelfde geval 403 geeft. Het is dezelfde soort
+     weigering -- de zaak is het genre niet -- en dus horen ze hier. Dat ze
+     alleen via de oogst boven water kwamen, is precies waarom die zijn eigen
+     redenen is gaan melden. */
+  { code: 'GARNIZOEN', genre: 'defensie',      prefixen: ['/api/supplier/def/'],
+    waarom: 'de defensie-organisatie; kern/defensie/index.js leest s.type === "defensie"' },
+  { code: 'GUARDIA',   genre: 'politie',       prefixen: ['/api/supplier/hulp/'],
+    waarom: 'de hulpdienst; kern/hulpdienst/index.js leest s.type uit HULP_TYPES' }
 ];
 
 /* De rem op /api/supplier/roster staat op dertig per kwartier per IP. Deze
-   lijst gebruikt er een per zaak, en de proef doet er verder geen. */
-const ROSTER_BUDGET = 30;
+   lijst gebruikt er een per zaak; daarnaast doet de rol `zaak-persoonlijk`
+   er nog een op de demo-zaak (./proefsleutels.js). Vandaar de aftrek: het
+   budget dat hier te verdelen valt is niet het hele plafond. */
+const ROSTER_PLAFOND = 30;
+const ROSTER_ELDERS = 1;
+const ROSTER_BUDGET = ROSTER_PLAFOND - ROSTER_ELDERS;
 
 /* Welke zaak hoort bij dit pad -- of geen. Het langste voorvoegsel wint, zodat
    /api/supplier/zorgpolis niet bij /api/supplier/zorg belandt. */

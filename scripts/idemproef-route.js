@@ -335,6 +335,16 @@ wachtOpSchoneBoom();
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
     objecten.geprobeerd + ' maakroutes, in ' + objecten.takken + ' takken');
+  /* En waarom de rest niets opleverde -- zonder die redenen is het getal
+     hierboven niet te bewerken. Zie ./lib/objectoogst.js. */
+  if (process.env.RTG_OOGST_VELDEN) {
+    for (const m of (objecten.mislukt || []).filter(x => /geen herkenbaar id/.test(x.waarom))) {
+      console.log('      GEEN-ID ' + m.pad + '  velden: ' + JSON.stringify(m.velden || []));
+    }
+  }
+  for (const rd of (objecten.redenen || []).slice(0, 8)) {
+    console.log('      ' + String(rd.aantal).padStart(4) + '  ' + rd.reden + '   | ' + rd.voorbeeld);
+  }
 
   /* ============================================================================
      HET TWEEDE MEETPUNT IJKEN.

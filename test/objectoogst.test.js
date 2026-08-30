@@ -157,3 +157,22 @@ test('het werkwoord aan het eind is geen object', async () => {
   const v = u.voor('/api/festival/bewijs');
   assert.ok(!('nieuw' in v), '`nieuw` is een werkwoord en geen ding');
 });
+
+/* De verwijzingsvorm. Deze regels kwamen uit de oogst zelf: die meldde sinds
+   kort waarom een maakroute niets opleverde, en toen bleek
+   /api/bedrijf/lid/aanmeld een `lidId` terug te geven die niemand zag. */
+test('een veld met een voorvoegsel is ook een verwijzing', () => {
+  const { IDVELD } = require('../scripts/lib/objectoogst');
+  for (const k of ['id', 'code', 'lidId', 'partnerCode', 'zaakRef']) {
+    assert.ok(IDVELD.test(k), k + ' hoort een verwijzing te zijn');
+  }
+});
+
+/* En de grens: een token is een sleutel tot een sessie en geen verwijzing naar
+   een ding. Die als object-id rondsturen vergiftigt de oogst. */
+test('een token is GEEN verwijzing', () => {
+  const { IDVELD } = require('../scripts/lib/objectoogst');
+  for (const k of ['token', 'beheerToken', 'lidToken', 'naam', 'status']) {
+    assert.ok(!IDVELD.test(k), k + ' hoort geen verwijzing te zijn');
+  }
+});

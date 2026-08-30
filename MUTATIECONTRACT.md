@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **561** |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **492** |
 | `NOT_APPLICABLE` | 40 | 868 |
-| geclassificeerd | 3.069 | 4.092 van 4.653 |
+| geclassificeerd | 3.069 | 4.161 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -489,12 +489,45 @@ toegangsklasse — een contract zonder deur bestaat niet.
 `/api/supplier/bezorg/overzicht` meet als beschermd zonder dat zijn handler is
 gelezen; die hoort er niet bij, want dan zou de aftekening niet kloppen.
 
+### En de andere 100
+
+Dezelfde behandeling voor de rest van de 116, in twee helften die het
+tegenovergestelde vragen.
+
+**55 kregen een duplicaatregel** (`server/lib/idemsleutels-kaleronde.js`): een
+tweede ontwerp, een tweede uitnodiging, een tweede cadeaukaart, een tweede
+werkruimte. Daarbij hoort ook de categorie die er onschuldig uitziet — de
+overschrijving. Het ding blijft één, maar er komt wel een tweede regel in het
+auditspoor, en dat spoor hoort te zeggen hoe vaak een *mens* op de knop drukte,
+niet hoe vaak het verzoek aankwam.
+
+**30 kregen er met opzet géén** (`server/lib/idemsleutels-kaleronde-b.js`), elk
+met een reden, want dat is de moeilijkere helft:
+
+| | waarom niet dedupliceren |
+|---|---|
+| rondes | de tweede ronde hoort iets anders te vinden — dat is het *bewijs* dat de eerste werkte |
+| inzage | twee keer in een leerlingdossier kijken is twee keer kijken; het inzagejournaal hoort dat allebei te dragen |
+| momenten | een pols, een locatiemelding, een vraag aan de AI — twee keer is twee keer |
+
+Die laatste categorie is niet theoretisch: `/api/supplier/security` is een
+**alarmknop**. Een laag die de tweede druk opslikt, kan iemand in nood stil laten
+staan.
+
+Voor die dertig levert de kale ronde per definitie geen voorstel — geen meter
+leest een bedoeling af. Maar het bewijs dat `INTENTIONALLY_NON_IDEMPOTENT` eist
+("bewijs dat het gedrag ook werkelijk zo is") is er wél: alle dertig zijn gemeten
+als `onbeschermd`. De reden staat op één plek, in de sleutellijst waar hij ook de
+idem-poort stuurt; het contract haalt hem daar op en **gooit** als hij ontbreekt,
+in plaats van een lege string te dragen.
+
 | | voor | na |
 |---|---:|---:|
-| dubbeltik opgevangen | 33 | **43** |
-| dubbeltik deed het werk opnieuw | 148 | 132 |
-| `PROTECTED` | 24 | **39** |
-| `LEGACY_PENDING_CLASSIFICATION` | 576 | **561** |
+| dubbeltik opgevangen | 33 | **86** |
+| dubbeltik deed het werk opnieuw | 148 | **93** |
+| `PROTECTED` | 24 | **78** |
+| `INTENTIONALLY_NON_IDEMPOTENT` | 32 | **62** |
+| `LEGACY_PENDING_CLASSIFICATION` | 576 | **492** |
 
 ## 6. De poort
 

@@ -49,6 +49,61 @@ const SLEUTELS = {
      waarin een dubbeltik een dubbele klant oplevert. */
   'POST /api/bedrijf/klant/zet': { zelfdeVerzoek: true },              // klantId of, zonder id, de naam
   'POST /api/bedrijf/repo/zet': { zelfdeVerzoek: true },               // repoId of, zonder id, de naam
+
+  /* ---- tweede ronde twee: dezelfde kale ronde, de rest van de 116 ----
+
+     AANMAAK EN OVERSCHRIJVING. Bij deze staat er een veld in de body dat bepaalt
+     wat er ontstaat, of ze schrijven een waarde die bij een tweede identieke
+     oproep precies hetzelfde is. In allebei de gevallen is een woordelijk gelijk
+     verzoek binnen het venster een dubbeltik: bij de eerste soort scheelt dat een
+     dubbel ding, bij de tweede een tweede schrijfactie met een tweede regel in
+     het auditspoor -- en dat spoor hoort te zeggen hoe vaak een MENS op de knop
+     drukte, niet hoe vaak het verzoek aankwam. */
+  'POST /api/office/rendezvous/tafel/maak': { zelfdeVerzoek: true },   // genodigden + tijd
+  'POST /api/supplier/gebouwpand/bhv': { zelfdeVerzoek: true },        // dag + opkomst
+  'POST /api/supplier/gebouwplus/lead': { zelfdeVerzoek: true },       // naam + wens
+  'POST /api/supplier/samenwerking/oproep': { zelfdeVerzoek: true },   // de oproep zelf
+  'POST /api/rtgone/frictie': { zelfdeVerzoek: true },                 // de frictie zelf
+  'POST /api/supplier/betaalverzoek': { zelfdeVerzoek: true },         // codename + bedrag
+  'POST /api/pay/verzoek': { zelfdeVerzoek: true },                    // aan + totaalCenten
+  'POST /api/supplier/giftcard/sell': { zelfdeVerzoek: true },         // bedrag
+  'POST /api/supplier/staff/invite': { zelfdeVerzoek: true },          // naam + rol + functie
+
+  /* De tien bureaus van de werkplek delen een vorm: `doe('atelier', 'ontwerpMaak',
+     'body')` maakt uit de body een ontwerp of een collectie. Tien routes, een
+     patroon, en bij alle tien draagt de body de titel. */
+  'POST /api/werkplek/bureau/architect/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/architect/project': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/atelier/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/atelier/collectie': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/hardware/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/hardware/serie': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/ideeen/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/redactie/artikel/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/studio/maak': { zelfdeVerzoek: true },
+  'POST /api/werkplek/bureau/studio/collectie': { zelfdeVerzoek: true },
+  'POST /api/office/hardware/serie': { zelfdeVerzoek: true },          // dezelfde vorm, kantoorkant
+
+  /* Overschrijvingen: de tweede oproep zet dezelfde waarden. */
+  'POST /api/office/boardroom/rahul/zet': { zelfdeVerzoek: true },     // karakter + verhaal
+  'POST /api/foundation/gezin/oppasinfo': { zelfdeVerzoek: true },     // noodcontacten + info
+  'POST /api/office/atelierweb/bewaar': { zelfdeVerzoek: true },       // het ontwerp
+  'POST /api/office/merk/sjabloon': { zelfdeVerzoek: true },           // code + ontwerp
+  'POST /api/site/bewaar': { zelfdeVerzoek: true },                    // het ontwerp
+  'POST /api/supplier/site/bewaar': { zelfdeVerzoek: true },           // het ontwerp
+  'POST /api/salon/bio': { zelfdeVerzoek: true },                      // de bio
+  'POST /api/supplier/salon/bio': { zelfdeVerzoek: true },             // de bio
+  'POST /api/gedachten/zet': { zelfdeVerzoek: true },
+  'POST /api/metier/kaart': { zelfdeVerzoek: true },
+  'POST /api/onboarding/paspoort': { zelfdeVerzoek: true },
+  'POST /api/toestellen/koppel': { zelfdeVerzoek: true },
+  'POST /api/supplier/horeca/venue/concept': { zelfdeVerzoek: true },  // de posities
+  'POST /api/supplier/horeca/wijk/zet': { zelfdeVerzoek: true },       // wijkId + tafels
+  'POST /api/supplier/horeca/rahul/grens': { zelfdeVerzoek: true },    // de grens in centen
+  'POST /api/supplier/aanwezig/leeg': { zelfdeVerzoek: true },         // zet drie tellers op nul
+  'POST /api/supplier/bezorg/terug': { zelfdeVerzoek: true },          // verwijdert de eigen rit
+  'POST /api/techniek/fouten/wis': { zelfdeVerzoek: true },            // wist de storingslijst
+  'POST /api/foundation/school/calamiteit': { zelfdeVerzoek: true },   // zet of heft het alarm
 };
 
 module.exports = { SLEUTELS };

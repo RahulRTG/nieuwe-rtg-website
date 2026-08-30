@@ -303,8 +303,21 @@ function alleRoutes() {
    opleveren dat niets bewijst. Welke soort een deur is, staat nu uitputtend in
    scripts/lib/bewakers.js en wordt daar bewaakt door een toets. Hier alleen nog
    de doorgeefluiken, want vier proeven en twee toetsen roepen deze namen aan. */
-function rolVan(bewakers) {
-  return bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: bewakers || [] }).rol;
+function rolVan(bewakers, route) {
+  /* HET PAD GAAT MEE, EN DAT WAS EERST NIET ZO. De bewakerskaart kent sinds de
+     openbaar-tak een oordeel dat van het PAD afhangt: een route zonder bewaker
+     die met een reden op de openbaar-lijst staat, hoort zonder sleutel open te
+     gaan en is dus wel degelijk te beproeven. Zolang hier alleen `bewakers`
+     binnenkwam, werd die tak nooit bereikt en bleven 45 openbare routes als
+     instrumenttekort tellen -- een tak die stil nooit afgaat, is geen tak.
+
+     `route` is optioneel: vier proeven roepen deze functie nog met alleen de
+     bewakerslijst aan, en die krijgen het oude antwoord. Dat is geen gat maar
+     een kleinere vraag; wie het pad niet meegeeft, kan er ook geen oordeel over
+     krijgen. */
+  const r = route || {};
+  return bewakerskaart.beoordeel({ bewakersBekend: true, bewakers: bewakers || [],
+    pad: r.pad, methode: r.methode }).rol;
 }
 
 /* De reden waarom een rol niet te bepalen valt. Zie bewakers.js: de reden bepaalt
@@ -312,7 +325,7 @@ function rolVan(bewakers) {
    onzichtbaar bleven. */
 function redenZonderRol(r) {
   return bewakerskaart.beoordeel(r).reden ||
-    'geen reden -- deze route heeft wel degelijk een rol (' + rolVan(r.bewakers) + ')';
+    'geen reden -- deze route heeft wel degelijk een rol (' + rolVan(r.bewakers, r) + ')';
 }
 
 /* Splitst een routelijst in wat beproefbaar is en wat niet, met de redenen
@@ -339,7 +352,7 @@ function verdeelOpRol(routes, beschikbareRollen) {
      beproeven. */
   const beschikbaar = Array.isArray(beschikbareRollen) ? new Set(beschikbareRollen) : null;
   for (const r of routes) {
-    const rol = rolVan(r.bewakers);
+    const rol = rolVan(r.bewakers, r);
     if (rol && (!beschikbaar || beschikbaar.has(rol))) {
       /* `methode` EN NIET `method`. Hier stond de enige plek in dit huis waar een
          route halverwege de pijplijn van veldnaam wisselde: alleRoutes() geeft

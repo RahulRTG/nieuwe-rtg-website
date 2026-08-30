@@ -182,3 +182,53 @@ test('de reclassificatie levert echte meting op, en dat is te tellen', () => {
     'de eigenrol-routes zijn kruisbaar geworden; dat aantal mag groeien maar niet ' +
     'krimpen zonder reden. Nu: ' + kruisbaar.length + ', ondergrens 138.');
 });
+
+/* ============================================================================
+   EEN OPENBARE ROUTE IS TE BEPROEVEN, EN TELDE ALS INSTRUMENTTEKORT.
+
+   WAT ER MIS WAS. `beoordeel()` gaf voor een route zonder middleware altijd
+   "geen bewakerslaag (bewaking zit in de handler)". Voor de meeste klopt dat,
+   maar niet voor de routes die met een REDEN op de openbaar-lijst staan
+   (scripts/lib/publiek.js): die horen zonder sleutel open te gaan. Ze vielen
+   daarmee in de bak GEEN_PROEFSLEUTEL van scripts/onbewezen.js -- een tekort
+   van de opstelling -- terwijl er niets ontbrak. Er valt juist WEL te meten, en
+   op de enige juiste manier: zonder token, want dat is wat een bezoeker
+   meestuurt.
+
+   Gemeten: 55 routes verhuisden van "geen sleutel" naar beproefbaar.
+
+   EN DE TWEEDE HELFT VAN DEZELFDE FOUT: `rolVan()` gaf alleen de BEWAKERS door
+   en niet het pad, dus de nieuwe tak werd nooit bereikt. De eerste meting na
+   het toevoegen gaf 0 openbaar. Een tak die stil nooit afgaat is geen tak
+   (LAT.md regel 9) -- vandaar dat de tweede toets hieronder door verdeelOpRol
+   heen meet en niet alleen beoordeel() aanroept.
+
+   DE MUTATIE: haal de PUBLIEK-tak uit beoordeel() -> beide toetsen zakken.
+   Geef in verdeelOpRol het pad niet meer mee -> de tweede zakt.
+   ========================================================================== */
+test('een route zonder bewaker die met reden openbaar is, krijgt de rol openbaar', () => {
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = [...PUBLIEK.keys()][0];
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: [], pad, methode: 'POST' });
+  assert.equal(u.rol, 'openbaar', pad + ' staat met een reden op de openbaar-lijst');
+  assert.equal(u.reden, null, 'een besluit is geen reden-om-niet');
+});
+
+test('een route zonder bewaker die NIET openbaar is, blijft een gat', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: [], pad: '/api/bestaat-niet-xyz', methode: 'POST' });
+  assert.equal(u.rol, null);
+  assert.match(u.reden, /geen bewakerslaag/);
+});
+
+test('en de verdeling bereikt die tak ook werkelijk', () => {
+  /* De tak zat er een meting lang in zonder ooit af te gaan, omdat het pad niet
+     werd doorgegeven. Deze toets meet daarom door verdeelOpRol heen. */
+  const { alleRoutes, isSchakel, verdeelOpRol } = require('../scripts/lib/routes');
+  const { ROLLEN } = require('../scripts/lib/proefsleutels');
+  const m = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET' &&
+    !isSchakel(r.pad) && !r.pad.includes(':'));
+  const v = verdeelOpRol(m, ROLLEN);
+  const openbaar = v.metRol.filter(x => x.rol === 'openbaar').length;
+  assert.ok(openbaar > 20,
+    'er horen tientallen openbare schrijfroutes beproefbaar te zijn, gevonden: ' + openbaar);
+});

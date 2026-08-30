@@ -196,12 +196,27 @@ function namenVan(soort) {
    officeAuth EN boardroomAuth is voor het kruisen een kantoorroute plus een
    extra slot -- het kantoortoken is dan de juiste rol en member/supplier zijn
    fout, en dat is de scherpere meting). Verfijners doen nooit mee. */
+const { PUBLIEK } = require('./publiek');
+
 function beoordeel(route) {
   const r = route || {};
   if (!r.bewakersBekend) return { rol: null, reden: 'de router kon geen bewakers noemen' };
 
   const namen = Array.isArray(r.bewakers) ? r.bewakers : [];
   if (!namen.length) {
+    /* GEEN BEWAKER IS NIET ALTIJD EEN GAT -- soms is het een BESLUIT.
+
+       Een route die met een reden op de openbaar-lijst staat (scripts/lib/publiek.js)
+       hoort zonder sleutel open te gaan. Zonder deze tak viel hij hier onder "geen
+       bewakerslaag" en daarmee in de bak GEEN_PROEFSLEUTEL van de trechter: een
+       instrumenttekort, terwijl er niets ontbreekt. Er valt hier juist WEL te
+       meten, en op de enige juiste manier -- zonder token, want dat is precies
+       wat een bezoeker meestuurt.
+
+       De lijst komt uit lib/publiek.js en wordt hier niet nog een keer bedacht;
+       twee lijsten van wat openbaar mag zijn lopen uiteen (LAT.md regel 4), en
+       dat is met deze lijst al een keer gebeurd. */
+    if (r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
     return { rol: null, reden: 'geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)' };
   }
 

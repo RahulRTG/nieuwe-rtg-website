@@ -55,7 +55,13 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
 /* De volgorde waarin ze worden opgehaald. member/office/supplier eerst, want de
    meeste proeven hebben aan die drie genoeg en een falende eigenaarslogin mag
    ze niet ophouden. */
-const ROLLEN = ['member', 'office', 'supplier', 'boardroom', 'techniek', 'kantoor-op-naam'];
+/* `openbaar` is geen inlog maar het ONTBREKEN ervan, en staat hier toch in de
+   lijst -- want een rol die niet in ROLLEN staat, valt bij verdeelOpRol() uit
+   de beproefbare verzameling. Zijn "sleutel" is de lege string: de proeven
+   zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
+   die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
+   als instrumenttekort terwijl er niets ontbrak. */
+const ROLLEN = ['member', 'office', 'supplier', 'boardroom', 'techniek', 'kantoor-op-naam', 'openbaar'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
    zijn eigen basis-URL en foutafhandeling); `officeCode` de backoffice-code van
@@ -102,6 +108,9 @@ function maakSleutels({ post, officeCode, eigen }) {
     'kantoor-op-naam': haalEigenaar
   }, eigen || {});
 
+  /* Geen aanroep: er valt niets in te loggen. De lege string is de sleutel, en
+     `haalSleutels` bewaart hem dan ook expliciet -- zie de uitzondering daar. */
+  inlog.openbaar = async () => '';
   return { inlog, ROLLEN, OWNER_EMAIL };
 }
 
@@ -117,7 +126,13 @@ async function haalSleutels(bos) {
     if (!bos.inlog[rol]) continue;
     try {
       const t = await bos.inlog[rol]();
-      if (t) tokens[rol] = t;
+      /* EEN LEGE SLEUTEL IS EEN SLEUTEL, voor precies een rol. Voor elke andere
+         rol betekent "geen token" dat de inlog mislukte; voor `openbaar`
+         betekent het dat er geen token HOORT te zijn. Die twee op `if (t)` over
+         een kam scheren zou de openbare routes stil uit elke proef laten
+         vallen -- en dat is hoe ze eerder als instrumenttekort telden. */
+      if (rol === 'openbaar') tokens[rol] = '';
+      else if (t) tokens[rol] = t;
       else mislukt.push({ rol, reden: 'de inlog gaf geen token terug' });
     } catch (e) { mislukt.push({ rol, reden: String(e && e.message || e).slice(0, 120) }); }
   }

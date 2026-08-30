@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **271** |
-| `NOT_APPLICABLE` | 40 | 1.042 |
-| geclassificeerd | 3.069 | 4.382 van 4.653 (94,2%) |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **258** |
+| `NOT_APPLICABLE` | 40 | 1.055 |
+| geclassificeerd | 3.069 | 4.395 van 4.653 (94,5%) |
 
 ### Een derde argument, en 147 deuren
 
@@ -638,6 +638,39 @@ de eerste leverde honderden, deze vier.
 deur staat op de router. Hij ziet er precies zo uit als een poort, en zonder een
 regel die zegt dat hij er geen is, kregen 23 routes hun toegangsklasse van een
 leesfunctie. Hij staat daarom in het register, als `geen-deur`.
+
+### De objectpoort op de router, en het veld dat niemand had opgeschreven
+
+Dertien werkplek-routes stonden stil op precies één ontbrekend gegeven. Ze
+haalden alle vier de bewijseisen, hun toegangsklasse was bekend
+(`OBJECT_SCOPED`) — maar een `OBJECT_SCOPED`-contract moet noemen *welk veld*
+het object aanwijst, en dat wist niemand.
+
+De reden: hun objectpoort hangt op de **router** (`app.post(pad, huisAuth, …)`),
+niet in de handler. De bewakerskaart ziet hem wel — zij leest de router — en weet
+dat het een objectpoort is, maar niet welk veld uit het lichaam het object kiest.
+Het handlerpoortregister ging uitdrukkelijk over poorten *in de handler*.
+
+`ROUTERPOORTEN` in `server/kern/handlerpoorten/index.js` vult dat gat, en staat
+er **apart** van de handlerpoorten: het zijn twee verschillende waarnemingen, de
+een leest de handler en de ander de router. Zes bewakers, elk veld gelezen in de
+bewaker zelf, met het bestand erbij:
+
+| bewaker | veld | waar |
+|---|---|---|
+| `huisAuth` | `bedrijf` | `routes/werkplek.js` |
+| `huisPoort` | `bedrijf` | `routes/kantoorpakket-huis.js` via `huisDrive()` |
+| `gezinsPoort` | `code` | `routes/tiener.js`, `routes/baby.js` |
+| `rtfPoort` | `code` | `routes/kantoorpakket-huis.js` |
+| `gastAuth` | `sleutel` | `routes/gast.js` |
+| `arrivalPassAuth` | `pass` | `routes/supplier/horeca/arrival-toegang.js` |
+
+| | voor | na |
+|---|---:|---:|
+| voorstellen zonder bruikbare deur | 21 | **8** |
+| routes onder het bewijsbesluit | 1.002 | **1.015** |
+| `LEGACY_PENDING_CLASSIFICATION` | 271 | **258** |
+| geclassificeerd | 4.382 | **4.395 van 4.653 (94,5%)** |
 
 ## 6. De poort
 

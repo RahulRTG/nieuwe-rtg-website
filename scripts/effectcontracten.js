@@ -51,6 +51,7 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const proef = require(path.join(WORTEL, 'IDEMPROEF.json'));
 const { PUBLIEK } = require('./lib/publiekeroutes');
+const handlerpoorten = require(path.join(__dirname, '..', 'server/kern/handlerpoorten'));
 const DOEL = path.join(WORTEL, 'MUTATIECONTRACT-VOORSTEL.json');
 
 /* De routes die al een verklaring van een mens hebben, blijven onaangeroerd:
@@ -217,7 +218,11 @@ for (const r of rijen) {
   }
   if (klasse === 'OBJECT_SCOPED') {
     const uh = String((x.toegang && x.toegang.uitHandler) || '');
-    const veld = uh.startsWith('object: ') ? uh.slice(8) : null;
+    /* Uit de handler, of -- als de objectpoort op de ROUTER hangt -- uit
+       ROUTERPOORTEN. Dertien werkplek-routes haalden alle vier de bewijseisen en
+       strandden hier op een ontbrekend veld. */
+    const veld = uh.startsWith('object: ') ? uh.slice(8)
+      : ((x.toegang && x.toegang.bewakers) || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean);
     if (!veld) { zonderDeur++; continue; }   // OBJECT_SCOPED zonder veld is geen contract
     rij.objectVeld = veld;
   }

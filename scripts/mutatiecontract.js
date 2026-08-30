@@ -562,7 +562,11 @@ if (process.argv.includes('--afleiden')) {
     if (toeg === 'PUBLIC') toegang.waarom = PUBLIEK.get(r.route.replace(/^\S+ /, '')) || null;
     if (toeg === 'OBJECT_SCOPED') {
       const p = uitHandler.get(r.route) || handlerpoorten.poortVanRoute(r.pad);
-      toegang.objectVeld = (p && p.veld) || 'nog af te leiden uit de handler';
+      /* En anders: staat de objectpoort op de ROUTER? De bewakerskaart weet dat
+         het er een is, maar niet welk veld het object aanwijst. Zie
+         ROUTERPOORTEN in server/kern/handlerpoorten/index.js. */
+      const viaBewaker = (r.bewakers || []).map(n => handlerpoorten.veldVanBewaker(n)).find(Boolean);
+      toegang.objectVeld = (p && p.veld) || viaBewaker || 'nog af te leiden uit de handler';
     }
     uitContracten[r.route] = {
       mutatieId: r.mutatieId,

@@ -92,6 +92,42 @@ const NIET_IN = {
 };
 
 /* ---------------------------------------------------------------------------
+   DE OBJECTPOORTEN OP DE ROUTER.
+
+   Dit register gaat over poorten IN de handler -- dat staat in de kop, en dat
+   blijft zo. Maar een handvol objectpoorten hangt op de ROUTER: `app.post(pad,
+   huisAuth, ...)`. De bewakerskaart ziet ze wel (zij leest de router) en weet
+   dat het objectpoorten zijn, maar niet WELK veld uit het lichaam het object
+   aanwijst -- en dat is precies wat een OBJECT_SCOPED-contract moet noemen.
+
+   Dertien werkplek-routes stonden daarop stil: alle vier de bewijseisen gehaald,
+   en toch geen contract, omdat het objectveld ontbrak.
+
+   Ze staan hier apart en niet tussen de handlerpoorten, want het zijn twee
+   verschillende waarnemingen: de een leest de handler, de ander de router. Elk
+   veld hieronder is gelezen in de bewaker zelf; het bestand staat erbij. */
+const ROUTERPOORTEN = {
+  huisAuth: { veld: 'bedrijf',
+    wat: 'server/routes/werkplek.js: welk huis, en mag deze sessie daarin' },
+  huisPoort: { veld: 'bedrijf',
+    wat: 'server/routes/kantoorpakket-huis.js via huisDrive(): werkplek.kent(bedrijf) plus magIn()' },
+  gezinsPoort: { veld: 'code',
+    wat: 'server/routes/tiener.js en baby.js: rtf.verifieerProfiel(code, token)' },
+  rtfPoort: { veld: 'code',
+    wat: 'server/routes/kantoorpakket-huis.js: dezelfde profielcontrole op code + token' },
+  gastAuth: { veld: 'sleutel',
+    wat: 'server/routes/gast.js: sessie.herken(sleutel) -- de gastsleutel wijst het verblijf aan' },
+  arrivalPassAuth: { veld: 'pass',
+    wat: 'server/routes/supplier/horeca/arrival-toegang.js: de Arrival Pass zelf, met vervaldatum' }
+};
+
+/* Het objectveld van een bewaker op de router, of null. */
+function veldVanBewaker(naam) {
+  const p = ROUTERPOORTEN[String(naam)];
+  return (p && p.veld) || null;
+}
+
+/* ---------------------------------------------------------------------------
    DE GEGENEREERDE FAMILIES.
 
    Een handvol routes wordt in een LUS aangemaakt: `app.post('/api/rtf/spel/' +
@@ -150,4 +186,5 @@ function poortVan(bestand, naam) {
   return POORTEN[n] || null;
 }
 
-module.exports = { POORTEN, poortVan, poortVanRoute, NIET_IN, FAMILIES };
+module.exports = { POORTEN, poortVan, poortVanRoute, veldVanBewaker,
+  NIET_IN, FAMILIES, ROUTERPOORTEN };

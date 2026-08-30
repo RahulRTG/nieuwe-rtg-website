@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:18:10.264Z",
-  "commit": "8b3eec61",
+  "op": "2026-08-30T09:22:58.248Z",
+  "commit": "378d6d7d",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,15 +9,15 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4382,
+  "geclassificeerd": 4395,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3200,
-   "NOT_APPLICABLE": 1042,
-   "LEGACY_PENDING_CLASSIFICATION": 271,
+   "NOT_APPLICABLE": 1055,
+   "LEGACY_PENDING_CLASSIFICATION": 258,
    "PROTECTED": 78,
    "INTENTIONALLY_NON_IDEMPOTENT": 62
   },
-  "vastgesteldDoorMens": 1192,
+  "vastgesteldDoorMens": 1205,
   "afgeleidDoorScript": 3190,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3808,
@@ -35,7 +35,7 @@
   },
   "voorstellen": {
    "BLOCKED_BY_TEST_FIXTURE": 40,
-   "NOT_APPLICABLE": 23,
+   "NOT_APPLICABLE": 10,
    "PROTECTED": 7
   },
   "metingVan": "2026-08-30T04:33:05.678Z"
@@ -120987,12 +120987,14 @@
   {
    "mutatieId": "werkplek.bureau.architect",
    "route": "POST /api/werkplek/bureau/architect",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121004,10 +121006,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.architect.bouwstaat",
@@ -121224,12 +121226,14 @@
   {
    "mutatieId": "werkplek.bureau.atelier",
    "route": "POST /api/werkplek/bureau/atelier",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121241,10 +121245,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.atelier.collectie",
@@ -121436,12 +121440,14 @@
   {
    "mutatieId": "werkplek.bureau.hardware",
    "route": "POST /api/werkplek/bureau/hardware",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121453,10 +121459,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.hardware.concept",
@@ -121596,12 +121602,14 @@
   {
    "mutatieId": "werkplek.bureau.hardware.productblad",
    "route": "POST /api/werkplek/bureau/hardware/productblad",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121613,10 +121621,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.hardware.serie",
@@ -121727,12 +121735,14 @@
   {
    "mutatieId": "werkplek.bureau.ideeen",
    "route": "POST /api/werkplek/bureau/ideeen",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121744,10 +121754,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.ideeen.maak",
@@ -121912,12 +121922,14 @@
   {
    "mutatieId": "werkplek.bureau.redactie",
    "route": "POST /api/werkplek/bureau/redactie",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -121929,10 +121941,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.redactie.ai.redactie",
@@ -122178,12 +122190,14 @@
   {
    "mutatieId": "werkplek.bureau.redactie.nieuwstips",
    "route": "POST /api/werkplek/bureau/redactie/nieuwstips",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122195,20 +122209,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.studio",
    "route": "POST /api/werkplek/bureau/studio",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122220,10 +122236,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.studio.collectie",
@@ -122309,12 +122325,14 @@
   {
    "mutatieId": "werkplek.bureau.studio.lookbook",
    "route": "POST /api/werkplek/bureau/studio/lookbook",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122326,10 +122344,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.bureau.studio.maak",
@@ -122440,12 +122458,14 @@
   {
    "mutatieId": "werkplek.bureaus",
    "route": "POST /api/werkplek/bureaus",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122457,10 +122477,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.kantoorpakket.aanwezig",
@@ -122627,12 +122647,14 @@
   {
    "mutatieId": "werkplek.kantoorpakket.mijn",
    "route": "POST /api/werkplek/kantoorpakket/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisPoort"
     ]
@@ -122644,10 +122666,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.kantoorpakket.open",
@@ -122970,12 +122992,14 @@
   {
    "mutatieId": "werkplek.overzicht",
    "route": "POST /api/werkplek/overzicht",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -122987,20 +123011,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.plank",
    "route": "POST /api/werkplek/plank",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": [
      "huisAuth"
     ]
@@ -123012,10 +123038,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "werkplek.taak",

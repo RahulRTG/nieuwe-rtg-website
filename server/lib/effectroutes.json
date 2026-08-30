@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 1002,
- "zonderWaargenomenDeur": 21,
+ "aantal": 1015,
+ "zonderWaargenomenDeur": 8,
  "routes": [
   {
    "route": "POST /api/aanmeld/start",
@@ -5052,6 +5052,84 @@
    "route": "POST /api/wereld/zoek",
    "mutatieId": "wereld.zoek",
    "toegang": "AUTHENTICATED"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/architect",
+   "mutatieId": "werkplek.bureau.architect",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/atelier",
+   "mutatieId": "werkplek.bureau.atelier",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/hardware",
+   "mutatieId": "werkplek.bureau.hardware",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/hardware/productblad",
+   "mutatieId": "werkplek.bureau.hardware.productblad",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/ideeen",
+   "mutatieId": "werkplek.bureau.ideeen",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/redactie",
+   "mutatieId": "werkplek.bureau.redactie",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/redactie/nieuwstips",
+   "mutatieId": "werkplek.bureau.redactie.nieuwstips",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/studio",
+   "mutatieId": "werkplek.bureau.studio",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureau/studio/lookbook",
+   "mutatieId": "werkplek.bureau.studio.lookbook",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/bureaus",
+   "mutatieId": "werkplek.bureaus",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/kantoorpakket/mijn",
+   "mutatieId": "werkplek.kantoorpakket.mijn",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/overzicht",
+   "mutatieId": "werkplek.overzicht",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
+  },
+  {
+   "route": "POST /api/werkplek/plank",
+   "mutatieId": "werkplek.plank",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "bedrijf"
   },
   {
    "route": "POST /api/werkplek/toegang",

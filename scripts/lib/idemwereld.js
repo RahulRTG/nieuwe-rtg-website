@@ -335,53 +335,36 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     }
   }
 
-  /* 11g. EEN TAXIBEDRIJF, want een genre is geen rol maar een SCHAKELAAR.
+  /* 11g. GEEN TAXIBEDRIJF -- en waarom die deur toch dicht blijft.
 
           Eenenvijftig routes onder /api/supplier/mob, /api/staff/mob, /oog, /ov
           en /flits antwoorden "Deze functie is voor dit genre zaken
           uitgeschakeld door RTG." Dat is geen bevoegdheid maar een
-          functieschakelaar per genre (middleware/schakelaar-antwoord.js), en de
-          demozaak van de proef is een hotel.
+          functieschakelaar per genre, en de demozaak van de proef is een hotel.
+          Er staat wel een taxibedrijf in de seed (MKKX), maar dat heeft geen
+          personeelsinlog: de demo-inlog komt altijd op DEMO_SUPPLIER uit.
 
-          `taxi` is een OPEN genre en staat niet in BEWIJS_EISEN: er hoort geen
-          vergunning bij die een mens moet hebben gezien. Een taxibedrijf
-          aanmelden is dus de gewone partnerweg, en die loopt de proef af:
+          IK HEB DE AANMELDWEG GEBOUWD EN WEER WEGGEHAALD. De redenering was dat
+          `taxi` een OPEN genre is en niet in BEWIJS_EISEN staat -- de acht
+          genres die pas een zaak krijgen als een mens het papier heeft gezien.
+          Dat klopte, en het was toch fout: ik had maar EEN van de twee lijsten
+          gelezen. De aanvraagroute vraagt daarnaast om de officiele referenties
+          uit `controle.eisenVoor()`, en voor taxi is dat de
+          Kiwa-ondernemersvergunning taxivervoer. De proef kreeg gewoon een 400
+          met die eis erin.
 
-            1. aanvragen   /api/partner/apply, als lid met een ZAKELIJKE pas --
-                           de route eist dat met zoveel woorden.
-            2. besluiten   /api/office/partner/decide (boardroom) -- geeft de
-                           bedrijfscode en de manager-PIN terug.
-            3. wie is er   /api/supplier/roster, dezelfde inlogkiezer als bij de
-                           Rijksoverheid.
-            4. inloggen    /api/supplier/login.
+          Dat is de scherpere regel dan die ik bij de Rijksoverheid formuleerde.
+          Niet "identiteit tegenover voorwerp", maar: EEN GENRE DAT BIJ HET
+          AANMELDEN OM EEN VERGUNNINGREFERENTIE VRAAGT, IS EEN GENRE WAAR EEN
+          MENS IETS HEEFT MOETEN ZIEN. Een proefronde die daar een verzonnen
+          vergunningnummer intypt om eenenvijftig regels uit de kolom `ongemeten`
+          te halen, verzint bewijs voor een gereguleerd beroep. Ze blijven
+          ongemeten, en dat is de eerlijke uitslag.
 
-          Er staat al een taxibedrijf in de seed (MKKX), maar dat heeft geen
-          personeelsinlog: de demo-inlog komt altijd op DEMO_SUPPLIER uit. Een
-          eigen zaak aanmelden is dus geen omweg maar de enige weg. */
-  if (tokens['lid-business'] && tokens.boardroom) {
-    const aanvraag = await stil('/api/partner/apply', {
-      company: 'Proeftaxi (idemproef)', type: 'taxi', city: 'Proefstad',
-      contactName: 'Proefbeheerder', email: 'proeftaxi@example.invalid',
-      landCode: 'NL', kvkNummer: '87654321',
-      akkoord: true, bevoegd: true, waarheidsgetrouw: true
-    }, tokens['lid-business']);
-    const aanvraagId = veld(aanvraag, 'id');
-    if (aanvraagId) {
-      const besluit = await stil('/api/office/partner/decide',
-        { id: aanvraagId, besluit: 'goedkeuren', akkoord: true }, tokens.boardroom);
-      const code = veld(besluit, 'code'), pin = veld(besluit, 'pin');
-      if (code && pin) {
-        const rooster = await stil('/api/supplier/roster', { code });
-        const eerste = ((rooster.data && rooster.data.staff) || [])[0];
-        if (eerste) {
-          const login = await stil('/api/supplier/login', { code, staffId: eerste.id, pin });
-          w.taxiToken = veld(login, 'token');
-          w.taxiCode = code;
-          if (w.taxiToken) tokens.taxi = w.taxiToken;   // zelfde reden als bij `rijk`
-        }
-      }
-    }
-  }
+          Wat hier WEL zou kunnen: `ov` is een intern genre en gaat dus net als
+          de Rijksoverheid via /api/office/instelling/aansluiten. Dat dekt zeven
+          van de eenenvijftig; de andere vierenveertig hangen aan `mob`, `oog` en
+          `flits`, en die vragen alle drie om een taxi- of vervoersgenre. */
 
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
 }
@@ -498,29 +481,6 @@ function voorvoegselLijf(w) {
      voorvoegsel geeft dus de sleutel mee en verder niets. */
   if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk' });
 
-  /* En de mobiliteitskant, om dezelfde reden een ROL en geen lijf. Deze
-     voorvoegsels zijn smal gehouden: /api/supplier/ in zijn geheel omzetten zou
-     honderden routes van de hotelzaak naar de taxizaak verhuizen, en dan meet de
-     volgende ronde iets anders zonder dat iemand het ziet. */
-  if (w.taxiToken) {
-    for (const vv of ['/api/supplier/mob/', '/api/staff/mob/', '/api/staff/oog/',
-      '/api/staff/ov/', '/api/staff/flits/', '/api/supplier/ov/', '/api/supplier/oog/',
-      '/api/supplier/ghost/']) uit.push({ voorvoegsel: vv, lijf: {}, rol: 'taxi' });
-  }
-
-  /* De kantoorpakketten, elk met het document van HUN kring. Deze staan na het
-     werkplek-voorvoegsel maar zijn specialer, dus ze moeten ervoor -- de eerste
-     treffer wint (zie de waarschuwing bij /api/foundation/school/ hierboven).
-     Vandaar unshift en niet push. */
-  const kp = [
-    ['/api/kantoorpakket/', w.kp],
-    ['/api/office/kantoorpakket/', w.kpOffice],
-    ['/api/supplier/kantoorpakket/', w.kpSupplier],
-    ['/api/werkplek/kantoorpakket/', w.kpWerkplek, 'boardroom']
-  ];
-  for (const [voorvoegsel, id, rol] of kp) {
-    if (id) uit.unshift(rol ? { voorvoegsel, lijf: { id }, rol } : { voorvoegsel, lijf: { id } });
-  }
   return uit;
 }
 

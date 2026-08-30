@@ -225,8 +225,14 @@ const FAMILIES = [
     naam: 'les',
     /* De onderwijskant van de RTFoundation: het digitale schoolbord, de agenda,
        de opgaven en het schrift. Tien routes achter lesVan/docentCheck. */
+    /* MET EN ZONDER SLUITENDE STREEP. `/api/foundation/agenda` bestaat als
+       route NAAST `/api/foundation/agenda/verwijder`, en een voorvoegsel dat op
+       een streep eindigt mist de eerste. Twee routes vielen daardoor stil
+       buiten deze familie -- geen foutmelding, ze stonden gewoon in de bak
+       "geen sleutel". Een toets loopt dit nu voor elke familie na. */
     prefixen: ['/api/foundation/les/', '/api/foundation/bord/', '/api/foundation/agenda/',
-      '/api/foundation/opgave/', '/api/foundation/schrift/', '/api/foundation/ai'],
+      '/api/foundation/agenda', '/api/foundation/opgave/', '/api/foundation/opgave',
+      '/api/foundation/schrift/', '/api/foundation/ai'],
     velden: ['code', 'token'],
     waarom: 'lesVan leest de lescode uit het lijf en docentCheck de docentsleutel via ' +
       'tokenUit(req), die ook het lijfveld `token` accepteert (server/foundation/basis.js)',
@@ -278,6 +284,38 @@ const FAMILIES = [
       if (!sleutel) return null;
       return { sleutel };
     }
+  },
+  {
+    naam: 'doos',
+    /* De zaakdoos: het kastje in de zaak dat zijn status, metingen en dagrapport
+       meldt op het EIGEN net van de zaak. Vier routes achter doosSleutelOk. */
+    prefixen: ['/api/doos/'],
+    velden: [],
+    koppen: ['x-doos-sleutel'],
+    waarom: 'doosSleutelOk vergelijkt de kop x-doos-sleutel tijd-veilig met RTG_DOOS_SLEUTEL ' +
+      'uit de omgeving; zonder die omgevingsvariabele bestaat de deur niet (server/routes/doos.js)',
+    /* DIT IS DE ENIGE FAMILIE MET EEN KOP IN PLAATS VAN EEN LIJFVELD, en dat
+       verschil is geen detail. De sleutel hoort in een kop te reizen; hem in de
+       body meesturen zou een weg beproeven die de route niet kent, en dan meet
+       de proef iets anders dan het product doet.
+
+       De sleutel komt uit de omgeving van de wegwerpserver. Dat is geen
+       omzeiling maar dezelfde soort opstelling als OFFICE_CODE, die de proef al
+       zet: zonder RTG_DOOS_SLEUTEL bestaat deze deur helemaal niet, ook niet in
+       productie. Staat hij niet gezet, dan meldt de familie zich als mislukt --
+       geen verzonnen sleutel, want dan zou 403 als 200 gaan lezen. */
+    async bouw({ post, doosSleutel }) {
+      if (!doosSleutel) return null;
+      /* Aankloppen op een route die WERKELIJK een POST is. De eerste versie
+         probeerde /api/doos/status, en dat is een GET -- de proef kreeg 403 en
+         de familie meldde zich als mislukt. Dat is precies wat een bouwer hoort
+         te doen als hij zijn sleutel niet kan bewijzen, en het was hier de
+         verkeerde deur en niet de verkeerde sleutel. */
+      const r = await post('/api/doos/update/status', { versie: 'proef', ok: true }, null,
+        { 'x-doos-sleutel': doosSleutel });
+      if (!r || r.status < 200 || r.status >= 300) return null;
+      return { __koppen: { 'x-doos-sleutel': doosSleutel } };
+    }
   }
 ];
 
@@ -292,8 +330,13 @@ async function bouwLijfsleutels(ctx) {
     let uit = null;
     try { uit = await f.bouw(ctx); } catch (e) { uit = null; }
     if (!uit) { mislukt.push({ naam: f.naam, reden: 'de bouwer kreeg geen sleutel terug' }); continue; }
-    gebouwd.push({ naam: f.naam, velden: Object.keys(uit), rol: f.rol || null });
-    for (const p of f.prefixen) velden.set(p, { velden: uit, rol: f.rol || null });
+    /* `koppen` is met opzet een APARTE uitkomst en geen veld in het lijf: een
+       apparaatsleutel die in een kop hoort te reizen, in de body meesturen zou
+       een andere weg beproeven dan de route werkelijk kent. */
+    const koppen = uit.__koppen || null;
+    const lijf = Object.assign({}, uit); delete lijf.__koppen;
+    gebouwd.push({ naam: f.naam, velden: Object.keys(lijf), rol: f.rol || null, koppen: !!koppen });
+    for (const p of f.prefixen) velden.set(p, { velden: lijf, rol: f.rol || null, koppen });
   }
   const vind = (pad) => {
     for (const [p, v] of velden) if (String(pad).startsWith(p)) return v;
@@ -304,8 +347,10 @@ async function bouwLijfsleutels(ctx) {
      Dat onderscheid hoort expliciet te zijn -- een undefined die toevallig geen
      kop oplevert, is niet te onderscheiden van een vergeten rol. */
   const rolVoor = (pad) => { const v = vind(pad); return v ? v.rol : null; };
+  /* Extra koppen voor deze route, of null. Zie de opmerking bij `__koppen`. */
+  const koppenVoor = (pad) => { const v = vind(pad); return v ? v.koppen : null; };
   const dekt = (pad) => !!vind(pad);
-  return { gebouwd, mislukt, lijfVoor, rolVoor, dekt, families: FAMILIES.map(f => f.naam) };
+  return { gebouwd, mislukt, lijfVoor, rolVoor, koppenVoor, dekt, families: FAMILIES.map(f => f.naam) };
 }
 
 /* Voor wie alleen wil weten WELKE paden een familie zou dekken, zonder een

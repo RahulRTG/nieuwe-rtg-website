@@ -185,7 +185,7 @@ function weegHerhaling(a, b, c, staat, diepeStaat) {
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging, staatDiep }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, koppenVoor, hernieuw, maxRoutes, staatVan, vastlegging, staatDiep }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -199,13 +199,17 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const lijf = lijfVoor(r);
 
     const doe = async (sleutel) => {
-      let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol));
+      /* Sommige deuren verwachten hun sleutel in een KOP en niet in het lijf
+         (de zaakdoos). Zonder deze doorgifte klopt de proef er zonder sleutel
+         aan en leest 403 als een uitslag. */
+      const koppen = koppenVoor ? koppenVoor(r) : null;
+      let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol), koppen);
       gedaan++;
       /* Een dood token maakt van elke volgende route een 401, en dan meldt de
          ronde "niets gemeten" over honderden routes zonder dat iets klaagt --
          dezelfde meetfout als in de invoerproef, en dezelfde reparatie. */
       if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol)); gedaan++; }
+        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol), koppen); gedaan++; }
       }
       return st;
     };

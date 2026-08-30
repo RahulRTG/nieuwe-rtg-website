@@ -38,7 +38,12 @@ test('elke familie noemt zijn velden, zijn paden en WAAROM hij bestaat', () => {
   for (const f of FAMILIES) {
     assert.ok(f.naam, 'een familie zonder naam is niet te melden');
     assert.ok(Array.isArray(f.prefixen) && f.prefixen.length, f.naam + ': geen paden');
-    assert.ok(Array.isArray(f.velden) && f.velden.length, f.naam + ': geen velden');
+    /* Velden OF koppen -- de doosfamilie draagt haar sleutel in een kop, want
+       daar hoort hij te reizen; in de body meesturen zou een weg beproeven die
+       de route niet kent. Maar iets moet hij declareren: een familie die niets
+       meestuurt, opent niets. */
+    const draagt = (f.velden || []).length + (f.koppen || []).length;
+    assert.ok(draagt > 0, f.naam + ': declareert geen velden en geen koppen');
     assert.ok(f.waarom && f.waarom.length > 40,
       f.naam + ': geen uitgeschreven reden. Zonder reden is dit een plek om een sleutel te verzinnen');
     assert.equal(typeof f.bouw, 'function', f.naam + ': geen bouwer');
@@ -198,4 +203,35 @@ test('geen enkel voorvoegsel valt onder dat van een andere familie', () => {
       }
     }
   }
+});
+
+/* ============================================================================
+   EEN VOORVOEGSEL MET EEN SLUITENDE STREEP MIST HET KALE PAD.
+
+   `/api/foundation/agenda` bestaat als route NAAST
+   `/api/foundation/agenda/verwijder`. Een familie met voorvoegsel
+   '/api/foundation/agenda/' dekt de tweede wel en de eerste niet.
+
+   Er komt geen foutmelding van: die routes stonden gewoon in de bak "geen
+   sleutel", tussen tientallen andere, alsof er iets ontbrak. Twee stuks in
+   dit geval -- weinig, en precies het soort stille misser dat groeit met elke
+   familie die erbij komt.
+
+   DE MUTATIE: haal '/api/foundation/agenda' (zonder streep) uit de prefixen
+   van de lesfamilie -> deze toets zakt.
+   ========================================================================== */
+test('elk voorvoegsel met een streep dekt ook het kale pad, als dat bestaat', () => {
+  const { alleRoutes } = require('../scripts/lib/routes');
+  const paden = new Set(alleRoutes().filter(r => r.methode !== 'GET').map(r => r.pad));
+  const gemist = [];
+  for (const f of FAMILIES) {
+    for (const p of f.prefixen) {
+      if (!p.endsWith('/')) continue;
+      const kaal = p.slice(0, -1);
+      if (paden.has(kaal) && !f.prefixen.includes(kaal)) gemist.push(f.naam + ' -> ' + kaal);
+    }
+  }
+  assert.deepEqual(gemist, [],
+    'deze paden bestaan als route maar vallen buiten hun familie omdat het voorvoegsel ' +
+    'op een streep eindigt: ' + gemist.join(', '));
 });

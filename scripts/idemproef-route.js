@@ -102,10 +102,14 @@ wachtOpSchoneBoom();
     env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
-  const post = async (pad, lijf, tok) => {
+  /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en
+     niet in het lijf -- de zaakdoos is de enige. Hem in de body meesturen zou
+     een weg beproeven die de route niet kent. */
+  const post = async (pad, lijf, tok, extraKoppen) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
+        headers: { 'Content-Type': 'application/json',
+          ...(tok ? { Authorization: 'Bearer ' + tok } : {}), ...(extraKoppen || {}) },
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
@@ -133,7 +137,7 @@ wachtOpSchoneBoom();
      elke proef, terwijl er wel degelijk een sleutel te MAKEN is. Zie de kop van
      ./lib/lijfsleutels.js voor waarom dat een tweede begrip is en geen rol. */
   const { bouwLijfsleutels } = require('./lib/lijfsleutels');
-  const lijfsleutels = await bouwLijfsleutels({ post, tokens, datamap: server.datamap });
+  const lijfsleutels = await bouwLijfsleutels({ post, tokens, datamap: server.datamap, doosSleutel: DOOS_SLEUTEL });
   console.log('  lijfsleutels gebouwd                 : ' +
     (lijfsleutels.gebouwd.length ? lijfsleutels.gebouwd.map(g => g.naam).join(', ') : 'GEEN') +
     (lijfsleutels.mislukt.length ? '   (mislukt: ' + lijfsleutels.mislukt.map(m => m.naam).join(', ') + ')' : ''));
@@ -256,7 +260,8 @@ wachtOpSchoneBoom();
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(lijfsleutels.lijfVoor(r.pad) || {}),
-      ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
+      ...(geldLijven[r.pad] || {}) }),
+    koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
        niet meer beweren dat een wijziging op zijn plaats onzichtbaar is. Uit
        staatlog zelf en niet uit de env-string hier -- de module beslist of hij

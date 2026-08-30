@@ -123,8 +123,21 @@ function routekaart() {
    staarttreffer heeft, krijgt het langste voorvoegsel dat op zijn pad past --
    en, net als bij de staart, alleen bij precies EEN kandidaat. Wat zo'n plek
    oplevert is de regel van de REGISTRATIE en niet van de handler-body per
-   actie; dat is precies wat er te weten valt, en het is meer dan niets. */
+   actie; dat is precies wat er te weten valt, en het is meer dan niets.
+
+   VIERDE INGANG: DE STAART VAN EEN SAMENGESTELD PAD. Hetzelfde patroon komt ook
+   andersom voor: `app.post(p.pad + '/vak', ...)` in een lus over twee poorten
+   (lid en zaak, server/routes/rtmail-vak.js). Daar is het VOORVOEGSEL de
+   variabele en het achtervoegsel de letterlijke tekst. Vierenzeventig
+   rtmail-routes stonden zo buiten bereik.
+
+   Dezelfde discipline: het langste achtervoegsel dat past, en alleen bij precies
+   EEN kandidaat. Dat laatste doet hier echt werk -- `/Users/:id` staat viermaal
+   in de SCIM-laag en `/papieren` tweemaal, en die blijven dus met opzet zonder
+   bron in plaats van naar een van de vier te wijzen. */
 const ROUTE_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*(['"`])([^'"`]+)\3([^\n]*)/g;
+/* De omgekeerde vorm: eerst een variabele, dan een letterlijk achtervoegsel. */
+const STAART_RE = /\b(app|router)\.(post|get|put|delete|patch)\(\s*[A-Za-z_$][\w$.]*\s*\+\s*(['"`])([^'"`]+)\3([^\n]*)/g;
 
 let _bron = null;
 function bronIndex() {
@@ -132,6 +145,7 @@ function bronIndex() {
   const exact = new Map();
   const perStaart = new Map();
   const voorvoegsels = new Map();
+  const achtervoegsels = new Map();
   loopMap(path.join(WORTEL, 'server'), /\.js$/, f => {
     const tekst = fs.readFileSync(f, 'utf8');
     let m;
@@ -159,13 +173,27 @@ function bronIndex() {
       lijst.push(plek);
       perStaart.set(sleutel, lijst);
     }
+    STAART_RE.lastIndex = 0;
+    while ((m = STAART_RE.exec(tekst))) {
+      const staart = m[4];
+      if (!staart.startsWith('/')) continue;
+      const sleutel = m[2].toUpperCase() + ' ' + staart;
+      const av = achtervoegsels.get(sleutel) || [];
+      av.push({
+        bestand: path.relative(WORTEL, f).replace(/\\/g, '/'),
+        regel: tekst.slice(0, m.index).split('\n').length,
+        viaRouter: m[1] === 'router',
+        rauw: (m[5] || '').trim().slice(0, 160)
+      });
+      achtervoegsels.set(sleutel, av);
+    }
   });
-  _bron = { exact, perStaart, voorvoegsels };
+  _bron = { exact, perStaart, voorvoegsels, achtervoegsels };
   return _bron;
 }
 
 function plekVan(methode, pad) {
-  const { exact, perStaart, voorvoegsels } = bronIndex();
+  const { exact, perStaart, voorvoegsels, achtervoegsels } = bronIndex();
   const heel = exact.get(methode + ' ' + pad);
   if (heel) return heel;
   /* De staart: loop de padgrenzen af van lang naar kort, en neem de eerste
@@ -187,6 +215,16 @@ function plekVan(methode, pad) {
     const vv = sleutel.slice(spatie + 1);
     if (!pad.startsWith(vv)) continue;
     if (vv.length > besteLengte) { besteLengte = vv.length; beste = kandidaten; }
+  }
+  if (beste && beste.length === 1) return Object.assign({ samengesteld: true }, beste[0]);
+  /* En dezelfde vraag van de andere kant: het langste letterlijke achtervoegsel. */
+  besteLengte = -1; beste = null;
+  for (const [sleutel, kandidaten] of achtervoegsels) {
+    const spatie = sleutel.indexOf(' ');
+    if (sleutel.slice(0, spatie) !== methode) continue;
+    const av = sleutel.slice(spatie + 1);
+    if (!pad.endsWith(av)) continue;
+    if (av.length > besteLengte) { besteLengte = av.length; beste = kandidaten; }
   }
   if (beste && beste.length === 1) return Object.assign({ samengesteld: true }, beste[0]);
   return null;

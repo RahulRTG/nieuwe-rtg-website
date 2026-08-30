@@ -51,6 +51,32 @@ test('het voorvoegsel zelf komt niet als route in de index terecht', () => {
     "'/api/rtf/spel/' is een voorvoegsel en geen pad");
 });
 
+test('ook de omgekeerde vorm: een variabele met een letterlijk achtervoegsel', () => {
+  /* server/routes/rtmail-vak.js: app.post(p.pad + '/vak', ...) in een lus over
+     twee poorten. Vierenzeventig rtmail-routes stonden zo buiten bereik. */
+  for (const pad of ['/api/member/rtmail/vak', '/api/supplier/rtmail/vak']) {
+    const r = zoek('POST', pad);
+    assert.ok(r, pad + ' hoort in de routekaart te staan');
+    assert.equal(r.bestand, 'server/routes/rtmail-vak.js', pad + ' wijst naar de verkeerde bron');
+    assert.equal(r.samengesteld, true);
+  }
+});
+
+test('wat er overblijft is de routefabriek, en dat blijft eerlijk leeg', () => {
+  /* De derde vorm is `app.post(basis + pad, ...)` met TWEE variabelen
+     (server/routes/verzorging.js). Daar valt met een index over de brontekst
+     niets te vinden: er staat geen letterlijk deel in de aanroep. Die routes
+     houden `bestand: null` in plaats van naar de fabriek te wijzen -- een
+     verkeerd toegewezen bronbestand is erger dan geen.
+
+     Deze toets legt vast dat het er nog zijn en hoeveel, zodat het aantal niet
+     ongemerkt groeit. Zakt hij omdat het er MINDER zijn, dan is dat winst en
+     mag het getal omlaag. */
+  const zonder = ROUTES.filter(r => !r.bestand);
+  assert.ok(zonder.length <= 54,
+    'routes zonder bron: ' + zonder.length + ' (was 54); groeit dit, dan is er een vorm bijgekomen');
+});
+
 test('geen enkele route wordt aan meer dan een bron tegelijk toegewezen', () => {
   /* De voorvoegselingang is de ruimste van de drie. Als hij ooit te ruim wordt,
      is dat hier te zien: een voorvoegsel met meerdere registraties hoort te

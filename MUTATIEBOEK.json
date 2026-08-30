@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T11:36:34.811Z",
-  "commit": "0734118c",
+  "op": "2026-08-30T11:40:54.025Z",
+  "commit": "b4b16424",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -26,8 +26,8 @@
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 0734118c, schone boom",
-  "metingGemetenOp": "2026-08-30T11:36:22.559Z",
+  "metingReden": "gemeten op commit b4b16424, schone boom",
+  "metingGemetenOp": "2026-08-30T11:40:42.679Z",
   "perGraad": [
    {
     "id": "afgeleid",

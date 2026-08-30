@@ -39,7 +39,7 @@
    heuristiek: hij mist een route die anders heet en pakt er een die niets
    maakt. Allebei is ongevaarlijk -- een gemiste maakroute levert geen oogst en
    een overbodige levert niets bruikbaars. */
-const MAAK = /\/(maak|nieuw|open|start|aanmaak|toevoeg|uitgeven|koppel|boek|aanvraag|maken)$/;
+const MAAK = /\/(maak|nieuw|open|start|aanmaak|toevoeg|voeg|uitgeven|koppel|boek|aanvraag|maken|aanmeld|inschrijf|uitnodig|registreer|zet)$/;
 /* Welke veldnamen dragen een verwijzing naar een zojuist gemaakt ding? Gemeten
    over de 68 maakroutes die doorkomen: id, code, iban, sleutel, nummer. De
    andere twee staan erbij omdat ze in dezelfde vorm voorkomen. */

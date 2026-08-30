@@ -221,10 +221,26 @@ wachtOpSchoneBoom();
 
      Hij draait NA de wereldopzet en de lijfsleutels, want een maakroute heeft
      die zelf nodig. */
+  /* DE SCHOOLWERELD -- ./lib/wereld-school.js. Vier objecten die aan elkaar
+     hangen (gezin, kind, leraar, klas) en die samen 87 routes uit de
+     404-bak halen. Draait NA de lijfsleutels, want hij bouwt op de school- en
+     gezinsleutel voort. */
+  const { zetSchoolKlaar } = require('./lib/wereld-school');
+  const schoolSleutels = {};
+  for (const f of require('./lib/lijfsleutels').FAMILIES) {
+    if (lijfsleutels.gebouwd.some(g => g.naam === f.naam)) schoolSleutels[f.naam] = lijfsleutels.lijfVoor(f.prefixen[0]);
+  }
+  const schoolWereld = await zetSchoolKlaar({ post, sleutels: schoolSleutels, datamap: server.datamap });
+  console.log('  schoolwereld                         : ' + (schoolWereld.klaar ? 'klaar' : 'NIET klaar -- ' + schoolWereld.reden) +
+    '   (' + schoolWereld.stappen.filter(x => x.ok).length + '/' + schoolWereld.stappen.length + ' stappen)');
+  for (const st of schoolWereld.stappen.filter(x => !x.ok)) console.log('      niet gelukt: ' + st.naam + ' -- ' + st.waarom);
+
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
-    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra,
+      ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
+      ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
@@ -294,6 +310,7 @@ wachtOpSchoneBoom();
        van een verzonnen waarde en te verliezen van een sleutel die bij deze
        deur hoort. */
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...objecten.voor(r.pad),
+      ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
@@ -387,6 +404,8 @@ wachtOpSchoneBoom();
          telde -- die keek naar de declaratie. Sindsdien leest de trechter dit
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
+      schoolwereld: schoolWereld.klaar,
+      schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       lijfsleutelsMislukt: lijfsleutels.mislukt,
       routesOpLijfsleutel: metLijf.length,

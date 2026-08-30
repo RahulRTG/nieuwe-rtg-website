@@ -43,8 +43,8 @@ const { maakSleutels, haalSleutels, ROLLEN } = require('./lib/proefsleutels');
 const { bouwLijfsleutels } = require('./lib/lijfsleutels');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol } = require('./lib/routes');
-const MAAK = /\/(maak|nieuw|open|start|aanmaak|toevoeg|uitgeven|koppel|boek|aanvraag|maken)$/;
-const IDVELD = /^(id|code|iban|sleutel|nummer|ref|handle|slug)$/i;
+const { MAAK, IDVELD } = require('./lib/objectoogst');
+
 const tak = (p, d) => p.split('/').slice(0, d + 1).join('/');
 
 (async () => {

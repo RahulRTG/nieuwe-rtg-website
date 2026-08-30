@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 454 delen, 0 zonder onderwerp.**
+**59 bundels, 457 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 95 delen, 9677 regels in de delen
+`public/apps/app-main/` -- 95 delen, 9708 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -530,7 +530,7 @@ omlaag.
 
 ## `shared/appmenu.js`
 
-`public/shared/appmenu/` -- 6 delen, 635 regels in de delen
+`public/shared/appmenu/` -- 6 delen, 645 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -807,6 +807,16 @@ omlaag.
 | `rtghorloge-02.js` | toegepaste baton-indexen (AP), dubbel op 12 |
 | `rtghorloge-03.js` | een heel lichte saffier-sheen bovenop alles |
 | `rtghorloge-04.js` | het gaande werk: de middelpunten liggen op EXACT meshende afstand -- voor elk grijpend paar geldt afstand = steekstra... |
+
+## `shared/sprong.js`
+
+`public/shared/sprong/` -- 3 delen, 293 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `sprong-01.js` | DE SPRONG -- een tik naar elke functie, vanaf elk scherm |
+| `sprong-02.js` | deel 2: de vorm (stijl) |
+| `sprong-03.js` | deel 3: de lijst en wat een tik doet |
 
 ## `shared/sterren.js`
 

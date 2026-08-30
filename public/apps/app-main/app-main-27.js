@@ -56,6 +56,15 @@
      die knoppen openden Rahul wel en vulden de vraag NOOIT in. De guard ving het
      stil af. Eén functie, hier, en daar aangeroepen: geen tweede kopie. */
   window.RTGVraag = vraagRahul;
+  /* De handelingen worden EEN keer opgehaald en daarna hergebruikt; hij is
+     klein en verandert alleen bij een nieuwe bouw. Mislukt het ophalen, dan is
+     de lijst leeg en doet de lade gewoon wat hij hiervoor deed. */
+  let HANDELINGEN = [];
+  fetch('/shared/handelingindex.json', { credentials: 'same-origin' })
+    .then(r => (r.ok ? r.json() : { items: [] }))
+    .then(j => { HANDELINGEN = (j && j.items) || []; })
+    .catch(() => { HANDELINGEN = []; });
+
   function zoekSectie(tekst) {
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
@@ -116,6 +125,28 @@
     for (const { item, uit } of alleItems()) {
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
       zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
+    }
+    /* HANDELINGEN DIE IN EEN ANDERE APP WONEN. Dezelfde lijst die de sprong op
+       elk ander scherm toont (shared/handelingindex.json, gegenereerd uit de
+       knoppen van de schermen zelf). Zonder dit deed de zoeklade hier MINDER dan
+       de sprong drie schermen verderop, en dat is precies het soort verschil dat
+       een mens niet kan onthouden.
+
+       Alleen bij een zoekwoord, en een tik brengt je ERHEEN: uitvoeren doet de
+       mens op het scherm zelf (GRAMMATICA.md). */
+    if (q && HANDELINGEN.length) {
+      const treffers = HANDELINGEN.filter(h => (h.label + ' ' + h.app).toLowerCase().includes(q)).slice(0, 8);
+      if (treffers.length) {
+        zoekSectie('Handelingen');
+        for (const h of treffers) {
+          const ic = document.createElement('span'); ic.textContent = '>';
+          zoekRij(ic, h.label, 'in ' + h.app, () => {
+            sluitScrims();
+            if (window.RTGCommand && RTGCommand.actief()) RTGCommand.open(h.url, h.app);
+            else location.href = h.url;
+          });
+        }
+      }
     }
     // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
     if (q) {

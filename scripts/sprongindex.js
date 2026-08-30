@@ -26,6 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const reg = require('./lib/wereldregister');
+const { vanScherm, woordenUit } = require('./lib/schermwoorden');
 
 const DOEL = path.join(reg.WORTEL, 'public', 'shared', 'sprongindex.json');
 const controle = process.argv.includes('--controle');
@@ -39,8 +40,18 @@ function premiumSet() {
   return new Set((m[1].match(/'([^']+)'/g) || []).map(s => s.slice(1, -1)));
 }
 
+/* De naam die de appcatalogus van de server aan hetzelfde adres geeft. Twee
+   namen voor een ding is hier geen dubbeling maar juist de winst: allebei zijn
+   het woorden waarmee een mens zoekt. */
+function catalogusnamen() {
+  const rijen = [].concat(require(path.join(reg.WORTEL, 'server/kern/appcatalogus-rijen/deel1')),
+                          require(path.join(reg.WORTEL, 'server/kern/appcatalogus-rijen/deel2')));
+  return new Map(rijen.map((r) => [r[3], r[1]]));
+}
+
 function bouw() {
   const premium = premiumSet();
+  const catalogusnaam = catalogusnamen();
   const volgorde = new Map(reg.MAPPEN.map((m, i) => [m.naam, i]));
   const items = [];
   const gezien = new Set();
@@ -56,6 +67,17 @@ function bouw() {
          opent, zodat de sprong nooit een adres verzint dat niet bestaat. */
       if (l.soort === 'link') rij.url = l.url;
       if (premium.has(l.sleutel)) rij.label = 'Lifestyle';
+      /* DE WOORDEN DIE OP HET SCHERM ZELF STAAN. Een mens typt wat hij heeft
+         zien staan, niet wat wij in deze lijst hebben gezet: "pay" vond niets
+         terwijl de app RTG Pay heet en de rij hier "Betalen". Ze komen uit de
+         titel en de eerste kop van het scherm en uit de naam in de
+         appcatalogus -- niet verzonnen, en gemeten door scripts/vindbaar.js.
+         Woorden die al in de naam staan hoeven er niet bij. */
+      const eigen = rij.url ? vanScherm(reg.WORTEL, rij.url) : [];
+      const uitCatalogus = woordenUit(catalogusnaam.get(rij.url) || '');
+      const extra = [...new Set(eigen.concat(uitCatalogus))]
+        .filter((w) => rij.naam.toLowerCase().indexOf(w) < 0).slice(0, 12);
+      if (extra.length) rij.woorden = extra;
       items.push(rij);
     }
     /* Het huis van de wereld zelf is ook een bestemming. */

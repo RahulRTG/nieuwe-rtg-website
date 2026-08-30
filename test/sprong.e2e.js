@@ -89,7 +89,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
 
     await t.test('elke rij met een adres draagt dat adres ook echt', async () => {
       const zonder = await page.evaluate(() => [...document.querySelectorAll('.rtgsprong-rij')]
-        .filter(b => !b.dataset.url).map(b => b.textContent.trim()));
+        .filter(b => !b.dataset.url && !b.dataset.handeling).map(b => b.textContent.trim()));
       /* Tabs en os-apps wonen IN de leden-app en hebben geen eigen adres; die
          mogen er zonder staan. Een rij met een adres dat het verzwijgt, niet:
          dan ziet scripts/tikken.js de korte weg niet. */
@@ -98,6 +98,45 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
       assert.ok(zonder.length <= zonderAdres,
         'rijen zonder data-url: ' + zonder.length + ', terwijl er maar ' + zonderAdres +
         ' bestemmingen zonder adres zijn -- ' + JSON.stringify(zonder.slice(0, 5)));
+    });
+
+    await t.test('wat je HIER kunt doen staat bovenaan, en komt uit het app-menu', async () => {
+      /* Fase 2 van TIKKEN.md: de sprong toont niet alleen bestemmingen maar ook
+         de handelingen van het scherm waar je staat -- uit RTGAppMenu.functies(),
+         dezelfde lijst die het app-menu toont. Een eigen lijst handelingen zou
+         binnen een week iets anders zeggen dan het menu ernaast. */
+      const uitMenu = await page.evaluate(() =>
+        (window.RTGAppMenu && RTGAppMenu.functies ? RTGAppMenu.functies() : []).map(f => f.label));
+      const secties = await page.$$eval('.rtgsprong-wereld', e => e.map(x => x.textContent));
+      if (!uitMenu.length) {
+        assert.ok(!secties.includes('Hier'),
+          'zonder handelingen hoort er geen kopje Hier te staan: een leeg kopje belooft iets');
+        return;
+      }
+      assert.equal(secties[0], 'Hier', 'wat je hier kunt doen hoort bovenaan te staan, kreeg: ' + secties[0]);
+      const eerste = await page.$$eval('.rtgsprong-rij', e => e.slice(0, 3).map(x => x.textContent.trim()));
+      assert.ok(eerste.some(t => uitMenu.some(l => t.indexOf(l) === 0)),
+        'de bovenste rijen horen de handelingen van dit scherm te zijn: ' + JSON.stringify(eerste));
+    });
+
+    await t.test('een handeling die in een ANDERE app woont, is hier ook te vinden', async () => {
+      /* Fase 3 van TIKKEN.md. scripts/vindbaar.js mat dat je een functie vaak
+         niet terugvond met het woord dat erop staat: die woorden waren
+         handelingen ("fooi", "tegoed"), en die stonden in geen enkele index.
+         Nu wel -- en een tik brengt je ERHEEN, hij voert niets uit. */
+      await page.fill('.rtgsprong-kop input', 'fooi');
+      await page.waitForTimeout(300);
+      const rijen = await page.$$eval('.rtgsprong-rij:visible', e => e.map(x => x.textContent.trim()));
+      assert.ok(rijen.some(t => /fooi/i.test(t) && /horeca/i.test(t)),
+        'zoeken op "fooi" hoort de handeling in Horeca te vinden, kreeg: ' + JSON.stringify(rijen));
+      await page.locator('.rtgsprong-rij:visible').first().click();
+      await page.waitForTimeout(1500);
+      assert.equal(new URL(page.url()).pathname, '/apps/horeca.html',
+        'een handeling brengt je naar het scherm waar hij woont');
+      await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
+      await page.waitForTimeout(1600);
+      await page.locator('.rtgsprong-greep').click();
+      await page.waitForTimeout(400);
     });
 
     await t.test('de tweede tik opent de functie', async () => {

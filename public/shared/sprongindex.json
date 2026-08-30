@@ -6,14 +6,23 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "wereldlaag",
-      "url": "/apps/wereld.html"
+      "url": "/apps/wereld.html",
+      "woorden": [
+        "elite",
+        "private",
+        "society"
+      ]
     },
     {
       "naam": "App-dossier",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "appdossier",
-      "url": "/apps/appstore-dossier.html"
+      "url": "/apps/appstore-dossier.html",
+      "woorden": [
+        "store",
+        "inkoopdossier"
+      ]
     },
     {
       "naam": "Assets",
@@ -27,21 +36,31 @@
       "soort": "link",
       "sleutel": "attenties",
       "url": "/apps/attenties.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Balans",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "balans",
-      "url": "/apps/geld.html#balans"
+      "url": "/apps/geld.html#balans",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Bank",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "bank",
-      "url": "/apps/geld.html#bank"
+      "url": "/apps/geld.html#bank",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Bellen",
@@ -67,7 +86,10 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "rtgcode",
-      "url": "/apps/geld.html#rtgcode"
+      "url": "/apps/geld.html#rtgcode",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Betalen",
@@ -80,7 +102,12 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "pay",
-      "url": "/apps/pay.html"
+      "url": "/apps/pay.html",
+      "woorden": [
+        "jouw",
+        "geld",
+        "knop"
+      ]
     },
     {
       "naam": "Camera",
@@ -95,7 +122,11 @@
       "soort": "link",
       "sleutel": "cellier",
       "url": "/apps/cellier.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Cercle",
@@ -103,21 +134,34 @@
       "soort": "link",
       "sleutel": "cercle",
       "url": "/apps/cercle.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Commerce",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "commerce",
-      "url": "/apps/commerce.html"
+      "url": "/apps/commerce.html",
+      "woorden": [
+        "koop",
+        "staat"
+      ]
     },
     {
       "naam": "Daten",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "vonk",
-      "url": "/apps/vonk.html"
+      "url": "/apps/vonk.html",
+      "woorden": [
+        "vonk",
+        "geverifieerde",
+        "introducties"
+      ]
     },
     {
       "naam": "Entourage",
@@ -125,21 +169,31 @@
       "soort": "link",
       "sleutel": "entourage",
       "url": "/apps/entourage.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Films en series",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "theater",
-      "url": "/apps/theater.html"
+      "url": "/apps/theater.html",
+      "woorden": [
+        "theater"
+      ]
     },
     {
       "naam": "Fonds",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "labfonds",
-      "url": "/apps/geld.html#labfonds"
+      "url": "/apps/geld.html#labfonds",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Food Court",
@@ -153,7 +207,10 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "spelavond",
-      "url": "/apps/spelscherm.html"
+      "url": "/apps/spelscherm.html",
+      "woorden": [
+        "tafel"
+      ]
     },
     {
       "naam": "Garde-robe",
@@ -161,14 +218,21 @@
       "soort": "link",
       "sleutel": "garderobe",
       "url": "/apps/garderobe.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Geld",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "geldcommand",
-      "url": "/apps/geld-command.html"
+      "url": "/apps/geld-command.html",
+      "woorden": [
+        "rust"
+      ]
     },
     {
       "naam": "Gezin",
@@ -181,21 +245,33 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "vooruitzicht",
-      "url": "/apps/living-os.html"
+      "url": "/apps/living-os.html",
+      "woorden": [
+        "living",
+        "kyoto",
+        "zonder",
+        "onrust"
+      ]
     },
     {
       "naam": "Krant",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "krant",
-      "url": "/apps/krant.html"
+      "url": "/apps/krant.html",
+      "woorden": [
+        "titel"
+      ]
     },
     {
       "naam": "Live",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "podium",
-      "url": "/apps/podium.html"
+      "url": "/apps/podium.html",
+      "woorden": [
+        "podium"
+      ]
     },
     {
       "naam": "LivingOS",
@@ -211,7 +287,10 @@
       "soort": "link",
       "sleutel": "logboek",
       "url": "/apps/geld.html#logboek",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Maison",
@@ -219,7 +298,11 @@
       "soort": "link",
       "sleutel": "maison",
       "url": "/apps/maison.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Mall",
@@ -234,28 +317,41 @@
       "soort": "link",
       "sleutel": "mecenaat",
       "url": "/apps/geld.html#mecenaat",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Mijn bestellingen",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "mijnmall",
-      "url": "/apps/mijnmall.html"
+      "url": "/apps/mijnmall.html",
+      "woorden": [
+        "mall"
+      ]
     },
     {
       "naam": "Mijn leven",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "leven",
-      "url": "/apps/leven.html"
+      "url": "/apps/leven.html",
+      "woorden": [
+        "past",
+        "vanavond"
+      ]
     },
     {
       "naam": "Muziek",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "muziek",
-      "url": "/apps/muziek.html"
+      "url": "/apps/muziek.html",
+      "woorden": [
+        "sound"
+      ]
     },
     {
       "naam": "Nalatenschap",
@@ -263,7 +359,10 @@
       "soort": "link",
       "sleutel": "nalatenschap",
       "url": "/apps/geld.html#nalatenschap",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Nieuws",
@@ -277,7 +376,14 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "ontdek",
-      "url": "/apps/rtg.html"
+      "url": "/apps/rtg.html",
+      "woorden": [
+        "livingos",
+        "life",
+        "leven",
+        "ritme",
+        "huis"
+      ]
     },
     {
       "naam": "Privekantoor",
@@ -285,7 +391,11 @@
       "soort": "link",
       "sleutel": "rechterhand",
       "url": "/apps/lifestyle.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Rendez-vous",
@@ -293,7 +403,10 @@
       "soort": "link",
       "sleutel": "rendezvous",
       "url": "/apps/rendezvous.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "signature"
+      ]
     },
     {
       "naam": "RTFoundation",
@@ -306,7 +419,10 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "mediaos",
-      "url": "/apps/media.html"
+      "url": "/apps/media.html",
+      "woorden": [
+        "mediawereld"
+      ]
     },
     {
       "naam": "Salon",
@@ -319,7 +435,11 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "wbw",
-      "url": "/apps/geld.html#wbw"
+      "url": "/apps/geld.html#wbw",
+      "woorden": [
+        "geld",
+        "betaalt"
+      ]
     },
     {
       "naam": "Snaps",
@@ -332,7 +452,12 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "sociaal",
-      "url": "/apps/sociaal.html"
+      "url": "/apps/sociaal.html",
+      "woorden": [
+        "wereld",
+        "zorgvuldig",
+        "dichtbij"
+      ]
     },
     {
       "naam": "Spelen",
@@ -354,7 +479,11 @@
       "soort": "link",
       "sleutel": "table",
       "url": "/apps/table.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Thuis",
@@ -382,21 +511,30 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "vandaag",
-      "url": "/apps/vandaag.html"
+      "url": "/apps/vandaag.html",
+      "woorden": [
+        "goedemorgen"
+      ]
     },
     {
       "naam": "Vandaag",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "pulse",
-      "url": "/apps/pulse.html"
+      "url": "/apps/pulse.html",
+      "woorden": [
+        "pulse"
+      ]
     },
     {
       "naam": "Video",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "clips",
-      "url": "/apps/clips.html"
+      "url": "/apps/clips.html",
+      "woorden": [
+        "clips"
+      ]
     },
     {
       "naam": "Videobellen",
@@ -409,14 +547,20 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "vrienden",
-      "url": "/apps/foundation/vrienden.html"
+      "url": "/apps/foundation/vrienden.html",
+      "woorden": [
+        "contacten"
+      ]
     },
     {
       "naam": "Wallet",
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "wallet",
-      "url": "/apps/geld.html#wallet"
+      "url": "/apps/geld.html#wallet",
+      "woorden": [
+        "geld"
+      ]
     },
     {
       "naam": "Zorg",
@@ -450,21 +594,31 @@
       "wereld": "Instellingen",
       "soort": "link",
       "sleutel": "ik",
-      "url": "/apps/ik.html"
+      "url": "/apps/ik.html",
+      "woorden": [
+        "instellingen"
+      ]
     },
     {
       "naam": "Documenten",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "office",
-      "url": "/apps/office.html"
+      "url": "/apps/office.html",
+      "woorden": [
+        "office"
+      ]
     },
     {
       "naam": "Horeca",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "horeca",
-      "url": "/apps/horeca.html"
+      "url": "/apps/horeca.html",
+      "woorden": [
+        "operatie",
+        "service"
+      ]
     },
     {
       "naam": "Loon",
@@ -478,7 +632,13 @@
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "magnaat",
-      "url": "/apps/magnaat.html"
+      "url": "/apps/magnaat.html",
+      "woorden": [
+        "wereld",
+        "bedrijf",
+        "leeft",
+        "reageert"
+      ]
     },
     {
       "naam": "Onderneming",
@@ -492,21 +652,32 @@
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "partnernetwerk",
-      "url": "/apps/partner-network.html"
+      "url": "/apps/partner-network.html",
+      "woorden": [
+        "symbiotic"
+      ]
     },
     {
       "naam": "RTG One",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "rtgone",
-      "url": "/apps/rtgone.html"
+      "url": "/apps/rtgone.html",
+      "woorden": [
+        "enterprise",
+        "command",
+        "center"
+      ]
     },
     {
       "naam": "RTG Werk OS",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "werkos",
-      "url": "/apps/werk.html"
+      "url": "/apps/werk.html",
+      "woorden": [
+        "work"
+      ]
     },
     {
       "naam": "RTMail",
@@ -527,14 +698,21 @@
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "browser",
-      "url": "/apps/browser.html"
+      "url": "/apps/browser.html",
+      "woorden": [
+        "browser",
+        "start"
+      ]
     },
     {
       "naam": "Website",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "sitemaker",
-      "url": "/apps/sitemaker.html"
+      "url": "/apps/sitemaker.html",
+      "woorden": [
+        "maker"
+      ]
     },
     {
       "naam": "Werk",
@@ -555,7 +733,15 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "aankomst",
-      "url": "/apps/arrival.html"
+      "url": "/apps/arrival.html",
+      "woorden": [
+        "invisible",
+        "arrival",
+        "vertel",
+        "keer",
+        "zetten",
+        "goed"
+      ]
     },
     {
       "naam": "Hangar",
@@ -563,14 +749,22 @@
       "soort": "link",
       "sleutel": "hangar",
       "url": "/apps/hangar.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Navigatie",
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "navigatie",
-      "url": "/apps/navigatie.html"
+      "url": "/apps/navigatie.html",
+      "woorden": [
+        "navigation",
+        "intelligence"
+      ]
     },
     {
       "naam": "Openbaar vervoer",
@@ -592,7 +786,11 @@
       "soort": "link",
       "sleutel": "reisboek",
       "url": "/apps/reisboek.html",
-      "label": "Lifestyle"
+      "label": "Lifestyle",
+      "woorden": [
+        "lifestyle",
+        "pass"
+      ]
     },
     {
       "naam": "Reizen",
@@ -605,7 +803,10 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "reizen",
-      "url": "/apps/reizen-veilig.html"
+      "url": "/apps/reizen-veilig.html",
+      "woorden": [
+        "goedemiddag"
+      ]
     },
     {
       "naam": "Routedossier",
@@ -640,14 +841,20 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "residentie",
-      "url": "/apps/residentie.html"
+      "url": "/apps/residentie.html",
+      "woorden": [
+        "sidence"
+      ]
     },
     {
       "naam": "Verkeer",
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "flits",
-      "url": "/apps/flits.html"
+      "url": "/apps/flits.html",
+      "woorden": [
+        "flits"
+      ]
     },
     {
       "naam": "Vluchten",
@@ -683,14 +890,25 @@
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "rtfbuurt",
-      "url": "/apps/foundation/os-publiek.html"
+      "url": "/apps/foundation/os-publiek.html",
+      "woorden": [
+        "foundationos",
+        "iedere",
+        "heeft",
+        "toekomst"
+      ]
     },
     {
       "naam": "RTFoundation portaal",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "rtfportaal",
-      "url": "/apps/foundation/os-portaal.html"
+      "url": "/apps/foundation/os-portaal.html",
+      "woorden": [
+        "partners",
+        "gemeenten",
+        "ondernemers"
+      ]
     }
   ]
 }

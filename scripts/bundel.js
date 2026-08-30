@@ -109,7 +109,12 @@ const bundels = {
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',
   'shared/verbinding.js': 'shared/verbinding',
-  'shared/teamcall.js': 'shared/teamcall'
+  'shared/teamcall.js': 'shared/teamcall',
+  /* De sprong: de korte weg naar elke functie. Drie delen op een echte naad --
+     wat hij is en waar zijn lijst vandaan komt, hoe hij eruitziet, en wat een
+     tik doet. Hij groeide over de 10 KB toen hij naast bestemmingen ook de
+     HANDELINGEN van het scherm ging tonen (TIKKEN.md fase 2). */
+  'shared/sprong.js': 'shared/sprong'
 };
 
 function deelBestanden(deelMap) {

@@ -1,0 +1,1811 @@
+{
+  "uitleg": "Gegenereerd door scripts/handelingindex.js uit de knoppen en tabs van de schermen zelf. Een rij zegt waar een handeling woont en brengt je erheen; hij voert niets uit. Bewerk dit bestand niet met de hand.",
+  "items": [
+    {
+      "label": "Ik ben gearriveerd",
+      "app": "Aankomst",
+      "wereld": "TravelOS",
+      "url": "/apps/arrival.html"
+    },
+    {
+      "label": "Ik vertrek nu",
+      "app": "Aankomst",
+      "wereld": "TravelOS",
+      "url": "/apps/arrival.html"
+    },
+    {
+      "label": "Maak mijn plan",
+      "app": "Aankomst",
+      "wereld": "TravelOS",
+      "url": "/apps/arrival.html"
+    },
+    {
+      "label": "Stop delen",
+      "app": "Aankomst",
+      "wereld": "TravelOS",
+      "url": "/apps/arrival.html"
+    },
+    {
+      "label": "Mall",
+      "app": "App-dossier",
+      "wereld": "LivingOS",
+      "url": "/apps/appstore-dossier.html"
+    },
+    {
+      "label": "Vat samen",
+      "app": "Berichten",
+      "wereld": "LivingOS",
+      "url": "/apps/comm.html"
+    },
+    {
+      "label": "Kopieer de code",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Maak mijn betaalcode",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Naar de app",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Tik en betaal",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Verzilver",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Vraag het Klompje",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Zet op ontvangen",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Zet tegoed klaar",
+      "app": "Betalen",
+      "wereld": "LivingOS",
+      "url": "/apps/pay.html"
+    },
+    {
+      "label": "Auto",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Fijnregelaars",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Food",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Food Fresh",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Golden Hour",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Herstel",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Ibiza Zon",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Origineel",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Quiet Luxury",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Spiegel",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Vakantie",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Vrij",
+      "app": "Camera",
+      "wereld": "LivingOS",
+      "url": "/apps/camera.html"
+    },
+    {
+      "label": "Leegmaken",
+      "app": "Commerce",
+      "wereld": "LivingOS",
+      "url": "/apps/commerce.html"
+    },
+    {
+      "label": "Terug",
+      "app": "Commerce",
+      "wereld": "LivingOS",
+      "url": "/apps/commerce.html"
+    },
+    {
+      "label": "Alleen blokkeren",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Blokkeren en melden",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Nog niet",
+      "app": "Daten",
+      "wereld": "LivingOS",
+      "url": "/apps/vonk.html"
+    },
+    {
+      "label": "Afdruk",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Alleen u",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Bewaar beleid",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Bewaar keuze",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Concept",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Deel",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Delen",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Export",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Notitie",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Open nieuwste versie",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Plaats",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Presenteer",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Rahul",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "sluit",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Ter beoordeling",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Versies",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Vraag voorstel",
+      "app": "Documenten",
+      "wereld": "WorkOS",
+      "url": "/apps/office.html"
+    },
+    {
+      "label": "Bewaar de ondertitels",
+      "app": "Films en series",
+      "wereld": "LivingOS",
+      "url": "/apps/theater.html"
+    },
+    {
+      "label": "Melden bij RTG-kantoor",
+      "app": "Films en series",
+      "wereld": "LivingOS",
+      "url": "/apps/theater.html"
+    },
+    {
+      "label": "Ondertitels",
+      "app": "Films en series",
+      "wereld": "LivingOS",
+      "url": "/apps/theater.html"
+    },
+    {
+      "label": "Plaats",
+      "app": "Films en series",
+      "wereld": "LivingOS",
+      "url": "/apps/theater.html"
+    },
+    {
+      "label": "Beheer bronnen",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Consequenties",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Controleer",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Mecenaat",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Nalatenschap",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Noodzakelijk",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Open balans",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Open verdeling",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Persoonlijk bevestigen",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "RAHUL swipe",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Simuleer eerst",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Stel grens in",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Toegestaan",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Toekomsten",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Toestemming",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Volledig logboek",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Zet gecontroleerd klaar",
+      "app": "Geld",
+      "wereld": "LivingOS",
+      "url": "/apps/geld-command.html"
+    },
+    {
+      "label": "Kopieer",
+      "app": "Het bord",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/bord.html"
+    },
+    {
+      "label": "Paneel",
+      "app": "Het bord",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/bord.html"
+    },
+    {
+      "label": "Alleen akkoord",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Geef voorbereiding vrij",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Het Vooruitzicht V-",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Ideaal",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Vergelijk",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Verstoring",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Waarschijnlijk",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Wijzig",
+      "app": "Het Vooruitzicht",
+      "wereld": "LivingOS",
+      "url": "/apps/living-os.html"
+    },
+    {
+      "label": "Boek oninbaar",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Bouw servicegolf",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Fooi erop",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Gang vrijgeven",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Guest Recovery",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Horeca Command OPERATIONS",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Keuken",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Korting",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Open",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Open Dish Intelligence",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Splits per persoon",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Stoel erbij",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Verdeel de rekening",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Verplaats",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Ververs",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Voeg samen",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Zaal",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Zet erop",
+      "app": "Horeca",
+      "wereld": "WorkOS",
+      "url": "/apps/horeca.html"
+    },
+    {
+      "label": "Alleen abonnees",
+      "app": "Live",
+      "wereld": "LivingOS",
+      "url": "/apps/podium.html"
+    },
+    {
+      "label": "Ga live",
+      "app": "Live",
+      "wereld": "LivingOS",
+      "url": "/apps/podium.html"
+    },
+    {
+      "label": "Melden bij RTG-kantoor",
+      "app": "Live",
+      "wereld": "LivingOS",
+      "url": "/apps/podium.html"
+    },
+    {
+      "label": "Bekijk nieuwe kansen",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Bestuur de economie",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Betreed mijn kantoor",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Computer",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Deelnemen",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Kies een functie",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Ontmoet bedrijven",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Open lab",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "PDA",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Quick Match",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Start gekozen dossier",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Strategie vastleggen",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Ververs codepunten",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Verwerk volgende dag",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Wissel rol",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Zoek spelers",
+      "app": "Magnaat",
+      "wereld": "WorkOS",
+      "url": "/apps/magnaat.html"
+    },
+    {
+      "label": "Alles tonen",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Mijn lijsten reizen",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Nu open",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Op voorraad",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Vraag Rahul",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
+      "label": "Lijst",
+      "app": "Mijn bestellingen",
+      "wereld": "LivingOS",
+      "url": "/apps/mijnmall.html"
+    },
+    {
+      "label": "Plaatsen",
+      "app": "Mijn bestellingen",
+      "wereld": "LivingOS",
+      "url": "/apps/mijnmall.html"
+    },
+    {
+      "label": "Reismand",
+      "app": "Mijn bestellingen",
+      "wereld": "LivingOS",
+      "url": "/apps/mijnmall.html"
+    },
+    {
+      "label": "Bekijk bezorgen",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Bijzonder",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Buiten",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Laat Rahul kiezen",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Maak Moment",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Nu open",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Rustig",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Volledige planner",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Zoek een tafel",
+      "app": "Mijn leven",
+      "wereld": "LivingOS",
+      "url": "/apps/leven.html"
+    },
+    {
+      "label": "Doe mee",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
+      "label": "Start een sessie",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
+      "label": "Stoppen",
+      "app": "Muziek",
+      "wereld": "LivingOS",
+      "url": "/apps/muziek.html"
+    },
+    {
+      "label": "Comfort",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Electric",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Kies vertrekpunt",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "RTG Slim",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Snel",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Start begeleiding",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Zeker",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "BUSINESS",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Commerce",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Flits",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Geld",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Hangar Lifestyle",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Leven",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "LIFESTYLE",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Media",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Navigatie",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Reisboek Lifestyle",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Reizen",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Residentie",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Sociaal",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Stad",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Vandaag",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Veilig",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Vluchten",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Wallet",
+      "app": "Ontdekken",
+      "wereld": "LivingOS",
+      "url": "/apps/rtg.html"
+    },
+    {
+      "label": "Abonnement nemen",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Bedrijfspendel",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Check uit",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Deel deze rit",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Kopen",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Maak veilig concept",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Openbaar vervoer",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Plan mijn reis",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Private",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Reizen",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Toon",
+      "app": "Openbaar vervoer",
+      "wereld": "TravelOS",
+      "url": "/apps/ov.html"
+    },
+    {
+      "label": "Bewaar de lijn",
+      "app": "OV-routes",
+      "wereld": "TravelOS",
+      "url": "/apps/ovroutes.html"
+    },
+    {
+      "label": "Haltes wissen",
+      "app": "OV-routes",
+      "wereld": "TravelOS",
+      "url": "/apps/ovroutes.html"
+    },
+    {
+      "label": "Lijn verwijderen",
+      "app": "OV-routes",
+      "wereld": "TravelOS",
+      "url": "/apps/ovroutes.html"
+    },
+    {
+      "label": "Alleen aandacht",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Filters",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Gereed voor controle",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Kyoto Consortium LIVE",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Maak capaciteitsvoorstel",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Open levend contract",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Simuleer belofte",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Verstoring",
+      "app": "Partner Network",
+      "wereld": "WorkOS",
+      "url": "/apps/partner-network.html"
+    },
+    {
+      "label": "Passkey toevoegen",
+      "app": "Passkeys",
+      "wereld": "Instellingen",
+      "url": "/apps/passkeys.html"
+    },
+    {
+      "label": "Adviseer",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Deel mijn aankomst",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Meenemen",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Moment starten",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Nieuw Moment",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Open",
+      "app": "Reizen & Veilig",
+      "wereld": "TravelOS",
+      "url": "/apps/reizen-veilig.html"
+    },
+    {
+      "label": "Alleen blokkeren",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Blokkeren en melden",
+      "app": "Rendez-vous",
+      "wereld": "LivingOS",
+      "url": "/apps/rendezvous.html"
+    },
+    {
+      "label": "Wis filter",
+      "app": "Routedossier",
+      "wereld": "TravelOS",
+      "url": "/apps/routedossier.html"
+    },
+    {
+      "label": "Openen",
+      "app": "RTFoundation portaal",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/os-portaal.html"
+    },
+    {
+      "label": "Bibliotheek",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Controle starten",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Lijsten",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Mijn bord",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Nieuwe productie",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Review Niemand typt",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Samen",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Stop",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Studio nieuwe productie",
+      "app": "RTG Media",
+      "wereld": "LivingOS",
+      "url": "/apps/media.html"
+    },
+    {
+      "label": "Opslaan",
+      "app": "RTG One",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgone.html"
+    },
+    {
+      "label": "RTF",
+      "app": "RTG One",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgone.html"
+    },
+    {
+      "label": "Samen",
+      "app": "RTG One",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgone.html"
+    },
+    {
+      "label": "Authority",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Herstelproef doen",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Journey",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Modules",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Naar binnen",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Onboarding Worlds",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Operations Universe LIVE",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Rahul AI WORKSPACE",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Start",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Uitloggen",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Ververs",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Zoek",
+      "app": "RTG Werk OS",
+      "wereld": "WorkOS",
+      "url": "/apps/werk.html"
+    },
+    {
+      "label": "Antwoord",
+      "app": "School",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgschool.html"
+    },
+    {
+      "label": "Inschrijven",
+      "app": "School",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgschool.html"
+    },
+    {
+      "label": "Jaar erbij",
+      "app": "School",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgschool.html"
+    },
+    {
+      "label": "Start de training",
+      "app": "School",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgschool.html"
+    },
+    {
+      "label": "Vraag het advies",
+      "app": "School",
+      "wereld": "WorkOS",
+      "url": "/apps/rtgschool.html"
+    },
+    {
+      "label": "Geef een tip",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Herstel",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Klaar met leggen",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Maak team",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Opgeven",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Pak een kaart",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Pak een steen",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Partij toewijzen",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Pas",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Random tegenstander",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Ruil alles",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Speel woord",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "volgende",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "vorige",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "Wis",
+      "app": "Spelen",
+      "wereld": "LivingOS",
+      "url": "/apps/spelen.html?pas="
+    },
+    {
+      "label": "De club",
+      "app": "Sport",
+      "wereld": "LivingOS",
+      "url": "/apps/sport.html"
+    },
+    {
+      "label": "De stand",
+      "app": "Sport",
+      "wereld": "LivingOS",
+      "url": "/apps/sport.html"
+    },
+    {
+      "label": "Mijn tickets",
+      "app": "Sport",
+      "wereld": "LivingOS",
+      "url": "/apps/sport.html"
+    },
+    {
+      "label": "Tickets",
+      "app": "Sport",
+      "wereld": "LivingOS",
+      "url": "/apps/sport.html"
+    },
+    {
+      "label": "Uitslagen",
+      "app": "Sport",
+      "wereld": "LivingOS",
+      "url": "/apps/sport.html"
+    },
+    {
+      "label": "Host",
+      "app": "Thuis",
+      "wereld": "LivingOS",
+      "url": "/apps/thuis.html"
+    },
+    {
+      "label": "Mijn reizen",
+      "app": "Thuis",
+      "wereld": "LivingOS",
+      "url": "/apps/thuis.html"
+    },
+    {
+      "label": "Zet live",
+      "app": "Thuis",
+      "wereld": "LivingOS",
+      "url": "/apps/thuis.html"
+    },
+    {
+      "label": "Zoek",
+      "app": "Thuis",
+      "wereld": "LivingOS",
+      "url": "/apps/thuis.html"
+    },
+    {
+      "label": "Vraag Rahul",
+      "app": "Uitgaan",
+      "wereld": "LivingOS",
+      "url": "/apps/uitgaan.html"
+    },
+    {
+      "label": "Open mijn berichten",
+      "app": "Vandaag",
+      "wereld": "LivingOS",
+      "url": "/apps/vandaag.html"
+    },
+    {
+      "label": "Bewaar",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Gids",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Inrichten",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Klaar met inrichten",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Mijn suite",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Ophangen",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Samen spelen",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Speel",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Stop",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Wandel samen",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Weghaal-modus",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Zeg",
+      "app": "Verblijven",
+      "wereld": "TravelOS",
+      "url": "/apps/residentie.html"
+    },
+    {
+      "label": "Klopt",
+      "app": "Verkeer",
+      "wereld": "TravelOS",
+      "url": "/apps/flits.html"
+    },
+    {
+      "label": "Weg",
+      "app": "Verkeer",
+      "wereld": "TravelOS",
+      "url": "/apps/flits.html"
+    },
+    {
+      "label": "Alleen met ondertitel",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Bewaar de ondertitels",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Deel de clip",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Eigen geluid",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Maak een clip",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Met gesproken toelichting",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Plaats",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Regel erbij",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Sluit",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Terugdraaien",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Zet de knip",
+      "app": "Video",
+      "wereld": "LivingOS",
+      "url": "/apps/clips.html"
+    },
+    {
+      "label": "Het bord",
+      "app": "Vluchten",
+      "wereld": "TravelOS",
+      "url": "/apps/vluchten.html"
+    },
+    {
+      "label": "Mijn reizen",
+      "app": "Vluchten",
+      "wereld": "TravelOS",
+      "url": "/apps/vluchten.html"
+    },
+    {
+      "label": "Kopieer",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Live code",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Mijn koppelingen",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Nieuwe pin",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Opnemen",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Pin uitzetten",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Scan",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Toon QR",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Versturen",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Weiger",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Zoek",
+      "app": "Vrienden",
+      "wereld": "LivingOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Bewaren",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Desktop",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Donker",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Ga online",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Historie",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Mijn sites",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Reset",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Tablet",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Telefoon",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Upload eigen foto",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Voorbeeld",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Zet online",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Zet wijzigingen online",
+      "app": "Website",
+      "wereld": "WorkOS",
+      "url": "/apps/sitemaker.html"
+    },
+    {
+      "label": "Bewaren",
+      "app": "Wie ben ik",
+      "wereld": "Instellingen",
+      "url": "/apps/ik.html"
+    }
+  ]
+}

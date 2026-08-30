@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit d6e2320b, schone boom",
+  "metingReden": "gemeten op commit e9d6ec5b, schone boom",
   "stempel": {
-    "op": "2026-08-30T12:11:44.460Z",
-    "commit": "d6e2320b",
+    "op": "2026-08-30T12:18:48.920Z",
+    "commit": "e9d6ec5b",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit d6e2320b, schone boom"
+    "metingReden": "gemeten op commit e9d6ec5b, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1496,
-    "onbewezen": 3165,
+    "metBewijs": 1500,
+    "onbewezen": 3161,
     "sluit": true
   },
   "bakken": [
@@ -48,12 +48,9 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 11,
+      "aantal": 1,
       "voorbeelden": [
-        "POST /api/arrival/pass",
-        "POST /api/arrival/pulse",
-        "POST /api/code/dyn",
-        "POST /api/code/scan"
+        "POST /api/sonde/melding"
       ]
     },
     {
@@ -70,7 +67,7 @@
     {
       "id": "FIXTURE_403",
       "uitleg": "de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht",
-      "aantal": 721,
+      "aantal": 722,
       "voorbeelden": [
         "POST /api/account/koppel",
         "POST /api/account/ontkoppel",
@@ -81,7 +78,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1634,
+      "aantal": 1635,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmeld/zeg",
@@ -103,7 +100,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 515,
+      "aantal": 519,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -202,17 +199,7 @@
       "POST /api/theater/upload/:id"
     ],
     "GEEN_PROEFSLEUTEL": [
-      "POST /api/arrival/pass",
-      "POST /api/arrival/pulse",
-      "POST /api/code/dyn",
-      "POST /api/code/scan",
-      "POST /api/link/koppelingen",
-      "POST /api/link/los",
-      "POST /api/partner/applications/mijn",
-      "POST /api/partner/apply",
-      "POST /api/partner/types",
-      "POST /api/sonde/melding",
-      "POST /api/toestel/meting"
+      "POST /api/sonde/melding"
     ],
     "FIXTURE_401": [
       "POST /api/auth/login",
@@ -245,6 +232,7 @@
       "POST /api/bedrijf/post/context",
       "POST /api/bedrijf/post/herkomst",
       "POST /api/chat/send",
+      "POST /api/code/dyn",
       "POST /api/comm/ai",
       "POST /api/foundation/gezin/wissen",
       "POST /api/foundation/gezin/wissen/intrekken",
@@ -2486,6 +2474,7 @@
       "POST /api/thuis/wens",
       "POST /api/thuis/zakelijk",
       "POST /api/ticket/koop",
+      "POST /api/toestel/meting",
       "POST /api/toestellen/intrek",
       "POST /api/toestemming/intrek",
       "POST /api/training/deed-weg",
@@ -2763,6 +2752,7 @@
       "POST /api/ai",
       "POST /api/annuleer",
       "POST /api/appstore/koop",
+      "POST /api/arrival/pulse",
       "POST /api/arrival/request",
       "POST /api/auth/register",
       "POST /api/auth/reset",
@@ -2800,6 +2790,7 @@
       "POST /api/boardroom/onboarding/ai",
       "POST /api/boeken/lees",
       "POST /api/clips/maak",
+      "POST /api/code/scan",
       "POST /api/comm/begin",
       "POST /api/comm/concept",
       "POST /api/comm/gesprek",
@@ -2898,6 +2889,7 @@
       "POST /api/les/maak",
       "POST /api/leven/band/vraag",
       "POST /api/leven/deel/zet",
+      "POST /api/link/los",
       "POST /api/login",
       "POST /api/mail/binnen",
       "POST /api/mail/ses",
@@ -3052,6 +3044,7 @@
       "POST /api/overheid/toeslag",
       "POST /api/overheid/uitkering",
       "POST /api/overheid/voertuig/meld",
+      "POST /api/partner/apply",
       "POST /api/pin/herstel",
       "POST /api/plaats/hekken",
       "POST /api/plaats/venster",

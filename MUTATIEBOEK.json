@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:11:29.461Z",
-  "commit": "d6e2320b",
+  "op": "2026-08-30T12:18:33.454Z",
+  "commit": "e9d6ec5b",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -20,18 +20,18 @@
   "nogNietGeclassificeerd": 3,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1285,
+  "metGemetenDuplicaatgedrag": 1289,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit d6e2320b, schone boom",
-  "metingGemetenOp": "2026-08-30T12:11:16.714Z",
+  "metingReden": "gemeten op commit e9d6ec5b, schone boom",
+  "metingGemetenOp": "2026-08-30T12:18:21.457Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 53,
+    "aantal": 43,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -40,11 +40,11 @@
    },
    {
     "id": "gemeten",
-    "aantal": 4394,
+    "aantal": 4404,
     "voorbeelden": [
-     "POST /api/bedrijf/apparaat/innemen",
-     "POST /api/bedrijf/apparaat/uitgeven",
-     "POST /api/bedrijf/apparaat/zet"
+     "POST /api/arrival/pass",
+     "POST /api/arrival/pulse",
+     "POST /api/bedrijf/apparaat/innemen"
     ]
    },
    {
@@ -69,11 +69,11 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 3048
+    "aantal": 3054
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1277
+    "aantal": 1281
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -180,13 +180,13 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1371,
+   "aantal": 1375,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
+    "POST /api/arrival/pass",
     "POST /api/bedrijf/apparaten",
-    "POST /api/bedrijf/beeld",
-    "POST /api/bedrijf/besluiten"
+    "POST /api/bedrijf/beeld"
    ]
   },
   {
@@ -216,7 +216,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 101,
+   "aantal": 93,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -228,7 +228,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 3061,
+   "aantal": 3065,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -356,11 +356,11 @@
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 4610,
+   "vastgelegd": 4620,
    "nu": 3891,
    "vastgelegdOp": "2026-08-30",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": -719,
+   "verschil": -729,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-08-30; sindsdien zijn er routes bijgekomen"
   }

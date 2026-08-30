@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-30T15:10:49.856Z",
-  "commit": "6916cf81",
-  "boomVuil": true,
+  "op": "2026-08-30T15:14:43.107Z",
+  "commit": "181a116f",
+  "boomVuil": false,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
@@ -44,13 +44,13 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1571,
-  "beschermd": 1570,
+  "beoordeeld": 1588,
+  "beschermd": 1587,
   "onbeschermd": 1,
-  "ongemeten": 3050,
-  "oproepen": 13895,
+  "ongemeten": 3033,
+  "oproepen": 13891,
   "tokensHernieuwd": 22,
-  "uitOpslag": 5,
+  "uitOpslag": 4,
   "ruisGeijkt": [
    "rtgai",
    "handelingLog",
@@ -84,8 +84,8 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
-  "objectenGemaakt": 123,
-  "objectTakken": 75,
+  "objectenGemaakt": 124,
+  "objectTakken": 76,
   "schoolwereld": true,
   "horecawereld": true,
   "schoolwereldStappen": [
@@ -140,7 +140,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 10,
+ "vermoedensVerworpen": 6,
  "perRoute": [
   {
    "methode": "POST",
@@ -612,7 +612,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "techniek": 1,
+     "wacht": 6
+    },
     "b": {},
     "c": {}
    }
@@ -2531,18 +2534,15 @@
    "methode": "POST",
    "pad": "/api/bank/passen",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in kosten en de herhaling niets",
+   "idempotentie": "ongemeten",
+   "reden": "het antwoord verandert niet per oproep, en de eerste oproep veranderde de opslag niet: een leesroute, of een die alleen op zijn plaats bijwerkt -- dat verschil ziet dit meetpunt niet",
    "statussen": [
     200,
     200,
     200
    ],
-   "bron": "opslag",
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -2615,6 +2615,7 @@
     "a": {
      "bankSaldi": "gewijzigd",
      "bankBoekingen": 1,
+     "kosten": "gewijzigd",
      "bankIdem": 1,
      "bankIdemAfdruk": 1
     },
@@ -5270,7 +5271,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 1edcc459-881d-486f-b401-d698504f917c"
+   "blokkade": "Die regel bestaat niet: 9c373a5a-b854-467a-ac34-6e2ba05504f5"
   },
   {
    "methode": "POST",
@@ -5288,7 +5289,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: 1edcc459-881d-486f-b401-d698504f917c"
+   "blokkade": "Die regel bestaat niet: 9c373a5a-b854-467a-ac34-6e2ba05504f5"
   },
   {
    "methode": "POST",
@@ -5502,7 +5503,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: 1edcc459-881d-486f-b401-d698504f917c"
+   "blokkade": "Onbekende functie: 9c373a5a-b854-467a-ac34-6e2ba05504f5"
   },
   {
    "methode": "POST",
@@ -6293,7 +6294,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: 1edcc459-881d-486f-b401-d698504f917c"
+   "blokkade": "Dat runbook bestaat niet: 9c373a5a-b854-467a-ac34-6e2ba05504f5"
   },
   {
    "methode": "POST",
@@ -6609,7 +6610,8 @@
    ],
    "opslag": {
     "a": {
-     "techniek": "gewijzigd"
+     "techniek": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -6649,9 +6651,7 @@
      "commandAlarmen": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die organisatie kennen we niet."
   },
@@ -7124,36 +7124,36 @@
    "pad": "/api/concern/bulk/lees",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Er staat niets in dit bestand."
   },
   {
    "methode": "POST",
    "pad": "/api/concern/bulk/verstuur",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Er is niets te versturen."
   },
   {
    "methode": "POST",
@@ -7203,47 +7203,48 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Dit voorstel bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/concern/document/lees",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Er staat te weinig tekst in dit document om iets uit te halen."
   },
   {
    "methode": "POST",
    "pad": "/api/concern/entiteit",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -7261,7 +7262,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Deze groep bestaat niet."
   },
   {
    "methode": "POST",
@@ -7287,54 +7288,56 @@
    "pad": "/api/concern/entiteit/onderneming",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Welke onderneming wijst u aan?"
   },
   {
    "methode": "POST",
    "pad": "/api/concern/entiteit/registratie",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Welk registratienummer hoort hierbij?"
   },
   {
    "methode": "POST",
    "pad": "/api/concern/entiteit/verwijder",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 409)",
    "statussen": [
-    404,
-    404,
-    404
+    409,
+    409,
+    409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": 1
+    },
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Er hangt nog werk aan deze entiteit."
   },
   {
    "methode": "POST",
@@ -7369,43 +7372,42 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Dit gegeven bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/concern/feit/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Dit soort gegeven kennen we niet: proef"
   },
   {
    "methode": "POST",
    "pad": "/api/concern/functiescheiding",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -7447,19 +7449,18 @@
    "methode": "POST",
    "pad": "/api/concern/geschiedenis",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -7483,18 +7484,18 @@
    "pad": "/api/concern/kwalificatie/zet",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Wie heeft welke kwalificatie?"
   },
   {
    "methode": "POST",
@@ -7512,61 +7513,59 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Deze persoon werkt hier niet."
   },
   {
    "methode": "POST",
    "pad": "/api/concern/launch",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mag",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/mens/nieuw",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Wie gaat hier werken?"
   },
   {
    "methode": "POST",
@@ -7608,19 +7607,18 @@
    "methode": "POST",
    "pad": "/api/concern/mensen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -7662,37 +7660,37 @@
    "methode": "POST",
    "pad": "/api/concern/opdatum",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/opname/herstel",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze momentopname bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -7711,8 +7709,7 @@
     },
     "b": {},
     "c": {
-     "concern": "gewijzigd",
-     "wacht": "gewijzigd"
+     "concern": "gewijzigd"
     }
    }
   },
@@ -7737,37 +7734,36 @@
    "methode": "POST",
    "pad": "/api/concern/organigram",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/overname",
    "rol": "member",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Wie neemt over, en voor welk deel?"
   },
   {
    "methode": "POST",
@@ -7781,9 +7777,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "concern": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -7792,55 +7786,52 @@
    "methode": "POST",
    "pad": "/api/concern/readiness",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/tekenen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/ubo",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -7858,7 +7849,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Deze persoon heeft hier geen lopende werkrelatie."
   },
   {
    "methode": "POST",
@@ -7876,7 +7867,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Deze persoon heeft hier geen lopende werkrelatie."
   },
   {
    "methode": "POST",
@@ -7894,7 +7885,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   "blokkade": "Deze vestiging bestaat niet."
   },
   {
    "methode": "POST",
@@ -7936,55 +7927,56 @@
    "methode": "POST",
    "pad": "/api/concern/uitnodigingen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/verloopt",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/concern/vestiging/nieuw",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "concern": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+    "c": {
+     "concern": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -8044,19 +8036,18 @@
    "methode": "POST",
    "pad": "/api/concern/vestigingen",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze entiteit staat niet op uw naam."
+   }
   },
   {
    "methode": "POST",
@@ -8142,7 +8133,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Vul minimaal uw naam en contactgegevens in."
   },
@@ -8522,7 +8515,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8540,7 +8533,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8558,7 +8551,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8576,7 +8569,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8594,7 +8587,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8612,7 +8605,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8630,7 +8623,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8648,7 +8641,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8666,7 +8659,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8684,7 +8677,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8702,7 +8695,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8720,7 +8713,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8738,7 +8731,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8756,7 +8749,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8774,7 +8767,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8792,7 +8785,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8810,7 +8803,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8828,25 +8821,25 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/festival/editie",
    "rol": "supplier",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Geef een geldig jaar op."
   },
   {
    "methode": "POST",
@@ -8917,7 +8910,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8935,7 +8928,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8953,7 +8946,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze groep bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8971,7 +8964,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze groep bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -8989,25 +8982,24 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze groep bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/festival/groep/mijn",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze groep bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -9025,7 +9017,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze groep bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9043,7 +9035,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze groep bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9099,7 +9091,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9117,7 +9109,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9135,7 +9127,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9153,7 +9145,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9171,7 +9163,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze band bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9189,7 +9181,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze band bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9224,7 +9216,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9242,7 +9234,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze band bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9260,7 +9252,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze band bestaat niet."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9278,7 +9270,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9296,7 +9288,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9314,7 +9306,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9332,7 +9324,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9350,7 +9342,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9368,7 +9360,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9386,7 +9378,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9404,7 +9396,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9422,7 +9414,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9440,7 +9432,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9457,8 +9449,7 @@
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   }
   },
   {
    "methode": "POST",
@@ -9476,7 +9467,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9494,7 +9485,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9512,7 +9503,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9530,7 +9521,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9548,7 +9539,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9566,7 +9557,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9584,7 +9575,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
@@ -9602,25 +9593,24 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   "blokkade": "Deze editie bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/festival/vooruit",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit festival staat niet op naam van uw zaak."
+   }
   },
   {
    "methode": "POST",
@@ -11353,7 +11343,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -11554,9 +11546,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit genootschap bestaat niet."
   },
@@ -15889,7 +15879,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Alleen voor het luchthavenpersoneel."
   },
@@ -16069,12 +16061,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -16532,9 +16521,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16732,9 +16719,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -19483,7 +19473,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -19755,9 +19747,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit project bestaat niet (meer)."
   },
@@ -23750,7 +23740,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -24198,12 +24190,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -24701,12 +24690,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -24737,7 +24723,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -26709,7 +26697,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26995,7 +26985,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "atelier": "gewijzigd"
     },
     "b": {},
@@ -29547,7 +29536,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -29640,8 +29631,7 @@
    ],
    "opslag": {
     "a": {
-     "officeDocs": "gewijzigd",
-     "wacht": "gewijzigd"
+     "officeDocs": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -33331,9 +33321,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -33645,7 +33633,8 @@
    ],
    "opslag": {
     "a": {
-     "studio": "gewijzigd"
+     "studio": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -33665,10 +33654,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Concept niet gevonden."
   },
@@ -34091,7 +34077,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34621,7 +34610,6 @@
    ],
    "opslag": {
     "a": {
-     "commandAlarmen": "gewijzigd",
      "weefselPanden": 2
     },
     "b": {},
@@ -34885,7 +34873,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -38851,9 +38841,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -38905,7 +38893,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Vul een geldig kenteken in."
   },
@@ -38995,9 +38985,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Alleen voor het rijk."
   },
@@ -39332,7 +39320,8 @@
    ],
    "opslag": {
     "a": {
-     "payCodes": 1
+     "payCodes": 1,
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -41325,7 +41314,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -41468,9 +41459,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -44704,7 +44693,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze hulpvraag bestaat niet."
   },
@@ -45081,9 +45072,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze stadsafdeling bestaat niet."
   },
@@ -45297,9 +45286,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -45375,7 +45362,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Belofte niet gevonden."
   },
@@ -47994,7 +47983,9 @@
     503
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -48138,9 +48129,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -50878,7 +50867,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc0fd85877a2b4"
+   "blokkade": "Die regel bestaat niet: doc6525d89f33d9"
   },
   {
    "methode": "POST",
@@ -50896,7 +50885,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc0fd85877a2b4"
+   "blokkade": "Die regel bestaat niet: doc6525d89f33d9"
   },
   {
    "methode": "POST",
@@ -51091,7 +51080,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc0fd85877a2b4"
+   "blokkade": "Dat runbook bestaat niet: doc6525d89f33d9"
   },
   {
    "methode": "POST",
@@ -51122,7 +51111,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -51208,7 +51199,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -51278,9 +51271,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51333,9 +51324,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54155,7 +54144,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -54241,9 +54232,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -56436,9 +56425,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -56560,9 +56552,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -56596,9 +56591,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit venster heeft geen geldige sessiesleutel."
   },
@@ -56654,12 +56647,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -59168,7 +59158,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Onbekend mobiliteitssignaal."
   },
@@ -59294,9 +59286,7 @@
      "supplierNotifications": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -61479,7 +61469,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -61623,9 +61615,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -61747,9 +61742,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kamer niet gevonden."
   },
@@ -61861,12 +61854,9 @@
     "a": {
      "rtmailSchrijf": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -63711,7 +63701,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -64046,9 +64038,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -65933,9 +65923,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -66056,7 +66049,8 @@
    ],
    "opslag": {
     "a": {
-     "techniek": "gewijzigd"
+     "techniek": "gewijzigd",
+     "kosten": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -66170,7 +66164,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -66402,9 +66399,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Geef twee vingerafdrukken mee: voor en na."
   },
@@ -66492,12 +66487,9 @@
     "a": {
      "wacht": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -66760,10 +66752,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -66907,7 +66896,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Dit huis beheert u niet."
   },
@@ -67420,9 +67411,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die training staat niet in uw logboek."
   },
@@ -68166,7 +68155,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -68681,12 +68672,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -70248,9 +70236,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -70318,7 +70309,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -70979,9 +70972,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -71104,12 +71095,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -73861,7 +73849,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -74025,7 +74015,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -74040,9 +74032,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -74576,9 +74566,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -75799,14 +75787,11 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "foundation": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -75873,7 +75858,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -77379,7 +77366,7 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd"
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -77617,7 +77604,9 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Die aanvraag kennen we niet."
   },
@@ -77994,8 +77983,7 @@
    ],
    "opslag": {
     "a": {
-     "horeca": "gewijzigd",
-     "wacht": "gewijzigd"
+     "horeca": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -79096,12 +79084,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -79275,7 +79260,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -81026,7 +81013,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -81546,9 +81535,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {

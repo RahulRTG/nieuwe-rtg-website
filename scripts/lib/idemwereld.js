@@ -18,17 +18,23 @@
    EN WAT HET NADRUKKELIJK NIET DOET -- twee dingen, en de tweede is er op
    30 augustus 2026 bij gekomen.
 
-   GEEN RIJKSOVERHEID. Vierenzestig routes onder /api/overheid/ antwoorden
-   "Alleen voor het rijk.": `magBehandelen` vraagt een leverancier van het genre
-   `rijk`, en dat genre staat in de seed als `status: 'intern'` -- er is er geen,
-   met opzet. De proef zou er een kunnen aanvragen langs de gewone aanmeldbalie
-   en hem door het kantoor laten goedkeuren. Dat gebeurt hier niet. Een
-   Rijksoverheid-account is geen voorwerp maar een IDENTITEIT, en de goedkeuring
-   ervan leunt op een vergunning die een mens heeft gezien
-   (kern/aanmeldingen/bewijs.js). Een proef die zichzelf tot overheid benoemt om
-   vierenzestig regels uit de kolom `ongemeten` te halen, meet zijn eigen fixture.
-   Ze blijven ongemeten, en dat is de eerlijke uitslag -- geen gat dat nog
-   gevuld moet worden.
+   WEL EEN RIJKSOVERHEID, MAAR NIET LANGS DE AANMELDBALIE. Vierenzestig routes
+   onder /api/overheid/ antwoorden "Alleen voor het rijk.": `magBehandelen`
+   vraagt een leverancier van het genre `rijk`. Dat genre staat in de seed als
+   `status: 'intern'`, en die stand betekent letterlijk "dit genre hoort bij de
+   wereld zelf en wordt niet door een partner aangevraagd" (seed/genres.js).
+
+   Eerst liet deze proef ze daarom ongemeten, met als reden dat een
+   overheidsaccount een IDENTITEIT is en geen voorwerp. Die redenering ging over
+   de verkeerde deur. Een intern genre wordt niet AANGEVRAAGD en dus ook niet
+   goedgekeurd op een vergunning die een mens heeft gezien -- het wordt door RTG
+   zelf aangesloten, en daar bestaat een eigen weg voor:
+   /api/office/instelling/aansluiten, achter de boardroom-sleutel. Besluit van de
+   eigenaar, 30 augustus 2026: dat genre is van ons, koppel het.
+
+   Dus loopt de proef die weg af, en geen andere. Wat hij NIET doet is een
+   aanvraag door de aanmeldbalie duwen of een vergunningcontrole overslaan; die
+   deur blijft dicht, en de kredietroutes hieronder blijven dat ook.
 
    En het oudere geval: de drie kredietroutes forceren. Die geven
    503 met "hiervoor is een vergunning nodig die nog niet is vastgelegd" -- een
@@ -289,6 +295,46 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     w[sleutel] = veld(d, 'document', 'id') || veld(d, 'id') || veld(d, 'doc', 'id');
   }
 
+  /* 11f. DE RIJKSOVERHEID, langs de weg die daarvoor bestaat.
+
+          Drie stappen, alle drie gewone routes met hun gewone poort ervoor:
+
+            1. aansluiten   /api/office/instelling/aansluiten (boardroom) -- geeft
+                            een bedrijfscode en een eenmalige beheer-PIN terug,
+                            precies zoals bij een goedgekeurde partneraanvraag.
+            2. wie is er    /api/supplier/roster -- de inlogkiezer die elke zaak
+                            heeft; hij geeft het personeelsID bij de PIN.
+            3. inloggen     /api/supplier/login met code + staffId + pin.
+
+          Stap 2 is nodig omdat het aansluiten wel de PIN teruggeeft maar niet
+          het ID waar hij bij hoort, en de personeelslogin allebei wil. Dat is
+          geen omweg: het is hetzelfde scherm dat een medewerker ziet.
+
+          De naam draagt met opzet het woord "proef": wie deze instelling in een
+          lijst tegenkomt, hoort te zien dat hij van een proefronde is en niet
+          van een echte overheidsdienst. */
+  if (tokens.boardroom) {
+    const inst = await stil('/api/office/instelling/aansluiten', {
+      genre: 'rijk', naam: 'Proefrijksdienst (idemproef)', plaats: 'Proefstad', beheerder: 'Proefbeheerder'
+    }, tokens.boardroom);
+    const code = veld(inst, 'code'), pin = veld(inst, 'pin');
+    if (code && pin) {
+      const rooster = await stil('/api/supplier/roster', { code });
+      const eerste = ((rooster.data && rooster.data.staff) || [])[0];
+      if (eerste) {
+        const login = await stil('/api/supplier/login', { code, staffId: eerste.id, pin });
+        w.rijkToken = veld(login, 'token');
+        w.rijkCode = code;
+        /* DE SLEUTEL IN DE BOS, want een voorvoegsel geeft hier een ROL door en
+           geen lijf, en tokenVoor() leest die rol rechtstreeks uit deze bak
+           (scripts/lib/proefsleutels.js). Zonder deze regel wijst
+           `rol: 'rijk'` naar een sleutel die niet bestaat en roept de proef de
+           64 routes aan met GEEN token -- stiller mis dan met de verkeerde. */
+        if (w.rijkToken) tokens.rijk = w.rijkToken;
+      }
+    }
+  }
+
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
 }
 
@@ -398,6 +444,11 @@ function voorvoegselLijf(w) {
      vaste codes ('rtg', 'rtf') en geen route die er een derde bij zet. `magIn`
      laat de BAAS overal in, en dat is de eigenaar -- dus de boardroom-sleutel. */
   uit.push({ voorvoegsel: '/api/werkplek/', lijf: { bedrijf: 'rtg' }, rol: 'boardroom' });
+
+  /* De overheidskant draait op een EIGEN ROL en niet op een eigen lijf: die 64
+     routes willen geen extra veld, ze willen een zaak van het genre `rijk`. Het
+     voorvoegsel geeft dus de sleutel mee en verder niets. */
+  if (w.rijkToken) uit.push({ voorvoegsel: '/api/overheid/', lijf: {}, rol: 'rijk' });
 
   /* De kantoorpakketten, elk met het document van HUN kring. Deze staan na het
      werkplek-voorvoegsel maar zijn specialer, dus ze moeten ervoor -- de eerste

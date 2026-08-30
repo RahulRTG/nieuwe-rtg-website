@@ -24,6 +24,24 @@
       `id`-plek bij; elk nieuw object overschreef het vorige. Een `id` uit de
       kluis van een lid is zinloos voor een festival van een zaak. Vandaar de
       oogst PER TAK, op twee en drie segmenten diep, met de diepste die wint.
+   2b. EN EEN TWEEDE KANS OOK NIET. MAAK kijkt naar de STAART van het pad, en
+      dat mist een hele klasse: een route die naar zijn OBJECT heet in plaats
+      van naar zijn werkwoord. /api/festival/editie maakt een editie, en 54
+      routes stranden op "Deze editie bestaat niet" omdat die deur nooit
+      openging; zo ook /api/lab2/onderzoek (38) en /api/site (18). De
+      voordehandliggende reparatie -- in elke LEGE tak elke overgebleven route
+      een keer proberen en houden wat een verwijzing teruggeeft -- is gebouwd
+      en gemeten, en hij deugt niet:
+
+        1232 extra oproepen, 13 takken gevuld
+        beoordeeld 1817 -> 1816 (dus niets)
+        en 14 bank- en pay-routes gingen van `ongemeten` naar `onbeschermd`,
+        omdat die extra oproepen toestand maakten die de herhaling verstoorde
+
+      Dat laatste is het echte bezwaar: de oogst mag de meting niet vervuilen.
+      Wie deze klasse alsnog wil vangen, doet dat met een GEMETEN koppeling
+      tussen veld en route (welke route levert `editie`), niet met een sleepnet.
+
    2. HERHALEN WIKKELT DE KETEN NIET AF. Ik verwachtte dat een tweede ronde meer
       maakroutes zou laten slagen omdat er dan meer ouders bestaan. Gemeten
       wordt het er niet meer maar MINDER (71 -> 68): wat in ronde een lukte,

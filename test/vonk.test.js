@@ -100,8 +100,8 @@ test('4. beide betalen EUR 10 vooraf; dan pas staat de reservering vast', async 
   const mijnA = await api('/api/vonk/mijn', {}, A.token);
   const m = mijnA.body.matches[0];
   assert.equal(m.status, 'wacht-op-betaling');
-  await api('/api/pay/oplaad', { centen: 2000 }, A.token);
-  await api('/api/pay/oplaad', { centen: 2000 }, B.token);
+  await api('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 2000 }, A.token);
+  await api('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 2000 }, B.token);
   const b1 = await api('/api/vonk/betaal', { id: m.id }, A.token);
   assert.equal(b1.status, 200);
   assert.notEqual(b1.body.status2, 'bevestigd', 'een kant betaald is nog niet vast');

@@ -113,7 +113,7 @@ module.exports = (ctx) => {
       save();
       seintje(k.codenaam);
       return { ok: true, centen: c, van: k.codenaam, kosten, kostenStatus, apartGezet: apart, delen: b.delen, bijgeladen: b.bijgeladen || 0 };
-    });
+    }, { geld: 'rekent een tik af tegen een kascode' });
   }
 
   /* De partnerkant staat in ./partner.js en niet hier: dit bestand ging anders

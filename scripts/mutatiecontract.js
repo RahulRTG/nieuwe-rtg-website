@@ -252,11 +252,39 @@ function voorstelUitBewijs(m, sleutel) {
        NIET ziet -- een bestand, een bericht, een teller buiten de gemeten
        collecties -- en dat is precies het gat waar NOT_APPLICABLE om `nagekeken`
        vraagt. Gemeten op 29 augustus 2026: 185 routes. */
+    /* HET DERDE MEETPUNT (server/effectmeter.js), en het spreekt VOOR de
+       statische analyse. Die laatste kan in dit huis niet ver kijken -- de
+       routelaag krijgt haar modules via een contextobject uit server/opzet/, dus
+       een aanroep als bank.bankOverboek() staat nergens als afhankelijkheid.
+       Gemeten: een resolver over de modulegrens won 28 routes op 4.400.
+
+       De effectmeter meet niet wat de code KAN maar wat dit verzoek HEEFT
+       gedaan, op drie choke points (een schrijfpoging, een mail, een sms). Twee
+       kale oproepen die allebei `geen` melden zijn daarmee een echte tweede
+       bewijslijn onder NOT_APPLICABLE, in plaats van een tweede stilte. */
+    const ef = z.effect;
+    const kaalEffect = ef && ef.d != null && ef.e != null ? [ef.d, ef.e] : null;
+    if (kaalEffect && kaalEffect.some(x => x !== 'geen')) {
+      /* Hetzelfde veto als hieronder, maar nu GEMETEN in plaats van uit de
+         brontekst gelezen: de opslagmeter zag niets en er gebeurde toch iets. */
+      return { voorstel: null, grond: 'TEGENSPRAAK: de opslagmeter zag niets, maar de effectmeter telde ' +
+        kaalEffect.join(' en ') + ' op de twee kale oproepen. Er verandert iets buiten de gemeten collecties; ' +
+        'NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is.' };
+    }
     const sa = statisch.get(sleutel);
     if (sa && sa.schrijft === 'ja') {
       return { voorstel: null, grond: 'TEGENSPRAAK: de opslagmeter zag niets, maar ' + sa.bestand +
         ' bevat een schrijfvorm (' + sa.waarom.replace(/^schrijfvorm gevonden: /, '') + '). ' +
         'Er verandert iets dat deze meter niet ziet; NOT_APPLICABLE zou hier bewijs voorwenden dat er niet is.' };
+    }
+    if (kaalEffect) {
+      /* Twee meters, allebei nul, en de tweede kijkt buiten de collecties. Wat
+         hij NIET ziet gaat mee in de grond en niet eronder: een bestand en een
+         externe aanroep hebben geen choke point, en dat hoort een mens te lezen
+         voordat hij dit aftekent. */
+      return { voorstel: 'NOT_APPLICABLE', grond: 'kale ronde: twee geslaagde oproepen zonder spoor in de opslag, ' +
+        'EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, ' +
+        'twee keer nul. Wat geen van beide ziet: ' + (ef.nietGemeten || 'onbekend') + '.' };
     }
     return { voorstel: 'NOT_APPLICABLE', grond: 'kale ronde: twee geslaagde oproepen zonder spoor in de opslag' +
       (sa && sa.schrijft === 'nee' ? ', EN de statische analyse vindt geen enkele schrijfvorm in de handler ' +

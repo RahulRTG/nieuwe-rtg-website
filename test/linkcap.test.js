@@ -324,7 +324,7 @@ test('de KYC-poort van RTG Pay geldt ook via de capabilitydeur', async () => {
   const lijf = await json(r);
   assert.equal(lijf.kyc, true, 'en de app weet dat ze naar de paspoortstap moet');
   // de rechtstreekse weg weigert precies hetzelfde, en dat is het punt
-  assert.equal((await api('/api/pay/stuur', { aan: geert.codenaam, centen: 1200 }, hanna.token)).status, 403);
+  assert.equal((await api('/api/pay/stuur', { idem: 'proef-' + Math.random(), aan: geert.codenaam, centen: 1200 }, hanna.token)).status, 403);
   // de code is niet opgegaan aan een poging die nooit doorging
   assert.equal((await json(await api('/api/link/los', { tekst: gemaakt.token }, hanna.token))).type, 'capability');
 });

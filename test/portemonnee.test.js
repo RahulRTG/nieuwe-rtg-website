@@ -92,7 +92,7 @@ test('RTG Pay: wat de een verliest wint de ander, tot op de cent', async () => {
     const anna = await nieuwLid(P, 'Annika');
     const boris = await nieuwLid(P, 'Bodhi');
 
-    const op = await P('/api/pay/oplaad', { centen: 5000 }, anna);
+    const op = await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 5000 }, anna);
     assert.equal(op.status, 200, 'Annika laadt 50 euro op: ' + JSON.stringify(op.body).slice(0, 180));
 
     const aVoor = await saldo(P, anna);
@@ -105,7 +105,7 @@ test('RTG Pay: wat de een verliest wint de ander, tot op de cent', async () => {
     assert.ok(codenaamB, 'Bodhi heeft een codenaam: ' + JSON.stringify(wie.body).slice(0, 140));
     assert.ok(!/Bodhi/i.test(codenaamB), 'en dat is niet zijn echte naam');
 
-    const stuur = await P('/api/pay/stuur', { aan: codenaamB, centen: 1250, oms: 'Voor de lunch' }, anna);
+    const stuur = await P('/api/pay/stuur', { idem: 'proef-' + Math.random(), aan: codenaamB, centen: 1250, oms: 'Voor de lunch' }, anna);
     assert.equal(stuur.status, 200, 'Annika stuurt 12,50: ' + JSON.stringify(stuur.body).slice(0, 200));
 
     const aNa = await saldo(P, anna);
@@ -127,7 +127,7 @@ test('RTG Pay laadt zelf bij als het saldo tekortschiet -- maar nooit stilletjes
     const arm = await nieuwLid(P, 'Casper');
     const ander = await nieuwLid(P, 'Delphine');
 
-    await P('/api/pay/oplaad', { centen: 500 }, arm);
+    await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 500 }, arm);
     const cVoor = await saldo(P, arm);
     const dVoor = await saldo(P, ander);
 
@@ -143,7 +143,7 @@ test('RTG Pay laadt zelf bij als het saldo tekortschiet -- maar nooit stilletjes
     const wie = await P('/api/salon/lid', {}, ander);
     const groot = cVoor + 10000;
     const gestuurd = await P('/api/pay/stuur',
-      { aan: wie.body.codenaam, centen: groot, oms: 'Meer dan er stond' }, arm);
+      { idem: 'proef-' + Math.random(), aan: wie.body.codenaam, centen: groot, oms: 'Meer dan er stond' }, arm);
     assert.equal(gestuurd.status, 200, 'de betaling gaat door: ' + JSON.stringify(gestuurd.body).slice(0, 200));
     assert.ok(gestuurd.body.bijgeladen > 0,
       'en het antwoord meldt dat er is bijgeladen: ' + JSON.stringify(gestuurd.body).slice(0, 200));
@@ -173,7 +173,7 @@ test('het Klompje: een betaalverzoek dat je een keer kunt betalen', async () => 
     const P = post(base);
     const vrager = await nieuwLid(P, 'Esmee');
     const betaler = await nieuwLid(P, 'Ferdi');
-    await P('/api/pay/oplaad', { centen: 8000 }, betaler);
+    await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 8000 }, betaler);
 
     const wieB = await P('/api/salon/lid', {}, betaler);
     const verzoek = await P('/api/pay/verzoek',
@@ -191,7 +191,7 @@ test('het Klompje: een betaalverzoek dat je een keer kunt betalen', async () => 
     const vVoor = await saldo(P, vrager);
     const bVoor = await saldo(P, betaler);
 
-    const betaald = await P('/api/pay/verzoek/betaal', { id: mijn.id }, betaler);
+    const betaald = await P('/api/pay/verzoek/betaal', { idem: 'proef-' + Math.random(), id: mijn.id }, betaler);
     assert.equal(betaald.status, 200, 'hij betaalt het: ' + JSON.stringify(betaald.body).slice(0, 200));
 
     assert.equal(await saldo(P, vrager) - vVoor, 2000, 'de vrager krijgt precies 20 euro');
@@ -199,7 +199,7 @@ test('het Klompje: een betaalverzoek dat je een keer kunt betalen', async () => 
 
     /* TWEE KEER BETALEN KAN NIET. Zonder deze bewering is een betaalverzoek
        een knop die je kunt blijven indrukken. */
-    const nogEens = await P('/api/pay/verzoek/betaal', { id: mijn.id }, betaler);
+    const nogEens = await P('/api/pay/verzoek/betaal', { idem: 'proef-' + Math.random(), id: mijn.id }, betaler);
     assert.notEqual(nogEens.status, 200, 'hetzelfde Klompje twee keer betalen stuit: ' +
       nogEens.status + ' ' + JSON.stringify(nogEens.body).slice(0, 160));
   } finally { child.kill('SIGKILL'); }
@@ -212,8 +212,8 @@ test('de tikcode: je zet jezelf op ontvangen, en een nieuwe code doodt de oude',
     const ontvanger = await nieuwLid(P, 'Guusje');
     const betaler = await nieuwLid(P, 'Hidde');
     const derde = await nieuwLid(P, 'Ilias');
-    await P('/api/pay/oplaad', { centen: 6000 }, betaler);
-    await P('/api/pay/oplaad', { centen: 6000 }, derde);
+    await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 6000 }, betaler);
+    await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 6000 }, derde);
 
     /* HOE HET ECHT WERKT, en mijn eerste versie had het mis. Een tikcode draagt
        GEEN bedrag: je zet jezelf op ontvangen en de betaler bepaalt wat hij
@@ -228,18 +228,18 @@ test('de tikcode: je zet jezelf op ontvangen, en een nieuwe code doodt de oude',
     const oVoor = await saldo(P, ontvanger);
     const bVoor = await saldo(P, betaler);
 
-    const eerste = await P('/api/pay/tik', { code: tik, centen: 1500, oms: 'Rondje' }, betaler);
+    const eerste = await P('/api/pay/tik', { idem: 'proef-' + Math.random(), code: tik, centen: 1500, oms: 'Rondje' }, betaler);
     assert.equal(eerste.status, 200, 'de eerste tik gaat door: ' + JSON.stringify(eerste.body).slice(0, 200));
     assert.equal(await saldo(P, ontvanger) - oVoor, 1500, 'de ontvanger krijgt precies 15 euro');
     assert.equal(bVoor - await saldo(P, betaler), 1500, 'en de betaler is precies 15 euro kwijt');
 
     /* Een tweede vriend mag ook tikken: dat is het punt van op ontvangen staan. */
-    const tweede = await P('/api/pay/tik', { code: tik, centen: 500, oms: 'Ik ook' }, derde);
+    const tweede = await P('/api/pay/tik', { idem: 'proef-' + Math.random(), code: tik, centen: 500, oms: 'Ik ook' }, derde);
     assert.equal(tweede.status, 200, 'een tweede vriend kan ook tikken: ' + JSON.stringify(tweede.body).slice(0, 160));
 
     /* JE EIGEN TIK IS GEEN BETALING. Zonder deze grens kun je jezelf geld
        sturen en het grootboek laten rondzingen. */
-    const zelf = await P('/api/pay/tik', { code: tik, centen: 100 }, ontvanger);
+    const zelf = await P('/api/pay/tik', { idem: 'proef-' + Math.random(), code: tik, centen: 100 }, ontvanger);
     assert.notEqual(zelf.status, 200, 'je eigen tik kan niet: ' + JSON.stringify(zelf.body).slice(0, 160));
 
     /* EEN NIEUWE CODE DOODT DE OUDE. Dat is de echte veiligheidsbelofte hier:
@@ -249,13 +249,13 @@ test('de tikcode: je zet jezelf op ontvangen, en een nieuwe code doodt de oude',
     assert.notEqual(nieuweCode.body.code, tik, 'de nieuwe code is een andere');
 
     const dVoor = await saldo(P, derde);
-    const oudeCode = await P('/api/pay/tik', { code: tik, centen: 500 }, derde);
+    const oudeCode = await P('/api/pay/tik', { idem: 'proef-' + Math.random(), code: tik, centen: 500 }, derde);
     assert.notEqual(oudeCode.status, 200, 'de oude code werkt niet meer: ' +
       oudeCode.status + ' ' + JSON.stringify(oudeCode.body).slice(0, 160));
     assert.equal(await saldo(P, derde), dVoor, 'en er is niets afgeschreven');
 
     // en een code die nooit heeft bestaan al helemaal niet
-    const onzin = await P('/api/pay/tik', { code: 'ZZZZZZ', centen: 500 }, derde);
+    const onzin = await P('/api/pay/tik', { idem: 'proef-' + Math.random(), code: 'ZZZZZZ', centen: 500 }, derde);
     assert.notEqual(onzin.status, 200, 'een verzonnen code wordt geweigerd');
   } finally { child.kill('SIGKILL'); }
 });

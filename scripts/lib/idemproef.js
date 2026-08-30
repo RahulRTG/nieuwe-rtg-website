@@ -334,6 +334,14 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
          allemaal uit de andere twee gronden, en het register liet dat niet zien. */
       zonder = { stand: oz.stand, grond: oz.grond || null, reden: oz.reden, statussen: [d.status, e.status] };
       if (staatVan) zonder.opslag = { d: dD, e: dE };
+      /* HET DERDE MEETPUNT, en met opzet ONBEWERKT. De weging hierboven leunt
+         nog op de opslag; dit veld staat ernaast zodat het contractregister zelf
+         kan zien of er werkelijk niets gebeurde. Ontbreekt de kop, dan staat er
+         null en niet 'geen' -- niet gemeten is iets anders dan gemeten nul, en
+         dat verschil is het hele bestaansrecht van deze meter. */
+      if (d.effect != null || e.effect != null)
+        zonder.effect = { d: d.effect || null, e: e.effect || null,
+          nietGemeten: d.effectNietGemeten || e.effectNietGemeten || null };
       /* De laag die het deed, voor zover van buiten te zien: `herhaald: true`
          zonder dat de proef een sleutel stuurde, komt van de idem-poort op grond
          van een verklaring -- de enige weg die daar dan nog voor is. */

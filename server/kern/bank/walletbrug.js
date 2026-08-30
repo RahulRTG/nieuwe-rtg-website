@@ -43,7 +43,10 @@ module.exports = (ctx) => {
       error: 'Saldo in RTG Pay besteedt u binnen RTG; het gaat niet naar een bankrekening. ' +
         'Andersom kan wel: geld van uw rekening naar uw wallet.' };
   }
-  async function bankNaarWallet({ iban, codenaam, centen, idem }) {
+  /* `internDek` zegt: dit is een stap binnen een andere handeling, geen eigen
+     verzoek. Zie dekWallet hieronder voor waarom die stand bestaat en wat hij
+     kost. Hij komt NIET van buiten: geen route leest hem uit een verzoek. */
+  async function bankNaarWallet({ iban, codenaam, centen, idem, internDek }) {
     const c = String(codenaam || '').trim();
     const m = rekMeta(iban);
     if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
@@ -56,7 +59,7 @@ module.exports = (ctx) => {
       if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
       seintje(c);
       return { ok: true, saldoCenten: saldoVan(iban) };
-    });
+    }, internDek ? null : { geld: 'verplaatst saldo van een rekening naar de wallet' });
   }
 
   /* De wallet-dekking: RTG Pay komt saldo tekort en vraagt de eigen bank om
@@ -64,7 +67,18 @@ module.exports = (ctx) => {
      (binnen zijn bodem, dus incl. rood-staan-ruimte) kan dragen en verhuizen
      precies het tekort naar de wallet. Zo draait Pay op de eigen bank zodra
      die er is, en pas daarna op de kaart-naad. */
-  async function dekWallet({ codenaam, centen }) {
+  /* DE SLEUTEL REIST MEE, en dat moest hij worden.
+
+     Deze functie dekt een tekort in de wallet vanaf de eigen betaalrekening, en
+     riep bankNaarWallet aan ZONDER idem-sleutel. Toen de geldgrens in
+     ../../lib/idem.js kwam (geen sleutel, geen geldhandeling), weigerde die
+     aanroep -- en de `catch` een laag hoger in ../pay/opladen.js slikte dat stil
+     op: het lid kreeg `bijgeladen: 0` en niemand zei waarom.
+
+     De sleutel bestond wel degelijk: pay/opladen.js krijgt hem van de aanroeper
+     en gaf hem alleen niet door. Hij reist nu de hele keten mee, zodat een
+     dubbeltik op `pay/stuur` ook de DEKKING niet twee keer doet. */
+  async function dekWallet({ codenaam, centen, idem }) {
     const c = String(codenaam || '').trim();
     const bedrag = Math.round(Number(centen));
     if (!Number.isFinite(bedrag) || bedrag < 1) return { status: 400, error: 'Dat bedrag kan niet.' };
@@ -72,7 +86,25 @@ module.exports = (ctx) => {
     const kandidaat = Object.values(rekeningen()).find(m =>
       m.codenaam === c && m.soort === 'betaal' && !m.bevroren && saldoVan(m.iban) - bedrag >= bodem(m.iban));
     if (!kandidaat) return { status: 402, error: 'Geen betaalrekening met genoeg ruimte.' };
-    return bankNaarWallet({ iban: kandidaat.iban, codenaam: c, centen: bedrag });
+    /* EN ALS ER GEEN SLEUTEL VAN BOVEN KOMT. Dan gaat de dekking toch door, en
+       dat is een grens die het uitschrijven waard is.
+
+       Deze dekking is geen zelfstandig verzoek maar een STAP BINNEN een andere
+       handeling (een betaling die de wallet niet vol genoeg vindt). De
+       idempotentie van die handeling hoort bij die handeling: `pay.huisIn` of
+       `pay.stuur` dragen hem, en als die geen sleutel kreeg, is dat daar het
+       gebrek en niet hier. Deze stap alsnog weigeren maakt van een ontbrekende
+       bescherming een STORING -- gemeten in test/zorgwallet.test.js, waar het
+       kopen van feestmunten er in zijn geheel op afketste terwijl niemand om een
+       tweede boeking had gevraagd.
+
+       Wat dat kost, want dat hoort erbij: een aanroeper die zelf geen sleutel
+       stuurt, kan door een dubbeltik twee keer laten dekken. Die aanroepers zijn
+       te tellen (pay/huisIn en pay/huisUit zonder idem) en horen er een te
+       krijgen; tot die tijd staat het hier zichtbaar in plaats van dat de
+       dekking stil uitvalt. */
+    if (!idem) return bankNaarWallet({ iban: kandidaat.iban, codenaam: c, centen: bedrag, internDek: true });
+    return bankNaarWallet({ iban: kandidaat.iban, codenaam: c, centen: bedrag, idem: 'dek:' + idem });
   }
 
   return { bankWalletNaarBank: walletNaarBank, bankBankNaarWallet: bankNaarWallet, bankDekWallet: dekWallet };

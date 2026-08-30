@@ -59,7 +59,7 @@ module.exports = (ctx) => {
         if (b.ok) geboekt++;
       }
       return { ok: true, geboekt, aantal: schoonPosten.length, totaalCenten: totaal, saldoCenten: saldoVan(vanIban) };
-    });
+    }, { geld: 'boekt een reeks posten ineens (bulk of loonronde)' });
   }
 
   /* Het salarisvoorstel: de brug tussen de klokuren van een zaak en de

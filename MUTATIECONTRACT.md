@@ -238,6 +238,102 @@ een `zelfdeVerzoek` legt daar het eerste antwoord over een bewuste weigering hee
 
 ---
 
+## 5c. De derde meter, en de fout die hij blootlegde
+
+De statische analyse hierboven mag alleen weerleggen, dus onder `NOT_APPLICABLE`
+bleef één meter over die alles moest dragen. Daarom staat er nu een derde:
+`server/effectmeter.js`. Hij meet niet wat de code *kan* en niet wat er in de
+*collecties* veranderde, maar of dit ene verzoek werkelijk **iets heeft gedaan**
+— op drie choke points: een schrijfpoging (`save()` in `server/db/index.js`), een
+mail en een sms (`server/mail.js`, `server/mail-lokaal.js`).
+
+Drie regels houden hem eerlijk:
+
+1. **Hij staat uit.** Zonder `RTG_STAATLOG` hangt hij niet eens in de keten —
+   dezelfde vlag als de opslagmeter, want twee vlaggen voor één meetopstelling is
+   er één te veel.
+2. **Hij telt alleen choke points.** Een teller die op honderd plekken wordt
+   aangeroepen, wordt op de honderdeneerste vergeten.
+3. **Wat hij niet telt, staat met naam in het antwoord.** De kop
+   `X-RTG-Effect-Niet-Gemeten` noemt `bestand` en `externe-aanroep`, en die tekst
+   gaat mee in de grond van elk contract dat op deze meter leunt. Er is geen veld
+   dat `0` teruggeeft voor iets dat niet gemeten wordt — dat is precies hoe een
+   meter een geruststelling wordt.
+
+Twee dingen die hij bewust *niet* meet en waarom: **bestandsschrijfacties** hebben
+geen enkel choke point (uploads via `server/kluis.js`, de outbox rechtstreeks, een
+handvol modules met een eigen `fs.writeFileSync`) — wie dat wil meten maakt eerst
+één schrijfweg, en dat is een opruimklus en geen meetklus. **Externe aanroepen**
+zouden halve dekking geven: `server/ai.js` is wel een choke point, de betaalrails
+niet, en een meter die bij drie van de vier zwijgt leest als "er gebeurde niets".
+
+**Hij telt de poging en niet de fysieke schrijfactie.** Een bundel van drie saves
+plus zijn commit telt vier. Dat is bewust: de vraag hier is niet *hoeveel* maar
+*iets of niets*, en die eerste vraag mag geen tak missen. De eerste versie telde
+wél onder de bundelcheck, en meldde `geen` op een verzoek dat een compleet account
+aanmaakte — `bijeen()` keert daar af met alleen een vlag, en de echte schrijfactie
+loopt daarna via `saveDuurzaam()`, die `save()` lang niet in elke tak aanroept.
+
+### De fout eronder: de async-context ging verloren bij het lezen van de body
+
+De meter meldde ook na die reparatie `geen`. De oorzaak zat niet in de meter maar
+in `server/web/body.js`, en ze raakt alles in dit huis dat met een async-context
+werkt: **een luisteraar op een EventEmitter draait in de context van wie `emit`,
+niet van wie hem heeft aangehangen.** De `end` van een verzoeklichaam komt uit de
+HTTP-parser, dus alles ná `express.json()` liep buiten elke async-context die de
+keten daarvóór had geopend.
+
+Dat trof niet alleen deze meter. `server/kern/kosten/haak.js` draagt langs dezelfde
+weg de vraag *wie betaalt dit*; die staat verderop gemount en ontsnapte daarmee aan
+het gat, maar elke context die vóór de body-lezer wordt geopend was stil kapot.
+`AsyncResource.bind` op de terugroep repareert het bij de oorzaak, één binding per
+verzoek met een lichaam.
+
+`test/effectmeter.test.js` houdt het vast, en die toets moest zelf twee keer
+gemaakt worden: de eerste versie speelde het verzoek na met een `EventEmitter` die
+zijn eigen `end` uitzond — binnen de context, dus zonder verlies. Die toets slaagde
+ook zónder de reparatie en bewees dus niets. De parser is precies het stuk dat je
+niet kunt naspelen; de toets draait nu over een echte socket.
+
+## 5d. Geen sleutel is geen verzoek — op de handelingen die geld verplaatsen
+
+Overal in dit huis is een idem-sleutel een **vangnet**: is hij er niet, dan gebeurt
+het werk gewoon. Voor het overgrote deel is dat de juiste afweging — een dubbele
+agenda-afspraak is hinderlijk, een geweigerd verzoek is erger.
+
+Bij geld draait die afweging om, en de kale ronde zegt precies hoe hard:
+**achttien geldroutes** deden bij een woordelijk gelijke herhaling zónder sleutel
+het werk gewoon opnieuw. `/api/bank/overboek` boekte twee keer, `/api/bank/sepa`
+stuurde twee keer het huis uit, `/api/pay/stuur` betaalde twee keer.
+
+De grens staat in `server/lib/idem.js`, op de regel die er al stond:
+`if (!sleutel) return werk()`. Een aanroeper die weet dat zijn handeling geld
+verplaatst, zegt dat — `metIdem(sleutel, afdruk, werk, { geld: 'boekt van de ene
+rekening naar de andere' })` — en dan wordt de sleutelloze aanroep geweigerd met
+`400 IDEMPOTENTIESLEUTEL_VERPLICHT` en de reden van díé handeling erbij. **Twaalf
+aanroepplekken** dragen die verklaring: storten, overboeken, SEPA, bulk/loon,
+pasbetaling, wallet-brug, terugkerende reeks, geld sturen, een betaalverzoek
+voldoen, opladen, een tik afrekenen en tegoed kopen.
+
+### Waarom niet in de HTTP-poort, en hoe dat gemeten is
+
+De eerste versie stond in `server/lib/idem-poort.js`, met een lijst van paden. Dat
+is een aantrekkelijke plek — één middleware, alle routes — en hij was fout. Die
+poort draait **vóór de bewakers**, dus een lid dat de rekening van een ander
+probeerde kreeg `400` in plaats van `404`. Tien toetsen zakten, en twee ervan
+meten juist die eigendomsgrens: *"B komt met zijn eigen geldige sessie nergens bij
+A binnen"* zag hem niet meer.
+
+Dat is de les die het waard is om op te schrijven: **een ergonomische regel mag
+nooit een veiligheidsmeting blind maken.** In de geldlaag staat de weigering ná de
+eigenaarscontrole (`if (!eigenaar(...)) return 404` staat in de kern boven de
+`metIdem`-aanroep) en vóór het werk — de enige plek waar allebei waar is.
+
+Er is daarmee ook géén tweede lijst: deze laag kent geen routes, en een register
+van paden naast de aanroepplek loopt binnen een jaar uiteen. De verklaring staat
+waar de handeling staat. `test/geldroutes.test.js` houdt de twaalf vast en zakt
+zodra er een zijn `{ geld: … }` verliest.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

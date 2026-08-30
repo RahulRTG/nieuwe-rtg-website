@@ -83,7 +83,15 @@ if (require.main !== module) { module.exports = {}; return; }
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
-      return { status: r.status, data, staat: r.headers.get('x-rtg-staat') };
+      /* HET DERDE MEETPUNT (server/effectmeter.js). De opslagmeter kijkt naar de
+         COLLECTIES; deze zegt of er uberhaupt iets gebeurde -- een schrijfpoging,
+         een mail, een sms. Dat is precies wat NOT_APPLICABLE nodig heeft: "geen
+         spoor in de collecties" is uit een meter die alleen collecties ziet een
+         gevolgtrekking uit AFWEZIG bewijs. `nietGemeten` gaat mee, want wat deze
+         meter niet ziet hoort naast zijn uitslag te staan en niet erbuiten. */
+      return { status: r.status, data, staat: r.headers.get('x-rtg-staat'),
+        effect: r.headers.get('x-rtg-effect'),
+        effectNietGemeten: r.headers.get('x-rtg-effect-niet-gemeten') };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 

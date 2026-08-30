@@ -153,7 +153,13 @@ const FAMILIES = [
        gezinSessie, rtfSpeler, rtfSociaal, profiel, samenSess en sessieVan: 187
        routes, verdeeld over deze twee voorvoegsels. Ze lezen allemaal dezelfde
        twee velden -- de gezinscode en het profieltoken. */
-    prefixen: ['/api/foundation/gezin/', '/api/rtf/'],
+    /* De markt en de hulplijn staan buiten /gezin/ en /rtf/ maar hangen aan
+       dezelfde deur: familieVan roept sessieVan aan, en dat is opnieuw de
+       gezinscode plus het profieltoken (server/foundation.js). Ze zijn er
+       daarom bij gezet in plaats van als eigen familie -- twee families met
+       dezelfde sleutel lopen uiteen zodra er iets aan verandert. */
+    prefixen: ['/api/foundation/gezin/', '/api/rtf/',
+      '/api/foundation/markt/', '/api/foundation/hulp/'],
     velden: ['code', 'token'],
     waarom: 'de RTF-kant draait op een gezinscode plus een profieltoken uit het lijf ' +
       '(server/foundation/sollicitaties.js, verifieerProfiel); een gezin ontstaat aan de ' +

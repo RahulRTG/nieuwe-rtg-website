@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit f8b48254, schone boom",
+  "metingReden": "gemeten op commit 0e067089, schone boom",
   "stempel": {
-    "op": "2026-08-30T11:22:37.106Z",
-    "commit": "f8b48254",
+    "op": "2026-08-30T11:27:13.639Z",
+    "commit": "0e067089",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit f8b48254, schone boom"
+    "metingReden": "gemeten op commit 0e067089, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1457,
-    "onbewezen": 3204,
+    "metBewijs": 1463,
+    "onbewezen": 3198,
     "sluit": true
   },
   "bakken": [
@@ -26,7 +26,7 @@
     {
       "id": "GEEN_PROEFSLEUTEL",
       "uitleg": "dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets",
-      "aantal": 151,
+      "aantal": 142,
       "voorbeelden": [
         "POST /api/aanmeld/zeg",
         "POST /api/arrival/interpret",
@@ -48,7 +48,7 @@
     {
       "id": "FIXTURE_403",
       "uitleg": "de eerste oproep gaf 403 -- verkeerde rol of ontbrekend recht",
-      "aantal": 717,
+      "aantal": 719,
       "voorbeelden": [
         "POST /api/account/koppel",
         "POST /api/account/ontkoppel",
@@ -81,7 +81,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 500,
+      "aantal": 501,
       "voorbeelden": [
         "POST /api/agenda/antwoord",
         "POST /api/agenda/bereik",
@@ -154,24 +154,15 @@
       "POST /api/doos/rapport",
       "POST /api/doos/update/status",
       "POST /api/foundation/agenda",
-      "POST /api/foundation/agenda/verwijder",
-      "POST /api/foundation/ai",
-      "POST /api/foundation/bord/stroke",
-      "POST /api/foundation/bord/undo",
-      "POST /api/foundation/bord/wis",
-      "POST /api/foundation/les/join",
-      "POST /api/foundation/les/maak",
       "POST /api/foundation/mail/inbox",
       "POST /api/foundation/mail/lees",
       "POST /api/foundation/mail/overzicht",
       "POST /api/foundation/mail/stuur",
       "POST /api/foundation/mail/verzonden",
       "POST /api/foundation/opgave",
-      "POST /api/foundation/opgave/inleveren",
       "POST /api/foundation/registratie/aanvragen",
       "POST /api/foundation/registratie/status",
       "POST /api/foundation/reis/aanvraag",
-      "POST /api/foundation/schrift/opslaan",
       "POST /api/gast/band",
       "POST /api/gast/bestel",
       "POST /api/gast/betaal",
@@ -317,6 +308,7 @@
       "POST /api/comm/ai",
       "POST /api/foundation/gezin/wissen",
       "POST /api/foundation/gezin/wissen/intrekken",
+      "POST /api/foundation/opgave/inleveren",
       "POST /api/foundation/school/aandacht",
       "POST /api/foundation/school/absentie/afhandelen",
       "POST /api/foundation/school/absentie/meld",
@@ -390,6 +382,7 @@
       "POST /api/foundation/school/toets/sluit",
       "POST /api/foundation/school/toets/spiegel",
       "POST /api/foundation/school/vervanging/briefing",
+      "POST /api/foundation/schrift/opslaan",
       "POST /api/gemeente/afspraken",
       "POST /api/gemeente/bekendmaking",
       "POST /api/gemeente/melding/zet",
@@ -2845,6 +2838,7 @@
       "POST /api/drm/key",
       "POST /api/flits/meld",
       "POST /api/fluister",
+      "POST /api/foundation/bord/stroke",
       "POST /api/foundation/gezin/gezondheid/afspraak",
       "POST /api/foundation/gezin/gezondheid/meting",
       "POST /api/foundation/gezin/inloggen",

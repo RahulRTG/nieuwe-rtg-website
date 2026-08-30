@@ -44,17 +44,14 @@ const SLEUTELS = {
   /* ---- 2. HET KANTOORPAKKET, drie handelingen maal drie kringen ----
 
      Dezelfde laag (kern/office/samen.js) hangt onder het lid, het kantoor en de
-     zaak. Een opmerking eist een verplichte tekst; delen en beheren zetten een
-     toestand en laten bij een tweede identieke oproep hetzelfde achter. */
+     zaak. Een opmerking eist een verplichte tekst, dus een leeg lijf maakt er
+     geen.
+
+     DELEN EN BEHEREN STONDEN HIER OOK EN ZIJN ERAF (zie ./idemsleutels-nooit.js).
+     Hun antwoord op een herhaling is een BESLUIT en geen echo. */
   'POST /api/kantoorpakket/opmerking': { zelfdeVerzoek: true },
   'POST /api/office/kantoorpakket/opmerking': { zelfdeVerzoek: true },
   'POST /api/supplier/kantoorpakket/opmerking': { zelfdeVerzoek: true },
-  'POST /api/kantoorpakket/deel': { zelfdeVerzoek: true },
-  'POST /api/office/kantoorpakket/deel': { zelfdeVerzoek: true },
-  'POST /api/supplier/kantoorpakket/deel': { zelfdeVerzoek: true },
-  'POST /api/kantoorpakket/beheer': { zelfdeVerzoek: true },
-  'POST /api/office/kantoorpakket/beheer': { zelfdeVerzoek: true },
-  'POST /api/supplier/kantoorpakket/beheer': { zelfdeVerzoek: true },
 
   /* ---- 3. DE RTF-KANT: wat er ontstaat, en wat er met opzet twee keer mag ----
 
@@ -62,7 +59,6 @@ const SLEUTELS = {
   'POST /api/rtf/baby/entry-maak': { zelfdeVerzoek: true },        // een moment in het babyboek
   'POST /api/rtf/leren/project-maak': { zelfdeVerzoek: true },     // titel
   'POST /api/rtf/leren/schrijf-bewaar': { zelfdeVerzoek: true },   // bewaren is overschrijven
-  'POST /api/rtf/samen/maak': { zelfdeVerzoek: true },
   'POST /api/rtf/tiener/boek': { zelfdeVerzoek: true },
   'POST /api/rtf/kantoorpakket/maak': { zelfdeVerzoek: true },     // zelfde reden als de andere kantoorpakketten
   'POST /api/rtf/social/pin/live': { zelfdeVerzoek: true },

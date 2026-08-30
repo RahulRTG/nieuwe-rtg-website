@@ -1,8 +1,8 @@
 {
  "uitleg": "De routes die onder het besluit van 30 augustus 2026 vallen: twee onafhankelijke runtime-metingen lezen allebei nul. Alleen de namen en de deur -- de redenering, het bewijs en de aftekening staan een keer, in ./mutatiecontracten-effect.js.",
  "geschrevenDoor": "scripts/effectcontracten.js",
- "aantal": 825,
- "zonderWaargenomenDeur": 23,
+ "aantal": 828,
+ "zonderWaargenomenDeur": 20,
  "routes": [
   {
    "route": "POST /api/aanmelding/betalingen",
@@ -638,6 +638,18 @@
    "objectVeld": "code"
   },
   {
+   "route": "POST /api/foundation/markt/ai",
+   "mutatieId": "foundation.markt.ai",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "code"
+  },
+  {
+   "route": "POST /api/foundation/markt/mijn",
+   "mutatieId": "foundation.markt.mijn",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "code"
+  },
+  {
    "route": "POST /api/foundation/markt/postvak",
    "mutatieId": "foundation.markt.postvak",
    "toegang": "OBJECT_SCOPED",
@@ -723,6 +735,12 @@
   {
    "route": "POST /api/foundation/school/machtiging/mijn",
    "mutatieId": "foundation.school.machtiging.mijn",
+   "toegang": "OBJECT_SCOPED",
+   "objectVeld": "code"
+  },
+  {
+   "route": "POST /api/foundation/school/mijn",
+   "mutatieId": "foundation.school.mijn",
    "toegang": "OBJECT_SCOPED",
    "objectVeld": "code"
   },

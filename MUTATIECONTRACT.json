@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T03:16:42.909Z",
-  "commit": "18941a22",
+  "op": "2026-08-30T03:42:36.149Z",
+  "commit": "aeff560e",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,21 +9,21 @@
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
   "totaal": 4653,
-  "geclassificeerd": 4059,
+  "geclassificeerd": 4073,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3138,
-   "LEGACY_PENDING_CLASSIFICATION": 594,
-   "NOT_APPLICABLE": 865,
+   "BLOCKED_BY_TEST_FIXTURE": 3149,
+   "LEGACY_PENDING_CLASSIFICATION": 580,
+   "NOT_APPLICABLE": 868,
    "PROTECTED": 24,
    "INTENTIONALLY_NON_IDEMPOTENT": 32
   },
-  "vastgesteldDoorMens": 931,
-  "afgeleidDoorScript": 3128,
+  "vastgesteldDoorMens": 934,
+  "afgeleidDoorScript": 3139,
   "toegangWaargenomen": {
    "AUTHENTICATED": 3804,
    "PUBLIC": 99,
-   "(niet af te leiden -- vraagt een verklaring)": 116,
-   "OBJECT_SCOPED": 625,
+   "(niet af te leiden -- vraagt een verklaring)": 102,
+   "OBJECT_SCOPED": 639,
    "SERVICE_TO_SERVICE": 8,
    "SYSTEM_INTERNAL": 1
   },
@@ -34,8 +34,8 @@
    "niet gemeten": 10
   },
   "voorstellen": {
-   "BLOCKED_BY_TEST_FIXTURE": 102,
-   "NOT_APPLICABLE": 26,
+   "BLOCKED_BY_TEST_FIXTURE": 91,
+   "NOT_APPLICABLE": 23,
    "PROTECTED": 6
   },
   "metingVan": "2026-08-30T02:11:24.317Z"
@@ -17046,12 +17046,14 @@
   {
    "mutatieId": "foundation.agenda",
    "route": "POST /api/foundation/agenda",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17061,20 +17063,22 @@
     "grond": null,
     "hindernis": "Deze lescode kennen we niet. Klopt hij?"
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze lescode kennen we niet. Klopt hij?\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.agenda.verwijder",
    "route": "POST /api/foundation/agenda/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17084,20 +17088,22 @@
     "grond": null,
     "hindernis": "Deze lescode kennen we niet. Klopt hij?"
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze lescode kennen we niet. Klopt hij?\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.ai",
    "route": "POST /api/foundation/ai",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -17107,10 +17113,10 @@
     "grond": null,
     "hindernis": "Deze lescode kennen we niet. Klopt hij?"
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Deze lescode kennen we niet. Klopt hij?\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.bord.stroke",
@@ -18995,12 +19001,14 @@
   {
    "mutatieId": "foundation.markt.ai",
    "route": "POST /api/foundation/markt/ai",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19010,20 +19018,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.antwoord",
    "route": "POST /api/foundation/markt/antwoord",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19033,10 +19043,10 @@
     "grond": null,
     "hindernis": "Gesprek niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Gesprek niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.blokkeer",
@@ -19064,12 +19074,14 @@
   {
    "mutatieId": "foundation.markt.chat",
    "route": "POST /api/foundation/markt/chat",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19079,20 +19091,22 @@
     "grond": null,
     "hindernis": "Gesprek niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Gesprek niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.deal.betaal",
    "route": "POST /api/foundation/markt/deal/betaal",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19102,20 +19116,22 @@
     "grond": null,
     "hindernis": "Gesprek niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Gesprek niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.deal.hier",
    "route": "POST /api/foundation/markt/deal/hier",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19125,20 +19141,22 @@
     "grond": null,
     "hindernis": "Gesprek niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Gesprek niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.deal.voorstel",
    "route": "POST /api/foundation/markt/deal/voorstel",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19148,10 +19166,10 @@
     "grond": null,
     "hindernis": "Gesprek niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Gesprek niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.detail",
@@ -19229,12 +19247,14 @@
   {
    "mutatieId": "foundation.markt.mijn",
    "route": "POST /api/foundation/markt/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19244,20 +19264,22 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.plaats",
    "route": "POST /api/foundation/markt/plaats",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19267,10 +19289,10 @@
     "grond": null,
     "hindernis": "Schrijf kort wat je aanbiedt."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Schrijf kort wat je aanbiedt.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.postvak",
@@ -19325,12 +19347,14 @@
   {
    "mutatieId": "foundation.markt.status",
    "route": "POST /api/foundation/markt/status",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19340,20 +19364,22 @@
     "grond": null,
     "hindernis": "Advertentie niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Advertentie niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.markt.verwijder",
    "route": "POST /api/foundation/markt/verwijder",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "onbekend"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -19363,10 +19389,10 @@
     "grond": null,
     "hindernis": "Advertentie niet gevonden."
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "BLOCKED_BY_TEST_FIXTURE",
-   "voorstelGrond": "de proef kwam er niet bij: \"Advertentie niet gevonden.\""
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.opgave",
@@ -22283,12 +22309,14 @@
   {
    "mutatieId": "foundation.school.mijn",
    "route": "POST /api/foundation/school/mijn",
-   "semantiek": null,
+   "semantiek": {
+    "klasse": "idempotent"
+   },
    "duplicaatregel": null,
    "toegang": {
-    "waargenomen": null,
-    "uitHandler": null,
-    "bedoeld": null,
+    "waargenomen": "OBJECT_SCOPED",
+    "uitHandler": "object: code",
+    "bedoeld": "OBJECT_SCOPED",
     "bewakers": []
    },
    "bewijs": {
@@ -22298,10 +22326,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "LEGACY_PENDING_CLASSIFICATION",
-   "herkomst": null,
-   "voorstel": "NOT_APPLICABLE",
-   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
   },
   {
    "mutatieId": "foundation.school.mijn-rechten",

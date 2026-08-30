@@ -134,6 +134,21 @@ let meerdereTreffers = 0;
     /if\s*\(\s*!\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/,
     /if\s*\(\s*(\w+)\s*\(\s*req\s*,\s*res[^)]*\)\s*\)\s*return/
   ];
+  /* Het voorvoegsel waarmee dit bestand gemount is, afgeleid uit zijn EIGEN
+     handlers die wel uniek matchen. Eén uitkomst of niets: twee verschillende
+     voorvoegsels uit één bestand betekent dat we het niet weten. */
+  const voorvoegselVan = (rel, handlers) => {
+    const gezien = new Set();
+    for (const h of handlers) {
+      const k = volledigePaden.filter(v =>
+        v.methode === h.methode && (v.pad === h.pad || v.pad.endsWith(h.pad)));
+      if (k.length !== 1) continue;
+      gezien.add(k[0].pad.slice(0, k[0].pad.length - h.pad.length));
+      if (gezien.size > 1) return null;
+    }
+    return gezien.size === 1 ? [...gezien][0] : null;
+  };
+
   const loop = (map) => {
     for (const naam of fs.readdirSync(map)) {
       const pad = path.join(map, naam);
@@ -160,8 +175,29 @@ let meerdereTreffers = 0;
            is erger dan geen. */
         const kandidaten = volledigePaden.filter(v =>
           v.methode === h.methode && (v.pad === h.pad || v.pad.endsWith(h.pad)));
-        if (kandidaten.length === 1) uitHandler.set(kandidaten[0].methode + ' ' + kandidaten[0].pad, poort);
-        else if (kandidaten.length > 1) meerdereTreffers++;
+        if (kandidaten.length === 1) { uitHandler.set(kandidaten[0].methode + ' ' + kandidaten[0].pad, poort); continue; }
+        if (kandidaten.length < 2) continue;
+        /* TWEE OF MEER TREFFERS: HET MONTAGEPAD BESLIST, EN DAT IS AF TE LEIDEN.
+
+           `router.post('/agenda')` in server/foundation/onderwijs/schrift.js past
+           op zeven routes -- /api/foundation/agenda, /api/genootschap/agenda,
+           /api/supplier/care/agenda en nog vier. Niets toewijzen was tot nu toe
+           het enige eerlijke, en dat kostte veertien routes een klasse die ze wel
+           degelijk hebben.
+
+           Het montagepad hoeft niet geraden te worden: het staat in de ANDERE
+           handlers van hetzelfde bestand. Die matchen wel uniek, en het stuk dat
+           bij hun bronpad wordt geplakt is het voorvoegsel van dat bestand. Zijn
+           die het niet eens (of is er geen), dan blijft het bij niets toewijzen.
+
+           Gemeten: veertien routes erbij, en NUL die daarna nog dubbelzinnig
+           zijn -- de afleiding kiest dus nooit tussen twee kandidaten, hij vindt
+           er precies een of geen. Dat is het verschil met een gok. */
+        const prefix = voorvoegselVan(rel, hs);
+        if (!prefix) { meerdereTreffers++; continue; }
+        const exact = kandidaten.filter(v => v.pad === prefix + h.pad);
+        if (exact.length === 1) uitHandler.set(exact[0].methode + ' ' + exact[0].pad, poort);
+        else meerdereTreffers++;
       }
     }
   };

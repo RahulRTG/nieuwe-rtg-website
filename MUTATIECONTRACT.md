@@ -370,9 +370,9 @@ contract dat wél gelezen is (`server/lib/mutatiecontracten.js` gooit erop, want
 
 | | voor | na |
 |---|---:|---:|
-| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **594** |
-| `NOT_APPLICABLE` | 40 | 865 |
-| geclassificeerd | 3.069 | 4.059 van 4.653 |
+| `LEGACY_PENDING_CLASSIFICATION` | 1.584 | **580** |
+| `NOT_APPLICABLE` | 40 | 868 |
+| geclassificeerd | 3.069 | 4.073 van 4.653 |
 
 ### Een derde argument, en 147 deuren
 
@@ -421,8 +421,27 @@ allebei de takken.
 
 | | voor | na |
 |---|---:|---:|
-| toegang niet af te leiden | 215 | **116** |
+| toegang niet af te leiden | 215 | **102** |
 | `PUBLIC` | 0 | 99 |
+
+### Het montagepad hoeft niet geraden te worden
+
+`router.post('/agenda')` in `server/foundation/onderwijs/schrift.js` past op
+zeven routes — `/api/foundation/agenda`, `/api/genootschap/agenda`,
+`/api/supplier/care/agenda` en nog vier. Niets toewijzen was tot nu toe het
+enige eerlijke, en dat kostte veertien routes een klasse die zij wel degelijk
+hebben.
+
+Maar het montagepad staat in de **andere handlers van hetzelfde bestand**: die
+matchen wél uniek, en het stuk dat voor hun bronpad wordt geplakt is het
+voorvoegsel van dat bestand. Zijn die het onderling niet eens, of is er geen
+enkele unieke, dan blijft het bij niets toewijzen.
+
+Dat het geen gok is, is gemeten: veertien routes erbij en **nul** die daarna nog
+dubbelzinnig zijn. De afleiding kiest dus nooit tussen twee kandidaten — hij
+vindt er precies één of geen. De zeven die overblijven zijn bestanden waarvan het
+voorvoegsel niet uit hun eigen handlers volgt.
+
 
 ## 6. De poort
 

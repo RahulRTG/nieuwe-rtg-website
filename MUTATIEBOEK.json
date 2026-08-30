@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T15:14:56.062Z",
-  "commit": "181a116f",
+  "op": "2026-08-30T19:16:24.393Z",
+  "commit": "2cb21c82",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -17,17 +17,17 @@
   "bakken": 7,
   "statusSom": 4661,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 4,
+  "nogNietGeclassificeerd": 3,
   "metBesluitOverDuplicaat": 211,
   "zonderBesluitOverDuplicaat": 4450,
-  "metGemetenDuplicaatgedrag": 1489,
+  "metGemetenDuplicaatgedrag": 1492,
   "somVanDeBakken": 4748,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 181a116f, schone boom",
-  "metingGemetenOp": "2026-08-30T15:14:43.107Z",
+  "metingReden": "gemeten op commit 2cb21c82, schone boom",
+  "metingGemetenOp": "2026-08-30T19:16:10.615Z",
   "perGraad": [
    {
     "id": "afgeleid",
@@ -40,7 +40,7 @@
    },
    {
     "id": "gemeten",
-    "aantal": 4404,
+    "aantal": 4405,
     "voorbeelden": [
      "POST /api/arrival/pass",
      "POST /api/arrival/pulse",
@@ -49,11 +49,11 @@
    },
    {
     "id": "onbekend",
-    "aantal": 4,
+    "aantal": 3,
     "voorbeelden": [
      "POST /api/betaal/webhook",
      "POST /api/fout/client",
-     "POST /api/munt/webhook"
+     "POST /api/supplier/facturen/pdf"
     ]
    },
    {
@@ -69,11 +69,11 @@
   "gemetenGronden": [
    {
     "reden": "gemeten: de eerste oproep gaf N -- er is geen geldige invoer of geen bestaand object om aan te roepen",
-    "aantal": 2854
+    "aantal": 2852
    },
    {
     "reden": "gemeten: de server merkte de herhaling zelf (herhaald: true)",
-    "aantal": 1481
+    "aantal": 1483
    },
    {
     "reden": "gemeten: de eerste oproep gaf N -- de dienst staat in deze opstelling uit",
@@ -93,6 +93,10 @@
    },
    {
     "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in bankTerugkerend en de herhaling niets",
+    "aantal": 1
+   },
+   {
+    "reden": "gemeten: het antwoord reageert niet op een nieuwe oproep, maar de OPSLAG wel: de eerste oproep gaf een wijziging in kosten en de herhaling niets",
     "aantal": 1
    }
   ]
@@ -180,7 +184,7 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 1575,
+   "aantal": 1578,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -228,7 +232,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 2865,
+   "aantal": 2863,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -240,13 +244,13 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 4,
+   "aantal": 3,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
     "POST /api/betaal/webhook",
     "POST /api/fout/client",
-    "POST /api/munt/webhook"
+    "POST /api/supplier/facturen/pdf"
    ]
   }
  ],

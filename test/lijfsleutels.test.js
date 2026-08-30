@@ -236,3 +236,40 @@ test('elk voorvoegsel met een streep dekt ook het kale pad, als dat bestaat', ()
     'deze paden bestaan als route maar vallen buiten hun familie omdat het voorvoegsel ' +
     'op een streep eindigt: ' + gemist.join(', '));
 });
+
+/* ============================================================================
+   EEN FAMILIE MAG EEN ROL OOK OPWAARDEREN.
+
+   WAT ER MIS WAS. De Lifestyle-familie dekt vier takken waarvan de
+   bewakerskaart terecht `member` zegt: de deur eist een ledensessie en verder
+   niets, de PAS-controle zit in de handler. Die routes hebben dus AL een rol,
+   en de proef nam families alleen uit de verzameling ZONDER rol. De familie
+   werd netjes gebouwd en deed vervolgens niets.
+
+   Gemeten: FIXTURE_403 bleef staan op 668 en `met bewijs` ging drie omhoog in
+   plaats van tweehonderd. Dat is precies de vorm van fout die deze sessie al
+   twee keer eerder maakte -- een tak die er staat en nooit afgaat -- en hij
+   was aan de uitslag alleen te zien doordat het getal niet bewoog.
+
+   DE GRENS. Een familie wint van de bewakerskaart, maar het is geen
+   tegenspraak: de kaart zegt welke SESSIE er nodig is, de familie welke PAS
+   die sessie moet dragen. Dat is een verfijning, en hij wordt geteld en gemeld
+   zodat niemand denkt dat de kaart iets anders vond.
+   ========================================================================== */
+test('de Lifestyle-familie dekt routes die al een rol hebben', () => {
+  const { alleRoutes, isSchakel, verdeelOpRol } = require('../scripts/lib/routes');
+  const { ROLLEN } = require('../scripts/lib/proefsleutels');
+  const m = alleRoutes().filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET' &&
+    !isSchakel(r.pad) && !r.pad.includes(':'));
+  const v = verdeelOpRol(m, ROLLEN);
+  const metRolFamilies = FAMILIES.filter(f => f.rol);
+  let opwaardeerbaar = 0;
+  for (const r of v.metRol) {
+    const f = metRolFamilies.find(x => x.prefixen.some(p => r.pad.startsWith(p)));
+    if (f && f.rol !== r.rol) opwaardeerbaar++;
+  }
+  assert.ok(opwaardeerbaar > 50,
+    'er horen tientallen routes te zijn waarvan een familie de rol opwaardeert, gevonden: ' +
+    opwaardeerbaar + '. Staat dit op 0, dan zit de opwaardering er niet meer in en doet ' +
+    'de Lifestyle-familie stilzwijgend niets');
+});

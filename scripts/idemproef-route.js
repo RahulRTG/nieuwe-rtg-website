@@ -187,7 +187,33 @@ wachtOpSchoneBoom();
        `lijfsleutel`, wat geen Authorization-kop oplevert. Dat verschil moet uit
        de familie komen en niet uit een gok hier. */
     .map(r => ({ methode: r.methode, pad: r.pad, rol: lijfsleutels.rolVoor(r.pad) || 'lijfsleutel' }));
-  const routes = verdeling.metRol.concat(metLijf);
+
+  /* EEN FAMILIE MAG EEN ROL OOK OPWAARDEREN, en dat kon eerst niet.
+
+     De Lifestyle-familie dekt vier takken waarvan de bewakerskaart terecht
+     `member` zegt: de deur eist een ledensessie en verder niets, de
+     PAS-controle zit in de handler. Die routes hebben dus AL een rol en vielen
+     daarmee buiten `metLijf` -- de familie werd netjes gebouwd en deed
+     vervolgens niets. Gemeten: FIXTURE_403 bleef staan op 668, en `met bewijs`
+     ging drie omhoog in plaats van tweehonderd.
+
+     Een familie met een rol wint daarom van de bewakerskaart, MAAR alleen bij
+     dezelfde soort deur: de kaart zegt welke SESSIE er nodig is, de familie
+     welke PAS die sessie moet dragen. Dat is geen tegenspraak maar een
+     verfijning, en hij staat expliciet in het uitslagbestand zodat niemand
+     denkt dat de kaart iets anders vond. */
+  const opgewaardeerd = [];
+  const metRol = verdeling.metRol.map(r => {
+    const familieRol = lijfsleutels.rolVoor(r.pad);
+    if (!familieRol || familieRol === r.rol) return r;
+    opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
+    return { ...r, rol: familieRol, rolVan: r.rol };
+  });
+  if (opgewaardeerd.length) {
+    console.log('  rol opgewaardeerd door een familie    : ' + opgewaardeerd.length +
+      '   (' + [...new Set(opgewaardeerd.map(x => x.van + ' -> ' + x.naar))].join(', ') + ')');
+  }
+  const routes = metRol.concat(metLijf);
   console.log('  routes op een lijfsleutel            : ' + metLijf.length);
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
@@ -414,6 +440,7 @@ wachtOpSchoneBoom();
          veld, en een familie die niet is gebouwd dekt niets. */
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
+      rolOpgewaardeerd: opgewaardeerd.length,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),
       lijfsleutelsMislukt: lijfsleutels.mislukt,

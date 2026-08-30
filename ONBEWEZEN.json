@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 181a116f, schone boom",
+  "metingReden": "gemeten op commit 2cb21c82, schone boom",
   "stempel": {
-    "op": "2026-08-30T15:15:08.787Z",
-    "commit": "181a116f",
+    "op": "2026-08-30T19:16:45.211Z",
+    "commit": "2cb21c82",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 181a116f, schone boom"
+    "metingReden": "gemeten op commit 2cb21c82, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 1700,
-    "onbewezen": 2961,
+    "metBewijs": 1703,
+    "onbewezen": 2958,
     "sluit": true
   },
   "bakken": [
@@ -98,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 597,
+      "aantal": 595,
       "voorbeelden": [
         "POST /api/aanmelding/beslis",
         "POST /api/agenda/antwoord",
@@ -120,11 +120,10 @@
     {
       "id": "GEEN_EFFECT_BEREIKT",
       "uitleg": "de oproep slaagt, maar raakt een no-op toestand; de fixture moet het effect mogelijk maken",
-      "aantal": 4,
+      "aantal": 3,
       "voorbeelden": [
         "POST /api/betaal/webhook",
         "POST /api/fout/client",
-        "POST /api/munt/webhook",
         "POST /api/supplier/facturen/pdf"
       ]
     },
@@ -2781,8 +2780,6 @@
       "POST /api/office/redactie/artikel/status",
       "POST /api/office/redactie/editie/maak",
       "POST /api/office/regering/besluit",
-      "POST /api/office/rtgai/roer/geef",
-      "POST /api/office/rtgai/roer/terug",
       "POST /api/office/stad/node/aanmeld",
       "POST /api/office/stad/scenario",
       "POST /api/office/stad/update",
@@ -3132,7 +3129,6 @@
     "GEEN_EFFECT_BEREIKT": [
       "POST /api/betaal/webhook",
       "POST /api/fout/client",
-      "POST /api/munt/webhook",
       "POST /api/supplier/facturen/pdf"
     ],
     "STAAT_NIET_ZICHTBAAR": [],

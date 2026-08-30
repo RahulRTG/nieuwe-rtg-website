@@ -232,3 +232,51 @@ test('en de verdeling bereikt die tak ook werkelijk', () => {
   assert.ok(openbaar > 20,
     'er horen tientallen openbare schrijfroutes beproefbaar te zijn, gevonden: ' + openbaar);
 });
+
+/* ============================================================================
+   OPENBAAR MET EEN REM ERVOOR IS NOG STEEDS OPENBAAR.
+
+   De openbaar-tak zat eerst alleen op de tak ZONDER enige middleware. Maar een
+   openbare route heeft juist vaak wel iets voor zich staan -- een rem, want
+   open en scheppend hoort begrensd te zijn. /api/arrival/interpret, de twee
+   betaal-webhooks, de hele lab2-bewonerkant en het rtfos-portaal vielen
+   daardoor onder "alleen verfijners, geen laag die een identiteit vaststelt".
+   Dat is waar, en het is niet de conclusie: er valt WEL te meten, zonder token,
+   precies zoals een bezoeker het doet.
+
+   Gemeten: 41 routes stonden zo als instrumenttekort geboekt terwijl er niets
+   ontbrak.
+
+   HET IS DEZELFDE FOUT ALS EEN TAK HOGER, en die herhaling is het punt: de
+   vraag "is dit met reden openbaar" hoort niet aan de VORM van de bewakerslijst
+   te hangen. Wie hier een derde tak toevoegt, hoort deze vraag weer te stellen.
+
+   DE MUTATIE: haal de PUBLIEK-tak uit de verfijner-tak -> deze toets zakt.
+   ========================================================================== */
+test('een openbare route met alleen een rem ervoor is beproefbaar', () => {
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = '/api/arrival/interpret';
+  assert.ok(PUBLIEK.has(pad), 'deze route hoort met een reden op de openbaar-lijst te staan');
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad, methode: 'POST' });
+  assert.equal(u.rol, 'openbaar', 'een rem is geen identiteitslaag, maar ook geen reden om niet te meten');
+});
+
+test('een NIET-openbare route met alleen een rem blijft wel een gat', () => {
+  const u = bk.beoordeel({ bewakersBekend: true, bewakers: ['mw'], pad: '/api/bestaat-niet-xyz', methode: 'POST' });
+  assert.equal(u.rol, null);
+  assert.match(u.reden, /geen autorisatielaag/,
+    'zonder reden op de openbaar-lijst blijft een rem gewoon een rem');
+});
+
+test('de openbaar-lijst overschrijft nooit een ECHTE deur', () => {
+  /* De zwakste bewering mag de sterkste niet overschrijven. Staat er een
+     lichaamssleutel of een objectpoort voor, dan is er wel degelijk een deur --
+     en dan mag "hij staat op de openbaar-lijst" die niet wegschrijven. */
+  const { PUBLIEK } = require('../scripts/lib/publiek');
+  const pad = [...PUBLIEK.keys()][0];
+  for (const bewaker of ['gastAuth', 'huisAuth', 'meetpoort']) {
+    const u = bk.beoordeel({ bewakersBekend: true, bewakers: [bewaker], pad, methode: 'POST' });
+    assert.notEqual(u.rol, 'openbaar',
+      bewaker + ' is een deur; de openbaar-lijst hoort die niet weg te schrijven');
+  }
+});

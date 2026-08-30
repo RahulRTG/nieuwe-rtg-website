@@ -236,6 +236,21 @@ function beoordeel(route) {
      wat er dan WEL staat -- en de zwaarste telt, want die bepaalt de reparatie. */
   const dragend = namen.filter((n, i) => soorten[i] !== 'verfijner');
   if (!dragend.length) {
+    /* EN OOK HIER GELDT: OPENBAAR MET REDEN IS EEN BESLUIT.
+
+       De openbaar-tak stond hierboven, op de tak ZONDER enige middleware. Maar
+       een openbare route heeft juist vaak wel iets voor zich staan -- een rem,
+       want open en scheppend hoort begrensd te zijn. `/api/arrival/interpret`,
+       de twee betaal-webhooks, de hele lab2-bewonerkant en het rtfos-portaal
+       kwamen daardoor hier terecht, onder "geen laag die een identiteit
+       vaststelt". Dat is waar en het is niet de conclusie: er valt WEL te
+       meten, zonder token, precies zoals een bezoeker het doet.
+
+       Eenenveertig routes stonden zo als instrumenttekort geboekt terwijl er
+       niets ontbrak. Dezelfde fout als hierboven, een tak dieper -- en die
+       herhaling is het argument om de vraag "is dit met reden openbaar" niet
+       aan de vorm van de bewakerslijst te hangen. */
+    if (r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
     return { rol: null, reden: 'alleen verfijners (' + namen.join('+') +
       '), geen laag die een identiteit vaststelt' };
   }
@@ -256,6 +271,20 @@ function beoordeel(route) {
     geenBewaker: 'geen autorisatielaag -- alleen een rem of cache',
     omgeving: 'de opstelling beslist (configuratie), niet de bezoeker'
   }[soort] || 'niet te kruisen';
+  /* OPENBAAR MET REDEN, EN ALLEEN WAAR ER GEEN DEUR IS.
+
+     Deze tak hoort hier en niet hoger: `mw` is geen verfijner maar een
+     `geenBewaker` -- een rem, geen autorisatielaag -- dus een openbare route
+     met een rem ervoor kwam helemaal tot hier. Eenenveertig routes stonden zo
+     als instrumenttekort geboekt (arrival, de twee betaal-webhooks, de hele
+     lab2-bewonerkant, het rtfos-portaal) terwijl er niets ontbrak.
+
+     EN ALLEEN BIJ `geenBewaker`. Staat er een lichaamssleutel, een objectpoort
+     of een omgevingsbeslissing voor, dan is er wel degelijk een deur, en dan
+     mag "hij staat op de openbaar-lijst" die deur niet wegschrijven. De zwakste
+     bewering mag de sterkste niet overschrijven -- dezelfde regel als die van
+     de rangorde hierboven, en om dezelfde reden. */
+  if (soort === 'geenBewaker' && r.pad && PUBLIEK.has(r.pad)) return { rol: 'openbaar', reden: null };
   return { rol: null, reden: soort + ': ' + dragend.join('+') + ' -- ' + uitleg };
 }
 

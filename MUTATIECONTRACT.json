@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-30T12:46:41.298Z",
-  "commit": "5a5212b3",
+  "op": "2026-08-30T13:55:43.689Z",
+  "commit": "7ed1d9db",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -52204,7 +52204,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -52366,7 +52366,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -52420,7 +52420,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -97732,7 +97732,7 @@
    "semantiek": {
     "klasse": "sleutelVereist"
    },
-   "duplicaatregel": "zelfdeVerzoek",
+   "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

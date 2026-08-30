@@ -1027,6 +1027,62 @@ De 3.402 geblokkeerde routes zijn geen dekking maar een wachtrij met per stuk ee
 adres; het werk daaraan heeft één plek, `scripts/lib/idemwereld.js`, en paragraaf 8
 beschrijft wat daar moet komen.
 
+## 5q. De volle ronde was rood, en vier van de veertien waren van mij
+
+Tot hier had ik naar `scripts/check.js` en de deeltoetsen gekeken en die stonden
+groen. De **volle** testronde is iets anders, en `SUITE.json` laat zien dat hij
+rood was — in zijn hele vastgelegde geschiedenis heeft `"groen": true` er nog
+nooit gestaan. Dat had ik eerder moeten nakijken.
+
+Veertien zakkers. Acht bestonden al, vier komen uit deze werkstroom, en één is
+een breuk uit de geldgrens zelf.
+
+**De noodstop en de herstelknop van de bank — de ernstigste.** Ik had ze allebei
+een duplicaatregel gegeven, en allebei dragen ze een lijf dat leeg mag zijn. Twee
+keer drukken geeft dus dezelfde vingerafdruk, en de tweede druk werd opgeslikt
+mét het antwoord van de eerste: dus met "ok". Een tweede noodstop zet de bank
+niet stil; een tweede herstel haalt hem er niet uit. In `test/bank.test.js` bleef
+de bank daardoor in nood staan, en dat werd pas **drie toetsen verderop**
+zichtbaar doordat de foundation-afdracht via de kaart liep in plaats van het eigen
+grootboek. Dat late zichtbaar worden is het gevaarlijke: op een echte bank is dat
+een stand die niemand terugdraait. Dezelfde redenering had ik voor de alarmknop
+van een zaak wél opgeschreven — *"een laag die de tweede opslikt, kan iemand in
+nood stil laten staan"* — en niet toegepast op de herstelkant.
+
+**`/api/office/bank/mislukking`.** Drie mislukte clearings melden gaat met een
+leeg lijf, dus de teller kwam op 1 in plaats van 3 en de bank sloeg niet
+automatisch in nood.
+
+**`/api/supplier/horeca/folio/nacht`.** De nachtrun houdt zelf bij welke nachten
+geboekt zijn en meldt eerlijk `geboekt: 0, overgeslagen: 1`. Met een regel erboven
+kreeg de tweede oproep `geboekt: 1` terug: er werd niets dubbel geboekt, maar het
+*antwoord* loog over wat er gebeurd was.
+
+Samen één regel: **een route die zelf al weet dat ze het al gedaan heeft, krijgt
+hier niets.** Die laag is er voor routes die dat niet weten. En hij staat nu als
+**grendel** in `lib/idemsleutels-nooit.js`, niet als opmerking — wie deze lijst
+aanvult, leest geen opmerking over iets wat er niet meer staat. Daar zijn meteen
+de andere twee laadkeuringen bij gaan staan: drie controles die om beurten iets
+over dezelfde lijst zeggen, horen op één plek, anders draait de volgende over de
+helft. Dat is hier al een keer gebeurd.
+
+**Een verse sleutel werd genegeerd — en dat was de oorzaak, één keer
+gerepareerd.** De poort keek alleen naar de header, terwijl dit huis zijn sleutel
+in het *lijf* draagt (`idem` / `idempotentieSleutel`). Bij een route met een
+inhoudsregel besliste dus de vingerafdruk, en die is voor twee inhoudelijk gelijke
+verzoeken dezelfde — hoe vers de sleutel ook is. Een tweede bankpas met een nieuwe
+sleutel kwam er niet, en een tweede betaalverzoek evenmin. De verklaring is een
+vangnet voor wie niets meestuurt; **wie wel iets meestuurt, heeft al gesproken.**
+
+**En de geldgrens brak Rahul.** Na "ja" kon hij geen Tik meer sturen, want hij gaf
+geen sleutel mee. Nu is het *voorstel* de sleutel: twee keer "ja" op hetzelfde
+voorstel is één Tik, een nieuw voorstel is een nieuwe. Zelfde voor het betalen van
+een klompje.
+
+Eén ding om niet te herhalen: ik had eerst `test/bank.test.js` aangepast om een
+van de zakkers op te lossen. Dat was symptoombestrijding — na de echte reparatie
+bleek de aanpassing niet nodig, en ze is teruggedraaid.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

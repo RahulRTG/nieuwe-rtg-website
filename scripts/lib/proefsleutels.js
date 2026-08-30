@@ -61,7 +61,7 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
-const ROLLEN = ['member', 'member-zakelijk', 'member-lifestyle', 'office', 'supplier', 'boardroom', 'techniek',
+const ROLLEN = ['member', 'member-account', 'member-zakelijk', 'member-lifestyle', 'office', 'supplier', 'boardroom', 'techniek',
   'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving', 'eigen-poort'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
@@ -96,6 +96,39 @@ function maakSleutels({ post, officeCode, eigen }) {
 
   const inlog = Object.assign({
     member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
+    /* EEN LID MET EEN ECHT ACCOUNT, en dat is nog een andere rol.
+
+       `/api/login { tier }` geeft een PAS-sessie: een lid met een pas, maar
+       zonder account erachter. Dat is geen bedachte tussenvorm -- het is wat
+       de demo-inlog van de app oplevert. Vijfentachtig routes in FIXTURE_403
+       weigeren precies daarop, met zoveel woorden: "Alleen voor leden met een
+       eigen account", "Passkeys horen bij een eigen RTG-account", "De algemene
+       pin hoort bij een echt RTG-account". De poort leest `uid(req)`, en die
+       is bij een passessie leeg.
+
+       Waarom niet gewoon `member` een account geven: een vers account begint
+       LEEG (routes/auth/account.js zegt dat er zelf bij) -- geen reis, geen
+       facturen, geen bagage uit de seed. De hele ledenkant die op die seed
+       leunt zou dan van 200 naar 404 gaan. Twee rollen dus, en de meting laat
+       zien welke welke deur opent.
+
+       De eigenaar heeft ook een echt account, maar die draagt de boardroom mee;
+       daarmee meten zou meer opendoen dan de route vraagt. Dit is een gewoon
+       gratis lid, aangemeld langs de gewone aanmeldweg. */
+    'member-account': async () => {
+      const r = await post('/api/auth/register', {
+        name: 'Proef Rekening', email: 'proef.rekening@rtg.test',
+        password: 'ProefWachtwoord-2026!', geboortedatum: '1990-04-12',
+        tier: 'rtg', pasApp: 'rtg'
+      });
+      if (r && r.status === 200 && r.data && r.data.token) return r.data.token;
+      /* Bestaat hij al (een proef die twee keer over dezelfde datamap loopt),
+         dan gewoon inloggen. Stil falen mag hier niet: dan zou de proef 85
+         routes met een passessie beproeven en denken dat ze niets deden. */
+      const l = await post('/api/auth/login',
+        { login: 'proef.rekening@rtg.test', password: 'ProefWachtwoord-2026!', pasApp: 'rtg' });
+      return (l && l.data && l.data.token) || null;
+    },
     /* EEN LID MET EEN ZAKELIJKE PAS, en dat is een andere rol dan `member`.
        Het partnerkanaal eist de capability `can_be_partner`, en die zit op de
        zakelijke treden en niet op RTG Pass (kern/commercie/capaciteiten.js).

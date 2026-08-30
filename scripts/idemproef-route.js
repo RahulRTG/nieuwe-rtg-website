@@ -163,6 +163,7 @@ wachtOpSchoneBoom();
      wordt en geen variant van `supplier`. */
   const { zetGenreKlaar } = require('./lib/wereld-genre');
   const { genreRolVoor, rolVanZaak: genreRolVanZaak } = require('./lib/genrezaken');
+  const { accountRolVoor } = require('./lib/accountroutes');
   const genreWereld = await zetGenreKlaar({ post });
   for (const [code, tok] of Object.entries(genreWereld.tokens)) tokens[genreRolVanZaak(code)] = tok;
   console.log('  genrewereld                          : ' +
@@ -221,6 +222,7 @@ wachtOpSchoneBoom();
   const opgewaardeerd = [];
   const geweigerd = [];
   const naarGenre = [];
+  const naarAccount = [];
   const metRol = verdeling.metRol.map(r => {
     /* EERST DE GENREZAAK. Die verfijnt `supplier` naar EEN bepaalde zaak en
        staat los van de lijfsleutelfamilies: hij zegt niet welke pas de sessie
@@ -229,6 +231,11 @@ wachtOpSchoneBoom();
        aankloppen zonder sleutel en dat meet niets. */
     const g = genreRolVoor(r.rol, r.pad);
     if (g.rol && tokens[g.rol]) { naarGenre.push({ pad: r.pad, naar: g.rol }); return { ...r, rol: g.rol, rolVan: r.rol }; }
+    /* EN DE ACCOUNTSESSIE. Dezelfde vorm, andere vraag: niet bij welk soort
+       bedrijf hoort deze route, maar heeft de ledensessie een ACCOUNT nodig in
+       plaats van alleen een pas. Zie ./lib/accountroutes.js. */
+    const a = accountRolVoor(r.rol, r.pad);
+    if (a.rol && tokens[a.rol]) { naarAccount.push({ pad: r.pad }); return { ...r, rol: a.rol, rolVan: r.rol }; }
     const familieRol = lijfsleutels.rolVoor(r.pad);
     const oordeel = magOpwaarderen(r.rol, familieRol);
     if (!familieRol || familieRol === r.rol) return r;
@@ -236,6 +243,9 @@ wachtOpSchoneBoom();
     opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
     return { ...r, rol: familieRol, rolVan: r.rol };
   });
+  if (naarAccount.length) {
+    console.log('  routes naar een accountsessie        : ' + naarAccount.length);
+  }
   if (naarGenre.length) {
     console.log('  routes naar een genrezaak            : ' + naarGenre.length +
       '   (' + new Set(naarGenre.map(x => x.naar)).size + ' zaken)');

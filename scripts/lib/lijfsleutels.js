@@ -410,6 +410,40 @@ const FAMILIES = [
       if (!sleutel) return null;
       return { __koppen: { 'x-rtg-toestel': sleutel } };
     }
+  },
+  {
+    naam: 'lifestyle',
+    /* DE PAS IS DE SLEUTEL, en niet een veld of een sessie.
+
+       Gemeten over de 668 routes in FIXTURE_403: 191 worden geweigerd op een
+       PAS, en 168 daarvan wonen in vier takken -- De Rechterhand (69), het
+       Privekantoor (67), Rendez-vous (17) en RTG Lifestyle (15). De proef
+       logde in met tier=rtg, en dat is de instappas; deze vier zijn
+       uitvoering, en daar betaal je juist voor (WERELDEN.md: RTG betaalt voor
+       het platform, Lifestyle voor uitvoering).
+
+       Met tier=rtg geeft /api/member/bureau/ai een 403 met "Het Privekantoor
+       is onderdeel van de Lifestyle Pass"; met tier=lifestyle een 200. Vooraf
+       gemeten en niet aangenomen.
+
+       WAAROM DIT EEN FAMILIE IS EN GEEN BREDERE `member`-ROL. De bewakerskaart
+       ziet hier `auth` staan en zegt terecht `member` -- de deur eist een
+       ledensessie en verder niets; de PAS-controle zit in de handler. Zou ik
+       `member` overal op lifestyle zetten, dan kan de rolproef niet meer zien
+       dat een RTG Pass hier buiten hoort te blijven, en dat is precies de
+       scheiding die deze 191 routes bewaken. */
+    prefixen: ['/api/member/rechterhand/', '/api/member/bureau/',
+      '/api/member/rendezvous/', '/api/member/lifestyle/'],
+    velden: [],
+    rol: 'member-lifestyle',
+    waarom: 'deze vier takken weigeren een RTG Pass met zoveel woorden ("onderdeel van de ' +
+      'Lifestyle Pass"); de pas is hier de sleutel en de sessie alleen de deur',
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens['member-lifestyle']) return null;
+      const r = await post('/api/member/bureau/ai', {}, tokens['member-lifestyle']);
+      if (!r || r.status < 200 || r.status >= 300) return null;
+      return {};
+    }
   }
 ];
 

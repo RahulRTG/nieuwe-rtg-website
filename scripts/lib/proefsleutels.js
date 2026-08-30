@@ -61,7 +61,7 @@ const OWNER_WACHTWOORD = process.env.RTG_OWNER_WACHTWOORD || 'Imran';
    zetten dan geen Authorization-kop, en dat IS de juiste invoer voor een route
    die met een reden openbaar is. Zonder deze regel telden 45 openbare routes
    als instrumenttekort terwijl er niets ontbrak. */
-const ROLLEN = ['member', 'member-zakelijk', 'office', 'supplier', 'boardroom', 'techniek',
+const ROLLEN = ['member', 'member-zakelijk', 'member-lifestyle', 'office', 'supplier', 'boardroom', 'techniek',
   'kantoor-op-naam', 'werkplekbaas', 'scim', 'openbaar', 'omgeving', 'eigen-poort'];
 
 /* `post` is de POST-functie van het instrument zelf (elk heeft er al een, met
@@ -103,6 +103,20 @@ function maakSleutels({ post, officeCode, eigen }) {
        geen gat maar de scheiding die werkt; alleen kon de proef er daardoor
        niets over zeggen. Gemeten met tier=business: 200. */
     'member-zakelijk': async () => (await post('/api/login', { tier: 'business' })).data.token,
+    /* EN EEN LID MET EEN LIFESTYLE PASS, want dat is weer een andere rol.
+
+       Gemeten over de 668 routes in FIXTURE_403: 427 worden geweigerd op een
+       GENRE of een PAS, en de grootste groepen noemen de Lifestyle Pass bij
+       naam -- het Privekantoor (67), De Rechterhand (15), RTG Zakelijk (13) en
+       een reeks apps (69). Met tier=rtg geeft /api/member/bureau/ai een 403
+       met "Het Privekantoor is onderdeel van de Lifestyle Pass"; met
+       tier=lifestyle een 200. Vooraf gemeten, niet aangenomen.
+
+       Waarom niet gewoon `member-zakelijk` gebruiken: business opent deze ook,
+       maar de rolproef hoort te kunnen zien dat een RTG Pass hier BUITEN
+       blijft. Drie passen, drie rollen -- dezelfde redenering als bij
+       werkplekbaas en kantoor-op-naam. */
+    'member-lifestyle': async () => (await post('/api/login', { tier: 'lifestyle' })).data.token,
     office: async () => (await post('/api/office/login', { code: officeCode })).data.token,
     supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token,
     /* Beide via de eigenaar; zie de kop waarom dat twee namen blijven. */

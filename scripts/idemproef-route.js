@@ -163,8 +163,7 @@ wachtOpSchoneBoom();
      wordt en geen variant van `supplier`. */
   const { zetGenreKlaar } = require('./lib/wereld-genre');
   const { genreRolVoor, rolVanZaak: genreRolVanZaak } = require('./lib/genrezaken');
-  const { accountRolVoor } = require('./lib/accountroutes');
-  const { persoonsRolVoor } = require('./lib/persoonsroutes');
+  const { verfijn } = require('./lib/sessieverfijning');
   const genreWereld = await zetGenreKlaar({ post });
   for (const [code, tok] of Object.entries(genreWereld.tokens)) tokens[genreRolVanZaak(code)] = tok;
   console.log('  genrewereld                          : ' +
@@ -223,8 +222,7 @@ wachtOpSchoneBoom();
   const opgewaardeerd = [];
   const geweigerd = [];
   const naarGenre = [];
-  const naarAccount = [];
-  const naarPersoon = [];
+  const verfijnd = [];
   const metRol = verdeling.metRol.map(r => {
     /* EERST DE GENREZAAK. Die verfijnt `supplier` naar EEN bepaalde zaak en
        staat los van de lijfsleutelfamilies: hij zegt niet welke pas de sessie
@@ -233,16 +231,12 @@ wachtOpSchoneBoom();
        aankloppen zonder sleutel en dat meet niets. */
     const g = genreRolVoor(r.rol, r.pad);
     if (g.rol && tokens[g.rol]) { naarGenre.push({ pad: r.pad, naar: g.rol }); return { ...r, rol: g.rol, rolVan: r.rol }; }
-    /* EN DE ACCOUNTSESSIE. Dezelfde vorm, andere vraag: niet bij welk soort
-       bedrijf hoort deze route, maar heeft de ledensessie een ACCOUNT nodig in
-       plaats van alleen een pas. Zie ./lib/accountroutes.js. */
-    const a = accountRolVoor(r.rol, r.pad);
-    if (a.rol && tokens[a.rol]) { naarAccount.push({ pad: r.pad }); return { ...r, rol: a.rol, rolVan: r.rol }; }
-    /* EN DE PERSOONLIJKE LOGIN. Zelfde vorm nog een keer: niet welke zaak en
-       niet welke pas, maar of er een PERSOON achter de sessie hoort te staan.
-       Zie ./lib/persoonsroutes.js. */
-    const w = persoonsRolVoor(r.rol, r.pad);
-    if (w.rol && tokens[w.rol]) { naarPersoon.push({ pad: r.pad }); return { ...r, rol: w.rol, rolVan: r.rol }; }
+    /* EN DE SESSIEVERFIJNING -- drie registers met een regel, zie
+       ./lib/sessieverfijning.js: een pas die een account nodig heeft, een zaak
+       die een persoon nodig heeft, een kantoorcode die iemand nodig heeft die
+       zit. */
+    const v = verfijn(r.rol, r.pad, (rol) => !!tokens[rol]);
+    if (v.rol) { verfijnd.push({ pad: r.pad, naar: v.rol, register: v.register }); return { ...r, rol: v.rol, rolVan: r.rol }; }
     const familieRol = lijfsleutels.rolVoor(r.pad);
     const oordeel = magOpwaarderen(r.rol, familieRol);
     if (!familieRol || familieRol === r.rol) return r;
@@ -250,11 +244,11 @@ wachtOpSchoneBoom();
     opgewaardeerd.push({ pad: r.pad, van: r.rol, naar: familieRol });
     return { ...r, rol: familieRol, rolVan: r.rol };
   });
-  if (naarPersoon.length) {
-    console.log('  routes naar een persoonlijke login   : ' + naarPersoon.length);
-  }
-  if (naarAccount.length) {
-    console.log('  routes naar een accountsessie        : ' + naarAccount.length);
+  if (verfijnd.length) {
+    const per = {};
+    for (const x of verfijnd) per[x.naar] = (per[x.naar] || 0) + 1;
+    console.log('  sessie verfijnd                      : ' + verfijnd.length + '   (' +
+      Object.entries(per).map(([k, n]) => k + ' ' + n).join(', ') + ')');
   }
   if (naarGenre.length) {
     console.log('  routes naar een genrezaak            : ' + naarGenre.length +
@@ -324,12 +318,20 @@ wachtOpSchoneBoom();
   console.log('  horecawereld                         : ' + (horecaWereld.klaar ? 'klaar' : 'NIET klaar -- ' + horecaWereld.reden));
 
 
+  /* DE RTFOS-WERELD -- ./lib/wereld-rtfos.js. Een stadsafdeling als wortel;
+     de kinderen maakt de objectoogst hieronder, per tak. */
+  const { zetRtfosKlaar } = require('./lib/wereld-rtfos');
+  const rtfosWereld = await zetRtfosKlaar({ post, tokens });
+  console.log('  rtfos-wereld                         : ' + (rtfosWereld.klaar ? 'klaar' : 'NIET klaar -- ' + rtfosWereld.reden));
+  for (const st of rtfosWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { oogstObjecten } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra,
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
+      ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
@@ -412,6 +414,7 @@ wachtOpSchoneBoom();
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...objecten.voor(r.pad),
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
+      ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

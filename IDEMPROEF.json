@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-30T21:26:56.671Z",
-  "commit": "33530197",
-  "boomVuil": false,
+  "op": "2026-08-30T21:53:26.573Z",
+  "commit": "7aadaf87",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
@@ -44,12 +44,12 @@
  "routesGevonden": 4622,
  "gemeten": {
   "routesMetRol": 4621,
-  "beoordeeld": 1787,
-  "beschermd": 1786,
+  "beoordeeld": 1817,
+  "beschermd": 1816,
   "onbeschermd": 1,
-  "ongemeten": 2834,
-  "oproepen": 13898,
-  "tokensHernieuwd": 22,
+  "ongemeten": 2804,
+  "oproepen": 13887,
+  "tokensHernieuwd": 4,
   "uitOpslag": 4,
   "ruisGeijkt": [
    "rtgai",
@@ -67,7 +67,7 @@
    },
    {
     "collectie": "securityLog",
-    "families": 10
+    "families": 4
    },
    {
     "collectie": "supplierActivity",
@@ -84,8 +84,8 @@
    "code"
   ],
   "geldroutesMetEigenLijf": 20,
-  "objectenGemaakt": 137,
-  "objectTakken": 88,
+  "objectenGemaakt": 140,
+  "objectTakken": 92,
   "schoolwereld": true,
   "horecawereld": true,
   "rolOpgewaardeerd": 171,
@@ -143,7 +143,7 @@
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 13,
+ "vermoedensVerworpen": 20,
  "perRoute": [
   {
    "methode": "POST",
@@ -1209,9 +1209,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze app is niet (meer) beschikbaar."
   },
@@ -1839,7 +1837,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -2989,9 +2989,7 @@
      "bestanden": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dat bestand staat niet in uw kluis."
   },
@@ -3044,12 +3042,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -4065,9 +4060,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -4452,7 +4450,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -5236,9 +5236,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -5278,7 +5276,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: dc6d1a4f-9057-4095-97ba-f9070693eab8"
+   "blokkade": "Die regel bestaat niet: aeef1079-41a8-4089-ae4c-de2a617d9568"
   },
   {
    "methode": "POST",
@@ -5296,7 +5294,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: dc6d1a4f-9057-4095-97ba-f9070693eab8"
+   "blokkade": "Die regel bestaat niet: aeef1079-41a8-4089-ae4c-de2a617d9568"
   },
   {
    "methode": "POST",
@@ -5510,7 +5508,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: dc6d1a4f-9057-4095-97ba-f9070693eab8"
+   "blokkade": "Onbekende functie: aeef1079-41a8-4089-ae4c-de2a617d9568"
   },
   {
    "methode": "POST",
@@ -6301,7 +6299,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: dc6d1a4f-9057-4095-97ba-f9070693eab8"
+   "blokkade": "Dat runbook bestaat niet: aeef1079-41a8-4089-ae4c-de2a617d9568"
   },
   {
    "methode": "POST",
@@ -6420,11 +6418,14 @@
     "a": {
      "sondeMonsters": 5
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "sondeMonsters": 5
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -7119,9 +7120,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -8911,7 +8910,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -8931,9 +8932,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze editie bestaat niet."
   },
@@ -9347,7 +9346,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze editie bestaat niet."
   },
@@ -10941,9 +10942,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -11334,12 +11333,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -11731,7 +11727,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -12778,9 +12776,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die wekker bestaat niet."
   },
@@ -13534,7 +13530,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -15146,12 +15144,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -15397,9 +15392,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze bestemming heeft geen digitale deuren."
   },
@@ -15736,10 +15729,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16422,9 +16412,12 @@
     "a": {
      "mallLijsten": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -16458,9 +16451,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -16492,9 +16483,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -17367,7 +17356,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "De AI-boekhouder is onderdeel van de Business Pass."
   },
@@ -17758,9 +17749,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Borden zijn onderdeel van de Business Pass."
   },
@@ -17849,9 +17838,13 @@
     "a": {
      "lifestyle": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in betaalOpdrachten, een wijziging in capGezondheid, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -17901,7 +17894,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -17970,9 +17965,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -18771,9 +18764,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -19251,9 +19247,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -19506,7 +19500,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit project bestaat niet (meer)."
   },
@@ -20401,7 +20397,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -20473,9 +20471,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -20674,8 +20670,7 @@
     },
     "b": {},
     "c": {
-     "contactPinSecurity": "gewijzigd",
-     "wacht": "gewijzigd"
+     "contactPinSecurity": "gewijzigd"
     }
    }
   },
@@ -20937,7 +20932,9 @@
      "pulse": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -21714,14 +21711,11 @@
     "a": {
      "lifestyle": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "lifestyle": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -22609,9 +22603,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -23107,9 +23104,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -23268,12 +23263,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -23630,7 +23622,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -24238,7 +24232,9 @@
      "spellen": 1
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Er loopt geen puzzel. Begin er een."
   },
@@ -24512,9 +24508,7 @@
      "spellen": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -25856,9 +25850,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -26643,7 +26635,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -26781,7 +26775,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "architect": "gewijzigd"
     },
     "b": {},
@@ -27117,6 +27110,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "atelierSites": "gewijzigd"
     },
     "b": {},
@@ -27945,9 +27939,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies tussen 0 en 50.000 euro."
   },
@@ -29408,7 +29400,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -30472,9 +30466,6 @@
    "opslag": {
     "a": {
      "magnaatWereld": "gewijzigd",
-     "wacht": "gewijzigd",
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd",
      "mailQ": 2
     },
     "b": {},
@@ -30959,7 +30950,6 @@
    ],
    "opslag": {
     "a": {
-     "commandAlarmen": "gewijzigd",
      "ondernemersregie": 3
     },
     "b": {},
@@ -31646,7 +31636,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze bron kennen we niet."
   },
@@ -32255,12 +32247,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -34168,9 +34157,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -34538,7 +34530,10 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -34590,7 +34585,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "weefselPanden": 2
     },
     "b": {},
@@ -35366,7 +35360,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Kies een soort: buurthuis, consultatiebureau, wijkteam, schuldhulp, voedselhulp, dagopvang, crisisopvang, jeugdteam, ouderensteunpunt."
   },
@@ -36706,7 +36702,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -36758,9 +36756,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -36921,9 +36917,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -37101,7 +37095,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -38043,9 +38039,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies een geldige locatie."
   },
@@ -38459,7 +38453,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -39050,9 +39046,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Onbekend bedrijfstype."
   },
@@ -39247,9 +39241,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -39264,7 +39256,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -39501,7 +39495,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
    },
    "blokkade": "Dit tegoed is niet van jou."
@@ -40226,9 +40222,7 @@
      "spelTeams": -2
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -40606,7 +40600,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -41208,12 +41204,9 @@
     "a": {
      "residentie": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -41441,9 +41434,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -41677,7 +41668,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -42109,7 +42102,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze kamer bestaat niet."
   },
@@ -42313,7 +42308,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/afmelden",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42331,7 +42326,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/begeleiders",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42349,7 +42344,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/incheck",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42367,7 +42362,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/inschrijven",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42385,25 +42380,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"events\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/open",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42421,7 +42416,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42439,7 +42434,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteit/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42457,43 +42452,41 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/activiteiten",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/audit",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Het auditspoor is van het landelijke RTF-bestuur."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/beleid",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -42510,7 +42503,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/beleid/bevestig",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42528,61 +42521,60 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/beleid/herzien",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Landelijk beleid herziet het landelijke bestuur."
+   "blokkade": "Deze beleidsregel bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/beleid/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Landelijk beleid stelt het landelijke bestuur vast. Een stad kan het bevestigen, niet schrijven."
+   "blokkade": "Schrijf de regel uit. Een titel zonder tekst is niets om je aan te houden."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/benchmark",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "U heeft geen stadsafdeling om te vergelijken."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/bericht/besluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42600,25 +42592,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/bericht/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "Kies een doelgroep (vrijwilligers, partners, projectgroep, deelnemers, ondernemers, publiek)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/bericht/verzend",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42636,7 +42628,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/bericht/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42654,25 +42646,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/berichten",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/blauwdruk/deel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42690,7 +42681,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/blauwdruk/overnemen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42708,31 +42699,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/blauwdrukken",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    401,
-    401,
-    401
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1
-    }
-   },
-   "blokkade": "Log in om de blauwdrukken te lezen."
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/boom",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -42749,25 +42733,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/bron/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"donations\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/bron/verplaats",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42785,25 +42769,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/campagne/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Een landelijke campagne opent het landelijke RTF-bestuur."
+   "blokkade": "Gebruik een datum als 2026-12-31."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/campagne/ronde",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42821,7 +42805,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/campagne/sleutel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42839,7 +42823,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/campagne/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42857,32 +42841,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/campagnes",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    401,
-    401,
-    401
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1,
-     "kosten": "gewijzigd"
-    }
-   },
-   "blokkade": "Log in om de campagnes te zien."
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/code",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42900,7 +42876,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/contact",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42918,25 +42894,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"individual_cases\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/stap",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42954,7 +42930,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42972,7 +42948,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/toestemming-weg",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -42990,7 +42966,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casus/toewijzen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43008,25 +42984,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/casussen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"individual_cases\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/donateur/code",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43044,7 +43020,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/donateur/periodiek",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43062,43 +43038,42 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/geld",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/gemeente/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"municipal_reporting\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/gemeente/opdracht",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43116,25 +43091,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/gemeenten",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/herkomst",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -43151,25 +43125,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/herkomst/beoordeel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
-    403,
-    403,
-    403
+    404,
+    404,
+    404
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Een grote of contante gift beoordeelt het landelijke bestuur. Een stad die haar eigen gift goedkeurt, controleert zichzelf."
+   "blokkade": "Deze bron bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/ik",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -43186,31 +43160,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/inkoop",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    401,
-    401,
-    401
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1
-    }
-   },
-   "blokkade": "Log in om de gezamenlijke inkoop te zien."
+    "a": {},
+    "b": {},
+    "c": {}
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/inkoop/inschrijven",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43228,25 +43195,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/inkoop/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "Wat wordt er samen ingekocht?"
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/inkoop/sluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43264,7 +43231,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/inkoop/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43282,7 +43249,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/jaarverslag/aanvullen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43300,25 +43267,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/jaarverslag/opstellen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Het jaarverslag stelt het landelijke bestuur op."
+   "blokkade": "Over welk jaar gaat dit verslag?"
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/jaarverslag/publiceren",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43336,7 +43303,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/jaarverslag/vaststellen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43354,25 +43321,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/jaarverslagen",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Log in om de jaarverslagen te beheren."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/koppel/agenda",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43390,55 +43356,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/koppel/nog-niet",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ],
-   "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1
-    }
-   },
-   "blokkade": "Log in om het koppelbord te zien."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/koppelbord",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
-   "statussen": [
-    401,
-    401,
-    401
-   ],
-   "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1
-    }
-   },
-   "blokkade": "Log in om het koppelbord te zien."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/meldcode/open",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43451,12 +43369,47 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "Deze koppeling kennen we niet."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/koppelbord",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/meldcode/open",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 403)",
+   "statussen": [
+    403,
+    403,
+    403
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "blokkade": "De module \"individual_cases\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/meldcode/sluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43474,7 +43427,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/meldcode/stap",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43492,49 +43445,43 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/meldcodes",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"individual_cases\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/melding/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 401)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    401,
-    401,
-    401
+    400,
+    400,
+    400
    ],
    "opslag": {
-    "a": {
-     "sessions": 1
-    },
-    "b": {
-     "sessions": 1
-    },
-    "c": {
-     "sessions": 1
-    }
+    "a": {},
+    "b": {},
+    "c": {}
    },
-   "blokkade": "Log in om een melding te doen."
+   "blokkade": "Kies een soort (incident, klacht, klokkenluider, belangenverstrengeling, geschenk, datalek)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/melding/sluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43552,7 +43499,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/melding/stap",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43570,25 +43517,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/meldingen",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/ondernemer/aanbod",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43606,7 +43552,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/ondernemer/aanbod-status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43624,7 +43570,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/ondernemer/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43642,146 +43588,150 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/ondernemer/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"business_sponsorships\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/ondernemers",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partner/beoordeel",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze partner staat niet in het register."
+    "c": {
+     "rtfos": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partner/document",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze partner staat niet in het register."
+   "blokkade": "Kies een soort (statuten, beleidsplan, jaarrekening, jaarverslag, overeenkomst, verzekering, privacyafspraak, vog-beleid, anbi-beschikking, overig)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partner/maak",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+    "c": {
+     "rtfos": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partner/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze partner staat niet in het register."
+   "blokkade": "Kies een geldige status (aangemeld, in_toetsing, goedgekeurd, actief, opgeschort, beeindigd)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partner/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze partner staat niet in het register."
+   "blokkade": "Gebruik een datum als 2026-03-01."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/partners",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -43895,19 +43845,18 @@
    "methode": "POST",
    "pad": "/api/rtfos/portaal/partner",
    "rol": "openbaar",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze partnercode kennen we niet. Vraag het RTF-kantoor om de code."
+   }
   },
   {
    "methode": "POST",
@@ -43966,7 +43915,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/activiteit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43984,7 +43933,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/bewijs",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -43993,9 +43942,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -44004,7 +43951,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/deelnemers",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44022,7 +43969,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/indicator",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44040,7 +43987,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
@@ -44058,7 +44005,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/rapportage",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44076,7 +44023,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44094,7 +44041,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/project/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44112,20 +44059,19 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/projecten",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -44199,43 +44145,41 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/rapport",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/rapport/landelijk",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "U heeft geen stadsafdeling om over te rapporteren."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/risico/herbeoordeel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44253,25 +44197,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/risico/meld",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Een landelijk risico registreert het landelijke bestuur."
+   "blokkade": "Kans en impact zijn allebei 1 tot 5. Vijf klassen die iedereen begrijpt, geen formule."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/risico/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44280,10 +44224,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -44292,7 +44233,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/risicos",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -44309,115 +44250,117 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad/kernteam",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+    "c": {
+     "rtfos": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad/limiet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "Voor deze rol bestaat geen limiet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Alleen het landelijke RTF-bestuur opent een stadsafdeling."
+   "blokkade": "RTF Proefwaarde bestaat al."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad/module",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Modules aan- of uitzetten doet het landelijke bestuur."
+   "blokkade": "Deze module kennen we niet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/stad/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    403,
-    403,
-    403
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Een stad activeren of blokkeren doet het landelijke bestuur."
+   "blokkade": "Kies een geldige status (verkend, in_oprichting, actief, geblokkeerd, beeindigd)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidie/bewijs",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44435,25 +44378,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidie/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"subsidy_management\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidie/moment",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44471,7 +44414,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidie/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44489,7 +44432,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidie/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44507,25 +44450,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/subsidies",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitgave/aanvraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44543,7 +44485,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitgave/besluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44561,25 +44503,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitleen",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitleen/beeindig",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44597,7 +44538,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitleen/toestemming",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44608,14 +44549,16 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze uitleen bestaat niet."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/uitleen/vraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44633,7 +44576,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/veld/adres",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44651,7 +44594,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/veld/afronden",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
@@ -44669,7 +44612,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/veld/hulpvraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44687,25 +44630,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/veld/lijst",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 403)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    403,
-    403,
-    403
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Log in om uw eigen lijst te zien."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/veld/rapport",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44723,97 +44665,102 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze vergadering bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering/agenda",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze vergadering bestaat niet."
+   "blokkade": "Wat is het agendapunt?"
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering/besluit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    404,
-    404,
-    404
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze vergadering bestaat niet."
+   "blokkade": "Er is geen omvang van dit orgaan bekend, dus er valt geen quorum te berekenen. Leg eerst vast hoeveel bestuurders er zijn."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering/maak",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+    "c": {
+     "rtfos": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering/presentie",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtfos": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze vergadering bestaat niet."
+    "c": {
+     "rtfos": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergadering/vaststellen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44826,12 +44773,12 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze vergadering bestaat niet."
+   "blokkade": "De vergadering die vaststelt, bestaat niet. Notulen worden in een VOLGENDE vergadering vastgesteld."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vergaderingen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "beschermd",
    "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
@@ -44848,25 +44795,24 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/voorraad",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   }
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/voorraad/afschrijven",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44884,25 +44830,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/voorraad/binnen",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"warehouse_management\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/voorraad/uit",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44920,7 +44866,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/code",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44938,7 +44884,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/evaluatie",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44956,7 +44902,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -44974,25 +44920,25 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/maak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "reden": "de eerste oproep deed geen werk (status 403)",
    "statussen": [
-    404,
-    404,
-    404
+    403,
+    403,
+    403
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "De module \"volunteer_management\" staat uit voor RTF Proefstad. Het landelijke bestuur zet hem aan."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/uren",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -45010,7 +44956,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/uren-bevestig",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -45028,7 +44974,7 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilliger/zet",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -45046,45 +44992,42 @@
   {
    "methode": "POST",
    "pad": "/api/rtfos/vrijwilligers",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
+   ],
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtfos/zetel",
+   "rol": "kantoor-op-naam",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
+   "statussen": [
+    400,
+    400,
+    400
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
    },
-   "blokkade": "Deze stadsafdeling bestaat niet."
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtfos/zetel",
-   "rol": "office",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
-   "statussen": [
-    404,
-    404,
-    404
-   ],
-   "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
-    "b": {},
-    "c": {}
-   },
-   "blokkade": "Deze stadsafdeling bestaat niet."
+   "blokkade": "Kies een rol (stadsbestuur, projectleider, medewerker)."
   },
   {
    "methode": "POST",
    "pad": "/api/rtfos/zetel/weg",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "idempotentie": "ongemeten",
    "reden": "de eerste oproep deed geen werk (status 404)",
    "statussen": [
@@ -46295,9 +46238,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -46528,9 +46469,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -46615,9 +46559,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -47128,7 +47070,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -47274,9 +47218,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -47525,7 +47467,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -48461,9 +48405,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies man, vrouw of onbekend."
   },
@@ -48699,7 +48641,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -48737,9 +48681,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -49621,7 +49563,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -49820,12 +49764,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -50056,7 +49997,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    },
    "blokkade": "Dit is geen boerderij."
   },
@@ -50216,7 +50160,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -50864,7 +50810,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc31bf49befa8d"
+   "blokkade": "Die regel bestaat niet: docbb71b1884bc4"
   },
   {
    "methode": "POST",
@@ -50882,7 +50828,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc31bf49befa8d"
+   "blokkade": "Die regel bestaat niet: docbb71b1884bc4"
   },
   {
    "methode": "POST",
@@ -50949,7 +50895,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    }
   },
   {
@@ -51077,7 +51025,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc31bf49befa8d"
+   "blokkade": "Dat runbook bestaat niet: docbb71b1884bc4"
   },
   {
    "methode": "POST",
@@ -51264,9 +51212,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51556,7 +51502,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit ziekenhuis kennen we niet."
   },
@@ -51647,14 +51595,11 @@
     "a": {
      "defensie": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "defensie": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -52497,7 +52442,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze deling is er niet (meer)."
   },
@@ -52617,9 +52564,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -52963,7 +52908,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -53896,9 +53843,7 @@
     409
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54165,9 +54110,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54203,7 +54146,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -54832,9 +54777,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -54865,9 +54813,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -55208,7 +55154,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -55939,9 +55887,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -56271,9 +56217,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -56311,7 +56255,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Alleen de ambulance of de huisarts draagt over aan het ziekenhuis."
   },
@@ -56998,7 +56944,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -57182,9 +57130,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Verbind eerst met een ander korps in de keten."
   },
@@ -58350,9 +58296,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit gerecht staat niet op de kaart."
   },
@@ -58660,9 +58604,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
   },
@@ -58678,7 +58620,9 @@
     503
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -58895,10 +58839,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "blokkade": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
@@ -59402,9 +59343,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -59421,7 +59360,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze groep bestaat niet."
   },
@@ -59565,9 +59506,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Bestelling niet gevonden."
   },
@@ -60054,7 +59993,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -60430,9 +60371,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -60684,9 +60623,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -61042,7 +60979,9 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -61562,7 +61501,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -61651,9 +61592,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -62234,7 +62173,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit bericht bestaat niet."
   },
@@ -62694,9 +62635,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze code kennen we hier niet."
   },
@@ -62908,9 +62847,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -63167,9 +63104,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -63527,7 +63467,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -63670,9 +63612,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies een tafel om de bonnen samen te voegen."
   },
@@ -63777,7 +63717,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -64152,9 +64095,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -64297,9 +64243,12 @@
     "a": {
      "suppliers": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -64640,9 +64589,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Autoverkoop hoort bij een verhuur/autobedrijf."
   },
@@ -64857,12 +64804,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -65128,7 +65072,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Voor wie is de dag?"
   },
@@ -65451,9 +65397,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -65554,9 +65503,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -66169,9 +66116,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -66632,9 +66582,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Alleen de leiding van de zaak wijst werk aan."
   },
@@ -66829,9 +66777,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -67415,7 +67361,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd",
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Wat heeft u gedaan?"
   },
@@ -67576,9 +67525,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Offerte niet gevonden."
   },
@@ -68393,9 +68340,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -68590,12 +68540,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -68748,9 +68695,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -69271,9 +69216,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -69561,9 +69509,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -70404,7 +70350,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -70602,9 +70550,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -70780,12 +70726,9 @@
     "a": {
      "werkruimtes": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -70944,10 +70887,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -71311,7 +71251,8 @@
     },
     "b": {},
     "c": {
-     "werkruimtes": "gewijzigd"
+     "werkruimtes": "gewijzigd",
+     "wacht": "gewijzigd"
     }
    }
   },
@@ -71329,9 +71270,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Noteer waarom dit lidmaatschap eindigt; een lege uitstroom is later niet te reconstrueren."
   },
@@ -72477,9 +72416,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -72946,7 +72883,8 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd"
+     "foundation": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -73098,7 +73036,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -73132,8 +73072,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "kosten": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -73909,7 +73848,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Schrijf kort wat je aanbiedt."
   },
@@ -74017,9 +73958,7 @@
     403
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74184,9 +74123,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit doel hoort niet bij deze klas."
   },
@@ -74593,9 +74530,12 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -74734,9 +74674,14 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -74810,9 +74755,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -75224,7 +75167,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -75610,7 +75555,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Je staat al vast op deze klas; overnemen hoeft niet."
   },
@@ -75734,8 +75681,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "kosten": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -75851,9 +75797,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -76128,7 +76072,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -76346,9 +76292,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -76468,9 +76417,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -77088,9 +77035,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -77251,14 +77201,11 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "foundation": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -77383,9 +77330,7 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Start deze toets eerst."
   },
@@ -77706,9 +77651,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -77979,7 +77927,9 @@
     501
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -78158,9 +78108,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -79008,9 +78956,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -79262,7 +79208,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -80746,9 +80694,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit verhaal is er niet meer."
   },
@@ -80873,10 +80819,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit spel heeft geen dagopgave."
   },
@@ -81000,7 +80943,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Onbekend spel."
   },
@@ -81282,7 +81227,6 @@
    ],
    "opslag": {
     "a": {
-     "commandAlarmen": "gewijzigd",
      "spellen": "gewijzigd"
     },
     "b": {},
@@ -82330,9 +82274,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -82402,7 +82344,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },

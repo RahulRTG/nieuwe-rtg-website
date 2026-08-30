@@ -20,7 +20,10 @@
 
    WAT EEN FAMILIE IS. Een naam, de paden waar hij over gaat, en een BOUWER die
    de wereld werkelijk aanmaakt en de velden teruggeeft die daarna in elk lijf
-   meegaan. Optioneel ook een ROL: sommige deuren vragen allebei -- een
+   meegaan -- of, bij sommige, NIETS meegeeft en alleen een rol declareert. Dat
+   laatste is geen leeg geval: een route zonder middleware waarvan de HANDLER
+   een sessie eist, is voor de bewakerskaart niet van een gat te onderscheiden,
+   en toch gewoon te openen met het juiste token. Optioneel ook een ROL: sommige deuren vragen allebei -- een
    bestaande sessie in de KOP en een aanwijzing in het LIJF welk object je
    bedoelt. `huisAuth` van de werkplek is daar het voorbeeld van: hij leest de
    boardroom-sessie en daarnaast `bedrijf` uit het lijf, en zonder allebei is
@@ -315,6 +318,97 @@ const FAMILIES = [
         { 'x-doos-sleutel': doosSleutel });
       if (!r || r.status < 200 || r.status >= 300) return null;
       return { __koppen: { 'x-doos-sleutel': doosSleutel } };
+    }
+  },
+  {
+    naam: 'partner',
+    /* Drie routes van het partnerkanaal. Ze hebben GEEN middleware -- de
+       controle zit in de handler (partnerSessie) -- en eisen daar de
+       capability `can_be_partner`. Die zit op de zakelijke treden en niet op
+       RTG Pass, dus het gewone lid-token geeft hier 403. Dat is de scheiding
+       die werkt, en precies waarom dit een eigen rol is. */
+    /* `/api/partner` bestaat als kale route NAAST /api/partner/apply -- de
+       toets uit 1m ving dat meteen. */
+    prefixen: ['/api/partner/', '/api/partner'],
+    velden: [],
+    rol: 'member-zakelijk',
+    waarom: 'partnerSessie leest de Bearer uit de kop en eist can_be_partner; met tier=business ' +
+      'geeft /api/partner/types 200, met lifestyle 403 met de reden erbij',
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens['member-zakelijk']) return null;
+      const r = await post('/api/partner/types', {}, tokens['member-zakelijk']);
+      if (!r || r.status !== 200) return null;
+      return {};
+    }
+  },
+  {
+    naam: 'codelink',
+    /* RTG Link en de codelaag. Allebei op dezelfde functie: wieScant
+       (kern/link/wie.js) leest de Bearer uit de kop en herkent daar een lid,
+       een zaak, personeel of kantoor in. Geen lijfveld, alleen een sessie --
+       en dus was dit voor de bewakerskaart niet van een gat te onderscheiden. */
+    prefixen: ['/api/code/', '/api/link/'],
+    velden: [],
+    rol: 'member',
+    waarom: 'wieScant leest de Bearer uit de kop; er is geen middleware, dus de bewakerskaart ' +
+      'ziet hier geen laag terwijl er wel degelijk een sessie nodig is',
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.member) return null;
+      const r = await post('/api/link/koppelingen', {}, tokens.member);
+      if (!r || r.status < 200 || r.status >= 300) return null;
+      return {};
+    }
+  },
+  {
+    naam: 'arrival',
+    /* De gastenkant van Invisible Arrival: twee routes achter arrivalPassAuth,
+       dat `pass` uit het lijf leest. */
+    prefixen: ['/api/arrival/pass', '/api/arrival/pulse'],
+    velden: ['pass'],
+    waarom: 'arrivalPassAuth zoekt de Arrival Pass op `pass` uit het lijf; die ontstaat bij ' +
+      '/api/arrival/request, dat een aanvraagcode inwisselt voor een reservering',
+    /* DE AANVRAAGCODE KIEST DE CLIENT ZELF, en dat is met opzet zo: de server
+       bewaart alleen de HASH ervan (arrival-toegang.js). De fixture mag hem dus
+       zelf verzinnen -- dat is geen omzeiling maar precies het ontwerp. Wat hij
+       niet mag overslaan is de aanvraag zelf: zonder een echte reservering
+       bestaat er geen pass om mee te herkennen. */
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.supplier) return null;
+      /* DE ZAAKCODE KOMT UIT DE INLOG en niet uit een aparte route: die bestaat
+         niet (/api/supplier/mijn geeft 404). Hier opnieuw inloggen is geen
+         omweg maar de enige plek waar de code te halen valt -- `state` komt
+         alleen bij het aanmelden mee. */
+      const inlog = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' }, null);
+      const st = inlog && inlog.data && inlog.data.state;
+      const code = st && (st.code || (st.supplier && st.supplier.code) || (st.zaak && st.zaak.code));
+      if (!code) return null;
+      const deel = () => Array.from({ length: 24 }, () =>
+        'abcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 36)]).join('');
+      const requestToken = deel() + '.' + deel();
+      const morgen = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      const r = await post('/api/arrival/request', { requestToken, supplierCode: code,
+        datum: morgen, tijd: '19:00', personen: 2, naam: 'Proefgast' }, null);
+      const pass = r && r.data && r.data.pass && r.data.pass.accessToken;
+      if (!pass) return null;
+      return { pass };
+    }
+  },
+  {
+    naam: 'toestel',
+    /* Een gekoppeld toestel schrijft zijn metingen met een eigen sleutel in de
+       kop. Voor WIE er geschreven wordt volgt uit die sleutel en staat niet in
+       het verzoek -- dus een toestel kan alleen bij het lid dat hem koppelde. */
+    prefixen: ['/api/toestel/'],
+    velden: [],
+    koppen: ['x-rtg-toestel'],
+    waarom: 'toestelVanSleutel leest x-rtg-toestel uit de kop; die sleutel komt EEN keer terug ' +
+      'bij het koppelen (/api/toestellen/koppel) en wordt daarna nergens bewaard',
+    async bouw({ post, tokens }) {
+      if (!tokens || !tokens.member) return null;
+      const r = await post('/api/toestellen/koppel', { naam: 'Proeftoestel' }, tokens.member);
+      const sleutel = r && r.data && r.data.sleutel;
+      if (!sleutel) return null;
+      return { __koppen: { 'x-rtg-toestel': sleutel } };
     }
   }
 ];

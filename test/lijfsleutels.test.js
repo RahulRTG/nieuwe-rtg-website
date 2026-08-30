@@ -42,8 +42,9 @@ test('elke familie noemt zijn velden, zijn paden en WAAROM hij bestaat', () => {
        daar hoort hij te reizen; in de body meesturen zou een weg beproeven die
        de route niet kent. Maar iets moet hij declareren: een familie die niets
        meestuurt, opent niets. */
-    const draagt = (f.velden || []).length + (f.koppen || []).length;
-    assert.ok(draagt > 0, f.naam + ': declareert geen velden en geen koppen');
+    const draagt = (f.velden || []).length + (f.koppen || []).length + (f.rol ? 1 : 0);
+    assert.ok(draagt > 0, f.naam + ': declareert geen velden, geen koppen en geen rol -- ' +
+      'zo\'n familie stuurt niets mee en opent dus niets');
     assert.ok(f.waarom && f.waarom.length > 40,
       f.naam + ': geen uitgeschreven reden. Zonder reden is dit een plek om een sleutel te verzinnen');
     assert.equal(typeof f.bouw, 'function', f.naam + ': geen bouwer');

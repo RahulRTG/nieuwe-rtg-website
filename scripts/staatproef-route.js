@@ -88,8 +88,20 @@ if (require.main !== module) { module.exports = {}; return; }
   const bos = maakSleutels({ post, officeCode: 'RTG-OFFICE-PROEF' });
   const inlog = bos.inlog;
   const { tokens, mislukt } = await haalSleutels(bos);
-  const mist = Object.keys(inlog).filter(r => !tokens[r]);
-  if (mist.length) { console.error('geen token voor: ' + mist.join(', ')); klaar(); process.exit(2); }
+  /* ONMISBAAR en niet "alles wat in `inlog` staat". Dat laatste stond hier, en
+     het brak de proef volledig zodra `openbaar`, `omgeving` en `eigen-poort`
+     bij de sleutelbos kwamen: hun token is met opzet de LEGE STRING, en die is
+     falsy. De staatproef stopte dus met exitcode 2 voordat hij iets mat, en in
+     de meetronde stond daar niets anders dan "GESTRUIKELD".
+     De vijf zusterproeven gebruiken alle vijf ONMISBAAR; dit was de zesde die
+     zijn eigen regel had. Boardroom en techniek horen er bewust niet bij: die
+     zijn welkom als ze er zijn en geen reden om te stoppen. */
+  const mist = ONMISBAAR.filter(r => !tokens[r]);
+  if (mist.length) {
+    console.error('geen token voor: ' + mist.join(', ') +
+      ' -- de proef zou dan doen alsof die routes zijn beproefd');
+    klaar(); process.exit(2);
+  }
 
   /* DE EIGENAAR, voor de vingerafdruk. Hij staat in de seed; dit is een gewone
      inlog en geen achterdeur. Lukt hij niet, dan STOPT de proef -- een ronde

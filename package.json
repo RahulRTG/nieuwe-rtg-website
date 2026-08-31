@@ -49,6 +49,7 @@
     "tikken:naloop": "node scripts/tikken.js --naloop",
     "sprongindex": "node scripts/sprongindex.js",
     "sprongindex:controle": "node scripts/sprongindex.js --controle",
+    "wereldstijl": "node scripts/wereldstijl.js",
     "wereldrooster": "node scripts/wereldrooster.js",
     "wereldrooster:controle": "node scripts/wereldrooster.js --controle",
     "handelingindex": "node scripts/handelingindex.js",

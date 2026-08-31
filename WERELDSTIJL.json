@@ -1,0 +1,2019 @@
+{
+  "stempel": "2026-08-31",
+  "uitleg": "Per scherm van een wereld: draagt het de vormtaal van die wereld? De grond en de letter zijn GEMETEN in een echte browser (getComputedStyle), niet uit de CSS gelezen -- twee eerdere versies van deze meter lazen de cascade verkeerd. Vier klassen: schil (klaar), aankleden (alleen de schil ontbreekt), ombouwen (de binnenkant moet mee), niet gemeten (pagina ging niet open). Ziet niet of een scherm mooi is.",
+  "bron": "public/shared/sprongindex.json (afgeleid van MAPPEN) + een browsermeting",
+  "werelden": [
+    {
+      "wereld": "LivingOS",
+      "schermen": 41,
+      "telling": {
+        "aankleden": 30,
+        "ombouwen": 10,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "App-dossier"
+          ],
+          "bestand": "/apps/appstore-dossier.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #0b0b0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0b0b0a",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 209,
+          "bytes": 12008,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Camera"
+          ],
+          "bestand": "/apps/camera.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #0c0c0b materiaal onyx, boven #0b0b09, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0b0b09",
+            "waarde": "#0c0c0b",
+            "licht": 0.0467756862745098,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 607,
+          "bytes": 35447,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Cellier"
+          ],
+          "bestand": "/apps/cellier.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 113,
+          "bytes": 9827,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Video"
+          ],
+          "bestand": "/apps/clips.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120e0e",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 466,
+          "bytes": 26509,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Berichten"
+          ],
+          "bestand": "/apps/comm.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #1b1a18 materiaal onyx, boven #171815, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#1b1a18",
+            "licht": 0.10222823529411765,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(221, 214, 201)"
+          },
+          "regels": 782,
+          "bytes": 41601,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Commerce"
+          ],
+          "bestand": "/apps/commerce.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #0b0b0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0b0b0a",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 510,
+          "bytes": 30174,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Food Court"
+          ],
+          "bestand": "/apps/foodcourt.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 204,
+          "bytes": 13521,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Garde-robe"
+          ],
+          "bestand": "/apps/garderobe.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 116,
+          "bytes": 10184,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Geld"
+          ],
+          "bestand": "/apps/geld-command.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 25,
+          "bytes": 17991,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Balans",
+            "Bank",
+            "Betaalcode",
+            "Fonds",
+            "Logboek",
+            "Mecenaat",
+            "Nalatenschap",
+            "Samen betalen",
+            "Wallet"
+          ],
+          "bestand": "/apps/geld.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 165,
+          "bytes": 9046,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Krant"
+          ],
+          "bestand": "/apps/krant.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120e0e",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 183,
+          "bytes": 14592,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mijn leven"
+          ],
+          "bestand": "/apps/leven.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090909, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090909",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 12,
+          "bytes": 5427,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Privekantoor"
+          ],
+          "bestand": "/apps/lifestyle.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 759,
+          "bytes": 57224,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Het Vooruitzicht"
+          ],
+          "bestand": "/apps/living-os.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #0a0909 materiaal onyx, boven #120f0f, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120f0f",
+            "waarde": "#0a0909",
+            "licht": 0.0361278431372549,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 8,
+          "bytes": 8107,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Maison"
+          ],
+          "bestand": "/apps/maison.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 110,
+          "bytes": 10212,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mall"
+          ],
+          "bestand": "/apps/mall.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 1450,
+          "bytes": 96218,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Media"
+          ],
+          "bestand": "/apps/media.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080808 materiaal onyx, boven #100f0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #100f0e",
+            "waarde": "#080808",
+            "licht": 0.03137254901960784,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 265,
+          "bytes": 16280,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mijn bestellingen"
+          ],
+          "bestand": "/apps/mijnmall.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #130f0f, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #130f0f",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 137,
+          "bytes": 8296,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Muziek"
+          ],
+          "bestand": "/apps/muziek.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #110f0e materiaal onyx, boven #0d0d0c, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0d0d0c",
+            "waarde": "#110f0e",
+            "licht": 0.0602078431372549,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 373,
+          "bytes": 21789,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Nieuws"
+          ],
+          "bestand": "/apps/nieuws.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 121,
+          "bytes": 9033,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Betalen"
+          ],
+          "bestand": "/apps/pay.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 578,
+          "bytes": 33085,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Live"
+          ],
+          "bestand": "/apps/podium.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120e0e",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 654,
+          "bytes": 38989,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Tweede scherm"
+          ],
+          "bestand": "/apps/scherm.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #120e0d, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120e0d",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 231,
+          "bytes": 14015,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Sport"
+          ],
+          "bestand": "/apps/sport.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 223,
+          "bytes": 17071,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Table"
+          ],
+          "bestand": "/apps/table.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 124,
+          "bytes": 11664,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Films en series"
+          ],
+          "bestand": "/apps/theater.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #120e0e",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 769,
+          "bytes": 43853,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Thuis"
+          ],
+          "bestand": "/apps/thuis.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 398,
+          "bytes": 29454,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Uitgaan"
+          ],
+          "bestand": "/apps/uitgaan.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #101212",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 252,
+          "bytes": 17092,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/vandaag.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #27181a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #27181a",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 49,
+          "bytes": 4739,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Alles bij elkaar"
+          ],
+          "bestand": "/apps/wereld.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #0b0b0a materiaal onyx, boven #0c0c0b, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0c0c0b",
+            "waarde": "#0b0b0a",
+            "licht": 0.04285411764705882,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 610,
+          "bytes": 29222,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Attenties"
+          ],
+          "bestand": "/apps/attenties.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#ddd6c9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#ddd6c9",
+            "licht": 0.8413709803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(221, 214, 201)"
+          },
+          "regels": 141,
+          "bytes": 13626,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Cercle"
+          ],
+          "bestand": "/apps/cercle.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#ddd6c9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#ddd6c9",
+            "licht": 0.8413709803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(221, 214, 201)"
+          },
+          "regels": 142,
+          "bytes": 13110,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Entourage"
+          ],
+          "bestand": "/apps/entourage.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#ddd6c9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#ddd6c9",
+            "licht": 0.8413709803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(221, 214, 201)"
+          },
+          "regels": 144,
+          "bytes": 13305,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vrienden"
+          ],
+          "bestand": "/apps/foundation/vrienden.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgb(8, 12, 18)"
+          },
+          "regels": 1054,
+          "bytes": 67130,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/pulse.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#ddd6c9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#ddd6c9",
+            "licht": 0.8413709803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(221, 214, 201)"
+          },
+          "regels": 237,
+          "bytes": 20866,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Rendez-vous"
+          ],
+          "bestand": "/apps/rendezvous.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#f4f0e9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 378,
+          "bytes": 35116,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Sociaal"
+          ],
+          "bestand": "/apps/sociaal.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#f1eee7)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #f4f2ea",
+            "waarde": "#f1eee7",
+            "licht": 0.9338525490196078,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 779,
+          "bytes": 39335,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Spelen"
+          ],
+          "bestand": "/apps/spelen.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#07101b",
+            "licht": 0.058356078431372554,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgb(8, 15, 24)"
+          },
+          "regels": 1926,
+          "bytes": 120378,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Game Night"
+          ],
+          "bestand": "/apps/spelscherm.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgba(12, 12, 11, 0.294)"
+          },
+          "regels": 143,
+          "bytes": 7251,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Daten"
+          ],
+          "bestand": "/apps/vonk.html",
+          "klasse": "ombouwen",
+          "reden": "lichte grond (#f4f0e9)",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 354,
+          "bytes": 38721,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "LivingOS",
+            "Ontdekken"
+          ],
+          "bestand": "/apps/rtg.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #490b1e",
+            "waarde": "#0d0507",
+            "licht": 0.02684392156862745,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(74, 12, 30)"
+          },
+          "regels": 306,
+          "bytes": 33823,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "WorkOS",
+      "schermen": 13,
+      "telling": {
+        "aankleden": 12,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Web"
+          ],
+          "bestand": "/apps/browser.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 433,
+          "bytes": 31226,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Horeca"
+          ],
+          "bestand": "/apps/horeca.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #070707 materiaal onyx, boven #201c1d, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#070707",
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(11, 11, 10)"
+          },
+          "regels": 201,
+          "bytes": 15058,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Loon"
+          ],
+          "bestand": "/apps/loonstrook.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 251,
+          "bytes": 13858,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Magnaat"
+          ],
+          "bestand": "/apps/magnaat.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #070707 materiaal onyx, boven #100f0e, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #100f0e",
+            "waarde": "#070707",
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 591,
+          "bytes": 109517,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Documenten"
+          ],
+          "bestand": "/apps/office.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, boven #090908, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090908",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 629,
+          "bytes": 40754,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Onderneming"
+          ],
+          "bestand": "/apps/onderneming.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 898,
+          "bytes": 53165,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Partner Network"
+          ],
+          "bestand": "/apps/partner-network.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #070707 materiaal onyx, boven #201c1d, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#070707",
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 9,
+          "bytes": 6812,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "RTG One"
+          ],
+          "bestand": "/apps/rtgone.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #0d0c0b materiaal onyx, boven #0c0c0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0c0c0a",
+            "waarde": "#0d0c0b",
+            "licht": 0.04760941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 29,
+          "bytes": 31678,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "School"
+          ],
+          "bestand": "/apps/rtgschool.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(13, 12, 11)"
+          },
+          "regels": 183,
+          "bytes": 11287,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTMail"
+          ],
+          "bestand": "/apps/rtmail.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, boven #090a09, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a09",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 474,
+          "bytes": 34797,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Website"
+          ],
+          "bestand": "/apps/sitemaker.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0a0908",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 654,
+          "bytes": 48934,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Werk OS"
+          ],
+          "bestand": "/apps/werk.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #060606 materiaal onyx, boven #201c1d, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #201c1d",
+            "waarde": "#060606",
+            "licht": 0.023529411764705882,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 157,
+          "bytes": 15332,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "WorkOS"
+          ],
+          "bestand": "/apps/kantoor.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal royal, boven #0b0c0e",
+            "waarde": "#090a0b",
+            "licht": 0.03866509803921569,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 482,
+          "bytes": 26868,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "TravelOS",
+      "schermen": 13,
+      "telling": {
+        "aankleden": 12,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Aankomst"
+          ],
+          "bestand": "/apps/arrival.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080808 materiaal onyx, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#080808",
+            "licht": 0.03137254901960784,
+            "letter": "Inter, sans-serif",
+            "eigenschap": "rgb(8, 8, 8)"
+          },
+          "regels": 9,
+          "bytes": 6400,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Verkeer"
+          ],
+          "bestand": "/apps/flits.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080909 materiaal onyx, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#080909",
+            "licht": 0.034460392156862744,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 296,
+          "bytes": 16359,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Hangar"
+          ],
+          "bestand": "/apps/hangar.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 139,
+          "bytes": 13106,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Navigatie"
+          ],
+          "bestand": "/apps/navigatie.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 719,
+          "bytes": 42790,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Openbaar vervoer"
+          ],
+          "bestand": "/apps/ov.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 1021,
+          "bytes": 61534,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "OV-routes"
+          ],
+          "bestand": "/apps/ovroutes.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #07090a materiaal onyx, boven #070707, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #070707",
+            "waarde": "#07090a",
+            "licht": 0.03390980392156863,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": "rgb(8, 10, 11)"
+          },
+          "regels": 306,
+          "bytes": 17424,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Reisboek"
+          ],
+          "bestand": "/apps/reisboek.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 137,
+          "bytes": 13376,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Reizen & Veilig"
+          ],
+          "bestand": "/apps/reizen-veilig.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #070707 materiaal onyx, boven #131010, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #131010",
+            "waarde": "#070707",
+            "licht": 0.02745098039215686,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 97,
+          "bytes": 7523,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Verblijven"
+          ],
+          "bestand": "/apps/residentie.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #0d0b08 materiaal onyx, boven #040505, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #040505",
+            "waarde": "#0d0b08",
+            "licht": 0.04395529411764706,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 182,
+          "bytes": 12202,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Routedossier"
+          ],
+          "bestand": "/apps/routedossier.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #080807 materiaal onyx, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#080807",
+            "licht": 0.03108941176470588,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgba(13, 12, 11, 0.855)"
+          },
+          "regels": 320,
+          "bytes": 16943,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Stad"
+          ],
+          "bestand": "/apps/stad.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 164,
+          "bytes": 11015,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vluchten"
+          ],
+          "bestand": "/apps/vluchten.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "licht": 0.038381960784313725,
+            "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "eigenschap": null
+          },
+          "regels": 183,
+          "bytes": 14346,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "TravelOS"
+          ],
+          "bestand": "/apps/reizen.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #070606",
+            "waarde": "#050505",
+            "licht": 0.019607843137254898,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(8, 9, 9)"
+          },
+          "regels": 943,
+          "bytes": 56790,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "Instellingen",
+      "schermen": 4,
+      "telling": {
+        "aankleden": 3,
+        "ombouwen": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "Wie ben ik"
+          ],
+          "bestand": "/apps/ik.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 343,
+          "bytes": 19230,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Passkeys"
+          ],
+          "bestand": "/apps/passkeys.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #0f1111",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 225,
+          "bytes": 11613,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "RTG Veilig"
+          ],
+          "bestand": "/apps/veilig.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #090a0a",
+            "waarde": "#090809",
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 116,
+          "bytes": 5978,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Juridisch"
+          ],
+          "bestand": "/apps/juridisch.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #1b2326",
+            "waarde": "#090909",
+            "licht": 0.03529411764705883,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 71,
+          "bytes": 3754,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        }
+      ]
+    },
+    {
+      "wereld": "FoundationOS",
+      "schermen": 4,
+      "telling": {
+        "aankleden": 1,
+        "ombouwen": 2,
+        "schil": 1
+      },
+      "lijst": [
+        {
+          "namen": [
+            "RTFoundation portaal"
+          ],
+          "bestand": "/apps/foundation/os-portaal.html",
+          "klasse": "aankleden",
+          "reden": "donkere grond #07101b materiaal onyx, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#07101b",
+            "licht": 0.058356078431372554,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgb(8, 15, 23)"
+          },
+          "regels": 242,
+          "bytes": 15911,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Het bord"
+          ],
+          "bestand": "/apps/foundation/bord.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgb(7, 15, 24)"
+          },
+          "regels": 261,
+          "bytes": 17200,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Het schrift"
+          ],
+          "bestand": "/apps/foundation/schrift.html",
+          "klasse": "ombouwen",
+          "reden": "laadt fonts.css niet",
+          "grond": {
+            "herkomst": "materiaal onyx",
+            "waarde": "#08090c",
+            "licht": 0.03530980392156863,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "eigenschap": "rgb(7, 16, 26)"
+          },
+          "regels": 271,
+          "bytes": 19935,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "FoundationOS",
+            "RTFoundation in uw buurt"
+          ],
+          "bestand": "/apps/foundation/os-publiek.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #07101b",
+            "waarde": "#07101c",
+            "licht": 0.05863921568627451,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgba(7, 17, 28, 0.973)"
+          },
+          "regels": 186,
+          "bytes": 11112,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        }
+      ]
+    }
+  ]
+}

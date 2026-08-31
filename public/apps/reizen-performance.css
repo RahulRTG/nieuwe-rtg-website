@@ -79,33 +79,44 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}.rahulsnel button{height:58px;border:0;border-left:1px solid #4c1223;background:none;color:var(--wine-licht);font-size:1.3rem}
 
 /* ------------------------------------------------------------------ HET DEK
-   Twee kolommen: links de reis, rechts de klok. De klok stond hiervoor
-   ABSOLUUT in de fotokaart en lag daardoor over de bestemmingsnaam heen zodra
-   die lang was of het scherm smal. Een eigen kolom kan nergens overheen vallen;
-   daarom is dit een reparatie en geen smaakkwestie. */
-.dagdek{display:grid;gap:clamp(.8rem,2vw,1.2rem);grid-template-columns:minmax(0,1fr) clamp(112px,30vw,150px);align-items:stretch;margin-bottom:clamp(1.5rem,4vw,2.4rem)}
-.dagdek>.vandaagraster,.dagdek>.dagvoet{grid-column:1/-1}
-
-.klokpaneel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;padding:clamp(.6rem,2vw,1.4rem);border:1px solid var(--line)}
-.klokpaneel>.micro{color:#E7D3D8;font-size:.5rem;text-align:center}
-.klokpaneel>[data-rtg-klok]{--rtg-klok-maat:min(100%,14rem)}
-.dagvoet{display:grid;gap:clamp(.8rem,2vw,1.2rem)}
-.dagvoet .rahulsnel{margin-top:0}
-.dagvoet>#vandaagVak{margin-top:0;border-top:0;border:1px solid var(--line);padding:1rem 1.1rem}
+   Hoofdkolom en kompas. Links de reis, rechts de losse kaarten die erover
+   gaan: de tijd, wat er vandaag op de klok staat en de stand van de
+   onderdelen. De klok stond hiervoor ABSOLUUT in de fotokaart en lag daardoor
+   over de bestemmingsnaam heen; in een eigen kolom kan dat niet meer. */
+.dagdek{display:grid;gap:clamp(.8rem,2vw,1.4rem);align-items:start;margin-bottom:clamp(1.2rem,3vw,2rem)}
+.daghoofd{display:flex;flex-direction:column;gap:clamp(.8rem,2vw,1.2rem);min-width:0}
+.kompas{display:flex;flex-direction:column;gap:clamp(.7rem,1.6vw,1rem);min-width:0}
+.kompaskaart{border:1px solid var(--line);background:rgba(23,4,9,.42);padding:1rem 1.1rem}
+.kompaskop{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;margin-bottom:.8rem}
+.kompaskop .micro{margin:0}
+.kompaskaart .tel{color:var(--muted);font-size:.66rem}
+.klokpaneel{display:flex;flex-direction:column;align-items:center;gap:.7rem;padding:clamp(.9rem,2vw,1.4rem)}
+.klokpaneel>.micro{color:#E7D3D8;font-size:.52rem;text-align:center}
+.klokpaneel>[data-rtg-klok]{--rtg-klok-maat:clamp(7rem,13vw,12rem)}
+.kompas .statuslijst{border:0}
+.kompas .statuslijst:empty{display:none}
+.kompas .statuslijst button,.kompas .statuslijst>a{min-height:64px;padding:.7rem 0;gap:.75rem;background:transparent}
+.kompas .reiscontext{display:block}
+.rahulsnel{margin-top:0}
 
 /* De twee werkblokken onder de tabbladen staan naast elkaar, zoals de
    reiswacht en de invoerbalie dat in het ontwerp doen. Ze blijven in main. */
 .dagkaarten{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin:clamp(1.2rem,2.5vw,2rem) auto 0;display:grid;gap:clamp(1rem,2vw,1.6rem)}
 .dagkaart{min-width:0}
 .dagkaart .regkop{margin-top:0}
-@media(min-width:940px){
-  .dagdek{grid-template-columns:minmax(0,1fr) minmax(240px,.3fr)}
-  .dagvoet{grid-template-columns:1fr 1fr;align-items:start}
+@media(min-width:1000px){
+  .dagdek{grid-template-columns:minmax(0,1fr) clamp(300px,26vw,380px)}
   .dagkaarten{grid-template-columns:1fr 1fr;align-items:start}
 }
+@media(max-width:999px){
+  /* Op een smal scherm gaat het kompas ONDER de reis staan, niet ernaast: een
+     kolom van 300px naast een foto laat van allebei niets heel. */
+  .kompas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .klokpaneel>[data-rtg-klok]{--rtg-klok-maat:clamp(6rem,22vw,9rem)}
+}
 @media(max-width:520px){
-  .dagdek{margin-inline:-1rem;padding-inline:1rem;gap:.55rem}
   .dagkaarten{width:calc(100% - 2rem)}
+  .kompas{grid-template-columns:1fr}
 }
 
 .sectiekop{margin-bottom:2.4rem}.sectiekop>div{display:flex;align-items:end;justify-content:space-between;gap:1.5rem}.sectiekop h1{max-width:820px;margin:.65rem 0 .5rem;font-size:clamp(2.2rem,7vw,4.8rem);line-height:.95;letter-spacing:-.05em;text-transform:uppercase}.sectiekop>p:last-child{max-width:640px;margin:.8rem 0 0;line-height:1.6}
@@ -116,7 +127,7 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .reisregister{border-top:1px solid var(--line)}.registerkop{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0}.registerkop h2{margin:0;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}.registerkop span{color:var(--muted);font-size:.7rem}
 .reisregel{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:1.1rem;color:inherit;text-decoration:none;border-top:1px solid var(--line-soft);padding:1.15rem .2rem}.reisregel:hover{background:#20060d}.reisdatum{display:flex;flex-direction:column;color:var(--muted);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}.reisdatum b{color:var(--ivory);font-size:1.55rem;line-height:1.1}.reiskern{display:flex;flex-direction:column;gap:.3rem}.reiskern b{font-size:1rem}.reiskern small{color:var(--muted)}.reisstatus{display:flex;align-items:center;gap:.45rem;color:#d8d5cf;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.leegtekst{color:var(--muted);line-height:1.6}
 .reisdiensten{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:2.6rem}.reisdiensten a{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:1rem;background:#20060d;color:inherit;text-decoration:none;padding:1.15rem}.reisdiensten a:hover{background:#2a0711}.reisdiensten svg{width:26px;height:26px;color:var(--wine-licht)}.reisdiensten span{display:flex;flex-direction:column;gap:.2rem}.reisdiensten b{font-size:.86rem}.reisdiensten small{color:var(--muted);font-size:.68rem}
-#vandaagVak{border-top:1px solid var(--line);margin-top:2rem;padding-top:1.2rem}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
+#vandaagVak .cv-lijn{padding:.7rem 0}#vandaagVak .cv-lijn{max-width:none;padding:1.25rem 0}#vandaagVak .cv-uur{color:var(--muted)}#vandaagVak .cv-wat{border-color:var(--line)}#vandaagVak .cv-toe{color:var(--muted)}
 
 main>.regkop,main>#poorten,main>.wrooster{width:calc(var(--werkbreedte) - clamp(2.4rem,5vw,4.8rem));margin-inline:auto}
 main>.regkop.rtgdeel-vast{margin-top:clamp(2.5rem,5vw,4rem);padding-bottom:1rem;border-bottom:1px solid var(--line)}
@@ -220,7 +231,7 @@ body.rtg-stijl.rtg-edge-host .reisapp>main{padding-top:48px!important}
   .hoofdtabs button{flex-direction:row;gap:.6rem;justify-content:flex-start}
   .hoofdtabs svg{width:19px;height:19px}
   .hoofdtabs button::after{left:0;bottom:0;width:0;height:2px}.hoofdtabs button.actief::after{width:100%;height:2px}
-  .vandaagraster{grid-template-columns:1.08fr .92fr;align-items:start}.volgendblok{min-height:0;display:flex;flex-direction:column}.volgendblok .actieknop{margin-top:auto}
+.volgendblok{min-height:0;display:flex;flex-direction:column}.volgendblok .actieknop{margin-top:auto}
   .taxiraster{grid-template-columns:minmax(0,1fr) minmax(410px,.92fr);align-items:start;gap:1.6rem}.taxikop h1{font-size:4.7rem}
   .toast{bottom:1.5rem}
 }

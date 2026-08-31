@@ -61,7 +61,13 @@
              de klok lag over de bestemmingsnaam heen, omdat de titel op de
              VENSTERbreedte schaalde en de klok absoluut in dezelfde kaart
              stond. Wat een eigen kolom heeft, kan nergens overheen vallen. -->
+        <!-- HOOFDKOLOM EN KOMPAS. Links waar u bent (de reis), rechts wat u
+             erover moet weten: de tijd, wat er vandaag op de klok staat en de
+             stand van de onderdelen. Dat is dezelfde verdeling als in de andere
+             wereldhuizen -- en het houdt de klok uit de fotokaart, waar hij over
+             de bestemmingsnaam heen viel. -->
         <div class="dagdek">
+          <div class="daghoofd">
             <div class="dagkop">
               <div class="dagkop-inhoud">
                 <p class="micro" id="groet">GOEDEMIDDAG</p>
@@ -73,11 +79,6 @@
               </div>
             </div>
 
-          <aside class="klokpaneel" aria-label="Lokale tijd">
-            <span class="micro">LOKALE TIJD</span>
-            <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
-          </aside>
-
             <div class="vandaagraster" id="dagRaster" hidden>
               <section class="volgendblok" aria-labelledby="volgendTitel">
                 <div class="micro" id="volgendTitel">VOLGENDE</div>
@@ -86,31 +87,39 @@
                 <div class="vluchtregel"><span id="volgendExtra"></span></div>
                 <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
               </section>
+            </div>
 
+            <form class="rahulsnel" data-rahul-snel>
+              <label for="rahulSnel">Vraag Rahul over deze reis</label>
+              <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul over deze reis…">
+              <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
+            </form>
+          </div>
+
+          <aside class="kompas" aria-label="Kompas">
+            <section class="kompaskaart klokpaneel" aria-label="Lokale tijd">
+              <span class="micro">LOKALE TIJD</span>
+              <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
+            </section>
+
+            <section class="kompaskaart" id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
+              <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
+                   momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
+                   kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
+                   op null -- en die uitzondering brak de HELE reizenlijst af: #komend
+                   toonde "Cannot set properties of null" in plaats van de reizen, ook na
+                   een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
+              <div class="kompaskop"><h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span></div>
+              <div id="vandaag"></div>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="standTitel">
+              <div class="kompaskop"><h2 id="standTitel" class="micro">STATUS</h2></div>
               <div class="reiscontext">
-                <section class="statuslijst" id="statusLijst" aria-label="Reisstatus"></section>
+                <div class="statuslijst" id="statusLijst" aria-label="Reisstatus"></div>
               </div>
-            </div>
-
-            <div class="dagvoet">
-              <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
-                <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
-                     momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
-                     kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
-                     op null -- en die uitzondering brak de HELE reizenlijst af: #komend
-                     toonde "Cannot set properties of null" in plaats van de reizen, ook na
-                     een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
-                <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span>
-                <div id="vandaag"></div>
-              </section>
-
-              <form class="rahulsnel" data-rahul-snel>
-                <label for="rahulSnel">Vraag Rahul over deze reis</label>
-                <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul over deze reis…">
-                <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
-              </form>
-            </div>
-
+            </section>
+          </aside>
         </div>
       </div>
     </section>

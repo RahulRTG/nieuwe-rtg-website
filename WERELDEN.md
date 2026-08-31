@@ -104,16 +104,24 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 50 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
-| **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 11 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 2 |
+| **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 4 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
 
+De drie werelden groeiden op 30 augustus 2026 met veertien onderdelen, en dat is
+geen nieuwe software: `scripts/tikken.js` vond veertien ledenschermen die
+bestonden maar in geen enkele wereld hingen en dus vanaf het beginscherm
+onbereikbaar waren (`TIKKEN.md`). Ze hangen nu in de wereld waar de mens denkt
+te zijn als hij ze gebruikt -- Mall, Betalen, Thuis en de Food Court in
+LivingOS, Aankomst en de routes in TravelOS, het bord en het schrift in
+FoundationOS.
+
 **Wat er precies in elke wereld hangt staat in [`WERELDLIJST.md`](WERELDLIJST.md)**
-— alle 76 onderdelen met hun adres, uit `MAPPEN` geschreven door
+— alle 90 onderdelen met hun adres, uit `MAPPEN` geschreven door
 `npm run wereldlijst`. Dit document zegt *waarom* de werelden zo lopen; die lijst
 zegt *wat* erin zit, en regel 50 van `scripts/check.js` houdt de twee gelijk.
 

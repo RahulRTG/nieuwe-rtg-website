@@ -1,0 +1,51 @@
+/* HET WERELDROOSTER: alles wat in deze wereld hangt.
+
+   WAAROM DIT EEN EIGEN BLAD IS. De eerste versie leende de klassen van het huis
+   van LivingOS (.kaart, .laaglabel). Die bestaan daar, en op /apps/kantoor.html
+   niet -- dus stonden er twaalf links in de kleur die de browser zelf kiest, en
+   de toegankelijkheidskeuring zag precies die twaalf als contrastfout (grens 0).
+   Een klasse lenen van een ander scherm is hetzelfde als een lijst kopieren: het
+   werkt tot iemand het origineel verandert.
+
+   DE KLEUR WORDT GEERFD EN NIET GEKOZEN. `color: inherit` neemt de tekstkleur
+   van het huis waarin dit rooster staat. Dat is de enige keuze die niet kan
+   zakken: haalt het huis zijn eigen contrast, dan haalt dit blok het ook. De
+   rand komt van diezelfde kleur met weinig dekking, zodat hij op een donker en
+   op een licht huis werkt.
+
+   Geen ronde hoeken (merkregel 3), en een raakvlak van minstens 48 hoog --
+   TOEGANKELIJK.md vraagt 24, dit is een lijst waar een duim doorheen gaat. */
+.wrooster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: 10px;
+}
+.wrooster-kaart {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0;
+  color: inherit;
+  text-decoration: none;
+  font: 500 .82rem Inter, system-ui, sans-serif;
+}
+.wrooster-kaart:hover,
+.wrooster-kaart:focus-visible {
+  border-color: color-mix(in srgb, currentColor 45%, transparent);
+  outline: none;
+}
+/* Het label ("Lifestyle") is meta en geen titel; iets stiller, maar niet zo
+   stil dat het zakt: 70% van een kleur die zelf 4,5:1 haalt, blijft ruim boven
+   de 3:1 die voor deze maat geldt en het staat nooit alleen -- de naam ernaast
+   draagt de betekenis. */
+.wrooster-kaart .wrooster-label {
+  font: 600 .58rem Inter, system-ui, sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+  white-space: nowrap;
+}

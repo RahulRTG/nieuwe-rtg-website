@@ -129,14 +129,40 @@ function leegMaken() {
   try { fs.unlinkSync(journaal); } catch (e) { if (e.code !== 'ENOENT') throw e; }
 }
 
+/* HOE LANG EEN BESTAND MAG DUREN, EN WAAROM DAT NIET EEN GETAL IS.
+
+   Tien minuten voor een gewoon toetsbestand: wie dan niet klaar is, hangt.
+
+   De IJKINGEN zijn een ander soort werk. meterijk draait elke geijkte meter
+   een keer op een geplante fout, en sommige van die meters lopen zelf het hele
+   huis af; gemeten op 31 augustus 2026 duurde dat 650 seconden. Met tien
+   minuten werd die ijking in een volle lokale ronde dus AFGEBROKEN -- en een
+   afgebroken ijking zegt niets, terwijl hij in de samenvatting niet als gezakt
+   telt. De CI wist dit al en geeft elke ijking een eigen job met 45 minuten
+   (.github/workflows/ci.yml); lokaal stond er per ongeluk de grens van een
+   ander soort bestand.
+
+   DEZE GRENS MOET HIER STAAN EN KAN NIET IN DE TOETS. Een `{ timeout }` bij
+   een test binnen het bestand komt te laat: node hangt de tijdgrens aan het
+   BESTAND (de uitvoer noemt "Subtest: test/meterijk.test.js" op regel 1) en
+   breekt het geheel af voordat de eigen grens van een test aan de beurt is.
+   Dat is nagemeten: met veertig minuten in het bestand zelf zakte hij nog
+   steeds na exact 600018 ms.
+
+   Veertig minuten is ruim boven de gemeten 650 seconden en ruim onder de
+   jobgrens van de CI, zodat een ijking die werkelijk hangt nog steeds opvalt.
+   Verlaag hem niet om een trage machine te dwingen, en verhoog hem niet zonder
+   de meting erbij te zetten. */
+const TIJDGRENS = 600000;
+const TIJDGRENS_IJKING = 40 * 60 * 1000;
+
 let batch = 0;
-function draai(namen, parallel, metVloer) {
+function draai(namen, parallel, metVloer, tijdgrens) {
   if (!namen.length) return 0;
-  /* Een toets die niet afkomt krijgt na tien minuten een naam en een fout.
-     --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
+  /* --test-force-exit vangt de andere hanger af: alle toetsen zijn klaar, maar
      een gelekt handvat houdt het kindproces anders onbeperkt open. */
   const args = ['--test', '--test-concurrency=' + parallel,
-    '--test-timeout=600000', '--test-force-exit'];
+    '--test-timeout=' + (tijdgrens || TIJDGRENS), '--test-force-exit'];
   if (metVloer && dekkingVloer.length === 3) {
     args.push('--experimental-test-coverage',
       '--test-coverage-lines=' + dekkingVloer[0],
@@ -194,7 +220,7 @@ if (zonderIjkingen && !selectie.length) console.log('[tests] zonder de losse ijk
 let code = draai(gewoon, concurrency, true);
 for (const naam of geïsoleerd) {
   console.log('[tests] geïsoleerd: ' + naam);
-  const uit = draai([naam], 1, false);
+  const uit = draai([naam], 1, false, IJKINGEN.includes(naam) ? TIJDGRENS_IJKING : TIJDGRENS);
   if (uit && !code) code = uit;
 }
 geefAfbouwSlotVrij();

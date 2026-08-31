@@ -152,6 +152,32 @@ altijd aan de **ankerzijde**, Rahul altijd aan de **duimzijde**, het midden
 begint altijd met waar je bent. Wat verandert is de inhoud van het midden, nooit
 de plekken.
 
+### De sprong staat overal, en hij staat aan de duimzijde
+
+De schilbalk is er alleen op de werktafel. Elk ander scherm van dit huis — en dat
+zijn er ruim tweehonderd — had zijn eigen bediening en verder niets: geen weg
+naar een andere wereld, geen zoekveld, geen lijst van wat er nog meer is. Gemeten
+lag daardoor 119 keer een functie op drie tikken en 24 keer op vijf, en 52
+schermen nergens (`TIKKEN.md`).
+
+De **sprong** (`shared/sprong.js`) is daarvoor het tweede instrument: één greep,
+op elk scherm op dezelfde plek, met daarachter alles wat je kunt openen én wat je
+hier kunt doen. Twee tikken, waar je ook staat.
+
+Drie regels die hem adaptief maken in plaats van "een knop erbij":
+
+- hij staat aan de **duimzijde** en spiegelt dus mee met `data-hand`, net als
+  Rahul in de balk;
+- hij staat **boven** de schilbalk en nooit erop: twee instrumenten die elkaar
+  overlappen is er één te veel;
+- hij bestaat **niet in een blad**. Een werkblad is een iframe met een gewone
+  pagina erin; zonder die regel stond dezelfde deur twee keer op het scherm, en
+  opende de binnenste een lijst binnen een lijst.
+
+Op de werktafel zelf opent hij de zoeklade die daar al woonde in plaats van een
+eigen lijst te tekenen: twee spotlights naast elkaar is precies de fout die het
+tweede bank-kopje ooit maakte (`WERELD.md`).
+
 ### Ankerzijde en duimzijde, en waarom hier niet "links" en "rechts" staat
 
 Hier stond: *"links is altijd de bank, rechts is altijd Rahul."* Dat klopte voor

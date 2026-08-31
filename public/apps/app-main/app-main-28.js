@@ -124,6 +124,21 @@
     if (t) t.click();
   }, 600);
 
+  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
+     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
+     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
+     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
+     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
+
+     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
+     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
+     bericht nooit een tab openen die u niet hoort te hebben. */
+  const stand = /^#tab=(.+)$/.exec(location.hash);
+  if (stand) setTimeout(() => {
+    const t = tabKnop(decodeURIComponent(stand[1]));
+    if (t) t.click();
+  }, 600);
+
   /* ---------- batterij in de statusbalk, zoals op een telefoon ---------- */
   const bat = $('#osBat'), batVul = $('#osBatVul'), batPct = $('#osBatPct');
   if (bat && navigator.getBattery) {

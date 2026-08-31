@@ -66,10 +66,28 @@ test('na de wachttijd wordt er precies EEN keer gespoeld', async () => {
      AFWEZIGHEID; daar is de tijd zelf de meting en blijven ze staan.) */
   let gespoeld;
   const eersteSpoeling = new Promise((r) => { gespoeld = r; });
+  /* EEN ANKER, EN DIT IS GEEN WACHTEN OP DE KLOK.
+
+     De spoeling van het journaal hangt aan een setTimeout met unref() -- met
+     opzet, want een wachtende spoeling hoort het afsluiten van de server niet
+     tegen te houden (server/kern/doorgeefjournaal.js). Een unref'd timer houdt
+     de gebeurtenislus echter ook niet wakker: is er verder niets te doen, dan
+     besluit node dat het werk op is, en dan meldt de testrunner "Promise
+     resolution is still pending but the event loop has already resolved" en
+     BREEKT DEZE HELE BESTAND AF -- de vier toetsen hieronder werden zo mee
+     afgebroken zonder ooit gedraaid te hebben.
+
+     Op node v24 gebeurde dat niet en op v22 wel; allebei zitten ze binnen de
+     engines-band van dit huis, dus dit is geen versieprobleem maar een
+     onuitgesproken aanname in de toets. Het anker is een gewone, WEL
+     vastgehouden timer die alleen bestaat zolang we wachten: hij meet niets en
+     bepaalt niets -- hij houdt de lus wakker zodat de spoeling nog kan komen.
+     Zodra ze er is, gaat hij weg. */
+  const anker = setTimeout(() => {}, 30000);
   const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null,
     save: () => { schrijfacties++; gespoeld(); } });
   for (let i = 0; i < 50; i++) j.journaalBinnen({ wat: '/api/weg', methode: 'GET', status: 500, mislukt: true });
-  await eersteSpoeling;
+  try { await eersteSpoeling; } finally { clearTimeout(anker); }
   assert.equal(schrijfacties, 1,
     'vijftig mislukkingen binnen een seconde horen samen EEN schrijfactie te kosten, niet vijftig');
 });

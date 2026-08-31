@@ -42,6 +42,7 @@
   .verborgen{display:none;}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/wereldrooster.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
@@ -66,6 +67,23 @@
   </div>
   <div id="uit"></div>
   <div class="kaart" id="campagnes"></div>
+  <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
+       geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
+       dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
+       achterloopt. Het redactionele rooster hierboven blijft staan --
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md).
+
+       `rtgdeel-vast` omdat dit blok geen DEEL van de pagina is maar een vaste
+       bijlage: zonder die klasse maakt shared/deelmenu.js er een eigen knop bij,
+       en op een samenhanglaag als /apps/kantoor.html hoort geen enkel
+       bedieningselement te staan (test/kantoor.e2e.js). -->
+  <section class="hero rtgdeel-vast" aria-labelledby="allesFoundationOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesFoundationOS">Alles wat in FoundationOS hangt.</h2><div class="wrooster">
+  <!-- WERELDROOSTER:FoundationOS -->
+    <a class="wrooster-kaart" href="/apps/foundation/bord.html"><span>Het bord</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/schrift.html"><span>Het schrift</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/os-publiek.html"><span>RTFoundation in uw buurt</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/os-portaal.html"><span>RTFoundation portaal</span></a>
+  <!-- /WERELDROOSTER --></div></section>
 </main>
 
 <script>

@@ -57,6 +57,7 @@
     .doelgroeppoorten{grid-template-columns:1fr}}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/wereldrooster.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="work">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -222,6 +223,31 @@
 
   <div class="regkop"><h2>De kantoorwereld</h2></div>
   <div class="poorten" id="poorten"></div>
+  <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
+       geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
+       dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
+       achterloopt. Het redactionele rooster hierboven blijft staan --
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md).
+
+       `rtgdeel-vast` omdat dit blok geen DEEL van de pagina is maar een vaste
+       bijlage: zonder die klasse maakt shared/deelmenu.js er een eigen knop bij,
+       en op een samenhanglaag als /apps/kantoor.html hoort geen enkel
+       bedieningselement te staan (test/kantoor.e2e.js). -->
+  <section class="hero rtgdeel-vast" aria-labelledby="allesWorkOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesWorkOS">Alles wat in WorkOS hangt.</h2><div class="wrooster">
+  <!-- WERELDROOSTER:WorkOS -->
+    <a class="wrooster-kaart" href="/apps/office.html"><span>Documenten</span></a>
+    <a class="wrooster-kaart" href="/apps/horeca.html"><span>Horeca</span></a>
+    <a class="wrooster-kaart" href="/apps/loonstrook.html"><span>Loon</span></a>
+    <a class="wrooster-kaart" href="/apps/magnaat.html"><span>Magnaat</span></a>
+    <a class="wrooster-kaart" href="/apps/onderneming.html"><span>Onderneming</span></a>
+    <a class="wrooster-kaart" href="/apps/partner-network.html"><span>Partner Network</span></a>
+    <a class="wrooster-kaart" href="/apps/rtgone.html"><span>RTG One</span></a>
+    <a class="wrooster-kaart" href="/apps/werk.html"><span>RTG Werk OS</span></a>
+    <a class="wrooster-kaart" href="/apps/rtmail.html"><span>RTMail</span></a>
+    <a class="wrooster-kaart" href="/apps/rtgschool.html"><span>School</span></a>
+    <a class="wrooster-kaart" href="/apps/browser.html"><span>Web</span></a>
+    <a class="wrooster-kaart" href="/apps/sitemaker.html"><span>Website</span></a>
+  <!-- /WERELDROOSTER --></div></section>
 </main>
 
 <!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder

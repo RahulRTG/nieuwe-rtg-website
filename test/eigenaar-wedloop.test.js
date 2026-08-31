@@ -46,8 +46,24 @@ const HOEVEEL = 3;      // drie processen: net als de vloot, en genoeg om te bot
 
    Wachten kost hier niets: een proces dat OMVALT breekt de lus meteen af (zie
    de controle op `gestopt` hieronder), dus een echte terugval zakt nog steeds
-   binnen een paar seconden. Alleen een trage opkomst krijgt meer lucht. */
-const OPKOMST = 120000;
+   binnen een paar seconden. Alleen een trage opkomst krijgt meer lucht.
+
+   EN OP 31 AUGUSTUS 2026 WAS 120 S OOK NIET GENOEG. In de CI draaien vier
+   toetsscherven tegelijk op dezelfde runner, elk met hun eigen servers, plus een
+   postgres en een redis in containers ernaast. Deze toets zakte daar op de
+   volle 120 s met opnieuw geen enkel omgevallen proces: drie node-processen die
+   op twee kernen om de beurt mogen opstarten, halen die klok niet.
+
+   Dus 300 s, en de reden dat dat geen doekje voor het bloeden is staat
+   hierboven: dit is geen prestatietoets. Wat hij bewijst is dat drie servers op
+   dezelfde database elkaar niet omverduwen en samen EEN grootboek overhouden.
+   De tijd is het vervoermiddel, niet de bewering -- en de jobgrens van de CI
+   (45 minuten) blijft de echte vangrail voor iets dat werkelijk hangt.
+
+   Zou dit ooit nog eens zakken op de klok, dan is de volgende stap niet weer
+   meer tijd maar de opstart zelf meten: hoe lang doet EEN server hier over, en
+   waarom loopt dat uit de hand. */
+const OPKOMST = 300000;
 
 function vrijePoort() {
   return new Promise((res, rej) => {
@@ -104,8 +120,14 @@ test('drie servers die tegelijk opkomen op een gedeelde database botsen niet op 
     assert.equal(omgevallen.length, 0,
       'geen enkele server valt om bij het gelijktijdig opstarten; omgevallen: ' +
       JSON.stringify(omgevallen.map(k => ({ poort: k.poort, code: k.gestopt, fout: k.fouten[0] || null }))));
-    assert.ok(alle, 'en alle ' + HOEVEEL + ' antwoorden op /api/health binnen ' +
-      Math.round(OPKOMST / 1000) + 's');
+    /* Zakt hij toch op de klok, dan zegt de melding WELKE server niet
+       antwoordde. Zonder dat is de enige aanwijzing "een van de drie", en dan
+       begint het zoeken bij nul. */
+    if (!alle) {
+      const standen = await Promise.all(kinderen.map(async k => ({ poort: k.poort, gezond: await gezond(k.poort) })));
+      assert.fail('niet alle ' + HOEVEEL + ' servers antwoordden op /api/health binnen ' +
+        Math.round(OPKOMST / 1000) + 's; stand: ' + JSON.stringify(standen));
+    }
 
     /* EN HET GROOTBOEK IS ER MAAR EEN. Niemand omgevallen is de helft van de
        vraag; de andere helft is of de migraties ook precies EEN KEER zijn

@@ -88,3 +88,82 @@ test('4. de grens-posten sluiten nooit, en dat staat er ook', () => {
   assert.match(uit.uitleg, /sluit nooit/,
     'het register zegt zelf dat een grens-post nooit sluit; anders leest hij als achterstand');
 });
+
+/* ---------------------------------------------------------------------------
+   DE AFLOSREGEL. De ratel hierboven weigert GROEI, en dat is niet hetzelfde als
+   aflossen: een lijst die nooit stijgt en nooit daalt haalt nul nooit. Deze
+   toetsen houden vast dat het doel in het register staat, dat het nul is, en
+   dat stilstand opvalt.
+   ------------------------------------------------------------------------- */
+
+test('5. het doel staat in het register en het is nul', () => {
+  const uit = schuld.meet();
+  assert.equal(uit.aflossing.doel, 0, 'een schuldenlijst zonder doel is een plek om werk te stallen');
+  assert.equal(uit.aflossing.staat, uit.telling.meetwerk + uit.telling.instrument,
+    'de stand van de aflossing moet DE achterstand zijn, niet een tweede telling ernaast');
+  assert.ok(uit.aflossing.regels.length >= 4);
+  assert.ok(uit.aflossing.wat.includes('grens'),
+    'het doel moet zeggen dat `grens` niet meetelt, anders is nul onhaalbaar en dus geen doel');
+});
+
+test('6. nul betekent leeg, niet herbenoemd', () => {
+  const uit = schuld.meet();
+  /* De gevaarlijkste manier om op nul te komen is elke post `grens` noemen.
+     Toets 4 hierboven verbiedt die verhuizing al; hier staat dat de definitie
+     van nul dezelfde twee soorten noemt, zodat de twee niet uit elkaar lopen. */
+  assert.match(uit.aflossing.regels.join(' '), /herbenoemd/);
+  const grenzen = uit.posten.filter(p => p.soort === 'grens');
+  assert.ok(grenzen.length < uit.posten.length,
+    'alles is `grens` geworden -- dan is de achterstand nul zonder dat er iets is gemeten');
+});
+
+test('7. een post die drie rondes stilstaat, wordt gemeld', () => {
+  const b = path.join(__dirname, '..', 'BEWIJSSCHULD.json');
+  if (!fs.existsSync(b)) return;
+  const u = JSON.parse(fs.readFileSync(b, 'utf8'));
+  assert.ok(u.historie, 'zonder historie kan stilstand niet opvallen');
+  for (const [id, rij] of Object.entries(u.historie)) {
+    assert.ok(Array.isArray(rij) && rij.length <= 3, id + ': de historie is drie meetdagen diep, geen tijdreeks');
+    const dagen = rij.map(r => r.op);
+    assert.equal(new Set(dagen).size, dagen.length,
+      id + ': twee regels op dezelfde dag -- dan telt de melder aanroepen in plaats van dagen, ' +
+      'en gaat hij af van het meten zelf');
+    for (const r of rij) assert.match(String(r.op), /^\d{4}-\d{2}-\d{2}$/, id + ': een regel zonder datum');
+  }
+  /* Elke gemelde post moet ook werkelijk stilstaan, en elke stilstaande post
+     moet gemeld zijn. Anders is de melder decoratie. */
+  const stil = new Set((u.stilstaand || []).map(s => s.id));
+  for (const p of u.posten) {
+    const rij = u.historie[p.id] || [];
+    const staatStil = p.soort !== 'grens' && typeof p.aantal === 'number' && p.aantal > 0 &&
+      rij.length >= 3 && rij.every(x => x.aantal === rij[0].aantal);
+    assert.equal(stil.has(p.id), staatStil, p.id + ': de stilstandmelding klopt niet met de historie');
+  }
+  for (const s of (u.stilstaand || [])) assert.ok(s.reden && s.reden.includes('Sluitweg'),
+    s.id + ': gemeld als stilstaand zonder te zeggen wat hem sluit');
+});
+
+test('8. de melder gaat af na drie MEETDAGEN, en niet eerder', () => {
+  const post = { id: 'p', soort: 'meetwerk', aantal: 10, sluit: 'meten met het bestaande instrument' };
+  const dag = (op, aantal) => ({ op, aantal });
+
+  const twee = schuld.stilstandUit([post], { p: [dag('2026-08-29', 10), dag('2026-08-30', 10)] });
+  assert.equal(twee.length, 0, 'twee dagen is nog geen stilstand');
+
+  const drie = schuld.stilstandUit([post], { p: [dag('2026-08-29', 10), dag('2026-08-30', 10), dag('2026-08-31', 10)] });
+  assert.equal(drie.length, 1, 'drie dagen op hetzelfde getal is stilstand en hoort gemeld');
+  assert.ok(drie[0].reden.includes('Sluitweg'));
+
+  const bewoog = schuld.stilstandUit([post], { p: [dag('2026-08-29', 12), dag('2026-08-30', 11), dag('2026-08-31', 10)] });
+  assert.equal(bewoog.length, 0, 'een post die aflost is geen stilstand');
+
+  /* Een grens sluit nooit; die eeuwig melden leert mensen de melding negeren. */
+  const g = schuld.stilstandUit([{ ...post, soort: 'grens' }],
+    { p: [dag('2026-08-29', 10), dag('2026-08-30', 10), dag('2026-08-31', 10)] });
+  assert.equal(g.length, 0, 'een `grens` staat per definitie stil en is geen stokkende aflossing');
+
+  /* Op nul is er niets meer te melden -- dat is het doel, niet een probleem. */
+  const nul = schuld.stilstandUit([{ ...post, aantal: 0 }],
+    { p: [dag('2026-08-29', 0), dag('2026-08-30', 0), dag('2026-08-31', 0)] });
+  assert.equal(nul.length, 0, 'een gesloten post melden als stokkend maakt het doel onbereikbaar');
+});

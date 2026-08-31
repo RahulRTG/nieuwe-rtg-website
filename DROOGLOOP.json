@@ -1,0 +1,199 @@
+{
+ "uitleg": "Een plan werkelijk uitgevoerd tegen een wegwerpserver met een eigen datamap, en per stap gemeten welke collecties bewogen. Dit is een waarneming aan DEZE invoer, geen projectie.",
+ "doel": "een handvol stappen van een lid, om te zien wat er werkelijk verandert",
+ "stappen": [
+  {
+   "id": "s1",
+   "capability": "/api/pay/overzicht",
+   "status": 200,
+   "gewijzigd": [
+    "store.db:apiSpoor",
+    "store.db:bankregie",
+    "store.db:handelingLog",
+    "store.db:ledenBoard",
+    "store.db:paySaldi",
+    "store.db:payVerzoeken",
+    "store.db:rtgai",
+    "store.db:waardeReserves"
+   ],
+   "domein": [
+    "store.db:bankregie",
+    "store.db:ledenBoard",
+    "store.db:paySaldi",
+    "store.db:payVerzoeken",
+    "store.db:waardeReserves"
+   ],
+   "sporen": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "bevestigNodig": false,
+   "voorspeld": {
+    "graad": "geen-effect-gemeten",
+    "collecties": []
+   },
+   "klopteVoorspelling": false,
+   "gemeten": true,
+   "reden": "gemeten aan deze invoer"
+  },
+  {
+   "id": "s2",
+   "capability": "/api/agenda/mijn",
+   "status": 200,
+   "gewijzigd": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "domein": [],
+   "sporen": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "bevestigNodig": false,
+   "voorspeld": {
+    "graad": "geen-effect-gemeten",
+    "collecties": []
+   },
+   "klopteVoorspelling": true,
+   "gemeten": true,
+   "reden": "gemeten aan deze invoer"
+  },
+  {
+   "id": "s3",
+   "capability": "/api/leerstof/vakken",
+   "status": 200,
+   "gewijzigd": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:onderwijs",
+    "store.db:rtgai"
+   ],
+   "domein": [
+    "store.db:onderwijs"
+   ],
+   "sporen": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "bevestigNodig": false,
+   "voorspeld": {
+    "graad": "onbekend",
+    "collecties": []
+   },
+   "klopteVoorspelling": null,
+   "gemeten": true,
+   "reden": "gemeten aan deze invoer"
+  },
+  {
+   "id": "s4",
+   "capability": "/api/mediaos/stuur",
+   "status": 200,
+   "gewijzigd": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:mediaSmaak",
+    "store.db:rtgai"
+   ],
+   "domein": [
+    "store.db:mediaSmaak"
+   ],
+   "sporen": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "bevestigNodig": false,
+   "voorspeld": {
+    "graad": "onbekend",
+    "collecties": []
+   },
+   "klopteVoorspelling": null,
+   "gemeten": true,
+   "reden": "gemeten aan deze invoer"
+  },
+  {
+   "id": "s5",
+   "capability": "/api/agenda/toevoegen",
+   "status": 200,
+   "gewijzigd": [
+    "store.db:agendas",
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "domein": [
+    "store.db:agendas"
+   ],
+   "sporen": [
+    "store.db:apiSpoor",
+    "store.db:handelingLog",
+    "store.db:rtgai"
+   ],
+   "bevestigNodig": false,
+   "voorspeld": {
+    "graad": "gemeten",
+    "collecties": [
+     "agendas"
+    ]
+   },
+   "klopteVoorspelling": true,
+   "gemeten": true,
+   "reden": "gemeten aan deze invoer"
+  }
+ ],
+ "telling": {
+  "stappen": 5,
+  "gemeten": 5,
+  "nietGemeten": 0,
+  "collecties": 11,
+  "voorspellingBeoordeeld": 3,
+  "voorspellingKlopt": 2,
+  "voorspellingOnbekend": 2
+ },
+ "huishouding": {
+  "sporen": [
+   "apiSpoor",
+   "handelingLog",
+   "rtgai"
+  ],
+  "uitleg": "deze collecties schrijft ELKE oproep, ook een die alleen leest; ze staan apart zodat het gevolg van de handeling zelf zichtbaar blijft"
+ },
+ "geraakteCollecties": [
+  "store.db:agendas",
+  "store.db:apiSpoor",
+  "store.db:bankregie",
+  "store.db:handelingLog",
+  "store.db:ledenBoard",
+  "store.db:mediaSmaak",
+  "store.db:onderwijs",
+  "store.db:paySaldi",
+  "store.db:payVerzoeken",
+  "store.db:rtgai",
+  "store.db:waardeReserves"
+ ],
+ "afwijkingen": [
+  {
+   "capability": "/api/pay/overzicht",
+   "voorspeld": "geen-effect-gemeten",
+   "waargenomen": [
+    "store.db:bankregie",
+    "store.db:ledenBoard",
+    "store.db:paySaldi",
+    "store.db:payVerzoeken",
+    "store.db:waardeReserves"
+   ],
+   "reden": "de proefronde zag niets veranderen; met deze invoer veranderde er wel iets"
+  }
+ ],
+ "grenzen": [
+  "een stap op niveau `voorstel` wordt niet bevestigd: bevestigen is mensenwerk, dus wat daarachter gebeurt blijft ongemeten",
+  "de gegevens komen uit de zaaiset; een plan dat op de gegevens van een echt lid leunt doet hier iets anders",
+  "alles buiten de opslag blijft onzichtbaar: mail, een betaalprovider, een derde partij",
+  "gemeten wordt WELKE collectie bewoog, niet hoeveel erin veranderde",
+  "een voorspelling op `onbekend` wordt niet beoordeeld: onbekend kan niet fout zijn, en dat als goed tellen zou de uitslag opkloppen"
+ ]
+}

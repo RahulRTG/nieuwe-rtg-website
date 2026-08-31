@@ -62,6 +62,18 @@ const REGISTER = {
      buiten valt, en een vloer van 60% voor de vindbaarheid -- en allebei worden
      ze door test/sprongindex.test.js in controlestand gedraaid. Die toets noemt
      ze bij naam, dus de bewering is na te trekken en niet alleen opgeschreven. */
+  /* DE REGISTERS VAN DE UITVOERINGSLAAG (EXECUTIE.md). Zij hingen aan geen
+     enkele ratel, en dat was geen detail: zes metingen waarvan niemand zou zien
+     dat ze zakken. Elk draagt nu zijn grondwaarde in de genoemde toets --
+     dekking, bewezen paren, besloten treden -- en niet in NORM.json, want dit
+     zijn lijsten en geen enkelvoudige getallen. */
+  'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
+  'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+  'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
+  'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
+  'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },
+
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },
   'BEWIJSMATRIX.json': { eigenRatel: 'scripts/bewijsmatrix.js' },

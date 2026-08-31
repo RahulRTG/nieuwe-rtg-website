@@ -6,28 +6,10 @@
    budget van 24. Zonder sleutel geeft dit null terug en blijven de vaste antwoorden
    van de assistenten staan. Draait op de context die kern/stuur.js opbouwt. */
 const { TWIJFELREGELS, magDoen } = require('../rahul/twijfel');
-
-/* De twee gereedschappen. Staan buiten de fabriek omdat ze vast zijn, en
-   omdat de twijfelpoort alleen dichtzit als `zeker` en `begrepen` ECHT
-   verplichte velden zijn; dat is nu van buitenaf te controleren
-   (test/rahul-mens.test.js). */
-const TOOLS = [
-  { name: 'kaart', description: 'De lijst API-paden (POST) die je met "doe" kunt aanroepen.',
-    input_schema: { type: 'object', properties: {} } },
-  /* `zeker` en `begrepen` zijn geen formaliteit maar de poort tegen twijfel
-     (kern/rahul/twijfel.js). Het model moet expliciet verklaren dat het het
-     zeker weet en in een zin opschrijven wat het gaat doen; lukt dat niet,
-     dan hoort het te vragen in plaats van te doen. Dit is een gedragsrem, geen
-     autorisatiegrens: die staat server-side in stuur/beleid + goedkeuring. */
-  { name: 'doe', description: 'Voer een actie uit op een RTG API-pad (POST), met de inlog van de gebruiker. ' +
-      'Alleen gebruiken als je het ZEKER weet: zet zeker=true en beschrijf in "begrepen" in een zin wat je gaat doen en voor wie. ' +
-      'Twijfel je over wat, wanneer, hoeveel, waar of voor wie, gebruik deze tool dan NIET maar stel eerst een vraag.',
-    input_schema: { type: 'object', properties: {
-      pad: { type: 'string' }, body: { type: 'object' },
-      zeker: { type: 'boolean', description: 'true als je zonder enige twijfel weet wat er moet gebeuren' },
-      begrepen: { type: 'string', description: 'in een korte zin: wat ga je precies doen en voor wie' } },
-      required: ['pad', 'zeker', 'begrepen'] } }
-];
+const { resolveer } = require('./resolver');
+const { compileer } = require('./plan');
+const { voorspel } = require('./gevolg');
+const { TOOLS } = require('./gereedschap');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs }) => {
   const LUS_REGELS = TWIJFELREGELS.join(' ') + ' ' +
@@ -54,7 +36,10 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
     /* Eén tool-lus met een stappen-budget en een globale teller. Geeft de
        eindtekst (als de agent klaar is) en de nieuwe tellerstand terug. `label`
        is de menselijke kop die tijdens deze (deel)taak wordt gestreamd. */
-    async function loop(messages, budget, tel, totaal, label) {
+    /* `deeltaak` gaat mee naar de resolver: bij een zware opdracht zegt de
+       deelstap beter waar deze lus over gaat dan het hoofddoel. Beide wegen. */
+    async function loop(messages, budget, tel, totaal, label, deeltaak) {
+      const kaartVraag = deeltaak ? vraag + ' ' + deeltaak : vraag;
       for (let s = 0; s < budget; s++) {
         const resp = await anthropic.messages.create({
           model: 'claude-sonnet-5', max_tokens: 1400, system: systeem, tools: TOOLS, messages
@@ -68,7 +53,25 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
         const uitkomsten = [];
         for (const t of wilTools) {
           let uit;
-          if (t.name === 'kaart') uit = { paden: paden() };
+          if (t.name === 'plan') {
+            /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets
+               aan; wat hij teruggeeft is een oordeel dat het model aan de
+               gebruiker kan voorlezen voordat er een voorstel ontstaat. */
+            /* Het plan en de gevolgvoorspelling reizen SAMEN terug maar zijn
+               twee dingen: ./plan.js weegt de bevoegdheid, ./gevolg.js zegt uit
+               een eerdere meting wat de stappen aanraakten. Ze worden hier
+               samengevoegd tot een antwoord; het plan zelf bezit de voorspelling
+               niet (EXECUTIE.md blok 3: PLAN bezit niets). */
+            const gewogen = compileer(t.input || {}, opties.wereld);
+            uit = Object.assign({}, gewogen, { gevolg: voorspel(gewogen) });
+            acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
+          }
+          else if (t.name === 'kaart') {
+            const toegestaan = paden();
+            uit = (t.input && t.input.alles)
+              ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
+              : resolveer(kaartVraag, toegestaan);
+          }
           else {
             /* De twijfelpoort staat VOOR de aanroep. Zonder expliciete
                zekerheid gebeurt er niets en krijgt het model te horen dat het
@@ -126,7 +129,7 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
         const seed = [{ role: 'user', content:
           'Hoofddoel van de gebruiker: ' + vraag + '\nVoer NU alleen deze deeltaak volledig uit: ' + label +
           '\nStop zodra deze deeltaak klaar is en meld kort het resultaat.' }];
-        const r = await loop(seed, Math.min(perSub, totaal - tel), tel, totaal, label);
+        const r = await loop(seed, Math.min(perSub, totaal - tel), tel, totaal, label, label);
         tel = r.tel;
         deel.push('- ' + label + ': ' + (r.tekst || 'gedaan'));
       }

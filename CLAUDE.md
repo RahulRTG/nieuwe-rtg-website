@@ -426,8 +426,9 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
-zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->3803<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3080<!--/getal--> ongemeten (`IDEMPROEF.json`,
+levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
 
@@ -437,8 +438,8 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **twintig**, 91% van de leden woont in
-precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->249<!--/getal--> leden,
+91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
 toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
@@ -454,8 +455,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de 115 beproefde muterende routes zijn er 15
-retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1563<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1561<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -537,8 +538,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 96 namen die in meer dan
-één domein staan, dragen er **78 meer dan één betekenis** — samen 284
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->111<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->94<!--/getal--> meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -716,6 +717,185 @@ laat een geschorste capability uit `toegestanePaden` vallen). Lees vooral
 paragraaf 5, de grenzen: de AI kan nooit meer dan de persoon die hem iets vraagt,
 geld verlaat het huis nooit vanzelf, wat een tweede persoon bereikt bevestigt een
 mens, en autonomie wordt gepromoveerd en nooit geslopen.
+
+**`EXECUTIE.md` is de laag eronder** -- de RTG Execution Plane: niet "we moeten
+een veilige AI-executielaag ontwerpen" maar "we hebben meerdere volwassen
+executiemechanismen die nog niet als een platformwaarheid functioneren". Lees die
+voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
+vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
+scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
+een geplande taak leveren allemaal intentie -- alleen de execution plane
+veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/command/risico.js`
+rekent per geval uit of iets `hand`, `assist` of `auto` mag (met de score-opbouw
+erbij, want een cijfer zonder opbouw is een orakel), terwijl `kern/stuur/beleid.js`
+er naast staat met 21 patronen `direct` en 27 `voorstel`, vast per route en
+ongeacht bedrag. **Het zijn er trouwens vijf en geen twee** -- `scripts/gezag.js`
+registreert vijf gezagsvocabulaires plus 22 losse niveaunamen -- en ze botsen
+vandaag NERGENS: van de 120/40/16 AI-bedienbare paden is er geen enkele een
+Command-route. Dat is geen geruststelling maar een tijdvenster, want PLAN heeft
+die kruising nodig. De eerste opdracht is daarom semantische consolidatie en geen
+featurewerk. Vijf van de zeven "grote sprongen" blijken al gebouwd, alleen voor
+de ops-cockpit: voor- en nacontrole (`command/transactie-poorten.js`, waar *een
+controle die niet kon draaien niet geslaagd is* en de verificatie POSITIEF
+nakijkt), de transactie met terugweg, de zandbak die uit de zaaiset draait en
+niet uit productie, de simulatie met haar aannames in de uitslag, en het
+ketenspoor van `kern/envelop.js`. Echt ontbrekend zijn er vier: **PLAN als
+object**, de capability-compiler, het mandaat, en de optimizer zelf. Zes grenzen
+bovenop die van FABRIC.md, waarvan de drie scherpste: een **mandaat verleent
+nooit vermogen** maar versmalt alleen bestaand bewezen vermogen (de speelruimte
+is een doorsnede en geen optelsom), **voorbereiden, verplichten en betalen zijn
+drie gebeurtenissen** die er als een knop uitzien terwijl GELD.md erboven staat,
+en de **executiekaart is een projectie en nooit een bron** -- wie hem met de hand
+kan bijwerken heeft de 22e capabilitylijst gemaakt. Let op par. 5 voor je een
+volgorde kiest: `VERTROUWEN.json` staat op **0 bewezen, 0 geschorst en 4180
+verzwakt**, dus de bewijspoort houdt vandaag niets tegen en de regel "onbekende
+uitvoeringssemantiek krijgt nooit maximale autonomie" zet nu ALLES op het
+minimum -- die hoort dus eerst in de schaduw te lopen. De stuurmaat is niet
+"wanneer hebben we Mijn AI" maar **wanneer kan RTG een volledige keten
+bewijzen**; par. 7 zet er een van vier routes klaar, met per route gemeten wat
+er nog aan ontbreekt en waarom (twee zijn ongemeten omdat de proef geen
+gekoppelde groothandel had, niet omdat ze riskant zijn). **Blok 0 staat**
+(`server/kern/stuur/resolver.js`): de tool `kaart` geeft niet langer alles wat
+een rol mag maar de paden die DEZE opdracht raken -- **het succescriterium is DEKKING en
+niet compactheid** -- liever veertien relevante paden dan drie waarvan de juiste
+ontbreekt. Daarom twee meters en met opzet geen samengesteld cijfer
+(`npm run resolver`, over 27 zinnen in negen taalvormen): versmalling 89% kleiner
+(werkveld 8,8 paden) en **dekking 100%**, en het script eindigt met een foutcode
+zodra die dekking zakt. De dekkingsmeter verdiende zich meteen terug met drie
+gemiste vermogens, waaronder een zin met twee typefouten die naar EEN pad
+versmalde dat er niets mee te maken had -- daaruit volgt de regel *dun bewijs is
+geen bewijs*: raakt maar een woord iets terwijl de vraag er drie draagt, dan gaat
+de volledige lijst terug. **Blok 2 staat als MEETLAAG en niet als beslisser**
+(`scripts/gezagsnoemer.js`, `npm run gezagsnoemer`): een vier-tredige noemer
+(`geen` / `tonen` / `klaarzetten` / `uitvoeren`) waarin alle vijf schalen worden
+verklaard -- 16 treden evident met een citaat dat letterlijk in de bron moet
+staan, 3 aangenomen en 1 ONBEPAALD. Die laatste is de scherpste: `direct` in de
+AI-allowlist betekent "lezen OF een kleine omkeerbare handeling", en dat zijn twee
+noemertreden in een woord. De noemer beslist met opzet niets en woont daarom in
+`scripts/`; `test/gezagsnoemer.test.js` zakt zodra iets uit `server/` hem
+importeert, want dan is hij de zesde gezagsschaal in plaats van de laag
+eroverheen. **De vier besluiten zijn genomen (31 augustus 2026)** en de noemer staat op 18
+evident, 3 besloten, 0 open. Drie ervan hebben dezelfde vorm: wat de machine mag
+is een vraag, hoe ver hij mag gaan is een tweede -- `autonoom` en `begrensd`
+blijven daarom eigenschappen (van het mandaat, van de uitvoering) en worden geen
+trede. De vierde is in code uitgevoerd: **`direct` is gesplitst in `lezen` en
+`klein`** (`kern/stuur/beleid.js`), en dat legde vijf routes bloot die in de
+lezen-lijst stonden en aantoonbaar schrijven -- mediaos/stuur en /volg,
+leerstof/oefen en /antwoord, en bijles/vraag. De splitsing verplaatst geen
+bevoegdheid: `lezen` + `klein` is exact de oude `direct`, en
+`test/stuur-niveaus.test.js` houdt dat vast met de oude lijst er letterlijk in
+overgeschreven. **De dekking van de resolver wordt inmiddels GEGENEREERD gemeten**
+(`npm run resolverbereik`): een vraag per toegestaan pad in zeven vervormingen --
+1232 proeven, dekking 100%, en het corpus groeit mee met het platform in plaats
+van met de pen van wie het opschreef. Dat vond meteen 17 verborgen vermogens: de
+afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/betaal
+viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
+willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
+**En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->`), en
+`test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
+register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
+Nul merktekens is daar geen "in orde" maar een gezakte meter. **Blok 1 staat**: `EXECUTION_MAP.json`
+(`npm run executionmap`) is een PROJECTIE van 3282 routes -- bereikbaarheid uit
+`beleid.js`, gezagstrede uit de noemer, bewijs uit `VERTROUWEN.json`,
+herhaalbaarheid uit `IDEMPROEF.json` -- met risico, herstel en kosten als
+`ONBEPAALD` MET REDEN, want die zijn statisch niet af te leiden. Drie
+handhavingen, alle drie zakken ze: met de hand gewijzigd is rood (byte voor byte
+hercompileren), een generator die iets anders doet zonder bronwijziging is
+hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
+nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
+zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
+vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. **Blok 5 is half een vondst en half een negatief.** De
+HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 126 routes in zeven
+klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
+plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
+bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
+(`npm run herstel`, `HERSTEL.json`) en de uitkomst is dat hij NIET af te leiden
+is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
+(2,4%), 4 zijn dubbelzinnig en 0 waren er bevestigd. Niets komt boven de graad
+`vermoed` uit een naam, want /agenda/bewaar is geen omkering van /verwijder. Wat
+herstel nodig had bleek geen verklaringsregister maar een PROEF, en die staat er:
+`scripts/herstelproef.js` VOERT het paar uit (heen, kijken, terug, kijken) en
+vergelijkt de INHOUD van de opslag -- over 90 paren: 13 `exact`, 30
+`compensatie`, 1 `geen-herstel`, **0 niet beproefd** en 46 die een WERELD vragen
+die de proef niet opzet (een zaak met de werkvorm journalistiek, een ingericht landpakket, een
+salon), elk met wat er zou moeten bestaan erbij. Elk paar draagt dus een uitslag.
+`scripts/lib/herstelwereld.js` is daarvoor wat `idemwereld.js` voor de
+idempotentieproef is: de tegenhanger is de voorbereiding, het lijf staat per
+route, een voorziening laat het onderwerp langs de gewone route ontstaan, en de
+wereld gaat eenmalig aan. Hij draait drie sessies en haalt de rol uit
+IDEMPROEF.json, want wie /api/supplier/ ziet en daaruit leverancier afleidt zit
+er bij elke uitzondering naast. Alleen over die 42 mag een
+scherm of een bon iets over een terugweg zeggen, en dan met de SOORT erbij: een
+creditnota wist geen factuur, dus `exact` en `compensatie` worden nooit
+samengeteld. Twee dingen daar niet wegpoetsen: `nietBeproefd` is met opzet geen
+`geen-herstel` (een tekort van de proef is geen oordeel over het paar), en zonder
+de OPWARMRONDE bestaat de collectie nog niet en heet elk paar `compensatie` --
+een hoogste graad die niemand kan halen is geen graad. Drie dingen die daar stil verkeerd gingen en die je nergens anders
+moet herhalen: een verdict is een BESCHULDIGING (`geen-herstel` zegt dat een
+route liegt, dus dat oordeel wordt niet geveld als de sleutel uit het laatste
+element van een lijst is GERADEN), wachten op stilte is niet wachten op de
+schrijver (twee gelijke metingen vlak na een oproep zijn allebei van VOOR de
+schrijfronde, dus wordt er gewacht tot het beeld VERANDERT), en de proef
+beinvloedt zichzelf -- wat in de volle ronde niet lukt draait nog een keer alleen
+op een eigen server, en lukt het dan wel dan draagt de uitslag `ordeAfhankelijk`.
+Die opwarmronde heeft ook
+een prijs, en die staat in de uitslag: een EENMALIG gevolg (een kostenregel bij de
+eerste aanmaak) valt erin en wordt niet gemeten, dus `exact` betekent hier exact
+bij een TWEEDE en volgende uitvoering. De proef beproeft daarom ook de al
+bevestigde paren -- doet hij dat niet, dan verdwijnt een bevestiging bij de
+volgende ronde uit het register, en een bevestiging die zichzelf opheft is erger
+dan geen. Let ook op de tegenspraakregel
+die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
+bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. **Blok 3 staat** (`server/kern/stuur/plan.js`, gereedschap `plan`):
+het model levert doel + stappen, de compiler weegt ze en geeft een uitvoerbaar
+plan of een afwijzing MET bezwaren -- inclusief hoeveel bevestigingen het plan
+vooraf gaat vragen en welke. Vier regels houden hem klein en alle vier zakken ze
+op een mutatie: **PLAN voert niets uit** (getoetst op de BRON: geen fetch, geen
+stuurRoep), **PLAN bezit niets** (het oordeel is exact `beleidVoor()`), **de
+autoriteit komt LIVE en nooit uit EXECUTION_MAP.json** (een bouwartefact kan een
+commit achterlopen; de toets verandert de kaart en eist dat het oordeel niet
+meebeweegt), en **een verboden stap laat het hele plan zakken** in plaats van
+stil te worden overgeslagen. Wat PLAN met opzet NIET doet is de uitkomst van een
+stap doorgeven aan de volgende: zodra hij over gegevens gaat in plaats van over
+bevoegdheid, is hij niet meer klein. **Blok 4 staat half**: `kern/stuur/gevolg.js` hangt
+NAAST het plan en zegt uit een echte meting welke collecties de stappen
+aanraakten (`opslag` in IDEMPROEF.json -- 331 routes, 196 collecties). Drie
+graden, en over de 176 bereikbare paden zijn dat er 36 `gemeten`, 44
+`geen-effect-gemeten` en **96 `onbekend`**. Die laatste twee mogen NOOIT door
+elkaar lopen: "de proef kwam er niet bij" is iets anders dan "er gebeurt niets",
+en een plan dat "raakt niets aan" zegt terwijl niemand keek is een geruststelling
+zonder grond. Wat er NIET staat is een echte droogloop: het plan wordt niet in de
+zandbak uitgevoerd, er wordt een eerdere meting op geprojecteerd. **Blok 8 staat in de
+SCHADUW** (`kern/ai/router.js`): vijf technieken in volgorde -- regels,
+algoritme, optimalisatie, voorspelling, ai -- met een register van motoren die
+aantoonbaar bestaan en een uitslag die altijd een techniek EN een reden draagt.
+De vondst die het opende: de volgorde staat vandaag OMGEKEERD, want
+`demoantwoorden.js` levert al regelantwoorden maar staat in `kern/ai.js` NA het
+model. De router beslist daarom niets: hij meet hoe vaak een goedkopere techniek
+het gedekt zou hebben, en pas met dat getal is omdraaien een besluit in plaats
+van een gok (een matig regelantwoord dat een goed modelantwoord verdringt, merkt
+niemand). Hij wijst alleen naar motoren die laden, en de ontbrekende techniek
+staat er hardop bij: er is GEEN constraint solver -- kern/agent.js roostert op
+weekdagfactoren, en dat is een heuristiek. **Blok 6 staat als GRAMMATICA**
+(`kern/stuur/mandaat.js`): een mandaat verleent nooit vermogen maar VERSMALT
+bestaand vermogen, dus de speelruimte is een doorsnede die structureel niets kan
+toevoegen. Drie dingen daar niet wegpoetsen: **leeg is dicht** (geen mandaat
+betekent niets zelfstandig, niet alles), **een mandaat hoogt geen niveau op**
+(wat `voorstel` is blijft een mens vragen), en **geld en het pasbesluit blijven
+mensenwerk** hoeveel er ook in staat. Blok 7 is met opzet HALF: de speelruimte is
+de waarheid die een Mijn AI-scherm zou tonen, maar het scherm zelf komt er pas
+als de bewijsschuld gesloten is -- anders toont het een macht die het systeem niet
+kan definiëren. Blok 9 (commandbalk) is om dezelfde reden bewust niet gebouwd:
+0 bewezen routes en 96 van 176 onbekende gevolgen dragen geen balk die het hele
+huis in gewone taal bedient. Hij verandert geen bevoegdheid en kan dat ook niet
+(hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
+uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
+padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet
+wegpoetsen: een versmalling die het GEVRAAGDE vermogen verbergt is de gevaarlijkste
+faalvorm van deze laag (vandaar dat `kaart` met `alles: true` de versmalling altijd
+overslaat), en een brug als `taxi -> ride` wordt getoetst tegen de echte routes --
+`taxi -> rit` wees nergens heen en werd door die toets gevonden.
 
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 

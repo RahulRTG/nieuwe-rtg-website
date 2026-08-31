@@ -4,6 +4,17 @@ Dit is het richtingsdocument voor de laag boven PROOF: van "software bedienen"
 naar "een doel uitspreken". Lees PROOF.md eerst -- dit document leunt er
 volledig op en heeft zonder die bewijslaag geen bodem.
 
+Lees daarnaast `EXECUTIE.md`, de laag eronder. Dit document gaat over de
+AI-helft -- hoe een uitgesproken doel een handeling wordt. EXECUTIE.md gaat over
+de plek waar die handeling landt, en die hoort niet van de AI te zijn: een
+scherm, een automatisering, de commandbalk, een externe aanroep en een geplande
+taak stellen dezelfde vraag ("mag dit nu, en met hoeveel frictie?") en horen
+daar EEN antwoord op te krijgen. Daar staat ook de dubbele waarheid die deze
+laag vandaag heeft -- `kern/command/risico.js` en `kern/stuur/beleid.js`
+beantwoorden allebei de frictievraag, en verschillend -- en de vijf mechanismen
+uit par. 3 die al gebouwd blijken, alleen voor de ops-cockpit in plaats van voor
+het stuur.
+
 De lat is niet "onze AI kan alle functies bedienen". De lat is:
 
 > **Vertel RTG wat je wilt bereiken. RTG regelt de rest -- binnen jouw rechten,

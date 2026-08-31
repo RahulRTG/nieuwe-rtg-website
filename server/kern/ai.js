@@ -20,6 +20,7 @@ const { dagContext } = require('./context');
 // Geen AI-taal: de schrobber gaat over alles wat Rahul zegt, ook over de vaste
 // regelantwoorden (die komen niet langs een model, dus een prompt helpt daar niet).
 const { schrob } = require('./rahul/taal');
+const router = require('./ai/router');
 
 function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice, i18n, ledenInhoudVan, stemmingVoor, geloofRegel }) {
   /* De promptlaag (system prompt + regelantwoorden) draait als submodule
@@ -39,11 +40,21 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
       .slice(-12);
     while (history.length && history[0].role !== 'user') history.shift();
     const last = history.length ? history[history.length - 1].content : '';
+
+    /* DE INTELLIGENTIEROUTER, IN DE SCHADUW (EXECUTIE.md blok 8). Hij zegt welke
+       techniek bij deze vraag hoort -- een regel, een algoritme, een voorspeller
+       of toch een model -- en hij BESLIST NIETS: de aanroep hieronder gaat
+       gewoon door. Eerst meten hoe vaak een goedkopere techniek het gedekt zou
+       hebben; pas met dat getal is het omdraaien van de volgorde een besluit in
+       plaats van een gok. De keuze reist mee met het antwoord, zodat achteraf
+       narekenbaar is waarom er een model aan te pas kwam. */
+    const keuze = router.schaduw(last);
+
     if (anthropic && history.length && history[history.length - 1].role === 'user') {
       try {
         const r = await anthropic.messages.create({ model: 'claude-opus-4-8', max_tokens: 1024, system: aiSystemPrompt(tier, lang, key), messages: history });
         const reply = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-        if (reply) return { text: schrob(reply), lang };
+        if (reply) return { text: schrob(reply), lang, techniek: 'ai', waarom: keuze.reden, schaduw: keuze.techniek };
       } catch (e) { console.error('Claude-fout (rahul):', e.message); }
     }
     // de eigen reis van het lid mee: zonder reis noemt Rahul geen bestemming
@@ -52,10 +63,10 @@ function maakAi({ db, PERSONAS, anthropic, accounts, broadcastSync, sseToOffice,
     if (lang !== 'nl' && i18n) {
       try {
         const t = await i18n.translate(canned, lang, 'nl');
-        if (t && t.translated) return { text: t.text, lang };
+        if (t && t.translated) return { text: t.text, lang, techniek: 'regels', waarom: keuze.reden, schaduw: keuze.techniek };
       } catch (e) { /* val terug op Nederlands */ }
     }
-    return { text: canned, lang: 'nl' };
+    return { text: canned, lang: 'nl', techniek: 'regels', waarom: keuze.reden, schaduw: keuze.techniek };
   }
 
   function convOf(userId) { const md = accounts.getMemberState(userId) || {}; return md.conversation || []; }

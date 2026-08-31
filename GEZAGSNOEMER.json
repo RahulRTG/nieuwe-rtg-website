@@ -1,0 +1,251 @@
+{
+ "uitleg": "De vier-tredige noemer waarin de vijf gezagsschalen van GEZAG.json worden verklaard, met per trede of de verklaring EVIDENT is (citaat uit de bron), AANGENOMEN (een mens moet beslissen) BESLOTEN (de eigenaar heeft de vraag beantwoord, met de reden erbij) of ONBEPAALD (de trede dekt twee noemertreden en is niet af te beelden). Dit is een meetlaag: er hangt geen gedrag aan, en test/gezagsnoemer.test.js zakt zodra server/ hem importeert.",
+ "noemer": [
+  {
+   "trede": "geen",
+   "wat": "de handeling bestaat niet voor de machine"
+  },
+  {
+   "trede": "tonen",
+   "wat": "de machine leest, rekent of adviseert en verandert niets"
+  },
+  {
+   "trede": "klaarzetten",
+   "wat": "de machine stelt samen; een mens bevestigt"
+  },
+  {
+   "trede": "uitvoeren",
+   "wat": "de machine voert uit, binnen beleid"
+  }
+ ],
+ "schalen": 5,
+ "treden": 21,
+ "evident": 18,
+ "besloten": [
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "voorstellen",
+   "noemer": "tonen",
+   "grond": "besloten",
+   "besluit": "Een voorstel is informatie; KLAARZETTEN betekent dat er iets staat dat met een enkele bevestiging wordt uitgevoerd. Dat verschil is precies waarom die schaal beide woorden heeft, en het houdt \"klaarzetten\" een harde betekenis in de hele execution plane.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "begrensd",
+   "noemer": "uitvoeren",
+   "grond": "besloten",
+   "besluit": "De grens is een EIGENSCHAP van de uitvoering en geen trede. Wat de machine mag is een vraag, hoe ver hij mag gaan is een tweede; de grens hoort waar hij afdwingbaar is (het beleid) en niet in het woord.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "autonoom",
+   "noemer": "uitvoeren",
+   "grond": "besloten",
+   "besluit": "\"Zonder opdracht per geval\" is een eigenschap van het staande MANDAAT en niet van de handeling. De noemer blijft vier treden; dit sluit aan op grens 2 van EXECUTIE.md -- een mandaat verleent nooit vermogen, het versmalt bestaand vermogen.",
+   "bronGevonden": true
+  }
+ ],
+ "aangenomen": [],
+ "onbepaald": [],
+ "meterstuk": [],
+ "tredenZonderSchaal": [],
+ "dekking": {
+  "geen": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/stadsweefsel/ainiveau.js"
+  ],
+  "tonen": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ],
+  "klaarzetten": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ],
+  "uitvoeren": [
+   "server/kern/stuur/beleid.js",
+   "server/kern/command/risico.js",
+   "server/kern/geldbeleid/regels.js",
+   "server/kern/stadsweefsel/ainiveau.js",
+   "server/kern/bureau/delegatie.js"
+  ]
+ },
+ "rijen": [
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "verboden",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "Alles wat niet genoemd is blijft",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "voorstel",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "vereist daarom een eenmalig servervoorstel dat",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "lezen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "de machine leest en verandert niets",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "klein",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "een kleine, omkeerbare handeling zonder externe gevolgen",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "hand",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "een mens doet het zelf",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "assist",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "de machine bereidt het voor, een mens drukt af",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/command/risico.js",
+   "trede": "auto",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "de machine doet het volledig, binnen beleid",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "kijken",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "kijken",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "voorstellen",
+   "noemer": "tonen",
+   "grond": "besloten",
+   "besluit": "Een voorstel is informatie; KLAARZETTEN betekent dat er iets staat dat met een enkele bevestiging wordt uitgevoerd. Dat verschil is precies waarom die schaal beide woorden heeft, en het houdt \"klaarzetten\" een harde betekenis in de hele execution plane.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "klaarzetten",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "klaarzetten",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/geldbeleid/regels.js",
+   "trede": "automatisch",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "automatisch",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "waarnemen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "waarnemen",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "adviseren",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "adviseren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "voorbereiden",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "voorbereiden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "begrensd",
+   "noemer": "uitvoeren",
+   "grond": "besloten",
+   "besluit": "De grens is een EIGENSCHAP van de uitvoering en geen trede. Wat de machine mag is een vraag, hoe ver hij mag gaan is een tweede; de grens hoort waar hij afdwingbaar is (het beleid) en niet in het woord.",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stadsweefsel/ainiveau.js",
+   "trede": "verboden",
+   "noemer": "geen",
+   "grond": "evident",
+   "citaat": "verboden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "informeren",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "informeren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "aanbevelen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "aanbevelen",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "voorbereiden",
+   "noemer": "klaarzetten",
+   "grond": "evident",
+   "citaat": "voorbereiden",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "uitvoeren",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "uitvoeren",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/bureau/delegatie.js",
+   "trede": "autonoom",
+   "noemer": "uitvoeren",
+   "grond": "besloten",
+   "besluit": "\"Zonder opdracht per geval\" is een eigenschap van het staande MANDAAT en niet van de handeling. De noemer blijft vier treden; dit sluit aan op grens 2 van EXECUTIE.md -- een mandaat verleent nooit vermogen, het versmalt bestaand vermogen.",
+   "bronGevonden": true
+  }
+ ]
+}

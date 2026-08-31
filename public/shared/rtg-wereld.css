@@ -52,8 +52,18 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
 /* De plus blijft de laatste, ook als er een blad bij komt dat zichzelf achteraan
    hangt (shared/rahul-tab.js voegt zijn tab toe aan het EIND van de balk). Zonder
    deze volgorde staat "nieuw scherm" tussen de bladen in. */
+/* DE PLUS IS TEKST EN GEEN TEKEN VAN GOUD. Hij stond in --gold-tekst en dat
+   haalde 2,8:1 op de blauwe hero waar deze balk overheen ligt (grens 4,5 voor
+   kleine tekst; de a11y-poort ving het, drie rondes lang op precies dit
+   element). CLAUDE.md zegt het met zoveel woorden: goud en bordeaux zijn
+   accenten, en op een donkere grond is kleine tekst wit.
+
+   Goud blijft waar het wel hoort: het streepje boven het actieve blad. Dat is
+   een accent dat geen betekenis draagt die alleen in de kleur zit -- het
+   actieve blad zegt dat ook met aria-current. */
 .wereldtab-plus{order:2;margin-left:auto;min-width:2.75rem;justify-content:center;
-  color:var(--gold-tekst);font-size:.95rem;}
+  color:var(--rtg-txt);font-size:.95rem;}
+.wereldtab-plus:hover,.wereldtab-plus:focus-visible{color:var(--rtg-txt);}
 .wereldtabs .rtg-rahul-tab{order:1;}
 
 .merkkop{display:flex;align-items:flex-start;gap:1rem;padding:.7rem 0 1.1rem;}

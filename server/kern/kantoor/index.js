@@ -25,6 +25,9 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       // geen lidKey = geen mens achter dit token; zie ENVELOP.json (bevinding)
       envelop.zet(req, { soort: 'kantoor', id: sess.lidKey || null,
         identiteit: sess.lidKey ? 'bewezen' : 'anoniem' });
+      // het handvat van de mens: waarmee een besluit kan zien dat twee
+      // handelingen niet van dezelfde persoon zijn (kern/appstore/vierogen.js)
+      req.officeKey = sess.lidKey || null;
       return next();
     }
     // de eigenaar komt ook met zijn eigen accountlogin binnen (geen aparte code nodig)
@@ -32,6 +35,7 @@ function maakKantoor({ db, sessionFor, eigenaar, accounts, findSupplier, connect
       const u = token && accounts.verifyToken(token);
       if (u && eigenaar.isEigenaar(accounts, u)) {
         req.eigenaar = true;
+        req.officeKey = 'user-' + u.id;   // zie hierboven
         envelop.zet(req, { soort: 'eigenaar', id: 'user-' + u.id,
           identiteit: 'bewezen', gezagBron: 'eigenaar', gezagBaas: true });
         return next();

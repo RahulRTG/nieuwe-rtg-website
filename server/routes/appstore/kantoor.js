@@ -11,6 +11,12 @@ module.exports = (kern) => {
 
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
   const naam = (req) => String(req.body.door || '').trim().slice(0, 80);
+  /* WIE TEKENT ER, als persoon. Een kantoorsessie is een code en niet vanzelf
+     een mens; alleen wie met zijn eigen inlog binnenkomt heeft een sleutel
+     (kern/kantoor/index.js zet die op het verzoek). Ontbreekt hij, dan valt de
+     vier-ogenregel terug op de naam en zegt het dossier dat de scheiding is
+     OPGEGEVEN en niet bewezen. */
+  const wieKey = (req) => req.officeKey || null;
 
   // de wachtrij: alles wat de machinepoort heeft doorgelaten en op een mens wacht
   app.post('/api/appstore/kantoor/wachtrij', officeAuth, (req, res) => res.json({
@@ -46,7 +52,8 @@ module.exports = (kern) => {
   // een inzending publiceren of weigeren
   /* mutatie: nietHerhaalbaar -- een besluit is een handeling van een mens en telt op in het journaal */
   app.post('/api/appstore/kantoor/besluit', officeAuth, (req, res) => antwoord(res, appstore.besluit({
-    versieId: req.body.versieId, besluit: String(req.body.besluit || ''), reden: req.body.reden, door: naam(req) })));
+    versieId: req.body.versieId, besluit: String(req.body.besluit || ''), reden: req.body.reden,
+    door: naam(req), doorKey: wieKey(req) })));
 
   /* De noodrem. Een app die live staat en niet had gemoeten, is met een verzoek
      weg -- ook bij de leden die hem al hadden. Dat is geen extra functie maar de

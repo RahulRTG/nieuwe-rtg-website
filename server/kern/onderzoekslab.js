@@ -33,6 +33,7 @@ module.exports = ({ db, save, crypto, anthropic }) => {
   const fout = tekst => { const laag = tekst.toLowerCase(); return VERBODEN.some(w => laag.includes(w)); };
 
   const beeld = p => ({ id: p.id, titel: p.titel, veld: p.veld, veldNaam: (VELDEN[p.veld] || {}).naam,
+    herkomst: p.herkomst || null,
     voorWie: p.voorWie, doel: p.doel, fase: p.fase, budget: p.budget, veiligheid: p.veiligheid,
     team: p.team || [],
     logboek: (p.logboek || []).slice(0, 30), bevindingen: p.bevindingen || [], at: p.at });
@@ -74,7 +75,20 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     if (fout(titel + ' ' + doel)) return { status: 400, error: 'Dit lab onderzoekt nooit wapens of andere schadelijke richtingen. Dat is een principe, geen instelling.' };
     if (P().length >= 2000) return { status: 400, error: 'Het lab zit vol; archiveer eerst afgeronde projecten.' };
     const voorWie = ['rtg', 'rtf', 'samen'].includes(b.voorWie) ? b.voorWie : 'samen';
-    const p = { id: rid(), titel, veld: b.veld, voorWie, doel, fase: 'idee',
+    /* WAAR DIT PROJECT VANDAAN KOMT, als VELD en niet als logregel.
+
+       De koppeling met het Living Lab beloofde in haar eigen kop dat "de
+       verwijzing twee kanten op gaat", en dat was maar half waar: de studie
+       bewaarde de project-id, het project bewaarde een ZIN in zijn logboek. Een
+       logregel is te lezen en niet te volgen -- wie hier binnenkomt met een
+       project in de hand kon niet terug naar het onderzoek waar het uit kwam.
+       Nu wel, met het onderzoeksnummer erbij zodat het ook buiten de software
+       naar hetzelfde ding wijst (kern/livinglab/onderzoeksnummer.js). */
+    const h = b.herkomst && typeof b.herkomst === 'object' ? b.herkomst : null;
+    const herkomst = h ? { systeem: schoon(h.systeem, 40) || 'onbekend',
+      studieId: schoon(h.studieId, 40) || null, uitgangId: schoon(h.uitgangId, 40) || null,
+      nummer: schoon(h.nummer, 40) || null } : null;
+    const p = { id: rid(), titel, veld: b.veld, voorWie, doel, fase: 'idee', herkomst,
       budget: Math.max(0, Math.min(10000000, Math.round(Number(b.budget) || 0))),
       team: makerKey ? [String(makerKey)] : [],
       veiligheid: { status: 'open', door: null, om: null, notitie: '' },

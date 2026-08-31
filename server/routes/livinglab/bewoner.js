@@ -67,6 +67,27 @@ module.exports = (kern, hulp) => {
     return livinglab.bewijs.observatieBij(wie.studieId, b, wie.alias);
   }));
 
+  /* ---------- het meetvenster: de vragen die deze studie stelt ----------
+
+     Twee deuren, allebei op de labpas: de vragen ophalen en ze invullen. De
+     alias komt ook hier uit de pas en nooit uit het lijf.
+
+     DIT IS MET OPZET GEEN APP UIT DE APP STORE. Een app van derden draait in een
+     cel zonder netwerk en kan een meting dus niet terugsturen -- en zou dat ook
+     niet mogen: een meting draagt een toestemmingsgrond en hoort bij een studie
+     van de stichting (kern/livinglab/instrument.js). */
+  app.post('/api/lab2/mijn/venster', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.instrument.venster(wie.studieId, wie.alias);
+  }));
+
+  app.post('/api/lab2/mijn/meting', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.instrument.metingBij(wie.studieId, wie.alias, lijf(req));
+  }));
+
   /* Een reflectie insturen met de labpas: wat er misging, wat onverwacht was, of
      welke eerdere conclusie herzien moet worden. Dit staat open voor bewoners
      omdat het juist het gedrag is dat dit lab wil hebben -- en het is bovendien
@@ -80,6 +101,16 @@ module.exports = (kern, hulp) => {
   /* Zich terugtrekken uit het onderzoek. Dit is de kant waarop de scheiding uit
      kern/livinglab/mensen.js zich moet bewijzen: het werkt op de pas, dus ook
      bij een gescheiden studie waar niemand weet wie erachter zit. */
+  /* EERST KIJKEN, DAN PAS WISSEN. Deze deur rekent voor wat er zou gebeuren en
+     verandert niets: wat verdwijnt, wat in een dataset is opgegaan en welke
+     conclusies in bewijsgraad zakken. Een deelnemer die dat pas ná het wissen
+     hoort, heeft geen keuze gehad maar een mededeling gekregen. */
+  app.post('/api/lab2/mijn/terugtrekken/gevolg', remBron, remCode, (req, res) => veilig(res, () => {
+    const wie = livinglab.mensen.opPas(codeUit(req));
+    if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
+    return livinglab.terugtrekken.gevolg(wie.studieId, wie.alias);
+  }));
+
   app.post('/api/lab2/mijn/terugtrekken', remBron, remCode, (req, res) => veilig(res, () => {
     const wie = livinglab.mensen.opPas(codeUit(req));
     if (!wie) return { status: 404, error: 'Deze labpas kennen we niet.' };
@@ -89,6 +120,10 @@ module.exports = (kern, hulp) => {
   /* ---------- vragen uit de buurt ----------
      Open, want dit is de trechter vóór het onderzoek. Wel met een rem, en de
      stem telt op het THEMA (regel 7: de teller hangt aan het doel). */
+  /* ---------- de openbare onderzoekskaarten ----------
+     Zonder inlog en zonder labpas: dit is de kant die een gemeente, een
+     subsidiegever of een buurtbewoner leest. Er staat alleen wat het lab zelf
+     heeft geschreven en wat te tellen is -- geen aliassen, geen waarnemingen. */
   app.post('/api/lab2/bewoner/themas', remLezen, (req, res) => veilig(res, () => livinglab.themas.themas(lijf(req).labId)));
   app.post('/api/lab2/bewoner/thema', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaBij(lijf(req))));
   app.post('/api/lab2/bewoner/stem', remSchrijf, (req, res) => veilig(res, () => livinglab.themas.themaStem(lijf(req))));
@@ -122,4 +157,10 @@ module.exports = (kern, hulp) => {
      de cyclus en de methoden zijn (regel 4). Er staat niets vertrouwelijks in --
      het zijn de spelregels, en die horen juist openbaar te zijn. */
   app.post('/api/lab2/bewoner/kader', remLezen, (req, res) => veilig(res, () => livinglab.kaderVoorScherm()));
+
+  /* De deuren voor wie alleen KIJKT -- de onderzoekskaarten, de buurtvragen met
+     hun stand, de leenbare apparatuur -- staan in ./openbaar.js. Ze krijgen
+     dezelfde rem mee, want dat is dezelfde vraag: afgrazen tegenhouden zonder
+     iemand buiten te sluiten die er wel bij hoort. */
+  require('./openbaar')(kern, { veilig, lijf, remLezen, remSchrijf });
 };

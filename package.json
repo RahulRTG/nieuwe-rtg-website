@@ -108,6 +108,7 @@
     "samenhang": "node scripts/samenhang.js",
     "samenhang:vast": "node scripts/samenhang.js --vastleggen",
     "kaart": "node scripts/kaart.js",
+    "onderzoeksketen": "node scripts/onderzoeksketen.js",
     "wereldlijst": "node scripts/wereldlijst.js",
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",

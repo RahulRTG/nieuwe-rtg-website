@@ -70,7 +70,9 @@ function maakFout(d){
   return e;
 }
 function terug(e){ if(e.source!==window.parent) return; var d=e.data;
-  if(!d||d.rtgcel!==1||typeof d.nr!=='number') return; var w=open[d.nr]; if(!w) return; delete open[d.nr];
+  if(!d||d.rtgcel!==1) return;
+  if(d.context!==undefined){ contextBinnen(d.context); return; }
+  if(typeof d.nr!=='number') return; var w=open[d.nr]; if(!w) return; delete open[d.nr];
   if(d.fout) w.nee(maakFout(d.fout)); else if(d.error) w.nee(maakFout({error:d.error})); else w.ja(d.uit); }
 window.addEventListener('message',terug,false);
 function roep(methode,args){ return new Promise(function(ja,nee){
@@ -78,7 +80,17 @@ function roep(methode,args){ return new Promise(function(ja,nee){
   setTimeout(function(){ if(open[n]){ delete open[n];
     nee(maakFout({code:'RTG_GEEN_ANTWOORD',error:'De brug antwoordde niet op tijd.',herhaalbaar:true,methode:String(methode)})); } },15000);
   window.parent.postMessage({rtgcel:1,nr:n,methode:String(methode),args:args||{}},'*'); }); }
-window.RTG={ roep:roep, versie:1,
+/* DE CONTEXT VAN DEZE OPENING. Hij komt van de celpagina en alleen als het lid
+   hem daar heeft doorgegeven; hij komt EEN keer en er is niets op te vragen.
+   RTG.context() geeft een belofte die vervult met de waarden of met null --
+   null is de gewone toestand, want de meeste keren dat een app opengaat, is er
+   niets doorgegeven. */
+var ctxWachters=[],ctxWaarde=null,ctxKlaar=false;
+function contextBinnen(v){ ctxWaarde=v||null; ctxKlaar=true;
+  for(var i=0;i<ctxWachters.length;i++){ try{ ctxWachters[i](ctxWaarde); }catch(e){} } ctxWachters=[]; }
+function context(){ return new Promise(function(ja){ if(ctxKlaar) return ja(ctxWaarde); ctxWachters.push(ja);
+  setTimeout(function(){ if(!ctxKlaar){ ctxKlaar=true; ja(null); } },3000); }); }
+window.RTG={ roep:roep, context:context, versie:1,
   /* Wat een app NIET van de brug krijgt, staat hier zodat het in de console van
      de bouwer zichtbaar is en niet in een document dat hij nooit opent. */
   nietGebouwd:{ netwerk:'Een cel heeft geen netwerk. Alles loopt via RTG.roep().',

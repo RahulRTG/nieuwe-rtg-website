@@ -46,6 +46,8 @@
         'background:var(--rtg-card2,#1B1817);padding:.55rem .75rem;margin:.6rem 0;font-size:.83rem;line-height:1.45;}' +
       '#paneel .lf-scheids.twijfel{border-left-color:var(--rtg-goud,#C9A24B);}' +
       '#paneel .lf-scheids.afraden{border-left-color:var(--rtg-leesrood,var(--rtg-rood,#DE6E92));}' +
+      '#paneel .lf-onderzoek{font-size:.82rem;color:var(--rtg-soft);margin:.35rem 0 0;}' +
+      '#paneel .lf-onderzoek b{font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--rtg-tekst,#fff);}' +
       '#paneel .lf-stem{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}' +
       '#paneel .lf-stem .telling{margin-left:auto;font-size:.8rem;color:var(--rtg-soft);}' +
       '#paneel .lf-voor[aria-pressed="true"]{background:var(--rtg-groen,#4C9A75);border-color:var(--rtg-groen,#4C9A75);color:#08210F;}' +
@@ -70,6 +72,17 @@
     }).join('') : '<p class="stil">Nog geen locaties.</p>';
   }
 
+  /* Welk onderzoek dit voorstel financiert. Staat er geen, dan staat er niets:
+     "geen onderzoek" is geen gebrek maar een gewoon buurtvoorstel. Is het
+     onderzoek uit het lab verdwenen, dan staat de reden er -- het nummer blijft,
+     want dat verandert nooit. */
+  function onderzoekRegel(o, esc) {
+    if (!o) return '';
+    return '<p class="lf-onderzoek">Financiert onderzoek <b>' + esc(o.nummer || '') + '</b>' +
+      (o.titel ? ' · ' + esc(o.titel) : '') +
+      (o.nietTeZeggen ? ' <span class="stil">(' + esc(o.nietTeZeggen) + ')</span>' : '') + '</p>';
+  }
+
   var WOORD = { steun: 'Steunt', twijfel: 'Twijfelt', afraden: 'Raadt af' };
   function tekenVoorstellen(vs) {
     var esc = w.Geld.esc;
@@ -81,6 +94,7 @@
         '<div class="lf-loch">' + esc(v.locId) + '</div>' +
         '<p>' + esc(v.doel) + '</p>' +
         '<p class="stil">Voorgesteld door ' + esc(v.door) + '</p>' +
+        onderzoekRegel(v.onderzoek, esc) +
         (sc.reden ? '<div class="lf-scheids ' + o + '"><b>Scheidsrechter ' + WOORD[o] + '</b> · ' + esc(sc.reden) + '</div>' : '') +
         '<div class="lf-stem">' +
           '<button class="knop lf-voor" type="button" aria-pressed="' + (v.mijnStem === 'voor') + '"' +

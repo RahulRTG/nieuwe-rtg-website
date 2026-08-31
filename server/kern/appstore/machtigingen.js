@@ -52,7 +52,8 @@ const DOELEN = {
   'taal-kiezen': 'de app in jouw taal tonen',
   'pas-tonen': 'tonen wat er bij jouw pas hoort',
   'herinneren': 'je herinneren aan iets wat jij zelf hebt gezet',
-  'klaar-melden': 'melden dat iets waar je op wachtte klaar is'
+  'klaar-melden': 'melden dat iets waar je op wachtte klaar is',
+  'meedoen-arena': 'je score bewaren en je plaats tonen in de arena van deze app'
 };
 
 const MACHTIGINGEN = [
@@ -68,6 +69,17 @@ const MACHTIGINGEN = [
     'inzage in wat je in een andere app hebt staan, of in de rest van je RTG-gegevens',
     'laag',
     ['voortgang-onthouden', 'voorkeuren-onthouden', 'werk-bewaren']),
+  /* DE VIERDE, EN DE ENIGE WAARBIJ EEN ANDER LID IETS VAN JOU ZIET. Daarom
+     staat het risico op hoog en staat er in `nooit` met zoveel woorden wat er
+     NIET op het bord komt. De 18+-poort erachter is dezelfde als die van de
+     spellen van het huis (kern/spellen/grens.js): onder die grens speelt het
+     spel gewoon door en wordt er alleen niets bewaard. */
+  M('arena.meedoen',
+    'Meedoen aan de ranglijst van deze app',
+    'je score in de arena van DEZE app, met je codenaam ernaast',
+    'een plek in de ranglijsten van RTG zelf, en niets over leden die deze app niet spelen',
+    'hoog',
+    ['meedoen-arena']),
   M('bericht.klaarzetten',
     'Een bericht voor je klaarzetten in de App Store',
     'hooguit een handvol berichten per dag, die je zelf ophaalt in de App Store',

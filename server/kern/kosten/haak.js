@@ -43,7 +43,22 @@ const context = new AsyncLocalStorage();
    al werken (kern/facturatie.js). Echte namen wonen in de kluis (accounts.js)
    en komen in deze laag niet voor. */
 const HUIS = 'huis';
-const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'huis'];
+/* DE VIJFDE IS ER SINDS 31 AUGUSTUS 2026: `lab`. Een lab van de RTFoundation is
+   geen gebruiker maar een ENTITEIT van de stichting, en dat onderscheid is
+   precies wat ECONOMIE.md vraagt -- een rekening landt bij de entiteit van een
+   wereld, nooit bij een gebruiker ervan.
+
+   Hij is er omdat het verbruik van een lab anders bij het HUIS landt. De poorten
+   zetten een drager voor een lid, een zaak en een gezin (opzet/diensten2.js,
+   opzet/leverancierpoort.js, foundation/kostenpoort.js); de deuren van het
+   Living Lab -- personeel achter de kantoorinlog, en de bewonerskant die op een
+   labpas opengaat -- zetten er geen, en dan is het antwoord 'huis'. Dat is de
+   juiste terugval voor verbruik zonder eigenaar, maar hier is er wel degelijk
+   een eigenaar: de stichting. Zonder deze soort betaalt RTG dus stilzwijgend het
+   onderzoek van een andere rechtspersoon, en dat is precies wat ECONOMIE.md
+   verbiedt -- niet omdat het geld op is, maar omdat een stichting die haar eigen
+   kosten niet kent, ze ook niet kan verantwoorden. */
+const SOORTEN_DRAGER = ['lid', 'zaak', 'gezin', 'lab', 'huis'];
 
 function drager(soort, id) {
   const s = String(soort || '').trim();

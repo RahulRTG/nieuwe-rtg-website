@@ -148,6 +148,33 @@
   .as-knoprij{margin-top:.6rem;gap:.4rem;align-items:center;}
   .as-landrij{margin-top:.55rem;align-items:center;}
   .as-kleinlink{font-size:.72rem;text-decoration:none;}
+  /* DE BEREIKCHIPS EN HET PASPOORT. Systeeminformatie, dus klein, in kapitalen
+     en met ruime letterafstand -- en met opzet niet in Bodoni: die staat op een
+     gesloten lijst rollen (ONTWERP.md). Ze dragen geen kleur als oordeel; goud
+     is hier een merkaccent en geen groen vinkje. */
+  .as-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.45rem;}
+  .as-chip{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);padding:.24rem .5rem;white-space:nowrap;}
+  .as-chip.zwaar{color:var(--rtg-leesgoud,var(--gold));border-color:var(--rtg-leesgoud,var(--gold));}
+  .as-betekent{font-size:.76rem;color:var(--muted);line-height:1.55;display:block;margin-top:.4rem;}
+  .as-anders{font-size:.78rem;color:var(--txt);margin-top:.5rem;display:block;}
+  .as-pasrij{display:flex;justify-content:space-between;gap:.8rem;font-size:.74rem;
+    padding:.3rem 0;border-bottom:1px solid var(--line);}
+  .as-pasrij .pasveld{color:var(--soft);letter-spacing:.12em;text-transform:uppercase;font-size:.63rem;
+    flex:0 0 9rem;padding-top:.1rem;}
+  .as-pasrij .waarde{color:var(--txt);text-align:right;flex:1 1 auto;word-break:break-word;}
+  .as-pasrij .geen{color:var(--soft);text-align:right;flex:1 1 auto;font-style:italic;}
+  .as-pasbron{font-size:.66rem;color:var(--soft);display:block;margin-top:.1rem;}
+  .as-tijdrij2{display:flex;gap:.45rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;}
+  .as-tijdlabel{font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
+  .as-tijdveld{max-width:11rem;}
+  .as-universum{margin-top:1.6rem;}
+  .as-universum:first-child{margin-top:.2rem;}
+  .as-udeel{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.25rem;display:flex;align-items:baseline;gap:.6rem;}
+  .as-uaantal{font-size:.62rem;letter-spacing:.16em;color:var(--soft);font-family:'Inter',system-ui,sans-serif;}
+  .as-uuitleg{font-size:.78rem;color:var(--muted);line-height:1.55;margin:.15rem 0 .7rem;max-width:44rem;}
+  .as-verlopen{margin-top:.5rem;border-left:3px solid var(--rtg-leesgoud,var(--gold));padding:.45rem .7rem;
+    background:rgba(169,143,28,.09);font-size:.78rem;line-height:1.55;}
   .as-klein-blok{font-size:.76rem;display:block;}
   .as-klein{font-size:.76rem;line-height:1.5;}
   .as-klein-goud{font-size:.76rem;color:var(--rtg-leesgoud,var(--gold));}
@@ -284,7 +311,7 @@ const api = (pad, body, herkans) => fetch(pad, {
    "Cannot access 'AS' before initialization", zonder dat er iets op het scherm
    verandert. De afdelingen erboven ontkomen daaraan omdat ze toevallig eerst
    iets ophalen; toeval is een slechte reden om ergens op te vertrouwen. */
-const AS = { zoek: '', pagina: 1, mijn: false };
+const AS = { zoek: '', pagina: 1, mijn: false, laatste: {} };
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
@@ -650,8 +677,12 @@ async function tekenApps(){
    daar. */
 async function laadAppstore(){
   $('#appstore').innerHTML =
-    '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>App Store</h2>'+
-    '<span class="n">apps van derden · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
+    '<div class="etage" id="appstoreEtage"><div class="etage-kop"><h2>RTG Store</h2>'+
+    /* DE ZIN ONDER DE NAAM IS DE BELOFTE, en hij staat er permanent. Niet "apps
+       van derden" als waarschuwing, maar wat er anders is aan software hier:
+       elke app draait in zijn eigen cel. Dat is geen marketing maar de
+       uitvoering -- server/routes/appstore/cel.js zet connect-src op none. */
+    '<span class="n">Elke app leeft in haar eigen cel · gekeurd door een mens van RTG · jij bepaalt wat ze mogen</span></div>'+
     '<div class="rij as-mb">'+
       '<input id="asZoek" class="veld as-breed" placeholder="Zoek op naam of uitgever" maxlength="60" aria-label="Zoeken in de App Store">'+
       '<button class="knop stil" id="asMijn" type="button">Mijn apps van derden</button>'+
@@ -690,6 +721,17 @@ function storeKaart(a){
     '<span class="stad">van '+esc(a.uitgever ? a.uitgever.naam : 'een derde partij')+'</span>'+
     '<b class="as-naam">'+esc(a.naam)+'</b>'+
     '<span class="as-uitleg-blok">'+esc(a.uitleg)+'</span>'+
+    /* HOE VER DEZE APP KOMT, in een oogopslag. Afgeleid in
+       kern/appstore/bereik.js en hier alleen getoond -- er is geen veld waarmee
+       een uitgever dit zet. De kanaalfeiten staan ernaast en niet erin: geen
+       netwerk geldt voor ELKE app hier, en een chip die per app zou verschillen
+       suggereert dat er apps zijn die het internet wel bereiken. */
+    (a.vraagtBereik ? '<div class="as-chips">'+
+      '<span class="as-chip zwaar">'+esc(a.vraagtBereik.label)+'</span>'+
+      '<span class="as-chip">'+a.vraagtBereik.bruggen+' '+(a.vraagtBereik.bruggen === 1 ? 'brug' : 'bruggen')+'</span>'+
+      (a.vraagtBereik.kanaal || []).map(f => '<span class="as-chip">'+esc(f.feit)+'</span>').join('')+
+      '</div>'+
+      '<span class="as-betekent">'+esc(a.vraagtBereik.betekent)+'</span>' : '')+
     /* WAT EEN UPDATE MEER VRAAGT, boven de vinkjes en niet eronder. Een app die
        zijn manifest uitbreidt krijgt daarmee niets extra's -- hij vraagt alleen
        opnieuw -- en dat hoort een lid te zien voordat hij ergens op drukt. */
@@ -703,7 +745,27 @@ function storeKaart(a){
         '</div>' : '')+
     '<div class="as-scheiding-xs">'+
       '<span class="as-kop-plat">Wat je geeft</span>'+
-      vinkjes+'</div>'+
+      vinkjes+
+      /* DE SLUITZIN. Een toestemmingsscherm dat alleen opsomt wat er wel
+         gebeurt, laat de lezer zelf raden waar het ophoudt -- en dat is precies
+         waar de andere stores hem laten staan. Hier staat het er, en het is
+         geen belofte maar de uitvoering: wat er niet in de machtigingenlijst
+         staat, kan geen enkele app in dit kanaal vragen. */
+      '<span class="as-anders">'+esc(a.naam)+' krijgt niets anders.</span>'+
+      '</div>'+
+    /* TIJDELIJK OF BLIJVEND. Hij staat bij de knop en niet in een tweede
+       scherm: wie pas na het toevoegen te horen krijgt dat het ook tijdelijk
+       kon, heeft die keuze niet gehad. Leeg is blijvend, en dat is de gewone
+       toestand -- er staat dus geen datum voorgevuld. */
+    (a.geinstalleerd
+      ? (a.tot ? '<div class="as-tijdrij2"><span class="as-tijdlabel">staat er tot en met '+esc(a.tot)+'</span></div>' : '')
+      : '<div class="as-tijdrij2"><span class="as-tijdlabel">tot</span>'+
+        '<input type="date" class="veld as-tijdveld asTot" aria-label="Tot en met welke datum blijft deze app staan">'+
+        '<span class="as-tijdlabel">leeg = blijvend</span></div>')+
+    (a.verlopen
+      ? '<div class="as-verlopen"><b>Deze app is verlopen.</b> Hij stond er tot en met '+esc(a.tot)+
+        ' en opent niet meer. Wat hij voor je bewaarde staat er nog; zet hem opnieuw op je startscherm, of vernietig de cel.</div>'
+      : '')+
     '<div class="rij as-knoprij">'+
       (a.prijsCenten > 0
         ? '<b class="as-prijs">'+euroC(a.prijsCenten)+(a.gekocht?' &middot; gekocht':'')+'</b>'
@@ -712,7 +774,8 @@ function storeKaart(a){
       (a.geinstalleerd
         ? '<a class="knop stil" href="/apps/appcel.html?app='+encodeURIComponent(a.sleutel)+'" class="as-link">Openen</a>'+
           '<button class="knop stil asZet" type="button">Bijwerken</button>'+
-          '<button class="knop stil asWeg" type="button">Verwijderen</button>'
+          '<button class="knop stil asWeg" type="button">Verwijderen</button>'+
+          '<button class="knop stil asCelWeg" type="button">Cel vernietigen</button>'
         : (a.prijsCenten > 0 && !a.gekocht
             ? '<button class="knop asKoop" type="button">Kopen voor '+euroC(a.prijsCenten)+'</button>'
             : '<button class="knop asZet" type="button">Op mijn startscherm</button>'))+
@@ -727,12 +790,35 @@ function storeKaart(a){
        ADRES dat je bewaart en doorstuurt naar een inkoper of een security
        officer. Die laatste komt hier niet toevallig langs. */
     '<div class="rij as-mt-xs">'+
+      '<button class="knop stil asPas as-p72" type="button" aria-expanded="false">Softwarepaspoort</button>'+
       '<button class="knop stil asDos" type="button" aria-expanded="false" class="as-p72">Inkoopdossier</button>'+
       '<a class="knop stil" href="/apps/appstore-dossier.html?app='+encodeURIComponent(a.sleutel)+'" class="as-kleinlink">Op eigen pagina &rarr;</a>'+
     '</div>'+
+    '<div class="asPasVak" hidden class="as-scheiding-s"></div>'+
     '<div class="asDosVak" hidden class="as-scheiding-s"></div>'+
     '<div class="asBon" hidden class="as-scheiding-m"></div></div>';
 }
+/* HET PASPOORT ALS SCHERM. Een rij zonder waarde toont zijn REDEN en nooit een
+   streepje of een nul: een onbekende waarde die eruitziet als een gemeten
+   waarde, is erger dan geen paspoort (kern/appstore/paspoort.js). En er staat
+   met opzet geen cijfer onder -- wie de rijen leest, oordeelt zelf. */
+function paspoortHtml(p){
+  /* Een datum wordt gelezen door een mens en niet door een machine: een ISO-
+     tijdstempel op een kaart is een lek uit de database naar het scherm. */
+  const waarde = (r) => (r.veld === 'keuring' && /^\d{4}-\d{2}-\d{2}/.test(String(r.waarde))
+    ? new Date(r.waarde).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+    : r.waarde);
+  return '<div class="as-kop-plat">Softwarepaspoort</div>'+
+    '<div class="as-uitleg-mt">'+esc(p.object)+'</div>'+
+    p.rijen.map(r => '<div class="as-pasrij"><span class="pasveld">'+esc(r.veld)+'</span>'+
+      (r.waarde == null
+        ? '<span class="geen">'+esc(r.reden || 'niet vastgesteld')+'</span>'
+        : '<span class="waarde">'+esc(waarde(r))+
+          (r.bron ? '<span class="as-pasbron">'+esc(r.bron)+'</span>' : '')+'</span>')+
+      '</div>').join('')+
+    '<div class="as-voetnoot">'+esc(p.let)+'</div>';
+}
+
 async function tekenStore(){
   const grid = $('#asGrid'), blader = $('#asBlader');
   $('#asMijn').classList.toggle('aan', AS.mijn);
@@ -740,7 +826,23 @@ async function tekenStore(){
     let items = [], d = null;
     if (AS.mijn) { items = (await api('/api/appstore/mijn')).apps; blader.innerHTML = ''; }
     else { d = await api('/api/appstore/catalogus', { zoek: AS.zoek, pagina: AS.pagina }); items = d.items; }
-    grid.innerHTML = items.length ? '<div class="boutieks">'+items.map(storeKaart).join('')+'</div>'
+    /* De paspoorten van deze lijst blijven bij de lijst horen. Ze worden hier
+       vastgehouden en niet opnieuw opgehaald; zie de knop hieronder. */
+    AS.laatste = {}; for (const it of items) if (it.paspoort) AS.laatste[it.sleutel] = it.paspoort;
+    /* DE DRIE UNIVERSA. De indeling komt van de SERVER (kern/appstore/universa.js)
+       en wordt hier alleen getekend: een tweede indeling in dit scherm zou binnen
+       een half jaar iets anders zeggen dan de eerste. Komt hij niet mee -- een
+       oudere server -- dan valt de lijst terug op een gewoon raster zonder
+       koppen, en niet op een lege pagina. */
+    const universa = (d && Array.isArray(d.universa) && d.universa.length) ? d.universa : null;
+    const opSleutel = {}; for (const it of items) opSleutel[it.sleutel] = it;
+    grid.innerHTML = items.length
+      ? (universa && !AS.zoek
+          ? universa.map(u => '<div class="as-universum"><h3 class="as-udeel">'+esc(u.naam)+
+              '<span class="as-uaantal">'+u.aantal+'</span></h3>'+
+              '<p class="as-uuitleg">'+esc(u.uitleg)+'</p>'+
+              '<div class="boutieks">'+u.apps.map(k => opSleutel[k] ? storeKaart(opSleutel[k]) : '').join('')+'</div></div>').join('')
+          : '<div class="boutieks">'+items.map(storeKaart).join('')+'</div>')
       : '<div class="leeg">'+(AS.mijn
           ? 'Je hebt nog geen apps van derden. Blader hierboven en kies zelf wat je een app geeft.'
           : 'Er staat nog geen app van een derde in de store. Elke app hier is door een mens van RTG bekeken voordat hij verschijnt; zolang er geen doorheen is, blijft dit leeg.')+'</div>';
@@ -756,8 +858,9 @@ async function tekenStore(){
       const kaart = b.closest('.boutiek'), sleutel = kaart.dataset.sleutel;
       const gekozen = [...kaart.querySelectorAll('input[data-m]:checked')].map(i => i.dataset.m);
       const nieuw = b.textContent.indexOf('startscherm') !== -1;
+      const tot = (kaart.querySelector('.asTot') || {}).value || '';
       try {
-        const r = await api(nieuw ? '/api/appstore/installeer' : '/api/appstore/verleen', { sleutel, machtigingen: gekozen });
+        const r = await api(nieuw ? '/api/appstore/installeer' : '/api/appstore/verleen', { sleutel, machtigingen: gekozen, tot });
         meld(r.let || 'Bijgewerkt.'); tekenStore();
       } catch(e){ meld(e.message); }
     }));
@@ -781,6 +884,26 @@ async function tekenStore(){
       vak.innerHTML = '<span class="tag">Het dossier wordt opgemaakt…</span>';
       try { vak.innerHTML = dossierHtml(await api('/api/appstore/dossier', { sleutel: kaart.dataset.sleutel })); }
       catch(e){ vak.innerHTML = '<div class="as-klein-zacht">'+esc(e.message)+'</div>'; }
+    }));
+    /* HET PASPOORT HAALT NIETS OP. Alle rijen zaten al in de kaart die deze
+       lijst tekende (kern/appstore/paspoort.js, meegegeven door de etalage);
+       een tweede aanroep zou een tweede antwoord kunnen geven, en dan zegt de
+       ene helft van hetzelfde scherm iets anders dan de andere. */
+    grid.querySelectorAll('.asPas').forEach(b => b.addEventListener('click', () => {
+      const kaart = b.closest('.boutiek'), vak = kaart.querySelector('.asPasVak');
+      if (!vak.hidden) { vak.hidden = true; b.setAttribute('aria-expanded', 'false'); b.textContent = 'Softwarepaspoort'; return; }
+      vak.hidden = false; b.setAttribute('aria-expanded', 'true'); b.textContent = 'Paspoort sluiten';
+      const pas = (AS.laatste || {})[kaart.dataset.sleutel];
+      vak.innerHTML = pas ? paspoortHtml(pas) : '<div class="as-klein-zacht">Voor deze app is geen paspoort meegekomen.</div>';
+    }));
+    /* VERNIETIGEN ZEGT WAT ER VERDWIJNT, en vraagt niet "weet u het zeker?".
+       Twintig bevestigingsvragen leren mensen op ja drukken (GRAMMATICA.md); een
+       zin die zegt hoeveel er wordt gewist, leest iemand wel. */
+    grid.querySelectorAll('.asCelWeg').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r = await api('/api/appstore/vernietig', { sleutel: b.closest('.boutiek').dataset.sleutel });
+        meld(r.let || 'De cel is weg.'); tekenStore();
+      } catch(e){ meld(e.message); }
     }));
     grid.querySelectorAll('.asWeg').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/appstore/weg', { sleutel: b.closest('.boutiek').dataset.sleutel }); meld('Verwijderd.'); tekenStore(); }

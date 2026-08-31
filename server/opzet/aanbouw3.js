@@ -144,6 +144,12 @@ module.exports = function bouwKernAanDrie(kern, grens) {
        kern/envelop.js). Ontbreekt hij, dan werkt de App Store
        precies zoals hij altijd deed. */
     bus: kern.bus,
+    /* DE 18+-POORT VAN DE SPELLENLAAG, doorgegeven en niet nagebouwd. Een app in
+       de store mag een score bewaren (kern/appstore/arena.js), en daarvoor geldt
+       exact dezelfde grens als voor de spellen van het huis: een eigen account,
+       door RTG gekeurd, 18 of ouder. Twee leeftijdsregels in een huis is er een
+       te veel (LAT-regel 4). */
+    ...require('../kern/spellen/grens')({ volwassen: kern.volwassen }),
     log: (t) => { try { require('../log').log.warn(t); } catch (e) { console.warn(t); } } }));
   require('../routes/appstore')(grens('appstore'));
 };

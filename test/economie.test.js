@@ -58,7 +58,14 @@ test('vier werelden, en een gebruiker hoort bij precies een', async () => {
   assert.deepEqual(ids.slice().sort(), ['commercieel', 'consument', 'rtfoundation', 'rtg-intern']);
   const rtf = r.body.werelden.find(w => (w.id || w.wereld) === 'rtfoundation');
   assert.equal(rtf.factureerbaar, false, 'de RTFoundation stuurt haar gezinnen geen rekeningen');
-  assert.deepEqual(rtf.dragers, ['gezin']);
+  /* TWEE DRAGERS SINDS 31 AUGUSTUS 2026: een gezin en een LAB. Die tweede is de
+     eerste dragersoort die geen mens en geen huishouden is -- een lab van het
+     RTF Living Lab is een entiteit van de stichting, en zijn verbruik viel
+     daarvoor terug op 'huis', waarmee RTG stilzwijgend het onderzoek van een
+     andere rechtspersoon betaalde. Deze regel is bewust bijgewerkt en niet
+     opgerekt: hij hoort te zakken zodra er een dragersoort bij de stichting
+     wordt gezet die daar niet hoort. */
+  assert.deepEqual(rtf.dragers.slice().sort(), ['gezin', 'lab']);
   const intern = r.body.werelden.find(w => (w.id || w.wereld) === 'rtg-intern');
   assert.equal(intern.factureerbaar, false);
 

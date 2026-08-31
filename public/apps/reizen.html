@@ -38,55 +38,80 @@
     </button>
   </header>
 
+  <nav class="hoofdtabs" aria-label="RTG Reizen">
+    <button class="actief" type="button" data-tab="vandaag" aria-current="page">
+      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span>
+    </button>
+    <button type="button" data-tab="reizen">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span>Reizen</span>
+    </button>
+    <button type="button" data-tab="taxi">
+      <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
+    </button>
+    <button type="button" data-tab="rahul">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
+    </button>
+  </nav>
+
   <main id="inhoud">
     <section class="appblad actief" data-blad="vandaag" aria-labelledby="titelVandaag">
       <div class="bladbinnen vandaagblad">
-        <div class="dagkop">
-          <div class="dagkop-inhoud">
-            <p class="micro" id="groet">GOEDEMIDDAG</p>
-            <div class="bestemmingkop">
-              <h1 id="titelVandaag">IBIZA</h1>
-              <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+        <!-- HET DEK. Twee kolommen: links de reis, rechts de klok in een EIGEN
+             paneel. Dat is geen opmaakvoorkeur maar de reparatie van een fout:
+             de klok lag over de bestemmingsnaam heen, omdat de titel op de
+             VENSTERbreedte schaalde en de klok absoluut in dezelfde kaart
+             stond. Wat een eigen kolom heeft, kan nergens overheen vallen. -->
+        <div class="dagdek">
+            <div class="dagkop">
+              <div class="dagkop-inhoud">
+                <p class="micro" id="groet">GOEDEMIDDAG</p>
+                <div class="bestemmingkop">
+                  <h1 id="titelVandaag">IBIZA</h1>
+                  <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+                </div>
+                <p class="sub" id="dagzin">Alles staat klaar.</p>
+              </div>
             </div>
-            <p class="sub" id="dagzin">Alles staat klaar.</p>
-          </div>
-          <div class="reisdag-klok" aria-label="Huidige tijd">
-            <span>LOKALE TIJD</span>
+
+          <aside class="klokpaneel" aria-label="Lokale tijd">
+            <span class="micro">LOKALE TIJD</span>
             <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
-          </div>
+          </aside>
+
+            <div class="vandaagraster" id="dagRaster" hidden>
+              <section class="volgendblok" aria-labelledby="volgendTitel">
+                <div class="micro" id="volgendTitel">VOLGENDE</div>
+                <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
+                <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
+                <div class="vluchtregel"><span id="volgendExtra"></span></div>
+                <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
+              </section>
+
+              <div class="reiscontext">
+                <section class="statuslijst" id="statusLijst" aria-label="Reisstatus"></section>
+              </div>
+            </div>
+
+            <div class="dagvoet">
+              <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
+                <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
+                     momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
+                     kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
+                     op null -- en die uitzondering brak de HELE reizenlijst af: #komend
+                     toonde "Cannot set properties of null" in plaats van de reizen, ook na
+                     een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
+                <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span>
+                <div id="vandaag"></div>
+              </section>
+
+              <form class="rahulsnel" data-rahul-snel>
+                <label for="rahulSnel">Vraag Rahul over deze reis</label>
+                <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul over deze reis…">
+                <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
+              </form>
+            </div>
+
         </div>
-
-        <div class="vandaagraster" id="dagRaster" hidden>
-          <section class="volgendblok" aria-labelledby="volgendTitel">
-            <div class="micro" id="volgendTitel">VOLGENDE</div>
-            <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
-            <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
-            <div class="vluchtregel"><span id="volgendExtra"></span></div>
-            <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
-          </section>
-
-          <div class="reiscontext">
-
-            <section class="statuslijst" id="statusLijst" aria-label="Reisstatus"></section>
-          </div>
-        </div>
-
-        <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
-          <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
-               momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
-               kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
-               op null -- en die uitzondering brak de HELE reizenlijst af: #komend
-               toonde "Cannot set properties of null" in plaats van de reizen, ook na
-               een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
-          <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span>
-          <div id="vandaag"></div>
-        </section>
-
-        <form class="rahulsnel" data-rahul-snel>
-          <label for="rahulSnel">Vraag Rahul over deze reis</label>
-          <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul…">
-          <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
-        </form>
       </div>
     </section>
 
@@ -233,8 +258,13 @@
        gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
        niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
        en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
+  <div class="dagkaarten">
+  <section class="dagkaart">
   <div class="regkop"><h2>De reiswacht</h2></div>
   <div id="wacht"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section class="dagkaart">
 
   <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
        anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
@@ -261,6 +291,8 @@
     <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
       <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
   </div>
+  </section>
+  </div>
 
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
@@ -285,20 +317,6 @@
   <!-- /WERELDROOSTER --></div>
   </main>
 
-  <nav class="hoofdtabs" aria-label="RTG Reizen">
-    <button class="actief" type="button" data-tab="vandaag" aria-current="page">
-      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span>
-    </button>
-    <button type="button" data-tab="reizen">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span>Reizen</span>
-    </button>
-    <button type="button" data-tab="taxi">
-      <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
-    </button>
-    <button type="button" data-tab="rahul">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
-    </button>
-  </nav>
 </div>
 
 <dialog class="keuzedialoog" id="reizigersDialoog">

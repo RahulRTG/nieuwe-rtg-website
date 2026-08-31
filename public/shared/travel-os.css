@@ -10,6 +10,13 @@
   /* Het hoogsel van het fluweel: goed voor VORM en grote letters (3,78:1 op
      donker), niet voor kleine tekst -- die blijft ivoor. Zie CLAUDE.md. */
   --tos-wine-licht:#C23A5E;
+  /* HET ACCENT IS VORM, DE LEESTOON IS TEKST. #C23A5E haalt op deze gronden
+     3,62 tot 3,67:1 -- goed voor een rand, een outline en een letter van
+     24px, te weinig voor een prijs van 12px (CLAUDE.md). Deze rozetint komt
+     uit dezelfde familie en haalt op wijnzwart 9,8. Waar hieronder tekst
+     wordt gekleurd staat dus --tos-lees; waar een rand of een omtrek wordt
+     gekleurd blijft --tos-wine-licht staan. */
+  --tos-lees:#E7A8B8;
   --tos-green:#35bd72;
   --tos-danger:#C23A5E;
   --tos-top:88px;
@@ -115,7 +122,7 @@ body.travel-os[data-travelos-scene="residence"]{--tos-scene:url('/images/travelo
 }
 .tos-module-hero::before{content:"";position:absolute;z-index:-1;inset:0;border-left:3px solid var(--tos-wine-bright);background:linear-gradient(120deg,transparent 60%,rgba(194,58,94,.08));pointer-events:none}
 .tos-module-copy{width:min(72%,760px)}
-.tos-module-eyebrow{margin:0 0 .85rem;color:var(--tos-wine-licht);font-size:.62rem;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
+.tos-module-eyebrow{margin:0 0 .85rem;color:var(--tos-lees);font-size:.62rem;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
 .tos-module-hero h2{max-width:740px;margin:0;color:var(--tos-ivory);font:500 clamp(2.7rem,6.2vw,5.5rem)/.88 "Bodoni Moda",Didot,serif;letter-spacing:-.045em;text-wrap:balance;overflow-wrap:normal!important;word-break:normal!important;hyphens:none}
 .tos-module-intro{max-width:39rem;margin:1.1rem 0 0;color:#d3d1cb;font-size:.82rem;line-height:1.65}
 .tos-module-mark{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:.28rem;padding-left:1.1rem;border-left:1px solid rgba(194,58,94,.42);text-align:right}
@@ -240,7 +247,7 @@ body.travel-os main h3{
 }
 body.travel-os > header h1,
 body.travel-os > .kop h1{color:var(--tos-ivory)!important;font-size:1.25rem !important;font-weight:750 !important;text-transform:uppercase}
-body.travel-os header .ey{color:var(--tos-wine-licht) !important;font-weight:700;letter-spacing:.2em !important}
+body.travel-os header .ey{color:var(--tos-lees) !important;font-weight:700;letter-spacing:.2em !important}
 body.travel-os > main{width:min(100%,1180px);margin-inline:auto}
 body.travel-os > main:not([style]){padding-top:clamp(1.2rem,3vw,2rem)}
 body.travel-os main{color:var(--tos-ivory)}
@@ -267,7 +274,7 @@ body.travel-os .inlog{
   background:linear-gradient(120deg,rgba(17,19,19,.98),rgba(17,19,19,.86)) !important;
   box-shadow:0 22px 70px rgba(0,0,0,.2) !important;
 }
-body.travel-os .inlog::before{content:"BESLOTEN REISOMGEVING";display:block;margin-bottom:.65rem;color:var(--tos-wine-licht);font-size:.58rem;font-weight:750;letter-spacing:.18em}
+body.travel-os .inlog::before{content:"BESLOTEN REISOMGEVING";display:block;margin-bottom:.65rem;color:var(--tos-lees);font-size:.58rem;font-weight:750;letter-spacing:.18em}
 body.travel-os .inlog h2{margin:0!important;color:var(--tos-ivory)!important;font:500 clamp(1.65rem,4vw,2.4rem)/1 "Bodoni Moda",Didot,serif!important}
 body.travel-os main>.leeg,
 body.travel-os #inhoud>.leeg,
@@ -296,7 +303,7 @@ body.travel-os .moveHero{
   background-position:center !important;
   box-shadow:none !important;
 }
-body.travel-os .moveHero .eyebrow{color:var(--tos-wine-licht) !important}
+body.travel-os .moveHero .eyebrow{color:var(--tos-lees) !important}
 body.travel-os .moveHero h2{font-family:Inter,system-ui,sans-serif !important;font-weight:780 !important;letter-spacing:-.055em !important;text-transform:uppercase !important}
 body.travel-os .moveOrb{border-radius:50%;border-color:color-mix(in srgb,var(--tos-wine-licht) 58%,transparent) !important;box-shadow:inset 0 0 38px rgba(194,58,94,.08),0 0 70px rgba(142,15,54,.12) !important}
 body.travel-os .moveOrb b{font-family:Inter,system-ui,sans-serif !important;font-size:.76rem !important;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
@@ -349,12 +356,12 @@ body.travel-os :where(.tabs,.chips) > button{
 body.travel-os :where(.tabs,.chips) > button.aan,
 body.travel-os :where(.tabs,.chips) > button[aria-selected="true"]{border-bottom-color:var(--tos-wine-bright) !important;color:var(--tos-ivory) !important}
 body.travel-os :where(.badge,.status,.stand,.chip){border-radius:0!important}
-body.travel-os .status.goud{border-color:var(--tos-wine-licht) !important;color:var(--tos-wine-licht) !important}
+body.travel-os .status.goud{border-color:var(--tos-wine-licht) !important;color:var(--tos-lees) !important}
 body.travel-os .status.ok{border-color:var(--tos-green) !important;color:var(--tos-green) !important}
 body.travel-os .status.open{border-color:var(--tos-danger) !important;color:#ed527d !important}
 body.travel-os .prijs,
 body.travel-os .vanaf,
-body.travel-os .nr{color:var(--tos-wine-licht) !important;font-family:Inter,system-ui,sans-serif !important}
+body.travel-os .nr{color:var(--tos-lees) !important;font-family:Inter,system-ui,sans-serif !important}
 body.travel-os .melding,
 body.travel-os .toast{bottom:1.25rem !important;border:1px solid #561628 !important;border-radius:0!important;background:var(--tos-ivory) !important;color:var(--tos-onyx) !important;box-shadow:0 15px 45px rgba(0,0,0,.42) !important}
 body.travel-os .blad{
@@ -484,7 +491,7 @@ body.travel-os-guest > main>.rtg-ceremonie::after{content:" · PERSOONLIJKE UITN
 body.travel-os-guest #vak>h2{margin:.2rem 0 .5rem!important;color:var(--tos-ivory)!important;font-size:clamp(2rem,7vw,3.6rem)!important;line-height:.96!important}
 body.travel-os-guest :where(.rtg-sub,.rtg-intro,.rtg-uitleg){color:var(--tos-muted)!important;line-height:1.65}
 body.travel-os-guest .rtg-groep{margin-top:1.4rem!important;padding-top:1.3rem;border-top:1px solid var(--tos-line)}
-body.travel-os-guest .rtg-label{display:block;margin:.75rem 0 .32rem;color:var(--tos-wine-licht)!important;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+body.travel-os-guest .rtg-label{display:block;margin:.75rem 0 .32rem;color:var(--tos-lees)!important;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
 body.travel-os-guest .rtg-veld{width:100%;min-height:48px;padding:.75rem .85rem}
 body.travel-os-guest .rtg-rij{display:grid!important;grid-template-columns:1fr auto auto;gap:.6rem;align-items:center;margin-top:.7rem;padding:1rem!important}
 

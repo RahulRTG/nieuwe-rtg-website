@@ -517,7 +517,10 @@ body[data-rtg-world="travel"] .statuslijst button{
 }
 body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(58,10,24,.66);}
 body[data-rtg-world="travel"] .statuslijst small{color:#C6A3AD;}
-body[data-rtg-world="travel"] .statuslijst strong{color:var(--bordeaux-tekst);}
+/* De naam in de statuslijst is LOPENDE tekst en geen merk: op deze maat is
+   het bordeauxhoogsel 3,7:1 en dat is te weinig. Het merk zelf (.rtgmerk,
+   32px) houdt het accent -- daar geldt de grens van 3,0 wel. */
+body[data-rtg-world="travel"] .statuslijst strong{color:var(--rtg-leesgoud,#E7A8B8);}
 body[data-rtg-world="travel"] .actieknop{
   clip-path:none;
   background:linear-gradient(100deg,var(--bordeaux-hoog),var(--bordeaux-basis));

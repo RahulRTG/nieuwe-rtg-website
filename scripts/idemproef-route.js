@@ -171,6 +171,17 @@ wachtOpSchoneBoom();
                        : 'NIET klaar -- ' + genreWereld.reden));
   for (const st of genreWereld.stappen) if (!st.ok || st.waarom) console.log('      ' + st.zaak + ': ' + st.waarom);
 
+  /* EEN GEVERIFIEERD SIGNATURE-LID -- ./lib/wereld-signature.js. De zwaarste
+     sleutel van dit huis: een pas die alleen een mens kan toekennen, plus een
+     goedgekeurde identiteit. Hij komt VOOR de verdeling, want hij is een rol. */
+  const { zetSignatureKlaar } = require('./lib/wereld-signature');
+  const signatureWereld = await zetSignatureKlaar({ post, tokens });
+  if (signatureWereld.token) tokens['member-signature'] = signatureWereld.token;
+  console.log('  signature-lid                        : ' +
+    (signatureWereld.klaar ? 'klaar   (tier ' + signatureWereld.tier + ', geverifieerd)'
+                           : 'NIET klaar -- ' + signatureWereld.reden));
+  for (const st of signatureWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))

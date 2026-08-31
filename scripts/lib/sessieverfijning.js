@@ -8,6 +8,7 @@
      member   -> member-account    er moet een ACCOUNT achter de pas zitten
      supplier -> zaak-persoonlijk  er moet een PERSOON achter de zaak zitten
      office   -> kantoor-op-naam   er moet iemand ZITTEN, geen gedeelde code
+     een lid  -> member-signature  het lid moet aantoonbaar zijn wie het zegt
 
    Alle drie zijn ze een verfijning en geen tegenspraak: de soort deur blijft
    dezelfde, alleen wie er aanklopt wordt scherper. En alle drie dragen ze
@@ -25,13 +26,21 @@
 const { accountRolVoor } = require('./accountroutes');
 const { persoonsRolVoor } = require('./persoonsroutes');
 const { kantoorRolVoor } = require('./kantoorroutes');
+const { signatureRolVoor } = require('./signatureroutes');
 
 /* Op volgorde. Ze sluiten elkaar uit -- elk register verfijnt een andere
    uitgangsrol -- dus de volgorde is een vorm en geen voorrang. */
 const REGISTERS = [
   { naam: 'account',  van: 'member',   naar: 'member-account',   beslis: accountRolVoor },
   { naam: 'persoon',  van: 'supplier', naar: 'zaak-persoonlijk', beslis: persoonsRolVoor },
-  { naam: 'kantoor',  van: 'office',   naar: 'kantoor-op-naam',  beslis: kantoorRolVoor }
+  { naam: 'kantoor',  van: 'office',   naar: 'kantoor-op-naam',  beslis: kantoorRolVoor },
+  /* Deze laatste staat apart: hij verfijnt niet EEN uitgangsrol maar drie
+     (member, member-account, member-lifestyle), omdat de ontmoetpoort drie
+     dingen tegelijk vraagt en geen van die drie sessies ze alle drie heeft.
+     Daarom staat hij ACHTERAAN: de registers hierboven verfijnen elk vanaf
+     precies een rol, en dat blijft de regel waarop de volgorde geen voorrang
+     is. Deze mag als enige overlappen, en dan wint de specifiekere eis. */
+  { naam: 'signature', van: 'een lid', naar: 'member-signature', beslis: signatureRolVoor }
 ];
 
 /* Geeft { rol, register } als er verfijnd wordt, anders { rol: null }.

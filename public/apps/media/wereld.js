@@ -127,6 +127,29 @@
       ' · Minder: ' + (minder.join(', ') || '--') +
       ' · Nooit: ' + ((d.smaak.nooitMakers || []).concat(d.smaak.nooitOnderwerpen || []).join(', ') || '--');
   }
+  /* De lege stand van dit scherm, in de vorm die shared/rtg-ui.css voor het
+     hele huis vastlegt (.rtg-leeg-vlak). Hij stond hier als los kader met vier
+     inline stijlen; die kwamen op elk scherm net anders terug. Een uitweg komt
+     er alleen als hij bestaat -- een knop die nergens heen gaat is erger dan
+     geen knop. */
+  function aangemeld() {
+    try { return !!localStorage.getItem('rtg_member_token'); } catch (e) { return false; }
+  }
+  function leegVlak(o) {
+    var vlak = el('div', 'rtg-leeg-vlak');
+    vlak.style.gridColumn = '1 / -1';   // over de hele breedte: het is geen kaart tussen kaarten
+    if (o.ey) vlak.appendChild(el('span', 'rtg-leeg-ey', o.ey));
+    if (o.titel) vlak.appendChild(el('b', null, o.titel));
+    if (o.wat) vlak.appendChild(el('p', null, o.wat));
+    if (o.waarom) vlak.appendChild(el('p', null, o.waarom));
+    (o.stappen || []).forEach(function (st) {
+      var a = document.createElement('a');
+      a.className = 'rtg-leeg-actie'; a.href = st.pad; a.textContent = st.tekst;
+      vlak.appendChild(a);
+    });
+    return vlak;
+  }
+
   function teken(d) {
     stand = d;
     /* Welke clips op DIT toestel staan, zodat de deler ze kan uitdienen en de
@@ -136,30 +159,33 @@
       S.deler.zetEigen((d.stukken || []).filter(function (x) { return x.vorm === 'clip' && x.mijn; })
         .map(function (x) { return x.id.slice(x.id.indexOf(':') + 1); }));
     }
-    if (d.error) { $('#uitleg').textContent = d.error; return; }
+    /* EEN UITGELOGD SCHERM IS GEEN FOUTMELDING. Hier stond alleen
+       `$('#uitleg').textContent = d.error` en dan `return`: de zin "Niet
+       ingelogd." kwam als kale regel bovenaan een leeg vlak van driehonderd
+       pixels te staan, terwijl de LEGE stand er twee regels verderop al een
+       vorm voor had (d.leeg). Twee wegen naar hetzelfde moment, en maar een
+       ervan was ontworpen. Nu gebruiken ze allebei hetzelfde vlak. */
+    if (d.error) {
+      $('#uitleg').textContent = '';
+      var doosF = $('#stukken'); doosF.textContent = '';
+      doosF.appendChild(leegVlak({
+        ey: 'RTG Media',
+        titel: aangemeld() ? 'Dit lukte niet.' : 'Meld u aan om verder te gaan.',
+        wat: d.error,
+        stappen: aangemeld() ? [] : [{ tekst: 'Naar de leden-app', pad: '/apps/app.html' }]
+      }));
+      return;
+    }
     tekenStanden(d);
     $('#uitleg').textContent = d.uitleg;
     var doos = $('#stukken'); doos.textContent = '';
     /* Een lege stand is geen leeg raster: de server zegt wat hier komt, waarom
        het er nu niet is, en welke stap dat opheft. Die tekst staat daar en niet
        hier, want de reden hangt van de gegevens af (zie kern/mediaos/leeg.js). */
-    if (d.leeg) {
-      var kader = el('div', 'kader');
-      kader.style.gridColumn = '1 / -1';   // over de hele breedte, het is geen kaart tussen kaarten
-      kader.appendChild(el('b', null, d.leeg.titel));
-      kader.appendChild(el('p', 'stil', d.leeg.wat));
-      kader.appendChild(el('p', 'stil', d.leeg.waarom));
-      var rij = el('div', 'rij');
-      rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.marginTop = '0.7rem';
-      (d.leeg.stappen || []).forEach(function (st) {
-        var a = document.createElement('a');
-        a.className = 'knop'; a.href = st.pad; a.textContent = st.tekst;
-        a.style.textDecoration = 'none'; a.style.display = 'inline-block';
-        rij.appendChild(a);
-      });
-      kader.appendChild(rij);
-      doos.appendChild(kader);
-    }
+    if (d.leeg) doos.appendChild(leegVlak({
+      ey: 'RTG Media', titel: d.leeg.titel, wat: d.leeg.wat,
+      waarom: d.leeg.waarom, stappen: d.leeg.stappen
+    }));
     d.stukken.forEach(function (s) { doos.appendChild(kaart(s)); });
     $('#einde').textContent = d.einde;
 

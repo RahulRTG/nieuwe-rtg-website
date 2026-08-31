@@ -43,7 +43,7 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
   /* EEN INZENDING IS EEN VERSIE. Zij wordt nooit overschreven en nooit stilletjes
      gelijkgesteld aan een vorige: dezelfde bundel opnieuw insturen levert
      dezelfde hash en dat wordt gezegd, niet verzwegen. */
-  function inzenden({ org, manifest: ruwM, bestanden: ruwB }) {
+  function inzenden({ org, manifest: ruwM, bestanden: ruwB, inzender }) {
     const o = norm(org);
     if (!magInzenden(o)) {
       const u = uitgever(o);
@@ -88,8 +88,23 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
     }
 
     opslag.schrijf(m.manifest.sleutel, hash, b.bestanden);
+    /* WIE HEEFT DIT INGEZONDEN -- de mens, niet alleen de organisatie. Dit is de
+       helft van de vier-ogenregel die er niet was: zonder deze regel weet het
+       aftekenmoment alleen van welke ORG een bundel komt, en dan kan bij RTG's
+       eigen uitgever dezelfde persoon inzenden en goedkeuren
+       (kern/appstore/vierogen.js).
+
+       Het is een handvat en geen dossier: een personeelsnummer of een
+       sessiesleutel, plus de naam die de inzender zelf al voert in zijn
+       werkplek. Geen e-mailadres, geen account-id uit de kluis. */
+    const inz = inzender && typeof inzender === 'object'
+      ? { soort: String(inzender.soort || 'onbekend').slice(0, 20),
+          id: inzender.id ? String(inzender.id).slice(0, 120) : null,
+          naam: inzender.naam ? String(inzender.naam).slice(0, 80) : null }
+      : null;
     const v = { id: id(), sleutel: m.manifest.sleutel, org: o, manifest: m.manifest, hash,
-      maten: k.maten, bevindingen: k.bevindingen, status: 'wacht-op-mens', at: nu(), besluit: null };
+      maten: k.maten, bevindingen: k.bevindingen, status: 'wacht-op-mens', at: nu(), besluit: null,
+      inzender: inz };
     S().versies[v.id] = v;
     if (!bestaandeApp) S().apps[m.manifest.sleutel] = { sleutel: m.manifest.sleutel, org: o, naam: m.manifest.naam, categorie: m.manifest.categorie, at: nu(), live: null, ingetrokken: null };
     boek('inzending-door-naar-mens', m.manifest.sleutel, o, { versie: m.manifest.versie, hash });
@@ -122,6 +137,13 @@ module.exports = function maakVersies({ S, save, nu, boek, opslag, eigen, norm, 
       prijsCenten: Number(v.manifest.prijsCenten || 0),
       vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen), hash: v.hash, maten: v.maten,
       bevindingen: v.bevindingen, status: v.status, at: v.at, besluit: v.besluit || null,
+      /* WIE HET INZOND, voor de mens die aftekent -- met de NAAM en zonder het
+         handvat. De sleutel is er om twee handelingen te kunnen vergelijken
+         (kern/appstore/vierogen.js) en niet om te tonen; hij hoort in geen enkel
+         antwoord thuis. Deze regels gaan naar de wachtrij van het kantoor en
+         naar de eigen uitgeverij, en dat zijn allebei plekken waar bekend hoort
+         te zijn wie er aanspreekbaar is. */
+      inzender: v.inzender ? { soort: v.inzender.soort, naam: v.inzender.naam || null } : null,
       /* DE TOEGANKELIJKHEIDSUITSLAG REIST MEE, en alleen als hij bij DEZE bytes
          hoort. Een uitslag van een vorige bundel is geen uitslag (zie
          ./toegankelijk.js), dus hij hoort hier ook niet te verschijnen -- anders

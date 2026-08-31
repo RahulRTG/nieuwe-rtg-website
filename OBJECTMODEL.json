@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1890,
-    "vormen": 1292,
+    "bestanden": 1891,
+    "vormen": 1291,
     "velden": 1841,
     "modules": 692,
     "domeinen": 245,
     "envelopDrempel": 15,
     "envelop": 33,
-    "veldenDomeineigen": 1291,
+    "veldenDomeineigen": 1292,
     "veldenGedeeldVanafVier": 183,
     "gelijkendeVormparen": 19
   },
@@ -86,18 +86,6 @@
       ]
     },
     {
-      "veld": "categorie",
-      "domeinen": 13,
-      "waar": [
-        "kern/appbieb",
-        "kern/appstore",
-        "kern/command",
-        "kern/geloofbieb",
-        "kern/groothandel",
-        "kern/magnaat-partnerstudio-bedrijf"
-      ]
-    },
-    {
       "veld": "doel",
       "domeinen": 13,
       "waar": [
@@ -155,6 +143,18 @@
         "kern/labfonds",
         "kern/lidmaatschap",
         "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "categorie",
+      "domeinen": 12,
+      "waar": [
+        "kern/appbieb",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf",
+        "kern/mall"
       ]
     },
     {
@@ -422,18 +422,6 @@
       ]
     },
     {
-      "veld": "prijsCenten",
-      "domeinen": 9,
-      "waar": [
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/eten",
-        "kern/geloofbieb",
-        "kern/reisbieb",
-        "kern/rtfbieb"
-      ]
-    },
-    {
       "veld": "opties",
       "domeinen": 9,
       "waar": [
@@ -527,6 +515,18 @@
         "kern/handelsregelbronnen",
         "kern/handelsregelwacht",
         "kern/lidmaatschap"
+      ]
+    },
+    {
+      "veld": "totaal",
+      "domeinen": 8,
+      "waar": [
+        "kern/assets",
+        "kern/command",
+        "kern/facturatie",
+        "kern/magnaat-dekkingsmatrix",
+        "kern/mobiliteit",
+        "kern/onderneming"
       ]
     }
   ],

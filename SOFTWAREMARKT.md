@@ -30,6 +30,7 @@ bijna nergens de meting en bijna overal de PRESENTATIE.
 | bewijskaart: keuring, toegankelijkheid, omvang, hash | **staat** | `toegankelijk.js`, `bundel.js` (`maten`), `besluit.js` |
 | geen sterren, geen ranglijst | **staat** | met de reden in de kop van `etalage.js` |
 | first-party onder dezelfde celgrenzen | **staat** | grens 1 kent geen vertrouwde uitgever en geen vlag |
+| wie inzendt tekent niet af, op de MENS | **staat** | `kern/appstore/vierogen.js`; de organisatiecontrole alleen was bij onze eigen uitgever een formaliteit |
 | bereikklasse per app (Zero Reach e.d.) | **staat sinds vandaag** | `kern/appstore/bereik.js` — zie hieronder |
 | celkader met celnaam en kanaalfeiten | **staat sinds vandaag** | `uitgifte.js` (`celnaam`), `public/apps/appcel.html` |
 | softwarepaspoort op de winkelkaart | **staat sinds vandaag** | `kern/appstore/paspoort.js`, getoond in `mall.html` |

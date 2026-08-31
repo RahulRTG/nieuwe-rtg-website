@@ -164,6 +164,34 @@ ingediend stuk is geen bewijs.
 De prijs van dit besluit is bekend en aanvaard: een app die vandaag live staat,
 kan zonder aanpassing geen nieuwe versie meer publiceren.
 
+### 2b. Wie inzendt, tekent niet af -- en dat staat sinds 31 augustus 2026 op de MENS
+
+Grens 2 keek naar de **organisatie**: een uitgever tekent zijn eigen inzending
+niet af. Bij een externe partij is dat de hele scheiding, want die heeft geen
+kantoorinlog. Bij RTG's **eigen** uitgever is het niets: daar kan dezelfde mens
+bouwen, inzenden en aftekenen, en dan is de organisatiecontrole een formaliteit
+die precies de situatie doorlaat waarvoor hij bedoeld was.
+
+Daarom draagt elke versie nu een **inzender** (`kern/appstore/versies.js`): een
+handvat -- het personeelsnummer van de medewerker of de sessiesleutel van een
+persoonlijke uitgever -- plus de naam die hij in zijn werkplek al voert. Het
+besluit vergelijkt daar twee dingen mee (`kern/appstore/vierogen.js`): de
+**sleutel** (hard, werkt alleen als beide kanten er een hebben) en de **naam**
+(zwakker, maar het enige dat werkt wanneer het kantoor op een gedeelde code
+binnenkomt). Komt een van beide overeen, dan is het antwoord 403 met de reden.
+
+**Het handvat komt nooit in een antwoord.** Het dient om te vergelijken, niet om
+te tonen; de wachtrij van het kantoor toont alleen de naam, zodat de mens die
+tekent ziet van wie hij tekent.
+
+En het besluit draagt de **graad** van de scheiding: `bewezen` (twee inlogs),
+`opgegeven` (twee ingetypte namen) of `onbekend`. Dat is met opzet geen
+fail-closed: dichtgooien bij een gedeelde kantoorcode zou ook externe uitgevers
+raken, waar de organisatiecontrole al doet wat hij moet doen. Wat er wel gebeurt
+is dat het dossier laat zien waar de scheiding op rust -- want "twee verschillende
+mensen" is een andere bewering wanneer hij op een inlog rust dan wanneer hij op
+een tekstveld rust.
+
 ### 3. Een app ziet codenamen, nooit een naam
 
 Ook mét de machtiging `profiel.basis` komt er geen echte naam, e-mailadres,
@@ -277,7 +305,8 @@ server/kern/appstore/
   verboden.js     de lijsten van die poort, met per regel de uitleg
   scan.js         de virusscanner op een webbundel, met het filter bij naam
   bundel.js       de onveranderlijke bundel: pad, hash, schijf, integriteit
-  machtigingen.js de drie machtigingen, en wat er niet is met de reden
+  machtigingen.js de vier machtigingen, en wat er niet is met de reden
+  vierogen.js     wie inzendt tekent niet af -- op de MENS, met de graad erbij
   bereik.js       hoe ver een app komt: vier klassen, GEREKEND uit de machtigingen
   paspoort.js     het softwarepaspoort: vaste rijen, en een reden waar geen waarde is
   arena.js        het bord van EEN app, met de 18+-poort van kern/spellen/grens.js
@@ -309,6 +338,7 @@ public/apps/
 test/appstore.test.js      de zes grenzen over de lijn
 test/appstore-bereik.test.js   de bereikklasse, en dat hij nergens te ZETTEN is
 test/appstore-arena.test.js    het bord per app, en de leeftijdsgrens erachter
+test/appstore-vierogen.test.js de scheiding tussen inzenden en aftekenen
 test/appstore-tijdelijk.test.js  de einddatum, en het verschil tussen weg en vernietigd
 test/appstore-context.test.js  de contextbrug: gesloten lijst, eenmalig, en geen machtiging
 test/appstore-eersteapps.test.js  de eigen bundels in storeapps/ door dezelfde poort

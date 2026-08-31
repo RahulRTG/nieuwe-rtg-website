@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 457 delen, 0 zonder onderwerp.**
+**59 bundels, 458 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 95 delen, 9708 regels in de delen
+`public/apps/app-main/` -- 95 delen, 9712 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -140,7 +140,7 @@ omlaag.
 
 ## `apps/command.js`
 
-`public/apps/command/` -- 20 delen, 2798 regels in de delen
+`public/apps/command/` -- 21 delen, 2948 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -164,6 +164,7 @@ omlaag.
 | `command-18.js` | RTG Command, deel 18: de incidenten -- wat er stuk was, wat eraan is gedaan, en wat we nog steeds niet weten |
 | `command-19.js` | RTG Command, deel 19: bijstand |
 | `command-20.js` | RTG Command, deel 20: de vloot |
+| `command-21.js` | RTG Command, deel 21: het bezitsbewijs -- hoeveel zware verzoeken zouden er vandaag worden geweigerd als we het aanze... |
 
 ## `apps/defensie.js`
 
@@ -543,7 +544,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 583 regels in de delen
+`public/shared/basis/` -- 4 delen, 593 regels in de delen
 
 | deel | onderwerp |
 |---|---|

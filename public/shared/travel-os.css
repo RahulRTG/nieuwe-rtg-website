@@ -582,3 +582,54 @@ body.travel-os-immersive .paneel{border-color:rgba(194,58,94,.32)!important;back
 @media(prefers-reduced-motion:reduce){
   body.travel-os *,body.travel-os *::before,body.travel-os *::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
 }
+
+/* ------------------------------------------------------- EEN KOP, EEN RIJ
+   Deze schermen droegen twee kopbalken: de TravelOS-kop (merk, module,
+   beveiligd) en daaronder de ios-balk met een menuknop, een terug-link, de
+   paginatitel en de Rahul-tab. De terug-link stond daarmee twee keer (het
+   RTG-merk doet hetzelfde) en de titel drie keer, en het kostte 123 pixels
+   boven de inhoud van elk reisscherm.
+
+   WAT HIER NIET GEBEURT, EN WAAROM. Ik heb eerst geprobeerd de twee unieke
+   knoppen (het app-menu en de Rahul-tab) naar de TravelOS-kop te VERPLAATSEN en
+   de oude balk te verbergen. Dat werkte op drie schermen en niet op zes: de
+   balk wordt door een ander script gebouwd en opnieuw opgebouwd, dus de
+   verhuisde knop was even later weg -- en het menu daarmee onbereikbaar. Een
+   waarnemer die daar tegenin blijft duwen is een race, en een race verlies je
+   op het scherm van iemand anders.
+
+   Dus blijft de balk staan waar hij hoort en verliest hij alleen wat dubbel is.
+   Wat overblijft is een dunne handelingsrij: menu links, Rahul rechts. */
+body.travel-os .ios-nav{
+  /* !important omdat deze balk uit een andere laag komt die zichzelf later in
+     de bundel zet; het huis doet dat op dezelfde manier bij `html.tos-ingebed`.
+     Het gaat om drie eigenschappen en niet om een heel blok. */
+  position:static!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:space-between;
+  gap:.8rem;
+  min-height:0;
+  border:0;
+  background:none;
+  box-shadow:none;
+  padding:.4rem clamp(1rem,3vw,2rem) 0;
+}
+body.travel-os .ios-nav .ios-nav-rij{flex:1;display:flex;align-items:center}
+body.travel-os .ios-nav .ios-nav-titel,
+body.travel-os .ios-nav .ios-terug,
+body.travel-os .ios-nav .terug{display:none}
+body.travel-os .ios-nav .ios-nav-rij{min-height:0;padding-block:0}
+body.travel-os .ios-nav .ios-nav-acties{display:flex;align-items:center;gap:.5rem}
+body.travel-os .ios-nav .rtg-rahul-tab{
+  flex:none;
+  display:flex;
+  align-items:baseline;
+  gap:.4rem;
+  min-height:36px;
+  border:1px solid var(--tos-line);
+  background:none;
+  padding:.3rem .7rem;
+  font-size:.68rem;
+}
+body.travel-os .ios-nav .rtg-rahul-tab small{font-size:.5rem;letter-spacing:.14em}

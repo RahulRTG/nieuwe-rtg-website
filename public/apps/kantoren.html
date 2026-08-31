@@ -2910,16 +2910,20 @@ function bankRenderSalaris(reks){
     $('#bankSalMaak').addEventListener('click', async () => {
       try {
         const v = await api('bank/salaris/voorstel', { zaak: $('#bankSalZaak').value });
+        /* Eerst de loonruns ophalen, DAARNA in een keer schrijven. Toen dit in
+           twee stappen ging, stond de raming er even zonder de zin dat er nog
+           geen definitieve loonrun is -- en dat is precies het moment waarop
+           iemand denkt dat uitbetalen kan. */
+        const staart = await bankSalRuns($('#bankSalZaak').value);
         $('#bankSalUit').innerHTML =
           '<div style="color:var(--soft);margin-bottom:0.25rem;">' + esc(v.zaakNaam) + ' · maand ' + esc(v.maand) + ' · uurloon € ' + v.uurloon + '</div>' +
           v.regels.map(r => '<div style="padding:.3rem 0;' + bkLijn + '">' + esc(r.naam) + ' · ' + r.uren + ' uur · <strong>' + bkEuro(r.brutoCenten) + '</strong> ' +
             (r.iban ? '<span style="font-size:.75rem;color:var(--soft);">→ ' + esc(r.iban) + '</span>' : '<span style="color:var(--burgundy-on-dark,#C23A5E);font-size:.78rem;">geen rekening</span>') + '</div>').join('') +
           (v.zonderRekening.length ? '<div style="margin-top:0.25rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
-          '<div class="h-mt45">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>';
+          '<div class="h-mt45">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>' + staart;
         /* Geen knop aan de raming. Het antwoord zegt zelf uitbetaalbaar:false,
            en dat hoort het scherm te volgen in plaats van er een postenlijst
            uit te destilleren -- dat was nu juist de verleiding. */
-        await bankSalRuns($('#bankSalZaak').value);
       } catch (e) { meld(e.message); }
     });
     $('#bankSalRun').addEventListener('click', async () => {
@@ -2948,8 +2952,8 @@ function bankRenderSalaris(reks){
       sel.innerHTML = runs.map(r => '<option value="' + esc(r.id) + '">' + esc(r.periode) +
         (r.correctieVan ? ' (correctie)' : '') + (r.opDemoTabellen ? ' - op ongecontroleerde tabellen' : '') + '</option>').join('');
       wrap.hidden = knop.hidden = !runs.length;
-      if (!runs.length) $('#bankSalUit').innerHTML += '<div class="bk-nazin">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
-    } catch (e) { wrap.hidden = knop.hidden = true; meld(e.message); }
+      return runs.length ? '' : '<div class="bk-nazin">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
+    } catch (e) { wrap.hidden = knop.hidden = true; meld(e.message); return ''; }
   }
 
   // de bronrekening-lijst vers houden, met behoud van de gemaakte keuze

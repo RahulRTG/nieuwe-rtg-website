@@ -85,7 +85,7 @@ module.exports = (ctx) => {
       }
       const k = await kaartKoop(session, { vervoerder: e.vervoerder, lijnId: e.lijnId,
         van: e.van.id, naar: e.naar.id, product: 'enkel',
-        idem: body.idem ? 'reis:' + schoon(body.idem, 40) + ':' + e.lijnId : undefined,
+        idem: 'reis:' + (body.idem ? schoon(body.idem, 40) : r.id) + ':' + e.lijnId,
         stad: schoon(body.stad, 40) || null });
       if (k.error) { await draaiTerug(gemaakteRitten); return k; }
       r.etappes.push({ wijze: 'ov', lijnId: e.lijnId, lijnNaam: e.lijnNaam, vervoerder: e.vervoerder,

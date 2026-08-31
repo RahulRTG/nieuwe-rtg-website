@@ -89,6 +89,18 @@ const REGISTER = {
      krimpen, en voor identity, money en security is de eis nul. Dat getal hoort
      niet in NORM.json thuis -- het is geen kwaliteitscijfer over de code maar de
      grens van wat deze graaf op dit moment veilig kan bewijzen. */
+  /* DE MUTATIECONTRACTRONDE (augustus 2026), vier meetbestanden met een ratel.
+
+     Alle vier worden ze bij naam gelezen door de toets die ze vasthoudt, en die
+     toets zakt ook echt: de LEGACY-grens staat op NUL (test/mutatiecontract.test.js
+     regel 185), de afgeleide lijst mag geen route delen met de menselijke, en de
+     twee inventarissen moeten hetzelfde totaal tellen. Keuringsregel 64 van
+     scripts/check.js houdt MUTATIECONTRACT.json daarnaast tegen de code aan. */
+  'MUTATIECONTRACT.json': { eigenRatel: 'test/mutatiecontract.test.js' },
+  'MUTATIECONTRACT-AFGELEID.json': { eigenRatel: 'test/mutatiecontract.test.js' },
+  'MUTATIEINVENTARIS.json': { eigenRatel: 'test/mutatiecontract.test.js' },
+  'HANDLERBEWAKERS.json': { eigenRatel: 'test/handlerpoorten.test.js' },
+
   'BEDRADING.json': { eigenRatel: 'scripts/check.js' },
   'UITVOERPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'KLOK.json': { eigenRatel: 'scripts/klok.js' },

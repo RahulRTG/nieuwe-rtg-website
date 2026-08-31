@@ -255,6 +255,24 @@ afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
 per capability of er ergens een caller is, en hij vond er vijf die er geen
 hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
 lijst van wat er nog openstaat.
+**`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
+CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
+Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in
+één zin: **100% geclassificeerd, 100% meetbaar waar technisch zinvol, 0%
+schijnzekerheid — niet 100% idempotent.** Een route die met opzet een tweede
+handeling uitvoert is KLAAR zodra dat vaststaat en bewezen is; wie dat omdraait,
+verbouwt de architectuur om een percentage. Vijf assen met elk precies één huis
+(semantiek → `kern/mutatie.js`, duplicaatgedrag → `lib/idemsleutels.js`, bewijs →
+`IDEMPROEF.json`, en toegang + stand → `kern/mutatiecontract/klassen.js`), zes standen
+waarvan er maar één naar nul moet (`LEGACY_PENDING_CLASSIFICATION`), en zes
+toegangsklassen zodat "geen rol" ophoudt een restpost te zijn. Drie dingen die
+niet mogen sneuvelen: **een stand wordt nooit afgeleid uit bewijs** (het bewijs
+draagt een voorstel, een mens draagt het besluit), elke stand die toestemming
+geeft om níéts te doen eist een meting én een reden, en een herhaling die wordt
+GEWEIGERD is een toestandscontrole en geen idempotentie. `MUTATIEINVENTARIS.json`
+legt eerst de vijf inventarissen naast elkaar — er liepen vier getallen rond die
+alle vier "het aantal routes" heetten — want een percentage tussen twee
+verschillende noemers is fictie.
 **`TENANT.md` is de buitenkant van de bedrijvenkant** — hoe een partner het
 Werk OS onder zijn eigen naam gebruikt zonder dat er een tweede platform
 ontstaat. Lees die vóór je aan white-label, SSO-inrichting of "enterprise"

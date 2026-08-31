@@ -63,7 +63,7 @@ module.exports = (ctx) => {
         bewaar(t);
         if (aan) seintje(aan);
         return { ok: true, tegoed: naarBuiten(t), saldo: saldoVan(rekLid(codenaam)), bijgeladen: z.bijgeladen };
-      });
+      }, { geld: 'koopt tegoed, en dat is een betaling' });
   }
 
   /* ---------- verzilveren: van de escrow naar de wallet van de ontvanger ---------- */

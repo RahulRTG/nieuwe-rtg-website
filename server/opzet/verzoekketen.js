@@ -57,6 +57,17 @@ module.exports = function verzoekketen(deps) {
      X-Forwarded-For wordt genegeerd in plaats van geloofd. Staat de proxy op een
      publiek adres, zet die dan hier (komma-gescheiden). */
   app.set('proxy ips', String(process.env.RTG_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean));
+  /* DE EFFECTMETER, en met opzet als EERSTE laag van de keten.
+
+     Hij hing eerst naast de staatmeter, halverwege, en meldde daar `geen` op een
+     verzoek dat een account aanmaakte: de async-context ging tussen die plek en
+     de route verloren (de body-lezer parkeert het verzoek, en het vervolg loopt
+     dan buiten de context die halverwege is geopend). Een meter die zwijgt waar
+     iets gebeurde is erger dan geen meter, dus staat hij nu boven alles wat
+     parkeert. Zie server/effectmeter.js.
+
+     Zonder RTG_STAATLOG hangt hij helemaal niet in de keten. */
+  require('../effectmeter').haak(app);
   app.use(logboek.middleware()); // correlatie-id + verzoeklog (methode, pad, status, duur)
   // wat verandert dit verzoek: rijen per collectie voor en na (blast radius).
   // NA het logboek want hij leunt op req.id; bewust niet in save(). Zie de kop

@@ -99,7 +99,7 @@ module.exports = (ctx) => {
       save();
       seintje(p.codenaam);
       return { ok: true, id, saldoCenten: saldoVan(p.iban), besteedVandaagCenten: p.besteed };
-    });
+    }, { geld: 'rekent een betaling met een pas af' });
   }
 
   return { bankPasUitgeven: uitgeven, bankPassen: lijst, bankPasBevries: bevries, bankPasLimiet: limiet, bankPasSluit: sluit, bankPasBetaal: betaal };

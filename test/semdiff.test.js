@@ -179,10 +179,27 @@ test('de echte tak: de meting draagt soort, klasse en verwijderingen', () => {
      van iets kapots. */
   assert.ok(!r.fout, 'diff() liep vast: ' + r.fout);
   assert.ok(Array.isArray(r.bestanden), 'diff() levert een lijst');
-  if (r.bestanden.length > 10) {
-    const klassen = new Set(r.bestanden.map((b) => b.klasse));
-    assert.ok(klassen.size >= 4, 'er wordt echt onderscheiden: ' + [...klassen].join(', '));
-  }
+  /* HIER STOND EEN TWEEDE AANNAME OVER DE OMGEVING, uit dezelfde familie als
+     die hierboven: bij meer dan tien gewijzigde bestanden moest de tak minstens
+     VIER klassen dragen, anders zou de classificator overal hetzelfde etiket
+     plakken. Maar dat is geen eigenschap van de classificator, het is een
+     eigenschap van de TAK die hem toevallig voedt. Een gerichte schermronde
+     raakt twaalf bestanden die allemaal front-end zijn, en zakte hierop --
+     terwijl er niets mis was met het onderscheid.
+
+     Wat er te bewijzen valt is dat hij ECHT onderscheidt, en dat hoort tegen
+     invoer die wij kiezen: dan draait de proef altijd (ook op een lege diff) en
+     hangt hij niet af van wat er die dag toevallig veranderde. */
+  const proef = new Map([
+    ['ONTWERP.md', []],
+    ['public/apps/kantoor.html', []],
+    ['scripts/check.js', []],
+    ['server/kern/pay/poort.js', ['+  const bedrag = centen(regel);']],
+    ['server/kern/sessie.js', ['+  const token = maakToken(lid);']]
+  ]);
+  const klassen = new Set([...proef].map(([pad, regels]) => klasseVanBestand(pad, regels).klasse));
+  assert.ok(klassen.size >= 4,
+    'de classificator onderscheidt te weinig: ' + [...klassen].join(', '));
   for (const b of r.bestanden) {
     assert.ok(b.soort && b.klasse, 'elk bestand draagt soort en klasse: ' + b.pad);
     if (b.soort === 'document') {

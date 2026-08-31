@@ -4,7 +4,7 @@
  "gemeten": {
   "scherm": 0,
   "schermBestanden": 0,
-  "server": 35,
+  "server": 36,
   "serverBestanden": 18,
   "totaal": 35,
   "bestanden": 18
@@ -16,7 +16,7 @@
   "duurzaamheid-kill.test.js": 1,
   "eventloop.test.js": 7,
   "foutmelder.test.js": 1,
-  "journaalschrijf.test.js": 2,
+  "journaalschrijf.test.js": 3,
   "kycspoor.test.js": 2,
   "ledengids-race.test.js": 3,
   "lidfactuur.test.js": 1,
@@ -44,5 +44,6 @@
   "lidfactuur.test.js": "bewaakt een AFWEZIGHEID: uitgeven aan de balie levert GEEN tweede factuur op, en de facturatiemotor boekt in een losse belofte -- meteen tellen zou alleen zeggen \"op dit moment nog een\"",
   "speldag.test.js": "de wacht IS het onderwerp: een oplosser is er in milliseconden doorheen, dus zonder pauze zijn de klok van de server en de nul die de client meestuurt niet uit elkaar te houden",
   "spelsudoku.test.js": "zelfde als speldag: de verstreken tijd op de server is precies wat de toets tegenover de meegestuurde nul zet; zonder pauze meten allebei de volle basis"
- }
+ },
+ "metDeHand": "journaalschrijf.test.js ging van 2 naar 3 wachten, en dat is met de hand verantwoord op 30 augustus 2026 -- scripts/klokwacht.js legt een stijging niet zelf vast. De derde wacht bewaakt een AFWEZIGHEID: na de eerste spoeling mag er binnen het venster GEEN tweede komen. Zonder die wacht keek de toets op het moment van de eerste spoeling, en dat er er dan een geweest is, is per definitie waar -- met de rem (`if (spoelt) return`) uit kern/doorgeefjournaal.js bleef hij groen. Dit is dezelfde soort als alarmweg, foutmelder, pg-snapshot en lidfactuur: een tweede gebeurtenis zou zich in die ruimte verraden, en daar bestaat geen toestand voor om op te wachten."
 }

@@ -1,0 +1,490 @@
+{
+ "stempel": {
+  "op": "2026-08-29T23:10:05.053Z",
+  "commit": "55e4a311",
+  "boomVuil": true,
+  "node": "v22.22.2"
+ },
+ "uitleg": "Per handler de eerste poortvorm: een aanroep met (req, res) waarvan de uitkomst meteen tot een return leidt. Dat is de huisvorm van een bewaker die niet in de router staat maar in het lichaam.",
+ "grens": "Dit script vult NIETS in. Het levert de lijst waarmee een mens de toegangsklasse kan zetten, per BESTAND EN NAAM -- want drie van deze namen betekenen elders iets anders, en een map op naam alleen zou een rekenfunctie als bewaker tellen.",
+ "gemeten": {
+  "handlers": 4441,
+  "metPoortvorm": 1220,
+  "vormen": 60,
+  "zonderAfTeLeidenToegang": 366,
+  "daarvanMetPoortvorm": 6,
+  "vormenInDeBak": 2
+ },
+ "naambotsingen": [
+  {
+   "naam": "geenGast",
+   "bestanden": [
+    "server/routes/agenda.js",
+    "server/routes/appstore/lid.js",
+    "server/routes/bestanden-pdf.js",
+    "server/routes/bestanden.js",
+    "server/routes/clips.js",
+    "server/routes/facturatie.js",
+    "server/routes/festival/gast.js",
+    "server/routes/festival/groep.js",
+    "server/routes/flits.js",
+    "server/routes/galerij.js",
+    "server/routes/geld.js",
+    "server/routes/klok.js",
+    "server/routes/kosten.js",
+    "server/routes/link.js",
+    "server/routes/mediaos.js",
+    "server/routes/meet.js",
+    "server/routes/member/berichtenapp.js",
+    "server/routes/member/boardroom.js",
+    "server/routes/member/comm-stand.js",
+    "server/routes/member/comm.js",
+    "server/routes/member/genootschap.js",
+    "server/routes/member/kijk.js",
+    "server/routes/member/mall-vindlaag.js",
+    "server/routes/member/metier.js",
+    "server/routes/member/salonapp.js",
+    "server/routes/member/vooruit.js",
+    "server/routes/member/wauw.js",
+    "server/routes/member/winkel-bieb.js",
+    "server/routes/mobiliteit/vervoerbewijs.js",
+    "server/routes/mobiliteit.js",
+    "server/routes/muziek-samen.js",
+    "server/routes/muziek.js",
+    "server/routes/navigatie.js",
+    "server/routes/notities.js",
+    "server/routes/ov.js",
+    "server/routes/pay-tegoed.js",
+    "server/routes/pay-terug.js",
+    "server/routes/pay-waarde.js",
+    "server/routes/pay.js",
+    "server/routes/plaats.js",
+    "server/routes/podium.js",
+    "server/routes/rtmail-lid.js",
+    "server/routes/samen.js",
+    "server/routes/sociaal.js",
+    "server/routes/social/gezinnen/toezicht.js",
+    "server/routes/social/klets.js",
+    "server/routes/social/leden.js",
+    "server/routes/social/naamlaag.js",
+    "server/routes/social/pin.js",
+    "server/routes/social/snaps.js",
+    "server/routes/socialerahul.js",
+    "server/routes/spellen.js",
+    "server/routes/theater.js",
+    "server/routes/wbw.js",
+    "server/routes/webmaker.js"
+   ],
+   "routes": 378
+  },
+  {
+   "naam": "managerOnly",
+   "bestanden": [
+    "server/routes/agenda.js",
+    "server/routes/bankhart.js",
+    "server/routes/facturatie.js",
+    "server/routes/festival/artiest.js",
+    "server/routes/festival/dienst.js",
+    "server/routes/festival/gereed.js",
+    "server/routes/festival/partner.js",
+    "server/routes/festival/vooruit.js",
+    "server/routes/festival.js",
+    "server/routes/markt.js",
+    "server/routes/mobiliteit/vervoerbewijs.js",
+    "server/routes/mobiliteit/werkkant.js",
+    "server/routes/onboarding.js",
+    "server/routes/ov.js",
+    "server/routes/pay-zaak-treasury.js",
+    "server/routes/pay-zaak.js",
+    "server/routes/staff/collega.js",
+    "server/routes/supplier/agent.js",
+    "server/routes/supplier/autoverkoop.js",
+    "server/routes/supplier/bezorg.js",
+    "server/routes/supplier/boerderij.js",
+    "server/routes/supplier/charter/vloot.js",
+    "server/routes/supplier/contract.js",
+    "server/routes/supplier/creator.js",
+    "server/routes/supplier/defensie.js",
+    "server/routes/supplier/eten.js",
+    "server/routes/supplier/events/catering.js",
+    "server/routes/supplier/events/planning.js",
+    "server/routes/supplier/gebouwpand.js",
+    "server/routes/supplier/gebouwplus.js",
+    "server/routes/supplier/groothandel.js",
+    "server/routes/supplier/handel.js",
+    "server/routes/supplier/horeca/dish-twin.js",
+    "server/routes/supplier/horeca/keuken-regie.js",
+    "server/routes/supplier/horeca/rahul.js",
+    "server/routes/supplier/horeca/simulation-bridge.js",
+    "server/routes/supplier/horeca/spatial-command.js",
+    "server/routes/supplier/horeca/wijk.js",
+    "server/routes/supplier/hrplus.js",
+    "server/routes/supplier/hulpdienst.js",
+    "server/routes/supplier/kamers/huishouding.js",
+    "server/routes/supplier/kamers/voorzieningen.js",
+    "server/routes/supplier/kassa/modus.js",
+    "server/routes/supplier/keuken.js",
+    "server/routes/supplier/menukaart.js",
+    "server/routes/supplier/modebezorg.js",
+    "server/routes/supplier/orders/afhandeling.js",
+    "server/routes/supplier/pda/netwerk.js",
+    "server/routes/supplier/pda/vloer-missies.js",
+    "server/routes/supplier/pda/vloer.js",
+    "server/routes/supplier/prplus.js",
+    "server/routes/supplier/retail.js",
+    "server/routes/supplier/samenwerking.js",
+    "server/routes/supplier/tafels-team.js",
+    "server/routes/supplier/thuis.js",
+    "server/routes/supplier/tickets-dicht.js",
+    "server/routes/supplier/tickets.js",
+    "server/routes/supplier/toegang-settings.js",
+    "server/routes/supplier/toegang.js",
+    "server/routes/supplier/tools.js",
+    "server/routes/supplier/vastgoed/deals.js",
+    "server/routes/supplier/vastgoed/portefeuille.js",
+    "server/routes/supplier/verhuur/vloot.js",
+    "server/routes/supplier/vooruit.js",
+    "server/routes/supplier/werving/sollicitaties.js",
+    "server/routes/webmeting.js",
+    "server/routes/werkbeleid.js",
+    "server/routes/werkvloer.js",
+    "server/routes/zaakcommand/bestuur.js",
+    "server/routes/zaakcommand/herstel.js",
+    "server/routes/zaakcommand/index.js",
+    "server/routes/zaakweb.js"
+   ],
+   "routes": 220
+  },
+  {
+   "naam": "familieVan",
+   "bestanden": [
+    "server/foundation/buddy.js",
+    "server/foundation/gasten/geldschool.js",
+    "server/foundation/gasten/gezinsleven.js",
+    "server/foundation/gasten/gezondheid.js",
+    "server/foundation/gasten/keuken.js",
+    "server/foundation/gasten/ochtend.js",
+    "server/foundation/gasten/verjaardagen.js",
+    "server/foundation/markt.js",
+    "server/foundation/sollicitaties.js",
+    "server/foundation/vooruit.js"
+   ],
+   "routes": 60
+  },
+  {
+   "naam": "klasVan",
+   "bestanden": [
+    "server/school/aandacht.js",
+    "server/school/belasting.js",
+    "server/school/bewijs.js",
+    "server/school/bijdrage.js",
+    "server/school/denkfout.js",
+    "server/school/excursie.js",
+    "server/school/gezin.js",
+    "server/school/hulplijn.js",
+    "server/school/instap.js",
+    "server/school/klas.js",
+    "server/school/les.js",
+    "server/school/opvolging.js",
+    "server/school/taalcheck.js",
+    "server/school/taalpoort.js",
+    "server/school/toets.js",
+    "server/school/toetsbieb.js",
+    "server/school/toetskeuring.js",
+    "server/school/verbonden.js"
+   ],
+   "routes": 55
+  },
+  {
+   "naam": "gezinSessie",
+   "bestanden": [
+    "server/school/bellen.js",
+    "server/school/bijdrage.js",
+    "server/school/bijles.js",
+    "server/school/dag.js",
+    "server/school/excursie.js",
+    "server/school/gezin.js",
+    "server/school/hulplijn.js",
+    "server/school/klas.js",
+    "server/school/machtiging.js",
+    "server/school/opvolging.js",
+    "server/school/ouderportaal-mijn.js",
+    "server/school/ouderportaal.js",
+    "server/school/peiling-antwoord.js",
+    "server/school/planner.js",
+    "server/school/rapport-tekst.js",
+    "server/school/taal.js",
+    "server/school/toets-leerling.js",
+    "server/school/verbonden.js",
+    "server/school/verlof.js"
+   ],
+   "routes": 37
+  },
+  {
+   "naam": "lid",
+   "bestanden": [
+    "server/routes/luchthaven.js",
+    "server/routes/member/gemeente.js",
+    "server/routes/member/overheid.js",
+    "server/routes/member/residentie.js",
+    "server/routes/sportclub.js"
+   ],
+   "routes": 36
+  },
+  {
+   "naam": "gate",
+   "bestanden": [
+    "server/routes/bank.js",
+    "server/routes/bankhart.js"
+   ],
+   "routes": 31
+  },
+  {
+   "naam": "gast",
+   "bestanden": [
+    "server/routes/bank.js",
+    "server/routes/thuis.js",
+    "server/routes/vonk.js"
+   ],
+   "routes": 29
+  },
+  {
+   "naam": "rtfSociaal",
+   "bestanden": [
+    "server/routes/social/gezinnen/toezicht.js",
+    "server/routes/social/gezinnen/vrienden.js"
+   ],
+   "routes": 28
+  },
+  {
+   "naam": "profiel",
+   "bestanden": [
+    "server/routes/geloofbieb.js",
+    "server/routes/rtfbieb.js",
+    "server/routes/rtfschool.js"
+   ],
+   "routes": 25
+  },
+  {
+   "naam": "managerOf",
+   "bestanden": [
+    "server/routes/fiscaal-vooruit.js",
+    "server/routes/supplier/btw.js",
+    "server/routes/supplier/retour.js",
+    "server/routes/supplier/verkoopweg.js"
+   ],
+   "routes": 21
+  },
+  {
+   "naam": "gegevensStop",
+   "bestanden": [
+    "server/routes/member/boeken.js",
+    "server/routes/member/handel/uitjes.js",
+    "server/routes/member/handel/winkel.js",
+    "server/routes/member/kopen/bezorg.js",
+    "server/routes/member/kopen/tickets.js",
+    "server/routes/member/persoonlijk-care.js",
+    "server/routes/member/voertuigen/charter.js",
+    "server/routes/member/voertuigen/huur.js",
+    "server/routes/member/voertuigen/verkoop.js",
+    "server/routes/member/winkel-bieb.js",
+    "server/routes/member/winkel.js",
+    "server/routes/synergie.js",
+    "server/routes/verzorging.js"
+   ],
+   "routes": 20
+  },
+  {
+   "naam": "rekVan",
+   "bestanden": [
+    "server/routes/supplier/horeca/betalen.js",
+    "server/routes/supplier/horeca/gezelschap.js",
+    "server/routes/supplier/horeca/pas.js",
+    "server/routes/supplier/horeca/rekening.js",
+    "server/routes/supplier/horeca/schuif.js"
+   ],
+   "routes": 19
+  },
+  {
+   "naam": "werkPoort",
+   "bestanden": [
+    "server/bedrijf/aansluiting.js",
+    "server/bedrijf/gevolg.js",
+    "server/bedrijf/handeling.js",
+    "server/bedrijf/inzicht-graaf.js",
+    "server/bedrijf/inzicht.js",
+    "server/bedrijf/mijnwerk.js",
+    "server/bedrijf/regelpoort.js",
+    "server/bedrijf/rollen.js",
+    "server/bedrijf/start.js",
+    "server/bedrijf/toen.js"
+   ],
+   "routes": 17
+  },
+  {
+   "naam": "poort",
+   "bestanden": [
+    "server/school/koppelingen.js",
+    "server/school/omroep.js",
+    "server/school/organisatie.js",
+    "server/school/ouderportaal.js",
+    "server/school/rollen.js",
+    "server/school/schooljaar.js"
+   ],
+   "routes": 15
+  },
+  {
+   "naam": "eisAccount",
+   "bestanden": [
+    "server/routes/auth/webauthn.js",
+    "server/routes/member/gezin.js"
+   ],
+   "routes": 12
+  },
+  {
+   "naam": "personeelVan",
+   "bestanden": [
+    "server/school/beheer.js",
+    "server/school/belasting.js",
+    "server/school/hr-verlof.js",
+    "server/school/hr.js",
+    "server/school/instap.js",
+    "server/school/peiling-antwoord.js",
+    "server/school/rollen.js",
+    "server/school/verbonden.js"
+   ],
+   "routes": 12
+  },
+  {
+   "naam": "gezinVan",
+   "bestanden": [
+    "server/foundation/gezin.js",
+    "server/foundation/gezinstoegang.js",
+    "server/foundation/kosten.js",
+    "server/foundation/zorg.js"
+   ],
+   "routes": 11
+  },
+  {
+   "naam": "schoolVan",
+   "bestanden": [
+    "server/school/beheer.js",
+    "server/school/directie.js",
+    "server/school/opvolging.js",
+    "server/school/personeel-inlog.js",
+    "server/school/personeelstoegang.js",
+    "server/school/rollen.js",
+    "server/school/taalpoort.js"
+   ],
+   "routes": 11
+  },
+  {
+   "naam": "lesVan",
+   "bestanden": [
+    "server/foundation/onderwijs/les.js",
+    "server/foundation/onderwijs/schrift.js"
+   ],
+   "routes": 10
+  },
+  {
+   "naam": "viaBeheerOfDirectie",
+   "bestanden": [
+    "server/routes/tenant/bijstand.js",
+    "server/routes/tenant.js"
+   ],
+   "routes": 9
+  },
+  {
+   "naam": "echtAccount",
+   "bestanden": [
+    "server/routes/account.js",
+    "server/routes/algpin.js"
+   ],
+   "routes": 8
+  },
+  {
+   "naam": "ovZaakOnly",
+   "bestanden": [
+    "server/routes/mobiliteit/vervoerbewijs.js",
+    "server/routes/ov.js"
+   ],
+   "routes": 8
+  },
+  {
+   "naam": "sessieVan",
+   "bestanden": [
+    "server/foundation/berichten.js",
+    "server/foundation/gasten/gezinsleven.js",
+    "server/foundation/zorg.js"
+   ],
+   "routes": 7
+  },
+  {
+   "naam": "beheerVan",
+   "bestanden": [
+    "server/bedrijf/index.js",
+    "server/bedrijf/leden.js",
+    "server/bedrijf/rollen.js"
+   ],
+   "routes": 5
+  },
+  {
+   "naam": "zaakVan",
+   "bestanden": [
+    "server/routes/gast/betalen-buiten.js",
+    "server/routes/gast/bezorgen.js",
+    "server/routes/gast/mijn-buiten.js",
+    "server/routes/gast/profiel-buiten.js"
+   ],
+   "routes": 5
+  },
+  {
+   "naam": "eisSalonProfiel",
+   "bestanden": [
+    "server/routes/supplier/salon/profiel.js",
+    "server/routes/supplier/salon/publiceren.js"
+   ],
+   "routes": 4
+  },
+  {
+   "naam": "eis",
+   "bestanden": [
+    "server/routes/member/rechterhand.js",
+    "server/routes/member/rendezvous.js"
+   ],
+   "routes": 2
+  },
+  {
+   "naam": "geenEchtAccount",
+   "bestanden": [
+    "server/routes/pay-tegoed.js",
+    "server/routes/pay.js"
+   ],
+   "routes": 2
+  }
+ ],
+ "inDeBak": [
+  {
+   "naam": "doosSleutelOk",
+   "bestanden": [
+    "server/routes/doos.js"
+   ],
+   "routes": [
+    "POST /api/doos/meting",
+    "POST /api/doos/update/status",
+    "POST /api/doos/buurmelding",
+    "POST /api/doos/rapport"
+   ]
+  },
+  {
+   "naam": "geremd",
+   "bestanden": [
+    "server/routes/gast/tafel.js"
+   ],
+   "routes": [
+    "POST /api/gast/tafel",
+    "POST /api/gast/aanschuiven"
+   ]
+  }
+ ]
+}

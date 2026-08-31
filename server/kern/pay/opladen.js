@@ -10,7 +10,7 @@ function maakOpladen(basis) {
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP } = basis;
 
   /* ---------- opladen (Apple Pay / kaart via de betaal-naad) ---------- */
-  async function laadOp({ codenaam, centen, idem, oms, userId }) {
+  async function laadOp({ codenaam, centen, idem, oms, userId, interneStap }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c < OPLAAD_MIN || c > MAX_CENTEN) return { status: 400, error: 'Opladen kan van 1 tot 5000 euro.' };
     /* HET PLAFOND VALT HIER, EN NIET PAS BIJ DE BOEKING.
@@ -23,6 +23,7 @@ function maakOpladen(basis) {
        ontdekt, is geen grens maar een schadepost. */
     const vol = plafondFout(rekLid(codenaam), c);
     if (vol) return vol;
+    // `interneStap`: stap binnen een andere handeling (zie zorgSaldo), nooit van buiten.
     return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {
       let betaling;
       try {
@@ -64,7 +65,7 @@ function maakOpladen(basis) {
         return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
       }
       return oplaadAfronden({ codenaam, centen: c, oms, ref: betaling.id });
-    });
+    }, interneStap ? null : { geld: 'laadt de wallet op, met transactiekosten op dat moment' });
   }
 
   /* HET BIJSCHRIJVEN ZELF, als eigen functie -- want het gebeurt op TWEE
@@ -136,7 +137,9 @@ function maakOpladen(basis) {
     const tekort = Math.round(centen) - saldoVan(rekLid(codenaam));
     if (tekort <= 0) return { ok: true, bijgeladen: 0 };
     if (bankDekking) {
-      try { const b = await bankDekking({ codenaam, centen: tekort }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
+      /* De sleutel gaat MEE: anders weigert de geldgrens de dekking en slikt deze
+         catch dat op -- zo kreeg een lid `bijgeladen: 0` zonder uitleg. */
+      try { const b = await bankDekking({ codenaam, centen: tekort, idem }); if (b && b.ok) return { ok: true, bijgeladen: tekort, via: 'bank' }; }
       catch (e) { /* de bank kon niet dekken: gewoon door naar de kaart */ }
     }
     /* Afronden op tientjes is comfort, het plafond is een grens -- dus als de
@@ -147,7 +150,10 @@ function maakOpladen(basis) {
        betalen -- de duurste manier om een plafond te ontdekken. */
     const stap = Math.ceil(tekort / AUTOLAAD_STAP) * AUTOLAAD_STAP;
     const bedrag = plafondFout(rekLid(codenaam), stap) ? Math.max(tekort, OPLAAD_MIN) : stap;
-    const r = await laadOp({ codenaam, centen: bedrag, idem: idem ? idem + ':autolaad' : null, oms: 'Automatisch bijgeladen' });
+    /* Zonder sleutel van boven is dit een STAP: de handeling die hierom vroeg
+       draagt de idempotentie. Afweging voluit: ../bank/walletbrug.js. */
+    const r = await laadOp({ codenaam, centen: bedrag, oms: 'Automatisch bijgeladen',
+      idem: idem ? idem + ':autolaad' : null, interneStap: !idem });
     if (r.error) return r;
     return { ok: true, bijgeladen: bedrag, via: 'kaart' };
   }

@@ -17,6 +17,7 @@
    Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
    van de publieke API. */
 const verraad = require('../lib/verraad');
+const effectmeter = require('../effectmeter');
 const state = require('./state');
 const db = state.db;
 /* De werkvormen hangen aan db: db.capsVan(zaak) zegt wat een zaak mag
@@ -73,6 +74,13 @@ function save() {
      Binnen een bundel hoort save() sowieso alleen een vlag te zetten; de echte
      schrijfactie gebeurt aan het eind, buiten deze context, en daar slaat het
      verraad gewoon toe. */
+  /* DE EFFECTMETER (../effectmeter.js), boven de bundelcheck en het verraad.
+     Eronder was fout: een save binnen bijeen() keert hier af met alleen een vlag
+     en schrijft daarna via saveDuurzaam(), die save() niet in elke tak aanroept
+     -- de kop meldde `geen` op een verzoek dat een heel account aanmaakte. Hij
+     telt dus de POGING; een bundel van drie plus zijn commit telt vier. Bewust:
+     de vraag is niet "hoeveel" maar "iets of niets", en die mag geen tak missen. */
+  effectmeter.tel('opslag');
   const doos = bundelDoos();
   if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
   if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');

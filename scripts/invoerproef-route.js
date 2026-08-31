@@ -29,6 +29,7 @@ const { maakTeller, maakRommel } = require('./lib/rommel');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
 const { stempel } = require('./lib/stempel');
+const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'INVOERPROEF.json');
@@ -60,7 +61,7 @@ if (require.main !== module) { module.exports = {}; return; }
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'invoerproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  const server = await start({ naam: 'invoerproef', env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const { basis, klaar } = server;
 
   const post = async (pad, lijf, tok) => {
@@ -74,25 +75,19 @@ if (require.main !== module) { module.exports = {}; return; }
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
-  /* De drie inlogwegen, elk apart, zodat een token onderweg opnieuw te halen is. */
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const ontbreekt = Object.keys(inlog).filter(r => !tokens[r]);
+  /* De sleutelbos: ./lib/proefsleutels.js, zeven rollen op een plek. Deze drie
+     regels stonden in zes instrumenten en kenden alleen member/office/supplier;
+     routes met een eigenrol bleven daardoor overal ongemeten. */
+  const bos = await haalSleutels({ post });
+  const { tokens } = bos;
+  const ontbreekt = BASISROLLEN.filter(r => !tokens[r]);
   if (ontbreekt.length) {
     console.error('geen token voor: ' + ontbreekt.join(', ') +
       ' -- de proef zou dan doen alsof die routes zijn beproefd');
     klaar(); process.exit(2);
   }
-  const tokenVoor = (rol) => tokens[rol];
-  const hernieuw = async (rol) => {
-    try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {}
-    return false;
-  };
+  const { tokenVoor, hernieuw } = bos;   // elke rol apart, zodat een verlopen token opnieuw te halen is
+  meldSleutels(bos);
 
   const rng = maakTeller(SEED);
   const { chaosBody } = maakRommel(rng);
@@ -115,7 +110,7 @@ if (require.main !== module) { module.exports = {}; return; }
      geen sleutel voor bestaat: de invoerproef stuurt rommel MET de juiste rol; zonder token voor die rol
      meet hij de voordeur en niet de invoercontrole.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
+  const verdeling = verdeelOpRol(kandidaten, bos.rollen);
   const routes = verdeling.metRol;
 
   console.log('\n=== DE INVOER-ROBUUSTHEID PER ROUTE ===\n');

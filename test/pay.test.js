@@ -82,7 +82,7 @@ test('geld sturen op codenaam werkt met een knop; onbekende namen ketsen af', as
   assert.equal(r.status, 200);
   assert.equal(r.body.saldo, 6000);
   assert.equal((await api('pay/overzicht', {}, lidB.token)).body.saldo, 1000, 'B ving de 5 euro');
-  assert.equal((await api('pay/stuur', { aan: 'BestaatNiet999', centen: 100 }, lidA.token)).status, 404);
+  assert.equal((await api('pay/stuur', { idem: 'proef-' + Math.random(), aan: 'BestaatNiet999', centen: 100 }, lidA.token)).status, 404);
 });
 
 test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de partnerpot', async () => {
@@ -90,7 +90,7 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   assert.equal(k.status, 200);
   assert.match(k.body.code, /^[0-9A-F]{6}$/);
   // boven het maximum weigert de kassa
-  assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 9000 }, supToken)).status, 402);
+  assert.equal((await api('supplier/pay/in', { idem: 'proef-' + Math.random(), code: k.body.code, centen: 9000 }, supToken)).status, 402);
   const inn = await api('supplier/pay/in', { code: k.body.code, centen: 2500, oms: 'Lunch aan zee', idem: 'kas-1' }, supToken);
   assert.equal(inn.status, 200);
   assert.equal(inn.body.centen, 2500);
@@ -98,7 +98,7 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   // vaste voet + 1% van 2500 = 35 centen, per transactie meteen verrekend
   assert.equal(inn.body.kosten, 35, 'de kosten staan meteen op de transactie');
   // de code is eenmalig
-  assert.equal((await api('supplier/pay/in', { code: k.body.code, centen: 100 }, supToken)).status, 404);
+  assert.equal((await api('supplier/pay/in', { idem: 'proef-' + Math.random(), code: k.body.code, centen: 100 }, supToken)).status, 404);
   const pot = await api('supplier/pay/overzicht', {}, supToken);
   assert.equal(pot.body.saldo, 2465, 'de partnerpot telt de kassabetaling netto (kosten direct verrekend)');
   assert.equal(pot.body.kostenVandaag, 35, 'en toont de betaaldienstkosten van vandaag transparant');
@@ -234,7 +234,7 @@ test('het saldo van de zaak uitbetalen is van de manager, innen en kijken van ie
   // kijken mag: het saldo zien hoort bij het werk aan de kassa
   assert.equal((await api('supplier/pay/overzicht', {}, inlog.token)).status, 200, 'het saldo bekijken blijft van iedereen');
   // innen mag: dat IS het werk
-  assert.equal((await api('supplier/pay/in', { code: 'BESTAATNIET', centen: 100 }, inlog.token)).status, 404,
+  assert.equal((await api('supplier/pay/in', { idem: 'proef-' + Math.random(), code: 'BESTAATNIET', centen: 100 }, inlog.token)).status, 404,
     'innen komt gewoon door de deur (en struikelt pas op de onbekende code)');
   // weghalen niet
   const uit = await api('supplier/pay/uitbetaal', { idem: 'staf-probeert-1' }, inlog.token);

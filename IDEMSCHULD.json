@@ -1,8 +1,8 @@
 {
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",
  "gemeten": {
-  "schrijfroutes": 4564,
-  "verklaard": 85,
+  "schrijfroutes": 4661,
+  "verklaard": 182,
   "schuld": 4479,
   "weesverklaringen": 0
  },

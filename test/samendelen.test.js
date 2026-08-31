@@ -145,11 +145,11 @@ test('Wie betaalt wat: alleen met vrienden, en de balans komt op nul uit', async
     const aVoor = await saldo(P, anna.token);
     const bVoor = await saldo(P, bram.token);
 
-    const verkeerdeKant = await P('/api/wbw/verreken', { id: gid }, anna.token);
+    const verkeerdeKant = await P('/api/wbw/verreken', { idem: 'proef-' + Math.random(), id: gid }, anna.token);
     assert.notEqual(verkeerdeKant.status, 200,
       'wie in de plus staat heeft niets te verrekenen: ' + JSON.stringify(verkeerdeKant.body).slice(0, 160));
 
-    const verrekend = await P('/api/wbw/verreken', { id: gid }, bram.token);
+    const verrekend = await P('/api/wbw/verreken', { idem: 'proef-' + Math.random(), id: gid }, bram.token);
     assert.equal(verrekend.status, 200, 'Bram vereffent zijn schuld: ' + JSON.stringify(verrekend.body).slice(0, 200));
 
     assert.equal(await saldo(P, anna.token) - aVoor, 2000, 'Anna krijgt precies 20 euro');
@@ -168,7 +168,7 @@ test('de kascode: een bedrag dat de zaak niet zelf mag ophogen', async () => {
   try {
     const P = post(base);
     const gast = await nieuwLid(P, 'Kasgast');
-    await P('/api/pay/oplaad', { centen: 10000 }, gast.token);
+    await P('/api/pay/oplaad', { idem: 'proef-' + Math.random(), centen: 10000 }, gast.token);
 
     /* De kascode is de betaalcode uit de app: de gast bepaalt het MAXIMUM, de
        zaak int een bedrag daarbinnen. Dat maximum is de hele veiligheid van
@@ -183,12 +183,12 @@ test('de kascode: een bedrag dat de zaak niet zelf mag ophogen', async () => {
     const lg = await P('/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' });
     const zaak = lg.body.token;
 
-    const teVeel = await P('/api/supplier/pay/in', { code: kas, centen: 9000, oms: 'Te veel' }, zaak);
+    const teVeel = await P('/api/supplier/pay/in', { idem: 'proef-' + Math.random(), code: kas, centen: 9000, oms: 'Te veel' }, zaak);
     assert.notEqual(teVeel.status, 200,
       'de zaak kan niet meer innen dan het plafond: ' + teVeel.status + ' ' + JSON.stringify(teVeel.body).slice(0, 160));
 
     const voor = await saldo(P, gast.token);
-    const goed = await P('/api/supplier/pay/in', { code: kas, centen: 2500, oms: 'Diner' }, zaak);
+    const goed = await P('/api/supplier/pay/in', { idem: 'proef-' + Math.random(), code: kas, centen: 2500, oms: 'Diner' }, zaak);
     assert.equal(goed.status, 200, 'binnen het plafond gaat het wel: ' + JSON.stringify(goed.body).slice(0, 200));
     assert.equal(voor - await saldo(P, gast.token), 2500, 'en er gaat precies 25 euro af');
   } finally { child.kill('SIGKILL'); }

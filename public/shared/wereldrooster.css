@@ -17,8 +17,11 @@
    TOEGANKELIJK.md vraagt 24, dit is een lijst waar een duim doorheen gaat. */
 .wrooster {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
-  gap: 10px;
+  /* 11rem in plaats van 13: dit is een register en geen etalage. Op een
+     bureauscherm past de hele wereld daarmee in twee rijen in plaats van drie,
+     zonder dat een naam afbreekt -- de langste is 'Partner Network'. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: 6px;
 }
 .wrooster-kaart {
   display: flex;

@@ -43,7 +43,14 @@ module.exports = (ctx) => {
       return { tekst: 'Geregeld: uw 24 uur bij ' + r.gebruik.assetNaam + ' staat op ' + w.datum + ' (nog ' + r.dagenTegoed + ' dag(en) tegoed dit jaar). Het team neemt vooraf contact op.', gedaan: true };
     }
     if (w.soort === 'tik' && pay) {
-      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via Rahul', soort: 'tik' });
+      /* DE SLEUTEL IS HET VOORSTEL ZELF, en dat is geen formaliteit. Sinds de
+         geldgrens (lib/idem.js) weigert een geldhandeling zonder sleutel, en
+         zonder deze regel gaf Rahul na een "ja" gewoon "Dat lukt niet" terug.
+         Er valt hier ook precies een goede sleutel te kiezen: het openstaande
+         voorstel is het ding dat de mens heeft bevestigd, dus twee keer "ja" op
+         HETZELFDE voorstel is een Tik, en een nieuw voorstel is een nieuwe. */
+      const r = await pay.stuur({ van: codenaam, aanCodenaam: w.aan, centen: w.centen, oms: 'Via Rahul', soort: 'tik',
+        idem: 'rahul-tik-' + w.at });
       if (r.error) return { tekst: 'Dat lukt niet: ' + r.error };
       return { tekst: 'Gedaan: ' + eur(w.centen) + ' aan ' + w.aan + ' gestuurd via een Tik. Uw saldo: ' + eur(r.saldo) + '.', gedaan: true };
     }
@@ -77,7 +84,10 @@ module.exports = (ctx) => {
     if (w.soort === 'klompjes' && pay) {
       let betaald = 0, mis = null;
       for (const id of w.ids || []) {
-        const r = await pay.verzoekBetaal({ codenaam, verzoekId: id });
+        /* Zelfde reden als bij de Tik hierboven: de geldgrens vraagt een
+           sleutel. Hier is het verzoekID het voorstel -- twee keer "ja" op
+           hetzelfde klompje betaalt het een keer. */
+        const r = await pay.verzoekBetaal({ codenaam, verzoekId: id, idem: 'rahul-klompje-' + id });
         if (r.error) { mis = r.error; continue; }
         betaald++;
       }

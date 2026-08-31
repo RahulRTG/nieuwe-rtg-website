@@ -402,3 +402,71 @@ test('alleen de collectie die het OPNIEUW deed telt mee', async () => {
   assert.match(t, /\+1 in orders/);
   assert.doesNotMatch(t, /ruisje|seed/, 'de rest was niet herhaalbaar en hoort er niet in');
 });
+
+/* ============================================================================
+   DE RONDE ZONDER SLEUTEL -- weegZonderSleutel()
+
+   Waarom deze weging apart bestaat: alle oproepen hierboven dragen `idem` in het
+   lijf, en server/middleware/idempotentie.js is precies daarop opt-in voor elke
+   /api-POST. "beschermd" daar betekent dus "de platformlaag ving hem" en niet
+   "deze route is idempotent". Nagemeten op 29 augustus 2026: van vijf routes die
+   MET sleutel `herhaald: true` gaven, gaven er vier ZONDER sleutel `herhaald:
+   false`. Alleen /api/agenda/toevoegen bleef beschermd -- en die heeft dan ook
+   een verklaring in server/lib/idemsleutels.js.
+
+   Deze weging heeft GEEN ijkoproep, want die kan niet bestaan: in een ronde
+   zonder sleutels is elk verzoek woordelijk hetzelfde, en dat is nu juist het
+   geval dat gemeten wordt. Ze leunt daarom op de opslag, en waar die niets zegt
+   hoort het antwoord ONGEMETEN te zijn -- niet 'onbeschermd'.
+   ========================================================================== */
+const { weegZonderSleutel } = require('../scripts/lib/idemproef');
+
+test('zonder sleutel: eerste kale oproep deed niets -> ongemeten', () => {
+  const u = weegZonderSleutel({ status: 403, data: {} }, { status: 403, data: {} }, null);
+  assert.equal(u.stand, 'ongemeten');
+  assert.match(u.reden, /deed geen werk/);
+});
+
+test('zonder sleutel: `herhaald: true` kan alleen van de idem-poort komen', () => {
+  const u = weegZonderSleutel({ status: 200, data: { id: 1 } }, { status: 200, data: { id: 1, herhaald: true } }, null);
+  assert.equal(u.stand, 'beschermd');
+  assert.equal(u.grond, 'gemerkt');
+  assert.match(u.reden, /idem-poort/);
+});
+
+test('zonder sleutel: de dubbeltik deed het werk OPNIEUW', () => {
+  const u = weegZonderSleutel({ status: 200, data: { id: 1 } }, { status: 200, data: { id: 2 } },
+    { a: { orders: 1 }, b: { orders: 1 } });
+  assert.equal(u.stand, 'onbeschermd');
+  assert.match(u.reden, /dit is de dubbeltik/i);
+});
+
+test('zonder sleutel: eerste deed werk, herhaling niet -> beschermd op de opslag', () => {
+  const u = weegZonderSleutel({ status: 200, data: { id: 1 } }, { status: 200, data: { id: 1 } },
+    { a: { orders: 1 }, b: {} });
+  assert.equal(u.stand, 'beschermd');
+  assert.equal(u.grond, 'opslag');
+});
+
+test('zonder sleutel: geen tweede meetpunt -> ongemeten, en NIET onbeschermd', () => {
+  /* De gevaarlijkste vergissing van deze weging: zonder ijkoproep en zonder
+     opslagstand is een gelijk antwoord niet te onderscheiden van een antwoord
+     dat sowieso niet varieert. Wie hier 'onbeschermd' terugggeeft, verzint een
+     bevinding; wie 'beschermd' teruggeeft, verzint een geruststelling. */
+  const u = weegZonderSleutel({ status: 200, data: { id: 1 } }, { status: 200, data: { id: 1 } }, null);
+  assert.equal(u.stand, 'ongemeten');
+  assert.match(u.reden, /geen tweede meetpunt/);
+});
+
+test('zonder sleutel: de eerste oproep liet niets achter -> geen uitspraak', () => {
+  const u = weegZonderSleutel({ status: 200, data: { lijst: [] } }, { status: 200, data: { lijst: [] } },
+    { a: {}, b: {} });
+  assert.equal(u.stand, 'ongemeten');
+  assert.match(u.reden, /niets achter/);
+});
+
+test('zonder sleutel: een geweigerde herhaling is beschermd, maar op een andere grond', () => {
+  const u = weegZonderSleutel({ status: 200, data: { id: 1 } }, { status: 409, data: { error: 'al gedaan' } }, null);
+  assert.equal(u.stand, 'beschermd');
+  assert.equal(u.grond, 'geweigerd');
+});

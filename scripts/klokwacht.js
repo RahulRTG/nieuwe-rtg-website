@@ -217,7 +217,7 @@ function meet() {
 const VERANTWOORD = {
   'eventloop.test.js': 'de toets BLOKKEERT de event-loop een aantal ms en wacht tot de meter dat ziet; ' +
     'de tijd is hier de meting zelf en niet een gok erover',
-  'journaalschrijf.test.js': 'het journaal spoelt per venster van een seconde; de bewering gaat over dat venster',
+  'journaalschrijf.test.js': 'het journaal spoelt per venster van een seconde; de bewering gaat over dat venster. Sinds 30 augustus 2026 zijn het er drie: de derde bewaakt een AFWEZIGHEID -- na de eerste spoeling mag er binnen het venster GEEN tweede komen. Zonder die wacht keek de toets op het moment van de eerste spoeling, en dat er er dan een geweest is, is per definitie waar: met de rem uit de code bleef hij groen',
   'sloophamer.pg.test.js': 'chaosproef: redis en postgres gaan met opzet neer en weer aan, met verkeer ertussen. ' +
     'De duur van de storing is wat er getoetst wordt',
   'bugjacht.test.js': 'de sleeps zitten in NEPDIENSTEN die trage I/O nabootsen (Postgres, de motor, Stripe); ' +

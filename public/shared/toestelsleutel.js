@@ -82,9 +82,76 @@
       .catch(function () { return false; });
   }
 
+  /* ---- HET BEZITSBEWIJS ----
+     Bewijzen dat DIT toestel dit ENE verzoek doet. De handeling zit in de
+     handtekening (methode en pad), anders zou een bewijs voor het lezen van een
+     saldo ook een overboeking dekken -- en dan bewijst het alleen nog dat het
+     toestel er ooit was. Server: server/kern/identiteit/bezitsbewijs.js. */
+  function bewijsVoor(methode, pad) {
+    var lading = {
+      jti: btoa(String.fromCharCode.apply(null, crypto.getRandomValues(new Uint8Array(18))))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+      tijd: Date.now(), methode: String(methode || 'POST').toUpperCase(), pad: String(pad || '')
+    };
+    var kop = btoa(JSON.stringify(lading)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return sleutel().then(function (paar) {
+      return crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, paar.privateKey,
+        new TextEncoder().encode(kop)).then(function (sig) {
+          var ruw = new Uint8Array(sig), t = '';
+          for (var i = 0; i < ruw.length; i++) t += String.fromCharCode(ruw[i]);
+          return kop + '.' + btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        });
+    });
+  }
+
+  /* De paden waarbij dit huis een bewijs vraagt. Deze lijst is een KOPIE van de
+     server (kern/identiteit/bezitsbewijs.js) en dat is bewust: de client
+     bepaalt niets, hij weet alleen wanneer het zin heeft te tekenen. Loopt hij
+     achter, dan weigert de server -- de verkeerde kant om te falen is dat de
+     CLIENT zou beslissen dat iets niet zwaar is. */
+  var ZWAAR = ['/api/pay/', '/api/betaal/', '/api/wallet/', '/api/bank/', '/api/auth/password',
+    '/api/webauthn/registreer', '/api/webauthn/weg', '/api/mijn/toestel/introk',
+    '/api/privacy/delete', '/api/rtgid/machtig'];
+  function zwaar(pad) {
+    for (var i = 0; i < ZWAAR.length; i++) if (String(pad).indexOf(ZWAAR[i]) === 0) return true;
+    return false;
+  }
+
+  /* EEN PLEK WAAR DE KOP MEEGAAT. Zonder dit zou elk scherm apart moeten weten
+     wanneer het moet tekenen, en dan is het over een half jaar op een scherm
+     vergeten -- precies het scherm waar geld beweegt. Dit haakt op fetch en
+     laat alles wat niet zwaar is ongemoeid.
+
+     Faalt het tekenen (geen sleutel op dit toestel, een browser zonder
+     WebCrypto), dan gaat het verzoek gewoon zonder kop de deur uit: de server
+     beslist of dat mag. De client hoort geen handeling tegen te houden op grond
+     van iets dat hij zelf niet kon leveren. */
+  function haakAan() {
+    if (!beschikbaar() || global.__rtgBewijsHaak) return false;
+    global.__rtgBewijsHaak = true;
+    var origineel = global.fetch;
+    global.fetch = function (invoer, opties) {
+      var url = typeof invoer === 'string' ? invoer : (invoer && invoer.url) || '';
+      var pad = String(url).replace(/^https?:\/\/[^/]+/, '').split('?')[0];
+      var methode = ((opties && opties.method) || (invoer && invoer.method) || 'GET').toUpperCase();
+      if (!zwaar(pad)) return origineel.apply(this, arguments);
+      var eigen = opties || {};
+      return bewijsVoor(methode, pad).then(function (bewijs) {
+        var koppen = new Headers(eigen.headers || (typeof invoer === 'object' && invoer.headers) || {});
+        koppen.set('RTG-Bezitsbewijs', bewijs);
+        return origineel.call(global, invoer, Object.assign({}, eigen, { headers: koppen }));
+      }).catch(function () { return origineel.call(global, invoer, eigen); });
+    };
+    return true;
+  }
+
   function beschikbaar() {
     return typeof indexedDB !== 'undefined' && !!(global.crypto && global.crypto.subtle);
   }
 
-  global.RTGToestel = { bewijs: bewijs, vergeet: vergeet, beschikbaar: beschikbaar };
+  global.RTGToestel = { bewijs: bewijs, bewijsVoor: bewijsVoor, vergeet: vergeet,
+    beschikbaar: beschikbaar, zwaar: zwaar, haakAan: haakAan };
+  /* Meteen aanhaken. Wie dit bestand laadt, wil de bescherming -- een tweede
+     regel die iemand moet onthouden is een regel die vergeten wordt. */
+  haakAan();
 })(window);

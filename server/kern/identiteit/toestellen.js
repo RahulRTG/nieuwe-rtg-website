@@ -36,11 +36,11 @@
    ========================================================================== */
 'use strict';
 
-const { webcrypto, createHash, randomBytes } = require('crypto');
+const { randomBytes } = require('crypto');
+const { createHash } = require('crypto');
+const { idVan, schoneJwk, klopt } = require('./toestelsleutels');
 const klok = require('../../lib/klok');
 
-const ALG = { name: 'ECDSA', namedCurve: 'P-256' };
-const TEKEN = { name: 'ECDSA', hash: 'SHA-256' };
 /* Een uitdaging leeft kort. Hij hoeft alleen de reis naar de browser en terug te
    overleven; alles daarboven is een venster waarin een onderschepte handtekening
    opnieuw bruikbaar is. */
@@ -56,23 +56,7 @@ function maakToestellen({ db, save }) {
   const sleutelVan = (lidKey, toestelId) => String(lidKey) + '|' + String(toestelId);
   const geldigeId = (v) => typeof v === 'string' && /^[a-f0-9]{32}$/.test(v);
 
-  /* De toestelId is een AFGELEIDE van de publieke sleutel en geen los nummer.
-     Daardoor kan een toestel zijn eigen id niet kiezen: wie een andere id wil,
-     heeft een andere sleutel nodig, en dan is hij ook echt een ander toestel. */
-  function idVan(jwk) {
-    return createHash('sha256')
-      .update(JSON.stringify({ kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y }))
-      .digest('hex').slice(0, 32);
-  }
 
-  function schoneJwk(j) {
-    if (!j || typeof j !== 'object') return null;
-    if (j.kty !== 'EC' || j.crv !== 'P-256') return null;
-    if (typeof j.x !== 'string' || typeof j.y !== 'string') return null;
-    if (j.x.length > 64 || j.y.length > 64) return null;
-    if (j.d !== undefined) return null;   // een PRIVATE sleutel hoort hier nooit binnen te komen
-    return { kty: 'EC', crv: 'P-256', x: j.x, y: j.y, ext: true };
-  }
 
   /* De naam is invoer van een mens en gaat naar een scherm. Stuurtekens eruit,
      lengte begrensd; het ontsnappen zelf doet de laag die toont. */
@@ -114,11 +98,7 @@ function maakToestellen({ db, save }) {
     catch (e) { return { error: 'Onleesbare handtekening.' }; }
     if (!handtekening.length || handtekening.length > 256) return { error: 'Onleesbare handtekening.' };
 
-    let ok = false;
-    try {
-      const pub = await webcrypto.subtle.importKey('jwk', jwk, ALG, false, ['verify']);
-      ok = await webcrypto.subtle.verify(TEKEN, pub, handtekening, Buffer.from(nonce, 'utf8'));
-    } catch (e) { ok = false; }
+    const ok = await klopt(jwk, nonce, handtekening);
     if (!ok) return { error: 'De handtekening klopt niet bij deze sleutel.' };
 
     const toestelId = idVan(jwk);
@@ -180,6 +160,17 @@ function maakToestellen({ db, save }) {
     return r && !r.ingetrokkenOp ? (r.naam || null) : null;
   }
 
+  /* De publieke sleutel van een toestel, voor het controleren van een
+     bezitsbewijs. Alleen de PUBLIEKE helft -- er is er ook maar een, want de
+     private helft heeft dit huis nooit gezien en kan het toestel niet verlaten.
+     Per lid, zodat hetzelfde toestel bij een ander lid niets oplevert, en null
+     bij een ingetrokken toestel: dan hoort een bewijs juist te falen. */
+  function publiekeSleutelVan(lidKey, toestelId) {
+    if (!geldigeId(toestelId)) return null;
+    const r = bak()[sleutelVan(lidKey, toestelId)];
+    return r && !r.ingetrokkenOp ? r.jwk : null;
+  }
+
   function lijst(lidKey) {
     return Object.values(bak())
       .filter(r => r.lidKey === String(lidKey) && !r.ingetrokkenOp)
@@ -195,7 +186,7 @@ function maakToestellen({ db, save }) {
     for (let i = 0; i < teveel; i++) delete bak()[mijne[i][0]];
   }
 
-  return { uitdaging, bind, noem, trekIn, naamVan, lijst, idVan, UITDAGING_MS, MAX_PER_LID };
+  return { uitdaging, bind, noem, trekIn, naamVan, publiekeSleutelVan, lijst, idVan, UITDAGING_MS, MAX_PER_LID };
 }
 
 module.exports = { maakToestellen };

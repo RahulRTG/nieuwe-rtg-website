@@ -124,6 +124,9 @@ const sessieregister = require('../kern/identiteit/sessieregister').maakSessiere
    overleeft zijn sessies, en een sessie kan aan een toestel gebonden zijn zonder
    dat het toestel bij die sessie hoort. Twee levensduren, twee registers. */
 const toestellen = require('../kern/identiteit/toestellen').maakToestellen({ db, save });
+/* Het bezitsbewijs leunt op het toestelregister (daar ligt de publieke sleutel)
+   en wordt door auth gebruikt; daarom hier, naast de andere twee. */
+const bezitsbewijs = require('../kern/identiteit/bezitsbewijs').maakBezitsbewijs({ db, save, toestellen });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
@@ -185,6 +188,27 @@ function auth(req, res, next) {
   if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
     return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
   }
+  /* HET BEZITSBEWIJS (MIJN RTG blok 4), op hetzelfde keelgat als de boardroom
+     hierboven en om dezelfde reden: een regel die op een van de 213
+     routebestanden moet worden herhaald, staat er over een half jaar op 212.
+
+     Hij is asynchroon (een handtekening controleren is dat), dus de rest van de
+     keten schuift naar `verder()`. In de stand `schaduw` -- de standaard --
+     weigert hij nooit; hij rekent alleen uit wat er zou gebeuren. */
+  if (bezitsbewijs.zwaarPad(req.path)) {
+    bezitsbewijs.controleer({ sess, methode: req.method, pad: req.path,
+      kop: req.get('rtg-bezitsbewijs') || null })
+      .then(uit => {
+        if (uit.stand === 'geweigerd') return res.status(uit.code || 401).json({ error: uit.reden, bezitsbewijs: 'vereist' });
+        if (uit.nietAfgedwongen) res.set('RTG-Niet-Afgedwongen', 'bezitsbewijs');
+        verder();
+      })
+      .catch(() => verder());   // een storing in de bewijslaag is geen overtreding
+    return;
+  }
+  return verder();
+
+  function verder() {
   /* DE ENVELOP (server/opzet/envelop.js). Additief: req.session blijft precies
      wat hij was, hier komt alleen de canonieke vorm bij zodat een teller, een
      rem of een bonnetje niet zeven vormen hoeft te kennen. `capability` draagt
@@ -200,6 +224,7 @@ function auth(req, res, next) {
   const drager = kostenhaak.drager('lid', sess.key);
   kostenhaak.meld('verzoek', 1, { drager, pas: sess.tier });
   kostenhaak.binnen(drager, next, sess.tier);
+  }
 }
 
 /* Schoonmaakhulp voor vrije tekstvelden: knipt op lengte en haalt < en >
@@ -212,6 +237,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, sessieregister, toestellen, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, toestellen, bezitsbewijs, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

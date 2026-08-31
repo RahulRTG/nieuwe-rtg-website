@@ -218,6 +218,16 @@
     ovdS.src = '/shared/overdracht.js'; ovdS.async = true;
     (document.head || document.documentElement).appendChild(ovdS);
   }
+
+  /* ---- de toestelsleutel: het bezitsbewijs bij zware handelingen ----
+     NIET async: dit script haakt op fetch, en laadt het pas na het eerste
+     betaalverzoek, dan gaat dat verzoek zonder bewijs de deur uit. De uitleg
+     staat in shared/toestelsleutel.js; hier staat het omdat een regel die op
+     elk scherm herhaald moet worden, over een half jaar op een scherm
+     ontbreekt -- en dat is dan het scherm waar geld beweegt. */
+  var tsl = document.createElement('script');
+  tsl.src = '/shared/toestelsleutel.js';
+  (document.head || document.documentElement).appendChild(tsl);
 /* de toegankelijkheidshelpers van de gedeelde laag */
   var MELDPLEKKEN = '#toast,.toast,#melding,.melding,[data-toast],.status';
   /* ---- de toegankelijkheidshelpers van de gedeelde laag ----

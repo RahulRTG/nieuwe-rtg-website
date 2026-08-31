@@ -59,10 +59,19 @@ module.exports = (kern) => {
        tweede binding kan deze nooit stilletjes omlaag halen. */
     let inSessie = false;
     if (sessieregister && req.session.sid) {
+      const nu = new Date().toISOString();
+      const hk = { bron: 'toestelsleutel', methode: 'cryptografisch', vastgesteldOp: nu, regelversie: 'blok3' };
       const uit = sessieregister.vul(req.session.sid, {
-        toestel: { toestelId: r.toestelId, bindingId: r.bindingId, bindingStand: 'bevestigd',
-          herkomst: { bron: 'toestelsleutel', methode: 'cryptografisch',
-            vastgesteldOp: new Date().toISOString(), regelversie: 'blok3' } }
+        toestel: { toestelId: r.toestelId, bindingId: r.bindingId, bindingStand: 'bevestigd', herkomst: hk },
+        /* SLEUTELBINDING IS IETS ANDERS DAN TOESTELBINDING, al ontstaan ze op
+           hetzelfde moment. `toestel` zegt WELK toestel deze sessie draait;
+           `sleutelbinding` zegt dat het TOKEN aan die sleutel vastzit en dat
+           zware handelingen voortaan een bezitsbewijs vragen
+           (kern/identiteit/bezitsbewijs.js). Ze samenvoegen zou betekenen dat je
+           het een niet kunt hebben zonder het ander -- en juist het verschil
+           tussen "ik weet waar je zit" en "een gestolen token helpt niet" is
+           waar deze laag over gaat. */
+        sleutelbinding: { keyRef: r.toestelId, schema: 'rtg-bezitsbewijs-v1', herkomst: hk }
       });
       inSessie = !!(uit && uit.ok);
     }

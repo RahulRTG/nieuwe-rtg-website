@@ -147,7 +147,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 19 | AI-mandaat i.p.v. almacht | **staat, verkeerde doelgroep** | `command.toezicht.zetGrenzen()` doet dit voor RTG-agenten. `FABRIC.md` par. 5 heeft de grenzen al. |
 | 20 | Contextwisseling zonder opnieuw inloggen | **staat** | `kern/eenaccount.js` + `/api/account/rollen|start`, `/api/sso/wissel`. Sinds 31 augustus 2026 ook ZICHTBAAR: elke context legt zich vast bij het wisselen en verschijnt als eigen regel in "waar ben ik aanwezig". |
 | 21 | Aanwezigheid per context i.p.v. sessies | **na sessieverrijking** | Zie par. 2. |
-| 22 | Sender-constrained sessies (DPoP) | **besluit** | Gelaagd naar risico, niet overal. Een sleutelgebonden token voor betaalroutes is iets anders dan voor het lezen van een menukaart. |
+| 22 | Sender-constrained sessies (DPoP) | **staat, in de schaduw** | `kern/identiteit/bezitsbewijs.js`, 31 augustus 2026. Niet DPoP zelf (geen access token met cnf-claim, geen OAuth) maar het idee ervan, op de toestelsleutel uit blok 3. Gelaagd naar risico: tien paden met per stuk een reden. Drie standen, en hij begint in `schaduw` -- CONTROLPLANE.md: eerst meelopen zonder te blokkeren. `aanbevolen` maakt een gestolen token uit een gebonden sessie waardeloos; `verplicht` sluit ook het gat van ongebonden sessies. |
 | 23 | Evidence-native UI | **staat als taal, niet als UI** | `BESTUUR.md`: onbekend → vermoed → gemeten → bewezen, met datum, en *vervallen bewijs is geen bewijs*. Niet opnieuw uitvinden. |
 | 24 | Trust receipts | **stap weg** | De ketenhash (`server/lib/keten*.js`) en het handelingsspoor dragen het bewijs al; er is geen bon die het aan de mens toont. |
 

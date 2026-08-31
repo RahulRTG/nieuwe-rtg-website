@@ -1169,7 +1169,24 @@ function prestatieIjking(sleutel) {
   } finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 }
 
-test('elke geijkte meter slaat echt uit op een bekend-foute invoer', () => {
+/* EEN EIGEN TIJDGRENS, EN WAAROM DIE HIER HOORT.
+
+   Deze ene proef draait ELKE geijkte meter een keer op een geplante fout, en
+   sommige van die meters lopen zelf het hele huis af. Gemeten op 31 augustus
+   2026 in deze omgeving: 650 seconden. De testrunner geeft elk bestand
+   standaard 600 (scripts/test-runner.js), dus in een volle lokale ronde werd
+   deze proef AFGEBROKEN -- en een afgebroken ijking zegt niets, terwijl hij er
+   in de samenvatting uitziet als "niet gezakt".
+
+   De CI kende dit al: daar krijgt meterijk een eigen job met 45 minuten
+   (.github/workflows/ci.yml). Wat hier stond was dus geen strengere eis maar een
+   grens die per ongeluk van een ander bestand kwam. Veertig minuten is ruim
+   boven de gemeten 650 seconden en nog steeds ruim onder de jobgrens, zodat een
+   proef die werkelijk HANGT alsnog opvalt in plaats van een uur te blijven staan.
+
+   Verlaag deze grens niet om een trage machine te dwingen; verhoog hem ook niet
+   zonder de meting erbij te zetten. */
+test('elke geijkte meter slaat echt uit op een bekend-foute invoer', { timeout: 40 * 60 * 1000 }, () => {
   const voor = norm.meet();
   const geijkt = Object.keys(IJKINGEN).filter(k => IJKINGEN[k].proef);
   assert.ok(geijkt.length >= 5, 'er zijn ijkingen om te draaien (' + geijkt.length + ')');

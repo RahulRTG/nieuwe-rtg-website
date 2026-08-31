@@ -31,7 +31,10 @@ bijna nergens de meting en bijna overal de PRESENTATIE.
 | geen sterren, geen ranglijst | **staat** | met de reden in de kop van `etalage.js` |
 | first-party onder dezelfde celgrenzen | **staat** | grens 1 kent geen vertrouwde uitgever en geen vlag |
 | bereikklasse per app (Zero Reach e.d.) | **staat sinds vandaag** | `kern/appstore/bereik.js` — zie hieronder |
-| celkader, softwarepaspoort, contractkaart, drie universa | **een stap weg** | alle gegevens zijn er; het is schermwerk |
+| celkader met celnaam en kanaalfeiten | **staat sinds vandaag** | `uitgifte.js` (`celnaam`), `public/apps/appcel.html` |
+| softwarepaspoort op de winkelkaart | **staat sinds vandaag** | `kern/appstore/paspoort.js`, getoond in `mall.html` |
+| "krijgt niets anders" onder de vinkjes | **staat sinds vandaag** | `mall.html`, storeKaart |
+| drie universa (Essentials, Play, Makers) | **een stap weg** | de categorieen bestaan; dit is een indeling erover |
 | tijdelijke cel (voor deze reis) | **een stap weg** | intrekken bestaat, "vernietig het potje" is één handeling erbij |
 | Foundry-meters tijdens het bouwen | **een stap weg** | de proefkeuring geeft de getallen al terug (`versies.js`, `proef`) |
 | INSTANT-label | **een besluit** | alleen als het GEMETEN is, zoals `scripts/tikken.js` — nooit als claim |
@@ -101,6 +104,27 @@ de boekhouding — is het wél een brug en hoort het door de machtigingenlaag.
 Dat onderscheid vraagt een besluit van de eigenaar, want de verleidelijke kant
 ("Rome, 4 dagen" uit het reisdossier halen) valt aan de verkeerde kant van de
 streep.
+
+## 3a. De eerste eigen app staat er, en hij kreeg geen streepje voor
+
+`storeapps/rekenmachine/` is de rekenmachine uit RTG Gereedschap als bundel:
+13,3 kB in drie bestanden, waarvan 9,2 kB script (het budget is 2 MB en 300 kB).
+Hij ging langs dezelfde weg als een derde -- inzenden, machinepoort,
+toegankelijkheidskeuring, een mens die aftekent -- en `test/appstore-eersteapps.test.js`
+houdt vol dat elke bundel in `storeapps/` dat blijft halen, mét de echte
+virusscanner: zonder scanner gaat de poort dicht, en een toets die dat omzeilt
+toetst de poort niet.
+
+Twee dingen die die eerste app liet zien en die geen enkel document had
+opgeleverd:
+
+1. **Het kader vulde de cel niet.** Het iframe begon 69 px lager dan de cel en
+   liep er onderaan evenveel uit, omdat de schil van het huis eigen rijen om de
+   kop zet. De onderste regel van elke app viel dus buiten beeld. Gemeten met een
+   echte browser, niet vermoed.
+2. **Een app hoeft zijn eigen naam niet te dragen.** De cel noemt de app, de
+   uitgever en de versie al; de bundel deed het nog eens, en dat kostte op een
+   telefoon een schermhoogte. Een app in een cel begint bij zijn eerste handeling.
 
 ## 4. Wat er bewust niet komt
 

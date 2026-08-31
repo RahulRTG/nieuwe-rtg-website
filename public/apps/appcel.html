@@ -20,17 +20,74 @@
     display:flex;flex-direction:column;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{flex:0 0 auto;background:var(--bg);border-bottom:1px solid var(--line);
-    padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.8rem;}
-  header .wie{min-width:0;flex:1;}
+    padding:calc(env(safe-area-inset-top) + .8rem) 1.1rem .7rem;display:flex;align-items:center;gap:.6rem;}
+  header > .knop{flex:0 0 auto;}
+  header .wie{min-width:0;flex:1 1 auto;}
   header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
   header h1{font-size:1.1rem;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;}
+  header .van{font-size:.72rem;color:var(--soft);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* Op telefoonformaat is "Wat mag deze app?" te lang naast een naam die zelf
+     al mag afbreken; hij wordt dan een kort label zonder iets te verbergen --
+     ADAPTIEF.md: een handeling krijgt een andere VORM, hij verdwijnt niet. */
+  #watMag .lang{display:inline;}
+  #watMag .kort{display:none;}
+  /* OP EEN TELEFOON KRIJGT DE NAAM ZIJN EIGEN REGEL, en dat is geen smaak maar
+     een reparatie. In deze balk hangt ook de schil van het huis (de bank links,
+     Rahul rechts, via /shared/basis.js); die vier dingen naast een naam en een
+     knop passen niet op 430 px, en de naam brak dan onder de knoppen door. Nu
+     staan de handelingen op de eerste regel en de naam op de tweede -- niets
+     verdwijnt, alles verandert van VORM (ADAPTIEF.md). */
+  @media (max-width:560px){
+    #watMag .lang{display:none;}
+    #watMag .kort{display:inline;}
+    header{flex-wrap:wrap;}
+    header .wie{flex:1 0 100%;order:2;}
+    header h1{font-size:1.02rem;}
+  }
   .knop{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;
     padding:.42rem .75rem;font:inherit;font-size:.78rem;cursor:pointer;text-decoration:none;white-space:nowrap;min-height:2.5rem;
     display:inline-flex;align-items:center;justify-content:center;}
   .knop.aan{background:var(--txt);color:#000;border-color:var(--txt);font-weight:600;}
+  /* DE SYSTEEMBALK. Dit is geen versiering: de cel is het meest
+     onderscheidende deel van dit kanaal, en hij was nergens te zien. Wat hier
+     staat komt van de server (/api/appstore/open) en wordt hier niet verzonnen.
+     De letters zijn Inter en niet Bodoni -- dit is systeeminformatie, geen
+     merkregel (ONTWERP.md: Bodoni staat op een gesloten lijst rollen). */
+  .systeem{flex:0 0 auto;display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;
+    padding:.45rem 1.1rem;border-bottom:1px solid var(--line);background:var(--card);
+    font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);gap:.7rem;}
+  .systeem .cel-id{color:var(--txt);display:inline-flex;align-items:center;gap:.45rem;}
+  .systeem .stip{width:.4rem;height:.4rem;border-radius:50%;background:var(--gold);display:inline-block;}
+  .systeem .feit{display:inline-flex;align-items:center;gap:.4rem;}
+  .systeem .feit b{color:var(--muted);font-weight:600;letter-spacing:.18em;}
+  .systeem .rek{flex:1 1 auto;}
+  .systeem .klasse{color:var(--gold);}
+  .knop.mini{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .6rem;
+    min-height:1.9rem;color:var(--muted);}
+  /* DE OPENING. Zevenhonderd milliseconden waarin er iets WAARS staat: de cel
+     wordt genoemd voordat de app hem vult. Wie hem niet wil, ziet hem ook niet
+     -- prefers-reduced-motion haalt de beweging eruit en laat de tekst staan. */
+  .opening{position:absolute;inset:0;z-index:4;background:var(--bg);display:flex;
+    flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+    transition:opacity .45s ease;}
+  .opening[data-weg="1"]{opacity:0;pointer-events:none;}
+  .opening .ey{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);}
+  .opening h2{font-size:1.35rem;}
+  .opening .id{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);}
+  .opening .streep{width:0;height:1px;background:var(--gold);margin-top:.6rem;
+    animation:celstreep .7s ease forwards;}
+  @keyframes celstreep{from{width:0;}to{width:8rem;}}
+  @media (prefers-reduced-motion:reduce){
+    .opening .streep{animation:none;width:8rem;}
+    .opening{transition:none;}
+  }
   .cel{flex:1 1 auto;min-height:0;position:relative;background:var(--bg);}
-  .cel iframe{width:100%;height:100%;border:0;display:block;background:#fff;}
+  /* HET KADER VULT DE CEL ABSOLUUT. Met height:100% in de stroom begon het
+     iframe 69 px lager dan de cel (de schil van het huis zet er zijn eigen
+     rijen omheen) en liep het er onderaan net zoveel uit -- gemeten, niet
+     vermoed. Een app die zijn onderste regel buiten beeld heeft, is een app die
+     het niet doet. */
+  .cel iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff;}
   .paneel{position:absolute;inset:0;background:rgba(12,12,11,.94);backdrop-filter:blur(6px);overflow:auto;
     padding:1.2rem;display:none;}
   .paneel[data-open="1"]{display:block;}
@@ -65,10 +122,28 @@
     <h1 id="naam">Bezig met openen…</h1>
     <div class="van" id="van"></div>
   </div>
-  <button class="knop" id="watMag" type="button" aria-expanded="false">Wat mag deze app?</button>
 </header>
 
+<div class="systeem" id="systeem" hidden>
+  <span class="cel-id"><span class="stip" aria-hidden="true"></span><span id="celId">cel</span></span>
+  <span class="feit"><b id="feitNet">0</b> netwerkverbindingen</span>
+  <span class="feit">geen sensoren</span>
+  <span class="rek"></span>
+  <span class="klasse" id="celKlasse"></span>
+  <!-- DE KNOP STAAT IN DE SYSTEEMBALK EN NIET IN DE KOP. Daar hing hij naast de
+       naam, de bank en Rahul, en op telefoonformaat schoven die vijf over
+       elkaar heen. Hier hoort hij ook inhoudelijk: deze balk gaat over wat de
+       cel is en wat erin mag. -->
+  <button class="knop mini" id="watMag" type="button" aria-expanded="false"><span class="lang">Wat mag deze app?</span><span class="kort">Wat mag hij?</span></button>
+</div>
+
 <main class="cel" id="cel">
+  <div class="opening" id="opening">
+    <div class="ey">RTG</div>
+    <h2>Er wordt een cel geopend</h2>
+    <div class="id" id="openingId"></div>
+    <div class="streep" aria-hidden="true"></div>
+  </div>
   <div id="frameWrap" class="vul">
     <!-- HET KADER STAAT HIER EN NIET IN EEN SCRIPT, EN allow IS LEEG.
 
@@ -151,6 +226,7 @@ let frame = null, STAND = null;
    het draagt de sandbox en het lege allow, en die twee horen niet afhankelijk
    te zijn van welke tak van deze functie er is gelopen. */
 function toon(t, sub){
+  const o = $('#opening'); if (o) o.setAttribute('data-weg', '1');
   const f = $('#cel-kader'); if (f) f.hidden = true;
   let m = document.getElementById('celMelding');
   if (!m) { m = document.createElement('div'); m.id = 'celMelding'; m.className = 'leeg'; $('#frameWrap').appendChild(m); }
@@ -165,6 +241,23 @@ async function open(){
   catch (e) { $('#naam').textContent = 'Niet beschikbaar'; return toon(e.message); }
   STAND = d;
   $('#naam').textContent = d.naam;
+  /* DE CEL KRIJGT ZIJN NAAM VAN DE SERVER. Hij wordt daar afgeleid uit het lid
+     en de app (kern/appstore/uitgifte.js, celnaam); hier wordt hij alleen
+     getoond. Een naam die het scherm zelf verzint, is een naam die op twee
+     toestellen anders is. */
+  if (d.cel && d.cel.naam) {
+    $('#celId').textContent = 'cel ' + d.cel.naam;
+    $('#openingId').textContent = 'cel ' + d.cel.naam;
+  }
+  if (d.paspoort && d.paspoort.bereik) {
+    $('#celKlasse').textContent = d.paspoort.bereik.label;
+    /* Het aantal netwerkverbindingen komt uit het KANAALFEIT en niet uit een
+       getal in dit scherm: nul is hier geen optimisme maar de CSP van de
+       celroute (kern/appstore/bereik.js, KANAALFEITEN). */
+    const net = (d.paspoort.kanaal || []).find(f => f.feit === 'geen netwerk');
+    if (net) $('#feitNet').textContent = String(net.waarde).split(' ')[0];
+  }
+  $('#systeem').hidden = false;
   $('#van').textContent = 'versie ' + d.versie + (d.uitgever ? ' · van ' + d.uitgever.naam : '');
   document.title = d.naam + ' · App Store';
 
@@ -174,6 +267,14 @@ async function open(){
   const f = $('#cel-kader');
   f.title = d.naam + ' - een app van ' + (d.uitgever ? d.uitgever.naam : 'een derde partij');
   f.hidden = false;
+  /* De opening gaat pas weg als de app er werkelijk staat, met een ondergrens
+     zodat hij niet flikkert bij een bundel die er al is. Blijft de app hangen,
+     dan gaat hij alsnog weg: een schil die blijft staan omdat de derde niets
+     laadt, is een RTG-scherm dat kapot lijkt terwijl de app het is. */
+  const t0 = Date.now();
+  const dicht = () => { const o = $('#opening'); if (o) o.setAttribute('data-weg', '1'); };
+  f.addEventListener('load', () => setTimeout(dicht, Math.max(0, 700 - (Date.now() - t0))), { once: true });
+  setTimeout(dicht, 4000);
   f.src = d.start;
   frame = f;
 }

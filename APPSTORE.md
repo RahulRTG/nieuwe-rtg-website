@@ -266,6 +266,8 @@ server/kern/appstore/
   scan.js         de virusscanner op een webbundel, met het filter bij naam
   bundel.js       de onveranderlijke bundel: pad, hash, schijf, integriteit
   machtigingen.js de drie machtigingen, en wat er niet is met de reden
+  bereik.js       hoe ver een app komt: vier klassen, GEREKEND uit de machtigingen
+  paspoort.js     het softwarepaspoort: vaste rijen, en een reden waar geen waarde is
   geld.js         de afdracht en de rekensom (de bon)
   aanschaf.js     de koop zelf, en de omzet die een uitgever terugziet
   teruggave.js    het recht dat een ingetrokken, gekochte app achterlaat
@@ -287,6 +289,10 @@ public/apps/
   mall.html                de afdeling "App Store" naast de App-Bibliotheek
 
 test/appstore.test.js      de zes grenzen over de lijn
+test/appstore-bereik.test.js   de bereikklasse, en dat hij nergens te ZETTEN is
+test/appstore-eersteapps.test.js  de eigen bundels in storeapps/ door dezelfde poort
+
+storeapps/                 de eerste apps van RTG zelf, als gewone inzending
 test/appstore-cel.test.js  wat je aan de bron zelf kunt zien
 test/appstore-geld.test.js de bon, de aanschaf, de afdracht, de btw, het recht
 test/appstore-doel.test.js het doel bij een machtiging, en de vergunningsdiff

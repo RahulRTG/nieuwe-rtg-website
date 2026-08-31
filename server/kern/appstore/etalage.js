@@ -23,6 +23,7 @@
 
 const { toonbaar } = require('./machtigingen');
 const { bereik } = require('./bereik');
+const { paspoort } = require('./paspoort');
 
 module.exports = function maakEtalage(kern) {
   const { S, app, versie, uitgever, eigen, geld } = kern;
@@ -92,6 +93,10 @@ module.exports = function maakEtalage(kern) {
          ./bereik.js; er is geen veld waarmee een uitgever dit zet. */
       vraagtBereik: bereik(v.manifest.machtigingen),
       verleendBereik: verleend ? bereik(verleend.machtigingen) : null,
+      /* Het paspoort gaat over wat er in de WINKEL staat, dus over wat het
+         manifest vraagt -- ook bij een app die dit lid al heeft. Wat hij
+         werkelijk gaf staat hierboven in `verleend` en in `verleendBereik`. */
+      paspoort: paspoort({ app: a, versie: v, uitgever: u, verleend: null }),
       /* WAT DEZE UPDATE MEER VRAAGT DAN JE HEBT GEGEVEN. Zonder dit kan een app
          stilletjes groeien in bevoegdheden: een nieuwe versie zet een machtiging
          in zijn manifest en niemand die het ziet. Hij wordt hier UITGEREKEND en

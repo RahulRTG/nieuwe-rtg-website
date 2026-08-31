@@ -19,7 +19,21 @@
    ========================================================================== */
 'use strict';
 
+const crypto = require('crypto');
 const { toonbaar } = require('./machtigingen');
+const { paspoort } = require('./paspoort');
+
+/* DE CELNAAM. Een cel hoort een naam te hebben op het scherm waarop hij draait:
+   wie ziet dat zijn app in CEL 0184 zit, begrijpt zonder uitleg dat het ding
+   ergens IN staat en niet overal bij kan.
+
+   Hij wordt AFGELEID uit het lid en de app, en niet uitgedeeld uit een teller.
+   Een oplopend nummer zou over alle leden heen tellen en daarmee verklappen
+   hoeveel apps er in dit huis geopend zijn; deze naam is voor dit lid en deze
+   app stabiel en verder van niemand af te lezen. Vier tekens, want het is een
+   naam en geen sleutel -- er hangt niets aan, en botsen mag. */
+const celnaam = (key, sleutel) =>
+  crypto.createHash('sha256').update(String(key) + '\u0000' + String(sleutel)).digest('hex').slice(0, 4).toUpperCase();
 
 /* Krijgt de ETALAGE mee in plaats van hem zelf te maken. Twee keer
    require('./etalage')(kern) geeft twee objecten die dezelfde toestand lezen, en
@@ -54,7 +68,14 @@ function maakUitgifte(kern, E) {
          weigering op de brug kan er dan bij zeggen of de app het niet vroeg of
          het lid het niet gaf. Het bepaalt nooit wat er mag -- dat doet
          `machtigingen` hierboven, en dat is wat het lid verleende. */
-      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen) };
+      vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen),
+      /* DE CEL ZELF, ZICHTBAAR. De grenzen van dit kanaal zijn het sterkste wat
+         er over deze app te zeggen valt, en ze stonden alleen in een dossier dat
+         je apart moest opzoeken. Ze gaan nu mee met de opening, zodat het scherm
+         eromheen kan tonen waar de app in zit -- afgeleid, niet getypt: het
+         paspoort en de bereikklasse worden op een plek gerekend. */
+      cel: { naam: celnaam(key, sleutel) },
+      paspoort: paspoort({ app: a, versie: v, uitgever: u, verleend }) };
   }
 
   /* De poort van de celroute: mag deze hash van deze app uberhaupt uitgeleverd

@@ -92,6 +92,14 @@ module.exports = (kern, hulp) => {
   app.post('/api/lab2/uit/vervolg', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.vervolgStudie(id(req), req.body, wie(req))));
   app.post('/api/lab2/uit/pijplijn', officeAuth, (req, res) => veilig(res, () => livinglab.doorbraak.pijplijn(id(req))));
 
+  /* ---------- het observatorium ----------
+     Eén bord over alle labs (zonder id) of over één lab (met id). Het staat
+     achter de kantoordeur en niet op de openbare kant: er staan gebreken,
+     klachtaantallen en stilgelegde onderzoeken op, en dat is werk in uitvoering
+     en geen verantwoording naar buiten. Wat naar buiten gaat, is de
+     onderzoekskaart. */
+  app.post('/api/lab2/observatorium', officeAuth, (req, res) => veilig(res, () => livinglab.observatorium.bord((req.body || {}).id || null)));
+
   /* ---------- impact ---------- */
   app.post('/api/lab2/impact', officeAuth, (req, res) => veilig(res, () => livinglab.impact.impact(id(req))));
   app.post('/api/lab2/opbrengst', officeAuth, (req, res) => veilig(res, () => livinglab.impact.opbrengst(id(req), (req.body || {}).max)));

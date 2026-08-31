@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1902,
+    "bestanden": 1906,
     "domeinenTotaal": 536,
-    "koopbareVormen": 514,
+    "koopbareVormen": 515,
     "koopbareDomeinen": 108,
     "envelopDrempel": 7,
     "envelop": 44,
-    "veldenDomeineigen": 700,
-    "veldenNietEnvelop": 909,
+    "veldenDomeineigen": 702,
+    "veldenNietEnvelop": 911,
     "gelijkendeVormparen": 7,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -17,9 +17,9 @@
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 21,
-    "optellingen": 104,
+    "optellingen": 105,
     "optelDomeinen": 52,
-    "optelCenten": 55,
+    "optelCenten": 56,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -73,7 +73,7 @@
   "perWerkwoord": {
     "toon": 86,
     "prijs": 35,
-    "beschikbaarheid": 49,
+    "beschikbaarheid": 50,
     "reserveer": 26,
     "bevestig": 50,
     "lever": 18,
@@ -1297,6 +1297,24 @@
       "telt": 2
     },
     {
+      "domein": "kern/labfonds",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "beschikbaarheid": "openbaar"
+      },
+      "telt": 2
+    },
+    {
       "domein": "kern/leverancier",
       "heeft": {
         "toon": false,
@@ -1591,23 +1609,6 @@
       },
       "bewijs": {
         "toon": "boardroomLijst"
-      },
-      "telt": 1
-    },
-    {
-      "domein": "kern/labfonds",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "locBeeld"
       },
       "telt": 1
     },
@@ -2355,6 +2356,14 @@
       ]
     },
     {
+      "domein": "kern/labfonds",
+      "plekken": 2,
+      "waar": [
+        "server/kern/labfonds/onderzoek.js",
+        "server/kern/labfonds.js"
+      ]
+    },
+    {
       "domein": "kern/livinglab",
       "plekken": 2,
       "waar": [
@@ -2431,13 +2440,6 @@
       "plekken": 1,
       "waar": [
         "server/kern/agent.js"
-      ]
-    },
-    {
-      "domein": "kern/assets",
-      "plekken": 1,
-      "waar": [
-        "server/kern/assets/winkel.js"
       ]
     }
   ]

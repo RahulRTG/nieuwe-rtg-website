@@ -45,7 +45,7 @@
    (regel 4). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
+module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie, labfonds }) => {
   /* De context wordt hier één keer opgebouwd en aan elke deelmodule meegegeven.
      De VOLGORDE hieronder is niet vrij: een module die iets uit `ctx`
      DESTRUCTUREERT, leest de waarde op het moment dat hij wordt gebouwd. Wie
@@ -118,9 +118,19 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
      Hij staat hier achteraan omdat hij alleen LEEST: geen enkele module
      hierboven hangt ervan af, en een grootboek dat iets zou veranderen aan wat
      het telt, is geen grootboek. */
+  /* Ook het Lab-fonds komt als functie binnen, en om dezelfde reden: het wordt
+     verderop in kernlaag2 gebouwd. Het grootboek toont ermee welk fondsgeld aan
+     dit onderzoek is TOEGEZEGD -- naast de gemeten kosten, nooit erbij op. */
+  ctx.labfonds = labfonds;
   ctx.ledger = require('./ledger').maakLedger({
-    kosten, economie,
+    kosten, economie, labfonds,
     vindLab: (id) => ctx.vindLab(id), vindStudie: (id) => ctx.vindStudie(id), nu: ctx.nu });
+
+  /* HET OBSERVATORIUM (./observatorium.js): één bord over alle labs, dat kan
+     ZAKKEN. Hij staat helemaal achteraan omdat hij als enige het grootboek
+     hierboven nodig heeft -- en, via `ctx.labfonds`, het fonds dat pas later in
+     kernlaag2 wordt gebouwd. Hij leest alleen; er komt geen tabel bij. */
+  ctx.observatorium = require('./observatorium')(ctx);
 
   const kader = require('./kader');
 

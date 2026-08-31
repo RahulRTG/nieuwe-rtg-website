@@ -25,13 +25,19 @@ over tien stations. Dat is precies de vorm waarin `Asset` hier een keer sneuveld
 VERKLAARD in plaats van erin gevonden. Dus eerst tellen -- `scripts/onderzoeksketen.js`,
 uitslag in `ONDERZOEKSKETEN.json`.
 
-**Van de 90 mogelijke schakels tussen tien stations bestaan er 6.** Maar dat
-getal is misleidend, en de tweede meting zegt waarom:
+**Van de 90 mogelijke schakels tussen tien stations bestonden er bij de eerste
+meting 6** (nu 10). Maar dat getal is misleidend, en de tweede meting zegt
+waarom:
 
-> **Acht van de tien stations hangen al aan DEZELFDE studie.** Het is geen
+> **Acht van de tien stations hingen al aan DEZELFDE studie.** Het is geen
 > ketting maar een ster, en de spil bestond al: `studieId`.
 
-Aan de spil: buurtvraag, studie, ethiek, waarneming, bewijs, apparatuur, doorbraak, kosten. Niet: onderzoekslab, labfonds -- en dat zijn precies de twee ANDERE systemen.
+Aan de spil: buurtvraag, studie, ethiek, waarneming, bewijs, apparatuur,
+doorbraak, kosten. Niet: onderzoekslab en labfonds -- precies de twee ANDERE
+systemen. Van die twee hangt het **labfonds** er inmiddels wel aan (zie *Wat is
+er met mijn bijdrage onderzocht?* hieronder); het onderzoekslab niet, en dat is
+een andere vraag: dat is RTG's eigen R&D-keten en niet het onderzoek van de
+stichting. Draai `npm run onderzoeksketen` en de tabel rekent zichzelf na.
 
 De keten zoals het voorstel hem tekent, stap voor stap:
 
@@ -44,6 +50,7 @@ De keten zoals het voorstel hem tekent, stap voor stap:
 | bewijs -> doorbraak | **staat** (conclusieId) |
 | doorbraak -> onderzoekslab | **staat** |
 | onderzoekslab -> labfonds | ontbreekt |
+| labfonds -> studie | **staat** (`kern/labfonds/onderzoek.js`) |
 | labfonds -> kosten | ontbreekt |
 
 ## Wat daaruit volgde, en wat niet
@@ -235,11 +242,70 @@ graadverandering is een **versie**; wat ertoe leidde staat erbij. Dat legde mete
 een gat bloot: terugtrekken herijkte zelf en liet een conclusie stil zakken --
 de graad veranderde en niets zei waardoor.
 
+## Wat is er met mijn bijdrage onderzocht?
+
+Dat was de duurste ontbrekende schakel: het fonds haalde geld op VOOR onderzoek
+en wist niet WELK. Hij ligt er nu, en met opzet maar aan één kant.
+
+**Een voorstel noemt het onderzoek; het onderzoek noemt geen voorstel.** De
+verwijzing staat op één plek en de andere kant wordt afgeleid
+(`labfonds.financiering(studieId)`). Twee lijsten die naar elkaar wijzen lopen
+uit de pas zodra een voorstel wordt afgewezen of een studie verdwijnt.
+
+**Een mens tikt het nummer, de software bewaart de sleutel.** Het
+onderzoeksnummer is voor mensen en met opzet geen sleutel; wat er wordt
+vastgelegd is de interne studie-id. En hij wijst nooit naar niets: een voorstel
+dat een onbestaand onderzoek noemt, wordt geweigerd met de reden -- niet
+aangemaakt met een dood verwijzingsveld. Verdwijnt het onderzoek daarna alsnog,
+dan zegt de kaart dat, met het bevroren nummer erbij.
+
+**Er komt niet meer mee dan de openbare ring**: nummer, titel, soort, stap. Geen
+dossierinhoud, ook niet van een gescheiden studie -- het fonds is een openbare
+ledenpagina.
+
+**Het is een toezegging en geen betaling.** In het onderzoeksgrootboek staat het
+fondsgeld als DERDE boek naast de begroting (ingetypt) en het gemeten verbruik,
+en het wordt er niet bij opgeteld: het ene is door leden toegezegd, het andere
+door de meter geteld. Toegekend en nog-open staan ook apart -- een openstaand
+voorstel is een wens, en samengeteld zou het financiering lijken.
+
+De grenzen staan in `test/labfonds-onderzoek.test.js`; alle vier zijn ze
+nagerekend met een mutatie die de toets liet zakken.
+
+## Het observatorium: één bord dat kan zakken
+
+Dit is het laatste stuk van de bouwvolgorde, en het stond daar met reden achteraan:
+een cockpit boven een lege grond vertelt niets waars. De regel die zijn vorm
+bepaalt komt uit `BESTUUR.md`: **een cockpit die niet kan zakken, is een
+dashboard.** Elk sein heeft daarom drie standen -- `in orde`, `niet vast te
+stellen`, `storing` -- en het bord neemt de **zwaarste** van zijn seinen over, niet
+het gemiddelde: één stilgelegd onderzoek tussen twintig gezonde is geen lichte
+verkleuring.
+
+Zes seinen, allemaal afgeleid en niets ervan opgeslagen: stilgelegde onderzoeken,
+open klachten, verlopen ijkingen, waar een studie op wacht (uit dezelfde
+cycluspoort die de stap straks toelaat), conclusies die van graad veranderden, en
+het geld -- toegezegd fondsgeld naast gemeten kosten, nooit opgeteld.
+
+Vier dingen die er met opzet níét op staan:
+
+- **Geen samengesteld cijfer.** Eén getal boven zes eerlijke seinen verbergt welk
+  ervan bewoog, en over onderzoek van mensen zou het een oordeel over hun werk zijn.
+- **Geen drempels die hier verzonnen zijn.** "Staat te lang stil" vraagt een
+  termijn die niemand heeft vastgesteld. Wat er staat, staat er omdat het lab het
+  zelf opschreef.
+- **Geen mens.** Een sein noemt een studie bij nummer en titel, nooit een
+  deelnemer -- ook niet als alias, en de tekst van een klacht komt er niet op:
+  die gaat alleen naar de RTF-staf, want een klacht kan over het team zelf gaan.
+- **Geen nul waar niets gepeild is.** Ontbreekt het fonds of de kostenmeter, dan
+  zakt dat sein naar `niet vast te stellen` -- en die stand is zwaarder dan in
+  orde, want een meter die niet meet is geen groen licht.
+
+`kern/livinglab/observatorium.js`, `/api/lab2/observatorium` (kantoor),
+`test/livinglab-observatorium.test.js`. Het bord staat bovenaan
+`/apps/livinglab.html`.
+
 ## Wat er nog niet is, met de reden
 
-- **Labfonds ↔ studie.** Het fonds financiert onderzoek en weet niet welk. Dit is
-  nu de duurste ontbrekende schakel: zonder haar kan een lid niet zien wat er met
-  zijn bijdrage is onderzocht.
-
-Die vier staan hier zonder datum en zonder belofte. Wat er wel is, is gemeten:
+Die staan hier zonder datum en zonder belofte. Wat er wel is, is gemeten:
 draai `npm run onderzoeksketen` en de tabel hierboven rekent zichzelf na.

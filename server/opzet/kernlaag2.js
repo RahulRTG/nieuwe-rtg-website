@@ -74,7 +74,7 @@ Object.assign(kern, require('../kern/onderzoekslab')({ db, save, crypto, anthrop
    `comm: () => kern.comm` bij de spellen. Een kopie van de waarde zou hier
    `undefined` bevriezen, en dat merkt niemand tot een lab zijn rekening opvraagt. */
 Object.assign(kern, require('../kern/livinglab')({ db, save, crypto, anthropic, lab: kern.lab,
-  kosten: () => kern.kosten, economie: () => kern.economie }));
+  kosten: () => kern.kosten, economie: () => kern.economie, labfonds: () => kern.labfonds }));
 // De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
 // foundation-kantoor mee beslist over de lab-uitslagen
 Object.assign(kern, require('../kern/stadsraad')({ db, save, crypto }));
@@ -113,7 +113,10 @@ if (process.env.RTG_PAYROLL_BIJWERKEN !== '0') {
   try { kern.payrollOS.bijwerken.start(); } catch (e) { console.error('[payrollOS] bijwerkklok:', e.message); }
 }
 
-Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic }));
+/* Het Lab-fonds krijgt het Living Lab mee: een voorstel mag noemen WELK
+   onderzoek het financiert. Het lab staat hierboven al, dus dit mag een waarde
+   zijn en geen functie. */
+Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic, livinglab: kern.livinglab }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun
    takenlijst; wie binnenkomt kiest eerst een huis. */

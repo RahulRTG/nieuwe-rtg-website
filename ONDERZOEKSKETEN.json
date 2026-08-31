@@ -3,7 +3,7 @@
     "op": "2026-08-31",
     "stations": 10,
     "paren": 90,
-    "schakels": 8,
+    "schakels": 10,
     "ontbrekendeBestanden": []
   },
   "stations": [
@@ -183,27 +183,42 @@
       "modules": []
     },
     {
+      "van": "labfonds",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": []
+    },
+    {
       "van": "kosten",
       "naar": "studie",
       "velden": [
         "studieId"
       ],
       "modules": []
+    },
+    {
+      "van": "kosten",
+      "naar": "labfonds",
+      "velden": [],
+      "modules": [
+        "server/kern/labfonds.js",
+        "labfonds"
+      ]
     }
   ],
   "zonderUitgaand": [
     "studie",
     "ethiek",
     "waarneming",
-    "bewijs",
-    "labfonds"
+    "bewijs"
   ],
   "zonderInkomend": [
     "buurtvraag",
     "ethiek",
     "waarneming",
     "apparatuur",
-    "labfonds",
     "kosten"
   ],
   "hub": [
@@ -249,7 +264,7 @@
     },
     {
       "station": "labfonds",
-      "aanDeStudie": false,
+      "aanDeStudie": true,
       "aanHetLab": false
     },
     {
@@ -315,8 +330,8 @@
     {
       "van": "labfonds",
       "naar": "kosten",
-      "verbonden": false,
-      "richting": null,
+      "verbonden": true,
+      "richting": "terug",
       "via": []
     }
   ],

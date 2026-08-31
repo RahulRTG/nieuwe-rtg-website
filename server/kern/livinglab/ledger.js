@@ -46,6 +46,7 @@ const { dragerVanLab, dragerVanStudie, hoortBij, studieVanDrager } = require('./
 function maakLedger(ctx) {
   const kosten = () => (typeof ctx.kosten === 'function' ? ctx.kosten() : ctx.kosten);
   const economie = () => (typeof ctx.economie === 'function' ? ctx.economie() : ctx.economie);
+  const labfonds = () => (typeof ctx.labfonds === 'function' ? ctx.labfonds() : ctx.labfonds);
   const vindLab = (id) => ctx.vindLab(id);
   const vindStudie = (id) => ctx.vindStudie(id);
   const periodeNu = () => String(ctx.nu ? ctx.nu() : new Date().toISOString()).slice(0, 7);
@@ -66,35 +67,11 @@ function maakLedger(ctx) {
     };
   }
 
-  /* MAG DE STICHTING DEZE REKENING KRIJGEN? Twee vragen, en ze zijn niet
-     dezelfde: mag de infrastructuurwereld deze wereld belasten (firewall), en
-     past dit bedrag onder het plafond van die relatie. `magBelasten` doet ze
-     allebei wanneer het bedrag wordt meegegeven. */
-  function doorbelasting(centen) {
-    const eco = economie();
-    if (!eco) {
-      return { van: null, naar: 'rtfoundation', bedragCenten: centen, toegestaan: false,
-        besluit: { ok: false, code: 'geen-firewall', uitleg: 'De economielaag draait niet op deze server, dus is niet vast te stellen of deze kosten doorbelast mogen worden.' },
-        staatBij: null,
-        let: 'Niet vast te stellen. Zolang de firewall niet meedraait, staat hier geen doorbelasting -- ook geen nul.' };
-    }
-    const van = eco.INFRA_WERELD;
-    const naar = 'rtfoundation';
-    const besluit = eco.magBelasten({ van, naar, centen });
-    return {
-      van, naar, bedragCenten: centen,
-      toegestaan: !!besluit.ok, besluit,
-      /* WAT ER GEBEURT ALS HET NIET MAG, en dat hoort in het grootboek te staan
-         en niet in een foutmelding: de kosten blijven dan bij RTG. Dat is een
-         ANDER feit dan "de stichting betaalde het", en het verschil is precies
-         waar een accountant naar kijkt. */
-      staatBij: besluit.ok ? 'rtfoundation' : van,
-      let: besluit.ok
-        ? 'De stichting draagt deze kosten, op grond van: ' + (besluit.uitleg || 'een vastgelegde relatie') + '.'
-        : 'Deze kosten staan bij RTG en zijn NIET doorbelast. ' + besluit.uitleg
-          + (besluit.hoeWel ? ' ' + besluit.hoeWel : '')
-    };
-  }
+  /* Of de stichting deze rekening mag krijgen, is een andere vraag dan wat er
+     is verbruikt -- de eerste gaat over de firewall tussen de economische
+     werelden, de tweede over de meter. Die eerste woont daarom apart; zie
+     ./ledgerdoorbelasting.js. */
+  const doorbelasting = require('./ledgerdoorbelasting')(economie);
 
   /* Het grootboek van één studie. */
   function studieLedger(studieId, periode) {
@@ -111,6 +88,12 @@ function maakLedger(ctx) {
       studie: { id: s.id, nummer: s.nummer || null, titel: s.titel, soort: s.soort },
       verbruik: v,
       doorbelasting: doorbelasting(v.totaal.centen),
+      /* Wat het LAB-FONDS aan dit onderzoek heeft toegezegd. Het staat er als
+         DERDE boek naast de begroting en het gemeten verbruik, en wordt er niet
+         bij opgeteld: het is toegezegd door leden, niet uitgegeven. Ontbreekt
+         het fonds, dan staat er een reden en geen nul. */
+      fonds: labfonds() ? labfonds().financiering(s.id)
+        : { nietTeZeggen: 'Het Lab-fonds is hier niet beschikbaar.' },
       zegtNiet: ZEGT_NIET };
   }
 

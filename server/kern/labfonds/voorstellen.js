@@ -2,10 +2,10 @@
    de gezamenlijke beslissing. Draait op de gedeelde context die kern/labfonds.js
    opbouwt (de locaties, de pot, de helpers). */
 module.exports = (ctx) => {
-  const { F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT } = ctx;
+  const { F, loc, vindV, locBeeld, voorstelBeeld, schoon, naarCenten, eur, nu, rid, save, PRIVAAT, onderzoek } = ctx;
 
   // een voorstel om uit de pot van een locatie in de omgeving te investeren
-  function voorstelMaak(lidKey, lidNaam, locId, titel, doel, euro) {
+  function voorstelMaak(lidKey, lidNaam, locId, titel, doel, euro, onderzoekRef) {
     if (!lidKey) return { status: 403, error: 'Log in om een voorstel te doen.' };
     const l = loc(locId); if (!l) return { status: 404, error: 'Deze locatie bestaat niet.' };
     const t = schoon(titel, 100), d = schoon(doel, 500);
@@ -13,8 +13,18 @@ module.exports = (ctx) => {
     if (d.length < 10) return { status: 400, error: 'Leg kort uit wat het voor de omgeving oplevert.' };
     const c = naarCenten(euro);
     if (c < 100) return { status: 400, error: 'Noem een bedrag van minimaal EUR 1.' };
+    /* Het onderzoek is OPTIONEEL -- niet elk voorstel financiert een studie (een
+       buurtmoestuin is geen onderzoek). Maar wie er een noemt, noemt een
+       BESTAAND onderzoek: een voorstel met een dood verwijzingsveld belooft een
+       verantwoording die niemand meer kan naslaan. */
+    let studieId = null, studieNummer = null;
+    if (String(onderzoekRef == null ? '' : onderzoekRef).trim()) {
+      const r = onderzoek.zoek(onderzoekRef);
+      if (!r.gevonden) return { status: 400, error: r.reden };
+      studieId = r.studie.id; studieNummer = r.studie.nummer;
+    }
     const v = { id: rid(), locId: l.id, doorKey: lidKey, doorNaam: schoon(lidNaam, 40) || 'Lid',
-      titel: t, doel: d, centen: c, status: 'open',
+      titel: t, doel: d, centen: c, status: 'open', studieId, studieNummer,
       stemmen: { voor: [lidKey], tegen: [] }, scheids: null, besluit: null, at: nu() };
     // de scheidsrechter geeft meteen een eerste oordeel mee
     v.scheids = weegAf(v, l);

@@ -143,3 +143,21 @@ test('8. met een grondslag en een plafond mag het, en erboven niet', () => {
   assert.equal(boven.besluit.plafondCenten, 750000);
   assert.equal(boven.staatBij, 'rtg-intern', 'wat er niet door mag, blijft bij RTG staan');
 });
+
+/* 9. HET DERDE BOEK: wat het Lab-fonds aan dit onderzoek heeft toegezegd. Het
+   fonds haalde geld op VOOR onderzoek en wist niet welk; sinds
+   kern/labfonds/onderzoek.js staat het in het grootboek van de studie -- naast
+   de begroting en het gemeten verbruik, en niet erbij opgeteld. */
+test('9. het onderzoeksgrootboek toont het fondsgeld apart, als toezegging', async () => {
+  const r = await api('/api/lab2/ledger/studie', { id: studieId }, office);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const f = r.body.fonds;
+  assert.ok(f && f.toegezegd, 'het fonds hoort in het grootboek van een studie te staan');
+  assert.equal(f.toegezegd.bedrag, 0);
+  assert.match(f.toegezegd.herkomst, /fondsgrootboek/);
+  assert.ok(f.zegtNiet.some(z => /toegezegd/i.test(z) && /betaling/i.test(z)),
+    'een toezegging die als betaling leest, is een verkeerde verantwoording');
+  /* En het staat NAAST het verbruik: er wordt geen totaal van de twee gemaakt.
+     Het ene is door leden toegezegd, het andere door de meter geteld. */
+  assert.ok(!('saldo' in r.body) && !('totaalMetFonds' in r.body));
+});

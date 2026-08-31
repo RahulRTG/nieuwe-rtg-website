@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { app, livinglab } = kern;
+  const { app, livinglab, labfonds } = kern;
   const { veilig, lijf, remLezen, remSchrijf } = hulp;
 
   /* Wat een school of buurtinitiatief kan lenen, en de aanvraag zelf. Geen
@@ -30,6 +30,17 @@ module.exports = (kern, hulp) => {
   app.post('/api/lab2/publiek/vragen', remLezen, (req, res) => veilig(res, () => livinglab.vraagbesluit.vragen(lijf(req).labId, lijf(req))));
 
   app.post('/api/lab2/publiek/onderzoeken', remLezen, (req, res) => veilig(res, () => livinglab.publicatie.lijst(lijf(req).labId, lijf(req).n)));
-  app.post('/api/lab2/publiek/onderzoek', remLezen, (req, res) => veilig(res, () => livinglab.publicatie.kaart(lijf(req).id)));
+  /* De onderzoekskaart, met het fondsgeld dat eraan is TOEGEZEGD erbij. Dit is
+     de vraag van het lid dat inzamelde: wat is er met mijn bijdrage onderzocht?
+
+     De samenstelling gebeurt HIER en niet in een van de twee domeinen: de kaart
+     is van het lab, de toezegging van het fonds, en geen van beide hoort de
+     ander na te bouwen. Ontbreekt het fonds, dan blijft de kaart gewoon staan --
+     zonder financieringsblok en zonder verzonnen nul. */
+  app.post('/api/lab2/publiek/onderzoek', remLezen, (req, res) => veilig(res, () => {
+    const k = livinglab.publicatie.kaart(lijf(req).id);
+    if (!k || k.error || !labfonds) return k;
+    return Object.assign({}, k, { fonds: labfonds.financiering(lijf(req).id) });
+  }));
 
 };

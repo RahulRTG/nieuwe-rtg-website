@@ -1,39 +1,39 @@
 {
  "stempel": {
-  "op": "2026-08-31T19:09:26.263Z",
-  "commit": "9ecef79b",
+  "op": "2026-08-31T22:51:59.252Z",
+  "commit": "aa0359296",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/mutatieboek.js",
   "node": "v22.22.2"
  },
  "uitleg": "Elke route van de router valt in precies een bak, met de reden waarom hij niet verder komt in de keten. De optelling van de bakken is gelijk aan het totaal; dat is de toets, en niet een van de getallen. Zie de kop van scripts/mutatieboek.js. Dit boek beoordeelt geen enkele route.",
  "vastgelegd": "2026-08-31",
  "gemeten": {
-  "routesTotaal": 4748,
-  "mutaties": 4661,
-  "mutatiesVerklaard": 211,
-  "mutatiesOnverklaard": 4450,
-  "beproefbaar": 3891,
-  "beproefbaarVerklaard": 201,
+  "routesTotaal": 4856,
+  "mutaties": 4769,
+  "mutatiesVerklaard": 323,
+  "mutatiesOnverklaard": 4446,
+  "beproefbaar": 3998,
+  "beproefbaarVerklaard": 266,
   "bakken": 7,
-  "statusSom": 4661,
+  "statusSom": 4769,
   "statusSluit": true,
-  "nogNietGeclassificeerd": 3690,
-  "metBesluitOverDuplicaat": 211,
-  "zonderBesluitOverDuplicaat": 4450,
+  "nogNietGeclassificeerd": 3732,
+  "metBesluitOverDuplicaat": 323,
+  "zonderBesluitOverDuplicaat": 4446,
   "metGemetenDuplicaatgedrag": 0,
-  "somVanDeBakken": 4748,
+  "somVanDeBakken": 4856,
   "sluit": true
  },
  "bewijsgraad": {
   "metingGebruikt": false,
-  "metingReden": "de meting is van commit 5dc3b081 en HEAD staat op 9ecef79b; een meting van een andere stand is geen grond voor een status",
-  "metingGemetenOp": "2026-08-31T18:18:22.764Z",
+  "metingReden": "de meting is gemaakt met ongecommit werk in de boom (commit 2c0b0910); zij hoort bij een stand die nergens is vastgelegd",
+  "metingGemetenOp": "2026-08-31T09:44:33.117Z",
   "perGraad": [
    {
     "id": "afgeleid",
-    "aantal": 760,
+    "aantal": 714,
     "voorbeelden": [
      "POST /api/boardroom/reset",
      "POST /api/office/boardroom/alles",
@@ -42,7 +42,7 @@
    },
    {
     "id": "onbekend",
-    "aantal": 3690,
+    "aantal": 3732,
     "voorbeelden": [
      "POST /api/aandacht",
      "POST /api/aanmeld/start",
@@ -51,11 +51,11 @@
    },
    {
     "id": "verklaard",
-    "aantal": 211,
+    "aantal": 323,
     "voorbeelden": [
      "POST /api/office/bank/terugstorting",
-     "POST /api/foundation/kosten",
-     "POST /api/rtf/social/pin"
+     "POST /api/techniek/fouten/wis",
+     "POST /api/bedrijf/klant/zet"
     ]
    }
   ],
@@ -109,29 +109,29 @@
   {
    "id": "geen-rol-met-token",
    "uitleg": "Er is geen proefsleutel voor de rol achter deze deur. Aanroepen zonder sleutel geeft 401, en dat bewijst niets. De onderverdeling staat in zonderRolPerReden -- daar zitten drie verschillende reparaties in.",
-   "aantal": 730,
+   "aantal": 731,
    "eind": true,
    "voorbeelden": [
     "POST /api/arrival/pass",
     "POST /api/arrival/pulse",
-    "POST /api/bedrijf/apparaat/innemen"
+    "POST /api/auth/tweede"
    ]
   },
   {
    "id": "beproefbaar-verklaard",
    "uitleg": "Beproefbaar EN er staat een besluit over duplicaatgedrag in server/lib/idemsleutels.js.",
-   "aantal": 201,
+   "aantal": 266,
    "eind": true,
    "voorbeelden": [
     "POST /api/aanmelding/bewijs/herkeuring",
     "POST /api/agenda/toevoegen",
-    "POST /api/appstore/kantoor/toegankelijk"
+    "POST /api/appstore/kantoor/hercontrole"
    ]
   },
   {
    "id": "beproefbaar-onverklaard",
    "uitleg": "Beproefbaar, maar er is nog geen besluit over wat \"hetzelfde verzoek\" hier betekent. Dit is de enige bak die naar nul hoort.",
-   "aantal": 3690,
+   "aantal": 3732,
    "eind": true,
    "voorbeelden": [
     "POST /api/aandacht",
@@ -144,31 +144,31 @@
   {
    "id": "BESCHERMD",
    "uitleg": "Er staat verklaard hoe een herhaling wordt herkend. De idemproef kan hierop meten.",
-   "aantal": 86,
+   "aantal": 178,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
-    "POST /api/rtf/social/pin/connect",
-    "POST /api/rtf/social/pin/live/verbind",
-    "POST /api/rtf/social/pin/uit"
+    "POST /api/techniek/fouten/wis",
+    "POST /api/bedrijf/klant/zet",
+    "POST /api/bedrijf/project/maak"
    ]
   },
   {
    "id": "BEWUST_NIET_IDEMPOTENT",
    "uitleg": "Een herhaling is een echte tweede handeling, met een verplichte reden erbij. Dit is klaar en geen tekort.",
-   "aantal": 22,
+   "aantal": 62,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
     "POST /api/office/bank/terugstorting",
-    "POST /api/rtf/social/pin/live",
-    "POST /api/rtf/social/pin/nieuw"
+    "POST /api/foundation/gezin/bericht",
+    "POST /api/foundation/gezin/locatie"
    ]
   },
   {
    "id": "NIET_VAN_TOEPASSING",
    "uitleg": "Een POST die niets verandert. Er valt niets te dedupliceren.",
-   "aantal": 103,
+   "aantal": 83,
    "moetNaarNul": false,
    "semantiek": true,
    "voorbeelden": [
@@ -180,7 +180,7 @@
   {
    "id": "NIET_BEPROEFBAAR",
    "uitleg": "Dit instrument heeft geen sleutel voor deze deur. De reden staat erbij; zonder sleutel aankloppen bewijst niets.",
-   "aantal": 578,
+   "aantal": 549,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -192,7 +192,7 @@
   {
    "id": "WACHT_OP_FIXTURE",
    "uitleg": "Te beproeven, maar niet met twee kale oproepen: er moet eerst een levensloop worden opgebouwd (maak, geef rechten, muteer, herhaal).",
-   "aantal": 182,
+   "aantal": 165,
    "moetNaarNul": false,
    "semantiek": false,
    "voorbeelden": [
@@ -204,7 +204,7 @@
   {
    "id": "NOG_NIET_GECLASSIFICEERD",
    "uitleg": "Er is geen besluit over duplicaatgedrag. De enige bak die naar nul hoort.",
-   "aantal": 3690,
+   "aantal": 3732,
    "moetNaarNul": true,
    "semantiek": false,
    "voorbeelden": [
@@ -217,11 +217,11 @@
  "zonderRolPerReden": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 547,
+   "aantal": 548,
    "voorbeelden": [
+    "POST /api/auth/tweede",
     "POST /api/bedrijf/apparaat/innemen",
-    "POST /api/bedrijf/apparaat/uitgeven",
-    "POST /api/bedrijf/apparaat/zet"
+    "POST /api/bedrijf/apparaat/uitgeven"
    ]
   },
   {
@@ -292,32 +292,32 @@
    "bron": "IDEMSCHULD.json",
    "veld": "schrijfroutes",
    "vastgelegd": 4661,
-   "nu": 4661,
-   "vastgelegdOp": "2026-08-31",
+   "nu": 4769,
+   "vastgelegdOp": null,
    "zelfdeVraag": "API-paden die niet GET zijn",
-   "verschil": 0,
-   "gelijk": true,
-   "duiding": "gelijk"
+   "verschil": 108,
+   "gelijk": false,
+   "duiding": "het bestand draagt geen stempel, dus de ouderdom is niet vast te stellen"
   },
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesGevonden",
-   "vastgelegd": 4621,
+   "vastgelegd": 4643,
    "vastgelegdOp": "2026-08-31",
-   "nu": 4621,
+   "nu": 4729,
    "zelfdeVraag": "mutaties zonder schakelpad en zonder :parameter",
-   "verschil": 0,
-   "gelijk": true,
-   "duiding": "gelijk"
+   "verschil": 86,
+   "gelijk": false,
+   "duiding": "de vastlegging is van 2026-08-31; sindsdien zijn er routes bijgekomen"
   },
   {
    "bron": "IDEMPROEF.json",
    "veld": "routesMetRol",
-   "vastgelegd": 4620,
-   "nu": 3891,
+   "vastgelegd": 3803,
+   "nu": 3998,
    "vastgelegdOp": "2026-08-31",
    "zelfdeVraag": "daarvan: de routes waarvoor een proefsleutel bestaat",
-   "verschil": -729,
+   "verschil": 195,
    "gelijk": false,
    "duiding": "de vastlegging is van 2026-08-31; sindsdien zijn er routes bijgekomen"
   }

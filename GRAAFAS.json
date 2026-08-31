@@ -1,6 +1,6 @@
 {
  "uitleg": "Per graaf: de velden van zijn eenheid, en het veld waarop dringendheid wordt afgelezen. Zie de kop van scripts/graafas.js voor wat deze meter wel en niet zegt. Een gedeelde veldnaam is geen gedeelde betekenis.",
- "vastgelegd": "2026-08-29",
+ "vastgelegd": "2026-08-31",
  "gemeten": {
   "grafen": 7,
   "metEenEigenEenheid": 3,

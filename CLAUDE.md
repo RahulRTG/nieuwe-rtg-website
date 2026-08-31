@@ -456,7 +456,7 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->249<!--/getal--> leden,
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->250<!--/getal--> leden,
 91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
@@ -556,8 +556,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->111<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->94<!--/getal--> meer dan één betekenis** — samen 284
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->116<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->99<!--/getal--> meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

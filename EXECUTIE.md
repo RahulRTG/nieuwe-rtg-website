@@ -205,8 +205,8 @@ niet aangenomen.
 |---|---|
 | bewezen | **<!--getal:vertrouwen.bewezen-->0<!--/getal-->** |
 | verschaald | 0 |
-| verzwakt | <!--getal:vertrouwen.routes-->4180<!--/getal--> |
-| geschorst | **<!--getal:vertrouwen.geschorst-->0<!--/getal-->** |
+| verzwakt | <!--getal:vertrouwen.routes-->4786<!--/getal--> |
+| geschorst | **<!--getal:vertrouwen.geschorst-->45<!--/getal-->** |
 | ongemeten | 5 |
 
 Daar volgen twee dingen uit die niet in een roadmap horen te ontbreken.

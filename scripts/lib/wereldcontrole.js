@@ -21,6 +21,19 @@
    de route erbij, in plaats van dat iemand het over een half jaar terugvindt
    aan een reeks routes die 'nu eenmaal' 403 geven.
 
+   EEN SESSIE IS GEEN WERELD, en die twee uit elkaar houden was de eerste
+   reparatie aan deze module zelf. De controle meldde dat de spelwereld
+   gesneuveld was, met als reden wat de route zei: "Dit potje bestaat niet
+   (meer)." Dat klopte niet. Een sweep over alle 3091 beproefde routes wees
+   /api/logout aan (route 654): de proef logt haar eigen lid uit, en
+   `spelStaat` weigert dan met dezelfde zin -- want die controleert `p.spelers
+   .includes(mij)`, en zonder sessie is er geen `mij`. Het potje stond er nog.
+
+   De proef herstelt zo'n sessie vanzelf, maar pas als een volgende route 401
+   geeft; gebeurt dat niet meer, dan draait deze controle op een dood token.
+   Daarom haalt zij de sessie eerst opnieuw op. Lukt dat niet, dan is dat de
+   uitslag -- en niet een verzonnen oordeel over de wereld.
+
    WAT HET NIET DOET is repareren. Een wereld die halverwege sneuvelt, is een
    BEVINDING: misschien hoort die route niet aangeraakt te worden, misschien
    hoort de wereld een reservefiguur te krijgen (zoals de school er nu een
@@ -50,7 +63,17 @@ const CONTROLES = [
 /* Geeft per wereld { wereld, gecontroleerd, ok, waarom }. `gecontroleerd:
    false` is met opzet iets ANDERS dan `ok: false` -- niet gekeken is geen
    uitslag (LAT.md regel 3). */
-async function controleerWerelden({ post, extras, tokenVoor }) {
+async function controleerWerelden({ post, extras, tokenVoor, hernieuw }) {
+  /* Eerst de sessies, dan pas de werelden -- zie de kop. Een controle die op
+     een uitgelogd token draait, meet niets over de wereld en zegt het ergste. */
+  const sessieStuk = new Set();
+  if (hernieuw) {
+    for (const rol of new Set(CONTROLES.map(c => c.rol).filter(Boolean))) {
+      let ok = false;
+      try { ok = await hernieuw(rol); } catch (e) { ok = false; }
+      if (!ok) sessieStuk.add(rol);
+    }
+  }
   const uit = [];
   for (const c of CONTROLES) {
     const e = (extras && extras[c.wereld]) || null;
@@ -59,6 +82,11 @@ async function controleerWerelden({ post, extras, tokenVoor }) {
       uit.push({ wereld: c.wereld, gecontroleerd: false, ok: null,
         waarom: !e ? 'die wereld is niet opgezet'
                    : 'de wereld mist ' + mist.join(', ') + '; er valt niets te controleren' });
+      continue;
+    }
+    if (c.rol && sessieStuk.has(c.rol)) {
+      uit.push({ wereld: c.wereld, gecontroleerd: false, ok: null,
+        waarom: 'de sessie `' + c.rol + '` was niet opnieuw op te halen; over de wereld valt zo niets te zeggen' });
       continue;
     }
     const lijf = c.lijfUit ? c.lijfUit(e) : Object.fromEntries(c.velden.map(v => [v, e[v]]));

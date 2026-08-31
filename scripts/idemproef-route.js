@@ -519,7 +519,7 @@ wachtOpSchoneBoom();
      zich nog steeds klaar -- want klaar was hij, aan het begin. */
   const { controleerWerelden } = require('./lib/wereldcontrole');
   const wereldStand = await controleerWerelden({
-    post, tokenVoor,
+    post, tokenVoor, hernieuw,
     extras: { school: schoolWereld.extra, rtfos: rtfosWereld.extra,
       festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra }
   });

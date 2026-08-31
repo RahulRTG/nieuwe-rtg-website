@@ -444,6 +444,27 @@ const NIET_AANRAKEN = [
   { pad: '/api/techniek/tenant/vernietig', soort: 'onomkeerbaar', waarom: 'vernietigt de omgeving van een klant' },
   { pad: '/api/techniek/fouten/wis', soort: 'onomkeerbaar', waarom: 'wist het foutenlogboek waarop de proef zelf leunt' },
   { pad: '/api/boardroom/reset', soort: 'onomkeerbaar', waarom: 'zet de boardroom terug naar begin' },
+  /* DE PROEF WIST HAAR EIGEN LID, en dat is bij toeval gevonden.
+
+     /api/privacy/delete is het recht op vergetelheid: `wisLid(req.session)`
+     haalt alles weg -- reizen, facturen, kluis, mediastore -- en zet de sessie
+     op de sleutel `gewist`. Volstrekt juist gedrag, en precies daarom mag de
+     proef er niet aankloppen: hij staat op plek 1600 van de 3091 beproefde
+     routes, dus de ~1491 ledenroutes DAARNA werden gemeten op een leeggehaald
+     lid. Ze gaven netjes antwoord (de proef logt na een 401 opnieuw in), dus
+     er ging geen enkele lamp branten -- ze maten alleen iets anders dan
+     iedereen dacht.
+
+     Gevonden doordat de wereldcontrole meldde dat het spelpotje weg was. Dat
+     was de derde verklaring die ik probeerde: eerst leek /api/member/spel/
+     opgeven het (dat was het ook, voor een deel), toen /api/logout (dat gaf
+     dezelfde foutzin maar herstelt vanzelf), en pas een sweep over alle 3091
+     routes wees deze aan -- als de enige waarna het potje NIET meer terugkwam.
+
+     Dit is de vorm die deze lijst bedoelt: geen deur die te gevaarlijk is voor
+     de wereld, maar een die de PROEF zelf onbruikbaar maakt. */
+  { pad: '/api/privacy/delete', soort: 'onomkeerbaar',
+    waarom: 'wist het lid waarmee de proef zelf meet; alles erna meet een leeg account' },
 
   // -- gezag --
   { pad: '/api/office/boardroom/toegang', soort: 'gezag', waarom: 'wie er in de kamer van de eigenaar mag' },

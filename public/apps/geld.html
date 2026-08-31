@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -57,10 +57,21 @@
   #paneel .knop.hoofd{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
   #paneel .bedrag{font-variant-numeric:var(--rtg-cijfers);}
 </style>
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro">
+<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="living" data-rtg-eigenvlak="bordeaux">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <!-- ACHT APPS, NIET DRIEENTACHTIG (PLATFORM.md par. 0). RTG Geld is de eerste
      wereld die ECHT is samengevoegd: wat tien losse pagina's waren (wallet,
      bank, wie-betaalt-wat, rtg-code, balans, lab-fonds, mecenaat, logboek,
@@ -91,6 +102,7 @@
      tegenhoudt. Een id uit de klok is voorspelbaar en dus geen sleutel;
      keuringsregel 15 bewaakt allebei -- de bron en het laden. -->
 <script src="/shared/id.js"></script>
+<script src="/shared/leeg.js"></script>
 <script src="/apps/geld/hulp.js"></script>
 <!-- De volgorde van de scripts is de volgorde van de standenbalk: het
      overzicht eerst (daar bestaat de wereld voor), dan wat u dagelijks

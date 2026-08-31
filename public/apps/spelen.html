@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="bordeaux">
 <head>
 <script src="/shared/schermrust.js" defer></script>
 <meta charset="utf-8">
@@ -132,8 +132,19 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux">
+<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
+  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
+  <div class="os-switcher__links">
+    <a href="/apps/rtg.html" aria-current="page"><span>01</span>LivingOS</a>
+    <a href="/apps/kantoor.html"><span>02</span>WorkOS</a>
+    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
+    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
+  </div>
+  <span class="os-switcher__state">Kern verbonden</span>
+</div>
 <main class="wrap" id="hoofd">
   <!-- lobby -->
   <section id="vLobby">
@@ -1921,5 +1932,6 @@ else if (qs.get('open') && MIJN_SPELLEN.includes(qs.get('open'))) {
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/leeg.js"></script>
 </body>
 </html>

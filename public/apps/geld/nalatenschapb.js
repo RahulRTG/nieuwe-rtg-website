@@ -30,8 +30,7 @@
          over de Lifestyle Pass het hele verhaal, en een 500 tegen een
          ingelogd lid "log eerst in" noemen is een leugen. De pagina toonde
          de inlogkaart ook alleen zonder token. */
-      $('#nlVak').innerHTML = '<p class="stil">' + Geld.esc(e.message) +
-        (e.status === 401 ? ' Log eerst in via de leden-app.' : '') + '</p>';
+      $('#nlVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

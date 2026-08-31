@@ -82,7 +82,7 @@
       '<p class="stil">Rollen die je binnen RTG hebt gewerkt staan hier met de bevestiging van RTG erbij: ' +
       'daarvoor heb je een keer de zaak-code en je eigen PIN gegeven. Werk van buiten RTG mag erbij, en staat ' +
       'er eerlijk bij als zelf opgegeven.</p>' +
-      (alle.length ? alle.map(M.rolRij).join('') : '<p class="stil">Nog geen werk op je profiel.</p>') +
+      (alle.length ? alle.map(M.rolRij).join('') : '<p class="leeg">Nog geen werk op je profiel.</p>') +
       '<label class="stil lbl" for="mtRwat">Rol toevoegen</label><input id="mtRwat" maxlength="80" placeholder="Wat deed je?">' +
       '<input class="h-mt40" id="mtRwaar" maxlength="80" placeholder="Waar?">' +
       '<div class="mt-half"><input id="mtRvan" inputmode="numeric" placeholder="van (jaar)" aria-label="Van welk jaar">' +
@@ -93,7 +93,7 @@
       (p.vaardigheden.length ? '<div class="chips">' + p.vaardigheden.map(function (v) {
         var o = (p.onderschreven || {})[v] || { aantal: 0 };
         return '<button type="button" disabled>' + esc(v) + (o.aantal ? ' · ' + o.aantal : '') + '</button>';
-      }).join('') + '</div>' : '<p class="stil">Nog geen vaardigheden.</p>') +
+      }).join('') + '</div>' : '<p class="leeg">Nog geen vaardigheden.</p>') +
       '<label class="stil lbl" for="mtFvaardig">Vaardigheden (met komma\'s)</label>' +
       '<input id="mtFvaardig" value="' + esc(p.vaardigheden.join(', ')) + '">' +
       '<label class="stil lbl" for="mtFtalen">Talen (met komma\'s)</label>' +
@@ -105,7 +105,7 @@
           (a.verborgen ? '<span class="badge">Verborgen</span>' : '') +
           '<div class="sub">' + esc(a.tekst) + '</div></div>' +
           '<button class="mt-mini" data-mtverberg="' + esc(a.id) + '">' + (a.verborgen ? 'tonen' : 'verbergen') + '</button></div>';
-      }).join('') : '<p class="stil">Nog geen aanbevelingen. Iemand met wie je verbonden bent kan er een schrijven.</p>') +
+      }).join('') : '<p class="leeg">Nog geen aanbevelingen. Iemand met wie je verbonden bent kan er een schrijven.</p>') +
       '</div>';
   };
 
@@ -136,6 +136,6 @@
         return '<div class="rij"><div class="mt-tx"><b>' + esc(l.zaak) + '</b>' +
           (l.gelukt ? '<span class="badge mt-zg">Naam gezien</span>' : '<span class="badge">Geweigerd</span>') +
           '<div class="sub">' + esc(String(l.at).replace('T', ' ').slice(0, 16)) + '</div></div></div>';
-      }).join('') : '<p class="stil">Nog niemand heeft gekeken.</p>') + '</div>';
+      }).join('') : '<p class="leeg">Nog niemand heeft gekeken.</p>') + '</div>';
   };
 })(window, document);

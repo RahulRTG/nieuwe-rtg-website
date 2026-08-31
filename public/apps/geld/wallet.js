@@ -88,7 +88,8 @@
      De echte naam ligt in de gescheiden kluis (privacy by design). */
   function tekenPas(user) {
     var esc = w.Geld.esc;
-    if (!user) { $('#waPas').innerHTML = '<p class="stil">Geen pas te tonen.</p>'; return; }
+    if (!user) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+      ey: 'Wallet', wat: 'Uw pas hoort bij uw account en wordt niet zonder aanmelding getoond.' })); return; }
     $('#waPas').innerHTML =
       '<div class="wa-pas">' +
         '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
@@ -124,7 +125,8 @@
     try {
       var r = await w.Geld.api('/api/state');
       tekenPas(r && r.state && r.state.user);
-    } catch (e) { $('#waPas').innerHTML = '<p class="stil">Geen pas te tonen.</p>'; }
+    } catch (e) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, { ey: 'Wallet',
+      titel: 'Uw pas is nu niet op te halen.' })); }
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};

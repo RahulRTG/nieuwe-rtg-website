@@ -91,7 +91,7 @@
 
   async function laad() {
     try { tekenWacht(await w.Veilig.api('/api/veiligheid/wacht')); }
-    catch (e) { $('#wacht').innerHTML = '<p class="stil">' + w.Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>'; }
+    catch (e) { $('#wacht').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Veilig.esc(e.message) })); }
   }
 
   V.standen.push({

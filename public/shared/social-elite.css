@@ -4,9 +4,17 @@
 body.rtg-social-elite{
   --rtg-social-top:72px;
   --rtg-social-rail:78px;
-  --rtg-bg:#ebe9e4;
-  --rtg-card:#f8f7f3;
-  --rtg-card2:#f1efe9;
+  /* op de pearl-ladder van het huis, zie MATERIAAL.md par. "De sociale kant
+     staat op Pearl": grond = basis, wat erbovenop ligt = hoog, wat erin ligt
+     = diep. Hier stonden drie eigen lichte kleuren met dezelfde bedoeling. */
+  --rtg-bg:var(--pearl-basis);
+  --rtg-card:var(--pearl-hoog);
+  --rtg-card2:var(--pearl-diep);
+  /* Wie de grond verft, zet ook het LEESBARE goud. Dit blok maakt de grond
+     pearl maar liet --rtg-leesgoud staan zoals hij op een donkere grond hoort
+     (#C0A544, het hoogsel); elk klein gouden opschrift haalde hier 2,2:1.
+     Gevonden door scripts/a11y.js in de zaak-ronde. */
+  --rtg-leesgoud:var(--gold-diep);
   --rtg-txt:#181817;
   --rtg-muted:#5e5d58;
   --rtg-soft:#858178;
@@ -64,9 +72,14 @@ body.rtg-social-elite:not(.rtg-salon-elite) .merkkop>.amn-knop{position:fixed!im
    ========================================================================== */
 body.rtg-social-elite{
   --rtg-social-top:66px;
-  --rtg-bg:#f1eee7;
-  --rtg-card:#f7f4ed;
-  --rtg-card2:#ebe6dc;
+  --rtg-bg:var(--pearl-basis);
+  --rtg-card:var(--pearl-hoog);
+  --rtg-card2:var(--pearl-diep);
+  /* Wie de grond verft, zet ook het LEESBARE goud. Dit blok maakt de grond
+     pearl maar liet --rtg-leesgoud staan zoals hij op een donkere grond hoort
+     (#C0A544, het hoogsel); elk klein gouden opschrift haalde hier 2,2:1.
+     Gevonden door scripts/a11y.js in de zaak-ronde. */
+  --rtg-leesgoud:var(--gold-diep);
   --rtg-txt:#171712;
   --rtg-muted:#625f57;
   --rtg-soft:#625f57;

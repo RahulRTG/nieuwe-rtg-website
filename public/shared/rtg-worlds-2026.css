@@ -13,9 +13,41 @@ body[data-rtg-world]{
   --world-soft:var(--rtg-soft,#CDC9C0);
   --world-line:var(--rtg-line,var(--onyx-rand));
   min-width:320px;
-  background:var(--rtg-grond,var(--onyx-glans));
+  /* DE GROND IS ZWART EN HET MATERIAAL IS LICHT (31 augustus 2026).
+
+     Hier stond `background:var(--rtg-grond)` -- de GLANS van het materiaal,
+     over de hele pagina. Voor bordeaux is dat een verloop dat begint op
+     #9E1C40, en dat is `--burgundy-bright`: in CLAUDE.md staat die kleur
+     genoteerd als HOVER-STATE. Een accent dat over de volle hoogte van elk
+     scherm wordt uitgesmeerd is geen accent meer, en het resultaat was een
+     roze waas waarin kaarten, randen en tekst allemaal even hard riepen.
+
+     Dat botst met drie merkregels tegelijk: bordeaux is een accent, er komt
+     geen gradient-grond, en het ritme is stark zwart/wit.
+
+     De schermen zelf deden het al goed. /apps/rtg.html droeg
+     `radial-gradient(circle at 38% 4%, rgba(127,22,52,.25), transparent 42%)`
+     over #030303 -- zwart, met het materiaal als LICHT dat ergens vandaan
+     komt. Precies een signatuurelement. Die behandeling staat nu hier, zodat
+     elke wereld hem krijgt in plaats van hem te moeten overschrijven.
+
+     De gloed komt uit `--rtg-bg` van het gekozen materiaal, dus hij verhuist
+     mee als een materiaal verandert; hij wordt hier niet overgetypt. */
+  background:
+    radial-gradient(circle at 38% 4%,
+      color-mix(in srgb, var(--rtg-bg,#0C0C0B) 55%, transparent) 0%,
+      transparent 42%),
+    #060605;
+  background-attachment:fixed;
   color:var(--world-ink);
   font-family:var(--rtg-interface);
+}
+/* Champagne is het enige LICHTE materiaal, en een donkere grond met een
+   lichte gloed erover is daar precies verkeerd om. Pearl blijft dus gewoon
+   pearl; de gloed vervalt en het vlak wordt de glans die het altijd was. */
+:root[data-rtg-thema="champagne"] body[data-rtg-world]{
+  background:var(--rtg-grond,var(--pearl-glans));
+  background-attachment:fixed;
 }
 body[data-rtg-world]::before{
   content:"";
@@ -31,10 +63,53 @@ body[data-rtg-world]::before{
   mask-image:linear-gradient(to bottom,rgba(0,0,0,.72),transparent 72%);
 }
 
+/* DE SCHIL MOET WETEN DAT DEZE BALK ER IS.
+
+   `.rtg-edge-chrome` is een vaste overlay op `inset:0` -- de zijrail, de
+   onderbalk en de kruimel zitten daarin. Toen de switcher op elk scherm kwam,
+   legde die zich er dus overheen: de bovenste knop van de rail werd afgesneden
+   en niemand kon er nog bij.
+
+   Twee regels lossen het op, en ze horen bij elkaar: de balk wordt PLAKKEND
+   (anders ontstaat er een gat zodra je scrolt, want de schil staat vast en de
+   balk niet), en de schil begint onder de balk in plaats van bovenaan het
+   venster. De hoogte staat als variabele zodat er maar een getal is. */
+:root{ --os-switcher-h:64px; }
+/* TWEE SOORTEN SCHERMEN, TWEE KANTEN OP SCHUIVEN.
+
+   Eerst schoof hier de gedeelde schil (`.rtg-edge-chrome`) omlaag. Dat klopte
+   niet: die schil zet zelf al `padding-top` op de body, dus de switcher stond
+   al ONDER zijn balk -- en door hem ook nog eens 64px te verplaatsen kwam hij
+   precies over de switcher heen te liggen. Twee dingen die allebei ruimte
+   maakten voor elkaar.
+
+   De schil is de baas waar hij bestaat: zijn balk blijft op nul en de switcher
+   plakt eronder. Waar hij NIET bestaat draagt het scherm zijn eigen zijbalk,
+   en dan is het andersom -- daar staat de switcher bovenaan en schuift de
+   zijbalk. Die tweede regel staat hieronder. */
+body.rtg-edge-host > .os-switcher{
+  top:calc(var(--edge-top,40px) + env(safe-area-inset-top,0px));
+}
+/* Niet elk scherm gebruikt die schil: de meeste dragen hun EIGEN vaste
+   zijbalk of kopbalk, elk met een eigen klassenaam (.media-bank, .bank, ...).
+   Een regel per naam wordt een lijst die veroudert, dus wordt hier op VORM
+   geselecteerd: een landmark dat rechtstreeks in de body staat. `top` doet
+   niets bij een statisch element, dus dit raakt alleen wat werkelijk vast of
+   plakkend staat -- precies de elementen die anders onder de balk verdwijnen.
+   De hoogte krimpt mee, anders schuift de onderkant het beeld uit. */
+body:has(> .os-switcher):not(.rtg-edge-host) > aside,
+body:has(> .os-switcher):not(.rtg-edge-host) > nav,
+body:has(> .os-switcher):not(.rtg-edge-host) > header{
+  top:var(--os-switcher-h);
+}
+body:has(> .os-switcher):not(.rtg-edge-host) > aside{
+  max-height:calc(100vh - var(--os-switcher-h));
+}
 .os-switcher{
-  position:relative;
+  position:sticky;
+  top:0;
   z-index:60;
-  min-height:64px;
+  min-height:var(--os-switcher-h);
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
   align-items:center;
@@ -150,9 +225,16 @@ body[data-rtg-world="living"]{
   --lijn:var(--bordeaux-rand);
   --vlak:rgba(12,12,11,.72);
   --zacht:#E6CECC;
+  /* De gloed blijft, de GROND wordt zwart. Hier stond `var(--bordeaux-diep)`
+     als paginagrond: dan is bordeaux geen accent meer maar verf, en dat is
+     precies wat CLAUDE.md verbiedt (bordeaux is de accentkleur, het ritme is
+     stark zwart/wit, geen gradient-grond). Op een volle pagina gaf het een
+     roze waas waarin kaarten, randen en tekst allemaal even hard riepen.
+     Het materiaal hoort LICHT te zijn dat ergens vandaan komt -- die radiaal
+     hieronder deed dat al goed en heeft alleen zwart onder zich nodig. */
   background:
     radial-gradient(circle at 76% 11%,rgba(158,28,64,.32),transparent 27rem),
-    var(--bordeaux-diep);
+    #080707;
 }
 body[data-rtg-world="living"]::before{
   opacity:.35;
@@ -167,6 +249,33 @@ body[data-rtg-world="living"] .os-switcher{
   background:rgba(74,12,30,.92);
 }
 body[data-rtg-world="living"] .os-switcher__links a span{color:#F4F0E9;}
+/* DEZELFDE WERELD, TWEE MATERIALEN.
+
+   LivingOS is bordeaux behalve op de sociale schermen: die staan op Pearl, en
+   dat is een besluit (MATERIAAL.md). De balk hierboven ging daar mee de fout
+   in -- hij bleef de donkere wijnband die bij bordeaux hoort, en stond dus met
+   ivoren letters op een licht scherm. Van een afstandje leek dat een keuze;
+   van dichtbij was het onleesbaar.
+
+   Op champagne wordt de balk daarom zelf pearl, met de inkt van het materiaal.
+   De actieve wereld houdt de gouden rand -- dat is het accent en dat werkt op
+   allebei de gronden. */
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher{
+  background:color-mix(in srgb,var(--pearl-hoog) 94%,transparent);
+  border-bottom-color:var(--pearl-rand);
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand b,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a{
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand span,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__state{
+  color:#41403E;   /* de zachte toon die rtg-themas.css voor champagne heeft uitgerekend */
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a span{
+  color:var(--gold-diep,#6B5A05);
+}
 body[data-rtg-world="living"] .schil{
   min-height:calc(100vh - 64px);
   grid-template-rows:58px 1fr;
@@ -298,7 +407,10 @@ body[data-rtg-world="living"] .kaart:hover{
 body[data-rtg-world="work"]{
   --world-accent:var(--gold-tekst);
   --world-accent-deep:var(--gold-basis);
-  background:var(--royal-glans);
+  /* zelfde correctie als bij living: satijn is licht, geen verf */
+  background:
+    radial-gradient(circle at 76% 11%,color-mix(in srgb,var(--royal-basis) 34%,transparent),transparent 27rem),
+    #070809;
 }
 body[data-rtg-world="work"]::before{
   opacity:.65;

@@ -11,8 +11,19 @@ body.rtg-suite-page{
   --suite-stack:116px;
   --suite-ink:#181917;
   --suite-ink-2:#20211e;
-  --suite-paper:#ebe9e3;
-  --suite-paper-2:#f6f4ef;
+  /* DE SUITE STAAT OP PEARL (31 augustus 2026).
+     Hier stonden zes eigen lichte kleuren die niemand had uitgerekend --
+     #ebe9e3 en verderop #ddd6c9, tot 32 stappen naast --pearl-basis. Dezelfde
+     bedoeling als het materiaal van het huis, een eigen getal. Het licht van
+     deze schermen is een BESLUIT (MATERIAAL.md, "De sociale kant staat op
+     Pearl"); alleen de kleuren waren niet die van het huis.
+
+     Het is een LADDER en geen kleur, en dat is waarom er drie tokens staan en
+     niet een: de grond is `basis`, wat erbovenop ligt is `hoog`, wat erin ligt
+     is `diep`. Wie hier alleen de grond vervangt, maakt de grond lichter dan
+     de kaarten die erop liggen -- dan keert de verhouding om en zweeft alles. */
+  --suite-paper:var(--pearl-basis);
+  --suite-paper-2:var(--pearl-hoog);
   --suite-text:#1b1c19;
   --suite-muted:#68675f;
   --suite-line:rgba(27,28,25,.14);
@@ -20,15 +31,22 @@ body.rtg-suite-page{
   --suite-wine:#713044;
   --rtg-bg:var(--suite-paper);
   --rtg-card:var(--suite-paper-2);
-  --rtg-card2:#e4e1d9;
+  --rtg-card2:var(--pearl-diep);
   --rtg-txt:var(--suite-text);
   --rtg-muted:var(--suite-muted);
   --rtg-soft:#625f57;
   --rtg-line:var(--suite-line);
   --rtg-goud:var(--suite-gold);
+  /* WIE DE GROND VERFT, ZET OOK HET LEESBARE GOUD. Dit blok maakt de grond
+     pearl maar liet --rtg-leesgoud staan zoals hij op een DONKERE grond hoort
+     (#C0A544, het hoogsel). Daardoor haalde elk klein gouden opschrift hier
+     2,2:1 -- gevonden door scripts/a11y.js in de zaak-ronde, op het opschrift
+     van de lege stand. Op pearl is het leesbare goud --gold-diep; dat is
+     precies waarvoor rtg-themas.css die token per materiaal uitrekent. */
+  --rtg-leesgoud:var(--gold-diep);
   --bg:var(--suite-paper);
   --card:var(--suite-paper-2);
-  --card2:#e4e1d9;
+  --card2:var(--pearl-diep);
   --txt:var(--suite-text);
   --muted:var(--suite-muted);
   --soft:#625f57;
@@ -333,9 +351,9 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
    zwevende witte bediening, geen lege demo-vlakken, geen generieke SaaS-card.
    ========================================================================== */
 body.rtg-suite-page{
-  --suite-paper:#ddd6c9;
-  --suite-paper-2:#f1ecdf;
-  --suite-card:#f4efe4;
+  --suite-paper:var(--pearl-basis);
+  --suite-paper-2:var(--pearl-hoog);
+  --suite-card:var(--pearl-hoog);
   --suite-ink:#171815;
   --suite-ink-2:#20211d;
   --suite-gold:#ae9250;
@@ -451,4 +469,27 @@ body.rtg-social-circles .aibalk input{border-color:rgba(255,255,255,.12)!importa
   body.rtg-social-circles main#main>.kaart{padding:0 1.15rem 1.25rem!important;}
   body.rtg-social-circles main#main>.kaart>h2{margin:0 -1.15rem 1rem;padding:1.15rem;}
   body.rtg-social-circles .aibalk{bottom:calc(var(--suite-nav) + .65rem)!important;}
+}
+
+/* ---- de DONKERE vlakken binnen dit lichte scherm --------------------------
+   Deze suite verft de pagina pearl, en daarom staat --rtg-leesgoud hierboven
+   op --gold-diep: dat is het goud dat op parelmoer leest. Maar de suite
+   schildert daarbinnen ook vlakken met --suite-ink (#171815): de bovenbalk,
+   de private wereld, en de hele lijstkolom van Berichten. Op die vlakken is
+   het donkere goud onleesbaar -- scripts/a11y.js mat 1,93:1 op het merkje
+   "Rahul" in de balk.
+
+   Dus geldt hier dezelfde regel als een blok hoger, alleen andersom: wie een
+   vlak DONKER schildert binnen een licht scherm, zet daar het goud terug dat
+   op donker leest. Een token per scherm is niet genoeg zodra een scherm twee
+   gronden heeft. */
+.rtg-suitebar,
+body.rtg-social-messages .comm,
+body.rtg-social-private-hub,
+.private-world,
+body.rtg-suite-page button.knop.vol,
+body.rtg-social-messages .nieuwknop,
+body.rtg-social-messages .stuurknop{
+  --rtg-leesgoud:var(--gold-tekst);
+  --rtg-goud:var(--gold-tekst);
 }

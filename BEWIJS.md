@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1438 bestanden en 10122 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1440 bestanden en 10133 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1438 |
-| losse beweringen (`test(...)`) | 10122 |
+| toetsbestanden | 1440 |
+| losse beweringen (`test(...)`) | 10133 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
 | alleen in de kop *genoemd*, nog niet gemeten | 133 |
-| niets van beide | 288 |
+| niets van beide | 290 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1263 bestanden, 9821 beweringen.
+1265 bestanden, 9832 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1025,6 +1025,7 @@ toets omvalt.
 | `sessies.test.js` | 4 | gezakt op `return-weg#2` | De sessie-opslag: gelijktijdige sessies mogen niet stilletjes op 400 vastlopen (dat gooide vroeger de 401e ingelogde gebruiker eruit). Verlopen sessies gaan wel weg. |
 | `sessieverfijning.test.js` | 6 | -- | De sessieverfijning: drie registers, een regel. Meet gedrag. |
 | `sessiewacht.test.js` | 5 | -- | DE SESSIEWACHT, NAGETROKKEN. Een puur oordeel over een dubbelzinnige statuscode, los toetsbaar (LAT.md regel 10): de instrumenten eromheen hebben een server nodig, deze regel niet -- een nagebouwde `post` is genoeg. |
+| `signatureroutes.test.js` | 4 | -- | De signatureroutes: deuren achter de KYC-poort. Vierde variant van de sessieverfijning, en de enige die vanaf MEER dan een uitgangsrol werkt -- de ontmoetpoort vraagt drie dingen tegelijk (een pas, een geverifieerd... |
 | `simulatiebank.test.js` | 7 | gezakt op `liegpoort /api/` | DE SIMULATIEBANK, EN DE POORT DIE HIJ NIET AANRAAKT. MAGNAATLAB.md par. |
 | `skipwacht.test.js` | 2 | geen module gevonden | EEN OVERGESLAGEN SCHERMTOETS IS ROOD. Afspraak van Rahul, 11 augustus 2026. |
 | `sleutelwoorden.test.js` | 7 | gezakt op `===->!==#0` | Sleutelwoorden: inloggen door een gesprek met Rahul in plaats van een wachtwoord. Getoetst op kern-niveau (met een nep-kluis en echte crypto): het instellen keurt precies vier verschillende woorden van minstens drie... |
@@ -1240,6 +1241,7 @@ toets omvalt.
 | `wereldregels.test.js` | 4 | gezakt op `liegpoort /api/` | De wereldtabel: alle landen van de wereld in de fiscale tabel, in dezelfde structuur als de rijke kernlanden, en de Regelwacht die elk land automatisch kan bijwerken. Getest: dekking en veldkwaliteit (alles binnen de... |
 | `wereldregister.test.js` | 13 | genoemd | HET WERELDREGISTER IS FAIL-CLOSED: een item dat niet oplost, laat de bouw zakken in plaats van stil te verdwijnen. WAAROM DEZE TOETS BESTAAT, en het is een echt gevonden gat. |
 | `wereldroutes.test.js` | 3 | gezakt op `liegpoort /api/` | DE DRIE SAMENHANGLAGEN OVER HUN EIGEN ROUTE (PLATFORM.md, het wereldpatroon). De lagen zelf staan los getoetst -- test/socialewereld.test.js, test/kantoorwereld.test.js en test/reiswereld.test.js roepen de kern... |
+| `wereldrtf.test.js` | 7 | -- | De RTF-kant van het gezin: wie klopt er aan, per deelgebied. Derde variant van hetzelfde: een veldnaam die per deelgebied iets anders betekent. |
 | `wereldschool.test.js` | 6 | genoemd | DE SCHOOLWERELD -- vier objecten die aan elkaar hangen. Na de sleutelronde en de objectoogst stonden er 87 schoolroutes op 404, en de server zei zelf waarom: 36 keer "Dit gezin kennen we niet", 14 keer "Deze leerling... |
 | `wereldtaal.test.js` | 3 | overleefd | Het wereld-kernwoordenboek: ALLE talen uit het register werken ook zonder AI-sleutel. Geen volzin-vertaler (dat doet de AI), maar de 30 school-kernwoorden zijn in elke taal aanwezig en compleet -- deze test is de... |
 | `wereldvermogens.test.js` | 14 | gezakt op `liegpoort /api/` | De vermogens van de Lifestyle- en Business Pass die eerst alleen een NAAM in rechten.js hadden: geavanceerd zoeken, netwerkanalyse en "wie bekeek mijn profiel". De belangrijkste bewering staat in het midden: ZOEKEN... |

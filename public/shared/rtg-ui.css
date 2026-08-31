@@ -301,48 +301,72 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   text-align:center;
 }
 .rtg-leeg-vlak{
+  /* GEEN HOLLE RECHTHOEK. De eerste versie was een kader over de volle
+     breedte met de tekst ergens in het midden -- 250 pixels lucht met een rand
+     eromheen. Dat leest als een plaatshouder en niet als een besluit.
+
+     Wat het wel is: een blok tekst met een maat. Een kolom die ophoudt waar
+     lezen ophoudt (34rem), lucht die in verhouding staat tot de inhoud in
+     plaats van tot het scherm, en een haarlijn boven in plaats van een doos
+     eromheen. Een rand die helemaal om iets heen loopt zegt "dit is een ding";
+     een lijn erboven zegt "hier begint iets", en dat is hier het juiste. */
   display:flex;
   flex-direction:column;
-  align-items:center;
-  gap:.55rem;
-  padding:clamp(2.4rem,7vh,4.5rem) 1.5rem;
-  border:1px solid var(--rtg-line);
-  border-radius:0;
-  background:var(--rtg-card,rgba(255,255,255,.02));
-  text-align:center;
+  align-items:flex-start;
+  gap:.35rem;
+  max-width:34rem;
+  margin:clamp(1.6rem,5vh,3rem) 0 0;
+  padding:clamp(1.5rem,4vh,2.1rem) 0 0;
+  border:0;
+  border-top:1px solid var(--rtg-line);
+  background:none;
+  text-align:left;
 }
 .rtg-leeg-vlak .rtg-leeg-ey{
-  font-size:.58rem;
-  letter-spacing:.24em;
+  font-size:.56rem;
+  letter-spacing:.26em;
   text-transform:uppercase;
   color:var(--rtg-leesgoud,var(--rtg-goud));
 }
 .rtg-leeg-vlak b{
   font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
   font-weight:500;
-  font-size:clamp(1.15rem,2.4vw,1.5rem);
+  font-size:clamp(1.35rem,2.6vw,1.8rem);
+  line-height:1.12;
+  letter-spacing:-.005em;
   color:var(--rtg-txt);
+  margin-top:.15rem;
   text-wrap:balance;
 }
 .rtg-leeg-vlak p{
-  margin:0;
-  max-width:44ch;
+  margin:.3rem 0 0;
+  max-width:42ch;
   color:var(--rtg-muted);
-  font-size:.84rem;
-  line-height:1.6;
+  font-size:.86rem;
+  line-height:1.65;
 }
+/* De handeling staat los van de tekst en niet eronder geplakt: dat verschil
+   in ruimte is wat hem tot handeling maakt. */
 .rtg-leeg-actie{
-  margin-top:.7rem;
-  display:inline-block;
+  margin-top:1.15rem;
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
   border:1px solid var(--rtg-line);
   border-radius:0;
-  padding:.6rem 1.1rem;
+  padding:.65rem 1.15rem;
   color:var(--rtg-txt);
   text-decoration:none;
   font-weight:600;
   font-size:.78rem;
+  letter-spacing:.01em;
+  transition:border-color .18s ease,background-color .18s ease;
 }
-.rtg-leeg-actie:hover{ border-color:var(--rtg-leesgoud,var(--rtg-goud)); }
+.rtg-leeg-actie:hover,
+.rtg-leeg-actie:focus-visible{
+  border-color:var(--rtg-leesgoud,var(--rtg-goud));
+  background:color-mix(in srgb,var(--rtg-leesgoud,var(--rtg-goud)) 9%,transparent);
+}
 
 /* ------------------------------------------------- de paginakop ---
    Elk scherm bouwde dezelfde drie dingen zelf: een klein gouden opschrift,

@@ -1,8 +1,10 @@
 {
  "stempel": {
-  "op": "2026-08-30T00:58:37.325Z",
-  "commit": "4e583324",
-  "boomVuil": true,
+  "op": "2026-08-31T19:08:48.845Z",
+  "commit": "9ecef79b",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/idorproef.js",
   "node": "v22.22.2"
  },
  "uitleg": "Twee echte leden met dezelfde rol: A oogst objecten (objectpool), B probeert ze te bedienen. gescheiden = B geweigerd (bewijs); doorbraak = B kreeg 2xx op een object uit A's antwoord (BEVINDING, met de hand nakijken -- kan publiek zijn); onbereikbaar = geen id of validatie strandde eerder. Zie scripts/lib/idor.js voor het oordeel.",

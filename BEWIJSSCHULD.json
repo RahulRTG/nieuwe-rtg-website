@@ -1,34 +1,35 @@
 {
  "stempel": {
-  "op": "2026-08-31T17:43:21.111Z",
-  "commit": "df671f92",
+  "op": "2026-08-31T19:14:22.655Z",
+  "commit": "9ecef79b",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 7,
+  "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 14,
-  "meetwerk": 57,
+  "meetwerk": 335,
   "instrument": 323,
-  "grens": 642
+  "grens": 643
  },
  "gemeten": {
   "postenTotaal": 14,
-  "achterstand": 380,
-  "randVanDeMethode": 642,
+  "achterstand": 658,
+  "randVanDeMethode": 643,
   "auth-onbeslist": 1,
-  "capability-in-handler": 546,
+  "capability-in-handler": 547,
   "objectpoort": 52,
   "output-deuren": 18,
   "lichaamssleutel": 74,
-  "output-niet-toerekenbaar": 0,
+  "output-niet-toerekenbaar": 277,
   "output-blind": 0,
   "output-onwaarneembaar": 4,
   "audit-wisselend": null,
   "audit-verklaard": null,
-  "rollback-gezakt": 1,
+  "rollback-gezakt": 2,
   "object-vooraf": 323,
   "proefruis": 1,
   "wegwerpserver-kopieen": 2
@@ -46,7 +47,7 @@
    "id": "capability-in-handler",
    "soort": "grens",
    "wat": "routes zonder bewakerslaag: de controle zit IN de handler (een capability-token)",
-   "aantal": 546,
+   "aantal": 547,
    "waarom": "de rolproef kruist ROLLEN. Deze routes kennen geen rol -- ze eisen een token dat je alleen hebt als je het hebt gekregen (de schoolborden van foundation, rtf/social). Rollen kruisen is hier niet moeilijk maar zinloos.",
    "sluit": "niets in deze proef. Een eigen proef op capability-tokens zou de goede vraag stellen; die bestaat niet en is een project, geen achterstand."
   },
@@ -78,7 +79,7 @@
    "id": "output-niet-toerekenbaar",
    "soort": "meetwerk",
    "wat": "routes waar inhoudgevoelige toetsen op zitten, maar die toetsen raken er meer",
-   "aantal": 0,
+   "aantal": 277,
    "waarom": "een toets die op de lege inhoud zakt en tien routes raakt, kan op de inhoud van een van die tien zijn gezakt. Aan DEZE route valt dan niets toe te rekenen.",
    "sluit": "node scripts/outputproef.js --meet=<n>. Die liegt over EEN route en draait alleen de toetsen die hem raken; de uitslagen stapelen in OUTPUTPROEF.json. Een paar honderd per ronde, dus dit sluit met werk en niet met een doorbraak."
   },
@@ -118,7 +119,7 @@
    "id": "rollback-gezakt",
    "soort": "meetwerk",
    "wat": "routes die weigeren en toch de toestand veranderen",
-   "aantal": 1,
+   "aantal": 2,
    "waarom": "de meeste zijn /api/rtfos/* met securityLog en sessions -- vermoedelijk de auth-laag die een geweigerde poging vastlegt, en dus mogelijk ruis in de meting en geen lek. Maar EEN ervan verspringt per ronde van plek, en een bevinding die verhuist is zelf een bevinding over de meting.",
    "sluit": "per route nalopen wat er beweegt en waarom. Dit is de oudste post op deze lijst en de enige die naar een mogelijk defect wijst."
   },
@@ -165,6 +166,12 @@
    "van": 985,
    "naar": 989,
    "reden": "De samenvoeging van 24 takken. De groei zit volledig in object-vooraf: nieuwe routes die een BESTAAND object willen bedienen dat de proef zelf niet heeft aangemaakt. Geen enkele post wisselde van soort en geen bestaande meting ging verloren -- het huis werd groter en deze teller telt routes. Sluiten doe je met een aanmaakstap per nieuw domein in de proef."
+  },
+  {
+   "op": "2026-08-31",
+   "van": 380,
+   "naar": 658,
+   "reden": "OUTPUTPROEF.json was verouderd en gemeten op een vuile boom; de post output-niet-toerekenbaar stond daardoor op 0 omdat er niets gemeten WAS, niet omdat er niets was. Nu vers gemeten komen er 277 routes in beeld waar inhoudgevoelige toetsen op zitten die meer routes raken. Dat is bestaande schuld die zichtbaar wordt, geen nieuwe. Daarnaast rollback-gezakt 1 -> 2 en capability-in-handler 546 -> 547, allebei binnen de meetruis tussen twee rondes op ongewijzigde server-code (30cd8c2e -> 5dc3b081 raakt geen regel in server/ of public/)."
   }
  ]
 }

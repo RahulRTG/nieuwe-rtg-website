@@ -1,8 +1,10 @@
 {
  "stempel": {
-  "op": "2026-08-30T09:11:56.285Z",
-  "commit": "894e463f",
-  "boomVuil": true,
+  "op": "2026-08-31T19:09:21.846Z",
+  "commit": "9ecef79b",
+  "boomVuil": false,
+  "boomAnders": 2,
+  "instrument": "scripts/idemschuld.js",
   "node": "v22.22.2"
  },
  "uitleg": "Schrijfroutes zonder verklaring in server/lib/idemsleutels.js. MAG ALLEEN KRIMPEN -- zie test/idemschuld.test.js. Een route met nietIdempotent staat NIET in de schuld: daar is over nagedacht. Dit telt of er een besluit is, niet of de idempotentie werkt (dat doet de idemproef).",

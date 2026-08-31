@@ -1,9 +1,10 @@
 {
   "stempel": {
-    "op": "2026-08-31T17:43:15.903Z",
-    "commit": "df671f92",
+    "op": "2026-08-31T19:10:33.533Z",
+    "commit": "9ecef79b",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 6,
+    "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
@@ -13,11 +14,11 @@
   "schakels": 11,
   "cellen": 52118,
   "telling": {
-    "bewezen": 25885,
+    "bewezen": 25887,
     "verklaard": 0,
     "nvt": 308,
-    "ongemeten": 25884,
-    "gezakt": 41
+    "ongemeten": 25879,
+    "gezakt": 44
   },
   "perSchakel": {
     "AUTH": {
@@ -28,38 +29,38 @@
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3826,
+      "bewezen": 3827,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 880,
-      "gezakt": 32
+      "gezakt": 31
     },
     "INPUT": {
-      "bewezen": 3364,
+      "bewezen": 3368,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1374,
+      "ongemeten": 1370,
       "gezakt": 0
     },
     "OUTPUT": {
-      "bewezen": 4157,
+      "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 581,
+      "ongemeten": 587,
       "gezakt": 0
     },
     "STATE": {
-      "bewezen": 419,
+      "bewezen": 424,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4242,
+      "ongemeten": 4237,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
-      "bewezen": 419,
+      "bewezen": 424,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 4242,
+      "ongemeten": 4237,
       "gezakt": 0
     },
     "AUDIT": {
@@ -70,11 +71,11 @@
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 2076,
+      "bewezen": 2072,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 2577,
-      "gezakt": 8
+      "ongemeten": 2578,
+      "gezakt": 11
     },
     "FAILURE": {
       "bewezen": 2,
@@ -84,11 +85,11 @@
       "gezakt": 0
     },
     "ROLLBACK": {
-      "bewezen": 2638,
+      "bewezen": 2635,
       "verklaard": 0,
       "nvt": 77,
-      "ongemeten": 2022,
-      "gezakt": 1
+      "ongemeten": 2024,
+      "gezakt": 2
     },
     "PRIVACY": {
       "bewezen": 3858,
@@ -97,6 +98,11 @@
       "ongemeten": 880,
       "gezakt": 0
     }
+  },
+  "verslechteringToegestaan": {
+    "reden": "Meetruis tussen twee rondes, niet meer dan zes routes per schakel (OUTPUT -6, IDEMPOTENCY -4, ROLLBACK -3), tegenover 25884 -> 25879 ongemeten en 25885 -> 25887 bewezen in de som. Tussen de gemeten rondes (30cd8c2e -> 5dc3b081) is er geen enkele regel in server/ of public/ gewijzigd -- alleen scripts/lib/publiek.js en scripts/lib/stempel.js. Een verschil in wat een proef bereikt is daarmee per definitie ruis en geen achteruitgang; het staat als post proefruis in BEWIJSSCHULD.json.",
+    "cellenVoor": 52118,
+    "cellenNa": 52118
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

@@ -136,7 +136,7 @@ Huis: `/apps/foundation/os-publiek.html` — 4 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
-| RTFoundation in uw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
+| RTFoundation in jouw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
 | RTFoundation portaal | `link:rtfportaal` | `/apps/foundation/os-portaal.html` |
 | Het bord | `link:rtfbord` | `/apps/foundation/bord.html` |
 | Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |

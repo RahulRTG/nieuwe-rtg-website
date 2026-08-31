@@ -23,7 +23,7 @@ module.exports = {
       'Lees in gewone taal waar uw vraag staat en wat er is gedaan',
       'Trek uw toestemming in als u niet meer wilt dat uw gegevens worden gedeeld; dat kan hier, zonder te bellen'],
     'Wat er al is gedaan blijft in het dossier staan -- dat wissen zou het onbetrouwbaar maken, ook voor u -- maar er gaat daarna niets meer naar een partner.'),
-  '/apps/foundation/os-publiek.html': G('RTFoundation in uw buurt: wat er loopt, waar u binnen kunt lopen en hoe u meedoet.',
+  '/apps/foundation/os-publiek.html': G('RTFoundation in jouw buurt: wat er loopt, waar je binnen kunt lopen en hoe je meedoet.',
     ['Kies uw stad en zie welke projecten er draaien',
       'Bekijk de activiteiten die openstaan, met datum, plek en of er nog plek is',
       'Lees hoe u meedoet als vrijwilliger of als ondernemer'],

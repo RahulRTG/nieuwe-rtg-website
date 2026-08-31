@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
-<title>FoundationOS · RTFoundation in uw buurt</title>
+<title>FoundationOS · RTFoundation in jouw buurt</title>
 <link rel="icon" href="/icons/foundation.svg">
 <link rel="manifest" href="/manifests/rtf-buurt.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
@@ -187,11 +187,11 @@
   <section class="onthaal" aria-labelledby="onthaalkop">
     <div class="onthaal-beeld">
       <div class="buurtey" id="groet">FoundationOS · RTFoundation</div>
-      <h1 id="onthaalkop">Uw toekomst.<br>Op wereldniveau.</h1>
+      <h1 id="onthaalkop">Iedere buurt<br>heeft een toekomst.</h1>
       <p id="wat">De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.</p>
     </div>
     <div class="onthaal-kies">
-      <div class="buurtsec">Kies uw stad</div>
+      <div class="buurtsec">Kies je stad</div>
       <div class="steden" id="steden"><div class="leeg">Laden...</div></div>
       <div class="stippen" id="stippen" aria-hidden="true"></div>
     </div>
@@ -199,7 +199,7 @@
 
   <div class="tweeluik">
     <section aria-labelledby="doenkop">
-      <div class="buurtsec" id="doenkop">Wat kunt u doen in uw stad</div>
+      <div class="buurtsec" id="doenkop">Wat kun je doen in jouw stad</div>
       <div class="doen">
 
         <button type="button" class="doenkaart" data-heen="hulp">
@@ -212,14 +212,14 @@
         <button type="button" class="doenkaart" data-heen="projecten">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.4"/><path d="M3 19c0-3 2.7-5 6-5s6 2 6 5M15 19c0-2 1.6-3.4 3.6-3.4S22 17 22 19"/></svg>
           <div class="tekst"><b>Wat er loopt</b>
-          <div class="uitleg">Bekijk projecten en initiatieven in uw buurt.</div></div>
+          <div class="uitleg">Bekijk projecten en initiatieven in jouw buurt.</div></div>
           <span class="heen">Bekijk projecten <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
         </button>
 
         <button type="button" class="doenkaart" data-heen="activiteiten">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <div class="tekst"><b>Waar u binnen kunt lopen</b>
-          <div class="uitleg">Vind activiteiten bij u in de buurt.</div>
+          <div class="tekst"><b>Waar je binnen kunt lopen</b>
+          <div class="uitleg">Vind activiteiten bij jou in de buurt.</div>
           <!-- HET GETAL VERSCHIJNT ALLEEN ALS HET GETELD IS. In het ontwerp
                stond hier vast "2 plekken vrij"; dat is precies het soort cijfer
                dat een scherm niet mag verzinnen. Deze pil wordt door
@@ -254,7 +254,7 @@
     <div class="band-merk"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"/><path d="M12 9c0-3 2-5 5-5 0 3-2 5-5 5zM12 12c0-2.6-1.8-4.4-4.4-4.4 0 2.6 1.8 4.4 4.4 4.4z"/></svg></div>
     <div>
       <p id="bandkop">Samen bouwen we aan buurten waar iedereen mee kan doen.</p>
-      <a class="buurtknop rand" href="os-vrijwilliger.html">Bekijk hoe u kunt meedoen
+      <a class="buurtknop rand" href="os-vrijwilliger.html">Bekijk hoe je kunt meedoen
         <svg viewBox="0 0 24 24" style="width:.9rem;height:.9rem;stroke:currentColor;fill:none;stroke-width:1.6;" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
     </div>
   </section>
@@ -273,7 +273,7 @@
   <!-- WERELDROOSTER:FoundationOS -->
     <a class="wrooster-kaart" href="/apps/foundation/bord.html"><span>Het bord</span></a>
     <a class="wrooster-kaart" href="/apps/foundation/schrift.html"><span>Het schrift</span></a>
-    <a class="wrooster-kaart" href="/apps/foundation/os-publiek.html"><span>RTFoundation in uw buurt</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/os-publiek.html"><span>RTFoundation in jouw buurt</span></a>
     <a class="wrooster-kaart" href="/apps/foundation/os-portaal.html"><span>RTFoundation portaal</span></a>
   <!-- /WERELDROOSTER --></div></section>
 </main>
@@ -293,8 +293,8 @@
    toont wat het krijgt. Filteren in de browser is geen grens.
 
    DE VIER KAARTEN ONDER "WAT KUNT U DOEN" ZIJN GEEN VIERDE INGANG. Ze brengen
-   u naar een blok dat er al is; is er nog geen stad gekozen, dan brengen ze u
-   naar de stadkiezer en onthouden ze waar u heen wilde. Dat scheelt een lijst
+   je naar een blok dat er al is; is er nog geen stad gekozen, dan brengen ze
+   je naar de stadkiezer en onthouden ze waar je heen wilde. Dat scheelt een lijst
    bestemmingen die naast de echte gaat lopen. */
 const $ = s => document.querySelector(s);
 const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -376,7 +376,7 @@ async function toonStad(id) {
           '<span class="pil">' + esc(p.soort) + '</span>' +
           '<div class="sub">' + esc(p.doelgroep || '') + '</div></div>').join('')
           : '<div class="leeg">Hier start binnenkort het eerste project.</div>') + '</div>' +
-      '<div class="buurtkaart ruimte" id="blok-activiteiten"><div class="buurtsec">Waar u binnen kunt lopen</div>' +
+      '<div class="buurtkaart ruimte" id="blok-activiteiten"><div class="buurtsec">Waar je binnen kunt lopen</div>' +
         (r.activiteiten.length ? r.activiteiten.map(a => '<div class="lijnrij"><span class="naam">' + esc(a.naam) + '</span>' +
           '<span class="pil">' + esc(a.wanneer || 'datum volgt') + ' ' + esc(a.tijd || '') + '</span>' +
           (a.vol ? '<span class="pil let">vol</span>' : '<span class="pil goed">' + a.plekVrij + ' plekken vrij</span>') +

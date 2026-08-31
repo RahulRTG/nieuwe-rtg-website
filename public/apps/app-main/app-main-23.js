@@ -118,7 +118,7 @@
        bestaan niet meer. */
     horeca:      { naam: 'Horeca',         url: '/apps/horeca.html' },
     partnernetwerk:{ naam: 'Partner Network', url: '/apps/partner-network.html' },
-    rtfbuurt:    { naam: 'RTFoundation in uw buurt', url: '/apps/foundation/os-publiek.html' },
+    rtfbuurt:    { naam: 'RTFoundation in jouw buurt', url: '/apps/foundation/os-publiek.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },

@@ -72,7 +72,37 @@ const SPOREN = Object.freeze({
   voorspelling: [/\bverwacht\b/, /\bvoorspel\b/, /\bwanneer ga ik\b/, /\bhoeveel ga ik\b/, /\bprognose\b/, /\bvooruitblik\b/]
 });
 
-const tellers = { totaal: 0, regels: 0, algoritme: 0, optimalisatie: 0, voorspelling: 0, ai: 0, zonderMotor: 0 };
+/* DE TELLERS, EN WAAROM ZE DUURZAAM MOETEN ZIJN. Een schaduwmeting bestaat om
+   een besluit te dragen: draaien we de volgorde om? Tellers die bij elke
+   herstart op nul springen, dragen dat besluit niet -- dan is "60% had een
+   goedkopere techniek gekund" een indruk van deze middag en geen meting.
+
+   Ze schrijven daarom door naar een opslagpunt dat de aanroeper meegeeft
+   (`onthoud`), en pas dan mag de uitslag zeggen dat hij duurzaam is. Zonder dat
+   punt blijven ze in dit proces EN zegt de stand dat ook: `duurzaam: false`.
+   Dat is dezelfde regel als overal in dit huis -- niet gemeten mag nooit als
+   gemeten langskomen.
+
+   TELLERS EN GEEN JOURNAAL. Voor deze vraag is niet nodig wie wat vroeg; er
+   worden geen vragen bewaard, alleen aantallen per techniek (KOSTEN.md). */
+const LEEG = { totaal: 0, regels: 0, algoritme: 0, optimalisatie: 0, voorspelling: 0, ai: 0, zonderMotor: 0 };
+let tellers = Object.assign({}, LEEG);
+let bewaarplek = null;
+
+/* De aanroeper geeft een plek met lees() en schrijf(); zolang die er niet is,
+   telt de router in het geheugen en zegt dat erbij. */
+function onthoud(plek) {
+  if (!plek || typeof plek.lees !== 'function' || typeof plek.schrijf !== 'function') return false;
+  bewaarplek = plek;
+  /* Ook LEZEN gebeurt achter een vangnet. Een meting die de aanroeper kan
+     laten klappen, is erger dan geen meting -- en dit is een schaduwlaag: hij
+     mag nooit in de weg lopen van het antwoord waar hij naast hangt. */
+  let eerder = null;
+  try { eerder = plek.lees(); } catch (e) { eerder = null; }
+  if (eerder && typeof eerder === 'object')
+    for (const k of Object.keys(LEEG)) if (Number.isFinite(eerder[k])) tellers[k] = eerder[k];
+  return true;
+}
 
 function motorenVoor(techniek) { return MOTOREN.filter(m => m.techniek === techniek); }
 
@@ -110,6 +140,7 @@ function schaduw(vraag) {
   tellers.totaal++;
   tellers[uit.techniek]++;
   if (!uit.motor) tellers.zonderMotor++;
+  if (bewaarplek) { try { bewaarplek.schrijf(Object.assign({}, tellers)); } catch (e) { /* meten mag nooit stukmaken */ } }
   return uit;
 }
 
@@ -117,9 +148,13 @@ function stand() {
   const g = tellers.totaal ? Math.round(1000 * (tellers.totaal - tellers.ai) / tellers.totaal) / 10 : 0;
   return Object.assign({}, tellers, {
     goedkoperMogelijkPct: g,
-    grens: 'Tellers van dit proces; een herstart zet ze op nul. De router BESLIST NIETS: ' +
-      'de modelaanroep gaat door, dit is de schaduwmeting die aan een omkering vooraf hoort te gaan.'
+    duurzaam: !!bewaarplek,
+    grens: (bewaarplek
+      ? 'Tellers die een herstart overleven. '
+      : 'Tellers van DIT PROCES; een herstart zet ze op nul, dus dit getal draagt nog geen besluit. ') +
+      'De router BESLIST NIETS: de modelaanroep gaat door, dit is de schaduwmeting die aan een ' +
+      'omkering vooraf hoort te gaan.'
   });
 }
 
-module.exports = { kies, schaduw, stand, TECHNIEKEN, MOTOREN, ONTBREEKT, SPOREN };
+module.exports = { kies, schaduw, stand, onthoud, TECHNIEKEN, MOTOREN, ONTBREEKT, SPOREN };

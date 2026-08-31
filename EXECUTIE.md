@@ -704,7 +704,7 @@ aanwijzing voor wie dat register vult, en voor niets anders. Zolang `bevestigd`
 leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven — en dat
 is precies wat `bon.js` vandaag al weigert.
 
-### Blok 6 — Mandaatmotor · **jaren weg, en dat is een bewijsvraag**
+### Blok 6 — Mandaatmotor · **de GRAMMATICA staat, de autonomie wacht op bewijs**
 
 Machine-afdwingbare mandaten met scope, context, bedrag, tijdvenster, looptijd
 en gedrag boven de grens. Plus budgetten die niet allemaal over geld gaan:
@@ -714,7 +714,34 @@ is consent (grens 3).
 Dit blok is niet moeilijk om te bouwen. Het is moeilijk om te verdienen: met nul
 bewezen routes zou een mandaat vandaag toestemming geven op ongemeten grond.
 
-### Blok 7 — Mijn AI · **jaren weg**
+**Wat er daarom wél is gebouwd** (`server/kern/stuur/mandaat.js`): de helft die
+vandaag al waar kan zijn, namelijk de **versmalling**. De speelruimte is een
+doorsnede van wat het beleid toestaat, wat het mandaat overlaat en wat de
+plafonds toelaten — en zij kan structureel niets toevoegen. Dat is geen
+vuistregel maar de eerste toets: wat eruit komt, zat er al in.
+
+Op de 120 toegestane ledenpaden houdt een ruim mandaat er **8** over. De rest
+valt af **met een reden**, en de twee belangrijkste redenen zijn grenzen die
+elders zijn genomen:
+
+- **een mandaat hoogt geen niveau op** — wat `voorstel` is, blijft een menselijke
+  bevestiging vragen. Geen bedrag, geen looptijd en geen agent verandert dat;
+- **geld blijft mensenwerk** (`GELD.md`) en het pasbesluit ook (`CLAUDE.md`),
+  hoeveel er ook in het mandaat staat.
+
+**En de stilste fout is expliciet dichtgezet: leeg is dicht.** Geen mandaat, een
+leeg mandaat of een verlopen mandaat geeft **niets** zelfstandig — niet alles.
+Dat is de klassieke omkering in dit soort lagen, en zij is van buiten niet te
+zien omdat er gewoon iets gebeurt.
+
+**Eén ding dat de mutatieronde blootlegde en dat blijft staan als les:** de
+geldregel werd *overschaduwd* door de niveau-regel. De drie geldpaden waarop ik
+hem toetste zijn allemaal `voorstel`, dus ze werden sowieso tegengehouden — de
+regel weghalen liet de toets groen. Hij wordt nu getoetst op `/api/pay/saldo`,
+dat `lezen` is en dus alléén door de geldregel wordt tegengehouden. Een regel die
+meelift op een andere, is niet bewezen.
+
+### Blok 7 — Mijn AI · **de waarheid eronder staat, het scherm bewust niet**
 
 Het scherm, en pas hier. Eenvoudig aan de bovenkant (lezen / voorbereiden /
 uitvoeren per domein), rijk eronder (agent, mandaat, scope, context, budget,
@@ -725,6 +752,18 @@ agent-activiteit is uitvoeringshistorie.
 Een scherm dat "mijn AI mag bestellingen zelfstandig plaatsen ✓" toont terwijl
 een fractie van de bestelroutes onder bewijs ligt, is een schermleugen
 (`SCHERMLEUGEN.json` bestaat niet voor niets).
+
+**Daarom is de speelruimte gebouwd en het scherm niet.** `speelruimte()` uit blok
+6 ís de waarheid die zo'n scherm zou moeten tonen: per rol en per mandaat, welke
+paden er zelfstandig overblijven en waarom de rest afvalt. Dat is uitrekenbaar,
+narekenbaar en vandaag al eerlijk.
+
+Wat er niet is, is de bovenkant: vinkjes waarmee een lid autonomie *aanzet*. Die
+zou een macht tonen die het systeem niet betrouwbaar kan definiëren zolang
+`VERTROUWEN.json` op **0 bewezen** staat. Het is geen ontbrekend scherm maar een
+uitgesteld besluit, en de volgorde is: eerst de bewijsschuld voor de betrokken
+capabilities sluiten, dan het scherm. Wie het omdraait, bouwt precies de
+schermleugen waar dit huis een register voor heeft.
 
 ### Blok 8 — Intelligence router · **GEBOUWD, in de schaduw**
 
@@ -777,15 +816,37 @@ in beide richtingen.
 `schaduw` op het antwoord van Rahul), zodat achteraf narekenbaar is waarom er een
 model aan te pas kwam.
 
-**Wat er open blijft:** de omkering zelf, en die hoort te wachten op de meting.
-De tellers leven in het proces en overleven een herstart niet — dat staat in de
-uitslag, want een schaduwmeting die zichzelf groter voordoet dan zij is, is
-erger dan geen meting.
+**De tellers kunnen nu duurzaam.** Een schaduwmeting bestaat om een besluit te
+dragen; tellers die bij elke herstart op nul springen dragen dat niet, en dan is
+"zoveel procent had goedkoper gekund" een indruk van één middag. `onthoud()`
+neemt een bewaarplek aan en de stand zegt zelf wat hij is — **`duurzaam: true`
+of `false`, met de grens erbij**. Zonder plek telt hij in het geheugen én zegt
+dat er hardop bij; de mutatie die altijd `duurzaam: true` meldt, zakt.
 
-### Blok 9 — Commandbalk · **jaren weg**
+En meten mag nooit stukmaken: zowel lezen als schrijven van die plek zit achter
+een vangnet. Dat gat vond de toets zelf — de eerste versie liet een kapotte
+bewaarplek de registratie laten klappen.
+
+**Wat open blijft: de omkering zelf.** Die hoort te wachten tot het getal er is,
+en dat is nu voor het eerst een getal dat kan blijven bestaan.
+
+### Blok 9 — Commandbalk · **bewust niet gebouwd, en dit is waarom**
 
 Natuurlijke taal vrijwel overal, en pas hier — omdat alles eronder dan
 afdwingbaar is. Niet eerder.
+
+**Wat er nu wél onder ligt** (blok 0 t/m 8): de resolver versmalt naar wat
+relevant is, de compiler weegt een keten vóór uitvoering, de gevolgvoorspelling
+zegt wat er zou veranderen, het mandaat versmalt de zelfstandigheid, en de router
+zegt welke techniek erbij hoort. Dat is precies het fundament dat een commandbalk
+nodig heeft.
+
+**Wat er nog níét onder ligt, en waarom het wachten geen luiheid is:**
+`VERTROUWEN.json` staat op **0 bewezen**, en de gevolgvoorspelling staat op
+**96 van 176 onbekend**. Een balk waarin een lid in gewone taal het hele huis
+bedient, belooft dekking die die twee getallen niet dragen. De volgorde is dus
+niet "commandbalk erbij" maar: **eerst die twee getallen bewegen, dan de balk.**
+Dat is één besluit, geen bouwopdracht.
 
 ---
 

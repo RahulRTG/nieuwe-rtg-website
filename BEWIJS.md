@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1424 bestanden en 10018 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1425 bestanden en 10030 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1424 |
-| losse beweringen (`test(...)`) | 10018 |
+| toetsbestanden | 1425 |
+| losse beweringen (`test(...)`) | 10030 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
-| alleen in de kop *genoemd*, nog niet gemeten | 118 |
+| alleen in de kop *genoemd*, nog niet gemeten | 119 |
 | niets van beide | 286 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1247 bestanden, 9715 beweringen.
+1248 bestanden, 9727 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -62,7 +62,7 @@ toets omvalt.
 | `ai-optioneel.test.js` | 12 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ai-regie.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-regie van de boardroom: het kantoor vult Rahuls karakter en verhaal AAN (nooit vervangen: de vaste kern staat in de code en wordt door test/rahul-eerlijk.test.js bewaakt). De aanvulling komt live mee in elke... |
 | `ai-rem.test.js` | 3 | -- | DE REM PER AANROEPER. De meter ernaast (./ai-meter.test.js) draait de kraan dicht op een DAGbedrag. |
-| `ai-router.test.js` | 10 | -- | DE INTELLIGENTIEROUTER (server/kern/ai/router.js, EXECUTIE.md blok 8). De huisregel is: kan het met een regel, dan een regel; pas als er taal, dubbelzinnigheid of redenering nodig is, komt een model. |
+| `ai-router.test.js` | 12 | -- | DE INTELLIGENTIEROUTER (server/kern/ai/router.js, EXECUTIE.md blok 8). De huisregel is: kan het met een regel, dan een regel; pas als er taal, dubbelzinnigheid of redenering nodig is, komt een model. |
 | `ai-uitwijk.test.js` | 10 | gezakt op `===->!==` | De AI-uitwijk: onze eigen dunne clients voor Claude, OpenAI en Gemini (allemaal in de Claude-vorm: messages.create in, Claude-vormig antwoord uit) plus server/ai.js die naar de volgende aanbieder overstapt als er een... |
 | `aidata.test.js` | 3 | gezakt op `liegpoort /api/` | De eigen-AI-dataset: de boardroom-knop die alle logs (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL bewaart om later een eigen model te trainen. Getest: het bord telt, de export is geldig... |
 | `aikosten-route.test.js` | 8 | -- | HET LUIK OP DE MODELKRAAN. server/ai-meter.js telt wat er aan externe modellen omgaat. |
@@ -1084,6 +1084,7 @@ toets omvalt.
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |
 | `stuur-aanval.test.js` | 6 | gezakt op `!==->===#0` | Aanvalstoetsen voor het AI-stuur. Deze gebruiken bewust een vijandig nagemaakt model dat bevestigingsvelden fabriceert en verborgen routes kiest. |
 | `stuur-gevolg.test.js` | 8 | -- | DE GEVOLGVOORSPELLING (server/kern/stuur/gevolg.js, EXECUTIE.md blok 4). Een gebruiker vraagt voor het bevestigen niet "welke routes roep je aan" maar "wat verandert er dan". |
+| `stuur-mandaat.test.js` | 10 | genoemd | HET MANDAAT (server/kern/stuur/mandaat.js, EXECUTIE.md blok 6). De dragende regel van deze laag staat in EXECUTIE.md grens 2 en moet hier afgedwongen zijn en niet beloofd: EEN MANDAAT VERLEENT NOOIT VERMOGEN. |
 | `stuur-niveaus.test.js` | 9 | -- | DE SPLITSING VAN `direct` IN `lezen` EN `klein` (server/kern/stuur/beleid.js). AANLEIDING. |
 | `stuur-plan.test.js` | 11 | genoemd | DE PLANCOMPILER (server/kern/stuur/plan.js, EXECUTIE.md blok 3). De sprong van dit blok is dat een keten van handelingen een OBJECT wordt dat je kunt wegen voordat er iets gebeurt. |
 | `stuur-resolver-taal.test.js` | 7 | -- | DE TAALSUITE VAN DE CAPABILITY-RESOLVER -- de veiligheidskant. test/stuur-resolver.test.js bewijst de GRENS: er komt nooit een pad bij. |

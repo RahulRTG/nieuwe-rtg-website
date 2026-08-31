@@ -2,7 +2,7 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1886,
+    "bestanden": 1887,
     "domeinenTotaal": 536,
     "koopbareVormen": 514,
     "koopbareDomeinen": 109,
@@ -74,7 +74,7 @@
     "toon": 86,
     "prijs": 34,
     "beschikbaarheid": 49,
-    "reserveer": 26,
+    "reserveer": 27,
     "bevestig": 50,
     "lever": 18,
     "annuleer": 26,
@@ -1458,6 +1458,23 @@
       "telt": 2
     },
     {
+      "domein": "kern/ai",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "reserveer": "onthoud"
+      },
+      "telt": 1
+    },
+    {
       "domein": "kern/aidata",
       "heeft": {
         "toon": true,
@@ -1881,21 +1898,6 @@
         "toon": "lijstVan"
       },
       "telt": 1
-    },
-    {
-      "domein": "kern/ai",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {},
-      "telt": 0
     },
     {
       "domein": "kern/antivirus",

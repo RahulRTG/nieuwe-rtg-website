@@ -829,7 +829,18 @@ het gedekt zou hebben, en pas met dat getal is omdraaien een besluit in plaats
 van een gok (een matig regelantwoord dat een goed modelantwoord verdringt, merkt
 niemand). Hij wijst alleen naar motoren die laden, en de ontbrekende techniek
 staat er hardop bij: er is GEEN constraint solver -- kern/agent.js roostert op
-weekdagfactoren, en dat is een heuristiek. Hij verandert geen bevoegdheid en kan dat ook niet
+weekdagfactoren, en dat is een heuristiek. **Blok 6 staat als GRAMMATICA**
+(`kern/stuur/mandaat.js`): een mandaat verleent nooit vermogen maar VERSMALT
+bestaand vermogen, dus de speelruimte is een doorsnede die structureel niets kan
+toevoegen. Drie dingen daar niet wegpoetsen: **leeg is dicht** (geen mandaat
+betekent niets zelfstandig, niet alles), **een mandaat hoogt geen niveau op**
+(wat `voorstel` is blijft een mens vragen), en **geld en het pasbesluit blijven
+mensenwerk** hoeveel er ook in staat. Blok 7 is met opzet HALF: de speelruimte is
+de waarheid die een Mijn AI-scherm zou tonen, maar het scherm zelf komt er pas
+als de bewijsschuld gesloten is -- anders toont het een macht die het systeem niet
+kan definiëren. Blok 9 (commandbalk) is om dezelfde reden bewust niet gebouwd:
+0 bewezen routes en 96 van 176 onbekende gevolgen dragen geen balk die het hele
+huis in gewone taal bedient. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

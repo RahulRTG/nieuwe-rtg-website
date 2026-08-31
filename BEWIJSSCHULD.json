@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T13:40:37.073Z",
-  "commit": "39f827c6",
+  "op": "2026-08-31T14:06:01.462Z",
+  "commit": "4a725acc",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,8 +9,8 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1002,
-  "instrument": 1006,
+  "meetwerk": 1069,
+  "instrument": 932,
   "grens": 608
  },
  "posten": [
@@ -136,11 +136,11 @@
   },
   {
    "id": "herstel-onbevestigd",
-   "soort": "instrument",
-   "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nooit zijn beproefd",
-   "aantal": 74,
+   "soort": "meetwerk",
+   "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
+   "aantal": 67,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
-   "sluit": "een proef die het paar echt uitvoert en de opslag ervoor en erna vergelijkt. Dat gereedschap bestaat niet: de droogloop meet EEN stap, niet een paar met een tussenstand. Instrument dus, geen achterstand -- en tot dan blijft compenserend handelen onbewezen."
+   "sluit": "de herstelproef over de overige paren halen. Die draait vandaag als LID, en de meeste resterende paren zijn leveranciers- en kantoorroutes; die sessies erbij halen sluit het grootste deel. Wat daarna overblijft is de vorm die de afleiding uberhaupt niet ziet: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
   {
    "id": "idem-ongeclassificeerd",

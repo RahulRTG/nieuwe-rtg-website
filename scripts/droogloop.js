@@ -38,6 +38,7 @@
    Draaien: npm run droogloop */
 'use strict';
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 const { start } = require('./lib/wegwerpserver');
@@ -116,6 +117,32 @@ function opslagBeeld(datamap) {
    van alles aan" heten. Twee lijsten dus, en de reden staat erbij. */
 const SPOREN = ['apiSpoor', 'handelingLog', 'rtgai'];
 const isSpoor = (naam) => SPOREN.includes(String(naam).split(':').pop());
+
+/* TWEE BEELDEN, TWEE VRAGEN. Hierboven telt `ver` -- het versienummer van een
+   sleutel -- en dat beantwoordt "is er iets gebeurd". Dat is precies wat de
+   droogloop wil weten, en het is precies wat de HERSTELPROEF niet kan
+   gebruiken: `ver` loopt alleen maar op, dus na een heen- en een terugstap
+   staat hij nooit meer op zijn oude waarde, ook niet als de inhoud terug is.
+   Voor "staat het er weer zoals het stond" hoort dus een INHOUDSbeeld, en die
+   twee door elkaar halen zou de herstelproef laten zeggen dat niets ooit
+   herstelt. Zelfde bestand, want het is dezelfde opslag. */
+function inhoudsBeeld(datamap) {
+  const uit = {};
+  for (const boek of BOEKEN) {
+    const bestand = path.join(datamap, boek);
+    if (!fs.existsSync(bestand)) continue;
+    let db;
+    try {
+      db = new DatabaseSync(bestand, { readOnly: true });
+      const heeftKv = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kv'").get();
+      if (!heeftKv) continue;
+      for (const r of db.prepare('SELECT key, val FROM kv').all())
+        uit[boek + ':' + r.key] = crypto.createHash('sha256').update(String(r.val || '')).digest('hex').slice(0, 16);
+    } catch (e) { /* niet te lezen: die collectie doet niet mee */ }
+    finally { try { db && db.close(); } catch (e) {} }
+  }
+  return Object.keys(uit).length ? uit : null;
+}
 
 function verschil(voor, na) {
   if (!voor || !na) return null;
@@ -233,4 +260,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error('droogloop: ' + e.message); process.exit(1); });
-module.exports = { opslagBeeld, verschil, isSpoor, SPOREN, STANDAARDPLAN };
+module.exports = { opslagBeeld, inhoudsBeeld, verschil, isSpoor, SPOREN, STANDAARDPLAN };

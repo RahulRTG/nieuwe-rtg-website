@@ -17,6 +17,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
+const fs = require('fs');
+const path = require('path');
 const { bouw, PAREN, laatste } = require('../scripts/herstel');
 
 const R = bouw();
@@ -29,13 +31,37 @@ test('0. de meting deugt: er zijn routes en er is iets gevonden', () => {
   assert.ok(R.gemeten.vermoed > 0, 'geen enkele kandidaat gevonden -- dan is de afleiding stuk, niet streng');
 });
 
-test('1. NIETS IS BEWEZEN: de hoogste graad is `vermoed`', () => {
-  for (const [pad, v] of Object.entries(R.per))
-    assert.ok(['vermoed', 'onbepaald'].includes(v.graad),
-      pad + ' draagt graad "' + v.graad + '" -- alleen vermoed en onbepaald zijn af te leiden uit een naam');
-  assert.deepEqual(R.bevestigd, [],
-    'er staat een bevestigde tegenhanger in een register dat alleen namen vergelijkt; ' +
-    'bevestigen doet een mens, en dan hoort dat register erbij te komen');
+test('1. een NAAM bewijst niets: bevestigen kan alleen de uitgevoerde proef', () => {
+  /* Deze toets stond er eerst als `bevestigd` moet leeg zijn, en dat was de
+     goede regel voor de stand van toen: een register dat namen vergelijkt mag
+     nooit zeggen dat een terugweg werkt. De regel is niet vervallen maar
+     scherper geworden -- er mag nu een graad `bevestigd` in, en dan UITSLUITEND
+     met een uitgevoerde proef eronder. Zonder die eis was de nieuwe tak precies
+     het gat dat de oude toets dichthield. */
+  const proef = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'HERSTELPROEF.json'), 'utf8')); }
+    catch (e) { return null; }
+  })();
+  const uitProef = new Map((proef && proef.per || []).map(u => [u.heen, u]));
+
+  for (const [pad, v] of Object.entries(R.per)) {
+    assert.ok(['vermoed', 'onbepaald', 'bevestigd'].includes(v.graad), pad + ' draagt graad "' + v.graad + '"');
+    if (v.graad !== 'bevestigd') continue;
+    const u = uitProef.get(pad);
+    assert.ok(u, pad + ' heet bevestigd zonder dat de herstelproef hem ooit heeft uitgevoerd');
+    assert.equal(u.terug, v.tegenhanger, pad + ': bevestigd op een andere tegenhanger dan er beproefd is');
+    assert.ok(['exact', 'compensatie'].includes(u.uitslag),
+      pad + ': de proef gaf "' + u.uitslag + '", en dat is geen bevestiging');
+    assert.equal(v.soort, u.uitslag, pad + ': de soort moet mee, anders leest exact en compensatie hetzelfde');
+  }
+
+  for (const b of R.bevestigd) {
+    const u = uitProef.get(b.heen);
+    assert.ok(u && u.terug === b.terug && u.uitslag === b.soort,
+      b.heen + ' staat in de bevestigde lijst zonder overeenkomstige uitslag in de proef');
+  }
+  if (!proef) assert.deepEqual(R.bevestigd, [],
+    'er is geen HERSTELPROEF.json, en toch staat er iets bevestigd -- dat kan alleen met de hand zijn gezet');
 });
 
 test('2. dubbelzinnig blijft dubbelzinnig, met beide kandidaten erbij', () => {

@@ -313,8 +313,13 @@ const POSTEN = [
       'daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf ' +
       'onbeoordeelde stappen er groen uitziet en niets bewijst.' },
 
-  { id: 'herstel-onbevestigd', soort: 'instrument',
-    wat: 'vermoede tegenhangers (annuleren, terugdraaien) die nooit zijn beproefd',
+  /* VAN 'instrument' NAAR 'meetwerk': scripts/herstelproef.js bestaat nu en
+     voert het paar werkelijk uit. Wat rest is meten -- en dat de meeste paren
+     nog niet gemeten ZIJN, komt doordat de proef als lid inlogt en de meeste
+     paren een leveranciers- of kantoorsessie vragen. Dat is achterstand met
+     bekend gereedschap, precies wat deze soort betekent. */
+  { id: 'herstel-onbevestigd', soort: 'meetwerk',
+    wat: 'vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd',
     uit: (r) => {
       const g = (r.herstel || {}).gemeten;
       return g && typeof g.vermoed === 'number' ? g.vermoed : null;
@@ -322,9 +327,10 @@ const POSTEN = [
     waarom: 'HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan ' +
       'opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de ' +
       'eerste de tweede werkelijk ongedaan maakt.',
-    sluit: 'een proef die het paar echt uitvoert en de opslag ervoor en erna vergelijkt. Dat ' +
-      'gereedschap bestaat niet: de droogloop meet EEN stap, niet een paar met een tussenstand. ' +
-      'Instrument dus, geen achterstand -- en tot dan blijft compenserend handelen onbewezen.' },
+    sluit: 'de herstelproef over de overige paren halen. Die draait vandaag als LID, en de meeste ' +
+      'resterende paren zijn leveranciers- en kantoorroutes; die sessies erbij halen sluit het ' +
+      'grootste deel. Wat daarna overblijft is de vorm die de afleiding uberhaupt niet ziet: een ' +
+      'terugweg die anders heet, en een schakelaar met een vlag in het lichaam.' },
 
   { id: 'idem-ongeclassificeerd', soort: 'meetwerk',
     wat: 'muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer',

@@ -204,7 +204,8 @@
     "versheid": "node scripts/versheid.js",
     "waarom": "node scripts/waarom.js",
     "swcache": "node scripts/swcache.js",
-    "swcache:vast": "node scripts/swcache.js --schrijf"
+    "swcache:vast": "node scripts/swcache.js --schrijf",
+    "herstelproef": "node scripts/herstelproef.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

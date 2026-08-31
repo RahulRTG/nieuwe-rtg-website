@@ -2,14 +2,50 @@
  "uitleg": "Kandidaat-tegenhangers per route, afgeleid uit de NAMEN. Niets hierin is bevestigd: de hoogste graad is `vermoed`. Een terugweg beloven op grond van een vermoeden is precies wat server/kern/stuur/bon.js weigert. Herstel heeft een verklaringsregister nodig zoals IDEMBESLUIT.json.",
  "gemeten": {
   "routes": 3282,
-  "vermoed": 74,
+  "vermoed": 67,
   "dubbelzinnig": 4,
-  "zonderKandidaat": 3204,
-  "dekkingPct": 2.4
+  "zonderKandidaat": 3211,
+  "dekkingPct": 2.2
  },
  "grens": "Deze afleiding kijkt alleen naar het LAATSTE segment binnen hetzelfde voorvoegsel. Zij mist elke terugweg die anders heet (een compensatie, een creditnota, een annulering bij een derde) en zij vindt paren die geen omkering zijn -- /agenda/bewaar is een wijziging en geen aanmaak. Het percentage is dus een bovengrens van wat NAMEN kunnen zeggen, niet van wat waar is. En zij mist een hele VORM: een schakelaar. Het paar bevries/ontdooi stond hier eerst in en werd door de toets verworpen omdat `ontdooi` nergens als route-einde bestaat -- /api/bank/bevries zet de stand vermoedelijk in EEN route met een vlag in het lichaam. Zo n terugweg is per definitie onzichtbaar voor een vergelijking van namen.",
- "bevestigd": [],
- "bevestigdUitleg": "Leeg, en dat is de stand: niemand heeft een tegenhanger bevestigd. Zolang deze lijst leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven.",
+ "bevestigd": [
+  {
+   "heen": "/api/agenda/toevoegen",
+   "terug": "/api/agenda/verwijder",
+   "soort": "exact"
+  },
+  {
+   "heen": "/api/kantoorpakket/maak",
+   "terug": "/api/kantoorpakket/weg",
+   "soort": "exact"
+  },
+  {
+   "heen": "/api/live/start",
+   "terug": "/api/live/stop",
+   "soort": "compensatie"
+  },
+  {
+   "heen": "/api/meet/maak",
+   "terug": "/api/meet/weg",
+   "soort": "compensatie"
+  },
+  {
+   "heen": "/api/muziek/maak",
+   "terug": "/api/muziek/weg",
+   "soort": "exact"
+  },
+  {
+   "heen": "/api/samen/maak",
+   "terug": "/api/samen/weg",
+   "soort": "exact"
+  },
+  {
+   "heen": "/api/site/bewaar",
+   "terug": "/api/site/verwijder",
+   "soort": "compensatie"
+  }
+ ],
+ "bevestigdUitleg": "Deze paren zijn UITGEVOERD (scripts/herstelproef.js): heen, kijken, terug, kijken. `exact` betekent dat de inhoud van elke geraakte collectie letterlijk terug is; `compensatie` dat de terugweg werk deed maar de oude inhoud niet terugkwam. Alleen over deze paren mag een scherm of een bon iets over een terugweg zeggen, en dan met de soort erbij. Een bevestiging geldt bovendien alleen voor het gunstigste geval: meteen erna, door dezelfde gebruiker.",
  "per": {
   "/api/agenda/bewaar": {
    "graad": "vermoed",
@@ -17,9 +53,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/agenda/toevoegen": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "exact",
    "tegenhanger": "/api/agenda/verwijder",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   "/api/agenda/verwijder": {
    "graad": "onbepaald",
@@ -113,9 +150,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/kantoorpakket/maak": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "exact",
    "tegenhanger": "/api/kantoorpakket/weg",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   "/api/kantoorpakket/weg": {
    "graad": "vermoed",
@@ -123,9 +161,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/live/start": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "compensatie",
    "tegenhanger": "/api/live/stop",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   "/api/live/stop": {
    "graad": "vermoed",
@@ -138,9 +177,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/meet/maak": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "compensatie",
    "tegenhanger": "/api/meet/weg",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   "/api/meet/verlaat": {
    "graad": "vermoed",
@@ -173,9 +213,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/muziek/maak": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "exact",
    "tegenhanger": "/api/muziek/weg",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   "/api/muziek/weg": {
    "graad": "vermoed",
@@ -258,9 +299,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/samen/maak": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "exact",
    "tegenhanger": "/api/samen/weg",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   "/api/samen/weg": {
    "graad": "vermoed",
@@ -268,9 +310,10 @@
    "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
   },
   "/api/site/bewaar": {
-   "graad": "vermoed",
+   "graad": "bevestigd",
+   "soort": "compensatie",
    "tegenhanger": "/api/site/verwijder",
-   "reden": "de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   "/api/site/live": {
    "graad": "vermoed",

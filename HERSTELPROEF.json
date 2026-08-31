@@ -1,0 +1,651 @@
+{
+ "uitleg": "Vermoede tegenhangers uit HERSTEL.json, werkelijk uitgevoerd: heen, kijken, terug, kijken. Alleen `exact` en `compensatie` zijn een uitspraak over het paar; de rest is een tekort van de proef.",
+ "gemeten": {
+  "paren": 74,
+  "exact": 4,
+  "compensatie": 3,
+  "geenHerstel": 0,
+  "nietBeproefd": 67
+ },
+ "per": [
+  {
+   "heen": "/api/agenda/bewaar",
+   "terug": "/api/agenda/verwijder",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/agenda/toevoegen",
+   "terug": "/api/agenda/verwijder",
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:agendas"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+  },
+  {
+   "heen": "/api/annuleer",
+   "terug": "/api/reserveer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/asset/gebruik",
+   "terug": "/api/asset/herroep",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/asset/koop",
+   "terug": "/api/asset/herroep",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/bank/pas/sluit",
+   "terug": "/api/bank/pas/uitgeven",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 403,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/bank/pas/uitgeven",
+   "terug": "/api/bank/pas/sluit",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 403,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/bank/terugkerend/stop",
+   "terug": "/api/bank/terugkerend/zet",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 403,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/bank/terugkerend/zet",
+   "terug": "/api/bank/terugkerend/stop",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 403,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/care/annuleer",
+   "terug": "/api/care/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/care/boek",
+   "terug": "/api/care/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/clips/maak",
+   "terug": "/api/clips/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [
+    "store.db:clips",
+    "store.db:clipsMeldingen",
+    "store.db:clipsReacties",
+    "store.db:clipsVolg",
+    "store.db:kosten"
+   ],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/clips/weg",
+   "terug": "/api/clips/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/command/stad/start",
+   "terug": "/api/command/stad/stop",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/command/stad/stop",
+   "terug": "/api/command/stad/start",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/command/zandbak/maak",
+   "terug": "/api/command/zandbak/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/command/zandbak/weg",
+   "terug": "/api/command/zandbak/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/kantoorpakket/maak",
+   "terug": "/api/kantoorpakket/weg",
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:officeDocs"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+  },
+  {
+   "heen": "/api/kantoorpakket/weg",
+   "terug": "/api/kantoorpakket/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/live/start",
+   "terug": "/api/live/stop",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:live"
+   ],
+   "nietTerug": [
+    "store.db:live"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/live/stop",
+   "terug": "/api/live/start",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 200,
+   "geraakt": [],
+   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+  },
+  {
+   "heen": "/api/meet/kom",
+   "terug": "/api/meet/verlaat",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/meet/maak",
+   "terug": "/api/meet/weg",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:kosten",
+    "store.db:meetKamers"
+   ],
+   "nietTerug": [
+    "store.db:kosten"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/meet/verlaat",
+   "terug": "/api/meet/kom",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 200,
+   "geraakt": [],
+   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+  },
+  {
+   "heen": "/api/meet/weg",
+   "terug": "/api/meet/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/member/rtmail/regel/maak",
+   "terug": "/api/member/rtmail/regel/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/member/rtmail/regel/weg",
+   "terug": "/api/member/rtmail/regel/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/mob/reis/annuleer",
+   "terug": "/api/mob/reis/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/mob/reis/boek",
+   "terug": "/api/mob/reis/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/muziek/maak",
+   "terug": "/api/muziek/weg",
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:muziek"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+  },
+  {
+   "heen": "/api/muziek/weg",
+   "terug": "/api/muziek/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/afdelingshotel/annuleer",
+   "terug": "/api/office/afdelingshotel/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/afdelingshotel/boek",
+   "terug": "/api/office/afdelingshotel/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/atelierweb/bewaar",
+   "terug": "/api/office/atelierweb/verwijder",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/atelierweb/verwijder",
+   "terug": "/api/office/atelierweb/bewaar",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/kantoorpakket/maak",
+   "terug": "/api/office/kantoorpakket/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/kantoorpakket/weg",
+   "terug": "/api/office/kantoorpakket/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/weefsel/relatie/maak",
+   "terug": "/api/office/weefsel/relatie/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/office/weefsel/relatie/weg",
+   "terug": "/api/office/weefsel/relatie/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/reisbureau/annuleer",
+   "terug": "/api/reisbureau/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/reisbureau/boek",
+   "terug": "/api/reisbureau/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/reserveer",
+   "terug": "/api/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/residentie/spel/stop",
+   "terug": "/api/residentie/spel/zet",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/residentie/spel/zet",
+   "terug": "/api/residentie/spel/stop",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/rtfos/meldcode/open",
+   "terug": "/api/rtfos/meldcode/sluit",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/rtfos/meldcode/sluit",
+   "terug": "/api/rtfos/meldcode/open",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/samen/maak",
+   "terug": "/api/samen/weg",
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:samenKamers"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+  },
+  {
+   "heen": "/api/samen/weg",
+   "terug": "/api/samen/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 200,
+   "geraakt": [],
+   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+  },
+  {
+   "heen": "/api/site/bewaar",
+   "terug": "/api/site/verwijder",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/site/live",
+   "terug": "/api/site/offline",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/site/publiceer",
+   "terug": "/api/site/offline",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/site/verwijder",
+   "terug": "/api/site/bewaar",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 200,
+   "geraakt": [],
+   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+  },
+  {
+   "heen": "/api/staff/mob/cdt/aanmelden",
+   "terug": "/api/staff/mob/cdt/afmelden",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/staff/mob/cdt/afmelden",
+   "terug": "/api/staff/mob/cdt/aanmelden",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/agenda/toevoegen",
+   "terug": "/api/supplier/agenda/verwijder",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/agenda/verwijder",
+   "terug": "/api/supplier/agenda/toevoegen",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/kantoorpakket/maak",
+   "terug": "/api/supplier/kantoorpakket/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/kantoorpakket/weg",
+   "terug": "/api/supplier/kantoorpakket/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/redactie/artikel/bewaar",
+   "terug": "/api/supplier/redactie/artikel/verwijder",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/redactie/artikel/verwijder",
+   "terug": "/api/supplier/redactie/artikel/bewaar",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/redactie/rubriek/bewaar",
+   "terug": "/api/supplier/redactie/rubriek/verwijder",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/redactie/rubriek/verwijder",
+   "terug": "/api/supplier/redactie/rubriek/bewaar",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/rtmail/regel/maak",
+   "terug": "/api/supplier/rtmail/regel/weg",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [
+    "store.db:kosten",
+    "store.db:techniek",
+    "store.db:wacht"
+   ],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/rtmail/regel/weg",
+   "terug": "/api/supplier/rtmail/regel/maak",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/site/live",
+   "terug": "/api/supplier/site/offline",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/supplier/site/publiceer",
+   "terug": "/api/supplier/site/offline",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 401,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 401: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/thuis/annuleer",
+   "terug": "/api/thuis/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/thuis/boek",
+   "terug": "/api/thuis/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/vak/ritme/start",
+   "terug": "/api/vak/ritme/stop",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/vak/ritme/stop",
+   "terug": "/api/vak/ritme/start",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/veiligheid/wacht/start",
+   "terug": "/api/veiligheid/wacht/stop",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 400,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/veiligheid/wacht/stop",
+   "terug": "/api/veiligheid/wacht/start",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/verzorging/annuleer",
+   "terug": "/api/verzorging/boek",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  },
+  {
+   "heen": "/api/verzorging/boek",
+   "terug": "/api/verzorging/annuleer",
+   "uitslag": "nietBeproefd",
+   "heenStatus": 404,
+   "geraakt": [],
+   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+  }
+ ],
+ "grenzen": [
+  "de proef weet niet WELK ding de terugweg moet aanwijzen; zij geeft de identificerende velden uit het antwoord van de heenweg door, en faalt dat, dan is de uitslag nietBeproefd en geen oordeel",
+  "een paar wordt in het gunstigste geval beproefd: meteen erna, door dezelfde gebruiker, met een vers gemaakt ding. Een bevestiging hier zegt niets over een terugweg een week later",
+  "exact en compensatie zijn niet hetzelfde, en worden nooit samengeteld: een creditnota wist geen factuur",
+  "de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep"
+ ]
+}

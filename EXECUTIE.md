@@ -709,7 +709,7 @@ te tellen.
 meet één stap, niet een paar met een tussenstand. Dat gereedschap bestaat niet,
 en tot het er is blijft compenserend handelen onbewezen.
 
-### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, het herstel is GEMETEN en blijkt niet af te leiden**
+### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, en het herstel is nu UITGEVOERD in plaats van afgeleid**
 
 `transactie.js` en `transactie-poorten.js` doen voorcontrole, verificatie en
 terugdraaien al; ze generiek maken is goedkoper dan de simulatie. Wat erbij
@@ -758,7 +758,7 @@ naam, `/toevoegen` bij `/verwijder` — levert:
 | vermoede tegenhanger | 74 |
 | dubbelzinnig | 4 |
 | **dekking** | **2,4%** |
-| bevestigd door een mens | **0** |
+| wat een NAAM kan bevestigen | **0** |
 
 En de kwaliteit van die 2,4% is zelf twijfelachtig: `/api/agenda/bewaar` wordt aan
 `/api/agenda/verwijder` gekoppeld terwijl bewaren een wijziging is en geen
@@ -773,12 +773,76 @@ vorm van terugweg — **een schakelaar** — die een vergelijking van namen per
 definitie niet ziet. Diezelfde toets is de `rooms`-les: een woord dat nergens
 heen wijst, laat de bouw zakken.
 
-**De conclusie hoort bij de meting:** herstel heeft een **verklaringsregister**
-nodig zoals `IDEMBESLUIT.json`, ingevuld door mensen, met dezelfde eerlijke klasse
-voor "hier is nog niet over besloten". De naamafleiding is bruikbaar als
-aanwijzing voor wie dat register vult, en voor niets anders. Zolang `bevestigd`
-leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven — en dat
-is precies wat `bon.js` vandaag al weigert.
+**De conclusie hoorde bij de meting:** een naamafleiding is een aanwijzing en
+geen bewijs. Wat ontbrak was niet een verklaringsregister maar een **proef** —
+en die staat er nu.
+
+#### De herstelproef (`scripts/herstelproef.js`, `npm run herstelproef`)
+
+Zij voert het paar **uit**: heen, kijken, terug, kijken — tegen dezelfde
+wegwerpserver als de droogloop, en met dezelfde lezer van de opslag. Er komt
+geen tweede lezer bij.
+
+**Twee beelden, en dat is het hele mechanisme.** De droogloop telt het
+versienummer van een collectie, want die beantwoordt *is er iets gebeurd*. Voor
+*staat het er weer zoals het stond* is dat de verkeerde vraag: `ver` loopt alleen
+maar op. De herstelproef leest daarom de **inhoud** (een hash per collectie) en
+gebruikt het versiebeeld alleen om te zien of een stap werk deed.
+
+**Vier uitslagen, en drie ervan zijn geen bewijs:**
+
+| uitslag | wat het zegt |
+|---|---|
+| `exact` | de inhoud van elke geraakte collectie is letterlijk terug |
+| `compensatie` | de terugweg deed werk, de oude inhoud kwam niet terug |
+| `geen-herstel` | de terugweg draaide en veranderde niets; de naam belooft iets dat de handeling niet doet |
+| `nietBeproefd` | de heenweg kwam niet binnen — er valt niets te keren |
+
+Die laatste is met opzet een eigen uitslag. Een `geen-herstel` zou 67 paren
+veroordelen voor een tekort van de **proef**, en niet-gemeten mag nooit als
+oordeel langskomen. `exact` en `compensatie` worden nooit samengeteld — een
+creditnota wist geen factuur — en `test/herstelproef.test.js` zakt zodra er één
+getal voor beide verschijnt.
+
+**De uitslag van de eerste ronde:**
+
+| | |
+|---|---|
+| `exact` | **4** |
+| `compensatie` | **3** |
+| `geen-herstel` | 0 |
+| niet beproefd | 67 |
+
+`HERSTEL.json` staat daarmee op **7 bevestigd** en `vermoed` op 67. De
+bevestiging komt uit de proef en niet uit een pen: `test/herstel.test.js` eist
+per bevestigd paar een overeenkomstige uitslag in `HERSTELPROEF.json`, met
+dezelfde tegenhanger en de soort erbij. De oude toets — *`bevestigd` moet leeg
+zijn* — is niet vervallen maar scherper geworden; zonder die eis was de nieuwe
+tak precies het gat dat zij dichthield.
+
+**Een opwarmronde bleek niet-onderhandelbaar,** en dat is het leerzame deel. In
+een verse database bestáát de collectie `agendas` niet. Voegt de heenweg het
+eerste item toe en haalt de terugweg het weer weg, dan is die collectie daarna
+leeg maar *aanwezig* — een andere inhoud dan "er was niets". Zonder opwarmronde
+heette **elk** paar `compensatie` en was `exact` structureel onbereikbaar. Een
+hoogste graad die niemand ooit kan halen, is geen graad. Dat is dezelfde
+faalvorm als de rijtelling op `kv` in de droogloop: een meting die stil het
+verkeerde antwoord geeft.
+
+**En één bevinding is er inhoudelijk uitgekomen:** `/api/meet/maak → /api/meet/weg`
+is `compensatie` en geen `exact`, met `kosten` als de collectie die niet
+terugkomt. Een vergaderkamer opheffen maakt niet ongedaan dat hij geld heeft
+gekost. Precies het soort verschil dat een naamvergelijking nooit had gezien, en
+precies wat een bon moet zeggen voordat iemand op "ongedaan maken" drukt.
+
+**Wat de proef níét zegt, staat in haar eigen uitslag:** zij weet niet wélk ding
+de terugweg moet aanwijzen (zij geeft de identificerende velden uit het antwoord
+van de heenweg door, en faalt dat, dan is de uitslag `nietBeproefd`); zij toetst
+een paar in het gunstigste geval — meteen erna, door dezelfde gebruiker, op een
+vers gemaakt ding; en zij logt in als **lid**, terwijl de meeste resterende paren
+een leveranciers- of kantoorsessie vragen. Dat laatste is wat de post
+`herstel-onbevestigd` in `BEWIJSSCHULD.json` van `instrument` naar **`meetwerk`**
+verplaatst: het gereedschap bestaat, er is nog niet overal mee gemeten.
 
 ### Blok 6 — Mandaatmotor · **de GRAMMATICA staat, de autonomie wacht op bewijs**
 

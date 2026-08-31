@@ -62,6 +62,14 @@ function bouw() {
   for (const p of alle) (buren[prefix(p)] = buren[prefix(p)] || []).push(laatste(p));
 
   const per = {};
+  const bevestigd = [];
+  /* De uitslagen van de herstelproef, per heenweg. Er is geen tweede afleiding:
+     wat hier binnenkomt is UITGEVOERD, niet geraden. */
+  const beproefd = {};
+  try {
+    for (const u of (JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), 'utf8')).per || []))
+      beproefd[u.heen] = u;
+  } catch (e) { /* geen proef gedraaid: dan blijft alles vermoed, en dat is de eerlijke stand */ }
   let vermoed = 0, dubbelzinnig = 0;
   for (const p of alle) {
     const l = laatste(p), pre = prefix(p);
@@ -71,8 +79,22 @@ function bouw() {
       if (l === b && (buren[pre] || []).includes(a)) doelen.add(a);
     }
     if (doelen.size === 1) {
+      const tegen = pre + '/' + [...doelen][0];
+      /* IS HET PAAR OOK UITGEVOERD? scripts/herstelproef.js draait heen en terug
+         tegen een wegwerpserver en vergelijkt de INHOUD van de opslag. Alleen
+         die proef kan een graad boven `vermoed` opleveren -- deze afleiding
+         kijkt naar namen en zal dat altijd blijven doen. `exact` en
+         `compensatie` worden NOOIT samengeteld: een creditnota wist geen
+         factuur, en wie die twee gelijkstelt belooft een terugweg die er niet
+         is. Ontbreekt de proef, dan blijft alles gewoon `vermoed`. */
+      const bewijs = beproefd[p];
+      if (bewijs && (bewijs.uitslag === 'exact' || bewijs.uitslag === 'compensatie') && bewijs.terug === tegen) {
+        bevestigd.push({ heen: p, terug: tegen, soort: bewijs.uitslag });
+        per[p] = { graad: 'bevestigd', soort: bewijs.uitslag, tegenhanger: tegen, reden: bewijs.reden };
+        continue;
+      }
       vermoed++;
-      per[p] = { graad: 'vermoed', tegenhanger: pre + '/' + [...doelen][0],
+      per[p] = { graad: 'vermoed', tegenhanger: tegen,
         reden: 'de namen zijn elkaars omkering; niemand heeft bevestigd dat de handeling dat ook is' };
     } else if (doelen.size > 1) {
       dubbelzinnig++;
@@ -94,9 +116,15 @@ function bouw() {
       'door de toets verworpen omdat `ontdooi` nergens als route-einde bestaat -- /api/bank/bevries zet ' +
       'de stand vermoedelijk in EEN route met een vlag in het lichaam. Zo n terugweg is per definitie ' +
       'onzichtbaar voor een vergelijking van namen.',
-    bevestigd: [],
-    bevestigdUitleg: 'Leeg, en dat is de stand: niemand heeft een tegenhanger bevestigd. Zolang deze ' +
-      'lijst leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven.',
+    bevestigd,
+    bevestigdUitleg: bevestigd.length
+      ? 'Deze paren zijn UITGEVOERD (scripts/herstelproef.js): heen, kijken, terug, kijken. `exact` ' +
+        'betekent dat de inhoud van elke geraakte collectie letterlijk terug is; `compensatie` dat de ' +
+        'terugweg werk deed maar de oude inhoud niet terugkwam. Alleen over deze paren mag een scherm ' +
+        'of een bon iets over een terugweg zeggen, en dan met de soort erbij. Een bevestiging geldt ' +
+        'bovendien alleen voor het gunstigste geval: meteen erna, door dezelfde gebruiker.'
+      : 'Leeg, en dat is de stand: niemand heeft een tegenhanger bevestigd. Zolang deze ' +
+        'lijst leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven.',
     per
   };
 }

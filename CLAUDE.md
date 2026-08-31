@@ -794,10 +794,18 @@ plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
 bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
 (`npm run herstel`, `HERSTEL.json`) en de uitkomst is dat hij NIET af te leiden
 is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
-(2,4%), 4 zijn dubbelzinnig en 0 zijn bevestigd. Niets komt boven de graad
-`vermoed`, want /agenda/bewaar is geen omkering van /verwijder. Herstel heeft dus
-een VERKLARINGSREGISTER nodig zoals IDEMBESLUIT.json; zolang `bevestigd` leeg is
-mag geen scherm en geen bon een terugweg beloven. Let ook op de tegenspraakregel
+(2,4%), 4 zijn dubbelzinnig en 0 waren er bevestigd. Niets komt boven de graad
+`vermoed` uit een naam, want /agenda/bewaar is geen omkering van /verwijder. Wat
+herstel nodig had bleek geen verklaringsregister maar een PROEF, en die staat er:
+`scripts/herstelproef.js` VOERT het paar uit (heen, kijken, terug, kijken) en
+vergelijkt de INHOUD van de opslag -- 4 `exact`, 3 `compensatie`, 0 `geen-herstel`,
+67 niet beproefd omdat de proef als lid inlogt. Alleen over die zeven mag een
+scherm of een bon iets over een terugweg zeggen, en dan met de SOORT erbij: een
+creditnota wist geen factuur, dus `exact` en `compensatie` worden nooit
+samengeteld. Twee dingen daar niet wegpoetsen: `nietBeproefd` is met opzet geen
+`geen-herstel` (een tekort van de proef is geen oordeel over het paar), en zonder
+de OPWARMRONDE bestaat de collectie nog niet en heet elk paar `compensatie` --
+een hoogste graad die niemand kan halen is geen graad. Let ook op de tegenspraakregel
 die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
 bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. **Blok 3 staat** (`server/kern/stuur/plan.js`, gereedschap `plan`):
 het model levert doel + stappen, de compiler weegt ze en geeft een uitvoerbaar

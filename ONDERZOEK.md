@@ -144,14 +144,39 @@ Onderweg bleek het oude `deelnemerWeg` alleen observaties te wissen. Sinds er oo
 metingen bestaan, liet dat gegevens achter van iemand die zich had teruggetrokken;
 beide wegen lopen nu langs dezelfde functie.
 
+## De openbare onderzoekskaart
+
+Sinds 31 augustus 2026 kan een lab een onderzoek openbaar maken
+(`kern/livinglab/publicatie.js`). Drie dingen maken dat iets anders dan een
+persbericht:
+
+1. **Publiceren is een besluit van een mens**, geen gevolg van "af zijn". Er hoort
+   een naam onder, en het kan pas als er een besluit over het onderzoek ligt --
+   ook als dat besluit "gestopt" is.
+2. **"Wat werkte niet" is een verplicht blok.** Niet een appendix, niet optioneel.
+   Een lab dat alleen zijn successen publiceert, publiceert geen onderzoek. Leeg
+   laten wordt geweigerd, met de uitnodiging op te schrijven waarom er volgens de
+   onderzoeker niets misging.
+3. **De feiten worden afgeleid en niet overgetypt.** Bewijsgraad, deelnames,
+   herziene conclusies, teruggetrokken deelnemers en het aantal protocolversies
+   komen live uit het dossier. Wat een mens schrijft is de duiding. Zou de kaart
+   bevroren worden, dan blijft er een graad staan die inmiddels is gezakt -- en
+   terugtrekken kan dat vandaag laten gebeuren.
+
+Wat er nooit op komt: aliassen, de tekst van een waarneming, de tekst van een
+klacht. Bij een studie met een verhoogde risicoklasse (gescheiden bewaard) gaan
+ook de vraagstelling en de conclusieteksten er niet op -- alleen wat het lab zelf
+schreef, de graden, en de reden dat de rest ontbreekt.
+
+**Intrekken wist niets.** Een publicatie die iemand niet meer uitkomt, moet niet
+stilletjes weg kunnen: de kaart blijft staan en toont dat zij is ingetrokken, met
+de reden erbij.
+
 ## Wat er nog niet is, met de reden
 
 - **Labfonds ↔ studie.** Het fonds financiert onderzoek en weet niet welk. Dit is
   de duurste ontbrekende schakel: zonder haar kan een lid niet zien wat er met
   zijn bijdrage is onderzocht.
-- **Publicatie.** Er is geen openbare onderzoekskaart. De impactmodule telt
-  herziene conclusies en gestopte studies al intern; wat ontbreekt is de kant die
-  een gemeente leest.
 - **Reproductiecapsule en conclusieversies.** De bewijsmotor weegt al per studie;
   een conclusie is nog geen object met een geschiedenis.
 

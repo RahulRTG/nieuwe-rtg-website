@@ -91,6 +91,10 @@ module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
   ctx.terugtrekken = require('./terugtrekken')(ctx);
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
+  /* De openbare onderzoekskaart (./publicatie.js). Hij staat achteraan omdat hij
+     alles hierboven LEEST en zelf niets aan het onderzoek verandert -- op het
+     besluit om te publiceren na, en dat is een handeling van een mens. */
+  ctx.publicatie = require('./publicatie')(ctx);
   ctx.ai = require('./ai')(ctx);
 
   /* HET ONDERZOEKSGROOTBOEK (./ledger.js): wat een studie kostte en waarom de

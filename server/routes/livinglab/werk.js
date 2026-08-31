@@ -52,6 +52,13 @@ module.exports = (kern, hulp) => {
   app.post('/api/lab2/app/uitgifte', officeAuth, (req, res) => veilig(res, () => livinglab.apparatuur.uitgifte(req.body, wie(req))));
 
   /* ---------- van onderzoek naar verandering ---------- */
+  /* ---------- openbaar maken ----------
+     Publiceren is een besluit van een mens: er hoort een naam onder, en het blok
+     "wat werkte niet" is verplicht. Intrekken wist niets -- de reden blijft
+     openbaar staan. */
+  app.post('/api/lab2/publicatie/zet', officeAuth, (req, res) => veilig(res, () => livinglab.publicatie.publiceer(id(req), req.body, wie(req))));
+  app.post('/api/lab2/publicatie/intrekken', officeAuth, (req, res) => veilig(res, () => livinglab.publicatie.trekIn(id(req), req.body, wie(req))));
+
   /* ---------- meetinstrumenten ----------
      Het protocol samenstellen doet de onderzoeksleider; invullen doet de
      deelnemer met zijn labpas (./bewoner.js). Die twee staan met opzet aan

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1423 bestanden en 9991 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1424 bestanden en 9997 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1423 |
-| losse beweringen (`test(...)`) | 9991 |
+| toetsbestanden | 1424 |
+| losse beweringen (`test(...)`) | 9997 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 116 |
-| niets van beide | 287 |
+| niets van beide | 288 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1246 bestanden, 9687 beweringen.
+1247 bestanden, 9693 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -585,6 +585,7 @@ toets omvalt.
 | `livinglab-instrument.test.js` | 10 | -- | MEETINSTRUMENTEN -- wat een deelnemer met zijn labpas invult. Wat deze toets vastlegt: 1. |
 | `livinglab-ledger.test.js` | 8 | -- | HET ONDERZOEKSGROOTBOEK -- wat een studie kostte, en waarom de stichting die rekening mocht betalen. Wat deze toets vastlegt: 1. |
 | `livinglab-nummer.test.js` | 7 | -- | HET ONDERZOEKSNUMMER -- één naam voor één onderzoek, door het hele systeem. De meting eronder (scripts/onderzoeksketen.js) wees uit dat zeven van de tien stations al aan DEZELFDE studie hangen: het is een ster en... |
+| `livinglab-publicatie.test.js` | 6 | -- | DE OPENBARE ONDERZOEKSKAART -- wat een lab naar buiten zegt, inclusief wat er niet werkte. Wat deze toets vastlegt: 1. |
 | `livinglab-routes.test.js` | 11 | gezakt op `liegpoort /api/` | DE OVERIGE ROUTES VAN HET LIVING LAB -- werkplaats, apparatuur, deelnemers, themas, de pijplijn, de coach en de bewonerskant. test/livinglab.test.js loopt de ONDERZOEKSCYCLUS af: de poorten, de ethiek, de bewijsmotor. |
 | `livinglab-terugtrekken.test.js` | 5 | -- | TERUGTREKKEN -- wat er verdwijnt, wat er blijft, en wat dat met de conclusies doet. Wat deze toets vastlegt: 1. |
 | `livinglab.test.js` | 20 | gezakt op `liegpoort /api/` | Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de pijplijn naar echte verandering. Draai los: node --test... |

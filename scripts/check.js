@@ -1960,6 +1960,8 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/lab2/mijn/meting', 'idem; de meting gaat de studie in op de alias uit de pas, met de toestemmingsgrond van die studie'],
     ['/api/lab2/mijn/terugtrekken', 'toestemming intrekken moet werken met wat de deelnemer zelf heeft: zijn pas'],
     ['/api/lab2/mijn/terugtrekken/gevolg', 'idem, en dit leest alleen: het rekent voor wat terugtrekken zou betekenen zonder iets te wissen'],
+    ['/api/lab2/publiek/onderzoeken', 'de openbare onderzoekskaarten: alleen wat een mens van het lab heeft gepubliceerd, zonder aliassen en zonder waarnemingen'],
+    ['/api/lab2/publiek/onderzoek', 'idem, een kaart -- openbaar zijn is hier het hele punt: onderzoek dat niemand kan nakijken, is geen onderzoek'],
     ['/api/lab2/bewoner/themas', 'de vragen uit de buurt zijn openbaar; dat is de trechter vóór het onderzoek'],
     ['/api/lab2/bewoner/thema', 'een bewoner draagt een onderzoeksvraag aan zonder account (rem 10/min per bron)'],
     ['/api/lab2/bewoner/stem', 'stemmen op een thema; de teller hangt aan het THEMA en niet aan de stemmer (regel 7)'],

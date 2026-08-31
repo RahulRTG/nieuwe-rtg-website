@@ -1,0 +1,54 @@
+/* HET MATERIAAL VAN TRAVELOS -- voor schermen die de schil NIET delen.
+
+   De meeste reisschermen hangen aan shared/travel-os.css: die geeft ze een kop,
+   een rail, een scenefoto en het materiaal in één. Vier schermen doen dat niet,
+   en met reden -- ze hebben een eigen vorm die daar niet in past:
+
+     arrival.html        de aankomsthal, een scherm dat vanzelf doorloopt
+     reizen-veilig.html  een werkruimte met eigen bank en ingebedde modules
+     routedossier.html   een dossier met de wos-vorm van het werkhuis
+     chauffeur.html      de PDA van een rijder, bediend met een duim
+
+   Zij horen wel in dezelfde wereld thuis. Dit blad geeft ze daarom het
+   MATERIAAL en niets anders: het fluweel eronder, en de accentkleur. Geen
+   kop, geen rail, geen raster -- dat is precies wat hun karakter zou wissen.
+
+   DE REGEL DIE DIT BLAD KLEIN HOUDT: hier komt niets in te staan wat over
+   INDELING gaat. Zodra dat gebeurt, is het een tweede schil naast travel-os.css
+   en dan hebben we twee plekken die hetzelfde scherm anders willen inrichten.
+
+   Kleine tekst blijft ivoor: het bordeauxhoogsel haalt op donker 3,78:1 en is
+   daarmee alleen goed voor vorm en grote letters (CLAUDE.md). */
+
+/* `html body` en niet alleen `body`: twee van deze vier schermen zetten hun
+   eigen grond met een klassenregel, en die weegt even zwaar als een
+   attribuutregel -- dan wint wie het laatst geladen is, en dat is toeval. */
+html body[data-rtg-world="travel"] {
+  /* Fluweel als ondergrond, zwart voor de diepte eronder -- dezelfde drie
+     tinten als het beginscherm en als travel-os.css. */
+  background-color: #2E0713;
+  background-image: linear-gradient(168deg, #7F1634 0%, #4A0C1E 44%, #2E0713 100%);
+  background-attachment: fixed;
+
+  /* De accenten die deze schermen uit het huis lenen. Waar zij `--gold` lazen,
+     lezen zij nu het bordeauxhoogsel: goud is in deze wereld teruggebracht tot
+     het merk en de wijzers van de klok. */
+  /* Het accent is vorm; de LEESTOON is lichter. Zie rtg-themas.css. */
+  --gold: #C23A5E;
+  --goud: #E7A8B8;
+  --rtg-leesgoud: #E7A8B8;
+  --burgundy: #9E1C40;
+  --burg: #9E1C40;
+  --rtg-bg: #1B050B;
+  --rtg-card: #2A0713;
+  --rtg-card2: #20060E;
+  --rtg-line: rgba(244, 240, 233, .14);
+}
+
+/* Een kaart of paneel dat zijn eigen zwart meebrengt, mag dat houden -- maar
+   dan wijnzwart, zodat het op het fluweel als diepte leest en niet als gat. */
+body[data-rtg-world="travel"] .kaart,
+body[data-rtg-world="travel"] .paneel,
+body[data-rtg-world="travel"] .blok {
+  border-color: rgba(244, 240, 233, .12);
+}

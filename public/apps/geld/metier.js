@@ -40,7 +40,9 @@
         'font-size:.85rem;line-height:1.5;white-space:pre-wrap;}' +
       '#paneel .mt-knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}' +
       '#paneel .mt-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
-      '#paneel .mt-vraag input{flex:1;width:auto;}' +
+      /* min-width:0 hoort bij flex:1: een input zakt niet onder zijn eigen
+         breedte, en duwde op 390px de knop Vraag buiten beeld. */
+      '#paneel .mt-vraag input{flex:1 1 0;min-width:0;width:auto;}' +
       '#paneel .mt-half{display:flex;gap:.4rem;margin-top:.4rem;}' +
       '#paneel .mt-naam{background:linear-gradient(150deg,rgba(127,22,52,.14),transparent);}';
     d.head.appendChild(s);

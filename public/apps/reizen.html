@@ -15,7 +15,7 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="travel">
+<body class="rtg-stijl" data-rtg-world="travel" data-rtg-eigenvlak="bordeaux">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil. Zie de opmerking in apps/kantoor.html. -->
@@ -30,55 +30,110 @@
     </button>
   </header>
 
+  <nav class="hoofdtabs" aria-label="RTG Reizen">
+    <button class="actief" type="button" data-tab="vandaag" aria-current="page">
+      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span>
+    </button>
+    <button type="button" data-tab="reizen">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span>Reizen</span>
+    </button>
+    <button type="button" data-tab="taxi">
+      <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
+    </button>
+    <button type="button" data-tab="samen">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 5M18 20a6 6 0 0 0-3-5.2"/></svg><span>Samen</span>
+    </button>
+    <button type="button" data-tab="rahul">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
+    </button>
+  </nav>
+
   <main id="inhoud">
     <section class="appblad actief" data-blad="vandaag" aria-labelledby="titelVandaag">
       <div class="bladbinnen vandaagblad">
-        <div class="dagkop">
-          <div class="dagkop-inhoud">
-            <p class="micro" id="groet">GOEDEMIDDAG</p>
-            <div class="bestemmingkop">
+        <!-- HET DEK. Twee kolommen: links de reis, rechts de klok in een EIGEN
+             paneel. Dat is geen opmaakvoorkeur maar de reparatie van een fout:
+             de klok lag over de bestemmingsnaam heen, omdat de titel op de
+             VENSTERbreedte schaalde en de klok absoluut in dezelfde kaart
+             stond. Wat een eigen kolom heeft, kan nergens overheen vallen. -->
+        <!-- HOOFDKOLOM EN KOMPAS. Links de reis zoals hij vandaag loopt, rechts
+             wat u erover moet weten. Dezelfde verdeling als de andere
+             wereldhuizen: een brede werkkolom met kaarten, en een smalle kolom
+             met losse feiten. De klok staat in die smalle kolom en niet meer in
+             de fotokaart, waar hij over de bestemmingsnaam heen viel. -->
+        <div class="dagdek">
+          <div class="daghoofd">
+            <header class="dagtitel">
+              <p class="micro"><span id="groet">GOEDEMIDDAG</span></p>
               <h1 id="titelVandaag">IBIZA</h1>
-              <span class="gereed" id="gereedTeller">4/4 GEREED</span>
+              <p class="sub" id="dagzin">Alles staat klaar.</p>
+            </header>
+
+            <!-- DE MOMENTEN VAN VANDAAG. De onderdelen van deze reis als strook,
+                 met de tijd eronder -- gevuld uit dezelfde lijst als de rest van
+                 het scherm (kern/reiswereld). Er staan hier geen mensen: dit
+                 huis verzint geen reisgenoten. -->
+            <section class="strook" aria-labelledby="strookTitel">
+              <div class="strookkop">
+                <h2 id="strookTitel">Momenten van deze reis</h2>
+                <span class="gereed" id="gereedTeller">0/0 GEREED</span>
+              </div>
+              <div class="pionnen" id="momenten"><p class="leegtekst">Uw reisgegevens worden veilig opgehaald…</p></div>
+            </section>
+
+            <div class="kaartraster">
+              <div class="dagkop">
+                <div class="dagkop-inhoud">
+                  <p class="micro">DE BESTEMMING</p>
+                  <p class="sub" id="dagbeeldzin">Uw volgende reis in beeld.</p>
+                </div>
+              </div>
+
+              <div class="vandaagraster" id="dagRaster" hidden>
+                <section class="volgendblok" aria-labelledby="volgendTitel">
+                  <div class="micro" id="volgendTitel">VOLGENDE</div>
+                  <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
+                  <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
+                  <div class="vluchtregel"><span id="volgendExtra"></span></div>
+                  <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
+                </section>
+              </div>
             </div>
-            <p class="sub" id="dagzin">Alles staat klaar.</p>
+
+            <form class="rahulsnel" data-rahul-snel>
+              <label for="rahulSnel">Vraag Rahul over deze reis</label>
+              <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul over deze reis…">
+              <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
+            </form>
           </div>
-          <div class="reisdag-klok" aria-label="Huidige tijd">
-            <span>LOKALE TIJD</span>
-            <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
-          </div>
+
+          <aside class="kompas" aria-label="Kompas">
+            <p class="kompaslabel">KOMPAS</p>
+
+            <section class="kompaskaart" id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
+              <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
+                   momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
+                   kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
+                   op null -- en die uitzondering brak de HELE reizenlijst af: #komend
+                   toonde "Cannot set properties of null" in plaats van de reizen, ook na
+                   een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
+              <div class="kompaskop"><h2 id="canvasVandaagTitel" class="micro">VANDAAG</h2><span id="telVandaag" class="tel"></span></div>
+              <div id="vandaag"></div>
+            </section>
+
+            <section class="kompaskaart klokpaneel" aria-label="Lokale tijd">
+              <span class="micro">LOKALE TIJD</span>
+              <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="standTitel">
+              <div class="kompaskop"><h2 id="standTitel" class="micro">STATUS</h2></div>
+              <div class="reiscontext">
+                <div class="statuslijst" id="statusLijst" aria-label="Reisstatus"></div>
+              </div>
+            </section>
+          </aside>
         </div>
-
-        <div class="vandaagraster" id="dagRaster" hidden>
-          <section class="volgendblok" aria-labelledby="volgendTitel">
-            <div class="micro" id="volgendTitel">VOLGENDE</div>
-            <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
-            <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
-            <div class="vluchtregel"><span id="volgendExtra"></span></div>
-            <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
-          </section>
-
-          <div class="reiscontext">
-
-            <section class="statuslijst" id="statusLijst" aria-label="Reisstatus"></section>
-          </div>
-        </div>
-
-        <section id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
-          <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
-               momenten neer, net zoals #tel dat doet bij "Wat eraan komt". De span
-               kwam de samenvoeging niet door, dus liep `$('#telVandaag').textContent`
-               op null -- en die uitzondering brak de HELE reizenlijst af: #komend
-               toonde "Cannot set properties of null" in plaats van de reizen, ook na
-               een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
-          <h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span>
-          <div id="vandaag"></div>
-        </section>
-
-        <form class="rahulsnel" data-rahul-snel>
-          <label for="rahulSnel">Vraag Rahul over deze reis</label>
-          <input id="rahulSnel" name="vraag" autocomplete="off" placeholder="Vraag Rahul…">
-          <button type="submit" aria-label="Verstuur naar Rahul">↗</button>
-        </form>
       </div>
     </section>
 
@@ -210,6 +265,81 @@
       </div>
     </section>
 
+    <!-- HET GEZELSCHAP (kern/reisgezelschap.js). Wie wat van een reis ziet,
+         bepaalt de poort op de server en niet dit scherm; dit blad toont wat
+         zij teruggeeft, inclusief wat een rol NIET ziet. -->
+    <section class="appblad" data-blad="samen" aria-labelledby="titelSamen" hidden>
+      <div class="bladbinnen samenblad">
+        <header class="dagtitel">
+          <p class="micro">HET GEZELSCHAP</p>
+          <h1 id="titelSamen">Samen</h1>
+          <p class="sub">De mensen die bij deze reis horen: wie meereist, en wie meeleeft.</p>
+        </header>
+
+        <div class="reiskeuzes" id="samenReizen"></div>
+
+        <div class="dagdek">
+          <div class="daghoofd">
+            <section class="kompaskaart" aria-labelledby="samenLijnTitel">
+              <div class="kompaskop"><h2 id="samenLijnTitel" class="micro">DE TIJDLIJN VAN DEZE REIS</h2></div>
+              <div id="samenTijdlijn"><p class="leegtekst">Kies een reis.</p></div>
+              <div class="beeldbalk" id="samenBeeldBalk" hidden>
+                <label class="rtg-label" for="samenBeeld">Deel een beeld uit uw kluis</label>
+                <div class="beeldkiezer">
+                  <select class="rtg-veld" id="samenBeeld"></select>
+                  <button class="rtg-knop" type="button" id="samenDeelBeeld">DEEL</button>
+                </div>
+                <p class="rtg-sub">Het bestand blijft in uw kluis; het gezelschap krijgt er toegang toe.
+                  Haalt u iemand weg, dan vervalt die toegang ook.</p>
+              </div>
+
+              <form class="rahulsnel" id="samenSchrijf">
+                <label for="samenTekst">Schrijf iets aan het gezelschap</label>
+                <input id="samenTekst" autocomplete="off" placeholder="Schrijf iets aan het gezelschap…" maxlength="1200">
+                <button type="submit" aria-label="Deel met het gezelschap">↗</button>
+              </form>
+            </section>
+          </div>
+
+          <aside class="kompas" aria-label="Het gezelschap">
+            <section class="kompaskaart" aria-labelledby="samenLedenTitel">
+              <div class="kompaskop"><h2 id="samenLedenTitel" class="micro">HET GEZELSCHAP</h2></div>
+              <div id="samenLeden"><p class="leegtekst">Kies een reis.</p></div>
+              <form id="samenNodig" class="nodigvorm">
+                <label class="rtg-label" for="samenCodenaam">Codenaam van wie u uitnodigt</label>
+                <input class="rtg-veld" id="samenCodenaam" autocomplete="off" placeholder="Bijvoorbeeld Nachtvlinder" maxlength="60" required>
+                <label class="rtg-label" for="samenRol">Als</label>
+                <select class="rtg-veld" id="samenRol">
+                  <option value="reisgenoot">Reisgenoot: reist mee, ziet het draaiboek</option>
+                  <option value="meekijker">Meekijker: ziet bestemming, periode en wat u deelt</option>
+                </select>
+                <button class="rtg-knop vol" type="submit">NODIG UIT</button>
+                <p class="rtg-sub">Zij zien pas iets nadat zij de uitnodiging zelf aanvaarden.</p>
+              </form>
+              <p class="rtg-sub" id="samenNodigNoot" hidden>Uitnodigen doet de reiziger zelf; u kijkt mee op zijn reis.</p>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="samenKringTitel">
+              <div class="kompaskop"><h2 id="samenKringTitel" class="micro">VOOR U</h2></div>
+              <div id="samenKring"><p class="leegtekst">Geen openstaande uitnodigingen.</p></div>
+            </section>
+
+            <section class="kompaskaart" id="samenDelenKaart" aria-labelledby="samenDelenTitel" hidden>
+              <div class="kompaskop"><h2 id="samenDelenTitel" class="micro">WAT U DEELT</h2></div>
+              <div id="samenDelen"></div>
+              <button class="rtg-knop vol" type="button" id="samenAangekomen">IK BEN AANGEKOMEN</button>
+              <p class="rtg-sub">Een moment, geen stip: RTG deelt geen doorlopende positie.</p>
+            </section>
+
+            <section class="kompaskaart" aria-labelledby="samenZichtTitel">
+              <div class="kompaskop"><h2 id="samenZichtTitel" class="micro">WAT U ZIET</h2></div>
+              <div class="zichtblok" id="samenZicht"><p class="leegtekst">Kies een reis.</p></div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </section>
+
     <!-- DEZE DRIE BLOKKEN STONDEN BUITEN DE SCHIL, en dat was geen opmaakdetail.
          Ze kwamen met de samenvoeging mee en werden ACHTER de tabbalk geplakt,
          achter </main> en achter </div> van .reisapp -- dus als kinderen van
@@ -225,8 +355,13 @@
        gewoon gezegd. Onderaan staan de bronnen, INCLUSIEF de bronnen die er
        niet zijn: een wachter zonder bron zegt dat hij niet kijkt (par. 4.2),
        en dit beeld is een momentopname bij het openen, geen achtergrondwacht. -->
+  <div class="dagkaarten">
+  <section class="dagkaart">
   <div class="regkop"><h2>De reiswacht</h2></div>
   <div id="wacht"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section class="dagkaart">
 
   <!-- DE INVOERBALIE (REIZEN.md fase 2). Hier komt een reis binnen die ergens
        anders geboekt is. Twee stappen, en die volgorde is het ontwerp: RTG
@@ -253,6 +388,8 @@
     <p class="rtg-sub" style="margin-top:.7rem;">Eerder een reisgenoot uitgenodigd?
       <a href="/apps/reisuitnodiging.html">Bekijk of trek uw uitnodigingen in</a>.</p>
   </div>
+  </section>
+  </div>
 
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
@@ -277,20 +414,6 @@
   <!-- /WERELDROOSTER --></div>
   </main>
 
-  <nav class="hoofdtabs" aria-label="RTG Reizen">
-    <button class="actief" type="button" data-tab="vandaag" aria-current="page">
-      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 3v4m8-4v4M4 10h16M8 14h.01m4 0h.01m4 0h.01M8 17h.01m4 0h.01"/></svg><span>Vandaag</span>
-    </button>
-    <button type="button" data-tab="reizen">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4zM8 7V4h8v3M4 12h16"/></svg><span>Reizen</span>
-    </button>
-    <button type="button" data-tab="taxi">
-      <svg viewBox="0 0 24 24"><path d="m5 16-1-2 2-6h12l2 6-1 2M6 16h12v3H6zM8 19v2m8-2v2M7 12h.01M17 12h.01"/></svg><span>Taxi</span>
-    </button>
-    <button type="button" data-tab="rahul">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Rahul</span>
-    </button>
-  </nav>
 </div>
 
 <dialog class="keuzedialoog" id="reizigersDialoog">
@@ -915,6 +1038,9 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-performance-taxi.js"></script>
 <script src="/apps/reizen-performance-boeken.js"></script>
 <script src="/apps/reizen-performance-rahul.js"></script>
+<script src="/apps/reizen-samen-delen.js"></script>
+<script src="/apps/reizen-samen-mensen.js"></script>
+<script src="/apps/reizen-samen.js"></script>
 <!-- De vier bestaande TravelOS-tabs reizen als capabilities naar de ene
      mobiele Command-balk; de uitvoering blijft in reizen-performance.js. -->
 <script src="/shared/adaptief.js" defer></script>

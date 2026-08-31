@@ -34,7 +34,7 @@
   .zoekwrap{position:fixed;top:calc(env(safe-area-inset-top,0px) + 3.4rem);left:1rem;right:1rem;z-index:6;max-width:640px;margin:0 auto;}
   .zoek{display:flex;align-items:center;gap:0.5rem;background:rgba(21,19,18,0.92);backdrop-filter:blur(10px);
     border:1px solid var(--line);border-radius:0;padding:0.2rem 0.3rem 0.2rem 0.8rem;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
-  .zoek span.i{color:var(--rtg-leesgoud,var(--gold));}
+  .zoek span.i{color:var(--rtg-leesgoud,#E7A8B8);}
   .zoek input{flex:1;background:transparent;border:0;color:var(--txt);font:inherit;font-size:0.95rem;padding:0.6rem 0.2rem;outline:none;}
   .zoek input::placeholder{color:var(--soft);}
   .res{margin-top:0.4rem;background:rgba(21,19,18,0.96);border:1px solid var(--line);border-radius:0;
@@ -47,7 +47,7 @@
   .res .pun{width:0.6rem;height:0.6rem;border-radius:50%;flex:none;}
   .res .nm{flex:1;}
   .res .nm small{display:block;color:var(--soft);font-size:0.72rem;margin-top:0.1rem;}
-  .res .af{color:var(--rtg-leesgoud,var(--gold));font-size:0.78rem;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .res .af{color:var(--rtg-leesgoud,#E7A8B8);font-size:0.78rem;white-space:nowrap;font-variant-numeric:tabular-nums;}
   /* de lagen-knoppen rechts */
   .lagen{position:fixed;right:0.8rem;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:0.4rem;}
   .lagen button{width:2.5rem;height:2.5rem;border-radius:0;border:1px solid var(--line);
@@ -66,9 +66,9 @@
   .modusrij{display:flex;gap:0.4rem;margin:0.7rem 0;overflow-x:auto;}
   .modusrij button{flex:none;display:flex;align-items:center;gap:0.35rem;background:var(--card2);
     border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.4rem 0.75rem;cursor:pointer;}
-  .modusrij button[aria-pressed="true"]{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .modusrij button[aria-pressed="true"]{border-color:var(--gold);color:var(--rtg-leesgoud,#E7A8B8);}
   .modusrij .m-eta{color:var(--soft);font-variant-numeric:tabular-nums;}
-  .modusrij button[aria-pressed="true"] .m-eta{color:var(--rtg-leesgoud,var(--gold));}
+  .modusrij button[aria-pressed="true"] .m-eta{color:var(--rtg-leesgoud,#E7A8B8);}
   .samenv{display:flex;align-items:baseline;gap:0.6rem;margin:0.2rem 0 0.4rem;}
   .samenv b{font-family:'Bodoni Moda',serif;font-size:1.7rem;font-variant-numeric:tabular-nums;}
   .samenv .km{color:var(--soft);font-size:0.9rem;}
@@ -76,7 +76,7 @@
   .stappen li{display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--line);}
   .stappen li:last-child{border-bottom:0;}
   .stappen .pijl{width:1.9rem;height:1.9rem;border-radius:0;background:var(--card2);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none;color:var(--rtg-leesgoud,var(--gold));}
+    display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none;color:var(--rtg-leesgoud,#E7A8B8);}
   .stappen .tk{flex:1;font-size:0.9rem;}
   .stappen .df{color:var(--soft);font-size:0.78rem;white-space:nowrap;font-variant-numeric:tabular-nums;}
   .langsrij{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;}
@@ -110,7 +110,7 @@
 <link href="/shared/travel-os.css" rel="stylesheet">
 <link href="/apps/navigatie-premium.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl travel-os travel-os-map" data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl travel-os travel-os-map" data-rtg-eigenvlak="bordeaux" data-rtg-world="travel">
 <canvas id="kaart" aria-label="3D-navigatiekaart van het netwerk"></canvas>
 <main>
   <header class="kop">

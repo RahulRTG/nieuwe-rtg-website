@@ -420,59 +420,75 @@ body[data-rtg-world="work"] .poort span{color:#CED6E5;}
 
 /* ------------------------------------------------------------- 03 TravelOS */
 body[data-rtg-world="travel"]{
-  --world-accent:var(--gold-tekst);
-  --world-accent-deep:var(--gold-basis);
+  --world-accent:var(--bordeaux-tekst);
+  --world-accent-deep:var(--bordeaux-hoog);
   --wine:var(--bordeaux-basis);
   --wine-bright:var(--bordeaux-hoog);
-  --gold:var(--gold-tekst);
-  --onyx:var(--onyx-basis);
-  --graphite:var(--onyx-hoog);
-  --graphite-2:var(--rtg-card2);
-  --ivory:var(--op-onyx);
-  --muted:#ABA79C;
-  --line:var(--onyx-rand);
-  --line-soft:rgba(255,255,255,.055);
-  background:var(--onyx-glans);
+  --gold:var(--bordeaux-tekst);
+  /* FLUWEEL DRAAGT DIT SCHERM. Onyx was hier de ondergrond en bordeaux het
+     accent; dat is omgedraaid. Zwart blijft over voor DIEPTE onder de panelen
+     -- en dan wijnzwart, want kolenzwart naast fluweel leest als een gat. */
+  --onyx:#1B050B;
+  --graphite:#2A0713;
+  --graphite-2:#20060E;
+  --ivory:var(--op-bordeaux);
+  /* GEMETEN EN NIET GEKOZEN: op de lichtste plek van deze grond (#8F2241) haalt
+     #C6A3AD 3,74:1 en #E2C9CF 5,45. De poort mat het verschil op het
+     beginscherm zelf ("Alles staat klaar." en de leegtekst). Het zachte grijs
+     mag lichter; de grond is fluweel en geen zwart. */
+  --muted:#E2C9CF;
+  --line:rgba(244,240,233,.14);
+  --line-soft:rgba(244,240,233,.07);
+  background:var(--bordeaux-glans);
 }
 body[data-rtg-world="travel"]::before{
   opacity:1;
   background:
-    radial-gradient(ellipse at 78% 6%,rgba(42,70,128,.3),transparent 31rem),
-    linear-gradient(164deg,transparent 0 61%,rgba(127,22,52,.18) 61% 61.2%,transparent 61.2%);
+    radial-gradient(ellipse at 82% 4%,rgba(158,28,64,.34),transparent 34rem),
+    linear-gradient(164deg,transparent 0 61%,rgba(244,240,233,.07) 61% 61.2%,transparent 61.2%);
   mask-image:none;
 }
-body[data-rtg-world="travel"] .os-switcher{background:rgba(5,5,5,.94);}
+body[data-rtg-world="travel"] .os-switcher{background:rgba(27,5,11,.92);}
 body[data-rtg-world="travel"] .reisapp{background:transparent;}
+/* DE 840 PIXELS UIT rtg-ui.css ZIJN HIER TE SMAL. Dit scherm is een werktafel
+   met twee kolommen (reis en klok) en een tegelrij eronder; op 840 valt die
+   opzet terug op een kolom en staat er links en rechts een halve pagina leeg.
+   WorkOS doet ditzelfde met een eigen breedte. */
+body.rtg-stijl[data-rtg-world="travel"] main{
+  max-width:none;
+  margin:0;
+  padding:0 0 5rem;
+}
 body[data-rtg-world="travel"] .prestatiekop{
-  border-color:var(--gold-rand);
-  background:rgba(12,12,11,.91);
+  border-color:var(--bordeaux-rand);
+  background:rgba(27,5,11,.86);
 }
 body[data-rtg-world="travel"] .prestatiekop>p{color:var(--op-onyx);}
-body[data-rtg-world="travel"] .rtgmerk{color:var(--gold-tekst);}
+body[data-rtg-world="travel"] .rtgmerk{color:var(--bordeaux-tekst);}
 body[data-rtg-world="travel"] .dagkop{
   position:relative;
-  padding:clamp(1rem,3vw,2rem) 0 clamp(2rem,4vw,3.4rem);
-  border-bottom:1px solid var(--onyx-rand);
+  border-bottom:1px solid var(--bordeaux-rand);
 }
 body[data-rtg-world="travel"] .dagkop::after{
   content:"03 / TRAVELOS";
   position:absolute;
   right:0;
   top:1.1rem;
-  color:var(--gold-tekst);
+  color:#E7DFDA;
   font-size:.58rem;
   font-weight:750;
   letter-spacing:.2em;
 }
 body[data-rtg-world="travel"] .bestemmingkop h1{
   color:var(--op-onyx);
-  font-size:clamp(5rem,20vw,12rem);
-  line-height:.76;
+  font-size:clamp(1.9rem,13cqi,9rem);
+  line-height:.82;
 }
 body[data-rtg-world="travel"] .vandaagraster{gap:1px;background:var(--onyx-rand);}
 body[data-rtg-world="travel"] .volgendblok{
-  border:0;
-  background:var(--bordeaux-glans);
+  border:1px solid var(--bordeaux-rand);
+  border-left:3px solid var(--bordeaux-hoog);
+  background:linear-gradient(150deg,rgba(127,22,52,.5),rgba(23,4,9,.7));
   color:var(--op-bordeaux);
 }
 body[data-rtg-world="travel"] .volgendblok::after{
@@ -484,36 +500,69 @@ body[data-rtg-world="travel"] .volgendblok .routekort,
 body[data-rtg-world="travel"] .volgendblok .vluchtregel{color:#EDE0DC;}
 body[data-rtg-world="travel"] .volgendblok .vluchtregel{border-color:var(--bordeaux-rand);}
 body[data-rtg-world="travel"] .reiscontext{
-  padding:clamp(1.2rem,3vw,2rem);
-  background:var(--pearl-glans);
-  color:var(--op-pearl);
+  padding:0;
+  background:transparent;
+  color:var(--op-bordeaux);
 }
-body[data-rtg-world="travel"] .reiscontext .padpunt{color:#34322F;}
-body[data-rtg-world="travel"] .reiscontext .padpunt small{color:#41403E;}
-body[data-rtg-world="travel"] .reiscontext .padlijn{background:var(--pearl-rand);}
+body[data-rtg-world="travel"] .reiscontext .padpunt{color:#E7D3D8;}
+body[data-rtg-world="travel"] .reiscontext .padpunt small{color:#C6A3AD;}
+body[data-rtg-world="travel"] .reiscontext .padlijn{background:rgba(244,240,233,.2);}
 body[data-rtg-world="travel"] .reiscontext .padlijn::after{background:var(--bordeaux-basis);}
-body[data-rtg-world="travel"] .reiscontext .padpunt i{background:var(--pearl-basis);}
-body[data-rtg-world="travel"] .statuslijst{border-color:var(--pearl-rand);}
+body[data-rtg-world="travel"] .reiscontext .padpunt i{background:#20060E;}
+body[data-rtg-world="travel"] .statuslijst{border-color:rgba(244,240,233,.12);}
 body[data-rtg-world="travel"] .statuslijst button{
-  border-color:var(--pearl-rand);
-  background:rgba(255,255,255,.28);
-  color:var(--op-pearl);
+  border-color:rgba(244,240,233,.1);
+  background:rgba(23,4,9,.55);
+  color:var(--op-bordeaux);
 }
-body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(255,255,255,.58);}
-body[data-rtg-world="travel"] .statuslijst small{color:#41403E;}
-body[data-rtg-world="travel"] .statuslijst strong{color:var(--bordeaux-basis);}
+body[data-rtg-world="travel"] .statuslijst button:hover{background:rgba(58,10,24,.66);}
+body[data-rtg-world="travel"] .statuslijst small{color:#C6A3AD;}
+/* De naam in de statuslijst is LOPENDE tekst en geen merk: op deze maat is
+   het bordeauxhoogsel 3,7:1 en dat is te weinig. Het merk zelf (.rtgmerk,
+   32px) houdt het accent -- daar geldt de grens van 3,0 wel. */
+body[data-rtg-world="travel"] .statuslijst strong{color:var(--rtg-leesgoud,#E7A8B8);}
 body[data-rtg-world="travel"] .actieknop{
   clip-path:none;
-  background:var(--gold-glans);
-  color:var(--op-gold);
+  background:linear-gradient(100deg,var(--bordeaux-hoog),var(--bordeaux-basis));
+  color:var(--op-bordeaux);
 }
 body[data-rtg-world="travel"] .hoofdtabs{
   border-color:var(--onyx-rand);
   background:rgba(5,5,5,.96);
 }
+body[data-rtg-world="travel"] .hoofdtabs button.actief svg{color:var(--bordeaux-tekst);}
 body[data-rtg-world="travel"] .hoofdtabs button.actief svg,
-body[data-rtg-world="travel"] .hoofdtabs button.actief{color:var(--gold-tekst);}
-body[data-rtg-world="travel"] .hoofdtabs button::after{background:var(--gold-basis);}
+body[data-rtg-world="travel"] .hoofdtabs button.actief{color:var(--op-onyx);}
+body[data-rtg-world="travel"] .hoofdtabs button::after{background:var(--bordeaux-hoog);}
+/* De nummers in de wereldbalk zijn 8px: te klein voor het bordeauxhoogsel
+   (3,78:1). Vorm mag bordeaux zijn, deze cijfers blijven ivoor. */
+body[data-rtg-world="travel"] .os-switcher__links a span{color:#E7DFDA;}
+/* De huisvelden en de volle huisknop komen uit rtg-ui.css met een grijs vlak en
+   een gouden knop. In deze wereld is het vlak fluweel; een grijze balk erin
+   leest als een gat, en een gouden knop is precies het goud dat hier weg moest. */
+body.rtg-stijl[data-rtg-world="travel"] .rahulsnel input,
+body.rtg-stijl[data-rtg-world="travel"] .rahulformulier input{
+  background:transparent;
+  border:0;
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-veld,
+body.rtg-stijl[data-rtg-world="travel"] textarea,
+body.rtg-stijl[data-rtg-world="travel"] select{
+  border-color:rgba(244,240,233,.14);
+  background:rgba(23,4,9,.5);
+  color:var(--op-bordeaux);
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-knop{
+  border-color:rgba(244,240,233,.2);
+  background:rgba(23,4,9,.45);
+  color:var(--op-bordeaux);
+}
+body.rtg-stijl[data-rtg-world="travel"] .rtg-knop.vol{
+  border-color:var(--bordeaux-hoog);
+  background:linear-gradient(100deg,var(--bordeaux-hoog),var(--bordeaux-basis));
+  color:var(--op-bordeaux);
+}
+body[data-rtg-world="travel"] .klokpaneel,
 body[data-rtg-world="travel"] .canvasband,
 body[data-rtg-world="travel"] .reisdiensten,
 body[data-rtg-world="travel"] .reisdiensten a,
@@ -521,9 +570,14 @@ body[data-rtg-world="travel"] .routevelden,
 body[data-rtg-world="travel"] .voertuig,
 body[data-rtg-world="travel"] .rahulsnel,
 body[data-rtg-world="travel"] .rahulformulier{
-  border-color:var(--onyx-rand);
-  background:var(--onyx-glans);
+  border-color:rgba(244,240,233,.1);
+  background:linear-gradient(168deg,rgba(23,4,9,.72),rgba(42,7,19,.5));
 }
+
+/* TWEE NAVIGATIES OVER HETZELFDE IS ER EEN TE VEEL. Draait de schil van het
+   huis (body.rtg-edge-host), dan zit het wisselen van wereld daar al in en
+   verdwijnt deze balk; zonder schil blijft hij staan zoals hij was. */
+body.rtg-edge-host .os-switcher{display:none;}
 
 /* --------------------------------------------------------- 04 FoundationOS */
 body[data-rtg-world="foundation"]{
@@ -668,8 +722,12 @@ body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
 
 @media(max-width:520px){
   .os-switcher__links a{font-size:.57rem;letter-spacing:.035em;}
-  body[data-rtg-world="travel"] .dagkop::after{position:static;display:block;margin-top:1rem;}
-  body[data-rtg-world="travel"] .bestemmingkop h1{font-size:clamp(4rem,22vw,6.2rem);}
+  /* Het bandje "03 / TRAVELOS" viel op een telefoon over de zin eronder; in een
+     kop die naast de klok staat is er geen ruimte voor. Het staat al in de balk. */
+  body[data-rtg-world="travel"] .dagkop::after{display:none;}
+  /* En de titel schaalt op de KOLOM, niet op het venster: 22vw was een maat uit
+     de tijd dat deze kop de volle breedte had. */
+  body[data-rtg-world="travel"] .bestemmingkop h1{font-size:clamp(1.7rem,15cqi,3.2rem);}
 }
 
 @media(prefers-reduced-motion:reduce){

@@ -556,6 +556,63 @@ aanziet.
 
 ---
 
+## 7b. Het gezelschap: de mensen rond één reis (31 augustus 2026)
+
+Een reis is zelden van één mens. Deze fase voegt daarom niet "sociaal" toe maar
+iets kleiners en preciezers: **de kring rond ÉÉN reis**. Niet een tijdlijn van al
+uw vrienden -- die woont in De Salon en in de vriendenlaag -- maar wie er bij
+deze reis hoort, wat hij ervan ziet, en wat u met hem deelt.
+
+**Twee rollen, en ze zien met opzet niet hetzelfde.** Een *reisgenoot* reist mee
+en ziet het draaiboek; een *meekijker* leeft mee en ziet de bestemming, de
+periode en wat u zelf deelt. Dat verschil is de hele module.
+
+**De poort is het product, niet het scherm.** `server/kern/reisgezelschap.js`
+draagt `zicht()`, en die werkt met een **witte lijst**: per rol staat
+opgeschreven welke velden meegaan. Een veld dat morgen aan een reisonderdeel
+wordt toegevoegd -- een stoelnummer, een adres, een prijs -- komt er dus niet
+vanzelf bij. Dat is de enige richting die veilig is: een zwarte lijst vergeet je
+één keer, en dan staat er een boekingsnummer op het scherm van iemands
+schoonmoeder. `test/reisgezelschap.test.js` handhaaft die tabel, en is met een
+mutatie nagerekend: draai de lijst om en er zakken drie toetsen.
+
+| van uw reis | u | reisgenoot | meekijker |
+|---|---|---|---|
+| bestemming, periode | ja | ja | ja |
+| draaiboek en tijden | ja | ja | nee |
+| boekingskenmerk, prijs, documenten | ja | nee | nee |
+| aankomstmoment | ja | ja | als u die schakelaar aan heeft |
+| wat u deelt (bericht, beeld) | ja | ja | ja |
+
+**Het aankomstmoment is een handeling en geen meting.** RTG heeft geen externe
+vluchtbron -- de reiswacht zegt dat zelf -- dus "uw vlucht is geland" zou hier
+verzonnen zijn. En met zo'n bron zou een stand die vanzelf doorloopt volgen
+worden. De reiziger drukt dus zelf op *ik ben aangekomen*. De schakelaar bepaalt
+niet of hij het mág melden maar wie het ziet.
+
+**Beeld is een verwijzing en geen tweede opslag.** Wat op de tijdlijn staat wijst
+naar een bestand in de kluis van de reiziger; de deellaag van die kluis regelt de
+toegang. Daarmee zijn drie dingen waar in plaats van beloofd: de bewaartermijn is
+die van de kluis, delen gebeurt per bestand en per persoon, en **intrekken werkt
+echt** -- wie uit het gezelschap gaat, verliest ook de beelden. Zonder die laatste
+stap raakt hij de tijdlijn kwijt en houdt hij de foto's, en dat is een halve
+waarheid.
+
+**Wat er bewust niet is** (par. 4 en LIFE.md par. 4 gelden hier onverkort):
+
+- **geen live locatie** -- u deelt een moment, geen stip die meeloopt. Het veld
+  bestaat niet, en een toets leest de broncode om dat zo te houden;
+- **geen cijfer op het leven tussen mensen** -- geen likes, geen teller wie het
+  meest kijkt, geen volgorde op betrokkenheid;
+- **niemand wordt in een gezelschap gezet** -- een uitnodiging staat op
+  `gevraagd` tot de ander hem zelf aanvaardt.
+
+Wat er nog niet is: de **reisregelaar** -- een reisgenoot die iets voor u mag
+klaarzetten dat u bevestigt. De rol staat in het ontwerp en niet in de code; dat
+staat hier zodat niemand hem voor gebouwd aanziet.
+
+---
+
 ## 8. Wat V1 minimaal moet zijn om "RTG" te mogen heten
 
 Niet de hele tabel uit de opdracht. Wel deze vijf, want zonder één ervan is het

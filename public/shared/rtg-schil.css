@@ -365,5 +365,5 @@ body[data-rtg-schil="standaard"] .rtg-tab[data-vangt]::after{
   border-radius:0;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
   color:var(--rtg-txt,#F4F0E9);}
 .rtg-voorstel button.vol{background:var(--rtg-goud,#C0A544);border-color:var(--rtg-goud,#C0A544);
-  color:#1C1608;font-weight:600;}
+  color:var(--rtg-opgoud,#1C1608);font-weight:600;}
 .rtg-voorstel button:hover{border-color:var(--gold-tekst,#C0A544);}

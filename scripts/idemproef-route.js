@@ -34,9 +34,16 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;   // 0 = alles
-/* KIJKEN NAAR EEN HANDVOL ROUTES, ZONDER HET REGISTER TE RAKEN. Een volle ronde
-   gaat over duizenden routes en duurt navenant; wie een keten wil nameten, moet
-   dat kunnen zonder een uur te wachten.
+/* KIJKEN NAAR EEN HANDVOL ROUTES, ZONDER HET REGISTER TE RAKEN.
+
+   LET OP WAT DIT WEL EN NIET SCHEELT. Hij slaat het METEN over van alles wat
+   niet op het pad past -- niet de WERELDOPBOUW, en dat is het dure deel:
+   zetWereldKlaar() maakt gezinnen, scholen, klassen, festivals, entiteiten en
+   een stad aan voordat er ook maar een route wordt beproefd, en die keten kun
+   je niet half draaien zonder de rest te laten stranden. Mijn eerste versie van
+   deze regel beloofde "zonder een uur te wachten"; de eerste gefilterde ronde
+   liep vervolgens over de dertig minuten heen. Dat stond hier verkeerd en staat
+   er nu goed: dit filter maakt de ronde korter, niet kort.
 
    En hij mag NIET wegschrijven. Een gefilterde ronde die IDEMPROEF.json
    overschrijft, laat het register zeggen dat er vier routes bestaan -- en alles

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T16:08:48.030Z",
-  "commit": "acfe1f97",
+  "op": "2026-08-31T19:40:30.629Z",
+  "commit": "afe61873",
   "boomVuil": false,
   "node": "v22.22.2"
  },
@@ -10,7 +10,7 @@
  "hoe": "npm test",
  "gemeten": {
   "bestanden": 1236,
-  "afsluitcode": 1,
-  "groen": false
+  "afsluitcode": 0,
+  "groen": true
  }
 }

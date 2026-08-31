@@ -98,3 +98,19 @@ test('5. de grens van de methode staat in de uitslag en niet in een commentaarre
   assert.ok(R.gemeten.dekkingPct < 50,
     'de dekking is opeens hoog -- controleer of de afleiding niet is gaan raden');
 });
+
+/* DE RATEL OP HERSTEL.json. Bevestigde paren mogen alleen MEER worden en
+   vermoede alleen minder -- dat is de aflosrichting van deze post in
+   BEWIJSSCHULD.json (`herstel-onbevestigd`, doel 0). Zakt dit, dan is er een
+   terugweg stukgegaan of is de proef minder gaan meten, en die twee wil je
+   allebei zien. */
+test('7. bevestigd groeit, vermoed krimpt', () => {
+  const grond = { bevestigd: 11, vermoed: 63 };
+  const vermoed = Object.values(R.per).filter(v => v.graad === 'vermoed').length;
+  assert.ok(R.bevestigd.length >= grond.bevestigd,
+    'bevestigde tegenhangers: ' + R.bevestigd.length + ' < ' + grond.bevestigd +
+    ' -- een terugweg die bewezen was is dat niet meer, of de proef meet minder');
+  assert.ok(vermoed <= grond.vermoed,
+    'vermoede tegenhangers: ' + vermoed + ' > ' + grond.vermoed +
+    ' -- deze post moet naar nul, dus hij mag niet groeien zonder dat iemand het ziet');
+});

@@ -451,10 +451,56 @@ function meet() {
       'zo vers als de laatste ronde; zie scripts/versheid.js.',
     telling: { posten: posten.length, meetwerk: som('meetwerk'),
       instrument: som('instrument'), grens: som('grens') },
+    /* DE AFLOSREGEL. Het doel is NUL, en dat staat hier en niet in een
+       commentaarregel: een lijst die alleen mag krimpen zonder te zeggen waar
+       hij heen krimpt, is een plek waar werk blijft liggen zolang het maar niet
+       groeit. Nul betekent hier: er staat niets meer onder `meetwerk` of
+       `instrument`, en wat overblijft is de rand van de methode.
+
+       Waarom geen harde poort op nul: die zou vanaf vandaag zakken en al het
+       andere werk blokkeren, en een poort die je uitzet bewaakt niets. Waarom
+       geen einddatum per post: die zou ik zelf verzinnen, en een afspraak die
+       niemand heeft gemaakt wordt de eerste keer stil verlengd. Wat er wel
+       staat, is dat de achterstand alleen nog omlaag kan en dat stilstand
+       opvalt. */
+    aflossing: {
+      doel: 0,
+      wat: 'de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en ' +
+        'sluit nooit -- dat is de rand van de methode en geen werk.',
+      staat: som('meetwerk') + som('instrument'),
+      regels: [
+        'de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)',
+        'een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` ' +
+          'verplaatsen laat de achterstand dalen zonder dat er iets gemeten is',
+        'een post die drie MEETDAGEN op hetzelfde getal staat, wordt gemeld als stilstaand -- ' +
+          'niet als fout, wel als iets dat een mens moet zien. Per dag en niet per aanroep, ' +
+          'anders gaat de melder af van het meten zelf',
+        'nul is bereikt als meetwerk en instrument allebei leeg zijn, en niet als de posten ' +
+          'zijn herbenoemd'
+      ]
+    },
     posten };
 }
 
-module.exports = { meet, POSTEN };
+/* Los van main(), want dit is het oordeel en niet de opmaak -- en een oordeel
+   dat alleen in een schrijfroutine woont, is niet te beproeven zonder het
+   register te schrijven. HISTORIE_DIEP staat hier zodat de melder en de toets
+   niet elk hun eigen drie hebben. */
+const HISTORIE_DIEP = 3;
+
+function stilstandUit(posten, historie) {
+  return (posten || [])
+    .filter(p => p.soort !== 'grens' && typeof p.aantal === 'number' && p.aantal > 0)
+    .filter(p => {
+      const r = (historie || {})[p.id] || [];
+      return r.length >= HISTORIE_DIEP && r.every(x => x.aantal === r[0].aantal);
+    })
+    .map(p => ({ id: p.id, aantal: p.aantal, meetdagen: HISTORIE_DIEP,
+      reden: 'staat ' + HISTORIE_DIEP + ' meetdagen op hetzelfde getal; de aflossing stokt hier. ' +
+        'Sluitweg: ' + p.sluit }));
+}
+
+module.exports = { meet, POSTEN, stilstandUit, HISTORIE_DIEP };
 
 if (require.main !== module) return;
 
@@ -471,7 +517,8 @@ for (const soort of ['meetwerk', 'instrument', 'grens']) {
   }
   console.log('');
 }
-console.log('  achterstand (meetwerk + instrument): ' + (uit.telling.meetwerk + uit.telling.instrument));
+console.log('  achterstand (meetwerk + instrument): ' + (uit.telling.meetwerk + uit.telling.instrument) +
+  '   -> DOEL 0');
 console.log('  rand van de methode (grens)        : ' + uit.telling.grens + '  -- sluit nooit, en dat is geen falen');
 
 if (VASTLEGGEN) {
@@ -499,6 +546,30 @@ if (VASTLEGGEN) {
     process.exitCode = 1;
     return;
   }
+  /* DE HISTORIE PER POST, drie rondes diep. Zij bestaat om een ding zichtbaar
+     te maken dat de ratel per definitie niet ziet: een post die niet groeit en
+     ook niet krimpt. Een lijst die alleen mag stijgen-noch-dalen is een lijst
+     waar werk blijft liggen zonder dat iemand het merkt, en dat is precies wat
+     "de achterstand gaat naar nul" onmogelijk maakt.
+
+     Drie rondes, en niet meer: dit is een melding voor een mens en geen
+     tijdreeks. Een post die opnieuw beweegt begint gewoon opnieuw.
+
+     EEN RONDE IS EEN DAG, GEEN AANROEP. De eerste versie telde runs, en toen ik
+     dit script drie keer achter elkaar draaide om de melder te beproeven, stond
+     de halve lijst "stil" -- inclusief een post die diezelfde middag van 67 naar
+     63 was gegaan. Een meter die afgaat van het meten zelf, meet het meten.
+     Daarom een regel per DATUM: dezelfde dag overschrijft, en pas drie
+     verschillende dagen zonder beweging is stilstand. */
+  const VANDAAG = new Date().toISOString().slice(0, 10);
+  const vorige = (oud && oud.historie) || {};
+  uit.historie = {};
+  for (const p of uit.posten) {
+    const was = (vorige[p.id] || []).filter(r => r && r.op !== VANDAAG);
+    uit.historie[p.id] = was.concat([{ op: VANDAAG, aantal: p.aantal }]).slice(-HISTORIE_DIEP);
+  }
+  uit.stilstaand = stilstandUit(uit.posten, uit.historie);
+
   if (oud && groeiArg && som(uit.telling) > som(oud.telling)) {
     uit.groei = (oud.groei || []).concat([{ op: new Date().toISOString().slice(0, 10),
       van: som(oud.telling), naar: som(uit.telling), reden: groeiArg }]);
@@ -507,6 +578,11 @@ if (VASTLEGGEN) {
   }
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\n  vastgelegd in BEWIJSSCHULD.json');
+  if (uit.stilstaand.length) {
+    console.log('\n  AFLOSSING STOKT -- ' + uit.stilstaand.length + ' post(en) staan ' +
+      HISTORIE_DIEP + ' rondes stil:');
+    for (const s2 of uit.stilstaand) console.log('    ' + String(s2.aantal).padStart(5) + '  ' + s2.id);
+  }
 }
 console.log('');
 process.exitCode = 0;

@@ -30,6 +30,17 @@ ambitie op een poster maar een mechanische afspraak:
   BEWIJSSCHULD.json (meetwerk + instrument). Groei kan alleen via
   `--groei="reden"` EN een handmatige normverhoging -- twee sloten, allebei
   met een naam eraan.
+- **En krimpen is niet hetzelfde als aflossen.** Een lijst die nooit stijgt en
+  nooit daalt haalt nul nooit -- de ratel ziet dat per definitie niet, want
+  stilstand is geen groei. BEWIJSSCHULD.json draagt daarom een veld
+  `aflossing`: **doel 0**, met wat nul betekent (meetwerk en instrument allebei
+  leeg, en niet: de posten herbenoemd) en met een melder die een post die drie
+  **meetdagen** op hetzelfde getal staat opschrijft als *de aflossing stokt
+  hier*, met zijn sluitweg erbij. Per dag en niet per aanroep: de eerste versie
+  telde runs, en toen viel de halve lijst stil van het meten zelf. Geen harde
+  poort op nul (die zakt vanaf dag een en wordt uitgezet, en dan bewaakt hij
+  niets) en geen zelfverzonnen einddatum per post (een afspraak die niemand
+  heeft gemaakt, wordt de eerste keer stil verlengd).
 - **Elke afwijking van 100% heeft een naam, een reden en een sluitweg.** Dat is
   BEWIJSSCHULD.json: elke post zegt wat hem zou sluiten. Een post zonder
   sluitweg is een klaagzang en komt er niet in.

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T14:18:59.560Z",
-  "commit": "2ae67c77",
+  "op": "2026-08-31T14:29:03.129Z",
+  "commit": "5036f5d4",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -12,6 +12,17 @@
   "meetwerk": 1065,
   "instrument": 932,
   "grens": 608
+ },
+ "aflossing": {
+  "doel": 0,
+  "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
+  "staat": 1997,
+  "regels": [
+   "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
+   "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
+   "een post die drie MEETDAGEN op hetzelfde getal staat, wordt gemeld als stilstaand -- niet als fout, wel als iets dat een mens moet zien. Per dag en niet per aanroep, anders gaat de melder af van het meten zelf",
+   "nul is bereikt als meetwerk en instrument allebei leeg zijn, en niet als de posten zijn herbenoemd"
+  ]
  },
  "posten": [
   {
@@ -159,6 +170,117 @@
    "sluit": "GEDAAN: alle instrumenten delen nu scripts/lib/wegwerpserver.js. De lib kreeg de opties die de laatste vier nodig hadden -- magSterven (keten/verraad saboteren de start), een eigen/hergebruikte datamap (hersteltijd herstart erop), nodeArgs (--expose-gc + gc-hook voor de geheugen-beproevingen), een vaste poort en readiness (ladder, beproeving, tot-crash). Een tiende kopie kan er niet meer bij zonder dat de teller het ziet."
   }
  ],
+ "historie": {
+  "auth-onbeslist": [
+   {
+    "op": "2026-08-31",
+    "aantal": 0
+   }
+  ],
+  "capability-in-handler": [
+   {
+    "op": "2026-08-31",
+    "aantal": 523
+   }
+  ],
+  "objectpoort": [
+   {
+    "op": "2026-08-31",
+    "aantal": 52
+   }
+  ],
+  "output-deuren": [
+   {
+    "op": "2026-08-31",
+    "aantal": 18
+   }
+  ],
+  "lichaamssleutel": [
+   {
+    "op": "2026-08-31",
+    "aantal": 63
+   }
+  ],
+  "output-niet-toerekenbaar": [
+   {
+    "op": "2026-08-31",
+    "aantal": 0
+   }
+  ],
+  "output-blind": [
+   {
+    "op": "2026-08-31",
+    "aantal": 0
+   }
+  ],
+  "output-onwaarneembaar": [
+   {
+    "op": "2026-08-31",
+    "aantal": 4
+   }
+  ],
+  "audit-wisselend": [
+   {
+    "op": "2026-08-31",
+    "aantal": null
+   }
+  ],
+  "audit-verklaard": [
+   {
+    "op": "2026-08-31",
+    "aantal": null
+   }
+  ],
+  "rollback-gezakt": [
+   {
+    "op": "2026-08-31",
+    "aantal": 0
+   }
+  ],
+  "object-vooraf": [
+   {
+    "op": "2026-08-31",
+    "aantal": 932
+   }
+  ],
+  "proefruis": [
+   {
+    "op": "2026-08-31",
+    "aantal": 1
+   }
+  ],
+  "gevolg-onbekend": [
+   {
+    "op": "2026-08-31",
+    "aantal": 94
+   }
+  ],
+  "droogloop-onbeoordeeld": [
+   {
+    "op": "2026-08-31",
+    "aantal": 2
+   }
+  ],
+  "herstel-onbevestigd": [
+   {
+    "op": "2026-08-31",
+    "aantal": 63
+   }
+  ],
+  "idem-ongeclassificeerd": [
+   {
+    "op": "2026-08-31",
+    "aantal": 849
+   }
+  ],
+  "wegwerpserver-kopieen": [
+   {
+    "op": "2026-08-31",
+    "aantal": 4
+   }
+  ]
+ },
+ "stilstaand": [],
  "groei": [
   {
    "op": "2026-08-18",

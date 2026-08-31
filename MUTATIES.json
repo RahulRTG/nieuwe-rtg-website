@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-31T07:20:06.653Z",
-    "commit": "07eb7c2c",
+    "op": "2026-08-31T14:34:33.256Z",
+    "commit": "5036f5d4",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -159,6 +159,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "ai-router.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ai/router.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "ai-uitwijk.test.js": {
       "soort": "puur",
@@ -645,6 +653,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/bewijsmatrix.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "bewijsschuld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsschuld.js",
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
@@ -1366,6 +1382,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "droogloop.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/droogloop.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 2
+    },
     "duels2.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1523,6 +1547,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "executionmap.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "facturatie.test.js": {
       "soort": "server",
@@ -1893,6 +1922,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "getallen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/getallen.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
     "gewoonten.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1907,6 +1944,14 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "gezagsnoemer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gezagsnoemer.js",
+      "operator": "===->!==#1",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "gezakte-toetsen.test.js": {
       "soort": "puur",
@@ -2080,6 +2125,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "overleefd"
+    },
+    "herstel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/herstel.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "herstel2fa.test.js": {
       "soort": "server",
@@ -4926,6 +4979,14 @@
       "gezakt": 1,
       "geprobeerd": 4
     },
+    "resolverbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/resolverbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "retail.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -6171,6 +6232,54 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 6
+    },
+    "stuur-gevolg.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/gevolg.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "stuur-mandaat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/mandaat.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 3
+    },
+    "stuur-niveaus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/beleid.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "stuur-plan.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/plan.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "stuur-resolver-taal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/resolver.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
+    "stuur-resolver.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/resolver.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "stuur.test.js": {
       "soort": "server",

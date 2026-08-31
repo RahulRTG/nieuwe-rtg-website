@@ -157,3 +157,23 @@ test('10. de vier besluiten van de eigenaar staan vast en zijn niet stilletjes t
   assert.equal(vind('server/kern/bureau/delegatie.js', 'autonoom').noemer, 'uitvoeren');
   assert.equal(TREDEN.length, 4, 'de noemer heeft geen vier treden meer, terwijl de eigenaar juist besloot hem op vier te houden');
 });
+
+/* DE RATEL OP GEZAGSNOEMER.json. De toetsen hierboven beproeven de BOUW; het
+   register zelf hing aan geen enkele ratel. Wat hier vastligt is de stand die
+   verdiend is: nul onbepaald en nul aangenomen. Een trede die terugvalt naar
+   "we nemen aan dat het dit betekent" is precies de vorm waar deze noemer
+   tegen bestaat, en dat mag niet stil gebeuren. */
+test('9. GEZAGSNOEMER.json zakt niet terug naar aannames', () => {
+  const b = path.join(WORTEL, 'GEZAGSNOEMER.json');
+  if (!fs.existsSync(b)) return;
+  const u = JSON.parse(fs.readFileSync(b, 'utf8'));
+  assert.equal(u.onbepaald.length, 0,
+    'er staat een ONBEPAALDE trede in het register; die zijn alle vier besloten en horen zo te blijven');
+  assert.equal(u.aangenomen.length, 0,
+    'er staat een AANGENOMEN trede in het register; aangenomen is geen grond, en de drie die er ' +
+    'stonden zijn met een besluit vervangen');
+  assert.ok(u.evident >= 18,
+    'minder evidente treden dan er waren (' + u.evident + ' < 18): een citaat dat niet meer ' +
+    'letterlijk in zijn bron staat, laat een trede zakken en dat hoort hier op te vallen');
+  assert.ok(u.tredenZonderSchaal.length === 0 || Array.isArray(u.tredenZonderSchaal));
+});

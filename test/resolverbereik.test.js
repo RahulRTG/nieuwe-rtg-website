@@ -58,3 +58,21 @@ test('4. en er is minstens een vorm waarin de resolver NIET het pad zelf terugkr
   assert.equal(R.vormen['mensenwoorden'].dekking, 100);
   assert.equal(R.vormen['typefout'].dekking, 100);
 });
+
+/* DE RATEL OP RESOLVERBEREIK.json. Deze toets bestond als bouwcontrole; wat er
+   ontbrak was een grondwaarde, en daardoor hing het register aan geen enkele
+   ratel (de norm noemt dat `metingenZonderRatel`). De dekking is het getal dat
+   telt: hij mag dalen noch stiekem kleiner gemeten worden. */
+test('9. de dekking van RESOLVERBEREIK.json zakt niet', () => {
+  const fs2 = require('fs');
+  const path2 = require('path');
+  const b = path2.join(__dirname, '..', 'RESOLVERBEREIK.json');
+  if (!fs2.existsSync(b)) return;
+  const u = JSON.parse(fs2.readFileSync(b, 'utf8'));
+  assert.ok(u.laagste >= 100,
+    'de dekking staat op ' + u.laagste + '%; hij stond op 100 en een gemiste capability is ' +
+    'precies de faalvorm waar deze meter voor bestaat');
+  assert.ok(u.paden >= 176,
+    'het corpus is kleiner geworden (' + u.paden + ' paden); een dekking van 100% over minder ' +
+    'paden is geen gelijke uitslag');
+});

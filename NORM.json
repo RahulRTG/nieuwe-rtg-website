@@ -42,7 +42,7 @@
     "delenZonderOnderwerp": 0,
     "beweringenZonderVulcontrole": 111,
     "bewijsCellenBewezen": 16475,
-    "bewijsAchterstand": 989,
+    "bewijsAchterstand": 1997,
     "schermenZonderVormtaal": 181,
     "dbDeuren": 507,
     "dbDeurenSchrijvend": 269
@@ -135,7 +135,7 @@
       "van": 426,
       "vervalt": "2026-11-30",
       "meter": "toetsenNietGemeten 426 -> 427",
-      "reden": "Drie nieuwe toetsen kwamen erbij (sprong.e2e.js, wereldrooster.e2e.js, sprongindex.test.js). Twee zijn alsnog door de mutatiemotor gehaald en zakken allebei op een liegende poort; de derde kan hij niet bereiken en meldt \u0027geen module gevonden\u0027, want die toets roept CLI-generatoren aan (scripts/sprongindex.js en broers) in plaats van een module te laden. Er is dus geen bron om te muteren. Dat hij kan zakken is wel aangetoond, alleen met de hand: een achterlopende handelingindex liet hem tijdens de bouw daadwerkelijk zakken. Aflossen betekent die generatoren een module-oppervlak geven, of de motor leren een CLI aan te roepen."
+      "reden": "Drie nieuwe toetsen kwamen erbij (sprong.e2e.js, wereldrooster.e2e.js, sprongindex.test.js). Twee zijn alsnog door de mutatiemotor gehaald en zakken allebei op een liegende poort; de derde kan hij niet bereiken en meldt 'geen module gevonden', want die toets roept CLI-generatoren aan (scripts/sprongindex.js en broers) in plaats van een module te laden. Er is dus geen bron om te muteren. Dat hij kan zakken is wel aangetoond, alleen met de hand: een achterlopende handelingindex liet hem tijdens de bouw daadwerkelijk zakken. Aflossen betekent die generatoren een module-oppervlak geven, of de motor leren een CLI aan te roepen."
     },
     {
       "datum": "2026-08-28",
@@ -1258,6 +1258,14 @@
       "waarheen": "testbestanden 982",
       "meter": "testbestanden 949 -> 982",
       "reden": "VIERDE EN LAATSTE VAN DEZELFDE FOUT: main stond strenger (982) dan deze tak (949) en bij het oplossen van de conflicten nam ik onze waarde. Een ratel mag alleen strakker, dus is de merge van twee latten de strengste van de twee -- niet 'de onze'. De samengevoegde boom telt 1169 toetsbestanden en staat er dus ruim boven. Gevonden doordat de vergelijking met main in CI hem als enige zonder reden aanwees; de andere drie (dekkingPct, e2eBestanden, browserpoortToetsen) waren al gezet."
+    },
+    {
+      "datum": "2026-08-31",
+      "meter": "bewijsAchterstand 989 -> 1997",
+      "soort": "structureel",
+      "sleutel": "bewijsAchterstand",
+      "waarheen": "BEWIJSSCHULD.json, veld `aflossing`: doel 0, met de aflosregels erbij",
+      "reden": "Nieuwe grondwaarde, en met opzet GEEN schuld-notitie met een vervaldatum. Dit is ONTDEKTE schuld en geen nieuwe: de uitvoeringslaag (EXECUTIE.md) kreeg vier eigen posten, alle vier afgeleid uit een register -- 849 muterende routes zonder uitspraak over wat een tweede keer betekent, 94 bereikbare capabilities waarvan nooit is gemeten wat zij veranderen, 63 tegenhangers die uit namen zijn afgeleid en nog niet zijn uitgevoerd, en 2 onbeoordeelde droogloopstappen. Die gaten bestonden al en stonden nergens; een nieuwe laag zonder schuldpost ziet er per ongeluk schuldenvrij uit. Terugkeren naar 989 zou betekenen dat we 1008 werkelijk bestaande gaten weer onzichtbaar maken, en dan bewaakt de ratel een leugen. Vanaf hier geldt de aflosregel in BEWIJSSCHULD.json: doel 0, de achterstand mag alleen omlaag, en een post die drie meetdagen stilstaat wordt gemeld."
     }
   ],
   "prestatie": {

@@ -129,3 +129,15 @@ test('8. de uitslag draagt zijn grenzen, en telt exact en compensatie nooit same
     'de uitslagen tellen niet op tot het aantal paren: er valt er een tussenuit');
   assert.ok(!('hersteld' in g), 'exact en compensatie mogen nooit tot een getal worden samengevoegd');
 });
+
+/* DE RATEL OP HERSTELPROEF.json. `exact` en `compensatie` worden nergens
+   samengeteld, dus staan er twee grondwaarden en niet een. */
+test('9. de bewezen paren worden niet minder', () => {
+  const b = path.join(__dirname, '..', 'HERSTELPROEF.json');
+  if (!fs.existsSync(b)) return;
+  const g = JSON.parse(fs.readFileSync(b, 'utf8')).gemeten;
+  assert.ok(g.exact >= 8, 'exact: ' + g.exact + ' < 8');
+  assert.ok(g.compensatie >= 3, 'compensatie: ' + g.compensatie + ' < 3');
+  assert.ok(g.nietBeproefd <= 63, 'niet beproefd: ' + g.nietBeproefd + ' > 63 -- de proef komt ' +
+    'bij minder paren binnen dan hij deed');
+});

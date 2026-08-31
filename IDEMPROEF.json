@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-08-31T10:39:33.314Z",
-  "commit": "460dcd8b",
-  "boomVuil": false,
+  "op": "2026-08-31T11:13:19.067Z",
+  "commit": "800f1a62",
+  "boomVuil": true,
   "node": "v22.22.2"
  },
  "uitleg": "Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de IJKING -- verschilt hij van de eerste, dan is het antwoord gevoelig voor een nieuwe oproep en pas dan betekent een gelijke herhaling iets. Een route die hier NIET in staat is niet beproefd. \"onbeschermd\" is een telling en geen defect-oordeel; zie de grens in scripts/lib/idemproef.js.",
@@ -44,10 +44,10 @@
  "routesGevonden": 4621,
  "gemeten": {
   "routesMetRol": 4620,
-  "beoordeeld": 1937,
-  "beschermd": 1936,
+  "beoordeeld": 1948,
+  "beschermd": 1947,
   "onbeschermd": 1,
-  "ongemeten": 2683,
+  "ongemeten": 2672,
   "oproepen": 13883,
   "tokensHernieuwd": 2,
   "uitOpslag": 4,
@@ -1472,12 +1472,9 @@
     "a": {
      "appstore": 1
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -1511,7 +1508,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze zaak hangt nog niet onder een organisatie. Een app in de officiele App Store heeft een aanspreekbare rechtspersoon achter zich; vraag RTG om je zaak aan je"
   },
@@ -2242,9 +2241,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -2748,7 +2745,9 @@
      "bankRekeningen": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -5052,9 +5051,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -5343,7 +5340,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: d9dd5a16-6b2b-4d66-90b9-1fc35548d267"
+   "blokkade": "Die regel bestaat niet: e728abc3-8022-4541-9996-545928d205f0"
   },
   {
    "methode": "POST",
@@ -5361,7 +5358,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: d9dd5a16-6b2b-4d66-90b9-1fc35548d267"
+   "blokkade": "Die regel bestaat niet: e728abc3-8022-4541-9996-545928d205f0"
   },
   {
    "methode": "POST",
@@ -5575,7 +5572,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Onbekende functie: d9dd5a16-6b2b-4d66-90b9-1fc35548d267"
+   "blokkade": "Onbekende functie: e728abc3-8022-4541-9996-545928d205f0"
   },
   {
    "methode": "POST",
@@ -5881,7 +5878,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -6366,7 +6365,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: d9dd5a16-6b2b-4d66-90b9-1fc35548d267"
+   "blokkade": "Dat runbook bestaat niet: e728abc3-8022-4541-9996-545928d205f0"
   },
   {
    "methode": "POST",
@@ -6719,7 +6718,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "commandAlarmen": "gewijzigd"
     },
     "b": {},
@@ -6906,9 +6904,12 @@
     "a": {
      "zandbakken": -1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -7546,9 +7547,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -9681,9 +9680,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -10060,9 +10062,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze code hoort niet bij een tafel die wij kennen."
   },
@@ -11742,12 +11742,9 @@
     "a": {
      "gewoonten": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -12260,9 +12257,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -12312,7 +12312,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -12589,7 +12591,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "officeDocs": "gewijzigd"
     },
     "b": {},
@@ -14802,7 +14803,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -14998,9 +15001,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16339,9 +16340,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -16841,9 +16840,12 @@
     "a": {
      "mediaBieb": 1
     },
-    "b": {},
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -16857,9 +16859,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -16878,7 +16878,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -18741,9 +18743,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -18832,9 +18832,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -19935,9 +19938,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -20224,9 +20225,7 @@
    ],
    "opslag": {
     "a": {
-     "magnaatWereld": 1,
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
+     "magnaatWereld": 1
     },
     "b": {},
     "c": {}
@@ -20571,9 +20570,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -20678,7 +20675,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -20770,7 +20769,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -21032,12 +21033,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -21087,7 +21085,10 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -21798,7 +21799,8 @@
     },
     "b": {},
     "c": {
-     "lifestyle": "gewijzigd"
+     "lifestyle": "gewijzigd",
+     "commandAlarmen": "gewijzigd"
     }
    }
   },
@@ -22117,9 +22119,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze reis staat niet in uw boek."
   },
@@ -22424,7 +22424,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Dit is (nog) geen wederzijdse match."
   },
@@ -22894,19 +22896,22 @@
    "methode": "POST",
    "pad": "/api/member/rtmail/concept/bewaar",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+    "c": {
+     "rtmailSchrijf": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -22924,25 +22929,26 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+   "blokkade": "Aan wie moet dit bericht?"
   },
   {
    "methode": "POST",
    "pad": "/api/member/rtmail/concept/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
+    200,
+    200,
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+   }
   },
   {
    "methode": "POST",
@@ -23083,9 +23089,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -23311,19 +23315,20 @@
    "methode": "POST",
    "pad": "/api/member/rtmail/regel/weg",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
+    200,
+    200,
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRegels": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze regel bestaat niet in dit postvak."
+   }
   },
   {
    "methode": "POST",
@@ -23510,20 +23515,19 @@
    "methode": "POST",
    "pad": "/api/member/rtmail/team/maak",
    "rol": "member",
-   "idempotentie": "beschermd",
-   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 400)",
    "statussen": [
-    200,
-    200,
+    400,
+    400,
     400
    ],
    "opslag": {
-    "a": {
-     "rtmailTeams": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
-   }
+   },
+   "blokkade": "Dit adres bestaat al."
   },
   {
    "methode": "POST",
@@ -23787,12 +23791,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -24186,7 +24187,9 @@
      "spellen": "gewijzigd"
     },
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -24272,7 +24275,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -25479,9 +25484,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -26021,6 +26024,7 @@
     },
     "b": {},
     "c": {
+     "kosten": "gewijzigd",
      "muziek": 1
     }
    }
@@ -26498,7 +26502,6 @@
    ],
    "opslag": {
     "a": {
-     "wacht": "gewijzigd",
      "noodkaarten": 1
     },
     "b": {},
@@ -27074,7 +27077,6 @@
     },
     "b": {},
     "c": {
-     "kosten": "gewijzigd",
      "atelier": "gewijzigd"
     }
    }
@@ -27661,7 +27663,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -27757,11 +27761,14 @@
     "a": {
      "bankregie": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {
      "bankregie": "gewijzigd"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -28547,12 +28554,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -29320,9 +29324,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -30561,6 +30563,7 @@
    "opslag": {
     "a": {
      "magnaatWereld": "gewijzigd",
+     "wacht": "gewijzigd",
      "mailQ": 2
     },
     "b": {},
@@ -32107,9 +32110,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -33059,9 +33060,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -33145,9 +33149,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -33302,7 +33304,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -35134,9 +35138,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -36421,7 +36423,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37184,7 +37188,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -37378,7 +37384,6 @@
    ],
    "opslag": {
     "a": {
-     "kosten": "gewijzigd",
      "ovRegie": "gewijzigd"
     },
     "b": {},
@@ -37896,9 +37901,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Bezwaar niet gevonden."
   },
@@ -38273,10 +38276,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -38692,9 +38692,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -38795,9 +38798,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -38817,9 +38818,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies een bron: aanslagen, bezwaren."
   },
@@ -39211,7 +39210,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze partnercode kennen we niet."
   },
@@ -39455,7 +39456,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -39884,7 +39888,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -39919,9 +39925,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -39974,7 +39978,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Geen open venster voor dit doel."
   },
@@ -40459,12 +40465,9 @@
     "a": {
      "reisInvoer": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -41361,11 +41364,11 @@
     400
    ],
    "opslag": {
-    "a": {},
-    "b": {},
-    "c": {
+    "a": {
      "kosten": "gewijzigd"
-    }
+    },
+    "b": {},
+    "c": {}
    },
    "blokkade": "Onbekend soort."
   },
@@ -41884,7 +41887,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -42812,9 +42817,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Deze bron bestaat niet."
   },
@@ -42904,7 +42907,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -43382,9 +43387,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -45147,7 +45150,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -46201,7 +46206,6 @@
     },
     "b": {},
     "c": {
-     "wacht": "gewijzigd",
      "ledenSites": "gewijzigd"
     }
    }
@@ -46432,9 +46436,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -46558,9 +46560,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -47464,9 +47469,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Onbekende raadpleging."
   },
@@ -47631,7 +47634,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Geef een geldig API-pad (begint met /api/, zonder query)."
   },
@@ -47682,7 +47687,9 @@
     503
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -48472,12 +48479,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -48679,9 +48683,7 @@
      "agendas": 1
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -48805,9 +48807,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -49965,8 +49970,7 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd",
-     "kosten": "gewijzigd"
+     "suppliers": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -50326,7 +50330,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -50380,7 +50386,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -50866,7 +50874,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc5af680f6f4f9"
+   "blokkade": "Die regel bestaat niet: docf9a31de6cc7c"
   },
   {
    "methode": "POST",
@@ -50884,7 +50892,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Die regel bestaat niet: doc5af680f6f4f9"
+   "blokkade": "Die regel bestaat niet: docf9a31de6cc7c"
   },
   {
    "methode": "POST",
@@ -51079,7 +51087,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dat runbook bestaat niet: doc5af680f6f4f9"
+   "blokkade": "Dat runbook bestaat niet: docf9a31de6cc7c"
   },
   {
    "methode": "POST",
@@ -51196,9 +51204,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -51431,9 +51437,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dit is geen content-creator-account."
   },
@@ -51811,7 +51815,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -52818,9 +52824,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Boeking niet gevonden."
   },
@@ -53206,10 +53210,15 @@
     200
    ],
    "opslag": {
-    "a": {},
-    "b": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
+    "b": {
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -53858,14 +53867,11 @@
     "a": {
      "horeca": "gewijzigd"
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "horeca": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -54041,11 +54047,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd",
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -54423,9 +54425,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -54512,9 +54517,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -55106,9 +55109,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -55528,9 +55529,13 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd",
+     "wacht": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -55691,7 +55696,10 @@
     409
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -56095,9 +56103,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -56277,7 +56283,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "commandAlarmen": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -56439,12 +56447,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -56769,6 +56774,7 @@
    ],
    "opslag": {
     "a": {
+     "kosten": "gewijzigd",
      "officeDocs": "gewijzigd"
     },
     "b": {},
@@ -57685,9 +57691,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -57956,11 +57960,13 @@
    ],
    "opslag": {
     "a": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "wacht": "gewijzigd"
     },
     "b": {},
     "c": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     }
    }
   },
@@ -58771,9 +58777,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -58989,9 +58993,7 @@
     503
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -59261,9 +59263,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -60124,12 +60129,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -60288,7 +60290,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -60306,9 +60310,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -60898,9 +60905,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -61136,9 +61141,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -61360,7 +61363,8 @@
     },
     "b": {},
     "c": {
-     "suppliers": "gewijzigd"
+     "suppliers": "gewijzigd",
+     "kosten": "gewijzigd"
     }
    }
   },
@@ -61893,19 +61897,24 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/antwoord",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmail": "gewijzigd",
+     "rtmailRegels": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit bericht bestaat niet."
+    "c": {
+     "rtmail": "gewijzigd",
+     "rtmailRegels": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -62003,19 +62012,18 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/bijlagen",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dat bericht bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -62038,19 +62046,22 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/concept/bewaar",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
-    "c": {}
-   },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+    "c": {
+     "rtmailSchrijf": "gewijzigd"
+    }
+   }
   },
   {
    "methode": "POST",
@@ -62068,25 +62079,26 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+   "blokkade": "Aan wie moet dit bericht?"
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/rtmail/concept/weg",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
+    200,
+    200,
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailSchrijf": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit concept bestaat niet in dit postvak."
+   }
   },
   {
    "methode": "POST",
@@ -62145,19 +62157,18 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/draad",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit bericht bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -62175,7 +62186,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit bericht bestaat niet."
+   "blokkade": "Geef een etiket op."
   },
   {
    "methode": "POST",
@@ -62206,9 +62217,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rtmailRecht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -62226,7 +62235,8 @@
    ],
    "opslag": {
     "a": {
-     "rtmailSchrijf": "gewijzigd"
+     "rtmailSchrijf": "gewijzigd",
+     "rtmailRecht": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -62236,19 +62246,18 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/hulp",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
     "a": {},
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit bericht bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -62335,11 +62344,11 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Geef een groothandel-code op."
   },
@@ -62372,7 +62381,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -62381,19 +62392,20 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/lees",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmail": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit bericht staat niet in dit postvak."
+   }
   },
   {
    "methode": "POST",
@@ -62469,19 +62481,20 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/regel/weg",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
+    200,
+    200,
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmailRegels": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Deze regel bestaat niet in dit postvak."
+   }
   },
   {
    "methode": "POST",
@@ -62534,25 +62547,26 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit bericht bestaat niet."
+   "blokkade": "Dat is geen tijdstip."
   },
   {
    "methode": "POST",
    "pad": "/api/supplier/rtmail/ster",
    "rol": "supplier",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 400)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    400,
-    400,
-    400
+    200,
+    200,
+    200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "rtmail": "gewijzigd"
+    },
     "b": {},
     "c": {}
-   },
-   "blokkade": "Dit bericht bestaat niet."
+   }
   },
   {
    "methode": "POST",
@@ -62622,7 +62636,7 @@
     "b": {},
     "c": {}
    },
-   "blokkade": "Dit bericht bestaat niet."
+   "blokkade": "Deze map bestaat niet."
   },
   {
    "methode": "POST",
@@ -63103,12 +63117,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -63356,11 +63367,11 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Onbekende medewerker."
   },
@@ -64326,7 +64337,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -64363,9 +64376,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -64403,7 +64414,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze klant staat niet in de onderhoudslijst."
   },
@@ -65121,9 +65134,7 @@
      "weddings": 1
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -65447,9 +65458,7 @@
      "suppliers": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -65533,7 +65542,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -66537,9 +66548,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kanaal niet gevonden."
   },
@@ -66626,7 +66635,9 @@
     403
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -66718,7 +66729,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -67315,12 +67328,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -67500,10 +67510,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Ticket niet gevonden."
   },
@@ -67627,12 +67634,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -67665,9 +67669,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -67932,12 +67939,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "commandAlarmen": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -68521,7 +68525,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Deze auto staat niet te koop."
   },
@@ -68610,9 +68616,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -68645,7 +68654,10 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    }
    }
   },
   {
@@ -68661,12 +68673,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -69094,9 +69103,12 @@
     "a": {
      "wallet": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "commandAlarmen": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in commandAlarmen, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -69397,9 +69409,7 @@
      "wereld": 1
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Je bent nog niet verbonden met Gouden Ibis."
   },
@@ -69547,7 +69557,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Deze vraag ken ik niet."
   },
@@ -69799,12 +69811,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -70585,7 +70594,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Dat voorstel kennen we niet."
   },
@@ -70690,9 +70701,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -70941,9 +70955,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Dat issue kennen we niet."
   },
@@ -71507,9 +71519,7 @@
      "werkruimtes": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -72396,7 +72406,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -73088,9 +73100,12 @@
     "a": {
      "foundation": "gewijzigd"
     },
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -73106,9 +73121,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -73291,9 +73304,7 @@
      "foundation": "gewijzigd"
     },
     "b": {},
-    "c": {
-     "wacht": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -73953,9 +73964,7 @@
     404
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -74049,9 +74058,12 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -74243,7 +74255,9 @@
     400
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -74818,9 +74832,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -74909,7 +74921,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -75000,9 +75014,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }
@@ -75682,9 +75694,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "kosten": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Die vestiging kennen we niet."
   },
@@ -75833,7 +75843,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    },
    "blokkade": "Noteer waarom de leerling wordt uitgeschreven (verhuizing, overstap, einde opleiding)."
   },
@@ -75925,7 +75937,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Een les wordt afgerond door een mens die bevestigt, niet vanzelf."
   },
@@ -76539,12 +76553,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -76578,7 +76589,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "kosten": "gewijzigd"
+    }
    }
   },
   {
@@ -76629,12 +76642,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -77313,9 +77323,7 @@
     400
    ],
    "opslag": {
-    "a": {
-     "kosten": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -77369,7 +77377,9 @@
     200
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "kosten": "gewijzigd"
+    },
     "b": {},
     "c": {}
    }
@@ -77479,7 +77489,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    }
   },
   {
@@ -78203,7 +78215,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "kosten": "gewijzigd"
+    },
     "c": {}
    },
    "blokkade": "Dit verzoek kennen we niet."
@@ -78255,12 +78269,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -78398,8 +78409,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "wacht": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {
@@ -78513,10 +78523,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "betaalOpdrachten": "gewijzigd",
-     "capGezondheid": "gewijzigd"
-    }
+    "c": {}
    }
   },
   {
@@ -78929,9 +78936,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "commandAlarmen": "gewijzigd"
-    }
+    "c": {}
    },
    "blokkade": "Kies concept, beoordeling, goedgekeurd of archief."
   },
@@ -79059,6 +79064,7 @@
    ],
    "opslag": {
     "a": {
+     "wacht": "gewijzigd",
      "officeDocs": "gewijzigd"
     },
     "b": {},
@@ -79184,7 +79190,10 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "betaalOpdrachten": "gewijzigd",
+     "capGezondheid": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -79601,7 +79610,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "commandAlarmen": "gewijzigd"
+    }
    },
    "blokkade": "Deze leersessie bestaat niet (meer)."
   },
@@ -80263,12 +80274,9 @@
      "contactPins": 2,
      "contactPinSecurity": 2
     },
-    "b": {
-     "wacht": "gewijzigd"
-    },
+    "b": {},
     "c": {}
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in wacht, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -80812,7 +80820,9 @@
     404
    ],
    "opslag": {
-    "a": {},
+    "a": {
+     "wacht": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -81819,8 +81829,7 @@
    ],
    "opslag": {
     "a": {
-     "foundation": "gewijzigd",
-     "wacht": "gewijzigd"
+     "foundation": "gewijzigd"
     },
     "b": {},
     "c": {}
@@ -82180,6 +82189,7 @@
     },
     "b": {},
     "c": {
+     "kosten": "gewijzigd",
      "architect": "gewijzigd"
     }
    }
@@ -82216,14 +82226,11 @@
     "a": {
      "architect": "gewijzigd"
     },
-    "b": {
-     "kosten": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "architect": "gewijzigd"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in kosten, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -82256,7 +82263,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "wacht": "gewijzigd"
+    }
    },
    "blokkade": "Concept niet gevonden."
   },
@@ -83498,9 +83507,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "wacht": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    }

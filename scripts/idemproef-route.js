@@ -360,6 +360,13 @@ wachtOpSchoneBoom();
   console.log('  spelwereld                           : ' + (spelWereld.klaar ? 'klaar   (' + spelWereld.extra.soort + ')' : 'NIET klaar -- ' + spelWereld.reden));
   for (const st of spelWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
+  /* DE POSTBUSWERELD -- ./lib/wereld-rtmail.js. Vier dingen (bericht, team,
+     concept, regel) over TWEE domeinen die dezelfde postbus zijn. */
+  const { zetRtmailKlaar, lijfVoor: rtmailLijf } = require('./lib/wereld-rtmail');
+  const rtmailWereld = await zetRtmailKlaar({ post, tokens });
+  console.log('  postbuswereld                        : ' + (rtmailWereld.klaar ? 'klaar' : 'NIET klaar -- ' + rtmailWereld.reden));
+  for (const st of rtmailWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
+
   const { oogstObjecten, metAchtervoegsels } = require('./lib/objectoogst');
   const rtfWereld = require('./lib/wereld-rtf');
   const objecten = await oogstObjecten({
@@ -375,7 +382,8 @@ wachtOpSchoneBoom();
       ...(lijfsleutels.lijfVoor(r.pad) || {}),
       /* NA de familie: die levert het token van de BEHEERDER, en een deel van
          /api/rtf/ hoort bij het kind. Zie ./lib/wereld-rtf.js. */
-      ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}) }),
+      ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
+      ...rtmailLijf(rtmailWereld.extra, r.pad) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
@@ -473,6 +481,7 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/rtf/spel/') ? { ...(spelWereld.extra.rtf || {}), ...spelWereld.idVoor(r.pad) } : {}),
       ...(lijfsleutels.lijfVoor(r.pad) || {}),
       ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
+      ...rtmailLijf(rtmailWereld.extra, r.pad),
       ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag

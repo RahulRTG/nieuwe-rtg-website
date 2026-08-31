@@ -85,6 +85,10 @@ module.exports = function maakEtalage(kern) {
       prijsCenten: prijsVan(v),
       gekocht: prijsVan(v) > 0 ? heeftGekocht(key, a.sleutel) : true,
       geinstalleerd: !!verleend,
+      /* TIJDELIJK OF BLIJVEND. `tot` is null bij blijvend, en dat is een keuze
+         en geen ontbrekende waarde -- de meeste apps zijn blijvend. */
+      tot: verleend && verleend.tot ? verleend.tot : null,
+      verlopen: require('./tijdelijk').isVerlopen(verleend && verleend.tot, kern.nu()),
       verleend: verleend ? toonbaar(verleend.machtigingen, verleend.doelen) : [],
       /* HOE VER DEZE APP KOMT, in een woord. Twee keer dezelfde rekensom over
          twee verschillende vragen: wat het manifest VRAAGT, en wat dit lid
@@ -97,6 +101,11 @@ module.exports = function maakEtalage(kern) {
          manifest vraagt -- ook bij een app die dit lid al heeft. Wat hij
          werkelijk gaf staat hierboven in `verleend` en in `verleendBereik`. */
       paspoort: paspoort({ app: a, versie: v, uitgever: u, verleend: null }),
+      /* Of deze app een eigen bord heeft. Het staat op de kaart omdat de winkel
+         erop indeelt (./universa.js) en omdat een lid het hoort te zien voordat
+         hij iets verleent -- een ranglijst is het enige in dit kanaal waarbij
+         een ander lid iets van hem ziet. */
+      arena: v.manifest.arena ? { richting: v.manifest.arena.richting, eenheid: v.manifest.arena.eenheid } : null,
       /* WAT DEZE UPDATE MEER VRAAGT DAN JE HEBT GEGEVEN. Zonder dit kan een app
          stilletjes groeien in bevoegdheden: een nieuwe versie zet een machtiging
          in zijn manifest en niemand die het ziet. Hij wordt hier UITGEREKEND en
@@ -117,8 +126,17 @@ module.exports = function maakEtalage(kern) {
     alles.sort((x, y) => (x.naam.toLowerCase() < y.naam.toLowerCase() ? -1 : 1));
     const p = Math.max(1, Math.min(1000, Number(pagina) || 1));
     const n = Math.max(1, Math.min(48, Number(per) || 24));
-    return { items: alles.slice((p - 1) * n, (p - 1) * n + n), totaal: alles.length, pagina: p,
-      paginas: Math.max(1, Math.ceil(alles.length / n)) };
+    const bladzijde = alles.slice((p - 1) * n, (p - 1) * n + n);
+    return { items: bladzijde, totaal: alles.length, pagina: p,
+      paginas: Math.max(1, Math.ceil(alles.length / n)),
+      /* DE AFDELINGEN VAN DEZE BLADZIJDE, afgeleid en niet ingevuld
+         (./universa.js). Ze gaan mee met de catalogus zodat het scherm niet zelf
+         hoeft te raden waar een app hoort -- en zodat er maar EEN plek is waar
+         die indeling wordt bepaald. Bij zoeken of filteren blijft de indeling
+         gewoon werken: hij zegt dan wat er in dit RESULTAAT zit. */
+      universa: require('./universa').indeel(bladzijde).map(u => ({
+        sleutel: u.sleutel, naam: u.naam, uitleg: u.uitleg, aantal: u.aantal,
+        apps: u.apps.map(a => a.sleutel) })) };
   }
 
   /* Mijn apps. Een ingetrokken of geschorste app valt hier VANZELF weg: er wordt

@@ -241,6 +241,14 @@ async function open(){
   catch (e) { $('#naam').textContent = 'Niet beschikbaar'; return toon(e.message); }
   STAND = d;
   $('#naam').textContent = d.naam;
+  /* EN DE KOPIE IN DE SCHILBALK. De iOS-schil (/shared/ios.js) neemt de TEKST
+     van de h1 over in zijn eigen balk op het moment dat de pagina laadt -- en
+     op dat moment staat er "Bezig met openen...", want de naam komt pas terug
+     van /api/appstore/open. Zonder deze regel blijft die tekst staan terwijl de
+     app er al draait. Een kop die iets anders zegt dan het scherm eronder, is
+     een scherm dat kapot lijkt. */
+  const kopie = document.querySelector('.ios-nav-titel');
+  if (kopie) kopie.textContent = d.naam;
   /* DE CEL KRIJGT ZIJN NAAM VAN DE SERVER. Hij wordt daar afgeleid uit het lid
      en de app (kern/appstore/uitgifte.js, celnaam); hier wordt hij alleen
      getoond. Een naam die het scherm zelf verzint, is een naam die op twee

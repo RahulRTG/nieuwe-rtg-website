@@ -34,8 +34,9 @@ bijna nergens de meting en bijna overal de PRESENTATIE.
 | celkader met celnaam en kanaalfeiten | **staat sinds vandaag** | `uitgifte.js` (`celnaam`), `public/apps/appcel.html` |
 | softwarepaspoort op de winkelkaart | **staat sinds vandaag** | `kern/appstore/paspoort.js`, getoond in `mall.html` |
 | "krijgt niets anders" onder de vinkjes | **staat sinds vandaag** | `mall.html`, storeKaart |
-| drie universa (Essentials, Play, Makers) | **een stap weg** | de categorieen bestaan; dit is een indeling erover |
-| tijdelijke cel (voor deze reis) | **een stap weg** | intrekken bestaat, "vernietig het potje" is één handeling erbij |
+| drie universa (Essentials, Play, Makers) | **staat** | `kern/appstore/universa.js`, afgeleid uit uitgever en arena -- geen manifestveld |
+| spellen met een eigen arena | **staat** | `kern/appstore/arena.js`; Sudoku, Tetris en Sneek staan in `storeapps/` |
+| tijdelijke cel (voor deze reis) | **staat** | `kern/appstore/tijdelijk.js` + `opruim.js`: einddatum van het LID, en "vernietig de cel" zegt wat er verdwijnt |
 | Foundry-meters tijdens het bouwen | **een stap weg** | de proefkeuring geeft de getallen al terug (`versies.js`, `proef`) |
 | INSTANT-label | **een besluit** | alleen als het GEMETEN is, zoals `scripts/tikken.js` — nooit als claim |
 | minimum context invocation | **een besluit** | de scherpste vraag van het hele voorstel; par. 3 |
@@ -125,6 +126,29 @@ opgeleverd:
 2. **Een app hoeft zijn eigen naam niet te dragen.** De cel noemt de app, de
    uitgever en de versie al; de bundel deed het nog eens, en dat kostte op een
    telefoon een schermhoogte. Een app in een cel begint bij zijn eerste handeling.
+
+## 3b. De arena per game, en wat die kostte
+
+Besloten: storeversies van spellen bewaren wel degelijk een score, met de
+bestaande 18+-progressie erachter. Dat is de eerste keer dat er via de brug iets
+naar buiten gaat dat een ANDER lid ziet, en dat vroeg drie dingen:
+
+1. **Een bord per app, nooit dat van het huis.** Een derde stuurt het getal in;
+   een gedeelde ranglijst zou daarmee zo betrouwbaar zijn als de minst
+   betrouwbare app erin. Een app die verdwijnt, neemt zijn bord mee.
+2. **De 18+-poort wordt doorgegeven, niet nagebouwd.** `kern/spellen/grens.js`
+   stond alleen in de spellenlaag; hij is nu een eigenschap van de kern
+   (`kern.volwassen`), want twee leeftijdsregels in een huis is er een te veel.
+   Een vers geregistreerd lid haalt hem NIET -- dat is de standaard, en
+   `test/appstore-arena.test.js` toets 1 zakt zodra dat verandert.
+3. **De richting staat in het manifest.** Wint de hoogste of de laagste? Zou een
+   app dat per aanroep meesturen, dan draait hij het bord om zodra hij verliest.
+   Nu gaat het door de keuring en tekent een mens het af.
+
+Wat er eerlijk bij hoort: de score van een spel in een cel is een **bewering van
+die app**, geen meting van RTG. De Sudoku van het huis rekent op de server juist
+om die reden -- en in een cel kan dat niet, want een cel heeft geen netwerk. Het
+staat in de kop van elke bundel, zodat niemand het later voor bewijs aanziet.
 
 ## 4. Wat er bewust niet komt
 

@@ -214,6 +214,18 @@ Er zijn er **drie**, en alle drie worden ze uitgevoerd:
 | `profiel.basis` | codenaam, taal, pas | naam, e-mail, telefoon, adres, geboortedatum |
 | `opslag.eigen` | een kladblok per app per lid (32 sleutels, 64 kB) | inzage in een andere app of in de rest van je gegevens |
 | `bericht.klaarzetten` | hooguit vijf berichten per dag in het eigen bakje | push, e-mail, sms, of iets dat onderbreekt |
+| `arena.meedoen` | je score op het bord van DEZE app, met je codenaam | een plek in de ranglijsten van RTG zelf, en iets over leden die deze app niet spelen |
+
+**De vierde machtiging is er sinds 31 augustus 2026, en hij is de eerste waarbij
+een ander lid iets van je ziet.** Daarom drie dingen die niet mogen sneuvelen: het
+bord hoort bij EEN app en nooit bij de ranglijsten van het huis (een derde stuurt
+het getal in, en dan is een gedeelde ranglijst zo betrouwbaar als de minst
+betrouwbare app erin); de leeftijdsgrens is dezelfde als die van de spellen
+(`kern/spellen/grens.js`, doorgegeven en niet nagebouwd), en onder die grens is
+het antwoord GEEN fout maar `bewaard: false` met de reden -- het spel speelt door;
+en op het bord staat alleen wie er zelf, in deze app, een score heeft ingestuurd.
+De richting (wint hoog of laag?) staat in het MANIFEST en niet in de aanroep,
+anders draait een app het bord om zodra hij verliest.
 
 Wat een app **niet** kan vragen staat met de reden in
 `machtigingen.NIET_GEBOUWD` — betalen, agenda, bestanden, locatie, contacten,
@@ -268,6 +280,11 @@ server/kern/appstore/
   machtigingen.js de drie machtigingen, en wat er niet is met de reden
   bereik.js       hoe ver een app komt: vier klassen, GEREKEND uit de machtigingen
   paspoort.js     het softwarepaspoort: vaste rijen, en een reden waar geen waarde is
+  arena.js        het bord van EEN app, met de 18+-poort van kern/spellen/grens.js
+  universa.js     de drie afdelingen van de winkel, afgeleid uit uitgever en arena
+  tijdelijk.js    een cel met een einddatum die het LID koos
+  opruim.js       verwijderen, wissen en de cel vernietigen -- wat een lid terugneemt
+  manifestvorm.js welke velden een manifest kent en hoe ze eruitzien
   geld.js         de afdracht en de rekensom (de bon)
   aanschaf.js     de koop zelf, en de omzet die een uitgever terugziet
   teruggave.js    het recht dat een ingetrokken, gekochte app achterlaat
@@ -290,6 +307,8 @@ public/apps/
 
 test/appstore.test.js      de zes grenzen over de lijn
 test/appstore-bereik.test.js   de bereikklasse, en dat hij nergens te ZETTEN is
+test/appstore-arena.test.js    het bord per app, en de leeftijdsgrens erachter
+test/appstore-tijdelijk.test.js  de einddatum, en het verschil tussen weg en vernietigd
 test/appstore-eersteapps.test.js  de eigen bundels in storeapps/ door dezelfde poort
 
 storeapps/                 de eerste apps van RTG zelf, als gewone inzending

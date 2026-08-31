@@ -43,6 +43,14 @@ Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DAT
 kern.magnaatLeren = require('../kern/spellen/magnaat/leerkring')({ db, save, crypto });
 /* Spellen (kern/spellen.js): het spelplatform op de vriendenlaag; RTF- en
    RTG-leden spelen tegen elkaar. */
+/* DE 18+-POORT KOMT OP DE KERN EN NIET ALLEEN IN DE SPELLENLAAG. Hij stond
+   hieronder als argument van kern/spellen en nergens anders, en toen de App
+   Store dezelfde grens nodig had (kern/appstore/arena.js: een score van een app
+   van derden) was hij niet te bereiken zonder hem opnieuw te maken. Een tweede
+   leeftijdsregel in een huis is er een te veel (LAT-regel 4), dus staat hij nu
+   op de kern -- een regel die bepaalt wat er van iemand bewaard blijft, hoort
+   vindbaar te zijn onder een naam. */
+kern.volwassen = maakVolwassen({ accounts: hulp.accounts });
 Object.assign(kern, require('../kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
@@ -57,7 +65,7 @@ Object.assign(kern, require('../kern/spellen')({
   /* De 18+-poort staat in kern/volwassen.js: een eigen account, door RTG
      gekeurd (A3) en 18 of ouder. Daar staat ook waarom die keuring er eerst
      niet in zat en wat dat gat betekende. */
-  volwassen: maakVolwassen({ accounts: hulp.accounts })
+  volwassen: kern.volwassen
 }));
 /* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
    ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in

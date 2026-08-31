@@ -44,7 +44,12 @@ const KLASSEN = [
   { sleutel: 'met-identiteit', rang: 2, label: 'Kent uw codenaam',
     betekent: 'Deze app leest uw codenaam, uw taal en uw pas. Uw echte naam kan er niet uit komen.' },
   { sleutel: 'met-bakje', rang: 3, label: 'Kan een bericht klaarzetten',
-    betekent: 'Deze app kan een bericht voor u neerleggen in de App Store. Zij kan u niet onderbreken: geen push, geen e-mail, geen sms.' }
+    betekent: 'Deze app kan een bericht voor u neerleggen in de App Store. Zij kan u niet onderbreken: geen push, geen e-mail, geen sms.' },
+  /* De zwaarste, en niet omdat er meer uit gaat maar omdat er iets van u bij
+     een ANDER terechtkomt: uw codenaam staat op het bord van deze app. Alles
+     eronder blijft tussen u en de app. */
+  { sleutel: 'op-een-bord', rang: 4, label: 'Uw codenaam op een ranglijst',
+    betekent: 'Andere spelers van deze app zien uw codenaam en uw score op het bord van deze app. Alleen van deze app, en alleen als u zelf een score instuurt.' }
 ];
 
 const OP_SLEUTEL = new Map(KLASSEN.map(k => [k.sleutel, k]));
@@ -57,7 +62,8 @@ const OP_SLEUTEL = new Map(KLASSEN.map(k => [k.sleutel, k]));
 const KLASSE_VAN_MACHTIGING = {
   'opslag.eigen': 'eigen-potje',
   'profiel.basis': 'met-identiteit',
-  'bericht.klaarzetten': 'met-bakje'
+  'bericht.klaarzetten': 'met-bakje',
+  'arena.meedoen': 'op-een-bord'
 };
 const ZWAARSTE = KLASSEN[KLASSEN.length - 1].sleutel;
 

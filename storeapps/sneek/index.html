@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sneek</title>
+<link href="stijl.css" rel="stylesheet">
+</head>
+<body>
+<div class="stand"><span>score <b id="score">0</b></span><span>lengte <b id="lengte">3</b></span><span>beste <b id="beste">–</b></span></div>
+<canvas id="bord2d" width="425" height="425" aria-label="Speelveld"></canvas>
+<div class="rij">
+  <button id="start" class="aan" type="button">Start</button>
+  <button data-r="op" type="button" aria-label="Omhoog">&#8593;</button>
+  <button data-r="links" type="button" aria-label="Naar links">&#8592;</button>
+  <button data-r="neer" type="button" aria-label="Omlaag">&#8595;</button>
+  <button data-r="rechts" type="button" aria-label="Naar rechts">&#8594;</button>
+</div>
+<p class="melding" id="uitleg">Pijltjestoetsen, de knoppen of vegen over het veld.</p>
+<div class="bord" id="bord"></div>
+<script src="app.js"></script>
+</body>
+</html>

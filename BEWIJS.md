@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1415 bestanden en 9928 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1417 bestanden en 9948 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1415 |
-| losse beweringen (`test(...)`) | 9928 |
+| toetsbestanden | 1417 |
+| losse beweringen (`test(...)`) | 9948 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 116 |
-| niets van beide | 279 |
+| niets van beide | 281 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1238 bestanden, 9624 beweringen.
+1240 bestanden, 9644 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -79,14 +79,16 @@ toets omvalt.
 | `api-contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracttests: leggen de VORM (velden + types) van de belangrijkste API- antwoorden vast, los van de flow-tests. Zo kan een refactor of herindeling niet stilletjes een veld weglaten waar een van de apps op leunt (bijv. |
 | `apipoort.test.js` | 9 | gezakt op `===->!==#0` | De API-poort (kern/command/apipoort.js): sleutels, scopes, quota en contractregels voor koppelingen. WAT DEZE TOETS VOORAL BEWAAKT zijn vier dingen die allemaal onzichtbaar kapot kunnen gaan: 1. |
 | `appbieb.test.js` | 5 | gezakt op `liegpoort /api/` | De App-Bibliotheek: de ECHTE RTG-apps van het ecosysteem (geen verzonnen namen meer). Elke tegel opent een bestaande pagina; installeren zet hem op je startscherm. |
+| `appstore-arena.test.js` | 10 | -- | DE ARENA VAN EEN APP -- een bord per app, met de 18+-poort van het huis. Wat deze toets vastlegt: 1. |
 | `appstore-bereik.test.js` | 5 | -- | HET BEREIK VAN EEN APP -- de klasse die wordt GEREKEND en nooit gezet. Een keurmerk is de duurste vorm van LAT-regel 6: een lid dat "zonder bereik" leest, gedraagt zich ernaar. |
 | `appstore-cel.test.js` | 11 | -- | DE CEL EN DE POORT, zonder server: de invarianten die je aan de code zelf kunt zien. Ze staan apart van test/appstore.test.js omdat ze in milliseconden draaien en omdat ze iets ANDERS bewaken: daar gaat het om wat er... |
 | `appstore-doel.test.js` | 8 | -- | HET DOEL BIJ EEN MACHTIGING, EN DE VERGUNNINGSDIFF. Een machtiging zegt WAT een app krijgt; het doel zegt WAARVOOR. |
 | `appstore-dossier.test.js` | 9 | -- | HET INKOOPDOSSIER, DE TIJDLIJN EN DE CONTROLERONDE -- de enterprise-kant. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
-| `appstore-eersteapps.test.js` | 2 | -- | DE EERSTE APPS VAN RTG ZELF -- komen ze door hun eigen poort? Deze bundels staan in storeapps/ en zijn bedoeld om de App Store te vullen. |
+| `appstore-eersteapps.test.js` | 5 | -- | DE EERSTE APPS VAN RTG ZELF -- komen ze door hun eigen poort? Deze bundels staan in storeapps/ en zijn bedoeld om de App Store te vullen. |
 | `appstore-geld.test.js` | 9 | -- | DE BETAALDE KANT VAN DE APP STORE -- de bon, de aanschaf, de afdracht, de btw en het teruggaverecht. Wat deze toets vastlegt, en waarom elk punt er staat: 1. |
 | `appstore-meting.test.js` | 10 | genoemd | CIJFERS OVER EEN APP -- en of er werkelijk geen mens in zit. Besloten op 27 augustus 2026: privacyarme tellingen per dag. |
 | `appstore-persoon.test.js` | 12 | -- | DE GEVERIFIEERDE PERSOON ALS UITGEVER -- en de grens die eraan hangt. Besloten op 27 augustus 2026: een geverifieerd persoon mag publiceren, maar alleen GRATIS. |
+| `appstore-tijdelijk.test.js` | 7 | -- | EEN TIJDELIJKE CEL -- een app die er staat tot een datum die het LID koos. Wat deze toets vastlegt: 1. |
 | `appstore-toegankelijk.test.js` | 12 | -- | DE TOEGANKELIJKHEIDSPOORT -- houdt hij werkelijk tegen? Besloten op 27 augustus 2026: de keuring blokkeert vanaf nu alles, ook een update van een app die vandaag live is. |
 | `appstore.test.js` | 16 | -- | DE RTG APP STORE -- het derdenkanaal, van aanvraag tot cel. Deze toets legt de zes grenzen uit kern/appstore/index.js vast. |
 | `appwereldcatalogus.test.js` | 6 | -- | DE VIER MEGA-APPS BEGINNEN BIJ EIGENAARSCHAP, NIET BIJ VORM. Iedere bediende app-route hoort precies één keer bij LIFE, WORK, FOUNDATION of INSTELLINGEN. |

@@ -52,6 +52,15 @@ function maakUitgifte(kern, E) {
     if (!v || v.status !== 'gepubliceerd') return { status: 404, error: 'Deze app is niet (meer) beschikbaar.' };
     const verleend = verleendeVan(key, sleutel);
     if (!verleend) return { status: 403, error: 'Zet deze app eerst in de App Store op je startscherm; dan kies je ook wat hij mag.' };
+    /* EEN TIJDELIJKE CEL DIE VERLOPEN IS, GAAT NIET MEER OPEN -- en hij wordt
+       ook niet stilletjes opgeruimd. Wat de app voor dit lid bewaarde staat er
+       nog, want dat is zijn inhoud (grens 5); pas "vernietig de cel" haalt het
+       weg. Het antwoord zegt daarom allebei: dat hij verlopen is, en dat er nog
+       iets staat. */
+    if (require('./tijdelijk').isVerlopen(verleend.tot, kern.nu())) {
+      return { status: 403, error: 'Deze app stond er tot en met ' + verleend.tot + '. Zet hem opnieuw op je startscherm om verder te gaan, of vernietig de cel.',
+        verlopen: true, tot: verleend.tot, sleutel };
+    }
     /* En hij blijft dicht als de aanschaf er niet (meer) is. Dat kan: een lid
        dat een app verwijderde en terugzet, komt langs installeer(); een lid dat
        hem hield terwijl de prijs van nul naar iets ging, komt hier. */

@@ -56,3 +56,34 @@ for (const naam of APPS) {
     assert.equal(b.bruggen, m.manifest.machtigingen.length);
   });
 }
+
+/* DE DRIE UNIVERSA -- afgeleid, en nooit door een uitgever gekozen.
+
+   De indeling van de winkel (Essentials, Play, Makers) hangt aan twee dingen die
+   al vaststaan: wie de uitgever is, en of het manifest een arena draagt. Er is
+   geen veld waarmee een uitgever zijn app in een afdeling zet -- dat zou de
+   etalage overlaten aan degene die erin wil staan. */
+const { universumVan, indeel, UNIVERSA } = require('../server/kern/appstore/universa');
+const { SLEUTELS: MANIFESTVELDEN } = require('../server/kern/appstore/manifest');
+
+test('de afdeling volgt uit uitgever en arena, niet uit een keuze', () => {
+  assert.equal(universumVan({ uitgever: { org: 'O-LABS' }, arena: null }), 'essentials');
+  assert.equal(universumVan({ uitgever: { org: 'O-LABS' }, arena: { richting: 'hoog' } }), 'play');
+  /* Herkomst wint van vorm: een spel van een derde hoort bij Makers. Waar een
+     app vandaan komt is het belangrijkste onderscheid dat een lid heeft. */
+  assert.equal(universumVan({ uitgever: { org: 'O-ANDER' }, arena: { richting: 'hoog' } }), 'makers');
+  assert.equal(universumVan({ uitgever: null, arena: null }), 'makers');
+});
+
+test('een lege afdeling wordt niet getoond', () => {
+  const alleen = indeel([{ sleutel: 'a', uitgever: { org: 'O-LABS' }, arena: null }]);
+  assert.equal(alleen.length, 1);
+  assert.equal(alleen[0].sleutel, 'essentials');
+  assert.deepEqual(indeel([]), []);
+});
+
+test('er is geen manifestveld waarmee een uitgever zijn afdeling kiest', () => {
+  for (const u of UNIVERSA) assert.ok(!MANIFESTVELDEN.includes(u.sleutel));
+  assert.ok(!MANIFESTVELDEN.includes('universum'));
+  assert.ok(!MANIFESTVELDEN.includes('afdeling'));
+});

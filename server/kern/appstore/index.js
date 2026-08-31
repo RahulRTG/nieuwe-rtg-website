@@ -37,7 +37,7 @@ const { INZENDINGEN_PER_UUR } = require('./versies');
    ./besluit.js (versie). */
 const STATUS_VERSIE = ['wacht-op-mens', 'gepubliceerd', 'geweigerd', 'ingetrokken'];
 
-function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus }) {
+function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus, progressieMag, GEEN_PROGRESSIE }) {
   /* De gebeurtenissenstroom loopt over de BUS, en de bus doet de envelop.
 
      Hier stond eerst een eigen laag (kern/gebeurtenis.js) die zelf een envelop
@@ -102,7 +102,22 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus })
   const { geld, intrekken, hercontrole, tijdlijn, noteer, TIJDLIJN_SOORTEN } = require('./naad')({
     S, save, nu, boek, eigen, norm, uitgever, app, versie, opslag, pay, findSupplier, intrekkenKaal });
 
-  const motor = { S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
+  /* DE ARENA (./arena.js): het bord van een app, met de 18+-poort van het huis
+     erachter. Hij staat op de MOTOR en niet in de brug, omdat twee kanten hem
+     lezen: de brug (een app stuurt een score in) en de winkel (een lid dat zijn
+     opslag wist, wist ook zijn plaats). Ontbreekt de spellenlaag -- een opzet
+     zonder spellen -- dan bewaart hij niets en zegt hij dat, in plaats van
+     stilzwijgend wel te bewaren.
+
+     Hij wordt gebouwd NA de versiekant, want hij leest de vorm van het bord
+     (hoog of laag, en de eenheid) uit het manifest van de live versie. */
+  const arena = require('./arena').maakArena({ S, save, nu,
+    progressieMag: typeof progressieMag === 'function' ? progressieMag : () => false,
+    GEEN_PROGRESSIE: GEEN_PROGRESSIE || 'De ranglijst is op deze server niet ingericht; het spel speelt gewoon door.',
+    versieVan: (sleutel) => { const a = app(sleutel); return a && a.live ? versie(a.live) : null; } });
+
+  const motor = { progressieMag, GEEN_PROGRESSIE, arena,
+    S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit,
     magInzenden, magPrijsVragen, uitgeverVanPersoon,
     app, versie, inzenden, proef, wachtrij, besluit, intrekken, mijnUitgeverij,

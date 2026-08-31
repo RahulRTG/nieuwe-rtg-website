@@ -12,13 +12,20 @@ const fs = require('fs');
 const path = require('path');
 const { parenUit, sleutelsUit, beproefPaar } = require('../scripts/herstelproef');
 
-test('1. alleen vermoede paren met een tegenhanger worden beproefd', () => {
+/* Vermoede EN al bevestigde paren, en dat tweede is geen luxe: HERSTEL.json
+   leidt zijn graad uit deze uitslag af, dus een bevestiging die niet opnieuw
+   wordt beproefd verdwijnt bij de volgende ronde uit het register. Een
+   bevestiging die zichzelf opheft is erger dan geen. */
+test('1. vermoede en bevestigde paren worden beproefd, onbepaalde niet', () => {
   const p = parenUit({ per: {
     '/api/a/maak': { graad: 'vermoed', tegenhanger: '/api/a/weg' },
     '/api/b/weg': { graad: 'onbepaald', kandidaten: ['/api/b/maak', '/api/b/bewaar'] },
     '/api/c/maak': { graad: 'bevestigd', tegenhanger: '/api/c/weg' }
-  } });
-  assert.deepStrictEqual(p, [{ heen: '/api/a/maak', terug: '/api/a/weg' }]);
+  } }, { '/api/c/maak': 'supplier' });
+  assert.deepStrictEqual(p, [
+    { heen: '/api/a/maak', terug: '/api/a/weg', rol: 'member' },
+    { heen: '/api/c/maak', terug: '/api/c/weg', rol: 'supplier' }
+  ]);
 });
 
 test('2. de sleutel komt uit het antwoord, ook uit het laatste item van een lijst', () => {

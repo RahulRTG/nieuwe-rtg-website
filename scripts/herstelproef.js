@@ -73,10 +73,36 @@ function sleutelsUit(antwoord) {
   return uit;
 }
 
-function parenUit(register) {
+/* DE ROL KOMT UIT DE METING, NIET UIT HET PAD. Wie /api/supplier/ ziet en
+   daaruit "leverancier" afleidt, zit er bij elke uitzondering naast -- en een
+   verkeerde rol geeft 401, wat hier `nietBeproefd` heet. IDEMPROEF.json noteert
+   per route met welke rol hij bereikbaar bleek; die nemen we over.
+
+   De eerste ronde draaide alleen als LID en zette 67 paren op nietBeproefd,
+   waarvan 28 met een 401. Dat was geen eigenschap van die paren maar van de
+   proef. */
+function rollenUit(idemproef) {
+  const uit = {};
+  for (const r of (idemproef || {}).perRoute || []) if (r && r.pad && r.rol) uit[r.pad] = r.rol;
+  return uit;
+}
+
+function parenUit(register, rollen) {
   const uit = [];
+  const r = rollen || {};
   for (const [pad, v] of Object.entries((register || {}).per || {}))
-    if (v && v.graad === 'vermoed' && v.tegenhanger) uit.push({ heen: pad, terug: v.tegenhanger });
+    /* OOK DE AL BEVESTIGDE PAREN, en dat is geen dubbel werk maar de enige
+       manier waarop dit register klopt. HERSTEL.json leest deze uitslag om zijn
+       graad te bepalen; nam de proef alleen `vermoed`, dan verdween een
+       bevestiging bij de volgende ronde uit de uitslag en daarmee uit het
+       register -- een bevestiging die zichzelf opheft. En inhoudelijk: een
+       terugweg die vorige maand werkte en vandaag niet meer, hoort te zakken. */
+    if (v && (v.graad === 'vermoed' || v.graad === 'bevestigd') && v.tegenhanger)
+      /* De rol van de HEENWEG bepaalt de sessie. Vraagt de terugweg een andere
+         rol, dan geeft hij 401 en heet het paar nietBeproefd -- eerlijk, want
+         een terugweg die een andere mens nodig heeft is een ander verhaal dan
+         een terugweg die niet werkt. */
+      uit.push({ heen: pad, terug: v.tegenhanger, rol: r[pad] || 'member' });
   return uit;
 }
 
@@ -155,25 +181,44 @@ async function beproefPaar(srv, token, paar) {
 
 async function main() {
   const register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTEL.json'), 'utf8'));
-  let paren = parenUit(register);
+  const idemproef = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
+    catch (e) { return null; }
+  })();
+  let paren = parenUit(register, rollenUit(idemproef));
   const i = process.argv.indexOf('--pad');
   if (i >= 0 && process.argv[i + 1]) paren = paren.filter(p => p.heen === process.argv[i + 1]);
   console.log('DE HERSTELPROEF\n');
   console.log('  ' + paren.length + ' vermoed(e) paren, uitgevoerd tegen een wegwerpserver\n');
 
-  const srv = await start({ naam: 'herstelproef', gereed: 'ready', env: { NODE_ENV: 'test', RTG_DEMO: '1' } });
+  const srv = await start({ naam: 'herstelproef', gereed: 'ready',
+    env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
   const uitslagen = [];
   try {
-    const login = await fetch(srv.basis + '/api/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'rtg' })
-    }).then(async r => ({ status: r.status, data: await r.json().catch(() => null) })).catch(() => ({ status: 0, data: null }));
-    const token = login.data && login.data.token;
-    if (!token) throw new Error('geen sessie op de wegwerpserver (status ' + login.status + '): zonder inlog meet deze proef niets');
+    /* DRIE SESSIES, EN EEN ONTBREKENDE IS EEN FOUT. Een rol die niet inlogt en
+       waarvan de paren dan "niet beproefd" heten, zou de proef laten lijken op
+       een die keek. Zij stopt liever. */
+    const aanmeld = async (pad, lijf) => {
+      const r = await fetch(srv.basis + pad, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lijf)
+      }).then(async x => ({ status: x.status, data: await x.json().catch(() => null) })).catch(() => ({ status: 0, data: null }));
+      return { token: r.data && r.data.token, status: r.status };
+    };
+    const sessies = {
+      member: await aanmeld('/api/login', { tier: 'rtg' }),
+      office: await aanmeld('/api/office/login', { code: 'RTG-OFFICE-PROEF' }),
+      supplier: await aanmeld('/api/supplier/login', { username: 'rahul', password: 'Imran' })
+    };
+    const nodig = [...new Set(paren.map(p => p.rol))];
+    const mist = nodig.filter(r => !(sessies[r] && sessies[r].token));
+    if (mist.length) throw new Error('geen sessie voor: ' + mist.map(r =>
+      r + ' (status ' + ((sessies[r] || {}).status) + ')').join(', ') +
+      ' -- dan zouden hun paren "niet beproefd" heten terwijl de proef zelf de reden is');
 
     for (const paar of paren) {
-      const u = await beproefPaar(srv, token, paar);
+      const u = await beproefPaar(srv, sessies[paar.rol].token, paar);
       uitslagen.push(u);
-      console.log('  ' + u.uitslag.padEnd(13) + paar.heen + '  ->  ' + paar.terug);
+      console.log('  ' + u.uitslag.padEnd(13) + paar.rol.padEnd(9) + paar.heen + '  ->  ' + paar.terug);
     }
   } finally { try { srv.klaar(); } catch (e) {} }
 
@@ -190,7 +235,12 @@ async function main() {
       'een paar wordt in het gunstigste geval beproefd: meteen erna, door dezelfde gebruiker, met een ' +
         'vers gemaakt ding. Een bevestiging hier zegt niets over een terugweg een week later',
       'exact en compensatie zijn niet hetzelfde, en worden nooit samengeteld: een creditnota wist geen factuur',
-      'de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep'
+      'de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep',
+      'de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, ' +
+        'een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` ' +
+        'betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` ' +
+        'onbereikbaar, dus dit is een gekozen ruil en geen vergissing -- /api/meet/maak stond in de ' +
+        'eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact'
     ]
   };
   fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
@@ -200,4 +250,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(e => { console.error('herstelproef: ' + e.message); process.exit(1); });
-module.exports = { parenUit, sleutelsUit, beproefPaar };
+module.exports = { parenUit, rollenUit, sleutelsUit, beproefPaar };

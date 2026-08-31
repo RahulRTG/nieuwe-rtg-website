@@ -804,21 +804,38 @@ oordeel langskomen. `exact` en `compensatie` worden nooit samengeteld — een
 creditnota wist geen factuur — en `test/herstelproef.test.js` zakt zodra er één
 getal voor beide verschijnt.
 
-**De uitslag van de eerste ronde:**
+**De uitslag:**
 
 | | |
 |---|---|
-| `exact` | **4** |
+| `exact` | **8** |
 | `compensatie` | **3** |
 | `geen-herstel` | 0 |
-| niet beproefd | 67 |
+| niet beproefd | 63 |
 
-`HERSTEL.json` staat daarmee op **7 bevestigd** en `vermoed` op 67. De
+`HERSTEL.json` staat daarmee op **11 bevestigd** en `vermoed` op 63. De
 bevestiging komt uit de proef en niet uit een pen: `test/herstel.test.js` eist
 per bevestigd paar een overeenkomstige uitslag in `HERSTELPROEF.json`, met
 dezelfde tegenhanger en de soort erbij. De oude toets — *`bevestigd` moet leeg
 zijn* — is niet vervallen maar scherper geworden; zonder die eis was de nieuwe
 tak precies het gat dat zij dichthield.
+
+**De eerste ronde logde alleen in als lid,** en zette 67 paren op
+`nietBeproefd` waarvan 28 met een 401. Dat was geen eigenschap van die paren
+maar van de proef. Nu draaien er drie sessies (lid, kantoor, leverancier), en
+de rol komt uit `IDEMPROEF.json` — uit de meting dus, niet uit het pad, want wie
+`/api/supplier/` ziet en daaruit "leverancier" afleidt zit er bij elke
+uitzondering naast. Van de 63 die overblijven draagt elk nu een leesbare reden:
+35 × 404, 12 × 400, 6 × 409, 4 × 403 en 6 die draaiden zonder een domeincollectie
+te raken. Dat is het plausibele lijf dat niet op die route past — handwerk per
+route, geen ontbrekend gereedschap.
+
+**En de proef beproeft ook de al bevestigde paren.** Dat lijkt dubbel werk en is
+het niet: `HERSTEL.json` leidt zijn graad uit deze uitslag af, dus een paar dat
+niet opnieuw wordt beproefd verdwijnt bij de volgende ronde uit de uitslag en
+daarmee uit het register. Een bevestiging die zichzelf opheft is erger dan geen.
+Dat gebeurde ook werkelijk: de eerste ronde met rollen erbij liet
+`compensatie` van 3 naar 0 zakken, en dát was de vondst.
 
 **Een opwarmronde bleek niet-onderhandelbaar,** en dat is het leerzame deel. In
 een verse database bestáát de collectie `agendas` niet. Voegt de heenweg het
@@ -829,11 +846,20 @@ hoogste graad die niemand ooit kan halen, is geen graad. Dat is dezelfde
 faalvorm als de rijtelling op `kv` in de droogloop: een meting die stil het
 verkeerde antwoord geeft.
 
-**En één bevinding is er inhoudelijk uitgekomen:** `/api/meet/maak → /api/meet/weg`
-is `compensatie` en geen `exact`, met `kosten` als de collectie die niet
-terugkomt. Een vergaderkamer opheffen maakt niet ongedaan dat hij geld heeft
-gekost. Precies het soort verschil dat een naamvergelijking nooit had gezien, en
-precies wat een bon moet zeggen voordat iemand op "ongedaan maken" drukt.
+**En één bevinding is er inhoudelijk uitgekomen:**
+`/api/office/atelierweb/bewaar → /verwijder` is `compensatie` en geen `exact`,
+met `kosten` als de collectie die niet terugkomt. Een website weggooien maakt
+niet ongedaan dat hij geld heeft gekost. Precies het soort verschil dat een
+naamvergelijking nooit had gezien, en precies wat een bon moet zeggen voordat
+iemand op "ongedaan maken" drukt.
+
+**Die vondst legt meteen de prijs van de opwarmronde bloot.** `/api/meet/maak`
+stond in de eerste ronde óók op `compensatie` met `kosten` als reden, en staat er
+nu op `exact` — de kostenregel valt bij de eerste aanmaak, en die aanmaak is nu
+de opwarmronde. `exact` betekent hier dus: **exact bij een tweede en volgende
+uitvoering.** Dat is een gekozen ruil (zonder opwarmronde was `exact`
+onbereikbaar) en het staat als vijfde grens in de uitslag zelf, niet in een
+voetnoot.
 
 **Wat de proef níét zegt, staat in haar eigen uitslag:** zij weet niet wélk ding
 de terugweg moet aanwijzen (zij geeft de identificerende velden uit het antwoord

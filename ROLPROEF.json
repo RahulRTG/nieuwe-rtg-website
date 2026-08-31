@@ -1,17 +1,18 @@
 {
  "stempel": {
-  "op": "2026-08-31T17:06:24.822Z",
-  "commit": "30cd8c2e",
+  "op": "2026-08-31T18:11:29.043Z",
+  "commit": "5dc3b081",
   "boomVuil": false,
   "boomAnders": 1,
+  "instrument": "scripts/rolproef-route.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",
- "nietBeproefbaar": 729,
+ "nietBeproefbaar": 730,
  "redenenNietBeproefbaar": [
   {
    "reden": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
-   "aantal": 546,
+   "aantal": 547,
    "routes": [
     "POST /api/bedrijf/apparaat/innemen",
     "POST /api/bedrijf/apparaat/uitgeven",
@@ -356,6 +357,7 @@
     "POST /api/foundation/school/personeel/aanmeld",
     "POST /api/foundation/school/personeel/besluit",
     "POST /api/foundation/school/personeel/inlog/accepteer",
+    "POST /api/foundation/school/personeel/inloglink",
     "POST /api/foundation/school/personeel/mail/inbox",
     "POST /api/foundation/school/personeel/mail/lees",
     "POST /api/foundation/school/personeel/mail/overzicht",
@@ -789,10 +791,10 @@
  ],
  "routesGevonden": 4661,
  "gemeten": {
-  "routesMetRol": 3932,
+  "routesMetRol": 3931,
   "beproefd": 3858,
   "pogingen": 8000,
-  "aclOpen": 32,
+  "aclOpen": 31,
   "privacyLek": 0,
   "zijeffecten": 0,
   "blindeRondes": 0,
@@ -6787,18 +6789,6 @@
     "office"
    ],
    "acl": "dicht",
-   "privacy": "schoon"
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/foundation/school/personeel/inloglink",
-   "rol": "openbaar",
-   "geprobeerd": [
-    "member",
-    "supplier",
-    "office"
-   ],
-   "acl": "OPEN",
    "privacy": "schoon"
   },
   {
@@ -43516,7 +43506,19 @@
    "pad": "/api/vracht/volg",
    "rol": "openbaar",
    "geprobeerd": [
-    "member"
+    "member",
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/wachtlijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier"
    ],
    "acl": "dicht",
    "privacy": "schoon"

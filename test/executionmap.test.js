@@ -105,13 +105,43 @@ test('5. de vertaling naar de noemer komt uit de noemer, niet uit een tweede tab
 });
 
 test('6. wat we niet weten staat er als ONBEPAALD MET REDEN, en niet als een verzonnen waarde', () => {
-  for (const naam of ['risico', 'herstel', 'kosten']) {
+  for (const naam of ['risico', 'kosten']) {
     const v = K.velden[naam];
     assert.ok(v, 'veldsoort ' + naam + ' ontbreekt');
     assert.equal(v.waarde, 'ONBEPAALD', naam + ' heeft een waarde gekregen die niemand heeft vastgesteld');
     assert.ok(v.reden && v.reden.length > 25, naam + ' is ONBEPAALD zonder reden');
     assert.equal(v.afgeleid, false, naam + ' heet afgeleid maar er is niets om uit af te leiden');
   }
+});
+
+test('6b. HERSTEL KOMT NOOIT BOVEN `vermoed`, ook niet nu hij is afgeleid', () => {
+  /* Sinds blok 5 komt herstel uit HERSTEL.json in plaats van uit niets. Dat maakt
+     hem GRADEERBAAR en niet WAAR: de afleiding vergelijkt namen. Een rij die zich
+     `exact` of `bewezen` noemt, zou een terugweg beloven die niemand heeft
+     vastgesteld -- precies wat server/kern/stuur/bon.js weigert. */
+  for (const c of K.capabilities) {
+    if (!c.herstel) continue;
+    assert.ok(['vermoed', 'onbepaald'].includes(c.herstel),
+      c.pad + ' draagt herstel "' + c.herstel + '"; alleen vermoed en onbepaald zijn af te leiden uit namen');
+    if (c.herstel === 'vermoed') assert.ok(c.herstelTegenhanger, c.pad + ': vermoed zonder tegenhanger');
+    if (c.herstel === 'onbepaald') assert.ok(c.herstelKandidaten && c.herstelKandidaten.length > 1,
+      c.pad + ': onbepaald zonder de kandidaten die het onbepaald maken');
+  }
+  assert.equal(K.telling.bevestigdeTerugweg, 0,
+    'er staat een BEVESTIGDE terugweg in de kaart terwijl niemand er een heeft bevestigd');
+});
+
+test('6c. het besluit staat NAAST de meting en vervangt hem niet', () => {
+  const besluiten = require('../IDEMBESLUIT.json').routes || {};
+  let getoetst = 0;
+  for (const c of K.capabilities) {
+    const b = besluiten[c.pad];
+    if (!b) { assert.ok(!c.herhalingBesluit, c.pad + ' draagt een besluit dat niet in IDEMBESLUIT.json staat'); continue; }
+    getoetst++;
+    assert.equal(c.herhalingBesluit, b.klasse, c.pad + ': de kaart zegt iets anders dan het besluitregister');
+    assert.ok(c.herhaling, c.pad + ': het besluit heeft de meting weggedrukt');
+  }
+  assert.ok(getoetst > 50, 'te weinig besluiten getoetst: ' + getoetst);
 });
 
 test('7. elke afgeleide veldsoort noemt zijn bron en wat hij betekent', () => {

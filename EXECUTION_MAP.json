@@ -2,10 +2,12 @@
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
   "IDEMPROEF.json": "3e6938bab66c5200",
+  "IDEMBESLUIT.json": "25382fc65a0b8513",
+  "HERSTEL.json": "cebaefdcc3ccd0e3",
   "VERTROUWEN.json": "4acd0745523e3c37",
   "server/kern/stuur/beleid.js": "46af464eb38ae3a0",
   "scripts/gezagsnoemer.js": "a4abcfdedb5256b2",
-  "scripts/executionmap.js": "31c25521c30540ee"
+  "scripts/executionmap.js": "3b1f962bb74b6763"
  },
  "velden": {
   "bereikbaar": {
@@ -34,11 +36,15 @@
    "waarde": "ONBEPAALD",
    "reden": "risico wordt per GEVAL berekend uit bedrag, aantal en omkeerbaarheid; statisch bestaat het niet"
   },
+  "herhalingBesluit": {
+   "bron": "IDEMBESLUIT.json",
+   "afgeleid": true,
+   "wat": "waarom een herhaalde oproep hier wel of niet iets nieuws mag doen -- het OORDEEL van een mens, naast de meting. Ontbreekt hij, dan is er over die route nog niet besloten."
+  },
   "herstel": {
-   "bron": null,
-   "afgeleid": false,
-   "waarde": "ONBEPAALD",
-   "reden": "geen register kent de tegenhanger van een route (EXECUTIE.md blok 5)"
+   "bron": "HERSTEL.json",
+   "afgeleid": true,
+   "wat": "de kandidaat-tegenhanger, hoogstens met de graad `vermoed`. NIEMAND heeft er een bevestigd, dus hier mag geen enkele terugweg op worden beloofd (server/kern/stuur/bon.js)."
   },
   "kosten": {
    "bron": null,
@@ -68,7 +74,10 @@
  "telling": {
   "capabilities": 3282,
   "bereikbaarPerRol": 176,
-  "conflicten": 28
+  "conflicten": 28,
+  "metBesluit": 126,
+  "metVermoedeTerugweg": 74,
+  "bevestigdeTerugweg": 0
  },
  "capabilities": [
   {
@@ -222,6 +231,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/agenda/verwijder",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -270,6 +281,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/agenda/verwijder",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -294,6 +308,11 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "onbepaald",
+   "herstelKandidaten": [
+    "/api/agenda/toevoegen",
+    "/api/agenda/bewaar"
+   ],
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -334,6 +353,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/reserveer",
    "bereik": "verboden"
   },
   {
@@ -354,6 +375,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/asset/herroep",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -366,6 +389,11 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "onbepaald",
+   "herstelKandidaten": [
+    "/api/asset/koop",
+    "/api/asset/gebruik"
+   ],
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -378,6 +406,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/asset/herroep",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -594,6 +624,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -666,6 +697,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -678,6 +710,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -702,6 +735,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -738,6 +772,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/bank/pas/uitgeven",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -750,6 +786,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/bank/pas/sluit",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -786,6 +825,7 @@
    "herhaling": "onbeschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "creatie",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -810,6 +850,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -870,6 +911,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/bank/terugkerend/zet",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -882,6 +925,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/bank/terugkerend/stop",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -894,6 +940,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -1090,6 +1137,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -1206,6 +1254,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": {
     "member": "klein",
     "supplier": "verboden",
@@ -1334,6 +1383,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/care/boek",
    "bereik": "verboden"
   },
   {
@@ -1350,6 +1401,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/care/annuleer",
    "bereik": "verboden"
   },
   {
@@ -1558,6 +1611,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/clips/weg",
    "bereik": "verboden"
   },
   {
@@ -1614,6 +1669,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/clips/maak",
    "bereik": "verboden"
   },
   {
@@ -1766,6 +1823,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -2038,6 +2096,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -2118,6 +2177,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -2206,6 +2266,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -2222,6 +2283,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -2238,6 +2300,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/command/stad/stop",
    "bereik": "verboden"
   },
   {
@@ -2246,6 +2310,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/command/stad/start",
    "bereik": "verboden"
   },
   {
@@ -2254,6 +2320,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -2286,6 +2353,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -2318,6 +2386,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/command/zandbak/weg",
    "bereik": "verboden"
   },
   {
@@ -2334,6 +2404,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/command/zandbak/maak",
    "bereik": "verboden"
   },
   {
@@ -2438,6 +2510,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -2606,6 +2679,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -2630,6 +2704,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -2902,6 +2977,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (OUTPUT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -3263,6 +3339,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -3463,6 +3540,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -3751,6 +3829,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -3815,6 +3894,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -3903,6 +3983,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -4163,6 +4244,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/kantoorpakket/weg",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -4275,6 +4358,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/kantoorpakket/maak",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -5240,6 +5325,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/live/stop",
    "bereik": "verboden"
   },
   {
@@ -5256,6 +5344,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/live/start",
    "bereik": "verboden"
   },
   {
@@ -5652,6 +5742,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -5860,6 +5951,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -5932,6 +6024,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -6052,6 +6145,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/meet/verlaat",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -6064,6 +6159,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/meet/weg",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -6100,6 +6198,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/meet/kom",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -6112,6 +6212,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/meet/maak",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -7045,6 +7147,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -7085,6 +7188,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -7349,6 +7453,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -7568,6 +7673,7 @@
    "herhalingReden": "het register spreekt zichzelf tegen: beschermd en onbeschermd. Een winnaar kiezen zou een oordeel neerzetten dat niemand heeft vastgesteld.",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "code-maker",
    "bereik": "verboden"
   },
   {
@@ -7593,6 +7699,7 @@
    "herhalingReden": "het register spreekt zichzelf tegen: beschermd en onbeschermd. Een winnaar kiezen zou een oordeel neerzetten dat niemand heeft vastgesteld.",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -8594,6 +8701,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/member/rtmail/regel/weg",
    "bereik": "verboden"
   },
   {
@@ -8602,6 +8711,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/member/rtmail/regel/maak",
    "bereik": "verboden"
   },
   {
@@ -9475,6 +9586,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -9707,6 +9819,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/mob/reis/boek",
    "bereik": "verboden"
   },
   {
@@ -9715,6 +9829,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/mob/reis/annuleer",
    "bereik": "verboden"
   },
   {
@@ -9795,6 +9911,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/muziek/weg",
    "bereik": "verboden"
   },
   {
@@ -9819,6 +9938,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -9931,6 +10051,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/muziek/maak",
    "bereik": "verboden"
   },
   {
@@ -10075,6 +10197,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/afdelingshotel/boek",
    "bereik": "verboden"
   },
   {
@@ -10083,6 +10207,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/afdelingshotel/annuleer",
    "bereik": "verboden"
   },
   {
@@ -10139,6 +10265,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10155,6 +10282,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10219,6 +10347,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10243,6 +10372,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10275,6 +10405,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/atelierweb/verwijder",
    "bereik": "verboden"
   },
   {
@@ -10339,6 +10472,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/atelierweb/bewaar",
    "bereik": "verboden"
   },
   {
@@ -10475,6 +10610,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -10483,6 +10619,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -10507,6 +10644,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -10531,6 +10669,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -10595,6 +10734,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -10763,6 +10903,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10779,6 +10920,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -10835,6 +10977,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -10939,6 +11082,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -11027,6 +11171,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/kantoorpakket/weg",
    "bereik": "verboden"
   },
   {
@@ -11107,6 +11254,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/kantoorpakket/maak",
    "bereik": "verboden"
   },
   {
@@ -11227,6 +11376,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11363,6 +11513,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11563,6 +11714,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11635,6 +11787,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11763,6 +11916,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11787,6 +11941,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11827,6 +11982,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -11891,6 +12047,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11915,6 +12072,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -11963,6 +12121,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -12163,6 +12322,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -12179,6 +12339,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -12203,6 +12364,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -12211,6 +12373,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -12540,6 +12703,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -12812,6 +12976,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/weefsel/relatie/weg",
    "bereik": "verboden"
   },
   {
@@ -12820,6 +12986,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/office/weefsel/relatie/maak",
    "bereik": "verboden"
   },
   {
@@ -12972,6 +13140,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -12988,6 +13157,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -13052,6 +13222,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -13100,6 +13271,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -13108,6 +13280,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -13116,6 +13289,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -13124,6 +13298,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 2 schakel(s) nooit gemeten (FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -13164,6 +13339,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -13180,6 +13356,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -13372,6 +13549,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -13660,6 +13838,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "code-maker",
    "bereik": "verboden"
   },
   {
@@ -14290,6 +14469,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -14498,6 +14678,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -14638,6 +14819,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "code-maker",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -14710,6 +14892,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "code-maker",
    "bereik": "verboden"
   },
   {
@@ -14730,6 +14913,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "beschermd",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -14942,6 +15126,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -15046,6 +15231,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/reisbureau/boek",
    "bereik": "verboden"
   },
   {
@@ -15054,6 +15241,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/reisbureau/annuleer",
    "bereik": "verboden"
   },
   {
@@ -15086,6 +15275,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/annuleer",
    "bereik": "verboden"
   },
   {
@@ -15122,6 +15313,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -15130,6 +15322,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -15194,6 +15387,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -15218,6 +15412,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/residentie/spel/zet",
    "bereik": "verboden"
   },
   {
@@ -15226,6 +15422,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/residentie/spel/stop",
    "bereik": "verboden"
   },
   {
@@ -16170,6 +16368,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/rtfos/meldcode/sluit",
    "bereik": "verboden"
   },
   {
@@ -16178,6 +16378,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/rtfos/meldcode/open",
    "bereik": "verboden"
   },
   {
@@ -16802,6 +17004,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -16882,6 +17085,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -17002,6 +17206,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -17058,6 +17263,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -17170,6 +17376,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/samen/weg",
    "bereik": "verboden"
   },
   {
@@ -17202,6 +17411,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/samen/maak",
    "bereik": "verboden"
   },
   {
@@ -17226,6 +17437,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/site/verwijder",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -17322,6 +17536,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/site/offline",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -17346,6 +17562,11 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "onbepaald",
+   "herstelKandidaten": [
+    "/api/site/publiceer",
+    "/api/site/live"
+   ],
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -17358,6 +17579,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -17378,6 +17600,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/site/offline",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -17438,6 +17662,8 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 7 schakel(s) nooit gemeten (OUTPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/site/bewaar",
    "bereik": {
     "member": "voorstel",
     "supplier": "verboden",
@@ -17978,6 +18204,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/staff/mob/cdt/afmelden",
    "bereik": {
     "member": "verboden",
     "supplier": "verboden",
@@ -17990,6 +18218,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/staff/mob/cdt/aanmelden",
    "bereik": {
     "member": "verboden",
     "supplier": "verboden",
@@ -18274,6 +18504,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -18374,6 +18605,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/agenda/verwijder",
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -18386,6 +18620,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/agenda/toevoegen",
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -18642,6 +18878,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -19362,6 +19599,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -19378,6 +19616,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -19434,6 +19673,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -19920,6 +20160,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -20152,6 +20393,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -20232,6 +20474,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -20296,6 +20539,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -20584,6 +20828,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -21131,6 +21376,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -21195,6 +21441,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -21220,6 +21467,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -21262,6 +21510,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -21606,6 +21855,9 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/kantoorpakket/weg",
    "bereik": "verboden"
   },
   {
@@ -21686,6 +21938,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/kantoorpakket/maak",
    "bereik": "verboden"
   },
   {
@@ -22120,6 +22374,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -22328,6 +22583,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -22712,6 +22968,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -23301,6 +23558,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/redactie/artikel/verwijder",
    "bereik": "verboden"
   },
   {
@@ -23333,6 +23592,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/redactie/artikel/bewaar",
    "bereik": "verboden"
   },
   {
@@ -23365,6 +23626,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/redactie/rubriek/verwijder",
    "bereik": "verboden"
   },
   {
@@ -23373,6 +23636,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/redactie/rubriek/bewaar",
    "bereik": "verboden"
   },
   {
@@ -23649,6 +23914,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -23941,6 +24207,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/rtmail/regel/weg",
    "bereik": "verboden"
   },
   {
@@ -23949,6 +24217,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/rtmail/regel/maak",
    "bereik": "verboden"
   },
   {
@@ -24149,6 +24419,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -24189,6 +24460,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "berekening",
    "bereik": "verboden"
   },
   {
@@ -24229,6 +24501,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -24301,6 +24574,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/site/offline",
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -24325,6 +24600,11 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "onbepaald",
+   "herstelKandidaten": [
+    "/api/supplier/site/publiceer",
+    "/api/supplier/site/live"
+   ],
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -24349,6 +24629,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/supplier/site/offline",
    "bereik": {
     "member": "verboden",
     "supplier": "voorstel",
@@ -24413,6 +24695,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "beschermd",
    "bereik": "verboden"
   },
   {
@@ -25197,6 +25480,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -25613,6 +25897,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/thuis/boek",
    "bereik": "verboden"
   },
   {
@@ -25653,6 +25939,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/thuis/annuleer",
    "bereik": "verboden"
   },
   {
@@ -25837,6 +26125,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "instelling",
    "bereik": "verboden"
   },
   {
@@ -25973,6 +26262,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/vak/ritme/stop",
    "bereik": "verboden"
   },
   {
@@ -25981,6 +26272,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/vak/ritme/start",
    "bereik": "verboden"
   },
   {
@@ -26253,6 +26546,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/veiligheid/wacht/stop",
    "bereik": "verboden"
   },
   {
@@ -26261,6 +26556,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/veiligheid/wacht/start",
    "bereik": "verboden"
   },
   {
@@ -26413,6 +26710,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/verzorging/boek",
    "bereik": "verboden"
   },
   {
@@ -26421,6 +26720,8 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herstel": "vermoed",
+   "herstelTegenhanger": "/api/verzorging/annuleer",
    "bereik": "verboden"
   },
   {
@@ -26565,6 +26866,7 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (AUDIT, FAILURE, ROLLBACK)",
+   "herhalingBesluit": "creatie",
    "bereik": "verboden"
   },
   {
@@ -26741,6 +27043,7 @@
    "herhaling": "onbeschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
+   "herhalingBesluit": "teller",
    "bereik": "verboden"
   },
   {

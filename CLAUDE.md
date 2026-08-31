@@ -787,7 +787,19 @@ hercompileren), een generator die iets anders doet zonder bronwijziging is
 hetzelfde rood, en waar twee bronnen elkaar tegenspreken staat `ONBEPAALD` en
 nooit stil een winnaar. Die derde was meteen nodig: `IDEMPROEF.json` spreekt
 zichzelf 28 keer tegen over dezelfde route (`beschermd` naast `ongemeten`) -- een
-vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. Hij verandert geen bevoegdheid en kan dat ook niet
+vondst in de bron, op te lossen in blok 5 en hier niet weg te poetsen. **Blok 5 is half een vondst en half een negatief.** De
+HERHALING-kant bestond al: `IDEMBESLUIT.json` verklaart 126 routes in zeven
+klassen (met het eerlijke `tebeslissen`), dus die is GEKOPPELD aan de kaart in
+plaats van nagebouwd -- meting en besluit staan er naast elkaar en de toets
+bewaakt dat het besluit de meting niet wegdrukt. De HERSTEL-kant is gemeten
+(`npm run herstel`, `HERSTEL.json`) en de uitkomst is dat hij NIET af te leiden
+is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
+(2,4%), 4 zijn dubbelzinnig en 0 zijn bevestigd. Niets komt boven de graad
+`vermoed`, want /agenda/bewaar is geen omkering van /verwijder. Herstel heeft dus
+een VERKLARINGSREGISTER nodig zoals IDEMBESLUIT.json; zolang `bevestigd` leeg is
+mag geen scherm en geen bon een terugweg beloven. Let ook op de tegenspraakregel
+die er bijna verkeerd in kwam: `code-maker` naast een gemeten `beschermd` is GEEN
+bug, want de proef kent `beschermd` pas toe als de VERSE sleutel iets anders gaf. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

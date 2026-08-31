@@ -50,7 +50,7 @@ const UIT = 'EXECUTION_MAP.json';
 
 /* De bronnen, met hun vingerafdruk: verandert er een, dan hoort de kaart mee te
    veranderen -- en verandert er geen, dan mag de kaart NIET veranderen. */
-const BRONNEN = ['IDEMPROEF.json', 'VERTROUWEN.json',
+const BRONNEN = ['IDEMPROEF.json', 'IDEMBESLUIT.json', 'HERSTEL.json', 'VERTROUWEN.json',
   'server/kern/stuur/beleid.js', 'scripts/gezagsnoemer.js', 'scripts/executionmap.js'];
 
 function vingerafdruk(bestand) {
@@ -74,8 +74,12 @@ const VELDEN = {
     wat: 'wat een tweede identieke aanroep doet: beschermd, onbeschermd of ongemeten' },
   risico: { bron: 'server/kern/command/risico.js', afgeleid: false, waarde: 'ONBEPAALD',
     reden: 'risico wordt per GEVAL berekend uit bedrag, aantal en omkeerbaarheid; statisch bestaat het niet' },
-  herstel: { bron: null, afgeleid: false, waarde: 'ONBEPAALD',
-    reden: 'geen register kent de tegenhanger van een route (EXECUTIE.md blok 5)' },
+  herhalingBesluit: { bron: 'IDEMBESLUIT.json', afgeleid: true,
+    wat: 'waarom een herhaalde oproep hier wel of niet iets nieuws mag doen -- het OORDEEL van een mens, ' +
+      'naast de meting. Ontbreekt hij, dan is er over die route nog niet besloten.' },
+  herstel: { bron: 'HERSTEL.json', afgeleid: true,
+    wat: 'de kandidaat-tegenhanger, hoogstens met de graad `vermoed`. NIEMAND heeft er een bevestigd, ' +
+      'dus hier mag geen enkele terugweg op worden beloofd (server/kern/stuur/bon.js).' },
   kosten: { bron: null, afgeleid: false, waarde: 'ONBEPAALD',
     reden: 'KOSTEN.md meet verbruik per aanroep, niet per route' }
 };
@@ -92,11 +96,15 @@ function noemerlegenda() {
 }
 
 function bouw() {
-  let idem, vert;
+  let idem, vert, besluit, herstel;
   try { idem = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
   catch (e) { return { fout: 'IDEMPROEF.json ontbreekt -- draai eerst: npm run idemproef' }; }
   try { vert = JSON.parse(fs.readFileSync(path.join(WORTEL, 'VERTROUWEN.json'), 'utf8')); }
   catch (e) { return { fout: 'VERTROUWEN.json ontbreekt -- draai eerst: npm run vertrouwen' }; }
+  try { besluit = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); }
+  catch (e) { return { fout: 'IDEMBESLUIT.json ontbreekt' }; }
+  try { herstel = JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTEL.json'), 'utf8')); }
+  catch (e) { return { fout: 'HERSTEL.json ontbreekt -- draai eerst: npm run herstel' }; }
 
   /* Herhaalbaarheid per (methode, pad, rol). Meerdere metingen die HETZELFDE
      zeggen zijn geen conflict; meerdere die iets anders zeggen wel. */
@@ -132,6 +140,31 @@ function bouw() {
     if (staat) { rij.bewijs = staat.staat; if (staat.reden) rij.bewijsReden = staat.reden; }
     else { rij.bewijs = 'ONBEPAALD'; rij.bewijsReden = 'deze route staat niet in het vervalregister'; }
 
+    /* HET BESLUIT NAAST DE METING. Ze spreken elkaar zelden tegen, en waar ze dat
+       lijken te doen is het meestal geen tegenspraak: een `code-maker` die bij
+       DEZELFDE sleutel hetzelfde antwoord geeft, doet precies wat een
+       idempotentiesleutel hoort te doen -- de proef kent `beschermd` namelijk pas
+       toe als de VERSE sleutel wel iets anders gaf (de ijking). Een naieve regel
+       had daar vier valse alarmen gemeld. Echt tegenstrijdig is alleen: een
+       besluit dat zegt dat de route beschermd MOET zijn terwijl de meting hem
+       onbeschermd vond, en nergens beschermd. */
+    const b = (besluit.routes || {})[pad];
+    if (b && b.klasse) {
+      rij.herhalingBesluit = b.klasse;
+      if (b.klasse === 'beschermd' && gemeten.includes('onbeschermd') && !gemeten.includes('beschermd')) {
+        conflicten++;
+        rij.herhalingReden = 'het besluit zegt dat deze route beschermd moet zijn, de meting vond hem onbeschermd';
+        rij.herhaling = 'ONBEPAALD';
+      }
+    }
+
+    const h = (herstel.per || {})[pad];
+    if (h) {
+      rij.herstel = h.graad;
+      if (h.tegenhanger) rij.herstelTegenhanger = h.tegenhanger;
+      if (h.kandidaten) rij.herstelKandidaten = h.kandidaten;
+    }
+
     const bereik = {};
     for (const rol of ROLLEN) {
       const b = beleidVoor(pad, rol);
@@ -152,7 +185,10 @@ function bouw() {
     bronnen: Object.fromEntries(BRONNEN.map(b => [b, vingerafdruk(b)])),
     velden: VELDEN,
     noemer: noemerlegenda(),
-    telling: { capabilities: capabilities.length, bereikbaarPerRol: bereikbaar, conflicten },
+    telling: { capabilities: capabilities.length, bereikbaarPerRol: bereikbaar, conflicten,
+      metBesluit: capabilities.filter(c => c.herhalingBesluit).length,
+      metVermoedeTerugweg: capabilities.filter(c => c.herstel === 'vermoed').length,
+      bevestigdeTerugweg: (herstel.bevestigd || []).length },
     capabilities
   };
   return kaart;

@@ -559,7 +559,7 @@ gasten voorspellen is probabilistisch, "de klant reageert positief" is niet
 voorspelbaar. Zonder dat onderscheid presenteert één mooie simulator alles als
 zekerheid — precies wat de bewijsgraden van `BESTUUR.md` verbieden.
 
-### Blok 5 — Transactie- en compensatiesemantiek · **half af**
+### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, het herstel is GEMETEN en blijkt niet af te leiden**
 
 `transactie.js` en `transactie-poorten.js` doen voorcontrole, verificatie en
 terugdraaien al; ze generiek maken is goedkoper dan de simulatie. Wat erbij
@@ -577,6 +577,58 @@ Dit blok hangt aan `IDEMPROEF.json`: 2247 ongemeten routes. Een agent die een
 herstelstrategie automatisch opnieuw probeert, plaatst anders twee bestellingen
 of stuurt twee externe berichten. Het doel is niet alles idempotent — het is
 alles geclassificeerd (`CREATE.md` par. 10).
+
+**De HERHALING-kant bleek al te bestaan, en beter dan dit document beweerde.**
+`IDEMBESLUIT.json` verklaart per route waarom een herhaalde oproep daar wel of
+niet iets nieuws mag doen: **zeven klassen** (`creatie`, `berekening`,
+`instelling`, `beschermd`, `code-maker`, `teller` en het eerlijke `tebeslissen`)
+over **126 routes**. Een vierwaardige `HERHALING` erbij bouwen zou een tweede
+register zijn geweest. Wat er wél moest gebeuren is het **koppelen**: de
+executiekaart draagt nu meting en besluit náást elkaar (`herhaling` uit
+`IDEMPROEF.json`, `herhalingBesluit` uit `IDEMBESLUIT.json`), en de toets bewaakt
+dat het besluit de meting niet wegdrukt.
+
+**Een tegenspraakregel die ik bijna verkeerd bouwde.** Vier routes staan als
+`code-maker` in het besluitregister ("elke oproep hoort iets nieuws te geven")
+terwijl de meting `beschermd` zegt. Dat lijkt een bug en is het niet: de proef
+kent `beschermd` pas toe als de **verse** sleutel wél iets anders gaf — de
+ijking. Een code-maker die bij dezelfde idempotentiesleutel hetzelfde antwoord
+geeft, doet precies wat zo'n sleutel hoort te doen. De naïeve regel had vier
+valse alarmen gemeld. Er blijft één regel over die écht tegenstrijdig is (besluit
+zegt beschermd, meting zegt onbeschermd en nergens beschermd), en die staat
+vandaag op **0**.
+
+**De HERSTEL-kant is gemeten, en de uitkomst is een negatief** (`npm run herstel`,
+`HERSTEL.json`). De voor de hand liggende weg — de tegenhanger afleiden uit de
+naam, `/toevoegen` bij `/verwijder` — levert:
+
+| | |
+|---|---|
+| routes | 3282 |
+| vermoede tegenhanger | 74 |
+| dubbelzinnig | 4 |
+| **dekking** | **2,4%** |
+| bevestigd door een mens | **0** |
+
+En de kwaliteit van die 2,4% is zelf twijfelachtig: `/api/agenda/bewaar` wordt aan
+`/api/agenda/verwijder` gekoppeld terwijl bewaren een wijziging is en geen
+aanmaak, en `/api/asset/herroep` past even goed op `/koop` als op `/gebruik`.
+Daarom komt niets boven de graad **`vermoed`** uit, en is `onbepaald` een echte
+uitkomst met béíde kandidaten erbij.
+
+**En de toets verwierp meteen een heel woordpaar.** `bevries/ontdooi` stond in de
+lijst, maar `ontdooi` bestaat nergens als route-einde: `/api/bank/bevries` zet de
+stand vermoedelijk in één route met een vlag in het lichaam. Dat is een derde
+vorm van terugweg — **een schakelaar** — die een vergelijking van namen per
+definitie niet ziet. Diezelfde toets is de `rooms`-les: een woord dat nergens
+heen wijst, laat de bouw zakken.
+
+**De conclusie hoort bij de meting:** herstel heeft een **verklaringsregister**
+nodig zoals `IDEMBESLUIT.json`, ingevuld door mensen, met dezelfde eerlijke klasse
+voor "hier is nog niet over besloten". De naamafleiding is bruikbaar als
+aanwijzing voor wie dat register vult, en voor niets anders. Zolang `bevestigd`
+leeg is, mag geen enkel scherm en geen enkele bon een terugweg beloven — en dat
+is precies wat `bon.js` vandaag al weigert.
 
 ### Blok 6 — Mandaatmotor · **jaren weg, en dat is een bewijsvraag**
 

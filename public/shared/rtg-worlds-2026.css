@@ -568,6 +568,11 @@ body[data-rtg-world="travel"] .rahulformulier{
   background:linear-gradient(168deg,rgba(23,4,9,.72),rgba(42,7,19,.5));
 }
 
+/* TWEE NAVIGATIES OVER HETZELFDE IS ER EEN TE VEEL. Draait de schil van het
+   huis (body.rtg-edge-host), dan zit het wisselen van wereld daar al in en
+   verdwijnt deze balk; zonder schil blijft hij staan zoals hij was. */
+body.rtg-edge-host .os-switcher{display:none;}
+
 /* --------------------------------------------------------- 04 FoundationOS */
 body[data-rtg-world="foundation"]{
   --world-accent:var(--bordeaux-basis);

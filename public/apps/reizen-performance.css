@@ -162,6 +162,43 @@ main>.regkop:has(+ #poorten){margin-top:clamp(3.5rem,7vw,6rem);padding-bottom:1r
 .keuzedialoog{width:min(92vw,480px);max-height:88dvh;overflow:auto;border:1px solid #571628;background:#24060f;color:var(--ivory);padding:0;box-shadow:0 30px 90px #000}.keuzedialoog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(5px)}.keuzedialoog form,.bevestiginginhoud{padding:1.35rem}.dialoogkop{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.4rem}.dialoogkop h2,.bevestiging h2{margin:.4rem 0 0;font-size:1.6rem}.dialoogkop>button{width:44px;height:44px;border:0;background:#320915;color:var(--ivory);font-size:1.4rem}.keuzedialoog label:not(.vink){display:grid;grid-template-columns:1fr 100px;align-items:center;border-top:1px solid var(--line);padding:.8rem 0}.keuzedialoog select{min-height:46px;border:1px solid #561628;background:#1e050c;color:var(--ivory);padding:0 .7rem}.vink{display:flex;gap:.7rem;align-items:center;border-top:1px solid var(--line);padding:1rem 0}.keuzedialoog .actieknop{margin-top:1rem}.bevestiginginhoud{text-align:center}.bevestigdicoon{width:64px;height:64px;display:grid;place-items:center;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:1.8rem;margin:0 auto 1.2rem}.bevestiging h2{font-size:1.8rem}.bevestiging p{color:var(--muted);line-height:1.55}.bevestiging #bevestigingFeiten{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin:1.3rem 0}.bevestiging #bevestigingFeiten span{display:flex;flex-direction:column;gap:.25rem;background:#1c050b;padding:1rem}.bevestiging #bevestigingFeiten small{color:var(--muted);font-size:.6rem;letter-spacing:.1em}.veiliglijst{list-style:none;margin:0;padding:0}.veiliglijst li{display:flex;gap:.8rem;padding:1rem 0;border-top:1px solid var(--line)}.veiliglijst b{color:var(--green)}
 .toast{position:fixed;z-index:80;left:50%;bottom:calc(var(--nav) + 1rem + env(safe-area-inset-bottom));transform:translate(-50%,20px);width:max-content;max-width:calc(100vw - 2rem);background:var(--ivory);color:var(--onyx);padding:.8rem 1rem;font-size:.75rem;font-weight:650;opacity:0;pointer-events:none;transition:.2s}.toast.zichtbaar{opacity:1;transform:translate(-50%,0)}
 
+/* ------------------------------------------------- ONDER DE SCHIL VAN HET HUIS
+   Met de RTG-schil eromheen (shared/randen.js) verbergt rtg-edge-system.css de
+   eigen kop en de bladbalk van deze pagina. Voor de KOP is dat juist: die zei
+   RTG, TRAVELOS en BEVEILIGD, en dat staat allemaal al in de schilbalk. Voor de
+   BLADEN is het dat niet: Vandaag, Reizen, Taxi en Rahul zijn geen schil maar
+   inhoud -- vier gezichten van dit scherm, niet vier plekken in het huis. Die
+   komen dus terug, direct onder de schilbalk, met de bank links vrij. */
+body.rtg-stijl.rtg-edge-host .hoofdtabs{
+  display:grid!important;
+  position:fixed;
+  z-index:8700;
+  left:var(--edge-side);
+  right:0;
+  top:calc(var(--edge-top) + env(safe-area-inset-top,0px));
+  bottom:auto;
+  width:auto;
+  height:48px;
+  padding:0 clamp(1rem,3vw,2.5rem);
+  grid-template-columns:repeat(4,minmax(0,150px));
+  justify-content:start;
+  gap:clamp(.5rem,3vw,2.2rem);
+  border-top:0;
+  border-bottom:1px solid var(--line);
+  background:rgba(27,5,11,.92);
+  backdrop-filter:blur(20px);
+}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button{flex-direction:row;gap:.55rem;justify-content:flex-start;font-size:.7rem}
+body.rtg-stijl.rtg-edge-host .hoofdtabs svg{width:18px;height:18px}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button::after{left:0;bottom:0;width:0;height:2px}
+body.rtg-stijl.rtg-edge-host .hoofdtabs button.actief::after{width:100%;height:2px}
+/* De inhoud begint onder die balk; de schil rekent alleen met zijn eigen kop. */
+body.rtg-stijl.rtg-edge-host .reisapp>main{padding-top:48px!important}
+@media(max-width:520px){
+  body.rtg-stijl.rtg-edge-host .hoofdtabs{grid-template-columns:repeat(4,minmax(0,1fr));padding:0;gap:0}
+  body.rtg-stijl.rtg-edge-host .hoofdtabs button{flex-direction:column;gap:.3rem;justify-content:center;align-items:center;font-size:.6rem}
+}
+
 :focus-visible{outline:2px solid var(--wine-licht);outline-offset:3px}
 @keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(min-width:720px){

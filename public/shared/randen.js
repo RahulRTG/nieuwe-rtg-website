@@ -39,6 +39,14 @@
     if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
     else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
     else if (['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html','/apps/agenda.html','/apps/office.html','/apps/rtmail.html','/apps/bestanden.html','/apps/sitemaker.html','/apps/browser.html','/apps/rtgone.html','/apps/onderneming.html','/apps/magnaat.html','/apps/backoffice.html','/apps/command.html','/apps/rtgschool.html'].includes(pad)) wereld = 'work';
+    /* TRAVELOS HAD ALS ENIGE WERELD GEEN SCHIL. De wereld staat compleet in
+       rtg-edge-worlds.js (drie groepen, negen snelle functies) en werd nooit
+       gestart: dit bestand kende een lijst voor Foundation, Living en Work en
+       geen voor Reizen. Het beginscherm van TravelOS miste daardoor de bank
+       links en de balk onderin die elk ander wereldhuis wel heeft.
+       Deze tak leest de wereld uit de PAGINA zelf (`data-rtg-world`), zodat er
+       geen vierde lijst adressen bijkomt die kan gaan afwijken. */
+    if (!wereld && d.body && d.body.dataset.rtgWorld && (w.RTGEdgeWorlds || { travel: 1 })[d.body.dataset.rtgWorld] !== undefined) wereld = d.body.dataset.rtgWorld;
     if (!wereld) return false;
     if (new URLSearchParams(w.location.search).get('embed') === '1') {
       d.body.classList.add('rtg-edge-embed');

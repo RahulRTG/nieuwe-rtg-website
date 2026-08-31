@@ -20,8 +20,45 @@
    waardeloos maakt. */
 'use strict';
 
+const kostenhaak = require('../../kern/kosten/haak');
+const { dragerVanLab, dragerVanStudie } = require('../../kern/livinglab/ledger');
+
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, livinglab } = kern;
+
+  /* WIE DRAAGT DE KOSTEN VAN DIT VERZOEK -- op één plek, voor alle deuren van
+     het lab tegelijk (kantoor en bewoner).
+
+     Zonder deze regel valt alles wat hier gebeurt terug op 'huis': de eigen
+     rekening van RTG. Dat is de juiste terugval voor verbruik zonder eigenaar,
+     maar het lab HEEFT een eigenaar, en het is een andere rechtspersoon. Wat
+     hier draait, hoort bij de stichting -- en zolang dat niet in de meter staat,
+     kan het lab niet zeggen wat zijn onderzoek kostte en betaalt RTG het stil.
+
+     De drager komt uit het VERZOEK en niet uit de sessie: een medewerker werkt
+     op een dag aan vier studies, en die vier horen ieder hun eigen rekening te
+     krijgen. Is er geen lab en geen studie in het verzoek te vinden (het kader
+     opvragen, de labs opsommen), dan wordt er niets omgezet -- een verzonnen
+     eigenaar is erger dan geen. */
+  function dragerVanVerzoek(req) {
+    const b = req.body || {};
+    const kandidaat = String(b.id || b.studieId || b.labId || '');
+    if (!kandidaat) return null;
+    const s = livinglab.vindStudie(kandidaat);
+    if (s) return dragerVanStudie(s.labId, s.id);
+    const l = livinglab.vindLab(kandidaat);
+    if (l) return dragerVanLab(l.id);
+    /* Een expliciet meegegeven labId telt ook wanneer `id` iets anders is: de
+       apparatuur- en bestuursroutes noemen het lab bij naam. */
+    const l2 = b.labId ? livinglab.vindLab(String(b.labId)) : null;
+    return l2 ? dragerVanLab(l2.id) : null;
+  }
+  app.use('/api/lab2', (req, res, next) => {
+    const d = dragerVanVerzoek(req);
+    if (!d) return next();
+    kostenhaak.meld('verzoek', 1, { drager: d });
+    kostenhaak.binnen(d, next);
+  });
 
   const stuur = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
   const veilig = (res, werk) => {
@@ -79,6 +116,12 @@ module.exports = (kern) => {
   app.post('/api/lab2/ethiek/stopcriterium', officeAuth, (req, res) => veilig(res, () => livinglab.ethiek.stopcriteriumZet(id(req), req.body, wie(req))));
   app.post('/api/lab2/ethiek/stilleggen', officeAuth, (req, res) => veilig(res, () => livinglab.ethiek.stilleggen(id(req), req.body, wie(req))));
   app.post('/api/lab2/ethiek/klacht-af', officeAuth, (req, res) => veilig(res, () => livinglab.ethiek.klachtAf(id(req), req.body, wie(req))));
+
+  /* ---------- het onderzoeksgrootboek ----------
+     Wat een studie kostte, en waarom de stichting die rekening mocht betalen.
+     Alleen lezen: dit grootboek verandert niets aan wat het telt. */
+  app.post('/api/lab2/ledger/lab', officeAuth, (req, res) => veilig(res, () => livinglab.ledger.labLedger(id(req), (req.body || {}).periode)));
+  app.post('/api/lab2/ledger/studie', officeAuth, (req, res) => veilig(res, () => livinglab.ledger.studieLedger(id(req), (req.body || {}).periode)));
 
   /* De rest van het kantoorwerk -- deelnemers, bewijs, werkplaats, apparatuur,
      de pijplijn, impact en de coach -- staat in ./werk.js. Ze delen dit

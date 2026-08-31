@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1888,
+    "bestanden": 1890,
     "domeinenTotaal": 536,
-    "koopbareVormen": 512,
+    "koopbareVormen": 514,
     "koopbareDomeinen": 108,
     "envelopDrempel": 7,
     "envelop": 44,
-    "veldenDomeineigen": 698,
-    "veldenNietEnvelop": 907,
+    "veldenDomeineigen": 700,
+    "veldenNietEnvelop": 909,
     "gelijkendeVormparen": 7,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
-    "wagenVormen": 31,
-    "wagenVormenUniek": 28,
-    "wagenDomeinen": 20,
-    "optellingen": 103,
+    "wagenVormen": 32,
+    "wagenVormenUniek": 29,
+    "wagenDomeinen": 21,
+    "optellingen": 104,
     "optelDomeinen": 52,
-    "optelCenten": 54,
+    "optelCenten": 55,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -72,7 +72,7 @@
   ],
   "perWerkwoord": {
     "toon": 86,
-    "prijs": 34,
+    "prijs": 35,
     "beschikbaarheid": 49,
     "reserveer": 26,
     "bevestig": 50,
@@ -522,6 +522,27 @@
       "telt": 5
     },
     {
+      "domein": "kern/livinglab",
+      "heeft": {
+        "toon": true,
+        "prijs": true,
+        "beschikbaarheid": true,
+        "reserveer": true,
+        "bevestig": false,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "beeld",
+        "prijs": "kosten",
+        "beschikbaarheid": "agenda",
+        "reserveer": "onderhoudBij",
+        "lever": "uitgifte"
+      },
+      "telt": 5
+    },
+    {
       "domein": "kern/markt",
       "heeft": {
         "toon": true,
@@ -741,26 +762,6 @@
         "prijs": "directeKostenPerDrager",
         "beschikbaarheid": "heropen",
         "bevestig": "boek"
-      },
-      "telt": 4
-    },
-    {
-      "domein": "kern/livinglab",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": true,
-        "bevestig": false,
-        "lever": true,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "beeld",
-        "beschikbaarheid": "agenda",
-        "reserveer": "onderhoudBij",
-        "lever": "uitgifte"
       },
       "telt": 4
     },
@@ -2211,6 +2212,7 @@
     "kern/horeca",
     "kern/kantoor",
     "kern/keuken",
+    "kern/livinglab",
     "kern/mobiliteit",
     "kern/modebezorg",
     "kern/onderneming",
@@ -2353,6 +2355,14 @@
       ]
     },
     {
+      "domein": "kern/livinglab",
+      "plekken": 2,
+      "waar": [
+        "server/kern/livinglab/impact.js",
+        "server/kern/livinglab/ledger.js"
+      ]
+    },
+    {
       "domein": "kern/mall",
       "plekken": 2,
       "waar": [
@@ -2428,13 +2438,6 @@
       "plekken": 1,
       "waar": [
         "server/kern/assets/winkel.js"
-      ]
-    },
-    {
-      "domein": "kern/avond",
-      "plekken": 1,
-      "waar": [
-        "server/kern/avond/plan.js"
       ]
     }
   ]

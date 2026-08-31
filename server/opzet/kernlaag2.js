@@ -69,7 +69,12 @@ Object.assign(kern, require('../kern/onderzoekslab')({ db, save, crypto, anthrop
    ethieklaag met risicoklassen, de bewijsmotor en de pijplijn naar echte
    verandering. Het krijgt het Onderzoekslab hierboven mee: een pilot uit een
    afgerond onderzoek wordt daar een project, en nergens een tweede lijst. */
-Object.assign(kern, require('../kern/livinglab')({ db, save, crypto, anthropic, lab: kern.lab }));
+/* HET ONDERZOEKSGROOTBOEK LEEST DE KOSTEN- EN ECONOMIELAAG, EN DIE BESTAAN HIER
+   NOG NIET (kernlaag4). Ze gaan daarom als FUNCTIE mee -- hetzelfde patroon als
+   `comm: () => kern.comm` bij de spellen. Een kopie van de waarde zou hier
+   `undefined` bevriezen, en dat merkt niemand tot een lab zijn rekening opvraagt. */
+Object.assign(kern, require('../kern/livinglab')({ db, save, crypto, anthropic, lab: kern.lab,
+  kosten: () => kern.kosten, economie: () => kern.economie }));
 // De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
 // foundation-kantoor mee beslist over de lab-uitslagen
 Object.assign(kern, require('../kern/stadsraad')({ db, save, crypto }));

@@ -45,7 +45,7 @@
    (regel 4). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, lab }) => {
+module.exports = ({ db, save, crypto, anthropic, lab, kosten, economie }) => {
   /* De context wordt hier één keer opgebouwd en aan elke deelmodule meegegeven.
      De VOLGORDE hieronder is niet vrij: een module die iets uit `ctx`
      DESTRUCTUREERT, leest de waarde op het moment dat hij wordt gebouwd. Wie
@@ -84,6 +84,18 @@ module.exports = ({ db, save, crypto, anthropic, lab }) => {
   ctx.doorbraak = require('./doorbraak')(ctx);
   ctx.impact = require('./impact')(ctx);
   ctx.ai = require('./ai')(ctx);
+
+  /* HET ONDERZOEKSGROOTBOEK (./ledger.js): wat een studie kostte en waarom de
+     stichting die rekening mocht betalen. Hij leest de kostenmeter en de
+     economische firewall, en die worden als functie doorgegeven omdat ze pas in
+     een latere laag bestaan (opzet/kernlaag2.js).
+
+     Hij staat hier achteraan omdat hij alleen LEEST: geen enkele module
+     hierboven hangt ervan af, en een grootboek dat iets zou veranderen aan wat
+     het telt, is geen grootboek. */
+  ctx.ledger = require('./ledger').maakLedger({
+    kosten, economie,
+    vindLab: (id) => ctx.vindLab(id), vindStudie: (id) => ctx.vindStudie(id), nu: ctx.nu });
 
   const kader = require('./kader');
 

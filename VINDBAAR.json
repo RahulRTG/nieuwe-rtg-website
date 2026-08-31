@@ -4,9 +4,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 81,
-  "woorden": 1053,
+  "woorden": 1056,
   "gevonden": 667,
-  "dekking": 0.6334,
+  "dekking": 0.6316,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -89,6 +89,31 @@
         "bestuur",
         "capaciteit",
         "mensen"
+      ]
+    },
+    {
+      "naam": "Mall",
+      "url": "/apps/mall.html",
+      "woorden": 43,
+      "gevonden": 26,
+      "mist": [
+        "gevonden",
+        "complete",
+        "bibliotheek",
+        "aantal",
+        "window",
+        "rtgglyf",
+        "svghtml",
+        "icon",
+        "klasse",
+        "glyf",
+        "label",
+        "dienstenplein",
+        "tussen",
+        "leveranciers",
+        "vernietigen",
+        "softwarepaspoort",
+        "plaatsen"
       ]
     },
     {
@@ -181,28 +206,6 @@
         "eindig",
         "matches",
         "afspraken"
-      ]
-    },
-    {
-      "naam": "Mall",
-      "url": "/apps/mall.html",
-      "woorden": 40,
-      "gevonden": 26,
-      "mist": [
-        "gevonden",
-        "complete",
-        "bibliotheek",
-        "window",
-        "rtgglyf",
-        "svghtml",
-        "icon",
-        "klasse",
-        "glyf",
-        "label",
-        "dienstenplein",
-        "tussen",
-        "leveranciers",
-        "plaatsen"
       ]
     },
     {

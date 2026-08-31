@@ -1,37 +1,39 @@
 {
  "stempel": {
-  "op": "2026-08-31T19:10:13.274Z",
-  "commit": "79ffec57",
+  "op": "2026-08-31T20:48:53.109Z",
+  "commit": "fe24d38f",
   "boomVuil": true,
+  "boomAnders": 9,
+  "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4679,
-  "geclassificeerd": 4655,
+  "totaal": 4708,
+  "geclassificeerd": 4633,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3201,
-   "NOT_APPLICABLE": 1078,
-   "PROTECTED": 297,
-   "INTENTIONALLY_NON_IDEMPOTENT": 79,
-   "LEGACY_PENDING_CLASSIFICATION": 24
+   "BLOCKED_BY_TEST_FIXTURE": 3184,
+   "NOT_APPLICABLE": 1074,
+   "PROTECTED": 296,
+   "LEGACY_PENDING_CLASSIFICATION": 75,
+   "INTENTIONALLY_NON_IDEMPOTENT": 79
   },
-  "vastgesteldDoorMens": 1481,
-  "afgeleidDoorScript": 3174,
+  "vastgesteldDoorMens": 1475,
+  "afgeleidDoorScript": 3158,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3842,
-   "PUBLIC": 105,
+   "AUTHENTICATED": 3863,
+   "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
    "SERVICE_TO_SERVICE": 14,
    "SYSTEM_INTERNAL": 1
   },
   "bewijs": {
-   "kale ronde: beschermd": 120,
+   "kale ronde: beschermd": 119,
    "kale ronde: onbeschermd": 86,
-   "kale ronde: geen uitspraak": 4437,
-   "niet gemeten": 36
+   "kale ronde: geen uitspraak": 4416,
+   "niet gemeten": 87
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -1158,6 +1160,63 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "appstore.context.geef",
+   "route": "POST /api/appstore/context/geef",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "appstore.context.klaarzet",
+   "route": "POST /api/appstore/context/klaarzet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "appstore.context.lees",
+   "route": "POST /api/appstore/context/lees",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "appstore.dossier",
    "route": "POST /api/appstore/dossier",
    "semantiek": {
@@ -2263,6 +2322,25 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "appstore.vernietig",
+   "route": "POST /api/appstore/vernietig",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "appstore.weg",
@@ -7843,34 +7921,6 @@
     "zonderSleutel": "ongemeten",
     "grond": null,
     "hindernis": "Geen account gevonden op die codenaam of e-mail."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "boardroom.reset",
-   "route": "POST /api/boardroom/reset",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
@@ -15106,6 +15156,126 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "experience.bootstrap",
+   "route": "POST /api/experience/bootstrap",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "experience.evidence",
+   "route": "POST /api/experience/evidence",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "experience.intent.execute",
+   "route": "POST /api/experience/intent/execute",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "experience.intent.preview",
+   "route": "POST /api/experience/intent/preview",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "experience.projection",
+   "route": "POST /api/experience/projection",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "experience.resume",
+   "route": "POST /api/experience/resume",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "lid"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "facturen.ai",
@@ -29167,6 +29337,82 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "ik.workspace",
+   "route": "POST /api/ik/workspace",
+   "semantiek": null,
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "ik.workspace.audit",
+   "route": "POST /api/ik/workspace/audit",
+   "semantiek": null,
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "ik.workspace.audit.noteer",
+   "route": "POST /api/ik/workspace/audit/noteer",
+   "semantiek": null,
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "ik.workspace.zet",
+   "route": "POST /api/ik/workspace/zet",
+   "semantiek": null,
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "ik.zet",
    "route": "POST /api/ik/zet",
    "semantiek": {
@@ -31397,6 +31643,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "lab2.capsule",
+   "route": "POST /api/lab2/capsule",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "lab2.coach",
    "route": "POST /api/lab2/coach",
    "semantiek": {
@@ -31910,6 +32175,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "lab2.ledger.lab",
+   "route": "POST /api/lab2/ledger/lab",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.ledger.studie",
+   "route": "POST /api/lab2/ledger/studie",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "lab2.mens.bij",
    "route": "POST /api/lab2/mens/bij",
    "semantiek": {
@@ -31991,6 +32294,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "lab2.metingen",
+   "route": "POST /api/lab2/metingen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "lab2.mijn",
    "route": "POST /api/lab2/mijn",
    "semantiek": {
@@ -32017,6 +32339,26 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lab2.mijn.meting",
+   "route": "POST /api/lab2/mijn/meting",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "lab2.mijn.observatie",
@@ -32101,6 +32443,65 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lab2.mijn.terugtrekken.gevolg",
+   "route": "POST /api/lab2/mijn/terugtrekken/gevolg",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.mijn.venster",
+   "route": "POST /api/lab2/mijn/venster",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.observatorium",
+   "route": "POST /api/lab2/observatorium",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "lab2.opbrengst",
@@ -32290,6 +32691,158 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lab2.protocol.zet",
+   "route": "POST /api/lab2/protocol/zet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publicatie.intrekken",
+   "route": "POST /api/lab2/publicatie/intrekken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publicatie.zet",
+   "route": "POST /api/lab2/publicatie/zet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publiek.apparatuur",
+   "route": "POST /api/lab2/publiek/apparatuur",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publiek.onderzoek",
+   "route": "POST /api/lab2/publiek/onderzoek",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publiek.onderzoeken",
+   "route": "POST /api/lab2/publiek/onderzoeken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publiek.uitleen-aanvraag",
+   "route": "POST /api/lab2/publiek/uitleen-aanvraag",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.publiek.vragen",
+   "route": "POST /api/lab2/publiek/vragen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "lab2.studie",
@@ -32643,6 +33196,158 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "lab2.uitleen.besluit",
+   "route": "POST /api/lab2/uitleen/besluit",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.uitleen.herijkt",
+   "route": "POST /api/lab2/uitleen/herijkt",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.uitleen.lijst",
+   "route": "POST /api/lab2/uitleen/lijst",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.uitleen.meegeven",
+   "route": "POST /api/lab2/uitleen/meegeven",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.uitleen.terug",
+   "route": "POST /api/lab2/uitleen/terug",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.vraag.heroverweeg",
+   "route": "POST /api/lab2/vraag/heroverweeg",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.vraag.niet-starten",
+   "route": "POST /api/lab2/vraag/niet-starten",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "lab2.vraag.verken",
+   "route": "POST /api/lab2/vraag/verken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "lab2.werk.agenda",
    "route": "POST /api/lab2/werk/agenda",
    "semantiek": {
@@ -32884,6 +33589,25 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "labfonds.financiering",
+   "route": "POST /api/labfonds/financiering",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "labfonds.locatie.maak",
@@ -53379,33 +54103,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.bank.terugstorting",
-   "route": "POST /api/office/bank/terugstorting",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Kies gesloten of open."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.bank.vergunning",
    "route": "POST /api/office/bank/vergunning",
    "semantiek": {
@@ -53671,141 +54368,6 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.boardroom.schakel",
-   "route": "POST /api/office/boardroom/schakel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onbekende functie."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.boardroom.schakel-fijn",
-   "route": "POST /api/office/boardroom/schakel-fijn",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onbekende functie."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.boardroom.toegang",
-   "route": "POST /api/office/boardroom/toegang",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.boardroom.toegang.geef",
-   "route": "POST /api/office/boardroom/toegang/geef",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.boardroom.toegang.weg",
-   "route": "POST /api/office/boardroom/toegang/weg",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -62210,33 +62772,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "office.techniek.lastafworp",
-   "route": "POST /api/office/techniek/lastafworp",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.terugval",
    "route": "POST /api/office/terugval",
    "semantiek": {
@@ -62572,7 +63107,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -62599,7 +63134,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -62626,7 +63161,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -62680,7 +63215,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -62707,7 +63242,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "officeAuth"
+     "kluisAuth"
     ]
    },
    "bewijs": {
@@ -71980,33 +72515,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "privacy.delete",
-   "route": "POST /api/privacy/delete",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "privacy.export",
    "route": "POST /api/privacy/export",
    "semantiek": {
@@ -72221,6 +72729,234 @@
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reis.gezelschap",
+   "route": "POST /api/reis/gezelschap",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.aangekomen",
+   "route": "POST /api/reis/gezelschap/aangekomen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.antwoord",
+   "route": "POST /api/reis/gezelschap/antwoord",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.beeld",
+   "route": "POST /api/reis/gezelschap/beeld",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.beleid",
+   "route": "POST /api/reis/gezelschap/beleid",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.beleid.zet",
+   "route": "POST /api/reis/gezelschap/beleid/zet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.kring",
+   "route": "POST /api/reis/gezelschap/kring",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.nodig-uit",
+   "route": "POST /api/reis/gezelschap/nodig-uit",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.reis",
+   "route": "POST /api/reis/gezelschap/reis",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.schrijf",
+   "route": "POST /api/reis/gezelschap/schrijf",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.tijdlijn",
+   "route": "POST /api/reis/gezelschap/tijdlijn",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "reis.gezelschap.weg",
+   "route": "POST /api/reis/gezelschap/weg",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "reis.invoer.bevestig",
@@ -115779,34 +116515,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "techniek.bewaren.veeg",
-   "route": "POST /api/techniek/bewaren/veeg",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "techniek.controle.incident",
    "route": "POST /api/techniek/controle/incident",
    "semantiek": {
@@ -115863,144 +116571,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "techniek.eigenaar",
-   "route": "POST /api/techniek/eigenaar",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onjuist wachtwoord; er is niets gewijzigd."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.fouten.wis",
-   "route": "POST /api/techniek/fouten/wis",
-   "semantiek": {
-    "klasse": "sleutelVereist"
-   },
-   "duplicaatregel": "zelfdeVerzoek",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "beschermd",
-    "grond": "gemerkt",
-    "hindernis": null
-   },
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.functie",
-   "route": "POST /api/techniek/functie",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onbekende functie."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.functie.ai",
-   "route": "POST /api/techniek/functie/ai",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Stel een vraag of geef een instructie."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.functie.besluit",
-   "route": "POST /api/techniek/functie/besluit",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Aanvraag niet gevonden."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "techniek.inloggen",
    "route": "POST /api/techniek/inloggen",
    "semantiek": {
@@ -116019,34 +116589,6 @@
     "zonderSleutel": "ongemeten",
     "grond": null,
     "hindernis": "Onjuiste inloggegevens."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.moderniseer",
-   "route": "POST /api/techniek/moderniseer",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Beschrijf kort wat u wilt vernieuwen of verbeteren."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
@@ -116303,34 +116845,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "techniek.sso.schakel",
-   "route": "POST /api/techniek/sso/schakel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onbekende koppeling."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "techniek.sso.scimsleutel",
    "route": "POST /api/techniek/sso/scimsleutel",
    "semantiek": {
@@ -116577,62 +117091,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "techniek.tenant.vernietig",
-   "route": "POST /api/techniek/tenant/vernietig",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Die tenant kennen we niet."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.toegang",
-   "route": "POST /api/techniek/toegang",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Geen account met dat e-mailadres of die gebruikersnaam."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "techniek.vingerafdruk",
    "route": "POST /api/techniek/vingerafdruk",
    "semantiek": {
@@ -116771,34 +117229,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "techniek.wacht.lastafworp",
-   "route": "POST /api/techniek/wacht/lastafworp",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "beschermd",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": null
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "techniek.wacht.opruimen",
    "route": "POST /api/techniek/wacht/opruimen",
    "semantiek": {
@@ -116820,62 +117250,6 @@
     "zonderSleutel": "ongemeten",
     "grond": null,
     "hindernis": null
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.wacht.quarantaine",
-   "route": "POST /api/techniek/wacht/quarantaine",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Geen bron opgegeven."
-   },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "techniek.zekering",
-   "route": "POST /api/techniek/zekering",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "techAuth",
-     "eigenaarAlleen"
-    ]
-   },
-   "bewijs": {
-    "op": "2026-08-31T09:44:33.117Z",
-    "metSleutel": "ongemeten",
-    "zonderSleutel": "ongemeten",
-    "grond": null,
-    "hindernis": "Onbekende zekering."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",

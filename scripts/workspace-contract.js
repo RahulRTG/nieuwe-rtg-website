@@ -72,9 +72,23 @@ function controleer(wortel = ROOT) {
     const worldCheck = worldBuild.controleer(); worlds = worldBuild.gegevens();
     if (!worldCheck.ok) fouten.push('workspace-world-catalog.js loopt achter op canonieke MAPPEN');
     const aantal = worlds.reduce((n, x) => n + x.items.length, 0);
+    /* HET AANTAL FUNCTIES IS EEN BODEM EN GEEN GETAL, en dat is een correctie.
+
+       Hier stond `aantal !== 82`. Dat getal was de stand van MAPPEN op de dag
+       dat deze regel werd geschreven, overgetypt in de controleur -- precies de
+       vorm die dit huis elders bestrijdt. Elke tak die een scherm toevoegt liet
+       hem zakken zonder dat er iets mis was, en een poort die bij correcte code
+       rood wordt, wordt weggeklikt.
+
+       Wat de exactheid moest bewaken, bewaakt regel `worldCheck.ok` hierboven
+       al en beter: die vergelijkt de catalogus BYTE VOOR BYTE met wat uit de
+       canonieke MAPPEN volgt. Wat hier overblijft is de positieve controle --
+       vier werelden, RTG Core erbij, en de catalogus is niet stilletjes leeg
+       gelopen. De bodem is de stand waarop deze regel is ingevoerd. */
     if (worlds.filter(x => x.kind === 'world').length !== 4 || !worlds.some(x => x.name === 'LivingOS') ||
-        !worlds.some(x => x.name === 'WorkOS') || !worlds.some(x => x.id === 'core') || aantal !== 82)
-      fouten.push('wereldcatalogus dekt niet exact vier werelden, RTG Core en 82 functies');
+        !worlds.some(x => x.name === 'WorkOS') || !worlds.some(x => x.id === 'core') || aantal < 82)
+      fouten.push('wereldcatalogus dekt niet vier werelden, RTG Core en minstens 82 functies (nu ' +
+        aantal + ')');
     worlds.flatMap(x => x.items).filter(x => x.module).forEach(x => {
       if (!ids.has(x.module)) fouten.push('wereldfunctie ' + x.id + ' wijst naar ontbrekende module ' + x.module);
     });

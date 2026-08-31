@@ -406,6 +406,15 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['server/seed/genres-lijst.js', 'het genre-register: 73 regels pure data zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
     ['server/kern/werkplek-kantoren.js', 'de enterprise-kantoorcatalogus: zestien afdelingen met rollen en bestaande app-ingangen, een pure definitietabel die opknippen weer twee bronnen van waarheid maakt'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
+    /* GEGENEREERD, EN DAAROM NIET MET DE HAND TE KNIPPEN. Dit bestand is de
+       uitdraai van MAPPEN door scripts/workspace-worlds.js -- een enkele
+       JSON-regel. Wie er een snede in maakt, is hem kwijt bij de eerstvolgende
+       generatie; en de maat groeit hier niet door een tweede onderwerp maar
+       doordat het huis meer schermen kreeg. Dat het klopt wordt bovendien
+       strenger bewaakt dan door een maat: scripts/workspace-contract.js
+       vergelijkt hem byte voor byte met wat uit de canonieke MAPPEN volgt, en
+       zakt als hij achterloopt. */
+    ['public/shared/interface/workspace-world-catalog.js', 'gegenereerd uit MAPPEN door scripts/workspace-worlds.js: een uitdraai zonder binnengrens, en byte voor byte bewaakt door workspace-contract.js'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
     /* De vijfenvijftig bureau-routes staan sinds regel 45 VOLUIT: een pad dat
@@ -3696,8 +3705,21 @@ console.log('\n51) elke afdruk is gelijk aan de meting eronder');
          En hij MOET blijven staan: hij is de enige plek waar leest waarom een
          schuld ooit gegroeid is. Hem meevergelijken zou hem stilzwijgend
          wegpoetsen bij het eerstvolgende vastleggen. */
+      /* `historie` en `stilstaand` staan hier om precies dezelfde reden als
+         `groei` hierboven, en het is dezelfde soort vondst. BEWIJSSCHULD.json
+         houdt per post een regel per MEETDAG bij, en leidt daaruit af welke
+         post drie dagen stilstaat. Die twee ontstaan alleen bij het VASTLEGGEN
+         -- meet() kent ze niet, en kan ze ook niet kennen: een meting weet niet
+         wat er gisteren stond. Zonder deze uitzondering meldt de regel na elk
+         vastleggen opnieuw dat de afdruk achterloopt, ook meteen nadat hij is
+         geschreven. Een regel die altijd rood staat, wordt genegeerd.
+
+         Ze moeten ook blijven staan: de stilstandmelder is de enige plek waar
+         te zien is dat de aflossing stokt in plaats van groeit, en die kan niet
+         bestaan zonder de historie eronder. */
       const blokken = [...new Set([...Object.keys(opSchijf), ...Object.keys(vers)])]
-        .filter(k => k !== 'uitleg' && k !== 'vastgelegd' && k !== 'stempel' && k !== 'groei');
+        .filter(k => k !== 'uitleg' && k !== 'vastgelegd' && k !== 'stempel' && k !== 'groei' &&
+          k !== 'historie' && k !== 'stilstaand');
       const anders = (a, b) => JSON.stringify(a) !== JSON.stringify(b);
       const verschil = [];
       for (const k of blokken) {

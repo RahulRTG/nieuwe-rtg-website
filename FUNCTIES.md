@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **204** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
 | Bedrijfsgenres | **73** in 26 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **1801** |
-| App-pagina's (`public/apps/**.html`) | **276** |
-| Testbestanden | **1446** |
+| Kernmodules (`server/kern/**`) | **1901** |
+| App-pagina's (`public/apps/**.html`) | **280** |
+| Testbestanden | **1507** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 204 functieschakelaars
+# 1. De 205 functieschakelaars
 
 ### Leden (RTG-app) — 21
 
@@ -135,7 +135,7 @@ ook blokkeert.
 - **RTF contacten & familiekoppeling** (`rtf-contacten`) — De contactenlaag van de RTFoundation: gezinnen koppelen, kanalen en meldingen tussen leden.  
   _voor: rtg, lifestyle, business, foundation_
 
-### Eigen apps — 34
+### Eigen apps — 35
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -181,6 +181,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **RTG One** (`rtgone`) — De bestuurlijke regielaag voor intenties, beloften, overdracht, goedkeuringen, projecten en herstelbare automatisering.  
   _voor: intern_
+- **RTG Experience Platform** (`experience-platform`) — De vier werelden, hun contextprojecties, resume state, attention en gebrokerde acties. Domeinen blijven eigenaar van hun brondata.  
+  _voor: rtg, lifestyle, business_
 - **RTG Life (het ene scherm)** (`life`) — Het overzichtsscherm en de dagcoach: ze lezen de lagen hieronder en leggen ze naast elkaar. Ze meten zelf niets en bezitten niets, dus uitzetten haalt geen gegevens weg.  
   _voor: rtg, lifestyle, business_
 - **Doelen** (`doelen`) — Waar u begon, waar u heen wilt en waarom; de mijlpalen worden afgeleid en niet bewaard.  

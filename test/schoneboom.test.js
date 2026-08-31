@@ -28,7 +28,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { eisSchoneBoom, vuileBoom, CODEPADEN } = require('../scripts/lib/stempel');
+const { spawnSync } = require('child_process');
+const { eisSchoneBoom, vuileBoom, sluiting, versheid, CODEPADEN } = require('../scripts/lib/stempel');
 
 const PROEVEN = ['idemproef-route', 'rolproef-route', 'handelingproef-route',
   'auditproef-route', 'uitvoerproef-route', 'invoerproef-route'];
@@ -109,4 +110,72 @@ test('10. alleen ongecommitte CODE maakt een meting onreproduceerbaar', () => {
 test('11. de grens staat op EEN plek', () => {
   assert.deepEqual(CODEPADEN, ['server', 'scripts', 'public'],
     'versheid() en de poort vooraf horen dezelfde drie mappen te bedoelen');
+});
+
+/* ============================================================================
+   DE SLUITING: WELKE WIJZIGING RAAKT WELK REGISTER?
+
+   De versheid rekende elke wijziging onder scripts/ aan elk register toe. Een
+   reparatie aan de staatproef verklaarde daarmee ook de poortwacht en de
+   sabotageronde verouderd; alle registers tegelijk vers was onbereikbaar, en
+   een meter die nooit groen kan worden meet niets (LAT.md regel 9).
+
+   Twee mutaties gedaan, allebei beten ze:
+     - een berekende require ONGEZIEN overslaan -> toets 13 zakt (dan is een
+       onbekende sluiting ineens een lege, en dat is de gevaarlijke kant op)
+     - de filter op scripts/ weghalen in versheid() -> toets 14 zakt
+   ========================================================================== */
+test('12. de sluiting van een instrument bevat wat het inleest, en niet meer', () => {
+  const s = sluiting('scripts/poortwacht.js');
+  assert.ok(s, 'de sluiting van de poortwacht hoort te lukken');
+  assert.ok(s.has('scripts/poortwacht.js'), 'het instrument zelf hoort erbij');
+  assert.ok(s.has('scripts/lib/publiek.js'), 'de publieke lijst leest hij in');
+  assert.ok(!s.has('scripts/sabotage.js'), 'een ander instrument hoort er niet bij');
+});
+
+test('13. een pad dat niet bestaat geeft ONBEKEND en geen lege sluiting', () => {
+  assert.equal(sluiting('scripts/dit-bestaat-niet.js'), null,
+    'onbekend als "raakt mij niets" lezen is precies de verkeerde kant op');
+});
+
+test('14. een wijziging buiten het instrument veroudert het register niet', () => {
+  /* Er wordt hier niets verzonnen: de vergelijking loopt over de echte
+     git-historie. Wel wordt het GEVAL gekozen -- een commit die alleen scripts
+     raakt die het instrument NIET inleest. Zonder die keuze hing de toets aan
+     wat er toevallig in de laatste commit stond, en toen beet de mutatie
+     "haal de filter weg" niet. */
+  const head = spawnSync('git', ['rev-parse', '--short', 'HEAD'],
+    { cwd: WORTEL2, encoding: 'utf8' }).stdout.trim();
+  if (!head) return;   // een ondiepe kloon; dan valt er niets te vergelijken
+
+  const instrumenten = ['scripts/poortwacht.js', 'scripts/sabotage.js',
+    'scripts/bewijsschuld.js', 'scripts/staatproef-route.js'];
+  const commits = spawnSync('git', ['log', '--format=%h', '-40', 'HEAD'],
+    { cwd: WORTEL2, encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
+
+  let bewijs = null;
+  for (const c of commits) {
+    const gewijzigd = spawnSync('git', ['diff', '--name-only', c + '..' + head, '--',
+      'server', 'scripts', 'public'], { cwd: WORTEL2, encoding: 'utf8' })
+      .stdout.split('\n').filter(Boolean);
+    if (!gewijzigd.length || gewijzigd.some(f => !f.startsWith('scripts/'))) continue;
+    for (const i of instrumenten) {
+      const sl = sluiting(i);
+      if (sl && !gewijzigd.some(f => sl.has(f))) { bewijs = { c, i, gewijzigd }; break; }
+    }
+    if (bewijs) break;
+  }
+  /* Geen geval in veertig commits? Dan zegt deze toets niets, en dat hoort hij
+     te ZEGGEN in plaats van groen te kleuren. */
+  assert.ok(bewijs, 'geen commit gevonden die alleen scripts buiten een instrument raakt; ' +
+    'deze toets meet dan niets -- verruim het venster of voeg een geval toe');
+
+  const met = versheid({ op: 'x', commit: bewijs.c, boomVuil: false, instrument: bewijs.i }, head);
+  assert.equal(met.vers, true, bewijs.i + ' leest geen van ' + bewijs.gewijzigd.join(', ') +
+    ' in, en hoort dus vers te blijven -- gezien: ' + met.reden);
+
+  /* En zonder `instrument` blijft de oude, strengste regel gelden: een bestaand
+     register mag niet ineens vers heten omdat de regel is bijgesteld. */
+  const zonder = versheid({ op: 'x', commit: bewijs.c, boomVuil: false }, head);
+  assert.equal(zonder.vers, false, 'een stempel zonder instrument valt terug op de strengste regel');
 });

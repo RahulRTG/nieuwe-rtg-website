@@ -39,6 +39,10 @@
    Nu is er EEN regel (`CODEPADEN`), en die staat aan de kant van de reden: een
    meting is reproduceerbaar als de CODE eronder is vastgelegd. Een register is
    uitvoer en geen invoer.
+     instrument   WELK script deze meting heeft geschreven, als pad in de repo.
+                 Niet om het na te vertellen: hiermee is uit te rekenen welke
+                 wijzigingen onder scripts/ deze meting werkelijk raken. Zie
+                 `sluiting()` verderop.
      node        welke node. Een meting op een andere runtime is een andere
                  meting; scripts/norm.js maakt dat onderscheid al voor prestatie.
 
@@ -47,6 +51,7 @@
    tweede waarheid (LAT.md regel 4). */
 'use strict';
 const { execFileSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..', '..');
@@ -73,6 +78,82 @@ function gitRuw(args) {
   } catch (e) { return ''; }
 }
 
+/* Welk script draait hier? process.argv[1] en niet een naam die het instrument
+   zelf opgeeft: een naam die je moet intikken, gaat afwijken van het bestand
+   dat werkelijk meet. Buiten de repo (of geen script) -> null, en dan valt de
+   versheid terug op de strengste regel. */
+function instrumentPad() {
+  const a = process.argv[1];
+  if (!a) return null;
+  const rel = path.relative(WORTEL, a).replace(/\\/g, '/');
+  return (rel && !rel.startsWith('..')) ? rel : null;
+}
+
+/* ============================================================================
+   DE SLUITING VAN EEN INSTRUMENT -- welke scripts leest dit script mee?
+
+   WAAROM DIT NODIG WAS. De versheid rekende elke wijziging onder scripts/ aan
+   elk register toe. Een reparatie in de staatproef verklaarde daarmee ook de
+   poortwacht, de ketenronde en de sabotageronde verouderd, en na de volgende
+   reparatie weer. Alle registers tegelijk vers was daarmee onbereikbaar, en een
+   meter die nooit groen kan worden meet niets (LAT.md regel 9). Die regel staat
+   ook nog eens in dit bestand zelf, twintig regels verderop.
+
+   WAT DIT WEL EN NIET VERSOEPELT. server/ en public/ blijven onverkort tellen:
+   dat is de code die gemeten WORDT. Onder scripts/ telt voortaan alleen wat dit
+   instrument werkelijk inleest -- zichzelf en alles wat het via require()
+   bereikt, hoe diep ook. `scripts/lib/routes.js` raakt daarmee nog steeds bijna
+   elk register, en terecht.
+
+   EN WAT ER GEBEURT ALS HET NIET LUKT. Een require die niet statisch te lezen
+   is (een naam uit een variabele), een bestand dat niet bestaat, of een register
+   zonder `instrument` in zijn stempel: dan is de sluiting ONBEKEND en geldt de
+   oude, strengste regel. Onbekend als "raakt mij niet" lezen is precies de fout
+   die dit bestand elders bestrijdt. */
+function sluiting(startPad) {
+  const start = path.join(WORTEL, startPad);
+  if (!fs.existsSync(start)) return null;
+  const gezien = new Set();
+  const wachtrij = [start];
+  while (wachtrij.length) {
+    const f = wachtrij.shift();
+    const rel = path.relative(WORTEL, f).replace(/\\/g, '/');
+    if (gezien.has(rel)) continue;
+    gezien.add(rel);
+    let bron;
+    try { bron = fs.readFileSync(f, 'utf8'); } catch (e) { return null; }
+    /* Alleen RELATIEVE requires: een pakket uit node_modules staat niet in deze
+       boom en kan een meting dus niet verouderen. Een require met iets anders
+       dan een letterlijke tekst erin maakt de sluiting onbekend -- dan weet dit
+       niet wat er wordt ingelezen, en dat mag geen stilte worden. */
+    for (const m of bron.matchAll(/\brequire\(\s*([^)]*?)\s*\)/g)) {
+      const arg = m[1].trim();
+      const lit = /^'([^']*)'$|^"([^"]*)"$/.exec(arg);
+      if (!lit) {
+        /* EEN BEREKENDE REQUIRE MAAKT DE SLUITING ONBEKEND -- tenzij er geen
+           enkel PAD in kan zitten. scripts/lib/scherm.js doet
+           `require(p ? require.resolve('playwright', ...) : 'playwright')`: dat
+           laadt een pakket uit node_modules, en dat kan deze boom niet
+           verouderen. Staat er wel een relatieve tekst in de uitdrukking, dan
+           weet dit niet wat er wordt ingelezen, en dan is onbekend het enige
+           eerlijke antwoord. */
+        if (/['"]\.{1,2}\//.test(arg)) return null;
+        continue;
+      }
+      const naam = lit[1] !== undefined ? lit[1] : lit[2];
+      if (!naam.startsWith('.')) continue;
+      let doel = path.resolve(path.dirname(f), naam);
+      if (!fs.existsSync(doel) || fs.statSync(doel).isDirectory()) {
+        const kandidaten = [doel + '.js', path.join(doel, 'index.js'), doel + '.json'];
+        doel = kandidaten.find(k => fs.existsSync(k)) || null;
+      }
+      if (!doel) return null;
+      wachtrij.push(doel);
+    }
+  }
+  return gezien;
+}
+
 function stempel(extra) {
   const commit = git(['rev-parse', '--short', 'HEAD']) || null;
   /* --porcelain geeft een regel per gewijzigd bestand; leeg = schone boom.
@@ -84,6 +165,7 @@ function stempel(extra) {
     commit,
     boomVuil: vuil === null ? null : vuil.code.length > 0,
     boomAnders: vuil === null ? null : vuil.anders.length,
+    instrument: instrumentPad(),
     node: process.version
   }, extra || {});
 }
@@ -173,7 +255,19 @@ function versheid(gemeten, huidigeCommit) {
      registers, documentatie of een tekstbestand aanraakt, maakt een meting niet
      ongeldig. Een commit in server/, scripts/ of public/ wel. */
   const gewijzigd = git(['diff', '--name-only', gemeten.commit + '..' + nu, '--'].concat(CODEPADEN));
-  if (gewijzigd === '') {
+  /* De wijzigingen onder scripts/ die dit instrument niet inleest, tellen niet
+     mee -- zie `sluiting()`. Lukt de sluiting niet, dan blijft alles tellen. */
+  let raakt = gewijzigd.split('\n').filter(Boolean);
+  let buiten = 0;
+  if (raakt.length && gemeten.instrument) {
+    const sl = sluiting(gemeten.instrument);
+    if (sl) {
+      const voor = raakt.length;
+      raakt = raakt.filter(f => !f.startsWith('scripts/') || sl.has(f));
+      buiten = voor - raakt.length;
+    }
+  }
+  if (raakt.length === 0) {
     /* Lege uitvoer betekent OOK "de vergelijking mislukte" (onbekende commit na
        een rebase, of geen git). Daarom apart nagaan of de commit bestaat: een
        mislukte vergelijking als "geen wijzigingen" lezen zou een meting van een
@@ -181,13 +275,13 @@ function versheid(gemeten, huidigeCommit) {
     const bestaat = git(['cat-file', '-e', gemeten.commit + '^{commit}']) === '' &&
       git(['rev-parse', '--quiet', '--verify', gemeten.commit + '^{commit}']) !== '';
     if (!bestaat) return { vers: false, reden: 'gemeten op commit ' + gemeten.commit + ', die hier niet meer bestaat' };
-    return { vers: true, reden: 'gemeten op ' + gemeten.commit + '; sindsdien is er geen code gewijzigd' };
+    return { vers: true, reden: 'gemeten op ' + gemeten.commit + '; sindsdien is er geen code gewijzigd' +
+      (buiten ? ' die dit instrument raakt (' + buiten + ' wijziging(en) in scripts die het niet inleest)' : '') };
   }
-  const n = gewijzigd.split('\n').filter(Boolean).length;
-  return { vers: false, reden: 'gemeten op ' + gemeten.commit + ', sindsdien zijn ' + n +
-    ' codebestand(en) gewijzigd' };
+  return { vers: false, reden: 'gemeten op ' + gemeten.commit + ', sindsdien zijn ' + raakt.length +
+    ' codebestand(en) gewijzigd' + (buiten ? ' (' + buiten + ' andere buiten dit instrument gelaten)' : '') };
 }
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, nuCommit, CODEPADEN, WORTEL };
+module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, sluiting, nuCommit, CODEPADEN, WORTEL };

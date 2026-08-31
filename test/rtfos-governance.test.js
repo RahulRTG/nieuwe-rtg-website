@@ -245,6 +245,19 @@ test('het jaarverslag heeft een besluit nodig, en de cijfers bevriezen', async (
   assert.equal(open.body.jaarverslagen.length, 1);
   assert.equal(open.body.jaarverslagen[0].cijfers.totaal.batenEuro, batenBevroren);
 
+  /* EN OP WELKE GROND DIT OPENBAAR STAAT. Dit deel noemde zijn publieke kant
+     "de ANBI-publicatie" terwijl de eigenaar in de giftstand had vastgelegd dat
+     de aanvraag nog loopt -- een status die op twee plekken werd aangenomen.
+     Zolang die stand niet 'ja' is, publiceert de stichting uit eigen keus, en
+     dat hoort er te STAAN in plaats van dat een lezer het invult. */
+  assert.ok(open.body.grondslag, 'de publieke kant zegt niet op welke grond hij openbaar staat');
+  assert.equal(open.body.grondslag.grond, 'eigen keus');
+  assert.notEqual(open.body.grondslag.anbi, 'ja');
+  assert.match(open.body.grondslag.zegt, /niet omdat het al moet|zelf wil|niet als een ANBI-publicatie/);
+  /* GEEN RSIN NAAST EEN STATUS DIE ER NOG NIET IS: dat leest als een
+     beschikking. */
+  assert.equal(open.body.grondslag.rsin, null);
+
   // een tweede verslag over hetzelfde jaar kan alleen met een reden
   const stil = await os_('jaarverslag/opstellen', { jaar: 2026 });
   assert.equal(stil.status, 400);

@@ -108,16 +108,16 @@ module.exports = (state) => {
      eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
   /* Fase drie: de governance-laag. Het bestuur zelf (vergaderingen, quorum,
      besluiten), de regels die het stelt, de verantwoording achteraf en de
-     dingen die mis kunnen gaan. Het jaarverslag leunt op twee andere delen --
-     de cijfers uit rapport.js en de besluitcontrole uit bestuur-notulen.js --
-     en maakt geen van beide na (LAT.md regel 4). */
+     dingen die mis kunnen gaan. Het jaarverslag leunt op drie delen -- rapport.js
+     (cijfers), bestuur-notulen.js (besluit) en gift.js (de ANBI-stand, die
+     het aannam) -- en maakt er geen na (LAT.md regel 4). */
   const bestuur = require('./bestuur')(ctx);
   const notulen = require('./bestuur-notulen')(ctx, { vind: bestuur.vind, beeld: bestuur.beeld,
     mag: bestuur.mag, quorumVan: bestuur.quorumVan });
   Object.assign(bestuur, notulen);
   const beleid = require('./beleid')(ctx);
   const jaarverslag = require('./jaarverslag')(ctx, { cijfersVan: rapport.cijfersVan,
-    besluitVindbaar: notulen.besluitVindbaar });
+    besluitVindbaar: notulen.besluitVindbaar, anbiVan: gift.stand });
   const risico = require('./risico')(ctx);
   const meldcode = require('./meldcode')(ctx);
 

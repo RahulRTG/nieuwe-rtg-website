@@ -257,15 +257,30 @@ zetten alleen de boardroom — en dat oordeel valt op de server.
 - **De incasso.** Er is er geen, en hij komt er niet uit zichzelf: elke termijn
   wordt door de gever zelf bevestigd. Geld dat vanzelf van iemands rekening gaat,
   vraagt een machtiging en een eigen besluit.
-- **En let op een derde plek waar ANBI al leeft.** `kern/rtfos/jaarverslag.js`
-  opent met *"Een ANBI moet publiceren. Dat is geen nette gewoonte maar een
-  voorwaarde"* en bouwt die publicatieplicht ook uit, onder `/publiek` en niet
-  achter een inlog. Dat module gaat er dus van uit dat de stichting er een is,
-  terwijl de giftstand nu vastlegt dat de aanvraag nog loopt. Die twee horen
-  elkaar te vinden zodra de beschikking er is — vandaag spreken ze elkaar niet
-  tegen op het scherm (het jaarstuk gaat over publiceren, de gift over
-  aftrekbaarheid), maar het is één status die op twee plekken wordt aangenomen.
+- **De derde plek waar ANBI leefde, is gesloten (31 augustus 2026).**
+  `kern/rtfos/jaarverslag.js` opende met *"Een ANBI moet publiceren. Dat is geen
+  nette gewoonte maar een voorwaarde"*, bouwde die publicatieplicht uit en hing
+  het stuk onder `/publiek` — terwijl de giftstand vastlegt dat de aanvraag nog
+  loopt. Eén status, twee plekken, en ze lazen elkaar niet. Er is nu één lezer:
+  `kern/rtfos/anbi-grondslag.js`, en `/api/rtfos/publiek/jaarverslagen` draagt
+  een `grondslag` die zegt op welke grond het stuk openbaar staat —
+  `publicatieplicht` alleen bij `anbi: 'ja'`, anders `eigen keus`.
 
-- **De ANBI-stand staat los van `foundationregistratie`.** Zodra de beschikking
-  er is, hoort het RSIN op de plek te komen waar die laag hem al kent, en niet
-  in een tweede veld. Nu staat hij in de giftstand.
+  Drie dingen die daar niet mogen sneuvelen. **De ANBI-stand houdt één
+  eigenaar** en dat is `gift.js`, want daar zet de eigenaar hem; het jaarstuk
+  leest en verzint niet. **Zonder lezer is de uitkomst `onbekend` en niet
+  `ja`** — dezelfde regel als bij de fiscale klassen: wat niemand heeft
+  ingedeeld, valt terug op de voorzichtige kant. En **het RSIN verschijnt
+  alleen bij `ja`**, want een RSIN naast "aangevraagd" leest als een
+  beschikking die er niet is. Vrijwillig publiceren is niet minder waard; doen
+  alsof het een plicht is die je vervult, is dat wel.
+
+- **De ANBI-stand staat los van `foundationregistratie`, en dat is nagemeten
+  géén dubbeling.** Die laag en `kern/rtfos/partners.js` leggen ANBI en RSIN
+  vast van *andere* organisaties: aanvragers en partnerstichtingen. Voor de
+  RTFoundation zélf is de giftstand vandaag de enige plek. Er valt dus niets
+  samen te voegen; wat er wél staat is een verschil in vórm dat opvalt zodra ze
+  ooit bij elkaar komen — daar is ANBI een `boolean` (`anbi: b.anbi === true`)
+  en hier een stand met vier waarden, waarvan `onbekend` met opzet iets anders
+  is dan `nee`. Een boolean kan die twee niet uit elkaar houden, dus als er ooit
+  één plek komt, is het deze vorm en niet die.

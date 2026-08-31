@@ -498,3 +498,36 @@ test('alleen de termijn van DIT jaar staat open, en een dubbele betaling meldt e
   assert.equal(tweede.termijn, null,
     'een tweede betaling in hetzelfde jaar meldde een termijn die niet is afgetekend');
 });
+
+/* ---------------------------------------------------------------------------
+   DE ANBI-STAND HEEFT EEN EIGENAAR, EN JAARVERSLAG.JS NAM HEM AAN.
+
+   Dat deel opent met "een ANBI moet publiceren", bouwt die publicatieplicht uit
+   en hangt het stuk onder /publiek -- terwijl de eigenaar in de giftstand had
+   vastgelegd dat de aanvraag nog LOOPT. Twee plekken, een status, en ze lazen
+   elkaar niet. kern/rtfos/anbi-grondslag.js is de lezer; dit is de toets dat hij
+   NOOIT de gunstige kant kiest als hij het niet weet. */
+const grondslagVan = require('../server/kern/rtfos/anbi-grondslag');
+
+test('de grondslag om te publiceren wordt gelezen en nooit aangenomen', () => {
+  const beschikt = grondslagVan(() => ({ anbi: 'ja', rsin: '123456789' }))();
+  assert.equal(beschikt.grond, 'publicatieplicht');
+  assert.equal(beschikt.rsin, '123456789');
+
+  /* AANGEVRAAGD IS GEEN JA. Dit is de stand van vandaag, en juist hier ging het
+     mis: publiceren mag, maar niet onder de vlag van een plicht. */
+  const loopt = grondslagVan(() => ({ anbi: 'aangevraagd', rsin: '123456789' }))();
+  assert.equal(loopt.grond, 'eigen keus');
+  assert.equal(loopt.rsin, null, 'een RSIN naast een lopende aanvraag leest als een beschikking');
+
+  /* GEEN LEZER, GEEN AANNAME. Valt de stand weg -- of gooit hij -- dan is de
+     uitkomst `onbekend` en niet `ja`. Dezelfde regel als bij de fiscale klassen
+     in CLAUDE.md: wat niemand heeft ingedeeld, valt terug op de voorzichtige
+     kant en zegt dat het niet is ingedeeld. */
+  for (const stuk of [undefined, () => null, () => { throw new Error('weg'); }, () => ({ anbi: 'misschien' })]) {
+    const g = grondslagVan(stuk)();
+    assert.equal(g.anbi, 'onbekend');
+    assert.equal(g.grond, 'eigen keus');
+    assert.match(g.zegt, /niet als een ANBI-publicatie/);
+  }
+});

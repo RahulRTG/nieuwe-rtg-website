@@ -81,6 +81,24 @@
     .opening .streep{animation:none;width:8rem;}
     .opening{transition:none;}
   }
+  /* DE OVERDRACHTSKAART. Hij ligt OVER de cel en niet eronder: wat er
+     doorgegeven wordt, hoort te worden gelezen voordat de app het heeft. Hij
+     verdwijnt door een van de twee knoppen -- er is geen kruisje dat het
+     stilzwijgend doet gebeuren. */
+  .over{position:absolute;inset:0;z-index:5;background:rgba(12,12,11,.96);backdrop-filter:blur(6px);
+    overflow:auto;padding:1.2rem;display:none;}
+  .over[data-open="1"]{display:block;}
+  .over .binnen{max-width:520px;margin:0 auto;}
+  .over .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  .over h2{font-size:1.25rem;margin:.15rem 0 .5rem;}
+  .over .sub{font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:.9rem;}
+  .over .veldrij{display:flex;justify-content:space-between;gap:.8rem;border-top:1px solid var(--line);
+    padding:.55rem 0;font-size:.9rem;}
+  .over .veldrij:last-of-type{border-bottom:1px solid var(--line);}
+  .over .veldnaam{color:var(--soft);font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;padding-top:.2rem;}
+  .over .veldnaam small{display:block;letter-spacing:0;text-transform:none;font-size:.72rem;color:var(--soft);}
+  .over .veldwaarde{color:var(--txt);text-align:right;font-variant-numeric:tabular-nums;}
+  .over .let{font-size:.78rem;color:var(--muted);line-height:1.6;margin-top:.8rem;}
   .cel{flex:1 1 auto;min-height:0;position:relative;background:var(--bg);}
   /* HET KADER VULT DE CEL ABSOLUUT. Met height:100% in de stroom begon het
      iframe 69 px lager dan de cel (de schil van het huis zet er zijn eigen
@@ -161,6 +179,19 @@
     <iframe id="cel-kader" sandbox="allow-scripts" allow="" referrerpolicy="no-referrer"
             title="Een app van een andere partij, in een afgeschermde cel" hidden></iframe>
   </div>
+  <div class="over" id="over" role="dialog" aria-label="Doorgeven aan deze app">
+    <div class="binnen">
+      <div class="ey">RTG geeft door</div>
+      <h2 id="overKop">Deze waarden gaan naar de app</h2>
+      <p class="sub" id="overSub"></p>
+      <div id="overVelden"></div>
+      <p class="let" id="overLet"></p>
+      <div class="knoprij">
+        <button class="knop aan" id="overJa" type="button">Geef door</button>
+        <button class="knop" id="overNee" type="button">Niet doorgeven</button>
+      </div>
+    </div>
+  </div>
   <div class="paneel" id="paneel" role="dialog" aria-label="Wat mag deze app">
     <div class="binnen">
       <h2>Wat mag deze app?</h2>
@@ -220,7 +251,11 @@ const FOUTVELDEN = ['code', 'error', 'herhaalbaar', 'methode', 'methodes',
   'machtiging', 'verleend', 'gevraagd', 'hoe', 'perMinuut'];
 
 const SLEUTEL = (() => { try { return new URLSearchParams(location.search).get('app') || ''; } catch (e) { return ''; } })();
-let frame = null, STAND = null;
+/* DE OVERDRACHT VAN DEZE OPENING. Een id in het adres, meer niet: de waarden
+   zelf staan op de server en worden hier opgehaald om ze te TONEN. Zouden ze in
+   de URL staan, dan is een gedeeld webadres een gedeelde overdracht. */
+const OVERDRACHT = (() => { try { return new URLSearchParams(location.search).get('context') || ''; } catch (e) { return ''; } })();
+let frame = null, STAND = null, KLAAR = null;
 
 /* Een melding in plaats van een app. Het kader zelf blijft staan (verborgen):
    het draagt de sandbox en het lege allow, en die twee horen niet afhankelijk
@@ -281,11 +316,57 @@ async function open(){
      laadt, is een RTG-scherm dat kapot lijkt terwijl de app het is. */
   const t0 = Date.now();
   const dicht = () => { const o = $('#opening'); if (o) o.setAttribute('data-weg', '1'); };
-  f.addEventListener('load', () => setTimeout(dicht, Math.max(0, 700 - (Date.now() - t0))), { once: true });
+  f.addEventListener('load', () => {
+    setTimeout(dicht, Math.max(0, 700 - (Date.now() - t0)));
+    /* De vraag komt PAS als de app er staat: een bevestiging boven een leeg
+       scherm is een bevestiging waarvan je niet ziet waar hij heen gaat. Staat
+       er niets klaar, dan krijgt de cel meteen `null` en wacht hij nergens op. */
+    toonOverdracht();
+  }, { once: true });
   setTimeout(dicht, 4000);
   f.src = d.start;
   frame = f;
 }
+
+/* ---------- de contextbrug: samenstellen doet RTG, bevestigen doet de mens ----------
+
+   De waarden gaan pas naar de cel als er op "geef door" is gedrukt. Drukt
+   niemand, dan krijgt de app `null` -- en dat is de gewone toestand, want de
+   meeste keren dat een app opengaat is er niets doorgegeven. Er is met opzet
+   geen "onthoud deze keuze": dan is het weer een machtiging, en precies dat is
+   het niet. */
+async function toonOverdracht(){
+  if (!OVERDRACHT) return stuurContext(null);
+  let d;
+  try { d = await api('/api/appstore/context/lees', { id: OVERDRACHT }); }
+  catch (e) { meld(e.message); return stuurContext(null); }
+  $('#overSub').textContent = 'Deze waarden komen uit RTG. ' + (d.let || '');
+  $('#overVelden').innerHTML = (d.toont || []).map(v =>
+    '<div class="veldrij"><span class="veldnaam">'+esc(v.label)+'<small>'+esc(v.uitleg)+'</small></span>'+
+    '<span class="veldwaarde">'+esc(v.tekst != null ? v.tekst : v.waarde)+'</span></div>').join('');
+  $('#overLet').textContent = 'De app krijgt alleen dit. Niet je naam, niet je codenaam, en niet waar dit vandaan komt. '
+    + 'Geef je het niet door, dan werkt de app gewoon: dan begint hij leeg.';
+  $('#over').setAttribute('data-open', '1');
+}
+function stuurContext(velden){
+  KLAAR = true;
+  if (frame && frame.contentWindow) {
+    try { frame.contentWindow.postMessage({ rtgcel: 1, context: velden || null }, '*'); } catch (e) {}
+  }
+}
+$('#overJa').addEventListener('click', async () => {
+  $('#over').setAttribute('data-open', '0');
+  try {
+    const r = await api('/api/appstore/context/geef', { id: OVERDRACHT, sleutel: SLEUTEL });
+    stuurContext(r.velden || null);
+    meld('Doorgegeven.');
+  } catch (e) { meld(e.message); stuurContext(null); }
+});
+$('#overNee').addEventListener('click', () => {
+  $('#over').setAttribute('data-open', '0');
+  stuurContext(null);
+  meld('Niet doorgegeven. De app begint leeg.');
+});
 
 /* De brug. Alles wat hier binnenkomt komt uit de cel; alles wat eruit gaat is
    het antwoord van de server op precies die aanroep. */

@@ -39,7 +39,7 @@ bijna nergens de meting en bijna overal de PRESENTATIE.
 | tijdelijke cel (voor deze reis) | **staat** | `kern/appstore/tijdelijk.js` + `opruim.js`: einddatum van het LID, en "vernietig de cel" zegt wat er verdwijnt |
 | Foundry-meters tijdens het bouwen | **een stap weg** | de proefkeuring geeft de getallen al terug (`versies.js`, `proef`) |
 | INSTANT-label | **een besluit** | alleen als het GEMETEN is, zoals `scripts/tikken.js` — nooit als claim |
-| minimum context invocation | **een besluit** | de scherpste vraag van het hele voorstel; par. 3 |
+| minimum context invocation | **staat** | `kern/appstore/context.js`: zeven velden, eenmalig, en het lid bevestigt per handeling |
 | private store voor een organisatie | **jaren weg** | vraagt eerst het tenantbestuur uit `TENANT.md` |
 
 ## 2. Waarom "Zero Reach" per app een leugen zou zijn
@@ -82,7 +82,7 @@ De klasse wordt twee keer gerekend en nooit één keer: wat het manifest VRAAGT 
 wat dit lid heeft VERLEEND (`vraagtBereik` en `verleendBereik` in `etalage.js`).
 Die twee door elkaar halen is grens 4.
 
-## 3. Minimum context invocation — het besluit dat er ligt
+## 3. Minimum context invocation — gebouwd, en waar de streep ligt
 
 De sterkste gedachte uit het voorstel, en de enige die een grens raakt:
 
@@ -102,9 +102,24 @@ niets bevat wat het lid niet zelf typte, en (d) niet wordt bewaard. Zodra er
 iets in mag komen dat RTG zelf heeft opgezocht — een reisprofiel, een bedrag uit
 de boekhouding — is het wél een brug en hoort het door de machtigingenlaag.
 
-Dat onderscheid vraagt een besluit van de eigenaar, want de verleidelijke kant
-("Rome, 4 dagen" uit het reisdossier halen) valt aan de verkeerde kant van de
-streep.
+**Besloten op 31 augustus 2026: ook wat RTG zelf opzoekt mag mee, en het lid
+bevestigt per handeling.** Dat is de ruimere kant van de streep, en daarom is de
+laag strenger gebouwd dan een openingseigenschap:
+
+- **Zeven velden, gesloten lijst** (`kern/appstore/context.js`): bedrag,
+  btw-tarief, bestemming, aantal dagen, aantal personen, datum, tot en met. Elk
+  veld draagt een wereld en een uitleg die een lid leest; een veld erbij is een
+  besluit. Een onbekend veld is een fout en wordt niet genegeerd.
+- **Nooit een identificator.** Wat op een e-mailadres, telefoonnummer of iban
+  lijkt, wordt geweigerd -- ook in een tekstveld als `bestemming`. Deze weg
+  draagt alleen waarden waarmee niemand te vinden is.
+- **Eenmalig, een kwartier geldig, aan een lid en aan een app.** Een id in het
+  adres en de waarden op de server: zou de waarde in de URL staan, dan is een
+  gedeeld webadres een gedeelde overdracht.
+- **Bevestigen doet de mens, per handeling.** Er is met opzet geen machtiging die
+  dit een keer aanzet -- `test/appstore-context.test.js` toets 8 zakt zodra er
+  een machtiging bijkomt die erop lijkt. De kaart staat OVER de app en toont elke
+  waarde voluit; "niet doorgeven" laat de app gewoon leeg beginnen.
 
 ## 3a. De eerste eigen app staat er, en hij kreeg geen streepje voor
 

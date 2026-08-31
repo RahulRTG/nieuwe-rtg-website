@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1887,
-    "vormen": 1291,
+    "bestanden": 1888,
+    "vormen": 1292,
     "velden": 1841,
-    "modules": 691,
+    "modules": 692,
     "domeinen": 245,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1292,
-    "veldenGedeeldVanafVier": 184,
+    "envelop": 33,
+    "veldenDomeineigen": 1291,
+    "veldenGedeeldVanafVier": 183,
     "gelijkendeVormparen": 19
   },
   "envelop": [
@@ -30,6 +30,7 @@
     "naam",
     "naar",
     "notitie",
+    "ok",
     "omschrijving",
     "prijs",
     "reden",
@@ -70,18 +71,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/eten"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 14,
-      "waar": [
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren",
-        "kern/mailaanname"
       ]
     },
     {
@@ -526,6 +515,18 @@
         "kern/gast",
         "kern/magnaat-economie",
         "kern/mall"
+      ]
+    },
+    {
+      "veld": "url",
+      "domeinen": 8,
+      "waar": [
+        "kern/appbieb",
+        "kern/bedrijfscontrole",
+        "kern/foundationregistratie-register",
+        "kern/handelsregelbronnen",
+        "kern/handelsregelwacht",
+        "kern/lidmaatschap"
       ]
     }
   ],

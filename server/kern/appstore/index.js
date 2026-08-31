@@ -116,7 +116,12 @@ function maakAppstore({ db, save, dir, antivirus, log, pay, findSupplier, bus, p
     GEEN_PROGRESSIE: GEEN_PROGRESSIE || 'De ranglijst is op deze server niet ingericht; het spel speelt gewoon door.',
     versieVan: (sleutel) => { const a = app(sleutel); return a && a.live ? versie(a.live) : null; } });
 
-  const motor = { progressieMag, GEEN_PROGRESSIE, arena,
+  /* DE CONTEXTBRUG (./context.js): waarden die RTG voor EEN handeling klaarzet
+     en die het LID zelf doorgeeft. Geen machtiging en geen zevende begrip -- een
+     eigenschap van de opening, eenmalig en met een vervaltijd. */
+  const context = require('./context').maakContext({ S, save, nu });
+
+  const motor = { progressieMag, GEEN_PROGRESSIE, arena, context,
     S, journaal, journaalVan, uitgeverApps, boek, opslag, nu, save, toegankelijk,
     uitgever, uitgevers, uitgeverAanvragen, uitgeverAanvragenPersoon, uitgeverBesluit,
     magInzenden, magPrijsVragen, uitgeverVanPersoon,

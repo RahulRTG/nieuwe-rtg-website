@@ -107,6 +107,21 @@
   });
   $('#splitFooi').addEventListener('change', function () { bewaar('fooi', $('#splitFooi').value); });
 
+  /* DE HANDELING WAARMEE DEZE APP WERD GEOPEND. RTG kan waarden meegeven die bij
+     EEN handeling horen -- een bedrag met zijn btw-tarief -- en het lid heeft ze
+     dan zelf doorgegeven. Krijgt de app niets (de gewone toestand), dan begint
+     hij leeg; daar wordt niets over gezegd en niets om gevraagd. */
+  if (window.RTG && window.RTG.context) {
+    window.RTG.context().then(function (c) {
+      if (!c) return;
+      if (c.bedrag != null) $('#btwBedrag').value = String(c.bedrag).replace('.', ',');
+      if (c.btwTarief != null && $('#btwPct').querySelector('option[value="' + c.btwTarief + '"]')) {
+        $('#btwPct').value = String(c.btwTarief);
+      }
+      btw();
+    }).catch(function () {});
+  }
+
   /* De voorkeuren terugzetten. Ze worden pas gelezen als het scherm er staat:
      een app die wacht op de brug voordat hij iets toont, voelt traag terwijl er
      niets te wachten viel. */

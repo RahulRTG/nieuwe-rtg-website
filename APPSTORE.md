@@ -283,6 +283,7 @@ server/kern/appstore/
   arena.js        het bord van EEN app, met de 18+-poort van kern/spellen/grens.js
   universa.js     de drie afdelingen van de winkel, afgeleid uit uitgever en arena
   tijdelijk.js    een cel met een einddatum die het LID koos
+  context.js      waarden voor EEN handeling: klaargezet door RTG, doorgegeven door het lid
   opruim.js       verwijderen, wissen en de cel vernietigen -- wat een lid terugneemt
   manifestvorm.js welke velden een manifest kent en hoe ze eruitzien
   geld.js         de afdracht en de rekensom (de bon)
@@ -309,6 +310,7 @@ test/appstore.test.js      de zes grenzen over de lijn
 test/appstore-bereik.test.js   de bereikklasse, en dat hij nergens te ZETTEN is
 test/appstore-arena.test.js    het bord per app, en de leeftijdsgrens erachter
 test/appstore-tijdelijk.test.js  de einddatum, en het verschil tussen weg en vernietigd
+test/appstore-context.test.js  de contextbrug: gesloten lijst, eenmalig, en geen machtiging
 test/appstore-eersteapps.test.js  de eigen bundels in storeapps/ door dezelfde poort
 
 storeapps/                 de eerste apps van RTG zelf, als gewone inzending

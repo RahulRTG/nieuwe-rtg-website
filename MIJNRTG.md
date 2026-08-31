@@ -261,10 +261,30 @@ rechttrekken van een scheve. Het antwoord noemt het **gevolg** en niet alleen he
 succes: *"een herstelcode gaat vanaf nu naar dit nummer"* -- wie dat leest en de
 wijziging niet herkent, hoort meteen te weten dat er iets mis is.
 
-Wat dit **niet** repareert: het e-mailadres. Er is vandaag geen ledenroute die
-het verandert (alleen de eigenaars-bootstrap in `server.js` raakt `renameUser`),
-dus er is niets te grendelen -- maar wie er ooit een bouwt, hoort langs dezelfde
-grendel te gaan.
+### Het e-mailadres, in twee stappen
+
+Er was geen ledenroute die het adres verandert, en dat was een gat en geen
+besluit: een lid kon zijn eigen inlognaam niet wijzigen. Die route staat er nu,
+met drie sloten in plaats van een, want dit adres is de inlognaam (`findByLogin`
+zoekt op `email_hash`) én het herstelkanaal tegelijk:
+
+1. **het wachtwoord**, net als bij het nummer;
+2. **bevestiging op het NIEUWE adres**, wat ook beschermt tegen een typefout --
+   ging het meteen in, dan is een verkeerde letter een account waar niemand meer
+   in kan;
+3. **een bericht naar het OUDE adres**, zonder goedkeurlink maar wel met wat er
+   gaat gebeuren. Wie dat leest en het niet zelf deed, kan het nog voor zijn.
+
+Twee dingen die daarbij niet mogen schuiven. Het aangevraagde adres ligt in het
+**ledendossier** en niet in `db.data`: dat dossier gaat versleuteld de kolom in,
+en een e-mailadres in de operationele opslag ligt buiten de kluis. En de
+**aanvraag toetst níét of het adres al bestaat** -- dat gebeurt pas bij de
+bevestiging, want anders was dit een manier om te ontdekken welke adressen een
+RTG-account hebben.
+
+De bevestigingsroute is publiek en staat met die reden in de `PUBLIEK`-lijst van
+`scripts/check.js`: hij komt uit de mailbox van het nieuwe adres en heeft dus
+geen sessie. Dat is geen omissie maar het bewijs zelf.
 
 ## 6. De volgorde
 

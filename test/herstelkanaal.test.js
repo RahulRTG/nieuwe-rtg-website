@@ -79,7 +79,7 @@ function bouwRoute({ wachtwoordKlopt, gezet }) {
       gezet.push(nummer); return { id, nummer };
     }
   };
-  require('../server/routes/member/sessies')({ app, auth: null, accounts, sessieregister: null });
+  require('../server/routes/member/herstelkanaal')({ app, auth: null, accounts });
   return routes['/api/mijn/herstelkanaal/telefoon'];
 }
 const antwoord = () => {
@@ -119,7 +119,7 @@ test('5c. eerst controleren, dan pas wijzigen', async () => {
     verifyPassword: async () => { volgorde.push('controle'); return true; },
     setPhone: () => { volgorde.push('wijziging'); return { ok: true }; }
   };
-  require('../server/routes/member/sessies')({ app, auth: null, accounts, sessieregister: null });
+  require('../server/routes/member/herstelkanaal')({ app, auth: null, accounts });
   await routes['/api/mijn/herstelkanaal/telefoon']({ session: sessie, body: { huidig: 'g', telefoon: '0612345678' } }, antwoord());
   assert.deepEqual(volgorde, ['controle', 'wijziging'],
     'andersom is de wijziging al gebeurd als de controle zakt');
@@ -143,4 +143,102 @@ test('6. de twee nummer-routes staan op de zware lijst', () => {
   const paden = PADEN.map(p => p.pad);
   assert.ok(paden.some(p => '/api/gegevens/zeg'.startsWith(p)));
   assert.ok(paden.some(p => '/api/onboarding/inricht'.startsWith(p)));
+});
+
+/* ===========================================================================
+   HET E-MAILADRES. Zwaarder dan het nummer, want dit adres is de INLOGNAAM
+   (findByLogin zoekt op email_hash) EN het herstelkanaal tegelijk. Wie het
+   vervangt, neemt de voordeur en de achterdeur in een keer over.
+
+   De dragende bewering staat in toets 8: het adres wisselt pas als iemand bij
+   het NIEUWE adres kan. Dat is niet alleen beveiliging maar ook bescherming
+   tegen een typefout -- ging het meteen in, dan is een verkeerd getypte letter
+   een account waar niemand meer in kan.
+   ========================================================================= */
+function bouwMail({ wachtwoordKlopt, verstuurd, gezet, dossier, tokenOk }) {
+  const routes = {};
+  const app = { post: (pad, a, fn) => { routes[pad] = fn || a; } };
+  const accounts = {
+    verifyPassword: async (a) => wachtwoordKlopt(a),
+    emailOf: () => 'oud@example.com',
+    getMemberState: () => dossier.waarde,
+    saveMemberState: (id, o) => { dossier.waarde = o; },
+    issueActionToken: () => 'tok-abc',
+    verifyActionToken: (t, doel) => (tokenOk && t === 'tok-abc' && doel === 'mailwissel' ? { id: 1 } : null),
+    trekInActie: () => true,
+    setEmail: (id, adres, opties) => {
+      if (!(opties && opties.vervangenMag === true)) return { error: 'herstelkanaal' };
+      gezet.push(adres); return { id, adres };
+    }
+  };
+  const mail = { send: (aan, onderwerp, tekst) => verstuurd.push({ aan, onderwerp, tekst }) };
+  require('../server/routes/member/herstelkanaal')({ app, auth: null, accounts, mail,
+    appUrl: () => 'https://rtg.test' });
+  return routes;
+}
+const dossierNu = () => ({ waarde: {} });
+
+test('8. het adres wisselt NIET bij de aanvraag -- pas na bevestiging', async () => {
+  const verstuurd = [], gezet = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier, tokenOk: true });
+  const res = antwoord();
+  await r['/api/mijn/herstelkanaal/email']({ session: sessie, body: { huidig: 'goed', email: 'nieuw@example.com' } }, res);
+  assert.equal(res.data.ok, true);
+  assert.deepEqual(gezet, [], 'na de aanvraag mag er nog niets gewijzigd zijn; een typefout zou het account anders onbereikbaar maken');
+  assert.equal(dossier.waarde.mailwissel.naar, 'nieuw@example.com');
+
+  const res2 = antwoord();
+  await r['/api/mijn/herstelkanaal/email/bevestig']({ body: { token: 'tok-abc' } }, res2);
+  assert.deepEqual(gezet, ['nieuw@example.com']);
+  assert.equal(dossier.waarde.mailwissel, undefined, 'de openstaande wissel hoort daarna weg te zijn');
+});
+
+test('8b. het OUDE adres krijgt bericht, zonder goedkeurlink', async () => {
+  const verstuurd = [], gezet = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier, tokenOk: true });
+  await r['/api/mijn/herstelkanaal/email']({ session: sessie, body: { huidig: 'goed', email: 'nieuw@example.com' } }, antwoord());
+  const naarOud = verstuurd.find(m => m.aan === 'oud@example.com');
+  const naarNieuw = verstuurd.find(m => m.aan === 'nieuw@example.com');
+  assert.ok(naarNieuw && /https:\/\/rtg\.test/.test(naarNieuw.tekst), 'het nieuwe adres krijgt de bevestigingslink');
+  assert.ok(naarOud, 'wie dit niet zelf deed, hoort het te horen op het adres dat hij nog heeft');
+  assert.equal(/https:\/\/rtg\.test/.test(naarOud.tekst), false,
+    'in dat bericht hoort GEEN link te staan: een aanvaller die de mailbox al leest, zou er anders zelf op klikken');
+});
+
+test('8c. zonder het juiste wachtwoord gebeurt er niets', async () => {
+  const verstuurd = [], gezet = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => false, verstuurd, gezet, dossier, tokenOk: true });
+  const res = antwoord();
+  await r['/api/mijn/herstelkanaal/email']({ session: sessie, body: { huidig: 'fout', email: 'nieuw@example.com' } }, res);
+  assert.equal(res.code, 403);
+  assert.deepEqual(verstuurd, [], 'er mag ook geen bericht de deur uit; anders is dit een manier om iemand te bestoken');
+  assert.deepEqual(dossier.waarde, {});
+});
+
+test('8d. een ongeldige of verlopen bevestiging wisselt niets', async () => {
+  const verstuurd = [], gezet = [], dossier = dossierNu();
+  const r = bouwMail({ wachtwoordKlopt: () => true, verstuurd, gezet, dossier, tokenOk: false });
+  const res = antwoord();
+  await r['/api/mijn/herstelkanaal/email/bevestig']({ body: { token: 'tok-abc' } }, res);
+  assert.equal(res.code, 400);
+  assert.deepEqual(gezet, []);
+});
+
+test('8e. de aanvraag verraadt niet of een adres al bestaat', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'routes', 'member', 'herstelkanaal.js'), 'utf8');
+  const i = bron.indexOf("app.post('/api/mijn/herstelkanaal/email'");
+  const j = bron.indexOf("app.post('/api/mijn/herstelkanaal/email/bevestig'");
+  const aanvraag = bron.slice(i, j);
+  assert.equal(/inGebruik/.test(aanvraag), false,
+    'bij de AANVRAAG toetsen of het adres vrij is, maakt dit een manier om te ontdekken welke adressen een RTG-account hebben');
+  assert.match(bron.slice(j), /inGebruik/, 'bij de BEVESTIGING hoort die toets wel te staan');
+});
+
+test('8f. het nieuwe adres komt binnen als onbevestigd', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'accounts', 'users.js'), 'utf8');
+  const i = bron.indexOf('function setEmail(');
+  const blok = bron.slice(i, i + 1800);
+  assert.match(blok, /email_verified = 0/,
+    'een adres dat als bevestigd binnenkomt, is een bevestiging die niemand heeft gegeven');
+  assert.match(blok, /vervangenMag === true/);
 });

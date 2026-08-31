@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4757 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4759 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,9 +18,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4757 |
-| servermodules (`server/**/*.js`) | 2872 |
-| routebestanden (`server/routes/**`) | 543 |
+| API-endpoints | 4759 |
+| servermodules (`server/**/*.js`) | 2873 |
+| routebestanden (`server/routes/**`) | 544 |
 | kernmodules (`server/kern/**`) | 1806 |
 | schermen (`public/**/*.html`) | 278 |
 | gedeelde browsermodules (`public/shared/*.js`) | 282 |
@@ -108,7 +108,7 @@ zie §5 -- er zijn nog 213 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 6 | 8 | 49 |
-| `member` | 679 | 66 | 14 | 415 |
+| `member` | 681 | 67 | 15 | 416 |
 | `supplier` | 615 | 118 | 6 | 309 |
 | `office` | 59 | 15 | 3 | 75 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -151,7 +151,7 @@ app(189) auth(115) supplierAuth(63) officeAuth(41) db(37) liveCodename(34) statu
 accounts(25) schoon(23) managerOnly(18) codenaamVan(17) save(16) rtf(15)
 boardroomWie(14) geenGast(13) crypto(12) tooManyTries(11) express(11) findSupplier(11)
 pay(11) anthropic(11) keyVanCodenaam(10) rtmail(10) gegevensStop(9) logActivity(9)
-boardroomAuth(9) sseToOffice(9) payrollOS(9) kern(8) stuur(8) appUrl(7) mail(7)
+boardroomAuth(9) sseToOffice(9) payrollOS(9) appUrl(8) kern(8) stuur(8) mail(7)
 noteFailedTry(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6) tenant(5)
 loginFails(5) logInlog(5) overheid(5) sseToCustomer(5)
 ```

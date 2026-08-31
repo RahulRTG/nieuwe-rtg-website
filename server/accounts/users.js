@@ -115,6 +115,45 @@ function setPhone(id, phone, opties) {
    inlognaam en echte naam in een keer, de kluis blijft de bron. Geef je ook een
    e-mailadres mee, dan verhuist het account daarheen: de zoekhash en de
    versleutelde waarde gaan samen mee, anders zou het account onvindbaar worden. */
+/* HET E-MAILADRES IS DE INLOGSLEUTEL EN EEN HERSTELKANAAL TEGELIJK.
+
+   Zelfde grendel als bij setPhone hierboven, en om een zwaardere reden: dit
+   adres is waarop findByLogin zoekt (email_hash) EN waar de herstel-link
+   heengaat. Wie het vervangt, neemt de voordeur en de achterdeur in een keer
+   over.
+
+   Dit deed vandaag geen enkele ledenroute -- renameUser is de enige schrijver en
+   wordt alleen door de eigenaars-bootstrap in server.js aangeroepen. Er was dus
+   niets te grendelen, maar wel iets te voorkomen: dat de eerste route die dit
+   ooit nodig heeft, hem zonder grendel bouwt.
+
+   DRIE DINGEN DIE HIER HARD STAAN:
+     1. vervangen alleen met `vervangenMag === true`, net als bij het nummer;
+     2. het adres mag niet al van een ander account zijn -- anders kun je een
+        bestaand account onbereikbaar maken door zijn adres te claimen;
+     3. het nieuwe adres komt binnen als ONBEVESTIGD (email_verified = 0). De
+        route die dit aanroept hoort het pas te doen nadat de houder van het
+        NIEUWE adres op een link heeft geklikt; deze regel is het vangnet als
+        iemand die volgorde ooit omdraait. */
+function setEmail(id, email, opties) {
+  const adres = String(email || '').trim().toLowerCase().slice(0, 160);
+  if (!adres || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(adres)) return { error: 'adres' };
+  const huidig = getUserById(id);
+  if (!huidig) return { error: 'onbekend' };
+  const bestaand = String(gebonden.emailOf(huidig) || '').trim().toLowerCase();
+  if (bestaand === adres) return huidig;                  // niets te doen
+  if (bestaand && !(opties && opties.vervangenMag === true)) {
+    return { error: 'herstelkanaal',
+      reden: 'Dit account heeft al een e-mailadres. Dat is zowel uw inlognaam als de weg waarlangs een wachtwoord hersteld wordt, en het vervangen ervan vraagt eerst uw wachtwoord en een bevestiging op het nieuwe adres.' };
+  }
+  const ander = S.zin('SELECT id FROM users WHERE email_hash = ?').get(kluis.emailHash(adres));
+  if (ander && Number(ander.id) !== Number(id)) return { error: 'inGebruik' };
+  S.zin('UPDATE users SET email_hash = ?, enc_email = ?, email_verified = 0 WHERE id = ?')
+    .run(kluis.emailHash(adres), gebonden.zegel('enc_email', id, adres), id);
+  mirror.markUser(id);
+  return getUserById(id);
+}
+
 function renameUser(id, { username, realName, email }) {
   if (email === undefined) {
     S.zin('UPDATE users SET username = ?, enc_name = ? WHERE id = ?')
@@ -237,7 +276,7 @@ module.exports = {
   /* uit ./publiekmail.js -- hier doorgegeven zodat de gevel (accounts/index.js)
      en alle bestaande aanroepers niets merken van de opsplitsing. */
   findByPublicMail, reservePublicMail,
-  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone,
+  renameUser, setTier, zetActief, isActief, realNameOf, emailOf, phoneOf, setPhone, setEmail,
   issueToken, verifyToken, sessieVan, trekIn, trekInActie, isIngetrokken, trekInSessie, sessieIngetrokken, issueActionToken, verifyActionToken,
   setEmailVerified, createReset, findByReset, setPassword, setPasswordSync, setPasswordZaai, vernieuwWachtwoordHash,
   getMemberState, saveMemberState, setVerification, listByVerification, conversations, ledenRegisterRijen, deleteUser

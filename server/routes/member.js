@@ -93,6 +93,7 @@ module.exports = (kern) => {
   require('./member/privacy')(kern);
   require('./member/sessies')(kern);
   require('./member/toestellen')(kern);
+  require('./member/herstelkanaal')(kern);
   // De persoonlijke AI en Rahul/concierge-chat.
   require('./member/assistent')(kern);
   // Rahul kijkt mee met een foto (kern/kijken.js) en zegt waar die foto heen kan

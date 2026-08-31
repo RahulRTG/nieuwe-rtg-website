@@ -66,3 +66,48 @@ test('de eindpoort noemt alleen bakken die werkelijk bestaan', () => {
       id + ' staat in de eindpoort maar niet in scripts/onbewezen.js');
   }
 });
+
+/* ============================================================================
+   EN DE WERELDEN, want een bak op nul zegt niets als de opstelling waarop
+   gemeten is halverwege is ingestort.
+
+   Dit is de tweede helft van dezelfde belofte. De bakken hierboven bewaken de
+   UITSLAG; deze twee bewaken de OPSTELLING waarop die uitslag rust. Ze staan
+   allebei op nul en horen daar te blijven:
+
+     gesneuveld = 0   geen wereld die aan het eind niet meer overeind staat
+     omslagen   = 0   en ook niet TUSSENDOOR omgevallen en weer opgekrabbeld
+
+   Die tweede is er omdat de eerste hem niet ziet: een route die op plek 800
+   iets sloopt en op plek 2000 een andere die het herstelt, laat aan het eind
+   niets zien terwijl er 1200 routes op een kapotte wereld zijn gemeten. Zo is
+   /api/privacy/delete ontdekt -- die wiste het lid waarmee de proef zelf meet,
+   en 1491 ledenroutes daarna maten een leeg account zonder dat er iets
+   klaagde.
+
+   `niet gecontroleerd` telt hier met opzet NIET als fout: niet gekeken is geen
+   uitslag (LAT.md regel 3). Maar het mag ook niet alles zijn -- dan zou de
+   poort dichtgaan door weg te kijken. */
+const proef = require('../IDEMPROEF.json');
+
+test('elke wereld staat na afloop nog overeind', () => {
+  const w = (proef.gemeten || {}).werelden;
+  assert.ok(Array.isArray(w) && w.length,
+    'de meting hoort per wereld te melden of hij er na afloop nog staat');
+  const stuk = w.filter(x => x.gecontroleerd && x.ok === false);
+  assert.equal(stuk.length, 0,
+    'gesneuveld: ' + stuk.map(x => x.wereld + ' (' + x.waarom + ')').join('; '));
+  assert.ok(w.some(x => x.gecontroleerd),
+    'geen enkele wereld is gecontroleerd; dan zegt deze poort niets');
+});
+
+test('geen wereld sloeg tussendoor om', () => {
+  const v = (proef.gemeten || {}).wereldwacht;
+  assert.ok(v && Number.isInteger(v.peilingen),
+    'de meting hoort een verslag van de wereldwacht te dragen');
+  assert.ok(v.peilingen > 0, 'er is onderweg geen enkele keer gepeild');
+  assert.equal((v.gebeurtenissen || []).length, 0,
+    'omslagen onderweg: ' + (v.gebeurtenissen || [])
+      .map(g => g.wereld + ' ' + g.van + '->' + g.naar + ' tussen ' + g.vanafRoute + ' en ' + g.totRoute)
+      .join('; '));
+});

@@ -134,6 +134,16 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
   } finally {
     if (browser) await browser.close().catch(() => {});
     child.kill();
-    fs.rmSync(TMP, { recursive: true, force: true });
+    /* HET OPRUIMEN LIET DE TOETS ZAKKEN TERWIJL DE METING KLOPTE: ENOTEMPTY op
+       /tmp/rtg-scherm-e2e-*. `child.kill()` stuurt een signaal en komt meteen
+       terug; de server schrijft ondertussen zijn sqlite-journaal nog weg, en dan
+       loopt rmSync tegen een map die zich tijdens het lopen weer vult. `force`
+       helpt daar niet tegen -- dat gaat over een pad dat ER NIET IS.
+
+       Zelfde reparatie als in geld.e2e.js en levenspas.e2e.js, die er eerder
+       tegenaan liepen: een paar herhaalpogingen met een tel ertussen. Geen
+       try/catch eromheen, want een map die ook na vijf pogingen niet leeg raakt
+       is geen ruis maar iets dat blijft draaien. */
+    fs.rmSync(TMP, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 });

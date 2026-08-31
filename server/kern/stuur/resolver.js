@@ -37,14 +37,17 @@
    ONGEFILTERDE lijst vragen: een fout in deze weging mag nooit een vermogen
    verbergen. */
 'use strict';
-const { woordenUit } = require('./resolver-woorden');
+const { woordenUit, inhoudswoorden } = require('./resolver-woorden');
 
 const MIN_STAM = 4;   // korter dan dit is een prefixtreffer toeval
 const STANDAARD_MAX = 15;
 
-/* De segmenten van een pad. */
+/* De segmenten van een pad, OOK op het koppelteken. `btw-herinner` is voor een
+   mens twee woorden, en "stuur de btw-herinnering" raakte het pad daarom niet:
+   de resolver koos /rtmail/stuur en liet juist /rtmail/btw-herinner weg. Dat is
+   een gemist vermogen, en dat weegt hier zwaarder dan een kortere lijst. */
 function segmentenVan(pad) {
-  return String(pad || '').split('/').filter(Boolean).map(s => s.toLowerCase());
+  return String(pad || '').split(/[/-]/).filter(Boolean).map(s => s.toLowerCase());
 }
 
 /* WELKE SEGMENTEN ZEGGEN NIETS? Een segment dat in ELK pad van de lijst staat,
@@ -121,6 +124,22 @@ function resolveer(vraag, paden, opties) {
 
   gewogen.sort((a, b) => b.score - a.score || a.pad.localeCompare(b.pad));
   const gekozen = gewogen.slice(0, max);
+
+  /* DUN BEWIJS IS GEEN BEWIJS. "Zet een afsrpaak in mijn agneda" heeft twee
+     typefouten; van de drie inhoudswoorden raakte alleen `zet` iets, en dat
+     leverde precies een pad op -- /api/bank/terugkerend/zet, dat met de vraag
+     niets te maken heeft. Zo'n versmalling is geen selectie maar een gok op een
+     werkwoord, en zij verbergt het gevraagde vermogen volledig.
+
+     Raakt maar EEN van de woorden iets terwijl de vraag er drie of meer draagt,
+     dan gaat de volledige lijst terug. Dat kost compactheid en levert dekking
+     op, en die ruil staat expres deze kant op: liever veertien relevante paden
+     dan drie waarvan de juiste ontbreekt (scripts/resolver.js meet allebei). */
+  const geraakt = new Set(gekozen.flatMap(r => r.raakvlak));
+  const kern = inhoudswoorden(vraag);
+  if (geraakt.size <= 1 && kern.length >= 3)
+    return geenVersmalling('Maar een van de ' + kern.length + ' woorden in deze vraag raakt een pad; ' +
+      'dat is te dun om de rest weg te laten. De volledige lijst blijft staan.');
   return {
     paden: gekozen.map(r => r.pad),
     versmald: true,

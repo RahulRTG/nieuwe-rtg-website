@@ -735,9 +735,16 @@ bewijzen**; par. 7 zet er een van vier routes klaar, met per route gemeten wat
 er nog aan ontbreekt en waarom (twee zijn ongemeten omdat de proef geen
 gekoppelde groothandel had, niet omdat ze riskant zijn). **Blok 0 staat**
 (`server/kern/stuur/resolver.js`): de tool `kaart` geeft niet langer alles wat
-een rol mag maar de paden die DEZE opdracht raken -- gemeten 5,6 paden gemiddeld en
-91% kleiner over zestien opdrachten in drie rollen (`npm run resolver` rekent het
-na op de echte routes; het kleinste werkveld is een pad). Hij verandert geen bevoegdheid en kan dat ook niet
+een rol mag maar de paden die DEZE opdracht raken -- **het succescriterium is DEKKING en
+niet compactheid** -- liever veertien relevante paden dan drie waarvan de juiste
+ontbreekt. Daarom twee meters en met opzet geen samengesteld cijfer
+(`npm run resolver`, over 27 zinnen in negen taalvormen): versmalling 89% kleiner
+(werkveld 8,8 paden) en **dekking 100%**, en het script eindigt met een foutcode
+zodra die dekking zakt. De dekkingsmeter verdiende zich meteen terug met drie
+gemiste vermogens, waaronder een zin met twee typefouten die naar EEN pad
+versmalde dat er niets mee te maken had -- daaruit volgt de regel *dun bewijs is
+geen bewijs*: raakt maar een woord iets terwijl de vraag er drie draagt, dan gaat
+de volledige lijst terug. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

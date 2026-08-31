@@ -234,22 +234,35 @@ definitie niet in.
 (de taalkant), aangehaakt op de tool `kaart` in `stuur/lus.js`. Een deterministische voorselectie vóór het model: per opdracht
 de paden die de vraag raken, in plaats van alles wat de rol mag.
 
-**Gemeten, niet geschat** — `npm run resolver` rekent het na op de echte
-routes uit `IDEMPROEF.json`, door dezelfde `toegestanePaden()` als het stuur:
+**Het succescriterium is dekking, niet compactheid.** Dat is de belangrijkste
+regel van dit blok en hij staat expres vóór de cijfers:
 
-| rol | toegestaan | werkveld na versmalling |
+> **Liever veertien relevante paden dan drie waarvan de juiste ontbreekt.**
+
+Compactheid is een kostenpost; dekking is de veiligheid. Een gemist vermogen
+laat de AI "dat kan ik niet" zeggen over iets dat de gebruiker gewoon mag — een
+leugen met een technische oorzaak, en van buiten niet te zien. Daarom zijn er
+**twee meters** (`npm run resolver`) en met opzet geen samengesteld cijfer:
+
+| meter | vraag | stand |
 |---|---|---|
-| member | 120 | 1–15 |
-| supplier | 40 | 1–14 |
-| staff | 16 | 2–5 |
+| versmalling | hoeveel kleiner werd de toolruimte? | **89% kleiner**, gemiddeld werkveld 8,8 paden |
+| **dekking** | bleef het gevraagde vermogen erin? | **100%** (23 van 23 zinnen met een eis) |
 
-Zestien gewone opdrachten, alle zestien versmald, **gemiddeld 5,6 paden — 91%
-kleiner**. Het kleinste werkveld is één pad, en juist daarom kan het model
-altijd om de volledige lijst vragen.
+Eén cijfer zou de tweede door de eerste laten opeten: strenger filteren maakt de
+versmalling altijd mooier en de dekking altijd slechter. Het script eindigt met
+een foutcode zodra de dekking onder de 100% komt — een meter die alleen praat,
+verandert niets.
+
+**Negen taalvormen, per vorm gemeten** (`scripts/resolver-corpus.js`, 27 zinnen
+over drie rollen): gewoon, synoniem, scheidbaar werkwoord, domeinjargon,
+spelfout, samengestelde opdracht, impliciete intentie, negatie, en
+promptinjectie waarin een routepad wordt genoemd. Per vorm apart, want
+"gemiddeld 96%" verbergt precies de categorie waar het misgaat.
 
 De meter zegt er zelf bij wat hij niet meet: of het model met dat werkveld de
-júiste keuze maakt, en of echte gebruikers zulke zinnen typen — de vragen staan
-in het script, want een register van echte gebruikersvragen bestaat niet. Wie de
+júiste keuze maakt, en of echte gebruikers zulke zinnen typen — de zinnen staan
+in het corpus, want een register van echte gebruikersvragen bestaat niet. Wie de
 vragen kiest, kiest het resultaat.
 
 **Dit verandert geen autoriteit.** De resolver krijgt de lijst die `beleid.js`
@@ -283,6 +296,26 @@ ooit heeft voorzien.
   stond. Dat is nu **geteld in plaats van opgesomd**: een segment dat in álle
   paden van de lijst staat, draagt geen informatie en telt niet mee. Een lijst
   die morgen een vierde rolvoorvoegsel krijgt, doet het meteen goed.
+
+**En de dekkingsmeter vond er meteen nog drie**, alle drie van dezelfde soort —
+een versmalling die het gevraagde vermogen wegfiltert:
+
+- *"Stuur de btw-herinnering"* koos `/rtmail/stuur` en liet `/rtmail/btw-herinner`
+  weg: `btw-herinner` is voor een mens twee woorden en voor een pad één.
+  Segmenten worden nu ook op het koppelteken gesplitst.
+- *"Ik moet inchecken voor mijn dienst"* koos `/ov/dienst` en miste `/ov/checkin`
+  — jargon dat als één woord wordt geschreven.
+- *"Zet een afsrpaak in mijn agneda"* (twee typefouten) versmalde naar één pad:
+  `/api/bank/terugkerend/zet`, dat met de vraag niets te maken heeft. Van de
+  drie inhoudswoorden raakte alleen het werkwoord iets. Daaruit volgt de regel
+  **dun bewijs is geen bewijs**: raakt maar één woord iets terwijl de vraag er
+  drie of meer draagt, dan gaat de volledige lijst terug. Dat kostte twee
+  procentpunt versmalling (91% → 89%) en bracht de dekking van 87% naar 100%.
+
+Die regels dekken elkaar bovendien af, en dat is meetbaar: haal de
+koppelteken-splitsing weg en de dekking blijft 100% doordat de dunne-bewijsregel
+de zin opvangt — alleen het werkveld wordt groter (8,8 → 9,1). Alleen de
+versmallingsmeter ziet dat, en dat is precies de taakverdeling tussen de twee.
 
 **De bruggen hebben tanden.** Toets 9 controleert dat elk doelwoord ook echt als
 segment in de routes voorkomt. Hij sloeg meteen aan: `taxi → rit` wees nergens

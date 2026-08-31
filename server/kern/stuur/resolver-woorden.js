@@ -46,7 +46,8 @@ const SYNONIEMEN = Object.freeze({
   plek: 'locatie', waar: 'locatie',
   spaargeld: 'spaardoel', sparen: 'spaardoel',
   lening: 'krediet', lenen: 'krediet',
-  loon: 'salaris', uitbetaling: 'uitbetaal'
+  loon: 'salaris', uitbetaling: 'uitbetaal',
+  inchecken: 'checkin', incheck: 'checkin', inchecked: 'checkin'
 });
 
 /* De doelwoorden van een sleutel, altijd als lijst. */
@@ -78,6 +79,17 @@ const PARTIKELS = Object.freeze(['over', 'af', 'aan', 'in', 'uit', 'op', 'terug'
 /* De woorden van een vraag: kleingemaakt, ontdaan van leestekens en
    stopwoorden, met hun synoniem erbij (het oorspronkelijke woord blijft ook
    staan -- "betaling" kan best een pad met `betaal` raken). */
+/* De inhoudswoorden van een vraag: wat er overblijft na leestekens en
+   stopwoorden, ZONDER de bruggen en de samengevoegde partikels. De resolver
+   telt hiermee hoe dun het bewijs onder een versmalling is: raakt maar een van
+   de zes woorden iets, dan is de rest weglaten een gok. */
+function inhoudswoorden(vraag) {
+  return String(vraag || '').toLowerCase()
+    .replace(/[^a-z0-9à-ÿ]+/g, ' ')
+    .split(' ')
+    .filter(w => w.length >= 3 && !STOPWOORDEN.has(w));
+}
+
 function woordenUit(vraag) {
   const alle = String(vraag || '').toLowerCase()
     .replace(/[^a-z0-9à-ÿ]+/g, ' ')
@@ -96,4 +108,4 @@ function woordenUit(vraag) {
 }
 
 
-module.exports = { woordenUit, bruggenVan, SYNONIEMEN, STOPWOORDEN, PARTIKELS };
+module.exports = { woordenUit, inhoudswoorden, bruggenVan, SYNONIEMEN, STOPWOORDEN, PARTIKELS };

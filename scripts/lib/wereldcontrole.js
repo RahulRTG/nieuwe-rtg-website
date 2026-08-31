@@ -57,7 +57,17 @@ const CONTROLES = [
     lijfUit: (e) => ({ id: e.studie }),
     waarom: 'het onderzoek draagt 38 routes' },
   { wereld: 'spel', pad: '/api/member/spel/staat', velden: ['id'], rol: 'member',
-    waarom: 'een potje kan door een andere route zijn afgelopen' }
+    waarom: 'een potje kan door een andere route zijn afgelopen' },
+  /* De postbus staat hier omdat zij precies deze fout maakte: /team/hef heft
+     het team op, de proef riep hem aan, en de tien routes die alfabetisch
+     daarna komen stonden op "Dit team bestaat niet". Dat is bij toeval
+     gevonden aan het patroon; met deze regel meldt de wacht het zelf. */
+  { wereld: 'postbus', pad: '/api/member/rtmail/team/postvak', velden: ['team'], rol: 'member',
+    lijfUit: (e) => ({ id: e.team }),
+    waarom: 'het gedeelde postvak draagt tien routes; /team/hef kan het opheffen' },
+  { wereld: 'weefsel', pad: '/api/office/weefsel/object', velden: ['object'], rol: 'kantoor-op-naam',
+    lijfUit: (e) => ({ id: e.object, objectId: e.object }),
+    waarom: 'het stadsobject is de wortel van de werkorders' }
 ];
 
 /* Geeft per wereld { wereld, gecontroleerd, ok, waarom }. `gecontroleerd:

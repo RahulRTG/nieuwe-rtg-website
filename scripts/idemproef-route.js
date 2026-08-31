@@ -469,7 +469,8 @@ wachtOpSchoneBoom();
      eindoordeel. */
   const { maakWereldwacht } = require('./lib/wereldcontrole');
   const wereldExtras = { school: schoolWereld.extra, rtfos: rtfosWereld.extra,
-    festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra };
+    festival: festivalWereld.extra, lab2: lab2Wereld.extra, spel: spelWereld.extra,
+    postbus: (rtmailWereld.extra || {}).lid, weefsel: weefselWereld.extra };
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
     elke: Number(process.env.RTG_WERELDWACHT || 250) });
 

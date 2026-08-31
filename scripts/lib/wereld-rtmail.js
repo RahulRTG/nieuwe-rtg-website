@@ -73,33 +73,54 @@ async function zetRtmailKlaar({ post, tokens }) {
     if (kant.team) {
       const t = await doe('een team', '/team/maak', { naam: 'Proefteam', adres: 'proefteam' });
       const team = t && t.team && t.team.id;
-      if (team) { bak.team = team; bak.teamId = team; }
+      if (team) { bak.team = team; bak.teamId = team; bak.teamAdres = t.team.adres || null; }
+
+      /* EN EEN RESERVETEAM, om dezelfde reden waarom de school een tweede
+         medewerker heeft en het spel een tweede potje.
+
+         /team/hef heft het team op en /team/verlaat stapt eruit. De proef
+         roept elke route aan, dus zij brak haar eigen team af -- en precies de
+         tien routes die alfabetisch NA `hef` komen (koppel, lid, notitie,
+         overzicht, pak, postvak, prioriteit, status, stuur, verlaat) stonden
+         daarna op "Dit team bestaat niet". Tien van de tien; geen toeval maar
+         een volgorde.
+
+         Dit is de derde keer dat deze vorm terugkomt, en de eerste keer dat ik
+         hem herkende aan het patroon in plaats van na een sweep. */
+      const r = await doe('een reserveteam voor de routes die een team opheffen',
+        '/team/maak', { naam: 'Proefteam reserve', adres: 'proefteam-reserve' });
+      const reserve = r && r.team && r.team.id;
+      if (reserve) bak.teamReserve = reserve;
     }
 
-    /* 2. Het eigen adres, want daar gaat het proefbericht heen. De zaakkant
-          kent /adres niet; daar komt het uit de inbox. */
+    /* 2. Het adres waar het proefbericht heen gaat. Aan de ledenkant is dat
+          het adres van het TEAM en niet het persoonlijke adres: de dossier-
+          routes (status, prioriteit, notitie, koppel) werken op een bericht IN
+          het gedeelde postvak, en daar komt niets terecht dat naar een persoon
+          is gestuurd. Dat kostte deze wereld een ronde: het bericht ging weg,
+          kwam netjes aan, en stond in het verkeerde postvak.
+          Aan de zaakkant is er geen team en dus het eigen adres uit de inbox. */
     let adres = null;
     if (kant.team) {
+      adres = bak.teamAdres || null;
       const a = await doe('het eigen adres', '/adres', {});
-      adres = a && a.adres;
+      if (a && a.adres) bak.eigenAdres = a.adres;
     }
     const inboxVoor = await doe('het postvak', '/inbox', {});
     if (!adres) adres = inboxVoor && inboxVoor.adres;
 
-    /* 3. Een bericht aan zichzelf. Het veld heet `naar` en niet `aan`
-          (kern/rtmail.js, stuur) -- uit de bron gelezen, want `aan` gaf
-          "Geen geldig ontvang-adres" en dat leest als een adresfout terwijl
-          het een veldnaamfout was. */
+    /* 3. Een bericht. Het veld heet `naar` en niet `aan` (kern/rtmail.js,
+          stuur), en het ANTWOORD draagt het bericht al -- het postvak
+          teruglezen is niet nodig en gaf een ronde lang niets omdat er in het
+          verkeerde postvak werd gekeken. */
     if (adres) {
       bak.adres = adres;
-      await doe('een bericht aan zichzelf', kant.team ? '/team/stuur' : '/stuur',
+      const verstuurd = await doe('een bericht in het postvak',
+        kant.team ? '/team/stuur' : '/stuur',
         { ...(bak.team ? { id: bak.team } : {}), naar: adres,
           onderwerp: 'Proefbericht', tekst: 'Een bericht om te kunnen meten.' });
-      const inbox = await doe('het postvak opnieuw', kant.team ? '/team/postvak' : '/inbox',
-        bak.team ? { id: bak.team } : {});
-      const lijst = (inbox && (inbox.berichten || inbox.postvak)) || [];
-      const eerste = Array.isArray(lijst) && lijst[0];
-      if (eerste && eerste.id) { bak.bericht = eerste.id; bak.berichtId = eerste.id; }
+      const b = verstuurd && verstuurd.bericht;
+      if (b && b.id) { bak.bericht = b.id; bak.berichtId = b.id; }
     }
 
     /* 3. Een concept. */
@@ -146,6 +167,10 @@ const { idVoor: idPerDeel } = require('./idperdeel');
    domein en staat daarom hier. */
 const tabelVoor = (pre) => ({
   [pre + '/team']: 'team',
+  /* De twee die het team SLOPEN krijgen de reserve. Zonder dit haalt de proef
+     haar eigen team onderuit en vallen de tien routes erna om. */
+  [pre + '/team/hef']: 'teamReserve',
+  [pre + '/team/verlaat']: 'teamReserve',
   [pre + '/concept']: 'concept',
   [pre + '/regel']: 'regel',
   [pre]: 'bericht'

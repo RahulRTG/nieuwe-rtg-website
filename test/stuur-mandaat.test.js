@@ -20,7 +20,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { speelruimte, magZelfstandig, geldig, NOOIT_AUTONOOM } = require('../server/kern/stuur/mandaat');
+const { speelruimte, magZelfstandig, mandaatGeldig, NOOIT_AUTONOOM } = require('../server/kern/stuur/mandaat');
 const { toegestanePaden, beleidVoor } = require('../server/kern/stuur/beleid');
 
 const ALLE = [...new Set((require('../IDEMPROEF.json').perRoute || [])
@@ -80,8 +80,8 @@ test('4. GELD BLIJFT MENSENWERK, hoeveel het mandaat ook toestaat', () => {
 });
 
 test('5. een verlopen of onleesbaar mandaat geeft niets', () => {
-  assert.equal(geldig({ capabilities: ['/api/*'], tot: '2020-01-01T00:00:00Z' }).ok, false);
-  assert.equal(geldig({ capabilities: ['/api/*'], tot: 'ooit' }).ok, false);
+  assert.equal(mandaatGeldig({ capabilities: ['/api/*'], tot: '2020-01-01T00:00:00Z' }).ok, false);
+  assert.equal(mandaatGeldig({ capabilities: ['/api/*'], tot: 'ooit' }).ok, false);
   const r = speelruimte(TOE, 'member', { capabilities: ['/api/*'], tot: '2020-01-01T00:00:00Z' });
   assert.deepEqual(r.paden, []);
   assert.match(r.reden, /verlopen/);

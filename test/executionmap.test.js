@@ -26,7 +26,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { bouw, tekst, BRONNEN, ROLLEN } = require('../scripts/executionmap');
+const { bouw, tekst, herhalingUit, BRONNEN, ROLLEN } = require('../scripts/executionmap');
 const { beleidVoor } = require('../server/kern/stuur/beleid');
 const { PROJECTIES } = require('../scripts/gezagsnoemer');
 
@@ -79,7 +79,29 @@ test('3. TEGENSPRAAK WORDT ONBEPAALD, nooit stil een winnaar', () => {
       ') maar de kaart zet er ' + c.herhaling + ' neer');
     assert.ok(c.herhalingReden && /tegen/.test(c.herhalingReden), k + ': ONBEPAALD zonder reden');
   }
-  assert.ok(getoetst > 0, 'geen enkele tegenspraak getoetst -- dan bewijst deze toets niets');
+  /* GEEN EIS MEER DAT DE DATA EEN TEGENSPRAAK BEVAT. Die stond er, en terecht --
+     een controle die nul gevallen ziet bewijst niets. Maar toen de bron zichzelf
+     niet meer tegensprak, zakte de bouw op iets GOEDS. De regel zelf staat nu
+     hieronder op een gebouwd geval; dit blijft de controle op de echte data. */
+  if (!getoetst) assert.equal([...gezien.values()].filter(w => w.size > 1).length, 0,
+    'er zijn tegenspraken in de bron die niet in de kaart terugkomen');
+});
+
+test('3b. de tegenspraakregel zelf, op een gebouwd geval', () => {
+  const eens = herhalingUit(['beschermd']);
+  assert.equal(eens.herhaling, 'beschermd');
+  assert.equal(eens.conflict, false);
+
+  const oneens = herhalingUit(['beschermd', 'ongemeten']);
+  assert.equal(oneens.herhaling, 'ONBEPAALD',
+    'twee verschillende metingen over dezelfde route mogen nooit stil een winnaar krijgen');
+  assert.equal(oneens.conflict, true);
+  assert.match(oneens.reden, /spreekt zichzelf tegen/);
+  assert.match(oneens.reden, /beschermd en ongemeten/, 'de reden noemt niet WAT er botst');
+
+  /* Leeg is `ongemeten` en niet ONBEPAALD: niets gemeten is geen tegenspraak. */
+  assert.equal(herhalingUit([]).herhaling, 'ongemeten');
+  assert.equal(herhalingUit([]).conflict, false);
 });
 
 test('4. DE KAART VERRUIMT NIETS: bereik is exact wat beleidVoor() zegt', () => {
@@ -114,23 +136,39 @@ test('6. wat we niet weten staat er als ONBEPAALD MET REDEN, en niet als een ver
   }
 });
 
-test('6b. HERSTEL KOMT NOOIT BOVEN `vermoed`, ook niet nu hij is afgeleid', () => {
-  /* Sinds blok 5 komt herstel uit HERSTEL.json in plaats van uit niets. Dat maakt
-     hem GRADEERBAAR en niet WAAR: de afleiding vergelijkt namen. Een rij die zich
-     `exact` of `bewezen` noemt, zou een terugweg beloven die niemand heeft
-     vastgesteld -- precies wat server/kern/stuur/bon.js weigert. */
+test('6b. HERSTEL: bevestigd mag, maar ALLEEN met een uitgevoerde proef eronder', () => {
+  /* Deze toets stond als "komt nooit boven `vermoed`", en dat was de goede regel
+     zolang herstel uit NAMEN werd afgeleid: die vergelijken woorden, geen
+     handelingen. Sinds scripts/herstelproef.js het paar werkelijk UITVOERT
+     (heen, kijken, terug, kijken) bestaat er wel bewijs, en dan zou "nooit boven
+     vermoed" het bewijs wegpoetsen. De regel is dus niet vervallen maar
+     verplaatst: een bevestiging moet naar een uitgevoerde proef wijzen, met
+     dezelfde tegenhanger en de soort erbij. Zonder die eis was de nieuwe tak
+     precies het gat dat de oude toets dichthield. */
+  const proef = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), 'utf8')); }
+    catch (e) { return null; }
+  })();
+  const uitProef = new Map((proef && proef.per || []).map(u => [u.heen, u]));
+
   for (const c of K.capabilities) {
     if (!c.herstel) continue;
-    assert.ok(['vermoed', 'onbepaald'].includes(c.herstel),
-      c.pad + ' draagt herstel "' + c.herstel + '"; alleen vermoed en onbepaald zijn af te leiden uit namen');
+    assert.ok(['vermoed', 'onbepaald', 'bevestigd'].includes(c.herstel),
+      c.pad + ' draagt herstel "' + c.herstel + '"');
     if (c.herstel === 'vermoed') assert.ok(c.herstelTegenhanger, c.pad + ': vermoed zonder tegenhanger');
     if (c.herstel === 'onbepaald') assert.ok(c.herstelKandidaten && c.herstelKandidaten.length > 1,
       c.pad + ': onbepaald zonder de kandidaten die het onbepaald maken');
+    if (c.herstel !== 'bevestigd') continue;
+    const u = uitProef.get(c.pad);
+    assert.ok(u, c.pad + ' heet bevestigd zonder dat de herstelproef hem heeft uitgevoerd');
+    assert.equal(u.terug, c.herstelTegenhanger, c.pad + ': bevestigd op een andere tegenhanger dan beproefd');
+    assert.ok(['exact', 'compensatie'].includes(u.uitslag),
+      c.pad + ': de proef gaf "' + u.uitslag + '", en dat is geen bevestiging');
   }
-  assert.equal(K.telling.bevestigdeTerugweg, 0,
-    'er staat een BEVESTIGDE terugweg in de kaart terwijl niemand er een heeft bevestigd');
+  assert.equal(K.telling.bevestigdeTerugweg, uitProef.size
+    ? K.capabilities.filter(c => c.herstel === 'bevestigd').length
+    : 0, 'de telling van bevestigde terugwegen klopt niet met de rijen');
 });
-
 test('6c. het besluit staat NAAST de meting en vervangt hem niet', () => {
   const besluiten = require('../IDEMBESLUIT.json').routes || {};
   let getoetst = 0;

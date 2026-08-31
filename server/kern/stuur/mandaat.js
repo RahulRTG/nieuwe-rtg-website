@@ -50,7 +50,7 @@ const NOOIT_AUTONOOM = [
 
 const leeg = () => ({ paden: [], reden: 'er is geen mandaat; zonder mandaat gebeurt er niets zelfstandig' });
 
-function geldig(mandaat, nu) {
+function mandaatGeldig(mandaat, nu) {
   if (!mandaat || typeof mandaat !== 'object')
     return { ok: false, reden: 'er is geen mandaat; zonder mandaat gebeurt er niets zelfstandig -- ' +
       'de afwezigheid van een regel is hier dicht en niet open' };
@@ -73,7 +73,7 @@ const raakt = (patronen, pad) => (patronen || []).some(p => {
    dus al door het beleid gegaan; deze functie kan hem alleen kleiner maken. */
 function speelruimte(toegestaan, wereld, mandaat, opties) {
   const alles = Array.isArray(toegestaan) ? toegestaan.filter(p => typeof p === 'string') : [];
-  const g = geldig(mandaat, opties && opties.nu);
+  const g = mandaatGeldig(mandaat, opties && opties.nu);
   if (!g.ok) return Object.assign(leeg(), { reden: g.reden, aantalVoor: alles.length });
 
   const uit = [], geweigerd = [];
@@ -121,4 +121,8 @@ function magZelfstandig(pad, wereld, mandaat, ctx) {
   return { mag: true, reden: 'binnen het mandaat, binnen de plafonds, en het beleid liet deze handeling al toe' };
 }
 
-module.exports = { speelruimte, magZelfstandig, geldig, BUDGETSOORTEN, NOOIT_AUTONOOM };
+/* `mandaatGeldig` en niet `geldig`: een naam van drie lettergrepen die in drie
+   kernmodules staat, zegt niets meer over wat hij toetst -- en de keuring telt
+   precies dat (`keuringDubbeling`). Hier gaat het over de looptijd en de vorm
+   van EEN MANDAAT, dus dat hoort in de naam. */
+module.exports = { speelruimte, magZelfstandig, mandaatGeldig, BUDGETSOORTEN, NOOIT_AUTONOOM };

@@ -30,13 +30,31 @@ test('1. HIJ VOERT NIETS UIT: geen weg naar een effect in de code', () => {
     assert.ok(!verboden.test(BRON), 'gevolg.js bevat een weg naar uitvoering: ' + verboden);
 });
 
+/* DE ROUTE WORDT GEKOZEN UIT HET REGISTER, NIET INGETYPT. Deze toets stond op
+   /api/bank/overboek, en die stond in de proefronde van toen op `gemeten`. Na
+   een nieuwe ronde deed hij geen werk meer (402: de bankwereld stond niet klaar)
+   en zakte de toets -- terwijl er niets stuk was. Een toets die een MEETUITSLAG
+   overtypt, zakt zodra er opnieuw wordt gemeten, en dat leert mensen om niet
+   opnieuw te meten. Wat hier vastligt is de EIGENSCHAP: een route met een
+   gemeten effect noemt precies de collecties die het register noemt. */
+function eenGemetenRoute() {
+  const rijen = require('../IDEMPROEF.json').perRoute || [];
+  for (const r of rijen)
+    for (const k of ['a', 'b', 'c'])
+      if (Object.keys((r.opslag || {})[k] || {}).length) return r.pad;
+  return null;
+}
+
 test('2. een gemeten route noemt zijn collecties, en die komen uit het register', () => {
-  const g = gevolgVan('/api/bank/overboek');
-  assert.equal(g.graad, 'gemeten');
-  assert.ok(g.collecties.includes('bankSaldi'), 'bankSaldi ontbreekt: ' + g.collecties.join(' '));
-  const rijen = require('../IDEMPROEF.json').perRoute.filter(r => r.pad === '/api/bank/overboek');
+  const pad = eenGemetenRoute();
+  assert.ok(pad, 'geen enkele route in IDEMPROEF.json heeft een gemeten effect -- dan is het ' +
+    'register leeg of van vorm veranderd, en dat is zelf de bevinding');
+  const g = gevolgVan(pad);
+  assert.equal(g.graad, 'gemeten', pad + ' heeft een gemeten effect maar heet niet `gemeten`');
+  const rijen = require('../IDEMPROEF.json').perRoute.filter(r => r.pad === pad);
   const echt = new Set();
   for (const r of rijen) for (const k of ['a', 'b', 'c']) for (const c of Object.keys((r.opslag || {})[k] || {})) echt.add(c);
+  assert.ok(g.collecties.length, pad + ': graad `gemeten` zonder een enkele collectie');
   assert.deepEqual(g.collecties, [...echt].sort(), 'de voorspelling wijkt af van het register');
 });
 
@@ -50,7 +68,7 @@ test('3. NIET GEMETEN IS GEEN "GEEN EFFECT": de graden worden niet door elkaar g
 });
 
 test('4. elke uitslag draagt een graad EN een reden', () => {
-  for (const pad of ['/api/bank/overboek', '/api/site/publiceer', '/api/pay/saldo', '/api/zomaar/iets']) {
+  for (const pad of [eenGemetenRoute(), '/api/site/publiceer', '/api/pay/saldo', '/api/zomaar/iets']) {
     const g = gevolgVan(pad);
     assert.ok(['gemeten', 'geen-effect-gemeten', 'onbekend'].includes(g.graad), pad + ': onbekende graad ' + g.graad);
     assert.ok(g.reden && g.reden.length > 20, pad + ': graad zonder reden');
@@ -58,8 +76,12 @@ test('4. elke uitslag draagt een graad EN een reden', () => {
 });
 
 test('5. de voorspelling over een plan telt het onbekende MEE en noemt het', () => {
+  /* Ook hier een gemeten route uit het register in plaats van een ingetypte:
+     wat de toets vasthoudt is dat de telling sluit en dat het onbekende deel
+     wordt GENOEMD, niet welke route deze maand toevallig gemeten is. */
+  const gemeten = eenGemetenRoute();
   const plan = compileer({ doel: 'gemengd', stappen: [
-    { id: 'a', capability: '/api/bank/overboek' },
+    { id: 'a', capability: gemeten },
     { id: 'b', capability: '/api/agenda/toevoegen' },
     { id: 'c', capability: '/api/site/publiceer' }] }, 'member');
   const g = voorspel(plan);
@@ -67,7 +89,7 @@ test('5. de voorspelling over een plan telt het onbekende MEE en noemt het', () 
   assert.ok(g.telling.onbekend >= 1, 'geen enkele onbekende stap -- verdacht');
   assert.match(g.samenvatting, /NIET gemeten/, 'de samenvatting verzwijgt wat niet gemeten is');
   assert.match(g.grens, /onbekend/);
-  assert.ok(g.geraakteCollecties.includes('bankSaldi'));
+  assert.ok(g.geraakteCollecties.length, 'een plan met een gemeten stap raakt geen enkele collectie');
 });
 
 test('6. de voorspelling verandert het plan niet: PLAN bezit niets', () => {

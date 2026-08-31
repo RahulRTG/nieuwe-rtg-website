@@ -43,7 +43,7 @@ let REGISTER = null;
 /* Per pad: welke collecties de proef zag veranderen, en of hij er uberhaupt bij
    kon. Een keer opgebouwd; het register is een bestand en verandert niet tijdens
    een verzoek. */
-function register() {
+function gevolgRegister() {
   if (REGISTER) return REGISTER;
   const uit = new Map();
   let rijen = [];
@@ -63,7 +63,7 @@ function register() {
 
 /* Het gevolg van EEN capability. Geeft altijd een graad en altijd een reden. */
 function gevolgVan(pad) {
-  const r = register().get(String(pad || ''));
+  const r = gevolgRegister().get(String(pad || ''));
   if (!r || !r.gezien)
     return { graad: 'onbekend', collecties: [],
       reden: 'deze route staat niet in de proefronde; er is nooit gemeten wat zij aanraakt' };

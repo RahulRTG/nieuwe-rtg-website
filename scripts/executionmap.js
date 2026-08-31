@@ -95,6 +95,21 @@ function noemerlegenda() {
   return uit;
 }
 
+/* DE TEGENSPRAAKREGEL, apart en zonder bestanden eromheen. Zij stond in het
+   hart van bouw() en was daardoor alleen te toetsen op ECHTE data -- en toen die
+   data zichzelf niet meer tegensprak (main draaide de idempotentieproef opnieuw),
+   zakte de toets met "geen enkele tegenspraak getoetst, dan bewijst deze toets
+   niets". Dat was terecht: een regel die alleen op toevallige data te bewijzen
+   is, is niet bewezen. Zo staat hij op een gebouwd geval vast, en blijft de
+   meting op de echte data er als tweede controle naast. */
+function herhalingUit(gemeten) {
+  const g = [...(gemeten || [])].sort();
+  if (g.length > 1) return { herhaling: 'ONBEPAALD', conflict: true,
+    reden: 'het register spreekt zichzelf tegen: ' + g.join(' en ') +
+      '. Een winnaar kiezen zou een oordeel neerzetten dat niemand heeft vastgesteld.' };
+  return { herhaling: g[0] || 'ongemeten', conflict: false };
+}
+
 function bouw() {
   let idem, vert, besluit, herstel;
   try { idem = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMPROEF.json'), 'utf8')); }
@@ -129,12 +144,10 @@ function bouw() {
     const gemeten = [...(herhaling.get(k) || [])].sort();
     const rij = { pad, rol: bron };
 
-    if (gemeten.length > 1) {
-      conflicten++;
-      rij.herhaling = 'ONBEPAALD';
-      rij.herhalingReden = 'het register spreekt zichzelf tegen: ' + gemeten.join(' en ') +
-        '. Een winnaar kiezen zou een oordeel neerzetten dat niemand heeft vastgesteld.';
-    } else rij.herhaling = gemeten[0] || 'ongemeten';
+    const hh = herhalingUit(gemeten);
+    if (hh.conflict) conflicten++;
+    rij.herhaling = hh.herhaling;
+    if (hh.reden) rij.herhalingReden = hh.reden;
 
     const staat = (vert.perRoute || {})['POST ' + pad];
     if (staat) { rij.bewijs = staat.staat; if (staat.reden) rij.bewijsReden = staat.reden; }
@@ -228,4 +241,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { bouw, tekst, BRONNEN, ROLLEN };
+module.exports = { bouw, tekst, herhalingUit, BRONNEN, ROLLEN };

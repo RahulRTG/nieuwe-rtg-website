@@ -46,6 +46,7 @@
    mag: een route zonder sleutel aanroepen geeft 401, en dat als "beproefd"
    tellen is een meting zonder invoer die toch een cijfer geeft (LAT.md regel 3). */
 'use strict';
+const { maakZaakinlog } = require('./zaakinlog');
 
 /* De eigenaar van de demo-seed. Uit server/eigenaar.js, want een tweede plek
    met dat adres loopt uiteen zodra iemand RTG_OWNER_EMAIL zet. */
@@ -93,6 +94,11 @@ function maakSleutels({ post, officeCode, eigen }) {
     } catch (e) { eigenaarToken = false; }
     return eigenaarToken || null;
   };
+
+  /* EEN BUREAU VOOR ELKE ZAAKINLOG. Hij wordt gedeeld met de genrewereld, die
+     hem via `bos.zaakbureau` meekrijgt -- zo bestaat er precies een teller en
+     precies een cache. */
+  const zaakbureau = maakZaakinlog({ post });
 
   const inlog = Object.assign({
     member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
@@ -170,12 +176,13 @@ function maakSleutels({ post, officeCode, eigen }) {
        eigen antwoord, en zolang de demo-inlog bestaat hoort er iets te meten
        of hij nog werkt. Twee rollen, zoals bij member en member-account. */
     'zaak-persoonlijk': async () => {
-      const code = process.env.DEMO_SUPPLIER || 'KIKUNOI';
-      const rooster = await post('/api/supplier/roster', { code }, null);
-      const mgr = ((rooster && rooster.data && rooster.data.staff) || []).find(x => x.role === 'manager');
-      if (!mgr) return null;
-      const l = await post('/api/supplier/login', { code, staffId: mgr.id, pin: '1234' });
-      return (l && l.data && l.data.token) || null;
+      /* VIA DE GEDEELDE INLOG, en dat scheelt een schaars slot. Hier stond
+         dezelfde rooster+login als in ./wereld-genre.js -- twee kopieen van
+         een handeling die aan een rem hangt van dertig opvragingen per
+         kwartier. De demo-zaak staat nu in ./genrezaken.js en de inlog cachet
+         per code (./zaakinlog.js), dus deze rol betaalt niets extra's. */
+      const uit = await zaakbureau.inlog(process.env.DEMO_SUPPLIER || 'KIKUNOI');
+      return uit.token || null;
     },
     /* Beide via de eigenaar; zie de kop waarom dat twee namen blijven. */
     boardroom: haalEigenaar,
@@ -234,7 +241,7 @@ function maakSleutels({ post, officeCode, eigen }) {
      HANDLER (scripts/lib/eigenpoort.js). Een inlogdeur die een sessie eist,
      laat niemand inloggen -- dus hoort er geen token mee. */
   inlog['eigen-poort'] = async () => '';
-  return { inlog, ROLLEN, OWNER_EMAIL };
+  return { inlog, ROLLEN, OWNER_EMAIL, zaakbureau };
 }
 
 /* Haalt alle rollen op. Geeft terug WAT er gelukt is en wat niet, met de reden --

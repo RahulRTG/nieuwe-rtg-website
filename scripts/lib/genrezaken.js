@@ -123,23 +123,40 @@ const ZAKEN = [
                                                           '/api/staff/oog', '/api/supplier/ghost'],
     waarom: 'de taxi; het functieregister geeft Vervoer, Flits, Eye en Ghost Driver alleen aan vervoersgenres' },
   { code: 'TRANSIT',   genre: 'ov',            prefixen: ['/api/supplier/ov', '/api/staff/ov'],
-    waarom: 'de OV-zaak; RTG OV staat in het register op alleenGenres: ["ov"] en dus op precies dit genre' }
+    waarom: 'de OV-zaak; RTG OV staat in het register op alleenGenres: ["ov"] en dus op precies dit genre' },
+  /* DE DEMO-ZAAK ZELF, en die staat hier om een andere reden dan de rest: niet
+     omdat een genrepoort haar vraagt, maar omdat `zaak-persoonlijk`
+     (./proefsleutels.js) een personeelssessie op DEZE zaak nodig heeft. Zolang
+     die rol zijn eigen opvraging deed, kostte hij een slot van de rem. Nu
+     deelt hij de inlog van deze lijst.
+
+     Hij heeft daarom GEEN voorvoegsels: hij verfijnt geen enkele route naar
+     een genre. Dat is met opzet en de toets hieronder laat dat toe -- een zaak
+     mag in deze lijst staan om ingelogd te worden, ook zonder eigen domein. */
+  { code: 'KIKUNOI',   genre: 'restaurant',    prefixen: [], alleenInlog: true,
+    waarom: 'de demo-zaak; `zaak-persoonlijk` heeft hier een personeelssessie nodig en deelt zo de inlog' }
 ];
 
-/* De rem op /api/supplier/roster staat op dertig per kwartier per IP. Deze
-   lijst gebruikt er een per zaak; daarnaast doet de rol `zaak-persoonlijk`
-   er nog een op de demo-zaak (./proefsleutels.js). Vandaar de aftrek: het
-   budget dat hier te verdelen valt is niet het hele plafond. */
-const ROSTER_PLAFOND = 30;
-const ROSTER_ELDERS = 1;
-const ROSTER_BUDGET = ROSTER_PLAFOND - ROSTER_ELDERS;
+/* De rem op /api/supplier/roster staat op dertig per kwartier per IP.
+
+   HIER STOND EEN AFTREK, en die was het symptoom van een dubbeling. De rol
+   `zaak-persoonlijk` deed zijn eigen opvraging op de demo-zaak, dus was het
+   budget 29 in plaats van 30 -- en met 28 zaken paste er nog precies een
+   genre bij. Die 29e was er een te veel omdat er TWEE implementaties van
+   dezelfde handeling stonden (LAT.md regel 4).
+
+   De inlog woont nu op een plek, met een cache per code (./zaakinlog.js), en
+   de demo-zaak staat gewoon in deze lijst. Wie twee keer om dezelfde zaak
+   vraagt, betaalt een keer. Het budget is daarmee het hele plafond, en het
+   aantal opvragingen is het aantal DISTINCTE codes hieronder. */
+const ROSTER_BUDGET = 30;
 
 /* Welke zaak hoort bij dit pad -- of geen. Het langste voorvoegsel wint, zodat
    /api/supplier/zorgpolis niet bij /api/supplier/zorg belandt. */
 function zaakVoor(pad) {
   let beste = null;
   for (const z of ZAKEN) {
-    for (const p of z.prefixen) {
+    for (const p of (z.prefixen || [])) {
       if (!String(pad || '').startsWith(p)) continue;
       if (!beste || p.length > beste.lengte) beste = { zaak: z, lengte: p.length };
     }

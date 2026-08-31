@@ -164,10 +164,11 @@ wachtOpSchoneBoom();
   const { zetGenreKlaar } = require('./lib/wereld-genre');
   const { genreRolVoor, rolVanZaak: genreRolVanZaak } = require('./lib/genrezaken');
   const { verfijn } = require('./lib/sessieverfijning');
-  const genreWereld = await zetGenreKlaar({ post });
+  const genreWereld = await zetGenreKlaar({ post, zaakinlog: bos.zaakbureau });
   for (const [code, tok] of Object.entries(genreWereld.tokens)) tokens[genreRolVanZaak(code)] = tok;
   console.log('  genrewereld                          : ' +
-    (genreWereld.klaar ? 'klaar   (' + Object.keys(genreWereld.tokens).length + ' zaken)'
+    (genreWereld.klaar ? 'klaar   (' + Object.keys(genreWereld.tokens).length + ' zaken, ' +
+                          bos.zaakbureau.verbruikt() + ' roosteropvragingen)'
                        : 'NIET klaar -- ' + genreWereld.reden));
   for (const st of genreWereld.stappen) if (!st.ok || st.waarom) console.log('      ' + st.zaak + ': ' + st.waarom);
 
@@ -609,6 +610,7 @@ wachtOpSchoneBoom();
       objectenGemaakt: objecten.gelukt, objectTakken: objecten.takken,
       schoolwereld: schoolWereld.klaar, horecawereld: horecaWereld.klaar,
       werelden: wereldStand, wereldwacht: wachtVerslag,
+      roosteropvragingen: bos.zaakbureau.verbruikt(), roosterRem: 30,
       rolOpgewaardeerd: opgewaardeerd.length, rolOpwaarderingGeweigerd: geweigerd.length,
       schoolwereldStappen: schoolWereld.stappen.map(x => ({ naam: x.naam, ok: x.ok, waarom: x.waarom })),
       lijfsleutelsGebouwd: lijfsleutels.gebouwd.map(g => g.naam),

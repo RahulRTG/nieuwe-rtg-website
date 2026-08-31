@@ -111,3 +111,27 @@ test('geen wereld sloeg tussendoor om', () => {
       .map(g => g.wereld + ' ' + g.van + '->' + g.naar + ' tussen ' + g.vanafRoute + ' en ' + g.totRoute)
       .join('; '));
 });
+
+/* ============================================================================
+   EN DE REM DIE NIET MAG SPRINGEN.
+
+   /api/supplier/roster laat dertig opvragingen per kwartier per IP toe, en dat
+   is een echte poort met een reden: zonder hem is het personeelsbestand van
+   elke partner in een paar minuten uit te lezen. De proef zat op 29 van de 30
+   omdat er TWEE implementaties van rooster+login stonden; dat is opgelost door
+   ze samen te voegen (scripts/lib/zaakinlog.js).
+
+   Deze poort kijkt naar wat er GEMETEN is opgevraagd en niet naar hoe lang de
+   lijst in genrezaken.js is. Een tweede plek die alsnog zelf gaat aankloppen,
+   valt daarmee op -- de lijst zou dan namelijk nog steeds kloppen. */
+test('de proef blijft onder de roster-rem, gemeten', () => {
+  const n = (proef.gemeten || {}).roosteropvragingen;
+  const rem = (proef.gemeten || {}).roosterRem;
+  assert.ok(Number.isInteger(n), 'de meting hoort te melden hoeveel roosteropvragingen zij deed');
+  assert.ok(Number.isInteger(rem) && rem > 0, 'en tegen welke rem');
+  assert.ok(n <= rem, n + ' roosteropvragingen tegen een rem van ' + rem +
+    '; de staart van de genrelijst meet dan niets');
+  /* En hij hoort ook niet op nul te staan: dan is er geen enkele zaak
+     ingelogd en zegt deze poort niets. */
+  assert.ok(n > 0, 'er is geen enkele roosteropvraging gedaan; dan staat er geen genrewereld');
+});

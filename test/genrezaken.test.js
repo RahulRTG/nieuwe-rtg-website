@@ -12,8 +12,15 @@ test('elke zaak draagt een code, een genre, voorvoegsels en een reden', () => {
   for (const z of ZAKEN) {
     assert.match(z.code, /^[A-Z0-9]{3,12}$/, 'code van ' + JSON.stringify(z));
     assert.ok(z.genre && typeof z.genre === 'string', 'genre van ' + z.code);
-    assert.ok(Array.isArray(z.prefixen) && z.prefixen.length, 'voorvoegsels van ' + z.code);
+    assert.ok(Array.isArray(z.prefixen), 'voorvoegsels van ' + z.code);
     for (const p of z.prefixen) assert.ok(p.startsWith('/api/'), z.code + ': ' + p);
+    /* Een zaak zonder voorvoegsels mag, maar alleen als zij zichzelf zo
+       aanwijst: dan staat zij er om INGELOGD te worden en niet om routes te
+       verfijnen. Zonder die vlag is een lege lijst een vergissing. */
+    if (!z.prefixen.length) {
+      assert.equal(z.alleenInlog, true,
+        z.code + ' heeft geen voorvoegsels; zet `alleenInlog: true` als dat de bedoeling is');
+    }
     assert.ok((z.waarom || '').length >= 30, 'de reden van ' + z.code + ' is te kort om na te lopen');
   }
 });
@@ -26,8 +33,12 @@ test('geen twee zaken op dezelfde code', () => {
    Deze toets zakt zodra de lijst eroverheen groeit, zodat de staart niet stil
    niets meet. */
 test('de lijst blijft onder de roster-rem', () => {
-  assert.ok(ZAKEN.length <= ROSTER_BUDGET,
-    ZAKEN.length + ' zaken tegen een rem van ' + ROSTER_BUDGET + ' opvragingen per kwartier');
+  /* Een opvraging per DISTINCTE code -- de inlog cachet per code
+     (scripts/lib/zaakinlog.js), dus twee regels op dezelfde zaak kosten er
+     een. */
+  const codes = new Set(ZAKEN.map(z => z.code));
+  assert.ok(codes.size <= ROSTER_BUDGET,
+    codes.size + ' zaken tegen een rem van ' + ROSTER_BUDGET + ' opvragingen per kwartier');
 });
 
 test('het langste voorvoegsel wint', () => {

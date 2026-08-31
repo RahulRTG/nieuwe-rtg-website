@@ -21,8 +21,13 @@
 'use strict';
 
 const { ZAKEN, ROSTER_BUDGET } = require('./genrezaken');
+const { maakZaakinlog } = require('./zaakinlog');
 
-async function zetGenreKlaar({ post }) {
+async function zetGenreKlaar({ post, zaakinlog }) {
+  /* De inlog woont in ./zaakinlog.js -- op EEN plek, met een cache per code.
+     Krijgt deze wereld er een mee, dan deelt hij hem met de proefsleutels en
+     kost de demo-zaak geen tweede opvraging. */
+  const bureau = zaakinlog || maakZaakinlog({ post });
   const stappen = [];
   const tokens = {};
 
@@ -33,35 +38,17 @@ async function zetGenreKlaar({ post }) {
   }
 
   for (const z of ZAKEN) {
-    let rooster = null;
-    try { rooster = await post('/api/supplier/roster', { code: z.code }, null); } catch (e) { rooster = null; }
-    if (!rooster || rooster.status !== 200) {
-      stappen.push({ zaak: z.code, genre: z.genre, ok: false, status: rooster ? rooster.status : 0,
-        waarom: (rooster && rooster.data && rooster.data.error) || 'geen antwoord op /api/supplier/roster' });
+    const uit = await bureau.inlog(z.code);
+    if (!uit.token) {
+      stappen.push({ zaak: z.code, genre: z.genre, ok: false, status: uit.status, waarom: uit.waarom });
       continue;
     }
-    const mgr = ((rooster.data || {}).staff || []).find(s => s.role === 'manager');
-    if (!mgr) {
-      stappen.push({ zaak: z.code, genre: z.genre, ok: false, status: 200,
-        waarom: 'deze zaak heeft geen manager in het rooster; zonder manager geen personeelslogin' });
-      continue;
-    }
-    let inlog = null;
-    try { inlog = await post('/api/supplier/login', { code: z.code, staffId: mgr.id, pin: '1234' }, null); }
-    catch (e) { inlog = null; }
-    const tok = inlog && inlog.status === 200 && inlog.data && inlog.data.token;
-    if (!tok) {
-      stappen.push({ zaak: z.code, genre: z.genre, ok: false, status: inlog ? inlog.status : 0,
-        waarom: (inlog && inlog.data && inlog.data.error) || 'de personeelslogin gaf geen sessie' });
-      continue;
-    }
+    tokens[z.code] = uit.token;
     /* Het GENRE nameten in plaats van aannemen: de zaak kan hernoemd zijn of
        een ander type gekregen hebben, en dan opent deze sessie niets. */
-    const werkelijk = (rooster.data.supplier || {}).type;
-    const klopt = werkelijk === z.genre;
-    tokens[z.code] = tok;
+    const klopt = uit.genre === z.genre;
     stappen.push({ zaak: z.code, genre: z.genre, ok: true, status: 200,
-      waarom: klopt ? null : 'deze zaak draagt genre "' + werkelijk + '" en niet "' + z.genre + '"' });
+      waarom: klopt ? null : 'deze zaak draagt genre "' + uit.genre + '" en niet "' + z.genre + '"' });
   }
 
   const gelukt = Object.keys(tokens).length;

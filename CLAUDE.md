@@ -798,17 +798,30 @@ is: van 3282 routes hebben er 74 een kandidaat-tegenhanger op grond van hun naam
 `vermoed` uit een naam, want /agenda/bewaar is geen omkering van /verwijder. Wat
 herstel nodig had bleek geen verklaringsregister maar een PROEF, en die staat er:
 `scripts/herstelproef.js` VOERT het paar uit (heen, kijken, terug, kijken) en
-vergelijkt de INHOUD van de opslag -- 8 `exact`, 3 `compensatie`, 0 `geen-herstel`,
-63 niet beproefd omdat het plausibele lijf niet op die route past (elk met een
-leesbare reden: 404, 400, 409, 403). Hij draait drie sessies en haalt de rol uit
+vergelijkt de INHOUD van de opslag -- 12 `exact`, 30 `compensatie`, 0
+`geen-herstel`, **0 niet beproefd** en 32 die een WERELD vragen die de proef niet
+opzet (een zaak met de werkvorm journalistiek, een ingericht landpakket, een
+salon), elk met wat er zou moeten bestaan erbij. Elk paar draagt dus een uitslag.
+`scripts/lib/herstelwereld.js` is daarvoor wat `idemwereld.js` voor de
+idempotentieproef is: de tegenhanger is de voorbereiding, het lijf staat per
+route, een voorziening laat het onderwerp langs de gewone route ontstaan, en de
+wereld gaat eenmalig aan. Hij draait drie sessies en haalt de rol uit
 IDEMPROEF.json, want wie /api/supplier/ ziet en daaruit leverancier afleidt zit
-er bij elke uitzondering naast. Alleen over die elf mag een
+er bij elke uitzondering naast. Alleen over die 42 mag een
 scherm of een bon iets over een terugweg zeggen, en dan met de SOORT erbij: een
 creditnota wist geen factuur, dus `exact` en `compensatie` worden nooit
 samengeteld. Twee dingen daar niet wegpoetsen: `nietBeproefd` is met opzet geen
 `geen-herstel` (een tekort van de proef is geen oordeel over het paar), en zonder
 de OPWARMRONDE bestaat de collectie nog niet en heet elk paar `compensatie` --
-een hoogste graad die niemand kan halen is geen graad. Die opwarmronde heeft ook
+een hoogste graad die niemand kan halen is geen graad. Drie dingen die daar stil verkeerd gingen en die je nergens anders
+moet herhalen: een verdict is een BESCHULDIGING (`geen-herstel` zegt dat een
+route liegt, dus dat oordeel wordt niet geveld als de sleutel uit het laatste
+element van een lijst is GERADEN), wachten op stilte is niet wachten op de
+schrijver (twee gelijke metingen vlak na een oproep zijn allebei van VOOR de
+schrijfronde, dus wordt er gewacht tot het beeld VERANDERT), en de proef
+beinvloedt zichzelf -- wat in de volle ronde niet lukt draait nog een keer alleen
+op een eigen server, en lukt het dan wel dan draagt de uitslag `ordeAfhankelijk`.
+Die opwarmronde heeft ook
 een prijs, en die staat in de uitslag: een EENMALIG gevolg (een kostenregel bij de
 eerste aanmaak) valt erin en wordt niet gemeten, dus `exact` betekent hier exact
 bij een TWEEDE en volgende uitvoering. De proef beproeft daarom ook de al

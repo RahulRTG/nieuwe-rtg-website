@@ -2,20 +2,29 @@
  "uitleg": "Vermoede tegenhangers uit HERSTEL.json, werkelijk uitgevoerd: heen, kijken, terug, kijken. Alleen `exact` en `compensatie` zijn een uitspraak over het paar; de rest is een tekort van de proef.",
  "gemeten": {
   "paren": 74,
-  "exact": 8,
-  "compensatie": 3,
+  "exact": 12,
+  "compensatie": 30,
   "geenHerstel": 0,
-  "nietBeproefd": 63
+  "nietBeproefd": 0,
+  "wereldOntbreekt": 32,
+  "ordeAfhankelijk": 3,
+  "buitenTweedeRonde": 0
  },
  "per": [
   {
    "heen": "/api/agenda/bewaar",
    "terug": "/api/agenda/verwijder",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:agendas"
+   ],
+   "nietTerug": [
+    "store.db:agendas"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/agenda/toevoegen",
@@ -27,142 +36,168 @@
    "geraakt": [
     "store.db:agendas"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
+   "ordeAfhankelijk": true
   },
   {
    "heen": "/api/annuleer",
    "terug": "/api/reserveer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een boeking in de zaaiset; het soort (order, ride, boeking) is een veld, maar het ding moet bestaan. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/asset/gebruik",
    "terug": "/api/asset/herroep",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een object in de assetlijst. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/asset/koop",
    "terug": "/api/asset/herroep",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een object in de assetlijst. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/bank/pas/sluit",
    "terug": "/api/bank/pas/uitgeven",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 403,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bankPassen"
+   ],
+   "nietTerug": [
+    "store.db:bankPassen"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/pas/uitgeven",
    "terug": "/api/bank/pas/sluit",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 403,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bankPassen"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/bank/terugkerend/stop",
    "terug": "/api/bank/terugkerend/zet",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 403,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bankTerugkerend"
+   ],
+   "nietTerug": [
+    "store.db:bankTerugkerend"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/bank/terugkerend/zet",
    "terug": "/api/bank/terugkerend/stop",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 403,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 403: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:bankTerugkerend"
+   ],
+   "nietTerug": [
+    "store.db:bankTerugkerend"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/care/annuleer",
    "terug": "/api/care/boek",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zorgaanbieder in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/care/boek",
    "terug": "/api/care/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zorgaanbieder in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/clips/maak",
    "terug": "/api/clips/weg",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:clips"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/clips/weg",
    "terug": "/api/clips/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:clips"
+   ],
+   "nietTerug": [
+    "store.db:clips"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/command/stad/start",
    "terug": "/api/command/stad/stop",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingericht landpakket; een stad in een land zonder inrichting is een stad zonder munt. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/command/stad/stop",
    "terug": "/api/command/stad/start",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingericht landpakket; een stad in een land zonder inrichting is een stad zonder munt. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/command/zandbak/maak",
    "terug": "/api/command/zandbak/weg",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:zandbakken"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/command/zandbak/weg",
    "terug": "/api/command/zandbak/maak",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:zandbakken"
+   ],
+   "nietTerug": [
+    "store.db:zandbakken"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/kantoorpakket/maak",
@@ -180,10 +215,16 @@
    "heen": "/api/kantoorpakket/weg",
    "terug": "/api/kantoorpakket/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:officeDocs"
+   ],
+   "nietTerug": [
+    "store.db:officeDocs"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/live/start",
@@ -204,85 +245,122 @@
    "heen": "/api/live/stop",
    "terug": "/api/live/start",
    "rol": "member",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:live"
+   ],
+   "nietTerug": [
+    "store.db:live"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/meet/kom",
    "terug": "/api/meet/verlaat",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
-  },
-  {
-   "heen": "/api/meet/maak",
-   "terug": "/api/meet/weg",
-   "rol": "member",
-   "uitslag": "exact",
+   "uitslag": "compensatie",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
     "store.db:meetKamers"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "nietTerug": [
+    "store.db:meetKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/meet/maak",
+   "terug": "/api/meet/weg",
+   "rol": "member",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites",
+    "store.db:meetKamers",
+    "store.db:veilig",
+    "store.db:wacht"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites",
+    "store.db:veilig",
+    "store.db:wacht"
+   ],
+   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/meet/verlaat",
    "terug": "/api/meet/kom",
    "rol": "member",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:meetKamers"
+   ],
+   "nietTerug": [
+    "store.db:meetKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/meet/weg",
    "terug": "/api/meet/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:meetKamers"
+   ],
+   "nietTerug": [
+    "store.db:meetKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/member/rtmail/regel/maak",
    "terug": "/api/member/rtmail/regel/weg",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:rtmailRegels"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/member/rtmail/regel/weg",
    "terug": "/api/member/rtmail/regel/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:rtmailRegels"
+   ],
+   "nietTerug": [
+    "store.db:rtmailRegels"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/mob/reis/annuleer",
    "terug": "/api/mob/reis/boek",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een geboekte reis, en die vraagt eerst een geplande reisoptie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/mob/reis/boek",
    "terug": "/api/mob/reis/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een geplande reisoptie; boeken gaat op een optie uit een reisplan en niet op twee punten. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/muziek/maak",
@@ -300,155 +378,151 @@
    "heen": "/api/muziek/weg",
    "terug": "/api/muziek/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:muziek"
+   ],
+   "nietTerug": [
+    "store.db:muziek"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/office/afdelingshotel/annuleer",
    "terug": "/api/office/afdelingshotel/boek",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een afdeling in het afdelingshotel. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/office/afdelingshotel/boek",
    "terug": "/api/office/afdelingshotel/annuleer",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een afdeling in het afdelingshotel. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/office/atelierweb/bewaar",
    "terug": "/api/office/atelierweb/verwijder",
    "rol": "office",
-   "uitslag": "compensatie",
+   "uitslag": "exact",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:atelierSites",
-    "store.db:kosten"
+    "store.db:atelierSites"
    ],
-   "nietTerug": [
-    "store.db:kosten"
-   ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/office/atelierweb/verwijder",
    "terug": "/api/office/atelierweb/bewaar",
    "rol": "office",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:atelierSites"
+   ],
+   "nietTerug": [
+    "store.db:atelierSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/office/kantoorpakket/maak",
    "terug": "/api/office/kantoorpakket/weg",
    "rol": "office",
-   "uitslag": "exact",
+   "uitslag": "compensatie",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:officeDocs"
+    "store.db:officeDocs",
+    "store.db:wacht"
    ],
-   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
+   "nietTerug": [
+    "store.db:wacht"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/office/kantoorpakket/weg",
    "terug": "/api/office/kantoorpakket/maak",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:officeDocs"
+   ],
+   "nietTerug": [
+    "store.db:officeDocs"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/office/weefsel/relatie/maak",
    "terug": "/api/office/weefsel/relatie/weg",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een stadsweefsel met objecten aan beide kanten van de relatie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/office/weefsel/relatie/weg",
    "terug": "/api/office/weefsel/relatie/maak",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een stadsweefsel met objecten aan beide kanten van de relatie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/reisbureau/annuleer",
    "terug": "/api/reisbureau/boek",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een reisaanvraag in het reisbureau. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/reisbureau/boek",
    "terug": "/api/reisbureau/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een reis in het reisbureau. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/reserveer",
    "terug": "/api/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een partner in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/residentie/spel/stop",
    "terug": "/api/residentie/spel/zet",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een lopend potje in de residentie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/residentie/spel/zet",
    "terug": "/api/residentie/spel/stop",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een lopend potje in de residentie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/rtfos/meldcode/open",
    "terug": "/api/rtfos/meldcode/sluit",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een stadsafdeling in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/rtfos/meldcode/sluit",
    "terug": "/api/rtfos/meldcode/open",
    "rol": "office",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een stadsafdeling in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/samen/maak",
@@ -466,10 +540,16 @@
    "heen": "/api/samen/weg",
    "terug": "/api/samen/maak",
    "rol": "member",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:samenKamers"
+   ],
+   "nietTerug": [
+    "store.db:samenKamers"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/site/bewaar",
@@ -490,46 +570,82 @@
    "heen": "/api/site/live",
    "terug": "/api/site/offline",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/site/publiceer",
    "terug": "/api/site/offline",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/site/verwijder",
    "terug": "/api/site/bewaar",
    "rol": "member",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/staff/mob/cdt/aanmelden",
    "terug": "/api/staff/mob/cdt/afmelden",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:mobDiensten",
+    "store.db:supplierActivity"
+   ],
+   "nietTerug": [
+    "store.db:mobDiensten",
+    "store.db:supplierActivity"
+   ],
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
+   "ordeAfhankelijk": true
   },
   {
    "heen": "/api/staff/mob/cdt/afmelden",
    "terug": "/api/staff/mob/cdt/aanmelden",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:mobDiensten",
+    "store.db:supplierActivity"
+   ],
+   "nietTerug": [
+    "store.db:mobDiensten",
+    "store.db:supplierActivity"
+   ],
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering. In de volle ronde lukte dit niet, alleen op een eigen server: een ander paar had de wereld veranderd waarin dit paar moest draaien",
+   "ordeAfhankelijk": true
   },
   {
    "heen": "/api/supplier/agenda/toevoegen",
@@ -547,10 +663,16 @@
    "heen": "/api/supplier/agenda/verwijder",
    "terug": "/api/supplier/agenda/toevoegen",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
+   "uitslag": "compensatie",
    "heenStatus": 200,
-   "geraakt": [],
-   "reden": "de heenweg draaide maar raakte geen enkele domeincollectie aan; er valt niets om te keren"
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:agendas"
+   ],
+   "nietTerug": [
+    "store.db:agendas"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/kantoorpakket/maak",
@@ -568,166 +690,165 @@
    "heen": "/api/supplier/kantoorpakket/weg",
    "terug": "/api/supplier/kantoorpakket/maak",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:officeDocs"
+   ],
+   "nietTerug": [
+    "store.db:officeDocs"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/redactie/artikel/bewaar",
    "terug": "/api/supplier/redactie/artikel/verwijder",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met de werkvorm journalistiek; deze proef logt in op de zaaizaak. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/supplier/redactie/artikel/verwijder",
    "terug": "/api/supplier/redactie/artikel/bewaar",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met de werkvorm journalistiek; deze proef logt in op de zaaizaak. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/supplier/redactie/rubriek/bewaar",
    "terug": "/api/supplier/redactie/rubriek/verwijder",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met de werkvorm journalistiek; deze proef logt in op de zaaizaak. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/supplier/redactie/rubriek/verwijder",
    "terug": "/api/supplier/redactie/rubriek/bewaar",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 409,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 409: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met de werkvorm journalistiek; deze proef logt in op de zaaizaak. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/supplier/rtmail/regel/maak",
    "terug": "/api/supplier/rtmail/regel/weg",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "exact",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:rtmailRegels"
+   ],
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/supplier/rtmail/regel/weg",
    "terug": "/api/supplier/rtmail/regel/maak",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:rtmailRegels"
+   ],
+   "nietTerug": [
+    "store.db:rtmailRegels"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/site/live",
    "terug": "/api/supplier/site/offline",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/site/publiceer",
    "terug": "/api/supplier/site/offline",
    "rol": "supplier",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:ledenSites"
+   ],
+   "nietTerug": [
+    "store.db:ledenSites"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/thuis/annuleer",
    "terug": "/api/thuis/boek",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een huis in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/thuis/boek",
    "terug": "/api/thuis/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een huis in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/vak/ritme/start",
    "terug": "/api/vak/ritme/stop",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met vaste afspraken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/vak/ritme/stop",
    "terug": "/api/vak/ritme/start",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een zaak met vaste afspraken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/veiligheid/wacht/start",
    "terug": "/api/veiligheid/wacht/stop",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 400,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 400: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een gevulde kring; deze wacht waarschuwt de kring, dus zonder kring is er niets te waarschuwen. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/veiligheid/wacht/stop",
    "terug": "/api/veiligheid/wacht/start",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een gevulde kring; deze wacht waarschuwt de kring, dus zonder kring is er niets te waarschuwen. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/verzorging/annuleer",
    "terug": "/api/verzorging/boek",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een salon in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/verzorging/boek",
    "terug": "/api/verzorging/annuleer",
    "rol": "member",
-   "uitslag": "nietBeproefd",
-   "heenStatus": 404,
-   "geraakt": [
-    "store.db:kosten",
-    "store.db:thuisBoekingen",
-    "store.db:thuisHuizen",
-    "store.db:vakRitmes",
-    "store.db:veilig"
-   ],
-   "reden": "de heenweg gaf status 404: er is niets gebeurd om terug te draaien"
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een salon in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   }
  ],
  "grenzen": [
   "de proef weet niet WELK ding de terugweg moet aanwijzen; zij geeft de identificerende velden uit het antwoord van de heenweg door, en faalt dat, dan is de uitslag nietBeproefd en geen oordeel",
   "een paar wordt in het gunstigste geval beproefd: meteen erna, door dezelfde gebruiker, met een vers gemaakt ding. Een bevestiging hier zegt niets over een terugweg een week later",
   "exact en compensatie zijn niet hetzelfde, en worden nooit samengeteld: een creditnota wist geen factuur",
-  "de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep"
+  "de huishouding (apiSpoor, handelingLog) blijft buiten het oordeel; die verandert bij elke oproep",
+  "de volle ronde is NIET onafhankelijk: een paar kan de wereld veranderen waarin een later paar draait. Wat in de volle ronde niet lukte, is daarom nog een keer alleen op een eigen server gedraaid; lukt het dan wel, dan staat `ordeAfhankelijk` erbij en geldt die uitslag",
+  "de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` onbereikbaar, dus dit is een gekozen ruil en geen vergissing -- /api/meet/maak stond in de eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact"
  ]
 }

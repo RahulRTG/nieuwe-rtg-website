@@ -125,7 +125,7 @@ test('8. de uitslag draagt zijn grenzen, en telt exact en compensatie nooit same
   const u = JSON.parse(fs.readFileSync(b, 'utf8'));
   assert.ok(u.grenzen.length >= 4);
   const g = u.gemeten;
-  assert.strictEqual(g.exact + g.compensatie + g.geenHerstel + g.nietBeproefd, g.paren,
+  assert.strictEqual(g.exact + g.compensatie + g.geenHerstel + g.nietBeproefd + g.wereldOntbreekt, g.paren,
     'de uitslagen tellen niet op tot het aantal paren: er valt er een tussenuit');
   assert.ok(!('hersteld' in g), 'exact en compensatie mogen nooit tot een getal worden samengevoegd');
 });
@@ -136,8 +136,90 @@ test('9. de bewezen paren worden niet minder', () => {
   const b = path.join(__dirname, '..', 'HERSTELPROEF.json');
   if (!fs.existsSync(b)) return;
   const g = JSON.parse(fs.readFileSync(b, 'utf8')).gemeten;
-  assert.ok(g.exact >= 8, 'exact: ' + g.exact + ' < 8');
-  assert.ok(g.compensatie >= 3, 'compensatie: ' + g.compensatie + ' < 3');
-  assert.ok(g.nietBeproefd <= 63, 'niet beproefd: ' + g.nietBeproefd + ' > 63 -- de proef komt ' +
-    'bij minder paren binnen dan hij deed');
+  assert.ok(g.exact >= 12, 'exact: ' + g.exact + ' < 12');
+  assert.ok(g.compensatie >= 30, 'compensatie: ' + g.compensatie + ' < 30');
+  /* NUL, en dat is de grondwaarde. Elk paar draagt een uitslag: uitgevoerd, of
+     met de reden waarom zijn wereld hier niet bestaat. Een paar dat terugvalt
+     naar "niet beproefd" is een proef die iets kwijt is. */
+  assert.strictEqual(g.nietBeproefd, 0,
+    'er staan weer paren op `nietBeproefd`; elk paar hoort een uitslag te dragen of een ' +
+    'uitgeschreven reden waarom zijn wereld hier niet bestaat');
+  assert.ok(g.wereldOntbreekt <= 32, 'wereldOntbreekt: ' + g.wereldOntbreekt + ' > 32');
+});
+
+/* De wereldlijst is een lijst BESLUITEN en geen prullenbak: wie een route hier
+   neerzet, sluit hem uit van de meting. Dat mag, mits er staat WAT er zou
+   moeten bestaan -- anders is het een manier om een lastig paar weg te
+   schrijven. */
+test('10. elke uitgesloten route zegt welke wereld hij vraagt', () => {
+  const wereld = require('../scripts/lib/herstelwereld');
+  for (const [pad, reden] of Object.entries(wereld.ONBEREIKBAAR)) {
+    assert.match(pad, /^\/api\//, pad + ': geen route');
+    assert.ok(reden && reden.length > 15, pad + ': uitgesloten zonder te zeggen wat er zou moeten bestaan');
+  }
+  /* En een route mag niet TEGELIJK worden uitgesloten en voorzien: dan zou de
+     proef hem klaarzetten en er daarna niets mee doen. */
+  for (const pad of Object.keys(wereld.VOORZIENINGEN))
+    assert.ok(!wereld.ONBEREIKBAAR[pad], pad + ' is zowel uitgesloten als voorzien');
+});
+
+test('11. een voorziening wijst naar een route en nooit naar zichzelf', () => {
+  const wereld = require('../scripts/lib/herstelwereld');
+  for (const [pad, via] of Object.entries(wereld.VOORZIENINGEN)) {
+    const keten = Array.isArray(via) ? via : [via];
+    for (const v of keten) {
+      assert.match(v, /^\/api\//, pad + ': voorziening is geen route');
+      assert.notStrictEqual(v, pad, pad + ': voorziening wijst naar zichzelf; dan draait de heenweg twee keer');
+    }
+  }
+});
+
+test('12. het wereldlijf wint van wat er meereist', () => {
+  const wereld = require('../scripts/lib/herstelwereld');
+  /* Het adres van een vorige publicatie reisde mee als sleutel en overschreef
+     het verse adres, waarna publiceren 409 gaf op zijn eigen vorige ronde.
+     Twee opeenvolgende aanroepen horen dus een ANDER adres te geven. */
+  const a = wereld.lijfVoor('/api/site/publiceer', {});
+  const b = wereld.lijfVoor('/api/site/publiceer', {});
+  assert.notStrictEqual(a.adres, b.adres, 'het adres is niet vers per poging');
+  /* En een lijf dat van de wereld afhangt, gebruikt die wereld ook echt. */
+  const tk = wereld.lijfVoor('/api/bank/terugkerend/zet', { iban: 'NL00A', naarIban: 'NL00B' });
+  assert.strictEqual(tk.vanIban, 'NL00A');
+  assert.strictEqual(tk.naarIban, 'NL00B');
+});
+
+/* MUTATIE DIE NIET BEET. Toets 5 hierboven laat een terugweg niets doen, maar
+   in die nepwereld antwoordt de heenweg met een id op het hoogste niveau -- een
+   ZEKERE sleutel. Haalde je de `uitLijst`-rem weg, dan bleef alles groen. Deze
+   toets laat de heenweg met een LIJST antwoorden, precies zoals /api/agenda/
+   toevoegen doet, en eist dat de proef dan geen oordeel velt. */
+test('13. een terugweg die niets doet op een GERADEN sleutel is geen beschuldiging', async () => {
+  const os = require('os');
+  const { DatabaseSync } = require('node:sqlite');
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-herstelproef-gok-'));
+  const db = new DatabaseSync(path.join(map, 'store.db'));
+  db.exec('CREATE TABLE kv (key TEXT PRIMARY KEY, val TEXT, ver INTEGER NOT NULL DEFAULT 0)');
+  let items = [];
+  const echt = global.fetch;
+  global.fetch = async (url, opties) => {
+    const pad = String(url).replace(/^http:\/\/nep/, '');
+    if (pad === '/api/x/maak') {
+      items = items.concat(['i' + items.length]);
+      db.exec("INSERT INTO kv (key,val,ver) VALUES ('dingen','" + JSON.stringify(items) +
+        "',1) ON CONFLICT(key) DO UPDATE SET val=excluded.val, ver=kv.ver+1");
+      /* een lijst, en het nieuwe item staat NIET achteraan */
+      return { status: 200, json: async () => ({ ok: true, items: [...items].reverse().map(id => ({ id })) }) };
+    }
+    return { status: 200, json: async () => ({ ok: true }) };   // de terugweg doet niets
+  };
+  try {
+    const u = await beproefPaar({ basis: 'http://nep', datamap: map }, 't', { heen: '/api/x/maak', terug: '/api/x/weg' });
+    assert.strictEqual(u.uitslag, 'nietBeproefd',
+      'de sleutel kwam uit een lijst en is dus geraden; daarop "deze terugweg doet niets" zeggen ' +
+      'is een beschuldiging op een gok');
+    assert.match(u.reden, /GERADEN/);
+  } finally {
+    global.fetch = echt; try { db.close(); } catch (e) {}
+    fs.rmSync(map, { recursive: true, force: true });
+  }
 });

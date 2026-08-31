@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T14:29:03.129Z",
-  "commit": "5036f5d4",
+  "op": "2026-08-31T15:36:25.068Z",
+  "commit": "289184ea",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,14 +9,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1065,
+  "meetwerk": 1034,
   "instrument": 932,
   "grens": 608
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 1997,
+  "staat": 1966,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -149,9 +149,9 @@
    "id": "herstel-onbevestigd",
    "soort": "meetwerk",
    "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
-   "aantal": 63,
+   "aantal": 32,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
-   "sluit": "de herstelproef over de overige paren halen. Die draait vandaag als LID, en de meeste resterende paren zijn leveranciers- en kantoorroutes; die sessies erbij halen sluit het grootste deel. Wat daarna overblijft is de vorm die de afleiding uberhaupt niet ziet: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
+   "sluit": "wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
   {
    "id": "idem-ongeclassificeerd",
@@ -264,7 +264,7 @@
   "herstel-onbevestigd": [
    {
     "op": "2026-08-31",
-    "aantal": 63
+    "aantal": 32
    }
   ],
   "idem-ongeclassificeerd": [

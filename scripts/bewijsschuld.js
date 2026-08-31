@@ -327,10 +327,12 @@ const POSTEN = [
     waarom: 'HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan ' +
       'opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de ' +
       'eerste de tweede werkelijk ongedaan maakt.',
-    sluit: 'de herstelproef over de overige paren halen. Die draait vandaag als LID, en de meeste ' +
-      'resterende paren zijn leveranciers- en kantoorroutes; die sessies erbij halen sluit het ' +
-      'grootste deel. Wat daarna overblijft is de vorm die de afleiding uberhaupt niet ziet: een ' +
-      'terugweg die anders heet, en een schakelaar met een vlag in het lichaam.' },
+    sluit: 'wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm ' +
+      'journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in ' +
+      'HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus ' +
+      'die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone ' +
+      'routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, ' +
+      'en een schakelaar met een vlag in het lichaam.' },
 
   { id: 'idem-ongeclassificeerd', soort: 'meetwerk',
     wat: 'muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer',

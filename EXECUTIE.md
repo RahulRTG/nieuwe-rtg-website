@@ -804,38 +804,72 @@ oordeel langskomen. `exact` en `compensatie` worden nooit samengeteld — een
 creditnota wist geen factuur — en `test/herstelproef.test.js` zakt zodra er één
 getal voor beide verschijnt.
 
-**De uitslag:**
+**De uitslag, na drie rondes gereedschap erbij:**
 
 | | |
 |---|---|
-| `exact` | **8** |
-| `compensatie` | **3** |
+| `exact` | **12** |
+| `compensatie` | **30** |
 | `geen-herstel` | 0 |
-| niet beproefd | 63 |
+| niet beproefd | **0** |
+| andere wereld nodig | 32 |
 
-`HERSTEL.json` staat daarmee op **11 bevestigd** en `vermoed` op 63. De
-bevestiging komt uit de proef en niet uit een pen: `test/herstel.test.js` eist
-per bevestigd paar een overeenkomstige uitslag in `HERSTELPROEF.json`, met
-dezelfde tegenhanger en de soort erbij. De oude toets — *`bevestigd` moet leeg
-zijn* — is niet vervallen maar scherper geworden; zonder die eis was de nieuwe
-tak precies het gat dat zij dichthield.
+`HERSTEL.json` staat daarmee op **42 bevestigd** en `vermoed` op 32. En die nul
+is het punt: **elk paar draagt een uitslag** — uitgevoerd, of met een
+uitgeschreven reden waarom zijn wereld hier niet bestaat.
 
-**De eerste ronde logde alleen in als lid,** en zette 67 paren op
-`nietBeproefd` waarvan 28 met een 401. Dat was geen eigenschap van die paren
-maar van de proef. Nu draaien er drie sessies (lid, kantoor, leverancier), en
-de rol komt uit `IDEMPROEF.json` — uit de meting dus, niet uit het pad, want wie
-`/api/supplier/` ziet en daaruit "leverancier" afleidt zit er bij elke
-uitzondering naast. Van de 63 die overblijven draagt elk nu een leesbare reden:
-35 × 404, 12 × 400, 6 × 409, 4 × 403 en 6 die draaiden zonder een domeincollectie
-te raken. Dat is het plausibele lijf dat niet op die route past — handwerk per
-route, geen ontbrekend gereedschap.
+**Van 63 onbeproefde paren naar nul, in vier ingrepen** (`scripts/lib/
+herstelwereld.js`, hetzelfde patroon als `idemwereld.js`):
 
-**En de proef beproeft ook de al bevestigde paren.** Dat lijkt dubbel werk en is
-het niet: `HERSTEL.json` leidt zijn graad uit deze uitslag af, dus een paar dat
-niet opnieuw wordt beproefd verdwijnt bij de volgende ronde uit de uitslag en
-daarmee uit het register. Een bevestiging die zichzelf opheft is erger dan geen.
-Dat gebeurde ook werkelijk: de eerste ronde met rollen erbij liet
-`compensatie` van 3 naar 0 zakken, en dát was de vondst.
+1. **De tegenhanger is de voorbereiding.** De helft van de onbeproefde paren was
+   de omgekeerde richting van een paar dat wél werkte — `/api/clips/weg →
+   /api/clips/maak`. De heenweg is daar een verwijdering, en in een verse
+   database is er niets te verwijderen. Wat zo'n paar nodig heeft is een
+   onderwerp, en dat maakt de tegenhanger. Eerst de tegenhanger, dan de
+   voorziening: andersom maakte de voorziening een afspraak aan en haalde de
+   tegenhanger hem meteen weer weg.
+2. **Het lijf, per route.** Een clip duurt 1 tot 60 seconden, een relatie heeft
+   een soort, een dienst heeft een chauffeurskaart, en een reis wil coördinaten
+   en geen plaatsnaam. Alleen vorm — wie hier een uitkomst stuurt, schrijft de
+   proef in plaats van de wereld.
+3. **De voorziening.** Publiceren vraagt een website, binnenkomen vraagt een
+   kamer, een pas sluiten vraagt een pas. Dat ding ontstaat langs de gewone
+   route, met zijn eigen poort ervoor, en mag een keten zijn: live-zetten vraagt
+   een gepubliceerde site vraagt een bewaarde.
+4. **De wereld, eenmalig.** De leden-bank staat in een verse database uit. En
+   `/api/bank/akkoord` geeft de rekening alleen bij de eerste oproep mee: elk
+   bankpaar zijn eigen akkoord laten doen gaf bij het tweede paar 404 *"De
+   rekening bestaat niet"* — terwijl die rekening er stond. Een gegeven dat maar
+   één keer wordt uitgedeeld, hoort bij de wereld en niet bij een paar.
+
+**En wat er níét mee wordt nagebouwd, staat er als besluit.** 32 paren vragen een
+wereld die deze proef niet opzet: een zaak met de werkvorm journalistiek, een
+ingericht landpakket, een salon, een geplande reisoptie. Die dragen
+`wereldOntbreekt` mét wat er zou moeten bestaan — een eigen uitslag, want *"wij
+hebben geen krant"* is iets anders dan *"de proef kwam er niet bij"*. Een proef
+die zijn eigen meetobject verzint, meet zichzelf.
+
+#### Drie dingen die stil verkeerd gingen
+
+**Een verdict is een beschuldiging.** `geen-herstel` zegt: deze route belooft een
+omkering die hij niet uitvoert. Het agendapaar kreeg dat oordeel — en het klopte
+niet: het id kwam uit het láátste element van een lijst, wat bij één agenda-item
+goed gaat en bij vijf een ander item aanwijst. De proef weet nu of een sleutel
+**geraden** is, en velt op een gok geen oordeel.
+
+**Wachten op stilte is niet wachten op de schrijver.** Een vaste pauze van 200 ms
+liet hetzelfde paar `exact` heten als het alleen draaide en *"raakte niets aan"*
+in de volle ronde. Twee gelijke metingen vlak na de oproep zijn allebei van vóór
+de schrijfronde — dus wordt er nu gewacht tot het beeld **verandert**, en pas
+daarna tot het stil ligt.
+
+**De proef beïnvloedt zichzelf.** `/api/staff/mob/cdt/aanmelden` kwam als
+`compensatie` door wanneer hij alleen draaide, en als 503 *"deze functie is voor
+dit genre uitgeschakeld"* in de volle ronde: een eerder paar had de wereld
+veranderd. Wat in de volle ronde niet lukt, draait daarom nog een keer **alleen,
+op zijn eigen verse server** — en lukt het dan wel, dan telt die uitslag met
+`ordeAfhankelijk` erbij. Drie paren staan zo. Een uitslag die van de volgorde van
+routenamen afhangt, is geen uitslag.
 
 **Een opwarmronde bleek niet-onderhandelbaar,** en dat is het leerzame deel. In
 een verse database bestáát de collectie `agendas` niet. Voegt de heenweg het

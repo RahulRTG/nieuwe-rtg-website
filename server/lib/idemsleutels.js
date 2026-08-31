@@ -93,6 +93,13 @@ const SLEUTELS = {
   'POST /api/office/hardware/maak': { zelfdeVerzoek: true },       // naam, verplicht (kern/hardwarelab/index.js)
   'POST /api/office/ideeen/maak': { zelfdeVerzoek: true },         // titel, verplicht (kern/ideeen.js)
 
+  /* De werkruimte bewaart één actuele compositie per lid en het auditspoor
+     noteert één brokerhandeling. Een netwerkretry met exact dezelfde inhoud
+     mag daarom noch een tweede schrijfbeweging, noch een dubbele auditregel
+     veroorzaken. */
+  'POST /api/ik/workspace/zet': { zelfdeVerzoek: true },
+  'POST /api/ik/workspace/audit/noteer': { zelfdeVerzoek: true },
+
   /* ---- bewust NIET idempotent, met de reden erbij ----
 
      /api/muziek/maak stond hier eerst als "zelfde verzoek is een herhaling", en
@@ -137,7 +144,9 @@ const SLEUTELS = {
      dingen zijn, en de schuldteller dat verschil hoort te zien. */
   'POST /api/office/anker': { leest: true },
   'POST /api/office/anker/reken': { leest: true },
-  'POST /api/office/handelingen': { leest: true }
+  'POST /api/office/handelingen': { leest: true },
+  'POST /api/ik/workspace': { leest: true },
+  'POST /api/ik/workspace/audit': { leest: true }
 };
 
 function sleutelVoor(methode, pad) {

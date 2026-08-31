@@ -515,6 +515,11 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
        de balk heeft een echte hoogte -- want er wordt opmaak gemeten (een hoogte
        en een ::after). Precies dat, en niets meer. */
     await page.goto(srv.base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded', timeout: 45000 });
+    await page.waitForSelector('#agPasskey', { state: 'visible', timeout: 20000 });
+    /* Passkey-first betekent de eerste en primaire deur, niet dat biometrie
+       zonder een handeling van de bezoeker mag openen. De toets raakt daarom
+       dezelfde knop aan die een mens in de officiële toegangspoort ziet. */
+    await page.click('#agPasskey');
     await page.waitForSelector('#rtgCommand[data-stand="open"] .cmd-leeg', { timeout: 20000 });
     await page.waitForFunction(() => {
       const b = document.querySelector('.cmd-balk');

@@ -418,6 +418,12 @@ test('de grammatica', { skip: geenBrowser(pw), concurrency: false }, async (t) =
         const b = r.getBoundingClientRect();
         return b.height < 6 || getComputedStyle(r).visibility === 'hidden' || b.width === 0;
       }, null, { timeout: 15000 });
+      /* Het laatste overgangsframe van de inklappende gridrij kan op een trage
+         renderer al `height < 6` melden terwijl de impliciete dockrij nog één
+         layoutcyclus op haar oude spoor staat. Wacht op STILSTAND en niet op de
+         gewenste y: een blijvend verschoven dock wordt dan nog steeds hieronder
+         afgekeurd, maar een tussenframe is geen productuitkomst. */
+      await wachtOpStilVak(page, '#rtgCommand .cmd-balk');
       const na = await page.locator('#rtgCommand .cmd-balk').boundingBox();
       assert.equal(Math.round(voor.y), Math.round(na.y), 'het dock hoort te blijven staan');
       assert.ok(!(await page.locator('#rtgCommand .cmd-rail').isVisible()) ||

@@ -62,7 +62,35 @@ module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
      blijft zoals het was. */
   const inVlucht = new Map();
 
-  return async function metIdem(sleutel, afdruk, werk) {
+  return async function metIdem(sleutel, afdruk, werk, opties) {
+    /* GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen.
+
+       `if (!sleutel) return werk()` was hier de hele regel: stuurt een client
+       geen sleutel, dan gebeurt het werk gewoon. Voor het meeste in dit huis is
+       dat de juiste afweging, maar de kale ronde van de idemproef mat achttien
+       geldroutes waar een woordelijk gelijke herhaling ZONDER sleutel het werk
+       opnieuw deed -- /api/bank/overboek boekte twee keer, /api/bank/sepa
+       stuurde twee keer het huis uit. Een dubbeltik op een trage verbinding is
+       precies dat verzoek, twee keer.
+
+       WAAROM HIER EN NIET IN DE HTTP-POORT. Daar heeft het gestaan, en het was
+       fout: server/lib/idem-poort.js draait VOOR de bewakers, dus een lid dat de
+       rekening van een ander probeerde kreeg 400 in plaats van 404, en twee
+       toetsen die juist die eigendomsgrens meten zagen hem niet meer. Hier staat
+       de weigering NA de eigenaarscontrole van de aanroeper (zie
+       ../kern/bank/overboeken.js: `if (!eigenaar(...)) return 404` staat boven de
+       metIdem-aanroep) en VOOR het werk. Dat is de enige plek waar allebei waar
+       is.
+
+       De aanroeper verklaart het, met een reden die in de weigering terechtkomt.
+       Geen lijst van paden hier: deze laag kent geen routes, en een tweede lijst
+       naast de aanroepplek loopt uit elkaar. */
+    if (!sleutel && opties && opties.geld) {
+      return { status: 400, code: 'IDEMPOTENTIESLEUTEL_VERPLICHT',
+        error: 'Deze opdracht verplaatst geld en vraagt een idempotentiesleutel. ' +
+          'Stuur een `idem` mee en gebruik bij een herhaling dezelfde waarde.',
+        waarom: String(opties.geld) };
+    }
     if (!sleutel) return werk();
     const s = store();
     const a = afdrukStore();

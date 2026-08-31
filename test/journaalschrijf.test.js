@@ -66,10 +66,41 @@ test('na de wachttijd wordt er precies EEN keer gespoeld', async () => {
      AFWEZIGHEID; daar is de tijd zelf de meting en blijven ze staan.) */
   let gespoeld;
   const eersteSpoeling = new Promise((r) => { gespoeld = r; });
+  /* EEN ANKER, EN DIT IS GEEN WACHTEN OP DE KLOK.
+
+     De spoeling van het journaal hangt aan een setTimeout met unref() -- met
+     opzet, want een wachtende spoeling hoort het afsluiten van de server niet
+     tegen te houden (server/kern/doorgeefjournaal.js). Een unref'd timer houdt
+     de gebeurtenislus echter ook niet wakker: is er verder niets te doen, dan
+     besluit node dat het werk op is, en dan meldt de testrunner "Promise
+     resolution is still pending but the event loop has already resolved" en
+     BREEKT DEZE HELE BESTAND AF -- de vier toetsen hieronder werden zo mee
+     afgebroken zonder ooit gedraaid te hebben.
+
+     Op node v24 gebeurde dat niet en op v22 wel; allebei zitten ze binnen de
+     engines-band van dit huis, dus dit is geen versieprobleem maar een
+     onuitgesproken aanname in de toets. Het anker is een gewone, WEL
+     vastgehouden timer die alleen bestaat zolang we wachten: hij meet niets en
+     bepaalt niets -- hij houdt de lus wakker zodat de spoeling nog kan komen.
+     Zodra ze er is, gaat hij weg. */
+  const anker = setTimeout(() => {}, 30000);
   const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null,
     save: () => { schrijfacties++; gespoeld(); } });
   for (let i = 0; i < 50; i++) j.journaalBinnen({ wat: '/api/weg', methode: 'GET', status: 500, mislukt: true });
-  await eersteSpoeling;
+  /* EERST WACHTEN OP DE SPOELING, DAN OP DE STILTE ERNA -- en dat tweede stond
+     er niet. Zonder die tweede wacht meet deze toets alleen dat er EEN keer is
+     gespoeld op het MOMENT dat de eerste spoeling binnenkomt, en dat is per
+     definitie waar. Nagemeten met een mutatie: haal de rem (`if (spoelt)
+     return`) uit kern/doorgeefjournaal.js en er komen vijftig spoelingen -- en
+     deze toets bleef gewoon groen. Een toets die je niet hebt zien zakken, is
+     geen toets.
+
+     Het anker hierboven blijft nodig voor de EERSTE wacht (die hangt aan een
+     unref'd timer); de tweede houdt de lus zelf wakker. */
+  try {
+    await eersteSpoeling;
+    await new Promise(r => setTimeout(r, 1300));
+  } finally { clearTimeout(anker); }
   assert.equal(schrijfacties, 1,
     'vijftig mislukkingen binnen een seconde horen samen EEN schrijfactie te kosten, niet vijftig');
 });

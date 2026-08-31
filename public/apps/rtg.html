@@ -29,6 +29,7 @@
 [hidden]{display:none!important}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/wereldrooster.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-ios-home data-rtg-eigenvlak="bordeaux" data-rtg-world="living">
 <a class="skip" href="#inhoud">Naar inhoud</a>
@@ -104,6 +105,68 @@
     <a class="kaart" href="/apps/muziek.html"><b>Muziek</b></a><a class="kaart" href="/apps/podium.html"><b>Podium</b></a><a class="kaart" href="/apps/theater.html"><b>Theater</b></a><a class="kaart" href="/apps/clips.html"><b>Video</b></a><a class="kaart" href="/apps/spelen.html"><b>Spelen</b></a><a class="kaart" href="/apps/nieuws.html"><b>Nieuws</b></a><a class="kaart" href="/apps/krant.html"><b>Krant</b></a><a class="kaart" href="/apps/sport.html"><b>Sport</b></a>
     <a class="kaart" href="/apps/living-os.html"><b>Het Vooruitzicht</b><p>Regie over wat nu speelt.</p></a><a class="kaart" href="/apps/lifestyle.html"><b>Privékantoor</b><p>Persoonlijke ondersteuning binnen LIFE.</p></a><a class="kaart" href="/apps/lifestyle.html" data-life-eist="lifestyle"><b>Privékantoor</b><p>Uw bestaande persoonlijke werkruimte en situatiekamer.</p><span class="laaglabel">Lifestyle</span></a><a class="kaart" href="/apps/living-os.html"><b>Living OS</b><p>Uw leefomgeving als verbonden onderdeel.</p></a>
   </div></section>
+  <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
+       geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
+       dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
+       achterloopt. Het redactionele rooster hierboven blijft staan --
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md).
+
+       `rtgdeel-vast` omdat dit blok geen DEEL van de pagina is maar een vaste
+       bijlage: zonder die klasse maakt shared/deelmenu.js er een eigen knop bij,
+       en op een samenhanglaag als /apps/kantoor.html hoort geen enkel
+       bedieningselement te staan (test/kantoor.e2e.js). -->
+  <section class="hero rtgdeel-vast" aria-labelledby="allesLivingOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesLivingOS">Alles wat in LivingOS hangt.</h2><div class="wrooster">
+  <!-- WERELDROOSTER:LivingOS -->
+    <a class="wrooster-kaart" href="/apps/wereld.html"><span>Alles bij elkaar</span></a>
+    <a class="wrooster-kaart" href="/apps/appstore-dossier.html"><span>App-dossier</span></a>
+    <a class="wrooster-kaart" href="/apps/attenties.html"><span>Attenties</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#balans"><span>Balans</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#bank"><span>Bank</span></a>
+    <a class="wrooster-kaart" href="/apps/comm.html"><span>Berichten</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#rtgcode"><span>Betaalcode</span></a>
+    <a class="wrooster-kaart" href="/apps/pay.html"><span>Betalen</span></a>
+    <a class="wrooster-kaart" href="/apps/camera.html"><span>Camera</span></a>
+    <a class="wrooster-kaart" href="/apps/cellier.html"><span>Cellier</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/cercle.html"><span>Cercle</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/commerce.html"><span>Commerce</span></a>
+    <a class="wrooster-kaart" href="/apps/vonk.html"><span>Daten</span></a>
+    <a class="wrooster-kaart" href="/apps/entourage.html"><span>Entourage</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/theater.html"><span>Films en series</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#labfonds"><span>Fonds</span></a>
+    <a class="wrooster-kaart" href="/apps/foodcourt.html"><span>Food Court</span></a>
+    <a class="wrooster-kaart" href="/apps/spelscherm.html"><span>Game Night</span></a>
+    <a class="wrooster-kaart" href="/apps/garderobe.html"><span>Garde-robe</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/geld-command.html"><span>Geld</span></a>
+    <a class="wrooster-kaart" href="/apps/living-os.html"><span>Het Vooruitzicht</span></a>
+    <a class="wrooster-kaart" href="/apps/krant.html"><span>Krant</span></a>
+    <a class="wrooster-kaart" href="/apps/podium.html"><span>Live</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#logboek"><span>Logboek</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/maison.html"><span>Maison</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/mall.html"><span>Mall</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#mecenaat"><span>Mecenaat</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/mijnmall.html"><span>Mijn bestellingen</span></a>
+    <a class="wrooster-kaart" href="/apps/leven.html"><span>Mijn leven</span></a>
+    <a class="wrooster-kaart" href="/apps/muziek.html"><span>Muziek</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#nalatenschap"><span>Nalatenschap</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/nieuws.html"><span>Nieuws</span></a>
+    <a class="wrooster-kaart" href="/apps/rtg.html"><span>Ontdekken</span></a>
+    <a class="wrooster-kaart" href="/apps/lifestyle.html"><span>Privekantoor</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/rendezvous.html"><span>Rendez-vous</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/media.html"><span>RTG Media</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#wbw"><span>Samen betalen</span></a>
+    <a class="wrooster-kaart" href="/apps/sociaal.html"><span>Sociaal</span></a>
+    <a class="wrooster-kaart" href="/apps/spelen.html?pas="><span>Spelen</span></a>
+    <a class="wrooster-kaart" href="/apps/sport.html"><span>Sport</span></a>
+    <a class="wrooster-kaart" href="/apps/table.html"><span>Table</span><span class="wrooster-label">Lifestyle</span></a>
+    <a class="wrooster-kaart" href="/apps/thuis.html"><span>Thuis</span></a>
+    <a class="wrooster-kaart" href="/apps/scherm.html"><span>Tweede scherm</span></a>
+    <a class="wrooster-kaart" href="/apps/uitgaan.html"><span>Uitgaan</span></a>
+    <a class="wrooster-kaart" href="/apps/vandaag.html"><span>Vandaag</span></a>
+    <a class="wrooster-kaart" href="/apps/pulse.html"><span>Vandaag</span></a>
+    <a class="wrooster-kaart" href="/apps/clips.html"><span>Video</span></a>
+    <a class="wrooster-kaart" href="/apps/foundation/vrienden.html"><span>Vrienden</span></a>
+    <a class="wrooster-kaart" href="/apps/geld.html#wallet"><span>Wallet</span></a>
+  <!-- /WERELDROOSTER --></div></section>
 </main></div>
 <script src="../shared/sterren.js"></script>
 <script src="../shared/uurwerk.js"></script>

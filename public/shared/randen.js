@@ -38,6 +38,11 @@
     var pad = w.location.pathname, wereld = null;
     if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
     else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
+    /* TravelOS hoort in deze lijst en stond er niet, terwijl reizen.html de vier
+       Edge-bestanden wel laadde. Ze deden niets: RTGEdge.start() werd nooit
+       aangeroepen. Vier geladen bestanden zonder werking is de stilste vorm van
+       dood hout -- het ziet eruit alsof de schil er is. */
+    else if (['/apps/reizen.html'].includes(pad)) wereld = 'travel';
     else if (['/apps/kantoor.html','/apps/kantoren.html','/apps/personeel.html','/apps/agenda.html','/apps/office.html','/apps/rtmail.html','/apps/bestanden.html','/apps/sitemaker.html','/apps/browser.html','/apps/rtgone.html','/apps/onderneming.html','/apps/magnaat.html','/apps/backoffice.html','/apps/command.html','/apps/rtgschool.html'].includes(pad)) wereld = 'work';
     if (!wereld) return false;
     if (new URLSearchParams(w.location.search).get('embed') === '1') {

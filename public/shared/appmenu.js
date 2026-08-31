@@ -630,6 +630,16 @@
        zet() vervangt de lijst, voegToe() vult hem aan; allebei worden ze pas
        gelezen als het menu opengaat, dus een app mag dit ook later nog doen. */
     zet: function (lijst) { GEZET = Array.isArray(lijst) ? lijst.slice(0, MAX) : []; },
-    voegToe: function (item) { if (item && item.label) GEZET.push(item); }
+    voegToe: function (item) { if (item && item.label) GEZET.push(item); },
+    /* WAT KAN IK HIER DOEN -- dezelfde lijst die het menu toont, opvraagbaar
+       door een andere laag. shared/sprong.js zet hem bovenaan zijn lijst, zodat
+       je met een tik niet alleen naar een SCHERM kunt springen maar ook naar
+       een HANDELING op het scherm waar je staat.
+
+       Een accessor en geen kopie: hij leest bij elke aanroep opnieuw wat de
+       pagina op dat moment heeft (de delenbalk, de tabs, de navigatiebalk, of
+       wat de app zelf opgaf). Een tweede lijst handelingen aanleggen zou hier
+       dezelfde fout zijn als een tweede lijst apps in de bank. */
+    functies: function () { try { return eigenFuncties(); } catch (e) { return []; } }
   };
 })(window, document);

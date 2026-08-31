@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1062c998';
+var RTG_BOUW = '1b36fbf8';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4046,10 +4046,49 @@ var RTG_BOUW = '1062c998';
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
     wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
-    sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
-    relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
-    gegevens:    { naam: 'Wat weet RTG van mij', url: '/apps/mijn-gegevens.html' },
-    post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
+  /* Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging
+     (keuringsregel 13). De snede loopt midden door LINKS -- dat mag hier, want
+     de bundel plakt de delen rauw aan elkaar (scripts/bundel.js) en 24a2/24a2b
+     doen precies hetzelfde met MAPPEN. De naad ligt op een echte grens: hierbo-
+     ven staat wat er altijd al hing, hieronder wat de tikkenmeting vond. */
+    /* ---------- VEERTIEN SCHERMEN DIE NERGENS AAN HINGEN ----------
+       Gevonden met scripts/tikken.js op 30 augustus 2026: die meter loopt het
+       huis af vanaf het beginscherm op telefoonformaat en vraagt per scherm
+       hoeveel tikken het kost. Tweeenvijftig schermen bleken vanaf het
+       beginscherm HELEMAAL niet te bereiken -- niet diep, maar los.
+
+       Van die tweeenvijftig zijn dit de schermen van een LID. De rest is met
+       reden onbereikbaar en staat als zodanig genoemd in scripts/tikken.js:
+       schermen van een rol (de kantoren, de PDA's, de leverancierskant) komen
+       niet op een beginscherm van een lid, en vier adressen zijn een stand van
+       een andere app geworden (Metier, Codewoord, Thuisrust, Thuiswacht) en
+       horen dus juist NIET opnieuw als tegel te bestaan.
+
+       Ze krijgen hier een sleutel en hangen hieronder in de wereld waar de mens
+       denkt te zijn als hij ze gebruikt (WERELDEN.md), niet in de wereld van
+       wie ze gebouwd heeft.
+
+       TWEE STAAN ER NIET BIJ, en dat is geen vergeten maar een bestaand besluit:
+       /apps/gast.html en /apps/festival-gast.html zijn LANDINGSPAGINA'S. Je komt
+       daar door een code op een tafel te scannen of via de link van je groep, en
+       scripts/lib/bereik.js zegt dat met zoveel woorden (MAG_LOS). Ze alsnog in
+       een wereld hangen zou een deur maken naar een tafel waar u niet zit. */
+    mall:        { naam: 'Mall',          url: '/apps/mall.html' },
+    mijnmall:    { naam: 'Mijn bestellingen', url: '/apps/mijnmall.html' },
+    pay:         { naam: 'Betalen',       url: '/apps/pay.html' },
+    huis:        { naam: 'Thuis',         url: '/apps/thuis.html' },
+    uitgaan:     { naam: 'Uitgaan',       url: '/apps/uitgaan.html' },
+    foodcourt:   { naam: 'Food Court',    url: '/apps/foodcourt.html' },
+    spelavond:   { naam: 'Game Night',    url: '/apps/spelscherm.html' },
+    tweedescherm:{ naam: 'Tweede scherm', url: '/apps/scherm.html' },
+    /* Het inkoopdossier staat bij het LID en niet achter een kantoorpoort
+       (APPSTORE.md). Dat het nergens aan hing, maakte die belofte leeg. */
+    appdossier:  { naam: 'App-dossier',   url: '/apps/appstore-dossier.html' },
+    aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
+    routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
+    ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    rtfbord:     { naam: 'Het bord',      url: '/apps/foundation/bord.html' },
+    rtfschrift:  { naam: 'Het schrift',   url: '/apps/foundation/schrift.html' },
     /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
        Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
        standen van een app (/apps/veilig.html), want een systeem dat een systeem
@@ -4289,14 +4328,22 @@ var RTG_BOUW = '1062c998';
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport'] },
+      'link:nieuws', 'link:krant', 'link:sport',
+    /* NEGEN UIT DE TIKKENMETING. Kopen, betalen, thuis, uitgaan, eten, samen
+       kijken en spelen -- allemaal een gewone dag, en allemaal hingen ze
+       nergens aan (scripts/tikken.js, 30 augustus 2026). Het app-dossier hoort
+       hier ook: APPSTORE.md zet het bij het lid en niet in een kantoor, en een
+       dossier dat nergens aan hangt is die belofte op papier. */
+      'link:mall', 'link:mijnmall', 'link:pay', 'link:appdossier',
+      'link:huis', 'link:uitgaan', 'link:foodcourt',
+      'link:spelavond', 'link:tweedescherm'] },
     /* INSTELLINGEN, EN MET OPZET ZONDER `wereld`. Een wereld is een context waar
        je in leeft; deze vier gaan niet over een dag maar over het systeem. Ze
        zijn RTG Core, en Core heeft in de bank een gezicht: het bedieningspaneel
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
        dezelfde wereld wonen, en die verschillen mogen de wereld niet splitsen:
@@ -4317,7 +4364,10 @@ var RTG_BOUW = '1062c998';
        Het huis bestond al en hing nergens aan: /apps/reizen.html. */
     { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
+    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
+       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
+      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
@@ -4363,7 +4413,10 @@ var RTG_BOUW = '1062c998';
        "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
        een lid; de andere twee zijn deuren BINNEN de wereld. */
     { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
-      'link:rtfbuurt', 'link:rtfportaal'] }
+      'link:rtfbuurt', 'link:rtfportaal',
+    /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
+       bestonden en hingen nergens aan. */
+      'link:rtfbord', 'link:rtfschrift'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
      langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:
@@ -5032,6 +5085,15 @@ var RTG_BOUW = '1062c998';
      die knoppen openden Rahul wel en vulden de vraag NOOIT in. De guard ving het
      stil af. Eén functie, hier, en daar aangeroepen: geen tweede kopie. */
   window.RTGVraag = vraagRahul;
+  /* De handelingen worden EEN keer opgehaald en daarna hergebruikt; hij is
+     klein en verandert alleen bij een nieuwe bouw. Mislukt het ophalen, dan is
+     de lijst leeg en doet de lade gewoon wat hij hiervoor deed. */
+  let HANDELINGEN = [];
+  fetch('/shared/handelingindex.json', { credentials: 'same-origin' })
+    .then(r => (r.ok ? r.json() : { items: [] }))
+    .then(j => { HANDELINGEN = (j && j.items) || []; })
+    .catch(() => { HANDELINGEN = []; });
+
   function zoekSectie(tekst) {
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
@@ -5052,6 +5114,16 @@ var RTG_BOUW = '1062c998';
   function zoekRij(icoonNode, label, meta, doe, sleutel) {
     const b = document.createElement('button');
     if (sleutel) b.dataset.sleutel = sleutel;
+    /* HET ADRES OP DE RIJ. Een rij die alleen in een klikafhandelaar weet waar
+       hij heen gaat, bestaat niet voor scripts/tikken.js -- de meter die telt
+       hoeveel tikken een functie van het beginscherm af ligt, en die met opzet
+       alleen ECHTE bestemmingen telt (anders is hij op te poetsen met een
+       belofte). Zwijgt deze lijst, dan meet het huis zich dieper dan het is.
+       De klik blijft lopen via openItem(): dit is een etiket en geen tweede weg. */
+    if (sleutel && sleutel.indexOf('link:') === 0) {
+      const l = LINKS[sleutel.slice(5)];
+      if (l && l.url) b.dataset.url = l.url;
+    }
     const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
     b.appendChild(zi);
     b.appendChild(document.createTextNode(label));
@@ -5083,6 +5155,28 @@ var RTG_BOUW = '1062c998';
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
       zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
+    /* HANDELINGEN DIE IN EEN ANDERE APP WONEN. Dezelfde lijst die de sprong op
+       elk ander scherm toont (shared/handelingindex.json, gegenereerd uit de
+       knoppen van de schermen zelf). Zonder dit deed de zoeklade hier MINDER dan
+       de sprong drie schermen verderop, en dat is precies het soort verschil dat
+       een mens niet kan onthouden.
+
+       Alleen bij een zoekwoord, en een tik brengt je ERHEEN: uitvoeren doet de
+       mens op het scherm zelf (GRAMMATICA.md). */
+    if (q && HANDELINGEN.length) {
+      const treffers = HANDELINGEN.filter(h => (h.label + ' ' + h.app).toLowerCase().includes(q)).slice(0, 8);
+      if (treffers.length) {
+        zoekSectie('Handelingen');
+        for (const h of treffers) {
+          const ic = document.createElement('span'); ic.textContent = '>';
+          zoekRij(ic, h.label, 'in ' + h.app, () => {
+            sluitScrims();
+            if (window.RTGCommand && RTGCommand.actief()) RTGCommand.open(h.url, h.app);
+            else location.href = h.url;
+          });
+        }
+      }
+    }
     // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
     if (q) {
       const acts = osActies().filter(a => a.naam.toLowerCase().includes(q));
@@ -5103,6 +5197,11 @@ var RTG_BOUW = '1062c998';
     }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
+  /* EEN KEER VOORAF OPBOUWEN. De lade blijft dicht; wat verandert is dat de
+     lijst er al IN staat. Twee redenen: hij staat er meteen als u hem opent, en
+     hij is meetbaar -- een korte weg die pas na een tik bestaat, telt in geen
+     enkele meting mee (zie de opmerking bij zoekRij hierboven). */
+  if (zoekLijst) setTimeout(zoek, 800);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 
 
@@ -5342,6 +5441,21 @@ var RTG_BOUW = '1062c998';
      na het opstarten openen we dan meteen de AI-tab. */
   if (location.hash === '#ai') setTimeout(() => {
     const t = tabKnop('ai');
+    if (t) t.click();
+  }, 600);
+
+  /* DEZELFDE AFSPRAAK, MAAR DAN VOOR ELKE STAND. De sprong (shared/sprong.js)
+     staat op elk scherm van het huis, ook op schermen die deze app niet laden.
+     Wil een lid daar naar een stand die IN deze app woont (Betalen, Salon,
+     Zorg), dan kan de sprong die knop niet indrukken -- hij staat er niet.
+     Hij stuurt dan hierheen met de stand in de hash, en wij drukken hem in.
+
+     Alleen een knop die er ECHT is: een stand die uw pas niet opent, staat
+     niet in de tabbalk, en dan gebeurt er niets. Zo kan een adres uit een
+     bericht nooit een tab openen die u niet hoort te hebben. */
+  const stand = /^#tab=(.+)$/.exec(location.hash);
+  if (stand) setTimeout(() => {
+    const t = tabKnop(decodeURIComponent(stand[1]));
     if (t) t.click();
   }, 600);
 

@@ -36,7 +36,7 @@ module.exports = (ctx) => {
       if (reeks().length > 50000) reeks().pop();
       save();
       return { ok: true, terugkerend: publiek(t) };
-    });
+    }, { geld: 'zet een reeks toekomstige boekingen klaar' });
   }
   function lijst(codenaam) {
     const c = String(codenaam || '').trim();

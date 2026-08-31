@@ -147,6 +147,33 @@ function verklaardeSleutel(req) {
      28 van de 85 verklaringen zeggen `leest`. Ze deden alle 28 hetzelfde. */
   if (!v || v.nietIdempotent || v.leest) return null;
   const body = req.body && typeof req.body === 'object' ? req.body : {};
+
+  /* EEN EIGEN SLEUTEL VAN DE AANROEPER WINT VAN DE VERKLARING, OOK ALS HIJ IN
+     HET LIJF ZIT.
+
+     De header wint hierboven al (zie de aanroep). Maar dit huis draagt zijn
+     idempotentiesleutel meestal in het LIJF -- `idem` of `idempotentieSleutel`,
+     zie middleware/idempotentie.js en lib/idem.js -- en die zag deze poort niet.
+     Gevolg: bij een route met `zelfdeVerzoek` besliste de VINGERAFDRUK van het
+     lijf, en die is voor twee inhoudelijk gelijke verzoeken dezelfde, hoe vers
+     de sleutel ook is die de aanroeper meestuurde.
+
+     Dat brak precies wat een verse sleutel BETEKENT. `bank/pas/uitgeven` met
+     dezelfde iban en soort maar een nieuwe sleutel is een tweede pas die het lid
+     bewust aanvraagt; `supplier/betaalverzoek` met een nieuwe sleutel is een
+     tweede verzoek dat de zaak bewust verstuurt. De poort gaf allebei het
+     antwoord van de eerste keer terug. Vier toetsen in test/bank.test.js en
+     test/directpay.test.js zakten hierop, en in de app zou het lezen als "mijn
+     tweede pas is nooit gekomen".
+
+     De verklaring is een VANGNET voor wie niets meestuurt. Wie wel iets
+     meestuurt, heeft al gesproken -- en dan hoort de laag die die sleutel
+     werkelijk kent (de duurzame geldlaag, of middleware/idempotentie.js) te
+     beslissen, niet een vingerafdruk die de sleutel niet eens ziet. */
+  const eigen = typeof body.idempotentieSleutel === 'string' ? body.idempotentieSleutel
+    : (typeof body.idem === 'string' ? body.idem : null);
+  if (eigen && eigen.trim()) return null;
+
   if (v.velden) {
     const uit = {};
     for (const veld of v.velden) uit[veld] = body[veld];

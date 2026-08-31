@@ -56,6 +56,15 @@
      die knoppen openden Rahul wel en vulden de vraag NOOIT in. De guard ving het
      stil af. Eén functie, hier, en daar aangeroepen: geen tweede kopie. */
   window.RTGVraag = vraagRahul;
+  /* De handelingen worden EEN keer opgehaald en daarna hergebruikt; hij is
+     klein en verandert alleen bij een nieuwe bouw. Mislukt het ophalen, dan is
+     de lijst leeg en doet de lade gewoon wat hij hiervoor deed. */
+  let HANDELINGEN = [];
+  fetch('/shared/handelingindex.json', { credentials: 'same-origin' })
+    .then(r => (r.ok ? r.json() : { items: [] }))
+    .then(j => { HANDELINGEN = (j && j.items) || []; })
+    .catch(() => { HANDELINGEN = []; });
+
   function zoekSectie(tekst) {
     const d = document.createElement('div'); d.className = 'os-zoek-sectie'; d.textContent = tekst;
     zoekLijst.appendChild(d);
@@ -76,6 +85,16 @@
   function zoekRij(icoonNode, label, meta, doe, sleutel) {
     const b = document.createElement('button');
     if (sleutel) b.dataset.sleutel = sleutel;
+    /* HET ADRES OP DE RIJ. Een rij die alleen in een klikafhandelaar weet waar
+       hij heen gaat, bestaat niet voor scripts/tikken.js -- de meter die telt
+       hoeveel tikken een functie van het beginscherm af ligt, en die met opzet
+       alleen ECHTE bestemmingen telt (anders is hij op te poetsen met een
+       belofte). Zwijgt deze lijst, dan meet het huis zich dieper dan het is.
+       De klik blijft lopen via openItem(): dit is een etiket en geen tweede weg. */
+    if (sleutel && sleutel.indexOf('link:') === 0) {
+      const l = LINKS[sleutel.slice(5)];
+      if (l && l.url) b.dataset.url = l.url;
+    }
     const zi = document.createElement('span'); zi.className = 'zi'; zi.appendChild(icoonNode);
     b.appendChild(zi);
     b.appendChild(document.createTextNode(label));
@@ -107,6 +126,28 @@
       if (q && !itemNaam(item).toLowerCase().includes(q)) continue;
       zoekRij(tegelInhoud(item), itemNaam(item), uit, () => { sluitScrims(); openItem(item); }, item);
     }
+    /* HANDELINGEN DIE IN EEN ANDERE APP WONEN. Dezelfde lijst die de sprong op
+       elk ander scherm toont (shared/handelingindex.json, gegenereerd uit de
+       knoppen van de schermen zelf). Zonder dit deed de zoeklade hier MINDER dan
+       de sprong drie schermen verderop, en dat is precies het soort verschil dat
+       een mens niet kan onthouden.
+
+       Alleen bij een zoekwoord, en een tik brengt je ERHEEN: uitvoeren doet de
+       mens op het scherm zelf (GRAMMATICA.md). */
+    if (q && HANDELINGEN.length) {
+      const treffers = HANDELINGEN.filter(h => (h.label + ' ' + h.app).toLowerCase().includes(q)).slice(0, 8);
+      if (treffers.length) {
+        zoekSectie('Handelingen');
+        for (const h of treffers) {
+          const ic = document.createElement('span'); ic.textContent = '>';
+          zoekRij(ic, h.label, 'in ' + h.app, () => {
+            sluitScrims();
+            if (window.RTGCommand && RTGCommand.actief()) RTGCommand.open(h.url, h.app);
+            else location.href = h.url;
+          });
+        }
+      }
+    }
     // acties (instellingen en schakelaars) doen mee zodra er getypt wordt
     if (q) {
       const acts = osActies().filter(a => a.naam.toLowerCase().includes(q));
@@ -127,5 +168,10 @@
     }
   }
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
+  /* EEN KEER VOORAF OPBOUWEN. De lade blijft dicht; wat verandert is dat de
+     lijst er al IN staat. Twee redenen: hij staat er meteen als u hem opent, en
+     hij is meetbaar -- een korte weg die pas na een tik bestaat, telt in geen
+     enkele meting mee (zie de opmerking bij zoekRij hierboven). */
+  if (zoekLijst) setTimeout(zoek, 800);
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 

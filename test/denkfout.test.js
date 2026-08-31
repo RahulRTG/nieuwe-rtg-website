@@ -177,8 +177,30 @@ test('de klas telt patronen zonder wie, en besproken is weg', async () => {
   const hwId = (hw.huiswerk && hw.huiswerk.id) || hw.id;
   assert.ok(hwId, 'het huiswerk is aangemaakt: ' + JSON.stringify(hw).slice(0, 160));
 
-  let v = (await fnd('/school/huiswerk/oefen', { code: gezin.code, token: kindToken, klasCode: klas.code, huiswerkId: hwId })).body;
+  /* EEN SOM WAARIN DE FOUT OOK ECHT FOUT IS.
+
+     Deze proef maakt met opzet de denkfout "plus in plaats van maal": op `n x t`
+     antwoordt hij `n + t`. Bij precies EEN som van de generator valt dat samen
+     met het goede antwoord -- 2 x 2 is vier, en twee plus twee ook. Dan is het
+     antwoord GOED, komt er geen duiding terug, en zakte deze toets op
+     `eerste.denkfout.id` met "Cannot read properties of undefined". Kans per
+     ronde ongeveer een op negentig (n is 1..10, t is een van negen tafels), en
+     daarmee precies het soort dobbelsteen dat maanden ongezien blijft en dan een
+     groene tak rood maakt (gebeurd in CI op 31 augustus 2026).
+
+     De oplossing is niet opnieuw proberen tot het lukt, maar de som KIEZEN: haal
+     een verse oefenronde op zolang de eerste vraag er een is waarin de fout geen
+     goed antwoord oplevert. Meer dan een handvol rondes heeft dat nooit nodig,
+     en als het toch niet lukt zakt de toets met een uitleg in plaats van op een
+     TypeError. */
   const plus = t => { const m = /^(\d+) x (\d+)/.exec(t); return m ? String(+m[1] + +m[2]) : 'x'; };
+  const echtFout = (t) => { const m = /^(\d+) x (\d+)/.exec(t); return !!m && (+m[1] + +m[2]) !== (+m[1] * +m[2]); };
+  let v = null;
+  for (let poging = 0; poging < 25 && !(v && echtFout(v.vraag)); poging++) {
+    v = (await fnd('/school/huiswerk/oefen', { code: gezin.code, token: kindToken, klasCode: klas.code, huiswerkId: hwId })).body;
+  }
+  assert.ok(v && echtFout(v.vraag),
+    'na 25 rondes nog geen som waarin "plus in plaats van maal" ook echt fout is; gekregen: ' + JSON.stringify(v && v.vraag));
   const eerste = (await fnd('/school/huiswerk/oefen-antwoord', { code: gezin.code, token: kindToken,
     klasCode: klas.code, antwoord: plus(v.vraag) })).body;
   assert.equal(eerste.denkfout.id, 'maal.plus-in-plaats-van-maal');

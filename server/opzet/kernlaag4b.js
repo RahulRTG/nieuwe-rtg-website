@@ -183,8 +183,8 @@ if (rvTimer.unref) rvTimer.unref();
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */
-kern.pay.koppelBank(({ codenaam, centen }) => bankregie.bankLedenAan()
-  ? kern.bank.bankDekWallet({ codenaam, centen })
+kern.pay.koppelBank(({ codenaam, centen, idem }) => bankregie.bankLedenAan()
+  ? kern.bank.bankDekWallet({ codenaam, centen, idem })
   : { status: 403, error: 'De leden-bank is niet live.' });
 /* DE TWEE PLAFONDS KOMEN HIER AAN HUN BRON. Ze zijn de grond onder het besluit
    in kern/bevoegdheid/lijst.js (WALLET_SALDO: gesloten circuit, harde

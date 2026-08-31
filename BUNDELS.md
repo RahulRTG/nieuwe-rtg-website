@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**58 bundels, 454 delen, 0 zonder onderwerp.**
+**59 bundels, 457 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 94 delen, 9594 regels in de delen
+`public/apps/app-main/` -- 95 delen, 9708 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -57,6 +57,7 @@ omlaag.
 | `app-main-21.js` | mijn bestellingen: betalen en volgen |
 | `app-main-22.js` | het boekingsblad: de diensten van een partner kiezen |
 | `app-main-23.js` | de lopende rekening bij een partner opvragen |
+| `app-main-23b.js` | Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging (keuringsregel 13) |
 | `app-main-24.js` | Veiligheid en verbinding |
 | `app-main-24a2.js` | Afgesplitst van app-main-24.js, dat over de 10 KB ging |
 | `app-main-24a2b.js` | Afgesplitst van app-main-24a2.js, dat over de 10 KB ging (keuringsregel 13) |
@@ -139,7 +140,7 @@ omlaag.
 
 ## `apps/command.js`
 
-`public/apps/command/` -- 21 delen, 2948 regels in de delen
+`public/apps/command/` -- 20 delen, 2798 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -163,7 +164,6 @@ omlaag.
 | `command-18.js` | RTG Command, deel 18: de incidenten -- wat er stuk was, wat eraan is gedaan, en wat we nog steeds niet weten |
 | `command-19.js` | RTG Command, deel 19: bijstand |
 | `command-20.js` | RTG Command, deel 20: de vloot |
-| `command-21.js` | RTG Command, deel 21: het bezitsbewijs -- hoeveel zware verzoeken zouden er vandaag worden geweigerd als we het aanze... |
 
 ## `apps/defensie.js`
 
@@ -530,7 +530,7 @@ omlaag.
 
 ## `shared/appmenu.js`
 
-`public/shared/appmenu/` -- 6 delen, 635 regels in de delen
+`public/shared/appmenu/` -- 6 delen, 645 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -543,7 +543,7 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 4 delen, 593 regels in de delen
+`public/shared/basis/` -- 4 delen, 583 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -618,7 +618,7 @@ omlaag.
 
 ## `shared/gebaar.js`
 
-`public/shared/gebaar/` -- 8 delen, 1044 regels in de delen
+`public/shared/gebaar/` -- 8 delen, 1051 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -807,6 +807,16 @@ omlaag.
 | `rtghorloge-02.js` | toegepaste baton-indexen (AP), dubbel op 12 |
 | `rtghorloge-03.js` | een heel lichte saffier-sheen bovenop alles |
 | `rtghorloge-04.js` | het gaande werk: de middelpunten liggen op EXACT meshende afstand -- voor elk grijpend paar geldt afstand = steekstra... |
+
+## `shared/sprong.js`
+
+`public/shared/sprong/` -- 3 delen, 326 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `sprong-01.js` | DE SPRONG -- een tik naar elke functie, vanaf elk scherm |
+| `sprong-02.js` | deel 2: de vorm (stijl) |
+| `sprong-03.js` | deel 3: de lijst en wat een tik doet |
 
 ## `shared/sterren.js`
 

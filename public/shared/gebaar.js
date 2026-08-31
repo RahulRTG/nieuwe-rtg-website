@@ -234,11 +234,18 @@
        actielade (vasthouden, menutoets, de greep) toont ze alle drie. De eerste
        blijft altijd staan: dat is de actie die een volle veeg uitvoert. */
     var breed = [], i;
-    for (i = 0; i < binnen.children.length; i++) breed.push(binnen.children[i].offsetWidth);
+    /* HELE PIXELS ZIJN HIER TE GROF. offsetWidth rondt af, en de knoppen houden
+       hun eigen (gebroken) breedte via flex:1 0 auto -- dus telde de lade de
+       afgeronde breedtes op terwijl de knoppenrij de echte breedte hield, en
+       stak de laatste knop er precies het afrondingsverlies uit. Op deze machine
+       viel dat op nul; op de bouwmachine rendert Inter net anders en stak de
+       Prullenbak er 2,4px uit. Meten met gebroken pixels en naar BOVEN afronden:
+       een lade mag ruimer zijn dan zijn knoppen, nooit krapper. */
+    for (i = 0; i < binnen.children.length; i++) breed.push(binnen.children[i].getBoundingClientRect().width);
     var houd = 1, som = breed[0] || 0;
     while (houd < breed.length && som + breed[houd] <= max) { som += breed[houd]; houd++; }
     while (binnen.children.length > houd) binnen.removeChild(binnen.lastChild);
-    var vol = Math.round(Math.min(Math.max(houd * KNOP, som), max));
+    var vol = Math.ceil(Math.min(Math.max(houd * KNOP, som), max));
     binnen.style.width = '';
     px(lade, '--gb-vol', vol + 'px');
     lade.vol = vol;

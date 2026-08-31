@@ -81,7 +81,15 @@
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
-      'link:nieuws', 'link:krant', 'link:sport'] },
+      'link:nieuws', 'link:krant', 'link:sport',
+    /* NEGEN UIT DE TIKKENMETING. Kopen, betalen, thuis, uitgaan, eten, samen
+       kijken en spelen -- allemaal een gewone dag, en allemaal hingen ze
+       nergens aan (scripts/tikken.js, 30 augustus 2026). Het app-dossier hoort
+       hier ook: APPSTORE.md zet het bij het lid en niet in een kantoor, en een
+       dossier dat nergens aan hangt is die belofte op papier. */
+      'link:mall', 'link:mijnmall', 'link:pay', 'link:appdossier',
+      'link:huis', 'link:uitgaan', 'link:foodcourt',
+      'link:spelavond', 'link:tweedescherm'] },
     /* INSTELLINGEN, EN MET OPZET ZONDER `wereld`. Een wereld is een context waar
        je in leeft; deze vier gaan niet over een dag maar over het systeem. Ze
        zijn RTG Core, en Core heeft in de bank een gezicht: het bedieningspaneel
@@ -109,7 +117,10 @@
        Het huis bestond al en hing nergens aan: /apps/reizen.html. */
     { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
+    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
+       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
+      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de

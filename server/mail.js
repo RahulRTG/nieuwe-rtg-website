@@ -97,6 +97,9 @@ function send(to, subject, text, opties) {
      bestaat. Wie de kost draagt staat in de async-context van de poort, dus een
      bericht uit een cronronde is van het huis. */
   if (/@/.test(String(to))) kostenhaak.meld('bericht', 1, { bron: 'mail' });
+  /* De effectmeter telt ook zonder apenstaartje: die vraagt of er iets GEBEURDE,
+     niet wie de rekening krijgt. Een sms telt verderop in sendSms. */
+  require('./effectmeter').tel('mail');
   /* EEN BERICHT DAT NERGENS HEEN KAN, MOET JE KUNNEN ZIEN.
 
      Hier stond `if (!/@/.test(to)) return;` -- alles zonder apenstaartje viel

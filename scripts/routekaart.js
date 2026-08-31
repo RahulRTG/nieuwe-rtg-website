@@ -27,9 +27,30 @@ const jsonUit = process.argv.includes('--json');
 
 /* Eigen poort en eigen datamap: dit gereedschap mag niets raken. Poort 0 (de
    nette "geef me maar wat") kan hier niet: de configuratiecontrole keurt hem af
-   en dat geeft een luide waarschuwing in de uitvoer. Dus een hoge, vrijwel
-   zeker vrije poort. Er komt sowieso niemand op af. */
-if (!process.env.PORT) process.env.PORT = String(28000 + Math.floor(Math.random() * 20000));
+   en dat geeft een luide waarschuwing in de uitvoer.
+
+   HIER STOND EEN GOK: een hoge poort uit een toevalsgetal, met "vrijwel zeker
+   vrij" als onderbouwing. Dat hield het niet in de CI, waar vier toetsscherven
+   een runner delen en er tientallen servers naast elkaar staan: op 31 augustus
+   2026 zakte de idempotentieschuld op EADDRINUSE, en die melding gaat niet over
+   de toets maar over de kans. Nu VRAGEN we het besturingssysteem om een vrije
+   poort (luisteren op 0, het nummer aflezen, weer loslaten) in plaats van er
+   een te hopen. Dat gebeurt in een kindproces omdat het antwoord er moet zijn
+   voordat de app geladen wordt, en dat is hier synchroon werk. */
+if (!process.env.PORT) process.env.PORT = String(vrijePoort());
+function vrijePoort() {
+  try {
+    const uit = require('child_process').execFileSync(process.execPath, ['-e',
+      "const s=require('net').createServer();s.listen(0,'127.0.0.1',()=>{" +
+      "process.stdout.write(String(s.address().port));s.close();});"],
+    { encoding: 'utf8', timeout: 10000 });
+    const n = Number(String(uit).trim());
+    if (n > 1024 && n < 65536) return n;
+  } catch (e) { /* dan de oude gok, met de reden hieronder */ }
+  /* Lukt dat niet, dan is een gok nog altijd beter dan niet draaien -- maar de
+     aanroeper (scripts/lib/routes.js) probeert het bij EADDRINUSE opnieuw. */
+  return 28000 + Math.floor(Math.random() * 20000);
+}
 if (!process.env.RTG_DATA_DIR) {
   process.env.RTG_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-routekaart-'));
 }

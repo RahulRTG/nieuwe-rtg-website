@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 18,
     "e2eBestanden": 174,
-    "keuringOmvang": 233,
+    "keuringOmvang": 237,
     "keuringDubbeling": 145,
     "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
@@ -25,12 +25,12 @@
     "kernGedeeld": 212,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 426,
+    "toetsenNietGemeten": 427,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
     "ratelTanden": 51,
-    "metingenZonderRatel": 31,
+    "metingenZonderRatel": 33,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
     "rolscheidingGaten": 0,
@@ -127,6 +127,15 @@
       "meter": "kernBreedte 1494 -> 1501; kernGedeeld 209 -> 212",
       "waarheen": "GRENZEN.json en de groene bedradingscontrole in npm run check, waar alle nieuwe kernnamen per domein begrensd en tegen echte exports gecontroleerd worden",
       "reden": "De twintig feature-PRs voegen zeven routezichtbare kernnamen toe; drie bestaande namen worden nu door een extra domein gedeeld. Dit is de gemeten functieprijs van de nieuwe kantoor-, kosten-, commerce- en wereldlagen. De integratie heeft ontbrekende grensnamen aangevuld en de controle bevestigt 1501 gebruikte kernnamen zonder ongebruikte destructurering."
+    },
+    {
+      "datum": "2026-08-31",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 426,
+      "vervalt": "2026-11-30",
+      "meter": "toetsenNietGemeten 426 -> 427",
+      "reden": "Drie nieuwe toetsen kwamen erbij (sprong.e2e.js, wereldrooster.e2e.js, sprongindex.test.js). Twee zijn alsnog door de mutatiemotor gehaald en zakken allebei op een liegende poort; de derde kan hij niet bereiken en meldt 'geen module gevonden', want die toets roept CLI-generatoren aan (scripts/sprongindex.js en broers) in plaats van een module te laden. Er is dus geen bron om te muteren. Dat hij kan zakken is wel aangetoond, alleen met de hand: een achterlopende handelingindex liet hem tijdens de bouw daadwerkelijk zakken. Aflossen betekent die generatoren een module-oppervlak geven, of de motor leren een CLI aan te roepen."
     },
     {
       "datum": "2026-08-28",
@@ -1249,6 +1258,24 @@
       "waarheen": "testbestanden 982",
       "meter": "testbestanden 949 -> 982",
       "reden": "VIERDE EN LAATSTE VAN DEZELFDE FOUT: main stond strenger (982) dan deze tak (949) en bij het oplossen van de conflicten nam ik onze waarde. Een ratel mag alleen strakker, dus is de merge van twee latten de strengste van de twee -- niet 'de onze'. De samengevoegde boom telt 1169 toetsbestanden en staat er dus ruim boven. Gevonden doordat de vergelijking met main in CI hem als enige zonder reden aanwees; de andere drie (dekkingPct, e2eBestanden, browserpoortToetsen) waren al gezet."
+    },
+    {
+      "datum": "2026-08-31",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 233,
+      "vervalt": "2026-11-30",
+      "meter": "keuringOmvang 233 -> 237",
+      "reden": "De mutatiecontractronde splitste vier bestanden op de 10 kB-grens: de contractlijst van de proefronde in bouw/lijst/rijk, en de sleutelverklaringen in eigen ronden. Dat is precies wat de grens vraagt, en het gevolg is dat de delen VLAK ERONDER landen -- deze meter telt die band. Ze verder knippen zou de uitleg losmaken van de lijst die hij verklaart, en dat is de kwaal erger dan de kwaal. Vervalt eind november: dan hoort er een ronde te zijn geweest die de contractbestanden op inhoudelijke naden herschikt in plaats van op bytes."
+    },
+    {
+      "datum": "2026-08-31",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 31,
+      "vervalt": "2026-11-30",
+      "meter": "metingenZonderRatel 31 -> 33",
+      "reden": "Deze ronde zette zes meetbestanden in de wortel. Vier hebben een echte ratel gekregen (MUTATIECONTRACT.json, -AFGELEID, MUTATIEINVENTARIS en HANDLERBEWAKERS staan in scripts/lib/metingen.js en worden bij naam gelezen door de toets die ze vasthoudt). Twee niet: MUTATIECONTRACT-VOORSTEL.json is een WACHTRIJ voor een mens en hoort te fluctueren, en SCHRIJFANALYSE.json heeft nog geen getal waarvan vaststaat welke kant het op moet. Ze met een gok in het register zetten is precies wat de kop van metingen.js verbiedt -- dan daalt dit getal door een regel in plaats van door een ratel. Vervalt eind november: SCHRIJFANALYSE hoort tegen die tijd een ratel te hebben op \"routes waarvan de handler niet te volgen was\", en dat getal mag alleen dalen."
     }
   ],
   "prestatie": {

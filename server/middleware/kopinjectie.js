@@ -29,6 +29,16 @@ function kopinjecties(html, nonce, req, res, magnaat) {
      losse scripttags voor. */
   const stijl = '<script nonce="' + nonce + '">' + STIJLSTEMPEL + '</script>';
   const handTag = '<script src="/shared/hand.js" nonce="' + nonce + '"></script>';
+  /* DE SPRONG OP ELKE PAGINA (shared/sprong.js): een tik naar elke functie,
+     waar u ook staat. Hij hoort hier en niet in 276 losse scripttags om
+     dezelfde reden als de hand hierboven -- en vooral: een korte weg die op
+     de helft van de schermen ontbreekt, is geen korte weg maar een verrassing.
+
+     ACHTERAAN EN MET defer, want hij tekent pas iets als de pagina er staat
+     en mag nooit voor de stempelaar of de blokkade komen. Zonder ledensessie
+     doet hij niets; dat besluit staat in het script zelf, want alleen daar is
+     te zien of er iemand is ingelogd. */
+  const sprongTag = '<script src="/shared/sprong.js" defer nonce="' + nonce + '"></script>';
   /* In Magnaat gaat de hand ACHTER de blokkade: de sandbox-tag (net na
      <head> gezet door herschrijfPagina) hoort het eerste EXTERNE script te
      blijven -- een blokkade achter een ander extern script komt te laat
@@ -40,6 +50,7 @@ function kopinjecties(html, nonce, req, res, magnaat) {
   html = magnaat && sandboxTag.test(html)
     ? html.replace(sandboxTag, (m) => m + handTag)
     : html.replace(stijl, stijl + handTag);
+  html = html.replace(handTag, handTag + sprongTag);
   /* LINKS- OF RECHTSHANDIG, voordat er iets getekend is.
 
      De duimboog van een linkshandige is het spiegelbeeld van die van een

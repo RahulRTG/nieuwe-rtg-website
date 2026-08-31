@@ -124,12 +124,12 @@ test('2. een ingetrokken verzoek is niet meer te betalen', async () => {
   /* Twee lagen, in deze volgorde. Eerst de KYC-poort: een RTG Pass-lid dat
      zijn paspoort nog niet liet bevestigen betaalt helemaal niets, en komt bij
      de statuscontrole niet eens in de buurt. */
-  const ongeverifieerd = await api('/api/pay/verzoek/betaal', { id: openId }, klant.token);
+  const ongeverifieerd = await api('/api/pay/verzoek/betaal', { idem: 'proef-' + Math.random(), id: openId }, klant.token);
   assert.equal(ongeverifieerd.status, 403, 'de KYC-poort staat ervoor');
   assert.equal(ongeverifieerd.body.kyc, true, 'en zegt eerlijk waar het op vastloopt');
 
   // en dan de bewering die over geld gaat, bij iemand die de poort wel passeert
-  const poging = await api('/api/pay/verzoek/betaal', { id: openId }, vriend.token);
+  const poging = await api('/api/pay/verzoek/betaal', { idem: 'proef-' + Math.random(), id: openId }, vriend.token);
   assert.equal(poging.status, 409, 'betalen na intrekken: ' + JSON.stringify(poging.body));
 
   // het verzoek staat ook niet meer open in het overzicht van de gevraagde

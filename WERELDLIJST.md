@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 50 |
+| **LivingOS** | `/apps/rtg.html` | 59 |
 | **WorkOS** | `/apps/kantoor.html` | 13 |
-| **TravelOS** | `/apps/reizen.html` | 11 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 2 |
-| | **samen** | **76** |
+| **TravelOS** | `/apps/reizen.html` | 14 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 4 |
+| | **samen** | **90** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 50 onderdelen.
+Huis: `/apps/rtg.html` — 59 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -79,6 +79,15 @@ Huis: `/apps/rtg.html` — 50 onderdelen.
 | Nieuws | `link:nieuws` | `/apps/nieuws.html` |
 | Krant | `link:krant` | `/apps/krant.html` |
 | Sport | `link:sport` | `/apps/sport.html` |
+| Mall | `link:mall` | `/apps/mall.html` |
+| Mijn bestellingen | `link:mijnmall` | `/apps/mijnmall.html` |
+| Betalen | `link:pay` | `/apps/pay.html` |
+| App-dossier | `link:appdossier` | `/apps/appstore-dossier.html` |
+| Thuis | `link:huis` | `/apps/thuis.html` |
+| Uitgaan | `link:uitgaan` | `/apps/uitgaan.html` |
+| Food Court | `link:foodcourt` | `/apps/foodcourt.html` |
+| Game Night | `link:spelavond` | `/apps/spelscherm.html` |
+| Tweede scherm | `link:tweedescherm` | `/apps/scherm.html` |
 
 ## WorkOS
 
@@ -102,7 +111,7 @@ Huis: `/apps/kantoor.html` — 13 onderdelen.
 
 ## TravelOS
 
-Huis: `/apps/reizen.html` — 11 onderdelen.
+Huis: `/apps/reizen.html` — 14 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -117,15 +126,20 @@ Huis: `/apps/reizen.html` — 11 onderdelen.
 | Reisboek | `link:reisboek` | `/apps/reisboek.html` |
 | Hangar | `link:hangar` | `/apps/hangar.html` |
 | Verblijven | `link:residentie` | `/apps/residentie.html` |
+| Aankomst | `link:aankomst` | `/apps/arrival.html` |
+| Routedossier | `link:routedossier` | `/apps/routedossier.html` |
+| OV-routes | `link:ovroutes` | `/apps/ovroutes.html` |
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 2 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 4 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
 | RTFoundation in uw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
 | RTFoundation portaal | `link:rtfportaal` | `/apps/foundation/os-portaal.html` |
+| Het bord | `link:rtfbord` | `/apps/foundation/bord.html` |
+| Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |
 
 ## Wat er buiten de werelden valt
 

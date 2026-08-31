@@ -1,19 +1,19 @@
 {
   "metingGebruikt": true,
-  "metingReden": "gemeten op commit 359c3245, schone boom",
+  "metingReden": "gemeten op commit 7f77d8a7, schone boom",
   "stempel": {
-    "op": "2026-08-31T14:35:35.292Z",
-    "commit": "359c3245",
+    "op": "2026-08-31T14:56:56.231Z",
+    "commit": "7f77d8a7",
     "boomVuil": true,
     "node": "v22.22.2",
     "metingGebruikt": true,
-    "metingReden": "gemeten op commit 359c3245, schone boom"
+    "metingReden": "gemeten op commit 7f77d8a7, schone boom"
   },
   "uitleg": "Waarom heeft deze mutatie geen geldig bewijs? De bakken staan van GOEDKOOP naar DUUR en een route valt in de EERSTE die past. De invariant: ONBEWEZEN mag alleen kleiner worden doordat een route geldig bewijs krijgt, nooit doordat een foutreden wordt hernoemd -- daarom ratelt het TOTAAL en niet de bakken. Zie de kop van scripts/onbewezen.js.",
   "gemeten": {
     "mutaties": 4661,
-    "metBewijs": 2146,
-    "onbewezen": 2515,
+    "metBewijs": 2154,
+    "onbewezen": 2507,
     "sluit": true
   },
   "bakken": [
@@ -76,7 +76,7 @@
     {
       "id": "FIXTURE_404",
       "uitleg": "de eerste oproep gaf 404 -- het object of de relatie bestaat niet",
-      "aantal": 1440,
+      "aantal": 1438,
       "voorbeelden": [
         "POST /api/aandacht",
         "POST /api/aanmelding/opzeggen",
@@ -87,7 +87,7 @@
     {
       "id": "FIXTURE_409",
       "uitleg": "de eerste oproep gaf 409 -- de toestand is niet voorbereid",
-      "aantal": 117,
+      "aantal": 112,
       "voorbeelden": [
         "POST /api/aanmelding/bewijs",
         "POST /api/aanmelding/bewijs/teken",
@@ -98,7 +98,7 @@
     {
       "id": "FIXTURE_422",
       "uitleg": "de eerste oproep gaf 400 of 422 -- lijf, velden of query kloppen niet",
-      "aantal": 759,
+      "aantal": 758,
       "voorbeelden": [
         "POST /api/aanmelding/beslis",
         "POST /api/agenda/antwoord",
@@ -1704,14 +1704,10 @@
       "POST /api/vastgoed/interesse",
       "POST /api/vastgoed/keyless",
       "POST /api/veiligheid/alarm/afsluiten",
-      "POST /api/veiligheid/codewoord/proef",
-      "POST /api/veiligheid/codewoord/schakel",
       "POST /api/veiligheid/kring/aanpassen",
       "POST /api/veiligheid/moment/pauze",
       "POST /api/veiligheid/moment/status",
       "POST /api/veiligheid/moment/stop",
-      "POST /api/veiligheid/wacht/checkin",
-      "POST /api/veiligheid/wacht/stop",
       "POST /api/veiligheid/wacht/verleng",
       "POST /api/verblijf",
       "POST /api/verblijf/annuleer",
@@ -1779,8 +1775,10 @@
       "POST /api/werving/verbind",
       "POST /api/zakelijk/aanbevelen",
       "POST /api/zakelijk/connect",
+      "POST /api/zakelijk/kans/reageer",
       "POST /api/zakelijk/kans/sluit",
-      "POST /api/zakelijk/like"
+      "POST /api/zakelijk/like",
+      "POST /api/zakelijk/reactie"
     ],
     "FIXTURE_409": [
       "POST /api/aanmelding/bewijs",
@@ -1810,7 +1808,6 @@
       "POST /api/lucht/vlucht/maak",
       "POST /api/mediaos/volg",
       "POST /api/member/spel/nabespreking",
-      "POST /api/member/spel/sudoku-klaar",
       "POST /api/member/spel/toewijzen",
       "POST /api/office/gezondheid/vrij",
       "POST /api/office/merk/maak",
@@ -1895,11 +1892,7 @@
       "POST /api/supplier/verkoop/auto/weg",
       "POST /api/supplier/zorgpolis/declaratie",
       "POST /api/tenant/groep",
-      "POST /api/theater/kanaal/aanmeld",
-      "POST /api/zakelijk/kans",
-      "POST /api/zakelijk/kans/reageer",
-      "POST /api/zakelijk/post",
-      "POST /api/zakelijk/reactie"
+      "POST /api/theater/kanaal/aanmeld"
     ],
     "FIXTURE_422": [
       "POST /api/aanmelding/beslis",
@@ -2211,6 +2204,7 @@
       "POST /api/member/spel/dag-klaar",
       "POST /api/member/spel/dag-start",
       "POST /api/member/spel/nieuw",
+      "POST /api/member/spel/sudoku-klaar",
       "POST /api/member/spel/toernooi-nieuw",
       "POST /api/member/spel/zet",
       "POST /api/member/story/post",
@@ -2632,14 +2626,12 @@
       "POST /api/techniek/vingerafdruk/verschil",
       "POST /api/techniek/wacht/beslis",
       "POST /api/training/deed",
-      "POST /api/veiligheid/alarm",
       "POST /api/veiligheid/codewoord/zet",
       "POST /api/veiligheid/kring/mail",
       "POST /api/veiligheid/kring/toevoegen",
       "POST /api/veiligheid/moment/maak",
       "POST /api/veiligheid/plek",
       "POST /api/veiligheid/rust/aan",
-      "POST /api/veiligheid/wacht/start",
       "POST /api/voeding/zet",
       "POST /api/wallet/munt/koop",
       "POST /api/wbw/maak",

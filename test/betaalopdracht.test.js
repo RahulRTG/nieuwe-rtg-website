@@ -401,3 +401,44 @@ test('de herhaling wordt geklaagd, want stil ontdubbelen verbergt een fout in de
   assert.equal(klachten[0].gegevens.idemSleutel, 'x');
   assert.ok(klachten[0].gegevens.bestaand, 'met de opdracht erbij die er al stond');
 });
+
+test('definitieve railbevestiging finaliseert de economic settlement precies een keer', async () => {
+  const { op } = maak({ railStatus: 'ingepland' });
+  const gezien = [];
+  op.registreerAfwikkeling('sepa-uit', async o => { gezien.push(o.id); return { ok: true }; });
+  const o = op.maak({ ...basis, economicIntentId: 'EI1', settlementId: 'ES1', claimId: 'CL1' });
+  assert.equal(o.afwikkelingNodig, true);
+  await op.dienIn(o);
+  const r = await op.bevestig({ id: o.id, settlementRef: 'SEPA-1' });
+  assert.deepEqual(gezien, [o.id]);
+  assert.ok(r.afwikkelingVerwerktAt);
+  assert.equal(r.economicIntentId, 'EI1');
+  await op.bevestig({ id: o.id, settlementRef: 'SEPA-1' });
+  assert.deepEqual(gezien, [o.id], 'een webhook-retry finaliseert niet dubbel');
+});
+
+test('een mislukte finalize-hook blijft zichtbaar en de ronde herstelt de crashnaad', async () => {
+  const { op, klok } = maak({ railStatus: 'paid' });
+  let pogingen = 0;
+  op.registreerAfwikkeling('sepa-uit', async () => {
+    pogingen++;
+    return pogingen === 1 ? { error: 'runtime tijdelijk niet schrijfbaar' } : { ok: true };
+  });
+  const o = op.maak(basis);
+  const eerste = await op.dienIn(o);
+  assert.equal(eerste.status, 'AFGEWIKKELD', 'de externe waarheid blijft waar');
+  assert.match(eerste.afwikkelFout, /niet schrijfbaar/);
+  assert.equal(op.openstaand().zonderAfwikkeling, 1, 'maar intern onaf staat op het bord');
+  klok.t += 1000;
+  await op.ronde({ tot: klok.t });
+  assert.equal(pogingen, 2);
+  assert.ok(op.vind(o.id).afwikkelingVerwerktAt);
+  assert.equal(op.openstaand().zonderAfwikkeling, 0);
+});
+
+test('twee rails kunnen niet dezelfde finalize-hook claimen', () => {
+  const { op } = maak();
+  op.registreerAfwikkeling('sepa-uit', async () => ({ ok: true }));
+  assert.throws(() => op.registreerAfwikkeling('sepa-uit', async () => ({ ok: true })), /staat al een afwikkeling/);
+  assert.throws(() => op.registreerAfwikkeling('x', 'geen functie'), /is een functie/);
+});

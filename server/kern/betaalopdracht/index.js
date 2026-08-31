@@ -37,37 +37,8 @@
      ./rij        de verzameling -- wie is aan de beurt, wat staat er open */
 'use strict';
 
-/* GEBOEKT/booked (de rail weet van niets), INGEDIEND/submitted (aangenomen, nog
-   niet definitief), AFGEWIKKELD/settled, MISLUKT/failed (opgegeven, het geld
-   moet terug), TERUGGEBOEKT/reversed. De Engelse namen staan erbij omdat ze in
-   elk betaalontwerp voorkomen; de code van dit huis is Nederlands. */
-const STATUS = { GEBOEKT: 'GEBOEKT', INGEDIEND: 'INGEDIEND', AFGEWIKKELD: 'AFGEWIKKELD', MISLUKT: 'MISLUKT', TERUGGEBOEKT: 'TERUGGEBOEKT' };
-
-/* Welke stap na welke mag. Een overgang die hier niet staat is een
-   programmeerfout en wordt geweigerd -- niet stil doorgevoerd, want een status
-   die achteruit kan lopen maakt elk getal eronder waardeloos. Opnieuw indienen
-   vanuit MISLUKT mag met de hand: dat is een besluit van het kantoor. */
-const OVERGANG = {
-  GEBOEKT: ['INGEDIEND', 'AFGEWIKKELD', 'MISLUKT'],
-  INGEDIEND: ['AFGEWIKKELD', 'MISLUKT'],
-  AFGEWIKKELD: [],
-  MISLUKT: ['TERUGGEBOEKT', 'INGEDIEND'],
-  TERUGGEBOEKT: []
-};
-
-const AF = new Set([STATUS.AFGEWIKKELD, STATUS.TERUGGEBOEKT]);          // klaar
-const OPEN = new Set([STATUS.GEBOEKT, STATUS.INGEDIEND, STATUS.MISLUKT]); // telt in de reconciliatie
-
-/* Wat de rail terugmeldt als "hier ben ik klaar mee". Alles wat hier niet in
-   staat is aangenomen maar niet afgerond -- dus INGEDIEND, en de definitieve
-   bevestiging komt later via bevestig() (de webhook). Liever een opdracht die
-   te lang open staat dan een die te vroeg dicht gaat. */
-const DEFINITIEF = new Set(['betaald', 'succeeded', 'paid', 'settled', 'afgewikkeld']);
-
-// oplopend wachten tussen pogingen; de laatste waarde geldt voor alles daarna
-const BACKOFF_MS = [30000, 120000, 600000, 1800000, 3600000];
-const MAX_POGINGEN = 6;
-const RAM_MAX = 50000;
+const { STATUS, OVERGANG, AF, OPEN, DEFINITIEF,
+  BACKOFF_MS, MAX_POGINGEN, RAM_MAX } = require('./status');
 
 module.exports = function maakBetaalopdrachten(opties) {
   const { d, save, crypto, nu, railInzenden, log } = opties || {};
@@ -81,8 +52,12 @@ module.exports = function maakBetaalopdrachten(opties) {
   const publiek = o => ({
     id: o.id, soort: o.soort, rail: o.rail, status: o.status, centen: o.centen, valuta: o.valuta,
     bron: o.bron, bestemming: o.bestemming, oms: o.oms, ledgerRef: o.ledgerRef,
+    economicIntentId: o.economicIntentId || null, settlementId: o.settlementId || null,
+    claimId: o.claimId || null,
     tariefCenten: o.tariefCenten || 0, settlementRef: o.settlementRef || null,
     pogingen: o.pogingen, volgendeAt: o.volgendeAt || null, laatsteFout: o.laatsteFout || null,
+    afwikkelingNodig: !!o.afwikkelingNodig, afwikkelingVerwerktAt: o.afwikkelingVerwerktAt || null,
+    afwikkelFout: o.afwikkelFout || null,
     at: o.at, klaarAt: o.klaarAt || null
   });
 
@@ -105,7 +80,8 @@ module.exports = function maakBetaalopdrachten(opties) {
   /* Vastleggen VOORDAT de rail wordt gebeld. Alles wat nodig is om de inzending
      later opnieuw te doen staat in de rij zelf; de aanroeper hoeft na een
      herstart niets te onthouden. */
-  function maak({ soort, rail, centen, valuta = 'eur', bron, bestemming, begunstigde, oms, ledgerRef, tariefCenten = 0, tariefRef = null, idemSleutel }) {
+  function maak({ soort, rail, centen, valuta = 'eur', bron, bestemming, begunstigde, oms, ledgerRef,
+    tariefCenten = 0, tariefRef = null, idemSleutel, economicIntentId, settlementId, claimId }) {
     const c = Math.round(Number(centen));
     if (!Number.isFinite(c) || c <= 0) throw new Error('Een betaalopdracht heeft een positief bedrag in centen nodig.');
     if (!ledgerRef) throw new Error('Een betaalopdracht hoort bij een boeking; ledgerRef ontbreekt.');
@@ -115,9 +91,12 @@ module.exports = function maakBetaalopdrachten(opties) {
       status: STATUS.GEBOEKT, centen: c, valuta,
       bron: bron || null, bestemming: bestemming || null, begunstigde: begunstigde || '',
       oms: String(oms || '').slice(0, 200), ledgerRef,
+      economicIntentId: economicIntentId || null, settlementId: settlementId || null, claimId: claimId || null,
       tariefCenten: Math.max(0, Math.round(Number(tariefCenten) || 0)), tariefRef,
       idemSleutel: idemSleutel || ('opdracht:' + ledgerRef),
       pogingen: 0, volgendeAt: nu(), laatsteFout: null, settlementRef: null,
+      afwikkelingNodig: afwikkelingen.has(String(soort || 'uitbetaling')),
+      afwikkelingVerwerktAt: null, afwikkelFout: null,
       at: nu(), klaarAt: null
     });
   }
@@ -143,8 +122,32 @@ module.exports = function maakBetaalopdrachten(opties) {
     return fn(o);
   };
 
+  /* Een definitieve railbevestiging is nog niet hetzelfde als interne
+     afwikkeling. Gebruikers met claims/ledger registreren hier hun ene
+     finalize-stap. Faalt die na de externe bevestiging, dan blijft de opdracht
+     AFGEWIKKELD maar zichtbaar onafgewerkt en probeert de ronde de hook opnieuw. */
+  const afwikkelingen = new Map();
+  function registreerAfwikkeling(soort, fn) {
+    if (typeof fn !== 'function') throw new Error('Een afwikkeling is een functie.');
+    if (afwikkelingen.has(soort)) throw new Error('Voor soort "' + soort + '" staat al een afwikkeling.');
+    afwikkelingen.set(String(soort), fn);
+  }
+  async function verwerkAfwikkeling(o) {
+    if (!o || !o.afwikkelingNodig || o.afwikkelingVerwerktAt) return true;
+    const fn = afwikkelingen.get(o.soort);
+    let uit = null, err = null;
+    try { uit = fn ? await fn(o) : null; } catch (e) { err = e; }
+    if (err || !uit || uit.error || uit.ok === false) {
+      o.afwikkelFout = String((err && err.message) || (uit && uit.error) || 'afwikkelhaak ontbreekt').slice(0, 300);
+      save(); klacht('externe betaling is afgewikkeld maar interne finalisatie niet', { id: o.id, fout: o.afwikkelFout });
+      return false;
+    }
+    o.afwikkelingVerwerktAt = nu(); o.afwikkelFout = null; save();
+    return true;
+  }
+
   const ctx = { rij, save, nu, klacht, publiek, zet, wacht, maxPogingen,
-    STATUS, AF, OPEN, DEFINITIEF, ramMax: RAM_MAX, railInzenden, terugboeken };
+    STATUS, AF, OPEN, DEFINITIEF, ramMax: RAM_MAX, railInzenden, terugboeken, verwerkAfwikkeling };
   const derij = require('./rij')(ctx);
   ctx.plaats = derij.plaats;
   ctx.vind = derij.vind;
@@ -152,6 +155,7 @@ module.exports = function maakBetaalopdrachten(opties) {
   ctx.dienIn = inzending.dienIn;
   ctx.draaiTerug = inzending.draaiTerug;   // bevestig() met een mislukking gebruikt dezelfde teruggang
 
-  return { STATUS, maak, publiek, registreerTeruggang, dienIn: inzending.dienIn, ...derij };
+  return { STATUS, maak, publiek, registreerTeruggang, registreerAfwikkeling,
+    dienIn: inzending.dienIn, ...derij };
 };
 module.exports.STATUS = STATUS;

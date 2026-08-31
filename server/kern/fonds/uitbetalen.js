@@ -1,109 +1,95 @@
-/* HOE HET GELD ER DAADWERKELIJK UIT GAAT -- de rails onder de RTF-afdracht.
+/* De settlement-rails onder het fonds.
 
-   ../fonds.js beslist DAT er 30% afgaat en HOEVEEL. Dit bestand brengt dat
-   bedrag naar buiten, en dat is een ander onderwerp: het kent geen percentage en
-   geen btw-profiel, alleen twee rails en wat er gebeurt als ze het niet doen.
-
-   TWEE RAILS, IN DEZE VOLGORDE. Staat de boardroom-knop op "eigen", dan gaat de
-   afdracht als boeking door het eigen grootboek. Anders, met een bekend IBAN, de
-   opdrachtenrij in -- dezelfde als de bank-SEPA en de partneruitbetaling.
-
-   DE TERUGGANG IS HIER MET OPZET ANDERS dan die van de bank en van Pay: er is
-   GEEN dubbele boeking om terug te draaien. De afdracht IS de administratie en
-   het geld stond nog bij RTG. "Terug" betekent hier dus: zet hem op te_storten,
-   met de reden erbij, zodat hij opnieuw kan worden ingepland zodra de rail het
-   weer doet.
-
-   TWEE FOUTEN DIE HIER ZIJN GEMAAKT en die er zo weer in sluipen:
-
-   1. EEN RECHTSTREEKSE AANROEP MET EEN CATCH die de afdracht op 'te_storten'
-      zette en logde. Niet stil, maar er kwam nooit iemand op terug: 'te_storten'
-      wachtte op een mens die het opmerkte, en het foundation-deel bleef liggen.
-      Nu wordt hij herhaald en telt hij mee in hetzelfde reconciliatiegetal als
-      de andere twee rails.
-   2. "AFGEWIKKELD OF ANDERS INGEPLAND" als binaire regel. Geeft de rij het al
-      bij de eerste poging op, dan heeft de teruggang de afdracht al op
-      te_storten gezet -- en die binaire regel schreef daar 'ingepland' overheen
-      en maakte van een mislukking weer een belofte. Alle standen staan nu
-      uitgeschreven. */
+   Niet langer één 30%-opdracht naar één rekening: iedere formele claim krijgt
+   een eigen settlement en betaalopdracht. De opdrachtenrij bewaart de externe
+   poging; de Economic Runtime is eigenaar van claim, ledger en bewijs. */
 'use strict';
 
-/* `bankGeef` is een functie en geen waarde: de RTG Bank ontstaat pas NA het
-   fonds, dus een vaste verwijzing zou hier voor altijd null zijn. Dezelfde late
-   binding als koppelBank in ../fonds.js. */
-function maakUitbetaling({ opdrachten, save, log, lijst, bankGeef }) {
+const SOORT = 'economic-settlement';
 
-  /* De teruggang van een afdracht, en die is met opzet anders dan die van de
-     bank en van Pay: hier is GEEN dubbele boeking om terug te draaien. De
-     afdracht is zelf de administratie, en het geld stond nog bij RTG. "Terug"
-     betekent hier dus: zet hem op te_storten, met de reden erbij, zodat hij
-     opnieuw kan worden ingepland zodra de rail het weer doet. Dat blijft
-     zichtbaar in het fondsoverzicht in plaats van weg te vallen. */
-  if (opdrachten) opdrachten.registreerTeruggang('rtf-afdracht', async (o) => {
-    const a = lijst().find(x => x.id === o.ledgerRef);
-    if (!a) return { error: 'De afdracht bij deze opdracht bestaat niet meer.' };
-    a.status = 'te_storten';
-    a.fout = o.laatsteFout || 'de uitbetaling is niet gelukt';
-    save();
-    if (log && log.warn) log.warn('rtf-afdracht terug op te_storten na een mislukte rail', { id: a.id, fout: a.fout });
-    return { ok: true };
-  });
+function maakUitbetaling({ opdrachten, runtime, save, log, lijst, bankGeef, herbereken }) {
+  const zoek = settlementId => {
+    for (const afdracht of lijst()) {
+      const leg = (afdracht.legs || []).find(x => x.settlementId === settlementId);
+      if (leg) return { afdracht, leg };
+    }
+    return null;
+  };
 
-  /* Een afdracht naar buiten brengen. Past de status van `afdracht` aan en
-     geeft hem terug; opslaan doet de aanroeper, die de rij ook bijhoudt. */
-  async function verstuur(afdracht, { centen, invoiceId, wie, best }) {
+  if (opdrachten) {
+    opdrachten.registreerTeruggang(SOORT, async o => {
+      const gevonden = zoek(o.settlementId || o.ledgerRef);
+      if (!gevonden) return { error: 'De settlement bij deze opdracht bestaat niet meer.' };
+      const r = await runtime.markSettlementFailed({ settlementId: gevonden.leg.settlementId,
+        operationId: o.id, reason: o.laatsteFout || 'de betaalrail heeft de opdracht teruggegeven', retryable: true });
+      if (!r || r.error) return r || { error: 'Economic recovery kon niet worden vastgelegd.' };
+      gevonden.leg.status = 'te_storten'; gevonden.leg.fout = o.laatsteFout || 'uitbetaling mislukt';
+      herbereken(gevonden.afdracht); save();
+      if (log && log.warn) log.warn('economic settlement terug naar claimbaar',
+        { intentId: gevonden.afdracht.economicIntentId, settlementId: gevonden.leg.settlementId, fout: gevonden.leg.fout });
+      return { ok: true };
+    });
+    opdrachten.registreerAfwikkeling(SOORT, async o => {
+      const gevonden = zoek(o.settlementId || o.ledgerRef);
+      if (!gevonden) return { error: 'De settlement bij deze opdracht bestaat niet meer.' };
+      const r = await runtime.markSettlementConfirmed({ settlementId: gevonden.leg.settlementId,
+        operationId: o.id, providerRef: o.settlementRef || o.id, sourceRef: 'provider:payout-rail' });
+      if (!r || r.error) return r || { error: 'Economic settlement kon niet worden bevestigd.' };
+      gevonden.leg.status = 'gestort'; gevonden.leg.providerRef = o.settlementRef || o.id;
+      gevonden.leg.fout = null; herbereken(gevonden.afdracht); save();
+      return { ok: true };
+    });
+  }
+
+  async function verstuurLeg(afdracht, leg, { invoiceId, wie }) {
+    if (!leg || !leg.settlementId || !leg.iban) return leg;
     const bankAfdracht = bankGeef();
-    // In de eigen-stand loopt de afdracht over de eigen rails: een boeking van
-    // de reserve naar de foundation-tegenrekening, per direct afgewikkeld.
     if (bankAfdracht) {
       try {
-        const eigen = bankAfdracht({ centen, referentie: afdracht.id, oms: 'RTFoundation-afdracht ' + (invoiceId || '') });
+        const eigen = await bankAfdracht({ centen: leg.centen, referentie: leg.settlementId,
+          oms: 'Sociale afdracht ' + leg.component + ' ' + (invoiceId || ''),
+          bestemming: leg.iban, begunstigde: leg.begunstigde, component: leg.component });
         if (eigen && eigen.ok) {
-          afdracht.status = 'gestort';
-          afdracht.via = 'eigen-bank';
-          afdracht.boekingId = eigen.boeking ? eigen.boeking.id : null;
-          save();
-          return afdracht;
+          const providerRef = 'bank:' + ((eigen.boeking && eigen.boeking.id) || leg.settlementId);
+          const vast = await runtime.markSettlementConfirmed({ settlementId: leg.settlementId,
+            operationId: (eigen.boeking && eigen.boeking.id) || null, providerRef, sourceRef: 'bank:rtg-ledger' });
+          if (!vast || vast.error) throw new Error((vast && vast.error) || 'runtime-finalisatie mislukt');
+          leg.status = 'gestort'; leg.via = 'eigen-bank'; leg.boekingId = eigen.boeking ? eigen.boeking.id : null;
+          leg.providerRef = providerRef; herbereken(afdracht); save(); return leg;
         }
       } catch (e) {
-        if (log && log.warn) log.warn('rtf-afdracht: eigen-bank-boeking mislukt', { invoiceId, fout: e.message });
+        if (log && log.warn) log.warn('sociale settlement: eigen-bank-boeking mislukt',
+          { invoiceId, component: leg.component, fout: e.message });
       }
     }
 
-    /* Met een bekend IBAN gaat de afdracht de opdrachtenrij in, dezelfde als de
-       bank-SEPA en de partneruitbetaling van Pay (kern/betaalopdracht/).
-
-       Hier stond een rechtstreekse aanroep met een catch die de afdracht op
-       'te_storten' zette en logde. Dat was niet stil, maar er kwam ook nooit
-       iemand op terug: 'te_storten' wachtte op een mens die het opmerkte, en het
-       foundation-deel bleef zolang liggen. Nu wordt hij herhaald, telt hij mee in
-       hetzelfde reconciliatiegetal als de andere twee rails, en is 'te_storten'
-       weer wat het hoort te zijn -- geen bestemming bekend -- in plaats van een
-       verzamelbak voor mislukte inzendingen. */
-    if (best.iban && opdrachten) {
+    if (opdrachten) {
       const op = opdrachten.maak({
-        soort: 'rtf-afdracht', rail: 'betaalnaad', centen, bestemming: best.iban,
-        begunstigde: best.begunstigde, oms: 'RTFoundation-afdracht ' + (invoiceId || ''),
-        ledgerRef: afdracht.id,
-        idemSleutel: 'rtf:' + (wie || '') + ':' + invoiceId
+        soort: SOORT, rail: 'betaalnaad', centen: leg.centen, bestemming: leg.iban,
+        begunstigde: leg.begunstigde, oms: 'Sociale afdracht ' + leg.component + ' ' + (invoiceId || ''),
+        ledgerRef: leg.settlementId, economicIntentId: afdracht.economicIntentId,
+        settlementId: leg.settlementId, claimId: leg.claimId,
+        idemSleutel: 'economic-settlement:' + leg.settlementId
       });
-      afdracht.opdrachtId = op.id;
+      leg.opdrachtId = op.id; herbereken(afdracht); save();
       const na = await opdrachten.dienIn(op);
-      afdracht.uitbetaalId = na.settlementRef || null;
-      /* Alle vijf de standen uitschrijven en niet "afgewikkeld of anders
-         ingepland". Geeft de rij het al bij deze eerste poging op, dan heeft de
-         teruggang hierboven de afdracht al op te_storten gezet -- een binaire
-         regel schreef daar 'ingepland' overheen en maakte van een mislukking
-         weer een belofte. */
-      if (na.status === 'AFGEWIKKELD') afdracht.status = 'gestort';
-      else if (na.status === 'MISLUKT' || na.status === 'TERUGGEBOEKT') afdracht.status = 'te_storten';
-      else afdracht.status = 'ingepland';
-      if (na.laatsteFout) afdracht.fout = na.laatsteFout;
+      if (na.status === 'INGEDIEND') {
+        await runtime.markSettlementSubmitted({ settlementId: leg.settlementId,
+          operationId: op.id, providerRef: na.settlementRef || null });
+        leg.status = 'ingepland'; leg.providerRef = na.settlementRef || null;
+      } else if (na.status === 'AFGEWIKKELD') {
+        /* De finalize-hook hierboven heeft runtime en leg al gesloten. */
+        leg.status = na.afwikkelFout ? 'afwikkeling_nodig' : 'gestort';
+        leg.providerRef = na.settlementRef || leg.providerRef;
+      } else if (na.status === 'MISLUKT' || na.status === 'TERUGGEBOEKT') {
+        leg.status = 'te_storten'; leg.fout = na.laatsteFout || 'uitbetaling mislukt';
+      } else leg.status = 'gepland';
+      herbereken(afdracht); save();
     }
-    return afdracht;
+    return leg;
   }
 
-  return { verstuur };
+  return { verstuurLeg, SOORT };
 }
 
-module.exports = { maakUitbetaling };
+module.exports = { maakUitbetaling, SOORT };

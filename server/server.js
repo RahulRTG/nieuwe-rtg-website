@@ -1740,7 +1740,7 @@ const betaalOpdrachten = require('./kern/betaalopdracht')({
    van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht
    wordt op het betaalmoment geboekt en, zodra het IBAN in de omgeving staat,
    via de betaal-naad als uitbetaling ingepland. */
-const fonds = maakFonds({ db, save, betaal, log, env: process.env, betaalOpdrachten });
+const fonds = maakFonds({ db, save, bijeen, inBundel, betaal, log, env: process.env, betaalOpdrachten });
 
 /* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
    cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende

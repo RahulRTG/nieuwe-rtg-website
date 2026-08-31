@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1911,
-    "vormen": 1293,
-    "velden": 1843,
-    "modules": 692,
-    "domeinen": 246,
+    "bestanden": 1947,
+    "vormen": 1313,
+    "velden": 1864,
+    "modules": 704,
+    "domeinen": 249,
     "envelopDrempel": 15,
-    "envelop": 32,
-    "veldenDomeineigen": 1294,
+    "envelop": 34,
+    "veldenDomeineigen": 1313,
     "veldenGedeeldVanafVier": 185,
     "gelijkendeVormparen": 19
   },
@@ -30,12 +30,14 @@
     "naam",
     "naar",
     "notitie",
+    "ok",
     "omschrijving",
     "prijs",
     "reden",
     "ref",
     "sinds",
     "soort",
+    "stand",
     "status",
     "supplierCode",
     "tekst",
@@ -61,27 +63,15 @@
       ]
     },
     {
-      "veld": "stand",
+      "veld": "waarom",
       "domeinen": 14,
       "waar": [
-        "bedrijf",
         "kern/bureau",
         "kern/command",
+        "kern/commerce",
         "kern/commercie",
         "kern/concern",
-        "kern/eten"
-      ]
-    },
-    {
-      "veld": "ok",
-      "domeinen": 14,
-      "waar": [
-        "kern/festival",
-        "kern/fiscaal",
-        "kern/foundationregistratie-register",
-        "kern/koppel",
-        "kern/leren",
-        "kern/mailaanname"
+        "kern/gewoonten"
       ]
     },
     {
@@ -94,18 +84,6 @@
         "kern/livinglab",
         "kern/magnaat-economenlab-rapport",
         "kern/magnaat-economie"
-      ]
-    },
-    {
-      "veld": "categorie",
-      "domeinen": 13,
-      "waar": [
-        "kern/appbieb",
-        "kern/appstore",
-        "kern/command",
-        "kern/geloofbieb",
-        "kern/groothandel",
-        "kern/magnaat-partnerstudio-bedrijf"
       ]
     },
     {
@@ -145,18 +123,6 @@
       ]
     },
     {
-      "veld": "waarom",
-      "domeinen": 13,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/commerce",
-        "kern/commercie",
-        "kern/concern",
-        "kern/gewoonten"
-      ]
-    },
-    {
       "veld": "open",
       "domeinen": 13,
       "waar": [
@@ -166,6 +132,18 @@
         "kern/labfonds",
         "kern/lidmaatschap",
         "kern/livinglab"
+      ]
+    },
+    {
+      "veld": "categorie",
+      "domeinen": 12,
+      "waar": [
+        "kern/appbieb",
+        "kern/command",
+        "kern/geloofbieb",
+        "kern/groothandel",
+        "kern/magnaat-partnerstudio-bedrijf",
+        "kern/mall"
       ]
     },
     {
@@ -277,6 +255,18 @@
       ]
     },
     {
+      "veld": "niveau",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/geldgraaf",
+        "kern/levenslijn",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "land",
       "domeinen": 11,
       "waar": [
@@ -385,15 +375,15 @@
       ]
     },
     {
-      "veld": "niveau",
+      "veld": "eigenaar",
       "domeinen": 10,
       "waar": [
         "bedrijf",
         "kern/command",
-        "kern/geldbeleid",
-        "kern/geldgraaf",
-        "kern/levenslijn",
-        "kern/livinglab"
+        "kern/levensgraaf",
+        "kern/onderneming",
+        "kern/reisgezelschap",
+        "kern/reisgezelschap-delen"
       ]
     },
     {
@@ -406,6 +396,18 @@
         "kern/livinglab",
         "kern/office",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "rol",
+      "domeinen": 10,
+      "waar": [
+        "kern/concern",
+        "kern/livinglab",
+        "kern/magnaatwereld",
+        "kern/onderneming",
+        "kern/rechterhand",
+        "kern/reisgezelschap"
       ]
     },
     {
@@ -433,18 +435,6 @@
       ]
     },
     {
-      "veld": "prijsCenten",
-      "domeinen": 9,
-      "waar": [
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/eten",
-        "kern/geloofbieb",
-        "kern/reisbieb",
-        "kern/rtfbieb"
-      ]
-    },
-    {
       "veld": "opties",
       "domeinen": 9,
       "waar": [
@@ -454,6 +444,18 @@
         "kern/gast",
         "kern/horeca",
         "kern/magnaat-werkroutefabriek"
+      ]
+    },
+    {
+      "veld": "nummer",
+      "domeinen": 9,
+      "waar": [
+        "bedrijf",
+        "kern/bank",
+        "kern/facturatie",
+        "kern/kosten",
+        "kern/labfonds",
+        "kern/livinglab"
       ]
     },
     {
@@ -792,6 +794,20 @@
     },
     {
       "gelijkenis": 0.63,
+      "a": "server/kern/geloofbieb.js",
+      "b": "server/kern/reisbieb/index.js",
+      "domeinA": "kern/geloofbieb",
+      "domeinB": "kern/reisbieb",
+      "gedeeld": [
+        "categorie",
+        "categorieLabel",
+        "gratis",
+        "nr",
+        "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
       "a": "server/kern/gast/order-beeld.js",
       "b": "server/kern/horeca/regel.js",
       "domeinA": "kern/gast",
@@ -805,22 +821,7 @@
         "ingredienten",
         "itemId",
         "lijstprijs",
-        "opties",
-        "stand"
-      ]
-    },
-    {
-      "gelijkenis": 0.63,
-      "a": "server/kern/geloofbieb.js",
-      "b": "server/kern/reisbieb/index.js",
-      "domeinA": "kern/geloofbieb",
-      "domeinB": "kern/reisbieb",
-      "gedeeld": [
-        "categorie",
-        "categorieLabel",
-        "gratis",
-        "nr",
-        "prijsCenten"
+        "opties"
       ]
     }
   ]

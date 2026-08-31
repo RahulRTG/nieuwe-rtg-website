@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1412 bestanden en 9937 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1413 bestanden en 9949 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1412 |
-| losse beweringen (`test(...)`) | 9937 |
+| toetsbestanden | 1413 |
+| losse beweringen (`test(...)`) | 9949 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 969 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 38 |
-| alleen in de kop *genoemd*, nog niet gemeten | 116 |
+| alleen in de kop *genoemd*, nog niet gemeten | 117 |
 | niets van beide | 279 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1237 bestanden, 9636 beweringen.
+1238 bestanden, 9648 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1123,6 +1123,7 @@ toets omvalt.
 | `tls-x509.test.js` | 3 | gezakt op `return-weg#0` | Bewijst dat onze eigen X.509/DER-laag echte, bruikbare bytes maakt: een self-signed certificaat dat OpenSSL (via Node's tls) accepteert in een ECHTE TLS-handshake, en een CSR die correct over de juiste inhoud is... |
 | `toegangprefix.test.js` | 4 | gezakt op `!==->===#0` | DE PREFIXKAART VAN DE TOEGANGSMOTOR (server/functies/toegang.js). functieVoorPad() zegt WELKE functieschakelaar dit pad bewaakt. |
 | `toegankelijk.test.js` | 6 | gezakt op `liegpoort /api/` | Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich hoort te gedragen. Wat hier bewezen wordt: de stand blijft staan, een onbekende waarde valt terug op normaal in plaats van stil te blijven... |
+| `toestelbinding.test.js` | 12 | genoemd | MIJN RTG blok 3 -- toestelbinding. DE BEWERING DIE ERTOE DOET staat in toets 1: alleen bezit van een sleutel die het toestel niet kan verlaten verdient `bewezen`. |
 | `toestellen.test.js` | 6 | gezakt op `liegpoort /api/` | Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Het zwaartepunt van deze toets is niet dat het werkt, maar dat de sleutel SMAL is. |
 | `toetskeuring.test.js` | 7 | -- | De toets als meetinstrument: keuring vooraf, spiegel achteraf. De beloftes die hier hard worden gemaakt: - de keuring BOUWT NIET. |
 | `training.test.js` | 9 | gezakt op `liegpoort /api/` | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |

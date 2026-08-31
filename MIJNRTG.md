@@ -241,6 +241,12 @@ opleverbaar en los terug te draaien.
    het toestel dat je kwijt bent. Contextbinding intrekken wacht op blok 7.)*
 3. **2FA en herstel voor leden** — `kern/totp.js` bestaat, maar alleen met
    `OFFICE_TOTP_SECRET`. Eén herstelcode is geen herstelcodeset.
+   *(Toestelbinding staat sinds 31 augustus 2026:
+   `kern/identiteit/toestellen.js` plus `public/shared/toestelsleutel.js`. Een
+   ECDSA-sleutel die de browser maakt met `extractable: false` tekent een
+   uitdaging; alleen dat verdient `bewezen`. De sleutel is nadrukkelijk GEEN
+   inlogmiddel -- hij bindt een sessie die er al is, en `test/toestelbinding.test.js`
+   toets 6 zakt zodra die module een account aanraakt.)*
 4. **De permission firewall** — projectie over vier bestaande bronnen. Het eerste
    blok dat er als MIJN RTG uitziet.
 5. **Trust receipts** — de bon onder wat blok 2 en 4 uitvoeren. Bewijs dat al

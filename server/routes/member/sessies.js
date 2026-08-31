@@ -33,7 +33,7 @@
 const TOKEN_MAX_MS = 30 * 24 * 3600 * 1000;
 
 module.exports = (kern) => {
-  const { app, auth, accounts, sessieregister, handelingsspoor } = kern;
+  const { app, auth, accounts, sessieregister, toestellen, handelingsspoor } = kern;
 
   const eisLid = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Alleen voor leden.' }); return false; }
@@ -51,7 +51,15 @@ module.exports = (kern) => {
   /* ---- de lijst ---- */
   app.post('/api/mijn/sessies', auth, (req, res) => {
     if (!eisLid(req, res)) return;
-    const rijen = sessieregister ? sessieregister.vanLid(req.session.key) : [];
+    const rijen = (sessieregister ? sessieregister.vanLid(req.session.key) : []).map(r => {
+      /* DE NAAM KOMT HIER BIJ ELKAAR, en niet uit de sessie. De sessie draagt
+         alleen de toestelId (kern/identiteit/sessievelden.js verbiedt de naam,
+         want een sessie repliceert over een bus); het toestelregister draagt de
+         naam die het lid zelf gaf. Onbekend of ingetrokken toestel geeft null,
+         nooit een gok -- anders staat er "MacBook" bij iets anders. */
+      const tid = r.toestelId;
+      return Object.assign({}, r, { toestelNaam: tid && toestellen ? toestellen.naamVan(req.session.key, tid) : null });
+    });
     /* WAAROM HIER EEN UITLEG BIJ ZIT EN GEEN AANTAL. Een lijst met "3 actieve
        apparaten" nodigt uit tot geruststelling; deze lijst hoort te zeggen wat
        zij NIET weet. Sessies van voor blok 1 dragen geen sid en staan er dus

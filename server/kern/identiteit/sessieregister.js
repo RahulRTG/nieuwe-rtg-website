@@ -138,6 +138,11 @@ function maakSessieregister({ db, save }) {
          en geen bewijs -- hij zegt WAT het was, de graad zegt hoe zeker. */
       uit.push({ sid, geopendOp: rij.geopendOp, gezienOp: rij.gezienOp,
         soort: (rij.context.authenticator && rij.context.authenticator.type) || null,
+        /* De toestelId reist mee, de toestelNAAM niet: die woont in het
+           toestelregister en wordt door de route erbij gezocht. Zou hij hier
+           staan, dan had de sessie hem moeten dragen -- en dat is precies wat
+           de verbodenlijst tegenhoudt. */
+        toestelId: (rij.context.toestel && rij.context.toestel.toestelId) || null,
         stand: ctx.stand(rij.context, nu) });
     }
     return uit.sort((a, b) => new Date(b.gezienOp) - new Date(a.gezienOp));

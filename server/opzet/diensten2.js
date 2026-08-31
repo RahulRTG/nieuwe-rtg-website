@@ -120,6 +120,10 @@ const scanNet = require('../middleware/malwarescan')({ antivirus, uploadquaranta
    gehandeld wordt -- en verleent zelf geen enkele toegang. Zie de kop van
    kern/identiteit/sessieregister.js voor waarom dat een apart ding moet zijn. */
 const sessieregister = require('../kern/identiteit/sessieregister').maakSessieregister({ db, save });
+/* Het toestelregister hoort naast het sessieregister en niet erin: een toestel
+   overleeft zijn sessies, en een sessie kan aan een toestel gebonden zijn zonder
+   dat het toestel bij die sessie hoort. Twee levensduren, twee registers. */
+const toestellen = require('../kern/identiteit/toestellen').maakToestellen({ db, save });
 
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
@@ -208,6 +212,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, sessieregister, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
+    resolveSession, sessieregister, toestellen, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

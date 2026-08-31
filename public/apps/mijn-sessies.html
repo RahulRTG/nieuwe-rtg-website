@@ -27,6 +27,7 @@
   .knop{background:var(--card);border:1px solid var(--line);border-radius:0;color:var(--txt);
     font-size:0.85rem;padding:0.6rem 0.95rem;min-height:44px;}
   .knop.rood{border-color:rgba(222,110,146,0.55);color:var(--rood);}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .knop[disabled]{opacity:0.5;cursor:default;}
 
@@ -180,13 +181,12 @@
      iets aannemelijks te verzinnen. Het kenmerk is dus de FALLBACK-naam en niet
      het eindstation: hij verdwijnt naar de details op de dag dat er een echte
      naam staat, zonder dat dit scherm opnieuw bedacht hoeft te worden. */
-  function naamVoorToestel(stand) {
-    if (!stand.toestel || !stand.toestel.aanwezig) return null;
-    return null; // er is nog geen toestelregister; blok 3 vult dit
+  function naamVoorToestel(s) {
+    return s.toestelNaam || null;   // uit het toestelregister; null = geen gok
   }
 
   function titelVoor(s, huidige) {
-    return naamVoorToestel(s.stand)
+    return naamVoorToestel(s)
       || (s.sid === huidige ? 'Deze sessie' : 'Sessie ' + kenmerkVan(s.sid));
   }
 
@@ -207,8 +207,9 @@
        derde manier van inloggen bij komt, en die kwam er ook (sleutelwoorden). */
     const hoe = !auth.aanwezig ? 'Herkomst niet vastgelegd'
       : (SOORT[s.soort] || 'Ingelogd');
-    const toestel = s.stand.toestel && s.stand.toestel.aanwezig
-      ? 'Toestel bevestigd' : 'Toestel nog niet bevestigd';
+    const tb = s.stand.toestel;
+    const toestel = !tb || !tb.aanwezig ? 'Toestel nog niet bevestigd'
+      : (tb.graad === 'bewezen' ? 'Toestel cryptografisch bevestigd' : 'Toestel bekend (' + tb.graad + ')');
     return { eerste: hoe + ' \u00b7 ' + wanneer(s.gezienOp) + ' actief', tweede: toestel };
   }
 
@@ -248,6 +249,17 @@
     el.appendChild(det);
 
     const acties = maak('div', 'acties');
+    /* De bevestigknop staat ALLEEN op de sessie waarin u zit: alleen dit toestel
+       kan nu een handtekening zetten. Hem op een andere kaart tonen zou beloven
+       dat je een toestel op afstand kunt bevestigen, en dat kan niet -- en zou
+       ook niet mogen, want dan bewijst de binding niets meer. */
+    if (s.sid === huidige && !(s.stand.toestel && s.stand.toestel.aanwezig)) {
+      const bev = maak('button', 'knop vol');
+      bev.type = 'button';
+      bev.textContent = 'Bevestig dit toestel';
+      bev.addEventListener('click', () => bindToestel(bev));
+      acties.appendChild(bev);
+    }
     const knop = maak('button', 'knop rood');
     knop.type = 'button';
     knop.textContent = s.sid === huidige ? 'Sluit deze sessie (uitloggen)' : 'Sluit deze sessie';
@@ -256,6 +268,32 @@
     acties.appendChild(knop);
     el.appendChild(acties);
     return el;
+  }
+
+  /* HET BINDEN. De browser tekent een uitdaging van de server met een sleutel
+     die het toestel niet kan verlaten; pas als de server die handtekening heeft
+     nagerekend, staat er `bewezen` in de sessie. Alles wat hier misgaat, zegt
+     wat er misging -- een stille mislukking zou als "niet bevestigd" lezen en
+     dat is iets anders dan "het lukte niet". */
+  async function bindToestel(knop) {
+    if (!window.RTGToestel || !RTGToestel.beschikbaar()) {
+      return zeg('Deze browser kan geen toestelsleutel bewaren. Toestelbinding werkt hier niet.');
+    }
+    const naam = window.prompt('Hoe wilt u dit toestel noemen? (bijvoorbeeld: MacBook van thuis)', '');
+    if (naam === null) return;
+    knop.disabled = true;
+    try {
+      const u = await api('/api/mijn/toestel/uitdaging');
+      if (u.body.error) { knop.disabled = false; return zeg(u.body.error); }
+      const bewijs = await RTGToestel.bewijs(u.body.nonce);
+      const r = await api('/api/mijn/toestel/bind', { jwk: bewijs.jwk, handtekening: bewijs.handtekening, naam });
+      if (r.body.error) { knop.disabled = false; return zeg(r.body.error); }
+      zeg(r.body.inSessie ? 'Toestel bevestigd. Deze sessie draagt nu een cryptografisch bewijs.' : (r.body.nietGeraakt || 'Toestel bevestigd.'));
+      laad();
+    } catch (e) {
+      knop.disabled = false;
+      zeg('Het ondertekenen lukte niet: ' + (e && e.message ? e.message : 'onbekende fout') + '.');
+    }
   }
 
   async function sluit(sid, ikzelf) {
@@ -302,6 +340,7 @@
   laad();
 })();
 </script>
+<script src="/shared/toestelsleutel.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 </body>

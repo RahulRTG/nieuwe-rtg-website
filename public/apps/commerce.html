@@ -8,6 +8,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/leeg.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <!-- RTG Commerce: de verkooplaag boven de domeinen (COMMERCE.md).
@@ -166,7 +167,12 @@ const api = (pad, body) => fetch(pad, {
 $('#terug').onclick = () => history.length > 1 ? history.back() : location.assign('/apps/app.html');
 
 if (!TOKEN) {
-  $('#main').innerHTML = '<p class="leeg">Log eerst in om je aanbod en je mand te zien.</p>';
+  /* Niet aangemeld is geen fout: een uitnodiging met een uitweg, in de vorm
+     die het hele huis gebruikt (shared/leeg.js). Hier stond een kale zin. */
+  $('#main').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+    ey: 'RTG Commerce',
+    wat: 'Je aanbod en je mand staan achter je account.'
+  }));
 } else { start(); }
 
 /* De acht werkwoorden in de volgorde van een koop -- dezelfde volgorde als
@@ -335,7 +341,11 @@ async function tekenMand(){
 function toonMand(m){
   const el = $('#mand');
   if (m.leeg || !(m.afrekeningen||[]).length) {
-    el.innerHTML = '<p class="leeg">Je mand is leeg.</p>' +
+    el.innerHTML = RTGLeeg.html({
+      ey: 'Mand', titel: 'Je mand is leeg.',
+      wat: 'Wat je aan je mand toevoegt, staat hier bij elkaar tot je afrekent.',
+      stappen: [{ tekst: 'Naar de etalage', pad: '#etalage' }]
+    }) +
       ((m.geweigerd||[]).length ? geweigerdBlok(m.geweigerd) : '');
     return;
   }

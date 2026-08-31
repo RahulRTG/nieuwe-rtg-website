@@ -84,8 +84,15 @@ const LIJVEN = Object.freeze({
      naar het tweede lid. Hier eerst een extern voorbeeld-IBAN als tegenrekening,
      en dat gaf "De tegenrekening bestaat niet" -- een vaste betaling binnen dit
      huis wijst naar een rekening die er is. */
+  /* `idem` hoort erbij sinds main: een opdracht die geld verplaatst vraagt een
+     idempotentiesleutel. VERS per poging, en dat is de hele les: met een vaste
+     sleutel gaf de meetronde keurig 200 en veranderde niets -- de route deed
+     precies waar hij voor is gebouwd, want de opwarmronde had die sleutel al
+     gebruikt. Een proef die met een herhaalsleutel meet, meet de herhaling en
+     niet de handeling. */
   '/api/bank/terugkerend/zet': (k) => ({ vanIban: k.iban, naarIban: k.naarIban,
-    centen: 100, interval: 'maand', oms: 'proef' }),
+    centen: 100, interval: 'maand', oms: 'proef',
+    idem: 'herstelproef-' + Math.random().toString(36).slice(2, 10) }),
 
   '/api/member/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
   '/api/supplier/rtmail/regel/maak': { veld: 'onderwerp', bevat: 'proef', actie: 'etiket', waarde: 'proef' },
@@ -159,7 +166,27 @@ const ONBEREIKBAAR = Object.freeze({
   '/api/mob/reis/annuleer': 'een geboekte reis, en die vraagt eerst een geplande reisoptie',
   '/api/annuleer': 'een boeking in de zaaiset; het soort (order, ride, boeking) is een veld, maar het ding moet bestaan',
   '/api/office/weefsel/relatie/maak': 'een stadsweefsel met objecten aan beide kanten van de relatie',
-  '/api/office/weefsel/relatie/weg': 'een stadsweefsel met objecten aan beide kanten van de relatie'
+  '/api/office/weefsel/relatie/weg': 'een stadsweefsel met objecten aan beide kanten van de relatie',
+
+  /* Vier families die met main meekwamen. Alle vier vragen zij een IDENTITEIT
+     die deze proef niet heeft: een gezinssessie, een klastoken, een bedrijf,
+     een geregistreerd vermogen. Dat is geen poort die dichtzit maar een wereld
+     die er niet is -- en hem nabouwen zou betekenen dat de proef zichzelf een
+     gezin toekent. */
+  '/api/rtf/kantoorpakket/maak': 'een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin',
+  '/api/rtf/kantoorpakket/weg': 'een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin',
+  '/api/rtf/samen/maak': 'een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin',
+  '/api/rtf/samen/weg': 'een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin',
+  '/api/foundation/school/les/start': 'een klas met een geldig klastoken',
+  '/api/foundation/school/les/stop': 'een klas met een geldig klastoken',
+  '/api/foundation/school/excursie/start': 'een klas met een geldig klastoken',
+  '/api/foundation/school/excursie/stop': 'een klas met een geldig klastoken',
+  '/api/foundation/school/machtiging/zet': 'een school en een gezin met een gezinscode',
+  '/api/foundation/school/machtiging/stop': 'een school en een gezin met een gezinscode',
+  '/api/werkplek/kantoorpakket/maak': 'een bedrijf waar dit lid werkt; de werkplekpoort kijkt eerst naar het bedrijf',
+  '/api/werkplek/kantoorpakket/weg': 'een bedrijf waar dit lid werkt; de werkplekpoort kijkt eerst naar het bedrijf',
+  '/api/command/incident/open': 'een geregistreerd vermogen in de ops-cockpit; een incident hangt aan een vermogen',
+  '/api/command/incident/sluit': 'een geregistreerd vermogen in de ops-cockpit; een incident hangt aan een vermogen'
 });
 
 /* Een lijf mag een FUNCTIE zijn van wat de voorziening opleverde. Twee redenen,

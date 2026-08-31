@@ -403,7 +403,7 @@ async function main() {
      kleine ronde stonden dezelfde stoorzenders. Isolatie is pas isolatie bij
      een paar per server. Begrensd op MAX_TWEEDE, want dit kost een start per
      paar; loopt de rest daarboven, dan staat dat in de uitslag. */
-  const MAX_TWEEDE = 12;
+  const MAX_TWEEDE = 24;
   const rest = uitslagen.filter(u => u.uitslag === 'nietBeproefd');
   const opnieuwGedaan = rest.slice(0, MAX_TWEEDE);
   if (opnieuwGedaan.length) {

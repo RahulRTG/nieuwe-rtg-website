@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-08-30",
+  "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1889,
-    "vormen": 1291,
-    "velden": 1841,
-    "modules": 691,
-    "domeinen": 245,
+    "bestanden": 1896,
+    "vormen": 1292,
+    "velden": 1843,
+    "modules": 692,
+    "domeinen": 246,
     "envelopDrempel": 15,
     "envelop": 32,
-    "veldenDomeineigen": 1292,
+    "veldenDomeineigen": 1294,
     "veldenGedeeldVanafVier": 184,
     "gelijkendeVormparen": 19
   },
@@ -58,6 +58,18 @@
         "kern/commerce",
         "kern/instant-reality",
         "kern/magnaat-werkroutefabriek"
+      ]
+    },
+    {
+      "veld": "waarom",
+      "domeinen": 14,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/commerce",
+        "kern/commercie",
+        "kern/concern",
+        "kern/gewoonten"
       ]
     },
     {
@@ -142,18 +154,6 @@
         "kern/koppel",
         "kern/labfonds",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "waarom",
-      "domeinen": 13,
-      "waar": [
-        "kern/bureau",
-        "kern/command",
-        "kern/commerce",
-        "kern/commercie",
-        "kern/concern",
-        "kern/gewoonten"
       ]
     },
     {
@@ -277,6 +277,18 @@
       ]
     },
     {
+      "veld": "niveau",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/geldgraaf",
+        "kern/levenslijn",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "land",
       "domeinen": 11,
       "waar": [
@@ -382,18 +394,6 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
-      ]
-    },
-    {
-      "veld": "niveau",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/geldgraaf",
-        "kern/levenslijn",
-        "kern/livinglab"
       ]
     },
     {

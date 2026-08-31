@@ -105,7 +105,7 @@ test('5. de grens van de methode staat in de uitslag en niet in een commentaarre
    terugweg stukgegaan of is de proef minder gaan meten, en die twee wil je
    allebei zien. */
 test('7. bevestigd groeit, vermoed krimpt', () => {
-  const grond = { bevestigd: 42, vermoed: 32 };
+  const grond = { bevestigd: 43, vermoed: 47 };
   const vermoed = Object.values(R.per).filter(v => v.graad === 'vermoed').length;
   assert.ok(R.bevestigd.length >= grond.bevestigd,
     'bevestigde tegenhangers: ' + R.bevestigd.length + ' < ' + grond.bevestigd +

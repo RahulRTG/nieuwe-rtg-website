@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-08-31T15:36:25.068Z",
-  "commit": "289184ea",
+  "op": "2026-08-31T19:13:16.701Z",
+  "commit": "fffbb0fc",
   "boomVuil": true,
   "node": "v22.22.2"
  },
@@ -9,14 +9,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 1034,
+  "meetwerk": 1673,
   "instrument": 932,
   "grens": 608
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 1966,
+  "staat": 2605,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -133,7 +133,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 94,
+   "aantal": 90,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -149,7 +149,7 @@
    "id": "herstel-onbevestigd",
    "soort": "meetwerk",
    "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
-   "aantal": 32,
+   "aantal": 47,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
    "sluit": "wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
@@ -157,7 +157,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 849,
+   "aantal": 1477,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -252,7 +252,7 @@
   "gevolg-onbekend": [
    {
     "op": "2026-08-31",
-    "aantal": 94
+    "aantal": 90
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -264,13 +264,13 @@
   "herstel-onbevestigd": [
    {
     "op": "2026-08-31",
-    "aantal": 32
+    "aantal": 47
    }
   ],
   "idem-ongeclassificeerd": [
    {
     "op": "2026-08-31",
-    "aantal": 849
+    "aantal": 1477
    }
   ],
   "wegwerpserver-kopieen": [
@@ -305,6 +305,12 @@
    "van": 989,
    "naar": 2008,
    "reden": "De uitvoeringslaag (EXECUTIE.md) kreeg vier eigen posten, en de achterstand gaat van 989 naar 2008. Er is niets bij gekomen: deze schuld bestond al en stond nergens. 849 muterende routes hebben geen uitspraak over wat een tweede keer betekent, 94 bereikbare capabilities zijn nooit gemeten op wat zij veranderen, 74 tegenhangers zijn uit NAMEN afgeleid en nooit uitgevoerd, en de laatste droogloop had 2 stappen waarvan de voorspelling niet te beoordelen was. Een nieuwe laag zonder schuldpost ziet er per ongeluk schuldenvrij uit; dat is precies de vorm waar deze lijst tegen bestaat."
+  },
+  {
+   "op": "2026-08-31",
+   "van": 1966,
+   "naar": 2605,
+   "reden": "Main binnengehaald: 4643 routes in plaats van 3282, en de idempotentieproef is over die nieuwe routes gedraaid. Daardoor groeit idem-ongeclassificeerd van 849 naar 1477 en gevolg-onbekend van 94 naar 90+ -- geen nieuwe schuld maar dezelfde schuld over een grotere boom. herstel-onbevestigd ging juist omlaag (63 -> 47) doordat de herstelproef ook over de nieuwe paren is gedraaid."
   }
  ]
 }

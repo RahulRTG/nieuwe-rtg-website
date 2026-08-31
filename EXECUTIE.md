@@ -227,11 +227,11 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 
 | | aantal |
 |---|---|
-| routes met een rol | <!--getal:idem.routesMetRol-->3092<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->845<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->845<!--/getal--> |
-| onbeschermd | **<!--getal:idem.onbeschermd-->0<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->2247<!--/getal--> |
+| routes met een rol | <!--getal:idem.routesMetRol-->3803<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1563<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1561<!--/getal--> |
+| onbeschermd | **<!--getal:idem.onbeschermd-->2<!--/getal-->** |
+| ongemeten | <!--getal:idem.ongemeten-->3080<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -808,13 +808,15 @@ getal voor beide verschijnt.
 
 | | |
 |---|---|
-| `exact` | **12** |
+| `exact` | **13** |
 | `compensatie` | **30** |
-| `geen-herstel` | 0 |
+| `geen-herstel` | **1** |
 | niet beproefd | **0** |
-| andere wereld nodig | 32 |
+| andere wereld nodig | 46 |
 
-`HERSTEL.json` staat daarmee op **42 bevestigd** en `vermoed` op 32. En die nul
+Over **90 paren** — main bracht een grotere boom mee (4643 routes in plaats van
+3282) en dus zestien nieuwe paren, die in dezelfde ronde zijn meegenomen.
+`HERSTEL.json` staat op **43 bevestigd** en `vermoed` op 47. En die nul
 is het punt: **elk paar draagt een uitslag** — uitgevoerd, of met een
 uitgeschreven reden waarom zijn wereld hier niet bestaat.
 
@@ -849,7 +851,14 @@ ingericht landpakket, een salon, een geplande reisoptie. Die dragen
 hebben geen krant"* is iets anders dan *"de proef kwam er niet bij"*. Een proef
 die zijn eigen meetobject verzint, meet zichzelf.
 
-#### Drie dingen die stil verkeerd gingen
+**De eerste `geen-herstel` staat er ook**, en het is een bevinding en geen
+proeffout: `/api/office/atelierweb/verwijder → /bewaar` haalt de site weg, en
+`bewaar` antwoordt daarna 200 zonder iets terug te zetten. Een 200 die niets doet
+en niets zegt, is precies wat GRAMMATICA.md verbiedt van een verhindering — die
+draagt een reden. Dit is code van main en valt buiten deze tak; het staat in het
+register zodat het niet verdwijnt.
+
+#### Vier dingen die stil verkeerd gingen
 
 **Een verdict is een beschuldiging.** `geen-herstel` zegt: deze route belooft een
 omkering die hij niet uitvoert. Het agendapaar kreeg dat oordeel — en het klopte
@@ -862,6 +871,12 @@ liet hetzelfde paar `exact` heten als het alleen draaide en *"raakte niets aan"*
 in de volle ronde. Twee gelijke metingen vlak na de oproep zijn allebei van vóór
 de schrijfronde — dus wordt er nu gewacht tot het beeld **verandert**, en pas
 daarna tot het stil ligt.
+
+**Een vaste idempotentiesleutel meet de herhaling en niet de handeling.** Main
+eist sinds kort een `idem` op elke opdracht die geld verplaatst. Met één vaste
+sleutel gaf de meetronde keurig 200 en veranderde niets — de route deed precies
+waar hij voor gebouwd is, want de opwarmronde had die sleutel al gebruikt. De
+sleutel is nu vers per poging.
 
 **De proef beïnvloedt zichzelf.** `/api/staff/mob/cdt/aanmelden` kwam als
 `compensatie` door wanneer hij alleen draaide, en als 503 *"deze functie is voor

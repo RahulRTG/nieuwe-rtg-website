@@ -1,12 +1,12 @@
 {
  "uitleg": "Vermoede tegenhangers uit HERSTEL.json, werkelijk uitgevoerd: heen, kijken, terug, kijken. Alleen `exact` en `compensatie` zijn een uitspraak over het paar; de rest is een tekort van de proef.",
  "gemeten": {
-  "paren": 74,
-  "exact": 12,
+  "paren": 90,
+  "exact": 13,
   "compensatie": 30,
-  "geenHerstel": 0,
+  "geenHerstel": 1,
   "nietBeproefd": 0,
-  "wereldOntbreekt": 32,
+  "wereldOntbreekt": 46,
   "ordeAfhankelijk": 3,
   "buitenTweedeRonde": 0
  },
@@ -110,12 +110,16 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
+    "store.db:bankIdem",
+    "store.db:bankIdemAfdruk",
     "store.db:bankTerugkerend"
    ],
    "nietTerug": [
+    "store.db:bankIdem",
+    "store.db:bankIdemAfdruk",
     "store.db:bankTerugkerend"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/care/annuleer",
@@ -159,6 +163,20 @@
    "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
+   "heen": "/api/command/incident/open",
+   "terug": "/api/command/incident/sluit",
+   "rol": "office",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een geregistreerd vermogen in de ops-cockpit; een incident hangt aan een vermogen. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/command/incident/sluit",
+   "terug": "/api/command/incident/open",
+   "rol": "office",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een geregistreerd vermogen in de ops-cockpit; een incident hangt aan een vermogen. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
    "heen": "/api/command/stad/start",
    "terug": "/api/command/stad/stop",
    "rol": "office",
@@ -198,6 +216,48 @@
     "store.db:zandbakken"
    ],
    "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/foundation/school/excursie/start",
+   "terug": "/api/foundation/school/excursie/stop",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een klas met een geldig klastoken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/foundation/school/excursie/stop",
+   "terug": "/api/foundation/school/excursie/start",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een klas met een geldig klastoken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/foundation/school/les/start",
+   "terug": "/api/foundation/school/les/stop",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een klas met een geldig klastoken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/foundation/school/les/stop",
+   "terug": "/api/foundation/school/les/start",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een klas met een geldig klastoken. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/foundation/school/machtiging/stop",
+   "terug": "/api/foundation/school/machtiging/zet",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een school en een gezin met een gezinscode. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/foundation/school/machtiging/zet",
+   "terug": "/api/foundation/school/machtiging/stop",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een school en een gezin met een gezinscode. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/kantoorpakket/maak",
@@ -419,7 +479,7 @@
    "heen": "/api/office/atelierweb/verwijder",
    "terug": "/api/office/atelierweb/bewaar",
    "rol": "office",
-   "uitslag": "compensatie",
+   "uitslag": "geen-herstel",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
@@ -428,23 +488,19 @@
    "nietTerug": [
     "store.db:atelierSites"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg gaf 200 en veranderde niets; de naam belooft een omkering die de handeling niet uitvoert"
   },
   {
    "heen": "/api/office/kantoorpakket/maak",
    "terug": "/api/office/kantoorpakket/weg",
    "rol": "office",
-   "uitslag": "compensatie",
+   "uitslag": "exact",
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:officeDocs",
-    "store.db:wacht"
+    "store.db:officeDocs"
    ],
-   "nietTerug": [
-    "store.db:wacht"
-   ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "na de terugweg is de inhoud van elke geraakte collectie letterlijk terug op de oude waarde"
   },
   {
    "heen": "/api/office/kantoorpakket/weg",
@@ -509,6 +565,34 @@
    "rol": "member",
    "uitslag": "wereldOntbreekt",
    "reden": "deze route vraagt een lopend potje in de residentie. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/rtf/kantoorpakket/maak",
+   "terug": "/api/rtf/kantoorpakket/weg",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/rtf/kantoorpakket/weg",
+   "terug": "/api/rtf/kantoorpakket/maak",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/rtf/samen/maak",
+   "terug": "/api/rtf/samen/weg",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/rtf/samen/weg",
+   "terug": "/api/rtf/samen/maak",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een ingelogd gezin (RTFoundation); de proef heeft een lid, geen gezin. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   },
   {
    "heen": "/api/rtfos/meldcode/open",
@@ -648,6 +732,42 @@
    "ordeAfhankelijk": true
   },
   {
+   "heen": "/api/supplier/activiteit/open",
+   "terug": "/api/supplier/activiteit/sluit",
+   "rol": "supplier",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:supplierActivity",
+    "store.db:suppliers",
+    "store.db:zandbakken"
+   ],
+   "nietTerug": [
+    "store.db:supplierActivity",
+    "store.db:suppliers",
+    "store.db:zandbakken"
+   ],
+   "reden": "de terugweg deed werk, maar 3 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
+   "heen": "/api/supplier/activiteit/sluit",
+   "terug": "/api/supplier/activiteit/open",
+   "rol": "supplier",
+   "uitslag": "compensatie",
+   "heenStatus": 200,
+   "terugStatus": 200,
+   "geraakt": [
+    "store.db:supplierActivity",
+    "store.db:suppliers",
+    "store.db:zandbakken"
+   ],
+   "nietTerug": [
+    "store.db:supplierActivity"
+   ],
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+  },
+  {
    "heen": "/api/supplier/agenda/toevoegen",
    "terug": "/api/supplier/agenda/verwijder",
    "rol": "supplier",
@@ -694,12 +814,14 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:officeDocs"
+    "store.db:officeDocs",
+    "store.db:wacht"
    ],
    "nietTerug": [
-    "store.db:officeDocs"
+    "store.db:officeDocs",
+    "store.db:wacht"
    ],
-   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/supplier/redactie/artikel/bewaar",
@@ -841,6 +963,20 @@
    "rol": "member",
    "uitslag": "wereldOntbreekt",
    "reden": "deze route vraagt een salon in de zaaiset. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/werkplek/kantoorpakket/maak",
+   "terug": "/api/werkplek/kantoorpakket/weg",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een bedrijf waar dit lid werkt; de werkplekpoort kijkt eerst naar het bedrijf. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
+  },
+  {
+   "heen": "/api/werkplek/kantoorpakket/weg",
+   "terug": "/api/werkplek/kantoorpakket/maak",
+   "rol": "member",
+   "uitslag": "wereldOntbreekt",
+   "reden": "deze route vraagt een bedrijf waar dit lid werkt; de werkplekpoort kijkt eerst naar het bedrijf. De proef zet die wereld niet op: een proef die zijn eigen meetobject verzint, meet zichzelf"
   }
  ],
  "grenzen": [

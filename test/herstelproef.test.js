@@ -136,7 +136,7 @@ test('9. de bewezen paren worden niet minder', () => {
   const b = path.join(__dirname, '..', 'HERSTELPROEF.json');
   if (!fs.existsSync(b)) return;
   const g = JSON.parse(fs.readFileSync(b, 'utf8')).gemeten;
-  assert.ok(g.exact >= 12, 'exact: ' + g.exact + ' < 12');
+  assert.ok(g.exact >= 13, 'exact: ' + g.exact + ' < 13');
   assert.ok(g.compensatie >= 30, 'compensatie: ' + g.compensatie + ' < 30');
   /* NUL, en dat is de grondwaarde. Elk paar draagt een uitslag: uitgevoerd, of
      met de reden waarom zijn wereld hier niet bestaat. Een paar dat terugvalt
@@ -144,7 +144,7 @@ test('9. de bewezen paren worden niet minder', () => {
   assert.strictEqual(g.nietBeproefd, 0,
     'er staan weer paren op `nietBeproefd`; elk paar hoort een uitslag te dragen of een ' +
     'uitgeschreven reden waarom zijn wereld hier niet bestaat');
-  assert.ok(g.wereldOntbreekt <= 32, 'wereldOntbreekt: ' + g.wereldOntbreekt + ' > 32');
+  assert.ok(g.wereldOntbreekt <= 46, 'wereldOntbreekt: ' + g.wereldOntbreekt + ' > 46');
 });
 
 /* De wereldlijst is een lijst BESLUITEN en geen prullenbak: wie een route hier

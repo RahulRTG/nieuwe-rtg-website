@@ -89,7 +89,38 @@ body.rtg-edge-host .tos-topbar,body.rtg-edge-host .tos-nav,body.rtg-edge-host .l
    draait staan de vier werelden in de topbalk, en twee wereldkiezers boven
    elkaar zeggen twee keer waar je bent. */
 body.rtg-edge-host .os-switcher{display:none!important}
-body.rtg-edge-host .prestatiekop,body.rtg-edge-host .hoofdtabs{display:none!important}body.rtg-edge-host .reisapp{padding-left:0!important}body.rtg-edge-host .reisapp>main{padding-bottom:1rem!important}
+body.rtg-edge-host .prestatiekop{display:none!important}
+/* DE VIER REISBLADEN WORDEN DE BLADENBALK. Deze regel verborg ze samen met de
+   prestatiekop, en dat kon zolang geen enkel reisscherm de schil droeg. Zodra
+   reizen.html hem wel draagt, verdwijnt met .hoofdtabs de enige weg naar
+   Reizen, Taxi en Ter plaatse -- vier bladen die alleen nog met een toetsenbord
+   te bereiken zijn. Verbergen zonder vervanging is een gebrek (ADAPTIEF.md).
+
+   Ze staan nu bovenaan als bladenbalk, dezelfde vorm als `.wereldtabs` op
+   kantoor.html: bladen bovenaan, handelingen onderin in de bank. Dat is een
+   ECHTE keuze en geen gratis winst -- op een telefoon lag deze rij eerst onder
+   de duim (GRAMMATICA.md). De bank onderin is nu de plek voor handelen, en twee
+   vaste balken onder elkaar is precies wat test/appmenu.e2e.js verbiedt.
+
+   Het zijn dezelfde knoppen met dezelfde luisteraars: er komt geen tweede
+   waarheid bij over welk blad open staat. */
+body.rtg-edge-host .hoofdtabs{position:static!important;inset:auto!important;width:auto!important;
+  height:auto!important;display:flex!important;gap:4px;padding:0!important;overflow-x:auto;
+  scrollbar-width:none;border:0!important;border-bottom:1px solid var(--edge-line)!important;
+  background:none!important;backdrop-filter:none!important}
+body.rtg-edge-host .hoofdtabs::-webkit-scrollbar{display:none}
+body.rtg-edge-host .hoofdtabs button{flex:0 0 auto;flex-direction:row!important;gap:8px;
+  min-height:44px;padding:0 14px!important;border:1px solid var(--edge-line);border-bottom:0;
+  font-size:.72rem!important}
+body.rtg-edge-host .hoofdtabs button::after{display:none}
+body.rtg-edge-host .hoofdtabs button.actief{box-shadow:inset 0 2px 0 var(--edge-metal)}
+body.rtg-edge-host .hoofdtabs svg{width:16px!important;height:16px!important}/* De bladenbalk staat in de bron NA de inhoud (hij was een vaste onderbalk).
+   Een kolom met een omgekeerde volgorde zet hem bovenaan zonder de HTML te
+   verhuizen -- en dus zonder de luisteraars van reizen-performance.js te raken.
+   Een schermlezer en een toetsenbord houden de bronvolgorde: eerst de inhoud,
+   dan de bladen. Dat is dezelfde afspraak als bij de bank onderin. */
+body.rtg-edge-host .reisapp{padding-left:0!important;display:flex;flex-direction:column}
+body.rtg-edge-host .reisapp>.hoofdtabs{order:-1}body.rtg-edge-host .reisapp>main{padding-bottom:1rem!important}
 body.travel-os.rtg-edge-host{padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-left:var(--edge-side)!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + 1rem)!important}
 body.travel-os.rtg-edge-host>.kop,body.travel-os.rtg-edge-host>header:not(.rtg-edge-top){top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
 body.travel-os-map.rtg-edge-host #kaart{top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;left:var(--edge-side)!important;width:calc(100% - var(--edge-side))!important;height:calc(100% - var(--edge-top) - var(--edge-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important}

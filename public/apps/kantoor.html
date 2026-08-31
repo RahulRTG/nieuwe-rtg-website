@@ -87,11 +87,20 @@
      als in shared/wereldschil.js). De plus opent de werkbank, waar bladen wel
      naast elkaar leven -- dat is een ander scherm en met opzet.
 
-     RAHUL STAAT HIER NIET BIJ. Op LivingOS hangt hij als derde tab in deze
-     balk, maar daar draagt het scherm de Edge-schil niet; hier staat hij al
-     rechtsonder in de bank. Een tweede ingang naar hetzelfde gesprek is precies
-     wat shared/randen.js een tak geleden heeft weggehaald. -->
-<nav class="wereldtabs" aria-label="Bladen in WorkOS">
+     RAHUL HANGT ERAAN ALS BLAD, en dat is een besluit van de eigenaar tegen mijn
+     eerste voorstel in. Hij staat ook rechtsonder in de bank, dus dit is een
+     tweede ingang naar hetzelfde gesprek -- eerlijk benoemd in plaats van
+     stilzwijgend. Twee dingen maken het verdedigbaar: LivingOS en TravelOS
+     dragen Rahul allebei al als blad naast hun andere bladen (reizen.html heeft
+     letterlijk `data-tab="rahul"`), en de bank is een schil om ELK scherm terwijl
+     deze balk over DIT scherm gaat. Wie de balk leest, leest de bladen van deze
+     wereld; dat Rahul daar een van is, is dan geen dubbeling maar een plek.
+
+     Hij wordt niet hier getekend: shared/rahul-tab.js hangt zichzelf in de
+     eerste balk die hij vindt, en `data-tabs` is hoe een scherm zegt dat het die
+     balk is. Zo staat de tab op alle schermen die hem dragen in dezelfde vorm,
+     en niet in een kopie per scherm. -->
+<nav class="wereldtabs" data-tabs aria-label="Bladen in WorkOS">
   <a class="wereldtab" href="/apps/kantoor.html" aria-current="page">Vandaag</a>
   <a class="wereldtab wereldtab-plus" href="/apps/werkruimte.html?gebied=kantoor"
      aria-label="Werkbank openen: meerdere schermen naast elkaar">&#xFF0B;</a>
@@ -508,6 +517,10 @@
   })();
 })();
 </script>
+<!-- Rahul als blad in de bladenbalk hierboven; hij zoekt zelf de balk met
+     data-tabs. Zonder dit bestand staat er gewoon geen tab -- de balk blijft
+     werken en de bank houdt zijn eigen Rahul. -->
+<script src="/shared/rahul-tab.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

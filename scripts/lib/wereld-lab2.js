@@ -126,12 +126,10 @@ const ID_BETEKENIS = {
   '/api/lab2/werk': 'studie'
 };
 
-function idVoor(extra, pad) {
-  const sub = String(pad || '').split('/').slice(0, 4).join('/');
-  const wat = ID_BETEKENIS[sub];
-  if (!wat) return {};
-  const w = extra[wat];
-  return w ? { id: w } : {};
-}
+/* De vorm zelf woont in ./idperdeel.js -- hij kwam vier keer terug en de fout
+   die hij voorkomt is duur en onzichtbaar (zie de kop daar). De TABEL blijft
+   hier, want welk deelgebied wat bedoelt is een meting aan DIT domein. */
+const { idVoor: idPerDeel } = require('./idperdeel');
+function idVoor(extra, pad) { return idPerDeel(ID_BETEKENIS, extra, pad); }
 
 module.exports = { zetLab2Klaar, ID_BETEKENIS, idVoor };

@@ -139,12 +139,26 @@ async function zetRtmailKlaar({ post, tokens }) {
 
    Een deelgebied dat het ding niet heeft, krijgt geen `id` -- dan is 404 het
    eerlijke antwoord en geen gok. */
+const { idVoor: idPerDeel } = require('./idperdeel');
+
+/* De tabel per kant. De VORM (langste deelgebied wint, geen ding = geen id)
+   staat in ./idperdeel.js; welk deelgebied wat bedoelt is een meting aan dit
+   domein en staat daarom hier. */
+const tabelVoor = (pre) => ({
+  [pre + '/team']: 'team',
+  [pre + '/concept']: 'concept',
+  [pre + '/regel']: 'regel',
+  [pre]: 'bericht'
+});
+
 function idSoortVoor(pad, pre) {
-  const rest = String(pad || '').slice(pre.length);
-  if (rest.startsWith('/team')) return 'team';
-  if (rest.startsWith('/concept')) return 'concept';
-  if (rest.startsWith('/regel')) return 'regel';
-  return 'bericht';
+  const t = tabelVoor(pre);
+  let beste = null;
+  for (const deel of Object.keys(t)) {
+    if (!(pad === deel || String(pad).startsWith(deel + '/'))) continue;
+    if (!beste || deel.length > beste.length) beste = deel;
+  }
+  return beste ? t[beste] : 'bericht';
 }
 
 function lijfVoor(wereld, pad) {
@@ -153,9 +167,7 @@ function lijfVoor(wereld, pad) {
     if (!String(pad || '').startsWith(k.pre)) continue;
     const bak = wereld[k.naam];
     if (!bak) return {};
-    const soort = idSoortVoor(pad, k.pre);
-    const w = bak[soort];
-    return w ? { ...bak, id: w } : { ...bak };
+    return { ...bak, ...idPerDeel(tabelVoor(k.pre), bak, pad) };
   }
   return {};
 }

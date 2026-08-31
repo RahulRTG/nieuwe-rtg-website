@@ -599,7 +599,7 @@ omlaag.
 
 ## `shared/deelmenu.js`
 
-`public/shared/deelmenu/` -- 3 delen, 365 regels in de delen
+`public/shared/deelmenu/` -- 3 delen, 374 regels in de delen
 
 | deel | onderwerp |
 |---|---|

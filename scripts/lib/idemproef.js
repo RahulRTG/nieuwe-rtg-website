@@ -159,10 +159,67 @@ function weegHerhaling(a, b, c, staat) {
   return { stand: 'onbeschermd', reden: 'de herhaling gaf een ander antwoord: hij deed het opnieuw' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, maxRoutes, staatVan, vastlegging }) {
+/* ============================================================================
+   HET OORDEEL VOOR DE RONDE ZONDER SLEUTEL.
+
+   Waarom dit NIET weegHerhaling() hierboven mag zijn: die leunt op de IJKING --
+   een derde oproep met een VERSE sleutel. Zonder dat ijkpunt betekent "b gaf
+   hetzelfde als a" niets, want een antwoord dat sowieso niet varieert ziet er
+   precies zo uit als een herkende herhaling. En in een ronde zonder sleutels
+   BESTAAT die verse sleutel niet: elk verzoek is woordelijk hetzelfde, dat is
+   nu juist het geval dat we meten. Een ander lijf sturen zou geen ijking zijn
+   maar een andere vraag.
+
+   Wat er wel is, is de opslag. Die kent het onderscheid dat het antwoord niet
+   kan maken:
+
+     D deed werk, E niet      -> de route (of zijn verklaring) ving de dubbeltik
+     D en E deden allebei werk -> een dubbeltik doet het werk twee keer
+     geen van beide deed werk  -> niets te zien; geen uitspraak
+
+   Plus een tweede, sterkere bron als hij er is: `herhaald: true` in het antwoord
+   is geen gevolgtrekking maar een mededeling van de server zelf. Draagt E dat
+   merk terwijl er geen sleutel is gestuurd, dan kan het alleen van de idem-poort
+   komen -- en die handelt op de verklaring in idemsleutels.js.
+
+   Zonder het tweede meetpunt (RTG_STAATLOG) blijft alleen dat merk over, en dan
+   is 'geen merk' eerlijk gezegd geen uitspraak: dat is hier dus ONGEMETEN en
+   niet 'onbeschermd'. */
+function weegZonderSleutel(d, e, staat) {
+  if (!isOk(d)) {
+    return { stand: 'ongemeten', reden: 'de eerste kale oproep deed geen werk (status ' + ((d && d.status) || 0) + ')' };
+  }
+  if (e && e.data && e.data.herhaald === true) {
+    return { stand: 'beschermd', grond: 'gemerkt',
+      reden: 'de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- ' +
+        'dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js' };
+  }
+  if (!isOk(e)) {
+    return { stand: 'beschermd', grond: 'geweigerd', reden: 'de kale herhaling werd geweigerd (status ' + e.status + ')' };
+  }
+  if (!staat || !staat.a) {
+    return { stand: 'ongemeten', reden: 'geen tweede meetpunt: zonder de opslagstand is een gelijk antwoord ' +
+      'niet te onderscheiden van een antwoord dat sowieso niet varieert' };
+  }
+  const werkD = Object.keys(staat.a || {}).length > 0;
+  const werkE = Object.keys(staat.b || {}).length > 0;
+  if (!werkD) {
+    return { stand: 'ongemeten', reden: 'de eerste kale oproep liet niets achter in de gemeten collecties; ' +
+      'dan is er geen tweede effect om te zien' };
+  }
+  if (!werkE) {
+    return { stand: 'beschermd', grond: 'opslag',
+      reden: 'de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet' };
+  }
+  return { stand: 'onbeschermd',
+    reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
+}
+
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder }) {
   const perRoute = {};
-  let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0;
+  let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
+  const telZonder = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
   const tegenspraken = [];
 
   for (const r of routes) {
@@ -172,14 +229,59 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const k2 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-2';
     const lijf = lijfVoor(r);
 
+    /* WELKE SLEUTEL PAST OP DEZE DEUR.
+
+       De rol bepaalt het token, maar bij een lid is er nog een tweede slot: de
+       PAS. Honderden routes weigeren een RTG Pass met een 403 die niets over de
+       rol zegt ("Het Privekantoor is onderdeel van de Lifestyle Pass"), en die
+       kwamen allemaal terug als ongemeten. Dat is geen uitspraak over de route
+       maar over de sleutelbos.
+
+       Dus: strandt de eerste oproep van een LID op een 403, dan proberen we
+       dezelfde deur met de andere twee passen. Slaagt er een, dan meten we
+       verder met die -- en het register vermeldt met welke, want een meting die
+       een andere pas nodig had is een ander feit dan een die het met de
+       instapfas deed. Slaagt geen enkele, dan blijft het eerlijk ongemeten met
+       de oorspronkelijke hindernis erbij.
+
+       Dit is geen omzeiling van een grens: elke pas is een legitieme sleutel van
+       een echt lid, en wat gemeten wordt is de idempotentie en niet de toegang.
+       De toegangsvraag is van de rolproef en die kruist juist met opzet.
+
+       WAT HET KOST, EERLIJK: dit is een EXTRA oproep per ledenroute, en die kan
+       werk doen. Op een creatieroute staat er dus een item meer in de wereld dan
+       zonder deze lus. Dat vertroebelt de meting niet -- `staatVan` geeft het
+       verschil PER oproep, en deze valt buiten de drie die gewogen worden -- maar
+       het is wel een mutatie die niemand heeft gevraagd, en daarom staat hij hier
+       genoemd in plaats van verstopt. Hij kan alleen op een wegwerpmap, en de
+       proef draait ook nergens anders. */
+    /* De rol die deze route werkelijk nodig heeft. Meestal die van de bewaker,
+       maar een voorvoegselregel kan er een opleggen -- het werkplek-huis laat
+       alleen de eigenaar binnen en draagt zelf geen bewakersrol. */
+    const gevraagdeRol = rolVoor ? rolVoor(r) : r.rol;
+    let pas = gevraagdeRol;
+    if (gevraagdeRol === 'member' && Array.isArray(pasladder) && pasladder.length > 1) {
+      const eerste = await post(r.pad, { ...lijf }, tokenVoor('member'));
+      gedaan++;
+      if (eerste.status === 403) {
+        for (const kandidaat of pasladder.slice(1)) {
+          const t = tokenVoor(kandidaat);
+          if (!t) continue;
+          const proef = await post(r.pad, { ...lijf }, t);
+          gedaan++;
+          if (proef.status !== 403) { pas = kandidaat; pasGewisseld++; break; }
+        }
+      }
+    }
+
     const doe = async (sleutel) => {
-      let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol));
+      let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
       gedaan++;
       /* Een dood token maakt van elke volgende route een 401, en dan meldt de
          ronde "niets gemeten" over honderden routes zonder dat iets klaagt --
          dezelfde meetfout als in de invoerproef, en dezelfde reparatie. */
       if (st.status === 401 && hernieuw) {
-        if (await hernieuw(r.rol)) { hernieuwd++; st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(r.rol)); gedaan++; }
+        if (await hernieuw(pas)) { hernieuwd++; st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas)); gedaan++; }
       }
       return st;
     };
@@ -190,14 +292,93 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
     const a = await doe(k1); const dA = staatVan ? staatVan(a) : null;
     const b = await doe(k1); const dB = staatVan ? staatVan(b) : null;
     const c = await doe(k2); const dC = staatVan ? staatVan(c) : null;
+
+    /* ========================================================================
+       DE RONDE ZONDER SLEUTEL -- en dit is de meting waar het bij een dubbeltik
+       werkelijk om gaat.
+
+       Deze proef stuurt in elke oproep hierboven `idem` EN `idempotentieSleutel`
+       mee. server/middleware/idempotentie.js is opt-in op precies die velden en
+       staat voor ELKE /api-POST: hij vangt de herhaling dus af, ongeacht wat de
+       route zelf doet. "beschermd" hierboven betekent daarom niet "deze route is
+       idempotent" maar "de platformbrede laag ving hem" -- en dat is iets anders.
+
+       Nagemeten op 29 augustus 2026, met dezelfde lijven en tokens: vier van de
+       vijf routes die MET sleutel `herhaald: true` gaven, gaven ZONDER sleutel
+       `herhaald: false`. Alleen /api/agenda/toevoegen bleef beschermd, en die
+       heeft dan ook een verklaring in server/lib/idemsleutels.js -- precies de
+       laag die zonder clientsleutel werkt (lib/idem-poort.js).
+
+       Een echte dubbeltik van een ongeduldige gebruiker draagt geen sleutel. Dus
+       meten we die apart: twee woordelijk gelijke oproepen, geen idem-veld,
+       geen header. Wat daar uitkomt is een uitspraak over de ROUTE en over zijn
+       verklaring -- niet over de kas die de proef zelf vult.
+
+       Het staat in een EIGEN veld en vervangt het oordeel hierboven niet: welke
+       van de twee lagen iets tegenhoudt, zijn twee dingen die je allebei wilt
+       weten, en samenvatten tot een cijfer maakt ze allebei onleesbaar. */
+    let zonder = null;
+    if (metenZonderSleutel) {
+      const kaal = async () => { const st = await post(r.pad, { ...lijf }, tokenVoor(pas)); gedaan++; return st; };
+      const d = await kaal(); const dD = staatVan ? staatVan(d) : null;
+      const e = await kaal(); const dE = staatVan ? staatVan(e) : null;
+      const oz = weegZonderSleutel(d, e, staatVan ? { a: dD, b: dE } : null);
+      /* DE GROND MOET MEE, EN DAT VERGAT DEZE REGEL. Zonder hem staat er alleen
+         'beschermd', en dan zijn drie heel verschillende dingen niet meer uit
+         elkaar te houden: de route herkende de herhaling (opslag), de server
+         merkte hem zelf (gemerkt), of de herhaling werd botweg GEWEIGERD met een
+         409. Dat laatste is geen idempotentie maar een toestandscontrole, en wie
+         daar `zelfdeVerzoek` op plakt legt het eerste antwoord over een bewuste
+         weigering heen. Gemeten: van de 29 'beschermd' in de ronde van 29
+         augustus 2026 had er geen ENKELE een spoor in de opslag -- ze kwamen
+         allemaal uit de andere twee gronden, en het register liet dat niet zien. */
+      zonder = { stand: oz.stand, grond: oz.grond || null, reden: oz.reden, statussen: [d.status, e.status] };
+      if (staatVan) zonder.opslag = { d: dD, e: dE };
+      /* HET DERDE MEETPUNT, en met opzet ONBEWERKT. De weging hierboven leunt
+         nog op de opslag; dit veld staat ernaast zodat het contractregister zelf
+         kan zien of er werkelijk niets gebeurde. Ontbreekt de kop, dan staat er
+         null en niet 'geen' -- niet gemeten is iets anders dan gemeten nul, en
+         dat verschil is het hele bestaansrecht van deze meter. */
+      if (d.effect != null || e.effect != null)
+        zonder.effect = { d: d.effect || null, e: e.effect || null,
+          nietGemeten: d.effectNietGemeten || e.effectNietGemeten || null };
+      /* De laag die het deed, voor zover van buiten te zien: `herhaald: true`
+         zonder dat de proef een sleutel stuurde, komt van de idem-poort op grond
+         van een verklaring -- de enige weg die daar dan nog voor is. */
+      const lijk = e && e.data && typeof e.data === 'object' && e.data.herhaald === true;
+      if (lijk) zonder.laag = 'idem-poort (verklaring in idemsleutels.js)';
+      telZonder[oz.stand] = (telZonder[oz.stand] || 0) + 1;
+    }
     const staat = staatVan ? { a: dA, b: dB, c: dC } : null;
     const o = weegHerhaling(a, b, c, staat);
     if (o.bron === 'opslag') uitOpslag++;
     tel[o.stand]++;
     const rij = { methode, pad: r.pad, rol: r.rol,
       idempotentie: o.stand, reden: o.reden, statussen: [a.status, b.status, c.status] };
+    /* Met een LEGE kop aangeroepen, en waarom. Zonder dit veld leest zo'n regel
+       als een meting met de juiste rol, en dat is iets anders. */
+    if (r.zonderRol) rij.zonderRol = r.zonderRol;
+    /* Met welke pas gemeten, als het niet de instapfas was. */
+    if (pas !== r.rol) rij.viaPas = pas;
+
+    /* WAT HIELD HEM TEGEN. Bij 'ongemeten' zei dit register alleen "de eerste
+       oproep deed geen werk (status 403)". Dat is waar en het is niet genoeg:
+       3.463 routes droegen dezelfde zin, en daarmee was de grootste post op de
+       lijst een hoop zonder handvat. De status verdeelt hem in vijf bakken, maar
+       pas de REDEN die de route zelf teruggaf zegt of er een schakelaar uit
+       staat, een pas ontbreekt, of het lijf niet past -- en dat zijn drie heel
+       verschillende reparaties.
+
+       Alleen de foutzin, kort, en alleen bij een status die iets tegenhield: dit
+       register is geen plek voor antwoordinhoud. */
+    if (o.stand === 'ongemeten' && a.status >= 400) {
+      const d = a.data;
+      const zin = d && typeof d === 'object' ? (d.error || d.fout || d.melding || d.reden) : (typeof d === 'string' ? d : null);
+      if (zin) rij.hindernis = String(zin).slice(0, 160);
+    }
     if (o.bron) rij.bron = o.bron;
     if (staat) rij.opslag = { a: dA, b: dB, c: dC };
+    if (zonder) rij.zonderSleutel = zonder;
 
     /* DE TEGENSPRAAK, EN WAAROM ER EEN VIERDE OPROEP BIJ HOORT.
 
@@ -316,7 +497,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, hernieuw, max
       'deze ronde kon een tweede effect nergens zien'
     : null;
 
-  return { perRoute, telling: tel, oproepen: gedaan, hernieuwd, meterStuk, uitOpslag, tegenspraken,
+  return { perRoute, telling: tel, zonderSleutel: telZonder, pasGewisseld, oproepen: gedaan, hernieuwd, meterStuk, uitOpslag, tegenspraken,
     vermoedensVerworpen: verworpen, vastleggingGemeten, vastleggingVerdacht };
 }
 
@@ -339,4 +520,4 @@ const CONTROL = {
     'TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.'
 };
 
-module.exports = { draaiIdemproef, weegHerhaling, normaliseer, gelijk, CONTROL };
+module.exports = { draaiIdemproef, weegHerhaling, weegZonderSleutel, normaliseer, gelijk, CONTROL };

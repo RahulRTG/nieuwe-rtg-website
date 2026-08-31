@@ -84,7 +84,7 @@ test('Business Pass: akkoord opent de betaalrekening EN automatisch (gratis) de 
 test('het hart-afschrift: alles op een afschrift, extern geld herkenbaar aan het bronlabel', async () => {
   const stort = await api('bank/storten', { iban: lid.iban, centen: 5000, idem: 'h1' }, lid.token);
   assert.equal(stort.status, 200);
-  const over = await api('bank/overboek', { vanIban: lid.iban, naarIban: lid.zakelijk, centen: 1250, oms: 'Werkkapitaal' }, lid.token);
+  const over = await api('bank/overboek', { idem: 'proef-' + Math.random(), vanIban: lid.iban, naarIban: lid.zakelijk, centen: 1250, oms: 'Werkkapitaal' }, lid.token);
   assert.equal(over.status, 200);
   const hart = await api('bank/hart', {}, lid.token);
   assert.equal(hart.status, 200);

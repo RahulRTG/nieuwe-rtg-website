@@ -25,6 +25,7 @@ const { start } = require('./lib/wegwerpserver');
 const { draaiIdemproef } = require('./lib/idemproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel, verdeelOpRol, meldZonderRol } = require('./lib/routes');
+const { haalSleutels, meldSleutels, BASISROLLEN, PASLADDER } = require('./lib/proefsleutels');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
    te lopen: verouderd ziet er identiek uit aan vers. Zie scripts/lib/stempel.js. */
 const { stempel } = require('./lib/stempel');
@@ -57,7 +58,22 @@ if (require.main !== module) { module.exports = {}; return; }
      code niet deed, en zo lopen kopieen uiteen zonder dat iemand het ziet
      (LAT.md regel 4 en 6, en de post wegwerpserver-kopieen in
      BEWIJSSCHULD.json). */
-  const server = await start({ naam: 'idemproef', env: { RTG_DEMO: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF' } });
+  /* RTG_MAGNAAT_TEST=1 EN NIET ALLEEN RTG_DEMO=1.
+
+     server/testomgeving.js: RTG_DEMO telt uitsluitend binnen NODE_ENV=test, en
+     die zet dit script niet. De proef hing dus aan een omgevingsvariabele van de
+     OPERATOR: wie hem toevallig had, kreeg tokens; wie hem niet had, kreeg
+     exit(2) op "geen token voor member, office, supplier". RTG_MAGNAAT_TEST is
+     de expliciete, gedocumenteerde vlag voor synthetische data en staat niet in
+     productie -- de opstelling zegt nu zelf wat ze nodig heeft. */
+  const server = await start({ naam: 'idemproef',
+    env: { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF',
+      /* Het TWEEDE meetpunt (de opslag) hing aan dezelfde toevalligheid: zonder
+         RTG_STAATLOG draagt geen antwoord een X-RTG-Staat-kop en meet de proef
+         alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
+         want alleen die ziet ook een wijziging OP ZIJN PLAATS (gelijke lengte,
+         andere inhoud). Zie server/staatlog.js. */
+      RTG_STAATLOG: '2' } });
   const { basis, klaar } = server;
 
   const post = async (pad, lijf, tok) => {
@@ -67,27 +83,29 @@ if (require.main !== module) { module.exports = {}; return; }
         body: JSON.stringify(lijf || {}) });
       const tekst = await r.text();
       let data; try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
-      return { status: r.status, data, staat: r.headers.get('x-rtg-staat') };
+      /* HET DERDE MEETPUNT (server/effectmeter.js). De opslagmeter kijkt naar de
+         COLLECTIES; deze zegt of er uberhaupt iets gebeurde -- een schrijfpoging,
+         een mail, een sms. Dat is precies wat NOT_APPLICABLE nodig heeft: "geen
+         spoor in de collecties" is uit een meter die alleen collecties ziet een
+         gevolgtrekking uit AFWEZIG bewijs. `nietGemeten` gaat mee, want wat deze
+         meter niet ziet hoort naast zijn uitslag te staan en niet erbuiten. */
+      return { status: r.status, data, staat: r.headers.get('x-rtg-staat'),
+        effect: r.headers.get('x-rtg-effect'),
+        effectNietGemeten: r.headers.get('x-rtg-effect-niet-gemeten') };
     } catch (e) { return { status: 0, data: String(e.message) }; }
   };
 
-  const inlog = {
-    member: async () => (await post('/api/login', { tier: 'rtg' })).data.token,
-    office: async () => (await post('/api/office/login', { code: 'RTG-OFFICE-PROEF' })).data.token,
-    supplier: async () => (await post('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data.token
-  };
-  const tokens = {};
-  for (const rol of Object.keys(inlog)) { try { tokens[rol] = await inlog[rol](); } catch (e) {} }
-  const ontbreekt = Object.keys(inlog).filter(r => !tokens[r]);
-  if (ontbreekt.length) {
-    console.error('geen token voor: ' + ontbreekt.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
+  /* De sleutelbos staat in ./lib/proefsleutels.js -- zeven rollen op een plek.
+     Hij stond hier woordelijk, en in vijf andere instrumenten nog eens; die zes
+     kopieen kenden alleen member/office/supplier, en daardoor bleven 111 routes
+     met een eigenrol (boardroom, techniek, werkplekbaas, scim) ongemeten. */
+  const bos = await haalSleutels({ post });
+  const { tokens, tokenVoor, hernieuw } = bos;
+  const basisMist = BASISROLLEN.filter(r => !tokens[r]);
+  if (basisMist.length) {
+    console.error('geen token voor: ' + basisMist.join(', ') + ' -- de proef zou dan doen alsof die routes zijn beproefd');
     klaar(); process.exit(2);
   }
-  const tokenVoor = (rol) => tokens[rol];
-  const hernieuw = async (rol) => {
-    try { const t = await inlog[rol](); if (t) { tokens[rol] = t; return true; } } catch (e) {}
-    return false;
-  };
 
   const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
@@ -102,13 +120,46 @@ if (require.main !== module) { module.exports = {}; return; }
      geen sleutel voor bestaat: de idemproef herhaalt een oproep MET de juiste rol; zonder token voor die rol
      wordt elke herhaling even hard geweigerd en zegt de gelijkheid niets.
      Ze komen nu met die reden terug in het uitslagbestand (LAT.md regel 3). */
-  const verdeling = verdeelOpRol(kandidaten, Object.keys(inlog));
-  const routes = verdeling.metRol;
+  const verdeling = verdeelOpRol(kandidaten, bos.rollen);
+
+  /* ============================================================================
+     DE IDEMPROEF KRUIST GEEN ROLLEN -- HIJ HEEFT TOEGANG NODIG.
+
+     Hier zat een denkfout die 840 routes buiten elke uitslag hield. De vier
+     proeven delen deze verdeling, maar ze vragen er niet hetzelfde van:
+
+       rolproef   klopt aan met de VERKEERDE rol en eist dat de deur dichtblijft.
+                  Zonder rol is er niets te kruisen -- daar is 'geen rol' terecht
+                  het einde van de meting.
+       idemproef  klopt aan met de JUISTE sleutel en herhaalt. Wat hij nodig heeft
+                  is dat de oproep WERK DOET; welke rol daarvoor nodig was, doet
+                  er alleen toe bij het kiezen van het token.
+
+     Voor een route zonder bewakerslaag is de juiste oproep dus die met een LEGE
+     kop -- dat is geen gebrekkige meting maar de enige goede. En voor een
+     lichaamssleutel (gastAuth, gezinsPoort) staat het letterlijk in
+     scripts/lib/bewakers.js: een token in de kop is daar 'niet fout maar
+     IRRELEVANT'. Ook die routes zijn dus correct aan te roepen; ze stranden
+     hooguit op een ontbrekende sleutel in het lijf, en dat komt eerlijk terug als
+     ONGEMETEN met de status erbij.
+
+     Het kan hier dus niet groen worden van een verkeerde aanname: een route die
+     we niet aan het werk krijgen, blijft ongemeten. Wat het wel doet is die
+     routes uit de restpost 'niet beproefbaar' halen, waar ze geen enkel getal
+     lieten bewegen.
+
+     De twee blijven in het register uit elkaar: `rol` staat er als er een token
+     mee ging, en `zonderRol` draagt de reden als de oproep met een lege kop is
+     gedaan. Wie het naleest kan die twee nooit voor elkaar aanzien. */
+  const zonderKop = verdeling.zonderRol.map(r => ({ methode: r.methode, pad: r.pad, rol: null, zonderRol: r.reden }));
+  const routes = [...verdeling.metRol, ...zonderKop];
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
+  meldSleutels(bos);
   console.log('  routes gevonden                      : ' + kandidaten.length);
-  console.log('  routes met een herkenbare rol        : ' + routes.length);
-  meldZonderRol(verdeling);
+  console.log('  routes met een herkenbare rol        : ' + verdeling.metRol.length + '   (aangeroepen MET dat token)');
+  console.log('  routes zonder rol, met lege kop      : ' + zonderKop.length + '   (geen kop om te dragen -- zie hieronder)');
+  meldZonderRol(verdeling, 'zonder rol, en waarom (allemaal AANGEROEPEN)');
   console.log('  oproepen per route                   : 3  (K1, K1 opnieuw, K2 vers)');
 
   /* DE WERELD KLAARZETTEN, VOOR ER GEMETEN WORDT -- ./lib/idemwereld.js.
@@ -121,10 +172,36 @@ if (require.main !== module) { module.exports = {}; return; }
      en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
      route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
   const { zetWereldKlaar } = require('./lib/idemwereld');
-  const { extra, perRoute: geldLijven } = await zetWereldKlaar({ post, tokens, login: inlog });
+  const { extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
+
+  /* De voorvoegselregels: binnen /api/foundation/ betekent `code` de gezinscode
+     en nergens anders. Zie de kop van ./lib/idemwereld.js voor waarom dit geen
+     gedeeld lijf mag zijn. Een regel mag ook een ROL opleggen -- het
+     werkplek-huis laat alleen de eigenaar binnen. */
+  const voorvoegselVan = (pad) => (perVoorvoegsel || []).find(v => pad.startsWith(v.voorvoegsel)) || null;
+  const schoonLijf = (o) => { const uit = {}; for (const [k, v] of Object.entries(o || {})) if (v !== undefined) uit[k] = v; return uit; };
   console.log('  wereld klaargezet                    : ' +
     (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
   console.log('  geldroutes met een eigen lijf        : ' + Object.keys(geldLijven).length);
+  /* WAT ER NIET IS KLAARGEKOMEN, en dat staat BOVEN de voorvoegsels met opzet.
+
+     Een gebroken keten leverde tot vandaag stil `null` op; wat hem verraadde was
+     een ontbrekende naam in de regel hieronder, en dan alleen als je die regel
+     las. Nu zegt de opbouw het zelf, met de status en de melding van de stap die
+     het voorwerp had moeten opleveren. Zie VERWACHT in scripts/lib/idemwereld.js.
+
+     Het is een MELDING en geen fout: een wereld die niet compleet is, mag de
+     proef niet tegenhouden -- dan verdwijnt ook het deel dat wel werkt. */
+  if (gemist && gemist.length) {
+    console.log('  NIET KLAARGEKOMEN                    : ' + gemist.length +
+      ' van de ' + (gemist.length + (perVoorvoegsel || []).length) + ' verwachte voorwerpen');
+    for (const g of gemist) {
+      console.log('      ' + g.wat + ' -- ' + g.via +
+        (g.status ? ' gaf ' + g.status : '') + (g.melding ? ': ' + String(g.melding).slice(0, 90) : ''));
+    }
+  }
+  console.log('  voorvoegsels met een eigen sleutel    : ' +
+    ((perVoorvoegsel || []).map(v => v.voorvoegsel + ' (' + Object.keys(schoonLijf(v.lijf)).join('+') + (v.rol ? ', als ' + v.rol : '') + ')').join(', ') || 'geen'));
 
   /* ============================================================================
      HET TWEEDE MEETPUNT IJKEN.
@@ -145,13 +222,53 @@ if (require.main !== module) { module.exports = {}; return; }
   const ruis = new Set();
   let ijkStand = null, staatWerkt = false;
   {
-    const eerste = await post('/api/pay/overzicht', {}, tokens.member);
-    ijkStand = eerste.staat || null;
-    for (let i = 0; i < 6 && ijkStand != null; i++) {
-      const nu = await post('/api/pay/overzicht', {}, tokens.member);
-      if (nu.staat == null) break;
-      for (const k of Object.keys(staatlog.verschil(ijkStand, nu.staat))) ruis.add(k);
-      ijkStand = nu.staat;
+    /* OP MEER DAN EEN ROUTE, en dat kostte veertien routes voordat het opviel.
+
+       De ijking liep alleen op /api/pay/overzicht. Wat daar niet groeit, komt
+       niet in de ruislijst -- en `kosten` groeide daar niet, want de kostenmeter
+       tikt op de poorten die een DRAGER kennen en niet op elke route. Veertien
+       leesroutes kwamen daardoor binnen als "er veranderde iets": het enige dat
+       veranderde was de boekhouding van het huis over het verzoek zelf.
+
+       Besluit van de eigenaar, 30 augustus 2026: een tik van de kostenmeter is
+       RUIS en geen werk. Zou het wel werk zijn, dan wordt elke leesroute
+       niet-idempotent zodra de meter hem raakt, en dat is bijna elke leesroute.
+
+       Het blijft een MEETPUNT en geen lijst: `kosten` staat hier nergens met
+       naam. Er komt een tweede leesroute bij die wel langs een dragende poort
+       gaat, en wat er dan bij ELKE oproep groeit is per definitie ruis. Een
+       handgeschreven lijst zou stil verouderen zodra er een teller bij komt. */
+    const IJKROUTES = ['/api/pay/overzicht', '/api/geld/beleid'];
+    /* EN EEN DIE DE IJKING NIET KAN VINDEN, met naam en met de reden.
+
+       `kosten` is de kostprijsboekhouding (kern/kosten/meter.js). Hij wordt
+       NOOIT door een handler geschreven -- alleen door de meter, over het
+       verzoek zelf. Voor de vraag "deed deze route werk" is dat per definitie
+       ruis: het is de boekhouding van het huis en niet de handeling.
+
+       Waarom hij hier met naam staat terwijl de rest gemeten wordt: de ijking
+       zoekt wat bij ELKE oproep groeit, en de kostenmeter tikt niet bij elke
+       oproep -- hij hangt aan de poorten die een drager kennen. Twee ijkroutes
+       vonden hem daarom evenmin (gemeten: de lijst bleef rtgai, handelingLog,
+       apiSpoor). Wat niet altijd groeit, kan een altijd-groeit-ijking niet
+       vinden; dat is geen tekortkoming van de ijking maar haar definitie.
+
+       Besluit van de eigenaar, 30 augustus 2026. De prijs staat erbij: zou een
+       handler ooit zelf in `kosten` schrijven, dan ziet deze proef dat niet meer.
+       Dat mag niet gebeuren en KOSTEN.md zegt dat ook -- de meter is de enige
+       schrijver. */
+    ruis.add('kosten');
+    for (const pad of IJKROUTES) {
+      const eerste = await post(pad, {}, tokens.member);
+      let stand = eerste.staat || null;
+      if (stand == null) continue;
+      for (let i = 0; i < 6; i++) {
+        const nu = await post(pad, {}, tokens.member);
+        if (nu.staat == null) break;
+        for (const k of Object.keys(staatlog.verschil(stand, nu.staat))) ruis.add(k);
+        stand = nu.staat;
+      }
+      ijkStand = stand;
     }
     staatWerkt = ijkStand != null;
   }
@@ -184,8 +301,13 @@ if (require.main !== module) { module.exports = {}; return; }
   const besluiten = register.routes || {};
 
   const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw,
-    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...(geldLijven[r.pad] || {}) }), maxRoutes: MAX, staatVan,
-    vastlegging: register.vastlegging });
+    lijfVoor: (r) => {
+      const vv = voorvoegselVan(r.pad);
+      return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
+    },
+    rolVoor: (r) => { const vv = voorvoegselVan(r.pad); return (vv && vv.rol) || r.rol; },
+    maxRoutes: MAX, staatVan,
+    vastlegging: register.vastlegging, metenZonderSleutel: true, pasladder: PASLADDER });
 
   if (uit.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.meterStuk);
@@ -196,6 +318,8 @@ if (require.main !== module) { module.exports = {}; return; }
   const beoordeeld = t.beschermd + t.onbeschermd;
   console.log('  oproepen                             : ' + uit.oproepen);
   console.log('  tokens onderweg opnieuw gehaald      : ' + uit.hernieuwd);
+  console.log('  routes gemeten met een ANDERE pas    : ' + (uit.pasGewisseld || 0) +
+    '   (403 op de instapfas; zie viaPas in het register)');
   console.log('  BEOORDEELD (tweede effect zichtbaar) : ' + beoordeeld + ' / ' + routes.length);
   console.log('      herhaling herkend (beschermd)    : ' + t.beschermd);
   console.log('      deed het opnieuw (onbeschermd)   : ' + t.onbeschermd);
@@ -243,6 +367,22 @@ if (require.main !== module) { module.exports = {}; return; }
   const zonderBesluit = onbeschermd.filter(r => !besluiten[r.pad]).map(r => r.pad);
   for (const r of onbeschermd.slice(0, 20)) console.log('      ' + r.methode + ' ' + r.pad + (besluiten[r.pad] ? '' : '   <- GEEN BESLUIT'));
   if (onbeschermd.length > 20) console.log('      ... en nog ' + (onbeschermd.length - 20));
+  /* DE RONDE ZONDER SLEUTEL, apart gemeld en met de reden waarom hij er is.
+     De regel erboven telt wat de PLATFORMLAAG ving; deze telt wat er bij een
+     echte dubbeltik gebeurt. Ze samenvatten tot een cijfer zou allebei de
+     getallen onleesbaar maken. */
+  const z = uit.zonderSleutel || {};
+  console.log('');
+  console.log('  EN ZONDER SLEUTEL (de echte dubbeltik) : ' +
+    ((z.beschermd || 0) + (z.onbeschermd || 0)) + ' met een uitspraak');
+  console.log('      dubbeltik opgevangen             : ' + (z.beschermd || 0) +
+    '   <- de route zelf, of zijn verklaring in idemsleutels.js');
+  console.log('      dubbeltik DEED HET WERK OPNIEUW  : ' + (z.onbeschermd || 0));
+  console.log('      geen uitspraak                   : ' + (z.ongemeten || 0));
+  const dubbel = Object.values(uit.perRoute).filter(r => r.zonderSleutel && r.zonderSleutel.stand === 'onbeschermd');
+  for (const r of dubbel.slice(0, 15)) console.log('      ' + r.methode + ' ' + r.pad);
+  if (dubbel.length > 15) console.log('      ... en nog ' + (dubbel.length - 15));
+  console.log('');
   console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
   if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
 
@@ -255,16 +395,30 @@ if (require.main !== module) { module.exports = {}; return; }
     /* WAT ER NIET IS BEPROEFD, met de reden erbij. Zonder dit veld leest
        routesMetRol als "dit zijn de routes" terwijl het "dit is wat we konden
        bereiken" betekent -- en dat verschil was jarenlang 1257 routes groot. */
-    nietBeproefbaar: verdeling.zonderRol.length,
+    /* NUL, EN DAT IS EEN BESLUIT EN GEEN VERGETEN VELD. Dit veld telde de
+       routes die deze proef niet AANRIEP. Sinds hij ook met een lege kop
+       aanroept, is die verzameling leeg: er is geen route meer die hij
+       overslaat. De redenen blijven staan -- ze zeggen nu WAAROM een route met
+       een lege kop is aangeroepen, en dat is precies wat een lezer nodig heeft
+       om zo'n regel te wegen. */
+    nietBeproefbaar: 0,
     redenenNietBeproefbaar: verdeling.redenen,
+    zonderRolAangeroepen: zonderKop.length,
     routesGevonden: kandidaten.length,
-    gemeten: { routesMetRol: routes.length, beoordeeld,
+    gemeten: { routesAangeroepen: routes.length, routesMetRol: verdeling.metRol.length,
+      routesZonderRol: zonderKop.length, beoordeeld,
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,
       uitOpslag: uit.uitOpslag || 0, ruisGeijkt: [...ruis], vastlegging: uit.vastleggingGemeten || [],
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
-      onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length },
+      onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length,
+      /* WAT DE PLATFORMLAAG VING, EN WAT DE ROUTE ZELF DOET -- twee getallen,
+         want ze gaan niet over hetzelfde. Alle oproepen hierboven dragen `idem`
+         in het lijf, en server/middleware/idempotentie.js is precies daarop
+         opt-in: 'beschermd' hierboven is dus grotendeels die laag. Een echte
+         dubbeltik draagt geen sleutel, en dat is wat hieronder staat. */
+      zonderSleutel: uit.zonderSleutel || null, pasGewisseld: uit.pasGewisseld || 0 },
     zonderBesluit, tegenspraken: uit.tegenspraken || [], vastleggingVerdacht: uit.vastleggingVerdacht || [],
     vermoedensVerworpen: uit.vermoedensVerworpen || 0,
     perRoute: Object.values(uit.perRoute)

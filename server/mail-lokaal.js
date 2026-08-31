@@ -44,6 +44,7 @@ module.exports = ({ CONFIGURED, SMTP_SANDBOX, DIRECT, toOutbox }) => {
        diezelfde reden alleen de mail; twee tellingen op een bericht is erger dan
        geen, want dan klopt de factuur precies twee keer zo hard niet. */
     kostenhaak.meld('bericht', 1, { bron: 'sms' });
+    require('./effectmeter').tel('sms');
     const journaal = (gelukt, hoe, reden) => {
       try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: 'sms:' + to, mislukt: !gelukt, reden }); } catch (e) {}
     };

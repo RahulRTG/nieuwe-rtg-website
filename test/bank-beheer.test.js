@@ -132,7 +132,7 @@ test('3. lid B kan de rekening van lid A niet bevriezen', async () => {
 });
 
 test('4. lid B kan geen geld van A naar zijn wallet halen', async () => {
-  const r = await api('bank/naar-wallet', { iban: lid.iban, centen: 1000 }, ander.token);
+  const r = await api('bank/naar-wallet', { idem: 'proef-' + Math.random(), iban: lid.iban, centen: 1000 }, ander.token);
   assert.notEqual(r.status, 200, 'geld van andermans rekening naar je eigen wallet halen mag niet');
 });
 
@@ -145,7 +145,7 @@ test('5. lid B kan geen SEPA-opdracht van A doen', async () => {
 });
 
 test('6. lid B kan geen salarisrun vanaf de rekening van A starten', async () => {
-  const r = await api('bank/salaris', {
+  const r = await api('bank/salaris', { idem: 'proef-' + Math.random(),
     vanIban: lid.iban, oms: 'kaping',
     posten: [{ naarIban: ander.iban, centen: 100000, naam: 'ikzelf' }]
   }, ander.token);
@@ -215,7 +215,7 @@ test('11. terugkerende opdrachten: lijst, zetten, stoppen', async () => {
   assert.equal(leeg.status, 200);
   assert.ok(Array.isArray(leeg.body.opdrachten || leeg.body.lijst || []), 'een lijst terug');
 
-  const zet = await api('bank/terugkerend/zet', {
+  const zet = await api('bank/terugkerend/zet', { idem: 'proef-' + Math.random(),
     vanIban: lid.iban, naarIban: ander.iban, centen: 500, oms: 'maandelijks', dag: 1
   }, lid.token);
   if (zet.status === 200 && (zet.body.opdracht || zet.body.id)) {
@@ -250,7 +250,7 @@ test('13. naar-wallet en sepa halen geen geld uit het niets', async () => {
      een geldpers. */
   const saldo = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
   assert.ok(Number.isFinite(saldo), 'we lezen een ECHT saldo, geen undefined');
-  const teveel = await api('bank/naar-wallet', { iban: lid.iban, centen: saldo + 1000000 }, lid.token);
+  const teveel = await api('bank/naar-wallet', { idem: 'proef-' + Math.random(), iban: lid.iban, centen: saldo + 1000000 }, lid.token);
   assert.notEqual(teveel.status, 200, 'meer naar de wallet dan er staat mag niet');
 
   const negatief = await api('bank/sepa', {

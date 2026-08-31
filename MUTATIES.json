@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-08-31T07:20:06.653Z",
-    "commit": "07eb7c2c",
+    "op": "2026-08-31T12:47:49.249Z",
+    "commit": "1dd1511b",
     "boomVuil": true,
     "node": "v22.22.2"
   },
@@ -1429,6 +1429,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "effectmeter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/effectmeter.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "eigen-website.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1782,6 +1790,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "geldroutes.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "geldveilig.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2051,6 +2067,14 @@
       "module": "public/shared/handenvrij.js",
       "operator": "false->true",
       "gezakt": 1
+    },
+    "handlerpoorten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/handlerpoorten/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "hardware.test.js": {
       "soort": "server",
@@ -2375,6 +2399,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "idemwereld-voorvoegsel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/routes.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 9
     },
     "identiteit-opvraag.test.js": {
       "soort": "puur",
@@ -3666,6 +3698,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "mutatiecontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mutatie.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 17
+    },
     "mutatiewacht.test.js": {
       "soort": "puur",
       "staat": "muteert zelf",
@@ -4615,6 +4655,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "proefsleutels.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/proefsleutels.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
     "provider-sandbox.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5524,6 +5572,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "schrijfanalyse.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/schrijfanalyse.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "scim.test.js": {
       "soort": "puur",

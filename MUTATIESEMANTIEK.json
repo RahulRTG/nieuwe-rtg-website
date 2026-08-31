@@ -1,14 +1,14 @@
 {
   "uitleg": "Gemeten met scripts/mutatiesemantiek.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 10. Dit script plakt geen etiketten: het legt VERKLAARD naast GEMETEN en meldt de tegenspraak.",
-  "vastgelegd": "2026-08-28",
+  "vastgelegd": "2026-08-31",
   "gemeten": {
-    "routesMetRol": 3092,
+    "routesMetRol": 3803,
     "routesGevonden": 4144,
     "verklaard": 34,
     "onverklaard": 4110,
-    "beproefd": 845,
-    "onbereikbaarVoorDeProef": 2247,
-    "verklaardEnBeproefd": 0,
+    "beproefd": 1563,
+    "onbereikbaarVoorDeProef": 3080,
+    "verklaardEnBeproefd": 12,
     "tegenspraken": 0,
     "onbekendeKlassen": 0,
     "randVerklaard": 6
@@ -55,8 +55,8 @@
       "regel": 32,
       "klasse": "idempotent",
       "waarom": "dezelfde uitslag twee keer noteren laat dezelfde stand */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -66,8 +66,8 @@
       "regel": 43,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -77,8 +77,8 @@
       "regel": 48,
       "klasse": "nietHerhaalbaar",
       "waarom": "een besluit is een handeling van een mens en telt op in het journaal */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -88,8 +88,8 @@
       "regel": 21,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -99,8 +99,8 @@
       "regel": 25,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -110,8 +110,8 @@
       "regel": 32,
       "klasse": "idempotent",
       "waarom": "twee keer installeren laat dezelfde app op het startscherm */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -121,8 +121,8 @@
       "regel": 37,
       "klasse": "idempotent",
       "waarom": "de verlening wordt GEZET en niet opgeteld */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -132,8 +132,8 @@
       "regel": 41,
       "klasse": "idempotent",
       "waarom": "twee keer verwijderen laat dezelfde stand achter */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -143,8 +143,8 @@
       "regel": 42,
       "klasse": "idempotent",
       "waarom": "twee keer wissen laat dezelfde lege opslag */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -154,8 +154,8 @@
       "regel": 46,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -165,8 +165,8 @@
       "regel": 83,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 404)",
       "tegenspraak": null
     },
     {
@@ -176,8 +176,8 @@
       "regel": 85,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -187,8 +187,8 @@
       "regel": 91,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -198,8 +198,8 @@
       "regel": 99,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -209,8 +209,8 @@
       "regel": 102,
       "klasse": "idempotent",
       "waarom": "twee keer gelezen melden laat dezelfde stand */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -220,8 +220,8 @@
       "regel": 64,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -231,8 +231,8 @@
       "regel": 72,
       "klasse": "idempotent",
       "waarom": "een tweede aanvraag werkt de eerste bij of zegt dat hij er al is */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 400)",
       "tegenspraak": null
     },
     {
@@ -242,8 +242,8 @@
       "regel": 76,
       "klasse": "idempotent",
       "waarom": "dezelfde bundel levert dezelfde hash en dus geen tweede versie */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -253,8 +253,8 @@
       "regel": 80,
       "klasse": "idempotent",
       "waarom": "twee keer intrekken laat dezelfde stand achter */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -264,8 +264,8 @@
       "regel": 84,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -275,8 +275,8 @@
       "regel": 88,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -286,8 +286,8 @@
       "regel": 97,
       "klasse": "idempotent",
       "waarom": "de proefkeuring bewaart niets */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -297,8 +297,8 @@
       "regel": 104,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -308,8 +308,8 @@
       "regel": 112,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -319,8 +319,8 @@
       "regel": 128,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -330,8 +330,8 @@
       "regel": 37,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -341,8 +341,8 @@
       "regel": 42,
       "klasse": "idempotent",
       "waarom": "een tweede aanvraag werkt de eerste bij of zegt dat hij er al is */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -352,8 +352,8 @@
       "regel": 49,
       "klasse": "idempotent",
       "waarom": "dezelfde bundel levert dezelfde hash en dus geen tweede versie */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -363,8 +363,8 @@
       "regel": 54,
       "klasse": "idempotent",
       "waarom": "twee keer intrekken laat dezelfde stand achter */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -374,8 +374,8 @@
       "regel": 62,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -385,8 +385,8 @@
       "regel": 70,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -396,8 +396,8 @@
       "regel": 80,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
       "tegenspraak": null
     },
     {
@@ -407,8 +407,8 @@
       "regel": 87,
       "klasse": "idempotent",
       "waarom": "de proefkeuring bewaart niets */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     },
     {
@@ -418,8 +418,8 @@
       "regel": 96,
       "klasse": "idempotent",
       "waarom": "lezen */",
-      "gemeten": null,
-      "reden": null,
+      "gemeten": "ongemeten",
+      "reden": "de eerste oproep deed geen werk (status 409)",
       "tegenspraak": null
     }
   ]

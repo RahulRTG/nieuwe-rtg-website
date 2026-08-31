@@ -99,7 +99,16 @@ module.exports = (ctx) => {
 
     const posten = bestand.posten.map(p => ({ naarIban: p.iban, centen: p.centen, oms: 'Salaris ' + run.periode }));
     // zelfde reden als hierboven: het kantoor maakt zich kenbaar
-    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten, codenaam: KANTOOR });
+    /* DE SLEUTEL IS DE LOONRUN ZELF, en niet iets dat de client meestuurt.
+
+       De geldgrens in lib/idem.js weigert een batch zonder sleutel, en dat is
+       hier geen hindernis maar een verbetering: een loonrun hoort exact een keer
+       te worden uitbetaald, en die eigenschap zit in de runId. Een sleutel van
+       de client zou zwakker zijn -- twee kantoormedewerkers die allebei op
+       "uitbetalen" drukken sturen twee verschillende sleutels en betalen twee
+       keer. Zo kan dat niet meer. */
+    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten, codenaam: KANTOOR,
+      idem: 'loonrun:' + run.id });
     veilig(res, () => {
       if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + run.code + ' (' + run.periode + ') uit loonrun ' + run.id + ': ' +
         r.geboekt + ' netto loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }

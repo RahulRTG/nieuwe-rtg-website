@@ -16,6 +16,11 @@ const stappen = [
   ['Sentinel-procesgrens', process.execPath, ['--test', 'test/sentinel.test.js']],
   ['Rust-migratieregister', process.execPath, ['scripts/rust-migraties.js', '--controle']],
   ['Bron- en securityregels', process.execPath, ['scripts/check.js']],
+  /* DE MUTATIEPOORT. Besluit van de eigenaar, 30 augustus 2026: geen release
+     zolang er een schrijfroute is waarvan dit huis niet weet wat een tweede
+     aanroep doet. Hij staat NA check.js, want die controleert of het register
+     nog klopt met de code -- een poort op een verouderd register is geen poort. */
+  ['Mutatiecontracten', process.execPath, ['scripts/mutatiepoort.js']],
   ['Dependency-audit', 'npm', ['audit', '--audit-level=high']],
   ['Backup en herstel', process.execPath, ['--test', 'test/herstelproef.test.js', 'test/backupvolledig.test.js']],
   ['Releasebewijs maken', process.execPath, ['scripts/release-bewijs.js']],

@@ -343,11 +343,14 @@ wachtOpSchoneBoom();
   /* DE SPELWERELD -- ./lib/wereld-spel.js. Een potje ontstaat pas met een
      tegenstander; de proef heeft er twee. */
   const { zetSpelKlaar } = require('./lib/wereld-spel');
-  const spelWereld = await zetSpelKlaar({ post, tokens, gezinLijf: lijfsleutels.lijfVoor('/api/rtf/overzicht') });
+  const spelWereld = await zetSpelKlaar({ post, tokens,
+    gezinLijf: lijfsleutels.lijfVoor('/api/rtf/overzicht'),
+    kindToken: schoolWereld.extra.kindToken });
   console.log('  spelwereld                           : ' + (spelWereld.klaar ? 'klaar   (' + spelWereld.extra.soort + ')' : 'NIET klaar -- ' + spelWereld.reden));
   for (const st of spelWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
   const { oogstObjecten, metAchtervoegsels } = require('./lib/objectoogst');
+  const rtfWereld = require('./lib/wereld-rtf');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra,
@@ -358,7 +361,10 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
       ...(r.pad.startsWith('/api/member/spel/') ? { ...spelWereld.extra, ...spelWereld.idVoor(r.pad) } : {}),
       ...(r.pad.startsWith('/api/rtf/spel/') ? { ...(spelWereld.extra.rtf || {}), ...spelWereld.idVoor(r.pad) } : {}),
-      ...(lijfsleutels.lijfVoor(r.pad) || {}) }),
+      ...(lijfsleutels.lijfVoor(r.pad) || {}),
+      /* NA de familie: die levert het token van de BEHEERDER, en een deel van
+         /api/rtf/ hoort bij het kind. Zie ./lib/wereld-rtf.js. */
+      ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad)
   });
   console.log('  objecten gemaakt voor de proef       : ' + objecten.gelukt + ' van ' +
@@ -454,7 +460,9 @@ wachtOpSchoneBoom();
       ...(r.pad.startsWith('/api/lab2/') ? { ...lab2Wereld.extra, ...lab2Wereld.idVoor(r.pad) } : {}),
       ...(r.pad.startsWith('/api/member/spel/') ? { ...spelWereld.extra, ...spelWereld.idVoor(r.pad) } : {}),
       ...(r.pad.startsWith('/api/rtf/spel/') ? { ...(spelWereld.extra.rtf || {}), ...spelWereld.idVoor(r.pad) } : {}),
-      ...(lijfsleutels.lijfVoor(r.pad) || {}), ...(geldLijven[r.pad] || {}) }),
+      ...(lijfsleutels.lijfVoor(r.pad) || {}),
+      ...(r.pad.startsWith('/api/rtf/') ? rtfWereld.lijfVoor(schoolWereld.extra, r.pad) : {}),
+      ...(geldLijven[r.pad] || {}) }),
     koppenVoor: (r) => lijfsleutels.koppenVoor(r.pad), maxRoutes: MAX, staatVan,
     /* De stand van het opslag-meetpunt reist mee: in stand 2 mag de uitslag
        niet meer beweren dat een wijziging op zijn plaats onzichtbaar is. Uit

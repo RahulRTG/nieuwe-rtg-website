@@ -30,7 +30,7 @@
    grens, geen gebrek, en de wereld loopt gewoon door naar de volgende. */
 'use strict';
 
-async function zetSpelKlaar({ post, tokens, gezinLijf }) {
+async function zetSpelKlaar({ post, tokens, gezinLijf, kindToken }) {
   const stappen = [];
   const een = (tokens || {}).member;
   const twee = (tokens || {})['member-account'];
@@ -79,7 +79,7 @@ async function zetSpelKlaar({ post, tokens, gezinLijf }) {
 
        Lukt deze helft niet, dan blijft de RTG-helft gewoon staan. Twee
        halve werelden zijn beter dan een die valt op de tweede. */
-    const rtf = await rtfPotje(post, gezinLijf, soort, stappen);
+    const rtf = await rtfPotje(post, gezinLijf, soort, stappen, kindToken);
 
     /* EN EEN TWEEDE POTJE, om dezelfde reden waarom de school een tweede
        medewerker heeft. /api/member/spel/opgeven beeindigt het potje, en de
@@ -105,7 +105,7 @@ async function zetSpelKlaar({ post, tokens, gezinLijf }) {
     reden: 'geen van de ' + soorten.length + ' spelsoorten leverde een potje op; zie stappen' };
 }
 
-async function rtfPotje(post, gezinLijf, soort, stappen) {
+async function rtfPotje(post, gezinLijf, soort, stappen, kindToken) {
   if (!gezinLijf || !gezinLijf.code || !gezinLijf.token) {
     stappen.push({ naam: 'een potje in het gezin', pad: '/api/rtf/spel/random', status: 0, ok: false,
       waarom: 'er is geen gezinssleutel; zonder gezinscode en profieltoken speelt daar niemand' });
@@ -136,8 +136,21 @@ async function rtfPotje(post, gezinLijf, soort, stappen) {
   const tweede = gekozen && gekozen.token;
   if (!tweede) return null;
 
-  await doe('de beheerder in de wachtrij', '/api/rtf/spel/random', { ...G, soort, grootte: 2 });
-  const b = await doe('het kind erbij, en het potje start', '/api/rtf/spel/random',
+  /* WIE ER SPEELT MOET DEZELFDE ZIJN ALS WIE ER STRAKS AANKLOPT.
+
+     De eerste versie zette de BEHEERDER in de wachtrij, en dat werkte -- er
+     ontstond een potje. Alleen stuurt ./wereld-rtf.js de spelroutes sindsdien
+     het token van het SCHOOLKIND mee, want een potje speelt een kind en niet
+     zijn ouder. Gevolg: negen routes bleven op "Dit potje bestaat niet
+     (meer)", niet omdat het potje weg was maar omdat de aanklopper er niet in
+     zat. Precies dezelfde verwarring als bij /api/logout, een laag hoger.
+
+     De eerste speler is dus het schoolkind als dat er is, en anders de
+     beheerder -- dan klopt de wereld nog steeds, alleen meet hij minder. */
+  const eerste = kindToken || G.token;
+  await doe('de eerste speler in de wachtrij', '/api/rtf/spel/random',
+    { code: G.code, token: eerste, soort, grootte: 2 });
+  const b = await doe('de tweede speler erbij, en het potje start', '/api/rtf/spel/random',
     { code: G.code, token: tweede, soort, grootte: 2 });
   const id = b && b.id;
   return id ? { id, potje: id, code: G.code, token: G.token, profielId } : null;

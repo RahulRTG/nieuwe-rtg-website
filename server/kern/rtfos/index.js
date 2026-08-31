@@ -132,29 +132,10 @@ module.exports = (state) => {
   const veld = require('./veld')(ctx, { vind: casus.vind, contactVan: casus.contactVan });
   const donateur = require('./donateur')(ctx, { cijfersVan: rapport.cijfersVan });
 
-  /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
-     een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
-     eruit haalt. De afkapteller gaat mee: "er staat niets meer" en "er is nooit
-     iets geweest" mogen niet hetzelfde lezen (LAT.md regel 3). */
-  function auditlog(req, filter) {
-    const w = ctx.wie(req);
-    if (!w.landelijk) return { status: 403, error: 'Het auditspoor is van het landelijke RTF-bestuur.' };
-    const f = filter || {};
-    let rijen = ctx.S().audit;
-    if (f.wat) rijen = rijen.filter(r => r.wat.startsWith(String(f.wat)));
-    if (f.wie) rijen = rijen.filter(r => r.wie === String(f.wie));
-    return { ok: true, totaal: rijen.length, afgekapt: Number(ctx.S().auditAfgekapt) || 0,
-      regels: rijen.slice(0, 300) };
-  }
-
-  // Wie ben ik in dit OS: het scherm bouwt hier zijn menu op.
-  function ik(req) {
-    const w = ctx.wie(req);
-    return { ok: true, ingelogd: !!w.key, key: w.key, landelijk: w.landelijk,
-      zetels: w.zetels.map(z => ({ stad: z.stad, rol: z.rol,
-        stadNaam: (ctx.stadVan(z.stad) || {}).naam || z.stad })),
-      vlaggen: ctx.VLAGGEN, rollen: ctx.ROLLEN };
-  }
+  /* De spiegel van dit OS -- "wat mag ik zien" en "wat is er gedaan" --
+     staat hiernaast: dit bestand is bedrading, en dat zijn de enige twee
+     functies die naar het systeem zelf kijken. */
+  const { auditlog, ik } = require('./index-spiegel')(ctx);
 
   return { rtfos: {
     ik, auditlog,

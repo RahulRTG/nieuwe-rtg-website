@@ -485,3 +485,28 @@ test('de lijsten tellen wat er open staat, en een herbeoordeling vraagt een oord
   assert.equal(welBij.status, 200);
   assert.equal(welBij.body.jaarverslag.bijlagen.length, 1);
 });
+
+/* ---------------------------------------------------------------------------
+   HET AUDITSPOOR IS VAN HET LANDELIJKE BESTUUR, EN DAT WAS NERGENS GETOETST.
+
+   Deze grendel stond in kern/rtfos/index.js tussen de bedrading. Bij het
+   uitsplitsen naar index-spiegel.js bleek met een mutatie dat de hele suite
+   groen bleef als je hem eruit haalde: een stadscoordinator kon dan het
+   landelijke auditspoor lezen -- wie welke casus opende, wie welke uitgave
+   deed. Een grendel zonder toets is een gewoonte.
+
+   En de AFKAPTELLER hoort erbij te staan (LAT.md regel 3): "er staat niets
+   meer" en "er is nooit iets geweest" mogen niet hetzelfde lezen. */
+test('het auditspoor is landelijk, en zegt of het is afgekapt', async () => {
+  const mag = await post('/api/rtfos/audit', {}, LAND);
+  assert.equal(mag.status, 200);
+  assert.ok(Array.isArray(mag.body.regels), 'het landelijke bestuur ziet het spoor niet');
+  assert.equal(typeof mag.body.afgekapt, 'number',
+    'zonder afkapteller leest een afgekapt spoor als een schoon spoor');
+
+  /* TWEE is een zetel in een stad en geen landelijk bestuurder. */
+  const magNiet = await post('/api/rtfos/audit', {}, TWEE);
+  assert.equal(magNiet.status, 403, 'een stadszetel kon het landelijke auditspoor lezen');
+  assert.match(magNiet.body.error, /landelijke/);
+  assert.equal(magNiet.body.regels, undefined, 'de weigering lekte alsnog regels');
+});

@@ -227,8 +227,13 @@
        geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
        dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
        achterloopt. Het redactionele rooster hierboven blijft staan --
-       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md). -->
-  <section class="hero" aria-labelledby="allesWorkOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesWorkOS">Alles wat in WorkOS hangt.</h2><div class="wrooster">
+       dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md).
+
+       `rtgdeel-vast` omdat dit blok geen DEEL van de pagina is maar een vaste
+       bijlage: zonder die klasse maakt shared/deelmenu.js er een eigen knop bij,
+       en op een samenhanglaag als /apps/kantoor.html hoort geen enkel
+       bedieningselement te staan (test/kantoor.e2e.js). -->
+  <section class="hero rtgdeel-vast" aria-labelledby="allesWorkOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesWorkOS">Alles wat in WorkOS hangt.</h2><div class="wrooster">
   <!-- WERELDROOSTER:WorkOS -->
     <a class="wrooster-kaart" href="/apps/office.html"><span>Documenten</span></a>
     <a class="wrooster-kaart" href="/apps/horeca.html"><span>Horeca</span></a>

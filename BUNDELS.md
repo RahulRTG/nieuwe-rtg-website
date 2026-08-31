@@ -810,7 +810,7 @@ omlaag.
 
 ## `shared/sprong.js`
 
-`public/shared/sprong/` -- 3 delen, 315 regels in de delen
+`public/shared/sprong/` -- 3 delen, 326 regels in de delen
 
 | deel | onderwerp |
 |---|---|

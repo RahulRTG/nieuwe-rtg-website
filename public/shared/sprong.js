@@ -56,6 +56,17 @@
       'width:52px;height:52px;display:grid;place-items:center;border:1px solid #857007;border-radius:0;' +
       'background:#0C0C0B;color:#FFFFFF;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.45);}' +
     '[data-hand="links"] .rtgsprong-greep{right:auto;left:14px;}' +
+    /* OP EEN BUREAU WISSELT HIJ VAN KANT, en dat is geen smaak. Daar staat de
+       console van Rahul rechtsonder met zijn maatgreep in precies dezelfde hoek
+       (shared/handenvrij-bureau.js: .hv-chat right:1rem, .hv-maat in de hoek
+       daarvan). Onze greep lag eroverheen en at de sleep op -- test/werkblad.e2e.js
+       zag de console niet meer breder worden.
+
+       ADAPTIEF.md zegt waar hij dan wel hoort: de duimzijde is van Rahul, de
+       ANKERZIJDE is van de navigatie. Op een telefoon is er geen bureauconsole
+       en blijft hij bij de duim. De spiegeling voor een linkshandige gaat mee. */
+    '@media (min-width:1000px){.rtgsprong-greep{right:auto;left:14px;}' +
+    '[data-hand="links"] .rtgsprong-greep{left:auto;right:14px;}}' +
     '.rtgsprong-greep:focus-visible{outline:2px solid #857007;outline-offset:2px;}' +
     '.rtgsprong{position:fixed;inset:0;z-index:9971;display:flex;flex-direction:column;background:#0C0C0B;' +
       'font-family:Inter,system-ui,sans-serif;color:#FFFFFF;}' +

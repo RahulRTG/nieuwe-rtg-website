@@ -111,7 +111,8 @@
      CLIENT zou beslissen dat iets niet zwaar is. */
   var ZWAAR = ['/api/pay/', '/api/betaal/', '/api/wallet/', '/api/bank/', '/api/auth/password',
     '/api/webauthn/registreer', '/api/webauthn/weg', '/api/mijn/toestel/introk',
-    '/api/privacy/delete', '/api/rtgid/machtig'];
+    '/api/privacy/delete', '/api/rtgid/machtig', '/api/mijn/sessies/sluit',
+    '/api/privacy/export', '/api/privacy/inzage', '/api/gegevens/', '/api/onboarding/inricht'];
   function zwaar(pad) {
     for (var i = 0; i < ZWAAR.length; i++) if (String(pad).indexOf(ZWAAR[i]) === 0) return true;
     return false;

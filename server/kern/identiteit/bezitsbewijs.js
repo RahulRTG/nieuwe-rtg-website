@@ -48,29 +48,13 @@
 'use strict';
 
 const { klopt } = require('./toestelsleutels');
+const { PADEN } = require('./bezitspaden');
 const klok = require('../../lib/klok');
 
 /* Hoe ver een bewijs mag afwijken van onze klok. Ruim genoeg voor een trage
    verbinding en een scheve telefoonklok, krap genoeg dat een onderschept bewijs
    niet de hele middag bruikbaar is. */
 const SPELING_MS = 90 * 1000;
-
-/* WELKE PADEN, EN WAAROM. Alleen handelingen waarbij een gestolen token echte,
-   moeilijk terug te draaien schade doet. Wie hier iets bij zet, schrijft de
-   reden erbij -- een lijst zonder redenen groeit tot hij overal staat en dan is
-   de zwaarte weer betekenisloos. */
-const PADEN = [
-  { pad: '/api/pay/', reden: 'geld verplaatsen' },
-  { pad: '/api/betaal/', reden: 'geld verplaatsen' },
-  { pad: '/api/wallet/', reden: 'tegoed en passen' },
-  { pad: '/api/bank/', reden: 'bankhandelingen' },
-  { pad: '/api/auth/password', reden: 'het wachtwoord wijzigen zet alle andere sessies eruit' },
-  { pad: '/api/webauthn/registreer', reden: 'een nieuwe passkey is een nieuwe sleutel tot het account' },
-  { pad: '/api/webauthn/weg', reden: 'een passkey verwijderen haalt een herstelroute weg' },
-  { pad: '/api/mijn/toestel/introk', reden: 'een toestel intrekken sluit sessies' },
-  { pad: '/api/privacy/delete', reden: 'onomkeerbaar' },
-  { pad: '/api/rtgid/machtig', reden: 'iemand anders bevoegdheid geven' }
-];
 
 const zwaarPad = (pad) => PADEN.find(p => String(pad || '').startsWith(p.pad)) || null;
 
@@ -83,10 +67,14 @@ function standNu() {
 }
 
 function maakBezitsbewijs({ db, save, toestellen }) {
+  const { maakMeter } = require('./bezitsmeter');
+  const { tel, stand } = maakMeter(standNu);
+
   /* De gebruikte bewijzen liggen in de DATABASE en niet in het geheugen van een
      proces. Dit huis draait meerdere werkprocessen; een lijst per proces
      betekent dat hetzelfde bewijs op het tweede proces gewoon nog werkt, en dan
-     is de herhaalbescherming een gebaar. */
+     is de herhaalbescherming een gebaar. (De METER mag wel per proces -- die
+     beslist niets. Zie de kop van ./bezitsmeter.js.) */
   const eigen = require('../eigencollectie')({ db, domein: 'kern/identiteit',
     bezit: { bezitsbewijzen: 'kaart' } });
   const gebruikt = () => eigen.bak('bezitsbewijzen');
@@ -114,8 +102,10 @@ function maakBezitsbewijs({ db, save, toestellen }) {
        uitgerekend en teruggegeven, want anders meet je niets en blijft de stand
        voor altijd op schaduw staan omdat niemand weet wat er zou gebeuren. */
     if (werkelijk === 'schaduw' && uit.stand === 'geweigerd') {
+      tel(zwaar.pad, 'schaduw');
       return { stand: 'schaduw', zouZijn: 'geweigerd', reden: uit.reden, waarom: zwaar.reden };
     }
+    tel(zwaar.pad, uit.stand);
     return uit;
   }
 
@@ -179,7 +169,7 @@ function maakBezitsbewijs({ db, save, toestellen }) {
     return { stand: 'bewezen', waarom: zwaar.reden };
   }
 
-  return { controleer, zwaarPad, standNu, PADEN, SPELING_MS };
+  return { controleer, zwaarPad, standNu, stand, PADEN, SPELING_MS };
 }
 
 module.exports = { maakBezitsbewijs, PADEN, zwaarPad, SPELING_MS };

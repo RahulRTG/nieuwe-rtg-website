@@ -119,6 +119,22 @@ test('4b. elk zwaar pad draagt een reden', () => {
   assert.equal(zwaarPad('/api/gids/app'), null);
 });
 
+/* DE TWEE LIJSTEN MOETEN GELIJK BLIJVEN. De client heeft een kopie van de zware
+   paden -- niet om te beslissen (dat doet de server) maar om te weten wanneer
+   tekenen zin heeft. Lopen ze uit elkaar, dan gebeurt dat STIL: de server
+   weigert en het scherm snapt niet waarom. Deze toets is de enige plek waar dat
+   opvalt voordat een gebruiker het merkt. */
+test('4c. de client kent exact dezelfde zware paden als de server', () => {
+  const fs = require('fs'), path = require('path');
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', 'toestelsleutel.js'), 'utf8');
+  const m = bron.match(/var ZWAAR = \[([\s\S]*?)\];/);
+  assert.ok(m, 'de client hoort een lijst zware paden te hebben');
+  const clientPaden = m[1].match(/'[^']+'/g).map(x => x.slice(1, -1)).sort();
+  const serverPaden = PADEN.map(p => p.pad).sort();
+  assert.deepEqual(clientPaden, serverPaden,
+    'server en client kennen verschillende zware paden; dan tekent de browser niet waar de server dat wel eist');
+});
+
 /* ---------------------------------------------------------------------------
    5. DE STANDEN. Schaduw weigert nooit -- dat is de hele reden dat hij bestaat.
    ------------------------------------------------------------------------- */
@@ -161,6 +177,49 @@ test('5d. een onbekende stand valt terug op schaduw en zegt dat', () => {
 /* ---------------------------------------------------------------------------
    6. EEN INGETROKKEN TOESTEL kan niet meer tekenen.
    ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   DE METER. Hij bestaat om het besluit over handhaven mogelijk te maken, dus
+   twee dingen: hij zegt NIET of je mag aanzetten (dat is het ene groene cijfer
+   dat LAT-regel 11 verbiedt), en hij zegt "niets gemeten" in plaats van nul.
+   ------------------------------------------------------------------------- */
+test('7. de meter zegt "niets gemeten", niet nul procent', async () => {
+  const { b } = await opzet();
+  const s = b.stand();
+  assert.equal(s.dekking, null, 'nul zou "niets werkt" betekenen terwijl het "wij weten het niet" is');
+  assert.match(s.uitleg, /iets anders dan nul/);
+  assert.ok(s.nietGemeten, 'de meter hoort te zeggen wat hij NIET dekt (per proces, geen herstart)');
+});
+
+test('7b. de meter telt per uitkomst en per pad, en rekent de dekking uit', async () => {
+  const { b, teken } = await opzet();
+  await b.controleer({ sess: gebonden, methode: 'POST', pad: '/api/pay/tik',
+    kop: await teken({ jti: jti(), tijd: Date.now(), methode: 'POST', pad: '/api/pay/tik' }), stand: 'aanbevolen' });
+  await b.controleer({ sess: gebonden, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'aanbevolen' });
+  const s = b.stand();
+  assert.equal(s.zwareVerzoeken, 2);
+  assert.equal(s.perUitkomst.bewezen, 1);
+  assert.equal(s.perUitkomst.geweigerd, 1);
+  assert.equal(s.dekking, 50);
+  assert.ok(s.perPad['/api/pay/']);
+});
+
+test('7c. de meter velt GEEN oordeel over aanzetten', async () => {
+  const { b } = await opzet();
+  const s = JSON.stringify(b.stand());
+  for (const verboden of ['klaar', 'gereed', 'veilig', 'mag aan', 'aanbevolenOm']) {
+    assert.equal(s.toLowerCase().includes(verboden.toLowerCase()), false,
+      'de meter levert het getal; de drempel is een besluit van de eigenaar en hoort niet in code');
+  }
+});
+
+test('7d. schaduw telt mee als "zou zijn geweigerd"', async () => {
+  const { b } = await opzet();
+  await b.controleer({ sess: gebonden, methode: 'POST', pad: '/api/pay/tik', kop: null, stand: 'schaduw' });
+  const s = b.stand();
+  assert.equal(s.perUitkomst.schaduw, 1);
+  assert.equal(s.dekking, 0, 'een schaduw-weigering telt als niet-gedekt; anders meet schaduw niets');
+});
+
 test('6. is het toestel ingetrokken, dan telt zijn bewijs niet meer', async () => {
   const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
   const jwk = await webcrypto.subtle.exportKey('jwk', kp.publicKey);

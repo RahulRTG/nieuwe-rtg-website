@@ -147,7 +147,7 @@ standaard of de wereld is er nog niet klaar voor.
 | 19 | AI-mandaat i.p.v. almacht | **staat, verkeerde doelgroep** | `command.toezicht.zetGrenzen()` doet dit voor RTG-agenten. `FABRIC.md` par. 5 heeft de grenzen al. |
 | 20 | Contextwisseling zonder opnieuw inloggen | **staat** | `kern/eenaccount.js` + `/api/account/rollen|start`, `/api/sso/wissel`. Sinds 31 augustus 2026 ook ZICHTBAAR: elke context legt zich vast bij het wisselen en verschijnt als eigen regel in "waar ben ik aanwezig". |
 | 21 | Aanwezigheid per context i.p.v. sessies | **na sessieverrijking** | Zie par. 2. |
-| 22 | Sender-constrained sessies (DPoP) | **staat, in de schaduw** | `kern/identiteit/bezitsbewijs.js`, 31 augustus 2026. Niet DPoP zelf (geen access token met cnf-claim, geen OAuth) maar het idee ervan, op de toestelsleutel uit blok 3. Gelaagd naar risico: tien paden met per stuk een reden. Drie standen, en hij begint in `schaduw` -- CONTROLPLANE.md: eerst meelopen zonder te blokkeren. `aanbevolen` maakt een gestolen token uit een gebonden sessie waardeloos; `verplicht` sluit ook het gat van ongebonden sessies. |
+| 22 | Sender-constrained sessies (DPoP) | **staat, in de schaduw** | `kern/identiteit/bezitsbewijs.js`, 31 augustus 2026. Niet DPoP zelf (geen access token met cnf-claim, geen OAuth) maar het idee ervan, op de toestelsleutel uit blok 3. Vijftien paden met per stuk een reden. Drie standen; hij begint in `schaduw` en de meter (`/api/command/bezitsbewijs`) levert het getal waar het besluit om te gaan handhaven op rust. |
 | 23 | Evidence-native UI | **staat als taal, niet als UI** | `BESTUUR.md`: onbekend → vermoed → gemeten → bewezen, met datum, en *vervallen bewijs is geen bewijs*. Niet opnieuw uitvinden. |
 | 24 | Trust receipts | **stap weg** | De ketenhash (`server/lib/keten*.js`) en het handelingsspoor dragen het bewijs al; er is geen bon die het aan de mens toont. |
 
@@ -225,6 +225,29 @@ naam hoort in de identiteitskluis, met een inzageregel. Draai
 `npm run afleidbaar` na elke uitbreiding van de graaf.
 
 ---
+
+## 5a. Een open bevinding: het telefoonnummer is een herstelkanaal
+
+Bij het uitbreiden van de zware paden (blok 4) kwam iets aan het licht dat geen
+onderdeel van dat blok is en dus blijft staan tot iemand het repareert.
+
+`/api/auth/reset` stuurt een sms naar `phoneOf(u)`. Dat nummer is dus een
+herstelkanaal. Maar het KAN worden vervangen door een ingelogde sessie **zonder
+dat er opnieuw om een wachtwoord wordt gevraagd** -- via `/api/gegevens/zeg`
+(`routes/member/gegevens.js`) of `/api/onboarding/inricht`. Het wachtwoord
+wijzigen eist wél het huidige wachtwoord (`routes/auth/herstel.js`), en dat is
+de scheve kant op: het nummer omzetten is de eerste stap van een overname en het
+wachtwoord de tweede.
+
+`herstel.js` redeneert in zijn eigen commentaar dat een aanvaller "eerst het
+telefoonnummer zou moeten weghalen, en daarvoor moet hij al binnen zijn".
+`setPhone` kan een nummer inderdaad niet leegmaken -- maar wel VERVANGEN, en dat
+komt op hetzelfde neer.
+
+Beide routes staan sinds blok 4 op de zware lijst, maar **dat dicht het niet**:
+een bezitsbewijs vraagt om het toestel, niet om de mens. De echte reparatie is
+her-authenticatie op die twee routes. Dat is een besluit over UX-wrijving en
+hoort daarom bij de eigenaar, niet bij wie dit toevallig vond.
 
 ## 6. De volgorde
 

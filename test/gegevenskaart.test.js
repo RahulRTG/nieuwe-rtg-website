@@ -176,6 +176,28 @@ test('3c. de telling toont de onbekende even groot als de rest', () => {
   assert.equal(k.samengesteld, undefined, 'er komt geen samengesteld cijfer op (LAT-regel 11)');
 });
 
+test('3e. een tweede helft bij een nee verschijnt alleen bij een HARDE nee', () => {
+  /* Bij de facturen zegt "RTG heeft dit niet" maar de helft: zodra er een komt
+     geldt de bewaarplicht meteen. Die zin hoort er dus bij -- maar niet bij
+     ONBEKEND, want dan bevestigt hij een afwezigheid die niet is vastgesteld,
+     en niet bij AANWEZIG, want dan zegt de termijn al hetzelfde. */
+  const leeg = opzet({ accounts: { getMemberState: () => ({ geboren: '1990-01-01' }) } })
+    .kaartVan('lid-1', { id: 1 }).rijen.find(r => r.id === 'facturen');
+  assert.equal(leeg.aanwezig, false);
+  assert.ok(leeg.bijAfwezig, 'bij een harde nee staat de tweede helft erbij');
+
+  const vol = opzet({ accounts: { getMemberState: () => ({ invoices: [{ id: 'a' }] }) } })
+    .kaartVan('lid-1', { id: 1 }).rijen.find(r => r.id === 'facturen');
+  assert.equal(vol.aanwezig, true);
+  assert.equal(vol.bijAfwezig, undefined, 'bij aanwezig zegt de termijn al hetzelfde');
+
+  const stuk = opzet({ accounts: { getMemberState: () => { throw new Error('dicht'); } } })
+    .kaartVan('lid-1', { id: 1 }).rijen.find(r => r.id === 'facturen');
+  assert.equal(stuk.aanwezig, null);
+  assert.equal(stuk.bijAfwezig, undefined,
+    'bij onbekend niet -- anders bevestigt hij een afwezigheid die niet is vastgesteld');
+});
+
 /* ---------------------------------------------------------------------------
    4. DE KAART LEEST EN SCHRIJFT NIET. Zou hij schrijven, dan werd uw eigen kaart
    voller door ernaar te kijken -- dezelfde regel als bij de inzagekaart.

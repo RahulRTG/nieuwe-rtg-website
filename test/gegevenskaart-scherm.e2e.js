@@ -50,21 +50,83 @@ test('Gegevenskaart: soorten en geen inhoud, met onbekend als eigen uitslag',
     /* 1. DE DRIE UITSLAGEN, elk met een eigen gezicht. */
     assert.ok(await page.locator('#lijst .vlag.ja').count() > 0, 'er staat iets dat RTG heeft');
     assert.ok(await page.locator('#lijst .vlag.nee').count() > 0, 'en iets dat RTG niet heeft');
+
+    /* DE DERDE UITSLAG IS NIET AF TE DWINGEN MET ECHTE DATA, en dat is goed
+       nieuws: bij een gezond lid is er niets onbekends. Hij moet wel gedekt --
+       juist die uitslag is de reden dat deze kaart bestaat. Dus wordt hieronder
+       EEN antwoord gestuurd, en alleen om te zien wat het scherm ermee doet.
+       Wat de server terugstuurt is elders gedekt (test/gegevenskaart.test.js);
+       hier gaat het om de opmaak, want een onderscheid dat alleen in de JSON zit
+       bestaat voor een mens niet. */
+    await page.route('**/api/mijn/gegevens', async (route) => {
+      const antwoord = await route.fetch();
+      const k = await antwoord.json();
+      k.rijen[0] = Object.assign({}, k.rijen[0], { aanwezig: null, waarom: 'De laag die dit bezit is hier niet aangesloten.' });
+      /* En een harde NEE met een tweede helft. Een vers lid blijkt al een
+         factuur te hebben, dus deze stand is met echte data niet af te dwingen
+         -- maar hij moet wel gedekt, want juist daar zegt "RTG heeft dit niet"
+         maar de helft. */
+      const f = k.rijen.findIndex(r => r.id === 'facturen');
+      if (f >= 0) k.rijen[f] = Object.assign({}, k.rijen[f], { aanwezig: false,
+        bijAfwezig: 'Er staat nu geen factuur op uw naam. Komt er een, dan valt die meteen onder de bewaartermijn hieronder.' });
+      await route.fulfill({ json: k });
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .rij').length > 0, null, { timeout: 15000 });
+
     assert.ok(await page.locator('#lijst .vlag.onbekend').count() > 0,
-      'en minstens een dat niet vast te stellen is -- die derde uitslag moet zichtbaar zijn');
+      'die derde uitslag moet een eigen gezicht krijgen en niet stil wegvallen');
     const kleuren = await page.evaluate(() => {
       const k = s => { const e = document.querySelector(s); return e ? getComputedStyle(e).color : null; };
-      return { nee: k('.vlag.nee'), onbekend: k('.vlag.onbekend') };
+      return { ja: k('.vlag.ja'), nee: k('.vlag.nee'), onbekend: k('.vlag.onbekend') };
     });
     assert.notEqual(kleuren.onbekend, kleuren.nee,
       '"niet vast te stellen" mag er niet uitzien als "nee"; dan bestaat het onderscheid voor een mens niet');
+    assert.notEqual(kleuren.onbekend, kleuren.ja, 'en ook niet als "ja"');
+    assert.match(await page.textContent('#lijst .rij'), /niet aangesloten/,
+      'en de reden staat bij de rij zelf, niet drie schermen verderop');
+    /* EEN NEE DIE NIET ALLES ZEGT, in dezelfde gestuurde fase. */
+    assert.match(await page.textContent('#lijst'), /Komt er een, dan valt die meteen onder de bewaartermijn/,
+      'bij een harde nee staat de tweede helft van het antwoord erbij');
 
-    /* 2. ELKE RIJ BEANTWOORDT DE VIER VRAGEN. */
+    await page.unroute('**/api/mijn/gegevens');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.querySelectorAll('#lijst .rij').length > 0, null, { timeout: 15000 });
+
+    /* 2. ELKE RIJ BEANTWOORDT DE VIER VRAGEN -- en niet alleen met een label.
+       scripts/schermmutatie.js liet zien dat dit blok half ongedekt was: de
+       labels waren gedekt, maar het ANTWOORD erachter verdween ongemerkt (het
+       stuk `t.appendChild(document.createTextNode(wat))` overleefde). Een rij
+       die "Waarvoor:" zegt en daarna niets, is erger dan geen rij. */
     const eerste = await page.locator('#lijst .rij').first().textContent();
-    assert.match(eerste, /Waarvoor/, 'waarvoor het gebruikt mag worden');
-    assert.match(eerste, /Waar/, 'waar het staat');
-    assert.match(eerste, /Hoe het bij ons kwam/, 'hoe het bij ons kwam');
+    /* PER FEIT-ELEMENT en niet op de tekst van de rij. Dat laatste stond hier
+       eerst, en de mutatie liet zien waarom het niets bewees: textContent plakt
+       de kinderen aan elkaar, dus "Waarvoor:" gevolgd door het volgende label
+       "Waar:" matchte gewoon door -- terwijl het antwoord zelf verdwenen was.
+       Voor de derde keer in deze ronde dezelfde vorm: wie een container leest,
+       bewijst niet welk element hij las. */
+    const feiten = page.locator('#lijst .rij').first().locator('.feit');
+    assert.equal(await feiten.count(), 3, 'drie feiten per rij');
+    for (const [i, label] of ['Waarvoor', 'Waar', 'Hoe het bij ons kwam'].entries()) {
+      const t = (await feiten.nth(i).textContent()).trim();
+      assert.ok(t.startsWith(label + ':'), 'feit ' + i + ' begint met ' + label + ', maar was: ' + t.slice(0, 40));
+      assert.ok(t.slice(label.length + 1).trim().length > 10,
+        label + ' staat er zonder antwoord erachter; een label zonder antwoord is erger dan geen label');
+    }
     assert.match(eerste, /kan niet weg|Weghalen kan/, 'en of het weg kan');
+    /* De gouden streep voor elk feit is geen versiering: hij scheidt de vier
+       antwoorden van elkaar. Zonder hem lopen ze in een telefoonbreedte in
+       elkaar over. */
+    assert.equal(await page.locator('#lijst .rij').first().locator('.feit i').count(), 3,
+      'elk van de drie feiten draagt zijn eigen streep');
+
+    /* De grond onder een gegeven dat niet weg kan, staat er in mensentaal bij.
+       Ook dit stuk overleefde eerst een mutatie: "Dit kan niet weg" bleef staan
+       terwijl de uitleg WAAROM verdween, en dat is precies het verschil tussen
+       een mededeling en een antwoord. */
+    const vast = page.locator('#lijst .rij').filter({ hasText: 'Dit kan niet weg' }).first();
+    assert.match(await vast.textContent(), /verdwijnt wel als u uw account opheft|wettelijke plicht|voor u is/,
+      'bij een gegeven dat niet weg kan staat de grond in mensentaal erbij');
 
     /* 3. GEEN INHOUD. De grens met de AVG-uitvoer. */
     const alles = await page.textContent('main');

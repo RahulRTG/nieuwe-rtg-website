@@ -128,6 +128,11 @@
     /* Een onbekende die je pas onderaan de pagina kunt verklaren, wordt gelezen
        als een nee. Dus staat de reden hier, bij de rij zelf. */
     if (r.waarom) el.appendChild(tekst(maak('div', 'waarom'), r.waarom));
+    /* EEN NEE DIE NIET ALLES ZEGT. Bij de facturen is "RTG heeft dit niet" maar
+       de helft: zodra er een komt, geldt de bewaarplicht meteen. Die tweede
+       helft komt alleen bij een harde nee -- bij onbekend zou hij een
+       afwezigheid bevestigen die niet is vastgesteld. */
+    if (r.bijAfwezig) el.appendChild(tekst(maak('div', 'waarom'), r.bijAfwezig));
 
     const weg = maak('div', 'weg' + (r.weg.kan ? '' : ' vast'));
     weg.appendChild(tekst(maak('b'), r.weg.kan ? 'Weghalen kan. ' : 'Dit kan niet weg. '));

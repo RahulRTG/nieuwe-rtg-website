@@ -29,6 +29,7 @@ const { SOORTEN, WAAR, HERKOMST, GRONDEN } = require('./gegevenssoorten');
    blijven maar twee jaar. Wie een bewaartermijn overtypt, heeft hem binnen een
    jaar mis. */
 const { BELEID } = require('../../bewaartermijnen');
+const { maakPeilingen } = require('./gegevenspeiling');
 
 function termijnVan(tak) {
   if (!tak) return null;
@@ -60,22 +61,7 @@ const GRENZEN = [
 
 function maakGegevenskaart({ accounts, sessieregister, toestellen, commercieel, inzagekaart }) {
 
-  /* DE PEILINGEN. Elk geeft true, false of null terug -- en null draagt altijd
-     een reden. Er is met opzet geen peiling die bij twijfel "nee" zegt. */
-  const peiling = {
-    'kluis:naam': (u) => !!(u && accounts.realNameOf(u)),
-    'kluis:codenaam': (u) => !!(u && u.codename),
-    'kluis:email': (u) => !!(u && accounts.emailOf(u)),
-    'kluis:telefoon': (u) => !!(u && accounts.phoneOf(u)),
-    'kluis:verificatie': (u) => !!(u && u.verified && u.verified !== 'unverified'),
-    'dossier:geboortedatum': (u, md) => !!(md && md.geboren),
-    'dossier:adres': (u, md) => !!(md && md.adres),
-    'dossier:tweefactor': (u, md) => !!(md && md.tweefactor && md.tweefactor.aan),
-    sessies: (u, md, key) => (sessieregister ? sessieregister.vanLid(key).length > 0 : null),
-    toestellen: (u, md, key) => (toestellen ? toestellen.lijst(key).length > 0 : null),
-    post: (u, md, key) => (commercieel ? commercieel.standVan(key).soorten.some(s => s.aan) : null),
-    inzage: (u, md, key) => (inzagekaart ? (inzagekaart(key).kaart || []).length > 0 : null)
-  };
+  const peiling = maakPeilingen({ accounts, sessieregister, toestellen, commercieel, inzagekaart });
 
   /* Een peiling die stukloopt is GEEN "nee". Hij komt terug als onbekend met de
      storing erbij, want een kaart die een storing als afwezigheid toont, liegt
@@ -119,6 +105,10 @@ function maakGegevenskaart({ accounts, sessieregister, toestellen, commercieel, 
            jurist iets en een lid niets. */
         weg: Object.assign({}, s.weg, s.weg.grond ? { grondUitleg: GRONDEN[s.weg.grond] } : {}),
         ...(s.bewaartak ? { termijn: termijnVan(s.bewaartak) } : {}),
+        /* Alleen bij een harde NEE. Bij onbekend zou hij een afwezigheid
+           bevestigen die niet is vastgesteld, en bij aanwezig zegt de termijn
+           al hetzelfde. */
+        ...(s.bijAfwezig && p.aanwezig === false ? { bijAfwezig: s.bijAfwezig } : {}),
         aanwezig: p.aanwezig,
         /* De reden reist mee met de rij en niet als losse lijst onderaan: een
            onbekende die je pas drie schermen verder kunt verklaren, wordt

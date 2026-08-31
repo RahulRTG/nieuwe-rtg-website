@@ -101,7 +101,15 @@ const SOORTEN = [
     bron: 'server/kern/identiteit/commercieel.js' },
 
   /* DE TWEE DIE NIET WEG KUNNEN, en ze staan er juist daarom in. */
-  { id: 'facturen', naam: 'Uw facturen en betalingen', waar: 'operationeel', herkomst: 'gemeten',
+  { id: 'facturen', naam: 'Uw facturen en betalingen', waar: 'dossier', herkomst: 'gemeten',
+    meet: 'dossier:facturen',
+    /* EEN NEE DIE NIET ALLES ZEGT. Deze rij stond eerst zonder peiling, omdat
+       "RTG heeft dit niet" hier de helft weglaat: er is nu niets, maar zodra er
+       een factuur komt geldt de bewaarplicht meteen. Dat is geen reden om niet
+       te peilen -- het is een reden om de tweede helft erbij te zetten. Deze
+       zin verschijnt alleen bij afwezigheid, want bij aanwezigheid vertelt de
+       termijn hetzelfde. */
+    bijAfwezig: 'Er staat nu geen factuur op uw naam. Komt er een, dan valt die meteen onder de bewaartermijn hieronder -- ook als u daarna uw account opheft.',
     doel: 'De uitvoering van een overeenkomst, en de administratie die de wet van RTG eist.',
     /* HET GETAL STAAT HIER NIET. Het stond er eerst wel ("zeven jaar") en dat
        is precies de vorm waarin een document van de code wegdrijft: de termijn

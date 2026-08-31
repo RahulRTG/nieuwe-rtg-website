@@ -105,7 +105,10 @@ function maakLedger(ctx) {
     const v = verbruikVan(dragerVanStudie(s.labId, s.id), p);
     return { ok: true, periode: p,
       lab: lab ? { id: lab.id, naam: lab.naam, stad: lab.stad } : null,
-      studie: { id: s.id, titel: s.titel, soort: s.soort },
+      /* Het onderzoeksnummer staat erbij, want dit is het stuk dat een
+         subsidiegever leest: die kent het onderzoek onder zijn nummer en niet
+         onder een interne sleutel. */
+      studie: { id: s.id, nummer: s.nummer || null, titel: s.titel, soort: s.soort },
       verbruik: v,
       doorbelasting: doorbelasting(v.totaal.centen),
       zegtNiet: ZEGT_NIET };
@@ -123,7 +126,7 @@ function maakLedger(ctx) {
       const v = verbruikVan(r.drager, p);
       const sid = v.studie;
       const s = sid ? vindStudie(sid) : null;
-      return { studie: s ? { id: s.id, titel: s.titel } : null,
+      return { studie: s ? { id: s.id, nummer: s.nummer || null, titel: s.titel } : null,
         drager: r.drager, centen: v.totaal.centen, graad: v.totaal.graad,
         /* Welke soorten er WEL zijn gemeten maar geen tarief hebben. Zonder deze
            regel leest een nul als "gratis", en dat is een andere bewering dan

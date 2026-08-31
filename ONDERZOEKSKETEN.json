@@ -1,0 +1,311 @@
+{
+  "gemeten": {
+    "op": "2026-08-31",
+    "stations": 10,
+    "paren": 90,
+    "schakels": 6,
+    "ontbrekendeBestanden": []
+  },
+  "stations": [
+    {
+      "id": "buurtvraag",
+      "naam": "Vraag uit de buurt",
+      "bestanden": [
+        "server/kern/livinglab/themas.js"
+      ],
+      "verwijst": [
+        "themaId",
+        "vraagId",
+        "buurtvraagId"
+      ]
+    },
+    {
+      "id": "studie",
+      "naam": "Studie (Living Lab)",
+      "bestanden": [
+        "server/kern/livinglab/studie.js"
+      ],
+      "verwijst": [
+        "studieId"
+      ]
+    },
+    {
+      "id": "ethiek",
+      "naam": "Ethiek en toestemming",
+      "bestanden": [
+        "server/kern/livinglab/ethiek.js",
+        "server/kern/livinglab/waarborg.js"
+      ],
+      "verwijst": [
+        "ethiekId",
+        "reviewId"
+      ]
+    },
+    {
+      "id": "waarneming",
+      "naam": "Waarnemingen",
+      "bestanden": [
+        "server/kern/livinglab/waarnemen.js"
+      ],
+      "verwijst": [
+        "waarnemingId",
+        "meting"
+      ]
+    },
+    {
+      "id": "bewijs",
+      "naam": "Bewijsmotor",
+      "bestanden": [
+        "server/kern/livinglab/bewijs.js"
+      ],
+      "verwijst": [
+        "bewijsId",
+        "conclusieId"
+      ]
+    },
+    {
+      "id": "apparatuur",
+      "naam": "Apparatuur",
+      "bestanden": [
+        "server/kern/livinglab/apparatuur.js",
+        "server/kern/livinglab/apparatuurgebruik.js"
+      ],
+      "verwijst": [
+        "apparaatId",
+        "kalibratieId"
+      ]
+    },
+    {
+      "id": "doorbraak",
+      "naam": "Uitgang / pilotvoorstel",
+      "bestanden": [
+        "server/kern/livinglab/doorbraak.js"
+      ],
+      "verwijst": [
+        "uitgangId",
+        "pilotId"
+      ]
+    },
+    {
+      "id": "onderzoekslab",
+      "naam": "RTG Onderzoekslab",
+      "bestanden": [
+        "server/kern/onderzoekslab.js"
+      ],
+      "verwijst": [
+        "projectId",
+        "labProjectId"
+      ]
+    },
+    {
+      "id": "labfonds",
+      "naam": "Labfonds",
+      "bestanden": [
+        "server/kern/labfonds.js"
+      ],
+      "verwijst": [
+        "fondsId",
+        "voorstelId"
+      ]
+    },
+    {
+      "id": "kosten",
+      "naam": "Onderzoeksgrootboek",
+      "bestanden": [
+        "server/kern/livinglab/ledger.js",
+        "server/kern/livinglab/ledgeradres.js"
+      ],
+      "verwijst": [
+        "ledgerId",
+        "kostenId"
+      ]
+    }
+  ],
+  "schakels": [
+    {
+      "van": "buurtvraag",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": []
+    },
+    {
+      "van": "apparatuur",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": []
+    },
+    {
+      "van": "doorbraak",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": [
+        "server/kern/livinglab/studie.js"
+      ]
+    },
+    {
+      "van": "doorbraak",
+      "naar": "bewijs",
+      "velden": [
+        "conclusieId"
+      ],
+      "modules": []
+    },
+    {
+      "van": "doorbraak",
+      "naar": "onderzoekslab",
+      "velden": [],
+      "modules": [
+        "ctx.lab",
+        "projectMaak",
+        "logMaak"
+      ]
+    },
+    {
+      "van": "kosten",
+      "naar": "studie",
+      "velden": [
+        "studieId"
+      ],
+      "modules": []
+    }
+  ],
+  "zonderUitgaand": [
+    "studie",
+    "ethiek",
+    "waarneming",
+    "bewijs",
+    "onderzoekslab",
+    "labfonds"
+  ],
+  "zonderInkomend": [
+    "buurtvraag",
+    "ethiek",
+    "waarneming",
+    "apparatuur",
+    "doorbraak",
+    "labfonds",
+    "kosten"
+  ],
+  "hub": [
+    {
+      "station": "buurtvraag",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "studie",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "ethiek",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "waarneming",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "bewijs",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "apparatuur",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "doorbraak",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    },
+    {
+      "station": "onderzoekslab",
+      "aanDeStudie": false,
+      "aanHetLab": false
+    },
+    {
+      "station": "labfonds",
+      "aanDeStudie": false,
+      "aanHetLab": false
+    },
+    {
+      "station": "kosten",
+      "aanDeStudie": true,
+      "aanHetLab": true
+    }
+  ],
+  "keten": [
+    {
+      "van": "buurtvraag",
+      "naar": "studie",
+      "verbonden": true,
+      "richting": "heen",
+      "via": [
+        "studieId"
+      ]
+    },
+    {
+      "van": "studie",
+      "naar": "ethiek",
+      "verbonden": false,
+      "richting": null,
+      "via": []
+    },
+    {
+      "van": "ethiek",
+      "naar": "waarneming",
+      "verbonden": false,
+      "richting": null,
+      "via": []
+    },
+    {
+      "van": "waarneming",
+      "naar": "bewijs",
+      "verbonden": false,
+      "richting": null,
+      "via": []
+    },
+    {
+      "van": "bewijs",
+      "naar": "doorbraak",
+      "verbonden": true,
+      "richting": "terug",
+      "via": [
+        "conclusieId"
+      ]
+    },
+    {
+      "van": "doorbraak",
+      "naar": "onderzoekslab",
+      "verbonden": true,
+      "richting": "heen",
+      "via": []
+    },
+    {
+      "van": "onderzoekslab",
+      "naar": "labfonds",
+      "verbonden": false,
+      "richting": null,
+      "via": []
+    },
+    {
+      "van": "labfonds",
+      "naar": "kosten",
+      "verbonden": false,
+      "richting": null,
+      "via": []
+    }
+  ],
+  "ketenGesloten": false,
+  "let": "Deze meting zegt welke stations NAAR ELKAAR VERWIJZEN in de code. Zij zegt niet of die verwijzing altijd gevuld is, en niet of het om hetzelfde onderzoek gaat."
+}

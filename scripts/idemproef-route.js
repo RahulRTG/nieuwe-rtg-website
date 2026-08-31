@@ -347,7 +347,7 @@ wachtOpSchoneBoom();
   console.log('  spelwereld                           : ' + (spelWereld.klaar ? 'klaar   (' + spelWereld.extra.soort + ')' : 'NIET klaar -- ' + spelWereld.reden));
   for (const st of spelWereld.stappen) if (!st.ok) console.log('      ' + st.naam + ': ' + st.waarom);
 
-  const { oogstObjecten } = require('./lib/objectoogst');
+  const { oogstObjecten, metAchtervoegsels } = require('./lib/objectoogst');
   const objecten = await oogstObjecten({
     post, routes, tokenVoor,
     lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra,
@@ -446,7 +446,7 @@ wachtOpSchoneBoom();
        zeker). Een id dat de applicatie zelf heeft uitgegeven, hoort te winnen
        van een verzonnen waarde en te verliezen van een sleutel die bij deze
        deur hoort. */
-    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...objecten.voor(r.pad),
+    lijfVoor: (r) => ({ ...plausibelLijf(r.pad), ...extra, ...metAchtervoegsels(objecten.voor(r.pad)),
       ...(r.pad.startsWith('/api/foundation/school/') ? schoolWereld.extra : {}),
       ...(r.pad.startsWith('/api/supplier/horeca/') ? horecaWereld.extra : {}),
       ...(r.pad.startsWith('/api/rtfos/') ? rtfosWereld.extra : {}),

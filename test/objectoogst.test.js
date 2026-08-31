@@ -176,3 +176,32 @@ test('een token is GEEN verwijzing', () => {
     assert.ok(!IDVELD.test(k), k + ' hoort geen verwijzing te zijn');
   }
 });
+
+/* DE ACHTERVOEGSELVORM bij het LEZEN. Het huis noemt zijn verwijzingen
+   `<ding>Id` en `<ding>Code`; de oogst bewaart onder `<ding>`. */
+test('een geoogst ding wordt ook onder <ding>Id en <ding>Code aangeboden', () => {
+  const { metAchtervoegsels } = require('../scripts/lib/objectoogst');
+  const uit = metAchtervoegsels({ taak: 'T1', project: 'P1' });
+  assert.equal(uit.taak, 'T1');
+  assert.equal(uit.taakId, 'T1');
+  assert.equal(uit.taakCode, 'T1');
+  assert.equal(uit.projectId, 'P1');
+});
+
+/* Een echte waarde wint van een afgeleide -- anders overschrijft een gok een
+   id dat de server zelf heeft teruggegeven. */
+test('een bestaande waarde wordt niet overschreven', () => {
+  const { metAchtervoegsels } = require('../scripts/lib/objectoogst');
+  const uit = metAchtervoegsels({ taak: 'T1', taakId: 'ECHT' });
+  assert.equal(uit.taakId, 'ECHT');
+});
+
+/* En er wordt niet gestapeld: `id` -> `idId` is onzin, `taakId` -> `taakIdId`
+   ook. */
+test('er wordt niet op een achtervoegsel gestapeld', () => {
+  const { metAchtervoegsels } = require('../scripts/lib/objectoogst');
+  const uit = metAchtervoegsels({ id: 'X', taakId: 'T', code: 'C' });
+  assert.equal(uit.idId, undefined);
+  assert.equal(uit.taakIdId, undefined);
+  assert.equal(uit.codeCode, undefined);
+});

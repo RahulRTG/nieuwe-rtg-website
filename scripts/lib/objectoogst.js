@@ -208,4 +208,38 @@ function uitOogst(oogst, pad) {
   return uit;
 }
 
-module.exports = { oogstObjecten, uitOogst, MAAK, IDVELD };
+/* DE ACHTERVOEGSELVORM, en die hoort BIJ HET LEZEN en niet bij het oogsten.
+
+   Dit is de spiegel van IDVELD: die leert de oogst dat `lidId` een verwijzing
+   IS, dit biedt een geoogst ding aan onder de naam waarmee ernaar gevraagd
+   wordt. Gemeten over de 2321 geblokkeerde routes: 520 lezen een id-veld
+   waarvan de naam door niemand werd aangeboden, en de lijst is opvallend
+   regelmatig -- taakId (51), besluitId (32), projectId (32), ticketId (17).
+   Het huis noemt zijn verwijzingen `<ding>Id` en `<ding>Code`, en de oogst had
+   alleen `<ding>` in huis. Geen woordenlijst dus maar een VORM, net als bij
+   IDVELD.
+
+   WAAROM NIET AL BIJ HET OOGSTEN. Zo stond het eerst, en dat kostte tien
+   objecten: een maakroute die er ineens een `taakId` bij kreeg, ging iets
+   ANDERS doen dan maken. Gemeten: 142 -> 132 objecten, tegen vier routes
+   winst. De oogst hoort zo kaal mogelijk te blijven; wat de PROEF meestuurt
+   is een andere vraag dan wat de oogst zelf nodig heeft.
+
+   Een echte waarde wint altijd: bestaat het veld al in de bak, dan blijft het
+   staan en wordt er niets afgeleid overheen gezet. */
+function metAchtervoegsels(bak) {
+  const uit = { ...bak };
+  for (const [k, w] of Object.entries(bak)) {
+    /* Alleen van de KALE objectnamen afleiden. `id` -> `idId` is onzin, en
+       `taakId` -> `taakIdId` ook. */
+    if (IDVELD.test(k) && /(Id|Code|Ref)$/.test(k)) continue;
+    if (['id', 'code', 'iban', 'sleutel', 'nummer', 'ref', 'handle', 'slug'].includes(k)) continue;
+    for (const achter of ['Id', 'Code']) {
+      const naam = k + achter;
+      if (!(naam in uit)) uit[naam] = w;
+    }
+  }
+  return uit;
+}
+
+module.exports = { oogstObjecten, uitOogst, metAchtervoegsels, MAAK, IDVELD };

@@ -849,7 +849,11 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
         try { await direct.first().click({ timeout: 7000 }); return; }
         catch (e) {
           if (poging === 2) throw e;
-          await page.waitForTimeout(400);
+          /* Op de knop wachten en niet op een klok (test/klokwacht.test.js):
+             de balk is opnieuw aan het tekenen, dus we wachten tot er weer een
+             knop met dit vermogen IN de balk staat. */
+          await page.waitForSelector('#rtgCommand .cmd-actie[data-cap="' + id + '"]',
+            { state: 'attached', timeout: 7000 }).catch(() => {});
         }
       }
       {

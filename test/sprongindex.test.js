@@ -34,6 +34,18 @@ test('de handelingindex is gelijk aan de knoppen van de schermen', () => {
   assert.equal(controle('handelingindex.js'), null);
 });
 
+/* De vierde afgeleide: het rooster dat in de vier wereldhuizen STAAT. Dat is
+   geen script in de browser maar tekst in de pagina (zie scripts/wereldrooster.js),
+   want test/beginscherm.test.js leest die pagina en een ingang die pas na een
+   fetch bestaat, is voor hem geen ingang -- en daar heeft hij gelijk in.
+
+   DE VOLGORDE WAARIN ZE GEDRAAID WORDEN IS NIET VRIJ: sprongindex leest MAPPEN,
+   wereldrooster schrijft daaruit de huizen bij, en handelingindex leest daarna
+   die huizen. Andersom draaien geeft een index die een ronde achterloopt. */
+test('de vier wereldhuizen dragen het rooster van hun eigen wereld', () => {
+  assert.equal(controle('wereldrooster.js'), null);
+});
+
 /* De vindbaarheidsmeter hoort niet onder zijn vloer te zakken. Hij meet WOORDEN
    en geen mensen (VINDBAAR.json zegt dat er zelf bij), maar een terugval van
    68% naar 20% betekent dat er een index is stukgegaan, en dat hoort een toets

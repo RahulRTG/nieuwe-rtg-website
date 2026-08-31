@@ -67,10 +67,17 @@
   <div id="uit"></div>
   <div class="kaart" id="campagnes"></div>
   <!-- ALLES IN DEZE WERELD, uit de bron. Dit blok is niet met de hand
-       geschreven: shared/wereldrooster.js vult het uit shared/sprongindex.json,
-       dat uit MAPPEN komt. Het redactionele rooster hierboven blijft staan --
+       geschreven: scripts/wereldrooster.js schrijft het uit shared/sprongindex.json,
+       dat uit MAPPEN komt, en npm run wereldrooster -- --controle zakt als het
+       achterloopt. Het redactionele rooster hierboven blijft staan --
        dat verleidt, dit is compleet, en dat zijn twee dingen (TIKKEN.md). -->
-  <section class="hero" aria-labelledby="allesFoundationOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesFoundationOS">Alles wat in FoundationOS hangt.</h2><div class="grid" data-wereldrooster="FoundationOS"></div></section>
+  <section class="hero" aria-labelledby="allesFoundationOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesFoundationOS">Alles wat in FoundationOS hangt.</h2><div class="grid">
+  <!-- WERELDROOSTER:FoundationOS -->
+    <a class="kaart" href="/apps/foundation/bord.html"><b>Het bord</b></a>
+    <a class="kaart" href="/apps/foundation/schrift.html"><b>Het schrift</b></a>
+    <a class="kaart" href="/apps/foundation/os-publiek.html"><b>RTFoundation in uw buurt</b></a>
+    <a class="kaart" href="/apps/foundation/os-portaal.html"><b>RTFoundation portaal</b></a>
+  <!-- /WERELDROOSTER --></div></section>
 </main>
 
 <script>
@@ -168,6 +175,5 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
 <script src="premium.js" defer></script>
-  <script src="/shared/wereldrooster.js" defer></script>
 </body>
 </html>

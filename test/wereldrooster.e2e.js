@@ -14,7 +14,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -50,7 +50,11 @@ test('elk wereldhuis toont alles wat in die wereld hangt', { skip: geenBrowser(p
     for (const [pad, wereld] of HUIZEN) {
       await t.test(wereld + ' staat compleet op ' + pad, async () => {
         await page.goto(srv.base + pad, { waitUntil: 'load' });
-        await page.waitForTimeout(1500);
+        /* Op een toestand wachten en niet op een klok: het rooster staat sinds
+           scripts/wereldrooster.js gewoon in de HTML, dus het is er zodra de
+           pagina er is. We wachten op de eerste kaart en niet op een seconde. */
+        await wachtTot(page, () => document.querySelectorAll('a[href]').length > 5,
+          null, { wat: 'de links van dit wereldhuis' });
         const opHetHuis = await page.evaluate(() => [...document.querySelectorAll('a[href]')]
           .map(a => new URL(a.getAttribute('href'), location.href).pathname));
         const hoort = index.items

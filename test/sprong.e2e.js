@@ -21,7 +21,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, stop, laadPlaywright, browserOpties, geenBrowser, wachtTot } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,6 +45,15 @@ async function opzet() {
 
 /* Telefoonformaat, want een tik is een duim. Op een breed scherm zou deze toets
    iets anders meten dan de belofte belooft. */
+/* WACHTEN OP DE GREEP, EN NIET MET wachtOpZichtbaar. Die helper vraagt naar
+   offsetParent, en dat is bij een `position: fixed` element altijd null -- de
+   greep zou dus nooit "zichtbaar" heten terwijl hij er gewoon staat. Vandaar
+   dezelfde vraag als de laag zelf stelt: staat hij er, en heeft hij maat? */
+const wachtOpGreep = (page) => wachtTot(page, () => {
+  const g = document.querySelector('.rtgsprong-greep');
+  return !!g && g.getBoundingClientRect().width > 10;
+}, null, { wat: 'de greep van de sprong' });
+
 const TELEFOON = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' };
 
 test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrowser(pw) }, async (t) => {
@@ -56,7 +65,11 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
       const ctx = await browser.newContext(TELEFOON);
       const page = await ctx.newPage();
       await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
-      await page.waitForTimeout(1200);
+      /* Wachten op een TOESTAND en niet op een klok (test/klokwacht.test.js):
+         de sprong hangt zichzelf aan zodra hij draait, dus wachten we tot het
+         script geladen is. Komt de greep er daarna alsnog, dan zakt de
+         bewering hieronder -- en dat is precies wat we willen weten. */
+      await wachtTot(page, () => !!window.RTGSprong, null, { wat: 'shared/sprong.js geladen' });
       assert.equal(await page.locator('.rtgsprong-greep').count(), 0,
         'een uitgelogde bezoeker hoort geen deur naar het hele huis te krijgen');
       await ctx.close();
@@ -70,7 +83,7 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
     /* Een gewoon ledenscherm dat app-main NIET laadt: juist daar bestond de
        korte weg niet, en juist daar moet hij nu staan. */
     await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
-    await page.waitForTimeout(1800);
+    await wachtOpGreep(page);
 
     await t.test('de greep staat er en is een duim groot', async () => {
       const greep = page.locator('.rtgsprong-greep');
@@ -82,7 +95,8 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
 
     await t.test('een tik opent de lijst, en die lijst is niet leeg', async () => {
       await page.locator('.rtgsprong-greep').click();
-      await page.waitForTimeout(400);
+      await wachtTot(page, () => document.querySelectorAll('.rtgsprong-rij').length > 20,
+        null, { wat: 'de lijst met bestemmingen' });
       const rijen = await page.locator('.rtgsprong-rij:visible').count();
       assert.ok(rijen > 20, 'de lijst hoort alles te tonen zonder dat er getypt wordt, kreeg ' + rijen + ' rijen');
     });
@@ -125,25 +139,32 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
          handelingen ("fooi", "tegoed"), en die stonden in geen enkele index.
          Nu wel -- en een tik brengt je ERHEEN, hij voert niets uit. */
       await page.fill('.rtgsprong-kop input', 'fooi');
-      await page.waitForTimeout(300);
+      await wachtTot(page, () => [...document.querySelectorAll('.rtgsprong-rij')]
+        .every(b => /fooi/i.test(b.textContent)), null, { wat: 'de lijst gefilterd op fooi' });
       const rijen = await page.$$eval('.rtgsprong-rij:visible', e => e.map(x => x.textContent.trim()));
       assert.ok(rijen.some(t => /fooi/i.test(t) && /horeca/i.test(t)),
         'zoeken op "fooi" hoort de handeling in Horeca te vinden, kreeg: ' + JSON.stringify(rijen));
-      await page.locator('.rtgsprong-rij:visible').first().click();
-      await page.waitForTimeout(1500);
+      await Promise.all([page.waitForURL('**/apps/horeca.html', { timeout: 20000 }),
+        page.locator('.rtgsprong-rij:visible').first().click()]);
       assert.equal(new URL(page.url()).pathname, '/apps/horeca.html',
         'een handeling brengt je naar het scherm waar hij woont');
       await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
-      await page.waitForTimeout(1600);
+      await wachtOpGreep(page);
       await page.locator('.rtgsprong-greep').click();
-      await page.waitForTimeout(400);
+      await wachtTot(page, () => {
+        const v = document.querySelector('.rtgsprong-kop input');
+        return !!v && v.getBoundingClientRect().width > 0;
+      }, null, { wat: 'het zoekveld van de sprong' });
     });
 
     await t.test('de tweede tik opent de functie', async () => {
       await page.fill('.rtgsprong-kop input', 'pay');
-      await page.waitForTimeout(250);
-      await page.locator('.rtgsprong-rij:visible').first().click();
-      await page.waitForTimeout(1500);
+      await wachtTot(page, () => {
+        const r = document.querySelectorAll('.rtgsprong-rij');
+        return r.length > 0 && r.length < 10;
+      }, null, { wat: 'de lijst gefilterd op pay' });
+      await Promise.all([page.waitForURL('**/apps/pay.html', { timeout: 20000 }),
+        page.locator('.rtgsprong-rij:visible').first().click()]);
       assert.equal(new URL(page.url()).pathname, '/apps/pay.html',
         'zoeken op de SLEUTEL (pay) hoort RTG Pay te openen, ook al heet de rij "Betalen"');
     });
@@ -153,13 +174,16 @@ test('de sprong: een tik naar elke functie, vanaf elk scherm', { skip: geenBrows
          Deze toets ving ook een echte fout: de pijltjes werden aangehangen
          voordat de lijst bestond, en toen tekende de lade helemaal niets meer. */
       await page.goto(srv.base + '/apps/leven.html', { waitUntil: 'load' });
-      await page.waitForTimeout(1600);
+      await wachtOpGreep(page);
       await page.locator('.rtgsprong-greep').click();
-      await page.waitForTimeout(400);
+      await wachtTot(page, () => {
+        const v = document.querySelector('.rtgsprong-kop input');
+        return !!v && v.getBoundingClientRect().width > 0;
+      }, null, { wat: 'het zoekveld van de sprong' });
       await page.fill('.rtgsprong-kop input', 'wallet');
-      await page.waitForTimeout(250);
-      await page.keyboard.press('Enter');
-      await page.waitForTimeout(1500);
+      await wachtTot(page, () => [...document.querySelectorAll('.rtgsprong-rij')]
+        .every(b => /wallet/i.test(b.textContent)), null, { wat: 'de lijst gefilterd op wallet' });
+      await Promise.all([page.waitForNavigation({ timeout: 20000 }), page.keyboard.press('Enter')]);
       /* Wallet woont als STAND in RTG Geld (/apps/geld.html#wallet) en niet op
          een eigen adres; dat is precies waarom deze toets het adres uit de index
          haalt in plaats van er een te verzinnen. */

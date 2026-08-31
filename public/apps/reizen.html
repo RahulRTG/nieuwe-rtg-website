@@ -263,11 +263,25 @@
 
   <div class="regkop"><h2>De reiswereld</h2></div>
   <div class="poorten" id="poorten"></div>
-  <!-- ALLES IN DEZE WERELD, uit de bron (shared/wereldrooster.js uit
+  <!-- ALLES IN DEZE WERELD, uit de bron (scripts/wereldrooster.js uit
        shared/sprongindex.json, dat uit MAPPEN komt). Het redactionele deel
        hierboven blijft staan: dat verleidt, dit is compleet (TIKKEN.md). -->
   <div class="regkop"><h2>Alles in TravelOS</h2></div>
-  <div class="grid" data-wereldrooster="TravelOS"></div>
+  <div class="grid">
+  <!-- WERELDROOSTER:TravelOS -->
+    <a class="kaart" href="/apps/arrival.html"><b>Aankomst</b></a>
+    <a class="kaart" href="/apps/hangar.html"><b>Hangar</b><span class="laaglabel">Lifestyle</span></a>
+    <a class="kaart" href="/apps/navigatie.html"><b>Navigatie</b></a>
+    <a class="kaart" href="/apps/ov.html"><b>Openbaar vervoer</b></a>
+    <a class="kaart" href="/apps/ovroutes.html"><b>OV-routes</b></a>
+    <a class="kaart" href="/apps/reisboek.html"><b>Reisboek</b><span class="laaglabel">Lifestyle</span></a>
+    <a class="kaart" href="/apps/reizen-veilig.html"><b>Reizen &amp; Veilig</b></a>
+    <a class="kaart" href="/apps/routedossier.html"><b>Routedossier</b></a>
+    <a class="kaart" href="/apps/stad.html"><b>Stad</b></a>
+    <a class="kaart" href="/apps/residentie.html"><b>Verblijven</b></a>
+    <a class="kaart" href="/apps/flits.html"><b>Verkeer</b></a>
+    <a class="kaart" href="/apps/vluchten.html"><b>Vluchten</b></a>
+  <!-- /WERELDROOSTER --></div>
   </main>
 
   <nav class="hoofdtabs" aria-label="RTG Reizen">
@@ -923,6 +937,5 @@ function tekenCanvasVandaag(lijst) {
 <script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-  <script src="/shared/wereldrooster.js" defer></script>
 </body>
 </html>

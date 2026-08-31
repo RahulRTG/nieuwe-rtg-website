@@ -47,7 +47,8 @@ function vanSchermBreed(wortel, url) {
   /* Script en stijl eruit VOORDAT er iets geteld wordt. Zonder dit sluipen
      `fromCharCode`, `svgHtml` en `disabled` binnen als 'woorden op het scherm',
      en dan meet je hoe een pagina geschreven is in plaats van wat er staat. */
-  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
+             .replace(/<!-- WERELDROOSTER:[\s\S]*?<!-- \/WERELDROOSTER -->/g, ' ');
   /* De woordenschat van een scherm zit in zijn BEDIENING en zijn tussenkoppen:
      etiketten die een mens leest en onthoudt. Niet in de lopende tekst -- die is
      proza, en wie daarop meet, meet of iemand de marketing kan navertellen. */
@@ -69,6 +70,12 @@ function etikettenVan(wortel, url) {
   if (!url || !fs.existsSync(pad)) return [];
   let html = fs.readFileSync(pad, 'utf8');
   html = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  /* HET GEGENEREERDE WERELDROOSTER TELT NIET MEE. Dat blok bevat de NAMEN van
+     andere apps (scripts/wereldrooster.js schrijft ze in het huis van hun
+     wereld); ze als HANDELING van dit huis opvoeren zou "Mall" een verrichting
+     van Ontdekken maken, en zou de index bovendien van zichzelf laten groeien.
+     Ze zijn al bestemming in shared/sprongindex.json, en daar horen ze. */
+  html = html.replace(/<!-- WERELDROOSTER:[\s\S]*?<!-- \/WERELDROOSTER -->/g, ' ');
   const uit = [];
   const zie = new Set();
   const pak = (re) => {

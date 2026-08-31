@@ -57,6 +57,23 @@ const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'TIKKEN.json');
 const controle = process.argv.includes('--controle');
 const stil = process.argv.includes('--stil');
+/* DE NALOOP: dezelfde vraag, maar aan het OPGESLAGEN antwoord.
+
+   De volle meting duurt een half uur in een echte browser en kan daarom niet bij
+   elke bouw draaien. Zonder iets ertussen zou TIKKEN.json een meetbestand zijn
+   waar niets op let: de norm noemt zulke bestanden `metingenZonderRatel`, en
+   terecht -- een getal dat niemand tegenhoudt, loopt weg.
+
+   Deze stand leest TIKKEN.json en toetst wat er zonder browser te toetsen is:
+   staat er een scherm buiten bereik zonder uitgeschreven reden, en staat er een
+   reden die niet meer nodig is? Dat is de belofte van dit document, en hij zakt
+   zodra iemand een scherm toevoegt en de meting niet opnieuw draait.
+
+   WAT DEZE STAND NIET DOET, en dat hoort er even groot bij: hij MEET niet. Hij
+   kijkt naar de laatste meting. Loopt die achter op de code, dan zegt hij daar
+   niets over -- daarvoor is de volle ronde, en scripts/versheid.js ziet een
+   register dat veroudert. */
+const naloop = process.argv.includes('--naloop');
 
 /* DE GRENS. Vijf, en die staat hier en niet in een leesregel: een belofte die
    alleen in een document staat, is over een half jaar weg (CLAUDE.md). */
@@ -305,6 +322,24 @@ async function loop(browser, base, rol, token) {
     await ctx.close();
   }
   return diepte;
+}
+
+/* De naloop draait vóór alles: hij start geen server en geen browser. */
+if (naloop) {
+  if (!fs.existsSync(DOEL)) { console.error('TIKKEN.json bestaat niet; draai eerst npm run tikken'); process.exit(1); }
+  const j = JSON.parse(fs.readFileSync(DOEL, 'utf8'));
+  const buiten = (j.perScherm || []).filter((x) => x.tikken === null).map((x) => x.pad);
+  const zonder = buiten.filter((p) => !MET_REDEN[p]);
+  const verlopen = Object.keys(MET_REDEN).filter((p) => !buiten.includes(p));
+  const teDiep = (j.perScherm || []).filter((x) => x.tikken !== null && x.tikken > GRENS).map((x) => x.pad);
+  const klachten = [];
+  if (zonder.length) klachten.push('buiten bereik zonder uitgeschreven reden (' + zonder.length + '): ' + zonder.join(', '));
+  if (verlopen.length) klachten.push('een reden die niemand meer nodig heeft (' + verlopen.length + '): ' + verlopen.join(', '));
+  if (teDiep.length) klachten.push('dieper dan ' + GRENS + ' tikken: ' + teDiep.join(', '));
+  if (klachten.length) { console.error(klachten.join('\n')); process.exit(1); }
+  console.log('tikken (naloop): ' + (j.perScherm || []).length + ' schermen, ' + buiten.length +
+    ' buiten bereik en allemaal met reden, niets dieper dan ' + GRENS + ' tikken.');
+  process.exit(0);
 }
 
 (async () => {

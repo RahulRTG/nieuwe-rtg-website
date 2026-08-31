@@ -57,6 +57,13 @@ const REGISTER = {
   /* Deze vier dragen hun eigen grondwaarde. De ratel staat in het genoemde
      bestand en niet in NORM.json -- dat is geen tekortkoming maar een keuze:
      een matrix met honderden vakjes hoort niet als een getal in de norm. */
+  /* De twee metingen van de tikkenronde (TIKKEN.md). Allebei dragen ze hun
+     grondwaarde zelf -- vijf tikken en een uitgeschreven reden voor wat er
+     buiten valt, en een vloer van 60% voor de vindbaarheid -- en allebei worden
+     ze door test/sprongindex.test.js in controlestand gedraaid. Die toets noemt
+     ze bij naam, dus de bewering is na te trekken en niet alleen opgeschreven. */
+  'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
+  'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },
   'BEWIJSMATRIX.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'IDEMPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },
   'INVOERPROEF.json': { eigenRatel: 'scripts/bewijsmatrix.js' },

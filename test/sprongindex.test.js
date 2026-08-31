@@ -16,9 +16,9 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 
-function controle(script) {
+function controle(script, vlag) {
   try {
-    execFileSync(process.execPath, [path.join(WORTEL, 'scripts', script), '--controle'],
+    execFileSync(process.execPath, [path.join(WORTEL, 'scripts', script), vlag || '--controle'],
       { cwd: WORTEL, stdio: 'pipe' });
     return null;
   } catch (e) {
@@ -46,7 +46,17 @@ test('de vier wereldhuizen dragen het rooster van hun eigen wereld', () => {
   assert.equal(controle('wereldrooster.js'), null);
 });
 
-/* De vindbaarheidsmeter hoort niet onder zijn vloer te zakken. Hij meet WOORDEN
+/* TIKKEN.json is ook een meetbestand, en dus hoort er een ratel op (NORM.json
+   telt meetbestanden zonder ratel). De volle meting duurt een half uur in een
+   echte browser en kan hier niet draaien; de NALOOP leest de laatste meting en
+   toetst de belofte die er zonder browser aan te toetsen valt: elk scherm buiten
+   bereik draagt een reden, elke reden is nog nodig, en niets ligt dieper dan
+   vijf tikken. */
+test('TIKKEN.json houdt zich aan zijn eigen belofte', () => {
+  assert.equal(controle('tikken.js', '--naloop'), null);
+});
+
+/* De vindbaarheidsmeter (VINDBAAR.json) hoort niet onder zijn vloer te zakken. Hij meet WOORDEN
    en geen mensen (VINDBAAR.json zegt dat er zelf bij), maar een terugval van
    68% naar 20% betekent dat er een index is stukgegaan, en dat hoort een toets
    te merken in plaats van een lezer. */

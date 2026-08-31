@@ -46,6 +46,7 @@
     "groepen": "node scripts/groepen.js",
     "tikken": "node scripts/tikken.js",
     "tikken:controle": "node scripts/tikken.js --controle",
+    "tikken:naloop": "node scripts/tikken.js --naloop",
     "sprongindex": "node scripts/sprongindex.js",
     "sprongindex:controle": "node scripts/sprongindex.js --controle",
     "wereldrooster": "node scripts/wereldrooster.js",

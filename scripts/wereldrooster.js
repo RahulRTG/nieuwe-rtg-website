@@ -44,8 +44,14 @@ function esc(t) {
 
 function rooster(items, wereld) {
   const mijn = items.filter((i) => i.wereld === wereld && i.url && !i.huis);
-  const rijen = mijn.map((i) => '    <a class="kaart" href="' + esc(i.url) + '"><b>' + esc(i.naam) + '</b>' +
-    (i.label ? '<span class="laaglabel">' + esc(i.label) + '</span>' : '') + '</a>').join('\n');
+  /* EIGEN KLASSEN EN GEEN GELEENDE. Hier stond `class="kaart"` -- de klasse van
+     het huis van LivingOS. Die bestaat op /apps/kantoor.html niet, en dus
+     stonden daar twaalf links in de standaardkleur van de browser; de
+     toegankelijkheidskeuring telde er precies twaalf contrastfouten (grens 0).
+     shared/wereldrooster.css hoort bij dit blok en erft zijn kleur van het huis
+     waarin het staat. */
+  const rijen = mijn.map((i) => '    <a class="wrooster-kaart" href="' + esc(i.url) + '"><span>' + esc(i.naam) + '</span>' +
+    (i.label ? '<span class="wrooster-label">' + esc(i.label) + '</span>' : '') + '</a>').join('\n');
   return rijen;
 }
 

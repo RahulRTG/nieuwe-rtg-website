@@ -176,6 +176,82 @@ test('een volledig contract komt er zonder klachten door', () => {
    DE POORT OP HET REGISTER
    ------------------------------------------------------------------------- */
 
+/* ---------------------------------------------------------------------------
+   DE LOGICA WAAR HET REGISTER OP RUST -- en waarom deze toetsen er zijn.
+
+   De mutatiemotor liet dit bestand een keer OVERLEVEN: drieendertig mutaties in
+   acht modules, en geen ervan viel op. Dat kwam doordat zes van die acht modules
+   VERKLARINGEN zijn (objecten met contracten), en een gewijzigde reden in een
+   contract hoort geen toets te laten zakken. De twee die wel logica dragen --
+   kern/mutatie.js en kern/mutatiecontract/index.js -- werden nauwelijks geraakt,
+   want dit bestand keek er niet naar.
+
+   Dat is precies de vorm waar dit huis een meter voor heeft: `toetsenOngevoeligPct`
+   liep van 1,0 naar 1,1 en de normratel hield hem tegen. De reparatie is niet de
+   norm verlagen maar de toets grip geven op wat hij bewaakt.
+
+   magHerhalen() is die logica. Het hele contractregister rust erop: `sleutelVereist`
+   betekent "herhalen mag, maar alleen met dezelfde sleutel", en `hooguitEens`
+   betekent "nooit automatisch". Draait iemand een van die twee om, dan verandert
+   de betekenis van honderden contracten in stilte.
+   ------------------------------------------------------------------------- */
+
+test('magHerhalen doet precies wat de klassen beloven', () => {
+  const { magHerhalen, KLASSEN } = mutatie;
+
+  // idempotent: herhalen mag, met of zonder sleutel
+  assert.equal(magHerhalen('idempotent', false), true);
+  assert.equal(magHerhalen('idempotent', true), true);
+
+  // sleutelVereist: ALLEEN met sleutel -- dit is de kern van de geldgrens
+  assert.equal(magHerhalen('sleutelVereist', false), false,
+    'zonder sleutel is een sleutelVereiste handeling een TWEEDE handeling');
+  assert.equal(magHerhalen('sleutelVereist', true), true);
+
+  // de drie die nooit automatisch herhaald mogen worden, ook niet met sleutel
+  for (const k of ['hooguitEens', 'compenseerbaar', 'nietHerhaalbaar', 'onbekend']) {
+    assert.equal(magHerhalen(k, false), false, k + ' mag niet herhalen zonder sleutel');
+    assert.equal(magHerhalen(k, true), false, k + ' mag ook MET een sleutel niet automatisch herhalen');
+  }
+
+  // een klasse die niet bestaat is geen vrijbrief
+  assert.equal(magHerhalen('verzonnen', true), false, 'een onbekende klasse geeft nooit toestemming');
+  assert.equal(magHerhalen(null, true), false);
+
+  /* En de tabel zelf: elke klasse noemt allebei de vlaggen expliciet. Een
+     ontbrekende vlag leest als `undefined` en dus als "nee", en dat is een
+     stilzwijgend besluit op de verkeerde plek. */
+  for (const [naam, d] of Object.entries(KLASSEN)) {
+    assert.equal(typeof d.herhaalbaar, 'boolean', naam + ' noemt `herhaalbaar` niet');
+    assert.equal(typeof d.sleutelNodig, 'boolean', naam + ' noemt `sleutelNodig` niet');
+    assert.ok(d.uitleg && d.uitleg.length > 20, naam + ' heeft geen uitleg die een mens verder helpt');
+  }
+});
+
+test('de poort weigert een opdracht zonder bruikbare mutatieklasse', () => {
+  const { poort } = mutatie;
+  /* De poort GOOIT bij een fout en geeft anders `true` -- met opzet, want hij
+     draait bij het opbouwen van een publieke laag en niet bij een verzoek: een
+     opdracht zonder klasse hoort de server niet te laten starten. Dat maakt de
+     naam van de plek ook belangrijk, en die staat in de melding. */
+  assert.equal(poort({ goed: { mutatie: 'idempotent' } }, 'proef'), true,
+    'een opdracht met een geldige klasse komt er gewoon door');
+
+  assert.throws(() => poort({ stil: {} }, 'proefplek'),
+    /noemt geen mutatieklasse/, 'een opdracht zonder klasse hoort de bouw te stoppen');
+  assert.throws(() => poort({ raar: { mutatie: 'bestaatniet' } }, 'proefplek'),
+    /bestaat niet/, 'een verzonnen klasse is geen klasse');
+
+  /* `onbekend` is met opzet GEEN vrijbrief aan de rand van het platform: hij
+     bestaat wel als klasse, maar een publieke opdracht mag er niet op staan. */
+  assert.throws(() => poort({ ongemeten: { mutatie: 'onbekend' } }, 'proefplek'),
+    /onbekend/, 'ongemeten is aan de rand een weigering en geen waarde');
+
+  /* En de melding noemt WELKE plek het betreft -- zonder dat weet niemand waar
+     hij moet zoeken. */
+  assert.throws(() => poort({ stil: {} }, 'de-derde-verdieping'), /de-derde-verdieping/);
+});
+
 test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
   /* De poort werpt; hier vangen we hem zodat de melding leesbaar is. */
   const rijen = Object.entries(CONTRACTEN).map(([route, c]) => ({ route, ...c }));

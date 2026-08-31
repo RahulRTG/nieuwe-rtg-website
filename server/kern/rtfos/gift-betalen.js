@@ -81,7 +81,10 @@ module.exports = (ctx, { standVan, voorbereidVan, bronUitGift, termijnAf }) => {
     try {
       bron = bronUitGift({
         stad: schoon(b.stad, 20) || null,
-        projectId: v.voornemen.project ? schoon(b.projectId, 20) || null : null,
+        /* UIT HET HERREKENDE VOORNEMEN en niet uit het verzoek: daar stond
+           `schoon(b.projectId)`, en dat is precies hoe een verzonnen id in de
+           boekhouding van de stichting belandde. */
+        projectId: v.voornemen.projectId || null,
         soort: v.voornemen.soort,
         centen, gever: codenaam, anoniem: v.voornemen.anoniem,
         kenmerk: 'online gift', door: codenaam

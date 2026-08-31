@@ -87,6 +87,14 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     veilig(res, () => rtfos.gift.plan.stop(ik(req), lijf(req)));
   });
 
+  /* WAAR EEN GEOORMERKTE GIFT HEEN KAN. Een lijst en geen vrij tekstveld: het
+     oormerk wees hiervoor nergens op na te kijken heen. `soort` is een beeld en
+     geen grens -- zie kern/rtfos/gift-projecten.js. */
+  app.post('/api/rtfos/gift/projecten', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.projecten.lijst(lijf(req)));
+  });
+
   /* DE SEPA-MACHTIGING, en die tekent de GEVER zelf. Er is met opzet geen
      route waarlangs het kantoor er een namens iemand aanmaakt: dat zou het
      woord "getekend" leegmaken. Intrekken kan altijd, zonder reden en per

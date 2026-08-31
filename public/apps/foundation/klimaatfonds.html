@@ -130,6 +130,14 @@
       <div class="rij ruimte"><a class="kfknop" href="/apps/geld.html#labfonds">Bekijk het labfonds</a>
         <a class="kfknop" href="/apps/livinglab.html">Het hele Living Lab</a></div>
     </div>
+
+    <div class="kfkaart ruimte" id="werkkaart">
+      <div class="kfsec">Het werk dat eruit voortkomt</div>
+      <div class="uitleg">Een vraag uit het lab is het begin; wat de RTFoundation er vervolgens
+        mee doet, is een project in een stad. Je kunt een gift aan zo'n project vastzetten &mdash;
+        dan wordt hij alleen met jouw toestemming herbestemd.</div>
+      <div id="werklijst"><div class="leeg">Laden...</div></div>
+    </div>
   </div>
 
 </main>
@@ -157,6 +165,40 @@ const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&a
    wie ze hier stilzwijgend bijtelt, zegt namens de bewoner dat zijn fietsvraag
    een klimaatvraag was. */
 const SOORT = 'duurzaam';
+
+/* DE ANDERE HELFT VAN DIT SCHERM. Hierboven staan de VRAGEN uit het Living Lab;
+   dit is het WERK dat eruit voortkomt -- projecten van de RTFoundation met soort
+   'duurzaam'. Twee registers, en met opzet niet samengevoegd: een vraag van een
+   bewoner is geen project, en een project is geen vraag.
+
+   GEVEN GEBEURT NIET HIER. De knop brengt je naar het geverscherm met dit
+   project al gekozen; daar staat een keer wat een gift is, wat er gebeurt en
+   wat het kost. Een tweede plek waar je kunt bevestigen, is een tweede plek
+   waar die uitleg kan gaan afwijken. */
+async function werkTeken() {
+  const doel = document.getElementById('werklijst');
+  if (!doel) return;
+  try {
+    const r = await fetch('/api/rtfos/gift/projecten', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (localStorage.getItem('rtg_member_token') || '') },
+      body: JSON.stringify({ soort: SOORT })
+    });
+    if (r.status === 401 || r.status === 403) {
+      doel.innerHTML = '<div class="leeg">Log in met je eigen RTG-account om te zien welke duurzaamheidsprojecten er lopen.</div>';
+      return;
+    }
+    const d = await r.json();
+    const rijen = d.projecten || [];
+    doel.innerHTML = rijen.length
+      ? rijen.map(p => '<div class="lijnrij"><div><b>' + esc(p.naam) + '</b>' +
+          (p.stad ? '<div class="sub">' + esc(p.stad) + '</div>' : '') + '</div>' +
+          '<a class="kfknop" href="/apps/foundation/geven.html?project=' + encodeURIComponent(p.id) + '">Hieraan geven</a></div>').join('')
+      : '<div class="leeg">' + esc(d.uitleg || 'Er loopt nog geen duurzaamheidsproject.') + '</div>';
+  } catch (e) {
+    doel.innerHTML = '<div class="leeg">De projecten zijn nu niet op te halen.</div>';
+  }
+}
 
 const api = (pad, body) => fetch('/api/lab2/bewoner/' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
@@ -275,6 +317,11 @@ start();
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="schil-os.js" defer></script>
-<script src="premium.js" defer></script>
+<script src="premium.js" defer>
+/* PAS HIER AANGEROEPEN en niet bij de definitie: `esc` is een const die verderop
+   in dit bestand staat, en een aanroep ervoor loopt op de temporal dead zone
+   stuk -- met een lege kaart en een consolefout als enig spoor. */
+werkTeken();
+</script>
 </body>
 </html>

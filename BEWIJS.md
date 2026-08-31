@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1416 bestanden en 9968 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1416 bestanden en 9969 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1416 |
-| losse beweringen (`test(...)`) | 9968 |
+| losse beweringen (`test(...)`) | 9969 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1239 bestanden, 9665 beweringen.
+1239 bestanden, 9666 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -914,7 +914,7 @@ toets omvalt.
 | `rtfos-bestuur.test.js` | 6 | gezakt op `liegpoort /api/` | ZES ROUTES VAN HET FOUNDATION OS DIE DOOR NIEMAND WERDEN AANGEROEPEN /api/rtfos/activiteiten, /api/rtfos/beleid, /api/rtfos/herkomst, /api/rtfos/subsidies, /api/rtfos/vergadering en /api/rtfos/voorraad stonden... |
 | `rtfos-context.test.js` | 3 | -- | WAT DE GEDEELDE CONTEXT BELOOFT -- en wat 47 modules eruit halen. DEZE TOETS KOMT UIT EEN FOUT DIE GROEN BLEEF. |
 | `rtfos-doelgroepen.test.js` | 6 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE DRIE DOELGROEPEN ZONDER RTG-ACCOUNT De vrijwilliger, de hulpvrager en de buurt stonden wel IN het systeem maar konden er niet IN. Deze toetsen gaan over de grenzen van die drie ingangen, en die... |
-| `rtfos-gift.test.js` | 34 | genoemd | DE GIFTSTAND -- de doneerknop die nog dicht staat (kern/rtfos/gift.js). Deze toets bewaakt een voorbereiding, en dat is een ander soort toets dan gewoonlijk: hij moet vooral vastleggen wat er NIET gebeurt. |
+| `rtfos-gift.test.js` | 35 | genoemd | DE GIFTSTAND -- de doneerknop die nog dicht staat (kern/rtfos/gift.js). Deze toets bewaakt een voorbereiding, en dat is een ander soort toets dan gewoonlijk: hij moet vooral vastleggen wat er NIET gebeurt. |
 | `rtfos-governance.test.js` | 10 | gezakt op `liegpoort /api/` | FASE DRIE: DE GOVERNANCE-LAAG VAN DE STICHTING Dit is de laag waarop een stichting wordt afgerekend als het misgaat. Niet op wat ze deed, maar op of ze het BEVOEGD deed, of ze het kon LATEN ZIEN, en of ze had gekeken... |
 | `rtfos-netwerk.test.js` | 7 | gezakt op `liegpoort /api/` | HET FOUNDATION OS, FASE VIER: HET NETWERKEFFECT Delen, samen kopen, mensen uitwisselen, landelijk werven. Dit is de laag waar een federatie iets waard wordt -- en tegelijk de laag waar een federatie zijn eigen... |
 | `rtfos-portalen.test.js` | 8 | gezakt op `liegpoort /api/` | HET FOUNDATION OS: DE PORTALEN EN DE DOSSIERS Dit derde toetsbestand dekt wat de eerste twee lieten liggen: de code-deuren naar buiten (partnerstichting en lokale ondernemer), en de dossierkant van projecten,... |

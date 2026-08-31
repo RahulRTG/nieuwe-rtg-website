@@ -19,7 +19,7 @@ const herkomstDrempels = require('./herkomst');
    met dezelfde drie woorden is precies hoe twee bestanden uiteen gaan lopen. */
 const { VORMEN, anbiZin } = require('./gift-vormen');
 
-module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
+module.exports = (ctx, { standVan, uitlegVan, ontbreektVan, projectVan }) => {
   const { schoon, naarCenten, euro } = ctx;
 
   /* ---------------------------------------------------------------------
@@ -43,8 +43,19 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
     if (!g.vormen.includes(vorm)) {
       return { status: 409, error: 'Deze vorm staat niet open. Wel: ' + g.vormen.join(', ') + '.' };
     }
-    if (vorm === 'geoormerkt' && !schoon(b.project, 60)) {
-      return { status: 400, error: 'Waar moet deze gift heen? Een geoormerkte gift wijst een project aan.' };
+    /* HET OORMERK WIJST EEN ECHT PROJECT AAN, en dat werd niet nagekeken.
+       Gemeten: een lid kon 25 euro oormerken op "Bestaat Helemaal Niet" met een
+       zelfverzonnen projectId, en het kwam er met 200 doorheen -- terwijl de
+       bron een belofte draagt (herbestemmen alleen met toestemming) over een
+       project dat niet bestaat. De NAAM komt daarom uit ./gift-projecten.js en
+       niet uit de browser. */
+    let project = null;
+    if (vorm === 'geoormerkt') {
+      const gekozen = projectVan(b.projectId);
+      if (!gekozen) {
+        return { status: 400, error: 'Waar moet deze gift heen? Kies een project dat nu loopt; een gift kan niet worden vastgezet op iets dat er niet is.' };
+      }
+      project = gekozen;
     }
 
     /* GRENDEL: de vraag naar de tegenprestatie komt VOOR het bedrag, en het
@@ -58,7 +69,9 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
     const aftrekbaar = !tegenprestatie && g.anbi === 'ja';
     return { ok: true,
       voornemen: {
-        euro: euro(centen), vorm, project: schoon(b.project, 60) || null,
+        euro: euro(centen), vorm,
+        project: project ? project.naam : null,
+        projectId: project ? project.id : null,
         anoniem: b.anoniem === true,
         /* Wat dit IS, en niet wat de gever hoopte. */
         /* EEN PERIODIEKE GIFT IS HIER JAARLIJKS, en de bronsoort

@@ -41,6 +41,17 @@ function bouw() {
   return { gift: require('../server/kern/rtfos/gift')(ctx), ctx, db };
 }
 
+/* Een echt project om aan te oormerken. Het oormerk wees hiervoor nergens op na
+   te kijken heen; sinds kern/rtfos/gift-projecten.js moet het een ACTIEF project
+   in een OPEN stad zijn, en die twee zet dit hulpje neer. */
+function metProject(b, naam) {
+  b.ctx.S().steden.push({ id: 'S1', naam: 'Haarlem', status: 'actief' });
+  const p = { id: 'P1', stad: 'S1', naam: naam || 'Huiswerkklas', soort: 'huiswerk',
+    status: 'actief', doelgroep: 'jongeren' };
+  b.ctx.S().projecten.push(p);
+  return p;
+}
+
 test('de stand staat dicht, en zegt met een zin waarom', () => {
   const { gift } = bouw();
   const s = gift.stand();
@@ -178,12 +189,70 @@ test('een vorm die niet openstaat, gaat niet alsnog open via het voornemen', () 
   assert.equal(g.status, 409, 'geoormerkt kon terwijl alleen eenmalig openstond');
 });
 
-test('een geoormerkte gift wijst een project aan', () => {
-  const { gift } = bouw();
+/* HET OORMERK WEES NERGENS OP, EN DAT IS GEMETEN. Tegen een echte server kon
+   een lid 25 euro geven aan het project "Bestaat Helemaal Niet", met een
+   zelfverzonnen projectId, en het kwam er met 200 doorheen. De bron belandde in
+   de boekhouding van de stichting met de belofte "herbestemmen alleen met
+   toestemming" over een project dat niet bestond -- terwijl het scherm zei dat
+   een geoormerkte gift een project aanwijst.
+
+   De naam kwam uit de browser en het id ook, en geen van beide werd nagekeken.
+   Nu kiest de gever een ID uit kern/rtfos/gift-projecten.js en wordt de naam
+   daar bij gezocht. */
+test('een geoormerkte gift wijst een BESTAAND project aan', () => {
+  const b = bouw();
+  const { gift } = b;
   gift.standZet({ ontvanger: { soort: 'wallet', code: 'RTF-WALLET' },
     vormen: ['eenmalig', 'geoormerkt'], stand: 'open' }, 'toets');
+
   assert.equal(gift.voorbereid({ euro: 50, vorm: 'geoormerkt' }).status, 400);
-  assert.ok(gift.voorbereid({ euro: 50, vorm: 'geoormerkt', project: 'Huiswerkklas' }).ok);
+  /* EEN NAAM IS GEEN AANWIJZING. Dit was precies de tak die doorliet. */
+  assert.equal(gift.voorbereid({ euro: 50, vorm: 'geoormerkt', project: 'Huiswerkklas' }).status, 400,
+    'een verzonnen projectnaam werd nog steeds geaccepteerd');
+  assert.equal(gift.voorbereid({ euro: 50, vorm: 'geoormerkt', projectId: 'VERZONNEN' }).status, 400,
+    'een verzonnen projectId werd geaccepteerd');
+
+  const p = metProject(b);
+  const ok = gift.voorbereid({ euro: 50, vorm: 'geoormerkt', projectId: p.id, project: 'Iets Anders' });
+  assert.equal(ok.ok, true, JSON.stringify(ok));
+  /* DE NAAM KOMT VAN DE SERVER: wat de browser meestuurde ('Iets Anders') doet
+     niet mee. */
+  assert.equal(ok.voornemen.project, 'Huiswerkklas');
+  assert.equal(ok.voornemen.projectId, p.id);
+
+  /* EN EEN GEWONE GIFT DRAAGT GEEN PROJECT, ook niet als de browser er een
+     meestuurt. Dit gat vond een mutatie: laat je de oude terugval staan
+     (`project: project ? project.naam : schoon(b.project)`), dan krijgt een
+     niet-geoormerkte gift alsnog een projectnaam uit het verzoek -- en dan
+     staat er op het scherm en in de bevestiging dat het geld naar iets
+     specifieks ging terwijl er niets is vastgezet. */
+  const vrij = gift.voorbereid({ euro: 50, vorm: 'eenmalig', project: 'Iets Verzonnen', projectId: p.id });
+  assert.equal(vrij.ok, true);
+  assert.equal(vrij.voornemen.project, null,
+    'een gewone gift kreeg een projectnaam uit de browser mee');
+  assert.equal(vrij.voornemen.projectId, null);
+});
+
+test('de lijst om aan te oormerken toont alleen wat echt loopt', () => {
+  const b = bouw();
+  const p = metProject(b);
+  b.ctx.S().projecten.push({ id: 'P2', stad: 'S1', naam: 'Nog een idee', soort: 'overig', status: 'idee' });
+  b.ctx.S().steden.push({ id: 'S2', naam: 'Gesloten stad', status: 'voorbereiding' });
+  b.ctx.S().projecten.push({ id: 'P3', stad: 'S2', naam: 'Achter de deur', soort: 'huiswerk', status: 'actief' });
+
+  const r = b.gift.projecten.lijst({});
+  assert.deepEqual(r.projecten.map(x => x.id), [p.id],
+    'een idee of een project in een gesloten stad stond in de keuzelijst');
+  /* GEEN BEDRAGEN. Wat een project kost is verantwoording en die hoort in het
+     jaarstuk, niet in een keuzemenu. */
+  assert.equal(Object.keys(r.projecten[0]).some(k => /budget|besteed|centen/i.test(k)), false);
+
+  /* HET FILTER IS EEN BEELD EN GEEN GRENS: een soort die niets oplevert geeft
+     een lege lijst met een zin, en tilt niets op dat anders dicht zou staan. */
+  assert.equal(b.gift.projecten.lijst({ soort: 'duurzaam' }).projecten.length, 0);
+  assert.match(b.gift.projecten.lijst({ soort: 'duurzaam' }).uitleg, /geen project/);
+  assert.equal(b.gift.projecten.vindBruikbaar('P3'), null,
+    'een project in een gesloten stad was toch aanwijsbaar');
 });
 
 test('het voornemen zegt zelf dat er niets is gebeurd', () => {
@@ -249,7 +318,7 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
          naam opleveren -- wat SEMANTIEK.json duur noemt. Het is een REGELmodule
          zonder opslag, zonder routes en zonder sessie; de opslag blijft van elk
          domein zelf. */
-      assert.match(pad, /^(\.\/(gift-vormen|gift-voornemen|gift-betalen|gift-periodiek|gift-machtiging|herkomst)|\.\.\/machtiging)$/,
+      assert.match(pad, /^(\.\/(gift-vormen|gift-voornemen|gift-betalen|gift-periodiek|gift-machtiging|gift-projecten|herkomst)|\.\.\/machtiging)$/,
         deel + ' haalt ' + pad + ' binnen; de giftlaag hoort binnen kern/rtfos te blijven -- de betaallaag komt via de ctx en niet via een require');
     }
   }
@@ -292,7 +361,7 @@ function bouwMetPay(payAntwoord) {
   const gift = require('../server/kern/rtfos/gift')(ctx);
   gift.standZet({ ontvanger: { soort: 'wallet', code: 'RTF-WALLET' },
     vormen: ['eenmalig', 'geoormerkt', 'periodiek'], anbi: 'aangevraagd', stand: 'open' }, 'toets');
-  return { gift, geboekt, bronnen, db };
+  return { gift, geboekt, bronnen, db, ctx };
 }
 
 test('de gift gaat naar de wallet uit de stand, met de codenaam uit de sessie', async () => {
@@ -333,12 +402,18 @@ test('mislukt de boeking, dan ontstaat er geen bron', async () => {
 });
 
 test('de bron ontstaat na de boeking, met de codenaam als gever', async () => {
-  const { gift, bronnen } = bouwMetPay();
-  await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 40, vorm: 'geoormerkt', project: 'Taalcafe' });
+  const b = bouwMetPay();
+  const { gift, bronnen } = b;
+  const p = metProject(b, 'Taalcafe');
+  await gift.bevestig({ codenaam: 'Poolvos 1BE9', euro: 40, vorm: 'geoormerkt', projectId: p.id });
   assert.equal(bronnen.length, 1);
   assert.equal(bronnen[0].gever, 'Poolvos 1BE9', 'de gever hoort een codenaam te zijn');
   assert.equal(bronnen[0].centen, 4000);
   assert.equal(bronnen[0].soort, 'donatie');
+  /* HET OORMERK STAAT OP DE BRON, en het is het id van een BESTAAND project.
+     Hier stond eerder een naam uit de browser en een id dat niemand naliep. */
+  assert.equal(bronnen[0].projectId, p.id,
+    'de bron droeg het oormerk niet, of een ander id dan het gekozen project');
 });
 
 test('een gift boven de drempel meldt vooraf dat hij eerst beoordeeld wordt', async () => {

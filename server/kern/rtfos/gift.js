@@ -156,8 +156,13 @@ module.exports = (ctx) => {
 
   /* Het voornemen woont hiernaast: dit bestand ging over de 10 KB, en de naad
      loopt langs de lezer -- hier de eigenaar, daar de gever. */
+  /* Waar een geoormerkte gift heen KAN. Hij gaat voor het voornemen, want dat
+     zoekt de projectnaam bij het gekozen id -- de browser mag hem niet meer
+     meesturen (./gift-projecten.js). */
+  const projecten = require('./gift-projecten')(ctx);
   const voornemen = require('./gift-voornemen')(ctx, {
-    standVan: d, uitlegVan: () => stand().uitleg, ontbreektVan: ontbreekt
+    standVan: d, uitlegVan: () => stand().uitleg, ontbreektVan: ontbreekt,
+    projectVan: projecten.vindBruikbaar
   });
   /* En de enige plek waar geld beweegt, ook apart: dit bestand gaat over de
      stand, dat over de handeling. */
@@ -181,7 +186,7 @@ module.exports = (ctx) => {
   });
 
   return { stand, standZet, voorbereid: voornemen.voorbereid, bevestig: betalen.bevestig,
-    plan: periodiek, machtiging, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
+    plan: periodiek, machtiging, projecten, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
 };
 module.exports.STANDEN = STANDEN;
 module.exports.VORMEN = VORMEN;

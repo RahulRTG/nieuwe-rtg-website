@@ -103,7 +103,7 @@
         <select class="gveld" id="vorm" aria-label="Wat voor gift"></select>
       </div>
       <div class="rij ruimte verborgen" id="projectrij">
-        <input class="gveld" id="project" maxlength="60" placeholder="Naar welk project?" aria-label="Project">
+        <select class="gveld" id="project" aria-label="Project"><option value="">Kies een project</option></select>
       </div>
 
       <div class="vraag">
@@ -212,6 +212,10 @@ let SLEUTEL = null;
 function zeg(t, goed) { $('#melding').innerHTML = '<div class="melder' + (goed ? ' goed' : '') + ' ruimte">' + esc(t) + '</div>'; }
 
 async function start() {
+  /* Kom je van het Klimaatfonds met een project, dan staat de vorm meteen goed.
+     Zonder dit moet iemand die op "Hieraan geven" drukte alsnog zelf
+     "Voor een project" kiezen, en dat is precies wat hij net deed. */
+  try { if (projectUitUrl()) { const v = $('#vorm'); if (v) v.value = 'geoormerkt'; } } catch (e) {}
   if (!token()) { $('#poort').classList.remove('verborgen'); return; }
   try {
     STAND = await api('stand', {});
@@ -230,7 +234,9 @@ async function start() {
 }
 
 function toonProjectrij() {
-  $('#projectrij').classList.toggle('verborgen', $('#vorm').value !== 'geoormerkt');
+  const geoormerkt = $('#vorm').value === 'geoormerkt';
+  $('#projectrij').classList.toggle('verborgen', !geoormerkt);
+  if (geoormerkt) projectenVullen();
 }
 $('#vorm').addEventListener('change', toonProjectrij);
 
@@ -243,7 +249,10 @@ $('#euro').addEventListener('input', () =>
 
 function invoer() {
   return { euro: Number($('#euro').value), vorm: $('#vorm').value,
-    project: $('#project').value.trim() || undefined,
+    /* HET ID EN NIET DE NAAM. Een naam uit de browser wees nergens op na te
+       kijken heen: je kon 25 euro oormerken op "Bestaat Helemaal Niet". De
+       server zoekt de naam bij dit id (kern/rtfos/gift-projecten.js). */
+    projectId: $('#project').value || undefined,
     tegenprestatie: $('#tegen').checked, anoniem: $('#anoniem').checked };
 }
 
@@ -307,6 +316,38 @@ const planApi = (pad, body) => api('plan/' + pad, body);
    incasso-rail), en de acht weken waarin je een afschrijving zonder reden kunt
    laten terugboeken. Dat laatste is de belangrijkste bescherming die een
    betaler heeft; hem klein zetten is hem verstoppen. */
+/* De projecten waar een gift aan vast kan. Eenmaal opgehaald: de lijst
+   verandert niet halverwege een gift, en elke keer opnieuw vragen zou de server
+   belasten voor een keuzemenu. Loopt het mis, dan zegt het veld dat -- niet een
+   leeg menu waar de gever naar zit te kijken. */
+let PROJECTEN = null;
+/* Een project dat via het Klimaatfonds is aangewezen (?project=<id>). Alleen
+   het ID: de naam wordt door de server opgezocht, hier net zo goed als daar. */
+function projectUitUrl() {
+  try { return new URLSearchParams(location.search).get('project') || ''; } catch (e) { return ''; }
+}
+
+async function projectenVullen() {
+  const kies = $('#project');
+  if (!kies || PROJECTEN) return;
+  try {
+    const r = await api('projecten', {});
+    PROJECTEN = r.projecten || [];
+    kies.innerHTML = '<option value="">Kies een project</option>' +
+      PROJECTEN.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) +
+        (p.stad ? ' \u00b7 ' + esc(p.stad) : '') + '</option>').join('');
+    if (!PROJECTEN.length) kies.innerHTML = '<option value="">' + esc(r.uitleg) + '</option>';
+    /* Kwam je van het Klimaatfonds, dan staat het project al goed -- maar
+       alleen als het ECHT in de lijst staat. Een id uit een adresbalk dat
+       nergens op slaat, hoort geen selectie te worden. */
+    const uit = projectUitUrl();
+    if (uit && PROJECTEN.some(p => p.id === uit)) kies.value = uit;
+  } catch (e) {
+    PROJECTEN = null;
+    kies.innerHTML = '<option value="">De projectenlijst is nu niet op te halen</option>';
+  }
+}
+
 let MACHTIGINGEN = [];
 function machtigingBlok(p) {
   const m = MACHTIGINGEN.find(x => x.planId === p.id && x.actief);

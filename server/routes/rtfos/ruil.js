@@ -57,4 +57,18 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     if (geenGast(req, res)) return;
     veilig(res, () => rtfos.ruil.meld(ik(req), lijf(req)));
   });
+
+  /* ---------- de giftstand ----------
+     LEZEN MAG IEDER LID, want de stand is geen geheim: wie wil geven hoort te
+     zien dat het (nog) niet kan en waarom. ZETTEN doet alleen de boardroom --
+     die poort hangt op de route hieronder en niet in de kern, zodat er maar een
+     plek is waar hij te vinden is. Zie GIFT.md. */
+  app.post('/api/rtfos/gift/stand', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.stand());
+  });
+  app.post('/api/rtfos/gift/voorbereid', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.voorbereid(lijf(req)));
+  });
 };

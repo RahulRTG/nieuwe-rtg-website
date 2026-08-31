@@ -108,5 +108,9 @@ module.exports = (kern) => {
      daarom andere onderdelen mee dan de rest van dit domein. */
   require('./ruil')({ app, auth: kern.auth, geenGast: kern.geenGast,
     liveCodename: kern.liveCodename, rtfos, veilig });
+  /* De schakelaar zelf: alleen de boardroom. Hij staat hier en niet bij de
+     ledendeur hierboven, want dat is de hele grens (GIFT.md par. 4). */
+  app.post('/api/rtfos/gift/stand/zet', kern.boardroomAuth || officeAuth,
+    (req, res) => veilig(res, () => rtfos.gift.standZet(req.body, kern.boardroomWie && kern.boardroomWie(req))));
   require('./portalen')({ app, rtfos, veilig });
 };

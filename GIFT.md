@@ -148,7 +148,36 @@ al als grens in `WAARDE.md`.
   `herkomst.js` is daar expliciet over: een knop die "gecontroleerd" zegt zonder
   iets te controleren is gevaarlijker dan geen knop.
 
-## 6. Wat ik nodig heb om te bouwen
+## 6. Wat er inmiddels staat (31 augustus 2026)
+
+De voorbereiding is gebouwd; de knop niet. Drie bestanden en een toets:
+
+| bestand | wat het doet |
+|---|---|
+| `kern/rtfos/gift.js` | De **stand**: dicht of open, de ontvanger, de vormen, de ANBI-status. Boardroom-only. Hij kan niet open zonder ontvanger en vorm, en de weigering zegt welke van de twee ontbreekt. |
+| `kern/rtfos/gift-voornemen.js` | Het **voornemen**: wat er zou gebeuren. Gift of sponsoring, wel of niet eerst beoordeeld, giftbewijs of ontvangstbevestiging of factuur. Ledendeur. |
+| `kern/rtfos/gift-vormen.js` | De drie woordenlijsten, één keer. |
+| `test/rtfos-gift.test.js` | Twaalf toetsen, waarvan er één zakt zodra deze laag de betaallaag aanroept of buiten `kern/rtfos` reikt. |
+
+Wat dat vandaag oplevert: de stand staat **dicht**, en wie hem uitleest krijgt
+een zin en een lijst van welke besluiten nog openstaan — geen grijze knop en
+geen storing. `voorbereid()` weigert dan met diezelfde zin.
+
+Twee dingen die uit het bouwen zelf kwamen en die hierboven nog niet stonden:
+
+- **`onbekend` is een eigen waarde naast `nee`.** Niet vastgelegd leest anders
+  dan besloten-van-niet, en het voornemen zegt dat ook zo: *"of deze gift
+  aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet
+  weten."* Zelfde regel als bij de fiscale klassen in `CLAUDE.md`.
+- **Sponsoring krijgt een factuur, geen ontvangstbevestiging.** Dat belooft
+  `donateur.js` al; het voornemen zei eerst iets anders, en dan hadden dit
+  scherm en het portaal een maand later niet hetzelfde gezegd.
+
+De ANBI-vraag blokkeert de knop met opzet **niet**: een stichting die geen ANBI
+is mag giften aannemen. Hij bepaalt alleen hoe het stuk heet dat de gever
+terugkrijgt.
+
+## 7. Wat ik nodig heb om af te bouwen
 
 Drie antwoorden, meer niet:
 
@@ -158,7 +187,8 @@ Drie antwoorden, meer niet:
    het stuk een ontvangstbevestiging en zegt het scherm dat de gift niet
    aftrekbaar is.
 
-Met die drie is het bouwwerk overzichtelijk: één module naast `donateur.js` die
-een voorgenomen gift klaarzet, één schakelaar in de boardroom, één scherm, en de
-toetsen die de zeven grendels hierboven vasthouden. De verantwoording erna
-bestaat al.
+Met die drie is wat er nog rest overzichtelijk, want par. 6 staat er al: de
+schakelaar zetten (dat is het besluit zelf), het scherm voor de gever, en de
+stap waarin een bevestigde gift een **bron** wordt zodat `donateur.js` en
+`herkomst.js` hem oppakken. Die laatste stap is de enige waar geld bij komt
+kijken, en hij hoort langs `kern/pay/poort.js` — nergens anders.

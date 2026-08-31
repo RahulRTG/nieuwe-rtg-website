@@ -52,6 +52,18 @@ module.exports = (kern) => {
     const b = req.body || {};
     gez(res, kern.reisgezelschap.schrijf(req.session.key, String(b.reis || ''), b.tekst));
   });
+  /* WAT U DEELT. De schakelaar bepaalt niet of de reiziger iets mag melden,
+     maar of een MEEKIJKER het te zien krijgt; wie meereist ziet het altijd. */
+  app.post('/api/reis/gezelschap/beleid', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.beleid(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/beleid/zet', auth, (req, res) => {
+    const b = req.body || {};
+    gez(res, kern.reisgezelschap.zetBeleid(req.session.key, String(b.reis || ''), String(b.veld || ''), b.aan === true));
+  });
+  /* Het aankomstmoment is een HANDELING van de reiziger, geen meting: RTG heeft
+     geen externe vluchtbron, en een stand die vanzelf doorloopt zou volgen zijn. */
+  app.post('/api/reis/gezelschap/aangekomen', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.meldAankomst(req.session.key, String((req.body || {}).reis || ''))));
 
   /* DE REISWACHT (REIZEN.md fase 3): de signalen rond de komende reizen, met
      per bron of hij gemeten is, stilviel of simpelweg niet bestaat. Alleen

@@ -70,10 +70,11 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
 
   const eigen = require('./eigencollectie')({
     db, domein: 'kern/reisgezelschap',
-    bezit: { reisGezelschap: 'lijst', reisTijdlijn: 'lijst' }
+    bezit: { reisGezelschap: 'lijst', reisTijdlijn: 'lijst', reisDeelbeleid: 'kaart' }
   });
   const leden = () => eigen.bak('reisGezelschap');
   const posts = () => eigen.bak('reisTijdlijn');
+  const beleidBak = () => eigen.bak('reisDeelbeleid');
 
   const reisVan = (key, reisId) => (mijnReizen(key).reizen || []).find(r => r.id === reisId) || null;
 
@@ -217,16 +218,83 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
     return { status: 200, ok: true, post: toonPost(post) };
   }
 
-  const toonPost = (p) => ({ id: p.id, van: p.doorCodenaam, rol: p.rol, tekst: p.tekst, at: p.at });
+  const toonPost = (p) => ({ id: p.id, van: p.doorCodenaam, rol: p.rol, soort: p.soort || 'bericht',
+    tekst: p.tekst, at: p.at });
+
+  /* WAT U DEELT -- per reis, en per stuk.
+
+     WAAROM DIT GEEN "LIVE" IETS IS. RTG heeft geen externe vluchtbron (de
+     reiswacht zegt dat met zoveel woorden), dus een melding "uw vlucht is
+     geland" zou hier verzonnen zijn. En zelfs mét zo'n bron zou een stand die
+     vanzelf doorloopt neerkomen op volgen. Het aankomstmoment is daarom een
+     HANDELING van de reiziger: hij zegt dat hij er is. Dat is precies de vorm
+     uit LIFE.md par. 4 -- een moment, geen stip.
+
+     De schakelaar bepaalt niet OF de reiziger het mag melden, maar of een
+     MEEKIJKER het te zien krijgt. Een reisgenoot ziet het altijd: die staat op
+     dezelfde reis. */
+  const STANDAARD_BELEID = { aankomst: true };
+
+  function beleidVan(reisId, eigenaarKey) {
+    const b = beleidBak()[eigenaarKey + '|' + reisId];
+    return Object.assign({}, STANDAARD_BELEID, b || {});
+  }
+
+  function beleid(key, reisId) {
+    if (!reisVan(key, reisId)) return { status: 404, error: 'Deze reis staat niet bij u.' };
+    /* Wat er NIET bestaat staat er met zoveel woorden bij: anders leest een
+       ontbrekende schakelaar als een functie die nog moet komen. */
+    return { status: 200, ok: true, beleid: beleidVan(reisId, key),
+      bestaatNiet: [{ naam: 'live locatie',
+        reden: 'RTG deelt geen doorlopende positie. U deelt een moment, geen stip.' }] };
+  }
+
+  function zetBeleid(key, reisId, veld, aan) {
+    if (!reisVan(key, reisId)) return { status: 404, error: 'Deze reis staat niet bij u.' };
+    if (!Object.prototype.hasOwnProperty.call(STANDAARD_BELEID, veld)) {
+      return { status: 400, error: 'Dat is geen instelling die bestaat.' };
+    }
+    const sleutel = key + '|' + reisId;
+    const b = Object.assign({}, beleidVan(reisId, key));
+    b[veld] = aan === true;
+    beleidBak()[sleutel] = b; save();
+    return { status: 200, ok: true, beleid: b };
+  }
+
+  /* HET AANKOMSTMOMENT. Alleen de reiziger zelf; een reisgenoot meldt niet aan
+     dat een ander er is. */
+  function meldAankomst(key, reisId) {
+    const reis = reisVan(key, reisId);
+    if (!reis) return { status: 404, error: 'Deze reis staat niet bij u.' };
+    const post = {
+      id: 'P-' + crypto.randomBytes(4).toString('hex'),
+      reis: reisId, eigenaar: key, door: key, doorCodenaam: naam(key), rol: 'eigenaar',
+      soort: 'aankomst',
+      tekst: 'Aangekomen in ' + (reis.bestemming || 'de bestemming') + '.',
+      at: nu()
+    };
+    posts().push(post); save();
+    const b = beleidVan(reisId, key);
+    return { status: 200, ok: true, post: toonPost(post),
+      /* Eerlijk terugmelden wie dit ziet -- de reiziger hoort te weten of zijn
+         meekijkers meelezen, en niet te moeten raden. */
+      gedeeldMet: b.aankomst ? 'het hele gezelschap' : 'alleen wie meereist' };
+  }
 
   function tijdlijn(key, reisId) {
     const eigen = reisVan(key, reisId);
     const mijn = eigen ? null : leden().find(x => x.reis === reisId && x.lid === key && x.stand === 'aanvaard');
     if (!eigen && !mijn) return { status: 404, error: 'Deze reis staat niet bij u.' };
     const eigenaar = eigen ? key : mijn.eigenaar;
-    return { status: 200, ok: true, rol: eigen ? 'eigenaar' : mijn.rol,
-      posts: posts().filter(p => p.reis === reisId && p.eigenaar === eigenaar)
-        .sort((a, b) => String(a.at).localeCompare(String(b.at))).map(toonPost) };
+    const rol = eigen ? 'eigenaar' : mijn.rol;
+    const b = beleidVan(reisId, eigenaar);
+    /* Het aankomstmoment is het enige dat een schakelaar kent: staat hij uit,
+       dan blijft het bij wie meereist. Berichten die iemand zelf schrijft
+       hebben geen schakelaar -- wie schrijft, deelt. */
+    const magZien = (p) => !(p.soort === 'aankomst' && rol === 'meekijker' && !b.aankomst);
+    return { status: 200, ok: true, rol,
+      posts: posts().filter(p => p.reis === reisId && p.eigenaar === eigenaar).filter(magZien)
+        .sort((a, b2) => String(a.at).localeCompare(String(b2.at))).map(toonPost) };
   }
 
   /* MIJN UITNODIGINGEN -- wat er aan mij gevraagd is, en wat ik zelf meereis. */
@@ -241,7 +309,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   return {
     reisgezelschap: {
       ROLLEN, STANDEN, zicht, rolVan, nodigUit, antwoord, verwijder,
-      gezelschap, reisVoor, schrijf, tijdlijn, mijnKring
+      gezelschap, reisVoor, schrijf, tijdlijn, mijnKring, beleid, zetBeleid, meldAankomst
     }
   };
 };

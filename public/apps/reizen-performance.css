@@ -267,6 +267,12 @@ body.rtg-stijl.rtg-edge-host .reisapp>main{padding-top:48px!important}
 .zichtblok small{color:var(--muted);font-size:.75rem;line-height:1.5}
 .zichtblok .nietzicht{color:#E7D3D8}
 .samenblad .rahulsnel{margin-top:1rem}
+.deelregel{display:grid;grid-template-columns:1fr auto;gap:.7rem;align-items:center;border-top:1px solid var(--line-soft);padding:.7rem 0}
+.deelregel:first-child{border-top:0}
+.schakel{min-width:64px;border:1px solid var(--line);background:transparent;color:var(--muted);padding:.3rem .6rem;font-size:.58rem;font-weight:700;letter-spacing:.14em}
+.schakel.aan{border-color:var(--wine-licht);background:linear-gradient(100deg,var(--wine-bright),var(--wine));color:#fff}
+#samenDelenKaart .rtg-knop{width:100%;margin-top:.9rem}
+#samenDelenKaart .rtg-sub{margin:.6rem 0 0;color:var(--muted);font-size:.72rem;line-height:1.5}
 
 :focus-visible{outline:2px solid var(--wine-licht);outline-offset:3px}
 @keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

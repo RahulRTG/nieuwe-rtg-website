@@ -141,8 +141,18 @@ test('wie niet is uitgenodigd, bestaat de reis niet voor', async () => {
    wordt op een dag gevuld. */
 test('de module kent geen live locatie, ook niet als veld', () => {
   const bron = require('node:fs').readFileSync(require.resolve('../server/kern/reisgezelschap.js'), 'utf8');
-  const code = bron.split('\n').filter(r => !/^\s*(\*|\/\*|\/\/)/.test(r)).join('\n');
-  for (const woord of ['latitude', 'longitude', 'coord', 'gps', 'positie']) {
+  /* Commentaar EN tekst tussen quotes gaan eruit voor de meting. Dat is geen
+     verzachting maar een scherpstelling: deze toets gaat over de VORM van de
+     module (draagt zij zo'n veld?) en niet over haar proza. Hij sloeg namelijk
+     eerst aan op de zin waarin de module uitlegt dat zij geen doorlopende
+     positie deelt -- de belofte zelf werd als overtreding gelezen. Een veld
+     `positie:` of een variabele `gps` staat na deze bewerking nog gewoon in de
+     tekst en laat de toets zakken. */
+  const code = bron
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')            // blokcommentaar, ook de regels die niet met * beginnen
+    .replace(/\/\/[^\n]*/g, ' ')                   // regelcommentaar
+    .replace(/'[^'\n]*'|"[^"\n]*"/g, "''");        // en de tekst tussen quotes
+  for (const woord of ['latitude', 'longitude', 'coord', 'gps', 'positie', 'locatie']) {
     assert.ok(!new RegExp(woord, 'i').test(code), 'geen ' + woord + ' in de code van het gezelschap');
   }
 });
@@ -156,4 +166,50 @@ test('er komt geen cijfer op het leven tussen mensen', async () => {
   for (const veld of ['likes', 'score', 'punten', 'reacties', 'gezien', 'kijkers']) {
     assert.equal(post[veld], undefined, 'een bericht draagt geen ' + veld);
   }
+});
+
+/* --------------------------------------------------------- WAT U DEELT ----
+   De schakelaar bepaalt niet of de reiziger iets mag melden, maar of een
+   MEEKIJKER het te zien krijgt. Een reisgenoot staat op dezelfde reis en ziet
+   het altijd. */
+test('het aankomstmoment volgt de schakelaar -- voor de meekijker, niet voor de reisgenoot', async () => {
+  const g = maak();
+  const mee = await g.nodigUit('user-1', REIS.id, 'Nachtvlinder', 'meekijker');
+  g.antwoord('user-2', mee.lid.id, true);
+  const genoot = await g.nodigUit('user-1', REIS.id, 'Steenmarter', 'reisgenoot');
+  g.antwoord('user-3', genoot.lid.id, true);
+
+  const melding = g.meldAankomst('user-1', REIS.id);
+  assert.equal(melding.status, 200);
+  assert.equal(melding.post.soort, 'aankomst');
+  assert.equal(melding.gedeeldMet, 'het hele gezelschap', 'standaard staat hij aan');
+  assert.equal(g.tijdlijn('user-2', REIS.id).posts.length, 1, 'de meekijker leest hem');
+
+  assert.equal(g.zetBeleid('user-1', REIS.id, 'aankomst', false).status, 200);
+  assert.equal(g.tijdlijn('user-2', REIS.id).posts.length, 0, 'uit betekent uit');
+  assert.equal(g.tijdlijn('user-3', REIS.id).posts.length, 1, 'wie meereist ziet het hoe dan ook');
+  assert.equal(g.tijdlijn('user-1', REIS.id).posts.length, 1, 'en de reiziger zelf ook');
+});
+
+test('een schakelaar die niet bestaat, wordt niet stilzwijgend aangemaakt', () => {
+  const g = maak();
+  const uit = g.zetBeleid('user-1', REIS.id, 'locatie', true);
+  assert.equal(uit.status, 400, 'anders staat er morgen een locatieschakelaar in de opslag');
+  assert.equal(g.beleid('user-1', REIS.id).beleid.locatie, undefined);
+});
+
+test('het beleid zegt zelf wat er niet bestaat', () => {
+  const g = maak();
+  const uit = g.beleid('user-1', REIS.id);
+  assert.equal(uit.status, 200);
+  assert.ok(uit.bestaatNiet.some(x => /locatie/i.test(x.naam)), 'live locatie staat er als bewust ontbrekend bij');
+  assert.ok(uit.bestaatNiet.every(x => x.reden), 'met een reden, niet als lege plek');
+});
+
+test('een reisgenoot meldt niet aan dat een ander is aangekomen', async () => {
+  const g = maak();
+  const genoot = await g.nodigUit('user-1', REIS.id, 'Steenmarter', 'reisgenoot');
+  g.antwoord('user-3', genoot.lid.id, true);
+  assert.equal(g.meldAankomst('user-3', REIS.id).status, 404);
+  assert.equal(g.zetBeleid('user-3', REIS.id, 'aankomst', false).status, 404);
 });

@@ -113,6 +113,45 @@
     }
   }
 
+  /* WAT U DEELT -- alleen voor de reiziger zelf, want alleen hij kan het zetten.
+     Wat er NIET bestaat komt van de server mee en staat er even groot bij: een
+     ontbrekende schakelaar leest anders als een functie die nog moet komen. */
+  function tekenDelen(uit) {
+    var kaart = $('#samenDelenKaart'), vak = $('#samenDelen');
+    if (!kaart || !vak) return;
+    if (!uit || uit.error) { kaart.hidden = true; return; }
+    kaart.hidden = false;
+    vak.textContent = '';
+    var b = uit.beleid || {};
+    Object.keys(b).forEach(function (veld) {
+      var regel = maak('div', 'deelregel');
+      var label = maak('span', 'gezelnaam');
+      label.appendChild(maak('b', '', veld === 'aankomst' ? 'Aankomst melden' : veld));
+      label.appendChild(maak('small', '', veld === 'aankomst'
+        ? 'Meekijkers zien dat u er bent. Wie meereist ziet het altijd.' : ''));
+      regel.appendChild(label);
+      var knop = maak('button', 'schakel' + (b[veld] ? ' aan' : ''), b[veld] ? 'AAN' : 'UIT');
+      knop.type = 'button';
+      knop.setAttribute('aria-pressed', b[veld] ? 'true' : 'false');
+      knop.addEventListener('click', function () {
+        R.api('/api/reis/gezelschap/beleid/zet', { reis: huidig, veld: veld, aan: !b[veld] })
+          .then(function () { laad(); })
+          .catch(function (e) { R.toast(e.message); });
+      });
+      regel.appendChild(knop);
+      vak.appendChild(regel);
+    });
+    (uit.bestaatNiet || []).forEach(function (x) {
+      var regel = maak('div', 'deelregel');
+      var label = maak('span', 'gezelnaam');
+      label.appendChild(maak('b', '', x.naam.charAt(0).toUpperCase() + x.naam.slice(1)));
+      label.appendChild(maak('small', '', x.reden));
+      regel.appendChild(label);
+      regel.appendChild(maak('em', 'rolpil', 'BESTAAT NIET'));
+      vak.appendChild(regel);
+    });
+  }
+
   function tekenKring(uit) {
     var vak = $('#samenKring'); if (!vak) return;
     vak.textContent = '';
@@ -161,11 +200,21 @@
       })).then(function (erbij) { return lijst.concat(erbij.filter(Boolean)); });
     }).then(function (lijst) {
       if ((!huidig || !lijst.some(function (r) { return r.id === huidig; })) && lijst.length) huidig = lijst[0].id;
+      /* Of dit MIJN reis is, weet het scherm hier al: hij stond in de eigen
+         lijst. Het beleid opvragen voor een reis van een ander levert een
+         terechte 404 op -- en een 404 op een normale weg is ruis waar een
+         lezer van het logboek later op gaat jagen. */
+      var vanMij = lijst.some(function (r) { return r.id === huidig && !r.van; });
       kiesReis(lijst);
       if (!huidig) return;
       R.api('/api/reis/gezelschap', { reis: huidig }).then(tekenLeden).catch(function () {});
       R.api('/api/reis/gezelschap/tijdlijn', { reis: huidig }).then(tekenTijdlijn).catch(function () {});
       R.api('/api/reis/gezelschap/reis', { reis: huidig }).then(tekenZicht).catch(function () {});
+      if (vanMij) {
+        R.api('/api/reis/gezelschap/beleid', { reis: huidig })
+          .then(tekenDelen)
+          .catch(function () { tekenDelen(null); });
+      } else tekenDelen(null);
     }).catch(function () {});
   }
 
@@ -194,6 +243,14 @@
       R.api('/api/reis/gezelschap/schrijf', { reis: huidig, tekst: veld.value })
         .then(function () { veld.value = ''; laad(); })
         .catch(function (fout) { R.toast(fout.message); });
+    });
+
+    var aangekomen = $('#samenAangekomen');
+    if (aangekomen) aangekomen.addEventListener('click', function () {
+      if (!huidig) { R.toast('Kies eerst een reis.'); return; }
+      R.api('/api/reis/gezelschap/aangekomen', { reis: huidig })
+        .then(function (uit) { R.toast('Gedeeld met ' + uit.gedeeldMet + '.'); laad(); })
+        .catch(function (e) { R.toast(e.message); });
     });
 
     /* Pas laden als het blad in beeld komt: een gezelschap ophalen dat niemand

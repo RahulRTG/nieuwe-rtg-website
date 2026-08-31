@@ -394,37 +394,37 @@ test('een traag antwoord van een eerdere ronde schrijft niet over het verse logb
     await wachtTot(page, () => [...document.querySelectorAll('#aPunt option')].some(o => /Koeling 9/.test(o.textContent)),
       null, { wat: 'het meetpunt in de keuzelijst', ms: 20000 });
 
-    /* het EERSTVOLGENDE logboek-antwoord wordt opgehouden; dat is de ronde die
-       nog van voor de meting is */
-    let traag = 0, traagBinnen = false;
+    /* Het EERSTVOLGENDE logboek-antwoord wordt OPGEHAALD en daarna
+       vastgehouden -- geen klok, maar een deur die wij zelf opendoen zodra de
+       verse ronde op het scherm staat. Zo is het antwoord echt OUD en niet
+       alleen traag, en dat is precies het verschil dat deze toets maakt. */
+    let traag = 0, laatDoor = null, afgeleverd = null;
+    const deur = new Promise(r => { laatDoor = r; });
     await page.route('**/api/supplier/horeca/haccp/logboek', async (route) => {
       if (traag === 1) {
         traag = 2;
-        /* eerst OPHALEN (dus met de stand van nu), dan pas laat afleveren --
-           anders is het antwoord niet oud maar alleen traag, en dat is precies
-           het verschil dat deze toets moet maken */
         const antwoord = await route.fetch();
         const lijf = await antwoord.text();
-        await new Promise(r => setTimeout(r, 3000));
-        await route.fulfill({ response: antwoord, body: lijf });
-        traagBinnen = true;
+        await deur;
+        afgeleverd = route.fulfill({ response: antwoord, body: lijf });
         return;
       }
       await route.continue();
     });
 
     traag = 1;
-    await page.click('#aToon');                 // ronde 1: wordt opgehouden
+    await page.click('#aToon');                 // ronde 1: wordt vastgehouden
     await page.selectOption('#aPunt', { label: 'Koeling 9 (0 tot 7 C)' });
     await page.fill('#aWaarde', '9');
     await page.fill('#aActie', 'teruggekoeld, monteur gebeld');
-    await page.click('#aMeting');               // ronde 2: komt er zo langs
+    await page.click('#aMeting');               // ronde 2: komt er gewoon langs
     await wachtOpTekst(page, /teruggekoeld, monteur gebeld/, { in: '#aLog' });
 
-    // pas oordelen als het opgehouden antwoord van ronde 1 echt binnen is
-    const grens = Date.now() + 25000;
-    while (!traagBinnen && Date.now() < grens) await new Promise(r => setTimeout(r, 100));
-    assert.ok(traagBinnen, 'het opgehouden logboek-antwoord is binnengekomen');
+    // en nu pas het oude antwoord binnenlaten, en wachten tot het is afgeleverd
+    const binnen = page.waitForResponse(r => /haccp\/logboek/.test(r.url()), { timeout: 20000 });
+    laatDoor();
+    await binnen;
+    await afgeleverd;
     /* het binnengekomen antwoord nog laten afhandelen door de pagina zelf:
        twee frames, geen klok -- de afhandeling staat al in de rij */
     await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));

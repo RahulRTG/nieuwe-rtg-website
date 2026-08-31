@@ -53,6 +53,14 @@ const PUBLIEK = new Map([
      bewijs zit in het verzoek: een handtekening over de uitdaging die de
      server zelf net heeft uitgegeven, en die maar een keer geldig is. */
   ['/api/webauthn/login', 'de tegenhanger van /api/webauthn/opties: de ondertekende uitdaging IS het bewijs, en die geldt eenmalig'],
+  /* Nog dezelfde deur, derde sleutel. Wachtwoordloos herinloggen van
+     schoolpersoneel: wie de link aanvraagt HEEFT per definitie geen sessie.
+     Wat hem eerlijk houdt staat in server/school/personeel-inlog.js en is
+     precies wat /api/auth/reset ook doet -- een rem per ip, een antwoord dat
+     bekend en onbekend niet uit elkaar houdt, EN een minimale antwoordtijd,
+     zodat het bestaan van een schoolaccount ook niet uit de duur volgt. Het
+     bewijs zit in de mailbox en niet in het verzoek. */
+  ['/api/foundation/school/personeel/inloglink', 'de wachtwoordloze herinlog van schoolpersoneel: wie hem aanvraagt heeft nog geen sessie; rem per ip, gelijk antwoord en gelijke antwoordtijd voor bekend en onbekend'],
   ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
   ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
   ['/api/foundation/registratie/aanvragen', 'een school, vrijwilliger of stichting heeft vóór toelating nog geen account of code (met rem per ip)'],

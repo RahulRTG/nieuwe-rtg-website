@@ -28,7 +28,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { eisSchoneBoom } = require('../scripts/lib/stempel');
+const { eisSchoneBoom, vuileBoom, CODEPADEN } = require('../scripts/lib/stempel');
 
 const PROEVEN = ['idemproef-route', 'rolproef-route', 'handelingproef-route',
   'auditproef-route', 'uitvoerproef-route', 'invoerproef-route'];
@@ -69,4 +69,44 @@ test('de ontsnapping bestaat, en zegt met haar naam wat ze kost', () => {
     if (oud === undefined) delete process.env.RTG_METEN_OP_VUILE_BOOM;
     else process.env.RTG_METEN_OP_VUILE_BOOM = oud;
   }
+});
+
+/* ============================================================================
+   DE GRENS: WAT MAAKT EEN METING ONREPRODUCEERBAAR?
+
+   Dit is de toets bij de fout die de volle meetronde onmogelijk maakte. De
+   poort weigerde op ELK ongecommit bestand; de meetronde schrijft in stap 1
+   POORTWACHT.json, en daarna weigerden stap 2 tot en met 7 op de uitvoer van
+   hun eigen ronde. Zes van de negen registers zijn zo nooit in een volle ronde
+   bijgewerkt, en aan de uitvoer was alleen "GESTRUIKELD" te zien.
+
+   De grens ligt nu waar `versheid()` hem altijd al legde: alleen server/,
+   scripts/ en public/. Twee mutaties gedaan, allebei beten ze:
+     - het pad een teken laten verschuiven (de trim-fout die er echt in zat)
+       -> een codebestand belandt bij "buiten de code", toets 10 zakt
+     - CODEPADEN leegmaken -> toets 10 zakt
+   ========================================================================== */
+const WORTEL2 = path.join(__dirname, '..');
+test('10. alleen ongecommitte CODE maakt een meting onreproduceerbaar', () => {
+  const inCode = path.join(WORTEL2, 'scripts', '.meetgrens-proef.tmp');
+  const erbuiten = path.join(WORTEL2, '.meetgrens-proef.json');
+  fs.writeFileSync(inCode, 'proef\n');
+  fs.writeFileSync(erbuiten, '{}\n');
+  try {
+    const v = vuileBoom();
+    const noem = rij => rij.map(r => r.slice(3));
+    assert.ok(noem(v.code).includes('scripts/.meetgrens-proef.tmp'),
+      'een bestand onder scripts/ hoort bij de code; gezien: ' + JSON.stringify(v.code));
+    assert.ok(noem(v.anders).includes('.meetgrens-proef.json'),
+      'een register in de wortel is uitvoer en geen invoer; gezien: ' + JSON.stringify(v.anders));
+    assert.ok(!noem(v.code).includes('.meetgrens-proef.json'),
+      'een register mag de poort niet dichthouden -- dat is precies wat de meetronde brak');
+  } finally {
+    fs.unlinkSync(inCode); fs.unlinkSync(erbuiten);
+  }
+});
+
+test('11. de grens staat op EEN plek', () => {
+  assert.deepEqual(CODEPADEN, ['server', 'scripts', 'public'],
+    'versheid() en de poort vooraf horen dezelfde drie mappen te bedoelen');
 });

@@ -18,10 +18,27 @@
      commit      waartegen. Twee registers van verschillende commits zijn niet
                  met elkaar te vergelijken, en een register van een oudere commit
                  dan HEAD is per definitie achterhaald.
-     boomVuil    stond er ongecommit werk in de boom tijdens het meten? Zo ja,
+     boomVuil    stond er ongecommit werk in de CODE tijdens het meten? Zo ja,
                  dan hoort die meting NIET bij die commit -- hij hoort bij iets
                  wat nergens is vastgelegd. Dat is geen detail: precies zo
                  ontstaat een register dat niemand kan reproduceren.
+     boomAnders   hoeveel ongecommitte bestanden er BUITEN de code stonden. Nul
+                 of niet, het staat er -- een uitzondering die je niet kunt
+                 tellen, is een uitzondering die je niet kunt narekenen.
+
+   WAT "CODE" HIER IS, en waarom dat een grens is en geen versoepeling.
+   `versheid()` verderop besloot dit al: een commit die alleen registers of
+   documentatie aanraakt, maakt een meting niet ongeldig -- alleen server/,
+   scripts/ en public/ doen dat. Het vooraf-oordeel (`boomVuil`) hanteerde een
+   ANDERE grens: elk gewijzigd bestand telde. Twee regels over dezelfde vraag,
+   en de strengste van de twee sloeg toe op zijn eigen uitvoer: de meetronde
+   schrijft in stap 1 POORTWACHT.json, en daarna weigerden stap 2 tot en met 7
+   omdat de boom vuil was -- door hun eigen ronde. Zes van de negen registers
+   zijn zo nooit in een volle ronde bijgewerkt.
+
+   Nu is er EEN regel (`CODEPADEN`), en die staat aan de kant van de reden: een
+   meting is reproduceerbaar als de CODE eronder is vastgelegd. Een register is
+   uitvoer en geen invoer.
      node        welke node. Een meting op een andere runtime is een andere
                  meting; scripts/norm.js maakt dat onderscheid al voor prestatie.
 
@@ -34,6 +51,11 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..', '..');
 
+/* De drie mappen waarin een wijziging een meting ongeldig maakt. Dezelfde
+   drie die `versheid()` gebruikt -- en met opzet dezelfde constante, want twee
+   lijsten die hetzelfde horen te zeggen lopen uiteen (LAT.md regel 4). */
+const CODEPADEN = ['server', 'scripts', 'public'];
+
 function git(args) {
   try {
     return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8',
@@ -44,18 +66,47 @@ function git(args) {
 /* `extra` komt er ONGEWIJZIGD bij, voor wat alleen dit instrument weet -- het
    aantal routes van dat moment, de gebruikte seed, de opstelling. Zie
    scripts/poortwacht.js, die zijn omgevingsvlaggen meegeeft. */
+function gitRuw(args) {
+  try {
+    return execFileSync('git', args, { cwd: WORTEL, encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch (e) { return ''; }
+}
+
 function stempel(extra) {
   const commit = git(['rev-parse', '--short', 'HEAD']) || null;
   /* --porcelain geeft een regel per gewijzigd bestand; leeg = schone boom.
      Faalt git (geen repo, geen git), dan is het ONBEKEND en niet 'schoon':
      onbekend als schoon lezen is precies de fout die dit veld moet voorkomen. */
-  const status = commit === null ? null : git(['status', '--porcelain']);
+  const vuil = commit === null ? null : vuileBoom();
   return Object.assign({
     op: new Date().toISOString(),
     commit,
-    boomVuil: status === null ? null : status.length > 0,
+    boomVuil: vuil === null ? null : vuil.code.length > 0,
+    boomAnders: vuil === null ? null : vuil.anders.length,
     node: process.version
   }, extra || {});
+}
+
+/* Wat er ongecommit staat, gesplitst in code en de rest. Faalt git, dan null:
+   onbekend als schoon lezen is precies de fout die dit veld moet voorkomen. */
+function vuileBoom() {
+  /* ONGETRIMD opvragen. `git()` trimt zijn uitvoer, en daarmee verdwijnt de
+     spatie waarmee " M pad" begint -- een vaste positie tellen gaf dan een pad
+     dat een letter miste, en elk gewijzigd codebestand belandde stilzwijgend
+     bij "buiten de code". Precies de kant op die niemand wil. */
+  const status = gitRuw(['status', '--porcelain']);
+  if (status === '' && !git(['rev-parse', '--short', 'HEAD'])) return null;
+  const regels = status.split('\n').filter(r => r.trim());
+  const code = [], anders = [];
+  for (const r of regels) {
+    /* --porcelain: twee tekens status, een spatie, dan het pad. Bij een
+       hernoeming staat er "oud -> nieuw"; dan tellen beide kanten mee. */
+    const pad = r.slice(3);   // XY + spatie; de regel is hier nog ongetrimd
+    const delen = pad.split(' -> ');
+    (delen.some(d => CODEPADEN.some(c => d === c || d.startsWith(c + '/'))) ? code : anders).push(r.trim());
+  }
+  return { code, anders };
 }
 
 /* ============================================================================
@@ -87,12 +138,15 @@ function eisSchoneBoom(naam) {
   if (process.env.RTG_METEN_OP_VUILE_BOOM === '1') {
     return { ok: true, reden: 'toegestaan met RTG_METEN_OP_VUILE_BOOM=1; deze uitslag telt niet als bewijs' };
   }
-  const status = git(['status', '--porcelain']);
-  if (!status) return { ok: true, reden: 'schone boom op ' + commit };
-  const regels = status.split('\n').filter(Boolean);
-  return { ok: false, commit, bestanden: regels.slice(0, 8).map(r => r.trim()),
+  const vuil = vuileBoom();
+  if (!vuil || vuil.code.length === 0) {
+    return { ok: true, buitenDeCode: vuil ? vuil.anders.length : 0,
+      reden: 'geen ongecommitte code op ' + commit +
+        (vuil && vuil.anders.length ? ' (' + vuil.anders.length + ' bestand(en) buiten server/scripts/public; die maken een meting niet onreproduceerbaar)' : '') };
+  }
+  return { ok: false, commit, bestanden: vuil.code.slice(0, 8),
     reden: (naam || 'deze meting') + ' zou een uitslag opleveren met boomVuil: true, en die telt nergens mee. ' +
-      regels.length + ' bestand(en) niet gecommit. Commit ze eerst, of zet RTG_METEN_OP_VUILE_BOOM=1 ' +
+      vuil.code.length + ' codebestand(en) niet gecommit. Commit ze eerst, of zet RTG_METEN_OP_VUILE_BOOM=1 ' +
       'als u weet dat deze ronde niet als bewijs hoeft te tellen.' };
 }
 
@@ -118,8 +172,7 @@ function versheid(gemeten, huidigeCommit) {
      Wat telt is of er sinds de meting CODE is veranderd. Een commit die alleen
      registers, documentatie of een tekstbestand aanraakt, maakt een meting niet
      ongeldig. Een commit in server/, scripts/ of public/ wel. */
-  const gewijzigd = git(['diff', '--name-only', gemeten.commit + '..' + nu, '--',
-    'server', 'scripts', 'public']);
+  const gewijzigd = git(['diff', '--name-only', gemeten.commit + '..' + nu, '--'].concat(CODEPADEN));
   if (gewijzigd === '') {
     /* Lege uitvoer betekent OOK "de vergelijking mislukte" (onbekende commit na
        een rebase, of geen git). Daarom apart nagaan of de commit bestaat: een
@@ -137,4 +190,4 @@ function versheid(gemeten, huidigeCommit) {
 
 const nuCommit = () => git(['rev-parse', '--short', 'HEAD']) || null;
 
-module.exports = { stempel, eisSchoneBoom, versheid, nuCommit, WORTEL };
+module.exports = { stempel, eisSchoneBoom, versheid, vuileBoom, nuCommit, CODEPADEN, WORTEL };

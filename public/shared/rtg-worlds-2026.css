@@ -637,10 +637,38 @@ body[data-rtg-world="foundation"] .knop.stil{
   color:var(--bordeaux-basis);
 }
 body[data-rtg-world="foundation"] .lijnrij{border-color:var(--pearl-rand);}
-body[data-rtg-world="foundation"] .pil{border-color:var(--pearl-rand);color:#34322F;}
-body[data-rtg-world="foundation"] .uitleg,
-body[data-rtg-world="foundation"] .leeg,
-body[data-rtg-world="foundation"] .lijnrij .sub{color:#41403E;}
+
+/* ------------------------------------------- pearl is niet altijd geschilderd
+   HIER STOND DE INKT VAST, EN DAT GING MIS ZODRA IEMAND ANDERS DE GROND KOOS.
+
+   Deze wereld is Pearl, dus stonden #34322F en #41403E hier als vaste waarden:
+   donkere inkt, want de grond is licht. Dat klopt zolang deze regels de enige
+   zijn die iets schilderen. Op /apps/foundation/os-publiek.html is dat niet zo:
+   premium.css (de vormtaal van de donkere RTF-werkschermen) zet `rtf-premium`
+   op de body en maakt de vlakken bijna zwart. De wereld leverde toen de inkt en
+   de schil de grond -- gemeten haalde de uitleg in een kaart 1,73:1 en een pil
+   1,40:1, waar 4,5 moet.
+
+   De regel eronder is dus niet "licht" of "donker" maar: WIE DE GROND
+   SCHILDERT, LEVERT DE INKT. Staat de donkere schil op deze body, dan wijkt
+   Pearl -- valt hij weg, dan geldt Pearl weer, vanzelf.
+
+   Dit raakt vandaag precies EEN pagina: `data-rtg-world="foundation"` staat
+   alleen daar. Het staat hier en niet in dat scherm omdat de volgende pagina
+   die deze wereld aanzet dezelfde val zou vinden, en die zou hem opnieuw in
+   zijn eigen <style> moeten ontwijken. */
+body[data-rtg-world="foundation"]:not(.rtf-premium) .pil{border-color:var(--pearl-rand);color:#34322F;}
+body[data-rtg-world="foundation"]:not(.rtf-premium) .uitleg,
+body[data-rtg-world="foundation"]:not(.rtf-premium) .leeg,
+body[data-rtg-world="foundation"]:not(.rtf-premium) .lijnrij .sub{color:#41403E;}
+
+/* En de tegenhanger staat er NIET, want gemeten deed hij niets. Hier stond een
+   blok dat --txt, --muted, --soft en --line op de onyx-waarden zette zodra de
+   donkere schil op de body staat. Weggehaald bleven alle tien de gemeten
+   tekststijlen boven de norm: valt de regel hierboven weg, dan komt de inkt uit
+   de tokens die premium.css en schil-os.js zelf al zetten. Een blok dat je niet
+   kunt laten zakken, is geen reparatie maar ruis. */
+
 
 /* ------------------------------------------------------------ klein scherm */
 @media(max-width:760px){

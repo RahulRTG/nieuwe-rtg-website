@@ -17,47 +17,11 @@
   h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
   main{padding:1rem;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:1.1rem;}
 
-  /* ------------------------------------------------- welke inkt hier hoort ---
-     TWEE LAGEN ZEGGEN IETS ANDERS OVER DEZE PAGINA, EN DE INKT ZAT ERTUSSEN.
-
-     shared/rtg-worlds-2026.css geeft FoundationOS het materiaal Pearl en zet
-     daarom op `body[data-rtg-world="foundation"]` de LICHTE tokens: --txt wordt
-     #1A1713, --muted #34322F. Tegelijk zet premium.js `rtf-premium` op de body
-     en schildert premium.css de vlakken bijna zwart (en schil-os.js zet het
-     thema op onyx). Gevolg: donkere inkt op een donkere kaart. Gemeten haalde
-     de uitleg in een kaart 1,73:1 waar 4,5 moet.
-
-     Hier staat dus niet "licht" of "donker" maar: ZOLANG DE DONKERE SCHIL OP
-     DEZE BODY STAAT, is de inkt licht. Valt die schil weg, dan verdwijnt deze
-     regel vanzelf mee en gelden de Pearl-tokens weer. Dat is met opzet een
-     voorwaarde en geen overschrijving.
-
-     De selector draagt allebei de haken omdat de wereldregel na dit blok wordt
-     ingeladen: op gelijke specificiteit wint zij, dus moet deze zwaarder wegen. */
-  body[data-rtg-world="foundation"].rtf-premium{
-    --txt:#F4F1EC;
-    --muted:rgba(244,241,236,.72);
-    --soft:rgba(244,241,236,.60);
-    --line:rgba(255,255,255,.12);
-    /* het leesgoud, niet de logotoon: die haalt op zwart geen 4,5 */
-    --gold:#C9A24B;
-  }
-  /* En dezelfde botsing één laag dieper. rtg-worlds-2026.css regel 640-643 zet
-     voor deze wereld een VASTE kleur op .pil, .uitleg, .leeg en .lijnrij .sub
-     (#34322F en #41403E) -- geen variabele, dus de tokens hierboven raken ze
-     niet. Op de donkere schil haalden ze 1,73 en 1,40 op 4,5.
-
-     Dit staat hier scherper dan het hoort: de oorzaak zit in dat gedeelde blad,
-     dat aanneemt dat FoundationOS altijd in Pearl geschilderd wordt. Zolang
-     premium.css het tegendeel doet, klopt die aanname op elke os-*.html van de
-     stichting niet. Repareren op die plek raakt ~70 schermen tegelijk en is
-     geen onderdeel van dit scherm; hier staat de meting en de reden. */
-  body[data-rtg-world="foundation"].rtf-premium .uitleg,
-  body[data-rtg-world="foundation"].rtf-premium .leeg,
-  body[data-rtg-world="foundation"].rtf-premium .lijnrij .buurtsub{color:var(--muted);}
-  body[data-rtg-world="foundation"].rtf-premium .pil{color:var(--muted);border-color:var(--line);}
-  body[data-rtg-world="foundation"].rtf-premium .pil.let{color:#C9A24B;border-color:#5C4E10;}
-  body[data-rtg-world="foundation"].rtf-premium .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  /* De inkt van dit scherm komt uit shared/rtg-worlds-2026.css. Daar stond de
+     inkt van deze wereld vast op de Pearl-waarden terwijl premium.css de grond
+     hier zwart schildert; die regel is nu voorwaardelijk op de schil. Hier
+     stond een omweg om dat te ontwijken -- die is weg, want twee plekken die
+     hetzelfde bedoelen lopen uiteen. */
   .buurtkaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:.95rem 1rem;}
   /* GOUD EN GEEN BORDEAUX. Deze labels zijn 10,5px; bordeaux haalt op de grond
      van dit scherm 1,87:1 en --burgundy-on-dark 3,78 -- allebei onder de 4,5
@@ -90,12 +54,22 @@
      letterlijk: overige visuals met CSS/SVG bouwen. */
   .onthaal{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,26rem);border:1px solid var(--line);}
   .onthaal-beeld{position:relative;overflow:hidden;padding:2.1rem 2.2rem 1.9rem;display:flex;flex-direction:column;justify-content:flex-end;min-height:19rem;
-    background:linear-gradient(155deg,#9E1C40 0%,#7F1634 52%,#4A0C1E 100%);color:#F4F0E9;}
-  .onthaal-beeld::before{content:"";position:absolute;inset:0;opacity:.32;pointer-events:none;
-    background:repeating-linear-gradient(118deg,rgba(244,240,233,.10) 0 2px,transparent 2px 26px),
-               radial-gradient(120% 90% at 78% 15%,rgba(244,240,233,.20),transparent 62%);}
+    background:linear-gradient(155deg,#8E1839 0%,#7F1634 52%,#4A0C1E 100%);color:#F4F0E9;}
+  /* De was is zachter dan hij was. De eigen a11y-scan meet de kleur die er
+     ECHT ligt: deze was tilde het bordeaux naar rgb(182,87,112), en daarop
+     haalde de tekst 4,03:1 waar 4,5 moet. Mijn eigen meting keek naar de
+     achtergrondkleur van het element en zag deze was niet -- de scan wel.
+
+     EN DE OPACITY WAS NIET DE KNOP. scripts/a11ykeuring.js rekent met de
+     UITERSTE kleurstops van elke laag en niet met de opacity van het pseudo,
+     dus die van .32 naar .2 zetten veranderde niets aan wat zij meet (en
+     terecht: de was ligt er nog steeds). Wat wel telt zijn de alfa's in de
+     stops zelf en de lichtste stop van het verloop eronder. */
+  .onthaal-beeld::before{content:"";position:absolute;inset:0;opacity:.2;pointer-events:none;
+    background:repeating-linear-gradient(118deg,rgba(244,240,233,.06) 0 2px,transparent 2px 26px),
+               radial-gradient(120% 90% at 78% 15%,rgba(244,240,233,.10),transparent 62%);}
   .onthaal-beeld > *{position:relative;}
-  .onthaal-beeld .buurtey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,240,233,.76);margin-bottom:.6rem;}
+  .onthaal-beeld .buurtey{font-size:.66rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#F4F0E9;margin-bottom:.6rem;}
   /* !important OMDAT premium.js `body.rtf-premium` op de body zet, en die laag
      élke kop in `main` naar sans 900 in kapitalen duwt. Dat is de vormtaal van
      de donkere RTF-werkschermen; de merkregel voor koppen is Bodoni Moda
@@ -109,7 +83,7 @@
      hernoemen zij hun klasse, dan blijft deze kop staan. */
   #onthaalkop{font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1.1;letter-spacing:-.01em;
     font-family:'Bodoni Moda',Georgia,serif!important;font-weight:400!important;text-transform:none!important;}
-  .onthaal-beeld p{font-size:.98rem;line-height:1.6;max-width:34ch;margin-top:.9rem;color:rgba(244,240,233,.88);}
+  .onthaal-beeld p{font-size:.98rem;line-height:1.6;max-width:34ch;margin-top:.9rem;color:#F4F0E9;}
   .onthaal-kies{border-left:1px solid var(--line);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:.8rem;}
 
   /* auto-FILL en niet auto-fit: met één open stad rekt auto-fit die ene kaart
@@ -176,7 +150,11 @@
      blok wordt door scripts/wereldrooster.js geschreven. */
   .hero{background:var(--card)!important;border:1px solid var(--line)!important;padding:1.2rem 1.1rem!important;}
   .hero h1,.hero h2{font-family:'Bodoni Moda',serif!important;font-weight:500!important;letter-spacing:-.01em!important;text-transform:none!important;}
-  .hero .ey{color:var(--burgundy)!important;}
+  /* GOUD. Hier stond var(--burgundy): #7F1634 op rgb(11,24,37) haalt 1,9:1, en
+     de merkregel is expliciet dat bordeaux een accent is en nooit een
+     tekstkleur op zwart. De eigen a11y-scan ving dit; mijn eigen meting keek
+     niet naar dit label. */
+  .hero .ey{color:var(--rtg-goud,#C9A24B)!important;}
 
   @media (max-width:860px){
     .onthaal{grid-template-columns:minmax(0,1fr);}

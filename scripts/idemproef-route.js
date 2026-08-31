@@ -172,7 +172,7 @@ if (require.main !== module) { module.exports = {}; return; }
      en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
      route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
   const { zetWereldKlaar } = require('./lib/idemwereld');
-  const { extra, perRoute: geldLijven, perVoorvoegsel } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
+  const { extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
 
   /* De voorvoegselregels: binnen /api/foundation/ betekent `code` de gezinscode
      en nergens anders. Zie de kop van ./lib/idemwereld.js voor waarom dit geen
@@ -183,6 +183,23 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  wereld klaargezet                    : ' +
     (Object.keys(extra).length ? Object.keys(extra).join(', ') : 'NIETS -- de proef meet dan als vanouds'));
   console.log('  geldroutes met een eigen lijf        : ' + Object.keys(geldLijven).length);
+  /* WAT ER NIET IS KLAARGEKOMEN, en dat staat BOVEN de voorvoegsels met opzet.
+
+     Een gebroken keten leverde tot vandaag stil `null` op; wat hem verraadde was
+     een ontbrekende naam in de regel hieronder, en dan alleen als je die regel
+     las. Nu zegt de opbouw het zelf, met de status en de melding van de stap die
+     het voorwerp had moeten opleveren. Zie VERWACHT in scripts/lib/idemwereld.js.
+
+     Het is een MELDING en geen fout: een wereld die niet compleet is, mag de
+     proef niet tegenhouden -- dan verdwijnt ook het deel dat wel werkt. */
+  if (gemist && gemist.length) {
+    console.log('  NIET KLAARGEKOMEN                    : ' + gemist.length +
+      ' van de ' + (gemist.length + (perVoorvoegsel || []).length) + ' verwachte voorwerpen');
+    for (const g of gemist) {
+      console.log('      ' + g.wat + ' -- ' + g.via +
+        (g.status ? ' gaf ' + g.status : '') + (g.melding ? ': ' + String(g.melding).slice(0, 90) : ''));
+    }
+  }
   console.log('  voorvoegsels met een eigen sleutel    : ' +
     ((perVoorvoegsel || []).map(v => v.voorvoegsel + ' (' + Object.keys(schoonLijf(v.lijf)).join('+') + (v.rol ? ', als ' + v.rol : '') + ')').join(', ') || 'geen'));
 

@@ -61,7 +61,25 @@ const BUITEN_IBAN = 'NL91ABNA0417164300';
 
 async function zetWereldKlaar({ post, tokens, datamap }) {
   const w = {};
-  const stil = async (pad, lijf, tok) => { try { return await post(pad, lijf, tok); } catch (e) { return { status: 0, data: {} }; } };
+  /* HET LOGBOEK VAN DE OPBOUW -- want een keten die faalt, faalde tot vandaag
+     STIL. `stil()` slikt elke fout in (dat is zijn taak: een wereld die niet
+     compleet is, mag de proef niet tegenhouden), en dus leverde een gebroken
+     stap gewoon `null` op en liep de opbouw door. Vier keer op een avond is dat
+     gebeurd -- de klas, het werkplekdocument, de stadsafdeling en twee keer de
+     studie -- en wat het elke keer aanwees was een REGEL DIE ER TOEVALLIG STOND:
+     de proef drukt zijn voorvoegsels met hun velden af, en daar ontbrak er dan
+     een. Redden door toeval is geen ontwerp.
+
+     Vanaf nu houdt de opbouw bij wat elke oproep deed, en zegt hij achteraf
+     welke voorwerpen NIET zijn klaargekomen, met de status en de melding van de
+     stap die ze had moeten opleveren. */
+  const logboek = [];
+  const stil = async (pad, lijf, tok) => {
+    let r;
+    try { r = await post(pad, lijf, tok); } catch (e) { r = { status: 0, data: { error: e.message } }; }
+    logboek.push({ pad, status: r.status, error: (r.data && r.data.error) || null });
+    return r;
+  };
   const veld = (r, ...pad) => { let v = r && r.data; for (const k of pad) { if (!v) return null; v = v[k]; } return v || null; };
 
   /* 1. DE BANK AAN. In een verse database staat de leden-bank niet live, en dat
@@ -395,7 +413,64 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     }
   }
 
-  return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w) };
+  /* 11i. VIJF OBJECTEN VOOR VIJF WERELDEN -- samen 192 routes.
+
+          Na de vier grote deuren bleven er vijf clusters over die elk om
+          hetzelfde vroegen: een voorwerp dat op naam van de aanvrager staat.
+          Ze zijn stuk voor stuk een maak-route en een veldnaam, en die twee
+          verschillen per wereld:
+
+            festival      /api/festival/nieuw          veld `festival`   (zaak)
+            entiteit      /api/concern/entiteit/nieuw  veld `entiteit`   (lid)
+            onderneming   /api/onderneming/nieuw       veld `id`         (lid)
+            onderzoek     /api/lab2/studie/maak        veld `id`         (kantoor)
+            stadsafdeling /api/rtfos/stad/maak         veld `id`         (kantoor)
+
+          Let op de laatste drie: ze heten alle drie `id`. Dat is precies waarom
+          dit per VOORVOEGSEL gaat en niet in het gedeelde lijf -- `id` daarin
+          zetten zou drieduizend andere routes een vreemd voorwerp geven. */
+  {
+    const fes = await stil('/api/festival/nieuw', { naam: 'Proeffestival' }, tokens.supplier);
+    w.festival = veld(fes, 'festival', 'id');
+
+    /* Een entiteit hangt aan een concern, dus die eerst. */
+    const con = await stil('/api/concern/nieuw', { naam: 'Proefconcern' }, tokens.member);
+    w.concern = veld(con, 'concern', 'id');
+    const ent = await stil('/api/concern/entiteit/nieuw',
+      { concern: w.concern || undefined, naam: 'Proefentiteit', rechtsvorm: 'bv' }, tokens.member);
+    w.entiteit = veld(ent, 'entiteit', 'id');
+
+    const ond = await stil('/api/onderneming/nieuw', { naam: 'Proefonderneming' }, tokens.member);
+    w.onderneming = veld(ond, 'onderneming', 'id');
+
+    /* Een studie hangt aan een LAB, en de seed heeft er een actief. Hem
+       opzoeken in plaats van een id overtypen: een vaste code hier veroudert
+       stil zodra de seed verandert. En `vraagstuk` moet echt tien tekens hebben
+       -- met alleen een titel gaf de route 400 en bleef het cluster staan. */
+    const labs = await stil('/api/lab2/labs', {}, tokens.office);
+    const lab = ((labs.data && (labs.data.labs || labs.data.lijst)) || [])[0];
+    if (lab && lab.id) {
+      /* `soort: 'software'` en niet iets menselijks: SOORTEN in
+         kern/livinglab/kader.js merkt de helft als `menselijk: true`, en een
+         onderzoek met mensen erin hangt aan een ethiekstap. Een proefronde die
+         zichzelf een gedragsonderzoek toekent, doet meer dan meten. */
+      const studie = await stil('/api/lab2/studie/maak', { labId: lab.id, titel: 'Proefonderzoek',
+        soort: 'software',
+        vraagstuk: 'Een synthetisch vraagstuk voor de idempotentieproef, lang genoeg voor de eis.',
+        doel: 'Meten wat een tweede oproep doet.' }, tokens.office);
+      w.studie = veld(studie, 'studie', 'id');
+    }
+
+    /* Een stadsafdeling openen doet het LANDELIJKE bestuur (magBoardroom), niet
+       het kantoor. Met de kantoorsleutel gaf de route 403 en bleef het cluster
+       staan -- dezelfde soort vergissing als de klascode: een aanname over wie
+       er aan de deur staat, die nergens zei dat hij fout was. */
+    const stad = await stil('/api/rtfos/stad/maak', { naam: 'Proefstad' }, tokens.boardroom);
+    w.stad = veld(stad, 'stad', 'id');
+  }
+
+  return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w),
+    gemist: gemist(w, logboek) };
 }
 
 /* De postbus van de wegwerpserver. Zonder SMTP legt server/mail-outbox.js elk
@@ -454,6 +529,53 @@ function zoekInPostbus(datamap, merk) {
    ook een bepaald token in de kop (het werkplek-huis laat alleen de eigenaar
    binnen, via boardroomBaas).
    ------------------------------------------------------------------------- */
+/* WAT DE WERELD HOORT TE HEBBEN, en wat het gekost heeft als het er niet is.
+
+   De lijst staat hier en niet verspreid over de opbouw: zo is er EEN plek waar
+   staat wat compleet betekent. Wie een keten toevoegt, zet hem hier ook neer --
+   doet hij dat niet, dan valt zijn keten stil uit en is dat precies het gat dat
+   deze lijst dicht.
+
+   `via` is de route die het voorwerp had moeten opleveren. Ontbreekt het
+   voorwerp, dan wordt in het logboek de LAATSTE oproep naar die route opgezocht
+   en komt zijn status en melding mee. Dat is het verschil tussen "de klas
+   ontbreekt" en "de klas ontbreekt, want /leraar/klas/maak gaf 403: alleen een
+   leraar maakt klassen". */
+const VERWACHT = [
+  { sleutel: 'iban', wat: 'een bankrekening', via: '/api/bank/akkoord' },
+  { sleutel: 'gezinCode', wat: 'een gezin', via: '/api/foundation/gezin/maak' },
+  { sleutel: 'werkruimte', wat: 'een werkruimte', via: '/api/bedrijf/werkruimte/maak' },
+  { sleutel: 'schoolCode', wat: 'een school', via: '/api/foundation/school/school/activeren' },
+  { sleutel: 'personeelToken', wat: 'een leraar', via: '/api/foundation/school/personeel/uitnodiging/accepteer' },
+  { sleutel: 'klasCode', wat: 'een klas', via: '/api/foundation/school/leraar/klas/maak' },
+  { sleutel: 'kp', wat: 'een document van het lid', via: '/api/kantoorpakket/maak' },
+  { sleutel: 'kpOffice', wat: 'een document van het kantoor', via: '/api/office/kantoorpakket/maak' },
+  { sleutel: 'kpSupplier', wat: 'een document van de zaak', via: '/api/supplier/kantoorpakket/maak' },
+  { sleutel: 'kpWerkplek', wat: 'een document van de werkplek', via: '/api/werkplek/kantoorpakket/maak' },
+  { sleutel: 'rijkToken', wat: 'een Rijksoverheid-zaak', via: '/api/office/instelling/aansluiten' },
+  { sleutel: 'ovToken', wat: 'een OV-zaak', via: '/api/supplier/login' },
+  { sleutel: 'festival', wat: 'een festival', via: '/api/festival/nieuw' },
+  { sleutel: 'entiteit', wat: 'een entiteit', via: '/api/concern/entiteit/nieuw' },
+  { sleutel: 'onderneming', wat: 'een onderneming', via: '/api/onderneming/nieuw' },
+  { sleutel: 'studie', wat: 'een onderzoek', via: '/api/lab2/studie/maak' },
+  { sleutel: 'stad', wat: 'een stadsafdeling', via: '/api/rtfos/stad/maak' }
+];
+
+function gemist(w, logboek) {
+  const uit = [];
+  for (const e of VERWACHT) {
+    if (w[e.sleutel]) continue;
+    /* De LAATSTE oproep telt: een keten kan een route twee keer aanroepen (een
+       poging en een herstelpoging), en dan is de laatste wat er echt gebeurde. */
+    let laatste = null;
+    for (const r of logboek) if (r.pad === e.via) laatste = r;
+    uit.push({ wat: e.wat, via: e.via,
+      status: laatste ? laatste.status : null,
+      melding: laatste ? laatste.error : 'deze route is nooit aangeroepen -- de keten brak eerder af' });
+  }
+  return uit;
+}
+
 function voorvoegselLijf(w) {
   const uit = [];
   if (w.gezinCode && w.gezinToken) {
@@ -539,6 +661,15 @@ function voorvoegselLijf(w) {
     if (id) uit.unshift(rol ? { voorvoegsel, lijf: { id }, rol } : { voorvoegsel, lijf: { id } });
   }
 
+  /* De vijf objectwerelden. Elk voorvoegsel krijgt ALLEEN het veld dat zijn
+     eigen poort leest; drie ervan heten `id` en zouden elkaar in een gedeelde
+     bak overschrijven. */
+  if (w.festival) uit.push({ voorvoegsel: '/api/festival/', lijf: { festival: w.festival } });
+  if (w.entiteit) uit.push({ voorvoegsel: '/api/concern/', lijf: { entiteit: w.entiteit,
+    concern: w.concern || undefined, onderneming: w.onderneming || undefined } });
+  if (w.onderneming) uit.push({ voorvoegsel: '/api/onderneming/', lijf: { id: w.onderneming } });
+  if (w.studie) uit.push({ voorvoegsel: '/api/lab2/', lijf: { id: w.studie }, rol: 'office' });
+  if (w.stad) uit.push({ voorvoegsel: '/api/rtfos/', lijf: { id: w.stad }, rol: 'boardroom' });
   return uit;
 }
 

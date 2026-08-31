@@ -248,6 +248,41 @@
   color:var(--rtg-txt);
 }
 
+/* EN EEN WERELD MAG ZEGGEN DAT ZIJ FLUWEEL IS.
+   `data-rtg-eigenvlak="bordeaux"` is dezelfde afspraak als onyx hierboven, maar
+   met het andere materiaal: TravelOS draagt bordeaux als GROND en niet als
+   accent. Het bestaat om dezelfde reden dat onyx bestaat -- een scherm dat zijn
+   vlak niet verklaart, krijgt onder een licht thema een grond die niet past bij
+   de inkt die het elders vandaan haalt.
+
+   Let op het verschil met onyx: het leesgoud gaat hier NIET mee. Goud is in deze
+   wereld teruggebracht tot het merk en de wijzers van de klok; wat een scherm
+   als accent leest, wordt het bordeauxhoogsel. En dat hoogsel haalt op fluweel
+   3,78:1 -- goed voor vorm en grote letters, niet voor lopende tekst. Vandaar
+   dat --rtg-muted en --rtg-soft ivoortinten blijven en geen roze. */
+:root[data-rtg-thema]:has(> body[data-rtg-eigenvlak="bordeaux"]){
+  --rtg-bg:#2E0713;
+  --rtg-grond:linear-gradient(168deg,#7F1634 0%,#4A0C1E 44%,#2E0713 100%);
+  --rtg-txt:var(--op-bordeaux);
+  --rtg-muted:#E2C9CF;
+  --rtg-soft:#C09AA5;
+  --rtg-line:rgba(244,240,233,.14);
+  --rtg-card:#2A0713;
+  --rtg-card2:#20060E;
+  --rtg-goud:var(--bordeaux-tekst);
+  --rtg-leesgoud:var(--bordeaux-tekst);
+  --rtg-leeszacht:var(--rtg-soft);
+  --rtg-leesgroen:#7BC79B;
+  --rtg-leesrood:#E7A8B8;
+  --rtg-dagsterkte:0.06;
+  color-scheme:dark;
+}
+:root[data-rtg-thema] body[data-rtg-eigenvlak="bordeaux"]{
+  background:var(--rtg-grond);
+  background-attachment:fixed;
+  color:var(--rtg-txt);
+}
+
 /* EN EEN VLAK BINNEN EEN SCHERM MAG HETZELFDE ZEGGEN.
    data-rtg-eigenvlak hierboven geldt voor een heel SCHERM. Er is ook de kleinere
    vorm: een scherm dat het thema gewoon volgt, met daarin EEN vlak dat altijd

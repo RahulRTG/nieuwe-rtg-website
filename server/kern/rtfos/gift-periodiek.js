@@ -138,12 +138,19 @@ module.exports = (ctx, { standVan }) => {
     p.stand = 'gestopt';
     p.gestoptOm = schoon(b.reden, 200) || null;
     audit(ik, 'giftplan.stop', p.id, p.gestoptOm || '');
+    /* EEN GESTOPT PLAN LAAT GEEN VOLMACHT ACHTER. Andersom geldt dat niet --
+       de machtiging intrekken stopt de incasso en niet de gift -- maar deze
+       kant wel: een machtiging zonder plan is een openstaande volmacht zonder
+       grond. Zie ./gift-machtiging.js, grendel 5. */
+    const vervallen = ctx.giftMachtigingWeg ? ctx.giftMachtigingWeg(p.id, ik) : [];
     save();
     /* WAT HIER NIET STAAT: of stoppen juridisch mag en wat het betekent voor
        eerder afgetrokken bedragen. Dat is een vraag aan de Belastingdienst en
        aan de overeenkomst zelf, en dit systeem gaat er niet over. */
-    return { ok: true, plan: beeld(p),
-      melding: 'Gestopt. Wat je al gaf blijft staan. Wat een gestopte overeenkomst betekent voor je aangifte, staat in de overeenkomst zelf -- daar gaan wij niet over.' };
+    return { ok: true, plan: beeld(p), vervallenMachtigingen: vervallen,
+      melding: 'Gestopt. Wat je al gaf blijft staan.' +
+        (vervallen.length ? ' De machtiging (' + vervallen.join(', ') + ') is hiermee vervallen; er wordt niets meer afgeschreven.' : '') +
+        ' Wat een gestopte overeenkomst betekent voor je aangifte, staat in de overeenkomst zelf -- daar gaan wij niet over.' };
   }
 
   /* Een betaalde termijn aantekenen. Wordt door ./gift-betalen.js aangeroepen

@@ -302,9 +302,38 @@ $('#nogeen').addEventListener('click', () => {
 /* ---------------------------------------------------------------- het plan */
 const planApi = (pad, body) => api('plan/' + pad, body);
 
+/* DE MACHTIGING BIJ EEN PLAN. Twee dingen die hier op het scherm horen en niet
+   in een voetnoot: dat er NIETS wordt afgeschreven (dit huis heeft geen
+   incasso-rail), en de acht weken waarin je een afschrijving zonder reden kunt
+   laten terugboeken. Dat laatste is de belangrijkste bescherming die een
+   betaler heeft; hem klein zetten is hem verstoppen. */
+let MACHTIGINGEN = [];
+function machtigingBlok(p) {
+  const m = MACHTIGINGEN.find(x => x.planId === p.id && x.actief);
+  if (m) {
+    return '<div class="kosten ruimte"><b>Machtiging ' + esc(m.kenmerk) + '</b> &middot; rekening op ' +
+      esc(m.ibanEinde) + ' &middot; maximaal ' + esc(eur(m.maxCenten / 100)) + ' per jaar</div>' +
+      '<div class="kosten">Er wordt op dit moment niets afgeschreven. Je krijgt elke termijn ' +
+        m.aankondigingDagen + ' dagen van tevoren bericht, en je kunt een afschrijving tot ' +
+        m.stornoWeken + ' weken terug laten boeken via je eigen bank, zonder opgaaf van reden.</div>' +
+      '<div class="rij ruimte"><button class="gknop" data-mweg="' + esc(m.id) + '">Machtiging intrekken</button>' +
+        '<span class="kosten">Dit stopt de incasso, niet de gift.</span></div>';
+  }
+  if (p.stand === 'gestopt') return '';
+  return '<div class="rij ruimte" style="flex-wrap:wrap;gap:.4rem;">' +
+    '<input class="gveld" data-mh="' + esc(p.id) + '" placeholder="Naam op de rekening" aria-label="Naam op de rekening">' +
+    '<input class="gveld" data-mi="' + esc(p.id) + '" placeholder="Laatste 4 cijfers" maxlength="4" aria-label="Laatste vier cijfers van je rekeningnummer">' +
+    '<input class="gveld" data-mm="' + esc(p.id) + '" type="number" min="1" value="' + p.euroPerJaar +
+      '" placeholder="Maximum per jaar" aria-label="Maximum per incasso">' +
+    '<button class="gknop" data-mteken="' + esc(p.id) + '">Machtiging tekenen</button></div>' +
+    '<div class="kosten">We bewaren alleen de laatste vier cijfers: er wordt hier niets geind. ' +
+      'Een machtiging zonder maximum bestaat niet.</div>';
+}
+
 async function planTeken() {
   try {
     const r = await planApi('mijn', {});
+    try { MACHTIGINGEN = (await api('machtiging/mijn', {})).machtigingen || []; } catch (e) { MACHTIGINGEN = []; }
     $('#planLijst').innerHTML = (r.plannen || []).length ? r.plannen.map(p =>
       '<div class="gevolg"><b>' + esc(eur(p.euroPerJaar)) + ' per jaar, ' + p.jaren + ' jaar</b>' +
         ' &middot; ' + esc(p.stand) +
@@ -318,10 +347,31 @@ async function planTeken() {
               (p.openDitJaar
                 ? '<button class="gknop vol" data-termijn="' + esc(p.id) + '" data-euro="' + p.euroPerJaar + '">Termijn ' + p.ditJaar + ' geven</button>'
                 : '<span class="kosten">De termijn van ' + p.ditJaar + ' is voldaan.</span>') +
-              '<button class="gknop" data-stop="' + esc(p.id) + '">Stoppen</button></div>'
+              '<button class="gknop" data-stop="' + esc(p.id) + '">Stoppen</button></div>' +
+              machtigingBlok(p)
           : '') +
       '</div>').join('') : '<div class="kosten">Je hebt nog geen meerjarige afspraak.</div>';
 
+    const mMeld = t => { $('#planMeld').innerHTML = '<div class="melder ruimte">' + esc(t) + '</div>'; };
+    $('#planLijst').querySelectorAll('[data-mteken]').forEach(b => b.addEventListener('click', async () => {
+      const id = b.dataset.mteken;
+      try {
+        const r2 = await api('machtiging/teken', { planId: id,
+          houder: $('[data-mh="' + id + '"]').value.trim(),
+          ibanEinde: $('[data-mi="' + id + '"]').value.trim(),
+          max: Number($('[data-mm="' + id + '"]').value), kanaal: 'app' });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' +
+          r2.zegt.map(z => esc(z)).join('<br>') + '</div>';
+        planTeken();
+      } catch (e) { mMeld(e.message); }
+    }));
+    $('#planLijst').querySelectorAll('[data-mweg]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const r2 = await api('machtiging/intrek', { id: b.dataset.mweg });
+        $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + r2.zegt.map(z => esc(z)).join('<br>') + '</div>';
+        planTeken();
+      } catch (e) { mMeld(e.message); }
+    }));
     $('#planLijst').querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => {
       try { const r2 = await planApi('stop', { id: b.dataset.stop });
         $('#planMeld').innerHTML = '<div class="melder goed ruimte">' + esc(r2.melding) + '</div>'; planTeken(); }

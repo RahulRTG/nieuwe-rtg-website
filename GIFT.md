@@ -276,9 +276,55 @@ zetten alleen de boardroom — en dat oordeel valt op de server.
   een rekening genoemd. En let op de route: hij heet `/api/supplier/pay/uitbetaal`
   en niet `/api/pay/zaak/uitbetalen`, zoals ik hem eerder in dit document en in
   drie codecommentaren had staan.
-- **De incasso.** Er is er geen, en hij komt er niet uit zichzelf: elke termijn
-  wordt door de gever zelf bevestigd. Geld dat vanzelf van iemands rekening gaat,
-  vraagt een machtiging en een eigen besluit.
+## 8. De SEPA-machtiging (31 augustus 2026)
+
+De eigenaar heeft besloten dat de incasso er komt. Wat dat eerlijk kan betekenen
+staat of valt met een feit dat eerst is **gemeten**: **dit huis heeft geen
+incasso-rail.** `server/betaal.js` kent `maakUitbetaling` (geld eruit) en
+`maakBetaling` (een kaartbetaling die de betaler zelf start). Er is geen functie
+die geld van de rekening van een ander haalt, en dat is geen vergeten regel code
+— een Europese incasso vraagt een **contract met een bank en een incassant-ID op
+naam van de stichting**. Software kan dat niet vervangen, en doen alsof breekt de
+huisregel: nooit claimen dat een boeking is verwerkt.
+
+Wat er dus staat, is de **machtiging** plus de **aankondiging**, en elk antwoord
+draagt `geindNu: false` met de reden. Dezelfde halve stap die
+`server/school/machtiging.js` bewust nam, en om dezelfde reden.
+
+**De regels staan op één plek.** Ze stonden al goed opgeschreven bij School — geen
+maximum is een blanco cheque, alleen de laatste vier cijfers, een tweede vervangt
+de eerste, intrekken kan altijd. Die zijn verhuisd naar `kern/machtiging.js` en
+School draait er nu ook op; anders waren het twee registers met dezelfde betekenis
+onder dezelfde naam, wat `SEMANTIEK.json` de duurste vorm van dubbeling noemt.
+Het is een **regelmodule**: geen opslag, geen routes, geen sessie. Waar een
+machtiging woont verschilt legitiem (bij een leerling, bij een plan); wat een
+geldige machtiging *is*, is één ding.
+
+Wat een gift anders maakt dan een schoolnota, staat in `kern/rtfos/gift-machtiging.js`:
+
+1. **De machtiging hangt aan een PLAN en niet aan een mens.** Wie twee periodieke
+   giften heeft lopen, tekent twee keer — twee kenmerken, twee maxima, twee
+   momenten om te stoppen. Eén machtiging voor "alles van deze gever" is de blanco
+   cheque in een andere vorm.
+2. **Het maximum mag niet onder het jaarbedrag liggen**, anders tekent iemand voor
+   iets dat per definitie stukloopt en merkt hij dat pas bij de eerste incasso.
+3. **De aankondiging gaat veertien dagen voor de afschrijving uit.** Een incasso
+   komt nooit als verrassing.
+4. **Intrekken stopt de incasso en NIET de gift.** Dat zijn twee dingen: de
+   overeenkomst loopt door (daar gaat de Belastingdienst over, niet wij), en wat is
+   toegezegd kan de gever zelf blijven overmaken. Een knop die stilletjes allebei
+   doet, laat iemand denken dat hij van een vijfjarige afspraak af is.
+5. **Andersom wél:** een gestopt plan laat geen volmacht achter.
+
+De **acht weken storneringstermijn** staan op het scherm en niet in een voetnoot —
+dat is de belangrijkste bescherming die de betaler heeft. Bij een onterechte
+incasso is het dertien maanden. RTG stelt die termijnen niet vast en rekt ze niet
+op; ze staan in `kern/machtiging.js` zodat er één plek is waar ze staan.
+
+**Wat er nog steeds niet is, en wat het zou vragen:** de afschrijving zelf, het
+bestandsformaat (pain.008) en het incassant-ID. Dat komt pas met een bankcontract,
+en dán hoort het volledige rekeningnummer daar te liggen en niet hier. De
+juridische toets op de machtigingstekst is mensenwerk; die claim ik niet.
 - **De derde plek waar ANBI leefde, is gesloten (31 augustus 2026).**
   `kern/rtfos/jaarverslag.js` opende met *"Een ANBI moet publiceren. Dat is geen
   nette gewoonte maar een voorwaarde"*, bouwde die publicatieplicht uit en hing

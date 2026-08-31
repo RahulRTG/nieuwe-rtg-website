@@ -209,6 +209,12 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
      (gift-betalen.js, met zijn eigen toets hieronder) en de andere drie blijven
      schoon. Dat is de vorm die je wilt kunnen nalopen -- een laag waarin drie
      van de vier bestanden niets met geld doen, is te overzien. */
+  /* gift-machtiging.js staat hier BEWUST NIET in, en dat is geen gaatje.
+     De woordenlijst hieronder verbiedt onder meer 'incasso' en 'sepa', en die
+     twee woorden zijn precies het ONDERWERP van dat bestand -- het bestaat om
+     op te schrijven dat er geen incasso is. Een woordverbod is daar het
+     verkeerde instrument. Wat er wel voor geldt, staat in de lus erna: het mag
+     de betaallaag niet AANROEPEN. Dat is de invariant die ertoe doet. */
   const delen = ['gift.js', 'gift-voornemen.js', 'gift-vormen.js', 'gift-periodiek.js'];
   for (const deel of delen) {
     const code = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', deel), 'utf8')
@@ -231,12 +237,33 @@ test('geld beweegt in precies EEN bestand, en de giftlaag blijft binnen het eige
 
   /* En niets van buiten het domein. De requires staan in de ONGESTRIPTE bron,
      want het pad zit in een tekst. */
-  for (const deel of delen.concat('gift-betalen.js')) {
+  for (const deel of delen.concat('gift-betalen.js', 'gift-machtiging.js')) {
     const ruw = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', deel), 'utf8');
     for (const m of ruw.match(/require\((['"])([^'"]+)\1\)/g) || []) {
       const pad = m.replace(/require\(['"]|['"]\)/g, '');
-      assert.match(pad, /^\.\/(gift-vormen|gift-voornemen|gift-betalen|gift-periodiek|herkomst)$/,
+      /* ../machtiging is de ENIGE uitzondering naar buiten dit domein, en met
+         een reden: de regels van een machtiging (geen maximum is een blanco
+         cheque, alleen de laatste vier cijfers, een tweede vervangt de eerste)
+         stonden al goed opgeschreven in server/school/machtiging.js. Ze hier
+         overtikken zou twee registers met dezelfde betekenis onder dezelfde
+         naam opleveren -- wat SEMANTIEK.json duur noemt. Het is een REGELmodule
+         zonder opslag, zonder routes en zonder sessie; de opslag blijft van elk
+         domein zelf. */
+      assert.match(pad, /^(\.\/(gift-vormen|gift-voornemen|gift-betalen|gift-periodiek|gift-machtiging|herkomst)|\.\.\/machtiging)$/,
         deel + ' haalt ' + pad + ' binnen; de giftlaag hoort binnen kern/rtfos te blijven -- de betaallaag komt via de ctx en niet via een require');
+    }
+  }
+
+  /* EN DE MACHTIGINGSLAAG RAAKT GEEN GELD AAN. Hij mag de woorden gebruiken --
+     dat is zijn onderwerp -- maar geen aanroep doen. Een machtiging die zelf
+     kan boeken, is precies wat GELD.md verbiedt. */
+  {
+    const code = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'rtfos', 'gift-machtiging.js'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ')
+      .replace(/'(?:[^'\\]|\\.)*'/g, "''").replace(/"(?:[^"\\]|\\.)*"/g, '""');
+    for (const weg of ['pay\\.', 'boekAsync', 'grootboek', 'partnerIn', 'metIdem']) {
+      assert.ok(!new RegExp(weg).test(code),
+        'gift-machtiging.js roept de betaallaag aan (' + weg + '); een machtiging legt vast wat er is getekend en boekt niets');
     }
   }
 });
@@ -530,4 +557,105 @@ test('de grondslag om te publiceren wordt gelezen en nooit aangenomen', () => {
     assert.equal(g.grond, 'eigen keus');
     assert.match(g.zegt, /niet als een ANBI-publicatie/);
   }
+});
+
+/* ---------------------------------------------------------------------------
+   DE SEPA-MACHTIGING -- besluit van de eigenaar, en wat het eerlijk kan
+   betekenen.
+
+   Er is in dit huis GEEN incasso-rail: server/betaal.js kent maakUitbetaling
+   (geld eruit) en maakBetaling (een kaartbetaling die de betaler zelf start).
+   Geld van de rekening van een ander halen vraagt een bankcontract en een
+   incassant-ID. Wat hier staat is de machtiging plus de aankondiging, en elk
+   antwoord zegt met geindNu:false dat er niets is afgeschreven -- dezelfde
+   halve stap die server/school/machtiging.js bewust nam.
+
+   De REGELS staan op een plek (kern/machtiging.js) en worden door school en
+   gift allebei gebruikt. Deze toetsen gaan over wat een GIFT anders maakt. */
+function bouwMachtiging() {
+  const b = bouwPlan('aangevraagd');
+  b.gift.standZet({ ontvanger: { soort: 'wallet', code: 'RTF-W' },
+    vormen: ['eenmalig', 'geoormerkt', 'periodiek'] }, 'toets');
+  b.gift.standZet({ stand: 'open' }, 'toets');
+  const plan = b.gift.plan.voorstel('Poolvos 1BE9', { euroPerJaar: 120, jaren: 5 });
+  return { ...b, planId: plan.plan.id };
+}
+
+test('een machtiging hangt aan een plan, kent een maximum en int niets', () => {
+  const { gift, planId } = bouwMachtiging();
+
+  /* ER WORDT NIETS GEIND, en dat staat in elk antwoord met een reden. */
+  const leeg = gift.machtiging.mijn('Poolvos 1BE9');
+  assert.equal(leeg.geindNu, false);
+  assert.match(leeg.uitleg, /contract met een bank/);
+
+  /* GEEN MAXIMUM, GEEN MACHTIGING -- een open volmacht is een blanco cheque. */
+  const zonderMax = gift.machtiging.teken('Poolvos 1BE9', { planId, houder: 'A. Gever', iban: 'NL91ABNA0417164300' });
+  assert.equal(zonderMax.status, 400);
+  assert.match(zonderMax.error, /blanco cheque/);
+
+  /* EN NIET ONDER HET JAARBEDRAG: dat zou gegarandeerd stuklopen bij de eerste
+     incasso, en dat merkt de gever dan pas als het misgaat. */
+  const teLaag = gift.machtiging.teken('Poolvos 1BE9',
+    { planId, houder: 'A. Gever', iban: 'NL91ABNA0417164300', max: 50 });
+  assert.equal(teLaag.status, 400);
+  assert.match(teLaag.error, /onder het jaarbedrag/);
+
+  const m = gift.machtiging.teken('Poolvos 1BE9',
+    { planId, houder: 'A. Gever', iban: 'NL91 ABNA 0417 1643 00', max: 150, kanaal: 'app' });
+  assert.equal(m.ok, true, JSON.stringify(m));
+  assert.equal(m.geindNu, false, 'een machtiging tekenen las als "er is geincasseerd"');
+
+  /* HET VOLLEDIGE REKENINGNUMMER WORDT NIET BEWAARD: we innen niet, dus we
+     hebben het niet nodig -- en een IBAN naast een codenaam voert die codenaam
+     terug naar een mens. */
+  assert.equal(m.machtiging.ibanEinde, '4300');
+  assert.equal(JSON.stringify(m.machtiging).includes('0417164300'), false,
+    'het volledige rekeningnummer staat in het antwoord');
+
+  /* DE TERMIJNEN STAAN OP HET SCHERM EN NIET IN EEN VOETNOOT. */
+  assert.equal(m.machtiging.stornoWeken, 8);
+  assert.equal(m.machtiging.aankondigingDagen, 14);
+  assert.ok(m.zegt.some(z => /8 weken terug laten boeken/.test(z)));
+
+  /* EEN TWEEDE MACHTIGING VERVANGT DE EERSTE: twee geldige naast elkaar is
+     precies hoe iemand twee keer wordt afgeschreven. */
+  const tweede = gift.machtiging.teken('Poolvos 1BE9',
+    { planId, houder: 'A. Gever', iban: 'NL91ABNA0417164300', max: 200 });
+  assert.equal(tweede.ok, true);
+  assert.deepEqual(tweede.vervangen, [m.machtiging.kenmerk]);
+  const mijn = gift.machtiging.mijn('Poolvos 1BE9');
+  assert.equal(mijn.machtigingen.filter(x => x.actief).length, 1,
+    'er stonden twee geldige machtigingen naast elkaar');
+});
+
+test('intrekken stopt de incasso en niet de gift; het plan stoppen doet wel beide', () => {
+  const { gift, planId } = bouwMachtiging();
+  const m = gift.machtiging.teken('Poolvos 1BE9',
+    { planId, houder: 'A. Gever', iban: 'NL91ABNA0417164300', max: 150 });
+
+  /* NIET VAN JOU, NIET INTREKKEN -- en ook niet "bestaat niet", want dan is de
+     weigering zelf een antwoord op de vraag of hij bestaat. */
+  assert.equal(gift.machtiging.trekIn('IemandAnders 9ZZ9', { id: m.machtiging.id }).status, 403);
+
+  const weg = gift.machtiging.trekIn('Poolvos 1BE9', { id: m.machtiging.id });
+  assert.equal(weg.ok, true);
+  assert.equal(weg.machtiging.actief, false);
+  /* GRENDEL 4: dit zijn twee dingen, en een knop die stilletjes allebei doet
+     laat iemand denken dat hij van een vijfjarige afspraak af is. */
+  assert.ok(weg.zegt.some(z => /loopt hiermee NIET af/.test(z)),
+    'het intrekken zei niet dat de gift zelf doorloopt');
+  assert.equal(gift.plan.mijn('Poolvos 1BE9').plannen[0].stand, 'voorgesteld',
+    'het intrekken van de machtiging stopte ook het plan');
+
+  /* ANDERSOM WEL: een machtiging zonder plan is een openstaande volmacht
+     zonder grond. */
+  const m2 = gift.machtiging.teken('Poolvos 1BE9',
+    { planId, houder: 'A. Gever', iban: 'NL91ABNA0417164300', max: 150 });
+  const stop = gift.plan.stop('Poolvos 1BE9', { id: planId, reden: 'het kan even niet' });
+  assert.equal(stop.ok, true);
+  assert.deepEqual(stop.vervallenMachtigingen, [m2.machtiging.kenmerk],
+    'het gestopte plan liet zijn machtiging staan');
+  assert.equal(gift.machtiging.mijn('Poolvos 1BE9').machtigingen.filter(x => x.actief).length, 0);
+  assert.match(stop.melding, /vervallen/);
 });

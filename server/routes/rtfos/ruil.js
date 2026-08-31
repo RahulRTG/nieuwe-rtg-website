@@ -87,6 +87,23 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     veilig(res, () => rtfos.gift.plan.stop(ik(req), lijf(req)));
   });
 
+  /* DE SEPA-MACHTIGING, en die tekent de GEVER zelf. Er is met opzet geen
+     route waarlangs het kantoor er een namens iemand aanmaakt: dat zou het
+     woord "getekend" leegmaken. Intrekken kan altijd, zonder reden en per
+     direct -- en het stopt de incasso, niet de gift. */
+  app.post('/api/rtfos/gift/machtiging/mijn', auth, leesRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.mijn(ik(req)));
+  });
+  app.post('/api/rtfos/gift/machtiging/teken', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.teken(ik(req), lijf(req)));
+  });
+  app.post('/api/rtfos/gift/machtiging/intrek', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.machtiging.trekIn(ik(req), lijf(req)));
+  });
+
   /* De bevestiging: hier beweegt er geld. De codenaam komt uit de SESSIE en
      niet uit het lijf -- anders geeft de een namens de ander. */
   app.post('/api/rtfos/gift/bevestig', auth, schrijfRem, (req, res) => {

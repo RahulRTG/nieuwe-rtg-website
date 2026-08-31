@@ -167,6 +167,13 @@ module.exports = (ctx) => {
      zodat er niet twee plekken zijn die hem bijhouden. */
   ctx.giftAnbi = () => stand().anbi;
   ctx.giftRsin = () => stand().rsin;
+  /* De SEPA-machtiging bij een meerjarig plan. Hij hangt NA het plan (hij
+     leest het) en zet zijn intrekker op de ctx, zodat een gestopt plan geen
+     volmacht achterlaat zonder dat die twee delen elkaar over en weer laden. */
+  const machtiging = require('./gift-machtiging')(ctx, {
+    planVan: periodiek.mijn, standVan: stand
+  });
+  ctx.giftMachtigingWeg = machtiging.bijPlanGestopt;
   const betalen = require('./gift-betalen')(ctx, {
     standVan: d, voorbereidVan: voornemen.voorbereid,
     bronUitGift: (x) => ctx.bronUitGift(x),
@@ -174,7 +181,7 @@ module.exports = (ctx) => {
   });
 
   return { stand, standZet, voorbereid: voornemen.voorbereid, bevestig: betalen.bevestig,
-    plan: periodiek, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
+    plan: periodiek, machtiging, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
 };
 module.exports.STANDEN = STANDEN;
 module.exports.VORMEN = VORMEN;

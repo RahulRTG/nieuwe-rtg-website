@@ -151,11 +151,99 @@ const WORTELS = [
     waarom: 'Clips hangt aan een clip; zonder clip staat het domein op "Clip niet gevonden"' }
 ];
 
+/* ---------------------------------------------------------------------------
+   EN DE PROCESSTARTS -- geen ding maar een TOESTAND.
+
+   Achtentwintig routes weigeren niet omdat er iets ontbreekt maar omdat er
+   iets nog niet LOOPT: "Er loopt geen puzzel. Begin er een", "Er is nog geen
+   codewoord ingesteld", "Maak eerst je zakelijke profiel aan". Dat is een
+   andere soort voorwaarde dan een wortel, en toch dezelfde reparatie: een
+   oproep die de toestand aanzet.
+
+   Ze staan apart omdat ze GEEN id opleveren en dus ook niets meegeven aan het
+   lijf; ze veranderen alleen wat de server van deze sessie weet. Een wortel
+   die niets teruggeeft zou anders als mislukt tellen.
+
+   Elke waarde hieronder komt uit een gesloten lijst of een geciteerde regel --
+   `VRAAG_MIJ` uit kern/commercie/tegoed/inhoud.js, "minstens 3 woorden" uit de
+   weigering zelf. Er wordt niets verzonnen. */
+const PROCESSTARTS = [
+  { naam: 'sudoku', pad: '/api/member/spel/sudoku-nieuw', rol: 'member',
+    lijf: { niveau: 'makkelijk' }, gemeten: 2,
+    waarom: 'twee routes zeggen "Er loopt geen puzzel. Begin er een"' },
+
+  /* HET CODEWOORD VRAAGT TWEE DINGEN, en het tweede is het aardige: eerst een
+     KRING. "Een codewoord waarschuwt je kring, dus zet daar eerst iemand in --
+     anders gaat er straks niets af en merk je dat niet." De code zegt er zelf
+     bij dat ook een PROEF hierop hoort te falen (kern/veiligheid/alarm.js),
+     en dat is precies goed: een alarm dat niemand bereikt is geen alarm.
+
+     De kring krijgt de tweede ledensessie, die door de gespreksketen hierboven
+     al een echte vriend is. Geen verzonnen contact dus. */
+  { naam: 'kring', pad: '/api/veiligheid/kring/toevoegen', rol: 'member',
+    lijfUit: (ctx) => (ctx.tweeKey ? { handle: ctx.tweeKey, locatie: true } : null),
+    gemeten: 0,
+    waarom: 'een codewoord en een wacht waarschuwen de kring; zonder kring waken ze over niemand' },
+
+  { naam: 'codewoord', pad: '/api/veiligheid/codewoord/zet', rol: 'member',
+    /* "Kies een zin van minstens 3 woorden. Een los woord valt te makkelijk
+       per ongeluk" -- de reden staat in de weigering, dus geen los woord. */
+    lijf: { woord: 'de proef meet mee', zin: 'de proef meet mee' }, gemeten: 2,
+    waarom: 'twee routes vragen een ingesteld codewoord' },
+
+  { naam: 'aibeleid', pad: '/api/member/ai/beleid', rol: 'member',
+    /* De vier standen staan in kern/commercie/tegoed/inhoud.js; VRAAG_MIJ is
+       de terughoudende, en dat is de juiste keuze voor een proef die geen geld
+       hoort uit te geven. */
+    lijf: { beleid: 'VRAAG_MIJ' }, gemeten: 1,
+    waarom: 'het tegoedbeleid moet gekozen zijn voor de AI-routes iets doen' },
+
+  { naam: 'zakelijkprofiel', pad: '/api/zakelijk/profiel/zet', rol: 'member-lifestyle',
+    lijf: { naam: 'Proef Zakelijk', kop: 'Oprichter', over: 'een profiel om te kunnen meten' },
+    gemeten: 3,
+    waarom: 'drie routes zeggen "Maak eerst je zakelijke profiel aan"' },
+
+  { naam: 'rendezvousprofiel', pad: '/api/member/rendezvous/profiel/zet', rol: 'member-signature',
+    lijf: { aan: true, over: 'een profiel om te kunnen meten', zoekt: 'iedereen' },
+    gemeten: 1,
+    waarom: 'Rendez-vous vraagt een eigen profiel voordat er gekozen kan worden' }
+];
+
 async function zetWortelsKlaar({ post, tokenVoor }) {
   const stappen = [];
   const per = {};
 
-  /* HET GESPREK STAAT APART, want het is als enige geen enkele oproep.
+  /* Het gesprek eerst: het levert de sleutel van de tweede persoon, en de
+     kring hieronder heeft die nodig. */
+  const gesprek = await zetGesprekKlaar({ post, tokenVoor, stappen });
+  if (gesprek) per['/api/comm'] = gesprek;
+  const ctx = { tweeKey: gesprek && gesprek.tweeKey };
+
+  /* Dan de toestanden: een wortel kan ervan afhangen. */
+  for (const ps of PROCESSTARTS) {
+    const tok = tokenVoor ? tokenVoor(ps.rol) : null;
+    if (!tok) {
+      stappen.push({ naam: ps.naam, pad: ps.pad, status: 0, ok: false,
+        waarom: 'geen sessie voor rol `' + ps.rol + '`' });
+      continue;
+    }
+    /* Een start die van een eerdere stap afhangt, bouwt zijn lijf uit de
+       context. Levert die niets, dan wordt er niets geprobeerd -- en dat staat
+       met reden in de stappen in plaats van als een verzonnen waarde. */
+    const lijf = ps.lijfUit ? ps.lijfUit(ctx) : ps.lijf;
+    if (!lijf) {
+      stappen.push({ naam: ps.naam, pad: ps.pad, status: 0, ok: false,
+        waarom: 'de voorwaarde uit een eerdere stap ontbreekt' });
+      continue;
+    }
+    let a = null;
+    try { a = await post(ps.pad, lijf, tok); } catch (e) { a = null; }
+    const ok = a && a.status >= 200 && a.status < 300;
+    stappen.push({ naam: ps.naam, pad: ps.pad, status: a ? a.status : 0, ok,
+      waarom: ok ? null : ((a && a.data && a.data.error) || 'geen antwoord') });
+  }
+
+  /* HET GESPREK (hierboven al gedaan) STAAT APART, want het is als enige geen enkele oproep.
      /api/comm/begin vraagt `met`: een lijst codenamen van mensen met wie je
      VERBONDEN bent ("Je bent nog niet verbonden met deze codenaam"). Dat is
      geen hobbel maar de regel -- een gesprek beginnen met een vreemde hoort
@@ -165,8 +253,6 @@ async function zetWortelsKlaar({ post, tokenVoor }) {
      (`member` en `member-account`, zie ./accountroutes.js), dus de vriendschap
      is te leggen langs de gewone weg: de een vraagt aan, de ander antwoordt.
      Precies zoals bij het spelpotje. */
-  const gesprek = await zetGesprekKlaar({ post, tokenVoor, stappen });
-  if (gesprek) per['/api/comm'] = gesprek;
 
   for (const w of WORTELS) {
     const tok = tokenVoor ? tokenVoor(w.rol) : null;
@@ -193,6 +279,7 @@ async function zetWortelsKlaar({ post, tokenVoor }) {
 
   const gelukt = Object.keys(per).length;
   return { klaar: gelukt > 0, per, stappen, telt: WORTELS.length + 1,
+    processtarts: PROCESSTARTS.length,
     reden: gelukt ? null : 'geen enkele wortel kwam er; zie stappen' };
 }
 
@@ -244,7 +331,7 @@ async function zetGesprekKlaar({ post, tokenVoor, stappen }) {
   const g = await doe('comm: het gesprek beginnen', '/api/comm/begin',
     { met: [tweeKey], tekst: 'Een gesprek om te kunnen meten.' }, een);
   const id = g && ((g.gesprek && g.gesprek.id) || g.id);
-  return id ? { id, gesprek: id, gesprekId: id } : null;
+  return id ? { id, gesprek: id, gesprekId: id, tweeKey } : null;
 }
 
 /* Wat er voor dit pad meegaat. Het langste voorvoegsel wint, zodat
@@ -259,4 +346,4 @@ function lijfVoor(per, pad) {
   return beste ? per[beste] : {};
 }
 
-module.exports = { WORTELS, zetWortelsKlaar, lijfVoor };
+module.exports = { WORTELS, PROCESSTARTS, zetWortelsKlaar, lijfVoor };

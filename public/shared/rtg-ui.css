@@ -205,7 +205,7 @@ button.rtg-rij:hover .rtg-naam{text-decoration:underline;text-underline-offset:.
 .rtg-knop:focus-visible{outline:2px solid var(--rtg-acc);outline-offset:2px;}
 .rtg-knop[disabled]{opacity:.45;cursor:not-allowed;}
 /* de primaire actie: goud, want dat is de kleur waarmee dit huis "ja" zegt */
-.rtg-knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+.rtg-knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:var(--rtg-opgoud,#1C1608);font-weight:600;}
 .rtg-knop.vol:hover{filter:brightness(1.07);}
 /* een rij knoppen onder elkaar of naast elkaar */
 .rtg-acties{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
@@ -538,7 +538,7 @@ body.rtg-stijl [role="button"].hoofd{
      bladen van dat scherm 5,5rem lucht onderaan waar niets stond. */
   body:has(.rtg-duimbalk:not([hidden] *)){ padding-bottom:calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + 5.5rem); }
 }
-body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+body.rtg-stijl .knop.vol{background:var(--rtg-goud);border-color:var(--rtg-goud);color:var(--rtg-opgoud,#1C1608);font-weight:600;}
 /* .prim is de variant die de pagina's zelf al jaren schrijven voor "dit is de
    handeling waar het om gaat": publiceren, versturen, vastleggen. Die eigen
    regel verloor het van `body.rtg-stijl .knop` hierboven -- die is specifieker --
@@ -616,7 +616,7 @@ body.rtg-stijl .tab:hover,body.rtg-stijl .chip:hover{border-color:color-mix(in s
 body.rtg-stijl .tab.aan,body.rtg-stijl .tab.actief,body.rtg-stijl .tab.active,
 body.rtg-stijl .chip.aan,body.rtg-stijl .chip.actief,
 body.rtg-stijl .tabs > button.aan,body.rtg-stijl .chips > button.aan{
-  background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+  background:var(--rtg-goud);border-color:var(--rtg-goud);color:var(--rtg-opgoud,#1C1608);font-weight:600;}
 
 /* een klein statuslabel achter een naam */
 body.rtg-stijl .status,body.rtg-stijl .merk,body.rtg-stijl .badge{
@@ -645,7 +645,7 @@ body.rtg-stijl .inlog h1,body.rtg-stijl .login h1{font-size:1.35rem;margin-botto
    binnen. Dezelfde vorm als in de leden-app. */
 body.rtg-stijl .skip{
   position:absolute;left:.6rem;top:-3rem;z-index:120;
-  background:var(--rtg-goud);color:#1C1608;padding:.5rem .9rem;
+  background:var(--rtg-goud);color:var(--rtg-opgoud,#1C1608);padding:.5rem .9rem;
   border-radius:0;font-weight:700;font-size:.9rem;text-decoration:none;
   transition:top .15s;}
 body.rtg-stijl .skip:focus{top:0;}

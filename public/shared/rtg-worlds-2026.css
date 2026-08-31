@@ -432,7 +432,11 @@ body[data-rtg-world="travel"]{
   --graphite:#2A0713;
   --graphite-2:#20060E;
   --ivory:var(--op-bordeaux);
-  --muted:#C6A3AD;
+  /* GEMETEN EN NIET GEKOZEN: op de lichtste plek van deze grond (#8F2241) haalt
+     #C6A3AD 3,74:1 en #E2C9CF 5,45. De poort mat het verschil op het
+     beginscherm zelf ("Alles staat klaar." en de leegtekst). Het zachte grijs
+     mag lichter; de grond is fluweel en geen zwart. */
+  --muted:#E2C9CF;
   --line:rgba(244,240,233,.14);
   --line-soft:rgba(244,240,233,.07);
   background:var(--bordeaux-glans);

@@ -39,13 +39,16 @@
   outline: none;
 }
 /* Het label ("Lifestyle") is meta en geen titel; iets stiller, maar niet zo
-   stil dat het zakt: 70% van een kleur die zelf 4,5:1 haalt, blijft ruim boven
-   de 3:1 die voor deze maat geldt en het staat nooit alleen -- de naam ernaast
-   draagt de betekenis. */
+   stil dat het zakt. Hier stond 70% met de redenering dat 3:1 genoeg is voor
+   deze maat, en dat was de fout: 3:1 geldt voor GROTE tekst (24px, of 18,66px
+   vet) en dit is 9,3px. De lat is dus 4,5 en op het bordeauxfluweel haalde 70%
+   er 4,41 -- net eronder, en daarom viel het pas op toen de wereld van kleur
+   veranderde. 80% haalt op datzelfde fluweel 5,32 en op de donkere gronden
+   navenant meer; het blijft stiller dan de naam ernaast. */
 .wrooster-kaart .wrooster-label {
   font: 600 .58rem Inter, system-ui, sans-serif;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: color-mix(in srgb, currentColor 70%, transparent);
+  color: color-mix(in srgb, currentColor 80%, transparent);
   white-space: nowrap;
 }

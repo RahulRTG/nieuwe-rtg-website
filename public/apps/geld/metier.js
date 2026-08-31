@@ -40,7 +40,12 @@
         'font-size:.85rem;line-height:1.5;white-space:pre-wrap;}' +
       '#paneel .mt-knoppen{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.7rem;}' +
       '#paneel .mt-vraag{display:flex;gap:.5rem;margin-top:.4rem;}' +
-      '#paneel .mt-vraag input{flex:1;width:auto;}' +
+      /* min-width:0 hoort bij flex:1 en is hier geen detail: een input heeft een
+         INTRINSIEKE breedte (de size-eigenschap, ~20 tekens) en flex laat een
+         kind daar niet vanzelf onder zakken. Op 390px duwde dat de knop Vraag
+         zeven pixels buiten beeld -- en omdat de pagina niet zijwaarts scrolt,
+         was die knop daar gewoon weg. */
+      '#paneel .mt-vraag input{flex:1 1 0;min-width:0;width:auto;}' +
       '#paneel .mt-half{display:flex;gap:.4rem;margin-top:.4rem;}' +
       '#paneel .mt-naam{background:linear-gradient(150deg,rgba(127,22,52,.14),transparent);}';
     d.head.appendChild(s);

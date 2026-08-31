@@ -19,7 +19,7 @@
   body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3.5rem;}
   h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
   header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),color-mix(in srgb,var(--bg) 86%,transparent));backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
-  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,#E7A8B8);}
   header h1{font-size:1.5rem;}
   main{padding:1.1rem;max-width:620px;margin:0 auto;}
   /* De tabbladenrij (Het bord / Mijn reizen) is de eigen schakelaar van deze
@@ -41,7 +41,7 @@
   .item{border:1px solid var(--line);border-radius:0;padding:.8rem .95rem;margin-bottom:.6rem;background:var(--card);}
   .item h4{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.02rem;}
   .item .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.55;}
-  .nr{font-family:'Bodoni Moda',serif;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.05em;}
+  .nr{font-family:'Bodoni Moda',serif;color:var(--rtg-leesgoud,#E7A8B8);letter-spacing:.05em;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem;align-items:center;}
   .veld{background:var(--bg);border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;font-size:.85rem;padding:.42rem .6rem;}
   .knop{background:var(--gold);color:#000;border:none;border-radius:0;font:inherit;font-weight:600;font-size:.84rem;padding:.45rem 1rem;cursor:pointer;}
@@ -49,9 +49,9 @@
   .status{display:inline-block;font-size:.68rem;padding:.1rem .5rem;border-radius:0;border:1px solid var(--line);color:var(--muted);}
   .status.open{border-color:var(--burgundy);color:var(--burgundy);}
   .status.ok{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
-  .status.goud{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .status.goud{border-color:var(--gold);color:var(--rtg-leesgoud,#E7A8B8);}
   .pass{border:1px solid rgba(169,143,7,.5);border-radius:0;background:linear-gradient(135deg,rgba(169,143,7,.12),transparent);padding:1rem 1.1rem;margin-bottom:.7rem;}
-  .pass .code{font-family:'Bodoni Moda',serif;font-size:2rem;color:var(--rtg-leesgoud,var(--gold));letter-spacing:.12em;text-align:center;margin:.5rem 0;animation:gloei 2.4s ease-in-out infinite;}
+  .pass .code{font-family:'Bodoni Moda',serif;font-size:2rem;color:var(--rtg-leesgoud,#E7A8B8);letter-spacing:.12em;text-align:center;margin:.5rem 0;animation:gloei 2.4s ease-in-out infinite;}
   @keyframes gloei{0%,100%{text-shadow:0 0 6px rgba(169,143,7,.25);}50%{text-shadow:0 0 22px rgba(194,58,94,.55);}}
   .pass .regel{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);padding:.2rem 0;}
   .pass .regel b{color:var(--txt);font-weight:600;}

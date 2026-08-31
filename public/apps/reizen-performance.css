@@ -36,7 +36,8 @@ svg{display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:
 main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
 .appblad{min-height:calc(100dvh - var(--header) - var(--nav));animation:blad-in .28s ease both}
 .bladbinnen{width:var(--werkbreedte);margin:0 auto;padding:clamp(1.2rem,2.5vw,2.2rem) clamp(1.2rem,2.5vw,2.4rem) 3.5rem}
-.micro{margin:0;color:#b5b7b3;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
+/* Op fluweel haalt #b5b7b3 4,2:1; deze tint 5,95. */
+.micro{margin:0;color:#E7D3D8;font-size:.65rem;font-weight:650;letter-spacing:.22em;text-transform:uppercase}
 .sub,.sectiekop>p:last-child{color:var(--muted)}
 .tekstknop{border:0;border-bottom:1px solid var(--wine);background:none;color:var(--ivory);padding:.4rem 0;font-size:.62rem;font-weight:700;letter-spacing:.16em}
 
@@ -46,7 +47,13 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .bestemmingkop{display:flex;flex-direction:column;align-items:flex-start;gap:.7rem;margin-top:.65rem}
 .bestemmingkop h1{margin:0;font:800 clamp(3rem,13cqi,7.4rem)/.88 var(--sans);letter-spacing:-.07em;text-transform:uppercase}
 .gereed{display:inline-flex;align-items:center;border:1px solid var(--line);padding:.3rem .6rem;color:var(--ivory);font-size:.78rem;font-weight:650;letter-spacing:.22em;white-space:nowrap}.gereed::first-letter{color:var(--wine-licht)}
-.dagkop .sub{margin:.85rem 0 0;font-size:1rem}
+/* DE KOP STAAT OP FLUWEEL EN NIET OP ZWART. Het huisgrijs (#b5b7b3) en het
+   zachte roze halen daar 3,48:1; op deze grond hoort ivoor. De a11y-poort ving
+   het op het beginscherm zelf. */
+.dagkop .sub{margin:.85rem 0 0;font-size:1rem;color:var(--ivory)}
+.dagkop .micro,.dagtitel .micro{color:#F4F0E9}
+.dagtitel .sub,.samenblad .sub{color:#E7D3D8}
+.leegtekst{color:#E2C9CF}
 .vandaagraster{display:grid;gap:2rem;align-items:start}
 .volgendblok{position:relative;overflow:hidden;border:1px solid #511425;background:linear-gradient(115deg,#280710 0,#1e050c 70%);padding:1.6rem 1.55rem 1.45rem}
 .volgendblok::after{content:"";position:absolute;right:-4rem;top:-2rem;width:9rem;height:130%;border-left:1px solid #400e1e;transform:skew(-17deg);background:repeating-linear-gradient(90deg,transparent 0,transparent 7px,#2e0813 8px,#2e0813 9px);pointer-events:none}
@@ -76,7 +83,8 @@ main{min-height:calc(100dvh - var(--header));padding-bottom:calc(var(--nav) + en
 .statusicoon{width:34px;height:34px;display:grid;place-items:center;border:1px solid;border-radius:50%;font-style:normal}.statusicoon.goed{color:var(--green)}.statusicoon.wacht{color:#8e918e}.statusicoon.let{color:var(--danger)}
 .statuslijst span{display:flex;flex-direction:column;gap:.22rem}.statuslijst b{font-size:.9rem;font-weight:570}.statuslijst small{color:var(--muted);font-size:.7rem}.statuslijst strong{color:var(--wine-bright);font-size:.62rem;letter-spacing:.13em}.statuslijst em{color:var(--ivory);font-size:1.35rem;font-style:normal}
 .rahulsnel{display:grid;grid-template-columns:1fr 52px;border:1px solid #4c1223;background:#23060e;margin-top:2rem}
-.rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}.rahulsnel button{height:58px;border:0;border-left:1px solid #4c1223;background:none;color:var(--wine-licht);font-size:1.3rem}
+.rahulsnel label{position:absolute;left:-9999px}.rahulsnel input{min-width:0;border:0;background:transparent;color:var(--ivory);outline:0;padding:0 1.2rem}.rahulsnel input::placeholder{color:#80847f}/* De pijl stond in het accent op een wijnvlak: 2,53:1; de leestoon haalt 6,66. */
+.rahulsnel button{height:58px;border:0;border-left:1px solid #4c1223;background:none;color:#E7A8B8;font-size:1.3rem}
 
 /* ------------------------------------------------------------------ HET DEK
    Werkkolom en kompas. Links de reis zoals hij loopt: titel, de momenten van

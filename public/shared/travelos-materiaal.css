@@ -33,8 +33,10 @@ html body[data-rtg-world="travel"] {
   /* De accenten die deze schermen uit het huis lenen. Waar zij `--gold` lazen,
      lezen zij nu het bordeauxhoogsel: goud is in deze wereld teruggebracht tot
      het merk en de wijzers van de klok. */
+  /* Het accent is vorm; de LEESTOON is lichter. Zie rtg-themas.css. */
   --gold: #C23A5E;
-  --goud: #C23A5E;
+  --goud: #E7A8B8;
+  --rtg-leesgoud: #E7A8B8;
   --burgundy: #9E1C40;
   --burg: #9E1C40;
   --rtg-bg: #1B050B;

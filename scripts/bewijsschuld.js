@@ -264,6 +264,92 @@ const POSTEN = [
     sluit: 'de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. ' +
       'Dan weet de ratel wat een echte verslechtering is en wat niet.' },
 
+
+  /* ------------------------------------------------------------------------
+     DE UITVOERINGSLAAG (EXECUTIE.md). Vier posten, alle vier uit een register
+     dat deze ronde zelf is gaan meten. Ze staan hier omdat een schuldenlijst
+     die alleen de OUDE laag kent, precies daar blind wordt waar het huis
+     nieuw is -- en een nieuwe laag zonder schuldpost ziet er per ongeluk
+     schuldenvrij uit.
+     ---------------------------------------------------------------------- */
+
+  { id: 'gevolg-onbekend', soort: 'meetwerk',
+    wat: 'bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen',
+    /* De bereikbare paden staan in EXECUTION_MAP.json; of er ooit gemeten is
+       WAT ze veranderen, weet gevolg.js -- en die vraag stellen we aan gevolg.js
+       zelf en niet aan een tweede lezing van IDEMPROEF.json. Een schuldpost die
+       zijn eigen kopie van de meetlogica meebrengt, gaat op een dag iets anders
+       zeggen dan de laag die hij beweert te tellen. */
+    uit: (r) => {
+      const caps = (r.executionmap || {}).capabilities;
+      if (!caps) return null;
+      let gevolgVan;
+      try { ({ gevolgVan } = require('../server/kern/stuur/gevolg')); } catch (e) { return null; }
+      const paden = new Set();
+      for (const c of Object.values(caps))
+        if (c && c.pad && c.bereik && c.bereik !== 'verboden') paden.add(c.pad);
+      if (!paden.size) return null;
+      let n = 0;
+      for (const pad of paden) if (gevolgVan(pad).graad === 'onbekend') n++;
+      return n;
+    },
+    waarom: 'server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van ' +
+      'een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en ' +
+      'een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.',
+    sluit: 'de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het ' +
+      'gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); ' +
+      'wat rest is meten.' },
+
+  { id: 'droogloop-onbeoordeeld', soort: 'meetwerk',
+    wat: 'stappen in de laatste droogloop waarvan de voorspelling niet te beoordelen was',
+    uit: (r) => {
+      const t = (r.droogloop || {}).telling;
+      return t && typeof t.voorspellingOnbekend === 'number' ? t.voorspellingOnbekend : null;
+    },
+    waarom: 'een voorspelling die `onbekend` zegt kan niet fout zijn, dus meetellen als "klopte" ' +
+      'zou de uitslag opkloppen. Deze stappen zijn wel UITGEVOERD en wel waargenomen; wat ' +
+      'ontbreekt is iets om de waarneming tegen af te zetten.',
+    sluit: 'dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is ' +
+      'daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf ' +
+      'onbeoordeelde stappen er groen uitziet en niets bewijst.' },
+
+  { id: 'herstel-onbevestigd', soort: 'instrument',
+    wat: 'vermoede tegenhangers (annuleren, terugdraaien) die nooit zijn beproefd',
+    uit: (r) => {
+      const g = (r.herstel || {}).gemeten;
+      return g && typeof g.vermoed === 'number' ? g.vermoed : null;
+    },
+    waarom: 'HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan ' +
+      'opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de ' +
+      'eerste de tweede werkelijk ongedaan maakt.',
+    sluit: 'een proef die het paar echt uitvoert en de opslag ervoor en erna vergelijkt. Dat ' +
+      'gereedschap bestaat niet: de droogloop meet EEN stap, niet een paar met een tussenstand. ' +
+      'Instrument dus, geen achterstand -- en tot dan blijft compenserend handelen onbewezen.' },
+
+  { id: 'idem-ongeclassificeerd', soort: 'meetwerk',
+    wat: 'muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer',
+    uit: (r) => {
+      /* De routes MET een besluit staan in IDEMBESLUIT.json; hoeveel er in
+         totaal beproefd zijn, weet IDEMPROEF.json. Het verschil is de
+         achterstand. Beide moeten er zijn -- anders een vraagteken. */
+      const besluiten = (r.idembesluit || {}).routes;
+      const rijen = r.idemproef && Array.isArray(r.idemproef.perRoute) ? r.idemproef.perRoute : null;
+      if (!besluiten || !rijen) return null;
+      /* Alleen routes die WERK deden tellen mee. Een route waar de proef niet
+         binnenkwam (404, geen geldig lijf) heeft geen tweede keer om over te
+         beslissen; die als achterstand tellen maakt de post twee keer zo groot
+         als hij is, en dat is dezelfde fout als bij auth-onbeslist. Zij staan
+         al onder object-vooraf en proefruis. */
+      const werk = rijen.filter(x => !/geen werk/.test(x.reden || ''));
+      const beslist = new Set(Object.keys(besluiten));
+      return werk.filter(x => !beslist.has(x.pad)).length;
+    },
+    waarom: 'autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege ' +
+      'afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles ' +
+      'idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.',
+    sluit: 'per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js ' +
+      'plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk.' },
+
   { id: 'wegwerpserver-kopieen', soort: 'meetwerk',
     wat: 'scripts met een eigen kopie van "start een wegwerpserver"',
     uit: () => {
@@ -333,7 +419,13 @@ function meet() {
   const r = {
     poortwacht: lees('POORTWACHT.json'), rolproef: lees('ROLPROEF.json'),
     staatproef: lees('STAATPROEF.json'), output: lees('OUTPUTPROEF.json'),
-    audit: lees('AUDITPROEF.json'), waarom: lees('WAAROM.json'), idor: lees('IDOR.json')
+    audit: lees('AUDITPROEF.json'), waarom: lees('WAAROM.json'), idor: lees('IDOR.json'),
+    /* De registers van de uitvoeringslaag. Ontbreekt er een, dan geeft de post
+       `null` en staat er een vraagteken -- nooit een nul, want niet gemeten is
+       iets anders dan niets te melden. */
+    resolverbereik: lees('RESOLVERBEREIK.json'), idemproef: lees('IDEMPROEF.json'),
+    droogloop: lees('DROOGLOOP.json'), herstel: lees('HERSTEL.json'),
+    idembesluit: lees('IDEMBESLUIT.json'), executionmap: lees('EXECUTION_MAP.json')
   };
   const posten = POSTEN.map(p => {
     let aantal = null;

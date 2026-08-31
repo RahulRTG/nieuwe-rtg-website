@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-08-21T00:45:13.967Z",
-  "commit": "30dc6bb4",
+  "op": "2026-08-31T13:40:37.073Z",
+  "commit": "39f827c6",
   "boomVuil": true,
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
-  "posten": 14,
-  "meetwerk": 57,
-  "instrument": 932,
+  "posten": 18,
+  "meetwerk": 1002,
+  "instrument": 1006,
   "grens": 608
  },
  "posten": [
@@ -119,6 +119,38 @@
    "sluit": "de ruis meten: tien rondes op dezelfde commit, en per as de spreiding vastleggen. Dan weet de ratel wat een echte verslechtering is en wat niet."
   },
   {
+   "id": "gevolg-onbekend",
+   "soort": "meetwerk",
+   "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
+   "aantal": 94,
+   "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
+   "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
+  },
+  {
+   "id": "droogloop-onbeoordeeld",
+   "soort": "meetwerk",
+   "wat": "stappen in de laatste droogloop waarvan de voorspelling niet te beoordelen was",
+   "aantal": 2,
+   "waarom": "een voorspelling die `onbekend` zegt kan niet fout zijn, dus meetellen als \"klopte\" zou de uitslag opkloppen. Deze stappen zijn wel UITGEVOERD en wel waargenomen; wat ontbreekt is iets om de waarneming tegen af te zetten.",
+   "sluit": "dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf onbeoordeelde stappen er groen uitziet en niets bewijst."
+  },
+  {
+   "id": "herstel-onbevestigd",
+   "soort": "instrument",
+   "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nooit zijn beproefd",
+   "aantal": 74,
+   "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
+   "sluit": "een proef die het paar echt uitvoert en de opslag ervoor en erna vergelijkt. Dat gereedschap bestaat niet: de droogloop meet EEN stap, niet een paar met een tussenstand. Instrument dus, geen achterstand -- en tot dan blijft compenserend handelen onbewezen."
+  },
+  {
+   "id": "idem-ongeclassificeerd",
+   "soort": "meetwerk",
+   "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
+   "aantal": 849,
+   "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
+   "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
+  },
+  {
    "id": "wegwerpserver-kopieen",
    "soort": "meetwerk",
    "wat": "scripts met een eigen kopie van \"start een wegwerpserver\"",
@@ -145,6 +177,12 @@
    "van": 985,
    "naar": 989,
    "reden": "De samenvoeging van 24 takken. De groei zit volledig in object-vooraf: nieuwe routes die een BESTAAND object willen bedienen dat de proef zelf niet heeft aangemaakt. Geen enkele post wisselde van soort en geen bestaande meting ging verloren -- het huis werd groter en deze teller telt routes. Sluiten doe je met een aanmaakstap per nieuw domein in de proef."
+  },
+  {
+   "op": "2026-08-31",
+   "van": 989,
+   "naar": 2008,
+   "reden": "De uitvoeringslaag (EXECUTIE.md) kreeg vier eigen posten, en de achterstand gaat van 989 naar 2008. Er is niets bij gekomen: deze schuld bestond al en stond nergens. 849 muterende routes hebben geen uitspraak over wat een tweede keer betekent, 94 bereikbare capabilities zijn nooit gemeten op wat zij veranderen, 74 tegenhangers zijn uit NAMEN afgeleid en nooit uitgevoerd, en de laatste droogloop had 2 stappen waarvan de voorspelling niet te beoordelen was. Een nieuwe laag zonder schuldpost ziet er per ongeluk schuldenvrij uit; dat is precies de vorm waar deze lijst tegen bestaat."
   }
  ]
 }

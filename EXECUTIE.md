@@ -585,7 +585,7 @@ doorgeven aan de volgende. Dat tweede is met opzet: zodra een stap de invoer van
 de volgende bepaalt, gaat de compiler over gegevens in plaats van over
 bevoegdheid, en dan is hij niet meer klein.
 
-### Blok 4 — Simulatie en droogloop · **de gevolgvoorspelling STAAT, de echte droogloop niet**
+### Blok 4 — Simulatie en droogloop · **de gevolgvoorspelling STAAT, en de droogloop nu ook**
 
 `zandbak.js` en `simulatie.js` bestaan. Wat ontbreekt is de koppeling aan PLAN
 en één eerlijke eigenschap per capability: is simulatie hier `exact`,
@@ -627,11 +627,87 @@ invoer van de proef, dus een ander lichaam kan andere collecties raken; alles
 buiten de opslag valt erbuiten (mail, een betaalprovider, een derde partij); en
 zij is een momentopname van de laatste proefronde, niet van deze commit.
 
-**Wat dit dus níét is: een echte droogloop.** Het plan wordt niet in de zandbak
-uitgevoerd; er wordt een eerdere meting op geprojecteerd. Die stap — het plan
-werkelijk laten lopen tegen `zandbak.js`, dat al uit de zaaiset draait en
-structureel niet terugschrijft — is wat er van blok 4 openblijft, en zij vraagt
-een besluit: een zandbak per gebruiker kost geheugen en tijd per opdracht.
+**En dit was géén droogloop.** Er werd een eerdere meting op het plan
+geprojecteerd; het plan liep niet. Dat deel staat er nu wel.
+
+#### De echte droogloop (`scripts/droogloop.js`, `npm run droogloop`)
+
+Het plan draait werkelijk — tegen een **wegwerpserver met een eigen datamap**
+(`scripts/lib/wegwerpserver.js`, geen tiende kopie van die opstelling), met de
+echte routes en de echte poorten ervoor. Per stap wordt de opslag vóór en ná
+vergeleken, en dat is geen projectie meer maar een waarneming aan **deze**
+invoer.
+
+**Niet in de zandbak, en dat is geen uitwijkmanoeuvre.**
+`server/kern/command/zandbak.js` leek de plek, maar hij is een *datavenster*
+voor de Command-laag (journaal, beleid, risico, runbooks) en geen routehost: er
+luistert geen HTTP op. Een plan bestaat uit API-paden, dus daar kan het niet
+draaien. Het besluit over "een zandbak per gebruiker kost geheugen" hoefde
+daarmee niet genomen te worden — de vraag was verkeerd gesteld.
+
+**Twee dingen die de eerste versie stil verkeerd deed**, en allebei zijn ze de
+reden dat een droogloop bestaat:
+
+1. Hij las `db.json`. Dat bestand bestaat **niet** in een verse datamap — de
+   opslag is sqlite (`store.db`) — en dus meldde hij "0 collecties bewogen"
+   terwijl er aantoonbaar een agenda-item bij kwam. Een meting die stil nul
+   zegt, is erger dan een die afbreekt.
+2. Hij telde rijen in de `kv`-tabel. Die telling beweegt nooit: elke collectie
+   ís één rij. Nu staat er per sleutel het versienummer, zodat een schrijfronde
+   die de lengte niet verandert ook meetelt. `test/droogloop.test.js` bouwt daar
+   een echte kv-tabel voor; zonder die toets bleef de mutatie groen.
+
+**Huishouding staat apart van gevolg.** Elke oproep schrijft in `apiSpoor`,
+`handelingLog` en `rtgai` — ook een die alleen leest. Op een hoop gegooid heten
+alle vijf stappen "raakt van alles aan"; apart gehouden blijft zichtbaar wat de
+handeling zélf deed.
+
+**De opbrengst: de projectie klopte niet.** Van vijf stappen waren er drie te
+beoordelen, twee klopten, en één week af:
+
+| stap | voorspeld | waargenomen |
+|---|---|---|
+| `/api/pay/overzicht` | `geen-effect-gemeten` | `bankregie ledenBoard paySaldi payVerzoeken waardeReserves` |
+
+Een **lezende** route die vijf domeincollecties schrijft. De proefronde had daar
+"geen effect" gemeten, met háár invoer; met deze invoer gebeurt er iets. Dat is
+precies waarom een projectie geen droogloop is.
+
+**En wat de droogloop niet doet, staat in zijn eigen uitslag:** een stap op
+`voorstel` wordt niet bevestigd (bevestigen is mensenwerk), de gegevens komen
+uit de zaaiset, alles buiten de opslag blijft onzichtbaar, er wordt gemeten
+wélke collectie bewoog en niet hoeveel, en een voorspelling op `onbekend` wordt
+**niet beoordeeld** — onbekend kan niet fout zijn, en dat als goed tellen zou de
+uitslag opkloppen.
+
+#### De bewijsschuld van deze laag staat nu op de lijst
+
+Een nieuwe laag zonder schuldpost ziet er per ongeluk schuldenvrij uit. Vier
+posten erbij in `BEWIJSSCHULD.json`, alle vier afgeleid uit een register en geen
+ervan met de hand ingetypt:
+
+| post | soort | aantal | wat |
+|---|---|---|---|
+| `idem-ongeclassificeerd` | meetwerk | 849 | muterende routes zonder uitspraak over wat een tweede keer betekent |
+| `gevolg-onbekend` | meetwerk | 94 | bereikbare capabilities waarvan nooit gemeten is wat ze veranderen |
+| `herstel-onbevestigd` | instrument | 74 | tegenhangers uit NAMEN afgeleid en nooit uitgevoerd |
+| `droogloop-onbeoordeeld` | meetwerk | 2 | stappen waarvan de voorspelling niet te beoordelen was |
+
+De achterstand springt daarmee van **989 naar 2008**, en die groei staat mét
+reden in het register — het script weigert te groeien zonder. Er is niets
+bíj gekomen: deze schuld bestond al en stond nergens.
+
+Twee dingen die daarbij zijn rechtgezet. `idem-ongeclassificeerd` telde eerst
+3242, want hij nam de routes mee waar de proef niet binnenkwam — die hebben geen
+tweede keer om over te beslissen en staan al onder `object-vooraf`. En
+`gevolg-onbekend` stelt zijn vraag aan `gevolg.js` zélf in plaats van
+`IDEMPROEF.json` een tweede keer te lezen: een schuldpost met een eigen kopie
+van de meetlogica gaat op een dag iets anders zeggen dan de laag die hij beweert
+te tellen.
+
+`herstel-onbevestigd` is bewust `instrument` en geen `meetwerk`: de droogloop
+meet één stap, niet een paar met een tussenstand. Dat gereedschap bestaat niet,
+en tot het er is blijft compenserend handelen onbewezen.
 
 ### Blok 5 — Transactie- en compensatiesemantiek · **de herhaling staat, het herstel is GEMETEN en blijkt niet af te leiden**
 

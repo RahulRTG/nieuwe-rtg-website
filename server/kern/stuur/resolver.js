@@ -123,7 +123,20 @@ function resolveer(vraag, paden, opties) {
       'de volledige lijst blijft staan in plaats van een leeg werkveld.');
 
   gewogen.sort((a, b) => b.score - a.score || a.pad.localeCompare(b.pad));
-  const gekozen = gewogen.slice(0, max);
+
+  /* NOOIT AFKAPPEN MIDDEN IN EEN GELIJKE SCORE. De grens van vijftien paden is
+     een kostenmaat, geen oordeel. Wie "ik wil iets met de bank" zegt, laat dertig
+     bankpaden even hard scoren; het lijstje afkappen op vijftien betekende dan dat
+     de andere vijftien op ALFABET afvielen -- en /api/bank/pas/betaal viel eruit
+     terwijl /api/bank/advies bleef. Gemeten met scripts/resolverbereik.js: op de
+     vorm "alleen het domein genoemd" zakte de dekking daardoor naar 90%.
+
+     Alles wat gelijk staat aan de laatste die er nog in past, gaat dus mee. De
+     lijst wordt daarmee soms langer dan het maximum, en dat is de bedoeling:
+     dekking gaat voor compactheid (EXECUTIE.md blok 0). Willekeur is hier het
+     ergste van de drie -- hij verbergt een vermogen zonder dat iemand het merkt. */
+  const drempel = gewogen.length > max ? gewogen[max - 1].score : -1;
+  const gekozen = gewogen.filter((r, i) => i < max || r.score === drempel);
 
   /* DUN BEWIJS IS GEEN BEWIJS. "Zet een afsrpaak in mijn agneda" heeft twee
      typefouten; van de drie inhoudswoorden raakte alleen `zet` iets, en dat

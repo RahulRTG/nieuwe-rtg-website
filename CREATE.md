@@ -706,10 +706,11 @@ journaal zou het onaanvaardbaar zijn, en daarom staat dat ergens anders.
 ## 10. Mutatiesemantiek: geclassificeerd, niet idempotent
 
 `IDEMPROEF.json` meet wat er gebeurt als een route twee keer wordt aangeroepen:
-van **3074 routes met een rol** zijn er **115 beoordeeld, 15 beschermd, 100
-onbeschermd en 2959 ongemeten**. Het bestand zegt er zelf bij dat "onbeschermd"
-een telling is en geen defect-oordeel — en dat is juist. Het getal dat ertoe doet
-is 2959.
+van **<!--getal:idem.routesMetRol-->3092<!--/getal--> routes met een rol** zijn er **<!--getal:idem.beoordeeld-->845<!--/getal--> beoordeeld,
+<!--getal:idem.beschermd-->845<!--/getal--> beschermd, <!--getal:idem.onbeschermd-->0<!--/getal--> onbeschermd en <!--getal:idem.ongemeten-->2247<!--/getal--> ongemeten**
+(levende getallen: `npm run getallen` schrijft ze uit `IDEMPROEF.json`). Het
+bestand zegt er zelf bij dat "onbeschermd" een telling is en geen defect-oordeel
+— en dat is juist. Het getal dat ertoe doet is dat van de ongemeten routes.
 
 **Maar het doel is niet 3074 van 3074 idempotent. Het doel is 3074 van 3074
 geclassificeerd.** Een mutatie mag bewust niet veilig herhaalbaar zijn; dat moet

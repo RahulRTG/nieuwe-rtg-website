@@ -1,5 +1,5 @@
 {
- "uitleg": "De vier-tredige noemer waarin de vijf gezagsschalen van GEZAG.json worden verklaard, met per trede of de verklaring EVIDENT is (citaat uit de bron), AANGENOMEN (een mens moet beslissen) of ONBEPAALD (de trede dekt twee noemertreden en is niet af te beelden). Dit is een meetlaag: er hangt geen gedrag aan, en test/gezagsnoemer.test.js zakt zodra server/ hem importeert.",
+ "uitleg": "De vier-tredige noemer waarin de vijf gezagsschalen van GEZAG.json worden verklaard, met per trede of de verklaring EVIDENT is (citaat uit de bron), AANGENOMEN (een mens moet beslissen) BESLOTEN (de eigenaar heeft de vraag beantwoord, met de reden erbij) of ONBEPAALD (de trede dekt twee noemertreden en is niet af te beelden). Dit is een meetlaag: er hangt geen gedrag aan, en test/gezagsnoemer.test.js zakt zodra server/ hem importeert.",
  "noemer": [
   {
    "trede": "geen",
@@ -19,47 +19,36 @@
   }
  ],
  "schalen": 5,
- "treden": 20,
- "evident": 16,
- "aangenomen": [
+ "treden": 21,
+ "evident": 18,
+ "besloten": [
   {
    "bestand": "server/kern/geldbeleid/regels.js",
    "trede": "voorstellen",
    "noemer": "tonen",
-   "grond": "aangenomen",
-   "vraag": "Is een VOORSTEL aan een lid al \"klaarzetten\", of pas iets tonen? Deze schaal kent beide woorden naast elkaar, dus het verschil is daar bedoeld; de noemer heeft er een trede minder.",
+   "grond": "besloten",
+   "besluit": "Een voorstel is informatie; KLAARZETTEN betekent dat er iets staat dat met een enkele bevestiging wordt uitgevoerd. Dat verschil is precies waarom die schaal beide woorden heeft, en het houdt \"klaarzetten\" een harde betekenis in de hele execution plane.",
    "bronGevonden": true
   },
   {
    "bestand": "server/kern/stadsweefsel/ainiveau.js",
    "trede": "begrensd",
    "noemer": "uitvoeren",
-   "grond": "aangenomen",
-   "vraag": "Begrensd uitvoeren en onbegrensd uitvoeren vallen in de noemer samen. Hoort de grens zelf een noemertrede te zijn, of is hij een eigenschap van de uitvoering?",
+   "grond": "besloten",
+   "besluit": "De grens is een EIGENSCHAP van de uitvoering en geen trede. Wat de machine mag is een vraag, hoe ver hij mag gaan is een tweede; de grens hoort waar hij afdwingbaar is (het beleid) en niet in het woord.",
    "bronGevonden": true
   },
   {
    "bestand": "server/kern/bureau/delegatie.js",
    "trede": "autonoom",
    "noemer": "uitvoeren",
-   "grond": "aangenomen",
-   "vraag": "Deze schaal onderscheidt UITVOEREN van AUTONOOM (zonder opdracht per geval). De noemer doet dat niet: dat onderscheid valt weg. Hoort er een vijfde trede te zijn?",
+   "grond": "besloten",
+   "besluit": "\"Zonder opdracht per geval\" is een eigenschap van het staande MANDAAT en niet van de handeling. De noemer blijft vier treden; dit sluit aan op grens 2 van EXECUTIE.md -- een mandaat verleent nooit vermogen, het versmalt bestaand vermogen.",
    "bronGevonden": true
   }
  ],
- "onbepaald": [
-  {
-   "bestand": "server/kern/stuur/beleid.js",
-   "trede": "direct",
-   "noemer": [
-    "tonen",
-    "uitvoeren"
-   ],
-   "grond": "onbepaald",
-   "vraag": "De bron zegt: \"uitsluitend lezen OF een kleine, omkeerbare handeling zonder externe gevolgen\". Dat zijn twee noemertreden in een trede. Splitsen (lezen tegenover kleine handeling) of samenvoegen?",
-   "bronGevonden": true
-  }
- ],
+ "aangenomen": [],
+ "onbepaald": [],
  "meterstuk": [],
  "tredenZonderSchaal": [],
  "dekking": {
@@ -95,7 +84,7 @@
    "trede": "verboden",
    "noemer": "geen",
    "grond": "evident",
-   "citaat": "Alles wat niet genoemd is blijft dicht",
+   "citaat": "Alles wat niet genoemd is blijft",
    "bronGevonden": true
   },
   {
@@ -103,18 +92,23 @@
    "trede": "voorstel",
    "noemer": "klaarzetten",
    "grond": "evident",
-   "citaat": "vereist daarom een eenmalig servervoorstel dat de gebruiker buiten het model bevestigt",
+   "citaat": "vereist daarom een eenmalig servervoorstel dat",
    "bronGevonden": true
   },
   {
    "bestand": "server/kern/stuur/beleid.js",
-   "trede": "direct",
-   "noemer": [
-    "tonen",
-    "uitvoeren"
-   ],
-   "grond": "onbepaald",
-   "vraag": "De bron zegt: \"uitsluitend lezen OF een kleine, omkeerbare handeling zonder externe gevolgen\". Dat zijn twee noemertreden in een trede. Splitsen (lezen tegenover kleine handeling) of samenvoegen?",
+   "trede": "lezen",
+   "noemer": "tonen",
+   "grond": "evident",
+   "citaat": "de machine leest en verandert niets",
+   "bronGevonden": true
+  },
+  {
+   "bestand": "server/kern/stuur/beleid.js",
+   "trede": "klein",
+   "noemer": "uitvoeren",
+   "grond": "evident",
+   "citaat": "een kleine, omkeerbare handeling zonder externe gevolgen",
    "bronGevonden": true
   },
   {
@@ -153,8 +147,8 @@
    "bestand": "server/kern/geldbeleid/regels.js",
    "trede": "voorstellen",
    "noemer": "tonen",
-   "grond": "aangenomen",
-   "vraag": "Is een VOORSTEL aan een lid al \"klaarzetten\", of pas iets tonen? Deze schaal kent beide woorden naast elkaar, dus het verschil is daar bedoeld; de noemer heeft er een trede minder.",
+   "grond": "besloten",
+   "besluit": "Een voorstel is informatie; KLAARZETTEN betekent dat er iets staat dat met een enkele bevestiging wordt uitgevoerd. Dat verschil is precies waarom die schaal beide woorden heeft, en het houdt \"klaarzetten\" een harde betekenis in de hele execution plane.",
    "bronGevonden": true
   },
   {
@@ -201,8 +195,8 @@
    "bestand": "server/kern/stadsweefsel/ainiveau.js",
    "trede": "begrensd",
    "noemer": "uitvoeren",
-   "grond": "aangenomen",
-   "vraag": "Begrensd uitvoeren en onbegrensd uitvoeren vallen in de noemer samen. Hoort de grens zelf een noemertrede te zijn, of is hij een eigenschap van de uitvoering?",
+   "grond": "besloten",
+   "besluit": "De grens is een EIGENSCHAP van de uitvoering en geen trede. Wat de machine mag is een vraag, hoe ver hij mag gaan is een tweede; de grens hoort waar hij afdwingbaar is (het beleid) en niet in het woord.",
    "bronGevonden": true
   },
   {
@@ -249,8 +243,8 @@
    "bestand": "server/kern/bureau/delegatie.js",
    "trede": "autonoom",
    "noemer": "uitvoeren",
-   "grond": "aangenomen",
-   "vraag": "Deze schaal onderscheidt UITVOEREN van AUTONOOM (zonder opdracht per geval). De noemer doet dat niet: dat onderscheid valt weg. Hoort er een vijfde trede te zijn?",
+   "grond": "besloten",
+   "besluit": "\"Zonder opdracht per geval\" is een eigenschap van het staande MANDAAT en niet van de handeling. De noemer blijft vier treden; dit sluit aan op grens 2 van EXECUTIE.md -- een mandaat verleent nooit vermogen, het versmalt bestaand vermogen.",
    "bronGevonden": true
   }
  ]

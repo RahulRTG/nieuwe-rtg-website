@@ -77,8 +77,10 @@ test('5. elke trede draagt een grond, en elke grond draagt zijn onderbouwing', (
   for (const p of PROJECTIES)
     for (const [trede, v] of Object.entries(p.treden)) {
       const waar = p.bestand + ' :: ' + trede;
-      assert.ok(['evident', 'aangenomen', 'onbepaald'].includes(v.grond), waar + ' heeft geen geldige grond');
+      assert.ok(['evident', 'besloten', 'aangenomen', 'onbepaald'].includes(v.grond), waar + ' heeft geen geldige grond');
       if (v.grond === 'evident') assert.ok(v.citaat && v.citaat.length > 2, waar + ' noemt zich evident zonder citaat uit de bron');
+      else if (v.grond === 'besloten') assert.ok(v.besluit && v.besluit.length > 40,
+        waar + ' heet BESLOTEN zonder de reden die de eigenaar gaf -- dan is het een aanname met een ander etiket');
       else assert.ok(v.vraag && v.vraag.length > 20, waar + ' is ' + v.grond + ' zonder de vraag die een mens moet beantwoorden');
       for (const d of (Array.isArray(v.noemer) ? v.noemer : [v.noemer]))
         assert.ok(TREDEN.includes(d), waar + ' valt op een noemertrede die niet bestaat: ' + d);
@@ -97,6 +99,12 @@ test('6. een "evident" citaat staat echt in de bron waar het uit heet te komen',
 });
 
 test('7. DE NOEMER BESLIST NIETS: niets in server/ importeert hem', () => {
+  /* Alleen een ECHTE import telt. Deze toets zocht eerst op elke vermelding van
+     het woord, en sloeg toen aan op het commentaar in stuur/beleid.js dat naar
+     de noemer verwijst om uit te leggen waarom `direct` gesplitst is. Dat is
+     precies het tegenovergestelde van het gevaar: een verwijzing in commentaar
+     maakt de herkomst van een besluit navolgbaar, een require maakt de meetlaag
+     tot beslisser. */
   const raak = [];
   (function loop(dir) {
     for (const naam of fs.readdirSync(dir)) {
@@ -104,7 +112,8 @@ test('7. DE NOEMER BESLIST NIETS: niets in server/ importeert hem', () => {
       const st = fs.statSync(p);
       if (st.isDirectory()) { if (naam !== 'node_modules' && naam !== 'data') loop(p); continue; }
       if (!naam.endsWith('.js')) continue;
-      if (/gezagsnoemer/.test(fs.readFileSync(p, 'utf8'))) raak.push(path.relative(WORTEL, p));
+      const tekst = fs.readFileSync(p, 'utf8');
+      if (/require\([^)]*gezagsnoemer|import[^;]*gezagsnoemer/.test(tekst)) raak.push(path.relative(WORTEL, p));
     }
   })(path.join(WORTEL, 'server'));
   assert.deepEqual(raak, [],
@@ -119,10 +128,32 @@ test('8. de noemer is geordend van minst naar meest machine, en staat letterlijk
   assert.equal(NOEMER.length, TREDEN.length);
 });
 
-test('9. de openstaande besluiten worden geteld en niet weggepoetst', () => {
-  const open = R.aangenomen.length + R.onbepaald.length;
-  assert.ok(open > 0, 'nul open besluiten zou betekenen dat vijf verschillende schalen naadloos passen; ' +
-    'dat is precies de bewering die GEZAG.json weerspreekt');
+test('9. niets valt tussen wal en schip: elke niet-evidente trede is open OF beslist', () => {
+  /* Dit ving eerst iets anders: zolang er open besluiten waren, eiste deze toets
+     er minstens een. Nu de eigenaar ze heeft beantwoord zou die eis de toets
+     laten zakken op een OPGELOST probleem -- en dat is precies hoe een toets een
+     hindernis wordt in plaats van een vangnet. Wat overblijft is de eis die niet
+     verjaart: geen trede zonder grond, en geen grond zonder onderbouwing. */
   for (const a of R.aangenomen.concat(R.onbepaald))
     assert.ok(a.vraag, 'open besluit zonder vraag bij ' + a.bestand + ' :: ' + a.trede);
+  for (const b of R.besloten)
+    assert.ok(b.besluit && b.besluit.length > 40,
+      'beslist zonder reden bij ' + b.bestand + ' :: ' + b.trede);
+  const verklaard = R.evident + R.besloten.length + R.aangenomen.length + R.onbepaald.length;
+  assert.equal(verklaard, R.treden, 'er zijn treden zonder grond: ' + (R.treden - verklaard));
+});
+
+test('10. de vier besluiten van de eigenaar staan vast en zijn niet stilletjes teruggedraaid', () => {
+  /* De splitsing van `direct` is de enige die ook CODE veranderde; de andere
+     drie zijn keuzes in de projectie. Alle vier horen ze na te trekken te zijn,
+     want een besluit dat alleen in een gesprek bestond is over een half jaar
+     een aanname. */
+  const vind = (bestand, trede) => (PROJECTIES.find(p => p.bestand === bestand) || { treden: {} }).treden[trede];
+  assert.ok(!vind('server/kern/stuur/beleid.js', 'direct'), '`direct` bestaat weer als trede: de splitsing is teruggedraaid');
+  assert.equal(vind('server/kern/stuur/beleid.js', 'lezen').noemer, 'tonen');
+  assert.equal(vind('server/kern/stuur/beleid.js', 'klein').noemer, 'uitvoeren');
+  assert.equal(vind('server/kern/geldbeleid/regels.js', 'voorstellen').noemer, 'tonen');
+  assert.equal(vind('server/kern/stadsweefsel/ainiveau.js', 'begrensd').noemer, 'uitvoeren');
+  assert.equal(vind('server/kern/bureau/delegatie.js', 'autonoom').noemer, 'uitvoeren');
+  assert.equal(TREDEN.length, 4, 'de noemer heeft geen vier treden meer, terwijl de eigenaar juist besloot hem op vier te houden');
 });

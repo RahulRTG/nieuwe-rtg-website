@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1416 bestanden en 9951 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1419 bestanden en 9972 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1416 |
-| losse beweringen (`test(...)`) | 9951 |
+| toetsbestanden | 1419 |
+| losse beweringen (`test(...)`) | 9972 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 50 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 971 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
 | niet te meten (al rood, geen module gevonden, ...) | 39 |
 | alleen in de kop *genoemd*, nog niet gemeten | 117 |
-| niets van beide | 279 |
+| niets van beide | 282 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1239 bestanden, 9648 beweringen.
+1242 bestanden, 9669 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -382,9 +382,10 @@ toets omvalt.
 | `gerechtkennis.test.js` | 5 | gezakt op `liegpoort /api/` | Het gerechtenmenu op het keukenscherm: recept, bereidingswijze, allergenen met vervangers en een dranksuggestie per gerecht, plus de 86-melding (uitverkocht) die het bestellen per direct blokkeert. |
 | `gereedschap.test.js` | 2 | gezakt op `===->!==` | RTG Gereedschap: de rekenmotor (puur, geen eval) en de klok-kern (wekkers en timers op de server; de veegfunctie wordt hier direct aangeroepen, dus de test wacht nergens op). |
 | `gesprekdraad.test.js` | 5 | gezakt op `liegpoort /api/` | Het gesprek met Rahul als EEN draadje, met een grens erin. De balk in het OS praat met de assistent (/api/fluister); de chat in de app leest het doorlopende gesprek (/api/chat/history). |
+| `getallen.test.js` | 6 | -- | DE LEVENDE GETALLEN IN DE DOCUMENTEN (scripts/getallen.js). Een meetgetal in proza veroudert stil. |
 | `gewoonten.test.js` | 7 | gezakt op `liegpoort /api/` | Gewoonten (kern/gewoonten.js). Het meeste dat hier bewezen wordt is een NEGATIEF, en dat is de hele reden dat deze laag zo klein is: - de reeksteller staat UIT tot het lid hem zelf aanzet, en wat uit staat komt ook... |
 | `gezag.test.js` | 13 | gezakt op `===->!==#0` | HET GEZAG (scripts/gezag.js + GEZAG.json). WAT HIER OP HET SPEL STAAT. |
-| `gezagsnoemer.test.js` | 10 | -- | DE GEDEELDE NOEMER VAN DE GEZAGSSCHALEN (scripts/gezagsnoemer.js). GEZAG.json houdt vast dat dit huis de vraag "mag de machine dit zelf?" op vijf plekken met vijf eigen woordenlijsten beantwoordt, en zegt erbij dat... |
+| `gezagsnoemer.test.js` | 11 | -- | DE GEDEELDE NOEMER VAN DE GEZAGSSCHALEN (scripts/gezagsnoemer.js). GEZAG.json houdt vast dat dit huis de vraag "mag de machine dit zelf?" op vijf plekken met vijf eigen woordenlijsten beantwoordt, en zegt erbij dat... |
 | `gezakte-toetsen.test.js` | 6 | te langzaam | De herhaling onderaan een rode CI-stap moet de REDEN dragen, niet alleen de naam. Dat is een belofte in .github/workflows/ci.yml ("zodat een rode stap zichzelf uitlegt"), en een belofte in tekst is een belofte in code. |
 | `gezelschap.test.js` | 1 | gezakt op `liegpoort /api/` | HET GEZELSCHAP: kan iedereen elkaar bereiken -- en wie juist niet? Het proefpubliek (test/gezelschap.js) zet alle passen neer, alle RTF-leeftijden en een lid per genre. |
 | `gezin-weghalen.test.js` | 6 | gezakt op `liegpoort /api/` | HET GEZIN: DE KANT WAAR DINGEN VERDWIJNEN -- 7 endpoints. De waargenomen dekkingsmeting wees eenentwintig foundation-routes aan als nooit aangeroepen, en daar zat een patroon in: het gezinsdeel was wel beproefd op... |
@@ -889,6 +890,7 @@ toets omvalt.
 | `residentie2.test.js` | 5 | gezakt op `liegpoort /api/` | De Residence, samen spelen: uitdagen en accepteren in de juiste zaal, om de beurt spelen met een timing-nauwkeurigheid, een eerlijke uitslag zonder ranglijsten, de vragen van het huis aan het diner, en de... |
 | `residentie3.test.js` | 4 | gezakt op `liegpoort /api/` | De Residence, het paar en de directeur: samen "vast" wandelen (verzoek, volgen bij stap en kamerwissel, losmaken), koppel tegen koppel spelen (2 tegen 2 met teamstand) en Rahul, de directeur, die het vragenspel... |
 | `residentie4.test.js` | 3 | gezakt op `return-weg#0` | De vragenmotor van De Residence: ruim tienduizend verschillende vragen in zes genres, van superluchtig tot een traan tot zakelijk en door en door. Pure unit-test op de module zelf. |
+| `resolverbereik.test.js` | 5 | -- | HET BEREIK VAN DE RESOLVER (scripts/resolverbereik.js). test/stuur-resolver-taal.test.js bewaakt de dekking op 27 met de hand geschreven zinnen. |
 | `retail-annulering.test.js` | 9 | -- | EEN VERKOOP TERUGDRAAIEN -- als tegenboeking, en nooit door de bon te wissen. DE ZWAARSTE TOETS IS 3. |
 | `retail-prijs.test.js` | 8 | -- | DE PRIJS VAN EEN RETAILVERKOOP -- en de fout die eronder zat. DE ZWAARSTE TOETS IS 4. |
 | `retail.test.js` | 12 | gezakt op `liegpoort /api/` | End-to-end tests voor het retail-/mode-genre (kern/retail.js): collecties en artikelen met varianten, voorraad, clienteling (maten/verlanglijst/historie/ notities), apart leggen, paskamerverzoeken,... |
@@ -1078,6 +1080,7 @@ toets omvalt.
 | `studio.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van de kantoren (automotive, jachten, luchtvaart, helikopters). Een AI tekent het concept uit (silhouet, aandrijving, materialen, gedempt palet, uitrusting,... |
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |
 | `stuur-aanval.test.js` | 6 | gezakt op `!==->===#0` | Aanvalstoetsen voor het AI-stuur. Deze gebruiken bewust een vijandig nagemaakt model dat bevestigingsvelden fabriceert en verborgen routes kiest. |
+| `stuur-niveaus.test.js` | 9 | -- | DE SPLITSING VAN `direct` IN `lezen` EN `klein` (server/kern/stuur/beleid.js). AANLEIDING. |
 | `stuur-resolver-taal.test.js` | 7 | -- | DE TAALSUITE VAN DE CAPABILITY-RESOLVER -- de veiligheidskant. test/stuur-resolver.test.js bewijst de GRENS: er komt nooit een pad bij. |
 | `stuur-resolver.test.js` | 14 | genoemd | DE CAPABILITY-RESOLVER (server/kern/stuur/resolver.js, EXECUTIE.md blok 0). Wat hier bewezen moet worden is niet "hij kiest goed" maar iets hardere: hij kan de bevoegdheid niet veranderen. |
 | `stuur.test.js` | 9 | gezakt op `liegpoort /api/` | Het AI-stuur: Rahul voert acties uit op elk toegestaan API-pad via een interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en dezelfde schakelkast als de app-knoppen; infrastructuur is verboden... |

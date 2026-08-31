@@ -10,8 +10,9 @@
       "bestand": "server/kern/stuur/beleid.js",
       "schaal": [
         "verboden",
+        "lezen",
         "voorstel",
-        "direct"
+        "klein"
       ],
       "beslisser": "beleidVoor",
       "bestuurt": "de AI over HTTP-routes, per rol (member/supplier/staff)"

@@ -203,10 +203,10 @@ niet aangenomen.
 
 | staat | aantal |
 |---|---|
-| bewezen | **0** |
+| bewezen | **<!--getal:vertrouwen.bewezen-->0<!--/getal-->** |
 | verschaald | 0 |
-| verzwakt | 4180 |
-| geschorst | **0** |
+| verzwakt | <!--getal:vertrouwen.routes-->4180<!--/getal--> |
+| geschorst | **<!--getal:vertrouwen.geschorst-->0<!--/getal-->** |
 | ongemeten | 5 |
 
 Daar volgen twee dingen uit die niet in een roadmap horen te ontbreken.
@@ -227,11 +227,11 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 
 | | aantal |
 |---|---|
-| routes met een rol | 3092 |
-| beoordeeld | 845 |
-| beschermd | 845 |
-| onbeschermd | **0** |
-| ongemeten | 2247 |
+| routes met een rol | <!--getal:idem.routesMetRol-->3092<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->845<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->845<!--/getal--> |
+| onbeschermd | **<!--getal:idem.onbeschermd-->0<!--/getal-->** |
+| ongemeten | <!--getal:idem.ongemeten-->2247<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -279,10 +279,39 @@ spelfout, samengestelde opdracht, impliciete intentie, negatie, en
 promptinjectie waarin een routepad wordt genoemd. Per vorm apart, want
 "gemiddeld 96%" verbergt precies de categorie waar het misgaat.
 
-De meter zegt er zelf bij wat hij niet meet: of het model met dat werkveld de
-júiste keuze maakt, en of echte gebruikers zulke zinnen typen — de zinnen staan
-in het corpus, want een register van echte gebruikersvragen bestaat niet. Wie de
-vragen kiest, kiest het resultaat.
+**En omdat "wie de vragen kiest, kiest het resultaat" een echte zwakte is, is er
+een tweede meter die het omdraait** (`npm run resolverbereik`,
+`RESOLVERBEREIK.json`). Die schrijft geen zinnen maar GENEREERT er een voor élk
+pad dat een rol mag bedienen — 176 vandaag — in zeven vervormingen, en eist dat
+het pad in het werkveld overleeft. **1232 gegenereerde proeven, dekking 100% op
+alle zeven.** Het corpus groeit mee met het platform: een nieuwe route brengt
+zijn eigen proef mee, en niemand kan er een toevoegen die onvindbaar is zonder
+dat de toets zakt.
+
+| vervorming | wat hij raakt | versmald | werkveld |
+|---|---|---|---|
+| eigen woorden | de weging (zwakste: de zin komt uit het pad zelf) | 100% | 10,7 |
+| mensenwoorden | de omgekeerde bruggen (`ride` → "taxi") | 100% | 10,8 |
+| **alleen domein** | **de afkapgrens** | 28% | 65,6 |
+| alleen werkwoord | de dunne-bewijsregel | 94% | 7,4 |
+| **typefout** | **de dunne-bewijsregel** | 14% | 80,2 |
+| omgekeerd | woordvolgorde | 100% | 10,8 |
+| veel ruis | het verzoek verstopt in beleefdheid | 94% | 12,8 |
+
+**Wat hij meteen vond:** op "alleen domein" zakte de dekking naar **90%** — 17
+verborgen vermogens. Niet door de weging maar door de **afkapgrens van vijftien,
+die midden in een gelijke score sneed**. Dertig bankpaden scoren even hard op het
+woord "bank"; de helft viel op alfabet af, dus `/api/bank/pas/betaal` verdween
+terwijl `/api/bank/advies` bleef. Sindsdien gaat alles wat gelijk staat aan de
+laatste mee: **een gelijke score afkappen is willekeur, en willekeur is hier de
+ergste faalvorm — hij verbergt een vermogen zonder dat iemand het merkt.** Kosten:
+88% versmalling in plaats van 89%.
+
+Wat ook déze meter niet meet: of het model met dat werkveld de júiste keuze
+maakt, en of echte gebruikers zo typen. De zwakste vervorming zegt dat zelf: een
+zin gebouwd uit de woorden van het pad en dan gewogen tegen diezelfde woorden is
+deels een identiteitstest. Daarom staat er per vorm bij hoe sterk het bewijs is,
+en zijn "mensenwoorden" en "typefout" de vormen die tellen.
 
 **Dit verandert geen autoriteit.** De resolver krijgt de lijst die `beleid.js`
 al heeft goedgekeurd en filtert die array; hij kan structureel niets toevoegen.
@@ -426,9 +455,34 @@ zelf" zegt kan niet op `uitvoeren` uitkomen), en een `evident` citaat dat niet
 letterlijk in de bron staat laat de bouw zakken — wat meteen gebeurde bij het
 eerste citaat dat over een regeleinde liep.
 
-**Wat er hierna nog moet:** de vier besluiten nemen, en pas dáárna één motor. De
-verhuizing van `risico.js` blijft de juiste eindtoestand; hij is alleen niet de
-eerste stap.
+**De vier besluiten zijn genomen** (31 augustus 2026), en drie ervan bleken
+dezelfde vorm te hebben: *wat de machine mag* is één vraag, *hoe ver hij mag
+gaan* is een tweede.
+
+| open punt | besluit |
+|---|---|
+| `direct` (onbepaald) | **splitsen** in `lezen` en `klein` — uitgevoerd in code |
+| `autonoom` | geen vijfde trede: "zonder opdracht per geval" is een eigenschap van het **mandaat** |
+| `begrensd` | geen eigen trede: de grens is een eigenschap van de **uitvoering** en hoort in het beleid |
+| `voorstellen` | valt op `tonen` — `klaarzetten` houdt zijn harde betekenis: er staat iets dat met één bevestiging wordt uitgevoerd |
+
+De noemer staat daarmee op **21 treden: 18 evident, 3 besloten, 0 open**. Een
+`besloten` verklaring draagt de reden die de eigenaar gaf, en de toets zakt als
+die reden ontbreekt — anders is het een aanname met een ander etiket.
+
+**De splitsing zelf legde vijf routes bloot die niet lazen.** `/api/mediaos/stuur`
+en `/volg` (zetten smaak en volgen), `/api/leerstof/oefen` en `/antwoord`
+(schrijven de oefenstand) en `/api/bijles/vraag` (roept een model aan en kost
+geld) stonden in de lijst die "uitsluitend lezen of een kleine handeling" heette.
+Ze staan nu onder `klein`. De splitsing **verplaatst geen bevoegdheid** — `lezen`
+en `klein` samen zijn exact de oude `direct`-lijst, en dat is toets 1 van
+`test/stuur-niveaus.test.js`, met de oude lijst er letterlijk in overgeschreven
+zodat de code niet met zichzelf wordt vergeleken. Vier mutaties bijten, waaronder
+de gevaarlijkste: een `voorstel`-route naar `klein` verplaatsen, waardoor een
+menselijke bevestiging stilletjes verdwijnt.
+
+**Wat er hierna nog moet:** één motor. De verhuizing van `risico.js` blijft de
+juiste eindtoestand; hij was alleen niet de eerste stap.
 
 ### Blok 3 — PLAN als protocol · **een besluit nodig**
 

@@ -1,0 +1,67 @@
+{
+ "paden": 176,
+ "perRol": {
+  "member": 120,
+  "supplier": 40,
+  "staff": 16
+ },
+ "vormen": {
+  "eigen woorden": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 100,
+   "gemiddeldWerkveld": 10.7,
+   "gemist": []
+  },
+  "mensenwoorden": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 100,
+   "gemiddeldWerkveld": 10.8,
+   "gemist": []
+  },
+  "alleen domein": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 28,
+   "gemiddeldWerkveld": 65.6,
+   "gemist": []
+  },
+  "alleen werkwoord": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 94,
+   "gemiddeldWerkveld": 7.4,
+   "gemist": []
+  },
+  "typefout": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 14,
+   "gemiddeldWerkveld": 80.2,
+   "gemist": []
+  },
+  "omgekeerd": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 100,
+   "gemiddeldWerkveld": 10.8,
+   "gemist": []
+  },
+  "veel ruis": {
+   "gevonden": 176,
+   "totaal": 176,
+   "dekking": 100,
+   "versmaldPct": 94,
+   "gemiddeldWerkveld": 12.8,
+   "gemist": []
+  }
+ },
+ "laagste": 100
+}

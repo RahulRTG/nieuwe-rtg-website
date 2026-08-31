@@ -408,8 +408,9 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van 3074 routes met een rol
-zijn er 115 beproefd op herhaalbaarheid en 2959 ongemeten (`IDEMPROEF.json`),
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->3092<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->845<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->2247<!--/getal--> ongemeten (`IDEMPROEF.json`,
+levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
 
@@ -419,8 +420,8 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **twintig**, 91% van de leden woont in
-precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->249<!--/getal--> leden,
+91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
 toevoegt aan de opzet: één grammatica mag over het **platformvermogen**
@@ -436,8 +437,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de 115 beproefde muterende routes zijn er 15
-retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->845<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->845<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -519,8 +520,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de 96 namen die in meer dan
-één domein staan, dragen er **78 meer dan één betekenis** — samen 284
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->111<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->94<!--/getal--> meer dan één betekenis** — samen 284
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -755,7 +756,28 @@ AI-allowlist betekent "lezen OF een kleine omkeerbare handeling", en dat zijn tw
 noemertreden in een woord. De noemer beslist met opzet niets en woont daarom in
 `scripts/`; `test/gezagsnoemer.test.js` zakt zodra iets uit `server/` hem
 importeert, want dan is hij de zesde gezagsschaal in plaats van de laag
-eroverheen. Neem de vier open besluiten vóór je twee schalen in een keten mengt. Hij verandert geen bevoegdheid en kan dat ook niet
+eroverheen. **De vier besluiten zijn genomen (31 augustus 2026)** en de noemer staat op 18
+evident, 3 besloten, 0 open. Drie ervan hebben dezelfde vorm: wat de machine mag
+is een vraag, hoe ver hij mag gaan is een tweede -- `autonoom` en `begrensd`
+blijven daarom eigenschappen (van het mandaat, van de uitvoering) en worden geen
+trede. De vierde is in code uitgevoerd: **`direct` is gesplitst in `lezen` en
+`klein`** (`kern/stuur/beleid.js`), en dat legde vijf routes bloot die in de
+lezen-lijst stonden en aantoonbaar schrijven -- mediaos/stuur en /volg,
+leerstof/oefen en /antwoord, en bijles/vraag. De splitsing verplaatst geen
+bevoegdheid: `lezen` + `klein` is exact de oude `direct`, en
+`test/stuur-niveaus.test.js` houdt dat vast met de oude lijst er letterlijk in
+overgeschreven. **De dekking van de resolver wordt inmiddels GEGENEREERD gemeten**
+(`npm run resolverbereik`): een vraag per toegestaan pad in zeven vervormingen --
+1232 proeven, dekking 100%, en het corpus groeit mee met het platform in plaats
+van met de pen van wie het opschreef. Dat vond meteen 17 verborgen vermogens: de
+afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/betaal
+viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
+willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
+**En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->`), en
+`test/getallen.test.js` zakt zodra een document iets anders beweert dan zijn
+register -- inclusief een zelfijking die een met opzet verkeerd getal moet vinden.
+Nul merktekens is daar geen "in orde" maar een gezakte meter. Hij verandert geen bevoegdheid en kan dat ook niet
 (hij filtert de lijst die `beleid.js` al goedkeurde, en toets 1 houdt vast dat de
 uitkomst altijd een deelverzameling is), en zijn woordenschat komt uit de
 padsegmenten zelf zodat er geen tweede routelijst ontstaat. Twee dingen daar niet

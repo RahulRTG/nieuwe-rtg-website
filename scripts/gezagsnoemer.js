@@ -55,11 +55,10 @@ const PROJECTIES = [
       verboden: { noemer: 'geen', grond: 'evident',
         citaat: 'Alles wat niet genoemd is blijft' },
       voorstel: { noemer: 'klaarzetten', grond: 'evident',
-        citaat: 'vereist daarom een eenmalig servervoorstel dat' },
-      direct: { noemer: ['tonen', 'uitvoeren'], grond: 'onbepaald',
-        vraag: 'De bron zegt: "uitsluitend lezen OF een kleine, omkeerbare handeling zonder ' +
-          'externe gevolgen". Dat zijn twee noemertreden in een trede. Splitsen (lezen tegenover ' +
-          'kleine handeling) of samenvoegen?' }
+        citaat: 'vereist een eenmalig servervoorstel dat de gebruiker' },
+      lezen: { noemer: 'tonen', grond: 'evident', citaat: 'de machine leest en verandert niets' },
+      klein: { noemer: 'uitvoeren', grond: 'evident',
+        citaat: 'een kleine, omkeerbare handeling zonder externe gevolgen' }
     } },
   { bestand: 'server/kern/command/risico.js', schaal: 'hand|assist|auto',
     treden: {
@@ -70,10 +69,10 @@ const PROJECTIES = [
   { bestand: 'server/kern/geldbeleid/regels.js', schaal: 'kijken|voorstellen|klaarzetten|automatisch',
     treden: {
       kijken: { noemer: 'tonen', grond: 'evident', citaat: 'kijken' },
-      voorstellen: { noemer: 'tonen', grond: 'aangenomen',
-        vraag: 'Is een VOORSTEL aan een lid al "klaarzetten", of pas iets tonen? Deze schaal ' +
-          'kent beide woorden naast elkaar, dus het verschil is daar bedoeld; de noemer heeft ' +
-          'er een trede minder.' },
+      voorstellen: { noemer: 'tonen', grond: 'besloten',
+        besluit: 'Een voorstel is informatie; KLAARZETTEN betekent dat er iets staat dat met een ' +
+          'enkele bevestiging wordt uitgevoerd. Dat verschil is precies waarom die schaal beide ' +
+          'woorden heeft, en het houdt "klaarzetten" een harde betekenis in de hele execution plane.' },
       klaarzetten: { noemer: 'klaarzetten', grond: 'evident', citaat: 'klaarzetten' },
       automatisch: { noemer: 'uitvoeren', grond: 'evident', citaat: 'automatisch' }
     } },
@@ -82,9 +81,10 @@ const PROJECTIES = [
       waarnemen: { noemer: 'tonen', grond: 'evident', citaat: 'waarnemen' },
       adviseren: { noemer: 'tonen', grond: 'evident', citaat: 'adviseren' },
       voorbereiden: { noemer: 'klaarzetten', grond: 'evident', citaat: 'voorbereiden' },
-      begrensd: { noemer: 'uitvoeren', grond: 'aangenomen',
-        vraag: 'Begrensd uitvoeren en onbegrensd uitvoeren vallen in de noemer samen. ' +
-          'Hoort de grens zelf een noemertrede te zijn, of is hij een eigenschap van de uitvoering?' },
+      begrensd: { noemer: 'uitvoeren', grond: 'besloten',
+        besluit: 'De grens is een EIGENSCHAP van de uitvoering en geen trede. Wat de machine mag is ' +
+          'een vraag, hoe ver hij mag gaan is een tweede; de grens hoort waar hij afdwingbaar is ' +
+          '(het beleid) en niet in het woord.' },
       verboden: { noemer: 'geen', grond: 'evident', citaat: 'verboden' }
     } },
   { bestand: 'server/kern/bureau/delegatie.js', schaal: 'informeren|aanbevelen|voorbereiden|uitvoeren|autonoom',
@@ -93,9 +93,10 @@ const PROJECTIES = [
       aanbevelen: { noemer: 'tonen', grond: 'evident', citaat: 'aanbevelen' },
       voorbereiden: { noemer: 'klaarzetten', grond: 'evident', citaat: 'voorbereiden' },
       uitvoeren: { noemer: 'uitvoeren', grond: 'evident', citaat: 'uitvoeren' },
-      autonoom: { noemer: 'uitvoeren', grond: 'aangenomen',
-        vraag: 'Deze schaal onderscheidt UITVOEREN van AUTONOOM (zonder opdracht per geval). ' +
-          'De noemer doet dat niet: dat onderscheid valt weg. Hoort er een vijfde trede te zijn?' }
+      autonoom: { noemer: 'uitvoeren', grond: 'besloten',
+        besluit: '"Zonder opdracht per geval" is een eigenschap van het staande MANDAAT en niet van ' +
+          'de handeling. De noemer blijft vier treden; dit sluit aan op grens 2 van EXECUTIE.md -- ' +
+          'een mandaat verleent nooit vermogen, het versmalt bestaand vermogen.' }
     } }
 ];
 
@@ -114,7 +115,7 @@ function bouw() {
     const ijk = schaalStaatEr(p.bestand, p.treden);
     for (const [trede, v] of Object.entries(p.treden))
       rijen.push({ bestand: p.bestand, trede, noemer: v.noemer, grond: v.grond,
-        citaat: v.citaat, vraag: v.vraag, bronGevonden: ijk.ok });
+        citaat: v.citaat, vraag: v.vraag, besluit: v.besluit, bronGevonden: ijk.ok });
     if (!ijk.ok) rijen.push({ bestand: p.bestand, trede: null, grond: 'meterstuk', reden: ijk.reden, bronGevonden: false });
   }
   const dekking = {};
@@ -124,12 +125,14 @@ function bouw() {
   return {
     uitleg: 'De vier-tredige noemer waarin de vijf gezagsschalen van GEZAG.json worden verklaard, ' +
       'met per trede of de verklaring EVIDENT is (citaat uit de bron), AANGENOMEN (een mens moet beslissen) ' +
-      'of ONBEPAALD (de trede dekt twee noemertreden en is niet af te beelden). Dit is een meetlaag: ' +
+      'BESLOTEN (de eigenaar heeft de vraag beantwoord, met de reden erbij) of ONBEPAALD (de trede dekt ' +
+      'twee noemertreden en is niet af te beelden). Dit is een meetlaag: ' +
       'er hangt geen gedrag aan, en test/gezagsnoemer.test.js zakt zodra server/ hem importeert.',
     noemer: NOEMER,
     schalen: PROJECTIES.length,
     treden: rijen.filter(r => r.trede).length,
     evident: rijen.filter(r => r.grond === 'evident').length,
+    besloten: rijen.filter(r => r.grond === 'besloten'),
     aangenomen: rijen.filter(r => r.grond === 'aangenomen'),
     onbepaald: rijen.filter(r => r.grond === 'onbepaald'),
     meterstuk: rijen.filter(r => r.grond === 'meterstuk'),
@@ -143,7 +146,8 @@ function main() {
   console.log('DE GEDEELDE NOEMER VAN DE GEZAGSSCHALEN\n');
   for (const n of NOEMER) console.log('  ' + n.trede.padEnd(12) + n.wat);
   console.log('\n  ' + r.schalen + ' schalen, ' + r.treden + ' treden verklaard: ' +
-    r.evident + ' evident, ' + r.aangenomen.length + ' aangenomen, ' + r.onbepaald.length + ' onbepaald.\n');
+    r.evident + ' evident, ' + r.besloten.length + ' besloten, ' +
+    r.aangenomen.length + ' aangenomen, ' + r.onbepaald.length + ' onbepaald.\n');
 
   for (const p of PROJECTIES) {
     console.log('  ' + p.bestand);
@@ -157,9 +161,16 @@ function main() {
     for (const m of r.meterstuk) console.error('  ' + m.bestand + ': ' + m.reden);
   }
 
-  console.log('\nWAT DE EIGENAAR MOET BESLISSEN (' + (r.aangenomen.length + r.onbepaald.length) + '):');
-  for (const a of r.aangenomen.concat(r.onbepaald))
+  const open = r.aangenomen.concat(r.onbepaald);
+  console.log('\nWAT DE EIGENAAR MOET BESLISSEN (' + open.length + '):');
+  if (!open.length) console.log('  niets meer open.');
+  for (const a of open)
     console.log('  [' + a.grond + '] ' + a.bestand + ' :: ' + a.trede + '\n      ' + a.vraag);
+
+  if (r.besloten.length) {
+    console.log('\nAL BESLOTEN (' + r.besloten.length + '), met de reden die de eigenaar gaf:');
+    for (const b of r.besloten) console.log('  ' + b.bestand + ' :: ' + b.trede + '\n      ' + b.besluit);
+  }
 
   if (r.tredenZonderSchaal.length)
     console.log('\nNoemertreden die geen enkele schaal kent: ' + r.tredenZonderSchaal.join(', '));

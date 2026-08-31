@@ -58,7 +58,7 @@ module.exports = (ctx) => {
     const uit = [];
     if (!g.ontvanger || !g.ontvanger.soort) {
       uit.push({ besluit: 1, wat: 'ontvanger',
-        vraag: 'Waar landt het geld? Zonder positie of rekening van de RTFoundation gaat een gift nergens heen.' });
+        vraag: 'Waar landt het geld? Zonder walletcode van de RTFoundation gaat een gift nergens heen.' });
     }
     if (!Array.isArray(g.vormen) || !g.vormen.length) {
       uit.push({ besluit: 2, wat: 'vormen',
@@ -102,13 +102,19 @@ module.exports = (ctx) => {
       const o = b.ontvanger;
       if (o === null) { g.ontvanger = null; }
       else {
+        /* EEN WALLET ZOALS EEN LEVERANCIER ER EEN HEEFT (besluit van de
+           eigenaar, 31 augustus 2026). Dat is met opzet geen nieuwe betaalvorm:
+           kern/pay/partner.js boekt al van een lid naar `partner:<code>`, en de
+           stichting betaalt zichzelf uit naar haar bankrekening langs precies
+           dezelfde weg als elke zaak (/api/pay/zaak/uitbetalen). Er komt dus
+           geen tweede betaalweg bij, alleen een tweede houder van een wallet. */
         const soort = schoon(o && o.soort, 20);
-        if (!['positie', 'bankrekening'].includes(soort)) {
-          return { status: 400, error: 'Een ontvanger is een positie in RTG Pay of een bankrekening van de stichting.' };
+        if (soort !== 'wallet') {
+          return { status: 400, error: 'De ontvanger is een wallet, zoals een leverancier er een heeft. De stichting betaalt zichzelf daarvandaan uit naar haar eigen bankrekening.' };
         }
-        const aanduiding = schoon(o.aanduiding, 80);
-        if (!aanduiding) return { status: 400, error: 'Welke positie of rekening? Zonder aanduiding landt er niets.' };
-        g.ontvanger = { soort, aanduiding };
+        const code = schoon(o.code, 40).toUpperCase();
+        if (!code) return { status: 400, error: 'Welke walletcode? Zonder die code landt er niets.' };
+        g.ontvanger = { soort: 'wallet', code };
       }
     }
     if (b.vormen !== undefined) {
@@ -153,8 +159,15 @@ module.exports = (ctx) => {
   const voornemen = require('./gift-voornemen')(ctx, {
     standVan: d, uitlegVan: () => stand().uitleg, ontbreektVan: ontbreekt
   });
+  /* En de enige plek waar geld beweegt, ook apart: dit bestand gaat over de
+     stand, dat over de handeling. */
+  const betalen = require('./gift-betalen')(ctx, {
+    standVan: d, voorbereidVan: voornemen.voorbereid,
+    bronUitGift: (x) => ctx.bronUitGift(x)
+  });
 
-  return { stand, standZet, voorbereid: voornemen.voorbereid, ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
+  return { stand, standZet, voorbereid: voornemen.voorbereid, bevestig: betalen.bevestig,
+    ontbreekt, STANDEN, VORMEN, ANBI_STANDEN };
 };
 module.exports.STANDEN = STANDEN;
 module.exports.VORMEN = VORMEN;

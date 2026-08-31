@@ -81,13 +81,20 @@ module.exports = (ctx, { standVan, uitlegVan, ontbreektVan }) => {
         beoordeeld
           ? 'Dit bedrag wordt eerst beoordeeld door het landelijke bestuur. Zolang dat loopt, wordt er niets mee gedaan.'
           : 'Dit bedrag gaat direct naar de stichting.',
+        /* VIER ANBI-STANDEN, VIER ZINNEN. De knop van de eigenaar en de zin die
+           de gever leest, bewegen samen -- dat was de opdracht. `aangevraagd`
+           zegt wat we weten (de aanvraag loopt) en niet wat we hopen (dat het
+           straks alsnog aftrekbaar is): of dat zo is, hangt af van de
+           beschikking en haar datum, en dat stelt dit systeem niet vast. */
         tegenprestatie
           ? 'Je krijgt een factuur en geen giftbewijs. Een sponsorbedrag is geen aftrekbare gift.'
           : (aftrekbaar
             ? 'Je krijgt een giftbewijs; de RTFoundation is een ANBI (RSIN ' + g.rsin + ').'
-            : (g.anbi === 'onbekend'
-              ? 'Je krijgt een ontvangstbevestiging. Of deze gift aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet weten.'
-              : 'Je krijgt een ontvangstbevestiging. Deze gift is niet aftrekbaar.')),
+            : (g.anbi === 'aangevraagd'
+              ? 'Je krijgt een ontvangstbevestiging. De RTFoundation is op dit moment geen ANBI; de aanvraag loopt. Of deze gift daarmee alsnog aftrekbaar wordt, hangt af van de beschikking -- dat zeggen wij niet toe.'
+              : (g.anbi === 'onbekend'
+                ? 'Je krijgt een ontvangstbevestiging. Of deze gift aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet weten.'
+                : 'Je krijgt een ontvangstbevestiging. Deze gift is niet aftrekbaar.'))),
         vorm === 'periodiek'
           ? 'Een periodieke gift loopt ten minste vijf jaar en vraagt een vastgelegde overeenkomst. Zonder die overeenkomst is het een gewone gift.'
           : null

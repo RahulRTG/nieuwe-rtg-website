@@ -71,4 +71,10 @@ module.exports = ({ app, auth, geenGast, liveCodename, rtfos, veilig }) => {
     if (geenGast(req, res)) return;
     veilig(res, () => rtfos.gift.voorbereid(lijf(req)));
   });
+  /* De bevestiging: hier beweegt er geld. De codenaam komt uit de SESSIE en
+     niet uit het lijf -- anders geeft de een namens de ander. */
+  app.post('/api/rtfos/gift/bevestig', auth, schrijfRem, (req, res) => {
+    if (geenGast(req, res)) return;
+    veilig(res, () => rtfos.gift.bevestig(Object.assign({}, lijf(req), { codenaam: ik(req) })));
+  });
 };

@@ -61,11 +61,31 @@ vóór je iets bouwt: de moeilijke helft bestaat al.
 wereld, nooit bij een gebruiker ervan. Een gift hoort dus bij de RTFoundation
 als rechtspersoon, en niet op een wallet die toevallig van een bestuurder is.
 
+**GENOMEN (31 augustus 2026): de RTFoundation krijgt een eigen wallet zoals een
+leverancier er een heeft, en betaalt zichzelf daarvandaan uit naar haar eigen
+bankrekening.**
+
+Dat is geen vierde optie naast de drie hieronder maar de scherpste vorm van de
+eerste, en hij heeft een eigenschap die de andere twee misten: **er komt geen
+betaalweg bij.** `kern/pay/partner.js` boekt al van een lid naar
+`partner:<code>`, en uitbetalen naar de bank bestaat al als
+`/api/pay/zaak/uitbetalen` — met de reserveringen die niet meeverhuizen, een
+idempotentiesleutel, een betaalopdracht die opnieuw wordt ingediend met dezelfde
+sleutel, en een eerlijke stand "in behandeling" in plaats van "gelukt". De
+stichting is daarmee een houder van een wallet, niet een nieuwe geldstroom.
+
+Wat je ervoor accepteert, en het staat op het scherm: **de transactiekosten komen
+van de ontvanger af**, precies zoals bij elke andere ontvangst in dit huis. Een
+gift van € 25 komt binnen als € 24,65. Een scherm dat "100% gaat naar de buurt"
+zou beweren, zou dus liegen.
+
+De drie opties zoals ze voorlagen:
+
 | optie | wat het betekent | prijs |
 |---|---|---|
-| **A. Een RTF-positie in RTG Pay** | De stichting krijgt een eigen positie in de waardelaag; een gift is een boeking van lid naar entiteit. | Blijft binnen het gesloten circuit, dus geen nieuwe vergunningvraag. Maar: het geld staat dan bij RTG en moet er ook weer uit naar de bankrekening van de stichting — dat is de uitgang uit `TOKEN.md`, en die staat nog open. |
-| **B. Rechtstreeks naar de bankrekening** | RTG zet de gift klaar; de betaling gaat via de betaalnaad naar de stichting. | Schoonste scheiding: RTG raakt het geld niet aan. Vraagt wel een echte betaalaanbieder op naam van de stichting, en dan is RTG betaaldienstverlener voor een derde — een eigen vraag. |
-| **C. Allebei, met een schakelaar** | Klein bedrag via Pay, groot via de bank. | Twee wegen betekent twee keer verantwoorden, en `WAARDE.md` waarschuwt precies daarvoor: er komt geen tweede boekhouding bij. Ik raad het af. |
+| **A. Een positie in RTG Pay** — gekozen, als partnerwallet | Een gift is een boeking van lid naar de wallet van de stichting. | Blijft binnen het gesloten circuit. Het geld moet er wel weer uit naar de bank, en dat doet de stichting zelf langs de bestaande leveranciersweg. |
+| **B. Rechtstreeks naar de bankrekening** | RTG zet de gift klaar; de betaling gaat via de betaalnaad naar de stichting. | Schoonste scheiding, maar vraagt een eigen betaalaanbieder op naam van de stichting. |
+| **C. Allebei, met een schakelaar** | Klein bedrag via Pay, groot via de bank. | Twee wegen is twee keer verantwoorden. Afgeraden. |
 
 ### Besluit 2 — Neemt RTG online giften aan?
 
@@ -86,14 +106,20 @@ ze verschillen in wat ze juridisch zijn:
 Het model ligt er al (zie par. 2.3); wat ontbreekt is de eigen status én de
 aansluiting op het bewijs. Bepalend voor de tekst op het scherm:
 
-- **Ja** → het RSIN en de ANBI-status horen zichtbaar op de pagina, en het
-  giftbewijs mag zo heten. Ze worden dan één keer vastgelegd op de plek waar de
-  registratielaag ze al kent, en `bewijsbaar()` leest ze — niet een tweede
-  veld ernaast, want twee plekken die hetzelfde bedoelen lopen uiteen.
-- **Nee, of nog niet** → het stuk heet geen giftbewijs maar een
-  *ontvangstbevestiging*, en het scherm zegt erbij dat de gift niet aftrekbaar
-  is. Dat is geen kleine lettertjes-kwestie: het verschil zit in wat de gever
-  bij zijn aangifte mag invullen.
+**GENOMEN (31 augustus 2026): nog geen ANBI, de aanvraag loopt.** Daarvoor is
+`aangevraagd` een eigen stand geworden naast `onbekend`, `nee` en `ja` — vier
+knopstanden, vier zinnen die met de knop meebewegen. Wat `aangevraagd` de gever
+zegt is wat we weten en niet wat we hopen: *"of deze gift daarmee alsnog
+aftrekbaar wordt, hangt af van de beschikking — dat zeggen wij niet toe."* Of een
+beschikking terugwerkt, stelt dit systeem niet vast.
+
+- **ja** → het RSIN (negen cijfers, afgedwongen) hoort zichtbaar op de pagina en
+  het stuk heet giftbewijs.
+- **aangevraagd** → ontvangstbevestiging, met de lopende aanvraag erbij en zonder
+  toezegging.
+- **nee** → ontvangstbevestiging, en het scherm zegt dat de gift niet aftrekbaar is.
+- **onbekend** → ontvangstbevestiging, en het scherm zegt dat het niet vastligt.
+  Dat is iets anders dan "nee", en het leest ook anders.
 
 ## 4. Het ontwerp dat eruit volgt
 
@@ -150,45 +176,55 @@ al als grens in `WAARDE.md`.
 
 ## 6. Wat er inmiddels staat (31 augustus 2026)
 
-De voorbereiding is gebouwd; de knop niet. Drie bestanden en een toets:
+De drie besluiten zijn genomen en de keten is af: van klaarzetten tot een gift
+die echt op de wallet van de stichting staat.
 
 | bestand | wat het doet |
 |---|---|
-| `kern/rtfos/gift.js` | De **stand**: dicht of open, de ontvanger, de vormen, de ANBI-status. Boardroom-only. Hij kan niet open zonder ontvanger en vorm, en de weigering zegt welke van de twee ontbreekt. |
-| `kern/rtfos/gift-voornemen.js` | Het **voornemen**: wat er zou gebeuren. Gift of sponsoring, wel of niet eerst beoordeeld, giftbewijs of ontvangstbevestiging of factuur. Ledendeur. |
+| `kern/rtfos/gift.js` | De **stand**: dicht of open, de wallet, de vormen, de ANBI-stand. Boardroom-only. Kan niet open zonder wallet en vorm, en de weigering zegt welke ontbreekt. |
+| `kern/rtfos/gift-voornemen.js` | Het **voornemen**: wat er zou gebeuren. Gift of sponsoring, wel of niet eerst beoordeeld, en welk stuk je terugkrijgt. Betaalt niets. |
+| `kern/rtfos/gift-betalen.js` | De **bevestiging**, en de enige plek in deze laag waar geld beweegt. Rekent het voornemen opnieuw, boekt via `pay.partnerIn`, en maakt daarna de bron. |
 | `kern/rtfos/gift-vormen.js` | De drie woordenlijsten, één keer. |
-| `test/rtfos-gift.test.js` | Twaalf toetsen, waarvan er één zakt zodra deze laag de betaallaag aanroept of buiten `kern/rtfos` reikt. |
+| `kern/rtfos/geld-bron.js: bronUitGift` | De bron die uit een online gift ontstaat — derde naast subsidie en campagne, en met de herkomstcontrole erop, want dit is één gever en één bedrag. |
+| `test/rtfos-gift.test.js` | 21 toetsen. Vijf mutaties op de betaalstap geprobeerd, alle vijf gepakt. |
 
-Wat dat vandaag oplevert: de stand staat **dicht**, en wie hem uitleest krijgt
-een zin en een lijst van welke besluiten nog openstaan — geen grijze knop en
-geen storing. `voorbereid()` weigert dan met diezelfde zin.
+**Nagelopen in het echte grootboek**, niet alleen in een toets: een gift van
+€ 25 boekt `lid:… → partner:RTF-WALLET`, daarna `partner:RTF-WALLET →
+rtg:betaaldienst` van € 0,35, en de wallet van de stichting staat op € 24,65.
+Twee keer bevestigen met dezelfde idempotentiesleutel levert één gift op.
 
-Twee dingen die uit het bouwen zelf kwamen en die hierboven nog niet stonden:
+Vier dingen die uit het bouwen zelf kwamen:
 
-- **`onbekend` is een eigen waarde naast `nee`.** Niet vastgelegd leest anders
-  dan besloten-van-niet, en het voornemen zegt dat ook zo: *"of deze gift
-  aftrekbaar is, ligt niet vast; wij zeggen daar niets over dat wij niet
-  weten."* Zelfde regel als bij de fiscale klassen in `CLAUDE.md`.
-- **Sponsoring krijgt een factuur, geen ontvangstbevestiging.** Dat belooft
-  `donateur.js` al; het voornemen zei eerst iets anders, en dan hadden dit
-  scherm en het portaal een maand later niet hetzelfde gezegd.
+- **De uitkomst wordt op de server opnieuw gerekend.** Wat de browser meestuurt
+  over aftrekbaarheid of de naam van het stuk, telt niet mee; alleen invoer
+  telt (bedrag, vorm, en of er iets tegenover staat).
+- **De bron ontstaat ná de boeking.** Een bron zonder geld is een belofte in de
+  boekhouding van de stichting; mislukt de registratie wél, dan staat dat in het
+  antwoord in plaats van dat het verdwijnt.
+- **Sponsoring krijgt een factuur**, geen ontvangstbevestiging — dat belooft
+  `donateur.js` al.
+- **Zonder betaallaag gebeurt er niets en wordt dat gezegd** (503, "er is niets
+  afgeschreven"), in plaats van een lege tak die "ok" antwoordt.
 
-De ANBI-vraag blokkeert de knop met opzet **niet**: een stichting die geen ANBI
-is mag giften aannemen. Hij bepaalt alleen hoe het stuk heet dat de gever
-terugkrijgt.
+## 7. Wat er nog niet is
 
-## 7. Wat ik nodig heb om af te bouwen
+- **Het scherm voor de gever.** De routes staan (`gift/stand`, `gift/voorbereid`,
+  `gift/bevestig`); er is nog geen pagina die ze gebruikt.
+- **Het uitbetalen is niet gebouwd en hoeft dat ook niet**: de stichting logt in
+  als houder van haar wallet en gebruikt `/api/pay/zaak/uitbetalen`. Daar een
+  eigen knop naast zetten zou een tweede pad zijn voor dezelfde handeling.
+- **De periodieke gift** kan als vorm aan staan, maar de overeenkomst van vijf
+  jaar wordt nog steeds door een mens vastgelegd (`donateur.js: periodiekVast`).
+  Een incasso is er niet en komt er niet zonder een eigen besluit.
+- **En let op een derde plek waar ANBI al leeft.** `kern/rtfos/jaarverslag.js`
+  opent met *"Een ANBI moet publiceren. Dat is geen nette gewoonte maar een
+  voorwaarde"* en bouwt die publicatieplicht ook uit, onder `/publiek` en niet
+  achter een inlog. Dat module gaat er dus van uit dat de stichting er een is,
+  terwijl de giftstand nu vastlegt dat de aanvraag nog loopt. Die twee horen
+  elkaar te vinden zodra de beschikking er is — vandaag spreken ze elkaar niet
+  tegen op het scherm (het jaarstuk gaat over publiceren, de gift over
+  aftrekbaarheid), maar het is één status die op twee plekken wordt aangenomen.
 
-Drie antwoorden, meer niet:
-
-1. **Entiteit** — optie A, B of C uit besluit 1.
-2. **Vorm** — welke van de drie giftvormen opengaan (en in welke volgorde).
-3. **ANBI** — is de RTFoundation er zelf een, en zo ja: het RSIN. Bij nee heet
-   het stuk een ontvangstbevestiging en zegt het scherm dat de gift niet
-   aftrekbaar is.
-
-Met die drie is wat er nog rest overzichtelijk, want par. 6 staat er al: de
-schakelaar zetten (dat is het besluit zelf), het scherm voor de gever, en de
-stap waarin een bevestigde gift een **bron** wordt zodat `donateur.js` en
-`herkomst.js` hem oppakken. Die laatste stap is de enige waar geld bij komt
-kijken, en hij hoort langs `kern/pay/poort.js` — nergens anders.
+- **De ANBI-stand staat los van `foundationregistratie`.** Zodra de beschikking
+  er is, hoort het RSIN op de plek te komen waar die laag hem al kent, en niet
+  in een tweede veld. Nu staat hij in de giftstand.

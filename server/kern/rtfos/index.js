@@ -44,6 +44,8 @@
      risico           het risicoregister: beheerst is een bewering, niet een vinkje
      herkomst         grote en contante giften: het geld staat stil tot er gekeken is
      meldcode         de vijf wettelijke stappen bij zorg om een kind
+     ruil             de buurtruil tussen leden: spullen, zonder geld
+     gift             de giftstand, het voornemen en de bevestigde gift
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -52,11 +54,11 @@
 const kluis = require('../../kluis');
 
 module.exports = (state) => {
-  const { db, save, crypto, boardroomWie, magBoardroom } = state;
+  const { db, save, crypto, boardroomWie, magBoardroom, pay } = state;
   const ctx = require('./basis')({ db, save, crypto, boardroomWie, magBoardroom });
   // De schrijflaag en de kluis gaan mee op dezelfde context: elk deel schrijft
   // via dezelfde save() en versleutelt via dezelfde sleutel.
-  Object.assign(ctx, { db, save, crypto, kluis });
+  Object.assign(ctx, { db, save, crypto, kluis, pay });
 
   const steden = require('./steden')(ctx);
   const partners = require('./partners')(ctx);
@@ -91,6 +93,7 @@ module.exports = (state) => {
   const subsidies = require('./subsidies')(ctx, { bronUitSubsidie: geld.bronUitSubsidie });
   const voorraad = require('./voorraad')(ctx);
   const ruil = require('./ruil')(ctx);
+  ctx.bronUitGift = (x) => geld.bronUitGift(x);
   const gift = require('./gift')(ctx);
   const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
   const berichten = require('./berichten')(ctx);

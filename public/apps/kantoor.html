@@ -37,19 +37,32 @@
   .doelgroeptekst p{max-width:42rem;margin:.45rem auto 0;color:var(--rtg-soft);
     font-size:.76rem;line-height:1.55;}
   .doelgroeppoorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin-top:1rem;}
-  .doelgroeppoorten a{display:block;padding:.85rem;border:1px solid var(--rtg-line);
-    border-radius:0;color:inherit;text-decoration:none;}
+  /* Een kolom en geen blok: het bovenschrift hoort onderaan de kaart te staan,
+     ook als de ene omschrijving twee regels langer is dan de andere. Drie
+     kaarten met hun onderschrift op drie hoogtes lezen als drie losse dingen. */
+  .doelgroeppoorten a{display:flex;flex-direction:column;min-height:9rem;padding:1rem;
+    border:1px solid var(--rtg-line);border-radius:0;color:inherit;text-decoration:none;}
   .doelgroeppoorten a:hover,.doelgroeppoorten a:focus-visible{border-color:var(--gold-rand);}
-  .doelgroeppoorten b{display:block;font-size:.72rem;letter-spacing:.04em;}
-  .doelgroeppoorten span{display:block;margin-top:.3rem;color:var(--rtg-soft);
-    font-size:.68rem;line-height:1.45;}
+  /* De naam van een poort is een naam en geen label: Bodoni, zoals elke andere
+     kop op dit scherm. Hij stond in Inter op .72rem en verdween daarmee tussen
+     de omschrijving eronder. */
+  .doelgroeppoorten b{display:block;font:500 1.05rem "Bodoni Moda",serif;letter-spacing:.005em;}
+  .doelgroeppoorten span{display:block;margin-top:.4rem;color:var(--rtg-soft);
+    font-size:.7rem;line-height:1.5;}
+  .doelgroeppoorten .voet{display:flex;align-items:center;justify-content:space-between;
+    gap:.6rem;margin-top:auto;padding-top:1rem;}
+  .doelgroeppoorten .voet span{margin:0;}
+  /* De pijl zegt "hier ga je heen" en herhaalt dus wat de link al is: hij is
+     aria-hidden en staat er voor het oog. Goud mag hier wel: het is een teken
+     en geen tekst, en het draagt geen betekenis die alleen in de kleur zit. */
+  .doelgroeppoorten .pijl{flex:none;color:var(--gold-tekst);font-size:.8rem;}
   /* GOUD IS EEN ACCENT EN GEEN TEKSTKLEUR OP EEN ACCENT. Deze poorten krijgen
      per thema de accentgrond, en --gold-tekst haalde daarop 1,53:1 (champagne),
      2,4 (bordeaux) en 2,2 (royal) -- negen keer, op de regel die zegt voor wie
      de poort is. --rtg-muted is de gedempte toon die MET het thema meedraait en
      haalt 8,11 / 5,69 / 6,42:1 op diezelfde drie gronden. Het bovenschrift
      blijft dus klein en ingetogen, alleen leesbaar. */
-  .doelgroeppoorten em{display:block;margin-top:.7rem;color:var(--rtg-muted);
+  .doelgroeppoorten em{display:block;color:var(--rtg-muted);
     font-style:normal;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;}
   [hidden]{display:none!important;}
   @media(max-width:650px){.doelgroep{padding:.75rem}.doelgroepnav{gap:.25rem}
@@ -61,16 +74,28 @@
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="work">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
-<div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
-  <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
-  <div class="os-switcher__links">
-    <a href="/apps/rtg.html"><span>01</span>LivingOS</a>
-    <a href="/apps/kantoor.html" aria-current="page"><span>02</span>WorkOS</a>
-    <a href="/apps/reizen.html"><span>03</span>TravelOS</a>
-    <a href="/apps/foundation/os-publiek.html"><span>04</span>FoundationOS</a>
-  </div>
-  <span class="os-switcher__state">Kern verbonden</span>
-</div>
+<!-- DE WERELDSTROOK IS WEG EN DAT IS GEEN GAT. De vier werelden stonden hier
+     als eigen balk, boven een schil die ze al kende: rtg-edge-system.js zet ze
+     nu in de topbalk zelf, uit dezelfde rij als de wereldlijst in het menu. Twee
+     wereldkiezers boven elkaar zeggen twee keer waar je bent en kosten 40px van
+     het scherm. Draait de schil niet (embed, print), dan blijft de kruimel weg
+     en is de bank onderin de weg terug -- geen scherm zonder uitgang.
+
+     WAT HIER WEL STAAT ZIJN DE BLADEN VAN DEZE WERELD. Het is navigatie en geen
+     werkbladbeheer: elke tab is een gewoon adres, er wordt niets bewaard en er
+     staat geen tweede waarheid over "waar ben ik" naast de URL (dezelfde regel
+     als in shared/wereldschil.js). De plus opent de werkbank, waar bladen wel
+     naast elkaar leven -- dat is een ander scherm en met opzet.
+
+     RAHUL STAAT HIER NIET BIJ. Op LivingOS hangt hij als derde tab in deze
+     balk, maar daar draagt het scherm de Edge-schil niet; hier staat hij al
+     rechtsonder in de bank. Een tweede ingang naar hetzelfde gesprek is precies
+     wat shared/randen.js een tak geleden heeft weggehaald. -->
+<nav class="wereldtabs" aria-label="Bladen in WorkOS">
+  <a class="wereldtab" href="/apps/kantoor.html" aria-current="page">Vandaag</a>
+  <a class="wereldtab wereldtab-plus" href="/apps/werkruimte.html?gebied=kantoor"
+     aria-label="Werkbank openen: meerdere schermen naast elkaar">&#xFF0B;</a>
+</nav>
 
 <!-- WORK ORKESTREERT de kantoordomeinen en vervangt ze niet
      (PLATFORM.md). RTG Office, Agenda, Notities en Bestanden houden elk hun
@@ -171,19 +196,19 @@
     </nav>
     <div class="doelgroeptekst"><h2 id="workDoelgroepKop">Uw werkdag, op uw eigen naam.</h2><p id="workDoelgroepUitleg">Open uw dienst, taken, team, loon en persoonlijke werkplek. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.</p></div>
     <div class="doelgroeppoorten" data-work-paneel="personeel">
-      <a href="/apps/personeel.html"><b>Personeels-app</b><span>Dienst, taken, team, chat en vertrouwenslijn.</span><em>Open mijn werkdag</em></a>
-      <a href="/apps/loonstrook.html"><b>Mijn loon</b><span>Loonstroken van alle bedrijven waar u werkt.</span><em>Alleen voor u</em></a>
-      <a href="/apps/werk.html"><b>Mijn werkplek</b><span>De organisatieomgeving waarvoor u bent uitgenodigd.</span><em>Rolgestuurde toegang</em></a>
+      <a href="/apps/personeel.html"><b>Personeels-app</b><span>Dienst, taken, team, chat en vertrouwenslijn.</span><span class="voet"><em>Open mijn werkdag</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/loonstrook.html"><b>Mijn loon</b><span>Loonstroken van alle bedrijven waar u werkt.</span><span class="voet"><em>Alleen voor u</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/werk.html"><b>Mijn werkplek</b><span>De organisatieomgeving waarvoor u bent uitgenodigd.</span><span class="voet"><em>Rolgestuurde toegang</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
     </div>
     <div class="doelgroeppoorten" data-work-paneel="ondernemers" hidden>
-      <a href="/apps/onderneming.html"><b>Mijn onderneming</b><span>Van een eerste idee naar plan, oprichting en klant.</span><em>Voor ondernemers</em></a>
-      <a href="/apps/leverancier.html"><b>Mijn bedrijf</b><span>Orders, reserveringen, voorraad, personeel en bedrijfsregie.</span><em>Voor bestaande bedrijven</em></a>
-      <a href="/apps/concern.html"><b>Mijn concern</b><span>Meerdere bedrijven, vestigingen en mensen onder één dak.</span><em>Voor groepen</em></a>
+      <a href="/apps/onderneming.html"><b>Mijn onderneming</b><span>Van een eerste idee naar plan, oprichting en klant.</span><span class="voet"><em>Voor ondernemers</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/leverancier.html"><b>Mijn bedrijf</b><span>Orders, reserveringen, voorraad, personeel en bedrijfsregie.</span><span class="voet"><em>Voor bestaande bedrijven</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/concern.html"><b>Mijn concern</b><span>Meerdere bedrijven, vestigingen en mensen onder één dak.</span><span class="voet"><em>Voor groepen</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
     </div>
     <div class="doelgroeppoorten" data-work-paneel="aanmelden" hidden>
-      <a href="/apps/partner-worden.html"><b>Partneraanvraag</b><span>Meld een bestaand bedrijf gecontroleerd aan bij RTG.</span><em>Menselijke beoordeling</em></a>
-      <a href="/apps/onderneming.html"><b>Eerst voorbereiden</b><span>Werk uw idee, rechtsvorm en ondernemingsplan uit voordat u aanvraagt.</span><em>Geen Business Pass nodig</em></a>
-      <a href="/apps/app.html?pas=business"><b>Business Pass</b><span>Een actieve Business Pass is vereist om de partneraanvraag in te dienen.</span><em>Geen automatische toelating</em></a>
+      <a href="/apps/partner-worden.html"><b>Partneraanvraag</b><span>Meld een bestaand bedrijf gecontroleerd aan bij RTG.</span><span class="voet"><em>Menselijke beoordeling</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/onderneming.html"><b>Eerst voorbereiden</b><span>Werk uw idee, rechtsvorm en ondernemingsplan uit voordat u aanvraagt.</span><span class="voet"><em>Geen Business Pass nodig</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/app.html?pas=business"><b>Business Pass</b><span>Een actieve Business Pass is vereist om de partneraanvraag in te dienen.</span><span class="voet"><em>Geen automatische toelating</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
     </div>
   </section>
 
@@ -195,7 +220,13 @@
        ZE STAAN LEEG, EN DAT IS DE BELANGRIJKSTE REGEL VAN DIT BLOK. Een woord
        dat in de HTML staat, staat er ook als er niets is opgehaald -- en dat is
        precies de leugen die de stand niet mag vertellen. Wat u hier ziet komt
-       altijd van een meting, of het zegt 'Onbekend'. -->
+       altijd van een meting, of het zegt 'Onbekend'.
+
+       DE DRIE STAAN NAAST ELKAAR (`.cv-rij`, shared/canvas.css) en niet onder
+       elkaar. Dat is een opstelling en geen nieuwe laag: canvas.js tekent
+       precies hetzelfde in precies dezelfde doelen. Op een telefoon vallen ze
+       vanzelf terug op onder elkaar, in deze volgorde. -->
+  <div class="cv-rij">
   <div id="stand"></div>
   <div id="rust"></div>
 
@@ -210,6 +241,7 @@
     <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
     <div id="vandaag"></div>
   </section>
+  </div>
 
   <!-- HET REGISTER HOUDT DE REST, en met opzet niet ook vandaag: dan zou
        hetzelfde overleg twee keer op een scherm staan dat zijn hele bestaan
@@ -248,6 +280,14 @@
     <a class="wrooster-kaart" href="/apps/browser.html"><span>Web</span></a>
     <a class="wrooster-kaart" href="/apps/sitemaker.html"><span>Website</span></a>
   <!-- /WERELDROOSTER --></div></section>
+
+  <!-- De stille voetregel. Geen tweede Rahul en geen tweede menu: de bediening
+       staat in de bank onderin (WERELD.md). Wat hier staat is waar u bent en van
+       wie dit huis is -- twee dingen die op een wereldscherm mogen eindigen. -->
+  <footer class="wereldvoet">
+    <span>&copy; RTG &middot; WorkOS</span>
+    <span>Experience the elite class</span>
+  </footer>
 </main>
 
 <!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder

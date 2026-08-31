@@ -1,8 +1,18 @@
 /* De doorzoekbare functiebibliotheek en de live status van het RTG Edge System. */
 (function (w) {
   'use strict';
+  /* De volgorde staat op één plek en is die van WERELDEN.md: LivingOS, WorkOS,
+     TravelOS, FoundationOS. De topbalk (rtg-edge-system.js) leest dezelfde
+     rij, zodat de nummers 01..04 daar niet apart worden bijgehouden. */
+  var ORDE = ['living', 'work', 'travel', 'foundation'];
   function werelden(e, C) {
-    return '<nav class="rtg-edge-worlds" aria-label="Vier RTG werelden"><a href="' + C.work.home + '" ' + (e.key === 'work' ? 'aria-current="page"' : '') + '>WorkOS</a><a href="' + C.travel.home + '" ' + (e.key === 'travel' ? 'aria-current="page"' : '') + '>TravelOS</a><a href="' + C.living.home + '" ' + (e.key === 'living' ? 'aria-current="page"' : '') + '>LivingOS</a><a href="' + C.foundation.home + '" ' + (e.key === 'foundation' ? 'aria-current="page"' : '') + '>RTFoundation</a></nav>';
+    return '<nav class="rtg-edge-worlds" aria-label="Vier RTG werelden">' + ORDE.map(function (sleutel) {
+      var wereld = C[sleutel];
+      /* Het HUIS en niet de werkplek: een tik op een wereld brengt je naar het
+         wereldscherm uit MAPPEN. Zie de opmerking in rtg-edge-worlds.js. */
+      return '<a href="' + (wereld.huis || wereld.home) + '" ' +
+        (e.key === sleutel ? 'aria-current="page"' : '') + '>' + wereld.kaart + '</a>';
+    }).join('') + '</nav>';
   }
   function html(e, C, esc, icoon, actief) {
     var groepen = e.cfg.groups || [['Functies', e.cfg.tools]], nr = 0;
@@ -66,5 +76,5 @@
     var actief = document.activeElement, index = e.root.querySelector('.rtg-edge-index');
     if (actief && index.contains(actief)) actief.blur();
   }
-  w.RTGEdgeLibrary = { html: html, status: status, refresh: refresh, bind: bind, crumbs: crumbs, release: release };
+  w.RTGEdgeLibrary = { html: html, status: status, refresh: refresh, bind: bind, crumbs: crumbs, release: release, orde: ORDE };
 })(window);

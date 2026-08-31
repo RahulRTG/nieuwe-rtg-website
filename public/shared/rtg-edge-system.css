@@ -21,7 +21,7 @@ body.rtg-edge-host{min-width:320px;padding-top:calc(var(--edge-top) + env(safe-a
 .rtg-edge-chrome button,.rtg-edge-chrome a,.rtg-edge-chrome input{font:inherit}
 .rtg-edge-chrome button,.rtg-edge-chrome a{pointer-events:auto;border:0;background:none;color:inherit;cursor:pointer;text-decoration:none}
 .rtg-edge-chrome svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}
-.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
+.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto auto;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
 .rtg-edge-top{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
 .rtg-edge-top::after{content:"";position:absolute;left:var(--edge-side);bottom:-1px;width:96px;height:1px;background:linear-gradient(90deg,var(--edge-accent),transparent)}
 .rtg-edge-mark{height:var(--edge-top);display:grid;place-items:center;border-right:1px solid var(--edge-line);color:var(--edge-metal);font:600 14px/1 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.04em}
@@ -30,6 +30,17 @@ body.rtg-edge-host{min-width:320px;padding-top:calc(var(--edge-top) + env(safe-a
 .rtg-edge-crumbs button:last-of-type{max-width:42%;color:var(--edge-copy)}
 .rtg-edge-crumbs button:hover,.rtg-edge-crumbs button:focus-visible{color:var(--edge-metal);outline:0}
 .rtg-edge-crumbs i{font-style:normal;color:color-mix(in srgb,var(--edge-dim) 40%,transparent)}
+/* De vier werelden, in de balk zelf. Ze vervangen de losse `.os-switcher`-strook
+   die elk wereldscherm apart droeg; zie de opmerking in rtg-edge-system.js.
+   Het nummer is een merkteken en geen inhoud, dus het staat er klein, gedempt
+   en aria-hidden -- een schermlezer hoort "LivingOS", niet "nul een LivingOS". */
+.rtg-edge-worldbar{height:var(--edge-top);display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none}
+.rtg-edge-worldbar::-webkit-scrollbar{display:none}
+.rtg-edge-worldbar a{display:flex;align-items:center;gap:6px;padding:0 12px;border-left:1px solid rgba(255,255,255,.05);color:var(--edge-dim);font-size:8px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.rtg-edge-worldbar a span{color:color-mix(in srgb,var(--edge-metal) 70%,transparent);font-size:7px;letter-spacing:.06em}
+.rtg-edge-worldbar a:hover,.rtg-edge-worldbar a:focus-visible{color:var(--edge-copy);background:rgba(255,255,255,.03);outline:0}
+.rtg-edge-worldbar a[aria-current="page"]{color:var(--edge-copy);background:linear-gradient(180deg,transparent,var(--edge-accent-soft))}
+.rtg-edge-worldbar a[aria-current="page"] span{color:var(--edge-metal)}
 .rtg-edge-state{height:var(--edge-top);display:flex;align-items:center;gap:7px;padding:0 13px;border-left:1px solid rgba(255,255,255,.05);color:var(--edge-dim);font-size:7px;letter-spacing:.14em;text-transform:uppercase}
 .rtg-edge-state i{width:5px;height:5px;border-radius:50%;background:var(--edge-ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--edge-ok) 12%,transparent)}
 
@@ -74,6 +85,10 @@ body.rtg-edge-host .mgz-blok:not(.rtg-edge-ai-panel .mgz-blok),body.rtg-edge-hos
 
 /* De oude wereld-chrome verdwijnt pas wanneer de nieuwe schil actief is. */
 body.rtg-edge-host .tos-topbar,body.rtg-edge-host .tos-nav,body.rtg-edge-host .lo-rail,body.rtg-edge-host .lo-top,body.rtg-edge-host>.wereldapps{display:none!important}
+/* De wereldstrook van een wereldscherm hoort bij de oude chrome: zodra de schil
+   draait staan de vier werelden in de topbalk, en twee wereldkiezers boven
+   elkaar zeggen twee keer waar je bent. */
+body.rtg-edge-host .os-switcher{display:none!important}
 body.rtg-edge-host .prestatiekop,body.rtg-edge-host .hoofdtabs{display:none!important}body.rtg-edge-host .reisapp{padding-left:0!important}body.rtg-edge-host .reisapp>main{padding-bottom:1rem!important}
 body.travel-os.rtg-edge-host{padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-left:var(--edge-side)!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + 1rem)!important}
 body.travel-os.rtg-edge-host>.kop,body.travel-os.rtg-edge-host>header:not(.rtg-edge-top){top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
@@ -85,7 +100,7 @@ body.rtg-edge-embed .lo-rail,body.rtg-edge-embed .lo-top,body.rtg-edge-embed .lo
 
 @media(max-width:767px){
   :root{--edge-top:40px;--edge-side:44px;--edge-bottom:48px}
-  .rtg-edge-state span{display:none}.rtg-edge-state{padding:0 12px}.rtg-edge-bottom{grid-template-columns:var(--edge-side) 40px 59px minmax(0,1fr) 58px}.rtg-edge-layout{display:none!important}.rtg-edge-action{padding:0 9px}.rtg-edge-ai small{display:none}.rtg-edge-crumbs{padding:0 9px;gap:5px}.rtg-edge-crumbs button{max-width:34%}.rtg-edge-crumbs button:nth-of-type(2){display:none}.rtg-edge-crumbs i:nth-of-type(2){display:none}
+  .rtg-edge-state span{display:none}.rtg-edge-state{padding:0 12px}.rtg-edge-worldbar a{padding:0 8px;font-size:0}.rtg-edge-worldbar a span{font-size:8px;letter-spacing:.04em}.rtg-edge-bottom{grid-template-columns:var(--edge-side) 40px 59px minmax(0,1fr) 58px}.rtg-edge-layout{display:none!important}.rtg-edge-action{padding:0 9px}.rtg-edge-ai small{display:none}.rtg-edge-crumbs{padding:0 9px;gap:5px}.rtg-edge-crumbs button{max-width:34%}.rtg-edge-crumbs button:nth-of-type(2){display:none}.rtg-edge-crumbs i:nth-of-type(2){display:none}
   body.rtg-edge-host .lo-stage{display:block}.rtg-edge-host .lo-panel{display:none!important}.rtg-edge-host .lo-panel[data-edge-active]{display:block!important;height:100%}
   body.rtg-edge-host>#balk{box-sizing:border-box;width:calc(100vw - var(--edge-side));max-width:calc(100vw - var(--edge-side))}
 }

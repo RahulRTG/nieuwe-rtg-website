@@ -36,6 +36,22 @@ main{padding:0 var(--rtg-ruim) 1rem;max-width:820px;margin-inline:auto;}
 a.terug{display:inline-block;margin-top:1rem;font-size:.8rem;color:var(--rtg-soft);
   text-decoration:none;letter-spacing:.04em;}
 a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
+/* --- de bladen van een wereld ---
+   Navigatie en geen werkbladbeheer: elke tab is een adres. Zie de opmerking bij
+   `.wereldtabs` in apps/kantoor.html voor waarom Rahul hier niet bij staat. */
+.wereldtabs{display:flex;align-items:stretch;gap:.4rem;margin:.6rem 0 0;
+  border-bottom:1px solid var(--rtg-line);}
+.wereldtab{display:flex;align-items:center;min-height:2.75rem;padding:0 1.1rem;
+  border:1px solid var(--rtg-line);border-bottom:0;color:var(--rtg-soft);
+  text-decoration:none;font-size:.82rem;letter-spacing:.02em;}
+.wereldtab:hover,.wereldtab:focus-visible{color:var(--rtg-txt);border-color:var(--gold-rand);}
+/* De actieve tab draagt zijn merk aan de BOVENkant en niet als vlak: een gevuld
+   blok zou hem zwaarder maken dan de kop eronder, en dit is navigatie. */
+.wereldtab[aria-current="page"]{color:var(--rtg-txt);
+  box-shadow:inset 0 2px 0 var(--gold-rand);}
+.wereldtab-plus{margin-left:auto;min-width:2.75rem;justify-content:center;
+  color:var(--gold-tekst);font-size:.95rem;}
+
 .merkkop{display:flex;align-items:flex-start;gap:1rem;padding:.7rem 0 1.1rem;}
 .merkkop h1{margin:0;font-size:clamp(2rem,8vw,2.6rem);line-height:1.02;letter-spacing:0.005em;}
 .merkkop .onder{display:block;margin-top:.45rem;font-size:.68rem;letter-spacing:.22em;
@@ -125,6 +141,12 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
 .reis .pijl{align-self:center;padding-left:.4rem;color:var(--rtg-soft);flex:none;}
 
 /* --- de wereld: vier poorten, gelijk van maat, icoon in goud --- */
+/* De voet van een wereldscherm: waar u bent en van wie dit huis is, verder
+   niets. Klein, gedempt en met ruimte boven de bank onderin. */
+.wereldvoet{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  margin-top:2.4rem;padding:1rem 0 2.5rem;border-top:1px solid var(--rtg-line);
+  font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-soft);}
+
 .poorten{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.55rem;}
 .poort{display:block;padding:1rem .7rem;border:1px solid var(--rtg-line);
   border-radius:0;text-align:center;color:inherit;text-decoration:none;}

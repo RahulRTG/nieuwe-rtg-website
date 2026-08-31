@@ -21,7 +21,7 @@
     var ctx = Object.assign({ scope: cfg.kort, title: d.title.replace(/\s*[|·-].*$/, ''), actie: cfg.actie, tool: '' }, o.context || {});
     d.body.classList.add('rtg-edge-host'); d.body.dataset.rtgWorld = key;
     var root = d.createElement('div'); root.className = 'rtg-edge-chrome';
-    root.innerHTML = '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Naar ' + cfg.naam + '">RTG</a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Beveiligd</span></button></header>' +
+    root.innerHTML = '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Naar ' + cfg.naam + '">RTG</a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><nav class="rtg-edge-worldbar" aria-label="De vier RTG-werelden"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Beveiligd</span></button></header>' +
       '<aside class="rtg-edge-side"><div class="rtg-edge-scope"></div><nav class="rtg-edge-tools" aria-label="Snelle functies"></nav></aside>' +
       '<section class="rtg-edge-index" aria-hidden="true"></section><section class="rtg-edge-status-panel" aria-hidden="true"></section>' +
       '<section class="rtg-edge-ai-panel" aria-hidden="true"><div class="rtg-edge-ai-empty"><span><b>Rahul staat klaar.</b>Log in voor uw beveiligde gesprek.<a href="/apps/app.html">Inloggen →</a></span></div></section>' +
@@ -34,6 +34,20 @@
     if (!A) return;
     var e = A, c = e.ctx, t = e.cfg.tools, cr = e.root.querySelector('.rtg-edge-crumbs');
     cr.innerHTML = '<button type="button" data-crumb="home">' + esc(e.cfg.naam) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="scope">' + esc(c.scope) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="current">' + esc(c.title) + '</button>';
+    /* DE WERELDEN STAAN IN DE BALK EN NIET MEER IN EEN EIGEN STROOK. Elk
+       wereldscherm droeg zijn eigen `.os-switcher`: dezelfde vier namen, in
+       eigen opmaak, op vier plekken overgetikt -- en boven een schil die die
+       vier al kende (`.rtg-edge-worlds` in het menu). Nu staan ze hier, uit
+       dezelfde rij als die menulijst, dus in dezelfde volgorde en met hetzelfde
+       adres. Verdwijnt een wereld, dan verdwijnt hij op beide plekken. */
+    var wb = e.root.querySelector('.rtg-edge-worldbar');
+    wb.innerHTML = (L.orde || []).map(function (sleutel, i) {
+      var wereld = C[sleutel];
+      if (!wereld) return '';
+      return '<a href="' + (wereld.huis || wereld.home) + '"' +
+        (sleutel === e.key ? ' aria-current="page"' : '') + '>' +
+        '<span aria-hidden="true">0' + (i + 1) + '</span>' + esc(wereld.kaart) + '</a>';
+    }).join('');
     e.root.querySelector('.rtg-edge-scope').textContent = c.scope;
     e.root.querySelector('.rtg-edge-tools').innerHTML = t.map(function (x, i) { return '<a class="rtg-edge-tool" data-tool="' + x[0] + '" data-shortcut="' + (i + 1) + '" href="' + x[3] + '" aria-label="' + esc(x[1]) + '" ' + ((c.tool === x[0] || (!c.tool && actief(x))) ? 'aria-current="page"' : '') + '>' + s(x[2]) + '<span class="rtg-edge-tip">' + esc(x[1]) + '<kbd>Alt+' + (i + 1) + '</kbd></span></a>'; }).join('');
     e.root.querySelector('.rtg-edge-action button').textContent = c.actie || e.cfg.actie;

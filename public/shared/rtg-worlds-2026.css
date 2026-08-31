@@ -463,8 +463,7 @@ body[data-rtg-world="travel"] .prestatiekop>p{color:var(--op-onyx);}
 body[data-rtg-world="travel"] .rtgmerk{color:var(--bordeaux-tekst);}
 body[data-rtg-world="travel"] .dagkop{
   position:relative;
-  padding:clamp(1rem,3vw,2rem) 0 clamp(2rem,4vw,3.4rem);
-  border-bottom:1px solid var(--onyx-rand);
+  border-bottom:1px solid var(--bordeaux-rand);
 }
 body[data-rtg-world="travel"] .dagkop::after{
   content:"03 / TRAVELOS";

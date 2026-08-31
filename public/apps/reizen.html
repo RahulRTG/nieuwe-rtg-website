@@ -61,32 +61,48 @@
              de klok lag over de bestemmingsnaam heen, omdat de titel op de
              VENSTERbreedte schaalde en de klok absoluut in dezelfde kaart
              stond. Wat een eigen kolom heeft, kan nergens overheen vallen. -->
-        <!-- HOOFDKOLOM EN KOMPAS. Links waar u bent (de reis), rechts wat u
-             erover moet weten: de tijd, wat er vandaag op de klok staat en de
-             stand van de onderdelen. Dat is dezelfde verdeling als in de andere
-             wereldhuizen -- en het houdt de klok uit de fotokaart, waar hij over
-             de bestemmingsnaam heen viel. -->
+        <!-- HOOFDKOLOM EN KOMPAS. Links de reis zoals hij vandaag loopt, rechts
+             wat u erover moet weten. Dezelfde verdeling als de andere
+             wereldhuizen: een brede werkkolom met kaarten, en een smalle kolom
+             met losse feiten. De klok staat in die smalle kolom en niet meer in
+             de fotokaart, waar hij over de bestemmingsnaam heen viel. -->
         <div class="dagdek">
           <div class="daghoofd">
-            <div class="dagkop">
-              <div class="dagkop-inhoud">
-                <p class="micro" id="groet">GOEDEMIDDAG</p>
-                <div class="bestemmingkop">
-                  <h1 id="titelVandaag">IBIZA</h1>
-                  <span class="gereed" id="gereedTeller">4/4 GEREED</span>
-                </div>
-                <p class="sub" id="dagzin">Alles staat klaar.</p>
-              </div>
-            </div>
+            <header class="dagtitel">
+              <p class="micro"><span id="groet">GOEDEMIDDAG</span></p>
+              <h1 id="titelVandaag">IBIZA</h1>
+              <p class="sub" id="dagzin">Alles staat klaar.</p>
+            </header>
 
-            <div class="vandaagraster" id="dagRaster" hidden>
-              <section class="volgendblok" aria-labelledby="volgendTitel">
-                <div class="micro" id="volgendTitel">VOLGENDE</div>
-                <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
-                <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
-                <div class="vluchtregel"><span id="volgendExtra"></span></div>
-                <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
-              </section>
+            <!-- DE MOMENTEN VAN VANDAAG. De onderdelen van deze reis als strook,
+                 met de tijd eronder -- gevuld uit dezelfde lijst als de rest van
+                 het scherm (kern/reiswereld). Er staan hier geen mensen: dit
+                 huis verzint geen reisgenoten. -->
+            <section class="strook" aria-labelledby="strookTitel">
+              <div class="strookkop">
+                <h2 id="strookTitel">Momenten van deze reis</h2>
+                <span class="gereed" id="gereedTeller">0/0 GEREED</span>
+              </div>
+              <div class="pionnen" id="momenten"><p class="leegtekst">Uw reisgegevens worden veilig opgehaald…</p></div>
+            </section>
+
+            <div class="kaartraster">
+              <div class="dagkop">
+                <div class="dagkop-inhoud">
+                  <p class="micro">DE BESTEMMING</p>
+                  <p class="sub" id="dagbeeldzin">Uw volgende reis in beeld.</p>
+                </div>
+              </div>
+
+              <div class="vandaagraster" id="dagRaster" hidden>
+                <section class="volgendblok" aria-labelledby="volgendTitel">
+                  <div class="micro" id="volgendTitel">VOLGENDE</div>
+                  <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
+                  <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
+                  <div class="vluchtregel"><span id="volgendExtra"></span></div>
+                  <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
+                </section>
+              </div>
             </div>
 
             <form class="rahulsnel" data-rahul-snel>
@@ -97,10 +113,7 @@
           </div>
 
           <aside class="kompas" aria-label="Kompas">
-            <section class="kompaskaart klokpaneel" aria-label="Lokale tijd">
-              <span class="micro">LOKALE TIJD</span>
-              <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
-            </section>
+            <p class="kompaslabel">KOMPAS</p>
 
             <section class="kompaskaart" id="vandaagVak" hidden aria-labelledby="canvasVandaagTitel">
               <!-- DE TELLER HOORDE ERBIJ EN ONTBRAK. tekenVandaag() zet hier het aantal
@@ -109,8 +122,13 @@
                    op null -- en die uitzondering brak de HELE reizenlijst af: #komend
                    toonde "Cannot set properties of null" in plaats van de reizen, ook na
                    een geslaagde toevoeging. Een ontbrekende span die een lijst leegt. -->
-              <div class="kompaskop"><h2 id="canvasVandaagTitel" class="micro">VANDAAG OP DE KLOK</h2><span id="telVandaag" class="tel"></span></div>
+              <div class="kompaskop"><h2 id="canvasVandaagTitel" class="micro">VANDAAG</h2><span id="telVandaag" class="tel"></span></div>
               <div id="vandaag"></div>
+            </section>
+
+            <section class="kompaskaart klokpaneel" aria-label="Lokale tijd">
+              <span class="micro">LOKALE TIJD</span>
+              <div data-rtg-klok="ring" aria-label="Officiële RTG-klok">--:--</div>
             </section>
 
             <section class="kompaskaart" aria-labelledby="standTitel">

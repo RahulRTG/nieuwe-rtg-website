@@ -23,6 +23,36 @@ module.exports = (kern) => {
      niet te plaatsen was komt mee terug in `los`, met de reden. */
   app.post('/api/reis/reizen', auth, (req, res) => res.json(kern.mijnReizen(req.session.key)));
 
+  /* HET REISGEZELSCHAP (kern/reisgezelschap.js). Alles hier loopt over dezelfde
+     poort: wat een ander van uw reis ziet, bepaalt `zicht()` en niet de route.
+     Een route die zelf zou filteren, is de tweede plek waar dat gebeurt -- en
+     dan lekt er ooit een boekingsnummer via de ene terwijl de andere dichtzit. */
+  const gez = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  app.post('/api/reis/gezelschap', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.gezelschap(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/nodig-uit', auth, (req, res) => {
+    const b = req.body || {};
+    gez(res, kern.reisgezelschap.nodigUit(req.session.key, String(b.reis || ''), b.codenaam, b.rol));
+  });
+  app.post('/api/reis/gezelschap/antwoord', auth, (req, res) => {
+    const b = req.body || {};
+    gez(res, kern.reisgezelschap.antwoord(req.session.key, String(b.id || ''), b.ja === true));
+  });
+  app.post('/api/reis/gezelschap/weg', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.verwijder(req.session.key, String((req.body || {}).id || ''))));
+  app.post('/api/reis/gezelschap/kring', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.mijnKring(req.session.key)));
+  /* De reis zoals DEZE lezer hem mag zien -- de eigenaar zijn eigen reis, een
+     reisgenoot of meekijker de uitgeklede vorm, met erbij wat hij niet ziet. */
+  app.post('/api/reis/gezelschap/reis', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.reisVoor(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/tijdlijn', auth, (req, res) =>
+    gez(res, kern.reisgezelschap.tijdlijn(req.session.key, String((req.body || {}).reis || ''))));
+  app.post('/api/reis/gezelschap/schrijf', auth, (req, res) => {
+    const b = req.body || {};
+    gez(res, kern.reisgezelschap.schrijf(req.session.key, String(b.reis || ''), b.tekst));
+  });
+
   /* DE REISWACHT (REIZEN.md fase 3): de signalen rond de komende reizen, met
      per bron of hij gemeten is, stilviel of simpelweg niet bestaat. Alleen
      lezen; en het antwoord zegt zelf dat het een momentopname is. */

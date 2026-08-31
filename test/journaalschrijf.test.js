@@ -41,27 +41,6 @@ const { maakJournaalbestand } = require('../server/kern/journaalbestand');
    die bijna niemand meer loopt. */
 const mappen = [];
 test.after(() => { for (const d of mappen) { try { fs.rmSync(d, { recursive: true, force: true }); } catch (e) {} } });
-
-/* WAAROM DEZE VIJF TOETSEN JARENLANG NIETS BEWAAKTEN.
-
-   De spoeling van het journaal hangt aan een setTimeout met unref() -- terecht,
-   want een wachtende spoeling hoort het afsluiten van de server niet tegen te
-   houden (zie kern/doorgeefjournaal.js). Maar in een KAAL toetsproces is die
-   timer het enige wat er nog loopt: Node ziet een lege lus, sluit af, en de
-   testloper meldde vijf keer `cancelledByParent -- Promise resolution is still
-   pending but the event loop has already resolved`.
-
-   Vijf toetsen die de belangrijkste eigenschap van deze laag bewaken (hoe vaak
-   er naar schijf wordt geschreven) draaiden dus helemaal niet, en dat viel niet
-   op omdat de loper ze als `cancelled` telt en niet als `fail`.
-
-   `wakker()` houdt de lus met opzet WEL in de lucht zolang een toets wacht. Dat
-   verzwakt geen enkele bewering -- er wordt nog steeds geteld en niet geklokt --
-   het maakt alleen dat de toets lang genoeg leeft om te zien wat hij meet. */
-function wakker() {
-  const t = setInterval(() => {}, 50);
-  return () => clearInterval(t);
-}
 function verseMap() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-jschrijf-')); mappen.push(d); return d; }
 // Hoe vaak is er ECHT naar schijf geschreven? De grootte van het logbestand
 // verandert alleen bij een spoeling, dus tellen we de spoelingen via de map.
@@ -87,24 +66,41 @@ test('na de wachttijd wordt er precies EEN keer gespoeld', async () => {
      AFWEZIGHEID; daar is de tijd zelf de meting en blijven ze staan.) */
   let gespoeld;
   const eersteSpoeling = new Promise((r) => { gespoeld = r; });
+  /* EEN ANKER, EN DIT IS GEEN WACHTEN OP DE KLOK.
+
+     De spoeling van het journaal hangt aan een setTimeout met unref() -- met
+     opzet, want een wachtende spoeling hoort het afsluiten van de server niet
+     tegen te houden (server/kern/doorgeefjournaal.js). Een unref'd timer houdt
+     de gebeurtenislus echter ook niet wakker: is er verder niets te doen, dan
+     besluit node dat het werk op is, en dan meldt de testrunner "Promise
+     resolution is still pending but the event loop has already resolved" en
+     BREEKT DEZE HELE BESTAND AF -- de vier toetsen hieronder werden zo mee
+     afgebroken zonder ooit gedraaid te hebben.
+
+     Op node v24 gebeurde dat niet en op v22 wel; allebei zitten ze binnen de
+     engines-band van dit huis, dus dit is geen versieprobleem maar een
+     onuitgesproken aanname in de toets. Het anker is een gewone, WEL
+     vastgehouden timer die alleen bestaat zolang we wachten: hij meet niets en
+     bepaalt niets -- hij houdt de lus wakker zodat de spoeling nog kan komen.
+     Zodra ze er is, gaat hij weg. */
+  const anker = setTimeout(() => {}, 30000);
   const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null,
     save: () => { schrijfacties++; gespoeld(); } });
   for (let i = 0; i < 50; i++) j.journaalBinnen({ wat: '/api/weg', methode: 'GET', status: 500, mislukt: true });
   /* EERST WACHTEN OP DE SPOELING, DAN OP DE STILTE ERNA -- en dat tweede stond
      er niet. Zonder die tweede wacht meet deze toets alleen dat er EEN keer is
-     gespoeld op het moment dat de eerste spoeling binnenkomt, en dat is per
+     gespoeld op het MOMENT dat de eerste spoeling binnenkomt, en dat is per
      definitie waar. Nagemeten met een mutatie: haal de rem (`if (spoelt)
      return`) uit kern/doorgeefjournaal.js en er komen vijftig spoelingen -- en
-     deze toets bleef gewoon groen, want hij keek op het moment dat er nog maar
-     een geweest was. Een toets die je niet hebt zien zakken, is geen toets.
+     deze toets bleef gewoon groen. Een toets die je niet hebt zien zakken, is
+     geen toets.
 
-     De spoeling blijft het sein dat het venster om is; de wacht erna is wat
-     "PRECIES een keer" tot een meting maakt. */
-  const stop1 = wakker();
+     Het anker hierboven blijft nodig voor de EERSTE wacht (die hangt aan een
+     unref'd timer); de tweede houdt de lus zelf wakker. */
   try {
     await eersteSpoeling;
     await new Promise(r => setTimeout(r, 1300));
-  } finally { stop1(); }
+  } finally { clearTimeout(anker); }
   assert.equal(schrijfacties, 1,
     'vijftig mislukkingen binnen een seconde horen samen EEN schrijfactie te kosten, niet vijftig');
 });
@@ -113,7 +109,7 @@ test('een geslaagd verzoek raakt de schijf sowieso niet', async () => {
   let schrijfacties = 0;
   const j = maakDoorgeefjournaal({ db: { data: {} }, bestand: null, save: () => { schrijfacties++; } });
   for (let i = 0; i < 200; i++) j.journaalBinnen({ wat: '/api/lijstje', methode: 'GET', status: 200 });
-  { const s = wakker(); try { await new Promise(r => setTimeout(r, 1300)); } finally { s(); } }
+  await new Promise(r => setTimeout(r, 1300));
   assert.equal(schrijfacties, 0, 'gewoon verkeer hoort het journaal niets te kosten');
 });
 
@@ -147,11 +143,8 @@ test('bestandsweg: na de wachttijd staat alles er, in EEN spoeling', async () =>
      goede -- hij brak op de INHOUD -- maar de wachtschuldmeter kan dat niet zien
      en telde het slaapje als wachten op de klok. De helper doet hetzelfde en
      zegt het in een regel. */
-  const stop2 = wakker();
-  try {
-    await wachtOpBestand(map, (naam, lees) => naam === 'huidig.log' && regels(lees()) >= 50,
-      { tijdgrens: 3000 });
-  } finally { stop2(); }
+  await wachtOpBestand(map, (naam, lees) => naam === 'huidig.log' && regels(lees()) >= 50,
+    { tijdgrens: 3000 });
   const inhoud = fs.readFileSync(path.join(map, 'huidig.log'), 'utf8');
   assert.equal(regels(inhoud), 50, 'alle vijftig regels staan erin');
   assert.equal(fs.readdirSync(map).length, 1,
@@ -163,6 +156,6 @@ test('bestandsweg: een geslaagd verzoek raakt de schijf sowieso niet', async () 
   const boek = maakJournaalbestand({ dir: map, vensterMs: 30 });
   const j = maakDoorgeefjournaal({ db: { data: {} }, save: () => {}, bestand: boek });
   for (let i = 0; i < 200; i++) j.journaalBinnen({ wat: '/api/lijstje', methode: 'GET', status: 200 });
-  { const s = wakker(); try { await new Promise(r => setTimeout(r, 200)); } finally { s(); } }
+  await new Promise(r => setTimeout(r, 200));
   assert.equal(schrijfacties(map), 0, 'gewoon verkeer hoort het journaal niets te kosten');
 });

@@ -67,14 +67,27 @@ function loopMap(map, filter, doe) {
    afnemers vragen hem twee keer (bewijsmatrix.js) en dat hoeft niet twee keer
    een server te kosten. */
 let _kaart = null;
+function haalKaart() {
+  return execFileSync(process.execPath,
+    [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
+    { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+}
 function routekaart() {
   if (_kaart) return _kaart;
   let uit;
   try {
-    uit = execFileSync(process.execPath,
-      [path.join(WORTEL, 'scripts', 'routekaart.js'), '--json'],
-      { cwd: WORTEL, encoding: 'utf8', timeout: 300000, maxBuffer: 64 * 1024 * 1024,
-        stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PORT: '', RTG_DATA_DIR: '' } });
+    try {
+      uit = haalKaart();
+    } catch (e) {
+      /* EEN BEZETTE POORT IS GEEN BEVINDING. Het kind kiest zelf een vrije
+         poort, maar tussen loslaten en luisteren past een andere server -- en
+         in de CI staan er tientallen naast elkaar. Precies EEN keer opnieuw,
+         en alleen hierop: elke andere fout gaat ongewijzigd naar boven, want
+         herhalen tot het lukt is hoe een echte storing onzichtbaar wordt. */
+      if (!/EADDRINUSE/.test(String(e.stderr || '') + String(e.message || ''))) throw e;
+      uit = haalKaart();
+    }
   } catch (e) {
     /* DE REDEN MEE NAAR BOVEN. Hier stond stderr op 'ignore', en toen dit
        kindproces een keer omviel tijdens de volle suite las de toets alleen

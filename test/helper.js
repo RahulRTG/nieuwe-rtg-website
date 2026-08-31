@@ -1080,11 +1080,35 @@ async function veegDoor(page, doos, opties) {
       /* De regel uit zijn rechthoek, niet het toevallige bovenste element op
          dat punt. Na een langdruk kan daar nog één frame een verdwijnende
          dialoog liggen; de rij zelf is de ingang die deze proef bedoelt. */
-      const doel = [...document.querySelectorAll('.gb-rij')].find((rij) => {
+      /* DE RIJ OP DAT PUNT, EN ANDERS DE DICHTSTBIJZIJNDE.
+
+         De rechthoek komt van de aanroeper, die hem vóór deze poging heeft
+         opgemeten. Tekent de lijst zich daartussen opnieuw (een badge die
+         binnenkomt, een rij die van hoogte verandert), dan ligt er op dat punt
+         geen rij meer en gaf deze poging `false` -- waarna de toets meldde dat
+         "de gebaarbedrading zelf stuk" was. Dat is de verkeerde conclusie uit
+         het juiste feit: er is niets stuk, het meubel is verschoven.
+
+         Dus: eerst de rij die het punt echt bevat, en anders de rij waarvan het
+         midden er verticaal het dichtst bij ligt. Zakken doet deze poging nog
+         steeds -- als er GEEN enkele rij is, of als de laag de beweging niet
+         oppakt -- en de melding zegt nu welke van de twee het was. */
+      const rijen = [...document.querySelectorAll('.gb-rij')];
+      if (!rijen.length) return 'geen-rij';
+      const raakt = rijen.find((rij) => {
         const r = rij.getBoundingClientRect();
         return x0 >= r.left && x0 <= r.right && y >= r.top && y <= r.bottom;
       });
-      if (!doel) return false;
+      const doel = raakt || rijen.slice().sort((a, b) => {
+        const ma = a.getBoundingClientRect(), mb = b.getBoundingClientRect();
+        return Math.abs((ma.top + ma.bottom) / 2 - y) - Math.abs((mb.top + mb.bottom) / 2 - y);
+      })[0];
+      if (!doel) return 'geen-rij';
+      /* Op de rij die we werkelijk pakken, en niet op de oude coordinaten: na
+         een herteking kan die een stuk hoger of lager liggen. */
+      const doelDoos = doel.getBoundingClientRect();
+      y = doelDoos.top + doelDoos.height / 2;
+      x0 = Math.min(Math.max(x0, doelDoos.left + 4), doelDoos.right - 4);
       const pid = 917;
       const stuur = (type, x, buttons) => doel.dispatchEvent(new PointerEvent(type, {
         bubbles: true, cancelable: true, view: window, pointerId: pid,
@@ -1098,11 +1122,12 @@ async function veegDoor(page, doos, opties) {
         for (let i = 2; i <= stappen; i++) stuur('pointermove', x0 + (px * i) / stappen, 1);
       }
       stuur('pointerup', x0 + (begon ? px : eerste), 0);
-      return begon;
+      return begon ? true : 'niet-opgepakt';
     }, { x0, y, px, stappen, eerste });
-    if (!rendererPoging) {
-      throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling; ' +
-        'dan is de gebaarbedrading zelf stuk.');
+    if (rendererPoging !== true) {
+      throw new Error('het gebaar begon niet via browserinput en ook niet in één rendererhandeling (' +
+        (rendererPoging === 'geen-rij' ? 'er stond geen enkele .gb-rij op het scherm'
+          : 'de gebaarlaag pakte de beweging niet op') + '); dan is de gebaarbedrading zelf stuk.');
     }
   } finally {
     await cdp.detach();

@@ -672,6 +672,31 @@ daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
 Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
 juridische oordeel blijft bij een mens.
 
+**`TIKKEN.md` zegt hoe diep het huis is** -- hoeveel tikken elke functie van het
+beginscherm af ligt, gemeten met `scripts/tikken.js` in een echte browser op
+telefoonformaat en niet geschat. De belofte staat er in twee helften, en de
+tweede is even hard als de eerste: **elke functie van een lid ligt binnen vijf
+tikken, en elk scherm dat er niet ligt draagt een uitgeschreven reden** (ROL,
+LANDING of STAND, in `MET_REDEN`). Een belofte "alle schermen" zou het huis
+dwingen een meldkamer op het beginscherm van een lid te zetten -- daarom meet de
+meter per ROL (lid, zaak, kantoor), elk met een echte sessie, en telt de kortste
+weg van de mens die er hoort te komen. Een rol die niet ingelogd kon worden laat
+de controle zakken: niet gemeten mag nooit als "in orde" langskomen. Lees die vóór je
+een scherm toevoegt of een menu verandert. Twee dingen daar niet wegpoetsen: de
+meter telt alleen ECHTE bestemmingen (een knop die zijn adres alleen in
+JavaScript kent, bestaat niet voor hem -- daarom is hij niet met een belofte op
+te poetsen, en daarom draagt elke rij van de sprong zijn `data-url`), en de korte
+weg zelf, `shared/sprong.js`, verzint geen bestemmingen: zijn lijst wordt
+AFGELEID uit `MAPPEN` door `scripts/sprongindex.js`. Er komt geen tweede lijst
+apps bij en geen tweede spotlight naast die van de leden-app. De sprong toont ook
+HANDELINGEN: die van dit scherm komen uit `RTGAppMenu.functies()` (dezelfde lijst
+als het app-menu, geen kopie), die van andere apps uit
+`shared/handelingindex.json` -- gelezen uit de knoppen van de schermen zelf, en
+een tik brengt je ERHEEN zonder iets uit te voeren. Of dat werkt is niet beweerd
+maar gemeten: `scripts/vindbaar.js` (`VINDBAAR.json`) vraagt of je een functie
+terugvindt met het woord dat erop staat, en die stond op 21% voordat de
+handelingen erin zaten.
+
 **`TOEGANKELIJK.md` zegt wat een mens met een handicap hier wel en niet kan** — per soort barrière, met de meting erbij en met de dingen die geen poort ooit ziet. Lees die vóór je iets aan een scherm verandert. De harde poorten (contrast en structuur op nul in beide staten, de springlink, het ondertitelregister, en elk raakvlak minstens 24x24 op telefoonformaat) staan erin met wat ze tegenhouden; daaronder staat per mens waar het ophoudt. De belangrijkste zin is de laatste: er is nog nooit iemand met een handicap door dit huis gelopen, dus alles wat daar staat is gemeten met een browser en niet met een mens.
 **`PROOF.md` is het diepte-document van de vertrouwenslaag** (werknaam RTG
 ProofOS): vertrouwen als levende uitkomst in plaats van instelling. De

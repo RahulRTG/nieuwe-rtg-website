@@ -1,4 +1,12 @@
 {
+  "stempel": {
+    "op": "2026-08-31T07:20:06.653Z",
+    "commit": "07eb7c2c",
+    "boomVuil": true,
+    "node": "v22.22.2"
+  },
+  "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
+  "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
   "toetsen": {
     "a11ykeuring.test.js": {
       "soort": "puur",
@@ -5979,6 +5987,19 @@
       "gezakt": 1,
       "geprobeerd": 33
     },
+    "sprong.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "overleefd"
+    },
+    "sprongindex.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "sso.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6986,6 +7007,15 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "wereldrooster.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 1,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "overleefd"
     },
     "wereldroutes.test.js": {
       "soort": "server",

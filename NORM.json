@@ -25,7 +25,7 @@
     "kernGedeeld": 212,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 426,
+    "toetsenNietGemeten": 427,
     "toetsenOngevoeligPct": 1,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -127,6 +127,15 @@
       "meter": "kernBreedte 1494 -> 1501; kernGedeeld 209 -> 212",
       "waarheen": "GRENZEN.json en de groene bedradingscontrole in npm run check, waar alle nieuwe kernnamen per domein begrensd en tegen echte exports gecontroleerd worden",
       "reden": "De twintig feature-PRs voegen zeven routezichtbare kernnamen toe; drie bestaande namen worden nu door een extra domein gedeeld. Dit is de gemeten functieprijs van de nieuwe kantoor-, kosten-, commerce- en wereldlagen. De integratie heeft ontbrekende grensnamen aangevuld en de controle bevestigt 1501 gebruikte kernnamen zonder ongebruikte destructurering."
+    },
+    {
+      "datum": "2026-08-31",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 426,
+      "vervalt": "2026-11-30",
+      "meter": "toetsenNietGemeten 426 -> 427",
+      "reden": "Drie nieuwe toetsen kwamen erbij (sprong.e2e.js, wereldrooster.e2e.js, sprongindex.test.js). Twee zijn alsnog door de mutatiemotor gehaald en zakken allebei op een liegende poort; de derde kan hij niet bereiken en meldt \u0027geen module gevonden\u0027, want die toets roept CLI-generatoren aan (scripts/sprongindex.js en broers) in plaats van een module te laden. Er is dus geen bron om te muteren. Dat hij kan zakken is wel aangetoond, alleen met de hand: een achterlopende handelingindex liet hem tijdens de bouw daadwerkelijk zakken. Aflossen betekent die generatoren een module-oppervlak geven, of de motor leren een CLI aan te roepen."
     },
     {
       "datum": "2026-08-28",

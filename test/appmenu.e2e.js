@@ -830,9 +830,33 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     }, null, { timeout: 20000 });
 
     async function kies(id, label) {
-      const direct = page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
-      if (await direct.count() && await direct.first().isVisible()) await direct.first().click();
-      else {
+      /* DRIE POGINGEN OP DE DIRECTE KNOP, en dat is geen dobbelsteen wegpoetsen
+         maar een race benoemen. De actiebalk van RTG Command wordt opnieuw
+         getekend zodra het blad van context wisselt; klikt de toets precies
+         daartussen, dan verdwijnt de knop onder zijn handen ("element was
+         detached from the DOM"). Dat is gedrag dat er hoort te zijn -- de balk
+         volgt het blad -- en het is geen fout die een gebruiker treft: die
+         drukt op wat hij ziet, en ziet de nieuwe balk.
+
+         Gemeten op 30 augustus 2026: deze toets zakte zo ongeveer twee van de
+         vijf keer, met en zonder de wijzigingen van die dag. Opnieuw pakken is
+         hier dus de juiste reparatie; een langere wachttijd zou de race alleen
+         onzichtbaar maken. */
+      const directeKnop = () => page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
+      for (let poging = 0; poging < 3; poging++) {
+        const direct = directeKnop();
+        if (!(await direct.count()) || !(await direct.first().isVisible())) break;
+        try { await direct.first().click({ timeout: 7000 }); return; }
+        catch (e) {
+          if (poging === 2) throw e;
+          /* Op de knop wachten en niet op een klok (test/klokwacht.test.js):
+             de balk is opnieuw aan het tekenen, dus we wachten tot er weer een
+             knop met dit vermogen IN de balk staat. */
+          await page.waitForSelector('#rtgCommand .cmd-actie[data-cap="' + id + '"]',
+            { state: 'attached', timeout: 7000 }).catch(() => {});
+        }
+      }
+      {
         const meer = page.locator('#rtgCommand .cmd-meer');
         assert.equal(await meer.isVisible(), true, label + ' is ook niet via Meer bereikbaar');
         await meer.click();

@@ -3,16 +3,16 @@
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 81,
-  "woorden": 1056,
-  "gevonden": 667,
-  "dekking": 0.6316,
+  "bestemmingen": 84,
+  "woorden": 1073,
+  "gevonden": 674,
+  "dekking": 0.6281,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 76,
-      "gevonden": 37,
+      "woorden": 75,
+      "gevonden": 36,
       "mist": [
         "instapt",
         "lobby",
@@ -94,8 +94,8 @@
     {
       "naam": "Mall",
       "url": "/apps/mall.html",
-      "woorden": 43,
-      "gevonden": 26,
+      "woorden": 41,
+      "gevonden": 25,
       "mist": [
         "gevonden",
         "complete",
@@ -112,15 +112,14 @@
         "tussen",
         "leveranciers",
         "vernietigen",
-        "softwarepaspoort",
-        "plaatsen"
+        "softwarepaspoort"
       ]
     },
     {
       "naam": "Privekantoor",
       "url": "/apps/lifestyle.html",
       "woorden": 35,
-      "gevonden": 19,
+      "gevonden": 20,
       "mist": [
         "briefing",
         "zaak",
@@ -134,7 +133,6 @@
         "reputatie",
         "dieren",
         "mogen",
-        "zelf",
         "blijft",
         "weten",
         "knoop"
@@ -274,7 +272,7 @@
     {
       "naam": "Rendez-vous",
       "url": "/apps/rendezvous.html",
-      "woorden": 28,
+      "woorden": 27,
       "gevonden": 17,
       "mist": [
         "intentie",
@@ -286,7 +284,6 @@
         "uitnodigingen",
         "voorgesteld",
         "worden",
-        "iemand",
         "ontmoet"
       ]
     },
@@ -294,14 +291,13 @@
       "naam": "Wie ben ik",
       "url": "/apps/ik.html",
       "woorden": 17,
-      "gevonden": 6,
+      "gevonden": 7,
       "mist": [
         "tegen",
         "doet",
         "voornaamwoorden",
         "gedraagt",
         "welke",
-        "gebruikt",
         "geloof",
         "levensbeschouwing",
         "gebedstijden",
@@ -313,7 +309,7 @@
       "naam": "Ontdekken",
       "url": "/apps/rtg.html",
       "woorden": 57,
-      "gevonden": 47,
+      "gevonden": 48,
       "mist": [
         "acties",
         "dagelijkse",
@@ -322,7 +318,6 @@
         "luxe",
         "regie",
         "rechtstreeks",
-        "zoekt",
         "tussen",
         "hangt"
       ]
@@ -396,8 +391,8 @@
     {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
-      "woorden": 31,
-      "gevonden": 23,
+      "woorden": 30,
+      "gevonden": 22,
       "mist": [
         "koppel",
         "persoonlijke",
@@ -440,21 +435,6 @@
       ]
     },
     {
-      "naam": "Entourage",
-      "url": "/apps/entourage.html",
-      "woorden": 11,
-      "gevonden": 4,
-      "mist": [
-        "reissecretaris",
-        "aandacht",
-        "vragen",
-        "iemand",
-        "gezelschap",
-        "aantal",
-        "samenstellen"
-      ]
-    },
-    {
       "naam": "Website",
       "url": "/apps/sitemaker.html",
       "woorden": 22,
@@ -467,6 +447,21 @@
         "begin",
         "sjabloon",
         "leden"
+      ]
+    },
+    {
+      "naam": "Geven",
+      "url": "/apps/foundation/geven.html",
+      "woorden": 8,
+      "gevonden": 1,
+      "mist": [
+        "voorstellen",
+        "gift",
+        "machtiging",
+        "tekenen",
+        "stoppen",
+        "inlogscherm",
+        "winkel"
       ]
     },
     {
@@ -495,6 +490,20 @@
         "kassa",
         "uitstaand",
         "geschiedenis"
+      ]
+    },
+    {
+      "naam": "Entourage",
+      "url": "/apps/entourage.html",
+      "woorden": 10,
+      "gevonden": 4,
+      "mist": [
+        "reissecretaris",
+        "aandacht",
+        "vragen",
+        "gezelschap",
+        "aantal",
+        "samenstellen"
       ]
     },
     {
@@ -528,8 +537,8 @@
     {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 20,
-      "gevonden": 14,
+      "woorden": 19,
+      "gevonden": 13,
       "mist": [
         "externe",
         "link",
@@ -556,8 +565,8 @@
     {
       "naam": "Mijn leven",
       "url": "/apps/leven.html",
-      "woorden": 21,
-      "gevonden": 16,
+      "woorden": 20,
+      "gevonden": 15,
       "mist": [
         "noire",
         "salon",
@@ -626,6 +635,30 @@
         "personeel",
         "taken",
         "opentaken"
+      ]
+    },
+    {
+      "naam": "Buurtruil",
+      "url": "/apps/foundation/buurtruil.html",
+      "woorden": 7,
+      "gevonden": 3,
+      "mist": [
+        "weggegeven",
+        "gezocht",
+        "belangstelling",
+        "inlogscherm"
+      ]
+    },
+    {
+      "naam": "RTFoundation in jouw buurt",
+      "url": "/apps/foundation/os-publiek.html",
+      "woorden": 11,
+      "gevonden": 7,
+      "mist": [
+        "hangt",
+        "vrijwilliger",
+        "worden",
+        "deelnemer"
       ]
     },
     {
@@ -746,6 +779,16 @@
       ]
     },
     {
+      "naam": "Klimaatfonds",
+      "url": "/apps/foundation/klimaatfonds.html",
+      "woorden": 9,
+      "gevonden": 7,
+      "mist": [
+        "onthoud",
+        "hieraan"
+      ]
+    },
+    {
       "naam": "Alles bij elkaar",
       "url": "/apps/wereld.html",
       "woorden": 6,
@@ -845,15 +888,6 @@
       ]
     },
     {
-      "naam": "RTFoundation in uw buurt",
-      "url": "/apps/foundation/os-publiek.html",
-      "woorden": 7,
-      "gevonden": 6,
-      "mist": [
-        "hangt"
-      ]
-    },
-    {
       "naam": "Balans",
       "url": "/apps/geld.html#balans",
       "woorden": 1,
@@ -919,8 +953,8 @@
     {
       "naam": "Mijn bestellingen",
       "url": "/apps/mijnmall.html",
-      "woorden": 3,
-      "gevonden": 3,
+      "woorden": 2,
+      "gevonden": 2,
       "mist": []
     },
     {
@@ -954,15 +988,15 @@
     {
       "naam": "Vandaag",
       "url": "/apps/pulse.html",
-      "woorden": 8,
-      "gevonden": 8,
+      "woorden": 7,
+      "gevonden": 7,
       "mist": []
     },
     {
       "naam": "Vrienden",
       "url": "/apps/foundation/vrienden.html",
-      "woorden": 14,
-      "gevonden": 14,
+      "woorden": 13,
+      "gevonden": 13,
       "mist": []
     },
     {

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-08-31T20:48:36.333Z",
-  "commit": "fe24d38f",
+  "op": "2026-08-31T21:21:51.755Z",
+  "commit": "3b4a1be43",
   "boomVuil": true,
-  "boomAnders": 9,
+  "boomAnders": 5,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -2264,31 +2264,31 @@
   },
   {
    "sleutel": "POST /api/foundation/school/machtiging/intrek",
-   "bestand": "server/school/machtiging.js:80",
+   "bestand": "server/school/machtiging.js:75",
    "staat": "bewaakt",
    "wacht": "poort"
   },
   {
    "sleutel": "POST /api/foundation/school/machtiging/lijst",
-   "bestand": "server/school/machtiging.js:71",
+   "bestand": "server/school/machtiging.js:66",
    "staat": "bewaakt",
    "wacht": "poort"
   },
   {
    "sleutel": "POST /api/foundation/school/machtiging/mijn",
-   "bestand": "server/school/machtiging.js:94",
+   "bestand": "server/school/machtiging.js:89",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
   },
   {
    "sleutel": "POST /api/foundation/school/machtiging/stop",
-   "bestand": "server/school/machtiging.js:106",
+   "bestand": "server/school/machtiging.js:101",
    "staat": "bewaakt",
    "wacht": "gezinSessie"
   },
   {
    "sleutel": "POST /api/foundation/school/machtiging/zet",
-   "bestand": "server/school/machtiging.js:44",
+   "bestand": "server/school/machtiging.js:47",
    "staat": "bewaakt",
    "wacht": "poort"
   },

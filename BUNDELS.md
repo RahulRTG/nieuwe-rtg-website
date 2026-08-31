@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 96 delen, 9824 regels in de delen
+`public/apps/app-main/` -- 96 delen, 9830 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -592,7 +592,7 @@ omlaag.
 
 ## `shared/cookie.js`
 
-`public/shared/cookie/` -- 2 delen, 179 regels in de delen
+`public/shared/cookie/` -- 2 delen, 192 regels in de delen
 
 | deel | onderwerp |
 |---|---|

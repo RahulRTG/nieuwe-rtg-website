@@ -18,12 +18,12 @@ het?**
 |---|---|
 | Functieschakelaars (aan/uit per functie) | **205** in 17 categorieën |
 | Apps in de leden-catalogus | **84** in 8 categorieën |
-| Bedrijfsgenres | **73** in 26 sectoren |
+| Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **1901** |
-| App-pagina's (`public/apps/**.html`) | **280** |
-| Testbestanden | **1507** |
+| Kernmodules (`server/kern/**`) | **1917** |
+| App-pagina's (`public/apps/**.html`) | **284** |
+| Testbestanden | **1511** |
 
 ## De vier werelden
 
@@ -630,7 +630,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 73 genres in 26 sectoren
+# 3. De 74 genres in 27 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -654,6 +654,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **maritime** (2) — Boten & jachten (`charter`), Marina & jachthaven (`marina`)
 - **media** (3) — Journalistiek (`journalistiek`), Content creator (`creator`), Fotografie & film (`fotograaf`)
 - **mobility** (6) — Taxi (`taxi`), Autoverhuur (`verhuur`), Tweewielers & quads (`tweewielers`), Vervoer & transfers (`vervoer`), Openbaar vervoer (`ov`), Vracht & expeditie (`vracht`)
+- **nonprofit** (1) — RTFoundation (`rtfoundation`)
 - **pharmacy** (1) — Apotheek (`apotheek`)
 - **professional** (2) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`)
 - **realestate** (1) — Vastgoed & makelaar (`vastgoed`)

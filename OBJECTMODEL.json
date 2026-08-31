@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1984,
-    "vormen": 1329,
-    "velden": 1928,
-    "modules": 715,
-    "domeinen": 252,
+    "bestanden": 2000,
+    "vormen": 1340,
+    "velden": 1941,
+    "modules": 720,
+    "domeinen": 253,
     "envelopDrempel": 16,
     "envelop": 30,
-    "veldenDomeineigen": 1369,
-    "veldenGedeeldVanafVier": 191,
+    "veldenDomeineigen": 1379,
+    "veldenGedeeldVanafVier": 193,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -119,6 +119,18 @@
       ]
     },
     {
+      "veld": "open",
+      "domeinen": 14,
+      "waar": [
+        "kern/commerce",
+        "kern/concern",
+        "kern/festival",
+        "kern/labfonds",
+        "kern/lidmaatschap",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "vraag",
       "domeinen": 13,
       "waar": [
@@ -163,18 +175,6 @@
         "kern/gemeente",
         "kern/koppel",
         "kern/labfonds",
-        "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "open",
-      "domeinen": 13,
-      "waar": [
-        "kern/commerce",
-        "kern/concern",
-        "kern/festival",
-        "kern/labfonds",
-        "kern/lidmaatschap",
         "kern/livinglab"
       ]
     },
@@ -248,6 +248,18 @@
         "kern/commercie",
         "kern/concern",
         "kern/levensgraaf"
+      ]
+    },
+    {
+      "veld": "actief",
+      "domeinen": 11,
+      "waar": [
+        "kern/bank",
+        "kern/beveiliging",
+        "kern/command",
+        "kern/concern",
+        "kern/livinglab",
+        "kern/machtiging"
       ]
     },
     {
@@ -392,18 +404,6 @@
         "kern/commerce",
         "kern/fiscaal",
         "kern/mobiliteit"
-      ]
-    },
-    {
-      "veld": "actief",
-      "domeinen": 10,
-      "waar": [
-        "kern/bank",
-        "kern/beveiliging",
-        "kern/command",
-        "kern/concern",
-        "kern/livinglab",
-        "kern/mall"
       ]
     },
     {

@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-08-31T20:48:53.109Z",
-  "commit": "fe24d38f",
+  "op": "2026-08-31T21:22:12.808Z",
+  "commit": "3b4a1be43",
   "boomVuil": true,
-  "boomAnders": 9,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4708,
+  "totaal": 4739,
   "geclassificeerd": 4633,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3184,
    "NOT_APPLICABLE": 1074,
    "PROTECTED": 296,
-   "LEGACY_PENDING_CLASSIFICATION": 75,
+   "LEGACY_PENDING_CLASSIFICATION": 106,
    "INTENTIONALLY_NON_IDEMPOTENT": 79
   },
   "vastgesteldDoorMens": 1475,
   "afgeleidDoorScript": 3158,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 3863,
+   "AUTHENTICATED": 3894,
    "PUBLIC": 113,
    "OBJECT_SCOPED": 716,
    "(niet af te leiden -- vraagt een verklaring)": 1,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 119,
    "kale ronde: onbeschermd": 86,
    "kale ronde: geen uitspraak": 4416,
-   "niet gemeten": 87
+   "niet gemeten": 118
   },
   "voorstellen": {},
   "metingVan": "2026-08-31T09:44:33.117Z"
@@ -61557,6 +61557,44 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.rtfwallet",
+   "route": "POST /api/office/rtfwallet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "office.rtfwallet.maak",
+   "route": "POST /api/office/rtfwallet/maak",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "office.rtgai",
    "route": "POST /api/office/rtgai",
    "semantiek": {
@@ -82100,6 +82138,282 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.gift.bevestig",
+   "route": "POST /api/rtfos/gift/bevestig",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.machtiging.intrek",
+   "route": "POST /api/rtfos/gift/machtiging/intrek",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.machtiging.mijn",
+   "route": "POST /api/rtfos/gift/machtiging/mijn",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.machtiging.teken",
+   "route": "POST /api/rtfos/gift/machtiging/teken",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.plan.lijst",
+   "route": "POST /api/rtfos/gift/plan/lijst",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.plan.mijn",
+   "route": "POST /api/rtfos/gift/plan/mijn",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.plan.stop",
+   "route": "POST /api/rtfos/gift/plan/stop",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.plan.vastleggen",
+   "route": "POST /api/rtfos/gift/plan/vastleggen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.plan.voorstel",
+   "route": "POST /api/rtfos/gift/plan/voorstel",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.projecten",
+   "route": "POST /api/rtfos/gift/projecten",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.stand",
+   "route": "POST /api/rtfos/gift/stand",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.stand.kantoor",
+   "route": "POST /api/rtfos/gift/stand/kantoor",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.stand.zet",
+   "route": "POST /api/rtfos/gift/stand/zet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.gift.voorbereid",
+   "route": "POST /api/rtfos/gift/voorbereid",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "rtfos.herkomst",
    "route": "POST /api/rtfos/herkomst",
    "semantiek": {
@@ -83838,6 +84152,126 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rtfos.ruil.interesse",
+   "route": "POST /api/rtfos/ruil/interesse",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.ruil.lijst",
+   "route": "POST /api/rtfos/ruil/lijst",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.ruil.meld",
+   "route": "POST /api/rtfos/ruil/meld",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.ruil.mijn",
+   "route": "POST /api/rtfos/ruil/mijn",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.ruil.plaats",
+   "route": "POST /api/rtfos/ruil/plaats",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.ruil.sluit",
+   "route": "POST /api/rtfos/ruil/sluit",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "rtfos.stad",
    "route": "POST /api/rtfos/stad",
    "semantiek": {
@@ -84970,6 +85404,142 @@
    "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtfos.winkel",
+   "route": "POST /api/rtfos/winkel",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.artikel.zet",
+   "route": "POST /api/rtfos/winkel/artikel/zet",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.artikelen",
+   "route": "POST /api/rtfos/winkel/artikelen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.bestellingen",
+   "route": "POST /api/rtfos/winkel/bestellingen",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.koop",
+   "route": "POST /api/rtfos/winkel/koop",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.mijn",
+   "route": "POST /api/rtfos/winkel/mijn",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": null,
+    "bewakers": [
+     "auth",
+     "mw"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "rtfos.winkel.stand",
+   "route": "POST /api/rtfos/winkel/stand",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "rtfos.zetel",
@@ -107332,6 +107902,44 @@
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.pay.rekening",
+   "route": "POST /api/supplier/pay/rekening",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": null,
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
+   "mutatieId": "supplier.pay.rekening.stand",
+   "route": "POST /api/supplier/pay/rekening/stand",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": null,
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
   },
   {
    "mutatieId": "supplier.pay.tegoed",

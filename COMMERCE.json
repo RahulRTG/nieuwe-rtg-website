@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1984,
-    "domeinenTotaal": 551,
-    "koopbareVormen": 523,
+    "bestanden": 2000,
+    "domeinenTotaal": 553,
+    "koopbareVormen": 524,
     "koopbareDomeinen": 109,
     "envelopDrempel": 7,
     "envelop": 45,
-    "veldenDomeineigen": 716,
-    "veldenNietEnvelop": 931,
-    "gelijkendeVormparen": 8,
+    "veldenDomeineigen": 718,
+    "veldenNietEnvelop": 934,
+    "gelijkendeVormparen": 9,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 43,
     "wagenVormen": 33,
     "wagenVormenUniek": 30,
     "wagenDomeinen": 22,
-    "optellingen": 107,
+    "optellingen": 108,
     "optelDomeinen": 53,
-    "optelCenten": 58,
+    "optelCenten": 59,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 44
@@ -325,7 +325,7 @@
         "prijs": "sleutelSom",
         "beschikbaarheid": "agendaBij",
         "reserveer": "gereserveerd",
-        "bevestig": "bevestig",
+        "bevestig": "bestellingen",
         "lever": "uitgifte"
       },
       "telt": 6
@@ -2133,6 +2133,20 @@
     {
       "gelijkenis": 0.83,
       "a": "server/kern/bank/overboeken.js",
+      "b": "server/kern/pay/partner.js",
+      "domeinA": "kern/bank",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
+      ]
+    },
+    {
+      "gelijkenis": 0.83,
+      "a": "server/kern/bank/overboeken.js",
       "b": "server/kern/pay/terug.js",
       "domeinA": "kern/bank",
       "domeinB": "kern/pay",
@@ -2180,19 +2194,6 @@
     },
     {
       "gelijkenis": 0.67,
-      "a": "server/kern/bank/overboeken.js",
-      "b": "server/kern/pay/partner.js",
-      "domeinA": "kern/bank",
-      "domeinB": "kern/pay",
-      "gedeeld": [
-        "begunstigde",
-        "idemSleutel",
-        "ledgerRef",
-        "rail"
-      ]
-    },
-    {
-      "gelijkenis": 0.67,
       "a": "server/kern/directpay/betalen.js",
       "b": "server/kern/settlement.js",
       "domeinA": "kern/directpay",
@@ -2216,6 +2217,20 @@
         "sleutel",
         "sub",
         "zoek"
+      ]
+    },
+    {
+      "gelijkenis": 0.63,
+      "a": "server/kern/fonds/uitbetalen.js",
+      "b": "server/kern/pay/partner.js",
+      "domeinA": "kern/fonds",
+      "domeinB": "kern/pay",
+      "gedeeld": [
+        "begunstigde",
+        "bestemming",
+        "idemSleutel",
+        "ledgerRef",
+        "rail"
       ]
     },
     {
@@ -2329,6 +2344,16 @@
       ]
     },
     {
+      "domein": "kern/rtfos",
+      "plekken": 4,
+      "waar": [
+        "server/kern/rtfos/donateur.js",
+        "server/kern/rtfos/geld.js",
+        "server/kern/rtfos/inkoop-sluiten.js",
+        "server/kern/rtfos/winkel.js"
+      ]
+    },
+    {
       "domein": "kern/command",
       "plekken": 3,
       "waar": [
@@ -2353,15 +2378,6 @@
         "server/kern/gast/betalen.js",
         "server/kern/gast/foodcourt.js",
         "server/kern/gast/order.js"
-      ]
-    },
-    {
-      "domein": "kern/rtfos",
-      "plekken": 3,
-      "waar": [
-        "server/kern/rtfos/donateur.js",
-        "server/kern/rtfos/geld.js",
-        "server/kern/rtfos/inkoop-sluiten.js"
       ]
     },
     {

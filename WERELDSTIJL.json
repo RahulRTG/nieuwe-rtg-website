@@ -7,8 +7,7 @@
       "wereld": "LivingOS",
       "schermen": 41,
       "telling": {
-        "aankleden": 40,
-        "schil": 1
+        "schil": 41
       },
       "lijst": [
         {
@@ -16,10 +15,10 @@
             "App-dossier"
           ],
           "bestand": "/apps/appstore-dossier.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #490b1d",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -34,12 +33,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 210,
-          "bytes": 12147,
+          "regels": 220,
+          "bytes": 12723,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -51,8 +50,8 @@
             "Attenties"
           ],
           "bestand": "/apps/attenties.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal champagne, boven #171815",
             "waarde": "#f4f0e9",
@@ -69,12 +68,12 @@
             "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 142,
-          "bytes": 13763,
+          "regels": 152,
+          "bytes": 14339,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -86,30 +85,30 @@
             "Camera"
           ],
           "bestand": "/apps/camera.html",
-          "klasse": "aankleden",
-          "reden": "grond #0c0c0b = onyx precies, huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0b0b09",
-            "waarde": "#0c0c0b",
+            "herkomst": "materiaal bordeaux, boven #161513",
+            "waarde": "#090909",
             "pixel": {
-              "r": 12,
-              "g": 12,
-              "b": 11,
+              "r": 9,
+              "g": 9,
+              "b": 9,
               "kanalen": 3,
               "w": 4,
               "h": 4
             },
-            "licht": 0.0467756862745098,
+            "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
             "eigenschap": null
           },
-          "regels": 608,
-          "bytes": 35556,
+          "regels": 618,
+          "bytes": 36132,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": false,
             "inter": true,
@@ -121,10 +120,10 @@
             "Cellier"
           ],
           "bestand": "/apps/cellier.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -139,12 +138,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 114,
-          "bytes": 9966,
+          "regels": 124,
+          "bytes": 10542,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -156,8 +155,8 @@
             "Cercle"
           ],
           "bestand": "/apps/cercle.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal champagne, boven #171815",
             "waarde": "#f4f0e9",
@@ -174,12 +173,12 @@
             "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 143,
-          "bytes": 13247,
+          "regels": 153,
+          "bytes": 13823,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -191,10 +190,10 @@
             "Video"
           ],
           "bestand": "/apps/clips.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0908",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -209,12 +208,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 467,
-          "bytes": 26648,
+          "regels": 477,
+          "bytes": 27224,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -226,8 +225,8 @@
             "Berichten"
           ],
           "bestand": "/apps/comm.html",
-          "klasse": "aankleden",
-          "reden": "grond #1b1a18 = onyx (15 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal champagne, boven #171815",
             "waarde": "#1b1a18",
@@ -244,12 +243,12 @@
             "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 783,
-          "bytes": 41711,
+          "regels": 793,
+          "bytes": 42287,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -261,10 +260,10 @@
             "Commerce"
           ],
           "bestand": "/apps/commerce.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #490b1d",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -279,12 +278,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 511,
-          "bytes": 30313,
+          "regels": 521,
+          "bytes": 30889,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -296,8 +295,8 @@
             "Entourage"
           ],
           "bestand": "/apps/entourage.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal champagne, boven #171815",
             "waarde": "#f4f0e9",
@@ -314,12 +313,12 @@
             "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 145,
-          "bytes": 13442,
+          "regels": 155,
+          "bytes": 14018,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -331,10 +330,10 @@
             "Food Court"
           ],
           "bestand": "/apps/foodcourt.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -349,12 +348,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 205,
-          "bytes": 13660,
+          "regels": 215,
+          "bytes": 14236,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -366,8 +365,8 @@
             "Vrienden"
           ],
           "bestand": "/apps/foundation/vrienden.html",
-          "klasse": "aankleden",
-          "reden": "grond #08090c = onyx (4 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal bordeaux",
             "waarde": "#08090c",
@@ -382,14 +381,14 @@
             "licht": 0.03530980392156863,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(7, 16, 26)"
+            "eigenschap": "rgb(7, 17, 27)"
           },
-          "regels": 1055,
-          "bytes": 67269,
+          "regels": 1065,
+          "bytes": 67845,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": false,
             "bodoni": true,
             "inter": false,
@@ -401,8 +400,8 @@
             "Garde-robe"
           ],
           "bestand": "/apps/garderobe.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal bordeaux, boven #080808",
             "waarde": "#090809",
@@ -419,12 +418,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 117,
-          "bytes": 10323,
+          "regels": 127,
+          "bytes": 10899,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -436,8 +435,8 @@
             "Geld"
           ],
           "bestand": "/apps/geld-command.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal bordeaux, boven #080808",
             "waarde": "#090809",
@@ -454,12 +453,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 26,
-          "bytes": 18100,
+          "regels": 36,
+          "bytes": 18676,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": false,
             "inter": false,
@@ -479,45 +478,10 @@
             "Wallet"
           ],
           "bestand": "/apps/geld.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #080808",
-            "waarde": "#090809",
-            "pixel": {
-              "r": 9,
-              "g": 8,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.032489411764705885,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 166,
-          "bytes": 9185,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Krant"
-          ],
-          "bestand": "/apps/krant.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #090908",
+            "herkomst": "materiaal bordeaux",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -532,12 +496,47 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 184,
-          "bytes": 14731,
+          "regels": 176,
+          "bytes": 9761,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Krant"
+          ],
+          "bestand": "/apps/krant.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 194,
+          "bytes": 15307,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -549,8 +548,8 @@
             "Mijn leven"
           ],
           "bestand": "/apps/leven.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal bordeaux, boven #090909",
             "waarde": "#090809",
@@ -567,12 +566,12 @@
             "letterEr": true,
             "eigenschap": "rgb(12, 12, 11)"
           },
-          "regels": 13,
-          "bytes": 5536,
+          "regels": 23,
+          "bytes": 6112,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": false,
             "inter": false,
@@ -584,640 +583,10 @@
             "Privekantoor"
           ],
           "bestand": "/apps/lifestyle.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 760,
-          "bytes": 57363,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Het Vooruitzicht"
-          ],
-          "bestand": "/apps/living-os.html",
-          "klasse": "aankleden",
-          "reden": "grond #0a0909 = onyx (3 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #120f0f",
-            "waarde": "#0a0909",
-            "pixel": {
-              "r": 10,
-              "g": 9,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.0361278431372549,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(12, 12, 11)"
-          },
-          "regels": 9,
-          "bytes": 8216,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": false
-          }
-        },
-        {
-          "namen": [
-            "Maison"
-          ],
-          "bestand": "/apps/maison.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #080808",
-            "waarde": "#090809",
-            "pixel": {
-              "r": 9,
-              "g": 8,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.032489411764705885,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 111,
-          "bytes": 10351,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Mall"
-          ],
-          "bestand": "/apps/mall.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 1451,
-          "bytes": 96357,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "RTG Media"
-          ],
-          "bestand": "/apps/media.html",
-          "klasse": "aankleden",
-          "reden": "grond #080808 = onyx (4 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #100f0e",
-            "waarde": "#080808",
-            "pixel": {
-              "r": 8,
-              "g": 8,
-              "b": 8,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.03137254901960784,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": null
-          },
-          "regels": 266,
-          "bytes": 16389,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Mijn bestellingen"
-          ],
-          "bestand": "/apps/mijnmall.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 138,
-          "bytes": 8435,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Muziek"
-          ],
-          "bestand": "/apps/muziek.html",
-          "klasse": "aankleden",
-          "reden": "grond #110f0e = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #0d0d0c",
-            "waarde": "#110f0e",
-            "pixel": {
-              "r": 17,
-              "g": 15,
-              "b": 14,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.0602078431372549,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": null
-          },
-          "regels": 374,
-          "bytes": 21898,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Nieuws"
-          ],
-          "bestand": "/apps/nieuws.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 122,
-          "bytes": 9172,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Betalen"
-          ],
-          "bestand": "/apps/pay.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 579,
-          "bytes": 33224,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Live"
-          ],
-          "bestand": "/apps/podium.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #090807",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 655,
-          "bytes": 39128,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Vandaag"
-          ],
-          "bestand": "/apps/pulse.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal champagne, boven #171815",
-            "waarde": "#f4f0e9",
-            "pixel": {
-              "r": 244,
-              "g": 240,
-              "b": 233,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.9425294117647058,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(244, 240, 233)"
-          },
-          "regels": 238,
-          "bytes": 21003,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Rendez-vous"
-          ],
-          "bestand": "/apps/rendezvous.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal champagne, boven #171815",
-            "waarde": "#f4f0e9",
-            "pixel": {
-              "r": 244,
-              "g": 240,
-              "b": 233,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.9425294117647058,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(244, 240, 233)"
-          },
-          "regels": 379,
-          "bytes": 35253,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Tweede scherm"
-          ],
-          "bestand": "/apps/scherm.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #090908",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 232,
-          "bytes": 14154,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Sociaal"
-          ],
-          "bestand": "/apps/sociaal.html",
-          "klasse": "aankleden",
-          "reden": "grond #f1eee7 = pearl (3 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal champagne, boven #f4f2ea",
-            "waarde": "#f1eee7",
-            "pixel": {
-              "r": 241,
-              "g": 238,
-              "b": 231,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.9338525490196078,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": null
-          },
-          "regels": 780,
-          "bytes": 39445,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Spelen"
-          ],
-          "bestand": "/apps/spelen.html",
-          "klasse": "aankleden",
-          "reden": "grond #07101c = onyx (17 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #07111b",
-            "waarde": "#07101c",
-            "pixel": {
-              "r": 7,
-              "g": 16,
-              "b": 28,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.05863921568627451,
-            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 18, 27)"
-          },
-          "regels": 1927,
-          "bytes": 120517,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Game Night"
-          ],
-          "bestand": "/apps/spelscherm.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 144,
-          "bytes": 7390,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": false,
-            "bodoni": true,
-            "inter": true,
-            "uniform": false
-          }
-        },
-        {
-          "namen": [
-            "Sport"
-          ],
-          "bestand": "/apps/sport.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 224,
-          "bytes": 17210,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Table"
-          ],
-          "bestand": "/apps/table.html",
-          "klasse": "aankleden",
-          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #080808",
-            "waarde": "#090809",
-            "pixel": {
-              "r": 9,
-              "g": 8,
-              "b": 9,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.032489411764705885,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 125,
-          "bytes": 11803,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Films en series"
-          ],
-          "bestand": "/apps/theater.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux, boven #090807",
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -1233,11 +602,11 @@
             "eigenschap": "rgb(8, 7, 7)"
           },
           "regels": 770,
-          "bytes": 43992,
+          "bytes": 57939,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -1246,13 +615,83 @@
         },
         {
           "namen": [
-            "Thuis"
+            "Het Vooruitzicht"
           ],
-          "bestand": "/apps/thuis.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "bestand": "/apps/living-os.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#0b0a0a",
+            "pixel": {
+              "r": 11,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.040049411764705875,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(12, 12, 11)"
+          },
+          "regels": 19,
+          "bytes": 8792,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Maison"
+          ],
+          "bestand": "/apps/maison.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 121,
+          "bytes": 10927,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mall"
+          ],
+          "bestand": "/apps/mall.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -1267,12 +706,12 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 399,
-          "bytes": 29593,
+          "regels": 1461,
+          "bytes": 96933,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -1281,13 +720,48 @@
         },
         {
           "namen": [
-            "Uitgaan"
+            "RTG Media"
           ],
-          "bestand": "/apps/uitgaan.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
+          "bestand": "/apps/media.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #0a0a09",
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#080808",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.03137254901960784,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 276,
+          "bytes": 16965,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Mijn bestellingen"
+          ],
+          "bestand": "/apps/mijnmall.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
             "waarde": "#080707",
             "pixel": {
               "r": 8,
@@ -1302,12 +776,152 @@
             "letterEr": true,
             "eigenschap": "rgb(8, 7, 7)"
           },
-          "regels": 253,
-          "bytes": 17231,
+          "regels": 148,
+          "bytes": 9011,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Muziek"
+          ],
+          "bestand": "/apps/muziek.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #450c1d",
+            "waarde": "#110f0e",
+            "pixel": {
+              "r": 17,
+              "g": 15,
+              "b": 14,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.0602078431372549,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 384,
+          "bytes": 22474,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Nieuws"
+          ],
+          "bestand": "/apps/nieuws.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 132,
+          "bytes": 9748,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Betalen"
+          ],
+          "bestand": "/apps/pay.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 589,
+          "bytes": 33800,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Live"
+          ],
+          "bestand": "/apps/podium.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #430a1b",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 665,
+          "bytes": 39704,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
             "huisletters": true,
             "bodoni": true,
             "inter": true,
@@ -1318,44 +932,9 @@
           "namen": [
             "Vandaag"
           ],
-          "bestand": "/apps/vandaag.html",
-          "klasse": "aankleden",
-          "reden": "grond #080707 = onyx (5 naast de basis), huisletter staat er",
-          "grond": {
-            "herkomst": "materiaal bordeaux",
-            "waarde": "#080707",
-            "pixel": {
-              "r": 8,
-              "g": 7,
-              "b": 7,
-              "kanalen": 3,
-              "w": 4,
-              "h": 4
-            },
-            "licht": 0.028284705882352938,
-            "letter": "Inter, system-ui, sans-serif",
-            "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
-          },
-          "regels": 50,
-          "bytes": 4878,
-          "dragers": {
-            "wereldschil": true,
-            "wereldcss": true,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": true,
-            "inter": true,
-            "uniform": false
-          }
-        },
-        {
-          "namen": [
-            "Daten"
-          ],
-          "bestand": "/apps/vonk.html",
-          "klasse": "aankleden",
-          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "bestand": "/apps/pulse.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
             "herkomst": "materiaal champagne, boven #171815",
             "waarde": "#f4f0e9",
@@ -1372,50 +951,50 @@
             "letterEr": true,
             "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 355,
-          "bytes": 38858,
+          "regels": 248,
+          "bytes": 21579,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
-            "bodoni": false,
-            "inter": false,
+            "bodoni": true,
+            "inter": true,
             "uniform": true
           }
         },
         {
           "namen": [
-            "Alles bij elkaar"
+            "Rendez-vous"
           ],
-          "bestand": "/apps/wereld.html",
-          "klasse": "aankleden",
-          "reden": "grond #460b1c = bordeaux (4 naast de basis), huisletter staat er",
+          "bestand": "/apps/rendezvous.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal bordeaux, boven #4a0c1e",
-            "waarde": "#460b1c",
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
             "pixel": {
-              "r": 70,
-              "g": 11,
-              "b": 28,
+              "r": 244,
+              "g": 240,
+              "b": 233,
               "kanalen": 3,
               "w": 4,
               "h": 4
             },
-            "licht": 0.09714039215686275,
+            "licht": 0.9425294117647058,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(8, 7, 7)"
+            "eigenschap": "rgb(244, 240, 233)"
           },
-          "regels": 611,
-          "bytes": 29361,
+          "regels": 389,
+          "bytes": 35829,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
-            "switcher": false,
+            "switcher": true,
             "huisletters": true,
-            "bodoni": true,
-            "inter": true,
+            "bodoni": false,
+            "inter": false,
             "uniform": true
           }
         },
@@ -1445,6 +1024,426 @@
           },
           "regels": 306,
           "bytes": 33823,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Tweede scherm"
+          ],
+          "bestand": "/apps/scherm.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 242,
+          "bytes": 14730,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Sociaal"
+          ],
+          "bestand": "/apps/sociaal.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #571e2e",
+            "waarde": "#f1eee7",
+            "pixel": {
+              "r": 241,
+              "g": 238,
+              "b": 231,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9338525490196078,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": null
+          },
+          "regels": 790,
+          "bytes": 40021,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Spelen"
+          ],
+          "bestand": "/apps/spelen.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #07111b",
+            "waarde": "#07101c",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.05863921568627451,
+            "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(7, 17, 28)"
+          },
+          "regels": 1937,
+          "bytes": 121093,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": false,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Game Night"
+          ],
+          "bestand": "/apps/spelscherm.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 154,
+          "bytes": 7966,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": false,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Sport"
+          ],
+          "bestand": "/apps/sport.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 234,
+          "bytes": 17786,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Table"
+          ],
+          "bestand": "/apps/table.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #080808",
+            "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.032489411764705885,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 135,
+          "bytes": 12379,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Films en series"
+          ],
+          "bestand": "/apps/theater.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 780,
+          "bytes": 44568,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Thuis"
+          ],
+          "bestand": "/apps/thuis.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #430a1b",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 409,
+          "bytes": 30169,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Uitgaan"
+          ],
+          "bestand": "/apps/uitgaan.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 263,
+          "bytes": 17807,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Vandaag"
+          ],
+          "bestand": "/apps/vandaag.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#080707",
+            "pixel": {
+              "r": 8,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.028284705882352938,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 60,
+          "bytes": 5454,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": true,
+            "inter": true,
+            "uniform": false
+          }
+        },
+        {
+          "namen": [
+            "Daten"
+          ],
+          "bestand": "/apps/vonk.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal champagne, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 365,
+          "bytes": 39434,
+          "dragers": {
+            "wereldschil": true,
+            "wereldcss": true,
+            "switcher": true,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
+            "Alles bij elkaar"
+          ],
+          "bestand": "/apps/wereld.html",
+          "klasse": "schil",
+          "reden": "de wereldschil staat er",
+          "grond": {
+            "herkomst": "materiaal bordeaux, boven #440b1c",
+            "waarde": "#460b1c",
+            "pixel": {
+              "r": 70,
+              "g": 11,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.09714039215686275,
+            "letter": "Inter, system-ui, sans-serif",
+            "letterEr": true,
+            "eigenschap": "rgb(8, 7, 7)"
+          },
+          "regels": 621,
+          "bytes": 29937,
           "dragers": {
             "wereldschil": true,
             "wereldcss": true,
@@ -1716,22 +1715,22 @@
           ],
           "bestand": "/apps/rtgone.html",
           "klasse": "aankleden",
-          "reden": "grond #110d0c = onyx (5 naast de basis), huisletter staat er",
+          "reden": "grond #180e0d = onyx (12 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0d0c0a",
-            "waarde": "#110d0c",
+            "waarde": "#180e0d",
             "pixel": {
-              "r": 17,
-              "g": 13,
-              "b": 12,
+              "r": 24,
+              "g": 14,
+              "b": 13,
               "kanalen": 3,
               "w": 4,
               "h": 4
             },
-            "licht": 0.054032156862745095,
+            "licht": 0.06295607843137255,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(14, 12, 11)"
+            "eigenschap": "rgb(18, 12, 11)"
           },
           "regels": 29,
           "bytes": 31678,
@@ -1753,7 +1752,7 @@
           "klasse": "aankleden",
           "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx",
+            "herkomst": "materiaal onyx, boven #090807",
             "waarde": "#080807",
             "pixel": {
               "r": 8,
@@ -1766,7 +1765,7 @@
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(14, 12, 11)"
+            "eigenschap": "rgb(17, 12, 11)"
           },
           "regels": 183,
           "bytes": 11287,
@@ -1788,7 +1787,7 @@
           "klasse": "aankleden",
           "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #090a09",
+            "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#080807",
             "pixel": {
               "r": 8,
@@ -1893,7 +1892,7 @@
           "klasse": "schil",
           "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal royal, boven #0b0c0e",
+            "herkomst": "materiaal royal, boven #33447c",
             "waarde": "#090a0b",
             "pixel": {
               "r": 9,
@@ -1973,7 +1972,7 @@
           "klasse": "aankleden",
           "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #080909",
+            "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
             "pixel": {
               "r": 9,
@@ -2148,7 +2147,7 @@
           "klasse": "aankleden",
           "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #080808",
+            "herkomst": "materiaal onyx, boven #0a0b0b",
             "waarde": "#090a0a",
             "pixel": {
               "r": 9,
@@ -2253,7 +2252,7 @@
           "klasse": "aankleden",
           "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx",
+            "herkomst": "materiaal onyx, boven #090807",
             "waarde": "#080807",
             "pixel": {
               "r": 8,
@@ -2266,7 +2265,7 @@
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgba(14, 12, 11, 0.95)"
+            "eigenschap": "rgba(16, 12, 11, 0.996)"
           },
           "regels": 320,
           "bytes": 16943,
@@ -2323,7 +2322,7 @@
           "klasse": "aankleden",
           "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #070707",
+            "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
             "pixel": {
               "r": 9,
@@ -2565,7 +2564,7 @@
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(7, 17, 27)"
+            "eigenschap": "rgb(7, 17, 28)"
           },
           "regels": 261,
           "bytes": 17200,
@@ -2587,7 +2586,7 @@
           "klasse": "aankleden",
           "reden": "grond #07101b = onyx (16 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx",
+            "herkomst": "materiaal onyx, boven #07101a",
             "waarde": "#07101b",
             "pixel": {
               "r": 7,
@@ -2600,7 +2599,7 @@
             "licht": 0.058356078431372554,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(7, 17, 27)"
+            "eigenschap": "rgb(7, 17, 26)"
           },
           "regels": 242,
           "bytes": 15911,
@@ -2635,7 +2634,7 @@
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
             "letterEr": true,
-            "eigenschap": "rgb(7, 17, 27)"
+            "eigenschap": "rgb(8, 18, 25)"
           },
           "regels": 271,
           "bytes": 19935,

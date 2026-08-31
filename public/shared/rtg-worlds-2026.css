@@ -206,6 +206,33 @@ body[data-rtg-world="living"] .os-switcher{
   background:rgba(74,12,30,.92);
 }
 body[data-rtg-world="living"] .os-switcher__links a span{color:#F4F0E9;}
+/* DEZELFDE WERELD, TWEE MATERIALEN.
+
+   LivingOS is bordeaux behalve op de sociale schermen: die staan op Pearl, en
+   dat is een besluit (MATERIAAL.md). De balk hierboven ging daar mee de fout
+   in -- hij bleef de donkere wijnband die bij bordeaux hoort, en stond dus met
+   ivoren letters op een licht scherm. Van een afstandje leek dat een keuze;
+   van dichtbij was het onleesbaar.
+
+   Op champagne wordt de balk daarom zelf pearl, met de inkt van het materiaal.
+   De actieve wereld houdt de gouden rand -- dat is het accent en dat werkt op
+   allebei de gronden. */
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher{
+  background:color-mix(in srgb,var(--pearl-hoog) 94%,transparent);
+  border-bottom-color:var(--pearl-rand);
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand b,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a{
+  color:var(--op-pearl);
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__brand span,
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__state{
+  color:#41403E;   /* de zachte toon die rtg-themas.css voor champagne heeft uitgerekend */
+}
+:root[data-rtg-thema="champagne"] body[data-rtg-world="living"] .os-switcher__links a span{
+  color:var(--gold-diep,#6B5A05);
+}
 body[data-rtg-world="living"] .schil{
   min-height:calc(100vh - 64px);
   grid-template-rows:58px 1fr;

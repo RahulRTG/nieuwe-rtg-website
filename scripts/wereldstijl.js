@@ -59,6 +59,64 @@ const SCHIL = [
   ['switcher', 'os-switcher']
 ];
 
+const cssKas = new Map();
+function cssTekst(rel) {
+  if (!cssKas.has(rel)) cssKas.set(rel, lees(path.join(WORTEL, 'public', rel.replace(/^\//, ''))) || '');
+  return cssKas.get(rel);
+}
+
+/* LICHT IS GEEN GEBREK.
+
+   De eerste versie van deze meter zette elk licht scherm op "ombouwen", en dat
+   was een oordeel dat hij niet mocht vellen. De sociale schermen -- Sociaal,
+   Vonk, Cercle, Entourage, Rendez-vous, Attenties, Vandaag -- zijn met opzet
+   licht, en het huis heeft daar al een materiaal voor: Pearl. Vonk en
+   Rendez-vous meten exact `--pearl-basis`, dus dat is geen toeval maar een
+   bestaande keuze die nergens stond opgeschreven.
+
+   De vraag is daarom niet donker-of-licht maar: staat dit scherm op een grond
+   van HET HUIS? De twee gronden komen uit rtg-materiaal.css en worden hier niet
+   overgetypt maar gelezen, zodat een wijziging daar deze meter meeneemt in
+   plaats van hem stil te laten liegen. */
+function huisgronden() {
+  const mat = cssTekst('/shared/rtg-materiaal.css');
+  const pak = (naam) => {
+    const m = new RegExp('--' + naam + ':\\s*(#[0-9a-fA-F]{6})').exec(mat);
+    return m ? m[1].toLowerCase() : null;
+  };
+  return [
+    { naam: 'onyx', kleur: pak('onyx-basis') },
+    { naam: 'pearl', kleur: pak('pearl-basis') },
+    { naam: 'bordeaux', kleur: pak('bordeaux-diep') },
+    { naam: 'royal', kleur: pak('royal-diep') }
+  ].filter((g) => g.kleur);
+}
+/* Een grond hoeft niet exact te zijn: over de basis ligt een glans (een
+   gradient) en de pixel die je meet zit daar ergens in. Vandaar een marge, en
+   die staat hier met een getal in plaats van als gevoel. */
+function naastLangs(kleur, gronden) {
+  let beste = null;
+  for (const g of gronden) {
+    const n = parseInt(g.kleur.slice(1), 16);
+    const d = Math.max(Math.abs(((n >> 16) & 255) - kleur.r),
+      Math.abs(((n >> 8) & 255) - kleur.g), Math.abs((n & 255) - kleur.b));
+    if (!beste || d < beste.d) beste = { naam: g.naam, d };
+  }
+  return beste ? beste.naam + ' op ' + beste.d : '?';
+}
+const MARGE = 26;
+function bijHuis(kleur, gronden) {
+  if (!kleur) return null;
+  let beste = null;
+  for (const g of gronden) {
+    const n = parseInt(g.kleur.slice(1), 16);
+    const d = Math.max(Math.abs(((n >> 16) & 255) - kleur.r),
+      Math.abs(((n >> 8) & 255) - kleur.g), Math.abs((n & 255) - kleur.b));
+    if (!beste || d < beste.afstand) beste = { naam: g.naam, afstand: d, kleur: g.kleur };
+  }
+  return beste && beste.afstand <= MARGE ? beste : null;
+}
+
 /* DE PIXEL, WANT DE EIGENSCHAP LOOG.
 
    Derde en laatste correctie van deze meter. `getComputedStyle(body)
@@ -151,7 +209,12 @@ function meet(url, gemeten) {
   const grond = gemeten && gemeten[rel] ? gemeten[rel] : { herkomst: 'niet gemeten', waarde: null, licht: null };
 
   const heeftSchil = SCHIL.every(([n]) => schil[n]);
-  const donker = grond.licht != null && grond.licht < 0.35;
+  /* De grond wordt tegen het PALET gehouden en niet tegen een helderheid.
+     Zo blijft licht toegestaan waar het huis licht kent (Pearl), en valt een
+     zelfbedachte kleur op -- ook als die toevallig donker is. */
+  const gronden = huisgronden();
+  const thuis = bijHuis(grond.pixel, gronden);
+  const donker = !!thuis;
   /* De LETTER wordt ook gemeten en niet gelezen: een scherm kan Inter in zijn
      bron hebben staan in een regel die nergens geldt, en een scherm zonder het
      woord "Inter" kan hem via een gedeelde stylesheet toch dragen. */
@@ -163,12 +226,19 @@ function meet(url, gemeten) {
   if (grond.herkomst === 'niet gemeten') { klasse = 'niet gemeten'; reden = 'de pagina is niet geopend'; }
   else if (heeftSchil) { klasse = 'schil'; reden = 'de wereldschil staat er'; }
   else if (donker && lettersOk) {
-    klasse = 'aankleden'; reden = 'donkere grond ' + grond.waarde + ' ' + grond.herkomst + ', huisletter staat er';
+    klasse = 'aankleden';
+    reden = 'grond ' + grond.waarde + ' = ' + thuis.naam
+      + (thuis.afstand ? ' (' + thuis.afstand + ' naast de basis)' : ' precies')
+      + ', huisletter staat er';
   } else {
     klasse = 'ombouwen';
     const mist = [];
     if (grond.licht == null) mist.push('grond niet vast te stellen');
-    else if (!donker) mist.push('lichte grond (' + grond.waarde + ')');
+    else if (!thuis) {
+      const dichtst = bijHuis(grond.pixel, gronden.map((g) => ({ ...g }))) || null;
+      mist.push('grond ' + grond.waarde + ' staat niet in het palet'
+        + (dichtst ? '' : ' (dichtstbij: ' + naastLangs(grond.pixel, gronden) + ')'));
+    }
     if (!binnen.huisletters) mist.push('laadt fonts.css niet');
     else if (!lettersOk) mist.push('leest niet in een huisletter (' + (gemetenLetter.split(',')[0] || '?') + ')');
     reden = mist.join(', ');
@@ -225,7 +295,7 @@ async function open(urls) {
       });
       uit[u] = {
         herkomst: (g.thema ? 'materiaal ' + g.thema : 'zonder materiaal') + (eens ? '' : ', boven ' + (hex(boven) || '?')),
-        waarde: hex(kleur), licht: helderheid(kleur), letter: g.letter,
+        waarde: hex(kleur), pixel: kleur, licht: helderheid(kleur), letter: g.letter,
         eigenschap: g.grond   /* wat backgroundColor zei -- bewaard, want het VERSCHIL is de les */
       };
     } catch (e) { /* een scherm dat niet opengaat blijft NIET GEMETEN */ }

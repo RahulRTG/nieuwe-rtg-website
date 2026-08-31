@@ -7,8 +7,8 @@
       "wereld": "LivingOS",
       "schermen": 41,
       "telling": {
-        "aankleden": 30,
-        "ombouwen": 10,
+        "aankleden": 33,
+        "ombouwen": 7,
         "schil": 1
       },
       "lijst": [
@@ -18,10 +18,18 @@
           ],
           "bestand": "/apps/appstore-dossier.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #0b0b0a, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0b0b0a",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -44,10 +52,18 @@
           ],
           "bestand": "/apps/camera.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #0c0c0b materiaal onyx, boven #0b0b09, huisletter staat er",
+          "reden": "grond #0c0c0b = onyx precies, huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0b0b09",
             "waarde": "#0c0c0b",
+            "pixel": {
+              "r": 12,
+              "g": 12,
+              "b": 11,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.0467756862745098,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -70,10 +86,18 @@
           ],
           "bestand": "/apps/cellier.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -96,10 +120,18 @@
           ],
           "bestand": "/apps/clips.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120e0e",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -122,10 +154,18 @@
           ],
           "bestand": "/apps/comm.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #1b1a18 materiaal onyx, boven #171815, huisletter staat er",
+          "reden": "grond #1b1a18 = onyx (15 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #171815",
             "waarde": "#1b1a18",
+            "pixel": {
+              "r": 27,
+              "g": 26,
+              "b": 24,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.10222823529411765,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(221, 214, 201)"
@@ -148,10 +188,18 @@
           ],
           "bestand": "/apps/commerce.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #0b0b0a, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0b0b0a",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -174,10 +222,18 @@
           ],
           "bestand": "/apps/foodcourt.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -200,10 +256,18 @@
           ],
           "bestand": "/apps/garderobe.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -226,10 +290,18 @@
           ],
           "bestand": "/apps/geld-command.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -260,10 +332,18 @@
           ],
           "bestand": "/apps/geld.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -286,10 +366,18 @@
           ],
           "bestand": "/apps/krant.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120e0e",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -312,10 +400,18 @@
           ],
           "bestand": "/apps/leven.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090909, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090909",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(12, 12, 11)"
@@ -338,10 +434,18 @@
           ],
           "bestand": "/apps/lifestyle.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -364,10 +468,18 @@
           ],
           "bestand": "/apps/living-os.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #0a0909 materiaal onyx, boven #120f0f, huisletter staat er",
+          "reden": "grond #0a0909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120f0f",
             "waarde": "#0a0909",
+            "pixel": {
+              "r": 10,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.0361278431372549,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(12, 12, 11)"
@@ -390,10 +502,18 @@
           ],
           "bestand": "/apps/maison.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -416,10 +536,18 @@
           ],
           "bestand": "/apps/mall.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -442,10 +570,18 @@
           ],
           "bestand": "/apps/media.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080808 materiaal onyx, boven #100f0e, huisletter staat er",
+          "reden": "grond #080808 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #100f0e",
             "waarde": "#080808",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03137254901960784,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -468,10 +604,18 @@
           ],
           "bestand": "/apps/mijnmall.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #130f0f, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #130f0f",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -494,10 +638,18 @@
           ],
           "bestand": "/apps/muziek.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #110f0e materiaal onyx, boven #0d0d0c, huisletter staat er",
+          "reden": "grond #110f0e = onyx (5 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0d0d0c",
             "waarde": "#110f0e",
+            "pixel": {
+              "r": 17,
+              "g": 15,
+              "b": 14,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.0602078431372549,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -520,10 +672,18 @@
           ],
           "bestand": "/apps/nieuws.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -546,10 +706,18 @@
           ],
           "bestand": "/apps/pay.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -572,10 +740,18 @@
           ],
           "bestand": "/apps/podium.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120e0e",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -594,14 +770,56 @@
         },
         {
           "namen": [
+            "Rendez-vous"
+          ],
+          "bestand": "/apps/rendezvous.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 378,
+          "bytes": 35116,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
             "Tweede scherm"
           ],
           "bestand": "/apps/scherm.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #120e0d, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120e0d",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -620,14 +838,56 @@
         },
         {
           "namen": [
+            "Sociaal"
+          ],
+          "bestand": "/apps/sociaal.html",
+          "klasse": "aankleden",
+          "reden": "grond #f1eee7 = pearl (3 naast de basis), huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #f4f2ea",
+            "waarde": "#f1eee7",
+            "pixel": {
+              "r": 241,
+              "g": 238,
+              "b": 231,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9338525490196078,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": null
+          },
+          "regels": 779,
+          "bytes": 39335,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
             "Sport"
           ],
           "bestand": "/apps/sport.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #1b2326, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -650,10 +910,18 @@
           ],
           "bestand": "/apps/table.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -676,10 +944,18 @@
           ],
           "bestand": "/apps/theater.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #120e0e, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #120e0e",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -702,10 +978,18 @@
           ],
           "bestand": "/apps/thuis.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -728,10 +1012,18 @@
           ],
           "bestand": "/apps/uitgaan.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #101212, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #101212",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -754,10 +1046,18 @@
           ],
           "bestand": "/apps/vandaag.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #27181a, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #27181a",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -776,14 +1076,56 @@
         },
         {
           "namen": [
+            "Daten"
+          ],
+          "bestand": "/apps/vonk.html",
+          "klasse": "aankleden",
+          "reden": "grond #f4f0e9 = pearl precies, huisletter staat er",
+          "grond": {
+            "herkomst": "materiaal onyx, boven #171815",
+            "waarde": "#f4f0e9",
+            "pixel": {
+              "r": 244,
+              "g": 240,
+              "b": 233,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.9425294117647058,
+            "letter": "Inter, system-ui, sans-serif",
+            "eigenschap": "rgb(244, 240, 233)"
+          },
+          "regels": 354,
+          "bytes": 38721,
+          "dragers": {
+            "wereldschil": false,
+            "wereldcss": false,
+            "switcher": false,
+            "huisletters": true,
+            "bodoni": false,
+            "inter": false,
+            "uniform": true
+          }
+        },
+        {
+          "namen": [
             "Alles bij elkaar"
           ],
           "bestand": "/apps/wereld.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #0b0b0a materiaal onyx, boven #0c0c0b, huisletter staat er",
+          "reden": "grond #0b0b0a = onyx (1 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0c0c0b",
             "waarde": "#0b0b0a",
+            "pixel": {
+              "r": 11,
+              "g": 11,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.04285411764705882,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -806,10 +1148,18 @@
           ],
           "bestand": "/apps/attenties.html",
           "klasse": "ombouwen",
-          "reden": "lichte grond (#ddd6c9)",
+          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
           "grond": {
             "herkomst": "materiaal onyx, boven #171815",
             "waarde": "#ddd6c9",
+            "pixel": {
+              "r": 221,
+              "g": 214,
+              "b": 201,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.8413709803921569,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(221, 214, 201)"
@@ -832,10 +1182,18 @@
           ],
           "bestand": "/apps/cercle.html",
           "klasse": "ombouwen",
-          "reden": "lichte grond (#ddd6c9)",
+          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
           "grond": {
             "herkomst": "materiaal onyx, boven #171815",
             "waarde": "#ddd6c9",
+            "pixel": {
+              "r": 221,
+              "g": 214,
+              "b": 201,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.8413709803921569,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(221, 214, 201)"
@@ -858,10 +1216,18 @@
           ],
           "bestand": "/apps/entourage.html",
           "klasse": "ombouwen",
-          "reden": "lichte grond (#ddd6c9)",
+          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
           "grond": {
             "herkomst": "materiaal onyx, boven #171815",
             "waarde": "#ddd6c9",
+            "pixel": {
+              "r": 221,
+              "g": 214,
+              "b": 201,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.8413709803921569,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(221, 214, 201)"
@@ -888,9 +1254,17 @@
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(8, 12, 18)"
+            "eigenschap": "rgb(7, 16, 26)"
           },
           "regels": 1054,
           "bytes": 67130,
@@ -910,10 +1284,18 @@
           ],
           "bestand": "/apps/pulse.html",
           "klasse": "ombouwen",
-          "reden": "lichte grond (#ddd6c9)",
+          "reden": "grond #ddd6c9 staat niet in het palet (dichtstbij: pearl op 32)",
           "grond": {
             "herkomst": "materiaal onyx, boven #171815",
             "waarde": "#ddd6c9",
+            "pixel": {
+              "r": 221,
+              "g": 214,
+              "b": 201,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.8413709803921569,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(221, 214, 201)"
@@ -932,69 +1314,25 @@
         },
         {
           "namen": [
-            "Rendez-vous"
-          ],
-          "bestand": "/apps/rendezvous.html",
-          "klasse": "ombouwen",
-          "reden": "lichte grond (#f4f0e9)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#f4f0e9",
-            "licht": 0.9425294117647058,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(244, 240, 233)"
-          },
-          "regels": 378,
-          "bytes": 35116,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
-            "Sociaal"
-          ],
-          "bestand": "/apps/sociaal.html",
-          "klasse": "ombouwen",
-          "reden": "lichte grond (#f1eee7)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #f4f2ea",
-            "waarde": "#f1eee7",
-            "licht": 0.9338525490196078,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": null
-          },
-          "regels": 779,
-          "bytes": 39335,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
             "Spelen"
           ],
           "bestand": "/apps/spelen.html",
           "klasse": "ombouwen",
           "reden": "laadt fonts.css niet",
           "grond": {
-            "herkomst": "materiaal onyx",
-            "waarde": "#07101b",
-            "licht": 0.058356078431372554,
+            "herkomst": "materiaal onyx, boven #07111b",
+            "waarde": "#07101c",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.05863921568627451,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(8, 15, 24)"
+            "eigenschap": "rgb(7, 17, 27)"
           },
           "regels": 1926,
           "bytes": 120378,
@@ -1018,9 +1356,17 @@
           "grond": {
             "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgba(12, 12, 11, 0.294)"
+            "eigenschap": "rgba(12, 12, 11, 0.325)"
           },
           "regels": 143,
           "bytes": 7251,
@@ -1036,32 +1382,6 @@
         },
         {
           "namen": [
-            "Daten"
-          ],
-          "bestand": "/apps/vonk.html",
-          "klasse": "ombouwen",
-          "reden": "lichte grond (#f4f0e9)",
-          "grond": {
-            "herkomst": "materiaal onyx, boven #171815",
-            "waarde": "#f4f0e9",
-            "licht": 0.9425294117647058,
-            "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(244, 240, 233)"
-          },
-          "regels": 354,
-          "bytes": 38721,
-          "dragers": {
-            "wereldschil": false,
-            "wereldcss": false,
-            "switcher": false,
-            "huisletters": true,
-            "bodoni": false,
-            "inter": false,
-            "uniform": true
-          }
-        },
-        {
-          "namen": [
             "LivingOS",
             "Ontdekken"
           ],
@@ -1071,6 +1391,14 @@
           "grond": {
             "herkomst": "materiaal bordeaux, boven #490b1e",
             "waarde": "#0d0507",
+            "pixel": {
+              "r": 13,
+              "g": 5,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.02684392156862745,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(74, 12, 30)"
@@ -1103,10 +1431,18 @@
           ],
           "bestand": "/apps/browser.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0a0908",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1129,10 +1465,18 @@
           ],
           "bestand": "/apps/horeca.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #070707 materiaal onyx, boven #201c1d, huisletter staat er",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #201c1d",
             "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(11, 11, 10)"
@@ -1155,10 +1499,18 @@
           ],
           "bestand": "/apps/loonstrook.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0f1111",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1181,10 +1533,18 @@
           ],
           "bestand": "/apps/magnaat.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #070707 materiaal onyx, boven #100f0e, huisletter staat er",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #100f0e",
             "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1207,10 +1567,18 @@
           ],
           "bestand": "/apps/office.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, boven #090908, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090908",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1233,10 +1601,18 @@
           ],
           "bestand": "/apps/onderneming.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0a0908",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1259,10 +1635,18 @@
           ],
           "bestand": "/apps/partner-network.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #070707 materiaal onyx, boven #201c1d, huisletter staat er",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #201c1d",
             "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(12, 12, 11)"
@@ -1285,13 +1669,21 @@
           ],
           "bestand": "/apps/rtgone.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #0d0c0b materiaal onyx, boven #0c0c0a, huisletter staat er",
+          "reden": "grond #120d0c = onyx (6 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0c0c0a",
-            "waarde": "#0d0c0b",
-            "licht": 0.04760941176470588,
+            "waarde": "#120d0c",
+            "pixel": {
+              "r": 18,
+              "g": 13,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.054865882352941174,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(12, 12, 11)"
+            "eigenschap": "rgb(14, 12, 11)"
           },
           "regels": 29,
           "bytes": 31678,
@@ -1311,13 +1703,21 @@
           ],
           "bestand": "/apps/rtgschool.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgb(13, 12, 11)"
+            "eigenschap": "rgb(14, 12, 11)"
           },
           "regels": 183,
           "bytes": 11287,
@@ -1337,10 +1737,18 @@
           ],
           "bestand": "/apps/rtmail.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, boven #090a09, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a09",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1363,10 +1771,18 @@
           ],
           "bestand": "/apps/sitemaker.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, boven #0a0908, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0a0908",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1389,10 +1805,18 @@
           ],
           "bestand": "/apps/werk.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #060606 materiaal onyx, boven #201c1d, huisletter staat er",
+          "reden": "grond #060606 = onyx (6 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #201c1d",
             "waarde": "#060606",
+            "pixel": {
+              "r": 6,
+              "g": 6,
+              "b": 6,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.023529411764705882,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(12, 12, 11)"
@@ -1419,6 +1843,14 @@
           "grond": {
             "herkomst": "materiaal royal, boven #0b0c0e",
             "waarde": "#090a0b",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 11,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03866509803921569,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1451,10 +1883,18 @@
           ],
           "bestand": "/apps/arrival.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080808 materiaal onyx, huisletter staat er",
+          "reden": "grond #080808 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#080808",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03137254901960784,
             "letter": "Inter, sans-serif",
             "eigenschap": "rgb(8, 8, 8)"
@@ -1477,11 +1917,19 @@
           ],
           "bestand": "/apps/flits.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080909 materiaal onyx, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx",
-            "waarde": "#080909",
-            "licht": 0.034460392156862744,
+            "herkomst": "materiaal onyx, boven #080808",
+            "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
+            "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
           },
@@ -1503,10 +1951,18 @@
           ],
           "bestand": "/apps/hangar.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1529,10 +1985,18 @@
           ],
           "bestand": "/apps/navigatie.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #080808",
+            "herkomst": "materiaal onyx, boven #070707",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1555,10 +2019,18 @@
           ],
           "bestand": "/apps/ov.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1581,10 +2053,18 @@
           ],
           "bestand": "/apps/ovroutes.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #07090a materiaal onyx, boven #070707, huisletter staat er",
+          "reden": "grond #07090a = onyx (5 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #070707",
+            "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#07090a",
+            "pixel": {
+              "r": 7,
+              "g": 9,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03390980392156863,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": "rgb(8, 10, 11)"
@@ -1607,10 +2087,18 @@
           ],
           "bestand": "/apps/reisboek.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1633,10 +2121,18 @@
           ],
           "bestand": "/apps/reizen-veilig.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #070707 materiaal onyx, boven #131010, huisletter staat er",
+          "reden": "grond #070707 = onyx (5 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #131010",
             "waarde": "#070707",
+            "pixel": {
+              "r": 7,
+              "g": 7,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.02745098039215686,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(12, 12, 11)"
@@ -1659,10 +2155,18 @@
           ],
           "bestand": "/apps/residentie.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #0d0b08 materiaal onyx, boven #040505, huisletter staat er",
+          "reden": "grond #0d0b08 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx, boven #040505",
+            "herkomst": "materiaal onyx, boven #090501",
             "waarde": "#0d0b08",
+            "pixel": {
+              "r": 13,
+              "g": 11,
+              "b": 8,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.04395529411764706,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1685,13 +2189,21 @@
           ],
           "bestand": "/apps/routedossier.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #080807 materiaal onyx, huisletter staat er",
+          "reden": "grond #080807 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
-            "herkomst": "materiaal onyx",
+            "herkomst": "materiaal onyx, boven #090807",
             "waarde": "#080807",
+            "pixel": {
+              "r": 8,
+              "g": 8,
+              "b": 7,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03108941176470588,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgba(13, 12, 11, 0.855)"
+            "eigenschap": "rgba(17, 12, 11, 0.965)"
           },
           "regels": 320,
           "bytes": 16943,
@@ -1711,10 +2223,18 @@
           ],
           "bestand": "/apps/stad.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1737,10 +2257,18 @@
           ],
           "bestand": "/apps/vluchten.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090a0a materiaal onyx, boven #080808, huisletter staat er",
+          "reden": "grond #090a0a = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #080808",
             "waarde": "#090a0a",
+            "pixel": {
+              "r": 9,
+              "g": 10,
+              "b": 10,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.038381960784313725,
             "letter": "Inter, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
             "eigenschap": null
@@ -1767,6 +2295,14 @@
           "grond": {
             "herkomst": "materiaal onyx, boven #070606",
             "waarde": "#050505",
+            "pixel": {
+              "r": 5,
+              "g": 5,
+              "b": 5,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.019607843137254898,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": "rgb(8, 9, 9)"
@@ -1799,10 +2335,18 @@
           ],
           "bestand": "/apps/ik.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0f1111",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1825,10 +2369,18 @@
           ],
           "bestand": "/apps/passkeys.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090909 materiaal onyx, boven #0f1111, huisletter staat er",
+          "reden": "grond #090909 = onyx (3 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #0f1111",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1851,10 +2403,18 @@
           ],
           "bestand": "/apps/veilig.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #090809 materiaal onyx, boven #090a0a, huisletter staat er",
+          "reden": "grond #090809 = onyx (4 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx, boven #090a0a",
             "waarde": "#090809",
+            "pixel": {
+              "r": 9,
+              "g": 8,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.032489411764705885,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1881,6 +2441,14 @@
           "grond": {
             "herkomst": "materiaal onyx, boven #1b2326",
             "waarde": "#090909",
+            "pixel": {
+              "r": 9,
+              "g": 9,
+              "b": 9,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03529411764705883,
             "letter": "Inter, system-ui, sans-serif",
             "eigenschap": null
@@ -1914,13 +2482,21 @@
           ],
           "bestand": "/apps/foundation/os-portaal.html",
           "klasse": "aankleden",
-          "reden": "donkere grond #07101b materiaal onyx, huisletter staat er",
+          "reden": "grond #07101b = onyx (16 naast de basis), huisletter staat er",
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#07101b",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 27,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.058356078431372554,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(8, 15, 23)"
+            "eigenschap": "rgb(8, 16, 25)"
           },
           "regels": 242,
           "bytes": 15911,
@@ -1944,9 +2520,17 @@
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 15, 24)"
+            "eigenschap": "rgb(7, 17, 28)"
           },
           "regels": 261,
           "bytes": 17200,
@@ -1970,9 +2554,17 @@
           "grond": {
             "herkomst": "materiaal onyx",
             "waarde": "#08090c",
+            "pixel": {
+              "r": 8,
+              "g": 9,
+              "b": 12,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.03530980392156863,
             "letter": "Inter, \"Helvetica Neue\", Helvetica, Arial, sans-serif",
-            "eigenschap": "rgb(7, 16, 26)"
+            "eigenschap": "rgb(7, 17, 27)"
           },
           "regels": 271,
           "bytes": 19935,
@@ -1995,11 +2587,19 @@
           "klasse": "schil",
           "reden": "de wereldschil staat er",
           "grond": {
-            "herkomst": "materiaal champagne, boven #07101b",
+            "herkomst": "materiaal champagne, boven #07111b",
             "waarde": "#07101c",
+            "pixel": {
+              "r": 7,
+              "g": 16,
+              "b": 28,
+              "kanalen": 3,
+              "w": 4,
+              "h": 4
+            },
             "licht": 0.05863921568627451,
             "letter": "Inter, system-ui, sans-serif",
-            "eigenschap": "rgba(7, 17, 28, 0.973)"
+            "eigenschap": "rgb(7, 17, 28)"
           },
           "regels": 186,
           "bytes": 11112,

@@ -168,6 +168,24 @@ dichtzet terwijl de rest van de app in de regelgestuurde werkmodus doorloopt
 (`kern/kosten/grens.js`; twee sloten, de strengste wint, en `geen-grens` is een
 andere stand dan `ruim`).
 
+**`GIFT.md` is het besluit vóór de doneerknop** -- die knop bestaat met opzet
+niet (`kern/rtfos/donateur.js`: geen doneerknop en geen incasso, geld aannemen
+loopt via RTG Pay en de bank). Lees hem vóór je iets bouwt waarmee de stichting
+geld aanneemt. De verantwoording ERNA is af en streng: het donateursportaal op
+een eigen code, een giftbewijs dat weigert waar het geen gift is (sponsoring,
+tegenprestatie, goederen), en een herkomstcontrole die boven de tienduizend euro
+het geld stil zet in plaats van te waarschuwen. Wat ontbreekt zijn drie
+BESLUITEN, niet drie functies: waar het geld landt (er is geen codenaam of
+positie van de RTFoundation om aan te betalen), welke giftvormen opengaan
+(eenmalig, geoormerkt, periodiek -- en periodiek heet alleen zo met een
+overeenkomst van vijf jaar), en of de stichting zelf een ANBI is. Dat laatste is
+gemodelleerd maar niet aangesloten: `kern/foundationregistratie*.js` en
+`kern/rtfos/partners.js` leggen ANBI en RSIN vast van PARTNERstichtingen, en de
+giftlaag leest die status nul keer -- terwijl er wel een giftbewijs uitgaat. De
+vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
+de boardroom die zelf de juridische positie IS, standaard dicht, en een route
+die dan weigert mét de reden.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

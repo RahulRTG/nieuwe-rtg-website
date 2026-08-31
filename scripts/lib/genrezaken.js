@@ -106,7 +106,24 @@ const ZAKEN = [
   { code: 'BODE',      genre: 'journalistiek', prefixen: ['/api/supplier/redactie'],
     waarom: 'de redactie; routes/journalistiek.js vraagt de cap "redactie"' },
   { code: 'MAISON',    genre: 'retail',        prefixen: ['/api/supplier/retail'],
-    waarom: 'de mode- en retailpartner; routes/supplier/retail.js vraagt de cap "retail"' }
+    waarom: 'de mode- en retailpartner; routes/supplier/retail.js vraagt de cap "retail"' },
+  /* DEZE TWEE ZIJN GEEN CAP EN GEEN s.type, MAAR EEN FUNCTIESCHAKELAAR -- en
+     dat was bijna een verkeerde conclusie. 51 routes weigerden met "Deze
+     functie is voor dit genre zaken uitgeschakeld door RTG", en dat leest als
+     een knop die in de boardroom uit staat. Dat is het niet: het functie-
+     register kent `alleenGenres` (server/functies/register/cat-apps.js), en
+     die vijf apps HOREN alleen bij vervoer -- Vervoer, OV, Flits, Eye en Ghost
+     Driver. Een restaurant heeft geen rijscherm.
+
+     Het verschil doet ertoe voor de trechter: een uitgeschakelde functie zou
+     onbeproefbaar zijn, maar dit is gewoon de verkeerde zaak. Een taxi dekt er
+     vier, de OV-zaak de vijfde. Dat is bewijs en geen hernoemde reden. */
+  { code: 'MKKX',      genre: 'taxi',          prefixen: ['/api/supplier/mob', '/api/staff/mob',
+                                                          '/api/staff/flits', '/api/supplier/oog',
+                                                          '/api/staff/oog', '/api/supplier/ghost'],
+    waarom: 'de taxi; het functieregister geeft Vervoer, Flits, Eye en Ghost Driver alleen aan vervoersgenres' },
+  { code: 'TRANSIT',   genre: 'ov',            prefixen: ['/api/supplier/ov', '/api/staff/ov'],
+    waarom: 'de OV-zaak; RTG OV staat in het register op alleenGenres: ["ov"] en dus op precies dit genre' }
 ];
 
 /* De rem op /api/supplier/roster staat op dertig per kwartier per IP. Deze

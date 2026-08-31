@@ -34,9 +34,14 @@ const REIS = {
   ]
 };
 
-function maak() {
+function maak(gedeeld) {
   const db = { data: {} };
   const save = () => {};
+  /* De deellaag van de kluis, in het klein. Deze toets meet niet HOE de kluis
+     deelt (dat doet kern/bestanden-delen.js zelf) maar of het gezelschap hem
+     op de juiste momenten aanroept -- en vooral: of intrekken ook de beelden
+     meeneemt. */
+  const bak = gedeeld || new Map();
   const mod = require('../server/kern/reisgezelschap').maakReisgezelschap({
     db, save, crypto,
     mijnReizen: (key) => ({ reizen: key === 'user-1' ? [REIS] : [] }),
@@ -46,7 +51,14 @@ function maak() {
        hoort erbij -- ook in de toets. */
     keyVanCodenaam: async (c) => ({ Zilverreiger: { key: 'user-1', codename: 'Zilverreiger' },
       Nachtvlinder: { key: 'user-2', codename: 'Nachtvlinder' },
-      Steenmarter: { key: 'user-3', codename: 'Steenmarter' } })[String(c)] || null
+      Steenmarter: { key: 'user-3', codename: 'Steenmarter' } })[String(c)] || null,
+    bestandenDeel: async (key, bid, codenaam, aan) => {
+      const sleutel = key + '|' + bid;
+      const rij = new Set(bak.get(sleutel) || []);
+      if (aan) rij.add(codenaam); else rij.delete(codenaam);
+      bak.set(sleutel, [...rij]);
+      return { ok: true };
+    }
   });
   return mod.reisgezelschap;
 }
@@ -121,7 +133,7 @@ test('wie eruit gaat, ziet ook niet meer wat er eerder stond', async () => {
   assert.equal(g.schrijf('user-1', REIS.id, 'Aangekomen.').status, 200);
   assert.equal(g.tijdlijn('user-2', REIS.id).posts.length, 1, 'hij leest de tijdlijn zolang hij erbij hoort');
 
-  assert.equal(g.verwijder('user-1', uit.lid.id).status, 200);
+  assert.equal((await g.verwijder('user-1', uit.lid.id)).status, 200);
   assert.equal(g.tijdlijn('user-2', REIS.id).status, 404, 'daarna niets meer -- ook niet het oude bericht');
   assert.equal(g.reisVoor('user-2', REIS.id).status, 404);
   assert.equal(g.schrijf('user-2', REIS.id, 'Nog een bericht').status, 403);
@@ -212,4 +224,50 @@ test('een reisgenoot meldt niet aan dat een ander is aangekomen', async () => {
   g.antwoord('user-3', genoot.lid.id, true);
   assert.equal(g.meldAankomst('user-3', REIS.id).status, 404);
   assert.equal(g.zetBeleid('user-3', REIS.id, 'aankomst', false).status, 404);
+});
+
+/* ------------------------------------------------------------------ BEELD ---
+   Wat op de tijdlijn staat is een VERWIJZING; het bestand blijft in de kluis
+   van de reiziger en de deellaag van die kluis regelt de toegang. */
+test('een gedeeld beeld gaat naar het gezelschap, en naar niemand anders', async () => {
+  const bak = new Map();
+  const g = maak(bak);
+  const mee = await g.nodigUit('user-1', REIS.id, 'Nachtvlinder', 'meekijker');
+  await g.antwoord('user-2', mee.lid.id, true);
+  const open = await g.nodigUit('user-1', REIS.id, 'Steenmarter', 'reisgenoot');   // aanvaardt NIET
+
+  const uit = await g.deelBeeld('user-1', REIS.id, 'B-123', 'De zee.');
+  assert.equal(uit.status, 200);
+  assert.equal(uit.post.soort, 'beeld');
+  assert.equal(uit.post.bestand, 'B-123');
+  assert.deepEqual(bak.get('user-1|B-123'), ['Nachtvlinder'],
+    'wie de uitnodiging nog niet aanvaardde, krijgt het beeld niet');
+  assert.ok(open.lid, 'de openstaande uitnodiging bestaat wel');
+});
+
+test('wie uit het gezelschap gaat, verliest ook de beelden', async () => {
+  const bak = new Map();
+  const g = maak(bak);
+  const mee = await g.nodigUit('user-1', REIS.id, 'Nachtvlinder', 'meekijker');
+  await g.antwoord('user-2', mee.lid.id, true);
+  await g.deelBeeld('user-1', REIS.id, 'B-123', 'De zee.');
+  assert.deepEqual(bak.get('user-1|B-123'), ['Nachtvlinder']);
+
+  await g.verwijder('user-1', mee.lid.id);
+  assert.deepEqual(bak.get('user-1|B-123'), [],
+    'anders raakt hij de tijdlijn kwijt en houdt hij de fotos -- een halve waarheid');
+  assert.equal(g.tijdlijn('user-2', REIS.id).status, 404);
+});
+
+test('het gezelschap legt geen tweede kopie van het beeld aan', async () => {
+  const g = maak();
+  const mee = await g.nodigUit('user-1', REIS.id, 'Nachtvlinder', 'meekijker');
+  await g.antwoord('user-2', mee.lid.id, true);
+  const uit = await g.deelBeeld('user-1', REIS.id, 'B-123', 'De zee.');
+  /* Alleen een verwijzing: geen bytes, geen url, geen kopie van het bestand. */
+  const post = uit.post;
+  assert.equal(post.bestand, 'B-123');
+  for (const veld of ['bytes', 'data', 'inhoud', 'url', 'pad']) {
+    assert.equal(post[veld], undefined, 'een post draagt geen ' + veld);
+  }
 });

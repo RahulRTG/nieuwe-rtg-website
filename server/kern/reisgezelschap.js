@@ -63,7 +63,7 @@ const ONDERDEELVELDEN = {
   meekijker: []                                     // geen draaiboek: de lijst blijft leeg
 };
 
-module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan, keyVanCodenaam }) => {
+module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan, keyVanCodenaam, bestandenDeel }) => {
   const nu = () => klok.datum().toISOString();
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
   const naam = (key) => (typeof codenaamVan === 'function' ? codenaamVan(key) : null) || key;
@@ -161,11 +161,22 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   /* INTREKKEN. Door de eigenaar (iemand eruit), of door het lid zelf (weggaan).
      In beide gevallen verdwijnt de toegang tot alles -- ook tot wat er eerder
      stond, want er is geen kopie elders. */
-  function verwijder(key, id) {
+  async function verwijder(key, id) {
     const rec = leden().find(x => x.id === id && (x.eigenaar === key || x.lid === key));
     if (!rec) return { status: 404, error: 'Niet gevonden.' };
     db.data.reisGezelschap = leden().filter(x => x !== rec); save();
-    return { status: 200, ok: true };
+    /* EN DE BEELDEN GAAN MEE. Wie de tijdlijn kwijtraakt maar de fotos houdt,
+       is niet weggehaald; dat is een halve waarheid en die is erger dan geen.
+       De deellaag van de kluis is hier de baas -- wij zetten alleen de
+       codenaam uit de lijst van elk beeld van deze reis. */
+    const codenaam = rec.lidCodenaam || naam(rec.lid);
+    if (typeof bestandenDeel === 'function') {
+      const beelden = posts().filter(p => p.reis === rec.reis && p.eigenaar === rec.eigenaar && p.bestand);
+      for (const p of beelden) {
+        try { await bestandenDeel(rec.eigenaar, p.bestand, codenaam, false); } catch (e) { /* de kluis meldt zelf */ }
+      }
+    }
+    return { status: 200, ok: true, beeldenIngetrokken: true };
   }
 
   const toon = (x) => ({
@@ -219,7 +230,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   }
 
   const toonPost = (p) => ({ id: p.id, van: p.doorCodenaam, rol: p.rol, soort: p.soort || 'bericht',
-    tekst: p.tekst, at: p.at });
+    tekst: p.tekst, bestand: p.bestand || null, at: p.at });
 
   /* WAT U DEELT -- per reis, en per stuk.
 
@@ -259,6 +270,54 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
     b[veld] = aan === true;
     beleidBak()[sleutel] = b; save();
     return { status: 200, ok: true, beleid: b };
+  }
+
+  /* BEELD DELEN -- en het besluit dat eronder ligt.
+
+     EEN FOTO DIE NAAR VIER MENSEN GAAT IS IETS ANDERS DAN EEN FOTO IN UW KLUIS.
+     Daarom komt er hier GEEN tweede opslag bij. Wat op de tijdlijn staat is een
+     VERWIJZING naar een bestand dat in de kluis van de reiziger blijft, en de
+     toegang wordt geregeld door de deellaag die die kluis al heeft
+     (kern/bestanden-delen.js). Dat is niet alleen minder code -- het maakt drie
+     dingen waar die anders beloftes waren geweest:
+
+       1. BEWAARTERMIJN. Het beeld valt onder de bewaartermijn van de kluis van
+          zijn eigenaar. Er ligt geen tweede exemplaar in een RTG-bak dat die
+          termijn overleeft, en er is niets te vergeten wat het recht op
+          vergetelheid (kern/bestanden-vergeten.js) niet al meepakt.
+       2. DOELBINDING. Delen gebeurt per bestand en per persoon, met de
+          codenamen van dít gezelschap. Niet "alles van deze reis" en niet
+          "iedereen die er ooit bij zat".
+       3. INTREKKEN WERKT ECHT. Wie uit het gezelschap gaat, verliest ook de
+          bestanden: `verwijder()` hieronder haalt hem uit de deellijst van elk
+          beeld van deze reis. Zonder die stap zou hij de tijdlijn kwijtraken en
+          de fotos houden -- precies de halve waarheid die dit huis niet wil.
+
+     WAT DIT NIET DOET: uploaden. Het bestand staat al in de kluis; hier wordt
+     het gedeeld. Een tweede uploadweg zou een tweede quotum, een tweede
+     virusscan en een tweede plek zijn waar bytes van een lid landen. */
+  async function deelBeeld(key, reisId, bestandId, tekst) {
+    const reis = reisVan(key, reisId);
+    if (!reis) return { status: 404, error: 'Deze reis staat niet bij u.' };
+    const bid = schoon(bestandId, 60);
+    if (!bid) return { status: 400, error: 'Kies een bestand uit uw kluis.' };
+    if (typeof bestandenDeel !== 'function') {
+      return { status: 501, error: 'Delen van bestanden is op deze server niet ingeschakeld.' };
+    }
+    const kring = leden().filter(x => x.reis === reisId && x.eigenaar === key && x.stand === 'aanvaard');
+    /* Eerst delen, dan pas plaatsen. Andersom zou er een regel op de tijdlijn
+       staan die naar een beeld wijst dat niemand mag openen. */
+    for (const l of kring) {
+      const uit = await bestandenDeel(key, bid, l.lidCodenaam || naam(l.lid), true);
+      if (uit && uit.error) return { status: uit.status || 400, error: uit.error };
+    }
+    const post = {
+      id: 'P-' + crypto.randomBytes(4).toString('hex'),
+      reis: reisId, eigenaar: key, door: key, doorCodenaam: naam(key), rol: 'eigenaar',
+      soort: 'beeld', bestand: bid, tekst: schoon(tekst, MAX_TEKST), at: nu()
+    };
+    posts().push(post); save();
+    return { status: 200, ok: true, post: toonPost(post), gedeeldMet: kring.length };
   }
 
   /* HET AANKOMSTMOMENT. Alleen de reiziger zelf; een reisgenoot meldt niet aan
@@ -309,7 +368,7 @@ module.exports.maakReisgezelschap = ({ db, save, crypto, mijnReizen, codenaamVan
   return {
     reisgezelschap: {
       ROLLEN, STANDEN, zicht, rolVan, nodigUit, antwoord, verwijder,
-      gezelschap, reisVoor, schrijf, tijdlijn, mijnKring, beleid, zetBeleid, meldAankomst
+      gezelschap, reisVoor, schrijf, tijdlijn, mijnKring, beleid, zetBeleid, meldAankomst, deelBeeld
     }
   };
 };

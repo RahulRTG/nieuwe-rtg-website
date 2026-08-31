@@ -291,6 +291,16 @@
             <section class="kompaskaart" aria-labelledby="samenLijnTitel">
               <div class="kompaskop"><h2 id="samenLijnTitel" class="micro">DE TIJDLIJN VAN DEZE REIS</h2></div>
               <div id="samenTijdlijn"><p class="leegtekst">Kies een reis.</p></div>
+              <div class="beeldbalk" id="samenBeeldBalk" hidden>
+                <label class="rtg-label" for="samenBeeld">Deel een beeld uit uw kluis</label>
+                <div class="beeldkiezer">
+                  <select class="rtg-veld" id="samenBeeld"></select>
+                  <button class="rtg-knop" type="button" id="samenDeelBeeld">DEEL</button>
+                </div>
+                <p class="rtg-sub">Het bestand blijft in uw kluis; het gezelschap krijgt er toegang toe.
+                  Haalt u iemand weg, dan vervalt die toegang ook.</p>
+              </div>
+
               <form class="rahulsnel" id="samenSchrijf">
                 <label for="samenTekst">Schrijf iets aan het gezelschap</label>
                 <input id="samenTekst" autocomplete="off" placeholder="Schrijf iets aan het gezelschap…" maxlength="1200">

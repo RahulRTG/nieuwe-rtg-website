@@ -273,6 +273,14 @@ body.rtg-stijl.rtg-edge-host .reisapp>main{padding-top:48px!important}
 .schakel.aan{border-color:var(--wine-licht);background:linear-gradient(100deg,var(--wine-bright),var(--wine));color:#fff}
 #samenDelenKaart .rtg-knop{width:100%;margin-top:.9rem}
 #samenDelenKaart .rtg-sub{margin:.6rem 0 0;color:var(--muted);font-size:.72rem;line-height:1.5}
+.beeldbalk{border-top:1px solid var(--line-soft);margin-top:1rem;padding-top:1rem;display:flex;flex-direction:column;gap:.45rem}
+.beeldbalk .rtg-label{font-size:.6rem;letter-spacing:.14em}
+.beeldbalk .rtg-sub{margin:0;color:var(--muted);font-size:.72rem;line-height:1.5}
+.beeldkiezer{display:grid;grid-template-columns:1fr auto;gap:.5rem}
+.postbeeld{margin-top:.6rem;border:1px solid var(--line);background:rgba(23,4,9,.5);padding:.5rem;color:var(--muted);font-size:.72rem}
+/* Een staande foto mag de tijdlijn niet opeten; hij wordt bijgesneden
+   getoond en opent op ware grootte in de kluis. */
+.postbeeld img{display:block;width:100%;max-width:460px;max-height:320px;height:auto;object-fit:cover}
 
 :focus-visible{outline:2px solid var(--wine-licht);outline-offset:3px}
 @keyframes blad-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

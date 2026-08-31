@@ -38,8 +38,8 @@ module.exports = (kern) => {
     const b = req.body || {};
     gez(res, kern.reisgezelschap.antwoord(req.session.key, String(b.id || ''), b.ja === true));
   });
-  app.post('/api/reis/gezelschap/weg', auth, (req, res) =>
-    gez(res, kern.reisgezelschap.verwijder(req.session.key, String((req.body || {}).id || ''))));
+  app.post('/api/reis/gezelschap/weg', auth, async (req, res) =>
+    gez(res, await kern.reisgezelschap.verwijder(req.session.key, String((req.body || {}).id || ''))));
   app.post('/api/reis/gezelschap/kring', auth, (req, res) =>
     gez(res, kern.reisgezelschap.mijnKring(req.session.key)));
   /* De reis zoals DEZE lezer hem mag zien -- de eigenaar zijn eigen reis, een
@@ -62,6 +62,13 @@ module.exports = (kern) => {
   });
   /* Het aankomstmoment is een HANDELING van de reiziger, geen meting: RTG heeft
      geen externe vluchtbron, en een stand die vanzelf doorloopt zou volgen zijn. */
+  /* Beeld delen: een VERWIJZING naar een bestand dat in de kluis van de
+     reiziger blijft. De deellaag van die kluis regelt de toegang; hier komt
+     geen tweede opslag en geen tweede uploadweg bij. */
+  app.post('/api/reis/gezelschap/beeld', auth, async (req, res) => {
+    const b = req.body || {};
+    gez(res, await kern.reisgezelschap.deelBeeld(req.session.key, String(b.reis || ''), b.bestand, b.tekst));
+  });
   app.post('/api/reis/gezelschap/aangekomen', auth, (req, res) =>
     gez(res, kern.reisgezelschap.meldAankomst(req.session.key, String((req.body || {}).reis || ''))));
 

@@ -94,7 +94,26 @@
       kop.appendChild(maak('b', '', p.van));
       kop.appendChild(maak('small', '', tijd(p.at) + ' · ' + p.rol));
       body.appendChild(kop);
-      body.appendChild(maak('p', '', p.tekst));
+      if (p.tekst) body.appendChild(maak('p', '', p.tekst));
+      if (p.soort === 'beeld') {
+        /* De bytes staan in de kluis van de reiziger en komen daar vandaan --
+           met de sessie van de LEZER, zodat de kluis zelf beslist of hij ze
+           krijgt. Dit scherm bewaart geen kopie en kent geen adres. */
+        var beeld = maak('div', 'postbeeld');
+        beeld.appendChild(maak('small', '', 'Beeld uit de kluis van ' + p.van));
+        body.appendChild(beeld);
+        R.api('/api/bestanden/haal', { id: p.bestand }).then(function (uit) {
+          if (!uit || !uit.dataUrl) return;
+          var img = d.createElement('img');
+          img.src = uit.dataUrl; img.alt = p.tekst || 'Gedeeld beeld';
+          img.loading = 'lazy';
+          beeld.textContent = ''; beeld.appendChild(img);
+        }).catch(function () {
+          /* Niet zwijgen als het niet lukt: een leeg vlak leest als "er is
+             niets", en er is wel iets -- u mag er alleen niet bij. */
+          beeld.textContent = 'Dit beeld is niet (meer) met u gedeeld.';
+        });
+      }
       post.appendChild(body);
       vak.appendChild(post);
     });
@@ -150,6 +169,33 @@
       regel.appendChild(maak('em', 'rolpil', 'BESTAAT NIET'));
       vak.appendChild(regel);
     });
+  }
+
+  /* DE BEELDKIEZER. Alleen voor de reiziger, en alleen met wat er al IN zijn
+     kluis staat: hier komt geen tweede uploadweg bij, want dat zou een tweede
+     quotum, een tweede virusscan en een tweede plek zijn waar bytes landen. */
+  function vulBeelden(vanMij) {
+    var balk = $('#samenBeeldBalk'), keuze = $('#samenBeeld');
+    if (!balk || !keuze) return;
+    if (!vanMij) { balk.hidden = true; return; }
+    R.api('/api/bestanden/mijn', {}).then(function (uit) {
+      var beelden = (uit.items || []).filter(function (x) {
+        return !x.weg && /^image\//.test(String(x.mime || ''));
+      });
+      keuze.textContent = '';
+      if (!beelden.length) {
+        balk.hidden = false;
+        keuze.appendChild(maak('option', '', 'Nog geen beeld in uw kluis'));
+        keuze.disabled = true; $('#samenDeelBeeld').disabled = true;
+        return;
+      }
+      keuze.disabled = false; $('#samenDeelBeeld').disabled = false;
+      beelden.forEach(function (b) {
+        var optie = maak('option', '', b.naam);
+        optie.value = b.id; keuze.appendChild(optie);
+      });
+      balk.hidden = false;
+    }).catch(function () { balk.hidden = true; });
   }
 
   function tekenKring(uit) {
@@ -210,6 +256,7 @@
       R.api('/api/reis/gezelschap', { reis: huidig }).then(tekenLeden).catch(function () {});
       R.api('/api/reis/gezelschap/tijdlijn', { reis: huidig }).then(tekenTijdlijn).catch(function () {});
       R.api('/api/reis/gezelschap/reis', { reis: huidig }).then(tekenZicht).catch(function () {});
+      vulBeelden(vanMij);
       if (vanMij) {
         R.api('/api/reis/gezelschap/beleid', { reis: huidig })
           .then(tekenDelen)
@@ -250,6 +297,19 @@
       if (!huidig) { R.toast('Kies eerst een reis.'); return; }
       R.api('/api/reis/gezelschap/aangekomen', { reis: huidig })
         .then(function (uit) { R.toast('Gedeeld met ' + uit.gedeeldMet + '.'); laad(); })
+        .catch(function (e) { R.toast(e.message); });
+    });
+
+    var deelKnop = $('#samenDeelBeeld');
+    if (deelKnop) deelKnop.addEventListener('click', function () {
+      var keuze = $('#samenBeeld');
+      if (!huidig || !keuze || !keuze.value) { R.toast('Kies eerst een beeld.'); return; }
+      R.api('/api/reis/gezelschap/beeld', { reis: huidig, bestand: keuze.value, tekst: $('#samenTekst').value })
+        .then(function (uit) {
+          $('#samenTekst').value = '';
+          R.toast('Gedeeld met ' + uit.gedeeldMet + ' ' + (uit.gedeeldMet === 1 ? 'persoon' : 'mensen') + '.');
+          laad();
+        })
         .catch(function (e) { R.toast(e.message); });
     });
 

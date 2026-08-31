@@ -34,6 +34,15 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;   // 0 = alles
+/* KIJKEN NAAR EEN HANDVOL ROUTES, ZONDER HET REGISTER TE RAKEN. Een volle ronde
+   gaat over duizenden routes en duurt navenant; wie een keten wil nameten, moet
+   dat kunnen zonder een uur te wachten.
+
+   En hij mag NIET wegschrijven. Een gefilterde ronde die IDEMPROEF.json
+   overschrijft, laat het register zeggen dat er vier routes bestaan -- en alles
+   wat erop leunt (de kaart, de bewijsschuld, de gevolgvoorspelling) rekent
+   daarmee door. Kijken en vastleggen zijn twee dingen, en dit is het eerste. */
+const PAD = (argv.find(a => a.startsWith('--pad=')) || '').slice(6);
 
 /* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
    te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
@@ -110,7 +119,8 @@ if (require.main !== module) { module.exports = {}; return; }
   const kandidaten = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
-    .filter(r => !r.pad.includes(':'));
+    .filter(r => !r.pad.includes(':'))
+    .filter(r => !PAD || r.pad === PAD || r.pad.startsWith(PAD + '/'));
   /* De verdeling in plaats van een filter. `.filter(r => r.rol)` liet hier
      honderden routes verdwijnen zonder dat er ergens een getal omhoog ging; nu
      komen ze met hun reden terug en staan ze straks ook in het uitslagbestand. */
@@ -386,6 +396,11 @@ if (require.main !== module) { module.exports = {}; return; }
   console.log('  onbeschermd MET een besluit          : ' + (onbeschermd.length - zonderBesluit.length) + ' / ' + onbeschermd.length);
   if (zonderBesluit.length) console.log('      zonder besluit in IDEMBESLUIT.json: ' + zonderBesluit.length);
 
+  if (PAD) {
+    console.log('\n  ' + UITSLAG.split('/').pop() + ' is NIET geschreven: dit was een gefilterde ronde');
+    console.log('  over "' + PAD + '". Een deelmeting in het register zou de rest laten verdwijnen.');
+    return;
+  }
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Per route drie oproepen: twee met dezelfde sleutel en een met een verse. De derde is de ' +

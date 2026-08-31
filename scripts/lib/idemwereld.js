@@ -469,6 +469,32 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
     w.stad = veld(stad, 'stad', 'id');
   }
 
+  /* ---- DE INKOOPKETEN VAN DE AI-AGENT (EXECUTIE.md par. 7) ----------------
+
+     De pilotketen van de execution plane is vier routes lang, en twee ervan
+     stonden op `ongemeten`: /agent/voorstel gaf 409 en /agent/beslis 404. Dat
+     lag niet aan die routes maar aan de opstelling -- er was geen gekoppelde
+     groothandel en geen openstaand voorstel. EXECUTIE.md noemt dit met zoveel
+     woorden "de goedkoopste denkbare eerste taak".
+
+     Drie stappen, alle drie langs de gewone routes met hun eigen poorten:
+     koppelen (alleen de gemachtigde), de markt lezen voor een echt productId,
+     en een voorstel laten ontstaan. Er wordt niets voorgekookt: welke regels de
+     AI voorstelt blijft aan de AI, en dat het voorstel in een verse database
+     leeg is (te weinig verkoopdata) is de echte uitkomst -- daarom draagt
+     /beslis zijn regels mee, wat precies de weg is die een manager ook heeft
+     ("akkoord, maar dan deze regels"). */
+  const koppel = await stil('/api/supplier/agent/koppel', { groothandelCode: 'MERCABIZA' }, tokens.supplier);
+  if (koppel && koppel.status === 200) {
+    w.groothandel = 'MERCABIZA';
+    const markt = await stil('/api/supplier/inkoop/markt', { groothandelCode: 'MERCABIZA' }, tokens.supplier);
+    const gh = ((markt && markt.data && markt.data.groothandels) || [])[0];
+    const product = ((gh && gh.producten) || [])[0];
+    if (product) w.ghProduct = product.id;
+    const voorstel = await stil('/api/supplier/agent/voorstel', {}, tokens.supplier);
+    w.agentVoorstel = veld(voorstel, 'voorstel', 'id');
+  }
+
   return { wereld: w, extra: gedeeldLijf(w), perRoute: geldLijf(w), perVoorvoegsel: voorvoegselLijf(w),
     gemist: gemist(w, logboek) };
 }
@@ -555,6 +581,13 @@ const VERWACHT = [
   { sleutel: 'rijkToken', wat: 'een Rijksoverheid-zaak', via: '/api/office/instelling/aansluiten' },
   { sleutel: 'ovToken', wat: 'een OV-zaak', via: '/api/supplier/login' },
   { sleutel: 'festival', wat: 'een festival', via: '/api/festival/nieuw' },
+  /* De pilotketen van EXECUTIE.md par. 7. Drie sleutels, want ze kunnen elk
+     apart wegvallen: geen koppeling, een groothandel zonder producten, of een
+     voorstel dat niet ontstond. Alle drie horen ze gemeld te worden -- anders
+     staan die twee routes weer op `ongemeten` zonder dat iemand ziet waarom. */
+  { sleutel: 'groothandel', wat: 'een gekoppelde groothandel', via: '/api/supplier/agent/koppel' },
+  { sleutel: 'ghProduct', wat: 'een product van de groothandel', via: '/api/supplier/inkoop/markt' },
+  { sleutel: 'agentVoorstel', wat: 'een openstaand inkoopvoorstel', via: '/api/supplier/agent/voorstel' },
   { sleutel: 'entiteit', wat: 'een entiteit', via: '/api/concern/entiteit/nieuw' },
   { sleutel: 'onderneming', wat: 'een onderneming', via: '/api/onderneming/nieuw' },
   { sleutel: 'studie', wat: 'een onderzoek', via: '/api/lab2/studie/maak' },
@@ -709,7 +742,13 @@ function geldLijf(w) {
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
     '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
-    '/api/pay/saldo': { invoiceId: w.factuurId }
+    '/api/pay/saldo': { invoiceId: w.factuurId },
+    /* De pilotketen. `beslis` krijgt zijn regels mee omdat een voorstel in een
+       verse database leeg is; dat is de weg van de manager die de lijst
+       aanpast, en niet een omweg om de route. */
+    '/api/supplier/agent/koppel': { groothandelCode: w.groothandel },
+    '/api/supplier/agent/beslis': { id: w.agentVoorstel, actie: 'akkoord',
+      regels: w.ghProduct ? [{ productId: w.ghProduct, aantal: 2 }] : null }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere

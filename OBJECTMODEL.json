@@ -2,16 +2,16 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-08-31",
   "gemeten": {
-    "bestanden": 1947,
-    "vormen": 1313,
-    "velden": 1864,
-    "modules": 704,
-    "domeinen": 249,
-    "envelopDrempel": 15,
-    "envelop": 34,
-    "veldenDomeineigen": 1313,
-    "veldenGedeeldVanafVier": 185,
-    "gelijkendeVormparen": 19
+    "bestanden": 1982,
+    "vormen": 1328,
+    "velden": 1928,
+    "modules": 714,
+    "domeinen": 252,
+    "envelopDrempel": 16,
+    "envelop": 30,
+    "veldenDomeineigen": 1369,
+    "veldenGedeeldVanafVier": 191,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -23,14 +23,12 @@
     "datum",
     "door",
     "gemaakt",
-    "icon",
     "id",
     "key",
     "label",
     "naam",
     "naar",
     "notitie",
-    "ok",
     "omschrijving",
     "prijs",
     "reden",
@@ -39,17 +37,51 @@
     "soort",
     "stand",
     "status",
-    "supplierCode",
     "tekst",
     "tijd",
     "titel",
     "tot",
     "uitleg",
     "van",
-    "wat",
-    "wie"
+    "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "icon",
+      "domeinen": 15,
+      "waar": [
+        "kern/appbieb",
+        "kern/architect",
+        "kern/assets",
+        "kern/atelier",
+        "kern/beroepenbieb",
+        "kern/boerderij"
+      ]
+    },
+    {
+      "veld": "ok",
+      "domeinen": 15,
+      "waar": [
+        "kern/appstore",
+        "kern/festival",
+        "kern/fiscaal",
+        "kern/foundationregistratie-register",
+        "kern/koppel",
+        "kern/leren"
+      ]
+    },
+    {
+      "veld": "supplierCode",
+      "domeinen": 15,
+      "waar": [
+        "kern/autoverkoop",
+        "kern/beveiliging",
+        "kern/comm",
+        "kern/commercie",
+        "kern/ervaring",
+        "kern/gastzorg"
+      ]
+    },
     {
       "veld": "type",
       "domeinen": 14,
@@ -72,6 +104,18 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
+      ]
+    },
+    {
+      "veld": "wie",
+      "domeinen": 14,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-lezers",
+        "kern/livinglab",
+        "kern/onderzoekslab"
       ]
     },
     {
@@ -387,6 +431,18 @@
       ]
     },
     {
+      "veld": "actor",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/envelop",
+        "kern/experience",
+        "kern/magnaat-controle"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 10,
       "waar": [
@@ -459,75 +515,15 @@
       ]
     },
     {
-      "veld": "bestemming",
-      "domeinen": 9,
-      "waar": [
-        "kern/betaalopdracht",
-        "kern/invoer",
-        "kern/luchthaven",
-        "kern/reisaanbod",
-        "kern/reisbieb",
-        "kern/reisbureau"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 9,
-      "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "actor",
+      "veld": "actie",
       "domeinen": 9,
       "waar": [
         "bedrijf",
+        "kern/bankregie",
         "kern/command",
-        "kern/commercie",
-        "kern/envelop",
-        "kern/magnaat-controle",
-        "kern/magnaatwereld"
-      ]
-    },
-    {
-      "veld": "pas",
-      "domeinen": 8,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/clubs",
-        "kern/commercie",
-        "kern/festival",
-        "kern/ledenbalie",
-        "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "periode",
-      "domeinen": 8,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/commercie",
-        "kern/fiscaal",
-        "kern/kosten",
-        "kern/overheid",
-        "kern/payroll"
-      ]
-    },
-    {
-      "veld": "regels",
-      "domeinen": 8,
-      "waar": [
-        "kern/agent",
-        "kern/commerce",
-        "kern/facturatie",
-        "kern/gast",
-        "kern/magnaat-economie",
-        "kern/mall"
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/magnaat-controle"
       ]
     }
   ],
@@ -822,6 +818,18 @@
         "itemId",
         "lijstprijs",
         "opties"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/appstore/context.js",
+      "b": "server/kern/mailsleutel.js",
+      "domeinA": "kern/appstore",
+      "domeinB": "kern/mailsleutel",
+      "gedeeld": [
+        "let",
+        "ok",
+        "sleutel"
       ]
     }
   ]
